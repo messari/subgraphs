@@ -62,6 +62,8 @@ export function handleSwap(event: Swap): void {
     event.params.to,
   );
 
+  fetchRetentionRatio(event.address);
+  fetchHaircutRate(event.address);
   updateFinancials(event);
   updateFeeMetrics(event, event.address, swap);
   updateSwapMetrics(event, swap);

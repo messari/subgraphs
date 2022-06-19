@@ -320,19 +320,52 @@ export function updateSwapMetrics(event: ethereum.Event, swap: Swap): void {
 }
 
 export function updateFeeMetrics(event: ethereum.Event, poolAddress: Address, swap: Swap): void {
-  let protocol = getOrCreateDexAmm();
+  let poolMetrics = getOrCreateLiquidityPoolParamsHelper(event.address);
   let swapFeeUsd = calculateSwapFeeInUsd(event, poolAddress, swap);
+  let supplySideFee = (exponentToBigDecimal(18).minus(poolMetrics.RetentionRatio)).times(swapFeeUsd);
+  let protocolSideFee = swapFeeUsd.minus(supplySideFee);
+  updateFinancialSnapshotFeeMetrics(event, supplySideFee, protocolSideFee);
+  updatePoolFeeMetrics(event, supplySideFee, protocolSideFee);
+}
 
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(swapFeeUsd);
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    protocol.cumulativeProtocolSideRevenueUSD,
-  );
+function updateFinancialSnapshotFeeMetrics(event: ethereum.Event, supplySideFee: BigDecimal, protocolSideFee: BigDecimal): void {
+  let protocol = getOrCreateDexAmm();
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplySideFee);
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideFee);
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(protocol.cumulativeProtocolSideRevenueUSD);
   protocol.save();
 
   let snapshot = getOrCreateFinancialsDailySnapshot(event);
-  snapshot.dailySupplySideRevenueUSD = snapshot.dailySupplySideRevenueUSD.plus(swapFeeUsd);
+  snapshot.dailySupplySideRevenueUSD = snapshot.dailySupplySideRevenueUSD.plus(supplySideFee);
+  snapshot.dailyProtocolSideRevenueUSD = snapshot.dailyProtocolSideRevenueUSD.plus(protocolSideFee);
   snapshot.dailyTotalRevenueUSD = snapshot.dailySupplySideRevenueUSD.plus(snapshot.dailyProtocolSideRevenueUSD);
   snapshot.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   snapshot.save();
+}
+
+function updatePoolFeeMetrics(event: ethereum.Event, supplySideFee: BigDecimal, protocolSideFee: BigDecimal): void {
+  let pool = getOrCreateLiquidityPool(event.address, event);
+  pool.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(supplySideFee);
+  pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(protocolSideFee);
+  pool.cumulativeTotalRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(pool.cumulativeProtocolSideRevenueUSD);
+  pool.save();
+
+  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(event)
+  hourlySnapshot.hourlySupplySideRevenueUSD = hourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideFee);
+  hourlySnapshot.hourlyProtocolSideRevenueUSD = hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(protocolSideFee);
+  hourlySnapshot.hourlyTotalRevenueUSD = hourlySnapshot.hourlySupplySideRevenueUSD.plus(hourlySnapshot.hourlyProtocolSideRevenueUSD);
+  hourlySnapshot.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  hourlySnapshot.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+  hourlySnapshot.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  hourlySnapshot.save();
+
+  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(event)
+  dailySnapshot.dailySupplySideRevenueUSD = dailySnapshot.dailySupplySideRevenueUSD.plus(supplySideFee);
+  dailySnapshot.dailyProtocolSideRevenueUSD = dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideFee);
+  dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailySupplySideRevenueUSD.plus(dailySnapshot.dailyProtocolSideRevenueUSD);
+  dailySnapshot.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  dailySnapshot.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+  dailySnapshot.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  dailySnapshot.save();
 }
