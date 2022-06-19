@@ -50,6 +50,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.network = DEFAULTNETWORK;
     protocol.type = ProtocolType.EXCHANGE;
+    protocol.totalPoolCount = 0;
     protocol.save();
   }
   return protocol;
@@ -104,7 +105,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
-
+    usageMetrics.totalPoolCount = 0;
     usageMetrics.save();
   }
 
