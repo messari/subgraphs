@@ -1,5 +1,10 @@
 specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
+{{#graftEnabled}}
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 schema:
   file: ./schema.graphql
 dataSources:
@@ -75,6 +80,71 @@ dataSources:
           handler: handlePoolBalanceChanged
         - event: Swap(indexed bytes32,indexed address,indexed address,uint256,uint256)
           handler: handleSwap
+{{#isBeets}}
+  - kind: ethereum/contract
+    name: MasterChefV2
+    network: {{ network }}
+    source:
+      address: "{{masterChefV2}}"
+      abi: MasterChefV2
+      startBlock: {{masterChefV2StartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/masterchef.ts
+      entities:
+        - MasterChefV2
+        - Pool
+        - User
+        - Rewarder
+      abis:
+        - name: MasterChefV2
+          file: ./abis/masterchef/MasterChefV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleWithdraw
+        - event: LogSetPool(indexed uint256,uint256,indexed address,bool)
+          handler: handleLogSetPool
+        - event: LogUpdatePool(indexed uint256,uint256,uint256,uint256)
+          handler: handleLogUpdatePool
+{{/isBeets}}
 templates:
   - kind: ethereum/contract
     name: WeightedPool

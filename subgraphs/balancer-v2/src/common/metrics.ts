@@ -1,25 +1,13 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { BigDecimal, ethereum, BigInt, Address, log } from "@graphprotocol/graph-ts";
-import { Account, Token, ActiveAccount, _HelperStore, DexAmmProtocol, LiquidityPool } from "../../generated/schema";
+import { BigDecimal, ethereum, BigInt, Address } from "@graphprotocol/graph-ts";
+import { Account, ActiveAccount, DexAmmProtocol, LiquidityPool } from "../../generated/schema";
 import { getUsdPrice } from "../prices";
-import {
-  SECONDS_PER_DAY,
-  INT_ZERO,
-  INT_ONE,
-  BIGDECIMAL_ONE,
-  UsageType,
-  SECONDS_PER_HOUR,
-  INT_TWO,
-  BIGINT_ZERO,
-  BIGINT_NEG_ONE,
-} from "./constants";
+import { SECONDS_PER_DAY, INT_ZERO, INT_ONE, BIGDECIMAL_ONE, UsageType, SECONDS_PER_HOUR, INT_TWO } from "./constants";
 import {
   getOrCreateDex,
   getLiquidityPool,
   getLiquidityPoolFee,
-  getLiquidityPoolAmounts,
   getOrCreateToken,
-  getOrCreateTokenWhitelist,
   getOrCreateLiquidityPoolDailySnapshot,
   getOrCreateLiquidityPoolHourlySnapshot,
   getOrCreateFinancialsDailySnapshot,
@@ -28,7 +16,6 @@ import {
 } from "./getters";
 import { calculatePrice, isUSDStable, TokenInfo } from "./pricing";
 import { scaleDown } from "./tokens";
-import { percToDec, convertTokenToDecimal } from "./utils/utils";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
@@ -116,10 +103,8 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
 export function updatePoolMetrics(event: ethereum.Event, poolAddress: string): void {
   // get or create pool metrics
   let pool = getLiquidityPool(poolAddress);
-  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event,poolAddress);
-  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event,poolAddress);
-
-
+  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event, poolAddress);
+  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event, poolAddress);
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -130,6 +115,11 @@ export function updatePoolMetrics(event: ethereum.Event, poolAddress: string): v
   poolMetricsDaily.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsDaily.blockNumber = event.block.number;
   poolMetricsDaily.timestamp = event.block.timestamp;
+  poolMetricsDaily.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  poolMetricsDaily.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsDaily.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+
+
 
   poolMetricsHourly.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsHourly.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
@@ -139,6 +129,9 @@ export function updatePoolMetrics(event: ethereum.Event, poolAddress: string): v
   poolMetricsHourly.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsHourly.blockNumber = event.block.number;
   poolMetricsHourly.timestamp = event.block.timestamp;
+  poolMetricsHourly.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  poolMetricsHourly.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsHourly.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
 
   poolMetricsDaily.save();
   poolMetricsHourly.save();
@@ -156,10 +149,11 @@ export function updateVolumeAndFee(
   let protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
   let tradingFee = getLiquidityPoolFee(pool.fees[INT_TWO]);
 
-
   financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(trackedAmountUSD);
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD);
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD);
+
+
 
   let tradingFeeAmountUSD = trackedAmountUSD.times(tradingFee.feePercentage!);
   let supplyFeeAmountUSD = tradingFeeAmountUSD.times(supplyFee.feePercentage!);
@@ -169,10 +163,15 @@ export function updateVolumeAndFee(
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
+  pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  pool.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
   financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   financialMetrics.dailyProtocolSideRevenueUSD =
-    financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+  financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
   financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;

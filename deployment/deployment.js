@@ -1,34 +1,98 @@
-import * as protocolNetworkData from './deploymentConfigurations.json'
-import {getDeploymentNetwork, runCommands, scripts} from './execution.js'
+const {getDeploymentNetwork, runCommands, scripts} = require('./execution.js')
+const protocolNetworkData = require('./deploymentConfigurations.json');
+const args = require('minimist')(process.argv.slice(2));
 
-const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))['default']['protocols'] 
-const configurations = JSON.parse(JSON.stringify(protocolNetworkData))['default']['configurations'] 
+const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))['subgraphs'] 
 
 let allScripts = new Map()
 let results = "RESULTS:\n"
 
-if (process.argv.length == 2) {
-    console.log('Error: please at least specify hosted service account to deploy all subgraphs (i.e. messari, steegecs, etc.)')
-} else if (process.argv.length == 3) {
-    if (!process.argv[2] in configurations['deployment']['locations']) {
-        console.log('Error: please specify a deployment location only to deploy all subgraphs (i.e. steegecs, messari, etc.)')
-    } else {
-        for (const protocol in protocolNetworkMap) {
-            for (const network in protocolNetworkMap[protocol]) {
 
-                let template = protocolNetworkMap[protocol][network]['template']
+if (!args.subgraph || !args.location) {
+    console.log('Please provide at least --SUBGRAPH and --LOCATION')
+} else if (args.subgraph && args.protocol && args.network && args.location) {
+    if (args.subgraph in protocolNetworkMap == false) {
+        console.log('Error: please specify a a valid subgraph directory or add to configurations (e.g. uniswap-forks, compound-forks, qidao, etc')
+    } else if (args.protocol in protocolNetworkMap[args.subgraph] == false) {
+        console.log('Error: please specify a valid protocol as 1st argument or add to configurations  (i.e. uniswap-v2, sushiswap, etc.)')
+        console.log('To deploy a protocol to a specific network, pass 3 arguements (protocol/network/location)')
+    } else if (args.network in protocolNetworkMap[args.subgraph][args.protocol] == false) {
+        console.log('Error: please specify a valid network as 2nd argument or add to configurations  (i.e. mainnet, ropsten, etc.)')
+        console.log('To deploy a protocol to a specific network, pass 3 arguements (protocol/network/location)')
+    } else {
+        let protocol = args.protocol
+        let network = args.network
+        let template = protocolNetworkMap[args.subgraph][protocol][network]['template']
+        let location = ""
+        let prepareConstants = protocolNetworkMap[args.subgraph][protocol][network]['prepare:constants']
+        
+        // Get location for configurations or derive using standard naming convention
+        if (args.location in protocolNetworkMap[args.subgraph][protocol][network]) {
+            location = protocolNetworkMap[args.subgraph][protocol][network][args.location]
+        } else {
+            location = args.location + '/' + protocol + '-' + getDeploymentNetwork(network)
+        }
+
+        // Check if deployment is ignored in configurations
+        if ([true, undefined].includes(protocolNetworkMap[args.subgraph][protocol][network]['deploy-on-merge']) | args.location != 'messari') {
+            allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
+        }else {
+            results += "Ignored in Deployment Configurations: " + location + '\n'
+        }
+        runCommands(allScripts, results, args, function(results) {});
+    } 
+} else if (args.subgraph && args.protocol && args.location) {
+    if (args.subgraph in protocolNetworkMap == false) {
+        console.log('Error: please specify a a valid subgraph directory or add to configurations  (e.g. uniswap-forks, compound-forks, qidao, etc')
+    } else if (args.protocol in protocolNetworkMap[args.subgraph] == false) {
+        console.log('Error: please specify a valid protocol as 1st argument or add to configurations  (i.e. uniswap-v2, sushiswap, etc.)')
+        console.log('To deploy all networks of a specified protocol, pass 2 arguements (protocol/location)')
+    } else {
+        let protocol = args.protocol
+
+        for (const network in protocolNetworkMap[args.subgraph][protocol]) {
+
+            let template = protocolNetworkMap[args.subgraph][protocol][network]['template']
+            let location = ""
+            let prepareConstants = protocolNetworkMap[args.subgraph][protocol][network]['prepare:constants']
+
+            // Get location for configurations or derive using standard naming convention
+            if (args.location in protocolNetworkMap[args.subgraph][protocol][network]) {
+                location = protocolNetworkMap[args.subgraph][protocol][network][args.location]
+            } else {
+                location = args.location + '/' + protocol + '-' + getDeploymentNetwork(network)
+            }
+            
+            // Check if deployment is ignored in configurations
+            if ([true, undefined].includes(protocolNetworkMap[args.subgraph][protocol][network]['deploy-on-merge']) | args.location != 'messari') {
+                allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
+            } else {
+                results += "Ignored in Deployment Configurations: " + location + '\n'
+            }
+        } 
+
+        runCommands(allScripts, results, args, function(results) {});
+    }
+} else if (args.subgraph && args.location) {
+    if (args.subgraph in protocolNetworkMap == false) {
+        console.log('Error: please specify a a valid subgraph directory or add to configurations  (e.g. uniswap-forks, compound-forks, qidao, etc')
+    } else {
+        for (const protocol in protocolNetworkMap[args.subgraph]) {
+            for (const network in protocolNetworkMap[args.subgraph][protocol]) {
+
+                let template = protocolNetworkMap[args.subgraph][protocol][network]['template']
                 let location = ""
-                let prepareConstants = protocolNetworkMap[protocol][network]['prepare:constants']
+                let prepareConstants = protocolNetworkMap[args.subgraph][protocol][network]['prepare:constants']
 
                 // Get location for configurations or derive using standard naming convention
-                if (process.argv[2] in protocolNetworkMap[protocol][network]) {
-                    location = protocolNetworkMap[protocol][network][process.argv[2]]
+                if (args.location in protocolNetworkMap[args.subgraph][protocol][network]) {
+                    location = protocolNetworkMap[args.subgraph][protocol][network][args.location]
                 } else {
-                    location = process.argv[2] + '/' + protocol + '-' + getDeploymentNetwork(network)
+                    location = args.location + '/' + protocol + '-' + getDeploymentNetwork(network)
                 }
                 
                 // Check if deployment is ignored in configurations
-                if ([true, undefined].includes(protocolNetworkMap[protocol][network]['deploy-on-merge']) | process.argv[2] != 'messari') {
+                if ([true, undefined].includes(protocolNetworkMap[args.subgraph][protocol][network]['deploy-on-merge']) | args.location != 'messari') {
                     allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
                 } else {
                     results += "Ignored in Deployment Configurations: " + location + '\n'
@@ -36,72 +100,8 @@ if (process.argv.length == 2) {
             }
         } 
 
-        runCommands(allScripts, results, function(results) {});
-
+        runCommands(allScripts, results, args, function(results) {});
     }
-} else if (process.argv.length == 4) {
-    if (!process.argv[2] in protocolNetworkMap) {
-        console.log('Error: please specify a valid protocol as 1st argument (i.e. uniswap-v2, sushiswap, etc.)')
-        console.log('To deploy all networks of a specified protocol, pass 2 arguements (protocol/location)')
-    } else if (!process.argv[3] in configurations['deployment']['locations']) {
-        console.log('Error: please specify a deployment location as 3rd argument (i.e. steegecs, messari, etc.)')
-        console.log('To deploy a protocol to a specific network, pass 3 arguements (protocol/network/location)')
-    } else {
-        let protocol = process.argv[2]
-        for (const network in protocolNetworkMap[protocol]) {
-            let template = protocolNetworkMap[protocol][network]['template']
-            let location = ""
-            let prepareConstants = protocolNetworkMap[protocol][network]['prepare:constants']
-
-            // Get location for configurations or derive using standard naming convention
-            if (process.argv[3] in protocolNetworkMap[protocol][network]) {
-                location = protocolNetworkMap[protocol][network][process.argv[3]]
-            } else {
-                location = process.argv[3] + '/' + protocol + '-' + getDeploymentNetwork(network)
-            }
-            
-            // Check if deployment is ignored in configurations
-            if ([true, undefined].includes(protocolNetworkMap[protocol][network]['deploy-on-merge']) | process.argv[3] != 'messari') {
-                allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
-            } else {
-                results += "Ignored in Deployment Configurations: " + location + '\n'
-            }
-        } 
-
-        runCommands(allScripts, results, function(results) {});
-    }
- } else if (process.argv.length == 5) {
-    if (!process.argv[2] in protocolNetworkMap) {
-        console.log('Error: please specify a valid protocol as 1st argument (i.e. uniswap-v2, sushiswap, etc.)')
-        console.log('To deploy a protocol to a specific network, pass 3 arguements (protocol/network/location)')
-    } else if (!process.argv[3] in protocolNetworkMap[process.argv[2]]) {
-        console.log('Error: please specify a valid network as 2nd argument (i.e. mainnet, ropsten, etc.)')
-        console.log('To deploy a protocol to a specific network, pass 3 arguements (protocol/network/location)')
-    } else if (!process.argv[4] in configurations['deployment']['locations']) {
-        console.log('Error: please specify a deployment location as 3rd argument (i.e. steegecs, messari, etc.)')
-        console.log('To deploy a protocol to a specific network, pass 3 arguements (protocol/network/location)')
-    } else {
-        let protocol = process.argv[2]
-        let network = process.argv[3]
-        let template = protocolNetworkMap[protocol][network]['template']
-        let location = ""
-        let prepareConstants = protocolNetworkMap[protocol][network]['prepare:constants']
-        
-        // Get location for configurations or derive using standard naming convention
-        if (process.argv[4] in protocolNetworkMap[protocol][network]) {
-            location = protocolNetworkMap[protocol][network][process.argv[4]]
-        } else {
-            location = process.argv[4] + '/' + protocol + '-' + getDeploymentNetwork(network)
-        }
-
-        // Check if deployment is ignored in configurations
-        if ([true, undefined].includes(protocolNetworkMap[protocol][network]['deploy-on-merge']) | process.argv[4] != 'messari') {
-            allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
-        }else {
-            results += "Ignored in Deployment Configurations: " + location + '\n'
-        }
-        runCommands(allScripts, results, function(results) {});
-    } 
 } else {
-    console.log('Error: Too many arguments')
+    console.log('UNKOWN - Please post issue on github.')
 }

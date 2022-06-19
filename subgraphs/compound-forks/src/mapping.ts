@@ -6,22 +6,6 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
-  MarketListed,
-  NewCollateralFactor,
-  NewLiquidationIncentive,
-  NewPriceOracle,
-  ActionPaused1,
-} from "../generated/Comptroller/Comptroller";
-import {
-  Mint,
-  Redeem,
-  Borrow as BorrowEvent,
-  RepayBorrow,
-  LiquidateBorrow,
-  AccrueInterest,
-  NewReserveFactor,
-} from "../generated/templates/CToken/CToken";
-import {
   Account,
   Borrow,
   ActiveAccount,
@@ -169,14 +153,16 @@ export class UpdateMarketData {
 // event.params.cToken:
 // event.params.oldCollateralFactorMantissa:
 // event.params.newCollateralFactorMantissa:
-export function _handleNewCollateralFactor(event: NewCollateralFactor): void {
-  let marketID = event.params.cToken.toHexString();
+export function _handleNewCollateralFactor(
+  marketID: string,
+  newCollateralFactorMantissa: BigInt
+): void {
   let market = Market.load(marketID);
   if (market == null) {
     log.warning("[handleNewCollateralFactor] Market not found: {}", [marketID]);
     return;
   }
-  let collateralFactor = event.params.newCollateralFactorMantissa
+  let collateralFactor = newCollateralFactorMantissa
     .toBigDecimal()
     .div(mantissaFactorBD)
     .times(BIGDECIMAL_HUNDRED);
@@ -200,9 +186,9 @@ export function _handleNewCollateralFactor(event: NewCollateralFactor): void {
 // event.params.newLiquidationIncentiveMantissa
 export function _handleNewLiquidationIncentive(
   protocol: LendingProtocol,
-  event: NewLiquidationIncentive
+  newLiquidationIncentiveMantissa: BigInt
 ): void {
-  let liquidationIncentive = event.params.newLiquidationIncentiveMantissa
+  let liquidationIncentive = newLiquidationIncentiveMantissa
     .toBigDecimal()
     .div(mantissaFactorBD)
     .minus(BIGDECIMAL_ONE)
@@ -231,9 +217,9 @@ export function _handleNewLiquidationIncentive(
 // - newPriceOracle
 export function _handleNewPriceOracle(
   protocol: LendingProtocol,
-  event: NewPriceOracle
+  newPriceOracle: Address
 ): void {
-  protocol._priceOracle = event.params.newPriceOracle.toHexString();
+  protocol._priceOracle = newPriceOracle.toHexString();
   protocol.save();
 }
 
@@ -243,18 +229,21 @@ export function _handleNewPriceOracle(
 //  - cToken: Address
 //  - action: string
 //  - pauseState: boolean
-export function _handleActionPaused(event: ActionPaused1): void {
-  let marketID = event.params.cToken.toHexString();
+export function _handleActionPaused(
+  marketID: string,
+  action: string,
+  pauseState: boolean
+): void {
   let market = Market.load(marketID);
   if (!market) {
     log.warning("[handleActionPaused] Market not found: {}", [marketID]);
     return;
   }
 
-  if (event.params.action == "Mint") {
-    market.isActive = event.params.pauseState;
-  } else if (event.params.action == "Borrow") {
-    market.canBorrowFrom = event.params.pauseState;
+  if (action == "Mint") {
+    market.isActive = pauseState;
+  } else if (action == "Borrow") {
+    market.canBorrowFrom = pauseState;
   }
 
   market.save();
@@ -265,9 +254,10 @@ export function _handleActionPaused(event: ActionPaused1): void {
 // event.params.cToken: The address of the market (token) to list
 export function _handleMarketListed(
   marketListedData: MarketListedData,
-  event: MarketListed
+  event: ethereum.Event
 ): void {
-  let cTokenAddr = event.params.cToken;
+  //let cTokenAddr = event.params.cToken;
+  let cTokenAddr = marketListedData.cToken.address;
   let cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
@@ -373,7 +363,13 @@ export function _handleMarketListed(
 // - minter
 // - mintAmount: The amount of underlying assets to mint
 // - mintTokens: The amount of cTokens minted
-export function _handleMint(comptrollerAddr: Address, event: Mint): void {
+export function _handleMint(
+  comptrollerAddr: Address,
+  minter: Address,
+  mintAmount: BigInt,
+  //mintTokens: BigInt, //not used
+  event: ethereum.Event
+): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[handleMint] protocol not found: {}", [
@@ -404,14 +400,14 @@ export function _handleMint(comptrollerAddr: Address, event: Mint): void {
   deposit.logIndex = event.transactionLogIndex.toI32();
   deposit.protocol = protocol.id;
   deposit.to = marketID;
-  deposit.from = event.params.minter.toHexString();
+  deposit.from = minter.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.market = marketID;
   deposit.asset = market.inputToken;
-  deposit.amount = event.params.mintAmount;
+  deposit.amount = mintAmount;
   let depositUSD = market.inputTokenPriceUSD.times(
-    event.params.mintAmount
+    mintAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
   );
@@ -432,7 +428,7 @@ export function _handleMint(comptrollerAddr: Address, event: Mint): void {
     comptrollerAddr,
     event.block.number,
     event.block.timestamp,
-    event.params.minter.toHexString(),
+    minter.toHexString(),
     EventType.Deposit
   );
 }
@@ -443,7 +439,12 @@ export function _handleMint(comptrollerAddr: Address, event: Mint): void {
 // - redeemer
 // - redeemAmount
 // - redeecTokens
-export function _handleRedeem(comptrollerAddr: Address, event: Redeem): void {
+export function _handleRedeem(
+  comptrollerAddr: Address,
+  redeemer: Address,
+  redeemAmount: BigInt,
+  event: ethereum.Event
+): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[handleMint] protocol not found: {}", [
@@ -473,15 +474,15 @@ export function _handleRedeem(comptrollerAddr: Address, event: Redeem): void {
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.transactionLogIndex.toI32();
   withdraw.protocol = protocol.id;
-  withdraw.to = event.params.redeemer.toHexString();
+  withdraw.to = redeemer.toHexString();
   withdraw.from = marketID;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
   withdraw.market = marketID;
   withdraw.asset = market.inputToken;
-  withdraw.amount = event.params.redeemAmount;
+  withdraw.amount = redeemAmount;
   withdraw.amountUSD = market.inputTokenPriceUSD.times(
-    event.params.redeemAmount
+    redeemAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
   );
@@ -493,7 +494,7 @@ export function _handleRedeem(comptrollerAddr: Address, event: Redeem): void {
     comptrollerAddr,
     event.block.number,
     event.block.timestamp,
-    event.params.redeemer.toHexString(),
+    redeemer.toHexString(),
     EventType.Withdraw
   );
 }
@@ -507,7 +508,9 @@ export function _handleRedeem(comptrollerAddr: Address, event: Redeem): void {
 // - totalBorrows
 export function _handleBorrow(
   comptrollerAddr: Address,
-  event: BorrowEvent
+  borrower: Address,
+  borrowAmount: BigInt,
+  event: ethereum.Event
 ): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -538,15 +541,15 @@ export function _handleBorrow(
   borrow.hash = event.transaction.hash.toHexString();
   borrow.logIndex = event.transactionLogIndex.toI32();
   borrow.protocol = protocol.id;
-  borrow.to = event.params.borrower.toHexString();
+  borrow.to = borrower.toHexString();
   borrow.from = marketID;
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
   borrow.market = marketID;
   borrow.asset = market.inputToken;
-  borrow.amount = event.params.borrowAmount;
+  borrow.amount = borrowAmount;
   let borrowUSD = market.inputTokenPriceUSD.times(
-    event.params.borrowAmount
+    borrowAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
   );
@@ -567,7 +570,7 @@ export function _handleBorrow(
     comptrollerAddr,
     event.block.number,
     event.block.timestamp,
-    event.params.borrower.toHexString(),
+    borrower.toHexString(),
     EventType.Borrow
   );
 }
@@ -582,7 +585,9 @@ export function _handleBorrow(
 // - totalBorrows
 export function _handleRepayBorrow(
   comptrollerAddr: Address,
-  event: RepayBorrow
+  payer: Address,
+  repayAmount: BigInt,
+  event: ethereum.Event
 ): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -614,14 +619,14 @@ export function _handleRepayBorrow(
   repay.logIndex = event.transactionLogIndex.toI32();
   repay.protocol = protocol.id;
   repay.to = marketID;
-  repay.from = event.params.payer.toHexString();
+  repay.from = payer.toHexString();
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
   repay.market = marketID;
   repay.asset = market.inputToken;
-  repay.amount = event.params.repayAmount;
+  repay.amount = repayAmount;
   repay.amountUSD = market.inputTokenPriceUSD.times(
-    event.params.repayAmount
+    repayAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
   );
@@ -631,7 +636,7 @@ export function _handleRepayBorrow(
     comptrollerAddr,
     event.block.number,
     event.block.timestamp,
-    event.params.payer.toHexString(),
+    payer.toHexString(),
     EventType.Repay
   );
 }
@@ -646,7 +651,11 @@ export function _handleRepayBorrow(
 // - seizeTokens
 export function _handleLiquidateBorrow(
   comptrollerAddr: Address,
-  event: LiquidateBorrow
+  cTokenCollateral: Address,
+  liquidator: Address,
+  seizeTokens: BigInt,
+  repayAmount: BigInt,
+  event: ethereum.Event
 ): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -678,7 +687,7 @@ export function _handleLiquidateBorrow(
     return;
   }
 
-  let liquidatedCTokenMarketID = event.params.cTokenCollateral.toHexString();
+  let liquidatedCTokenMarketID = cTokenCollateral.toHexString();
   let liquidatedCTokenMarket = Market.load(liquidatedCTokenMarketID);
   if (!liquidatedCTokenMarket) {
     log.warning(
@@ -714,7 +723,7 @@ export function _handleLiquidateBorrow(
   liquidate.logIndex = event.transactionLogIndex.toI32();
   liquidate.protocol = protocol.id;
   liquidate.to = repayTokenMarketID;
-  liquidate.from = event.params.liquidator.toHexString();
+  liquidate.from = liquidator.toHexString();
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.market = repayTokenMarketID;
@@ -722,12 +731,12 @@ export function _handleLiquidateBorrow(
     // this is logically redundant since nullcheck has been done before, but removing the if check will fail 'graph build'
     liquidate.asset = liquidatedCTokenID;
   }
-  liquidate.amount = event.params.seizeTokens;
-  let gainUSD = event.params.seizeTokens
+  liquidate.amount = seizeTokens;
+  let gainUSD = seizeTokens
     .toBigDecimal()
     .div(cTokenDecimalsBD)
     .times(liquidatedCTokenMarket.outputTokenPriceUSD);
-  let lossUSD = event.params.repayAmount
+  let lossUSD = repayAmount
     .toBigDecimal()
     .div(exponentToBigDecimal(repayToken.decimals))
     .times(repayTokenMarket.inputTokenPriceUSD);
@@ -750,7 +759,7 @@ export function _handleLiquidateBorrow(
     comptrollerAddr,
     event.block.number,
     event.block.timestamp,
-    event.params.liquidator.toHexString(),
+    liquidator.toHexString(),
     EventType.Liquidate
   );
 }
@@ -763,7 +772,9 @@ export function _handleLiquidateBorrow(
 export function _handleAccrueInterest(
   updateMarketData: UpdateMarketData,
   comptrollerAddr: Address,
-  event: AccrueInterest
+  interestAccumulated: BigInt,
+  totalBorrows: BigInt,
+  event: ethereum.Event
 ): void {
   let marketID = event.address.toHexString();
   let market = Market.load(marketID);
@@ -782,8 +793,8 @@ export function _handleAccrueInterest(
   updateMarket(
     updateMarketData,
     marketID,
-    event.params.interestAccumulated,
-    event.params.totalBorrows,
+    interestAccumulated,
+    totalBorrows,
     event.block.number,
     event.block.timestamp
   );
@@ -801,14 +812,16 @@ export function _handleAccrueInterest(
 // event.params
 // - oldReserveFactorMantissa
 // - newReserveFactorMantissa
-export function _handleNewReserveFactor(event: NewReserveFactor): void {
-  let marketID = event.address.toHexString();
+export function _handleNewReserveFactor(
+  marketID: string,
+  newReserveFactorMantissa: BigInt
+): void {
   let market = Market.load(marketID);
   if (market == null) {
     log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
     return;
   }
-  let reserveFactor = event.params.newReserveFactorMantissa
+  let reserveFactor = newReserveFactorMantissa
     .toBigDecimal()
     .div(mantissaFactorBD);
   market._reserveFactor = reserveFactor;
