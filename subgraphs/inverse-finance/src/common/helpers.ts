@@ -141,6 +141,8 @@ export function updateDeposit(event: Mint): void {
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   financialMetrics.dailyDepositUSD = financialMetrics.dailyDepositUSD.plus(depositAmountUSD);
   financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
   financialMetrics.save();
 
   // update usage metric
@@ -181,10 +183,14 @@ export function updateWithdraw(event: Redeem): void {
   }
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyWithdrawUSD = marketDaily.dailyWithdrawUSD.plus(withdraw.amountUSD);
+  marketDaily.blockNumber = event.block.number;
+  marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
 
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyWithdrawUSD = marketHourly.hourlyWithdrawUSD.plus(withdraw.amountUSD);
+  marketHourly.blockNumber = event.block.number;
+  marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();
 
   let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
@@ -309,10 +315,14 @@ export function updateRepay(event: RepayBorrow): void {
 
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyRepayUSD = marketDaily.dailyRepayUSD.plus(repay.amountUSD);
+  marketDaily.blockNumber = event.block.number;
+  marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
 
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyRepayUSD = marketHourly.hourlyRepayUSD.plus(repay.amountUSD);
+  marketHourly.blockNumber = event.block.number;
+  marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();
 
   let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
