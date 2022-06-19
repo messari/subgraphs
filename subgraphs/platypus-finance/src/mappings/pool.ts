@@ -1,4 +1,6 @@
+import { Address, log } from "@graphprotocol/graph-ts";
 import {
+  Pool,
   Deposit,
   Withdraw,
   Swap,
@@ -73,18 +75,32 @@ export function handleAssetAdded(event: AssetAdded): void {
   updatePoolMetrics(event);
 }
 
-export function handleRetentionRatioUpdated(event: RetentionRatioUpdated): void {
+export function fetchRetentionRatio(poolAddress: Address): void {
   // Get LiquidtiyPoolParamsHelper
-  let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
+  let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(poolAddress);
+  let PoolContract = Pool.bind(poolAddress);
+  let retentionRatio_call = PoolContract.try_getRetentionRatio();
+
+  if (retentionRatio_call.reverted) {
+    log.error("[Fetch Retention Ratio]Error fetching Retention Ration for address: {}", [poolAddress.toString()]);
+  }
+
   // Update LiquidityPoolParamsHelper
-  liquidityPoolParams.RetentionRatio = event.params.newRetentionRatio.toBigDecimal();
+  liquidityPoolParams.RetentionRatio = retentionRatio_call.value.toBigDecimal();
   liquidityPoolParams.save();
 }
 
-export function handleHaircutRateUpdated(event: HaircutRateUpdated): void {
+export function fetchHaircutRate(poolAddress: Address): void {
   // Get LiquidtiyPoolParamsHelper
-  let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
+  let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(poolAddress);
+  let PoolContract = Pool.bind(poolAddress);
+  let haircutRate_call = PoolContract.try_getHaircutRate();
+
+  if (haircutRate_call.reverted) {
+    log.error("[Fetch Haircut Rate]Error fetching Haircut Rate for address: {}", [poolAddress.toString()]);
+  }
+
   // Update LiquidityPoolParamsHelper
-  liquidityPoolParams.HaircutRate = event.params.newHaircut.toBigDecimal();
+  liquidityPoolParams.HaircutRate = haircutRate_call.value.toBigDecimal();
   liquidityPoolParams.save();
 }

@@ -264,10 +264,6 @@ dataSources:
           handler: handleWithdraw
         - event: Swap(indexed address,address,address,uint256,uint256,indexed address)
           handler: handleSwap
-        - event: HaircutRateUpdated(uint256,uint256)
-          handler: handleHaircutRateUpdated
-        - event: RetentionRatioUpdated(uint256,uint256)
-          handler: handleRetentionRatioUpdated
         - event: AssetAdded(indexed address,indexed address)
           handler: handleAssetAdded
 
@@ -322,7 +318,7 @@ templates:
           file: ./abis/Prices/SushiSwap/Factory.json
         - name: SushiSwapPair
           file: ./abis/Prices/SushiSwap/Pair.json
-        # TraderJoe Contracts
+        # TraderJOE Contracts
         - name: TraderJoeRouter
           file: ./abis/Prices/TraderJoe/Router.json
       eventHandlers:
