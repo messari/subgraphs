@@ -1215,10 +1215,10 @@ type Liquidate implements Event @entity {
 
   ##### Lending-Specific #####
 
-  " The market of which the debt is repaid to "
+  " The market of the collateral being used "
   market: Market!
 
-  " Collateral liquidated (e.g. cToken) "
+  " Asset repaid (borrowed) "
   asset: Token!
 
   " Amount of collateral liquidated in native units "
