@@ -96,7 +96,7 @@ export function getUnderlyingTokenPrice(cToken: Address): BigDecimal {
   let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
   let oracleAddress = factoryContract.oracle() as Address;
   let oracleContract = PriceOracle.bind(oracleAddress);
-  let underlyingDecimals = getOrCreateUnderlyingToken(cToken).decimals
+  let underlyingDecimals = getOrCreateUnderlyingToken(cToken).decimals;
   let mantissaDecimalFactor = 18 - underlyingDecimals + 18;
 
   let underlyingPrice = oracleContract
@@ -122,8 +122,8 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol = new LendingProtocol(FACTORY_ADDRESS);
     protocol.name = "Inverse Finance";
     protocol.slug = "inverse-finance";
-    protocol.schemaVersion = "1.2.1";
-    protocol.subgraphVersion = "1.2.1";
+    protocol.schemaVersion = "1.3.0";
+    protocol.subgraphVersion = "1.2.2";
     protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.ETHEREUM;
     protocol.type = ProtocolType.LENDING;
@@ -132,6 +132,7 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol.mintedTokens = [];
     protocol.mintedTokenSupplies = [];
     ////// quantitative data //////
+    protocol.totalPoolCount = INT_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -293,7 +294,8 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event): MarketHo
     marketMetrics.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
     marketMetrics.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
     marketMetrics.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
-
+    marketMetrics.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyRepayUSD = BIGDECIMAL_ZERO;
     marketMetrics.inputTokenBalance = market.inputTokenBalance;
     marketMetrics.inputTokenPriceUSD = market.inputTokenPriceUSD;
     marketMetrics.outputTokenSupply = market.outputTokenSupply;
@@ -328,6 +330,7 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics.dailyBorrowCount = INT_ZERO;
     usageMetrics.dailyRepayCount = INT_ZERO;
     usageMetrics.dailyLiquidateCount = INT_ZERO;
+    usageMetrics.totalPoolCount = INT_ZERO;
     usageMetrics.save();
   }
   return usageMetrics;

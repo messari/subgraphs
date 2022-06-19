@@ -129,7 +129,7 @@ export function updateDeposit(event: Mint): void {
   //      - hourlyDepositUSD
   //      - cumulativeDepositUSD
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
-  marketHourly.hourlyDepositUSD = marketDaily.dailyDepositUSD.plus(depositAmountUSD);
+  marketHourly.hourlyDepositUSD = marketHourly.hourlyDepositUSD.plus(depositAmountUSD);
   marketHourly.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketHourly.blockNumber = event.block.number;
   marketHourly.timestamp = event.block.timestamp;
@@ -179,6 +179,17 @@ export function updateWithdraw(event: Redeem): void {
   } else {
     log.warning("Withdraw {} already exists", [withdrawId]);
   }
+  let marketDaily = getOrCreateMarketDailySnapshot(event);
+  marketDaily.dailyWithdrawUSD = marketDaily.dailyWithdrawUSD.plus(withdraw.amountUSD);
+  marketDaily.save();
+
+  let marketHourly = getOrCreateMarketHourlySnapshot(event);
+  marketHourly.hourlyWithdrawUSD = marketHourly.hourlyWithdrawUSD.plus(withdraw.amountUSD);
+  marketHourly.save();
+
+  let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
+  financialSnapshot.dailyWithdrawUSD = financialSnapshot.dailyWithdrawUSD.plus(withdraw.amountUSD);
+  financialSnapshot.save();
 
   // update usage metric
   let usageDailyMetrics = getOrCreateUsageMetricsDailySnapshot(event);
@@ -245,7 +256,7 @@ export function updateBorrow(event: Borrow): void {
   //      - hourlyBorrowUSD
   //      - cumulativeBorrowUSD
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
-  marketHourly.hourlyBorrowUSD = marketDaily.dailyBorrowUSD.plus(borrowAmountUSD);
+  marketHourly.hourlyBorrowUSD = marketHourly.hourlyBorrowUSD.plus(borrowAmountUSD);
   marketHourly.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketHourly.blockNumber = event.block.number;
   marketHourly.timestamp = event.block.timestamp;
@@ -296,6 +307,18 @@ export function updateRepay(event: RepayBorrow): void {
     log.warning("Repay {} already exists", [repayId]);
   }
 
+  let marketDaily = getOrCreateMarketDailySnapshot(event);
+  marketDaily.dailyRepayUSD = marketDaily.dailyRepayUSD.plus(repay.amountUSD);
+  marketDaily.save();
+
+  let marketHourly = getOrCreateMarketHourlySnapshot(event);
+  marketHourly.hourlyRepayUSD = marketHourly.hourlyRepayUSD.plus(repay.amountUSD);
+  marketHourly.save();
+
+  let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
+  financialSnapshot.dailyRepayUSD = financialSnapshot.dailyRepayUSD.plus(repay.amountUSD);
+  financialSnapshot.save();
+
   // update usage metric
   let usageDailyMetrics = getOrCreateUsageMetricsDailySnapshot(event);
   usageDailyMetrics.dailyRepayCount += 1;
@@ -332,6 +355,7 @@ export function updateLiquidate(event: LiquidateBorrow): void {
     liquidate.protocol = FACTORY_ADDRESS;
     liquidate.to = event.address.toHexString();
     liquidate.from = event.params.liquidator.toHexString();
+    liquidate.liquidatee = event.params.borrower.toHexString();
     liquidate.blockNumber = event.block.number;
     liquidate.timestamp = event.block.timestamp;
     liquidate.market = event.address.toHexString();
@@ -340,7 +364,7 @@ export function updateLiquidate(event: LiquidateBorrow): void {
     liquidate.amountUSD = liquidateAmountUSD;
     let repayAmountUSD = event.params.repayAmount.toBigDecimal().times(pricePerUnderlyingToken);
 
-    liquidate.profitUSD = liquidate.amountUSD!.minus(repayAmountUSD);
+    liquidate.profitUSD = liquidate.amountUSD.minus(repayAmountUSD);
 
     liquidate.save();
   } else {
@@ -372,7 +396,7 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   //      - hourlyLiquidateUSD
   //      - cumulativeLiquidateUSD
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
-  marketHourly.hourlyLiquidateUSD = marketDaily.dailyLiquidateUSD.plus(liquidateAmountUSD);
+  marketHourly.hourlyLiquidateUSD = marketHourly.hourlyLiquidateUSD.plus(liquidateAmountUSD);
   marketHourly.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketHourly.blockNumber = event.block.number;
   marketHourly.timestamp = event.block.timestamp;
@@ -462,6 +486,35 @@ export function updateRevenue(
     protocol.cumulativeProtocolSideRevenueUSD,
   );
   protocol.save();
+
+  let marketID = event.address.toHexString();
+  let market = getOrCreateMarket(marketID, event);
+  market.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  market.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  market.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  market.save();
+
+  let marketDaily = getOrCreateMarketDailySnapshot(event);
+  marketDaily.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  marketDaily.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  marketDaily.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  marketDaily.dailyTotalRevenueUSD = marketDaily.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+  marketDaily.dailyProtocolSideRevenueUSD = marketDaily.dailyProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
+  marketDaily.dailySupplySideRevenueUSD = marketDaily.dailyTotalRevenueUSD.minus(
+    marketDaily.dailyProtocolSideRevenueUSD,
+  );
+  marketDaily.save();
+
+  let marketHourly = getOrCreateMarketHourlySnapshot(event);
+  marketHourly.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  marketHourly.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  marketHourly.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  marketHourly.hourlyTotalRevenueUSD = marketHourly.hourlyTotalRevenueUSD.plus(newTotalRevenueUSD);
+  marketHourly.hourlyProtocolSideRevenueUSD = marketHourly.hourlyProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
+  marketHourly.hourlySupplySideRevenueUSD = marketHourly.hourlyTotalRevenueUSD.minus(
+    marketHourly.hourlyProtocolSideRevenueUSD,
+  );
+  marketHourly.save();
 
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
