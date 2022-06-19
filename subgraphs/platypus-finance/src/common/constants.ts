@@ -48,6 +48,8 @@ export namespace LiquidityPoolFeeType {
   export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE";
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
+  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
+  export const DEPOSIT_FEE = "DEPOSIT_FEE";
 }
 
 export namespace RewardTokenType {

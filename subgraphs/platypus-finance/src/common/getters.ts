@@ -12,6 +12,7 @@ import {
   _LiquidityPoolParamsHelper,
   _Asset,
   RewardToken,
+  LiquidityPoolFee,
 } from "../../generated/schema";
 import { Pool as PoolTemplate } from "../../generated/templates";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
@@ -24,6 +25,7 @@ import {
   SECONDS_PER_HOUR,
   poolDetail,
   RewardTokenType,
+  LiquidityPoolFeeType,
 } from "../common/constants";
 import { exponentToBigDecimal } from "./utils/numbers";
 import { getUsdPrice } from "../prices";
@@ -99,6 +101,19 @@ export function getOrCreateLiquidityPool(poolAddress: Address, event: ethereum.E
   // fetch info if null
   if (!pool) {
     pool = new LiquidityPool(_address);
+    let tradingFee = new LiquidityPoolFee(LiquidityPoolFeeType.FIXED_TRADING_FEE.concat(_address));
+    tradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
+    tradingFee.save();
+
+    let withdrawFee = new LiquidityPoolFee(LiquidityPoolFeeType.WITHDRAWAL_FEE.concat(_address));
+    withdrawFee.feeType = LiquidityPoolFeeType.WITHDRAWAL_FEE;
+    withdrawFee.save();
+
+    let depositFee = new LiquidityPoolFee(LiquidityPoolFeeType.DEPOSIT_FEE.concat(_address));
+    depositFee.feeType = LiquidityPoolFeeType.DEPOSIT_FEE;
+    depositFee.save();
+
+    pool.fees = [tradingFee.id, withdrawFee.id, depositFee.id];
 
     pool.protocol = PROTOCOL_ADMIN;
     getOrCreateLiquidityPoolParamsHelper(poolAddress);
@@ -108,7 +123,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address, event: ethereum.E
     pool.symbol = detail.symbol;
     pool._ignore = detail.ignore;
 
-    pool.isSingleSided = true
+    pool.isSingleSided = true;
     pool._assets = new Array<string>();
     pool.inputTokens = new Array<string>();
     pool.inputTokenBalances = new Array<BigInt>();
