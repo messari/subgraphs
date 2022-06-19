@@ -7,7 +7,7 @@ dataSources:
     network: cronos
     source:
       address: "0x7De56Bd8b37827c51835e162c867848fE2403a48"
-      abi: Core
+      abi: Comptroller
       startBlock: 678408
     mapping:
       kind: ethereum/events

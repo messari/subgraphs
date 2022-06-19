@@ -53,7 +53,8 @@ import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
-  _handleNewPriceOracle(protocol, event);
+  log.debug('[Test Log] arbitrary argument {}', ["test handlenewpriceoracle"]);
+  _handleNewPriceOracle(protocol, event.params.newPriceOracle);
 }
 
 function getOrCreateProtocol(): LendingProtocol {
@@ -136,15 +137,17 @@ export function handleMarketListed(event: MarketListed): void {
   );
 }
 
-export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  _handleNewCollateralFactor(event);
-}
+// export function handleNewCollateralFactor(event: NewCollateralFactor): void {
+//   log.debug('[Test Log] arbitrary argument {}', ["test handlenewcollateralfactor"]);
+//   _handleNewCollateralFactor(event);
+// }
 
 export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
   let protocol = getOrCreateProtocol();
-  _handleNewLiquidationIncentive(protocol, event);
+  log.debug('[Test Log] arbitrary argument {}', ["test handlenewliquidationincentive"]);
+  _handleNewLiquidationIncentive(protocol, event.params.newLiquidationIncentiveMantissa);
 }
 
 // export function handleActionPaused(event: ActionPaused1): void {
