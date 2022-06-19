@@ -39,7 +39,7 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
   let MarketEntity = new Market(marketAddress);
   let MarketContract = Cauldron.bind(Address.fromString(marketAddress));
   let collateralCall = MarketContract.try_collateral();
-  let protocol =  getOrCreateLendingProtocol();
+  let protocol = getOrCreateLendingProtocol();
   if (!collateralCall.reverted) {
     let inputToken = getOrCreateToken(collateralCall.value);
     MarketEntity.protocol = protocol.id;

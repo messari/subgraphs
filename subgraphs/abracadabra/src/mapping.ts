@@ -47,7 +47,7 @@ export function handleLogDeploy(event: LogDeploy): void {
 export function handleLogAddCollateral(event: LogAddCollateral): void {
   let depositEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
-  if (!market){
+  if (!market) {
     return;
   }
   let CauldronContract = Cauldron.bind(event.address);
@@ -86,7 +86,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   }
   let withdrawalEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
-  if (!market){
+  if (!market) {
     return;
   }
   let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
@@ -119,7 +119,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
 export function handleLogBorrow(event: LogBorrow): void {
   let borrowEvent = new Borrow(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
-  if (!market){
+  if (!market) {
     return;
   }
   let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
@@ -156,21 +156,25 @@ export function handleLiquidation(event: LogRepay): void {
   // Retrieve cached liquidation that holds amount of collateral to help calculate profit usd (obtained from log remove collateral with from != to)
   let liquidateProxy = getLiquidateEvent(event); // retrieve cached liquidation by subtracting 1 from the current event log index (as we registered the liquidation in logRemoveCollateral that occurs 1 log index before this event)
   if (!liquidateProxy) {
-    log.error('Liquidation {} not found in cache. Liquidation event must be registered in logRemoveCollateral event',[event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString()]);
+    log.error("Liquidation {} not found in cache. Liquidation event must be registered in logRemoveCollateral event", [
+      event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString(),
+    ]);
     return;
   }
-  let liquidateEvent = new Liquidate('liquidate' + "-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
+  let liquidateEvent = new Liquidate(
+    "liquidate" + "-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString(),
+  );
   liquidateEvent.amount = liquidateProxy.amount;
   let market = getMarket(event.address.toHexString());
-  if (!market){
+  if (!market) {
     return;
   }
   let usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
   let usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
-  if (!marketHourlySnapshot || !marketDailySnapshot){
-    return
+  if (!marketHourlySnapshot || !marketDailySnapshot) {
+    return;
   }
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
@@ -211,7 +215,7 @@ export function handleLiquidation(event: LogRepay): void {
   marketHourlySnapshot.hourlyLiquidateUSD = marketHourlySnapshot.hourlyLiquidateUSD.plus(collateralAmountUSD);
   marketDailySnapshot.dailyLiquidateUSD = marketDailySnapshot.dailyLiquidateUSD.plus(collateralAmountUSD);
   financialsDailySnapshot.dailyLiquidateUSD = financialsDailySnapshot.dailyLiquidateUSD.plus(collateralAmountUSD);
-  
+
   market.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
   marketHourlySnapshot.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
   marketDailySnapshot.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
@@ -230,7 +234,7 @@ export function handleLiquidation(event: LogRepay): void {
 
 export function handleLogRepay(event: LogRepay): void {
   const invoker = event.transaction.from.toHex().toLowerCase();
-  const address = event.address.toHex().toLowerCase()
+  const address = event.address.toHex().toLowerCase();
   const to = event.transaction.to ? (event.transaction.to as Address).toHex().toLowerCase() : null;
   const user = event.params.to.toHex().toLowerCase();
   if ([invoker, address, to].indexOf(user) == -1) {
@@ -238,7 +242,7 @@ export function handleLogRepay(event: LogRepay): void {
   }
   let repayEvent = new Repay(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
-  if (!market){
+  if (!market) {
     return;
   }
   let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
@@ -266,7 +270,7 @@ export function handleLogRepay(event: LogRepay): void {
 
 export function handleLogExchangeRate(event: LogExchangeRate): void {
   let market = getMarket(event.address.toHexString());
-  if (!market){
+  if (!market) {
     return;
   }
   let token = getOrCreateToken(Address.fromString(market.inputToken));
@@ -282,5 +286,5 @@ export function handleLogExchangeRate(event: LogExchangeRate): void {
 export function handleLogAccrue(event: LogAccrue): void {
   let mimPriceUSD = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).lastPriceUSD;
   let feesUSD = bigIntToBigDecimal(event.params.accruedAmount, DEFAULT_DECIMALS).times(mimPriceUSD!);
-  updateFinancials(event, feesUSD ,event.address.toHexString());
+  updateFinancials(event, feesUSD, event.address.toHexString());
 }
