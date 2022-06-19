@@ -12,13 +12,14 @@ import {
   getOrCreateToken,
 } from "../common/getters";
 import { getDays, getHours } from "../common/utils/datetime";
-import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO, SECONDS_PER_HOUR, TransactionType } from "./constants";
-import { bigIntToBigDecimal, exponentToBigDecimal, tokenAmountToUSDAmount } from "./utils/numbers";
+import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO, TransactionType } from "./constants";
+import { exponentToBigDecimal, tokenAmountToUSDAmount } from "./utils/numbers";
 
 export function updateProtocolTVL(event: ethereum.Event): void {
   log.debug("[UpdateTVL][{}] get protocol", [event.transaction.hash.toHexString()]);
   let protocol = getOrCreateDexAmm();
   let protocolLockedValue = BIGDECIMAL_ZERO;
+  let totalPoolCount = 0;
 
   // loop through each pool and update total value locked in USD for protocol and each pool
   for (let i = 0; i < protocol.pools.length; i++) {
@@ -33,6 +34,7 @@ export function updateProtocolTVL(event: ethereum.Event): void {
     ]);
 
     if (!pool._ignore) {
+      totalPoolCount = totalPoolCount + 1;
       for (let j = 0; j < pool._assets.length; j++) {
         let _asset = _Asset.load(pool._assets[j])!;
 
@@ -71,6 +73,7 @@ export function updateProtocolTVL(event: ethereum.Event): void {
     protocolLockedValue.toString(),
   ]);
 
+  protocol.totalPoolCount = totalPoolCount;
   protocol.totalValueLockedUSD = protocolLockedValue;
   protocol.save();
 }
