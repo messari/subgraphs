@@ -10,7 +10,7 @@
     "weth": "0x4200000000000000000000000000000000000006",
     "wbtc": "0x68f180fcCe6836688e9084f035309E29Bf0A2095",
     "op": "0x4200000000000000000000000000000000000042",
-    "beets": "0x97513e975a7fA9072c72C92d8000B0dB90b163c5",   
+    "beets": "0x97513e975a7fA9072c72C92d8000B0dB90b163c5",
     "snx": "0x8700daec35af8ff88c16bdf0418774cb3d7599b4",
     "link": "0x350a791bfc2c21f9ed5d10980dad2e2638ffa7f6"
   },
@@ -18,8 +18,8 @@
   "protocolSlug": "beethoven-x",
   "defaultNetwork": "OPTIMISM",
   "isBeetsOp": true,
-  "rewardToken":"",
-  "graftEnabled" : false,
-  "subgraphId" : "QmStcMg9DrT5BgarALkqKfXivJxDRDspsAJsqW9NW3xWuQ",
-  "graftStartBlock" : "22912324"
+  "rewardToken": "",
+  "graftEnabled": false,
+  "subgraphId": "QmStcMg9DrT5BgarALkqKfXivJxDRDspsAJsqW9NW3xWuQ",
+  "graftStartBlock": "22912324"
 }

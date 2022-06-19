@@ -118,8 +118,6 @@ export function updatePoolMetrics(event: ethereum.Event, poolAddress: string): v
   poolMetricsDaily.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
   poolMetricsDaily.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
 
-
-
   poolMetricsHourly.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsHourly.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   poolMetricsHourly.inputTokenBalances = pool.inputTokenBalances;
@@ -152,8 +150,6 @@ export function updateVolumeAndFee(
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD);
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD);
 
-
-
   let tradingFeeAmountUSD = trackedAmountUSD.times(tradingFee.feePercentage!);
   let supplyFeeAmountUSD = tradingFeeAmountUSD.times(supplyFee.feePercentage!);
   let protocolFeeAmountUSD = tradingFeeAmountUSD.times(protocolFee.feePercentage!);
@@ -166,11 +162,10 @@ export function updateVolumeAndFee(
   pool.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
-
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
   financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   financialMetrics.dailyProtocolSideRevenueUSD =
-  financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+    financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
   financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;

@@ -40,7 +40,6 @@ export function shrinkToBigDecimal(amount: BigInt, exchangeDecimals: i32): BigDe
   return amount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals));
 }
 
-
 export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: i32): BigDecimal {
   if (exchangeDecimals == INT_ZERO) {
     return tokenAmount.toBigDecimal();

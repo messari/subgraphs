@@ -249,7 +249,6 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
   return financialMetrics;
 }
 
-
 export function getOrCreateRewardToken(address: string): RewardToken {
   let rewardToken = RewardToken.load(address);
   if (rewardToken == null) {

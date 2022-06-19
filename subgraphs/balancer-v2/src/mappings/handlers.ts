@@ -48,8 +48,8 @@ function handlePoolJoined(event: PoolBalanceChanged): void {
   //get the contract address
   let poolAddress: string = poolId.substring(0, 42);
 
-  if(NetworkConfigs.UNTRACKEDPOOLS.includes(poolAddress)){
-    return
+  if (NetworkConfigs.UNTRACKED_POOLS.includes(poolAddress)) {
+    return;
   }
   createDepositMulti(event, poolAddress, amounts);
   updateUsageMetrics(event, event.params.liquidityProvider, UsageType.DEPOSIT);
@@ -64,8 +64,8 @@ function handlePoolExited(event: PoolBalanceChanged): void {
   //get the contract address
   let poolAddress: string = poolId.substring(0, 42);
 
-  if(NetworkConfigs.UNTRACKEDPOOLS.includes(poolAddress)){
-    return
+  if (NetworkConfigs.UNTRACKED_POOLS.includes(poolAddress)) {
+    return;
   }
   createWithdrawMulti(event, poolAddress, amounts);
   updateUsageMetrics(event, event.params.liquidityProvider, UsageType.WITHDRAW);
@@ -77,8 +77,6 @@ function handlePoolExited(event: PoolBalanceChanged): void {
  ************** SWAPS ***************
  ************************************/
 export function handleSwap(event: SwapEvent): void {
-  
-
   let poolId: string = event.params.poolId.toHexString();
   let tokenIn: string = event.params.tokenIn.toHexString();
   let tokenOut: string = event.params.tokenOut.toHexString();
@@ -86,8 +84,8 @@ export function handleSwap(event: SwapEvent): void {
   //get the contract address
   let poolAddress: string = poolId.substring(0, 42);
 
-  if(NetworkConfigs.UNTRACKEDPOOLS.includes(poolAddress)){
-    return
+  if (NetworkConfigs.UNTRACKED_POOLS.includes(poolAddress)) {
+    return;
   }
   createSwapHandleVolume(event, poolAddress, tokenIn, event.params.amountIn, tokenOut, event.params.amountOut);
   updateFinancials(event);
@@ -140,10 +138,10 @@ function createPool(event: PoolRegistered): string {
 }
 
 export function handlePoolRegister(event: PoolRegistered): void {
-  if(NetworkConfigs.UNTRACKEDPOOLS.includes(event.params.poolAddress.toHexString())){
-    return 
+  if (NetworkConfigs.UNTRACKED_POOLS.includes(event.params.poolAddress.toHexString())) {
+    return;
   }
-  let poolAddress =   createPool(event);
+  let poolAddress = createPool(event);
   updateWeight(poolAddress);
 }
 
@@ -151,8 +149,8 @@ export function handleTokensRegister(event: TokensRegistered): void {
   let poolId: string = event.params.poolId.toHexString();
   //get the contract address
   let poolAddress: string = poolId.substring(0, 42);
-  if(NetworkConfigs.UNTRACKEDPOOLS.includes(poolAddress)){
-    return
+  if (NetworkConfigs.UNTRACKED_POOLS.includes(poolAddress)) {
+    return;
   }
   let tokens: string[] = new Array<string>();
   let tokensAmount: BigInt[] = new Array<BigInt>();
@@ -161,7 +159,7 @@ export function handleTokensRegister(event: TokensRegistered): void {
     tokens.push(token.id);
     tokensAmount.push(BIGINT_ZERO);
   }
-  let pool = getLiquidityPool(poolAddress)
+  let pool = getLiquidityPool(poolAddress);
   pool.inputTokens = tokens;
   pool.inputTokenBalances = tokensAmount;
   pool.save();

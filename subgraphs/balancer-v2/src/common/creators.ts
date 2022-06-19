@@ -10,13 +10,7 @@ import {
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "./getters";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ONE,
-  BIGINT_ZERO,
-  LiquidityPoolFeeType,
-  REWARDTOKEN,
-} from "./constants";
+import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, REWARDTOKEN } from "./constants";
 import { updateTokenPrice, updateVolumeAndFee } from "./metrics";
 import { valueInUSD } from "./pricing";
 import { convertTokenToDecimal } from "./utils/utils";
@@ -60,22 +54,19 @@ export function createLiquidityPool(
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  if(REWARDTOKEN != ""){
-    let  rewardToken = getOrCreateRewardToken(REWARDTOKEN);
+  if (REWARDTOKEN != "") {
+    let rewardToken = getOrCreateRewardToken(REWARDTOKEN);
     pool.rewardTokens = [rewardToken.id];
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   }
 
   pool.save();
-  protocol.totalPoolCount = protocol.totalPoolCount +1 ;
+  protocol.totalPoolCount = protocol.totalPoolCount + 1;
   protocol.save();
-
 }
 
 function createPoolFees(poolAddressString: string, fee: BigInt): string[] {
-
-
   let poolTradingFee = new LiquidityPoolFee("trading-fee-" + poolAddressString);
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
   poolTradingFee.feePercentage = scaleDown(fee, null);
@@ -96,8 +87,6 @@ function createPoolFees(poolAddressString: string, fee: BigInt): string[] {
   poolLpFee.save();
   poolProtocolFee.save();
   poolTradingFee.save();
-  
-
 
   return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
