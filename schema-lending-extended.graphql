@@ -244,6 +244,18 @@ type LendingProtocol implements Protocol @entity {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  " Number of cumulative depositors "
+  cumulativeUniqueDepositors: Int!
+
+  " Number of cumulative borrowers "
+  cumulativeUniqueBorrowers: Int!
+
+  " Number of cumulative liquidators (accounts that performed liquidation) "
+  cumulativeUniqueLiquidators: Int!
+
+  " Number of cumulative liquidatees (accounts that got liquidated) "
+  cumulativeUniqueLiquidatees: Int!
+
   " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
@@ -280,6 +292,26 @@ type LendingProtocol implements Protocol @entity {
   " Total number of pools "
   totalPoolCount: Int!
 
+  " Total number of open positions "
+  totalPositionsCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionsCount: Int!
+
+  ##### Account / Position Data #####
+
+  " Any account that has made a deposit before "
+  depositors: [Account!]
+
+  " Any account that has made a borrow before "
+  borrowers: [Account!]
+
+  " Any account that has made a liquidation before "
+  liquidators: [Account!]
+
+  " Any account that has been liquidated before "
+  liquidatees: [Account!]
+
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -313,6 +345,30 @@ type UsageMetricsDailySnapshot @entity {
 
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
+
+  " Number of unique daily depositors "
+  dailyActiveDepositors: Int!
+
+  " Number of cumulative depositors "
+  cumulativeUniqueDepositors: Int!
+
+  " Number of unique daily borrowers "
+  dailyActiveBorrowers: Int!
+
+  " Number of cumulative borrowers "
+  cumulativeUniqueBorrowers: Int!
+
+  " Number of unique daily liquidators (accounts that performed liquidation) "
+  dailyActiveLiquidators: Int!
+
+  " Number of cumulative liquidators (accounts that performed liquidation) "
+  cumulativeUniqueLiquidators: Int!
+
+  " Number of unique daily liquidatees (accounts that got liquidated) "
+  dailyActiveLiquidatees: Int!
+
+  " Number of cumulative liquidatees (accounts that got liquidated) "
+  cumulativeUniqueLiquidatees: Int!
 
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
   dailyTransactionCount: Int!
