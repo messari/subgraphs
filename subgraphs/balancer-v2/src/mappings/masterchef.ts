@@ -125,6 +125,8 @@ function createLiquidityPool(
   }
   pool.inputTokenWeights = [BIGDECIMAL_ONE];
   pool.save();
+  protocol.totalPoolCount =  protocol.totalPoolCount + 1;
+  protocol.save();
   return pool;
 }
 
