@@ -48,7 +48,15 @@ import { CToken } from "../generated/Comptroller/CToken";
 import { Comptroller } from "../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../generated/templates";
 import { ERC20 } from "../generated/Comptroller/ERC20";
-import { comptrollerAddr, nativeCToken, nativeToken } from "./constants";
+import { comptrollerAddr, 
+  tCROToken,
+  tETHToken,
+  tWBTCToken,
+  tUSDCToken,
+  tUSDTToken,
+  tDAIToken,
+  tTONICToken
+  , nativeToken } from "./constants";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
@@ -95,11 +103,11 @@ export function handleMarketListed(event: MarketListed): void {
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
-  if (cTokenAddr == nativeCToken.address) {
+  if (cTokenAddr == tCROToken.address) {
     let marketListedData = new MarketListedData(
       protocol,
       nativeToken,
-      nativeCToken,
+      tCROToken,
       cTokenReserveFactorMantissa
     );
     _handleMarketListed(marketListedData, event);
