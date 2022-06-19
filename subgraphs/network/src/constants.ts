@@ -44,7 +44,7 @@ export namespace SubgraphNetwork {
   export const BSC = "bsc";
   export const CELO = "celo";
   export const CLOVER = "clover";
-  export const CRONOS = "mainnet";
+  export const CRONOS = "cronos";
   export const COSMOS = "cosmoshub-4";
   export const ETHEREUM = "mainnet";
   export const FANTOM = "fantom";
