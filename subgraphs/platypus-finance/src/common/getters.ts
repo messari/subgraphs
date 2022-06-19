@@ -271,8 +271,8 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.name = "Platypus Finance";
     protocol.slug = "platypus-finance";
     protocol.methodologyVersion = "1.0.0";
-    protocol.schemaVersion = "1.2.1";
-    protocol.subgraphVersion = "1.0.0";
+    protocol.schemaVersion = "1.3.0";
+    protocol.subgraphVersion = "1.3.0";
     protocol.network = Network.AVALANCHE;
     protocol.type = ProtocolType.EXCHANGE;
 
