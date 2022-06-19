@@ -3,7 +3,7 @@
 ## Schema Update 1.3.0
 
 Main PR: [#310](https://github.com/messari/subgraphs/pull/310)
-Fixes: [#320](https://github.com/messari/subgraphs/pull/320), [#325](https://github.com/messari/subgraphs/pull/325), [#330](https://github.com/messari/subgraphs/pull/330), [#331](https://github.com/messari/subgraphs/pull/331)
+Fixes: [#320](https://github.com/messari/subgraphs/pull/320), [#325](https://github.com/messari/subgraphs/pull/325), [#330](https://github.com/messari/subgraphs/pull/330), [#331](https://github.com/messari/subgraphs/pull/331), [#359](https://github.com/messari/subgraphs/pull/359)
 
 ### Common
 
@@ -22,6 +22,7 @@ Fixes: [#320](https://github.com/messari/subgraphs/pull/320), [#325](https://git
 - Added daily/hourly withdraw/repay aggregates into snapshots.
 - Fixed a couple `AmountUSD` fields (they were accidentally left as nullable before).
 - Updated `Liquidate` entity to include `liquidatee` (the address that got liquidated).
+- Updated the definition of `market` and `asset` in the `Liquidate` entity.
 
 ## Schema Update 1.2.1
 
