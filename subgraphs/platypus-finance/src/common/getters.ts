@@ -108,6 +108,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address, event: ethereum.E
     pool.symbol = detail.symbol;
     pool._ignore = detail.ignore;
 
+    pool.isSingleSided = true
     pool._assets = new Array<string>();
     pool.inputTokens = new Array<string>();
     pool.inputTokenBalances = new Array<BigInt>();

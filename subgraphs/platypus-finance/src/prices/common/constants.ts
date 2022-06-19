@@ -4,7 +4,6 @@ import * as AVALANCHE from "../config/avalanche";
 import * as ARBITRUM_ONE from "../config/arbitrum_one";
 
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
-import { UniswapPair__getReservesResult } from "../../../generated/Pool/UniswapPair";
 import { SushiSwapPair__getReservesResult } from "../../../generated/Pool/SushiSwapPair";
 
 ///////////////////////////////////////////////////////////////////////////
@@ -107,7 +106,7 @@ TRADERJOE_ROUTER_ADDRESS_MAP.set(AVALANCHE.NETWORK_STRING, AVALANCHE.TRADERJOE_R
 ///////////////////////////// UNISWAP CONTRACT ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const UNISWAP_DEFAULT_RESERVE_CALL = new UniswapPair__getReservesResult(BIGINT_ZERO, BIGINT_ZERO, BIGINT_ZERO);
+// export const UNISWAP_DEFAULT_RESERVE_CALL = new UniswapPair__getReservesResult(BIGINT_ZERO, BIGINT_ZERO, BIGINT_ZERO);
 
 export const UNISWAP_ROUTER_CONTRACT_ADDRESSES = new TypedMap<string, TypedMap<string, Address>>();
 UNISWAP_ROUTER_CONTRACT_ADDRESSES.set(MAINNET.NETWORK_STRING, MAINNET.UNISWAP_ROUTER_ADDRESS);

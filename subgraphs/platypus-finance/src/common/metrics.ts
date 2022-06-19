@@ -340,6 +340,7 @@ function updateFinancialSnapshotFeeMetrics(event: ethereum.Event, supplySideFee:
   snapshot.dailyProtocolSideRevenueUSD = snapshot.dailyProtocolSideRevenueUSD.plus(protocolSideFee);
   snapshot.dailyTotalRevenueUSD = snapshot.dailySupplySideRevenueUSD.plus(snapshot.dailyProtocolSideRevenueUSD);
   snapshot.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  snapshot.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
   snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   snapshot.save();
 }
