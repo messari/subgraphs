@@ -103,7 +103,9 @@ function handleAccount(event: ethereum.Event, user: Address): void {
 
 function handleHourlyAccount(event: ethereum.Event, user: Address): void {
   let snapshot = getOrCreateHourlyUsageMetricSnapshot(event);
-  let hourlyAccountId = user.toHexString() + "-" + (event.block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
+  let hours = getHours(event.block.timestamp.toI64()).toString();
+  let hourlyAccountId = "hourly-".concat(user.toHexString().concat("-").concat(hours));
+
   let hourlyAccount = ActiveAccount.load(hourlyAccountId.toString());
   if (!hourlyAccount) {
     hourlyAccount = new ActiveAccount(hourlyAccountId);
@@ -116,9 +118,8 @@ function handleHourlyAccount(event: ethereum.Event, user: Address): void {
 
 function handleDailyAccount(event: ethereum.Event, user: Address): void {
   let snapshot = getOrCreateDailyUsageMetricSnapshot(event);
-  let timestamp = event.block.timestamp.toI64();
-  let days = getDays(timestamp);
-  let dailyAccountId = user.toHexString().concat("-").concat(days.toString());
+  let days = getDays(event.block.timestamp.toI64()).toString();
+  let dailyAccountId = "daily-".concat(user.toHexString().concat("-").concat(days));
 
   let dailyAccount = ActiveAccount.load(dailyAccountId);
   if (!dailyAccount) {
