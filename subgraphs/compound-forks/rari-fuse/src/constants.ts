@@ -59,8 +59,8 @@ export const GOHM_ADDRESS = "0x0ab87046fBb341D058F17CBC4c1133F25a20a52f";
 //// Protocol Specific ////
 ///////////////////////////
 
-export const PROTOCOL_NAME = "Fuse";
-export const PROTOCOL_SLUG = "fuse";
-export const SUBGRAPH_VERSION = "1.0.14";
-export const SCHEMA_VERSION = "1.2.1";
+export const PROTOCOL_NAME = "Rari Fuse";
+export const PROTOCOL_SLUG = "rari-fuse";
+export const SUBGRAPH_VERSION = "1.0.15";
+export const SCHEMA_VERSION = "1.3.0";
 export const METHODOLOGY_VERSION = "1.0.0";

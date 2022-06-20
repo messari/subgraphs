@@ -32,6 +32,7 @@ import {
   convertRatePerUnitToAPY,
   setBorrowInterestRate,
   getOrCreateMarketDailySnapshot,
+  getOrCreateMarketHourlySnapshot,
 } from "../../src/mapping";
 import { PoolRegistered } from "../generated/FusePoolDirectory/FusePoolDirectory";
 import {
@@ -90,7 +91,6 @@ import {
   INT_TWO,
   mantissaFactor,
   mantissaFactorBD,
-  Network,
   RewardTokenType,
 } from "../../src/constants";
 import {
@@ -100,7 +100,7 @@ import {
   _FusePool,
 } from "../generated/schema";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
-import { getUsdPrice, getUsdPricePerToken } from "./prices";
+import { getUsdPricePerToken } from "./prices";
 import {
   getOrCreateCircularBuffer,
   getRewardsPerDay,
@@ -236,7 +236,7 @@ export function handleMarketListed(event: MarketListed): void {
     );
   }
 
-  // populatet market data
+  // populate market data
   let marketData = new MarketListedData(
     protocol,
     underlyingToken,
@@ -286,7 +286,9 @@ export function handleMarketListed(event: MarketListed): void {
 
 // update a given markets collateral factor
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  _handleNewCollateralFactor(event);
+  let marketID = event.params.cToken.toHexString();
+  let newCollateralFactorMantissa = event.params.newCollateralFactorMantissa;
+  _handleNewCollateralFactor(marketID, newCollateralFactorMantissa);
 }
 
 export function handleNewLiquidationIncentive(
@@ -336,7 +338,10 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 }
 
 export function handleActionPaused(event: ActionPaused1): void {
-  _handleActionPaused(event);
+  let marketID = event.params.cToken.toHexString();
+  let action = event.params.action;
+  let pauseState = event.params.pauseState;
+  _handleActionPaused(marketID, action, pauseState);
 }
 
 /////////////////////////
@@ -344,23 +349,49 @@ export function handleActionPaused(event: ActionPaused1): void {
 /////////////////////////
 
 export function handleMint(event: Mint): void {
-  _handleMint(Address.fromString(FACTORY_CONTRACT), event);
+  let minter = event.params.minter;
+  let mintAmount = event.params.mintAmount;
+  let factoryContract = Address.fromString(FACTORY_CONTRACT);
+  _handleMint(factoryContract, minter, mintAmount, event);
 }
 
 export function handleRedeem(event: Redeem): void {
-  _handleRedeem(Address.fromString(FACTORY_CONTRACT), event);
+  let redeemer = event.params.redeemer;
+  let redeemAmount = event.params.redeemAmount;
+  let factoryContract = Address.fromString(FACTORY_CONTRACT);
+  _handleRedeem(factoryContract, redeemer, redeemAmount, event);
 }
 
 export function handleBorrow(event: Borrow): void {
-  _handleBorrow(Address.fromString(FACTORY_CONTRACT), event);
+  let borrower = event.params.borrower;
+  let borrowAmount = event.params.borrowAmount;
+  let factoryContract = Address.fromString(FACTORY_CONTRACT);
+  _handleBorrow(factoryContract, borrower, borrowAmount, event);
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
-  _handleRepayBorrow(Address.fromString(FACTORY_CONTRACT), event);
+  let payer = event.params.payer;
+  let repayAmount = event.params.repayAmount;
+  let factoryContract = Address.fromString(FACTORY_CONTRACT);
+  _handleRepayBorrow(factoryContract, payer, repayAmount, event);
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  _handleLiquidateBorrow(Address.fromString(FACTORY_CONTRACT), event);
+  let cTokenCollateral = event.params.cTokenCollateral;
+  let liquidator = event.params.liquidator;
+  let borrower = event.params.borrower;
+  let seizeTokens = event.params.seizeTokens;
+  let repayAmount = event.params.repayAmount;
+  let factoryContract = Address.fromString(FACTORY_CONTRACT);
+  _handleLiquidateBorrow(
+    factoryContract,
+    cTokenCollateral,
+    liquidator,
+    borrower,
+    seizeTokens,
+    repayAmount,
+    event
+  );
 }
 
 export function handleAccrueInterest(event: AccrueInterest): void {
@@ -488,7 +519,9 @@ export function handleNewAdminFee(event: NewAdminFee): void {
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
-  _handleNewReserveFactor(event);
+  let marketID = event.address.toHexString();
+  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
+  _handleNewReserveFactor(marketID, newReserveFactorMantissa);
 }
 
 /////////////////
@@ -576,8 +609,8 @@ function updateMarket(
   }
 
   // grab price of ETH then multiply by underlying price
-  let customPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
-  let ethPriceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
+  let customETHPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
+  let ethPriceUSD = customETHPrice.usdPrice.div(customETHPrice.decimalsBaseTen);
 
   let underlyingTokenPriceUSD: BigDecimal;
   if (updateMarketData.getUnderlyingPriceResult.reverted) {
@@ -722,14 +755,11 @@ function updateMarket(
   let tryRewardDistributors = troller.try_getRewardsDistributors();
   if (!tryRewardDistributors.reverted) {
     let rewardDistributors = tryRewardDistributors.value;
-    for (let i = 0; i < rewardDistributors.length; i++) {
-      updateRewards(rewardDistributors[i], marketID, blocksPerDay, blockNumber);
-    }
+    updateRewards(rewardDistributors, marketID, blocksPerDay, blockNumber);
   }
 
   // calculate new interests accumulated
   // With fuse protocol revenue includes (reserve factor + fuse fee + admin fee)
-
   let fuseFeeId =
     InterestRateSide.BORROWER + "-" + RariFee.FUSE_FEE + "-" + marketID;
   let fuseFee = InterestRate.load(fuseFeeId)!.rate.div(
@@ -754,32 +784,47 @@ function updateMarket(
     protocolSideRevenueUSDDelta
   );
 
-  market._cumulativeTotalRevenueUSD = market._cumulativeTotalRevenueUSD.plus(
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(
     interestAccumulatedUSD
   );
-  market._cumulativeProtocolSideRevenueUSD =
-    market._cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
-  market._cumulativeSupplySideRevenueUSD =
-    market._cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  market.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
+  market.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
   market.save();
 
-  // update daily fields in snapshot
-  let snapshot = getOrCreateMarketDailySnapshot(
+  // update daily fields in marketDailySnapshot
+  let dailySnapshot = getOrCreateMarketDailySnapshot(
     market.id,
     blockTimestamp.toI32()
   );
-  snapshot._dailyTotalRevenueUSD = snapshot._dailyTotalRevenueUSD.plus(
+  dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
     interestAccumulatedUSD
   );
-  snapshot._dailyProtocolSideRevenueUSD =
-    snapshot._dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
-  snapshot._dailySupplySideRevenueUSD =
-    snapshot._dailySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
-  snapshot.save();
+  dailySnapshot.dailyProtocolSideRevenueUSD =
+    dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
+  dailySnapshot.dailySupplySideRevenueUSD =
+    dailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  dailySnapshot.save();
+
+  // update hourly fields in marketHourlySnapshot
+  let hourlySnapshot = getOrCreateMarketHourlySnapshot(
+    market.id,
+    blockTimestamp.toI32()
+  );
+  hourlySnapshot.hourlyTotalRevenueUSD =
+    hourlySnapshot.hourlyTotalRevenueUSD.plus(interestAccumulatedUSD);
+  hourlySnapshot.hourlyProtocolSideRevenueUSD =
+    hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+      protocolSideRevenueUSDDelta
+    );
+  hourlySnapshot.hourlySupplySideRevenueUSD =
+    hourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  hourlySnapshot.save();
 }
 
 function updateRewards(
-  rewardDistributor: Address,
+  rewardDistributor: Address[],
   marketID: string,
   blocksPerDay: BigDecimal,
   blockNumber: BigInt
@@ -795,82 +840,98 @@ function updateRewards(
   let rewardEmissionsUSD: BigDecimal[] = [];
   let rewardTokens: string[] = [];
 
-  // get distributor contract and grab borrow/supply distribution
-  let distributor = RewardsDistributorDelegator.bind(rewardDistributor);
-  let tryBorrowSpeeds = distributor.try_compBorrowSpeeds(
-    Address.fromString(marketID)
-  );
-  let trySupplySpeeds = distributor.try_compSupplySpeeds(
-    Address.fromString(marketID)
-  );
-  let tryRewardToken = distributor.try_rewardToken();
+  for (let i = 0; i < rewardDistributor.length; i++) {
+    // setup reward arrays for distributor i
+    // always borrow side first
+    let distributorRewards: BigInt[] = [BIGINT_ZERO, BIGINT_ZERO];
+    let distributorRewardsUSD: BigDecimal[] = [
+      BIGDECIMAL_ZERO,
+      BIGDECIMAL_ZERO,
+    ];
+    let distributorTokens: string[] = [ZERO_ADDRESS, ZERO_ADDRESS];
 
-  // create reward token if available
-  if (!tryRewardToken.reverted) {
-    let token = Token.load(tryRewardToken.value.toHexString());
-    if (!token) {
-      let tokenContract = ERC20.bind(tryRewardToken.value);
-      token = new Token(tryRewardToken.value.toHexString());
-      token.name = getOrElse(tokenContract.try_name(), "UNKNOWN");
-      token.symbol = getOrElse(tokenContract.try_symbol(), "UNKOWN");
-      token.decimals = getOrElse(tokenContract.try_decimals(), -1);
-      token.save();
-    }
-
-    // get reward token price
-    let customPrice = getUsdPricePerToken(Address.fromString(token.id));
-    let rewardTokenPriceUSD = customPrice.usdPrice.div(
-      customPrice.decimalsBaseTen
+    // get distributor contract and grab borrow/supply distribution
+    let distributor = RewardsDistributorDelegator.bind(rewardDistributor[i]);
+    let tryBorrowSpeeds = distributor.try_compBorrowSpeeds(
+      Address.fromString(marketID)
     );
-    token.lastPriceUSD = rewardTokenPriceUSD;
-    token.lastPriceBlockNumber = blockNumber;
-    token.save();
+    let trySupplySpeeds = distributor.try_compSupplySpeeds(
+      Address.fromString(marketID)
+    );
+    let tryRewardToken = distributor.try_rewardToken();
 
-    // borrow speeds
-    if (!tryBorrowSpeeds.reverted) {
-      let borrowRewardsBD = tryBorrowSpeeds.value
-        .toBigDecimal()
-        .div(exponentToBigDecimal(token.decimals));
-      let rewardsPerDay = borrowRewardsBD.times(blocksPerDay);
-      rewardEmissions.push(
-        BigInt.fromString(rewardsPerDay.truncate(0).toString())
-      );
-      rewardEmissionsUSD.push(rewardsPerDay.times(rewardTokenPriceUSD));
-
-      // create borrow reward token
-      let rewardTokenId = RewardTokenType.BORROW + "-" + token.id;
-      let rewardToken = RewardToken.load(rewardTokenId);
-      if (!rewardToken) {
-        rewardToken = new RewardToken(rewardTokenId);
-        rewardToken.token = token.id;
-        rewardToken.type = RewardTokenType.BORROW;
-        rewardToken.save();
+    // create reward token if available
+    if (!tryRewardToken.reverted) {
+      let token = Token.load(tryRewardToken.value.toHexString());
+      if (!token) {
+        let tokenContract = ERC20.bind(tryRewardToken.value);
+        token = new Token(tryRewardToken.value.toHexString());
+        token.name = getOrElse(tokenContract.try_name(), "UNKNOWN");
+        token.symbol = getOrElse(tokenContract.try_symbol(), "UNKOWN");
+        token.decimals = getOrElse(tokenContract.try_decimals(), -1);
+        token.save();
       }
-      rewardTokens.push(rewardToken.id);
+
+      // get reward token price
+      let customPrice = getUsdPricePerToken(Address.fromString(token.id));
+      let rewardTokenPriceUSD = customPrice.usdPrice.div(
+        customPrice.decimalsBaseTen
+      );
+      token.lastPriceUSD = rewardTokenPriceUSD;
+      token.lastPriceBlockNumber = blockNumber;
+      token.save();
+
+      // borrow speeds
+      if (!tryBorrowSpeeds.reverted) {
+        let borrowRewardsBD = tryBorrowSpeeds.value
+          .toBigDecimal()
+          .div(exponentToBigDecimal(token.decimals));
+        let rewardsPerDay = borrowRewardsBD.times(blocksPerDay);
+        distributorRewards[0] = BigInt.fromString(
+          rewardsPerDay.truncate(0).toString()
+        );
+        distributorRewardsUSD[0] = rewardsPerDay.times(rewardTokenPriceUSD);
+
+        // create borrow reward token
+        let rewardTokenId = RewardTokenType.BORROW + "-" + token.id;
+        let rewardToken = RewardToken.load(rewardTokenId);
+        if (!rewardToken) {
+          rewardToken = new RewardToken(rewardTokenId);
+          rewardToken.token = token.id;
+          rewardToken.type = RewardTokenType.BORROW;
+          rewardToken.save();
+        }
+        distributorTokens[0] = rewardToken.id;
+      }
+
+      // supply speeds
+      if (!trySupplySpeeds.reverted) {
+        let supplyRewardsBD = trySupplySpeeds.value
+          .toBigDecimal()
+          .div(exponentToBigDecimal(token.decimals));
+        let rewardsPerDay = supplyRewardsBD.times(blocksPerDay);
+        rewardEmissions[1] = BigInt.fromString(
+          rewardsPerDay.truncate(0).toString()
+        );
+        rewardEmissionsUSD[1] = rewardsPerDay.times(rewardTokenPriceUSD);
+
+        // create supply reward token
+        let rewardTokenId = RewardTokenType.DEPOSIT + "-" + token.id;
+        let rewardToken = RewardToken.load(rewardTokenId);
+        if (!rewardToken) {
+          rewardToken = new RewardToken(rewardTokenId);
+          rewardToken.token = token.id;
+          rewardToken.type = RewardTokenType.DEPOSIT;
+          rewardToken.save();
+        }
+        rewardTokens[1] = rewardToken.id;
+      }
     }
 
-    // supply speeds
-    if (!trySupplySpeeds.reverted) {
-      let supplyRewardsBD = trySupplySpeeds.value
-        .toBigDecimal()
-        .div(exponentToBigDecimal(token.decimals));
-      let rewardsPerDay = supplyRewardsBD.times(blocksPerDay);
-      rewardEmissions.push(
-        BigInt.fromString(rewardsPerDay.truncate(0).toString())
-      );
-      rewardEmissionsUSD.push(rewardsPerDay.times(rewardTokenPriceUSD));
-
-      // create supply reward token
-      let rewardTokenId = RewardTokenType.DEPOSIT + "-" + token.id;
-      let rewardToken = RewardToken.load(rewardTokenId);
-      if (!rewardToken) {
-        rewardToken = new RewardToken(rewardTokenId);
-        rewardToken.token = token.id;
-        rewardToken.type = RewardTokenType.DEPOSIT;
-        rewardToken.save();
-      }
-      rewardTokens.push(rewardToken.id);
-    }
+    // concat this rewardDistributor results to cumulative results
+    rewardEmissions = rewardEmissions.concat(distributorRewards);
+    rewardEmissionsUSD = rewardEmissionsUSD.concat(distributorRewardsUSD);
+    rewardTokens = rewardTokens.concat(distributorTokens);
   }
 
   // update market

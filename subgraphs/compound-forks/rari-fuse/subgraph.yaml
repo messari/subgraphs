@@ -1,14 +1,14 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
-  file: ../schema.graphql
+  file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: FusePoolDirectory
-    network: {{ network }}
+    network: arbitrum-one
     source:
-      address: "{{ fusePoolDirectoryAddress }}"
+      address: "0xc201b8c8dd22c779025e16f1825c90e1e6dd6a08"
       abi: FusePoolDirectory
-      startBlock: {{ startBlock}}
+      startBlock: 4704251
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -27,7 +27,7 @@ dataSources:
 templates:
   - name: Comptroller
     kind: ethereum/contract
-    network: {{ network }}
+    network: arbitrum-one
     source:
       abi: Comptroller
     mapping:
@@ -61,7 +61,7 @@ templates:
           handler: handleActionPaused
   - name: CToken
     kind: ethereum/contract
-    network: {{ network }}
+    network: arbitrum-one
     source:
       abi: CToken
     mapping:
