@@ -31,10 +31,18 @@ export function getPriceUsdc(tokenAddress: Address, network: string): CustomPric
 }
 
 export function getPriceFromRouterUsdc(tokenAddress: Address, network: string): CustomPriceType {
-  return getPriceFromRouter(tokenAddress, constants.WHITELIST_TOKENS_MAP.get(network)!.get("USDC")!, network);
+  return getPriceFromRouter(
+    tokenAddress,
+    constants.WHITELIST_TOKENS_MAP.get(network)!.get("USDC")!,
+    network,
+  );
 }
 
-export function getPriceFromRouter(token0Address: Address, token1Address: Address, network: string): CustomPriceType {
+export function getPriceFromRouter(
+  token0Address: Address,
+  token1Address: Address,
+  network: string,
+): CustomPriceType {
   let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
   let wethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("WETH")!;
 
@@ -68,7 +76,9 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
   let token0Decimals = utils.getTokenDecimals(token0Address);
   let amountIn = BigInt.fromI32(10).pow(token0Decimals.toI32() as u8);
 
-  const uniSwapRouter = UniswapRouterContract.bind(constants.UNISWAP_CONTRACT_ADDRESSES.get(network)!);
+  const uniSwapRouter = UniswapRouterContract.bind(
+    constants.UNISWAP_CONTRACT_ADDRESSES.get(network)!,
+  );
 
   let amountOutArray = uniSwapRouter.try_getAmountsOut(amountIn, path);
 
@@ -112,7 +122,10 @@ export function getLpTokenPriceUsdc(tokenAddress: Address, network: string): Cus
   return CustomPriceType.initialize(pricePerLpTokenUsdc);
 }
 
-export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: string): CustomPriceType {
+export function getLpTokenTotalLiquidityUsdc(
+  tokenAddress: Address,
+  network: string,
+): CustomPriceType {
   const uniSwapPair = UniswapPairContract.bind(tokenAddress);
 
   let token0Address = utils.readValue<Address>(uniSwapPair.try_token0(), constants.ZERO_ADDRESS);

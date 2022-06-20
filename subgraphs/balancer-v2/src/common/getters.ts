@@ -27,7 +27,7 @@ import {
   VAULT_ADDRESS,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  DEFAULTNETWORK,
+  DEFAULT_NETWORK,
   RewardTokenType,
 } from "./constants";
 import { fetchPrice } from "./pricing";
@@ -48,8 +48,9 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
-    protocol.network = DEFAULTNETWORK;
+    protocol.network = DEFAULT_NETWORK;
     protocol.type = ProtocolType.EXCHANGE;
+    protocol.totalPoolCount = 0;
     protocol.save();
   }
   return protocol;
@@ -104,7 +105,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
-
+    usageMetrics.totalPoolCount = 0;
     usageMetrics.save();
   }
 
@@ -247,7 +248,6 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
   }
   return financialMetrics;
 }
-
 
 export function getOrCreateRewardToken(address: string): RewardToken {
   let rewardToken = RewardToken.load(address);

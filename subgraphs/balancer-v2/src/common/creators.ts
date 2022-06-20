@@ -10,13 +10,7 @@ import {
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "./getters";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ONE,
-  BIGINT_ZERO,
-  LiquidityPoolFeeType,
-  REWARDTOKEN,
-} from "./constants";
+import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, REWARD_TOKEN } from "./constants";
 import { updateTokenPrice, updateVolumeAndFee } from "./metrics";
 import { valueInUSD } from "./pricing";
 import { convertTokenToDecimal } from "./utils/utils";
@@ -60,34 +54,35 @@ export function createLiquidityPool(
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  if(REWARDTOKEN != ""){
-    let  rewardToken = getOrCreateRewardToken(REWARDTOKEN);
+  if (REWARD_TOKEN != "") {
+    let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
     pool.rewardTokens = [rewardToken.id];
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   }
 
   pool.save();
+  protocol.totalPoolCount = protocol.totalPoolCount + 1;
+  protocol.save();
 }
 
 function createPoolFees(poolAddressString: string, fee: BigInt): string[] {
+  let poolTradingFee = new LiquidityPoolFee("trading-fee-" + poolAddressString);
+  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
+  poolTradingFee.feePercentage = scaleDown(fee, null);
   // LP Fee
   // These fees were activated by a governance vote and were later raised to 50% by a subsequent proposal.
   //https://vote.balancer.fi/#/proposal/0xf6238d70f45f4dacfc39dd6c2d15d2505339b487bbfe014457eba1d7e4d603e3
   let poolLpFee = new LiquidityPoolFee("lp-fee-" + poolAddressString);
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
-  poolLpFee.feePercentage = BigDecimal.fromString("0.5");
+  poolLpFee.feePercentage = BigDecimal.fromString("0.5").times(poolTradingFee.feePercentage!);
 
   // These fees were activated by a governance vote and were later raised to 50% by a subsequent proposal.
   //https://vote.balancer.fi/#/proposal/0xf6238d70f45f4dacfc39dd6c2d15d2505339b487bbfe014457eba1d7e4d603e3
   // Protocol Fee
   let poolProtocolFee = new LiquidityPoolFee("protocol-fee-" + poolAddressString);
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
-  poolProtocolFee.feePercentage = BigDecimal.fromString("0.5");
-
-  let poolTradingFee = new LiquidityPoolFee("trading-fee-" + poolAddressString);
-  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
-  poolTradingFee.feePercentage = scaleDown(fee, null);
+  poolProtocolFee.feePercentage = BigDecimal.fromString("0.5").times(poolTradingFee.feePercentage!);
 
   poolLpFee.save();
   poolProtocolFee.save();

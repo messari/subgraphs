@@ -98,6 +98,6 @@ export function fetchPrice(tokenAddress: Address): BigDecimal {
   if (token) tokenPrice = token.lastPriceUSD;
   if (tokenPrice) return tokenPrice;
 
-  if (getOrCreateDex().network == "MATIC") return BIGDECIMAL_ZERO;
+  if (getOrCreateDex().network == "MATIC" || getOrCreateDex().network == "OPTIMISM") return BIGDECIMAL_ZERO;
   return getUsdPrice(tokenAddress, BIGDECIMAL_ONE);
 }

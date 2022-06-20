@@ -74,6 +74,9 @@ export function handleEvent(
   let protocol = getOrCreateLendingProtocol();
   let usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
   let usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
+  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id)!;
+  let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id)!;
+  let financialsDailySnapshot = getOrCreateFinancials(event);
   if (eventType == "DEPOSIT") {
 
     let depositEvent = new Deposit("deposit-" + createEntityID(event));
@@ -135,6 +138,12 @@ export function handleEvent(
     withdrawEvent.asset = getOrCreateToken(Address.fromString(market.inputToken!)).id;
     withdrawEvent.amount = absValBigInt(amountCollateral);
     withdrawEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
+    financialsDailySnapshot.dailyWithdrawUSD = 
+      financialsDailySnapshot.dailyWithdrawUSD.plus(withdrawEvent.amountUSD);
+    marketHourlySnapshot.hourlyWithdrawUSD = 
+      marketHourlySnapshot.hourlyWithdrawUSD.plus(withdrawEvent.amountUSD);
+    marketDailySnapshot.dailyWithdrawUSD =
+      marketDailySnapshot.dailyWithdrawUSD.plus(withdrawEvent.amountUSD);
     usageMetricsHourlySnapshot.hourlyWithdrawCount += 1;
     usageMetricsDailySnapshot.dailyWithdrawCount += 1;
 
@@ -157,6 +166,12 @@ export function handleEvent(
     repayEvent.asset = DAI;
     repayEvent.amount = absValBigInt(amountDAI);
     repayEvent.amountUSD = bigIntToBigDecimal(absValBigInt(amountDAI), WAD);
+    financialsDailySnapshot.dailyRepayUSD = 
+      financialsDailySnapshot.dailyRepayUSD.plus(repayEvent.amountUSD)
+    marketHourlySnapshot.hourlyRepayUSD =
+      marketHourlySnapshot.hourlyRepayUSD.plus(repayEvent.amountUSD);
+    marketDailySnapshot.dailyRepayUSD =
+      marketDailySnapshot.dailyRepayUSD.plus(repayEvent.amountUSD);
     usageMetricsHourlySnapshot.hourlyRepayCount += 1;
     usageMetricsDailySnapshot.dailyRepayCount += 1;
 
@@ -176,8 +191,9 @@ export function handleEvent(
     liquidateEvent.blockNumber = event.block.number;
     liquidateEvent.timestamp = event.block.timestamp;
     liquidateEvent.market = market.id;
-    liquidateEvent.asset = getOrCreateToken(Address.fromString(market.inputToken!)).id;
+    liquidateEvent.asset = getOrCreateToken(Address.fromString(DAI)).id;
     liquidateEvent.amount = absValBigInt(amountCollateral);
+    liquidateEvent.liquidatee = event.transaction.from.toHexString();
     liquidateEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
     liquidateEvent.profitUSD = bigIntToBigDecimal(absValBigInt(amountDAI), WAD)
       .times(market.debtMultiplier)
@@ -187,8 +203,11 @@ export function handleEvent(
     usageMetricsDailySnapshot.dailyLiquidateCount += 1;
 
     liquidateEvent.save();
+    financialsDailySnapshot.save();
     usageMetricsHourlySnapshot.save();
     usageMetricsDailySnapshot.save();
+    marketHourlySnapshot.save();
+    marketDailySnapshot.save();
   }
 }
 
@@ -310,7 +329,12 @@ export function handleGrab(event: LogNote): void {
   market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(totalLiqudationUSD);
 
   marketHourlySnapshot.hourlyLiquidateUSD = marketHourlySnapshot.hourlyLiquidateUSD.plus(totalLiqudationUSD);
+  marketHourlySnapshot.hourlyProtocolSideRevenueUSD = marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(liquidationProfit);
+  marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlyTotalRevenueUSD.plus(liquidationProfit);
+
   marketDailySnapshot.dailyLiquidateUSD = marketDailySnapshot.dailyLiquidateUSD.plus(totalLiqudationUSD);
+  marketDailySnapshot.dailyProtocolSideRevenueUSD = marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(liquidationProfit);
+  marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailyTotalRevenueUSD.plus(liquidationProfit);
 
   financialsDailySnapshot.dailyLiquidateUSD = financialsDailySnapshot.dailyLiquidateUSD.plus(totalLiqudationUSD);
   financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
@@ -321,6 +345,9 @@ export function handleGrab(event: LogNote): void {
   protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(totalLiqudationUSD);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(liquidationProfit);
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(liquidationProfit);
+  
+  market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(liquidationProfit);
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(liquidationProfit);
 
   market.save();
   marketHourlySnapshot.save();
@@ -340,6 +367,12 @@ export function handleHeal(event: LogNote): void {
 }
 
 export function handleSuck(event: LogNote): void {
+  let ilk = event.params.arg1;
+  let market = getMarketFromIlk(ilk);
+  if (!market) {
+    return;
+  }
+
   let rad = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.arg3), RAD);
   log.debug("handleSuck arg1 = {}, arg2 = {}, vow = {}, pot = {} ", [
     "0x" +
@@ -371,13 +404,37 @@ export function handleSuck(event: LogNote): void {
   ) {
     let FinancialsDailySnapshot = getOrCreateFinancials(event);
     let protocol = getOrCreateLendingProtocol();
+    let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id)!;
+    let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id)!;
     log.debug("supplySideRevenueUSD = {}", [rad.toString()]);
-    FinancialsDailySnapshot.dailySupplySideRevenueUSD = FinancialsDailySnapshot.dailySupplySideRevenueUSD.plus(rad);
-    FinancialsDailySnapshot.dailyTotalRevenueUSD = FinancialsDailySnapshot.dailyTotalRevenueUSD.plus(rad);
-    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(rad);
-    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(rad);
+    
+    FinancialsDailySnapshot.dailySupplySideRevenueUSD =
+      FinancialsDailySnapshot.dailySupplySideRevenueUSD.plus(rad);
+    protocol.cumulativeSupplySideRevenueUSD =
+      protocol.cumulativeSupplySideRevenueUSD.plus(rad);
+    market.cumulativeSupplySideRevenueUSD =
+      market.cumulativeSupplySideRevenueUSD.plus(rad);
+    marketDailySnapshot.dailySupplySideRevenueUSD = 
+      marketDailySnapshot.dailySupplySideRevenueUSD.plus(rad) 
+    marketHourlySnapshot.hourlySupplySideRevenueUSD =
+      marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(rad)
+    
+    FinancialsDailySnapshot.dailyTotalRevenueUSD =
+      FinancialsDailySnapshot.dailyTotalRevenueUSD.plus(rad);
+    protocol.cumulativeTotalRevenueUSD =
+      protocol.cumulativeTotalRevenueUSD.plus(rad);
+    market.cumulativeTotalRevenueUSD =
+      market.cumulativeTotalRevenueUSD.plus(rad);
+    marketDailySnapshot.dailyTotalRevenueUSD =
+      marketDailySnapshot.dailyTotalRevenueUSD.plus(rad) 
+    marketHourlySnapshot.hourlyTotalRevenueUSD =
+      marketHourlySnapshot.hourlyTotalRevenueUSD.plus(rad) 
+    
     FinancialsDailySnapshot.save();
+    marketHourlySnapshot.save();
+    marketDailySnapshot.save();
     protocol.save();
+    market.save();
   }
   updateTotalBorrowUSD(); // add debt
   updateFinancialsDailySnapshot(event);
@@ -395,6 +452,8 @@ export function handleFold(event: LogNote): void {
   let feesAccrued = dRate.times(market.totalBorrowBalanceUSD); // change in rate multiplied by total borrowed amt, compounded
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
+  let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id)!;
+  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id)!;
 
   market.debtMultiplier = market.debtMultiplier.plus(dRate);
   financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
@@ -404,8 +463,20 @@ export function handleFold(event: LogNote): void {
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(feesAccrued);
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(feesAccrued);
 
+  marketDailySnapshot.dailyProtocolSideRevenueUSD = 
+    marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(feesAccrued);
+  marketDailySnapshot.dailyTotalRevenueUSD = 
+    marketDailySnapshot.dailyTotalRevenueUSD.plus(feesAccrued);
+  
+  marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
+    marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(feesAccrued);
+  marketHourlySnapshot.hourlyTotalRevenueUSD = 
+    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(feesAccrued);
+
   market.save();
   financialsDailySnapshot.save();
+  marketHourlySnapshot.save();
+  marketDailySnapshot.save();
   protocol.save();
   updateTotalBorrowUSD(); // add debt
   updateFinancialsDailySnapshot(event);

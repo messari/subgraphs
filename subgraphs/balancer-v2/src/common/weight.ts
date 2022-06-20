@@ -14,7 +14,7 @@ export function updateWeight(poolId: string): void {
     let weights = weightsCall.value;
     let formattedWeights = new Array<BigDecimal>();
     for (let i = 0; i < weights.length; i++) {
-      formattedWeights.push(shrinkToBigDecimal(weights[i],DEFAULT_DECIMALS).times(BIGDECIMAL_HUNDRED));
+      formattedWeights.push(shrinkToBigDecimal(weights[i], DEFAULT_DECIMALS).times(BIGDECIMAL_HUNDRED));
     }
     pool.inputTokenWeights = formattedWeights;
     pool.save();

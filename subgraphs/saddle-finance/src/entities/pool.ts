@@ -46,11 +46,11 @@ import {
   getOrCreateTokenFromString,
   getTokenDecimals,
 } from "./token";
-import { NewSwapPool } from "../../generated/USDDeployer/SwapDeployer";
 import { getPriceUSD, getTokenAmountsSumUSD } from "../utils/price";
-import { MiniChefV2 } from "../../generated/MiniChefV2/MiniChefV2";
-import { SimpleRewarder } from "../../generated/MiniChefV2/SimpleRewarder";
 import { prefixID } from "../utils/strings";
+import { MiniChefV2 } from "../../generated/templates/Swap/MiniChefV2";
+import { NewSwapPool } from "../../generated/templates/Swap/SwapDeployer";
+import { SimpleRewarder } from "../../generated/templates/Swap/SimpleRewarder";
 
 export function getOrCreatePool(address: Address): LiquidityPool {
   let pool = LiquidityPool.load(address.toHexString());
@@ -118,6 +118,10 @@ export function getOrCreatePoolDailySnapshot(
     poolDailySnapshot.dailyVolumeByTokenUSD = new Array<BigDecimal>(
       pool.inputTokens.length
     ).map<BigDecimal>(() => BIGDECIMAL_ZERO);
+
+    poolDailySnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolDailySnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolDailySnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
   poolDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolDailySnapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
@@ -129,6 +133,13 @@ export function getOrCreatePoolDailySnapshot(
   poolDailySnapshot.rewardTokenEmissionsAmount =
     pool.rewardTokenEmissionsAmount;
   poolDailySnapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+
+  poolDailySnapshot.cumulativeSupplySideRevenueUSD =
+    pool.cumulativeSupplySideRevenueUSD;
+  poolDailySnapshot.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD;
+  poolDailySnapshot.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+
   poolDailySnapshot.blockNumber = event.block.number;
   poolDailySnapshot.timestamp = event.block.timestamp;
   poolDailySnapshot.save();
@@ -153,6 +164,10 @@ export function getOrCreatePoolHourlySnapshot(
     poolHourlySnapshot.hourlyVolumeByTokenUSD = new Array<BigDecimal>(
       pool.inputTokens.length
     ).map<BigDecimal>(() => BIGDECIMAL_ZERO);
+
+    poolHourlySnapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolHourlySnapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolHourlySnapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
   poolHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolHourlySnapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
@@ -164,9 +179,17 @@ export function getOrCreatePoolHourlySnapshot(
   poolHourlySnapshot.rewardTokenEmissionsAmount =
     pool.rewardTokenEmissionsAmount;
   poolHourlySnapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+
+  poolHourlySnapshot.cumulativeSupplySideRevenueUSD =
+    pool.cumulativeSupplySideRevenueUSD;
+  poolHourlySnapshot.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD;
+  poolHourlySnapshot.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+
   poolHourlySnapshot.blockNumber = event.block.number;
   poolHourlySnapshot.timestamp = event.block.timestamp;
   poolHourlySnapshot.save();
+
   return poolHourlySnapshot;
 }
 
@@ -248,7 +271,7 @@ export function handlePoolSwap(
     getSupplySideFee(pool.id)
   );
   const protocolRevenueUSD = swap.amountInUSD.times(getProtocolFee(pool.id));
-  addProtocolUSDRevenue(event, supplySideRevenueUSD, protocolRevenueUSD);
+  addProtocolUSDRevenue(event, pool, supplySideRevenueUSD, protocolRevenueUSD);
 }
 
 export function handlePoolRewardsUpdated(
@@ -467,7 +490,9 @@ function createPoolFromAddress(address: Address): LiquidityPool {
       ]);
     }
   }
-  pool.protocol = getOrCreateProtocol().id;
+
+  const protocol = getOrCreateProtocol();
+  pool.protocol = protocol.id;
   pool.inputTokens = getOrCreateInputTokensFromContract(contract);
   const token = getOrCreateToken(lpTokenAddress, address.toHexString());
   pool.outputToken = token.id;
@@ -481,7 +506,17 @@ function createPoolFromAddress(address: Address): LiquidityPool {
   pool.fees = createOrUpdateAllFees(address, tradingFee, adminFee);
   pool._basePool = getBasePool(contract);
   setInputTokenBalancesAndWeights(pool, contract);
+
+  pool.isSingleSided = false;
+  pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+  protocol.totalPoolCount += 1;
+
+  protocol.save();
   pool.save();
+
   return pool;
 }
 

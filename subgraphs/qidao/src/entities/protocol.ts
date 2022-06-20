@@ -7,6 +7,7 @@ import {
 import {
   FinancialsDailySnapshot,
   LendingProtocol,
+  Market,
 } from "../../generated/schema";
 import { ERC20 } from "../../generated/templates/Vault/ERC20";
 import {
@@ -25,6 +26,7 @@ import {
   SECONDS_PER_DAY,
 } from "../utils/constants";
 import { uppercaseNetwork } from "../utils/strings";
+import { getOrCreateMarketHourlySnapshot, getOrCreateMarketSnapshot } from "./market";
 import { getMaiToken } from "./token";
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
@@ -44,6 +46,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.mintedTokens = [getMaiToken().id];
 
     protocol.cumulativeUniqueUsers = INT_ZERO;
+    protocol.totalPoolCount = INT_ZERO;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -76,6 +79,9 @@ export function getOrCreateFinancialsSnapshot(
     financialsSnapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
     financialsSnapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
     financialsSnapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    
+    financialsSnapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    financialsSnapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
   }
   financialsSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialsSnapshot.mintedTokenSupplies = protocol.mintedTokenSupplies;
@@ -97,6 +103,7 @@ export function getOrCreateFinancialsSnapshot(
 
 export function addProtocolSideRevenue(
   event: ethereum.Event,
+  market: Market,
   revenueAmountUSD: BigDecimal
 ): void {
   const protocol = getOrCreateLendingProtocol();
@@ -111,10 +118,31 @@ export function addProtocolSideRevenue(
   financialsSnapshot.dailyTotalRevenueUSD =
     financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
+
+  market.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD.plus(revenueAmountUSD);
+  market.cumulativeTotalRevenueUSD =
+    market.cumulativeTotalRevenueUSD.plus(revenueAmountUSD);
+  market.save();
+
+  const marketDailySnapshot = getOrCreateMarketSnapshot(event, market);
+  marketDailySnapshot.dailyProtocolSideRevenueUSD =
+    marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(revenueAmountUSD);
+  marketDailySnapshot.dailyTotalRevenueUSD =
+    marketDailySnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD)
+  marketDailySnapshot.save();
+
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+  marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
+    marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(revenueAmountUSD);
+  marketHourlySnapshot.hourlyTotalRevenueUSD =
+    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(revenueAmountUSD)
+  marketHourlySnapshot.save();
 }
 
 export function addSupplySideRevenue(
   event: ethereum.Event,
+  market: Market,
   revenueAmountUSD: BigDecimal
 ): void {
   const protocol = getOrCreateLendingProtocol();
@@ -123,12 +151,33 @@ export function addSupplySideRevenue(
   protocol.cumulativeTotalRevenueUSD =
     protocol.cumulativeTotalRevenueUSD.plus(revenueAmountUSD);
   protocol.save();
+  
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.dailySupplySideRevenueUSD =
     financialsSnapshot.dailySupplySideRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.dailyTotalRevenueUSD =
     financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
+
+  market.cumulativeSupplySideRevenueUSD = 
+    market.cumulativeSupplySideRevenueUSD.plus(revenueAmountUSD);
+  market.cumulativeTotalRevenueUSD = 
+    market.cumulativeTotalRevenueUSD.plus(revenueAmountUSD);
+  market.save();
+
+  const marketDailySnapshot = getOrCreateMarketSnapshot(event, market);
+  marketDailySnapshot.dailySupplySideRevenueUSD = 
+    marketDailySnapshot.dailySupplySideRevenueUSD.plus(revenueAmountUSD);
+  marketDailySnapshot.dailyTotalRevenueUSD = 
+    marketDailySnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD)
+  marketDailySnapshot.save();
+
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+  marketHourlySnapshot.hourlySupplySideRevenueUSD =
+    marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(revenueAmountUSD);
+  marketHourlySnapshot.hourlyTotalRevenueUSD =
+    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(revenueAmountUSD)
+  marketHourlySnapshot.save();
 }
 
 export function addProtocolDepositVolume(

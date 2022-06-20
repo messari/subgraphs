@@ -58,7 +58,11 @@ export function getUSDPriceOfToken(market: Market, blockNumber: i32): BigDecimal
         getTokenDecimals,
       );
       let underlyingPrice = tokenPriceETH.truncate(getTokenDecimals);
-      if (cTokenAddress == CUSDC_ADDRESS || cTokenAddress == CUSDT_ADDRESS || cTokenAddress == CTUSD_ADDRESS) {
+      if (
+        cTokenAddress == CUSDC_ADDRESS ||
+        cTokenAddress == CUSDT_ADDRESS ||
+        cTokenAddress == CTUSD_ADDRESS
+      ) {
         tokenPrice = BIGDECIMAL_ONE;
       } else {
         tokenPrice = underlyingPrice.div(usdPriceinInETH).truncate(getTokenDecimals);
@@ -102,7 +106,9 @@ export function getTokenPrice(
     let priceOracle2 = PriceOracle2.bind(oracle2Address);
     let tryPrice = priceOracle2.try_getUnderlyingPrice(cTokenAddress);
 
-    underlyingPrice = tryPrice.reverted ? BIGDECIMAL_ZERO : tryPrice.value.toBigDecimal().div(bdFactor);
+    underlyingPrice = tryPrice.reverted
+      ? BIGDECIMAL_ZERO
+      : tryPrice.value.toBigDecimal().div(bdFactor);
   } else {
     /**
      * Calculate using PriceOracle1
@@ -131,10 +137,15 @@ export function getUSDCPriceETH(blockNumber: i32): BigDecimal {
     let bdFactorUSDC = exponentToBigDecimal(mantissaDecimalFactorUSDC);
     let tryPrice = priceOracle2.try_getUnderlyingPrice(Address.fromString(CUSDC_ADDRESS));
 
-    usdcPrice = tryPrice.reverted ? BIGDECIMAL_ZERO : tryPrice.value.toBigDecimal().div(bdFactorUSDC);
+    usdcPrice = tryPrice.reverted
+      ? BIGDECIMAL_ZERO
+      : tryPrice.value.toBigDecimal().div(bdFactorUSDC);
   } else {
     let priceOracle1 = PriceOracle1.bind(Address.fromString(PRICE_ORACLE1_ADDRESS));
-    usdcPrice = priceOracle1.getPrice(Address.fromString(USDC_ADDRESS)).toBigDecimal().div(mantissaFactorBD);
+    usdcPrice = priceOracle1
+      .getPrice(Address.fromString(USDC_ADDRESS))
+      .toBigDecimal()
+      .div(mantissaFactorBD);
   }
   return usdcPrice;
 }
@@ -146,7 +157,9 @@ export function getUSDPriceETH(blockNumber: i32): BigDecimal {
   let priceOracle2 = PriceOracle2.bind(oracle2Address);
   let tryPrice = priceOracle2.try_getUnderlyingPrice(Address.fromString(CETH_ADDRESS));
 
-  let ethPriceInUSD = tryPrice.reverted ? BIGDECIMAL_ZERO : tryPrice.value.toBigDecimal().div(mantissaFactorBD);
+  let ethPriceInUSD = tryPrice.reverted
+    ? BIGDECIMAL_ZERO
+    : tryPrice.value.toBigDecimal().div(mantissaFactorBD);
 
   return ethPriceInUSD;
 }
