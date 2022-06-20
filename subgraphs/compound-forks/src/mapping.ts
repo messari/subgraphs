@@ -24,6 +24,7 @@ import {
   UsageMetricsHourlySnapshot,
 } from "../generated/schema";
 import {
+  ActivityType,
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -338,9 +339,9 @@ export function _handleMarketListed(
   market.outputTokenSupply = BIGINT_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.exchangeRate = BIGDECIMAL_ZERO;
-  market._cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  market._cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  market._cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
   market.save();
 
@@ -350,6 +351,7 @@ export function _handleMarketListed(
   let marketIDs = marketListedData.protocol._marketIDs;
   marketIDs.push(market.id);
   marketListedData.protocol._marketIDs = marketIDs;
+  marketListedData.protocol.totalPoolCount++;
   marketListedData.protocol.save();
 }
 
@@ -489,6 +491,13 @@ export function _handleRedeem(
   withdraw.save();
 
   market.save();
+
+  updateMarketSnapshots(
+    marketID,
+    event.block.timestamp.toI32(),
+    withdraw.amountUSD,
+    EventType.Withdraw
+  );
 
   snapshotUsage(
     comptrollerAddr,
@@ -632,6 +641,13 @@ export function _handleRepayBorrow(
   );
   repay.save();
 
+  updateMarketSnapshots(
+    marketID,
+    event.block.timestamp.toI32(),
+    repay.amountUSD,
+    EventType.Repay
+  );
+
   snapshotUsage(
     comptrollerAddr,
     event.block.number,
@@ -653,6 +669,7 @@ export function _handleLiquidateBorrow(
   comptrollerAddr: Address,
   cTokenCollateral: Address,
   liquidator: Address,
+  borrower: Address,
   seizeTokens: BigInt,
   repayAmount: BigInt,
   event: ethereum.Event
@@ -724,6 +741,7 @@ export function _handleLiquidateBorrow(
   liquidate.protocol = protocol.id;
   liquidate.to = repayTokenMarketID;
   liquidate.from = liquidator.toHexString();
+  liquidate.liquidatee = borrower.toHexString();
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.market = repayTokenMarketID;
@@ -853,6 +871,11 @@ export function snapshotMarket(
   dailySnapshot.protocol = market.protocol;
   dailySnapshot.market = marketID;
   dailySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+  dailySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  dailySnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  dailySnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
   dailySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   dailySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   dailySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -884,6 +907,11 @@ export function snapshotMarket(
   hourlySnapshot.protocol = market.protocol;
   hourlySnapshot.market = marketID;
   hourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+  hourlySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  hourlySnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  hourlySnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
   hourlySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   hourlySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   hourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -944,6 +972,8 @@ export function snapshotFinancials(
   let dailyDepositUSD = BIGDECIMAL_ZERO;
   let dailyBorrowUSD = BIGDECIMAL_ZERO;
   let dailyLiquidateUSD = BIGDECIMAL_ZERO;
+  let dailyWithdrawUSD = BIGDECIMAL_ZERO;
+  let dailyRepayUSD = BIGDECIMAL_ZERO;
   let dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   let dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   let dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -976,20 +1006,26 @@ export function snapshotFinancials(
     dailyLiquidateUSD = dailyLiquidateUSD.plus(
       marketDailySnapshot.dailyLiquidateUSD
     );
+    dailyWithdrawUSD = dailyWithdrawUSD.plus(
+      marketDailySnapshot.dailyWithdrawUSD
+    );
+    dailyRepayUSD = dailyRepayUSD.plus(marketDailySnapshot.dailyRepayUSD);
     dailyTotalRevenueUSD = dailyTotalRevenueUSD.plus(
-      marketDailySnapshot._dailyTotalRevenueUSD
+      marketDailySnapshot.dailyTotalRevenueUSD
     );
     dailyProtocolSideRevenueUSD = dailyProtocolSideRevenueUSD.plus(
-      marketDailySnapshot._dailyProtocolSideRevenueUSD
+      marketDailySnapshot.dailyProtocolSideRevenueUSD
     );
     dailySupplySideRevenueUSD = dailySupplySideRevenueUSD.plus(
-      marketDailySnapshot._dailySupplySideRevenueUSD
+      marketDailySnapshot.dailySupplySideRevenueUSD
     );
   }
 
   snapshot.dailyDepositUSD = dailyDepositUSD;
   snapshot.dailyBorrowUSD = dailyBorrowUSD;
   snapshot.dailyLiquidateUSD = dailyLiquidateUSD;
+  snapshot.dailyWithdrawUSD = dailyWithdrawUSD;
+  snapshot.dailyRepayUSD = dailyRepayUSD;
   snapshot.dailyTotalRevenueUSD = dailyTotalRevenueUSD;
   snapshot.dailyProtocolSideRevenueUSD = dailyProtocolSideRevenueUSD;
   snapshot.dailySupplySideRevenueUSD = dailySupplySideRevenueUSD;
@@ -1046,7 +1082,10 @@ function snapshotUsage(
     dailySnapshot.blockNumber = blockNumber;
     dailySnapshot.timestamp = blockTimestamp;
   }
-  let dailyAccountID = accountID.concat("-").concat(dailySnapshotID);
+  let dailyAccountID = ActivityType.DAILY.concat("-")
+    .concat(accountID)
+    .concat("-")
+    .concat(dailySnapshotID);
   let dailyActiveAccount = ActiveAccount.load(dailyAccountID);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyAccountID);
@@ -1075,6 +1114,7 @@ function snapshotUsage(
     default:
       break;
   }
+  dailySnapshot.totalPoolCount = protocol.totalPoolCount;
   dailySnapshot.blockNumber = blockNumber;
   dailySnapshot.timestamp = blockTimestamp;
   dailySnapshot.save();
@@ -1098,7 +1138,10 @@ function snapshotUsage(
     hourlySnapshot.blockNumber = blockNumber;
     hourlySnapshot.timestamp = blockTimestamp;
   }
-  let hourlyAccountID = accountID.concat("-").concat(hourlySnapshotID);
+  let hourlyAccountID = ActivityType.HOURLY.concat("-")
+    .concat(accountID)
+    .concat("-")
+    .concat(hourlySnapshotID);
   let hourlyActiveAccount = ActiveAccount.load(hourlyAccountID);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyAccountID);
@@ -1155,6 +1198,14 @@ function updateMarketSnapshots(
       marketHourlySnapshot.hourlyLiquidateUSD =
         marketHourlySnapshot.hourlyLiquidateUSD.plus(amountUSD);
       break;
+    case EventType.Withdraw:
+      marketHourlySnapshot.hourlyWithdrawUSD =
+        marketHourlySnapshot.hourlyWithdrawUSD.plus(amountUSD);
+      break;
+    case EventType.Repay:
+      marketHourlySnapshot.hourlyRepayUSD =
+        marketHourlySnapshot.hourlyRepayUSD.plus(amountUSD);
+      break;
     default:
       break;
   }
@@ -1173,6 +1224,14 @@ function updateMarketSnapshots(
     case EventType.Liquidate:
       marketDailySnapshot.dailyLiquidateUSD =
         marketDailySnapshot.dailyLiquidateUSD.plus(amountUSD);
+      break;
+    case EventType.Withdraw:
+      marketDailySnapshot.dailyWithdrawUSD =
+        marketDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
+      break;
+    case EventType.Repay:
+      marketDailySnapshot.dailyRepayUSD =
+        marketDailySnapshot.dailyRepayUSD.plus(amountUSD);
       break;
     default:
       break;
@@ -1336,28 +1395,43 @@ export function updateMarket(
     protocolSideRevenueUSDDelta
   );
 
-  market._cumulativeTotalRevenueUSD = market._cumulativeTotalRevenueUSD.plus(
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(
     interestAccumulatedUSD
   );
-  market._cumulativeProtocolSideRevenueUSD =
-    market._cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
-  market._cumulativeSupplySideRevenueUSD =
-    market._cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  market.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
+  market.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
   market.save();
 
-  // update daily fields in snapshot
-  let snapshot = getOrCreateMarketDailySnapshot(
+  // update daily fields in marketDailySnapshot
+  let dailySnapshot = getOrCreateMarketDailySnapshot(
     market.id,
     blockTimestamp.toI32()
   );
-  snapshot._dailyTotalRevenueUSD = snapshot._dailyTotalRevenueUSD.plus(
+  dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
     interestAccumulatedUSD
   );
-  snapshot._dailyProtocolSideRevenueUSD =
-    snapshot._dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
-  snapshot._dailySupplySideRevenueUSD =
-    snapshot._dailySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
-  snapshot.save();
+  dailySnapshot.dailyProtocolSideRevenueUSD =
+    dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
+  dailySnapshot.dailySupplySideRevenueUSD =
+    dailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  dailySnapshot.save();
+
+  // update hourly fields in marketHourlySnapshot
+  let hourlySnapshot = getOrCreateMarketHourlySnapshot(
+    market.id,
+    blockTimestamp.toI32()
+  );
+  hourlySnapshot.hourlyTotalRevenueUSD =
+    hourlySnapshot.hourlyTotalRevenueUSD.plus(interestAccumulatedUSD);
+  hourlySnapshot.hourlyProtocolSideRevenueUSD =
+    hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+      protocolSideRevenueUSDDelta
+    );
+  hourlySnapshot.hourlySupplySideRevenueUSD =
+    hourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  hourlySnapshot.save();
 }
 
 export function updateProtocol(comptrollerAddr: Address): void {
@@ -1404,13 +1478,13 @@ export function updateProtocol(comptrollerAddr: Address): void {
       market.cumulativeLiquidateUSD
     );
     cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD.plus(
-      market._cumulativeTotalRevenueUSD
+      market.cumulativeTotalRevenueUSD
     );
     cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD.plus(
-      market._cumulativeProtocolSideRevenueUSD
+      market.cumulativeProtocolSideRevenueUSD
     );
     cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD.plus(
-      market._cumulativeSupplySideRevenueUSD
+      market.cumulativeSupplySideRevenueUSD
     );
   }
 
@@ -1459,6 +1533,7 @@ export function _getOrCreateProtocol(
     protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    protocol.totalPoolCount = INT_ZERO;
     protocol._marketIDs = [];
 
     // set liquidation incentive
@@ -1499,6 +1574,11 @@ function getOrCreateMarketHourlySnapshot(
     snapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
     snapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
     snapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyRepayUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
   }
 
   return snapshot;
@@ -1581,9 +1661,11 @@ export function getOrCreateMarketDailySnapshot(
     snapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
     snapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
     snapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
-    snapshot._dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot._dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot._dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   }
 
   return snapshot;

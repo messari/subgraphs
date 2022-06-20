@@ -161,12 +161,14 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let cTokenCollateral = event.params.cTokenCollateral;
   let liquidator = event.params.liquidator;
+  let borrower = event.params.borrower;
   let seizeTokens = event.params.seizeTokens;
   let repayAmount = event.params.repayAmount;
   _handleLiquidateBorrow(
     comptrollerAddr,
     cTokenCollateral,
     liquidator,
+    borrower,
     seizeTokens,
     repayAmount,
     event
@@ -205,8 +207,8 @@ function getOrCreateProtocol(): LendingProtocol {
     comptrollerAddr,
     "Iron Bank",
     "iron-bank",
-    "1.2.1",
-    "1.0.6",
+    "1.3.0",
+    "1.0.7",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
