@@ -100,34 +100,42 @@
       "qidao": {
         "arbitrum": {
           "template": "qidao.template.yaml",
+          "messari": "messari/qidao-arbitrum",
           "deploy-on-merge": true
         },
         "avalanche": {
           "template": "qidao.template.yaml",
+          "messari": "messari/qidao-avalanche",
           "deploy-on-merge": true
         },
         "bsc": {
           "template": "qidao.template.yaml",
+          "messari": "messari/qidao-bsc",
           "deploy-on-merge": true
         },
         "fantom": {
           "template": "qidao.template.yaml",
+          "messari": "messari/qidao-fantom",
           "deploy-on-merge": true
         },
         "matic": {
           "template": "qidao.template.yaml",
+          "messari": "messari/qidao-polygon",
           "deploy-on-merge": true
         },
         "moonriver": {
           "template": "qidao.template.yaml",
+          "messari": "messari/qidao-moonriver",
           "deploy-on-merge": true
         },
         "optimism": {
           "template": "qidao.template.yaml",
+          "messari": "messari/qidao-optimism",
           "deploy-on-merge": true
         },
         "xdai": {
           "template": "qidao.template.yaml",
+          "messari": "messari/qidao-gnosis",
           "deploy-on-merge": true
         }
       }
