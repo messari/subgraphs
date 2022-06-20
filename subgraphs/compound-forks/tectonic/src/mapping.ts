@@ -6,7 +6,7 @@ import {
   NewCollateralFactor,
   NewLiquidationIncentive,
   ActionPaused1,
-} from "../../generated/Comptroller/Comptroller";
+} from "../generated/Comptroller/Core";
 import {
   Mint,
   Redeem,
@@ -85,12 +85,12 @@ function getOrCreateProtocol(): LendingProtocol {
 
 
 export function handleMarketListed(event: MarketListed): void {
-  CTokenTemplate.create(event.params.cToken);
+  CTokenTemplate.create(event.params.tToken);
   log.warning(
     "logging: {}",
-    [event.params.cToken.toHexString()]
+    [event.params.tToken.toHexString()]
   );
-  let cTokenAddr = event.params.cToken;
+  let cTokenAddr = event.params.tToken;
   let cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
@@ -99,7 +99,7 @@ export function handleMarketListed(event: MarketListed): void {
   // this is a new cToken, a new underlying token, and a new market
 
   let protocol = getOrCreateProtocol();
-  let cTokenContract = CToken.bind(event.params.cToken);
+  let cTokenContract = CToken.bind(event.params.tToken);
   let cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
