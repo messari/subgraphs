@@ -92,19 +92,19 @@
       "gamma-strategies": {
         "arbitrum": {
           "template": "gamma.strategies.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "mainnet": {
           "template": "gamma.strategies.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "matic": {
           "template": "gamma.strategies.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "optimism": {
           "template": "gamma.strategies.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
