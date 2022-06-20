@@ -48,8 +48,8 @@
         }
       }
     },
-    "balancer": {
-      "balancer": {
+    "balancer-v2": {
+      "balancer-v2": {
         "arbitrum": {
           "template": "balancer.v2.template.yaml",
           "prepare:constants": true,
