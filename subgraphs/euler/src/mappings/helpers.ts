@@ -215,7 +215,7 @@ function updateMarketLendingFactors(marketUtility: _MarketUtility, usdcMarketUti
    * For the sake of simplicity when calculating maximumLTV and liquidationThreshold,
    * let's assume borrowed asset is always USDC and collateral asset is always given asset.
    *
-   * maximumLTV = usdcBorrowFactor * assetCollateralFactor
+   * maximumLTV = usdcBorrowFactor * assetCollateralFactor 
    * liquidationThreshold = maximumLTV
    */
   const market = getOrCreateMarket(marketUtility.id);
@@ -223,7 +223,7 @@ function updateMarketLendingFactors(marketUtility: _MarketUtility, usdcMarketUti
   const marketCollateralFactor = marketUtility.collateralFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE);
   const usdcBorrowFactorDecimal = usdcMarketUtility.borrowFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE);
 
-  market.maximumLTV = marketCollateralFactor.times(usdcBorrowFactorDecimal);
+  market.maximumLTV = marketCollateralFactor.times(usdcBorrowFactorDecimal).times(BigDecimal.fromString('100'));
   market.liquidationThreshold = market.maximumLTV;
   if (market.maximumLTV != BIGDECIMAL_ZERO) {
     market.canUseAsCollateral = true;
