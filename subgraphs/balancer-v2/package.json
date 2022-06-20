@@ -16,11 +16,8 @@
     "deploy:mainnet": "yarn prepare:mainnet && graph deploy --node https://api.thegraph.com/deploy/ messari/balancer-v2-ethereum",
     "deploy:polygon": "yarn prepare:polygon && graph deploy --node https://api.thegraph.com/deploy/ messari/balancer-v2-polygon",
     "deploy:arbitrum": "yarn prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ messari/balancer-v2-arbitrum",
-    "deploy:beets": "yarn prepare:beets && graph deploy --node https://api.thegraph.com/deploy/ messari/beets-fantom",
-    "deploy:beetsop": "yarn prepare:beetsop && graph deploy --node https://api.thegraph.com/deploy/ messari/beets-optimism",
-    "create-local": "graph create --node http://localhost:8020/ dOrgTech/balancer-v2",
-    "remove-local": "graph remove --node http://localhost:8020/ dOrgTech/balancer-v2",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dOrgTech/balancer-v2"
+    "deploy:beets": "yarn prepare:beets && graph deploy --node https://api.thegraph.com/deploy/ messari/beethoven-x-fantom",
+    "deploy:beetsop": "yarn prepare:beetsop && graph deploy --node https://api.thegraph.com/deploy/ messari/beethoven-x-optimism"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",
