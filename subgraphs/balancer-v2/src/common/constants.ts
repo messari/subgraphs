@@ -8,8 +8,8 @@ import { BigDecimal, BigInt, Address, dataSource } from "@graphprotocol/graph-ts
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.0";
+export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.1";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 export const PROTOCOL_NAME = "Beethoven X";
@@ -61,10 +61,9 @@ export namespace LiquidityPoolFeeType {
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
 
-export namespace HelperStoreType {
-  export const NATIVE_TOKEN = "NATIVE_TOKEN";
-  export const USERS = "USERS";
-  // Pool addresses are also stored in the HelperStore
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT";
+  export const BORROW = "BORROW";
 }
 
 export namespace UsageType {
@@ -109,7 +108,6 @@ export const BIGDECIMAL_TEN_THOUSAND = new BigDecimal(BIGINT_TEN_THOUSAND);
 export const BIGDECIMAL_MILLION = new BigDecimal(BIGINT_MILLION);
 
 export const Q192 = BigDecimal.fromString("6277101735386680763835789423207666416102355444464034512896");
-
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
@@ -130,20 +128,22 @@ export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
 ///// Protocol Specific /////
 /////////////////////////////
 
-export let DEFAULTNETWORK = "FANTOM";
+export let DEFAULTNETWORK = "OPTIMISM";
 
-export let VAULT_ADDRESS = Address.fromString("0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce");
+export let VAULT_ADDRESS = Address.fromString("0xBA12222222228d8Ba445958a75a0704d566BF2C8");
 
-export let MASTERCHEFV2_ADDRESS = Address.fromString("0x8166994d9ebBe5829EC86Bd81258149B87faCfd3");
+export let REWARDTOKEN = "";
 
-export let DAI: Address = Address.fromString("0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E");
-export let USDC: Address = Address.fromString("0x04068DA6C83AFCFA0e13ba15A6696662335D5B75");
-export let USDT: Address = Address.fromString("0x049d68029688eAbF473097a2fC38ef61633A3C7A");
-export let MIM: Address = Address.fromString("0x82f0B8B456c1A451378467398982d4834b6829c1");
-export let WFTM: Address = Address.fromString("0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83");
-export let WBTC: Address = Address.fromString("0x321162Cd933E2Be498Cd2267a90534A804051b11");
-export let WETH: Address = Address.fromString("0x74b23882a30290451A17c44f4F05243b6b58C76d");
-export let BEETS: Address = Address.fromString("0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e");
+export let DAI: Address = Address.fromString("0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1");
+export let USDC: Address = Address.fromString("0x7F5c764cBc14f9669B88837ca1490cCa17c31607");
+export let USDT: Address = Address.fromString("0x94b008aA00579c1307B0EF2c499aD98a8ce58e58");
+export let FRAX: Address = Address.fromString("0x2e3d870790dc77a83dd1d18184acc7439a53f475");
+export let OP: Address = Address.fromString("0x4200000000000000000000000000000000000042");
+export let WBTC: Address = Address.fromString("0x68f180fcCe6836688e9084f035309E29Bf0A2095");
+export let WETH: Address = Address.fromString("0x4200000000000000000000000000000000000006");
+export let BEETS: Address = Address.fromString("0x97513e975a7fA9072c72C92d8000B0dB90b163c5");
+export let SNX: Address = Address.fromString("0x8700daec35af8ff88c16bdf0418774cb3d7599b4");
+export let LINK: Address = Address.fromString("0x350a791bfc2c21f9ed5d10980dad2e2638ffa7f6");
 
-export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT, MIM];
-export let BASE_ASSETS: Address[] = [WETH, WFTM, WBTC, BEETS];
+export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT, FRAX];
+export let BASE_ASSETS: Address[] = [WETH, OP, WBTC, BEETS, SNX, LINK];

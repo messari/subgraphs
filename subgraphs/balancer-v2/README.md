@@ -64,6 +64,10 @@ To be added
 - Deployed addresses: https://github.com/balancer-labs/balancer-v2-monorepo/tree/master/pkg/deployments#past-deployments
 - Official subgraph: https://github.com/balancer-labs/balancer-subgraph-v2
 
+## Smart Contracts Interactions
+
+![balancer-v2](../../docs/images/protocols/balancer-v2.png "balancer-v2")
+
 ## Build
 
 - Generate code from manifest and schema: `yarn codegen`
@@ -71,6 +75,8 @@ To be added
   - Mainnet: `yarn build:mainnet`
   - Polygon: `yarn build:polygon`
   - Arbitrum: `yarn build:arbitrum`
+  - Beets: `yarn build:beets`
+  - Beets-optimism: `yarn build:beetsop`
 
 ## Deploy
 
@@ -79,3 +85,5 @@ To be added
   - Mainnet `yarn deploy:mainnet`
   - Polygon `yarn deploy:polygon`
   - Arbitrum `yarn deploy:arbitrum`
+  - Beets: `yarn deploy:beets`
+  - Beets-optimism: `yarn deploy:beetsop`

@@ -9,11 +9,20 @@ import {
 
 import { bigDecimal, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { getLiquidityPool, getOrCreateDex, getOrCreateRewardToken, getOrCreateToken } from "../common/getters";
-import { BEETS, BIGDECIMAL_ONE, BIGDECIMAL_ZERO, BIGINT_ZERO, FBEETS, MASTERCHEFV2_ADDRESS, REWARDTOKEN, SECONDS_PER_DAY } from "../common/constants";
-import { getUsdPricePerToken } from "../prices";
+import {
+  BEETS,
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  FBEETS,
+  MASTERCHEFV2_ADDRESS,
+  REWARD_TOKEN,
+  SECONDS_PER_DAY,
+} from "../common/constants";
 import { DEFAULT_DECIMALS } from "../prices/common/constants";
 import { convertTokenToDecimal } from "../common/utils/utils";
 import { LiquidityPool, RewardToken } from "../../generated/schema";
+import { fetchPrice } from "../common/pricing";
 
 export function handleUpdateEmissionRate(event: UpdateEmissionRate): void {
   log.info("[MasterChef] Log update emission rate {} {}", [
@@ -39,7 +48,7 @@ export function handleLogSetPool(event: LogSetPool): void {
     return;
   }
   let pool = getLiquidityPool(poolAddress.value.toHexString());
-  
+
   let rewardToken = getOrCreateRewardToken(BEETS.toHexString());
   pool.rewardTokens = [rewardToken.id];
   let protocol = getOrCreateDex();
@@ -53,9 +62,7 @@ export function handleLogSetPool(event: LogSetPool): void {
   pool.rewardTokenEmissionsAmount![0] = BigInt.fromString(
     convertTokenToDecimal(tokenAmount, DEFAULT_DECIMALS.toI32()).toString(),
   );
-  pool.rewardTokenEmissionsUSD![0] = getUsdPricePerToken(BEETS).usdPrice.times(
-    pool.rewardTokenEmissionsAmount![0].toBigDecimal(),
-  );
+  pool.rewardTokenEmissionsUSD![0] = fetchPrice(BEETS).times(pool.rewardTokenEmissionsAmount![0].toBigDecimal());
   pool.save();
 }
 
@@ -74,9 +81,11 @@ export function handleLogUpdatePool(event: LogUpdatePool): void {
     return;
   }
   let pool = LiquidityPool.load(poolAddress.value.toHexString());
-  if(!pool){
-    if(FBEETS.toHexString() == poolAddress.value.toHexString()){
-      pool = createLiquidityPool(event,poolAddress.value.toHexString(),"FreshBeets","FBEETS",[FBEETS.toHexString()] )
+  if (!pool) {
+    if (FBEETS.toHexString() == poolAddress.value.toHexString()) {
+      pool = createLiquidityPool(event, poolAddress.value.toHexString(), "FreshBeets", "FBEETS", [
+        FBEETS.toHexString(),
+      ]);
     }
   }
   pool!.outputTokenSupply = event.params.lpSupply;
@@ -117,14 +126,16 @@ function createLiquidityPool(
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  if(REWARDTOKEN != ""){
-    let  rewardToken = getOrCreateRewardToken(REWARDTOKEN);
+  if (REWARD_TOKEN != "") {
+    let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
     pool.rewardTokens = [rewardToken.id];
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   }
   pool.inputTokenWeights = [BIGDECIMAL_ONE];
   pool.save();
+  protocol.totalPoolCount = protocol.totalPoolCount + 1;
+  protocol.save();
   return pool;
 }
 

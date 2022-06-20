@@ -9,7 +9,7 @@ import { BigDecimal, BigInt, Address, dataSource } from "@graphprotocol/graph-ts
 ////////////////////
 
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.2";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 export const PROTOCOL_NAME = "{{protocolName}}"
@@ -130,14 +130,13 @@ export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
 ///// Protocol Specific /////
 /////////////////////////////
 
-export let DEFAULTNETWORK =  "{{defaultNetwork}}" 
+export let DEFAULT_NETWORK =  "{{defaultNetwork}}" 
 
 export let VAULT_ADDRESS = Address.fromString('{{vault}}')
 
-export let REWARDTOKEN = "{{rewardToken}}" 
+export let REWARD_TOKEN = "{{rewardToken}}" 
 
 {{#isBeets}}
-
 export let MASTERCHEFV2_ADDRESS = Address.fromString('{{masterChefV2}}')
 
 export let DAI: Address = Address.fromString('{{knownAssets.dai}}');
@@ -152,8 +151,24 @@ export let FBEETS: Address = Address.fromString('{{knownAssets.fbeets}}');
 
 export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT,MIM];
 export let BASE_ASSETS: Address[] = [WETH, WFTM, WBTC, BEETS,FBEETS];
-
 {{/isBeets}}
+
+
+{{#isBeetsOp}}
+export let DAI: Address = Address.fromString('{{knownAssets.dai}}');
+export let USDC: Address = Address.fromString('{{knownAssets.usdc}}');
+export let USDT: Address = Address.fromString('{{knownAssets.usdt}}');
+export let FRAX: Address = Address.fromString('{{knownAssets.frax}}');
+export let OP: Address = Address.fromString('{{knownAssets.op}}');
+export let WBTC: Address = Address.fromString('{{knownAssets.wbtc}}');
+export let WETH: Address = Address.fromString('{{knownAssets.weth}}');
+export let BEETS: Address = Address.fromString('{{knownAssets.beets}}');
+export let SNX: Address = Address.fromString('{{knownAssets.snx}}');
+export let LINK: Address = Address.fromString('{{knownAssets.link}}');
+
+export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT,FRAX];
+export let BASE_ASSETS: Address[] = [WETH, OP, WBTC, BEETS,SNX,LINK];
+{{/isBeetsOp}}
 
 
 {{#isBalancer}}
