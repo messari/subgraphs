@@ -3,7 +3,7 @@ import * as utils from "../common/utils";
 import { getRewardTokens } from "./Tokens";
 import * as constants from "../common/constants";
 import { ERC20 } from "../../generated/Booster/ERC20";
-import { getOrCreateToken } from "../common/initializer";
+import { getOrCreateToken, getOrCreateYieldAggregator } from "../common/initializer";
 import { PoolCrvRewards } from "../../generated/templates";
 import { Vault as VaultStore } from "../../generated/schema";
 import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
@@ -44,9 +44,9 @@ export function _NewVault(
     let rewardTokens = getRewardTokens(poolId, block, poolInfo.crvRewards);
     vault.rewardTokens = rewardTokens;
 
-    vault.rewardTokenEmissionsAmount = new Array<BigDecimal>(
+    vault.rewardTokenEmissionsAmount = new Array<BigInt>(
       rewardTokens.length
-    ).fill(constants.BIGDECIMAL_ZERO);
+    ).fill(constants.BIGINT_ZERO);
     vault.rewardTokenEmissionsUSD = new Array<BigDecimal>(
       rewardTokens.length
     ).fill(constants.BIGDECIMAL_ZERO);
@@ -66,11 +66,18 @@ export function _NewVault(
 
   vault.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
   vault.name = utils.readValue<string>(lpTokenContract.try_name(), "");
+  vault.symbol = utils.readValue<string>(lpTokenContract.try_symbol(), "");
+
+  vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+  vault.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+  vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+  vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+
 
   const performanceFeeId = utils
     .enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE)
     .concat(constants.CONVEX_BOOSTER_ADDRESS.toHexString());
-
+  
   let performanceFee = getTotalFees();
   utils.createFeeType(
     performanceFeeId,
@@ -83,9 +90,13 @@ export function _NewVault(
   vault._stashVersion = stashVersion;
   vault._lpToken = lpTokenAddress.toHexString();
 
+  const protocol = getOrCreateYieldAggregator();
+  protocol.totalPoolCount += 1;
+
   vault.createdBlockNumber = block.number;
   vault.createdTimestamp = block.timestamp;
 
   vault.fees = [performanceFeeId];
+  protocol.save();
   vault.save();
 }

@@ -52,7 +52,11 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 // update a given UsageMetricDailySnapshot
-export function updateUsageMetrics(event: ethereum.Event, from: Address, transaction: string): void {
+export function updateUsageMetrics(
+  event: ethereum.Event,
+  from: Address,
+  transaction: string,
+): void {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let hour: i64 = (event.block.timestamp.toI64() - id * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
@@ -81,6 +85,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   }
   hourlyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   dailyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  dailyMetrics.totalPoolCount = protocol.totalPoolCount;
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = from.toHexString() + "-" + id.toString();
@@ -118,6 +123,9 @@ export function updateMarketDailyMetrics(event: ethereum.Event): void {
 
   // update other vars
   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
   marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketMetrics.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketMetrics.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -149,6 +157,9 @@ export function updateMarketHourlyMetrics(event: ethereum.Event): void {
 
   // update other vars
   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
   marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketMetrics.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketMetrics.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;

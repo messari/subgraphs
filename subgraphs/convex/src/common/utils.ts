@@ -3,7 +3,6 @@ import {
   Address,
   ethereum,
   BigDecimal,
-  log,
 } from "@graphprotocol/graph-ts";
 import { PoolInfoType } from "./types";
 import * as constants from "../common/constants";

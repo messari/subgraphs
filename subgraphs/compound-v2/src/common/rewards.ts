@@ -164,10 +164,12 @@ export function getRewardsPerDay(
   );
 
   // Estimate block speed for the window in seconds.
-  let unnormalizedBlockSpeed = WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
+  let unnormalizedBlockSpeed =
+    WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
 
   // block speed converted to specified rate.
-  let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD).times(unnormalizedBlockSpeed);
+  let normalizedBlockSpeed =
+    RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD).times(unnormalizedBlockSpeed);
 
   // Update BlockTracker with new values.
   circularBuffer.blocksPerDay = normalizedBlockSpeed;

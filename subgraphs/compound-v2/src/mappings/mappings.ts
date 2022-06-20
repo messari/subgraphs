@@ -76,6 +76,7 @@ export function handleLiquidateBorrowNew(event: LiquidateBorrowNew): void {
     event,
     event.params.cTokenCollateral,
     event.params.liquidator,
+    event.params.borrower,
     event.params.seizeTokens,
     event.params.repayAmount,
   );
@@ -115,6 +116,7 @@ export function handleLiquidateBorrowOld(event: LiquidateBorrowOld): void {
     event,
     event.params.cTokenCollateral,
     event.params.liquidator,
+    event.params.borrower,
     event.params.seizeTokens,
     event.params.repayAmount,
   );
@@ -150,6 +152,7 @@ export function handleMarketListed(event: MarketListed): void {
   let ids = protocol._marketIds;
   ids.push(market.id);
   protocol._marketIds = ids;
+  protocol.totalPoolCount++;
 
   protocol.save();
 }
@@ -216,7 +219,12 @@ export function handleActionPaused(event: ActionPaused1): void {
 //// CToken Helpers ////
 ////////////////////////
 
-function mint(event: ethereum.Event, mintAmount: BigInt, mintTokens: BigInt, minter: Address): void {
+function mint(
+  event: ethereum.Event,
+  mintAmount: BigInt,
+  mintTokens: BigInt,
+  minter: Address,
+): void {
   if (createDeposit(event, mintAmount, mintTokens, minter)) {
     updateUsageMetrics(event, minter, TransactionType.DEPOSIT);
     updateFinancials(event);
@@ -225,7 +233,12 @@ function mint(event: ethereum.Event, mintAmount: BigInt, mintTokens: BigInt, min
   }
 }
 
-function redeem(event: ethereum.Event, redeemer: Address, redeemAmount: BigInt, redeemTokens: BigInt): void {
+function redeem(
+  event: ethereum.Event,
+  redeemer: Address,
+  redeemAmount: BigInt,
+  redeemTokens: BigInt,
+): void {
   if (createWithdraw(event, redeemer, redeemAmount, redeemTokens)) {
     updateUsageMetrics(event, redeemer, TransactionType.WITHDRAW);
     updateFinancials(event);
@@ -256,10 +269,11 @@ function liquidateBorrow(
   event: ethereum.Event,
   cTokenCollateral: Address,
   liquidator: Address,
+  borrower: Address,
   seizeTokens: BigInt,
   repayAmount: BigInt,
 ): void {
-  if (createLiquidate(event, cTokenCollateral, liquidator, seizeTokens, repayAmount)) {
+  if (createLiquidate(event, cTokenCollateral, liquidator, borrower, seizeTokens, repayAmount)) {
     updateUsageMetrics(event, liquidator, TransactionType.LIQUIDATE);
     updateFinancials(event);
     updateMarketDailyMetrics(event);
@@ -269,7 +283,9 @@ function liquidateBorrow(
 
 function newReserveFactor(event: ethereum.Event, newReserveFactorMantissa: BigInt): void {
   let market = getOrCreateMarket(event, event.address);
-  market._reserveFactor = newReserveFactorMantissa.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  market._reserveFactor = newReserveFactorMantissa
+    .toBigDecimal()
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
   market.save();
 }
 

@@ -1,0 +1,40 @@
+{
+  "name": "gamma-strategies",
+  "license": "MIT",
+  "scripts": {
+    "codegen": "graph codegen",
+
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "build:mainnet": "yarn prepare:mainnet && graph build",
+    "thegraph:deploy:mainnet": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory",
+    "deploy:mainnet": "yarn prepare:mainnet && yarn thegraph:deploy:mainnet",
+
+    "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
+    "build:arbitrum": "yarn prepare:arbitrum && graph build",
+    "thegraph:deploy:arbitrum": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory2",
+    "deploy:arbitrum": "yarn prepare:arbitrum && yarn thegraph:deploy:arbitrum",
+
+    "prepare:optimism": "mustache config/optimism.json subgraph.template.yaml > subgraph.yaml",
+    "build:optimism": "yarn prepare:optimism && graph build",
+    "thegraph:deploy:optimism": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory3",
+    "deploy:optimism": "yarn prepare:optimism && yarn thegraph:deploy:optimism",
+
+    "prepare:polygon": "mustache config/polygon.json subgraph.template.yaml > subgraph.yaml",
+    "build:polygon": "yarn prepare:polygon && graph build",
+    "thegraph:deploy:polygon": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory4",
+    "deploy:polygon": "yarn prepare:polygon && yarn thegraph:deploy:polygon",
+
+    "deploy:all": "yarn deploy:mainnet && yarn deploy:arbitrum && yarn deploy:optimism && yarn deploy:polygon",
+    
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory",
+    "create-local": "graph create --node http://localhost:8020/  l0c4t0r/laboratory",
+    "remove-local": "graph remove --node http://localhost:8020/  l0c4t0r/laboratory",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001  l0c4t0r/laboratory"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.29.2",
+    "@graphprotocol/graph-ts": "0.26.0",
+    "mustache": "4.2.0"
+  }
+}

@@ -11,6 +11,7 @@ import {
   DexAmmProtocol,
   UsageMetricsHourlySnapshot,
   ActiveAccount,
+  LiquidityPool,
 } from "../../generated/schema";
 import {
   DEPLOYER_ADDRESS,
@@ -23,6 +24,7 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "../utils/constants";
+import { getOrCreatePoolDailySnapshot, getOrCreatePoolHourlySnapshot } from "./pool";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(DEPLOYER_ADDRESS);
@@ -35,6 +37,7 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = ProtocolType.EXCHANGE;
+    protocol.totalPoolCount = 0;
     protocol.save();
   }
   return protocol;
@@ -51,6 +54,7 @@ export function getOrCreateUsageMetricsSnapshot(
     usageMetrics = new UsageMetricsDailySnapshot(id);
     usageMetrics.protocol = protocol.id;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
   }
   usageMetrics.blockNumber = event.block.number;
   usageMetrics.timestamp = event.block.timestamp;
@@ -191,6 +195,7 @@ export function addProtocolUSDVolume(
 
 export function addProtocolUSDRevenue(
   event: ethereum.Event,
+  pool: LiquidityPool,
   supplySideRevenueUSD: BigDecimal,
   protocolSideRevenueUSD: BigDecimal
 ): void {
@@ -204,6 +209,7 @@ export function addProtocolUSDRevenue(
       protocol.cumulativeProtocolSideRevenueUSD
     );
   protocol.save();
+
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.dailySupplySideRevenueUSD =
     financialsSnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
@@ -214,6 +220,41 @@ export function addProtocolUSDRevenue(
       financialsSnapshot.dailyProtocolSideRevenueUSD
     );
   financialsSnapshot.save();
+
+  pool.cumulativeSupplySideRevenueUSD =
+    pool.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  pool.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
+    supplySideRevenueUSD.plus(protocolSideRevenueUSD)
+  );
+  pool.save();
+
+  const poolDailySnapshot = getOrCreatePoolDailySnapshot(event, pool);
+  poolDailySnapshot.dailySupplySideRevenueUSD =
+    poolDailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  poolDailySnapshot.dailyProtocolSideRevenueUSD =
+    poolDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+      protocolSideRevenueUSD
+    );
+  poolDailySnapshot.dailyTotalRevenueUSD =
+    poolDailySnapshot.dailyTotalRevenueUSD.plus(
+      supplySideRevenueUSD.plus(protocolSideRevenueUSD)
+    );
+  poolDailySnapshot.save();
+
+  const poolHourlySnapshot = getOrCreatePoolHourlySnapshot(event, pool);
+  poolHourlySnapshot.hourlySupplySideRevenueUSD =
+    poolHourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  poolHourlySnapshot.hourlyProtocolSideRevenueUSD =
+    poolHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+      protocolSideRevenueUSD
+    );
+  poolHourlySnapshot.hourlyTotalRevenueUSD =
+    poolHourlySnapshot.hourlyTotalRevenueUSD.plus(
+      supplySideRevenueUSD.plus(protocolSideRevenueUSD)
+    );
+  poolHourlySnapshot.save();
 }
 
 export function updateProtocolTVL(

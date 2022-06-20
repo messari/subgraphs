@@ -74,13 +74,13 @@ export function _Deposit(
   if (vaultAddress.equals(constants.ANGLE_USDC_VAULT_ADDRESS)) {
     sharesMinted = utils
       .readValue<BigInt>(vaultContract.try_totalSupply(), constants.BIGINT_ZERO)
-      .minus(vault.outputTokenSupply);
+      .minus(vault.outputTokenSupply!);
   } else {
     // calculate shares minted as per the deposit function in vault contract address
-    sharesMinted = vault.outputTokenSupply.isZero()
+    sharesMinted = vault.outputTokenSupply!.isZero()
       ? depositAmount
       : depositAmount
-          .times(vault.outputTokenSupply)
+          .times(vault.outputTokenSupply!)
           .div(vault.inputTokenBalance);
   }
 
@@ -98,7 +98,7 @@ export function _Deposit(
     .div(inputTokenPrice.decimalsBaseTen);
 
   vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
-  vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
+  vault.outputTokenSupply = vault.outputTokenSupply!.plus(sharesMinted);
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .toBigDecimal()

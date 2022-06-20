@@ -63,7 +63,7 @@ export namespace RiskType {
 export namespace InterestRateType {
   export const STABLE = "STABLE";
   export const VARIABLE = "VARIABLE";
-  export const FIXED_TERM = "FIXED_TERM";
+  export const FIXED_TERM = "FIXED";
 }
 export namespace InterestRateSide {
   export const LENDER = "LENDER";
@@ -183,7 +183,6 @@ export const ARB_NETWORK = "arbitrum-one";
 export const BSC_NETWORK = "bsc";
 export const AVALANCHE_NETWORK = "avalanche";
 
-export const schemaVersion = "1.2.1";
-export const subgraphVersion = "1.0.4";
+export const schemaVersion = "1.3.0";
+export const subgraphVersion = "1.0.5";
 export const methodologyVersion = "1.0.0";
-

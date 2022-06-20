@@ -61,11 +61,11 @@ export function updateVaultSnapshots(
   let vault = getOrCreateVault(vaultAddress, block);
 
   const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
-    vaultAddress,
+    vaultAddress.toHexString(),
     block
   );
   const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    vaultAddress,
+    vaultAddress.toHexString(),
     block
   );
 
