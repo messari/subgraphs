@@ -120,18 +120,22 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics.dailyWithdrawCount = 0;
     usageMetrics.dailyRepayCount = 0;
     usageMetrics.dailyLiquidateCount = 0;
+    usageMetrics.totalPoolCount = 0;
     usageMetrics.save();
   }
   return usageMetrics;
 }
 
-export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot | null {
+export function getOrCreateMarketHourlySnapshot(
+  event: ethereum.Event,
+  marketAddress: string,
+): MarketHourlySnapshot | null {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let marketMetrics = MarketHourlySnapshot.load(marketAddress.concat("-").concat(id.toString()));
 
   if (!marketMetrics) {
     let market = getMarket(marketAddress);
-    if (!market){
+    if (!market) {
       return null;
     }
     marketMetrics = new MarketHourlySnapshot(marketAddress.concat("-").concat(id.toString()));
@@ -149,19 +153,31 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAdd
     marketMetrics.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
     marketMetrics.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
     marketMetrics.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+
+    marketMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+
+    marketMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+
     marketMetrics.save();
   }
 
   return marketMetrics;
 }
 
-export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot | null {
+export function getOrCreateMarketDailySnapshot(
+  event: ethereum.Event,
+  marketAddress: string,
+): MarketDailySnapshot | null {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
 
   if (!marketMetrics) {
     let market = getMarket(marketAddress);
-    if (!market){
+    if (!market) {
       return null;
     }
     marketMetrics = new MarketDailySnapshot(marketAddress.concat("-").concat(id.toString()));
@@ -178,7 +194,18 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddr
     marketMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
     marketMetrics.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
     marketMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
     marketMetrics.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+
+    marketMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+
+    marketMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+
     marketMetrics.save();
   }
 
@@ -200,7 +227,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
     financialMetrics.mintedTokenSupplies = protocol.mintedTokenSupplies;
 
-    // Revenue // 
+    // Revenue //
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -208,7 +235,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
 
-    // Lending Activities // 
+    // Lending Activities //
     financialMetrics.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
     financialMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
@@ -250,6 +277,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
   LendingProtocolEntity.lendingType = LendingType.CDP;
   LendingProtocolEntity.mintedTokens = [getMIMAddress(dataSource.network())];
+  LendingProtocolEntity.totalPoolCount = 0;
   LendingProtocolEntity.save();
   return LendingProtocolEntity;
 }
@@ -259,7 +287,7 @@ export function getMarket(marketId: string): Market | null {
   if (market) {
     return market;
   }
-  log.error('Cannot find market: {}', [marketId]);
+  log.error("Cannot find market: {}", [marketId]);
   return null;
 }
 
