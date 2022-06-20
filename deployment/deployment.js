@@ -33,11 +33,11 @@ if (!args.subgraph || !args.location) {
             location = args.location + '/' + protocol + '-' + getDeploymentNetwork(network)
         }
 
-        // Check if deployment is ignored in configurations
-        if ([true, undefined].includes(protocolNetworkMap[args.subgraph][protocol][network]['deploy-on-merge']) | args.location != 'messari') {
-            allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
-        }else {
+        // Don't execute the script if the location is messari, you have specified not to deploy on merge, and this script is excuted by Github Action upon merge
+        if (args.location == 'messari' && [false, undefined].includes(protocolNetworkMap[args.subgraph][protocol][network]['deploy-on-merge']) && ['true', 't'].includes(args.merge.toLowerCase())) {
             results += "Ignored in Deployment Configurations: " + location + '\n'
+        } else {
+            allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
         }
         runCommands(allScripts, results, args, function(results) {});
     } 
@@ -63,11 +63,11 @@ if (!args.subgraph || !args.location) {
                 location = args.location + '/' + protocol + '-' + getDeploymentNetwork(network)
             }
             
-            // Check if deployment is ignored in configurations
-            if ([true, undefined].includes(protocolNetworkMap[args.subgraph][protocol][network]['deploy-on-merge']) | args.location != 'messari') {
-                allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
-            } else {
+            // Don't execute the script if the location is messari, you have specified not to deploy on merge, and this script is excuted by Github Action upon merge
+            if (args.location == 'messari' && [false, undefined].includes(protocolNetworkMap[args.subgraph][protocol][network]['deploy-on-merge']) && ['true', 't'].includes(args.merge.toLowerCase())) {
                 results += "Ignored in Deployment Configurations: " + location + '\n'
+            } else {
+                allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
             }
         } 
 
@@ -91,11 +91,11 @@ if (!args.subgraph || !args.location) {
                     location = args.location + '/' + protocol + '-' + getDeploymentNetwork(network)
                 }
                 
-                // Check if deployment is ignored in configurations
-                if ([true, undefined].includes(protocolNetworkMap[args.subgraph][protocol][network]['deploy-on-merge']) | args.location != 'messari') {
-                    allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
-                } else {
+                // Don't execute the script if the location is messari, you have specified not to deploy on merge, and this script is excuted by Github Action upon merge
+                if (args.location == 'messari' && [false, undefined].includes(protocolNetworkMap[args.subgraph][protocol][network]['deploy-on-merge']) && ['true', 't'].includes(args.merge.toLowerCase())) {
                     results += "Ignored in Deployment Configurations: " + location + '\n'
+                } else {
+                    allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
                 }
             }
         } 
