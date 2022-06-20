@@ -95,6 +95,7 @@ export function handleMarketListed(event: MarketListed): void {
   if (cToken != null) {
     return;
   }
+  
   // this is a new cToken, a new underlying token, and a new market
 
   let protocol = getOrCreateProtocol();
