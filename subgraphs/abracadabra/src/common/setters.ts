@@ -39,9 +39,10 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
   let MarketEntity = new Market(marketAddress);
   let MarketContract = Cauldron.bind(Address.fromString(marketAddress));
   let collateralCall = MarketContract.try_collateral();
+  let protocol = getOrCreateLendingProtocol();
   if (!collateralCall.reverted) {
     let inputToken = getOrCreateToken(collateralCall.value);
-    MarketEntity.protocol = getOrCreateLendingProtocol().id;
+    MarketEntity.protocol = protocol.id;
     MarketEntity.inputToken = inputToken.id;
     MarketEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
     MarketEntity.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
@@ -185,6 +186,8 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     }
   }
   MarketEntity.save();
+  protocol.totalPoolCount = protocol.totalPoolCount + 1;
+  protocol.save();
   updateProtocolMarketList(marketAddress);
 }
 
