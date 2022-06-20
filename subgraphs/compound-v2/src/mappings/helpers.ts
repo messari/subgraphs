@@ -300,6 +300,7 @@ export function createLiquidate(
   event: ethereum.Event,
   liquidatedToken: Address,
   liquidator: Address,
+  borrower: Address,
   liquidatedAmount: BigInt, // sieze tokens
   repaidAmount: BigInt,
 ): bool {
@@ -326,6 +327,7 @@ export function createLiquidate(
   liquidate.protocol = COMPTROLLER_ADDRESS;
   liquidate.to = marketAddress.toHexString();
   liquidate.from = liquidator.toHexString();
+  liquidate.liquidatee = borrower.toHexString();
   liquidate.blockNumber = blockNumber;
   liquidate.timestamp = event.block.timestamp;
   liquidate.market = marketAddress.toHexString();

@@ -85,6 +85,7 @@ export function updateUsageMetrics(
   }
   hourlyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   dailyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  dailyMetrics.totalPoolCount = protocol.totalPoolCount;
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = from.toHexString() + "-" + id.toString();

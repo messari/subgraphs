@@ -25,6 +25,7 @@ import {
   INITIAL_EXCHANGE_RATE,
   InterestRateSide,
   InterestRateType,
+  INT_ZERO,
   LENDING_TYPE,
   METHODOLOGY_VERSION,
   NETWORK_ETHEREUM,
@@ -61,14 +62,15 @@ export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetri
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = COMPTROLLER_ADDRESS;
 
-    usageMetrics.dailyActiveUsers = 0;
-    usageMetrics.cumulativeUniqueUsers = 0;
-    usageMetrics.dailyTransactionCount = 0;
-    usageMetrics.dailyDepositCount = 0;
-    usageMetrics.dailyWithdrawCount = 0;
-    usageMetrics.dailyBorrowCount = 0;
-    usageMetrics.dailyRepayCount = 0;
-    usageMetrics.dailyLiquidateCount = 0;
+    usageMetrics.dailyActiveUsers = INT_ZERO;
+    usageMetrics.cumulativeUniqueUsers = INT_ZERO;
+    usageMetrics.dailyTransactionCount = INT_ZERO;
+    usageMetrics.dailyDepositCount = INT_ZERO;
+    usageMetrics.dailyWithdrawCount = INT_ZERO;
+    usageMetrics.dailyBorrowCount = INT_ZERO;
+    usageMetrics.dailyRepayCount = INT_ZERO;
+    usageMetrics.dailyLiquidateCount = INT_ZERO;
+    usageMetrics.totalPoolCount = INT_ZERO;
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.save();
@@ -88,14 +90,14 @@ export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetr
     usageMetrics = new UsageMetricsHourlySnapshot(hour.toString());
     usageMetrics.protocol = COMPTROLLER_ADDRESS;
 
-    usageMetrics.hourlyActiveUsers = 0;
-    usageMetrics.cumulativeUniqueUsers = 0;
-    usageMetrics.hourlyTransactionCount = 0;
-    usageMetrics.hourlyDepositCount = 0;
-    usageMetrics.hourlyWithdrawCount = 0;
-    usageMetrics.hourlyBorrowCount = 0;
-    usageMetrics.hourlyRepayCount = 0;
-    usageMetrics.hourlyLiquidateCount = 0;
+    usageMetrics.hourlyActiveUsers = INT_ZERO;
+    usageMetrics.cumulativeUniqueUsers = INT_ZERO;
+    usageMetrics.hourlyTransactionCount = INT_ZERO;
+    usageMetrics.hourlyDepositCount = INT_ZERO;
+    usageMetrics.hourlyWithdrawCount = INT_ZERO;
+    usageMetrics.hourlyBorrowCount = INT_ZERO;
+    usageMetrics.hourlyRepayCount = INT_ZERO;
+    usageMetrics.hourlyLiquidateCount = INT_ZERO;
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.save();
@@ -243,7 +245,7 @@ export function getOrCreateLendingProtcol(): LendingProtocol {
     protocol.type = PROTOCOL_TYPE;
     protocol.lendingType = LENDING_TYPE;
     protocol.riskType = PROTOCOL_RISK_TYPE;
-    protocol.cumulativeUniqueUsers = 0;
+    protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -253,6 +255,7 @@ export function getOrCreateLendingProtcol(): LendingProtocol {
     protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    protocol.totalPoolCount = INT_ZERO;
     protocol._marketIds = [];
 
     // get initial liquidation penalty

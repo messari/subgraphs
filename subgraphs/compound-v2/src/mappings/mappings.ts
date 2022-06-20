@@ -76,6 +76,7 @@ export function handleLiquidateBorrowNew(event: LiquidateBorrowNew): void {
     event,
     event.params.cTokenCollateral,
     event.params.liquidator,
+    event.params.borrower,
     event.params.seizeTokens,
     event.params.repayAmount,
   );
@@ -115,6 +116,7 @@ export function handleLiquidateBorrowOld(event: LiquidateBorrowOld): void {
     event,
     event.params.cTokenCollateral,
     event.params.liquidator,
+    event.params.borrower,
     event.params.seizeTokens,
     event.params.repayAmount,
   );
@@ -150,6 +152,7 @@ export function handleMarketListed(event: MarketListed): void {
   let ids = protocol._marketIds;
   ids.push(market.id);
   protocol._marketIds = ids;
+  protocol.totalPoolCount++;
 
   protocol.save();
 }
@@ -266,10 +269,11 @@ function liquidateBorrow(
   event: ethereum.Event,
   cTokenCollateral: Address,
   liquidator: Address,
+  borrower: Address,
   seizeTokens: BigInt,
   repayAmount: BigInt,
 ): void {
-  if (createLiquidate(event, cTokenCollateral, liquidator, seizeTokens, repayAmount)) {
+  if (createLiquidate(event, cTokenCollateral, liquidator, borrower, seizeTokens, repayAmount)) {
     updateUsageMetrics(event, liquidator, TransactionType.LIQUIDATE);
     updateFinancials(event);
     updateMarketDailyMetrics(event);
