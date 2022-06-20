@@ -8,7 +8,7 @@ import {
   BigDecimal,
   log,
 } from "@graphprotocol/graph-ts";
-import { Author } from "../generated/schema";
+import { Author, Chunk } from "../generated/schema";
 import { BIGINT_ZERO, INT_NINE, INT_ZERO } from "./constants";
 import { createBlock, updateMetrics, updateNetwork } from "./helper";
 import { exponentToBigDecimal } from "./utils";
@@ -28,7 +28,6 @@ export class BlockData {
   gasLimit: BigInt;
   gasUsed: BigInt;
   gasPrice: BigInt;
-  parentHash: Bytes;
   burntFees: BigInt;
   chunkCount: BigInt;
   transactionCount: BigInt;
@@ -41,7 +40,6 @@ export class BlockData {
     difficulty: BigInt,
     gasLimit: BigInt,
     gasUsed: BigInt,
-    parentHash: Bytes,
     size: BigInt,
     gasPrice: BigInt,
     baseFeePerGas: BigInt,
@@ -60,7 +58,6 @@ export class BlockData {
     this.gasLimit = gasLimit;
     this.gasUsed = gasUsed;
     this.gasPrice = gasPrice;
-    this.parentHash = parentHash;
     this.burntFees = burntFees;
     this.chunkCount = chunkCount;
     this.transactionCount = transactionCount;
@@ -140,7 +137,6 @@ export function handleArweaveBlock(block: arweave.Block): void {
     blockDifficulty,
     BIGINT_ZERO,
     BIGINT_ZERO,
-    block.previousBlock,
     blockSize,
     BIGINT_ZERO,
     BIGINT_ZERO,
@@ -199,7 +195,6 @@ export function handleCosmosBlock(block: cosmos.Block): void {
     BIGINT_ZERO,
     BIGINT_ZERO,
     BIGINT_ZERO,
-    header.lastCommitHash,
     BIGINT_ZERO,
     BIGINT_ZERO,
     BIGINT_ZERO,
@@ -258,7 +253,6 @@ export function handleEvmBlock(block: ethereum.Block): void {
     block.difficulty,
     block.gasLimit,
     block.gasUsed,
-    block.parentHash,
     block.size ? block.size! : BIGINT_ZERO,
     BIGINT_ZERO,
     block.baseFeePerGas ? block.baseFeePerGas! : BIGINT_ZERO,
@@ -322,9 +316,16 @@ export function handleNearBlock(block: near.Block): void {
   let gasUsed = BIGINT_ZERO;
   let burntFees = BIGINT_ZERO;
   for (let i = 0; i < chunks.length; i++) {
-    gasLimit = gasLimit.plus(BigInt.fromI64(chunks[i].gasLimit));
-    gasUsed = gasUsed.plus(BigInt.fromI64(chunks[i].gasUsed));
-    burntFees = burntFees.plus(chunks[i].balanceBurnt);
+    let chunk = new Chunk(chunks[i].chunkHash);
+    chunk.block = header.height.toString();
+    chunk.gasUsed = BigInt.fromI64(chunks[i].gasUsed);
+    chunk.gasLimit = BigInt.fromI64(chunks[i].gasLimit);
+    chunk.burntFees = chunks[i].balanceBurnt;
+    chunk.save();
+
+    gasLimit = gasLimit.plus(chunk.gasLimit);
+    gasUsed = gasUsed.plus(chunk.gasUsed);
+    burntFees = burntFees.plus(chunk.burntFees);
   }
 
   let blockData = new BlockData(
@@ -335,7 +336,6 @@ export function handleNearBlock(block: near.Block): void {
     BIGINT_ZERO,
     gasLimit,
     gasUsed,
-    header.prevHash,
     BIGINT_ZERO,
     header.gasPrice,
     BIGINT_ZERO,

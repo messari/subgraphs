@@ -332,9 +332,6 @@ type Block @entity(immutable: true) {
   " The price of gas in this block in network native gas units "
   gasPrice: BigInt!
 
-  " Hash of the previous block (TODO: is this necessary??) "
-  parentHash: Bytes!
-
   " Burnt fees in native asset (baseFeePerGas * gasUsed) (note, post London upgrade) "
   burntFees: BigInt!
 
@@ -387,6 +384,9 @@ type Chunk @entity(immutable: true) {
 
   " The gas limit in this chunk "
   gasLimit: BigInt!
+
+  " The fees burnt in this chunk, also the total amount of fees "
+  burntFees: BigInt!
 
   " Gas utilization within this chunk (e.g. gasUsed / gasLimit) "
   chunkUtilization: BigDecimal!

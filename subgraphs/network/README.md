@@ -23,7 +23,7 @@ The following data is collected:
 - `dailyMeanBlockInterval` = `dailyBlocks` / (`timestamp` - `firstTimestamp`)
 - `dailyMeanBlockSize` = `dailySize` / `dailyBlocks`
   - The size is the amount of data in a block in bytes (in the case of ethereum)
-- Chunks are the number of shards in a single block. This is used in networks where computation is parallelized into shards.
+- Chunks are the number of shards in a single block. This is used in networks where computation is parallelized into shards
 
 ## Block-specific Data
 
@@ -68,7 +68,7 @@ class Block {
      walletList: Bytes,
      rewardAddr: Bytes, // miner address
      tags: Tag[],
-     rewardPool: Bytes, // rewards for this block (offset by 1e12)
+     rewardPool: Bytes, // total rewards to be distributed to miners
      weaveSize: Bytes, // total data size in Bytes
      blockSize: Bytes, // block size in Bytes
      cumulativeDiff: Bytes,
@@ -132,7 +132,7 @@ class ChunkHeader {
       shardId: u64,
       chunkHash: Bytes,
       prevBlockHash: Bytes,
-      balanceBurnt: BigInt,
+      balanceBurnt: BigInt, // also the fee
   }
 
 class Block {
@@ -161,7 +161,7 @@ class Block {
 - BSC: https://thegraph.com/hosted-service/subgraph/dmelotik/network-bsc
 - Celo: https://thegraph.com/hosted-service/subgraph/dmelotik/network-celo
 - Clover: https://thegraph.com/hosted-service/subgraph/dmelotik/network-clover
-- Cronos: TODO: use cronos protal
+- Cronos: https://graph.cronoslabs.com/subgraphs/name/network-cronos/first-subgraph/graphql
 - Fantom: https://thegraph.com/hosted-service/subgraph/dmelotik/network-fantom
 - Fuse: https://thegraph.com/hosted-service/subgraph/dmelotik/network-fuse
 - Harmony: https://thegraph.com/hosted-service/subgraph/dmelotik/network-harmony

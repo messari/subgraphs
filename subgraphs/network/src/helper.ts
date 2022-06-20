@@ -361,7 +361,6 @@ export function createBlock(blockData: BlockData): void {
   block.gasLimit = blockData.gasLimit;
   block.gasUsed = blockData.gasUsed;
   block.gasPrice = blockData.gasPrice;
-  block.parentHash = blockData.parentHash;
   block.burntFees = blockData.burntFees;
   block.chunkCount = blockData.chunkCount.toI32();
   block.transactionCount = blockData.transactionCount.toI32();
