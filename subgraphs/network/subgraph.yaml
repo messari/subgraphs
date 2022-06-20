@@ -9,7 +9,7 @@ dataSources:
     source:
       address: "0x0000000000000000000000000000000000000000"
       abi: Placeholder
-      startBlock: 1
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
