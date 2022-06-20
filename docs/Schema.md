@@ -101,6 +101,33 @@ When indexing smart contract calls that represent a user action but do not emit 
 
 Note that the `from` and `to` field is defined differently per entity and may not necessarily correspond to that of the underlying transaction. For example, the `to` field is always the interacted smart contract address in the transaction but can be the user (caller) in the `Withdraw` entity, as the asset flows from the pool to the user. In general, `from` and `to` are defined according to the flow of the token/asset involved.
 
+## Account & Positions
+
+### Positions
+
+All positions are per market per account. We track two sides of the market separately:
+
+- When a deposit is made, a `LENDER` position is opened.
+- When a deposit is withdrew, the position is closed.
+- When a borrow is made, a `BORROWER` position is opened.
+- When a borrow is repaid, the position is closed.
+- Depending on the amount being liquidated, the position may either be closed, or stay open.
+
+When a deposit position is open, any additional deposits or withdraws updates the existing `Position` entity, instead of creating a new one. If a deposit occurs after an open `LENDER` position has been closed off, a new `LENDER` position gets created.
+
+Example 1: Compound
+
+1. User deposits 10 ETH
+2. User borrows 1000 USDC
+3. User borrows 200 SUSHI
+4. User withdraws 1 ETH
+
+The open positions should be:
+
+- LENDER: 9 ETH
+- BORROWER: 1000 USDC
+- BORROWER: 200 SUSHI
+
 ## Yield and Reward Tokens
 
 ### Yield

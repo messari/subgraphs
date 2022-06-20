@@ -28,6 +28,7 @@ import {
   BIGINT_ZERO,
   SECONDS_PER_HOUR
 } from "./constants";
+
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.getFactoryAddress());
 
@@ -46,6 +47,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.network = NetworkConfigs.getNetwork();
     protocol.type = ProtocolType.EXCHANGE;
+    protocol.totalPoolCount = 0;
 
     protocol.save();
   }
@@ -108,6 +110,9 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
+
+    const protocol = getOrCreateDex();
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
 
     usageMetrics.save();
   }

@@ -93,6 +93,11 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
+export namespace PositionSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
 export namespace UsageType {
   export const DEPOSIT = "DEPOSIT";
   export const WITHDRAW = "WITHDRAW";

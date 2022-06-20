@@ -60,6 +60,9 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   pool.createdBlockNumber = event.block.number;
   pool.name = protocol.name + " " + LPtoken.symbol;
   pool.symbol = LPtoken.symbol;
+  pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
   poolAmounts.inputTokens = [token0.id, token1.id];
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
@@ -77,6 +80,8 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   LPtoken.save();
   poolAmounts.save();
   poolDeposits.save();
+  protocol.totalPoolCount =  protocol.totalPoolCount + 1 ;
+  protocol.save();
 }
 
 function createPoolFees(poolAddressString: string, fee: i64): string[] {

@@ -39,6 +39,15 @@
         }
       }
     },
+    "aave-v2": {
+      "aave-v2": {
+        "mainnet": {
+          "template": "aave-v2.template.yaml",
+          "messari": "messari/aave-v2-ethereum",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "curve": {
       "curve": {
         "arbitrum": {
