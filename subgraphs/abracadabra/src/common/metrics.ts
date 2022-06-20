@@ -33,6 +33,7 @@ export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal, mar
   let financialsDailySnapshots = getOrCreateFinancials(event);
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, marketId);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, marketId);
+  let market = getMarket(marketId);
 
   let protocol = getOrCreateLendingProtocol();
 
@@ -60,9 +61,9 @@ export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal, mar
   marketDailySnapshot!.dailyProtocolSideRevenueUSD =
     marketDailySnapshot!.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
 
-  marketDailySnapshot!.cumulativeTotalRevenueUSD = marketDailySnapshot!.cumulativeTotalRevenueUSD;
-  marketDailySnapshot!.cumulativeSupplySideRevenueUSD = marketDailySnapshot!.cumulativeSupplySideRevenueUSD;
-  marketDailySnapshot!.cumulativeProtocolSideRevenueUSD = marketDailySnapshot!.cumulativeProtocolSideRevenueUSD;
+  marketDailySnapshot!.cumulativeTotalRevenueUSD = market!.cumulativeTotalRevenueUSD;
+  marketDailySnapshot!.cumulativeSupplySideRevenueUSD = market!.cumulativeSupplySideRevenueUSD;
+  marketDailySnapshot!.cumulativeProtocolSideRevenueUSD = market!.cumulativeProtocolSideRevenueUSD;
 
   marketHourlySnapshot!.hourlyTotalRevenueUSD = marketHourlySnapshot!.hourlyTotalRevenueUSD.plus(totalRevenueUSD); // feesUSD comes from logAccrue which is accounted in MIM
   marketHourlySnapshot!.hourlySupplySideRevenueUSD =
@@ -70,9 +71,9 @@ export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal, mar
   marketHourlySnapshot!.hourlyProtocolSideRevenueUSD =
     marketHourlySnapshot!.hourlyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
 
-  marketHourlySnapshot!.cumulativeTotalRevenueUSD = marketHourlySnapshot!.cumulativeTotalRevenueUSD;
-  marketHourlySnapshot!.cumulativeSupplySideRevenueUSD = marketHourlySnapshot!.cumulativeSupplySideRevenueUSD;
-  marketHourlySnapshot!.cumulativeProtocolSideRevenueUSD = marketHourlySnapshot!.cumulativeProtocolSideRevenueUSD;
+  marketHourlySnapshot!.cumulativeTotalRevenueUSD = market!.cumulativeTotalRevenueUSD;
+  marketHourlySnapshot!.cumulativeSupplySideRevenueUSD = market!.cumulativeSupplySideRevenueUSD;
+  marketHourlySnapshot!.cumulativeProtocolSideRevenueUSD = market!.cumulativeProtocolSideRevenueUSD;
 
   financialsDailySnapshots.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
   financialsDailySnapshots.save();
