@@ -226,3 +226,7 @@ Currently there are 3 Factory Pools. (Eg: H20/USDC Pool)
 
 The admin has for operational reasons changed the pool for an asset to their own address or the Platypus Multisig to carry out specific functions only allowed to be done by the pool. This causes "false pools" to be added to the subgraph. These pools are hardcoded to be ingored and do not contribute to the TVL or other metrics of the protocol. These are also not counted when we count the number of pools in the protocol.
 Deprecated Pools (like an Old MIM pool) are also ignored and as named as "Withdraw Pools" in the subgraphs, as they only allow withdraws and no other functions.
+
+## Interaction Diagram
+
+![Platypus Finance](./interaction-diagram.jpg "Platypus Finance")
