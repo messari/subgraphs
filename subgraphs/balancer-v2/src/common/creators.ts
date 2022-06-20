@@ -10,7 +10,7 @@ import {
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "./getters";
-import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, REWARDTOKEN } from "./constants";
+import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, REWARD_TOKEN } from "./constants";
 import { updateTokenPrice, updateVolumeAndFee } from "./metrics";
 import { valueInUSD } from "./pricing";
 import { convertTokenToDecimal } from "./utils/utils";
@@ -54,8 +54,8 @@ export function createLiquidityPool(
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  if (REWARDTOKEN != "") {
-    let rewardToken = getOrCreateRewardToken(REWARDTOKEN);
+  if (REWARD_TOKEN != "") {
+    let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
     pool.rewardTokens = [rewardToken.id];
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];

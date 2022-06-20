@@ -16,7 +16,7 @@ import {
   BIGINT_ZERO,
   FBEETS,
   MASTERCHEFV2_ADDRESS,
-  REWARDTOKEN,
+  REWARD_TOKEN,
   SECONDS_PER_DAY,
 } from "../common/constants";
 import { DEFAULT_DECIMALS } from "../prices/common/constants";
@@ -126,8 +126,8 @@ function createLiquidityPool(
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  if (REWARDTOKEN != "") {
-    let rewardToken = getOrCreateRewardToken(REWARDTOKEN);
+  if (REWARD_TOKEN != "") {
+    let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
     pool.rewardTokens = [rewardToken.id];
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
