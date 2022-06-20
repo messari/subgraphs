@@ -179,6 +179,7 @@ export function handleLiquidation(event: LogRepay): void {
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
+  let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
   let CauldronContract = Cauldron.bind(event.address);
   let tokenPriceUSD = collateralToken.lastPriceUSD;
   let collateralAmount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
@@ -199,7 +200,7 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.blockNumber = event.block.number;
   liquidateEvent.timestamp = event.block.timestamp;
   liquidateEvent.market = market.id;
-  liquidateEvent.asset = collateralToken.id;
+  liquidateEvent.asset = mimToken.id;
   liquidateEvent.amount = collateralAmount;
   liquidateEvent.amountUSD = collateralAmountUSD;
   liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
