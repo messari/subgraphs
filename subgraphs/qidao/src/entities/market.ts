@@ -29,6 +29,7 @@ import {
   addProtocolDepositVolume,
   addProtocolLiquidateVolume,
   addProtocolSideRevenue,
+  getOrCreateFinancialsSnapshot,
   getOrCreateLendingProtocol,
   updateProtocolBorrowBalance,
   updateProtocolTVL,
@@ -46,8 +47,9 @@ export function createERC20Market(event: ethereum.Event): void {
   let market = Market.load(id);
   if (!market) {
     const contract = erc20QiStablecoin.bind(event.address);
+    const protocol = getOrCreateLendingProtocol()
     market = new Market(id);
-    market.protocol = getOrCreateLendingProtocol().id;
+    market.protocol = protocol.id;
     market.name = contract.name();
     market.isActive = true;
     market.canUseAsCollateral = true;
@@ -71,6 +73,12 @@ export function createERC20Market(event: ethereum.Event): void {
     market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    protocol.totalPoolCount += 1;
+    protocol.save();
     market.save();
   }
 }
@@ -80,8 +88,9 @@ export function createMaticMarket(event: ethereum.Event): void {
   let market = Market.load(id);
   if (!market) {
     const contract = QiStablecoin.bind(event.address);
+    const protocol = getOrCreateLendingProtocol()
     market = new Market(id);
-    market.protocol = getOrCreateLendingProtocol().id;
+    market.protocol = protocol.id;
     market.name = contract.name();
     market.isActive = true;
     market.canUseAsCollateral = true;
@@ -104,6 +113,12 @@ export function createMaticMarket(event: ethereum.Event): void {
     market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.totalPoolCount += 1;
+
+    protocol.save();
     market.save();
   }
 }
@@ -123,6 +138,12 @@ export function getOrCreateMarketSnapshot(
     marketSnapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
     marketSnapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
     marketSnapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
+
+    marketSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
@@ -130,6 +151,11 @@ export function getOrCreateMarketSnapshot(
   marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
   marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+
+  marketSnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketSnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+
   marketSnapshot.inputTokenBalance = market.inputTokenBalance;
   marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketSnapshot.outputTokenSupply = market.outputTokenSupply;
@@ -156,6 +182,12 @@ export function getOrCreateMarketHourlySnapshot(
     marketSnapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
     marketSnapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
     marketSnapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyRepayUSD = BIGDECIMAL_ZERO;
+
+    marketSnapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
@@ -163,6 +195,11 @@ export function getOrCreateMarketHourlySnapshot(
   marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
   marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+
+  marketSnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketSnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+
   marketSnapshot.inputTokenBalance = market.inputTokenBalance;
   marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketSnapshot.outputTokenSupply = market.outputTokenSupply;
@@ -202,9 +239,26 @@ export function handleMarketWithdraw(
   token: Token
 ): void {
   const amount = withdraw.amount;
+  const amountUSD = withdraw.amountUSD;
   market.inputTokenBalance = market.inputTokenBalance.minus(amount);
   updateTVL(event, market, token);
   market.save();
+
+  const protocol = getOrCreateLendingProtocol();
+  const financialSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
+  financialSnapshot.dailyWithdrawUSD =
+    financialSnapshot.dailyWithdrawUSD.plus(amountUSD)
+  financialSnapshot.save();
+
+  const dailySnapshot = getOrCreateMarketSnapshot(event, market);
+  dailySnapshot.dailyWithdrawUSD =
+    dailySnapshot.dailyWithdrawUSD.plus(amountUSD);
+  dailySnapshot.save();
+
+  const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+  hourlySnapshot.hourlyWithdrawUSD =
+    hourlySnapshot.hourlyWithdrawUSD.plus(amountUSD);
+  hourlySnapshot.save();
 }
 
 export function handleMarketLiquidate(
@@ -256,11 +310,28 @@ export function handleMarketRepay(
   market: Market,
   repay: Repay
 ): void {
+  const amountUSD = repay.amountUSD;
   updateMarketBorrowBalance(
     event,
     market,
     BIGDECIMAL_ZERO.minus(repay.amountUSD!)
   );
+
+  const protocol = getOrCreateLendingProtocol();
+  const financialSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
+  financialSnapshot.dailyRepayUSD = 
+    financialSnapshot.dailyRepayUSD.plus(amountUSD)
+  financialSnapshot.save();
+
+  const dailySnapshot = getOrCreateMarketSnapshot(event, market);
+  dailySnapshot.dailyRepayUSD =
+    dailySnapshot.dailyRepayUSD.plus(amountUSD);
+  dailySnapshot.save();
+
+  const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+  hourlySnapshot.hourlyRepayUSD =
+    hourlySnapshot.hourlyRepayUSD.plus(amountUSD);
+  hourlySnapshot.save();
 }
 
 export function handleMarketClosingFee(
@@ -274,7 +345,7 @@ export function handleMarketClosingFee(
   );
   market.inputTokenBalance = market.inputTokenBalance.minus(feeAmount);
   updateTVL(event, market, token);
-  addProtocolSideRevenue(event, feeAmountUSD);
+  addProtocolSideRevenue(event, market, feeAmountUSD);
 }
 
 export function updateMarketBorrowBalance(
