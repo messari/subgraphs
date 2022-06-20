@@ -88,6 +88,26 @@
         }
       }
     },
+    "gamma-strategies": {
+      "gamma-strategies": {
+        "arbitrum": {
+          "template": "gamma.strategies.template.yaml",
+          "deploy-on-merge": false
+        },
+        "mainnet": {
+          "template": "gamma.strategies.template.yaml",
+          "deploy-on-merge": false
+        },
+        "matic": {
+          "template": "gamma.strategies.template.yaml",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "gamma.strategies.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "makerdao": {
       "makerdao": {
         "mainnet": {
