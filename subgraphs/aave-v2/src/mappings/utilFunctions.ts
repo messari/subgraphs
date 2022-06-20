@@ -40,7 +40,7 @@ import {
   USDC_TOKEN_ADDRESS
 } from '../common/constants';
 
-import { AaveIncentivesController as IncentivesControllerContract } from '../../generated/templates/IncentivesController/AaveIncentivesController';
+import { AaveIncentivesController as IncentivesControllerContract } from '../../generated/templates/LendingPoolAddressesProvider/AaveIncentivesController';
 
 import { StableDebtToken as SToken } from '../../generated/templates/LendingPool/StableDebtToken';
 

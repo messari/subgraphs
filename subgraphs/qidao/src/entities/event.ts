@@ -183,5 +183,5 @@ export function createLiquidate(
     BIGDECIMAL_ZERO.minus(debtRepaidUSD)
   );
   incrementProtocolLiquidateCount(event);
-  addSupplySideRevenue(event, liquidate.profitUSD!);
+  addSupplySideRevenue(event, market, liquidate.profitUSD!);
 }

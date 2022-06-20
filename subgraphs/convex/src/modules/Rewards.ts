@@ -1,4 +1,8 @@
 import {
+  updateFinancialsAfterReport,
+  updateVaultSnapshotsAfterReport,
+} from "./Metric";
+import {
   log,
   BigInt,
   Address,
@@ -10,7 +14,6 @@ import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import { getOrCreateRewardTokenInfo } from "./Tokens";
-import { updateFinancialsAfterReport } from "./Metric";
 import { CustomPriceType } from "../Prices/common/types";
 import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
 import { RewardTokenInfo, Vault as VaultStore } from "../../generated/schema";
@@ -36,34 +39,36 @@ export function updateRewardTokenEmission(
 ): void {
   const gapInDays = latestRewardsTimestamp
     .minus(rewardTokenInfo.lastRewardTimestamp)
-    .toBigDecimal()
-    .div(constants.BIGINT_SECONDS_PER_DAY.toBigDecimal());
+    .div(constants.BIGINT_SECONDS_PER_DAY);
 
-  if (gapInDays == constants.BIGDECIMAL_ZERO)
-    return;
+  if (gapInDays == constants.BIGINT_ZERO) return;
 
-  const rewardEmissionPerDay = totalRewards.toBigDecimal().div(gapInDays);
+  const rewardEmissionPerDay = totalRewards.div(gapInDays);
 
   let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
   let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
 
   rewardTokenEmissionsAmount[rewardTokenIdx] = rewardEmissionPerDay;
   rewardTokenEmissionsUSD[rewardTokenIdx] = rewardEmissionPerDay
+    .toBigDecimal()
     .times(rewardTokenPricePerToken.usdPrice)
     .div(rewardTokenPricePerToken.decimalsBaseTen)
     .div(rewardTokenDecimals);
 
   vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
-  
+
   vault.save();
 
   log.warning(
     "[RewardTokenEmission] gapInDays: {}, rewardEmissionPerDay: {}, rewardEmissionPerDayUSD: {}",
     [
       gapInDays.toString(),
-      rewardEmissionPerDay.div(rewardTokenDecimals).toString(),
-      vault.rewardTokenEmissionsUSD![rewardTokenIdx].toString()
+      rewardEmissionPerDay
+        .toBigDecimal()
+        .div(rewardTokenDecimals)
+        .toString(),
+      vault.rewardTokenEmissionsUSD![rewardTokenIdx].toString(),
     ]
   );
 }
@@ -209,9 +214,27 @@ export function _EarmarkRewards(
   crvRewardTokenInfoStore.lastRewardTimestamp = block.timestamp;
   crvRewardTokenInfoStore._previousExtraHistoricalRewards = historicalCvxCrvStakerRewards;
   crvRewardTokenInfoStore.save();
+
+  vault.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD.plus(
+    supplySideRevenueUSD
+  );
+  vault.cumulativeProtocolSideRevenueUSD = vault.cumulativeProtocolSideRevenueUSD.plus(
+    protocolSideRevenueUSD
+  );
+  vault.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD.plus(
+    totalRevenueUSD
+  );
   vault.save();
 
   updateFinancialsAfterReport(
+    block,
+    totalRevenueUSD,
+    supplySideRevenueUSD,
+    protocolSideRevenueUSD
+  );
+
+  updateVaultSnapshotsAfterReport(
+    vault,
     block,
     totalRevenueUSD,
     supplySideRevenueUSD,

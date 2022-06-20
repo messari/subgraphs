@@ -46,7 +46,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.network = NetworkConfigs.getNetwork();
     protocol.type = ProtocolType.EXCHANGE;
-
+    protocol.totalPoolCount = 0;
     protocol.save();
   }
   return protocol;
@@ -134,7 +134,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
-
+    usageMetrics.totalPoolCount = 0;
     usageMetrics.save();
   }
 
@@ -195,6 +195,13 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
     poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
     poolMetrics.inputTokenWeights = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
+    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;
 
@@ -231,6 +238,13 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
     poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
     poolMetrics.inputTokenWeights = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+
+    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
 
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;

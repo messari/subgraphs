@@ -90,7 +90,7 @@ export function withdraw(
 
   const poolAddress = Address.fromString(vault._pool);
   const poolContract = PoolContract.bind(poolAddress);
-  const outputTokenContract = ERC20.bind(Address.fromString(vault.outputToken));
+  const outputTokenContract = ERC20.bind(Address.fromString(vault.outputToken!));
 
   vault.outputTokenSupply = utils.readValue<BigInt>(
     outputTokenContract.try_totalSupply(),
