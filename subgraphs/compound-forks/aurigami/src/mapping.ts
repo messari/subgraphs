@@ -170,12 +170,14 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let cTokenCollateral = event.params.cTokenCollateral;
   let liquidator = event.params.liquidator;
+  let borrower = event.params.borrower;
   let seizeTokens = event.params.seizeTokens;
   let repayAmount = event.params.repayAmount;
   _handleLiquidateBorrow(
     comptrollerAddr,
     cTokenCollateral,
     liquidator,
+    borrower,
     seizeTokens,
     repayAmount,
     event
@@ -216,7 +218,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Aurigami",
     "aurigami",
     "1.3.0",
-    "1.0.4",
+    "1.0.5",
     "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),

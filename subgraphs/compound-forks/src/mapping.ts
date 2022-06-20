@@ -351,6 +351,7 @@ export function _handleMarketListed(
   let marketIDs = marketListedData.protocol._marketIDs;
   marketIDs.push(market.id);
   marketListedData.protocol._marketIDs = marketIDs;
+  marketListedData.protocol.totalPoolCount++;
   marketListedData.protocol.save();
 }
 
@@ -668,6 +669,7 @@ export function _handleLiquidateBorrow(
   comptrollerAddr: Address,
   cTokenCollateral: Address,
   liquidator: Address,
+  borrower: Address,
   seizeTokens: BigInt,
   repayAmount: BigInt,
   event: ethereum.Event
@@ -739,6 +741,7 @@ export function _handleLiquidateBorrow(
   liquidate.protocol = protocol.id;
   liquidate.to = repayTokenMarketID;
   liquidate.from = liquidator.toHexString();
+  liquidate.liquidatee = borrower.toHexString();
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.market = repayTokenMarketID;
@@ -1111,6 +1114,7 @@ function snapshotUsage(
     default:
       break;
   }
+  dailySnapshot.totalPoolCount = protocol.totalPoolCount;
   dailySnapshot.blockNumber = blockNumber;
   dailySnapshot.timestamp = blockTimestamp;
   dailySnapshot.save();
@@ -1529,6 +1533,7 @@ export function _getOrCreateProtocol(
     protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    protocol.totalPoolCount = INT_ZERO;
     protocol._marketIDs = [];
 
     // set liquidation incentive
