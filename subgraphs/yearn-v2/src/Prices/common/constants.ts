@@ -15,7 +15,7 @@ export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
-
+export const BIGDECIMAL_ONE_MILLION = BigDecimal.fromString('1000000');
 export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
@@ -43,6 +43,11 @@ export const WHITELIST_TOKENS_LIST: string[] = [
   "FRAX",
   "CRV",
 ];
+
+export const STABLE_COINS_LIST: string[] = [
+  "0x5f98805a4e8be255a32880fdec7f6728c6568ba0", // LUSD STABLE COIN
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
+]
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////

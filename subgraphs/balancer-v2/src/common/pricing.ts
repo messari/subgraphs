@@ -72,8 +72,8 @@ export function calculatePrice(
    * This is meant for tokens that do not share pools with stable coins (for example, COW)
    */
 
-  let tokenInPrice = getOrCreateToken(tokenInAddress).lastPriceUSD;
-  let tokenOutPrice = getOrCreateToken(tokenOutAddress).lastPriceUSD;
+  let tokenInPrice = getOrCreateToken(tokenInAddress.toHexString()).lastPriceUSD;
+  let tokenOutPrice = getOrCreateToken(tokenOutAddress.toHexString()).lastPriceUSD;
 
   if (isBaseAsset(tokenInAddress) && tokenInPrice) {
     amountIn = amountIn.times(tokenInPrice);
@@ -98,7 +98,6 @@ export function fetchPrice(tokenAddress: Address): BigDecimal {
   if (token) tokenPrice = token.lastPriceUSD;
   if (tokenPrice) return tokenPrice;
 
-  if (getOrCreateDex().network == "MATIC" || getOrCreateDex().network == "ARBITRUM_ONE") return BIGDECIMAL_ZERO;
-
+  if (getOrCreateDex().network == "MATIC") return BIGDECIMAL_ZERO;
   return getUsdPrice(tokenAddress, BIGDECIMAL_ONE);
 }

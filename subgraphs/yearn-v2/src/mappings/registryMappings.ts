@@ -1,9 +1,9 @@
-import { _NewVault } from "../modules/Vault";
-import { log } from "@graphprotocol/graph-ts";
 import {
   NewVault,
   NewExperimentalVault,
 } from "../../generated/Registry_v1/Registry_v1";
+import { _NewVault } from "../modules/Vault";
+import { log } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
 import { getOrCreateYieldAggregator } from "../common/initializers";
 
@@ -16,6 +16,7 @@ export function handleNewVault(event: NewVault): void {
   vaultIds.push(vaultAddress.toHexString());
 
   protocol._vaultIds = vaultIds;
+  protocol.totalPoolCount += 1;
   protocol.save();
 
   _NewVault(vaultAddress, event.block);
@@ -35,6 +36,7 @@ export function handleNewExperimentalVault(event: NewExperimentalVault): void {
 
   vaultIds.push(vaultAddress.toHexString());
   protocol._vaultIds = vaultIds;
+  protocol.totalPoolCount += 1;
   protocol.save();
 
   _NewVault(vaultAddress, event.block);

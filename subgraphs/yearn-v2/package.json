@@ -6,17 +6,17 @@
     "build:mainnet": "yarn prepare:mainnet && graph build",
     "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
     "thegraph:deploy:mainnet": "graph deploy --node https://api.thegraph.com/deploy/ harsh9200/yearn-v2",
-    "deploy:mainnet": "yarn prepare:mainnet && yarn build:mainnet && yarn thegraph:deploy:mainnet",
+    "deploy:mainnet": "yarn prepare:mainnet && yarn codegen && yarn thegraph:deploy:mainnet",
     
     "build:fantom": "yarn prepare:fantom && graph build",
     "prepare:fantom": "mustache config/fantom.json subgraph.template.yaml > subgraph.yaml",
     "thegraph:deploy:fantom": "graph deploy --node https://api.thegraph.com/deploy/ harsh9200/yearn-v2-fantom",
-    "deploy:fantom": "yarn prepare:fantom && yarn build:fantom && yarn thegraph:deploy:fantom",
+    "deploy:fantom": "yarn prepare:fantom && yarn codegen && yarn thegraph:deploy:fantom",
     
     "build:arbitrum": "yarn prepare:arbitrum && graph build",
     "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
     "thegraph:deploy:arbitrum": "graph deploy --node https://api.thegraph.com/deploy/ harsh9200/yearn-v2-arbitrum",
-    "deploy:arbitrum": "yarn prepare:arbitrum && yarn build:arbitrum && yarn thegraph:deploy:arbitrum",
+    "deploy:arbitrum": "yarn prepare:arbitrum && yarn codegen && yarn thegraph:deploy:arbitrum",
     
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ harsh9200/yearn-v2",
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.27.0",
-    "@graphprotocol/graph-ts": "0.24.1",
+    "@graphprotocol/graph-ts": "0.25.0",
     "mustache": "4.1.0"
   }
 }

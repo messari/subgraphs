@@ -11,5 +11,9 @@
     "wbtc": "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
     "wmatic": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     "bal": "0x9a71012b13ca4d3d0cdc72a177df3ef03b0e76a3"
-  }
+  },
+  "protocolName": "Balancer v2",
+  "protocolSlug": "balancer-v2",
+  "defaultNetwork": "MATIC",
+  "isBalancer": true
 }

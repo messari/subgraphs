@@ -35,6 +35,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = 0;
+    protocol.totalPoolCount = 0;
 
     protocol._poolCount = constants.BIGINT_ZERO;
   }
@@ -91,6 +92,9 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics.dailyDepositCount = 0;
     usageMetrics.dailyWithdrawCount = 0;
 
+    const protocol = getOrCreateYieldAggregator();
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
+    
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;
 
@@ -103,10 +107,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let metricsID: string = (block.timestamp.toI64() / constants.SECONDS_PER_DAY)
-    .toString()
-    .concat("-")
-    .concat((block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString());
+  let metricsID: string = (block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString()
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
 
   if (!usageMetrics) {
@@ -161,8 +162,17 @@ export function getOrCreateVaultsDailySnapshots(
     vaultSnapshots.inputTokenBalance = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGDECIMAL_ZERO];
+    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
     vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
+
+    vaultSnapshots.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO
+    vaultSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO
+    
+    vaultSnapshots.dailyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO
+    vaultSnapshots.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO
+    
+    vaultSnapshots.dailyTotalRevenueUSD = constants.BIGDECIMAL_ZERO
+    vaultSnapshots.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
@@ -179,8 +189,6 @@ export function getOrCreateVaultsHourlySnapshots(
 ): VaultHourlySnapshot {
   let id: string = vaultId
     .concat("-")
-    .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString())
-    .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString());
   let vaultSnapshots = VaultHourlySnapshot.load(id);
 
@@ -193,8 +201,17 @@ export function getOrCreateVaultsHourlySnapshots(
     vaultSnapshots.inputTokenBalance = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGDECIMAL_ZERO];
+    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
     vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
+
+    vaultSnapshots.hourlySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO
+    vaultSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO
+
+    vaultSnapshots.hourlyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO
+    vaultSnapshots.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO
+
+    vaultSnapshots.hourlyTotalRevenueUSD = constants.BIGDECIMAL_ZERO
+    vaultSnapshots.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
