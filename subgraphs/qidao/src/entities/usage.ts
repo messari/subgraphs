@@ -31,6 +31,7 @@ export function getOrCreateUsageMetricsSnapshot(
     usageMetrics.dailyBorrowCount = INT_ZERO;
     usageMetrics.dailyRepayCount = INT_ZERO;
     usageMetrics.dailyLiquidateCount = INT_ZERO;
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
   }
   usageMetrics.blockNumber = event.block.number;
   usageMetrics.timestamp = event.block.timestamp;
