@@ -114,7 +114,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Alchemix |   | | |
 | [Inverse Finance](https://www.inverse.finance/) | 🛠 | 1.3.0 / 1.2.2 / 1.0.0  | [![Inverse Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/inverse-finance-ethereum)|
 | [Liquity](https://www.liquity.org/) | 🛠 | 1.3.0 / 1.1.4 / 1.0.1 | [![Liquity Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/liquity-ethereum) |
-| [MakerDAO](https://makerdao.com/en/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![MakerDAO Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/makerdao-ethereum?selected=playground) |
+| [MakerDAO](https://makerdao.com/en/) | 🛠 | 1.3.0 / 1.1.0 / 1.0.0 | [![MakerDAO Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/makerdao-ethereum?selected=playground) |
 | QiDAO | 🛠 | | |
 | **Yield Aggregators** |     | |
 | [Arrakis Finance](https://www.arrakis.finance/) |  | | |
