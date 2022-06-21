@@ -257,7 +257,6 @@ export function _handleMarketListed(
   marketListedData: MarketListedData,
   event: ethereum.Event
 ): void {
-  //let cTokenAddr = event.params.cToken;
   let cTokenAddr = marketListedData.cToken.address;
   let cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
