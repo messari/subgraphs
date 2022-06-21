@@ -43,6 +43,9 @@ export function handleDrawdown(event: DrawdownEvent): void {
     // Update market
     ////
     market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(treasuryFee);
+    market._cumulativeProtocolSideRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(
+        getTokenAmountInUSD(event, inputToken, treasuryFee)
+    );
     market.save();
 
     ////

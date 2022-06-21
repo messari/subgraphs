@@ -1090,7 +1090,7 @@ type Liquidate implements Event @entity {
     amount: BigInt!
 
     " Amount of collateral liquidated in USD "
-    amountUSD: BigDecimal
+    amountUSD: BigDecimal!
 
     " Amount of profit from liquidation in USD "
     profitUSD: BigDecimal
@@ -1255,9 +1255,6 @@ type _Stake implements Event @entity {
     " Amount of asset being staked "
     amount: BigInt!
 
-    " Amount of stake tokens being staked in USD "
-    amountUSD: BigDecimal
-
     " Type of staking this transaction is for "
     stakeType: StakeType!
 }
@@ -1298,9 +1295,6 @@ type _Unstake implements Event @entity {
     " Amount of asset being unstaked "
     amount: BigInt!
 
-    " Amount of stake tokens being unstaked in USD "
-    amountUSD: BigDecimal
-
     " Type of staking this transaction is for "
     stakeType: StakeType!
 }
@@ -1318,7 +1312,7 @@ type _Loan @entity {
     " Interst rate for the loan "
     interestRate: InterestRate!
 
-    " Block number this loan was originally funded "
+    " Block number this loan was originally funded (not created) "
     creationBlockNumber: BigInt!
 
     " Amount the loan was funded for in market input tokens "

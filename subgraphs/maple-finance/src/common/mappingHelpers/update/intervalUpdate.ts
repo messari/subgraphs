@@ -99,24 +99,7 @@ function intervalUpdateMarket(event: ethereum.Event, market: Market): Market {
 
         market.totalDepositBalanceUSD = getTokenAmountInUSD(event, inputToken, market._totalDepositBalance);
 
-        market.cumulativeDepositUSD = getTokenAmountInUSD(event, inputToken, market._cumulativeDeposit);
-
         market.totalBorrowBalanceUSD = getTokenAmountInUSD(event, inputToken, market._totalBorrowBalance);
-
-        market.cumulativeBorrowUSD = getTokenAmountInUSD(event, inputToken, market._cumulativeBorrow);
-
-        market.cumulativeLiquidateUSD = getTokenAmountInUSD(event, inputToken, market._cumulativeLiquidate);
-
-        const cumulativeSupplySideRevenue = market._cumulativePoolDelegateRevenue
-            .plus(market._cumulativeInterest)
-            .plus(stakeLocker.cumulativeInterestInPoolInputTokens);
-        market._cumulativeSupplySideRevenueUSD = getTokenAmountInUSD(event, inputToken, cumulativeSupplySideRevenue);
-
-        market._cumulativeProtocolSideRevenueUSD = getTokenAmountInUSD(
-            event,
-            inputToken,
-            market._cumulativeTreasuryRevenue
-        );
 
         market._cumulativeTotalRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(
             market._cumulativeSupplySideRevenueUSD
@@ -268,8 +251,6 @@ export function intervalUpdateFinancialsDailySnapshot(event: ethereum.Event): vo
  * 3. update snapshots
  */
 export function intervalUpdate(event: ethereum.Event, market: Market): void {
-    log.warning("Before first: {}", [market._lastUpdatedBlockNumber.toString()]);
-
     ////
     // Interval update MplReward's
     ////
