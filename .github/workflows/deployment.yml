@@ -1,7 +1,9 @@
-on: [push]
+on: 
+  pull_request:
+    types: [closed]
 
 jobs:
-  Deployment: 
+  Deployment:
     runs-on: ubuntu-latest
     steps: 
       - id: files
