@@ -293,7 +293,7 @@ export function getOrCreateLoan(
                 loanV2OrV3Contract.try_interestRate.name
             );
 
-            const rate = parseUnits(rateFromContract, 18);
+            const rate = parseUnits(rateFromContract, 18).times(BigDecimal.fromString("100"));
             const interestRate = getOrCreateInterestRate(event, loan, rate, termDays);
             loan.interestRate = interestRate.id;
         }

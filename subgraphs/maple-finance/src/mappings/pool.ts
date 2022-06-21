@@ -62,6 +62,7 @@ export function handleTransfer(event: TransferEvent): void {
         // Update market
         ////
         market._cumulativeDeposit = market._cumulativeDeposit.plus(deposit.amount);
+        market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(deposit.amountUSD);
         market.save();
 
         ////
@@ -161,6 +162,7 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
     // Update market
     ////
     market._cumulativeBorrow = market._cumulativeBorrow.plus(amountFunded);
+    market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(getTokenAmountInUSD(event, inputToken, amountFunded));
     market.save();
 
     ////
@@ -191,13 +193,16 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
 export function handleClaim(event: ClaimEvent): void {
     const market = getOrCreateMarket(event, event.address);
     const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+    const poolInterest = event.params.interest;
+    const poolDelegatePotion = event.params.poolDelegatePortion;
+    const stakeLockerPortion = event.params.stakeLockerPortion;
 
     ////
     // Update stake locker
     ////
     const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
     stakeLocker.cumulativeInterestInPoolInputTokens = stakeLocker.cumulativeInterestInPoolInputTokens.plus(
-        event.params.stakeLockerPortion
+        stakeLockerPortion
     );
     stakeLocker.save();
 
@@ -205,9 +210,10 @@ export function handleClaim(event: ClaimEvent): void {
     // Update market
     ////
     market._cumulativePrincipalRepay = market._cumulativePrincipalRepay.plus(event.params.principal);
-    market._cumulativeInterest = market._cumulativeInterest.plus(event.params.interest);
-    market._cumulativePoolDelegateRevenue = market._cumulativePoolDelegateRevenue.plus(
-        event.params.poolDelegatePortion
+    market._cumulativeInterest = market._cumulativeInterest.plus(poolInterest);
+    market._cumulativePoolDelegateRevenue = market._cumulativePoolDelegateRevenue.plus(poolDelegatePotion);
+    market._cumulativeSupplySideRevenueUSD = market._cumulativeSupplySideRevenueUSD.plus(
+        getTokenAmountInUSD(event, inputToken, poolInterest.plus(poolDelegatePotion).plus(stakeLockerPortion))
     );
     market.save();
 
@@ -263,6 +269,7 @@ export function handleDefaultSuffered(event: DefaultSufferedEvent): void {
     // Update market
     ////
     market._cumulativePoolLosses = market._cumulativePoolLosses.plus(liquidate._defaultSufferedByPool);
+    market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(liquidate.amountUSD);
     market.save();
 
     ////

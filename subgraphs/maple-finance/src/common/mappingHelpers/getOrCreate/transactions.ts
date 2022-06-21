@@ -288,12 +288,6 @@ export function createStake(
     stake.to = event.address.toHexString(); // to whatever emitted this event (stakeLocker or mplReward)
     stake.amount = amount;
 
-    if (type == StakeType.STAKE_LOCKER) {
-        stake.amountUSD = getTokenAmountInUSD(event, stakeToken, stake.amount);
-    } else {
-        // Zero for mpl rewards pools pools
-        stake.amountUSD = ZERO_BD;
-    }
     stake.stakeType = type;
 
     stake.save();
@@ -334,7 +328,6 @@ export function createUnstake(
     unstake.from = event.address.toHexString(); // from whatever emitted this event (stakeLocker or mplReward)
     unstake.to = accountAddress.toHexString();
     unstake.amount = amount;
-    unstake.amountUSD = unstake.amount.toBigDecimal().times(market.inputTokenPriceUSD);
     unstake.stakeType = type;
 
     unstake.save();
