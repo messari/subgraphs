@@ -1,9 +1,4 @@
 {
-  "configurations": {
-    "deployment": {
-      "locations": ["messari"]
-    }
-  },
   "subgraphs": {
     "abracadabra": {
       "abracadabra": {
@@ -11,31 +6,31 @@
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-arbitrum",
           "messari": "messari/abracadabra-money-arbitrum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "avalanche": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-avalanche",
           "messari": "messari/abracadabra-money-avalanche",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "bsc": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-bsc",
           "messari": "messari/abracadabra-money-bsc",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "fantom": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-fantom",
           "messari": "messari/abracadabra-money-fantom",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "mainnet": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-ethereum",
           "messari": "messari/abracadabra-money-ethereum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -44,7 +39,7 @@
         "mainnet": {
           "template": "aave-v2.template.yaml",
           "messari": "messari/aave-v2-ethereum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -100,35 +95,35 @@
       "qidao": {
         "arbitrum": {
           "template": "qidao.template.yaml",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "avalanche": {
           "template": "qidao.template.yaml",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "bsc": {
           "template": "qidao.template.yaml",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "fantom": {
           "template": "qidao.template.yaml",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "matic": {
           "template": "qidao.template.yaml",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "moonriver": {
           "template": "qidao.template.yaml",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "optimism": {
           "template": "qidao.template.yaml",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "xdai": {
           "template": "qidao.template.yaml",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -136,7 +131,7 @@
       "rari-vaults": {
         "mainnet": {
           "template": "rari-vaults.template.yaml",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -245,7 +240,8 @@
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-xdai",
           "messari": "messari/sushiswap-gnosis",
-          "prepare:constants": true
+          "prepare:constants": true,
+          "deploy-on-merge": false
         }
       },
       "trader-joe": {
