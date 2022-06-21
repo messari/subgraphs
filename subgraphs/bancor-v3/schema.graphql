@@ -162,6 +162,9 @@ interface Protocol {
   " # of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  " Total number of pools "
+  totalPoolCount: Int!
+
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -224,6 +227,9 @@ type DexAmmProtocol implements Protocol @entity {
   " # of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  " Total number of pools "
+  totalPoolCount: Int!
+
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -271,6 +277,9 @@ type UsageMetricsDailySnapshot @entity {
 
   " # of cumulative unique users "
   cumulativeUniqueUsers: Int!
+
+  " Total number of pools "
+  totalPoolCount: Int!
 
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
   dailyTransactionCount: Int!

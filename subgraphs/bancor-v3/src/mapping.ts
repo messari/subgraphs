@@ -192,6 +192,7 @@ export function handlePoolTokenCreated(event: PoolTokenCreated): void {
   let poolIDs = protocol._poolIDs;
   poolIDs.push(liquidityPool.id);
   protocol._poolIDs = poolIDs;
+  protocol.totalPoolCount = poolIDs.length;
   protocol.save();
 }
 
@@ -671,6 +672,7 @@ function getOrCreateProtocol(): DexAmmProtocol {
     protocol.cumulativeProtocolSideRevenueUSD = zeroBD;
     protocol.cumulativeTotalRevenueUSD = zeroBD;
     protocol.cumulativeUniqueUsers = 0;
+    protocol.totalPoolCount = 0;
     protocol._poolIDs = [];
     protocol._defaultTradingFeeRate = zeroBD;
     protocol._networkFeeRate = zeroBD;
@@ -978,6 +980,7 @@ function snapshotUsage(
     dailySnapshot.protocol = protocol.id;
     dailySnapshot.dailyActiveUsers = 0;
     dailySnapshot.cumulativeUniqueUsers = 0;
+    dailySnapshot.totalPoolCount = 0;
     dailySnapshot.dailyTransactionCount = 0;
     dailySnapshot.dailyDepositCount = 0;
     dailySnapshot.dailyWithdrawCount = 0;
@@ -994,6 +997,7 @@ function snapshotUsage(
     dailySnapshot.dailyActiveUsers += 1;
   }
   dailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  dailySnapshot.totalPoolCount = protocol.totalPoolCount;
   dailySnapshot.dailyTransactionCount += 1;
   switch (eventType) {
     case EventType.Deposit:
