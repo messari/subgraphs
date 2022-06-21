@@ -3,34 +3,14 @@
   "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",
-
-    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
-    "build:mainnet": "yarn prepare:mainnet && graph build",
-    "thegraph:deploy:mainnet": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory",
-    "deploy:mainnet": "yarn prepare:mainnet && yarn thegraph:deploy:mainnet",
-
-    "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
-    "build:arbitrum": "yarn prepare:arbitrum && graph build",
-    "thegraph:deploy:arbitrum": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory2",
-    "deploy:arbitrum": "yarn prepare:arbitrum && yarn thegraph:deploy:arbitrum",
-
-    "prepare:optimism": "mustache config/optimism.json subgraph.template.yaml > subgraph.yaml",
-    "build:optimism": "yarn prepare:optimism && graph build",
-    "thegraph:deploy:optimism": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory3",
-    "deploy:optimism": "yarn prepare:optimism && yarn thegraph:deploy:optimism",
-
-    "prepare:polygon": "mustache config/polygon.json subgraph.template.yaml > subgraph.yaml",
-    "build:polygon": "yarn prepare:polygon && graph build",
-    "thegraph:deploy:polygon": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory4",
-    "deploy:polygon": "yarn prepare:polygon && yarn thegraph:deploy:polygon",
-
-    "deploy:all": "yarn deploy:mainnet && yarn deploy:arbitrum && yarn deploy:optimism && yarn deploy:polygon",
-    
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory",
-    "create-local": "graph create --node http://localhost:8020/  l0c4t0r/laboratory",
-    "remove-local": "graph remove --node http://localhost:8020/  l0c4t0r/laboratory",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001  l0c4t0r/laboratory"
+
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
+    "prepare:build": "graph codegen && graph build",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
+
+    "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.29.2",

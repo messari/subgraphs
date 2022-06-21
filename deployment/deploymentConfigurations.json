@@ -83,6 +83,30 @@
         }
       }
     },
+    "gamma-strategies": {
+      "gamma-strategies": {
+        "arbitrum": {
+          "template": "gamma.strategies.template.yaml",
+          "messari": "messari/gamma-arbitrum",
+          "deploy-on-merge": false
+        },
+        "mainnet": {
+          "template": "gamma.strategies.template.yaml",
+          "messari": "messari/gamma-ethereum",
+          "deploy-on-merge": true
+        },
+        "matic": {
+          "template": "gamma.strategies.template.yaml",
+          "messari": "messari/gamma-polygon",
+          "deploy-on-merge": true
+        },
+        "optimism": {
+          "template": "gamma.strategies.template.yaml",
+          "messari": "messari/gamma-optimism",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "makerdao": {
       "makerdao": {
         "mainnet": {
