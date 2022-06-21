@@ -1,6 +1,7 @@
 import { ethereum } from "@graphprotocol/graph-ts";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
+
 export namespace shared {
 	// TODO add this to toolkit
 	export function readValue<T>(callResult: ethereum.CallResult<T>, fallBackValue: T): T {
@@ -8,29 +9,7 @@ export namespace shared {
 	}
 
 	export namespace constants {
-		export namespace Network {
-			export const AVALANCHE = "AVALANCHE";
-			export const AURORA = "AURORA";
-			export const BSC = "BSC";
-			export const CELO = "CELO";
-			export const CRONOS = "CRONOS";
-			export const ETHEREUM = "MAINNET";
-			export const FANTOM = "FANTOM";
-			export const HARMONY = "HARMONY";
-			export const MOONBEAM = "MOONBEAM";
-			export const MOONRIVER = "MOONRIVER";
-			export const OPTIMISM = "OPTIMISM";
-			export const POLYGON = "POLYGON";
-			export const XDAI = "XDAI";
-		}
 
-		export namespace ProtocolType {
-			export const EXCHANGE = "EXCHANGE";
-			export const LENDING = "LENDING";
-			export const YIELD = "YIELD";
-			export const BRIDGE = "BRIDGE";
-			export const GENERIC = "GENERIC";
-		}
 
 		export namespace VaultFeeType {
 			export const MANAGEMENT_FEE = "MANAGEMENT_FEE";
@@ -65,8 +44,8 @@ export namespace shared {
 		export const PROTOCOL_ID = Address.fromString("0x222412af183BCeAdEFd72e4Cb1b71f1889953b1C");
 		export const PROTOCOL_NAME = "Harvest Finance";
 		export const PROTOCOL_SLUG = "harvest-finance";
-		export const PROTOCOL_TYPE = ProtocolType.YIELD;
-		export const PROTOCOL_NETWORK = Network.ETHEREUM;
+		export const PROTOCOL_TYPE = "YIELD";
+		export const PROTOCOL_NETWORK = "MAINNET";
 		export const PROTOCOL_SCHEMA_VERSION = "1.2.0";
 		export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
 		export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";

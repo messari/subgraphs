@@ -1,5 +1,7 @@
 export * from "./accounts"
+export * from "./events"
 export * from "./protocol"
 export * from "./shared"
 export * from "./timeSeries"
 export * from "./tokens"
+export * from "./vaults"
