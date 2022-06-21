@@ -10,14 +10,19 @@ npm run deploy --SUBGRAPH=uniswap-forks --PROTOCOL=uniswap-v2 --LOCATION=steegec
 # Deploys protocols from the uniswap-forks and networks in my hosted service.
 npm run deploy --SUBGRAPH=uniswap-forks --LOCATION=steegecs
 ```
-
-- Five Parameters:
+- 2 require parameters:
     - --SUBGRAPH
+    - --LOCATION
+
+- 2 Additional Parameters for specifying particular deployments from a subgraph directory.
     - --PROTOCOL
     - --NETWORK
-    - --LOCATION
-    - --PRINTLOGS  
-        - Set PRINTLOGS to 't' or 'true' to print all logs to the console instead of just to results.txt
+    
+- 2 Options (Leaving null means 'F')
+    - --PRINTLOGS
+        - T/F - Set PRINTLOGS to 't' or 'true' to print all logs to the console instead of just to results.txt
+    - --MERGE
+        - T/F - Specifies whether this deployment is triggered by a merge. Should only be set to merge in the deployment action unless for testing.
 
 
 - This works by taking the inputs from `npm run deploy` and using them to configure the subgraph.yaml, and optionally, configurations/configure.ts with a particulalar set of constants, and subsequently deploying to the specified hosted service account.

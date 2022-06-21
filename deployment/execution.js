@@ -9,6 +9,7 @@ const fs = require('fs');
 */
 function scripts(protocol, network, template, location, constants) {
     let scripts = [];
+    let removeResults = "rm -rf results.txt"
     let removeConfig = "rm -rf configurations/configure.ts"
     let removeSubgraphYaml = "rm -rf subgraph.yaml"
     let prepareYaml = "npm run prepare:yaml --PROTOCOL=" + protocol + " --NETWORK=" + network + " --TEMPLATE=" + template
@@ -16,6 +17,7 @@ function scripts(protocol, network, template, location, constants) {
     let prepareBuild = "graph codegen && graph build"
     let deployment = "npm run deploy:subgraph --LOCATION=" + location
 
+    scripts.push(removeResults)
     scripts.push(removeConfig)
     scripts.push(removeSubgraphYaml)
     scripts.push(prepareYaml)
@@ -87,7 +89,7 @@ async function runCommands(allScripts, results, args, callback) {
             if (['true', 't'].includes(args.printlogs.toLowerCase())) {
                 console.log(logs)
             }
-            console.log(results + "END" + '\n')
+            console.log('\n' + results + "END" + '\n\n')
             callback(results);
         }
     }
