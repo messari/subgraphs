@@ -43,6 +43,37 @@
         }
       }
     },
+    "balancer-forks": {
+      "balancer-v2": {
+        "arbitrum": {
+          "template": "balancer.v2.template.yaml",
+          "prepare:constants": true,
+          "deploy-on-merge": true
+        },
+        "mainnet": {
+          "template": "balancer.v2.template.yaml",
+          "prepare:constants": true,
+          "deploy-on-merge": true
+        },
+        "matic": {
+          "template": "balancer.v2.template.yaml",
+          "prepare:constants": true,
+          "deploy-on-merge": true
+        }
+      },
+      "beethoven-x": {
+        "fantom": {
+          "template": "balancer.v2.template.yaml",
+          "prepare:constants": true,
+          "deploy-on-merge": true
+        },
+        "optimism": {
+          "template": "balancer.v2.template.yaml",
+          "prepare:constants": true,
+          "deploy-on-merge": true
+        }
+      }
+    },
     "curve": {
       "curve": {
         "arbitrum": {
