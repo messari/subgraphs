@@ -14,8 +14,11 @@ import {
 import { amountInUSD } from "./price";
 import { getOrCreateToken, getTokenById } from "./token";
 
-export function createReserve(address: Address): void {
-  const reserve = new _Reserve(address.toHexString());
+export function createReserve(event: ReserveInitialized): void {
+  const reserve = new _Reserve(event.params.asset.toHexString());
+  reserve.aToken = event.params.aToken.toHexString();
+  reserve.stableDebtToken = event.params.stableDebtToken.toHexString();
+  reserve.variableDebtToken = event.params.variableDebtToken.toHexString();
   reserve.liquidityIndex = RAY;
   reserve.scaledATokenSupply = BIGINT_ZERO;
   reserve.totalATokenSupply = BIGINT_ZERO;
@@ -29,6 +32,14 @@ export function createReserve(address: Address): void {
 export function getReserve(address: Address): _Reserve {
   const asset = getOrCreateToken(address);
   return _Reserve.load(asset.underlyingAsset!)!;
+}
+
+export function getReserveOrNull(address: Address): _Reserve | null {
+  const asset = getOrCreateToken(address);
+  if (asset.underlyingAsset == null) {
+    return null;
+  }
+  return _Reserve.load(asset.underlyingAsset!);
 }
 
 export function updateReserveATokenSupply(
@@ -62,8 +73,7 @@ export function updateReserveStableDebtSupply(
   event: ethereum.Event,
   newTotalSupply: BigInt
 ): void {
-  const assetId = getOrCreateToken(event.address).underlyingAsset!;
-  const reserve = _Reserve.load(assetId)!;
+  const reserve = getReserve(event.address);
   reserve.stableDebtSupply = newTotalSupply;
   reserve.save();
   updateMarketBorrowBalance(

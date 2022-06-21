@@ -146,6 +146,7 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 /////////////////////
 
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
+export const BIGINT_SECONDS_PER_DAY = BigInt.fromI32(SECONDS_PER_DAY);
 export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const SECONDS_PER_YEAR = BigInt.fromI32(31556952);
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));

@@ -54,7 +54,7 @@ type Token @entity {
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
 
-  " Underlying asset, in case of aToken "
+  " Underlying asset, in case of aToken/vToken/sToken "
   underlyingAsset: String
 }
 
@@ -75,6 +75,9 @@ type RewardToken @entity {
 
   " The type of the reward token "
   type: RewardTokenType!
+
+  " Reward distribution end timestamp "
+  distributionEnd: BigInt!
 }
 
 enum LendingType {
@@ -1081,4 +1084,13 @@ type _Reserve @entity {
 
   " Total aToken accrued to treasury "
   accruedToTreasury: BigInt!
+
+  " aToken "
+  aToken: Token!
+
+  " Stable debt token "
+  stableDebtToken: Token!
+
+  " Variable debt token "
+  variableDebtToken: Token!
 }

@@ -21,9 +21,9 @@ import { bigIntToBigDecimal } from "../utils/numbers";
 export function handleReserveInitialized(event: ReserveInitialized): void {
   const asset = event.params.asset;
   createMarket(event, asset, event.params.aToken);
-  createReserve(asset);
   getOrCreateToken(event.params.stableDebtToken, asset.toHexString());
   getOrCreateToken(event.params.variableDebtToken, asset.toHexString());
+  createReserve(event);
   AToken.createWithContext(event.params.aToken, dataSource.context());
   StableDebtToken.createWithContext(
     event.params.stableDebtToken,

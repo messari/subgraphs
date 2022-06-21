@@ -3,11 +3,13 @@ import {
   Market,
   MarketDailySnapshot,
   MarketHourlySnapshot,
+  RewardToken,
 } from "../../generated/schema";
 import { ReserveDataUpdated } from "../../generated/templates/Pool/Pool";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
+  BIGINT_SECONDS_PER_DAY,
   BIGINT_ZERO,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
@@ -27,7 +29,7 @@ import {
   updateProtocolTVL,
 } from "./protocol";
 import { createInterestRatesFromEvent } from "./rate";
-import { getOrCreateToken, getTokenById } from "./token";
+import { getOrCreateToken, getRewardTokenById, getTokenById } from "./token";
 import { incrementProtocolTotalPoolCount } from "./usage";
 
 export function getMarket(address: Address): Market {
@@ -51,9 +53,9 @@ export function createMarket(
     market = new Market(id);
     market.protocol = getOrCreateLendingProtocol().id;
     market.name = token.name;
-    market.isActive = true;
-    market.canUseAsCollateral = true;
-    market.canBorrowFrom = true;
+    market.isActive = false;
+    market.canUseAsCollateral = false;
+    market.canBorrowFrom = false;
     market.maximumLTV = BIGDECIMAL_ZERO;
     market.liquidationThreshold = BIGDECIMAL_ZERO;
     market.liquidationPenalty = BIGDECIMAL_ZERO;
@@ -93,7 +95,6 @@ export function getOrCreateMarketSnapshot(
     marketSnapshot = new MarketDailySnapshot(id);
     marketSnapshot.protocol = market.protocol;
     marketSnapshot.market = market.id;
-    marketSnapshot.rates = market.rates;
 
     marketSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     marketSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -104,6 +105,7 @@ export function getOrCreateMarketSnapshot(
     marketSnapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
     marketSnapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
   }
+  marketSnapshot.rates = market.rates;
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketSnapshot.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD;
@@ -120,6 +122,8 @@ export function getOrCreateMarketSnapshot(
   marketSnapshot.outputTokenSupply = market.outputTokenSupply;
   marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
   marketSnapshot.exchangeRate = market.exchangeRate;
+  marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+  marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   marketSnapshot.blockNumber = event.block.number;
   marketSnapshot.timestamp = event.block.timestamp;
   marketSnapshot.save();
@@ -138,7 +142,6 @@ export function getOrCreateMarketHourlySnapshot(
     marketSnapshot = new MarketHourlySnapshot(id);
     marketSnapshot.protocol = market.protocol;
     marketSnapshot.market = market.id;
-    marketSnapshot.rates = market.rates;
 
     marketSnapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     marketSnapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -149,6 +152,7 @@ export function getOrCreateMarketHourlySnapshot(
     marketSnapshot.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
     marketSnapshot.hourlyRepayUSD = BIGDECIMAL_ZERO;
   }
+  marketSnapshot.rates = market.rates;
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketSnapshot.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD;
@@ -165,6 +169,8 @@ export function getOrCreateMarketHourlySnapshot(
   marketSnapshot.outputTokenSupply = market.outputTokenSupply;
   marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
   marketSnapshot.exchangeRate = market.exchangeRate;
+  marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+  marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   marketSnapshot.blockNumber = event.block.number;
   marketSnapshot.timestamp = event.block.timestamp;
   marketSnapshot.save();
@@ -341,6 +347,60 @@ export function addMarketProtocolSideRevenue(
   addProtocolSideRevenue(event, revenueAmountUSD);
 }
 
+export function updateMarketRewardTokens(
+  event: ethereum.Event,
+  market: Market,
+  rewardToken: RewardToken,
+  emissionRate: BigInt
+): void {
+  let rewardTokens = market.rewardTokens;
+  let rewardTokenEmissions = market.rewardTokenEmissionsAmount;
+  let rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+  if (rewardTokens == null) {
+    rewardTokens = [];
+    rewardTokenEmissions = [];
+    rewardTokenEmissionsUSD = [];
+  }
+  let rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
+  if (rewardTokenIndex == -1) {
+    rewardTokenIndex = rewardTokens.push(rewardToken.id) - 1;
+    rewardTokenEmissions!.push(BIGINT_ZERO);
+    rewardTokenEmissionsUSD!.push(BIGDECIMAL_ZERO);
+  }
+  rewardTokenEmissions![rewardTokenIndex] = emissionRate.times(
+    BIGINT_SECONDS_PER_DAY
+  );
+  market.rewardTokens = rewardTokens;
+  market.rewardTokenEmissionsAmount = rewardTokenEmissions;
+  market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+  updateMarketRewardTokenEmissions(event, market);
+}
+
+function updateMarketRewardTokenEmissions(
+  event: ethereum.Event,
+  market: Market
+): void {
+  if (market.rewardTokens == null) {
+    return;
+  }
+  const rewardTokens = market.rewardTokens!;
+  const rewardTokenEmissions = market.rewardTokenEmissionsAmount!;
+  const rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD!;
+  for (let i = 0; i < rewardTokens.length; i++) {
+    const rewardToken = getRewardTokenById(rewardTokens[i]);
+    if (event.block.timestamp.gt(rewardToken.distributionEnd)) {
+      rewardTokenEmissions[i] = BIGINT_ZERO;
+    }
+    rewardTokenEmissionsUSD[i] = amountInUSD(
+      rewardTokenEmissions[i],
+      getTokenById(rewardToken.token)
+    );
+  }
+  market.rewardTokenEmissionsAmount = rewardTokenEmissions;
+  market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+  market.save();
+}
+
 function updateMarketTVL(event: ethereum.Event, market: Market): void {
   const token = getTokenById(market.inputToken);
   const price = getAssetPrice(Address.fromString(market.inputToken));
@@ -353,4 +413,5 @@ function updateMarketTVL(event: ethereum.Event, market: Market): void {
   market.outputTokenPriceUSD = price;
   market.totalValueLockedUSD = totalValueLocked;
   market.totalDepositBalanceUSD = totalValueLocked;
+  updateMarketRewardTokenEmissions(event, market);
 }

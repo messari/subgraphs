@@ -9,6 +9,7 @@ import { Token, _PoolAddressesProvider } from "../../generated/schema";
 import { AaveOracle } from "../../generated/templates/Pool/AaveOracle";
 import {
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   POOL_ADDRESSES_PROVIDER_ID_KEY,
   ZERO_ADDRESS,
 } from "../utils/constants";
@@ -33,8 +34,13 @@ export function setPriceOracleAddress(
 }
 
 export function getAssetPrice(asset: Address): BigDecimal {
+  const poolAddressesProviderId = dataSource
+    .context()
+    .get(POOL_ADDRESSES_PROVIDER_ID_KEY);
   const poolAddressesProvider = _PoolAddressesProvider.load(
-    dataSource.context().getString(POOL_ADDRESSES_PROVIDER_ID_KEY)
+    poolAddressesProviderId != null
+      ? poolAddressesProviderId.toString()
+      : ZERO_ADDRESS
   )!;
   if (ZERO_ADDRESS != poolAddressesProvider.priceOracleCurrency) {
     log.error("Failed to fetch asset price, unexpected base currency: {}", [
@@ -59,6 +65,9 @@ export function getAssetPrice(asset: Address): BigDecimal {
 }
 
 export function amountInUSD(amount: BigInt, token: Token): BigDecimal {
+  if (amount == BIGINT_ZERO) {
+    return BIGDECIMAL_ZERO;
+  }
   if (token.underlyingAsset) {
     return amountInUSD(amount, getTokenById(token.underlyingAsset!));
   }

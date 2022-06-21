@@ -1,8 +1,8 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../generated/schema";
 import { IERC20Detailed } from "../../generated/templates/PoolConfigurator/IERC20Detailed";
 import { IERC20DetailedBytes } from "../../generated/templates/PoolConfigurator/IERC20DetailedBytes";
-import { RewardTokenType } from "../utils/constants";
+import { prefixID } from "../utils/strings";
 
 export const UNKNOWN_TOKEN_VALUE = "unknown";
 
@@ -76,14 +76,28 @@ function fetchTokenSymbol(contract: IERC20Detailed): string {
   return symbolValue;
 }
 
-export function getOrCreateRewardToken(tokenAddress: Address): RewardToken {
-  const id = tokenAddress.toHexString();
+export function getOrCreateRewardToken(
+  tokenAddress: Address,
+  rewardTokenType: string,
+  interestRateType: string,
+  distributionEnd: BigInt
+): RewardToken {
+  // deposit-variable-0x123, borrow-stable-0x123, borrow-variable-0x123
+  const id = prefixID(
+    rewardTokenType,
+    prefixID(interestRateType, tokenAddress.toHexString())
+  );
   let rewardToken = RewardToken.load(id);
   if (!rewardToken) {
     rewardToken = new RewardToken(id);
-    rewardToken.type = RewardTokenType.DEPOSIT;
+    rewardToken.type = rewardTokenType;
     rewardToken.token = getOrCreateToken(tokenAddress).id;
-    rewardToken.save();
   }
+  rewardToken.distributionEnd = distributionEnd;
+  rewardToken.save();
   return rewardToken;
+}
+
+export function getRewardTokenById(id: string): RewardToken {
+  return RewardToken.load(id)!;
 }

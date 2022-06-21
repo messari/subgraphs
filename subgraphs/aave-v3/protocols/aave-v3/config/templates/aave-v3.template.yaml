@@ -43,6 +43,8 @@ dataSources:
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
       eventHandlers:
         - event: AssetConfigUpdated(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleAssetConfigUpdated
