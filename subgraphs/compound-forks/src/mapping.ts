@@ -1558,7 +1558,7 @@ export function _getOrCreateProtocol(
   return protocol;
 }
 
-function getOrCreateMarketHourlySnapshot(
+export function getOrCreateMarketHourlySnapshot(
   marketID: string,
   blockTimestamp: i32
 ): MarketHourlySnapshot {
