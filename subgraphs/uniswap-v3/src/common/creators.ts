@@ -1,11 +1,9 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigInt, Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { LiquidityPool, Token, Deposit, Withdraw, Swap, _HelperStore, _LiquidityPoolAmount, LiquidityPoolFee } from "../../generated/schema";
-import { Pool as PoolTemplate } from "../../generated/templates";
-import { Factory as FactoryContract } from "../../generated/templates/Pool/Factory";
-
+import { Pool as PoolTemplate } from "../../generated/templates"
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateDex, getOrCreateLPToken, getOrCreateToken } from "./getters";
-import { NetworkConfigs } from "../../config/paramConfig";
+import { NetworkConfigs } from "../../configurations/configure";
 import {
   BIGDECIMAL_NEG_ONE,
   BIGDECIMAL_ONE,
@@ -22,11 +20,6 @@ import {
 import { getTrackedVolumeUSD, findNativeTokenPerToken, sqrtPriceX96ToTokenPrices, updateNativeTokenPriceInUSD } from "./price/price";
 import { updateTokenWhitelists, updateVolumeAndFees } from "./updateMetrics";
 import { convertFeeToPercent, convertTokenToDecimal } from "./utils/utils";
-
-export let factoryContract = FactoryContract.bind(Address.fromString(NetworkConfigs.FACTORY_ADDRESS));
-
-// rebass tokens, dont count in tracked volume
-export let UNTRACKED_PAIRS: string[] = ["0x9ea3b5b4ec044b70375236a281986106457b20ef"];
 
 // Create a liquidity pool from PairCreated contract call
 export function createLiquidityPool(event: ethereum.Event, poolAddress: string, token0Address: string, token1Address: string, fees: i32): void {
@@ -51,7 +44,7 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   pool.inputTokenWeights = [BIGDECIMAL_ONE.div(BIGDECIMAL_TWO), BIGDECIMAL_ONE.div(BIGDECIMAL_TWO)];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool.rewardTokens = NetworkConfigs.REWARD_TOKENS;
+  pool.rewardTokens = [NetworkConfigs.getRewardToken()];
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];

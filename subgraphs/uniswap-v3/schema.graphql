@@ -112,7 +112,7 @@ type LiquidityPoolFee @entity {
   id: ID!
 
   " Fee as a percentage of the trade (swap) amount. Does not always apply "
-  feePercentage: BigDecimal
+  feePercentage: BigDecimal!
 
   " Type of fee this pool uses "
   feeType: LiquidityPoolFeeType!
