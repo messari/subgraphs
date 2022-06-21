@@ -43,6 +43,15 @@
         }
       }
     },
+    "compound-forks/compound-v2": {
+      "compound-v2": {
+        "mainnet": {
+          "template": "compound-v2.template.yaml",
+          "messari": "messari/compound-ethereum",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "curve": {
       "curve": {
         "arbitrum": {
