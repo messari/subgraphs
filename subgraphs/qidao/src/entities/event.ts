@@ -168,6 +168,7 @@ export function createLiquidate(
   liquidate.market = market.id;
   liquidate.asset = collateral.id;
   liquidate.amount = amountLiquidated;
+  liquidate.liquidatee = liquidator.toHexString();
   liquidate.amountUSD = bigIntToBigDecimal(
     amountLiquidated,
     collateral.decimals
