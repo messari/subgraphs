@@ -1,11 +1,8 @@
 import { Box, CircularProgress, Grid, Typography } from "@mui/material";
-import { useState } from "react";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
-import { negativeFieldList, ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../../constants";
-import { convertTokenDecimals, toDate } from "../../utils";
-import SchemaTable from "../SchemaTable";
-import IssuesDisplay from "../IssuesDisplay";
+import { negativeFieldList } from "../../constants";
+import { convertTokenDecimals } from "../../utils";
 import { useEffect } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 
@@ -154,9 +151,7 @@ function ProtocolTabEntity({
               }
             }
           } catch (err) {
-            if (
-              issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0
-            ) {
+            if (issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0) {
               let message = "JAVASCRIPT ERROR";
               if (err instanceof Error) {
                 message = err.message;
@@ -192,7 +187,7 @@ function ProtocolTabEntity({
             const req =
               "!" ===
               entitiesData[entityName][entityField].split("")[
-              entitiesData[entityName][entityField].split("").length - 1
+                entitiesData[entityName][entityField].split("").length - 1
               ];
             if (req) {
               list[entityName][entityField] = "MISSING AND REQUIRED";

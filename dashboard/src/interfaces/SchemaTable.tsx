@@ -11,7 +11,6 @@ function checkValueFalsey(
   fieldDataType: string[],
   issues: { message: string; type: string; level: string; fieldName: string }[],
 ): { message: string; type: string; level: string; fieldName: string } | undefined {
-
   if (!fieldDataType || fieldDataType.length === 0) {
     return undefined;
   }
@@ -48,16 +47,11 @@ interface SchemaTableProps {
   >;
 }
 
-function SchemaTable({
-  entityData,
-  schemaName,
-  dataFields,
-  issuesProps,
-  setIssues
-}: SchemaTableProps) {
+function SchemaTable({ entityData, schemaName, dataFields, issuesProps, setIssues }: SchemaTableProps) {
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   let schema: (JSX.Element | null)[] = [];
   if (entityData) {
+    console.log("🥰", entityData);
     schema = Object.keys(entityData).map((fieldName: string) => {
       if (fieldName === "__typename") {
         return null;
