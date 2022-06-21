@@ -14,5 +14,8 @@
   "protocolName": "Balancer v2",
   "protocolSlug": "balancer-v2",
   "defaultNetwork": "MAINNET",
-  "isBalancer": true
+  "isBalancer": true,
+  "graftEnabled": false,
+  "subgraphId": "QmWLp26LboPZGu3ZzHx4QLsWHxcrwdCJZY77FyLa4dQHnB",
+  "graftStartBlock": "13818600"
 }

@@ -167,6 +167,9 @@ interface Protocol {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  " Total number of pools "
+  totalPoolCount: Int!
+
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -227,6 +230,9 @@ type DexAmmProtocol implements Protocol @entity {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  " Total number of pools "
+  totalPoolCount: Int!
+
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -278,6 +284,9 @@ type UsageMetricsDailySnapshot @entity {
 
   " Total number of trades (swaps) in a day "
   dailySwapCount: Int!
+
+  " Total number of pools "
+  totalPoolCount: Int!
 
   " Block number of this snapshot "
   blockNumber: BigInt!

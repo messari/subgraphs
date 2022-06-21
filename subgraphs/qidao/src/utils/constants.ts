@@ -7,8 +7,8 @@ import { prefixID } from "./strings";
 
 export const PROTOCOL_NAME = "QiDao";
 export const PROTOCOL_SLUG = "qidao";
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
+export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -21,17 +21,24 @@ export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
-  export const AVALANCHE = "AVALANCHE";
+  export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
   export const AURORA = "AURORA";
+  export const AVALANCHE = "AVALANCHE";
+  export const BOBA = "BOBA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
+  export const COSMOS = "COSMOS";
+  export const CRONOS = "CRONOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY";
+  export const JUNO = "JUNO";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
+  export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
 }
@@ -79,7 +86,7 @@ export namespace RiskType {
 export namespace InterestRateType {
   export const STABLE = "STABLE";
   export const VARIABLE = "VARIABLE";
-  export const FIXED_TERM = "FIXED_TERM";
+  export const FIXED = "FIXED";
 }
 
 export namespace InterestRateSide {

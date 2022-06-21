@@ -1,7 +1,6 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigDecimal, ethereum, BigInt, Address } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount, DexAmmProtocol, LiquidityPool } from "../../generated/schema";
-import { getUsdPrice } from "../prices";
 import { SECONDS_PER_DAY, INT_ZERO, INT_ONE, BIGDECIMAL_ONE, UsageType, SECONDS_PER_HOUR, INT_TWO } from "./constants";
 import {
   getOrCreateDex,
@@ -14,7 +13,7 @@ import {
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
-import { calculatePrice, isUSDStable, TokenInfo } from "./pricing";
+import { calculatePrice, fetchPrice, isUSDStable, TokenInfo } from "./pricing";
 import { scaleDown } from "./tokens";
 
 // Update FinancialsDailySnapshots entity
@@ -93,7 +92,7 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   }
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-
+  usageMetricsDaily.totalPoolCount = protocol.totalPoolCount;
   usageMetricsDaily.save();
   usageMetricsHourly.save();
   protocol.save();
@@ -118,8 +117,6 @@ export function updatePoolMetrics(event: ethereum.Event, poolAddress: string): v
   poolMetricsDaily.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
   poolMetricsDaily.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
   poolMetricsDaily.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
-
-
 
   poolMetricsHourly.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsHourly.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
@@ -153,8 +150,6 @@ export function updateVolumeAndFee(
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD);
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD);
 
-
-
   let tradingFeeAmountUSD = trackedAmountUSD.times(tradingFee.feePercentage!);
   let supplyFeeAmountUSD = tradingFeeAmountUSD.times(supplyFee.feePercentage!);
   let protocolFeeAmountUSD = tradingFeeAmountUSD.times(protocolFee.feePercentage!);
@@ -167,11 +162,10 @@ export function updateVolumeAndFee(
   pool.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
-
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
   financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   financialMetrics.dailyProtocolSideRevenueUSD =
-  financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+    financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
   financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
@@ -235,14 +229,14 @@ export function updateTokenPrice(
 
   if (!isUSDStable(tokenIn)) {
     const token = getOrCreateToken(tokenIn.toHexString());
-    token.lastPriceUSD = getUsdPrice(tokenIn, BIGDECIMAL_ONE);
+    token.lastPriceUSD = fetchPrice(tokenIn);
     token.lastPriceBlockNumber = blockNumber;
     token.save();
   }
 
   if (!isUSDStable(tokenOut)) {
     const token = getOrCreateToken(tokenOut.toHexString());
-    token.lastPriceUSD = getUsdPrice(tokenOut, BIGDECIMAL_ONE);
+    token.lastPriceUSD = fetchPrice(tokenOut);
     token.lastPriceBlockNumber = blockNumber;
     token.save();
   }

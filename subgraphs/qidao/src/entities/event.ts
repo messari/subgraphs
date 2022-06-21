@@ -168,6 +168,7 @@ export function createLiquidate(
   liquidate.market = market.id;
   liquidate.asset = collateral.id;
   liquidate.amount = amountLiquidated;
+  liquidate.liquidatee = liquidator.toHexString();
   liquidate.amountUSD = bigIntToBigDecimal(
     amountLiquidated,
     collateral.decimals
@@ -183,5 +184,5 @@ export function createLiquidate(
     BIGDECIMAL_ZERO.minus(debtRepaidUSD)
   );
   incrementProtocolLiquidateCount(event);
-  addSupplySideRevenue(event, liquidate.profitUSD!);
+  addSupplySideRevenue(event, market, liquidate.profitUSD!);
 }
