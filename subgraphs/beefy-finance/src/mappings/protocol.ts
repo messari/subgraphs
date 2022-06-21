@@ -135,6 +135,7 @@ export function updateProtocolRevenueFromWithdraw(
         .toBigDecimal()
         .times(fee.feePercentage)
         .div(BIGDECIMAL_HUNDRED)
+        .times(token.lastPriceUSD)
         .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
       protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
         revenue
