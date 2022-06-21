@@ -89,7 +89,7 @@ async function runCommands(allScripts, results, args, callback) {
             if (['true', 't'].includes(args.printlogs.toLowerCase())) {
                 console.log(logs)
             }
-            console.log(results + "END" + '\n')
+            console.log('\n' + results + "END" + '\n\n')
             callback(results);
         }
     }

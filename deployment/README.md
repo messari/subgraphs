@@ -22,7 +22,7 @@ npm run deploy --SUBGRAPH=uniswap-forks --LOCATION=steegecs
     - --PRINTLOGS
         - T/F - Set PRINTLOGS to 't' or 'true' to print all logs to the console instead of just to results.txt
     - --MERGE
-        - T/F - Specifies whether this deployment is triggered by a merge. 
+        - T/F - Specifies whether this deployment is triggered by a merge. Should only be set to merge in the deployment action unless for testing.
 
 
 - This works by taking the inputs from `npm run deploy` and using them to configure the subgraph.yaml, and optionally, configurations/configure.ts with a particulalar set of constants, and subsequently deploying to the specified hosted service account.

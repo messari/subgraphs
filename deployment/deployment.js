@@ -7,8 +7,10 @@ const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))['subg
 let allScripts = new Map()
 let results = "RESULTS:\n"
 
-
-if (!args.subgraph || !args.location) {
+if (args.subgraph === undefined || args.protocol === undefined || args.network === undefined || args.location === undefined || args.printlogs === undefined || args.merge === undefined) {
+    console.log("Usage: node deployment.js --subgraph=" + args.subgraph + " --protocol=" + args.protocol + " --network=" + args.network + " --location=" + args.location + " --printlogs=" + args.printlogs + " --merge=" + args.merge)
+    console.log("Please check subgraph:deploy script in package.json. Make sure it matches example script in the deployments folder. ")
+} else if (!args.subgraph || !args.location) {
     console.log('Please provide at least --SUBGRAPH and --LOCATION')
 } else if (args.subgraph && args.protocol && args.network && args.location) {
     if (args.subgraph in protocolNetworkMap == false) {
