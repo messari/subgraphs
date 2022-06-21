@@ -744,7 +744,7 @@ export function _handleLiquidateBorrow(
   liquidate.liquidatee = borrower.toHexString();
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
-  liquidate.market = liquidatedCTokenID;
+  liquidate.market = liquidatedCTokenID!;
   liquidate.asset = repayTokenMarketID;
   liquidate.amount = seizeTokens;
   let gainUSD = seizeTokens
