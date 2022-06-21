@@ -249,7 +249,7 @@
           "steegecs": "steegecs/sushiswap-xdai",
           "messari": "messari/sushiswap-gnosis",
           "prepare:constants": true,
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "trader-joe": {
