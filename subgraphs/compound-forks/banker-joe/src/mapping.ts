@@ -207,7 +207,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Banker Joe",
     "banker-joe",
     "1.3.0",
-    "1.0.4",
+    "1.0.5",
     "1.0.0",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),

@@ -298,7 +298,7 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
 // create liquidate entity, return false if any markets are null
 export function createLiquidate(
   event: ethereum.Event,
-  liquidatedToken: Address,
+  cTokenCollateral: Address,
   liquidator: Address,
   borrower: Address,
   liquidatedAmount: BigInt, // sieze tokens
@@ -330,11 +330,11 @@ export function createLiquidate(
   liquidate.liquidatee = borrower.toHexString();
   liquidate.blockNumber = blockNumber;
   liquidate.timestamp = event.block.timestamp;
-  liquidate.market = marketAddress.toHexString();
+  liquidate.market = cTokenCollateral.toHexString();
 
   // get liquidated underlying address
-  let liquidatedMarket = getOrCreateMarket(event, liquidatedToken);
-  liquidate.asset = liquidatedToken.toHexString();
+  let liquidatedMarket = getOrCreateMarket(event, cTokenCollateral);
+  liquidate.asset = marketAddress.toHexString();
 
   // get/update prices/rates/accrue interest/rewards for market
   if (market._lastUpdateBlock < event.block.number) {

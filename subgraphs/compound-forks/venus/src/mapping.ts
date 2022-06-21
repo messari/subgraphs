@@ -216,7 +216,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Venus",
     "venus",
     "1.3.0",
-    "1.0.5",
+    "1.0.6",
     "1.0.0",
     Network.BSC,
     comptroller.try_liquidationIncentiveMantissa(),
