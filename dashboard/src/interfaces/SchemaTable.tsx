@@ -51,7 +51,6 @@ function SchemaTable({ entityData, schemaName, dataFields, issuesProps, setIssue
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   let schema: (JSX.Element | null)[] = [];
   if (entityData) {
-    console.log("🥰", entityData);
     schema = Object.keys(entityData).map((fieldName: string) => {
       if (fieldName === "__typename") {
         return null;
