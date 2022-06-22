@@ -1,82 +1,104 @@
 # Maple Finance Subgraph
 
-## Development
+## Calculation Methodology v1.0.0 - Market methodologies
 
-TODO: remove this section for handoff
-
-### Installing dependencies
-
-```bash
-yarn global add @graphprotocol/graph-cli
-yarn
-```
-
-### Run codegen
-
-```bash
-graph codegen
-```
-
-### Deploy changes
-
-```bash
-graph deploy --product hosted-service papercliplabs/messari-maple-finance --deploy-key <DEPLOY_KEY>
-```
-
-Note: the DEPLOY_KEY can be found on the graph page if logged in, otherwise ask @spennyp
-
-## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
-Sum across all Pools:
+`Current Loans + remaining deposits available to borrow as loan + any staked assets providing cover to the market`
 
-`Current Borrow Loans + Remaining Cash Available to Borrow as Loan`
+total amount on the supply side that is earning interest; it does not include accrued staking rewards 
 
-### Total Revenue USD
+### Cumulative Deposit USD
 
-Sum across all Pools:
+`Sum of all deposits made over time to the market (pool)`
 
-`Interest Earned across all loans + Establishment Fees on the Loan Amount for new loans originated + MPL/USDC BPT Deposits`
+Does not include stake deposits since these are not loanable
 
-Note: Establish fee is taken on NEW LOANS. e.g. if you borrow $500k, repay the $500k and take out another $1m, you pay fees across the $1.5m
+### Cumulative Withdraw USD
 
-### Protocol-Side Revenue USD
+`Sum of all withdraws that have ever been removed from the market (pool)`
 
-Portion of the Total Revenue allocated to the Protocol
+Does not include stake deposits since these are not loanable
 
-Sum across all Pools:
+### Total Deposit Balance USD
 
-`Establishment Fees on the Loan Amount for new loans originated`
+`Cumulative Deposit USD - Cumulative Withdraw USD - Sum of all default suffered to the pool from defaulted loans`
 
-Note that Establishment Fees is split between Protocol and Delegate 50/50 but full Establishment Fees to be included Protocol-side Revenue
+### Total Borrow Balance USD
 
-### Supply-Side Revenue USD
+`Total borrows outstanding - any recognized losses to the market (pool)`
 
-Portion of the Total Revenue allocated to the Supply-Side
+Recognized losses do not count torwards borrow amounts; interpreted same as paying principal, just does not come from the borrower
 
-Sum across all Pools
+### Cumulative Borrow USD
 
-`Interest Earned across all loans`
+`Sum of all withdraws taken from a Market (pool)`
 
-### Total Unique Users
+### Cumulative Liquidate USD
 
-Count of Unique Addresses which have interacted with the protocol via any transaction
+`Total losses suffered by stakers and lenders of the market from defaulted loans`
 
-`Deposits`
+stake locker lossess + pool lossess
 
-`Withdraws`
+### Cumulative Supply Side Revenue USD
 
-`Borrows`
+`Sum of all interest paid and establishment fees paid to the Pool Delegate + Sum of all interested earned by Lenders + Sum of all interest earned by Stakers`
 
-`Repays`
+this doesn’t include MPL token distribution or profits earned by the Keeper for liquidations
 
-`Liquidations`
+### Cumulative Protocol Side Revenue USD
 
-### Reward Token Emissions Amount
+`Sum of all establishment fees from borrowers paid to Maple Treasury`
 
-To be added
+Fees are percentage of the drawdown amount; lump sum for v1 loans and amortized over time for v2/v3 loans
 
-### Protocol Controlled Value
+### Cumulative Total Revenue USD
 
-To be added
+`Cumulative Supply Side Revenue + Cumulative Protocol Side Revenue`
+
+---
+
+## Calculation Methodology v1.0.0 - Protocol methodologies
+
+### Total Value Locked USD
+
+`Sum of Total Value Locked USD for all markets in the protocol`
+
+Sum of Protocol-Side Revenue USD for all markets
+
+### Total Deposit Balance USD
+
+`Sum of Total Deposit Balance USD for all markets in the protocol`
+
+### Cumulative Deposit USD
+
+`Sum of Cumulative Deposit USD for all markets`
+
+### Total Borrow Balance USD
+
+`Sum of Total Borrow Balance USD for all markets`
+
+**Calculation is across all markets (pools)**
+
+### Cumulative Borrow USD
+
+`Sum of Cumulative Borrow USD for all markets`
+
+### Cumulative Liquidate USD
+
+`Sum of Cumulative Liquidate USD for all markets`
+
+stake locker lossess + pool lossess for all markets (pools)
+
+###  Cumulative Supply Side Revenue USD
+
+`Sum of Cumulative Supply Side Revenue USD for all markets`
+
+### Cumulative Protocol Side Revenue USD
+
+`Sum of Cumulative Protocol Side Revenue USD for all markets`
+
+### Cumulative Total Revenue USD
+
+`Sum of Cumulative Total Revenue USD for all markets`
