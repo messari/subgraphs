@@ -43,18 +43,15 @@ export function createVaultFromStrategy(
   const vaultAddress = strategyContract.vault();
   const vault = new Vault(vaultAddress.toHex());
   const vaultContract = BeefyVault.bind(vaultAddress);
-
   vault.name = fetchTokenName(vaultAddress);
   vault.symbol = fetchTokenSymbol(vaultAddress);
   vault.strategy = strategyAddress.toHex();
-
   let call = vaultContract.try_balance();
   if (call.reverted) {
     vault.inputTokenBalance = BIGINT_ZERO;
   } else {
     vault.inputTokenBalance = call.value;
   }
-
   let want = strategyContract.try_want();
   if (want.reverted) {
     want = vaultContract.try_token();
@@ -70,11 +67,9 @@ export function createVaultFromStrategy(
       .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
   }
   vault.outputToken = getTokenOrCreate(vaultAddress, event.block).id;
-
   vault.fees = getFees(vault.id, strategyContract);
   vault.createdTimestamp = event.block.timestamp;
   vault.createdBlockNumber = event.block.number;
-
   call = vaultContract.try_totalSupply();
   if (call.reverted) {
     vault.outputTokenSupply = BIGINT_ZERO;
@@ -89,17 +84,14 @@ export function createVaultFromStrategy(
       BigInt.fromI32(vaultContract.decimals())
     );
   }
-
   const outputSupply = vault.outputTokenSupply;
   if (outputSupply && outputSupply != BIGINT_ZERO)
     vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
       outputSupply.toBigDecimal()
     );
-
   const beefy = getBeefyFinanceOrCreate(vault.id);
   vault.protocol = beefy.id;
   vault.save();
-
   if (beefy.vaults[0] != vault.id) {
     beefy.vaults = beefy.vaults.concat([vault.id]);
     beefy.save();
@@ -134,7 +126,6 @@ export function updateVaultAndSnapshots(
       BigInt.fromI32(vaultContract.decimals())
     );
   }
-
   const wantCall = vaultContract.try_want();
   if (wantCall.reverted) {
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -144,15 +135,12 @@ export function updateVaultAndSnapshots(
       .times(vault.inputTokenBalance.toBigDecimal())
       .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
   }
-
   const outputSupply = vault.outputTokenSupply;
   if (outputSupply && outputSupply != BIGINT_ZERO)
     vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
       outputSupply.toBigDecimal()
     );
-
   vault.save();
-
   updateVaultHourlySnapshot(block, vault);
   updateVaultDailySnapshot(block, vault);
 }
@@ -202,7 +190,6 @@ export function getFees(
 
 export function handleDeposit(event: Deposit): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
-
   if (!vault.deposits) {
     const depositedAmount = event.params.tvl;
     createDeposit(event, depositedAmount, vault.id);
@@ -210,11 +197,9 @@ export function handleDeposit(event: Deposit): void {
     const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
     createDeposit(event, depositedAmount, vault.id);
   }
-
   updateVaultAndSnapshots(vault, event.block);
   updateProtocolUsage(event, vault, true, false);
 }
-
 export function handleWithdraw(event: Withdraw): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
   //const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl).abs();
@@ -224,13 +209,11 @@ export function handleWithdraw(event: Withdraw): void {
   updateVaultAndSnapshots(vault, event.block);
   updateProtocolRevenueFromWithdraw(event, vault, withdrawnAmount);
 }
-
 export function handleStratHarvestWithAmount(event: StratHarvest): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
   updateVaultAndSnapshots(vault, event.block);
   updateProtocolRevenueFromHarvest(event, event.params.wantHarvested, vault);
 }
-
 export function handleStratHarvest(event: StratHarvest): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
   const strategyContract = BeefyStrategy.bind(event.address);
@@ -248,5 +231,5 @@ export function handleStratHarvest(event: StratHarvest): void {
 export function handleChargedFees(event: ChargedFees): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
   updateVaultAndSnapshots(vault, event.block);
-  updateProtocolRevenueFromChargedFees(event, vault);
+  updateProtocolRevenueFromChargedFees(event, vault); //si rompe qua!
 }

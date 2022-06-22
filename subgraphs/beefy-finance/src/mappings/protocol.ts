@@ -84,9 +84,8 @@ export function updateProtocolRevenueFromChargedFees(
 ): void {
   updateProtocolUsage(event, vault, false, false);
   const protocol = getBeefyFinanceOrCreate(vault.id);
-  const native = WHITELIST_TOKENS_MAP.mustGet(dataSource.network()).mustGet(
-    "WETH"
-  );
+  const tokensMap = WHITELIST_TOKENS_MAP.get(dataSource.network());
+  const native = tokensMap!.get("WETH")!;
   const token = getTokenOrCreate(native, event.block);
   vault.fees = getFees(
     vault.id,
