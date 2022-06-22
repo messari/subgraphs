@@ -1,4 +1,4 @@
-# used for test deployments
+# used for deployments
 # full command sequence for successful deployment
 all: codegen deploy
 
