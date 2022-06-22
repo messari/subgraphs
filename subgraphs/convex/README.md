@@ -1,4 +1,4 @@
-# Convex Protocol Metrics Subgraph Methodology v1.2
+# Convex Protocol Metrics Subgraph Methodology v1.1.2
 
 
 
