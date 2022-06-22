@@ -860,6 +860,7 @@ type _LiquidityPoolParamsHelper @entity {
   RetentionRatio: BigDecimal!
   PriceDeviation: BigDecimal!
   HaircutRate: BigDecimal!
+  updateBlockNumber: BigInt!
 }
 
 type _Asset @entity {

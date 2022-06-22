@@ -2,7 +2,7 @@ import { Deposit, DepositFor, EmergencyWithdraw, Withdraw } from "../../generate
 
 import { RewardToken, _Asset } from "../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { getOrCreateLiquidityPool, getOrCreateRewardToken, getOrCreateToken } from "../common/getters";
+import { getOrCreateAsset, getOrCreateLiquidityPool, getOrCreateRewardToken, getOrCreateToken } from "../common/getters";
 import { MasterPlatypus } from "../../generated/MasterPlatypus/MasterPlatypus";
 import { MasterPlatypusOld } from "../../generated/MasterPlatypusOld/MasterPlatypusOld";
 import { MasterPlatypusFactory } from "../../generated/MasterPlatypusFactory/MasterPlatypusFactory";

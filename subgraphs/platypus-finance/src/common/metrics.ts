@@ -230,10 +230,10 @@ export function calculateSwapVolume(swap: Swap): BigDecimal {
   return swap.amountInUSD.plus(swap.amountOutUSD).div(BIGDECIMAL_TWO);
 }
 
-export function calculateSwapFeeInTokenAmount(poolAddress: Address, swap: Swap): BigDecimal {
+export function calculateSwapFeeInTokenAmount(event: ethereum.Event, poolAddress: Address, swap: Swap): BigDecimal {
   // Fee calculation
   // feeInTokenAmount = (haircut_rate * actual_amount) / (1 - haircut_rate)
-  let poolMetrics = getOrCreateLiquidityPoolParamsHelper(poolAddress);
+  let poolMetrics = getOrCreateLiquidityPoolParamsHelper(event, poolAddress);
   let haircutRate = poolMetrics.HaircutRate.div(exponentToBigDecimal(18));
   let n: BigDecimal = haircutRate.times(swap.amountOut.toBigDecimal());
   let d: BigDecimal = BigDecimal.fromString("1").minus(haircutRate);
@@ -243,7 +243,7 @@ export function calculateSwapFeeInTokenAmount(poolAddress: Address, swap: Swap):
 export function calculateSwapFeeInUsd(event: ethereum.Event, poolAddress: Address, swap: Swap): BigDecimal {
   // Fee calculation
   // feeInTokenUsd = feeInTokenAmount * outputLPTokenPrice / feeInTokenAmount * outputTokenPrice? Assuming latter in current implementation
-  let feeInTokenAmount = calculateSwapFeeInTokenAmount(poolAddress, swap);
+  let feeInTokenAmount = calculateSwapFeeInTokenAmount(event, poolAddress, swap);
   let feeToken = getOrCreateToken(event, Address.fromString(swap.tokenOut));
   return tokenAmountToUSDAmount(feeToken, BigInt.fromString(feeInTokenAmount.toString().split(".")[0]));
 }
@@ -320,19 +320,25 @@ export function updateSwapMetrics(event: ethereum.Event, swap: Swap): void {
 }
 
 export function updateFeeMetrics(event: ethereum.Event, poolAddress: Address, swap: Swap): void {
-  let poolMetrics = getOrCreateLiquidityPoolParamsHelper(event.address);
+  let poolMetrics = getOrCreateLiquidityPoolParamsHelper(event, poolAddress);
   let swapFeeUsd = calculateSwapFeeInUsd(event, poolAddress, swap);
-  let supplySideFee = (exponentToBigDecimal(18).minus(poolMetrics.RetentionRatio)).times(swapFeeUsd);
+  let supplySideFee = exponentToBigDecimal(18).minus(poolMetrics.RetentionRatio).times(swapFeeUsd);
   let protocolSideFee = swapFeeUsd.minus(supplySideFee);
   updateFinancialSnapshotFeeMetrics(event, supplySideFee, protocolSideFee);
   updatePoolFeeMetrics(event, supplySideFee, protocolSideFee);
 }
 
-function updateFinancialSnapshotFeeMetrics(event: ethereum.Event, supplySideFee: BigDecimal, protocolSideFee: BigDecimal): void {
+function updateFinancialSnapshotFeeMetrics(
+  event: ethereum.Event,
+  supplySideFee: BigDecimal,
+  protocolSideFee: BigDecimal,
+): void {
   let protocol = getOrCreateDexAmm();
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplySideFee);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideFee);
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(protocol.cumulativeProtocolSideRevenueUSD);
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
+    protocol.cumulativeProtocolSideRevenueUSD,
+  );
   protocol.protocolControlledValueUSD = protocol.cumulativeProtocolSideRevenueUSD;
   protocol.save();
 
@@ -354,19 +360,23 @@ function updatePoolFeeMetrics(event: ethereum.Event, supplySideFee: BigDecimal, 
   pool.cumulativeTotalRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(pool.cumulativeProtocolSideRevenueUSD);
   pool.save();
 
-  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(event)
+  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(event);
   hourlySnapshot.hourlySupplySideRevenueUSD = hourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideFee);
   hourlySnapshot.hourlyProtocolSideRevenueUSD = hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(protocolSideFee);
-  hourlySnapshot.hourlyTotalRevenueUSD = hourlySnapshot.hourlySupplySideRevenueUSD.plus(hourlySnapshot.hourlyProtocolSideRevenueUSD);
+  hourlySnapshot.hourlyTotalRevenueUSD = hourlySnapshot.hourlySupplySideRevenueUSD.plus(
+    hourlySnapshot.hourlyProtocolSideRevenueUSD,
+  );
   hourlySnapshot.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
   hourlySnapshot.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
   hourlySnapshot.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
   hourlySnapshot.save();
 
-  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(event)
+  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(event);
   dailySnapshot.dailySupplySideRevenueUSD = dailySnapshot.dailySupplySideRevenueUSD.plus(supplySideFee);
   dailySnapshot.dailyProtocolSideRevenueUSD = dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideFee);
-  dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailySupplySideRevenueUSD.plus(dailySnapshot.dailyProtocolSideRevenueUSD);
+  dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailySupplySideRevenueUSD.plus(
+    dailySnapshot.dailyProtocolSideRevenueUSD,
+  );
   dailySnapshot.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
   dailySnapshot.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
   dailySnapshot.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;

@@ -75,7 +75,10 @@ export function getOrCreateToken(event: ethereum.Event, tokenAddress: Address): 
   return token;
 }
 
-export function getOrCreateLiquidityPoolParamsHelper(poolAddress: Address): _LiquidityPoolParamsHelper {
+export function getOrCreateLiquidityPoolParamsHelper(
+  event: ethereum.Event,
+  poolAddress: Address,
+): _LiquidityPoolParamsHelper {
   let poolParam = _LiquidityPoolParamsHelper.load(poolAddress.toHexString());
 
   if (!poolParam) {
@@ -90,6 +93,7 @@ export function getOrCreateLiquidityPoolParamsHelper(poolAddress: Address): _Liq
     poolParam.RetentionRatio = exponentToBigDecimal(18);
     poolParam.PriceDeviation = BigDecimal.fromString("0.02e18");
 
+    poolParam.updateBlockNumber = event.block.number;
     poolParam.save();
   }
   return poolParam;
@@ -116,7 +120,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address, event: ethereum.E
     pool.fees = [tradingFee.id, withdrawFee.id, depositFee.id];
 
     pool.protocol = PROTOCOL_ADMIN;
-    getOrCreateLiquidityPoolParamsHelper(poolAddress);
+    getOrCreateLiquidityPoolParamsHelper(event, poolAddress);
 
     let detail: poolDetail = poolDetail.fromAddress(_address);
     pool.name = detail.name;
