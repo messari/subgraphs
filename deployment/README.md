@@ -1,5 +1,9 @@
 ## Deployment Instructions:
 
+- Dependencies: 
+    - Minimist
+        - `npm install -g minimist`
+
 ```
 # Deploys uniswap-v2 from the uniswap-forks to mainnet in my hosted service.
 npm run deploy --SUBGRAPH=uniswap-forks --PROTOCOL=uniswap-v2 --NETWORK=mainnet --LOCATION=steegecs
