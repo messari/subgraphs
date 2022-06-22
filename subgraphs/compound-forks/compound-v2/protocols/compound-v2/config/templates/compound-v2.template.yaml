@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Comptroller
-    network: {{ network }}
+    network: { { network } }
     source:
       address: "{{ factoryAddress }}"
       abi: Comptroller
-      startBlock: {{ startBlock }}
+      startBlock: { { startBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -49,7 +49,7 @@ templates:
   # Implemented at block 8983575
   - name: CTokenNew
     kind: ethereum/contract
-    network: {{ network }}
+    network: { { network } }
     source:
       abi: CTokenNew
     mapping:
@@ -132,7 +132,7 @@ templates:
   # Used until block 8983575
   - name: CTokenOld
     kind: ethereum/contract
-    network: {{ network }}
+    network: { { network } }
     source:
       abi: CTokenOld
     mapping:

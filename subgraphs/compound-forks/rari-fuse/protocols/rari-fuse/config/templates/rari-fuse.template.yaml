@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: FusePoolDirectory
-    network: {{ network }}
+    network: { { network } }
     source:
       address: "{{ fusePoolDirectoryAddress }}"
       abi: FusePoolDirectory
-      startBlock: {{ startBlock}}
+      startBlock: { { startBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -27,7 +27,7 @@ dataSources:
 templates:
   - name: Comptroller
     kind: ethereum/contract
-    network: {{ network }}
+    network: { { network } }
     source:
       abi: Comptroller
     mapping:
@@ -61,7 +61,7 @@ templates:
           handler: handleActionPaused
   - name: CToken
     kind: ethereum/contract
-    network: {{ network }}
+    network: { { network } }
     source:
       abi: CToken
     mapping:

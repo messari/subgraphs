@@ -1,15 +1,17 @@
 {
+  "license": "MIT",
   "scripts": {
-    "prepare:mainnet": "YARN_SILENT=1 yarn mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
-    "prepare:bsc": "YARN_SILENT=1 yarn mustache config/bsc.json subgraph.template.yaml > subgraph.yaml",
-    "prepare:matic": "YARN_SILENT=1 yarn mustache config/matic.json subgraph.template.yaml > subgraph.yaml",
-    "prepare:arbitrum": "YARN_SILENT=1 yarn mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:mainnet": "graph deploy --studio cream-subgraph-mainnet",
-    "deploy:bsc": "graph deploy --node https://api.thegraph.com/deploy/ 0xbe1/cream-subgraph-bsc",
-    "deploy:matic": "graph deploy --node https://api.thegraph.com/deploy/ 0xbe1/cream-subgraph-matic",
-    "deploy:arbitrum": "graph deploy --node https://api.thegraph.com/deploy/ 0xbe1/cream-subgraph-arbitrum"
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
+    "prepare:build": "graph codegen ../bastion-protocol/subgraph.yaml -o ../generated && graph codegen && graph build",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
+    "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-ts": "^0.27.0"
   },
   "devDependencies": {
-    "mustache": "^4.2.0"
+    "@graphprotocol/graph-cli": "^0.30.1",
+    "mustache": "^3.1.0"
   }
 }

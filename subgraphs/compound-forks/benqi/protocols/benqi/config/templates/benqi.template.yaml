@@ -19,7 +19,7 @@ dataSources:
         - Token
       abis:
         - name: Comptroller
-          file: ../abis/Comptroller.json
+          file: ./abis/Comptroller.json
         - name: CToken
           file: ./abis/CToken.json
         - name: ERC20
@@ -56,11 +56,15 @@ templates:
         - name: CToken
           file: ./abis/CToken.json
         - name: Comptroller
-          file: ../abis/Comptroller.json
+          file: ./abis/Comptroller.json
+        - name: OldComptroller
+          file: ./abis/OldComptroller.json
         - name: ERC20
           file: ../abis/ERC20.json
         - name: PriceOracle
           file: ../abis/PriceOracle.json
+        - name: JoePair
+          file: ./abis/JoePair.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint

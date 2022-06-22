@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Comptroller
-    network: {{ network }}
+    network: { { network } }
     source:
-      address: "{{ comptrollerAddr }}"
+      address: "{{ factoryAddress }}"
       abi: Comptroller
-      startBlock: {{ startBlock }}
+      startBlock: { { startBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -39,7 +39,7 @@ dataSources:
 templates:
   - name: CToken
     kind: ethereum/contract
-    network: {{ network }}
+    network: { { network } }
     source:
       abi: CToken
     mapping:
@@ -72,7 +72,7 @@ templates:
           handler: handleRepayBorrow
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
-        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+        - event: AccrueInterest(uint256,uint256,uint256,uint256) # diff
           handler: handleAccrueInterest
         - event: NewReserveFactor(uint256,uint256)
           handler: handleNewReserveFactor
