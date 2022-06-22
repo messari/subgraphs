@@ -1,9 +1,6 @@
-# TreasureDAO Protocol Metrics Subgraph Methodology v1.0
-
+# TreasureDAO Protocol Metrics Subgraph Methodology v1.0.0
 
 ## Useful Links
-
-
 
 * Protocol
     * [https://www.treasure.lol/](https://www.treasure.lol/)
