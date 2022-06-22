@@ -6,7 +6,7 @@ import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 
 import { SECONDS_PER_DAY } from "../common/constants";
 
-export function getOrCreateToken(tokenAddress: Address, underlyingAsset: string = ''): Token {
+export function getOrCreateToken(tokenAddress: Address, underlyingAsset: string = ""): Token {
   let token = Token.load(tokenAddress.toHexString());
   // fetch info if null
   if (!token) {
