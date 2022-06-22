@@ -735,6 +735,7 @@ export const schema130 = (): Schema => {
       dailyDepositCount: "Int!",
       dailyWithdrawCount: "Int!",
       timestamp: "BigInt!",
+      totalPoolCount: "Int!",
     },
     vaultDailySnapshots: {
       id: "ID!",
@@ -867,6 +868,7 @@ export const schema130 = (): Schema => {
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
         cumulativeUniqueUsers
+        totalPoolCount
       }
     }`;
 
@@ -918,6 +920,7 @@ export const schema130 = (): Schema => {
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
         cumulativeUniqueUsers
+        totalPoolCount
       }
 
       ${vaultHourlyQuery}
@@ -982,6 +985,7 @@ export const schema130 = (): Schema => {
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",
     cumulativeUniqueUsers: "Int!",
+    totalPoolCount: "Int!",
   };
 
   return {

@@ -877,6 +877,7 @@ export const schema130 = (): Schema => {
       dailyBorrowCount: "Int!",
       dailyRepayCount: "Int!",
       dailyLiquidateCount: "Int!",
+      totalPoolCount: "Int!",
       timestamp: "BigInt!",
     },
     marketDailySnapshots: {
@@ -983,7 +984,7 @@ export const schema130 = (): Schema => {
       event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { ";
     let fields = eventsFields.join(", ");
     if (event === "liquidates") {
-      fields += ", profitUSD";
+      fields += ", profitUSD, liquidatee";
     }
     return baseStr + fields + " }";
   });
@@ -1054,6 +1055,7 @@ export const schema130 = (): Schema => {
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
+        totalPoolCount
         protocolControlledValueUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
@@ -1121,6 +1123,7 @@ export const schema130 = (): Schema => {
       cumulativeSupplySideRevenueUSD
       cumulativeProtocolSideRevenueUSD
       cumulativeTotalRevenueUSD
+      totalPoolCount
       totalDepositBalanceUSD
       cumulativeDepositUSD
       totalBorrowBalanceUSD
@@ -1203,6 +1206,7 @@ export const schema130 = (): Schema => {
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",
+    totalPoolCount: "Int!",
     totalDepositBalanceUSD: "BigDecimal!",
     cumulativeDepositUSD: "BigDecimal!",
     totalBorrowBalanceUSD: "BigDecimal!",
