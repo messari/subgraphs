@@ -1093,4 +1093,7 @@ type _Reserve @entity {
 
   " Variable debt token "
   variableDebtToken: Token!
+
+  " Treasury address, from aToken "
+  treasuryAddress: String!
 }

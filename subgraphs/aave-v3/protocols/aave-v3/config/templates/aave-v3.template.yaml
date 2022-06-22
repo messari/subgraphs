@@ -157,6 +157,8 @@ templates:
           handler: handleBurn
         - event: Mint(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleMint
+        - event: BalanceTransfer(indexed address,indexed address,uint256,uint256)
+          handler: handleBalanceTransfer
       file: ./src/mappings/AToken.ts
   - kind: ethereum
     name: StableDebtToken

@@ -1,5 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _Reserve } from "../../generated/schema";
+import { AToken } from "../../generated/templates/AToken/AToken";
 import { ReserveInitialized } from "../../generated/templates/PoolConfigurator/PoolConfigurator";
 import { BIGINT_ZERO } from "../utils/constants";
 import { RAY, rayMul } from "../utils/numbers";
@@ -26,7 +27,13 @@ export function createReserve(event: ReserveInitialized): void {
   reserve.variableDebtSupply = BIGINT_ZERO;
   reserve.stableDebtSupply = BIGINT_ZERO;
   reserve.accruedToTreasury = BIGINT_ZERO;
+  reserve.treasuryAddress = getReserveTreasuryAddress(event.params.aToken);
   reserve.save();
+}
+
+function getReserveTreasuryAddress(aTokenAddress: Address): string {
+  const aToken = AToken.bind(aTokenAddress);
+  return aToken.RESERVE_TREASURY_ADDRESS().toHexString();
 }
 
 export function getReserve(address: Address): _Reserve {

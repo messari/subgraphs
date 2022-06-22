@@ -1,8 +1,9 @@
+import { log } from "@graphprotocol/graph-ts";
 import {
-  Pool,
   Borrow,
   LiquidationCall,
   MintedToTreasury,
+  Pool,
   Repay,
   ReserveDataUpdated,
   Supply,
@@ -67,13 +68,17 @@ export function handleRepay(event: Repay): void {
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   updateMarketRates(event);
   const pool = Pool.bind(event.address);
-  const accruedToTreasury = pool.getReserveData(
-    event.params.reserve
-  ).accruedToTreasury;
+  const reserveData = pool.try_getReserveData(event.params.reserve);
+  if (reserveData.reverted) {
+    log.error("Pool.getReserveData reverted for reserve: {}", [
+      event.params.reserve.toHexString(),
+    ]);
+    return;
+  }
   updateReserveAccruedToTreasury(
     event,
     event.params.reserve,
-    accruedToTreasury
+    reserveData.value.accruedToTreasury
   );
 }
 
