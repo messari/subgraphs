@@ -52,131 +52,128 @@
         }
       }
     },
-    "compound-forks/aurigami": {
+    "compound-forks": {
       "aurigami": {
         "aurora": {
           "template": "aurigami.template.yaml",
           "messari": "messari/aurigami-aurora",
+          "dmelotik": "dmelotik/aurigami-aurora",
           "deploy-on-merge": true
         }
-      }
-    },
-    "compound-forks/banker-joe": {
+      },
       "banker-joe": {
         "avalanche": {
           "template": "banker-joe.template.yaml",
           "messari": "messari/banker-joe-avalanche",
+          "dmelotik": "dmelotik/banker-joe-avalanche",
           "deploy-on-merge": true
         }
-      }
-    },
-    "compound-forks/bastion-protocol": {
+      },
       "bastion-protocol": {
         "aurora": {
           "template": "bastion-protocol.template.yaml",
           "messari": "messari/bastion-protocol-aurora",
+          "dmelotik": "dmelotik/bastion-protocol",
           "deploy-on-merge": true
         }
-      }
-    },
-    "compound-forks/benqi": {
+      },
       "benqi": {
         "avalanche": {
           "template": "benqi.template.yaml",
           "messari": "messari/benqi-avalanche",
+          "dmelotik": "dmelotik/benqi",
           "deploy-on-merge": true
         }
-      }
-    },
-    "compound-forks/compound-v2": {
+      },
       "compound-v2": {
         "mainnet": {
           "template": "compound-v2.template.yaml",
           "messari": "messari/compound-ethereum",
+          "dmelotik": "dmelotik/compound-ethereum",
           "deploy-on-merge": true
         }
-      }
-    },
-    "compound-forks/cream-finance": {
+      },
       "cream-finance": {
         "arbitrum": {
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-arbitrum",
+          "dmelotik": "dmelotik/cream-finance",
           "deploy-on-merge": true
         },
         "bsc": {
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-bsc",
+          "dmelotik": "dmelotik/cream-finance-bsc",
           "deploy-on-merge": true
         },
         "mainnet": {
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-ethereum",
+          "dmelotik": "dmelotik/cream-finance-ethereum",
           "deploy-on-merge": true
         },
         "matic": {
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-polygon",
+          "dmelotik": "dmelotik/cream-finance-polygon",
           "deploy-on-merge": true
         }
-      }
-    },
-    "compound-forks/iron-bank": {
+      },
       "iron-bank": {
         "avalanche": {
           "template": "iron-bank.template.yaml",
           "messari": "messari/iron-bank-avalanche",
+          "dmelotik": "dmelotik/iron-bank",
           "deploy-on-merge": true
         },
         "fantom": {
           "template": "iron-bank.template.yaml",
           "messari": "messari/iron-bank-fantom",
+          "dmelotik": "dmelotik/iron-bank-fantom",
           "deploy-on-merge": true
         },
         "mainnet": {
           "template": "iron-bank.template.yaml",
           "messari": "messari/iron-bank-ethereum",
+          "dmelotik": "dmelotik/iron-bank-ethereum",
           "deploy-on-merge": true
         }
-      }
-    },
-    "compound-forks/moonwell": {
+      },
       "moonwell": {
         "moonriver": {
           "template": "moonwell.template.yaml",
           "messari": "messari/moonwell-moonriver",
+          "dmelotik": "dmelotik/moonwell",
           "deploy-on-merge": true
         }
-      }
-    },
-    "compound-forks/rari-fuse": {
+      },
       "rari-fuse": {
         "arbitrum": {
           "template": "rari-fuse.template.yaml",
           "messari": "messari/rari-fuse-arbitrum",
+          "dmelotik": "dmelotik/fuse-official",
           "deploy-on-merge": true
         },
         "mainnet": {
           "template": "rari-fuse.template.yaml",
           "messari": "messari/rari-fuse-ethereum",
+          "dmelotik": "dmelotik/fuse-mainnet",
           "deploy-on-merge": true
         }
-      }
-    },
-    "compound-forks/scream": {
+      },
       "scream": {
         "fantom": {
           "template": "scream.template.yaml",
           "messari": "messari/scream-fantom",
+          "dmelotik": "dmelotik/scream",
           "deploy-on-merge": true
         }
-      }
-    },
-    "copmound-forks/venus": {
+      },
       "venus": {
         "bsc": {
           "template": "venus.template.yaml",
           "messari": "messari/venus-protocol-bsc",
+          "dmelotik": "dmelotik/venus",
           "deploy-on-merge": true
         }
       }

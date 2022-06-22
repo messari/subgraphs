@@ -10,7 +10,7 @@ npm run deploy --SUBGRAPH=uniswap-forks --PROTOCOL=uniswap-v2 --LOCATION=steegec
 # Deploys protocols from the uniswap-forks and networks in my hosted service.
 npm run deploy --SUBGRAPH=uniswap-forks --LOCATION=steegecs
 ```
-- 2 require parameters:
+- 2 required parameters:
     - --SUBGRAPH
     - --LOCATION
 
@@ -30,18 +30,18 @@ npm run deploy --SUBGRAPH=uniswap-forks --LOCATION=steegecs
 ## How CI/CD deployment works:
 - The CI/CD deployment scripts and actions allow you to deploy multiple subgraphs at a time and deploy on merge if specified in the deployment/deploymentConfigurations.json file. 
 - The subgraphs that get deployed on merge depend upon 2 conditions: 
-    - The deploy-on-merge variable in the deploymentConfigurations.json should be present and set to `true` for that particular protocol and network deployment.
-    - A change in the codebase is detected that is relevant to a particualr subgraph. For example: 
-        - A change in the src/ folder has an expected impact on all subgraphs in the directory, so all subgraphs will satisfy this condition and deploy on merge if the above condition met.
+    - The `deploy-on-merge` variable in the `deploymentConfigurations.json` should be present and set to `true` for that particular protocol and network deployment.
+    - A change in the codebase is detected that is relevant to a particular subgraph. For example: 
+        - A change in the `src/` folder has an expected impact on all subgraphs in the directory, so all subgraphs will satisfy this condition and deploy on merge if the above condition met.
         - A change in a particular Protocols/`protocol`/src/ folder, will trigger all deployments for a particular protocol if the above condition is met. 
         - A change in a particular Protocols/`protocol`/config/networks/`network` folder will deploy that specific protocol and network if the above condition is met.
 - Be careful to set the deploy-on-merge to its proper configuration each time you create a PR and merge it to the remote repository.
 
 ## How to set up:
 ### Directory Structure (See uniswap-forks as example): 
-- Using these scripts requires a particular directory structure. This is because when the `npm` scripts are executed, the deployment scripts should know where to look for configuration files and templates. Also, for the deploy-on-merge actions, the specific structure allows us to detect changes that may apply to specific subgraph (root directory of subgraph e.g. uniswap-forks), a specific subgraph and protocol, a specific subgraph protocol, and network, or some combination. This is then used to execute the particular subgraph deployments that have relevant changes if specified in deployment/deploymentConfigurations.json to the Hosted Service. 
+- Using these scripts requires a particular directory structure. This is because when the `npm` scripts are executed, the deployment scripts should know where to look for configuration files and templates. Also, for the deploy-on-merge actions, the specific structure allows us to detect changes that may apply to specific subgraph (root directory of subgraph e.g. uniswap-forks), a specific subgraph and protocol, a specific subgraph protocol, and network, or some combination. This is then used to execute the particular subgraph deployments that have relevant changes if specified in `deployment/deploymentConfigurations.json` to the Hosted Service. 
 
-- The folder structure is a minimum requirement. You can add additional folders and files as long as the general pattern is adhered to: 
+- The folder structure is a minimum **requirement**. You can add additional folders and files as long as the general pattern is adhered to: 
     - First, you should have a `src/` folder and add any code or constants that applies to all subgraphs.
         - Example Strucure:
             - src/
@@ -54,7 +54,7 @@ npm run deploy --SUBGRAPH=uniswap-forks --LOCATION=steegecs
         - This constants file should contain all constants that do not conflict accross protocols and networks. See subgraphs/uniswap-forks/src/common/constants.ts as an example.  
 
     - Additionally, within the particular subgraph folder, you should have a `Protocols/` folder. The directory structure should have each of these folders and files (configured by `protocol` and `network`).
-        - Protocols/ (contains a list of all protocols in developed in this directory) 
+        - Protocols/ (contains a list of all protocols developed in this directory) 
             - `protocol`/
                 - config/
                     - networks/
