@@ -6,7 +6,7 @@ import {
   NewCollateralFactor,
   NewLiquidationIncentive,
   ActionPaused1,
-} from "../generated/Comptroller/Core";
+} from "../generated/Core/Core";
 import {
   Mint,
   Redeem,
@@ -44,10 +44,10 @@ import {
   _handleActionPaused,
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
-import { CToken } from "../generated/Comptroller/CToken";
-import { Comptroller } from "../generated/Comptroller/Comptroller";
+import { CToken } from "../generated/Core/CToken";
+import { Core as Comptroller } from "../generated/Core/Core";
 import { CToken as CTokenTemplate } from "../generated/templates";
-import { ERC20 } from "../generated/Comptroller/ERC20";
+import { ERC20 } from "../generated/Core/ERC20";
 import { comptrollerAddr, 
   tCROToken,
   tETHToken,
@@ -61,41 +61,18 @@ import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
-  log.debug('[Test Log] arbitrary argument {}', ["test handlenewpriceoracle"]);
-  _handleNewPriceOracle(protocol, event.params.newPriceOracle);
+  let newPriceOracle = event.params.newPriceOracle;
+  _handleNewPriceOracle(protocol, newPriceOracle);
 }
-
-function getOrCreateProtocol(): LendingProtocol {
-  log.warning(
-    "logging: {}", ["does this work"])
-  let comptroller = Comptroller.bind(comptrollerAddr);
-  let protocolData = new ProtocolData(
-    comptrollerAddr,
-    "Tectonic Protocol",
-    "tectonic-protocol",
-    "1.0.1",
-    "1.0.0",
-    "1.0.0",
-    Network.CRONOS,
-    comptroller.try_liquidationIncentiveMantissa(),
-    comptroller.try_oracle()
-  );
-  return _getOrCreateProtocol(protocolData);
-}
-
 
 export function handleMarketListed(event: MarketListed): void {
   CTokenTemplate.create(event.params.tToken);
-  log.warning(
-    "logging: {}",
-    [event.params.tToken.toHexString()]
-  );
+
   let cTokenAddr = event.params.tToken;
   let cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
   }
-  
   // this is a new cToken, a new underlying token, and a new market
 
   let protocol = getOrCreateProtocol();
@@ -146,62 +123,112 @@ export function handleMarketListed(event: MarketListed): void {
   );
 }
 
-// export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-//   log.debug('[Test Log] arbitrary argument {}', ["test handlenewcollateralfactor"]);
-//   _handleNewCollateralFactor(event);
-// }
+export function handleNewCollateralFactor(event: NewCollateralFactor): void {
+  let marketID = event.params.tToken.toHexString();
+  let collateralFactorMantissa = event.params.newCollateralFactorMantissa;
+  _handleNewCollateralFactor(marketID, collateralFactorMantissa);
+}
 
 export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
   let protocol = getOrCreateProtocol();
-  log.debug('[Test Log] arbitrary argument {}', ["test handlenewliquidationincentive"]);
-  _handleNewLiquidationIncentive(protocol, event.params.newLiquidationIncentiveMantissa);
+  let newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
+  _handleNewLiquidationIncentive(protocol, newLiquidationIncentive);
 }
 
-// export function handleActionPaused(event: ActionPaused1): void {
-//   _handleActionPaused(event);
-// }
+export function handleActionPaused(event: ActionPaused1): void {
+  let marketID = event.params.tToken.toHexString();
+  let action = event.params.action;
+  let pauseState = event.params.pauseState;
+  _handleActionPaused(marketID, action, pauseState);
+}
 
-// export function handleNewReserveFactor(event: NewReserveFactor): void {
-//   _handleNewReserveFactor(event);
-// }
+export function handleNewReserveFactor(event: NewReserveFactor): void {
+  let marketID = event.address.toHexString();
+  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
+  _handleNewReserveFactor(marketID, newReserveFactorMantissa);
+}
 
-// export function handleMint(event: Mint): void {
-//   _handleMint(comptrollerAddr, event);
-// }
+export function handleMint(event: Mint): void {
+  let minter = event.params.minter;
+  let mintAmount = event.params.mintAmount;
+  _handleMint(comptrollerAddr, minter, mintAmount, event);
+}
 
-// export function handleRedeem(event: Redeem): void {
-//   _handleRedeem(comptrollerAddr, event);
-// }
+export function handleRedeem(event: Redeem): void {
+  let redeemer = event.params.redeemer;
+  let redeemAmount = event.params.redeemAmount;
+  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, event);
+}
 
-// export function handleBorrow(event: BorrowEvent): void {
-//   _handleBorrow(comptrollerAddr, event);
-// }
+export function handleBorrow(event: BorrowEvent): void {
+  let borrower = event.params.borrower;
+  let borrowAmount = event.params.borrowAmount;
+  _handleBorrow(comptrollerAddr, borrower, borrowAmount, event);
+}
 
-// export function handleRepayBorrow(event: RepayBorrow): void {
-//   _handleRepayBorrow(comptrollerAddr, event);
-// }
+export function handleRepayBorrow(event: RepayBorrow): void {
+  let payer = event.params.payer;
+  let repayAmount = event.params.repayAmount;
+  _handleRepayBorrow(comptrollerAddr, payer, repayAmount, event);
+}
 
-// export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-//   _handleLiquidateBorrow(comptrollerAddr, event);
-// }
+export function handleLiquidateBorrow(event: LiquidateBorrow): void {
+  let cTokenCollateral = event.params.cTokenCollateral;
+  let liquidator = event.params.liquidator;
+  let borrower = event.params.borrower;
+  let seizeTokens = event.params.seizeTokens;
+  let repayAmount = event.params.repayAmount;
+  _handleLiquidateBorrow(
+    comptrollerAddr,
+    cTokenCollateral,
+    liquidator,
+    borrower,
+    seizeTokens,
+    repayAmount,
+    event
+  );
+}
 
-// export function handleAccrueInterest(event: AccrueInterest): void {
-//   let marketAddress = event.address;
-//   let cTokenContract = CToken.bind(marketAddress);
-//   let protocol = getOrCreateProtocol();
-//   let oracleContract = PriceOracle.bind(
-//     Address.fromString(protocol._priceOracle)
-//   );
-//   let updateMarketData = new UpdateMarketData(
-//     cTokenContract.try_totalSupply(),
-//     cTokenContract.try_exchangeRateStored(),
-//     cTokenContract.try_supplyRatePerBlock(),
-//     cTokenContract.try_borrowRatePerBlock(),
-//     oracleContract.try_getUnderlyingPrice(marketAddress),
-//     SECONDS_PER_YEAR
-//   );
-//   _handleAccrueInterest(updateMarketData, comptrollerAddr, event);
-// }
+export function handleAccrueInterest(event: AccrueInterest): void {
+  let marketAddress = event.address;
+  let cTokenContract = CToken.bind(marketAddress);
+  let protocol = getOrCreateProtocol();
+  let oracleContract = PriceOracle.bind(
+    Address.fromString(protocol._priceOracle)
+  );
+  let updateMarketData = new UpdateMarketData(
+    cTokenContract.try_totalSupply(),
+    cTokenContract.try_exchangeRateStored(),
+    cTokenContract.try_supplyRatePerBlock(),
+    cTokenContract.try_borrowRatePerBlock(),
+    oracleContract.try_getUnderlyingPrice(marketAddress),
+    SECONDS_PER_YEAR
+  );
+  let interestAccumulated = event.params.interestAccumulated;
+  let totalBorrows = event.params.totalBorrows;
+  _handleAccrueInterest(
+    updateMarketData,
+    comptrollerAddr,
+    interestAccumulated,
+    totalBorrows,
+    event
+  );
+}
 
+function getOrCreateProtocol(): LendingProtocol {
+  let comptroller = Comptroller.bind(comptrollerAddr);
+  let protocolData = new ProtocolData(
+    comptrollerAddr,
+    "Bastion Protocol",
+    "bastion-protocol",
+    "1.3.0",
+    "1.0.8",
+    "1.0.0",
+    Network.AURORA,
+    comptroller.try_liquidationIncentiveMantissa(),
+    comptroller.try_oracle()
+  );
+  return _getOrCreateProtocol(protocolData);
+}

@@ -3,12 +3,12 @@ schema:
   file: ../schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Comptroller
+    name: Core
     network: cronos
     source:
-      address: "0x7De56Bd8b37827c51835e162c867848fE2403a48"
+      address: "0xb3831584acb95ED9cCb0C11f677B5AD01DeaeEc0"
       abi: Core
-      startBlock: 678408
+      startBlock: 570286
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -25,7 +25,7 @@ dataSources:
         - name: ERC20
           file: ../abis/ERC20.json
         - name: Core
-          file: ./abis/Core.json
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
@@ -63,8 +63,6 @@ templates:
           file: ../abis/ERC20.json
         - name: PriceOracle
           file: ../abis/PriceOracle.json
-        - name: TToken
-          file: ./abis/TToken.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint

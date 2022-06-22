@@ -7,7 +7,7 @@ import { TokenData } from "../../src/mapping";
 //////////////////////////////
 
 export let comptrollerAddr = Address.fromString(
-  "0x7De56Bd8b37827c51835e162c867848fE2403a48"
+  "0xb3831584acb95ED9cCb0C11f677B5AD01DeaeEc0"
 );
 
 export const nativeToken = new TokenData(
@@ -23,7 +23,6 @@ export const tCROToken = new TokenData(
   "tCRO",
   cTokenDecimals
 );
-
 
 export const tETHToken = new TokenData(
   Address.fromString("0x543F4Db9BD26C9Eb6aD4DD1C33522c966C625774"),
