@@ -32,6 +32,7 @@ import {
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 import { getTokenAmountInUSD, getTokenPriceInUSD } from "../common/prices/prices";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
+import { getOrCreateProtocol } from "../common/mapping-helpers/getOrCreate/spawners";
 
 export function handleLossesRecognized(event: LossesRecognizedEvent): void {
     const market = getOrCreateMarket(event, event.address);
@@ -64,6 +65,13 @@ export function handleTransfer(event: TransferEvent): void {
         market._cumulativeDeposit = market._cumulativeDeposit.plus(deposit.amount);
         market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(deposit.amountUSD);
         market.save();
+
+        ////
+        // Update protocol
+        ////
+        const protocol = getOrCreateProtocol();
+        protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(deposit.amountUSD);
+        protocol.save();
 
         ////
         // Update market snapshot
@@ -162,8 +170,16 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
     // Update market
     ////
     market._cumulativeBorrow = market._cumulativeBorrow.plus(amountFunded);
-    market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(getTokenAmountInUSD(event, inputToken, amountFunded));
+    const fundedAmountUSD = getTokenAmountInUSD(event, inputToken, amountFunded);
+    market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(fundedAmountUSD);
     market.save();
+
+    ////
+    // Update protocol
+    ////
+    const protocol = getOrCreateProtocol();
+    protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(fundedAmountUSD);
+    protocol.save();
 
     ////
     // Update market snapshot
@@ -212,10 +228,20 @@ export function handleClaim(event: ClaimEvent): void {
     market._cumulativePrincipalRepay = market._cumulativePrincipalRepay.plus(event.params.principal);
     market._cumulativeInterest = market._cumulativeInterest.plus(poolInterest);
     market._cumulativePoolDelegateRevenue = market._cumulativePoolDelegateRevenue.plus(poolDelegatePotion);
-    market._cumulativeSupplySideRevenueUSD = market._cumulativeSupplySideRevenueUSD.plus(
-        getTokenAmountInUSD(event, inputToken, poolInterest.plus(poolDelegatePotion).plus(stakeLockerPortion))
+    const amountUSD = getTokenAmountInUSD(
+        event,
+        inputToken,
+        poolInterest.plus(poolDelegatePotion).plus(stakeLockerPortion)
     );
+    market._cumulativeSupplySideRevenueUSD = market._cumulativeSupplySideRevenueUSD.plus(amountUSD);
     market.save();
+
+    ////
+    // Update protocol
+    ////
+    const protocol = getOrCreateProtocol();
+    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(amountUSD);
+    protocol.save();
 
     ////
     // Update financial snapshot
@@ -271,6 +297,13 @@ export function handleDefaultSuffered(event: DefaultSufferedEvent): void {
     market._cumulativePoolLosses = market._cumulativePoolLosses.plus(liquidate._defaultSufferedByPool);
     market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(liquidate.amountUSD);
     market.save();
+
+    ////
+    // Update protocol
+    ////
+    const protocol = getOrCreateProtocol();
+    protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidate.amountUSD);
+    protocol.save();
 
     ////
     // Trigger interval update

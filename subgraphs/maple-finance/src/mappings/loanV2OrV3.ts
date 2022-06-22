@@ -104,10 +104,15 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(
         bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
     );
-    market._cumulativeProtocolSideRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(
-        getTokenAmountInUSD(event, inputToken, treasuryFee)
-    );
+    const protocolRevenueUSD = getTokenAmountInUSD(event, inputToken, treasuryFee);
+    market._cumulativeProtocolSideRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(protocolRevenueUSD);
     market.save();
+
+    ////
+    // Update protocol
+    ////
+    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolRevenueUSD);
+    protocol.save();
 
     ////
     // Update market snapshot

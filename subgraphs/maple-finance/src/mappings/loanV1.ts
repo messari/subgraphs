@@ -43,10 +43,15 @@ export function handleDrawdown(event: DrawdownEvent): void {
     // Update market
     ////
     market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(treasuryFee);
-    market._cumulativeProtocolSideRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(
-        getTokenAmountInUSD(event, inputToken, treasuryFee)
-    );
+    const protocolRevenueUSD = getTokenAmountInUSD(event, inputToken, treasuryFee);
+    market._cumulativeProtocolSideRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(protocolRevenueUSD);
     market.save();
+
+    ////
+    // Update protocol
+    ////
+    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolRevenueUSD);
+    protocol.save();
 
     ////
     // Update market snapshot
