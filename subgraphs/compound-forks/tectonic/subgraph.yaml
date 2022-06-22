@@ -3,11 +3,11 @@ schema:
   file: ../schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Core
+    name: Comptroller
     network: cronos
     source:
       address: "0xb3831584acb95ED9cCb0C11f677B5AD01DeaeEc0"
-      abi: Core
+      abi: Comptroller
       startBlock: 570286
     mapping:
       kind: ethereum/events
@@ -24,8 +24,6 @@ dataSources:
           file: ../abis/CToken.json
         - name: ERC20
           file: ../abis/ERC20.json
-        - name: Core
-          file: ./abis/ERC20.json
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed

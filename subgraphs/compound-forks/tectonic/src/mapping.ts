@@ -6,7 +6,7 @@ import {
   NewCollateralFactor,
   NewLiquidationIncentive,
   ActionPaused1,
-} from "../generated/Core/Core";
+} from "../../generated/Comptroller/Comptroller";
 import {
   Mint,
   Redeem,
@@ -44,19 +44,11 @@ import {
   _handleActionPaused,
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
-import { CToken } from "../generated/Core/CToken";
-import { Core as Comptroller } from "../generated/Core/Core";
+import { CToken } from "../generated/Comptroller/CToken";
+import { Comptroller } from "../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../generated/templates";
-import { ERC20 } from "../generated/Core/ERC20";
-import { comptrollerAddr, 
-  tCROToken,
-  tETHToken,
-  tWBTCToken,
-  tUSDCToken,
-  tUSDTToken,
-  tDAIToken,
-  tTONICToken
-  , nativeToken } from "./constants";
+import { ERC20 } from "../generated/Comptroller/ERC20";
+import { comptrollerAddr, tCROToken, nativeToken } from "./constants";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
@@ -66,9 +58,9 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 }
 
 export function handleMarketListed(event: MarketListed): void {
-  CTokenTemplate.create(event.params.tToken);
+  CTokenTemplate.create(event.params.cToken);
 
-  let cTokenAddr = event.params.tToken;
+  let cTokenAddr = event.params.cToken;
   let cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
@@ -76,7 +68,7 @@ export function handleMarketListed(event: MarketListed): void {
   // this is a new cToken, a new underlying token, and a new market
 
   let protocol = getOrCreateProtocol();
-  let cTokenContract = CToken.bind(event.params.tToken);
+  let cTokenContract = CToken.bind(event.params.cToken);
   let cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
@@ -124,7 +116,7 @@ export function handleMarketListed(event: MarketListed): void {
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  let marketID = event.params.tToken.toHexString();
+  let marketID = event.params.cToken.toHexString();
   let collateralFactorMantissa = event.params.newCollateralFactorMantissa;
   _handleNewCollateralFactor(marketID, collateralFactorMantissa);
 }
@@ -138,7 +130,7 @@ export function handleNewLiquidationIncentive(
 }
 
 export function handleActionPaused(event: ActionPaused1): void {
-  let marketID = event.params.tToken.toHexString();
+  let marketID = event.params.cToken.toHexString();
   let action = event.params.action;
   let pauseState = event.params.pauseState;
   _handleActionPaused(marketID, action, pauseState);
