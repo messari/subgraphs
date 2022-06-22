@@ -221,6 +221,14 @@
         }
       }
     },
+    "liquity": {
+      "liquity": {
+        "mainnet": {
+          "template": "liquity.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "gamma-strategies": {
       "gamma-strategies": {
         "arbitrum": {
