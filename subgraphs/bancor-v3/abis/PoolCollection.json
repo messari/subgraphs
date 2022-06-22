@@ -1,0 +1,1039 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "contract IBancorNetwork",
+        "name": "initNetwork",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20",
+        "name": "initBNT",
+        "type": "address"
+      },
+      {
+        "internalType": "contract INetworkSettings",
+        "name": "initNetworkSettings",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IMasterVault",
+        "name": "initMasterVault",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IBNTPool",
+        "name": "initBNTPool",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IExternalProtectionVault",
+        "name": "initExternalProtectionVault",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IPoolTokenFactory",
+        "name": "initPoolTokenFactory",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IPoolMigrator",
+        "name": "initPoolMigrator",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  { "inputs": [], "name": "AccessDenied", "type": "error" },
+  { "inputs": [], "name": "AlreadyEnabled", "type": "error" },
+  { "inputs": [], "name": "AlreadyExists", "type": "error" },
+  { "inputs": [], "name": "DepositingDisabled", "type": "error" },
+  { "inputs": [], "name": "DoesNotExist", "type": "error" },
+  { "inputs": [], "name": "FundingLimitTooHigh", "type": "error" },
+  { "inputs": [], "name": "InsufficientLiquidity", "type": "error" },
+  { "inputs": [], "name": "InsufficientSourceAmount", "type": "error" },
+  { "inputs": [], "name": "InsufficientTargetAmount", "type": "error" },
+  { "inputs": [], "name": "InvalidAddress", "type": "error" },
+  { "inputs": [], "name": "InvalidFee", "type": "error" },
+  { "inputs": [], "name": "InvalidFraction", "type": "error" },
+  { "inputs": [], "name": "InvalidParam", "type": "error" },
+  { "inputs": [], "name": "InvalidPoolCollection", "type": "error" },
+  { "inputs": [], "name": "InvalidRate", "type": "error" },
+  { "inputs": [], "name": "InvalidStakedBalance", "type": "error" },
+  { "inputs": [], "name": "NotWhitelisted", "type": "error" },
+  { "inputs": [], "name": "Overflow", "type": "error" },
+  {
+    "inputs": [],
+    "name": "PoolCollectionWithdrawalInputInvalid",
+    "type": "error"
+  },
+  { "inputs": [], "name": "RateUnstable", "type": "error" },
+  { "inputs": [], "name": "SameOwner", "type": "error" },
+  { "inputs": [], "name": "TradingDisabled", "type": "error" },
+  { "inputs": [], "name": "ZeroValue", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "prevFeePPM",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newFeePPM",
+        "type": "uint32"
+      }
+    ],
+    "name": "DefaultTradingFeePPMUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "contract Token",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "bool",
+        "name": "newStatus",
+        "type": "bool"
+      }
+    ],
+    "name": "DepositingEnabled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "prevOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnerUpdate",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "contextId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "provider",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract Token",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "poolTokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "TokensDeposited",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "contextId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "provider",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract Token",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "poolTokenAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "externalProtectionBaseTokenAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bntAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "withdrawalFeeAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "TokensWithdrawn",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "contextId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract Token",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "liquidity",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "stakedBalance",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "poolTokenSupply",
+        "type": "uint256"
+      }
+    ],
+    "name": "TotalLiquidityUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "contract Token",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "bool",
+        "name": "newStatus",
+        "type": "bool"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "reason",
+        "type": "uint8"
+      }
+    ],
+    "name": "TradingEnabled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "contract Token",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "prevFeePPM",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "newFeePPM",
+        "type": "uint32"
+      }
+    ],
+    "name": "TradingFeePPMUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "contextId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract Token",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract Token",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "prevLiquidity",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newLiquidity",
+        "type": "uint256"
+      }
+    ],
+    "name": "TradingLiquidityUpdated",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "acceptOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "token", "type": "address" }
+    ],
+    "name": "createPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "defaultTradingFeePPM",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "contextId", "type": "bytes32" },
+      { "internalType": "address", "name": "provider", "type": "address" },
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      { "internalType": "uint256", "name": "tokenAmount", "type": "uint256" }
+    ],
+    "name": "depositFor",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" }
+    ],
+    "name": "depositingEnabled",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" }
+    ],
+    "name": "disableTrading",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      { "internalType": "bool", "name": "status", "type": "bool" }
+    ],
+    "name": "enableDepositing",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      {
+        "internalType": "uint256",
+        "name": "bntVirtualBalance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "baseTokenVirtualBalance",
+        "type": "uint256"
+      }
+    ],
+    "name": "enableTrading",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" }
+    ],
+    "name": "isPoolStable",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" }
+    ],
+    "name": "isPoolValid",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      {
+        "components": [
+          {
+            "internalType": "contract IPoolToken",
+            "name": "poolToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "tradingFeePPM",
+            "type": "uint32"
+          },
+          { "internalType": "bool", "name": "tradingEnabled", "type": "bool" },
+          {
+            "internalType": "bool",
+            "name": "depositingEnabled",
+            "type": "bool"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint32",
+                "name": "blockNumber",
+                "type": "uint32"
+              },
+              {
+                "components": [
+                  { "internalType": "uint112", "name": "n", "type": "uint112" },
+                  { "internalType": "uint112", "name": "d", "type": "uint112" }
+                ],
+                "internalType": "struct Fraction112",
+                "name": "rate",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  { "internalType": "uint112", "name": "n", "type": "uint112" },
+                  { "internalType": "uint112", "name": "d", "type": "uint112" }
+                ],
+                "internalType": "struct Fraction112",
+                "name": "invRate",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct AverageRates",
+            "name": "averageRates",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint128",
+                "name": "bntTradingLiquidity",
+                "type": "uint128"
+              },
+              {
+                "internalType": "uint128",
+                "name": "baseTokenTradingLiquidity",
+                "type": "uint128"
+              },
+              {
+                "internalType": "uint256",
+                "name": "stakedBalance",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct PoolLiquidity",
+            "name": "liquidity",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Pool",
+        "name": "data",
+        "type": "tuple"
+      }
+    ],
+    "name": "migratePoolIn",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      {
+        "internalType": "contract IPoolCollection",
+        "name": "targetPoolCollection",
+        "type": "address"
+      }
+    ],
+    "name": "migratePoolOut",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "newOwner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      { "internalType": "uint256", "name": "feeAmount", "type": "uint256" }
+    ],
+    "name": "onFeesCollected",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "poolCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" }
+    ],
+    "name": "poolData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "contract IPoolToken",
+            "name": "poolToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "tradingFeePPM",
+            "type": "uint32"
+          },
+          { "internalType": "bool", "name": "tradingEnabled", "type": "bool" },
+          {
+            "internalType": "bool",
+            "name": "depositingEnabled",
+            "type": "bool"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint32",
+                "name": "blockNumber",
+                "type": "uint32"
+              },
+              {
+                "components": [
+                  { "internalType": "uint112", "name": "n", "type": "uint112" },
+                  { "internalType": "uint112", "name": "d", "type": "uint112" }
+                ],
+                "internalType": "struct Fraction112",
+                "name": "rate",
+                "type": "tuple"
+              },
+              {
+                "components": [
+                  { "internalType": "uint112", "name": "n", "type": "uint112" },
+                  { "internalType": "uint112", "name": "d", "type": "uint112" }
+                ],
+                "internalType": "struct Fraction112",
+                "name": "invRate",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct AverageRates",
+            "name": "averageRates",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "uint128",
+                "name": "bntTradingLiquidity",
+                "type": "uint128"
+              },
+              {
+                "internalType": "uint128",
+                "name": "baseTokenTradingLiquidity",
+                "type": "uint128"
+              },
+              {
+                "internalType": "uint256",
+                "name": "stakedBalance",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct PoolLiquidity",
+            "name": "liquidity",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Pool",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" }
+    ],
+    "name": "poolLiquidity",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint128",
+            "name": "bntTradingLiquidity",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint128",
+            "name": "baseTokenTradingLiquidity",
+            "type": "uint128"
+          },
+          {
+            "internalType": "uint256",
+            "name": "stakedBalance",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct PoolLiquidity",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" }
+    ],
+    "name": "poolToken",
+    "outputs": [
+      { "internalType": "contract IPoolToken", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      {
+        "internalType": "uint256",
+        "name": "tokenAmountToDistribute",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "protocolPoolTokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "poolTokenAmountToBurn",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      {
+        "internalType": "uint256",
+        "name": "poolTokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "poolTokenToUnderlying",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "poolType",
+    "outputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pools",
+    "outputs": [
+      { "internalType": "contract Token[]", "name": "", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "newDefaultTradingFeePPM",
+        "type": "uint32"
+      }
+    ],
+    "name": "setDefaultTradingFeePPM",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      { "internalType": "uint32", "name": "newTradingFeePPM", "type": "uint32" }
+    ],
+    "name": "setTradingFeePPM",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "contextId", "type": "bytes32" },
+      {
+        "internalType": "contract Token",
+        "name": "sourceToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract Token",
+        "name": "targetToken",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "sourceAmount", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "minReturnAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "tradeBySourceAmount",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "tradingFeeAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "networkFeeAmount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct TradeAmountAndFee",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "contextId", "type": "bytes32" },
+      {
+        "internalType": "contract Token",
+        "name": "sourceToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract Token",
+        "name": "targetToken",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "targetAmount", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "maxSourceAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "tradeByTargetAmount",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "tradingFeeAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "networkFeeAmount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct TradeAmountAndFee",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract Token",
+        "name": "sourceToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract Token",
+        "name": "targetToken",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "targetAmount", "type": "uint256" }
+    ],
+    "name": "tradeInputAndFeeByTargetAmount",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "tradingFeeAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "networkFeeAmount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct TradeAmountAndFee",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract Token",
+        "name": "sourceToken",
+        "type": "address"
+      },
+      {
+        "internalType": "contract Token",
+        "name": "targetToken",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "sourceAmount", "type": "uint256" }
+    ],
+    "name": "tradeOutputAndFeeBySourceAmount",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "tradingFeeAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "networkFeeAmount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct TradeAmountAndFee",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" }
+    ],
+    "name": "tradingEnabled",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" }
+    ],
+    "name": "tradingFeePPM",
+    "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "ownerCandidate", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      { "internalType": "uint256", "name": "tokenAmount", "type": "uint256" }
+    ],
+    "name": "underlyingToPoolToken",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "version",
+    "outputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "contextId", "type": "bytes32" },
+      { "internalType": "address", "name": "provider", "type": "address" },
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      {
+        "internalType": "uint256",
+        "name": "poolTokenAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "baseTokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract Token", "name": "pool", "type": "address" },
+      {
+        "internalType": "uint256",
+        "name": "poolTokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawalAmounts",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "totalAmount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "baseTokenAmount",
+            "type": "uint256"
+          },
+          { "internalType": "uint256", "name": "bntAmount", "type": "uint256" }
+        ],
+        "internalType": "struct WithdrawalAmounts",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

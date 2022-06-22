@@ -57,7 +57,7 @@
         "avalanche": {
           "template": "banker-joe.template.yaml",
           "messari": "messari/banker-joe-avalanche",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },

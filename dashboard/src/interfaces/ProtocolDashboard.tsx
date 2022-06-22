@@ -154,8 +154,10 @@ function ProtocolDashboard() {
     ${poolOverview(protocolSchemaData?.protocols[0].type, schemaVersion)}
   `;
 
-  const [getPoolsOverviewData, { data: dataPools, error: poolOverviewError, loading: poolOverviewLoading, refetch: poolOverviewRefetch }] =
-    useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt } });
+  const [
+    getPoolsOverviewData,
+    { data: dataPools, error: poolOverviewError, loading: poolOverviewLoading, refetch: poolOverviewRefetch },
+  ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt } });
 
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
@@ -194,7 +196,6 @@ function ProtocolDashboard() {
     navigate(`?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}`);
     setTabValue(newValue);
   };
-
 
   useEffect(() => {
     // If the schema query request was successful, make the full data query
@@ -262,7 +263,7 @@ function ProtocolDashboard() {
     if (poolOverviewError) {
       poolOverviewRefetch();
     }
-  }, [poolOverviewError])
+  }, [poolOverviewError]);
 
   useEffect(() => {
     if (tabValue === "2") {

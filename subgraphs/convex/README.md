@@ -1,4 +1,5 @@
-# Convex Protocol Metrics Subgraph Methodology v1.1
+# Convex Protocol Metrics Subgraph Methodology v1.1.2
+
 
 
 ## Convex Finance Introduction
@@ -94,26 +95,27 @@ Total Revenue generated on Convex Finance is the combination of:
 
 
 1. Yield generated and harvested from Curve LP pools (excluding base Curve yield)
-    1. CRV token rewards
-    2. CVX token rewards
-    3. Additional rewards (if any)
+    - CRV token rewards
+    - CVX token rewards
+    - Additional rewards (if any)
 2. Yield generated and harvested from staked cvxCRV
-    4. CRV token rewards
-    5. CVX token rewards
-    6. 3crv token rewards
+    - CRV token rewards
+    - CVX token rewards
+    - 3crv token rewards
 3. Yield generated and harvested from staked CVX
-    7. cvxCRV token rewards
+    - cvxCRV token rewards
 4. Yield generated and harvested from Locked CVX
-    8. cvxCRV token rewards
+    - cvxCRV token rewards
 5. Yield generated and harvested from Frax LP pools (excluding base Curve yield if any)
-    9. CRV token rewards (if applicable)
-    10. CVX token rewards (if applicable)
-    11. FXS token rewards
-    12. Other token rewards (depend on the pool)
+    - CRV token rewards (if applicable)
+    - CVX token rewards (if applicable)
+    - FXS token rewards
+    - Other token rewards (depend on the pool)
 6. Yield generated and harvested from cvxFXS/FXS liquidity pool (excluding base Curve yield if any)
-    13. CRV token rewards
-    14. CVX token rewards
-    15. Additional rewards (if any)
+    - CRV token rewards
+    - CVX token rewards
+    - Additional rewards (if any)
+
 
 The total reward in USD shall be calculated by using this formula: 
 

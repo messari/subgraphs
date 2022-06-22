@@ -1,7 +1,6 @@
 import { TabContext, TabPanel } from "@mui/lab";
 import { CircularProgress, Tab, Tabs } from "@mui/material";
 import React from "react";
-import { ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 import EventsTab from "./tabs/EventsTab";
 import PoolTab from "./tabs/PoolTab";
 import ProtocolTab from "./tabs/ProtocolTab";
@@ -66,9 +65,8 @@ function AllDataTabs({
   handleTabChange,
   setPoolId,
   setProtocolId,
-  paginate
+  paginate,
 }: AllDataTabsProps) {
-
   let protocolDropDown = null;
   if (data.protocols.length > 1) {
     protocolDropDown = (
