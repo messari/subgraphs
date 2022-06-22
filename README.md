@@ -122,7 +122,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Beefy Finance | 🛠 | | |
 | [Belt Finance](https://belt.fi/landing) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Belt BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/belt-finance-bsc) |
 | [Convex Finance](https://www.convexfinance.com/) | 🛠 | 1.3.0 / 1.1.1 / 1.0.0 | [![Convex Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/convex-finance-ethereum) |
-| [Gamma Strategy](https://www.gamma.xyz/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Gamma Ethereum](./docs/images/chains/mainnet.png)](https://thegraph.com/hosted-service/subgraph/messari/gamma-ethereum) [![Gamma Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/gamma-polygon) |
+| [Gamma Strategy](https://www.gamma.xyz/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Gamma Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/gamma-ethereum) [![Gamma Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/gamma-polygon) |
 | Harvest Finance | 🔨  | | |
 | Liquid Driver | 🔨  | | |
 | [Rari Vaults](https://rari.capital/) | 🛠 | 1.2.1 / 1.3.13 / 1.0.0 | [![Rari Vaults Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-vaults-ethereum)|
