@@ -30,9 +30,9 @@ import {
     createWithdraw
 } from "../common/mappingHelpers/getOrCreate/transactions";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
-import { getTokenAmountInUSD, getTokenPriceInUSD } from "../common/prices/prices";
+import { getTokenAmountInUSD } from "../common/prices/prices";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
-import { getOrCreateProtocol } from "../common/mapping-helpers/getOrCreate/spawners";
+import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
 
 export function handleLossesRecognized(event: LossesRecognizedEvent): void {
     const market = getOrCreateMarket(event, event.address);
