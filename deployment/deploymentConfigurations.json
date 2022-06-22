@@ -212,6 +212,14 @@
         }
       }
     },
+    "inverse-finance": {
+      "inverse-finance": {
+        "mainnet": {
+          "template": "inverse.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "gamma-strategies": {
       "gamma-strategies": {
         "arbitrum": {
