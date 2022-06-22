@@ -43,6 +43,14 @@
         }
       }
     },
+    "convex-finance": {
+      "convex-finance": {
+        "mainnet": {
+          "template": "convex.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "compound-forks/aurigami": {
       "aurigami": {
         "aurora": {
