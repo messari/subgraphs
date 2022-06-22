@@ -39,6 +39,7 @@
         "mainnet": {
           "template": "aave-v2.template.yaml",
           "messari": "messari/aave-v2-ethereum",
+          "dmelotik": "dmelotik/aave-v2-ethereum",
           "deploy-on-merge": false
         }
       }
