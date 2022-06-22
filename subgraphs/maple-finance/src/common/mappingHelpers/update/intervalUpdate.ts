@@ -148,28 +148,8 @@ function intervalUpdateProtocol(event: ethereum.Event, marketBefore: Market, mar
         marketAfter.totalDepositBalanceUSD.minus(marketBefore.totalDepositBalanceUSD)
     );
 
-    protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
-        marketAfter.cumulativeDepositUSD.minus(marketBefore.cumulativeDepositUSD)
-    );
-
     protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(
         marketAfter.totalBorrowBalanceUSD.minus(marketBefore.totalBorrowBalanceUSD)
-    );
-
-    protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(
-        marketAfter.cumulativeBorrowUSD.minus(marketBefore.cumulativeBorrowUSD)
-    );
-
-    protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
-        marketAfter.cumulativeLiquidateUSD.minus(marketBefore.cumulativeLiquidateUSD)
-    );
-
-    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-        marketAfter._cumulativeSupplySideRevenueUSD.minus(marketBefore._cumulativeSupplySideRevenueUSD)
-    );
-
-    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-        marketAfter._cumulativeProtocolSideRevenueUSD.minus(marketBefore._cumulativeProtocolSideRevenueUSD)
     );
 
     protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
