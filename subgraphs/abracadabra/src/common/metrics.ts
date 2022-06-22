@@ -124,7 +124,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   usageDailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the hour/day
-  let hourlyActiveAccountIdFrom = hourlyId.toString() + "-" + from.toHexString();
+  let hourlyActiveAccountIdFrom = "hourly-" + from.toHexString() + "-" + hourlyId.toString();
   let hourlyActiveAccountFrom = ActiveAccount.load(hourlyActiveAccountIdFrom);
   if (!hourlyActiveAccountFrom) {
     hourlyActiveAccountFrom = new ActiveAccount(hourlyActiveAccountIdFrom);
@@ -132,7 +132,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     usageHourlySnapshot.hourlyActiveUsers += 1;
   }
 
-  let hourlyActiveAccountIdTo = hourlyId.toString() + "-" + to.toHexString();
+  let hourlyActiveAccountIdTo = "hourly-" + to.toHexString() + "-" + hourlyId.toString();
   let hourlyActiveAccountTo = ActiveAccount.load(hourlyActiveAccountIdTo);
   if (!hourlyActiveAccountTo) {
     hourlyActiveAccountTo = new ActiveAccount(hourlyActiveAccountIdTo);
@@ -140,7 +140,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     usageHourlySnapshot.hourlyActiveUsers += 1;
   }
 
-  let dailyActiveAccountIdFrom = dailyId.toString() + "-" + from.toHexString();
+  let dailyActiveAccountIdFrom = "daily-" + from.toHexString() + "-" + dailyId.toString();
   let dailyActiveAccountFrom = ActiveAccount.load(dailyActiveAccountIdFrom);
   if (!dailyActiveAccountFrom) {
     dailyActiveAccountFrom = new ActiveAccount(dailyActiveAccountIdFrom);
@@ -148,7 +148,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     usageDailySnapshot.dailyActiveUsers += 1;
   }
 
-  let dailyActiveAccountIdTo = dailyId.toString() + "-" + from.toHexString();
+  let dailyActiveAccountIdTo = "daily-" + to.toHexString() + "-" + dailyId.toString();
   let dailyActiveAccountTo = ActiveAccount.load(dailyActiveAccountIdTo);
   if (!dailyActiveAccountTo) {
     dailyActiveAccountTo = new ActiveAccount(dailyActiveAccountIdTo);
