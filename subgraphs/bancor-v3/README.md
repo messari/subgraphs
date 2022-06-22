@@ -1,5 +1,4 @@
-
-# Bancor V3 Subgraph Methodology v1.0.1
+# Bancor V3 Subgraph Methodology v1.0.0
 
 
 ## Contact Details
