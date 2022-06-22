@@ -54,24 +54,12 @@ export function handleDrawdown(event: DrawdownEvent): void {
     protocol.save();
 
     ////
-    // Update market snapshot
-    ////
-    const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
-    marketDailySnapshot.dailyBorrowUSD = marketDailySnapshot.dailyBorrowUSD.plus(borrow.amountUSD);
-    marketDailySnapshot.save();
-
-    const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-    MarketHourlySnapshot.hourlyBorrowUSD = MarketHourlySnapshot.hourlyBorrowUSD.plus(borrow.amountUSD);
-    MarketHourlySnapshot.save();
-
-    ////
     // Update financial snapshot
     ////
     const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
     financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
         getTokenAmountInUSD(event, inputToken, treasuryFee)
     );
-    financialsDailySnapshot.dailyBorrowUSD = financialsDailySnapshot.dailyBorrowUSD.plus(borrow.amountUSD);
     financialsDailySnapshot.save();
 
     ////

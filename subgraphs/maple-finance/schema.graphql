@@ -122,7 +122,8 @@ enum InterestRateSide {
 
 enum LoanVersion {
     V1
-    V2_OR_V3
+    V2
+    V3
 }
 
 # Most markets only have a single interest rate given a specific type.

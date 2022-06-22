@@ -40,74 +40,6 @@ export const WHITELIST_TOKENS_LIST: string[] = [
     "CRV"
 ];
 
-export namespace Network {
-    export const ARBITRUM_ONE = "ARBITRUM_ONE";
-    export const AVALANCHE = "AVALANCHE";
-    export const AURORA = "AURORA";
-    export const BSC = "BSC"; // aka BNB Chain
-    export const CELO = "CELO";
-    export const MAINNET = "MAINNET"; // Ethereum mainnet
-    export const FANTOM = "FANTOM";
-    export const FUSE = "FUSE";
-    export const MOONBEAM = "MOONBEAM";
-    export const MOONRIVER = "MOONRIVER";
-    export const NEAR_MAINNET = "NEAR_MAINNET";
-    export const OPTIMISM = "OPTIMISM";
-    export const MATIC = "MATIC"; // aka Polygon
-    export const XDAI = "XDAI"; // aka Gnosis Chain
-}
-
-export namespace ProtocolType {
-    export const EXCHANGE = "EXCHANGE";
-    export const LENDING = "LENDING";
-    export const YIELD = "YIELD";
-    export const BRIDGE = "BRIDGE";
-    export const GENERIC = "GENERIC";
-}
-
-export namespace RewardTokenType {
-    export const DEPOSIT = "DEPOSIT";
-    export const BORROW = "BORROW";
-}
-
-export namespace LendingType {
-    export const CDP = "CDP";
-    export const POOLED = "POOLED";
-}
-
-export namespace RiskType {
-    export const GLOBAL = "GLOBAL";
-    export const ISOLATED = "ISOLATED";
-}
-
-export namespace InterestRateType {
-    export const STABLE = "STABLE";
-    export const VARIABLE = "VARIABLE";
-    export const FIXED_TERM = "FIXED_TERM";
-}
-
-export namespace InterestRateSide {
-    export const LENDER = "LENDER";
-    export const BORROWER = "BORROWER";
-}
-
-export namespace TransactionType {
-    export const DEPOSIT = "DEPOSIT";
-    export const WITHDRAW = "WITHDRAW";
-    export const CLAIM = "CLAIM";
-    export const BORROW = "BORROW";
-    export const REPAY = "REPAY";
-    export const LIQUIDATE = "LIQUIDATE";
-    export const STAKE = "STAKE";
-    export const UNSTAKE = "UNSTAKE";
-}
-
-export namespace StakeType {
-    export const STAKE_LOCKER = "STAKE_LOCKER";
-    export const MPL_LP_REWARDS = "MPL_LP_REWARDS";
-    export const MPL_STAKE_REWARDS = "MPL_STAKE_REWARDS";
-}
-
 export namespace OracleType {
     export const NONE = "NONE";
     export const MAPLE = "MAPLE";
@@ -118,11 +50,6 @@ export namespace OracleType {
     export const CURVE_ROUTE = "CURVE_ROUTE";
     export const SUSHISWAP_ROUTE = "SUSHISWAP_ROUTE";
     export const UNISWAP_ROUTE = "UNISWAP_ROUTE";
-}
-
-export namespace LoanVersion {
-    export const V1 = "V1";
-    export const V2_OR_V3 = "V2_OR_V3";
 }
 
 ////////////////////////////

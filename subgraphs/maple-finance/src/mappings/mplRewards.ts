@@ -106,7 +106,7 @@ export function handleUpdatePeriodFinish(call: UpdatePeriodFinishCall): void {
     // Update mpl reward
     ////
     const eventFromCall = createEventFromCall(call);
-    const mplReward = getOrCreateMplReward(eventFromCall, call.to); // TODO:
+    const mplReward = getOrCreateMplReward(eventFromCall, call.to);
     mplReward.periodFinishedTimestamp = call.inputs.timestamp;
     mplReward.save();
 
