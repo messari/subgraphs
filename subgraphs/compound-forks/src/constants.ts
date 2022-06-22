@@ -113,7 +113,6 @@ export const mantissaFactor = 18;
 export const cTokenDecimals = 8;
 export const mantissaFactorBD = exponentToBigDecimal(mantissaFactor);
 export const cTokenDecimalsBD = exponentToBigDecimal(cTokenDecimals);
-export const initialExchangeRate = BigDecimal.fromString(".02");
 
 // n => 10^n
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
