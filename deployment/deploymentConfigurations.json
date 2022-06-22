@@ -79,11 +79,12 @@
         }
       }
     },
-    "compound-forks/compound-v2": {
+    "compound-forks": {
       "compound-v2": {
         "mainnet": {
           "template": "compound-v2.template.yaml",
           "messari": "messari/compound-ethereum",
+          "dmelotik": "dmelotik/compound-ethereum",
           "deploy-on-merge": true
         }
       }
