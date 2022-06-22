@@ -1,14 +1,15 @@
 import { Address, ethereum, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 
 import { InterestRate, Market, _AccountMarket, _Loan, _MplReward, _StakeLocker } from "../../../../generated/schema";
-import { LoanV2OrV3 as LoanV2OrV3Contract } from "../../../../generated/templates/LoanV2OrV3/LoanV2OrV3";
 import { LoanV1 as LoanV1Contract } from "../../../../generated/templates/LoanV1/LoanV1";
+import { LoanV2 as LoanV2Contract } from "../../../../generated/templates/LoanV2/LoanV2";
 import { Pool as PoolContract } from "../../../../generated/templates/Pool/Pool";
 import { StakeLocker as StakeLockerContract } from "../../../../generated/templates/StakeLocker/StakeLocker";
 import { MplReward as MplRewardContract } from "../../../../generated/templates/MplReward/MplReward";
 
 import {
     LoanVersion,
+    LOAN_V2_IMPLEMENTATION_ADDRESS,
     MPL_REWARDS_DEFAULT_DURATION_TIME_S,
     POOL_WAD_DECIMALS,
     PROTOCOL_ID,
@@ -263,20 +264,31 @@ export function getOrCreateLoan(
             const interestRate = getOrCreateInterestRate(event, loan, rate, tryTermDays.value);
             loan.interestRate = interestRate.id;
         } else {
-            // V2 or V3
-            loan.version = LoanVersion.V2_OR_V3;
-            const loanV2OrV3Contract = LoanV2OrV3Contract.bind(loanAddress);
+            // V2 or V3, functions used below are common between
+            const loanV2V3Contract = LoanV2Contract.bind(loanAddress);
+
+            const implementationAddress = readCallResult(
+                loanV2V3Contract.try_implementation(),
+                ZERO_ADDRESS,
+                loanV2V3Contract.try_implementation.name
+            );
+
+            if (LOAN_V2_IMPLEMENTATION_ADDRESS.equals(implementationAddress)) {
+                loan.version = LoanVersion.V2;
+            } else {
+                loan.version = LoanVersion.V3;
+            }
 
             const paymentIntervalSec = readCallResult(
-                loanV2OrV3Contract.try_paymentInterval(),
+                loanV2V3Contract.try_paymentInterval(),
                 ZERO_BI,
-                loanV2OrV3Contract.try_paymentInterval.name
+                loanV2V3Contract.try_paymentInterval.name
             );
 
             const paymentsRemaining = readCallResult(
-                loanV2OrV3Contract.try_paymentsRemaining(),
+                loanV2V3Contract.try_paymentsRemaining(),
                 ZERO_BI,
-                loanV2OrV3Contract.try_paymentsRemaining.name
+                loanV2V3Contract.try_paymentsRemaining.name
             );
 
             const termDays = bigDecimalToBigInt(
@@ -288,9 +300,9 @@ export function getOrCreateLoan(
 
             // Interst rate for V2/V3 stored as apr in units of 1e18, (i.e. 1% is 0.01e18).
             const rateFromContract = readCallResult(
-                loanV2OrV3Contract.try_interestRate(),
+                loanV2V3Contract.try_interestRate(),
                 ZERO_BI,
-                loanV2OrV3Contract.try_interestRate.name
+                loanV2V3Contract.try_interestRate.name
             );
 
             const rate = parseUnits(rateFromContract, 18).times(BigDecimal.fromString("100"));

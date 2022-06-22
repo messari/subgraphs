@@ -91,8 +91,10 @@ dataSources:
                 file: ./abis/ERC20SymbolBytes.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
-              - name: LoanV2OrV3
-                file: ./abis/LoanV2OrV3.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
               - name: MapleGlobals
                 file: ./abis/MapleGlobals.json
               - name: MplReward
@@ -160,8 +162,10 @@ templates:
                 file: ./abis/ERC20SymbolBytes.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
-              - name: LoanV2OrV3
-                file: ./abis/LoanV2OrV3.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
               - name: MapleGlobals
                 file: ./abis/MapleGlobals.json
               - name: MplReward
@@ -231,8 +235,10 @@ templates:
                 file: ./abis/ERC20SymbolBytes.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
-              - name: LoanV2OrV3
-                file: ./abis/LoanV2OrV3.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
               - name: MapleGlobals
                 file: ./abis/MapleGlobals.json
               - name: MplReward
@@ -312,8 +318,10 @@ templates:
                 file: ./abis/ERC20SymbolBytes.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
-              - name: LoanV2OrV3
-                file: ./abis/LoanV2OrV3.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
               - name: MapleGlobals
                 file: ./abis/MapleGlobals.json
               - name: MplReward
@@ -385,8 +393,10 @@ templates:
                 file: ./abis/ERC20SymbolBytes.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
-              - name: LoanV2OrV3
-                file: ./abis/LoanV2OrV3.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
               - name: MapleGlobals
                 file: ./abis/MapleGlobals.json
               - name: MplReward
@@ -432,16 +442,16 @@ templates:
               - event: Liquidation(uint256,uint256,uint256,uint256)
                 handler: handleLiquidation
 
-    - name: LoanV2OrV3
+    - name: LoanV2
       kind: ethereum/contract
       network: mainnet
       source:
-          abi: LoanV2OrV3
+          abi: LoanV2
       mapping:
           kind: ethereum/events
           apiVersion: 0.0.5
           language: wasm/assemblyscript
-          file: ./src/mappings/loanV2OrV3.ts
+          file: ./src/mappings/LoanV2.ts
           entities:
               - _Loan
               - Borrow
@@ -460,8 +470,10 @@ templates:
                 file: ./abis/ERC20SymbolBytes.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
-              - name: LoanV2OrV3
-                file: ./abis/LoanV2OrV3.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
               - name: MapleGlobals
                 file: ./abis/MapleGlobals.json
               - name: MplReward
@@ -509,6 +521,85 @@ templates:
               - event: NewTermsAccepted(bytes32,address,bytes[])
                 handler: handleNewTermsAccepted
 
+    - name: LoanV3
+      kind: ethereum/contract
+      network: mainnet
+      source:
+          abi: LoanV3
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mappings/LoanV3.ts
+          entities:
+              - _Loan
+              - Borrow
+              - Repay
+              - Liquidate
+              - Market
+              - _StakeLocker
+              - _MplReward
+              - Token
+          abis:
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+              - name: LoanV1
+                file: ./abis/LoanV1.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: MplReward
+                file: ./abis/MplRewards.json
+              - name: Pool
+                file: ./abis/Pool.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
+              - name: StakeLocker
+                file: ./abis/StakeLocker.json
+
+                # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
+          eventHandlers:
+              - event: FundsDrawnDown(uint256,indexed address)
+                handler: handleFundsDrawnDown
+              - event: PaymentMade(uint256,uint256,uint256,uint256)
+                handler: handlePaymentMade
+              - event: Repossessed(uint256,uint256,indexed address)
+                handler: handleRepossessed
+              - event: NewTermsAccepted(bytes32,address,uint256,bytes[])
+                handler: handleNewTermsAccepted
+
     - name: MplReward
       kind: ethereum/contract
       network: mainnet
@@ -534,8 +625,10 @@ templates:
                 file: ./abis/ERC20SymbolBytes.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
-              - name: LoanV2OrV3
-                file: ./abis/LoanV2OrV3.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
               - name: MapleGlobals
                 file: ./abis/MapleGlobals.json
               - name: MplReward
@@ -585,6 +678,3 @@ templates:
           callHandlers:
               - function: updatePeriodFinish(uint256)
                 handler: handleUpdatePeriodFinish
-# graft:
-#     base: QmWcgBgPuNRsFiZFDWLcbU3BEfWHF9bUkAkg3MNvcwk4S9
-#     block: 12506630

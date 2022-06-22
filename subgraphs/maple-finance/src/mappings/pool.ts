@@ -1,6 +1,10 @@
 import { Address, log } from "@graphprotocol/graph-ts";
 
-import { LoanV1 as LoanV1Template, LoanV2OrV3 as LoanV2OrV3Template } from "../../generated/templates";
+import {
+    LoanV1 as LoanV1Template,
+    LoanV2 as LoanV2Template,
+    LoanV3 as LoanV3Template
+} from "../../generated/templates";
 import {
     PoolStateChanged as PoolStateChangedEvent,
     LoanFunded as LoanFundedEvent,
@@ -162,8 +166,12 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
     ////
     if (LoanVersion.V1 == loan.version) {
         LoanV1Template.create(loanAddress);
+    } else if (LoanVersion.V2 == loan.version) {
+        LoanV2Template.create(loanAddress);
+    } else if (LoanVersion.V3 == loan.version) {
+        LoanV3Template.create(loanAddress);
     } else {
-        LoanV2OrV3Template.create(loanAddress);
+        log.warning("Loan version not supported: ", [loan.version]);
     }
 
     ////
@@ -297,6 +305,17 @@ export function handleDefaultSuffered(event: DefaultSufferedEvent): void {
     market._cumulativePoolLosses = market._cumulativePoolLosses.plus(liquidate._defaultSufferedByPool);
     market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(liquidate.amountUSD);
     market.save();
+
+    ////
+    // Update market snapshot
+    ////
+    const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
+    marketDailySnapshot.dailyLiquidateUSD = marketDailySnapshot.dailyLiquidateUSD.plus(liquidate.amountUSD);
+    marketDailySnapshot.save();
+
+    const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+    MarketHourlySnapshot.hourlyLiquidateUSD = MarketHourlySnapshot.hourlyLiquidateUSD.plus(liquidate.amountUSD);
+    MarketHourlySnapshot.save();
 
     ////
     // Update protocol

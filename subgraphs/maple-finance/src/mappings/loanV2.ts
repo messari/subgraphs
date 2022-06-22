@@ -5,8 +5,8 @@ import {
     PaymentMade as PaymentMadeEvent,
     Repossessed as RepossessedEvent,
     NewTermsAccepted as NewTermsAcceptedEvent
-} from "../../generated/templates/LoanV2OrV3/LoanV2OrV3";
-import { LoanV2OrV3 as LoanV2OrV3Contract } from "../../generated/templates/LoanV2OrV3/LoanV2OrV3";
+} from "../../generated/templates/LoanV2/LoanV2";
+import { LoanV2 as LoanV2Contract } from "../../generated/templates/LoanV2/LoanV2";
 
 import { ONE_BI, SEC_PER_DAY, ZERO_BI } from "../common/constants";
 import {
@@ -24,7 +24,7 @@ import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supportin
 import { createBorrow, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 import { getTokenAmountInUSD } from "../common/prices/prices";
-import { bigDecimalToBigInt, parseUnits, readCallResult } from "../common/utils";
+import { bigDecimalToBigInt, minBigInt, parseUnits, readCallResult } from "../common/utils";
 
 export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
     const loan = getOrCreateLoan(event, event.address);
@@ -39,18 +39,18 @@ export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
     // Update interest rate
     ////
     const interestRate = getOrCreateInterestRate(event, loan);
-    const loanV2OrV3Contract = LoanV2OrV3Contract.bind(Address.fromString(loan.id));
+    const loanV2Contract = LoanV2Contract.bind(Address.fromString(loan.id));
 
     const paymentIntervalSec = readCallResult(
-        loanV2OrV3Contract.try_paymentInterval(),
+        loanV2Contract.try_paymentInterval(),
         ZERO_BI,
-        loanV2OrV3Contract.try_paymentInterval.name
+        loanV2Contract.try_paymentInterval.name
     );
 
     const paymentsRemaining = readCallResult(
-        loanV2OrV3Contract.try_paymentsRemaining(),
+        loanV2Contract.try_paymentsRemaining(),
         ZERO_BI,
-        loanV2OrV3Contract.try_paymentsRemaining.name
+        loanV2Contract.try_paymentsRemaining.name
     );
 
     interestRate.duration = bigDecimalToBigInt(
@@ -62,9 +62,9 @@ export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
 
     // Interst rate for V2/V3 stored as apr in units of 1e18, (i.e. 1% is 0.01e18).
     const rateFromContract = readCallResult(
-        loanV2OrV3Contract.try_interestRate(),
+        loanV2Contract.try_interestRate(),
         ZERO_BI,
-        loanV2OrV3Contract.try_interestRate.name
+        loanV2Contract.try_interestRate.name
     );
 
     const rate = parseUnits(rateFromContract, 18);
@@ -100,7 +100,6 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     ////
     // Update market
     ////
-    // TODO (spennyp): V3 doesn't work like this
     market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(
         bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
     );
@@ -115,24 +114,12 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     protocol.save();
 
     ////
-    // Update market snapshot
-    ////
-    const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
-    marketDailySnapshot.dailyBorrowUSD = marketDailySnapshot.dailyBorrowUSD.plus(borrow.amountUSD);
-    marketDailySnapshot.save();
-
-    const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-    MarketHourlySnapshot.hourlyBorrowUSD = MarketHourlySnapshot.hourlyBorrowUSD.plus(borrow.amountUSD);
-    MarketHourlySnapshot.save();
-
-    ////
     // Update financial snapshot
     ////
     const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
     financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
         getTokenAmountInUSD(event, inputToken, treasuryFee)
     );
-    financialsDailySnapshot.dailyBorrowUSD = financialsDailySnapshot.dailyBorrowUSD.plus(borrow.amountUSD);
     financialsDailySnapshot.save();
 
     ////
@@ -146,7 +133,6 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
     const principalPaid = event.params.principalPaid_;
     const interestPaid = event.params.interestPaid_;
 
-    // TODO: V3 has param for treasury fee paid
     const repay = createRepay(event, loan, principalPaid, interestPaid, ZERO_BI);
 
     // Update loan
@@ -162,11 +148,11 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
 }
 
 export function handleRepossessed(event: RepossessedEvent): void {
-    const loan = getOrCreateLoan(event, event.address);
-
+    ////
     // Update loan, reposession counted towards principal paid
-    // TODO (spennyp): what if collatoral is more than owed?
-    loan.principalPaid = loan.principalPaid.plus(event.params.fundsRepossessed_);
+    ////
+    const loan = getOrCreateLoan(event, event.address);
+    loan.principalPaid = minBigInt(loan.drawnDown, loan.principalPaid.plus(event.params.fundsRepossessed_));
     loan.save();
 
     ////

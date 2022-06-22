@@ -99,7 +99,8 @@ export namespace OracleType {
 
 export namespace LoanVersion {
     export const V1 = "V1";
-    export const V2_OR_V3 = "V2_OR_V3";
+    export const V2 = "V2";
+    export const V3 = "V3";
 }
 
 ////////////////////////////
@@ -137,6 +138,8 @@ export const YEARN_ORACLE_QUOTE_DECIMALS = 6;
 export const MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS: BigInt = BigInt.fromString("8");
 
 export const MAPLE_POOL_LIB_ADDRESS = Address.fromString("0x2c1C30fb8cC313Ef3cfd2E2bBf2da88AdD902C30");
+
+export const LOAN_V2_IMPLEMENTATION_ADDRESS = Address.fromString("0x97940C7aea99998da4c56922211ce012E7765395");
 
 ////////////////////////
 ///// Type Helpers /////
