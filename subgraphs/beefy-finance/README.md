@@ -1,5 +1,7 @@
 # Beefy Finance - Yield Protocol Subgraph
 
+![Beefy](../../docs/images/protocols/beefy-finance.png)
+
 ## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
