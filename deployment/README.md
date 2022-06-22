@@ -2,7 +2,7 @@
 
 - Additional dependencies: 
     - minimist - install at ./subgraphs at head of repository 
-        - `npm install -g minimist`
+        - `npm install minimist`
 
 ```
 # Deploys uniswap-v2 from the uniswap-forks to mainnet in my hosted service.
