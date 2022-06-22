@@ -29,7 +29,7 @@ export function handleMint(event: Mint): void {
   updateReserveATokenSupply(event, amount, event.params.index);
 }
 
-export function handleBalanceTransfer(event: BalanceTransfer) {
+export function handleBalanceTransfer(event: BalanceTransfer): void {
   const reserve = getReserve(event.address);
   // Liquidation protocol fee gets transferred directly to treasury during liquidation (if activated)
   if (reserve.treasuryAddress == event.params.to.toHexString()) {
