@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import { MplRewardsCreated as MplRewardsCreatedEvent } from "../../generated/MapleRewardsFactory/MapleRewardsFactory";
 import { MplReward as MplRewardTemplate } from "../../generated/templates";
 
@@ -26,11 +26,17 @@ export function handleMplRewardsCreated(event: MplRewardsCreatedEvent): void {
     const rewardToken = getOrCreateToken(Address.fromString(mplReward.rewardToken));
 
     // Add the mplReward
-    if (market.id == mplReward.rewardToken) {
+    if (market.id == mplReward.stakeToken) {
         // MPL-LP
+        if (market._mplRewardMplLp) {
+            log.warning("Overwritting _mplRewardMplLp for market {}", [market.id]);
+        }
         market._mplRewardMplLp = mplReward.id;
     } else {
         // MPL-STAKE
+        if (market._mplRewardMplStake) {
+            log.warning("Overwritting _mplRewardMplStake for market {}", [market.id]);
+        }
         market._mplRewardMplStake = mplReward.id;
     }
 
