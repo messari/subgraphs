@@ -43,6 +43,15 @@
         }
       }
     },
+    "bancor-v3": {
+      "bancor-v3": {
+        "mainnet": {
+          "template": "bancor.v3.template.yaml",
+          "messari": "messari/bancor-v3-ethereum",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "compound-forks/aurigami": {
       "aurigami": {
         "aurora": {
