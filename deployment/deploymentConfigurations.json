@@ -44,6 +44,14 @@
         }
       }
     },
+    "belt-finance": {
+      "belt-finance": {
+        "bsc": {
+          "template": "belt.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "bancor-v3": {
       "bancor-v3": {
         "mainnet": {
