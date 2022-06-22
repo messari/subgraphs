@@ -68,7 +68,7 @@ Amount of MIM tokens minted for each Market
 - Analytics: http://dashboard.abracadabra.money/
 - Docs: https://wizard69.gitbook.io/abracadabra-money/
 - Smart contracts: https://github.com/Abracadabra-money/bentobox-strategies
-- Deployed addresses: hhttps://docs.abracadabra.money/our-ecosystem/our-contracts
+- Deployed addresses: https://docs.abracadabra.money/our-ecosystem/our-contracts
 
 ## Smart Contracts Interactions
 
