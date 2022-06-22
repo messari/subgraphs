@@ -1,7 +1,7 @@
 ## Deployment Instructions:
 
-- Dependencies: 
-    - Minimist
+- Additional dependencies: 
+    - minimist - install at ./subgraphs at head of repository 
         - `npm install -g minimist`
 
 ```
