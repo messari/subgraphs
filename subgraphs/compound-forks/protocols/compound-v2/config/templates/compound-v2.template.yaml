@@ -23,9 +23,9 @@ dataSources:
         - name: Comptroller
           file: ./abis/Comptroller.json
         - name: CTokenNew
-          file: ./abis/compound-v2/cTokenNew.json
+          file: ./abis/compound-v2/CTokenNew.json
         - name: CTokenOld
-          file: ./abis/compound-v2/cTokenOld.json
+          file: ./abis/compound-v2/CTokenOld.json
         - name: PriceOracle1
           file: ./abis/compound-v2/PriceOracle1.json
         - name: PriceOracle2
@@ -67,9 +67,9 @@ templates:
         - name: Comptroller
           file: ./abis/Comptroller.json
         - name: CTokenNew
-          file: ./abis/compound-v2/cTokenNew.json
+          file: ./abis/compound-v2/CTokenNew.json
         - name: CTokenOld
-          file: ./abis/compound-v2/cTokenOld.json
+          file: ./abis/compound-v2/CTokenOld.json
         - name: PriceOracle1
           file: ./abis/compound-v2/PriceOracle1.json
         - name: PriceOracle2
@@ -150,9 +150,9 @@ templates:
         - name: Comptroller
           file: ./abis/Comptroller.json
         - name: CTokenNew
-          file: ./abis/compound-v2/cTokenNew.json
+          file: ./abis/compound-v2/CTokenNew.json
         - name: CTokenOld
-          file: ./abis/compound-v2/cTokenOld.json
+          file: ./abis/compound-v2/CTokenOld.json
         - name: PriceOracle1
           file: ./abis/compound-v2/PriceOracle1.json
         - name: PriceOracle2
