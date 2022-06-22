@@ -123,6 +123,8 @@ templates:
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
+        - name: AToken
+          file: ./abis/AToken.json
       eventHandlers:
         - event: CollateralConfigurationChanged(indexed address,uint256,uint256,uint256)
           handler: handleCollateralConfigurationChanged
