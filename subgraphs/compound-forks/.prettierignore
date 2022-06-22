@@ -1,3 +1,4 @@
 **/subgraph.template.yaml
 **/generated
 **/build
+schema.graphql

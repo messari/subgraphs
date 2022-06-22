@@ -4,7 +4,6 @@ import {
   Deposit as DepositTransaction,
 } from "../../generated/schema";
 import {
-  log,
   BigInt,
   Address,
   ethereum,
@@ -90,7 +89,7 @@ export function deposit(
 
   const poolAddress = Address.fromString(vault._pool);
   const poolContract = PoolContract.bind(poolAddress);
-  const outputTokenContract = ERC20.bind(Address.fromString(vault.outputToken));
+  const outputTokenContract = ERC20.bind(Address.fromString(vault.outputToken!));
 
   vault.outputTokenSupply = utils.readValue<BigInt>(
     outputTokenContract.try_totalSupply(),

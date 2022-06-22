@@ -55,14 +55,15 @@ export function updateVaultSnapshots(
   vaultAddress: Address,
   block: ethereum.Block
 ): void {
-  let vault = VaultStore.load(vaultAddress.toHexString())!;
+  let vaultId = vaultAddress.toHexString()
+  let vault = VaultStore.load(vaultId)!;
 
   const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
-    vaultAddress,
+    vaultId,
     block
   );
   const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    vaultAddress,
+    vaultId,
     block
   );
 
@@ -72,8 +73,8 @@ export function updateVaultSnapshots(
   vaultDailySnapshots.inputTokenBalance = vault.inputTokenBalance;
   vaultHourlySnapshots.inputTokenBalance = vault.inputTokenBalance;
 
-  vaultDailySnapshots.outputTokenSupply = vault.outputTokenSupply;
-  vaultHourlySnapshots.outputTokenSupply = vault.outputTokenSupply;
+  vaultDailySnapshots.outputTokenSupply = vault.outputTokenSupply!;
+  vaultHourlySnapshots.outputTokenSupply = vault.outputTokenSupply!;
 
   vaultDailySnapshots.outputTokenPriceUSD = vault.outputTokenPriceUSD;
   vaultHourlySnapshots.outputTokenPriceUSD = vault.outputTokenPriceUSD;

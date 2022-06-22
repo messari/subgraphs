@@ -43,8 +43,10 @@ Use moonwell as an example. Visit the [docs](../../docs/Mapping.md#running-local
 ```
 # when you are able to build your subgraph
 make create-local subgraph-name=0xbe1/moonwell-subgraph
+
 # now we can deploy locally (assuming graph-node is running)
 make deploy-local subgraph-name=0xbe1/moonwell-subgraph subgraph=moonwell
+
 # if you want to deploy a completely different subgraph
 make remove-local subgraph-name=0xbe1/moonwell-subgraph
 ```

@@ -1,3 +1,4 @@
+
 # Bancor V3 Subgraph Methodology v1.0.1
 
 
@@ -345,3 +346,12 @@ For more detailed information see “Non-Identical TKN Emission Programs” in t
 **Historical Reward Incentive Programs**
 
 As Bancor V3 has only gone live on 11th May 2022, there are currently no historical reward incentive programs to date. This section can be updated in the future.
+=======
+# Bancor V3
+
+## Interaction
+
+![Bancor V3 Interaction](./docs/bancor-v3-interaction.png)
+
+Edit the chart [here](https://excalidraw.com/#json=8pcmLXt3KH0HR1BmvGgc4,xXC-0PZvj5s1kGpIX4Fwhw).
+

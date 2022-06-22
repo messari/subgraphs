@@ -101,6 +101,9 @@ export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   marketHourlySnapshot.inputTokenBalance = market.inputTokenBalance;
   marketHourlySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketHourlySnapshot.outputTokenSupply = market.outputTokenSupply;
+  marketHourlySnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketHourlySnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketHourlySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   marketHourlySnapshot.outputTokenPriceUSD = BIGDECIMAL_ONE;
 
   marketDailySnapshot.protocol = protocol.id;
@@ -115,6 +118,9 @@ export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   marketDailySnapshot.inputTokenBalance = market.inputTokenBalance;
   marketDailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketDailySnapshot.outputTokenSupply = market.outputTokenSupply;
+  marketDailySnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketDailySnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketDailySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   marketDailySnapshot.outputTokenPriceUSD = BIGDECIMAL_ONE;
 
   marketHourlySnapshot.save();

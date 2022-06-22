@@ -95,4 +95,3 @@ export function getOrCreatePair(address: string): Token {
   }
   return token as Token;
 }
-

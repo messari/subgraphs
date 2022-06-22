@@ -6,6 +6,9 @@
     "MasterChefV2Address": "0xd6a4F121CA35509aF06A0Be99093d08462f53052",
     "MasterChefV2StartBlock": 2486444,
     "MasterChefV3Address": "0x188bed1968b795d5c9022f6a0bb5931ac4c18f00",
-    "MasterChefV3StartBlock": 6034473
+    "MasterChefV3StartBlock": 6034473,
+    "graftEnabled": false,
+    "subgraphId": "",
+    "graftStartBlock": 0
   }
   

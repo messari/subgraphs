@@ -1,0 +1,37 @@
+{
+  "network": "optimism",
+  "hypervisorOrphan": [
+    {
+      "name": "xsUSD-DAI05",
+      "address": "0x2d6B26f430F261B77D14C495585116aA579b7217",
+      "startBlock": 7088429
+    },
+    {
+      "name": "xUSDC-USDT05",
+      "address": "0x0F548d7AD1A0CB30D1872b8C18894484d76e1569",
+      "startBlock": 7085119
+    },
+    {
+      "name": "xUSDC-sUSD05",
+      "address": "0x0b4645179C1b668464Df01362fC6219a7ab3234c",
+      "startBlock": 7088369
+    },
+    {
+      "name": "xsUSD-USDT05",
+      "address": "0x3f848EeFD234dA0B1B98Ea876fe2ee86a10773ca",
+      "startBlock": 7088231
+    },
+    {
+      "name": "xUSDC-DAI05",
+      "address": "0x66CD859053c458688044d816117D5Bdf42A56813",
+      "startBlock": 7087995
+    }
+  ],
+  "hypeRegistry": [
+    {
+      "name": "HypeRegistry",
+      "address": "0xF5BFA20F4A77933fEE0C7bB7F39E7642A070d599",
+      "startBlock": 6538026
+    }
+  ]
+}
