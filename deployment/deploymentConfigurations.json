@@ -267,6 +267,26 @@
         }
       }
     },
+    "saddle-finance": {
+      "saddle-finance": {
+        "arbitrum": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        },
+        "mainnet": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "tokemak": {
       "tokemak": {
         "mainnet": {
