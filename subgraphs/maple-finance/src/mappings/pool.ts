@@ -39,10 +39,13 @@ import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supportin
 import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
 
 export function handleLossesRecognized(event: LossesRecognizedEvent): void {
-    const market = getOrCreateMarket(event, event.address);
     const accountAddress = event.transaction.from;
+    const market = getOrCreateMarket(event, event.address);
     const accountMarket = getOrCreateAccountMarket(event, accountAddress, market);
 
+    ////
+    // Update account market
+    ////
     accountMarket.unrecognizedLosses = accountMarket.unrecognizedLosses.plus(event.params.lossesRecognized);
     accountMarket.save();
 

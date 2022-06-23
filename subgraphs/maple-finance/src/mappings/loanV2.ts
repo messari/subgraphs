@@ -15,11 +15,7 @@ import {
     getOrCreateMarket
 } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
-import {
-    getOrCreateFinancialsDailySnapshot,
-    getOrCreateMarketDailySnapshot,
-    getOrCreateMarketHourlySnapshot
-} from "../common/mappingHelpers/getOrCreate/snapshots";
+import { getOrCreateFinancialsDailySnapshot } from "../common/mappingHelpers/getOrCreate/snapshots";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { createBorrow, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
@@ -81,10 +77,6 @@ export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
 export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     const loan = getOrCreateLoan(event, event.address);
     const drawdownAmount = event.params.amount_;
-    const protocol = getOrCreateProtocol();
-    const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    const treasuryFee = bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee));
-    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
 
     ////
     // Create borrow
@@ -100,6 +92,10 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     ////
     // Update market
     ////
+    const protocol = getOrCreateProtocol();
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    const treasuryFee = bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee));
+    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
     market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(
         bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
     );
@@ -137,7 +133,7 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
 
     // Update loan
     loan.principalPaid = loan.principalPaid.plus(repay._principalPaid);
-    loan.interestPaid = loan.principalPaid.plus(repay._interestPaid);
+    loan.interestPaid = loan.interestPaid.plus(repay._interestPaid);
     loan.save();
 
     ////

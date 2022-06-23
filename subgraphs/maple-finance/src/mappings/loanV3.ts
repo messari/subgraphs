@@ -15,11 +15,7 @@ import {
     getOrCreateMarket
 } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
-import {
-    getOrCreateFinancialsDailySnapshot,
-    getOrCreateMarketDailySnapshot,
-    getOrCreateMarketHourlySnapshot
-} from "../common/mappingHelpers/getOrCreate/snapshots";
+import { getOrCreateFinancialsDailySnapshot } from "../common/mappingHelpers/getOrCreate/snapshots";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { createBorrow, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
@@ -79,9 +75,8 @@ export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
 }
 
 export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
-    const loan = getOrCreateLoan(event, event.address);
     const drawdownAmount = event.params.amount_;
-    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    const loan = getOrCreateLoan(event, event.address);
 
     ////
     // Create borrow
@@ -99,28 +94,28 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     ////
     // Trigger interval update
     ////
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
     intervalUpdate(event, market);
 }
 
 export function handlePaymentMade(event: PaymentMadeEvent): void {
-    const protocol = getOrCreateProtocol();
-    const loan = getOrCreateLoan(event, event.address);
-    const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
     const principalPaid = event.params.principalPaid_;
     const interestPaid = event.params.interestPaid_;
     const treasuryFee = event.params.treasuryFeePaid_;
+    const loan = getOrCreateLoan(event, event.address);
 
     const repay = createRepay(event, loan, principalPaid, interestPaid, treasuryFee);
 
     // Update loan
     loan.principalPaid = loan.principalPaid.plus(repay._principalPaid);
-    loan.interestPaid = loan.principalPaid.plus(repay._interestPaid);
+    loan.interestPaid = loan.interestPaid.plus(repay._interestPaid);
     loan.save();
 
     ////
     // Update market, V3 loan amortizes treasury fee (amortized delegate fee tracked in claim)
     ////
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
     const treasuryFeeUSD = getTokenAmountInUSD(event, inputToken, treasuryFee);
     market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(treasuryFee);
     market._cumulativeProtocolSideRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(treasuryFeeUSD);
@@ -129,6 +124,7 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
     ////
     // Update protocol
     ////
+    const protocol = getOrCreateProtocol();
     protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(treasuryFeeUSD);
     protocol.save();
 

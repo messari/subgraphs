@@ -138,4 +138,6 @@ Diagrams of the protocol, specifically focusing on key things needed for the Sub
 
 ## Validation
 
-Validation done for this subgraph can be found here: [Validation Spreadsheet](https://docs.google.com/spreadsheets/d/1viyui7nAzUXMx68EJSW61xC251uS8zpKePzV2xijjGQ/edit?usp=sharing)
+Validation done for this subgraph against other source can be found here: [Validation Spreadsheet](https://docs.google.com/spreadsheets/d/1viyui7nAzUXMx68EJSW61xC251uS8zpKePzV2xijjGQ/edit?usp=sharing)
+
+Validation for subgraph self-consistency is done in the [Self consistancy notebook](./validation/self_consistancy.ipynb)
