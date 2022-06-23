@@ -2,6 +2,8 @@ specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
     file: ./schema.graphql
+features:
+    - grafting
 dataSources:
     - kind: ethereum/contract
       name: MapleGlobals
@@ -80,6 +82,9 @@ dataSources:
               - RewardTokens
               - _MplReward
               - Token
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
           abis:
               - name: MapleRewardsFactory
                 file: ./abis/MapleRewardsFactory.json
@@ -151,6 +156,9 @@ templates:
               - Market
               - _StakeLocker
               - Token
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
           abis:
               - name: PoolFactory
                 file: ./abis/PoolFactory.json
@@ -226,6 +234,9 @@ templates:
               - Token
               - InterestRate
               - _MplReward
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
           abis:
               - name: ERC20
                 file: ./abis/ERC20.json
@@ -309,6 +320,9 @@ templates:
               - Market
               - Token
               - _MplReward
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
           abis:
               - name: ERC20
                 file: ./abis/ERC20.json
@@ -383,7 +397,10 @@ templates:
               - Market
               - _StakeLocker
               - _MplReward
+              - LendingProtocol
               - Token
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
           abis:
               - name: ERC20
                 file: ./abis/ERC20.json
@@ -461,6 +478,9 @@ templates:
               - _StakeLocker
               - _MplReward
               - Token
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
           abis:
               - name: ERC20
                 file: ./abis/ERC20.json
@@ -540,6 +560,9 @@ templates:
               - _StakeLocker
               - _MplReward
               - Token
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
           abis:
               - name: ERC20
                 file: ./abis/ERC20.json
@@ -616,6 +639,9 @@ templates:
               - Token
               - _Stake
               - _Unstake
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
           abis:
               - name: ERC20
                 file: ./abis/ERC20.json
@@ -678,3 +704,6 @@ templates:
           callHandlers:
               - function: updatePeriodFinish(uint256)
                 handler: handleUpdatePeriodFinish
+# graft:
+#     base: QmTqzDsjeeWXruNWgPGdeBku7i4D1hKvw9Q5DkTyLoUPcQ
+#     block: 12849585

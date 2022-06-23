@@ -180,9 +180,7 @@ export function getOrCreateUsageHourlyMetric(event: ethereum.Event): UsageMetric
         usageMetric.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
         usageMetric.hourlyActiveUsers = ZERO_I32;
-
         usageMetric.hourlyTransactionCount = ZERO_I32;
-
         usageMetric.hourlyDepositCount = ZERO_I32;
         usageMetric.hourlyWithdrawCount = ZERO_I32;
         usageMetric.hourlyBorrowCount = ZERO_I32;

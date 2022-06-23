@@ -21,17 +21,13 @@ import { getTokenAmountInUSD } from "../common/prices/prices";
 import { bigDecimalToBigInt } from "../common/utils";
 
 export function handleDrawdown(event: DrawdownEvent): void {
-    const loan = getOrCreateLoan(event, event.address);
     const drawdownAmount = event.params.drawdownAmount;
-    const protocol = getOrCreateProtocol();
-    const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    const treasuryFee = bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee));
-    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+    const loan = getOrCreateLoan(event, event.address);
 
     ////
     // Create borrow
     ////
-    const borrow = createBorrow(event, loan, drawdownAmount);
+    createBorrow(event, loan, drawdownAmount);
 
     ////
     // Update loan
@@ -42,8 +38,12 @@ export function handleDrawdown(event: DrawdownEvent): void {
     ////
     // Update market
     ////
-    market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(treasuryFee);
+    const protocol = getOrCreateProtocol();
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    const treasuryFee = bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee));
+    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
     const protocolRevenueUSD = getTokenAmountInUSD(event, inputToken, treasuryFee);
+    market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(treasuryFee);
     market._cumulativeProtocolSideRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(protocolRevenueUSD);
     market.save();
 
@@ -86,7 +86,7 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
     // Update loan
     ////
     loan.principalPaid = loan.principalPaid.plus(repay._principalPaid);
-    loan.interestPaid = loan.principalPaid.plus(repay._interestPaid);
+    loan.interestPaid = loan.interestPaid.plus(repay._interestPaid);
     loan.save();
 
     ////

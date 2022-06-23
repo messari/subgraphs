@@ -152,9 +152,15 @@ function intervalUpdateProtocol(event: ethereum.Event, marketBefore: Market, mar
         marketAfter.totalBorrowBalanceUSD.minus(marketBefore.totalBorrowBalanceUSD)
     );
 
-    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-        marketAfter._cumulativeTotalRevenueUSD.minus(marketBefore._cumulativeTotalRevenueUSD)
-    );
+    const deltaRevenueUSD = marketAfter._cumulativeTotalRevenueUSD.minus(marketBefore._cumulativeTotalRevenueUSD);
+    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(deltaRevenueUSD);
+
+    ////
+    // Update financial snapshot for dailyTotalRevenueUSD
+    ////
+    const financialsSnapshot = getOrCreateFinancialsDailySnapshot(event);
+    financialsSnapshot.dailyTotalRevenueUSD = financialsSnapshot.dailyTotalRevenueUSD.plus(deltaRevenueUSD);
+    financialsSnapshot.save();
 
     protocol.save();
 }
@@ -266,7 +272,7 @@ export function intervalUpdate(event: ethereum.Event, market: Market): void {
         ////
         // Interval update market snapshots
         ////
-        intervalUpdateMarketDailySnapshot(event, market);
+        intervalUpdateMarketHourlySnapshot(event, market);
         intervalUpdateMarketDailySnapshot(event, market);
 
         ////

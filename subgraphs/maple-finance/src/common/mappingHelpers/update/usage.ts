@@ -23,14 +23,13 @@ export function updateUsageMetrics(event: ethereum.Event, accountAddress: Addres
     let account = Account.load(accountAddress.toHexString());
     if (!account) {
         account = new Account(accountAddress.toHexString());
+        account.save();
 
         protocol.cumulativeUniqueUsers += ONE_I32;
-        usageDailyMetric.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-        usageHourlyMetric.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-
-        account.save();
         protocol.save();
     }
+    usageDailyMetric.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageHourlyMetric.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
     ////
     // Update active accounts
@@ -42,14 +41,14 @@ export function updateUsageMetrics(event: ethereum.Event, accountAddress: Addres
 
     if (!activeDailyAccount) {
         activeDailyAccount = new ActiveAccount(dailyAccountId);
-        usageDailyMetric.dailyActiveUsers += ONE_I32;
         activeDailyAccount.save();
+        usageDailyMetric.dailyActiveUsers += ONE_I32;
     }
 
     if (!activeHourlyAccount) {
         activeHourlyAccount = new ActiveAccount(hourlyAccountId);
-        usageHourlyMetric.hourlyActiveUsers += ONE_I32;
         activeHourlyAccount.save();
+        usageHourlyMetric.hourlyActiveUsers += ONE_I32;
     }
 
     ////
