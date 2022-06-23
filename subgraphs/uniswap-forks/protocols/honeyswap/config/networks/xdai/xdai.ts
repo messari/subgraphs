@@ -51,19 +51,33 @@ export class HoneyswapXdaiConfigurations implements Configurations {
     return RewardIntervalType.TIMESTAMP;
   }
   getReferenceToken(): string {
-    return "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1"; // WETH
+    return "0x9c58bacc331c9aa871afd802db6379a98e80cedb"; // GNO
   }
   getRewardToken(): string {
     return "0x38fb649ad3d6ba1113be5f57b927053e97fc5bf7"; // xCOMB
   }
   getWhitelistTokens(): string[] {
-    return [];
+    return [
+      "0x9c58bacc331c9aa871afd802db6379a98e80cedb", // GNO
+      "0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1", // WETH
+      "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // WXDAI
+      "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // USDC
+      "0x38fb649ad3d6ba1113be5f57b927053e97fc5bf7", // xCOMB
+      "0x71850b7e9ee3f13ab46d67167341e4bdc905eef9", // HNY
+    ];
   }
   getStableCoins(): string[] {
-    return [];
+    return [
+      "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // WXDAI
+      "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // USDC
+    ];
   }
   getStableOraclePools(): string[] {
-    return [];
+    return [
+      "0x321704900d52f44180068caa73778d5cd60695a6", // GNO-WXDAI
+      // "0x9e8e5e4a0900fe4634c02aaf0f130cfb93c53fbc", // xCOMB-WXDAI
+      // "0x7bea4af5d425f2d4485bdad1859c88617df31a67", // WETH-WXDAI
+    ];
   }
   getUntrackedPairs(): string[] {
     return [];
