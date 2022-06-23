@@ -89,7 +89,7 @@ export function handleEvent(
     depositEvent.blockNumber = event.block.number;
     depositEvent.timestamp = event.block.timestamp;
     depositEvent.market = market.id;
-    depositEvent.asset = getOrCreateToken(Address.fromString(market.inputToken!)).id;
+    depositEvent.asset = getOrCreateToken(Address.fromString(market.inputToken)).id;
     depositEvent.amount = absValBigInt(amountCollateral);
     depositEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
 
@@ -135,7 +135,7 @@ export function handleEvent(
     withdrawEvent.blockNumber = event.block.number;
     withdrawEvent.timestamp = event.block.timestamp;
     withdrawEvent.market = market.id;
-    withdrawEvent.asset = getOrCreateToken(Address.fromString(market.inputToken!)).id;
+    withdrawEvent.asset = getOrCreateToken(Address.fromString(market.inputToken)).id;
     withdrawEvent.amount = absValBigInt(amountCollateral);
     withdrawEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
     financialsDailySnapshot.dailyWithdrawUSD = 
@@ -228,7 +228,7 @@ export function handleFrob(event: LogNote): void {
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let inputTokenBalance = market.inputTokenBalance.plus(dink);
-  let collateralToken = getOrCreateToken(Address.fromString(market.inputToken!));
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
   let collateralTokenUSD = getOrCreateToken(Address.fromString(collateralToken.id)).lastPriceUSD;
   let ΔcollateralUSD = bigIntToBigDecimal(dink, WAD).times(collateralTokenUSD!);
   let ΔdebtUSD = bigIntToBigDecimal(dart, WAD);
@@ -308,7 +308,7 @@ export function handleGrab(event: LogNote): void {
   }
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
-  let collateralToken = getOrCreateToken(Address.fromString(market.inputToken!));
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
   let collateralTokenUSD = getOrCreateToken(Address.fromString(collateralToken.id)).lastPriceUSD;
   let ΔcollateralUSD = bigIntToBigDecimal(dink, WAD).times(collateralTokenUSD!);
   let ΔdebtUSD = bigIntToBigDecimal(dart, WAD);
