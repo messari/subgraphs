@@ -8,19 +8,17 @@ dataSources:
     source:
       address: "0x323A76393544d5ecca80cd6ef2A560C6a395b7E3"
       abi: ENSGovernor
-      startBlock: 13533772
+      startBlock: 13533771
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - ProposalCanceled
-        - ProposalCreated
-        - ProposalExecuted
-        - ProposalQueued
-        - QuorumNumeratorUpdated
-        - TimelockChange
-        - VoteCast
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
       abis:
         - name: ENSGovernor
           file: ./abis/ENSGovernor.json
@@ -46,15 +44,17 @@ dataSources:
     source:
       address: "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72"
       abi: ENSToken
-      startBlock: 13820619
+      startBlock: 13820618
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - DelegateChanged
-        - DelegateVotesChanged
-        - Transfer
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
       abis:
         - name: ENSToken
           file: ./abis/ENSToken.json
