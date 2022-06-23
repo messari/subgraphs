@@ -70,7 +70,7 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   // Halve pool fees for WETH pairs
-  if (NetworkConfigs.getReferenceToken() === token0Address || NetworkConfigs.getReferenceToken() === token1Address) {
+  if (NetworkConfigs.getReferenceToken() == token0Address || NetworkConfigs.getReferenceToken() == token1Address) {
     pool.fees = createHalvedPoolFees(poolAddress);
   } else {
     pool.fees = createPoolFees(poolAddress);
