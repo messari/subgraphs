@@ -267,6 +267,14 @@
         }
       }
     },
+    "stakedao": {
+      "stakedao": {
+        "mainnet": {
+          "template": "stakedao.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "saddle-finance": {
       "saddle-finance": {
         "arbitrum": {
