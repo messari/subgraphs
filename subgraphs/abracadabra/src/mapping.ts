@@ -1,5 +1,5 @@
 import { Address, dataSource, log } from "@graphprotocol/graph-ts";
-import { DegenBox, LogDeploy } from "../generated/bentoBox/DegenBox";
+import { DegenBox, LogDeploy } from "../generated/BentoBox/DegenBox";
 import {
   LogAddCollateral,
   LogBorrow,
