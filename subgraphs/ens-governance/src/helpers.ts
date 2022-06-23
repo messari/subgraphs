@@ -64,13 +64,16 @@ export function getGovernance(): Governance {
 
   if (governance == null) {
     governance = new Governance(GOVERNANCE_NAME);
-    governance.totalTokenHolders = BIGINT_ZERO;
+    governance.proposals = BIGINT_ZERO;
     governance.currentTokenHolders = BIGINT_ZERO;
+    governance.totalTokenHolders = BIGINT_ZERO;
     governance.currentDelegates = BIGINT_ZERO;
     governance.totalDelegates = BIGINT_ZERO;
     governance.delegatedVotesRaw = BIGINT_ZERO;
     governance.delegatedVotes = BIGDECIMAL_ZERO;
     governance.proposalsQueued = BIGINT_ZERO;
+    governance.proposalsExecuted = BIGINT_ZERO;
+    governance.proposalsCanceled = BIGINT_ZERO;
 
     governance.save();
   }

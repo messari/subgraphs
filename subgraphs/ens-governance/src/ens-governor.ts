@@ -163,7 +163,7 @@ export function handleProposalQueued(event: ProposalQueued): void {
 export function handleQuorumNumeratorUpdated(
   event: QuorumNumeratorUpdated
 ): void {
-  let governance = new Governance(GOVERNANCE_NAME);
+  let governance = getGovernance();
   governance.quorumNumerator = event.params.newQuorumNumerator;
   governance.save();
 }
