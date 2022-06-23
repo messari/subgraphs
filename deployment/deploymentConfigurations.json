@@ -536,6 +536,20 @@
           "messari": "messari/trisolaris-aurora",
           "prepare:constants": true
         }
+      },
+      "honeyswap": {
+        "xdai": {
+          "template": "honeyswap.template.yaml",
+          "mrbrianhobo": "mrbrianhobo/honeyswap-xdai",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "matic": {
+          "template": "honeyswap.template.yaml",
+          "mrbrianhobo": "mrbrianhobo/honeyswap-polygon",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
       }
     },
     "yearn-v2": {

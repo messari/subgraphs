@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: xdai
+    network: {{network}}
     source:
-      address: "0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7"
+      address: "{{factory.address}}"
       abi: Factory
-      startBlock: 11813490
+      startBlock: {{factory.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -35,7 +35,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: xdai
+    network: {{network}}
     source:
       abi: Pair
     mapping:
