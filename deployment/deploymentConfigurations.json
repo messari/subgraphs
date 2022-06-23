@@ -235,6 +235,14 @@
         }
       }
     },
+    "inverse-finance": {
+      "inverse-finance": {
+        "mainnet": {
+          "template": "inverse.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "liquity": {
       "liquity": {
         "mainnet": {
