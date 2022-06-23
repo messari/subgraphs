@@ -698,6 +698,7 @@ export const schema130 = (): Schema => {
       dailyWithdrawCount: "Int!",
       dailySwapCount: "Int!",
       timestamp: "BigInt!",
+      totalPoolCount: "Int!",
     },
     liquidityPoolDailySnapshots: {
       id: "ID!",
@@ -850,6 +851,7 @@ export const schema130 = (): Schema => {
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
         cumulativeUniqueUsers
+        totalPoolCount
       }
     }`;
 
@@ -942,6 +944,7 @@ export const schema130 = (): Schema => {
     network: "Network!",
     type: "ProtocolType!",
     totalValueLockedUSD: "BigDecimal!",
+    totalPoolCount: "Int!",
     protocolControlledValueUSD: "BigDecimal",
     cumulativeVolumeUSD: "BigDecimal!",
     cumulativeSupplySideRevenueUSD: "BigDecimal!",

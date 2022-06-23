@@ -23,7 +23,7 @@ import {
   getDegenBoxAddress,
 } from "./getters";
 import { bigIntToBigDecimal } from "./utils/numbers";
-import { DegenBox } from "../../generated/bentoBox/DegenBox";
+import { DegenBox } from "../../generated/BentoBox/DegenBox";
 import { readValue } from "./utils/utils";
 
 // Update FinancialsDailySnapshots entity
