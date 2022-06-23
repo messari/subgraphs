@@ -44,6 +44,14 @@
         }
       }
     },
+    "belt-finance": {
+      "belt-finance": {
+        "bsc": {
+          "template": "belt.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "bancor-v3": {
       "bancor-v3": {
         "mainnet": {
@@ -255,6 +263,42 @@
       "makerdao": {
         "mainnet": {
           "template": "makerdao.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "stakedao": {
+      "stakedao": {
+        "mainnet": {
+          "template": "stakedao.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "saddle-finance": {
+      "saddle-finance": {
+        "arbitrum": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        },
+        "mainnet": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "tokemak": {
+      "tokemak": {
+        "mainnet": {
+          "template": "tokemak.template.yaml",
           "deploy-on-merge": false
         }
       }
@@ -483,6 +527,22 @@
           "steegecs": "steegecs/trisolaris-aurora",
           "messari": "messari/trisolaris-aurora",
           "prepare:constants": true
+        }
+      }
+    },
+    "yearn-v2": {
+      "yearn-v2": {
+        "arbitrum": {
+          "template": "yearn.v2.template.yaml",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "yearn.v2.template.yaml",
+          "deploy-on-merge": false
+        },
+        "mainnet": {
+          "template": "yearn.v2.template.yaml",
+          "deploy-on-merge": false
         }
       }
     }

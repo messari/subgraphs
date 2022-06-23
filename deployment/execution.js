@@ -14,7 +14,7 @@ function scripts(protocol, network, template, location, constants) {
     let removeSubgraphYaml = "rm -rf subgraph.yaml"
     let prepareYaml = "npm run prepare:yaml --PROTOCOL=" + protocol + " --NETWORK=" + network + " --TEMPLATE=" + template
     let prepareConstants = "npm run prepare:constants --PROTOCOL=" + protocol + " --NETWORK=" + network
-    let prepareBuild = "graph codegen && graph build"
+    let codegen = "graph codegen"
     let deployment = "npm run deploy:subgraph --LOCATION=" + location
 
     scripts.push(removeResults)
@@ -24,7 +24,7 @@ function scripts(protocol, network, template, location, constants) {
     if (constants == true) {
         scripts.push(prepareConstants)
     }
-    scripts.push(prepareBuild)
+    scripts.push(codegen)
     scripts.push(deployment)
     
     return scripts

@@ -1,5 +1,11 @@
 ## Deployment Instructions:
 
+- Additional dependencies: 
+    - minimist - install at ./subgraphs at head of repository 
+        - `npm install minimist`
+    - mustache
+        - `npm install mustache`
+
 ```
 # Deploys uniswap-v2 from the uniswap-forks to mainnet in my hosted service.
 npm run deploy --SUBGRAPH=uniswap-forks --PROTOCOL=uniswap-v2 --NETWORK=mainnet --LOCATION=steegecs
