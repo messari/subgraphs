@@ -102,7 +102,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Geist | 🔨 | | |
 | [Iron Bank](https://app.ib.xyz/) | 🛠 | 1.3.0 / 1.0.8 / 1.0.0 | [![Iron Bank Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-fantom) [![Iron Bank Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-avalanche) [![Iron Bank Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-ethereum) |
 | Maple Finance | 🔨 | | |
-| [Moonwell Finance](https://moonwell.fi/) | 🛠 | 1.3.0 / 1.0.9 / 1.0.0 | [![Moonwell Moonriver](./docs/images/chains/moonriver.png)](https://thegraph.com/hosted-service/subgraph/messari/moonwell-moonriver)  |
+| [Moonwell Finance](https://moonwell.fi/) | 🛠 | 1.3.0 / 1.0.10 / 1.0.0 | [![Moonwell Moonriver](./docs/images/chains/moonriver.png)](https://thegraph.com/hosted-service/subgraph/messari/moonwell-moonriver)  |
 | Notional Finance | 🔨 | | |
 | [Rari Fuse](https://app.rari.capital/fuse) | 🔨 | 1.3.0 / 1.0.16 / 1.0.0 | [![Rari Fuse Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-ethereum) [![Rari Fuse Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-arbitrum) |
 | [SCREAM](https://scream.sh/) | 🛠 | 1.3.0 / 1.0.6 / 1.0.0 | [![SCREAM Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/scream-fantom)  |
