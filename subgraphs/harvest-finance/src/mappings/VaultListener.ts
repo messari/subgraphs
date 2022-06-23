@@ -7,7 +7,7 @@ export function handleDeposit(event: Deposit): void {
 	account.save()
 	// Increase protocl users
 
-	let vault = vaults.loadOrCreateVault(event.address.toHexString())
+	let vault = vaults.loadOrCreateVault(event.address)
 	vault.save()
 }
 

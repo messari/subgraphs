@@ -1,10 +1,12 @@
+import { Address } from "@graphprotocol/graph-ts";
 import { decimal, integer } from "@protofire/subgraph-toolkit";
 import { Vault } from "../../generated/schema"
 import { protocol } from "./protocol";
 import { shared } from "./shared";
 
 export namespace vaults {
-	export function loadOrCreateVault(id: string): Vault {
+	export function loadOrCreateVault(vaultAddress: Address): Vault {
+		let id = vaultAddress.toHexString()
 		let entity = Vault.load(id)
 		if (entity == null) {
 			entity = new Vault(id)
