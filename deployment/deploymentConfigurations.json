@@ -44,6 +44,14 @@
         }
       }
     },
+    "convex-finance": {
+      "convex-finance": {
+        "mainnet": {
+          "template": "convex.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "belt-finance": {
       "belt-finance": {
         "bsc": {
