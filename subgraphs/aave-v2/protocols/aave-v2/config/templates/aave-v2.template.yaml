@@ -156,7 +156,7 @@ templates:
         - event: ReserveActivated(indexed address)
           handler: handleReserveActivated
         - event: ReserveDeactivated(indexed address)
-          handler: handleReserveDeactivated  
+          handler: handleReserveDeactivated
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
       file: ./src/mappings/lendingPoolConfigurator.ts
