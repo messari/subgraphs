@@ -25,6 +25,7 @@ import {
 import { bigIntToBigDecimal } from "./utils/numbers";
 import { DegenBox } from "../../generated/BentoBox/DegenBox";
 import { readValue } from "./utils/utils";
+import { getOrCreateAccount } from "../positions";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal, marketId: string): void {
@@ -105,26 +106,8 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   usageDailySnapshot.timestamp = event.block.timestamp;
   usageDailySnapshot.dailyTransactionCount += 1;
 
-  let fromAccountId = from.toHexString();
-  let fromAccount = Account.load(fromAccountId);
-  let toAccountId = to.toHexString();
-  let toAccount = Account.load(toAccountId);
-
-  if (!fromAccount) {
-    fromAccount = new Account(fromAccountId);
-    fromAccount.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-
-  if (!toAccount) {
-    toAccount = new Account(fromAccountId);
-    toAccount.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
+  getOrCreateAccount(from.toHexString(), event);
+  getOrCreateAccount(to.toHexString(), event);
 
   usageHourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageDailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;

@@ -35,6 +35,7 @@ import {
   updateTotalBorrows,
 } from "./common/metrics";
 import { createMarket, createLiquidateEvent } from "./common/setters";
+import { addAccountToProtocol, getOrCreateAccount, updatePositions } from "./positions";
 
 export function handleLogDeploy(event: LogDeploy): void {
   const account = event.transaction.from.toHex().toLowerCase();
@@ -79,11 +80,14 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
+  updatePositions(market.id, "DEPOSIT", event.params.share, depositEvent.from, event, depositEvent.id);
 }
 
 export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
+  let liquidation = false;
   if (event.params.from.toHexString() != event.params.to.toHexString()) {
     createLiquidateEvent(event);
+    liquidation = true;
   }
   let withdrawalEvent = new Withdraw(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
@@ -116,6 +120,15 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
+  updatePositions(
+    market.id,
+    "WITHDRAW",
+    event.params.share,
+    withdrawalEvent.from,
+    event,
+    withdrawalEvent.id,
+    liquidation,
+  );
 }
 
 export function handleLogBorrow(event: LogBorrow): void {
@@ -146,6 +159,7 @@ export function handleLogBorrow(event: LogBorrow): void {
   updateMarketStats(market.id, "BORROW", getMIMAddress(dataSource.network()), event.params.amount, event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
+  updatePositions(market.id, "BORROW", event.params.amount, borrowEvent.from, event, borrowEvent.id);
 }
 
 // Liquidation steps
@@ -210,6 +224,16 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
   liquidateEvent.liquidatee = event.params.to.toHexString();
 
+  let liqudidatedAccount = getOrCreateAccount(liquidateEvent.liquidatee, event);
+  liqudidatedAccount.liquidateCount = liqudidatedAccount.liquidateCount + 1;
+  liqudidatedAccount.save();
+  addAccountToProtocol("LIQUIDATEE", liqudidatedAccount, event);
+
+  let liquidatorAccount = getOrCreateAccount(liquidateEvent.from, event);
+  liquidatorAccount.liquidationCount = liquidatorAccount.liquidationCount + 1;
+  liquidatorAccount.save();
+  addAccountToProtocol("LIQUIDATOR", liquidatorAccount, event);
+
   usageHourlySnapshot.hourlyLiquidateCount += 1;
   usageDailySnapshot.dailyLiquidateCount += 1;
   let marketCumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
@@ -242,8 +266,10 @@ export function handleLogRepay(event: LogRepay): void {
   const address = event.address.toHex().toLowerCase();
   const to = event.transaction.to ? (event.transaction.to as Address).toHex().toLowerCase() : null;
   const user = event.params.to.toHex().toLowerCase();
+  let liquidation = false;
   if ([invoker, address, to].indexOf(user) == -1) {
     handleLiquidation(event);
+    liquidation = true;
   }
   let repayEvent = new Repay(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
@@ -272,6 +298,7 @@ export function handleLogRepay(event: LogRepay): void {
   updateMarketStats(market.id, "REPAY", getMIMAddress(dataSource.network()), event.params.part, event); // smart contract code subs event.params.part from totalBorrow
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
+  updatePositions(market.id, "REPAY", event.params.amount, repayEvent.from, event, repayEvent.id, liquidation);
 }
 
 export function handleLogExchangeRate(event: LogExchangeRate): void {
