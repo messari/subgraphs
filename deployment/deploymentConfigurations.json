@@ -195,8 +195,8 @@
         }
       }
     },
-    "curve": {
-      "curve": {
+    "curve-finance": {
+      "curve-finance": {
         "arbitrum": {
           "template": "curve.template.yaml",
           "deploy-on-merge": false
@@ -222,7 +222,7 @@
           "deploy-on-merge": false
         },
         "xdai": {
-          "template": "apeswap.template.yaml",
+          "template": "curve.template.yaml",
           "deploy-on-merge": false
         }
       }
