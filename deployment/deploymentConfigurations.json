@@ -493,6 +493,22 @@
           "prepare:constants": true
         }
       }
+    },
+    "yearn-v2": {
+      "yearn-v2": {
+        "arbitrum": {
+          "template": "yearn.v2.template.yaml",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "yearn.v2.template.yaml",
+          "deploy-on-merge": false
+        },
+        "mainnet": {
+          "template": "yearn.v2.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
     }
   }
 }
