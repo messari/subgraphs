@@ -12,8 +12,8 @@
     "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs}"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.27.0",
-    "@graphprotocol/graph-ts": "0.24.1",
+    "@graphprotocol/graph-cli": "^0.31.0",
+    "@graphprotocol/graph-ts": "^0.27.0",
     "@magic/format": "^0.0.40",
     "mustache": "^4.2.0"
   }

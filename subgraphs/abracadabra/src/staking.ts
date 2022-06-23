@@ -1,5 +1,5 @@
 import { dataSource } from "@graphprotocol/graph-ts";
-import { Transfer } from "../generated/bentoBox/ERC20";
+import { Transfer } from "../generated/BentoBox/ERC20";
 import { getStakedSpellAddress } from "./common/getters";
 import { updateUsageMetrics } from "./common/metrics";
 

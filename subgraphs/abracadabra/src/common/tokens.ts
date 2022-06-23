@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
-import { ERC20 } from "../../generated/bentoBox/ERC20";
-import { ERC20SymbolBytes } from "../../generated/bentoBox/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../generated/bentoBox/ERC20NameBytes";
+import { ERC20 } from "../../generated/BentoBox/ERC20";
+import { ERC20SymbolBytes } from "../../generated/BentoBox/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/BentoBox/ERC20NameBytes";
 import { Address } from "@graphprotocol/graph-ts";
 
 export const INVALID_TOKEN_DECIMALS = 9999;

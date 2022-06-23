@@ -31,6 +31,7 @@ import {
   PRICE_ORACLE_ADDRESS,
   INCENTIVE_CONTROLLER_ADDRESS,
   USDC_TOKEN_ADDRESS,
+  METHODOLOGY_VERSION,
 } from "../common/constants";
 
 import { AaveIncentivesController as IncentivesControllerContract } from "../../generated/templates/LendingPoolAddressesProvider/AaveIncentivesController";
@@ -251,6 +252,7 @@ export function getOrCreateProtocol(protocolId: string): LendingProtocol {
     lendingProtocol.type = ProtocolType.LENDING;
     lendingProtocol.subgraphVersion = SUBGRAPH_VERSION;
     lendingProtocol.schemaVersion = SCHEMA_VERSION;
+    lendingProtocol.methodologyVersion = METHODOLOGY_VERSION;
     lendingProtocol.name = PROTOCOL_NAME;
     lendingProtocol.slug = PROTOCOL_SLUG;
     lendingProtocol.totalRevenueUSD = BIGDECIMAL_ZERO;
