@@ -56,6 +56,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD!);
 
   depositEvent.hash = event.transaction.hash.toHexString();
+  depositEvent.nonce = event.transaction.nonce;
   depositEvent.logIndex = event.transactionLogIndex.toI32();
   depositEvent.protocol = getOrCreateLendingProtocol().id;
   depositEvent.to = event.params.to.toHexString();
@@ -95,6 +96,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD!);
 
   withdrawalEvent.hash = event.transaction.hash.toHexString();
+  withdrawalEvent.nonce = event.transaction.nonce;
   withdrawalEvent.logIndex = event.transactionLogIndex.toI32();
   withdrawalEvent.protocol = getOrCreateLendingProtocol().id;
   withdrawalEvent.to = event.params.to.toHexString();
@@ -127,6 +129,7 @@ export function handleLogBorrow(event: LogBorrow): void {
   let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD!);
 
   borrowEvent.hash = event.transaction.hash.toHexString();
+  borrowEvent.nonce = event.transaction.nonce;
   borrowEvent.logIndex = event.transactionLogIndex.toI32();
   borrowEvent.protocol = getOrCreateLendingProtocol().id;
   borrowEvent.to = event.params.to.toHexString();
@@ -193,6 +196,7 @@ export function handleLiquidation(event: LogRepay): void {
   );
 
   liquidateEvent.hash = event.transaction.hash.toHexString();
+  liquidateEvent.nonce = event.transaction.nonce;
   liquidateEvent.logIndex = event.transactionLogIndex.toI32();
   liquidateEvent.protocol = getOrCreateLendingProtocol().id;
   liquidateEvent.to = event.params.to.toHexString();
@@ -251,6 +255,7 @@ export function handleLogRepay(event: LogRepay): void {
   let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD!);
 
   repayEvent.hash = event.transaction.hash.toHexString();
+  repayEvent.nonce = event.transaction.nonce;
   repayEvent.logIndex = event.transactionLogIndex.toI32();
   repayEvent.protocol = getOrCreateLendingProtocol().id;
   repayEvent.to = event.params.to.toHexString();
