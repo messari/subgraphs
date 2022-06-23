@@ -944,7 +944,7 @@ type Position @entity {
   hashOpened: String!
 
   " The hash of the transaction that closed this position "
-  hashClosed: String!
+  hashClosed: String
 
   " Block number of when the position was opened "
   blockNumberOpened: BigInt!
@@ -953,10 +953,10 @@ type Position @entity {
   timestampOpened: BigInt!
 
   " Block number of when the position was closed (0 if still open) "
-  blockNumberClosed: BigInt!
+  blockNumberClosed: BigInt
 
   " Timestamp when the position was closed (0 if still open) "
-  timestampClosed: BigInt!
+  timestampClosed: BigInt
 
   " Side of the position (either lender or borrower) "
   side: PositionSide!
