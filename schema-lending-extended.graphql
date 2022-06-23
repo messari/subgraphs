@@ -442,7 +442,7 @@ type FinancialsDailySnapshot @entity {
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -616,31 +616,31 @@ type Market @entity {
   ##### Account/Position Data #####
 
   " All positions in this market "
-  positions: [Positions!]! @derivedFrom(field: "market")
+  positions: [Position!]! @derivedFrom(field: "market")
 
   " Number of positions in this market "
   positionCount: Int!
 
   " All open positions in this market "
-  openPositions: [Positions!]!
+  openPositions: [Position!]!
 
   " Number of open positions in this market "
   openPositionCount: Int!
 
   " All closed positions in this market "
-  closedPositions: [Positions!]!
+  closedPositions: [Position!]!
 
   " Number of closed positions in this market "
   closedPositionCount: Int!
 
   " All lending positions in this market "
-  lendingPositions: [Positions!]!
+  lendingPositions: [Position!]!
 
   " Number of lending positions in this market "
   lendingPositionCount: Int!
 
   " All borrowing positions in this market "
-  borrowingPositions: [Positions!]!
+  borrowingPositions: [Position!]!
 
   " Number of borrowing positions in this market "
   borrowingPositionCount: Int!
@@ -684,7 +684,7 @@ type MarketDailySnapshot @entity {
 
   " The pool this snapshot belongs to "
   market: Market!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -780,7 +780,7 @@ type MarketHourlySnapshot @entity {
 
   " The pool this snapshot belongs to "
   market: Market!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -874,7 +874,7 @@ type MarketHourlySnapshot @entity {
 type Account @entity {
   " { Account address } "
   id: ID!
-  
+
   " Number of positions this account has "
   positionCount: Int!
 
@@ -882,13 +882,13 @@ type Account @entity {
   positions: [Position!]! @derivedFrom(field: "account")
 
   " All open positions this account has "
-  openPositions: [Positions!]!
+  openPositions: [Position!]!
 
   " Number of open positions this account has "
   openPositionCount: Int!
 
   " All closed positions this account has "
-  closedPositions: [Positions!]!
+  closedPositions: [Position!]!
 
   " Number of closed positions this account has "
   closedPositionCount: Int!
@@ -944,19 +944,19 @@ type Position @entity {
   hashOpened: String!
 
   " The hash of the transaction that closed this position "
-  hashClosed: String!
-  
+  hashClosed: String
+
   " Block number of when the position was opened "
   blockNumberOpened: BigInt!
 
   " Timestamp when the position was opened "
   timestampOpened: BigInt!
-  
+
   " Block number of when the position was closed (0 if still open) "
-  blockNumberClosed: BigInt!
+  blockNumberClosed: BigInt
 
   " Timestamp when the position was closed (0 if still open) "
-  timestampClosed: BigInt!
+  timestampClosed: BigInt
 
   " Side of the position (either lender or borrower) "
   side: PositionSide!
@@ -998,7 +998,7 @@ type Position @entity {
   liquidations: [Liquidate!]!
 
   " Position daily snapshots for open positions "
-  dailySnapshots: [PositionDailySnapshot!]! @derivedFrom(field: "position")
+  dailySnapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
 
 # Note that we only take snapshot for open positions
@@ -1011,7 +1011,7 @@ type PositionSnapshot @entity {
 
   " Token balance in this position, in native amounts "
   balance: BigInt!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -1048,10 +1048,10 @@ interface Event {
   protocol: LendingProtocol!
 
   " Address that received the tokens "
-  to: String!
+  to: Account!
 
   " Address that sent the tokens "
-  from: String!
+  from: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1077,10 +1077,10 @@ type Deposit implements Event @entity {
   protocol: LendingProtocol!
 
   " Market that tokens are deposited into "
-  to: String!
+  to: Account!
 
   " Address that deposited tokens "
-  from: String!
+  from: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1120,10 +1120,10 @@ type Withdraw implements Event @entity {
   protocol: LendingProtocol!
 
   " Address that received tokens "
-  to: String!
+  to: Account!
 
   " Market that tokens are withdrawn from "
-  from: String!
+  from: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1168,10 +1168,10 @@ type Borrow implements Event @entity {
   protocol: LendingProtocol!
 
   " Address that received tokens "
-  to: String!
+  to: Account!
 
   " Market that tokens are borrowed from "
-  from: String!
+  from: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1212,10 +1212,10 @@ type Repay implements Event @entity {
   protocol: LendingProtocol!
 
   " Market that tokens are repaid to "
-  to: String!
+  to: Account!
 
   " Address that sent tokens "
-  from: String!
+  from: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1258,10 +1258,10 @@ type Liquidate implements Event @entity {
   to: String!
 
   " Address that carried out the liquidation "
-  from: String!
+  from: Account!
 
   " Address that got liquidated "
-  liquidatee: String!
+  liquidatee: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1285,13 +1285,6 @@ type Liquidate implements Event @entity {
 
   " Amount of profit from liquidation in USD "
   profitUSD: BigDecimal!
-}
-
-# An account is a unique Ethereum address
-# Helps to accumulate total unique users
-type Account @entity {
-  " Address of the account "
-  id: ID!
 }
 
 # Helper entity for calculating daily/hourly active users

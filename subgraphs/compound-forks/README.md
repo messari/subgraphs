@@ -1,55 +1,51 @@
 # Compound Fork Subgraph
 
-## Deployments
-
-### Moonwell
-
-https://thegraph.com/hosted-service/subgraph/0xbe1/moonwell-subgraph
-
-### Bastion Protocol
-
-https://thegraph.com/hosted-service/subgraph/0xbe1/bastionprotocol-subgraph
-
-### Benqi
-
-https://thegraph.com/hosted-service/subgraph/0xbe1/benqi-subgraph
-
 ## Quickstart
 
-Use moonwell as an example.
+### Setup
 
+Setting up a new subgraph will require mimicing what is done currently. 
+
+ - Under `./protocols` will be the fork in a new folder
+ - Any protocol-specific mappings will live in `./protocols/$(protocol)/src`
+ - Setup a config folder in `./protocols/$(protocol)/config` for the supported networks and the manifest template
+ - Lastly you need to add your configuration to [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json)
+ - You can also reference the deployment [README](../../deployment/README.md) for help
+
+### Deployment
+
+Once everything is setup properly deploying is very easy.
+
+```bash
+# This example will deploy rari-fuse on all networks to the hosted service under "dmelotik" in deploymentConfigurations.json
+npm run deploy --SUBGRAPH=compound-forks --PROTOCOL=rari-fuse --LOCATION=dmelotik
+
+# This will do the same, but only deploying the mainnet subgraph
+npm run deploy --SUBGRAPH=compound-forks --PROTOCOL=rari-fuse --NETWORK=mainnet --LOCATION=dmelotik
 ```
-yarn
 
-# generate code under root
-# codegen needs subgraph.yaml, here borrow one from bastion-protocol/
-# why bastion-protocol? because it doesn't override any abi, hence an ideal candidate
-graph codegen bastion-protocol/subgraph.yaml -o ./generated
+> Setting `deploy-on-merge` to `true` in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) will run the above commands on subgraphs that have changed to messari's hosted service.
 
-# generate code under moonwell
-subgraph=moonwell make codegen
+### Development Commands
 
-# build moonwell
-subgraph=moonwell make build
+During development you probably won't want to fully deploy the subgraph every time. Follow this guide to do each step incrementally.
 
-# deploy moonwell
-make deploy subgraph-name=0xbe1/moonwell-subgraph subgraph=moonwell
+To setup the subgraph manifest from the template:
+
+```bash
+# Use rari fuse as an example
+npm run prepare:yaml --PROTOCOL=rari-fuse --NETWORK=mainnet --TEMPLATE=rari-fuse.template.yaml
 ```
 
-## Local Deployment
-
-Use moonwell as an example. Visit the [docs](../../docs/Mapping.md#running-locally) for local graph-node setup. We are assuming `graph-node` is running on port `8020`.
-
+To codegen and build:
+```bash
+graph codegen
+graph build
 ```
-# when you are able to build your subgraph
-make create-local subgraph-name=0xbe1/moonwell-subgraph
 
-# now we can deploy locally (assuming graph-node is running)
-make deploy-local subgraph-name=0xbe1/moonwell-subgraph subgraph=moonwell
+> If you are working on multiple subgraphs you may want to delete `./generated/**` before `codegen` so no old files are left behind.
 
-# if you want to deploy a completely different subgraph
-make remove-local subgraph-name=0xbe1/moonwell-subgraph
-```
+To deploy follow the steps above. You may put your hosted service endpoint in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) just how messari's is set to take advantage of the commands.
 
 ## Project Layout
 
@@ -69,7 +65,7 @@ Shared logic among the forks.
 
 Useful queries to run against a Compound fork subgraph.
 
-### bastion-protocol/moonwell/etc
+### protocols
 
 Protocol-specific subgraph definition, abis and implementations.
 

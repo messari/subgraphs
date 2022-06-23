@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
@@ -19,7 +19,7 @@ dataSources:
         - name: DegenBox
           file: ./abis/DegenBox.json
         - name: ERC20
-          file: ./abis/erc20.json
+          file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
@@ -51,7 +51,7 @@ dataSources:
         - name: DegenBox
           file: ./abis/DegenBox.json
         - name: ERC20
-          file: ./abis/erc20.json
+          file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
@@ -81,7 +81,7 @@ dataSources:
         - LogDeploy
       abis:
         - name: ERC20
-          file: ./abis/erc20.json
+          file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
@@ -111,7 +111,7 @@ dataSources:
         - LogDeploy
       abis:
         - name: ERC20
-          file: ./abis/erc20.json
+          file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
@@ -143,9 +143,9 @@ templates:
         - name: Cauldron
           file: ./abis/Cauldron.json
         - name: DegenBox
-          file: ./abis/degenbox.json
+          file: ./abis/DegenBox.json
         - name: ERC20
-          file: ./abis/erc20.json
+          file: ./abis/ERC20.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
       eventHandlers:
