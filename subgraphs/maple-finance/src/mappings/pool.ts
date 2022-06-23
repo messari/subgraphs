@@ -257,14 +257,9 @@ export function handleClaim(event: ClaimEvent): void {
     ////
     // Update financial snapshot
     ////
-    const supplySideRevenueUSD = getTokenAmountInUSD(
-        event,
-        inputToken,
-        market._cumulativeInterest.plus(market._cumulativePoolDelegateRevenue)
-    );
     const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
     financialsDailySnapshot.dailySupplySideRevenueUSD = financialsDailySnapshot.dailySupplySideRevenueUSD.plus(
-        supplySideRevenueUSD
+        amountUSD
     );
     financialsDailySnapshot.save();
 
