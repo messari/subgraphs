@@ -1,0 +1,10 @@
+{
+  "mainnet": {
+    "ENSGovernor": {
+      "address": "0x323A76393544d5ecca80cd6ef2A560C6a395b7E3"
+    },
+    "Contract": {
+      "address": "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72"
+    }
+  }
+}
