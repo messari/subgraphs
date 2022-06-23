@@ -931,7 +931,7 @@ type Account @entity {
 }
 
 type Position @entity {
-  " { Account address }-{ Market address }-{ Counter } "
+  " { Account address }-{ Market address }-{ Position Type }-{ Counter } "
   id: ID!
 
   " Account that owns this position "
