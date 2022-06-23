@@ -9,7 +9,7 @@ import { updateDepositHelper, updateTokenWhitelists, updateVolumeAndFees } from 
 import { NetworkConfigs } from "../../configurations/configure";
 import { getTrackedVolumeUSD } from "../price/price";
 
-function createPoolFees(poolAddress: string): string[] {
+export function createPoolFees(poolAddress: string): string[] {
   let poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
   let poolProtocolFee = new LiquidityPoolFee(poolAddress.concat("-protocol-fee"));
   let poolTradingFee = new LiquidityPoolFee(poolAddress.concat("-trading-fee"));
