@@ -94,7 +94,7 @@ Sum of Protocol-Side Revenue USD for all markets
 
 stake locker lossess + pool lossess for all markets (pools)
 
-#### Cumulative Supply Side Revenue USD
+#### Cumulative Supply Side Revenue USD
 
 `sum of Cumulative Supply Side Revenue USD for all markets`
 
