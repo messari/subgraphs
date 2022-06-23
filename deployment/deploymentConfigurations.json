@@ -267,6 +267,14 @@
         }
       }
     },
+    "tokemak": {
+      "tokemak": {
+        "mainnet": {
+          "template": "tokemak.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "uniswap-v3": {
       "uniswap-v3": {
         "mainnet": {
