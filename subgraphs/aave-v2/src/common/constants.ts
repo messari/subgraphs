@@ -104,7 +104,7 @@ export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString('10').pow(18);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
@@ -118,6 +118,7 @@ export const INT_FOUR = 4 as i32;
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -135,22 +136,22 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 /////////////////////////////
 
 // This is the LendingPoolAddressesProviderRegistry contract address
-export const PROTOCOL_ADDRESS = '0x52D306e36E3B6B02c153d0266ff0f85d18BCD413';
+export const PROTOCOL_ADDRESS = "0x52D306e36E3B6B02c153d0266ff0f85d18BCD413";
 
-export const USDC_TOKEN_ADDRESS = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
+export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 
-export const PRICE_ORACLE_ADDRESS = '0xa50ba011c48153de246e5192c8f9258a2ba79ca9';
+export const PRICE_ORACLE_ADDRESS = "0xa50ba011c48153de246e5192c8f9258a2ba79ca9";
 
-export const INCENTIVE_CONTROLLER_ADDRESS = '0xd784927Ff2f95ba542BfC824c8a8a98F3495f6b5';
+export const INCENTIVE_CONTROLLER_ADDRESS = "0xd784927Ff2f95ba542BfC824c8a8a98F3495f6b5";
 
 // For the Ethereum Mainnet, this is stkAAVE. Will need to set this in a config file depending on whether the network is Matic or Avax
-export const REWARD_TOKEN_ADDRESS = '0x4da27a545c0c5b758a6ba100e3a049001de870f5';
+export const REWARD_TOKEN_ADDRESS = "0x4da27a545c0c5b758a6ba100e3a049001de870f5";
 
-export const LENDING_POOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
+export const LENDING_POOL_ADDRESS = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9";
 
-export const SUBGRAPH_VERSION = '1.1.30';
-export const SCHEMA_VERSION = '1.1.0';
-export const PROTOCOL_NAME = 'Aave-v2';
-export const PROTOCOL_SLUG = 'aave-v2';
-export const LENDING_TYPE = 'POOLED';
-export const RISK_TYPE = 'ISOLATED';
+export const SUBGRAPH_VERSION = "1.1.31";
+export const SCHEMA_VERSION = "1.1.0";
+export const PROTOCOL_NAME = "Aave-v2";
+export const PROTOCOL_SLUG = "aave-v2";
+export const LENDING_TYPE = "POOLED";
+export const RISK_TYPE = "ISOLATED";
