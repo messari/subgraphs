@@ -52,6 +52,14 @@
         }
       }
     },
+    "beefy-finance": {
+      "beefy-finance": {
+        "aurora": {
+          "template": "beefy.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "belt-finance": {
       "belt-finance": {
         "bsc": {
