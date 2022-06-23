@@ -42,7 +42,7 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
 
   let votesDifference = newBalance.minus(previousBalance);
 
-  let delegate = new Delegate(delegateAddress.toHexString());
+  let delegate = getDelegate(delegateAddress.toHexString());
   delegate.delegatedVotesRaw = newBalance;
   delegate.delegatedVotes = toDecimal(newBalance);
   delegate.save();

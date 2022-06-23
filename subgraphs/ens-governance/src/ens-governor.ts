@@ -1,4 +1,4 @@
-import { Bytes, log } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts";
 import {
   ProposalCanceled,
   ProposalCreated,
@@ -8,22 +8,12 @@ import {
   TimelockChange,
   VoteCast,
 } from "../generated/ENSGovernor/ENSGovernor";
-import {
-  DelegateChanged,
-  DelegateVotesChanged,
-  Transfer,
-} from "../generated/ENSToken/ENSToken";
-import { Delegate, Governance, Vote } from "../generated/schema";
+import { Vote } from "../generated/schema";
 import {
   BIGINT_ONE,
   getGovernance,
   getDelegate,
   getProposal,
-  GOVERNANCE_NAME,
-  getTokenHolder,
-  toDecimal,
-  BIGINT_ZERO,
-  ZERO_ADDRESS,
   PROPOSAL_STATE_ACTIVE,
   PROPOSAL_STATE_CANCELED,
   PROPOSAL_STATE_EXECUTED,
@@ -204,7 +194,7 @@ export function handleVoteCast(event: VoteCast): void {
   proposal.save();
 
   // Add 1 to participant's proposal voting count
-  let voter = new Delegate(voterAddress);
+  let voter = getDelegate(voterAddress);
   voter.numberVotes = voter.numberVotes + 1;
   voter.save();
 }
