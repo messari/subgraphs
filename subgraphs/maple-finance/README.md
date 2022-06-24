@@ -8,59 +8,65 @@ Note that all cumulatives USD values are origination values (i.e values at the t
 
 In depth methodologies for every parameter in the protocol can be found here: [Schema Map](https://fluffy-cobalt-78d.notion.site/Schema-Map-59607afc87ac4891a7dc8c407e18f48d)
 
-### Market methodologies
-
-#### Total Value Locked (TVL) USD
+### Total Value Locked (TVL) USD
 
 Total amount on the supply side that is earning interest
+
+Sum across all Markets:
 
 `Total Deposit Balance USD + Total Stake Balance USD + Total Unclaimed Supplier Interest USD`
 
 This does not include accrued staking rewards.
 
-#### Total Deposit Balance USD
+### Total Deposit Balance USD
+
+Sum across all Markets:
 
 `Cumulative Deposit USD - Cumulative Withdraw USD - Cumulative Pool Losses USD`
 
 Pool Losses occur when a default is suffered by the pool, it is absorbed by the deposit amount.
 
-#### Total Borrow Balance USD
+### Total Borrow Balance USD
+
+Sum across all Markets:
 
 `Cumulative Withdraw USD - Cumulative Principal Repay USD - Loan Defaults USD`
 
 Liquidated collateral is interpreted the same as paying principal since from the pool perspective there is no difference. Defaults to the Stake Locker and Pool are absorbed and removed from total borrow.
 
-#### Cumulative Liquidate USD
+### Cumulative Liquidate USD
+
+Sum across all Markets:
 
 `Cumulative Stake Locker Losses USD + Cumulative Pool Losses USD`
 
 Collateral liquidation is not counted towards cumulative liquidate, and is instead considered the same as a principal repayment since from the pool perspective there is no difference.
 
-#### Cumulative Supply Side Revenue USD
+### Cumulative Supply Side Revenue USD
+
+Sum across all Markets:
 
 `Cumulative Establishment Fees To Pool Delegate USD + Cumulative Interest To Market USD`
 
 Interest To Market USD is all interest going to the Suppliers and the Stake Locker, this doesn't include MPL token distribution.
 
-#### Cumulative Protocol Side Revenue USD
+### Cumulative Protocol Side Revenue USD
+
+Sum across all Markets:
 
 `Cumulative Establishment Fees To Maple Treasury USD`
 
 Establishment Fees To Maple Treasury USD is a percentage of the drawdown amount; lump sum for V1 and V2 loans and amortized over repayments for V3 loans.
 
-#### Cumulative Total Revenue USD
+### Cumulative Total Revenue USD
+
+Sum across all Markets:
 
 `Cumulative Supply Side Revenue USD + Cumulative Protocol Side Revenue USD`
 
----
+### Total Unique Users
 
-### Protocol methodologies
-
-Each field in Protocol is the sum across all Markets of the corresponding Market field.
-
-#### Total Unique Users
-
-The number of Unique Addresses that interacted with the protocol through transaction
+The number of Unique Addresses that interacted with the protocol through these transactions:
 
 `Deposit`
 
