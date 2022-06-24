@@ -21,6 +21,7 @@ import {
   PROPOSAL_STATE_QUEUED,
   getVoteChoiceByValue,
   addressesToHexStrings,
+  getGovernanceFramework,
 } from "./helpers";
 
 // Note: If a handler doesn't require existing field values, it is faster
@@ -153,13 +154,16 @@ export function handleProposalQueued(event: ProposalQueued): void {
 export function handleQuorumNumeratorUpdated(
   event: QuorumNumeratorUpdated
 ): void {
-  let governance = getGovernance();
-  governance.quorumNumerator = event.params.newQuorumNumerator;
-  governance.save();
+  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  governanceFramework.quorumNumerator = event.params.newQuorumNumerator;
+  governanceFramework.save();
 }
 
+// TimelockChange (address oldTimelock, address newTimelock)
 export function handleTimelockChange(event: TimelockChange): void {
-  // FIXME: Can read this directly from contract getter?
+  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  governanceFramework.timelockAddress = event.params.newTimelock.toHexString();
+  governanceFramework.save();
 }
 
 // VoteCast(account, proposalId, support, weight, reason);
@@ -182,8 +186,8 @@ export function handleVoteCast(event: VoteCast): void {
   if (proposal.state == PROPOSAL_STATE_PENDING) {
     proposal.state = PROPOSAL_STATE_ACTIVE;
   }
+
   // Increment respective vote choice counts
-  // FIXME: Necessary? The contract has a getter function for this - could we resolve these 3 fields via GovernorCountingSimple.proposalVotes(uint256 proposalId)?
   if (event.params.support === 0) {
     proposal.againstVotes = proposal.againstVotes.plus(BIGINT_ONE);
   } else if (event.params.support === 1) {
