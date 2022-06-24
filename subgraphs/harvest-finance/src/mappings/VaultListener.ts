@@ -1,4 +1,5 @@
-import { Deposit } from "../../generated/ControllerListener/VaultContract";
+import { DoHardWorkCall } from "../../generated/ControllerListener/ControllerContract";
+import { Deposit, StrategyAnnounced, StrategyChanged } from "../../generated/ControllerListener/VaultContract";
 import { accounts, vaults } from "../modules";
 
 export function handleDeposit(event: Deposit): void {
@@ -11,6 +12,6 @@ export function handleDeposit(event: Deposit): void {
 	vault.save()
 }
 
-export function handleStrategyAnnounced(): void { }
-export function handleStrategyChanged(): void { }
-export function handleDoHardWorkCall(): void { }
+export function handleStrategyAnnounced(event: StrategyAnnounced): void { }
+export function handleStrategyChanged(event: StrategyChanged): void { }
+export function handleDoHardWorkCall(call: DoHardWorkCall): void { }
