@@ -115,6 +115,7 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
         financialsSnapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
         financialsSnapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
         financialsSnapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+        financialsSnapshot._treasuryFee = protocol._treasuryFee;
 
         financialsSnapshot.dailySupplySideRevenueUSD = ZERO_BD;
         financialsSnapshot.dailyProtocolSideRevenueUSD = ZERO_BD;

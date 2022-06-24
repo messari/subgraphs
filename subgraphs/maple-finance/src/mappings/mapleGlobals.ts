@@ -20,7 +20,6 @@ export function handleGlobalsParamSet(event: GlobalsParamSetEvent): void {
 
         // Convert bips to percentage
         protocol._treasuryFee = event.params.value.toBigDecimal().div(BigDecimal.fromString("10000"));
-
         protocol.save();
     }
 }

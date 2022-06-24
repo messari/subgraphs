@@ -22,30 +22,31 @@ import { bigDecimalToBigInt } from "../common/utils";
 
 export function handleDrawdown(event: DrawdownEvent): void {
     const drawdownAmount = event.params.drawdownAmount;
+    const treasuryFeePaid = bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(getOrCreateProtocol()._treasuryFee));
     const loan = getOrCreateLoan(event, event.address);
 
     ////
     // Create borrow
     ////
-    createBorrow(event, loan, drawdownAmount);
-
-    ////
-    // Update loan
-    ////
-    loan.drawnDown = loan.drawnDown.plus(drawdownAmount);
-    loan.save();
+    createBorrow(event, loan, drawdownAmount, treasuryFeePaid);
 
     ////
     // Update market
     ////
     const protocol = getOrCreateProtocol();
     const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    const treasuryFee = bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee));
     const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
-    const protocolRevenueUSD = getTokenAmountInUSD(event, inputToken, treasuryFee);
-    market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(treasuryFee);
+    const protocolRevenueUSD = getTokenAmountInUSD(event, inputToken, treasuryFeePaid);
+    market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(treasuryFeePaid);
     market._cumulativeProtocolSideRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(protocolRevenueUSD);
     market.save();
+
+    ////
+    // Update loan
+    ////
+    loan.drawnDown = loan.drawnDown.plus(drawdownAmount);
+    loan.treasuryFeePaid = loan.treasuryFeePaid.plus(treasuryFeePaid);
+    loan.save();
 
     ////
     // Update protocol
@@ -58,7 +59,7 @@ export function handleDrawdown(event: DrawdownEvent): void {
     ////
     const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
     financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-        getTokenAmountInUSD(event, inputToken, treasuryFee)
+        getTokenAmountInUSD(event, inputToken, treasuryFeePaid)
     );
     financialsDailySnapshot.save();
 

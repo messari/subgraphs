@@ -135,9 +135,10 @@ export function createClaim(event: ethereum.Event, market: Market, amount: BigIn
  * Create borrow entity for borrowing from a loan
  * @param loan loan that is being borrowed from
  * @param amount amount being borrowed in pool input tokens
+ * @param treasuryFeePaid amount being sent to treasury for establishment fee
  * @returns borrow entity
  */
-export function createBorrow(event: ethereum.Event, loan: _Loan, amount: BigInt): Borrow {
+export function createBorrow(event: ethereum.Event, loan: _Loan, amount: BigInt, treasuryFeePaid: BigInt): Borrow {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const borrow = new Borrow(id);
 
@@ -158,6 +159,8 @@ export function createBorrow(event: ethereum.Event, loan: _Loan, amount: BigInt)
     borrow.to = accountAddress.toHexString(); // They were the ones that triggered the drawdown
     borrow.amount = amount;
     borrow.amountUSD = getTokenAmountInUSD(event, asset, borrow.amount);
+    borrow._treasuryFeePaid = treasuryFeePaid;
+    borrow._treasuryFeePaidUSD = getTokenAmountInUSD(event, asset, treasuryFeePaid);
 
     borrow.save();
 
@@ -202,6 +205,7 @@ export function createRepay(
     repay._principalPaid = principalPaid;
     repay._interestPaid = interestPaid;
     repay._treasuryFeePaid = treasuryFeePaid;
+    repay._treasuryFeePaidUSD = getTokenAmountInUSD(event, asset, treasuryFeePaid);
     repay.amount = principalPaid.plus(interestPaid).plus(treasuryFeePaid);
     repay.amountUSD = getTokenAmountInUSD(event, asset, repay.amount);
 

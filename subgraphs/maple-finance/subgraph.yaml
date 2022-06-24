@@ -31,6 +31,8 @@ dataSources:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
 
               # Price oracle
               - name: ChainLinkOracle
@@ -94,6 +96,8 @@ dataSources:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
               - name: LoanV2
@@ -168,6 +172,8 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
               - name: LoanV2
@@ -244,6 +250,8 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
               - name: LoanV2
@@ -330,6 +338,8 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
               - name: LoanV2
@@ -408,6 +418,8 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
               - name: LoanV2
@@ -488,6 +500,8 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
               - name: LoanV2
@@ -570,6 +584,8 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
               - name: LoanV2
@@ -649,6 +665,8 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
               - name: LoanV1
                 file: ./abis/LoanV1.json
               - name: LoanV2
@@ -705,5 +723,5 @@ templates:
               - function: updatePeriodFinish(uint256)
                 handler: handleUpdatePeriodFinish
 # graft:
-#     base: QmTqzDsjeeWXruNWgPGdeBku7i4D1hKvw9Q5DkTyLoUPcQ
-#     block: 12849585
+#     base: QmbHyZcV8BC2Sg3eEPpwwDV3BJXbmjxpKpdBmmGLgygAvA
+#     block: 13347805

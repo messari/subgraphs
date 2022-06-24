@@ -171,7 +171,8 @@ export function getOrCreateStakeLocker(event: ethereum.Event, stakeLockerAddress
         stakeLocker.cumulativeInterestInPoolInputTokens = ZERO_BI;
 
         stakeLocker.stakeTokenBalance = ZERO_BI;
-        stakeLocker.stakeTokenBalanceInPoolInputTokens = ZERO_BI;
+        stakeLocker.stakeTokenBalanceUSD = ZERO_BD;
+        stakeLocker.stakeTokenSwapOutBalanceInPoolInputTokens = ZERO_BI;
         stakeLocker.lastUpdatedBlockNumber = event.block.number;
 
         stakeLocker.save();
@@ -253,6 +254,7 @@ export function getOrCreateLoan(
         loan.principalPaid = ZERO_BI;
         loan.interestPaid = ZERO_BI;
         loan.defaultSuffered = ZERO_BI;
+        loan.treasuryFeePaid = ZERO_BI;
 
         const tryTermDays = loanV1Contract.try_termDays();
 
