@@ -19,13 +19,13 @@ dataSources:
         - Token
       abis:
         - name: Comptroller
-          file: ./abis/Comptroller.json
+          file: ./abis/dforce/Comptroller.json
         - name: CToken
-          file: ./abis/CToken.json
+          file: ./abis/dforce/CToken.json
         - name: ERC20
-          file: ../abis/ERC20.json
+          file: ./abis/ERC20.json
         - name: PriceOracle
-          file: ./abis/PriceOracle.json
+          file: ./abis/dforce/PriceOracle.json
       eventHandlers:
         - event: MarketAdded(address,uint256,uint256,uint256,uint256,uint256)
           handler: handleMarketAdded
@@ -45,7 +45,7 @@ dataSources:
           handler: handleTransferPaused
         - event: NewRewardDistributor(address,address)
           handler: handleNewRewardDistributor
-      file: ./src/mapping.ts
+      file: ./protocols/dforce/src/mapping.ts
 
   - kind: ethereum/contract
     name: USX
@@ -63,13 +63,13 @@ dataSources:
         - FinancialsDailySnapshot
       abis:
         - name: Comptroller
-          file: ./abis/Comptroller.json
+          file: ./abis/dforce/Comptroller.json
         - name: stablecoin
-          file: ./abis/stablecoin.json
+          file: ./abis/dforce/stablecoin.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleStablecoinTransfer
-      file: ./src/mapping.ts
+      file: ./protocols/dforce/src/mapping.ts
 
   - kind: ethereum/contract
     name: EUX
@@ -87,13 +87,13 @@ dataSources:
         - FinancialsDailySnapshot
       abis:
         - name: Comptroller
-          file: ./abis/Comptroller.json
+          file: ./abis/dforce/Comptroller.json
         - name: stablecoin
-          file: ./abis/stablecoin.json
+          file: ./abis/dforce/stablecoin.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleStablecoinTransfer
-      file: ./src/mapping.ts
+      file: ./protocols/dforce/src/mapping.ts
 
 templates:
   - name: CToken
@@ -113,11 +113,11 @@ templates:
         - Liquidate
       abis:
         - name: CToken
-          file: ./abis/CToken.json
+          file: ./abis/dforce/CToken.json
         - name: Comptroller
-          file: ./abis/Comptroller.json
+          file: ./abis/dforce/Comptroller.json
         - name: PriceOracle
-          file: ./abis/PriceOracle.json
+          file: ./abis/dforce/PriceOracle.json
       eventHandlers:
         - event: Mint(address,address,uint256,uint256)
           handler: handleMint
@@ -135,7 +135,7 @@ templates:
           handler: handleUpdateInterest
         - event: NewReserveRatio(uint256,uint256)
           handler: handleNewReserveFactor
-      file: ./src/mapping.ts
+      file: ./protocols/dforce/src/mapping.ts
 
   - kind: ethereum/contract
     name: Reward
@@ -152,16 +152,16 @@ templates:
         - MarketHourlySnapshot
       abis:
         - name: Comptroller
-          file: ./abis/Comptroller.json
+          file: ./abis/dforce/Comptroller.json
         - name: ERC20
-          file: ../abis/ERC20.json
+          file: ./abis/ERC20.json
         - name: PriceOracle
-          file: ./abis/PriceOracle.json
+          file: ./abis/dforce/PriceOracle.json
         - name: RewardDistributor
-          file: ./abis/RewardDistributor.json
+          file: ./abis/dforce/RewardDistributor.json
       eventHandlers:
         - event: RewardDistributed(address,address,uint256,uint256)
           handler: handleRewardDistributed
         - event: NewRewardToken(address,address)
           handler: handleNewRewardToken
-      file: ./src/mapping.ts
+      file: ./protocols/dforce/src/mapping.ts

@@ -314,12 +314,14 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let cTokenCollateral = event.params.iTokenCollateral;
   let liquidator = event.params.liquidator;
+  let borrower = event.params.borrower;
   let seizeTokens = event.params.seizeTokens;
   let repayAmount = event.params.repayAmount;
   _handleLiquidateBorrow(
     comptrollerAddr,
     cTokenCollateral,
     liquidator,
+    borrower,
     seizeTokens,
     repayAmount,
     event
