@@ -15,33 +15,37 @@ export const BIGINT_FIVE = BigInt.fromI32(5);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 
 export const GOVERNANCE_NAME = "OZGovernor";
-export const PROPOSAL_STATE_PENDING = "PENDING";
-export const PROPOSAL_STATE_ACTIVE = "ACTIVE";
-export const PROPOSAL_STATE_CANCELED = "CANCELED";
-export const PROPOSAL_STATE_DEFEATED = "DEFEATED";
-export const PROPOSAL_STATE_SUCCEEDED = "SUCCEEDED";
-export const PROPOSAL_STATE_QUEUED = "QUEUED";
-export const PROPOSAL_STATE_EXPIRED = "EXPIRED";
-export const PROPOSAL_STATE_EXECUTED = "EXECUTED";
+export namespace ProposalState {
+  export const PENDING = "PENDING";
+  export const ACTIVE = "ACTIVE";
+  export const CANCELED = "CANCELED";
+  export const DEFEATED = "DEFEATED";
+  export const SUCCEEDED = "SUCCEEDED";
+  export const QUEUED = "QUEUED";
+  export const EXPIRED = "EXPIRED";
+  export const EXECUTED = "EXECUTED";
+}
 
-export const VOTE_CHOICE_AGAINST_VALUE = 0;
-export const VOTE_CHOICE_FOR_VALUE = 1;
-export const VOTE_CHOICE_ABSTAIN_VALUE = 2;
-export const VOTE_CHOICE_AGAINST = "AGAINST";
-export const VOTE_CHOICE_FOR = "FOR";
-export const VOTE_CHOICE_ABSTAIN = "ABSTAIN";
+export namespace VoteChoice {
+  export const AGAINST_VALUE = 0;
+  export const FOR_VALUE = 1;
+  export const ABSTAIN_VALUE = 2;
+  export const AGAINST = "AGAINST";
+  export const FOR = "FOR";
+  export const ABSTAIN = "ABSTAIN";
+}
 
 export function getVoteChoiceByValue(choiceValue: number): string {
-  if (choiceValue === 0) {
-    return VOTE_CHOICE_AGAINST;
-  } else if (choiceValue === 1) {
-    return VOTE_CHOICE_FOR;
-  } else if (choiceValue === 2) {
-    return VOTE_CHOICE_ABSTAIN;
+  if (choiceValue === VoteChoice.ABSTAIN_VALUE) {
+    return VoteChoice.AGAINST;
+  } else if (choiceValue === VoteChoice.FOR_VALUE) {
+    return VoteChoice.FOR;
+  } else if (choiceValue === VoteChoice.ABSTAIN_VALUE) {
+    return VoteChoice.ABSTAIN;
   } else {
     // Case that shouldn't happen
     log.error("Voting choice of {} does not exist", [choiceValue.toString()]);
-    return VOTE_CHOICE_ABSTAIN;
+    return VoteChoice.ABSTAIN;
   }
 }
 

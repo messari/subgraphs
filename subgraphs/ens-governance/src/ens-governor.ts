@@ -14,14 +14,10 @@ import {
   getGovernance,
   getDelegate,
   getProposal,
-  PROPOSAL_STATE_ACTIVE,
-  PROPOSAL_STATE_CANCELED,
-  PROPOSAL_STATE_EXECUTED,
-  PROPOSAL_STATE_PENDING,
-  PROPOSAL_STATE_QUEUED,
   getVoteChoiceByValue,
   addressesToHexStrings,
   getGovernanceFramework,
+  ProposalState,
 } from "./helpers";
 
 // Note: If a handler doesn't require existing field values, it is faster
@@ -69,7 +65,7 @@ import {
 // ProposalCanceled(proposalId)
 export function handleProposalCanceled(event: ProposalCanceled): void {
   let proposal = getProposal(event.params.proposalId.toString());
-  proposal.state = PROPOSAL_STATE_CANCELED;
+  proposal.state = ProposalState.CANCELED;
   proposal.cancellationBlock = event.block.number;
   proposal.cancellationTime = event.block.timestamp;
   proposal.save();
@@ -109,8 +105,8 @@ export function handleProposalCreated(event: ProposalCreated): void {
   proposal.description = event.params.description;
   proposal.state =
     event.block.number >= proposal.startBlock
-      ? PROPOSAL_STATE_ACTIVE
-      : PROPOSAL_STATE_PENDING;
+      ? ProposalState.ACTIVE
+      : ProposalState.PENDING;
   proposal.save();
 
   // Increment gov proposal count
@@ -123,7 +119,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
 export function handleProposalExecuted(event: ProposalExecuted): void {
   // Update proposal status + execution metadata
   let proposal = getProposal(event.params.proposalId.toString());
-  proposal.state = PROPOSAL_STATE_EXECUTED;
+  proposal.state = ProposalState.EXECUTED;
   proposal.executionETA = null;
   proposal.executionBlock = event.block.number;
   proposal.executionTime = event.block.timestamp;
@@ -140,7 +136,7 @@ export function handleProposalExecuted(event: ProposalExecuted): void {
 export function handleProposalQueued(event: ProposalQueued): void {
   // Update proposal status + execution metadata
   let proposal = getProposal(event.params.proposalId.toString());
-  proposal.state = PROPOSAL_STATE_QUEUED;
+  proposal.state = ProposalState.QUEUED;
   proposal.executionETA = event.params.eta;
   proposal.save();
 
@@ -183,8 +179,8 @@ export function handleVoteCast(event: VoteCast): void {
   vote.save();
 
   let proposal = getProposal(proposalId);
-  if (proposal.state == PROPOSAL_STATE_PENDING) {
-    proposal.state = PROPOSAL_STATE_ACTIVE;
+  if (proposal.state == ProposalState.PENDING) {
+    proposal.state = ProposalState.ACTIVE;
   }
 
   // Increment respective vote choice counts
