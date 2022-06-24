@@ -65,6 +65,14 @@ export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
   );
 }
 
+export function addressesToBytes(addresses: Address[]): Array<Bytes> {
+  const byteAddresses = new Array<Bytes>();
+  for (let i = 0; i < addresses.length; i++) {
+    byteAddresses.push(addresses[i] as Bytes);
+  }
+  return byteAddresses;
+}
+
 export function getGovernance(): Governance {
   let governance = Governance.load(GOVERNANCE_NAME);
 

@@ -17,6 +17,7 @@ import {
   getVoteChoiceByValue,
   getGovernanceFramework,
   ProposalState,
+  addressesToBytes,
 } from "./helpers";
 
 // ProposalCanceled(proposalId)
@@ -51,7 +52,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
   }
 
   proposal.proposer = proposer.id;
-  proposal.targets = event.params.targets as Bytes[];
+  proposal.targets = addressesToBytes(event.params.targets);
   proposal.values = event.params.values;
   proposal.signatures = event.params.signatures;
   proposal.calldatas = event.params.calldatas;
