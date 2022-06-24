@@ -170,7 +170,7 @@ export const POOL_WAD_DECIMALS: i32 = 18;
 
 export const PROTOCOL_NAME = "Maple v1";
 export const PROTOCOL_SLUG = "maple-v1";
-export const PROTOCOL_INITIAL_TREASURY_FEE = BigDecimal.fromString("0.5");
+export const PROTOCOL_INITIAL_TREASURY_FEE = BigDecimal.fromString("0.005");
 export const PROTOCOL_NETWORK = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.LENDING;
 export const PROTOCOL_LENDING_TYPE = LendingType.POOLED;
