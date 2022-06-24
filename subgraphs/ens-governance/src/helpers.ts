@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  Bytes,
+  log,
+} from "@graphprotocol/graph-ts";
 import { ENSGovernor } from "../generated/ENSGovernor/ENSGovernor";
 import {
   Delegate,
@@ -8,7 +14,9 @@ import {
   TokenHolder,
 } from "../generated/schema";
 
-export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+export const ZERO_ADDRESS = Address.fromString(
+  "0x0000000000000000000000000000000000000000"
+);
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_FIVE = BigInt.fromI32(5);
@@ -57,47 +65,10 @@ export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
   );
 }
 
-export function addressesToHexStrings(addresses: Address[]): string[] {
-  const hexStringAddress: string[] = [];
-  for (let i = 0; i < addresses.length; i++) {
-    hexStringAddress.push(addresses[i].toHexString());
-  }
-  return hexStringAddress;
-}
-
-export function getGovernanceFramework(
-  contractAddress: string
-): GovernanceFramework {
-  let governanceFramework = GovernanceFramework.load(contractAddress);
-
-  if (governanceFramework == null) {
-    governanceFramework = new GovernanceFramework(contractAddress);
-    let contract = ENSGovernor.bind(Address.fromString(contractAddress));
-
-    governanceFramework.name = contract.name();
-    governanceFramework.type = "OZGovernor";
-    governanceFramework.version = contract.version();
-
-    governanceFramework.contractAddress = contractAddress;
-    governanceFramework.tokenAddress = contract.timelock().toHexString();
-    governanceFramework.timelockAddress = contract.token().toHexString();
-
-    governanceFramework.votingDelay = contract.votingDelay();
-    governanceFramework.votingPeriod = contract.votingPeriod();
-    governanceFramework.proposalThreshold = contract.proposalThreshold();
-    governanceFramework.quorumNumerator = contract.quorumNumerator();
-    governanceFramework.quorumDenominator = contract.quorumDenominator();
-
-    governanceFramework.save();
-  }
-
-  return governanceFramework;
-}
-
 export function getGovernance(): Governance {
   let governance = Governance.load(GOVERNANCE_NAME);
 
-  if (governance == null) {
+  if (!governance) {
     governance = new Governance(GOVERNANCE_NAME);
     governance.proposals = BIGINT_ZERO;
     governance.currentTokenHolders = BIGINT_ZERO;
@@ -116,6 +87,35 @@ export function getGovernance(): Governance {
   return governance;
 }
 
+export function getGovernanceFramework(
+  contractAddress: Bytes
+): GovernanceFramework {
+  let governanceFramework = GovernanceFramework.load(contractAddress);
+
+  if (!governanceFramework) {
+    governanceFramework = new GovernanceFramework(contractAddress);
+    let contract = ENSGovernor.bind(Address.fromBytes(contractAddress));
+
+    governanceFramework.name = contract.name();
+    governanceFramework.type = "OZGovernor";
+    governanceFramework.version = contract.version();
+
+    governanceFramework.contractAddress = contractAddress;
+    governanceFramework.tokenAddress = contract.timelock();
+    governanceFramework.timelockAddress = contract.token();
+
+    governanceFramework.votingDelay = contract.votingDelay();
+    governanceFramework.votingPeriod = contract.votingPeriod();
+    governanceFramework.proposalThreshold = contract.proposalThreshold();
+    governanceFramework.quorumNumerator = contract.quorumNumerator();
+    governanceFramework.quorumDenominator = contract.quorumDenominator();
+
+    governanceFramework.save();
+  }
+
+  return governanceFramework;
+}
+
 export function getProposal(id: string): Proposal {
   let proposal = Proposal.load(id);
 
@@ -127,7 +127,7 @@ export function getProposal(id: string): Proposal {
   return proposal;
 }
 
-export function getDelegate(address: string): Delegate {
+export function getDelegate(address: Bytes): Delegate {
   let delegate = Delegate.load(address);
 
   if (delegate == null) {
@@ -149,7 +149,7 @@ export function getDelegate(address: string): Delegate {
   return delegate;
 }
 
-export function getTokenHolder(address: string): TokenHolder {
+export function getTokenHolder(address: Bytes): TokenHolder {
   let tokenHolder = TokenHolder.load(address);
 
   if (tokenHolder == null) {

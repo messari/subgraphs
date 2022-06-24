@@ -4,7 +4,6 @@ import {
   DelegateVotesChanged,
   Transfer,
 } from "../generated/ENSToken/ENSToken";
-import { Delegate } from "../generated/schema";
 import {
   getTokenHolder,
   getDelegate,
@@ -17,9 +16,9 @@ import {
 
 // DelegateChanged(indexed address,indexed address,indexed address)
 export function handleDelegateChanged(event: DelegateChanged): void {
-  let tokenHolder = getTokenHolder(event.params.delegator.toHexString());
-  let previousDelegate = getDelegate(event.params.fromDelegate.toHexString());
-  let newDelegate = getDelegate(event.params.toDelegate.toHexString());
+  let tokenHolder = getTokenHolder(event.params.delegator);
+  let previousDelegate = getDelegate(event.params.fromDelegate);
+  let newDelegate = getDelegate(event.params.toDelegate);
 
   tokenHolder.delegate = newDelegate.id;
   tokenHolder.save();
@@ -42,7 +41,7 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
 
   let votesDifference = newBalance.minus(previousBalance);
 
-  let delegate = getDelegate(delegateAddress.toHexString());
+  let delegate = getDelegate(delegateAddress);
   delegate.delegatedVotesRaw = newBalance;
   delegate.delegatedVotes = toDecimal(newBalance);
   delegate.save();
@@ -68,20 +67,20 @@ export function handleTransfer(event: Transfer): void {
   const to = event.params.to;
   const value = event.params.value;
 
-  let fromHolder = getTokenHolder(from.toHexString());
-  let toHolder = getTokenHolder(to.toHexString());
+  let fromHolder = getTokenHolder(from);
+  let toHolder = getTokenHolder(to);
   let governance = getGovernance();
 
   // Deduct from from holder balance + decrement gov token holders
   // if holder now owns 0 or increment gov token holders if new holder
-  if (from.toHexString() != ZERO_ADDRESS) {
+  if (from != ZERO_ADDRESS) {
     let fromHolderPreviousBalance = fromHolder.tokenBalanceRaw;
     fromHolder.tokenBalanceRaw = fromHolder.tokenBalanceRaw.minus(value);
     fromHolder.tokenBalance = toDecimal(fromHolder.tokenBalanceRaw);
 
     if (fromHolder.tokenBalanceRaw < BIGINT_ZERO) {
       log.error("Negative balance on holder {} with balance {}", [
-        fromHolder.id,
+        fromHolder.id.toHexString(),
         fromHolder.tokenBalanceRaw.toString(),
       ]);
     }

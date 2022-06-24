@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts";
+import { Bytes, log } from "@graphprotocol/graph-ts";
 import {
   ProposalCanceled,
   ProposalCreated,
@@ -15,52 +15,9 @@ import {
   getDelegate,
   getProposal,
   getVoteChoiceByValue,
-  addressesToHexStrings,
   getGovernanceFramework,
   ProposalState,
 } from "./helpers";
-
-// Note: If a handler doesn't require existing field values, it is faster
-// _not_ to load the entity from the store. Instead, create it fresh with
-// `new Entity(...)`, set the fields that should be updated and save the
-// entity back to the store. Fields that were not set or unset remain
-// unchanged, allowing for partial updates to be applied.
-
-// It is also possible to access smart contracts from mappings. For
-// example, the contract that has emitted the event can be connected to
-// with:
-//
-// let contract = Contract.bind(event.address)
-//
-// The following functions can then be called on this contract to access
-// state variables and other data:
-//
-// - contract.BALLOT_TYPEHASH(...)
-// - contract.COUNTING_MODE(...)
-// - contract.castVote(...)
-// - contract.castVoteBySig(...)
-// - contract.castVoteWithReason(...)
-// - contract.getVotes(...)
-// - contract.hasVoted(...)
-// - contract.hashProposal(...)
-// - contract.name(...)
-// - contract.proposalDeadline(...)
-// - contract.proposalEta(...)
-// - contract.proposalSnapshot(...)
-// - contract.proposalThreshold(...)
-// - contract.proposalVotes(...)
-// - contract.propose(...)
-// - contract.queue(...)
-// - contract.quorum(...)
-// - contract.quorumDenominator(...)
-// - contract.quorumNumerator(...)
-// - contract.state(...)
-// - contract.supportsInterface(...)
-// - contract.timelock(...)
-// - contract.token(...)
-// - contract.version(...)
-// - contract.votingDelay(...)
-// - contract.votingPeriod(...)
 
 // ProposalCanceled(proposalId)
 export function handleProposalCanceled(event: ProposalCanceled): void {
@@ -79,7 +36,7 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
   let proposal = getProposal(event.params.proposalId.toString());
-  let proposer = getDelegate(event.params.proposer.toHexString());
+  let proposer = getDelegate(event.params.proposer);
 
   // Checking if the proposer was a delegate already accounted for, if not we should log an error
   // since it shouldn't be possible for a delegate to propose anything without first being "created"
@@ -94,7 +51,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
   }
 
   proposal.proposer = proposer.id;
-  proposal.targets = addressesToHexStrings(event.params.targets);
+  proposal.targets = event.params.targets as Bytes[];
   proposal.values = event.params.values;
   proposal.signatures = event.params.signatures;
   proposal.calldatas = event.params.calldatas;
@@ -150,24 +107,27 @@ export function handleProposalQueued(event: ProposalQueued): void {
 export function handleQuorumNumeratorUpdated(
   event: QuorumNumeratorUpdated
 ): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  let governanceFramework = getGovernanceFramework(event.address);
   governanceFramework.quorumNumerator = event.params.newQuorumNumerator;
   governanceFramework.save();
 }
 
 // TimelockChange (address oldTimelock, address newTimelock)
 export function handleTimelockChange(event: TimelockChange): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
-  governanceFramework.timelockAddress = event.params.newTimelock.toHexString();
+  let governanceFramework = getGovernanceFramework(event.address);
+  governanceFramework.timelockAddress = event.params.newTimelock;
   governanceFramework.save();
 }
 
 // VoteCast(account, proposalId, support, weight, reason);
 export function handleVoteCast(event: VoteCast): void {
   const proposalId = event.params.proposalId.toString();
-  const voterAddress = event.params.voter.toHexString();
+  const voterAddress = event.params.voter;
 
-  let voteId = voterAddress.concat("-").concat(proposalId);
+  let voteId = voterAddress
+    .toHexString()
+    .concat("-")
+    .concat(proposalId);
   let vote = new Vote(voteId);
   vote.proposal = proposalId;
   vote.voter = voterAddress;
