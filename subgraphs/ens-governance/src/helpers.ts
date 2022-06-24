@@ -71,7 +71,7 @@ export function getGovernanceFramework(
     let contract = ENSGovernor.bind(Address.fromString(contractAddress));
 
     governanceFramework.name = contract.name();
-    governanceFramework.type = "OZ_GOVERNOR";
+    governanceFramework.type = "OZGovernor";
     governanceFramework.version = contract.version();
 
     governanceFramework.contractAddress = contractAddress;
