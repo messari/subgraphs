@@ -2,9 +2,9 @@
 
 ## Calculation Methodology v1.0.0
 
-Below, the methodologies for key fields in the protocol are surfaced for convience.
+Below, the methodologies for key fields in the protocol are surfaced for convenience.
 
-Note that all cumulatives USD values are origination values (i.e values at the time the accumulation occured), they are not current values. This means that the cumulative values are monotonically increacing over time. If current values are desired for the cumulatives, they can be derived from the cumulative token values.
+Note that all cumulatives USD values are origination values (i.e values at the time the accumulation occurred), they are not current values. This means that the cumulative values are monotonically increasing over time. If current values are desired for the cumulatives, they can be derived from the cumulative token values.
 
 In depth methodologies for every parameter in the protocol can be found here: [Schema Map](https://fluffy-cobalt-78d.notion.site/Schema-Map-59607afc87ac4891a7dc8c407e18f48d)
 
@@ -28,13 +28,13 @@ Pool Losses occur when a default is suffered by the pool, it is absorbed by the 
 
 `Cumulative Withdraw USD - Cumulative Principal Repay USD - Loan Defaults USD`
 
-Liquidated collatoral is interpreted the same as paying principal since from the pool perspective there is no difference. Defaults to the Stake Locker and Pool are absorbed and removed from total borrow.
+Liquidated collateral is interpreted the same as paying principal since from the pool perspective there is no difference. Defaults to the Stake Locker and Pool are absorbed and removed from total borrow.
 
 #### Cumulative Liquidate USD
 
 `Cumulative Stake Locker Losses USD + Cumulative Pool Losses USD`
 
-Collatoral liquidation is not counted towards cumulative liquidate, and is instead considered the same as a principal repayment since from the pool perspective there is no difference.
+Collateral liquidation is not counted towards cumulative liquidate, and is instead considered the same as a principal repayment since from the pool perspective there is no difference.
 
 #### Cumulative Supply Side Revenue USD
 
@@ -60,7 +60,7 @@ Each field in Protocol is the sum across all Markets of the corresponding Market
 
 #### Total Unique Users
 
-The number of Unique Adresses that interacted with the protocol through transaction
+The number of Unique Addresses that interacted with the protocol through transaction
 
 `Deposit`
 
