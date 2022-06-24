@@ -123,7 +123,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
         market._cumulativePoolDelegateRevenue = ZERO_BI;
         market._cumulativeTreasuryRevenue = ZERO_BI;
         market._totalDepositBalance = ZERO_BI;
-        market._totalInterstBalance = ZERO_BI;
+        market._totalInterestBalance = ZERO_BI;
         market._totalBorrowBalance = ZERO_BI;
         market._cumulativeLiquidate = ZERO_BI;
         market._cumulativeSupplySideRevenueUSD = ZERO_BD;
