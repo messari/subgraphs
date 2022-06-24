@@ -654,7 +654,7 @@ type Market @entity {
     _totalDepositBalance: BigInt!
 
     " Total amount of interest held by market in market input tokens "
-    _totalInterstBalance: BigInt!
+    _totalInterestBalance: BigInt!
 
     " Total amount of being borrowed in market input tokens"
     _totalBorrowBalance: BigInt!

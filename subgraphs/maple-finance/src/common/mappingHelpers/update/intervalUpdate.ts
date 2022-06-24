@@ -67,9 +67,9 @@ function intervalUpdateMarket(event: ethereum.Event, market: Market): Market {
             .minus(market._cumulativeWithdraw)
             .minus(market._cumulativePoolLosses);
 
-        market._totalInterstBalance = market._cumulativeInterest.minus(market._cumulativeInterestClaimed);
+        market._totalInterestBalance = market._cumulativeInterest.minus(market._cumulativeInterestClaimed);
 
-        market.inputTokenBalance = market._totalDepositBalance.plus(market._totalInterstBalance);
+        market.inputTokenBalance = market._totalDepositBalance.plus(market._totalInterestBalance);
 
         market.outputTokenSupply = bigDecimalToBigInt(
             market._totalDepositBalance.toBigDecimal().div(market._initialExchangeRate)
