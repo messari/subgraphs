@@ -1,14 +1,14 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
-  # Vault Engine
+  # Vault
   - name: Vat
     kind: ethereum/contract
     network: mainnet
     source:
       abi: Vat
-      address: '0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b'
+      address: "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b"
       startBlock: 8928152
     mapping:
       kind: ethereum/events
@@ -18,406 +18,317 @@ dataSources:
       abis:
         - name: Vat
           file: ./abis/Vat.json
-        - name: ERC20
-          file: ./abis/erc20.json
-        - name: ERC20SymbolBytes
-          file: ./abis/ERC20SymbolBytes.json
-        - name: ERC20NameBytes
-          file: ./abis/ERC20NameBytes.json
-        - name: Deploy
-          file: ./abis/Deploy.json
         - name: GemJoin
           file: ./abis/GemJoin.json
-        - name: Jug
-          file: ./abis/Jug.json
-        - name: Spot
-          file: ./abis/Spot.json
-        - name: Cat
-          file: ./abis/Cat.json
-        - name: IlkRegistry
-          file: ./abis/IlkRegistry.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
-        - CollateralType
-        - SystemState
-        - UserProxy
-        - Vault
+        - Market
+        - Token
       eventHandlers:
-        ### Administration ### 0x65fae35e00000000000000000000000000000000000000000000000000000000
         # function rely(address usr)
+        # 0x65fae35e00000000000000000000000000000000000000000000000000000000
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0x65fae35e00000000000000000000000000000000000000000000000000000000'
-          handler: handleRely
-
+          topic0: "0x65fae35e00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatRely
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x6924500900000000000000000000000000000000000000000000000000000000"
+          handler: handleVatCage
         ### CDP Manipulation ###
         # function frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0x7608870300000000000000000000000000000000000000000000000000000000'
-          handler: handleFrob
-
-        ### CDP Confiscation ###
-        # function grab(bytes32 i, address u, address v, address w, int256 dink, int256 dart)
-        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0x7bab3f4000000000000000000000000000000000000000000000000000000000'
-          handler: handleGrab
-
-        ### Settlement ###
-        # function heal(uint256 rad)
-        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0xf37ac61c00000000000000000000000000000000000000000000000000000000'
-          handler: handleHeal
-        # function suck(address u, address v, uint256 rad)
-        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0xf24e23eb00000000000000000000000000000000000000000000000000000000'
-          handler: handleSuck
-        
-        ### Rates ###
+          topic0: "0x7608870300000000000000000000000000000000000000000000000000000000"
+          handler: handleVatFrob
+        ### Collect stability fee ###
         # function fold(bytes32 i, address u, int256 rate)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0xb65337df00000000000000000000000000000000000000000000000000000000'
-          handler: handleFold
-  # Accumulation of Stability Fees for collateral types
+          topic0: "0xb65337df00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatFold
+        ## bad debt settlement/issue
+        # function heal(uint256 rad)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0xf37ac61c00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatDebtSettlement
+        # function suck(address u, address v, uint256 rad)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0xf24e23eb00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatDebtSettlement
+
+  # Borrow rate
   - name: Jug
     kind: ethereum/contract
     network: mainnet
     source:
       abi: Jug
-      address: '0x19c0976f590d67707e62397c87829d896dc0f1f1'
+      address: "0x19c0976f590d67707e62397c87829d896dc0f1f1"
       startBlock: 8928160
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/rates/jug.ts
+      file: ./src/mapping.ts
       abis:
         - name: Jug
           file: ./abis/Jug.json
-        - name: Vat
-          file: ./abis/Vat.json
-        - name: Deploy
-          file: ./abis/Deploy.json
-        - name: IlkRegistry
-          file: ./abis/IlkRegistry.json
-        - name: ERC20
-          file: ./abis/erc20.json
       entities:
-        - CollateralType
-        - SystemState
+        - Market
       eventHandlers:
-        ### Administration ###
+        ### Change borrow interest rate ###
         # function file(bytes32 ilk, bytes32 what, uint256 data)
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0x1a0b287e00000000000000000000000000000000000000000000000000000000'
-          handler: handleFile
+          topic0: "0x1a0b287e00000000000000000000000000000000000000000000000000000000"
+          handler: handleJugFileDuty
+
+  # Dai Deposit rate
+  - name: Pot
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Pot
+      address: "0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7"
+      startBlock: 8928160
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mapping.ts
+      abis:
+        - name: Pot
+          file: ./abis/Pot.json
+      entities:
+        - Market
+      eventHandlers:
+        ### Set Vow contract address ###
+        # function file(bytes32 what, address data)
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0xd4e8be8300000000000000000000000000000000000000000000000000000000"
+          handler: handlePotFileVow
+        ### Change borrow interest rate ###
+        # function file(bytes32 what, uint256 data)
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x29ae811400000000000000000000000000000000000000000000000000000000"
+          handler: handlePotFileDsr
+        # function drip()
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x9f678cca00000000000000000000000000000000000000000000000000000000"
+          handler: handlePotDrip
+
   #  Liaison between the oracles and core contracts
   - name: Spot
     kind: ethereum/contract
     network: mainnet
     source:
       abi: Spot
-      address: '0x65c79fcb50ca1594b025960e539ed7a9a6d434a3'
+      address: "0x65c79fcb50ca1594b025960e539ed7a9a6d434a3"
       startBlock: 8928152
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/core/spot.ts
+      file: ./src/mapping.ts
       abis:
         - name: Spot
           file: ./abis/Spot.json
-        - name: Vat
-          file: ./abis/Vat.json
-        - name: Deploy
-          file: ./abis/Deploy.json
-        - name: IlkRegistry
-          file: ./abis/IlkRegistry.json
-        - name: ERC20
-          file: ./abis/erc20.json
       entities:
-        - CollateralPrice
-        - CollateralType
-        - SystemState
+        - _Ilk
+        - LendingProtocol
       eventHandlers:
-        ### Administration ###
+        ### Setting mat & par (ltv ratio) ###
         # file(bytes32 ilk, bytes32 what, uint256 data)
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0x1a0b287e00000000000000000000000000000000000000000000000000000000'
-          handler: handleFile
-
-        ### Update value ###
+          topic0: "0x1a0b287e00000000000000000000000000000000000000000000000000000000"
+          handler: handleSpotFileMat
+        # file(bytes32 what, uint256 data)
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x29ae811400000000000000000000000000000000000000000000000000000000"
+          handler: handleSpotFilePar
+        ### Update price ###
         # event Poke(bytes32 ilk, bytes32 val, uint256 spot)
         - event: Poke(bytes32,bytes32,uint256)
-          handler: handlePoke
-  #  Liquidation Agent
-  - name: Cat
+          handler: handleSpotPoke
+
+  - name: CatV1
     kind: ethereum/contract
     network: mainnet
     source:
-      abi: Cat
-      address: '0x78f2c2af65126834c51822f56be0d7469d7a523e'
+      abi: CatV1
+      address: "0x78F2c2AF65126834c51822F56Be0d7469D7A523E"
       startBlock: 8928165
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/core/cat.ts
+      file: ./src/mapping.ts
       abis:
-        - name: Cat
-          file: ./abis/Cat.json
-        - name: Vat
-          file: ./abis/Vat.json
-        - name: Deploy
-          file: ./abis/Deploy.json
-        - name: IlkRegistry
-          file: ./abis/IlkRegistry.json
-        - name: ERC20
-          file: ./abis/erc20.json
+        - name: CatV1
+          file: ./abis/CatV1.json
       entities:
-        - CollateralType
-        - SystemState
+        - Market
+        - Token
       eventHandlers:
-        ### Administration ###
+        # flag loan for liquidation
+        - event: Bite(indexed bytes32,indexed address,uint256,uint256,uint256,address,uint256)
+          handler: handleCatBite
+        # set liquidation penalty
         # function file(bytes32 ilk, bytes32 what, uint256 data)
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0x1a0b287e00000000000000000000000000000000000000000000000000000000'
-          handler: handleFile
-        # function file(bytes32 ilk, bytes32 what, address flip)
-        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0xebecb39d00000000000000000000000000000000000000000000000000000000'
-          handler: handleFile
-  #  Liquidation Agent
-  - name: Cat_v2
+          topic0: "0x1a0b287e00000000000000000000000000000000000000000000000000000000"
+          handler: handleCatFile
+
+  # have to create two cat contracts because they have different addresses
+  - name: CatV2
     kind: ethereum/contract
     network: mainnet
     source:
-      abi: Cat
-      address: '0x78f2c2af65126834c51822f56be0d7469d7a523e'
+      abi: CatV2
+      address: "0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea"
       startBlock: 10742907
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/core/cat.ts
+      file: ./src/mapping.ts
       abis:
-        - name: Cat
-          file: ./abis/Cat.json
-        - name: Vat
-          file: ./abis/Vat.json
-        - name: Deploy
-          file: ./abis/Deploy.json
-        - name: IlkRegistry
-          file: ./abis/IlkRegistry.json
-        - name: ERC20
-          file: ./abis/erc20.json
+        - name: CatV2
+          file: ./abis/CatV2.json
       entities:
-        - CollateralType
-        - SystemState
+        - Market
+        - Token
       eventHandlers:
-        ### Administration ###
+        # flag loan for liquidation
+        - event: Bite(indexed bytes32,indexed address,uint256,uint256,uint256,address,uint256)
+          handler: handleCatBite
+        # set liquidation penalty
         # function file(bytes32 ilk, bytes32 what, uint256 data)
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0x1a0b287e00000000000000000000000000000000000000000000000000000000'
-          handler: handleFileV2
-        # function file(bytes32 ilk, bytes32 what, address flip)
-        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0xebecb39d00000000000000000000000000000000000000000000000000000000'
-          handler: handleFileV2
+          topic0: "0x1a0b287e00000000000000000000000000000000000000000000000000000000"
+          handler: handleCatFile
+
   - name: Dog
     kind: ethereum/contract
     network: mainnet
     source:
       abi: Dog
-      address: '0x135954d155898D42C90D2a57824C690e0c7BEf1B'
+      address: "0x135954d155898D42C90D2a57824C690e0c7BEf1B"
       startBlock: 12246358
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/core/cat.ts
+      file: ./src/mapping.ts
       abis:
         - name: Dog
           file: ./abis/Dog.json
-        - name: Vat
-          file: ./abis/Vat.json
-        - name: Deploy
-          file: ./abis/Deploy.json
-        - name: IlkRegistry
-          file: ./abis/IlkRegistry.json
-        - name: ERC20
-          file: ./abis/erc20.json
       entities:
-        - CollateralType
-        - SystemState
+        - Market
+        - Token
       eventHandlers:
-        ### Administration ###
+        # flag loan for liquidation
+        - event: Bark(indexed bytes32,indexed address,uint256,uint256,uint256,address,indexed uint256)
+          handler: handleDogBark
+        # set liquidation penalty
         # function file(bytes32 ilk, bytes32 what, uint256 data)
         - event: File(indexed bytes32,indexed bytes32,uint256)
-          handler: handleFileDog
-  - name: DsProxyFactory
-    kind: ethereum/contract
-    network: mainnet
-    source:
-      abi: DSProxyFactory
-      address: '0xa26e15c895efc0616177b7c1e7270a4c7d51c997'
-      startBlock: 8928152
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/users/users.ts
-      abis:
-        - name: DSProxyFactory
-          file: ./abis/DSProxyFactory.json
-        - name: Vat
-          file: ./abis/Vat.json
-        - name: ERC20
-          file: ./abis/erc20.json
-      entities:
-        - Account
-        - _Proxy
-      eventHandlers:
-        - event: Created(indexed address,indexed address,address,address)
-          handler: handleCreated
-  # Allow users to interact with their Vaults in an easy way, treating them as non-fungible tokens (NFTs)
+          handler: handleDogFile
+
+  # User may interact w/ maker contracts via cdpmanger
   - name: CdpManager
     kind: ethereum/contract
     network: mainnet
     source:
       abi: CdpManager
-      address: '0x5ef30b9986345249bc32d8928b7ee64de9435e39'
+      address: "0x5ef30b9986345249bc32d8928b7ee64de9435e39"
       startBlock: 8928198
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/users/users.ts
+      file: ./src/mapping.ts
       abis:
         - name: CdpManager
-          file: ./abis/CdpManager.json
-        - name: DsProxy
-          file: ./abis/DsProxy.json
-        - name: ERC20
-          file: ./abis/erc20.json
+          file: ./abis/DssCdpManager.json
       entities:
         - _Proxy
       eventHandlers:
-        # function give(uint cdp, address dst)
-        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0xfcafcc6800000000000000000000000000000000000000000000000000000000'
-          handler: handleGive
-        # function frob(cdp uint256, dink int256, dart int256)
-        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0x45e6bdcd00000000000000000000000000000000000000000000000000000000'
-          handler: handleFrob
-templates:
-  - name: Deploy
+        - event: NewCdp(indexed address,indexed address,indexed uint256)
+          handler: handleNewCdp
+
+  # User may interact w/ maker contracts via a DSProxy contract
+  - name: DSProxyFactory
     kind: ethereum/contract
     network: mainnet
     source:
-      abi: Deploy
+      abi: DSProxyFactory
+      address: "0xA26e15C895EFc0616177B7c1e7270A4C7D51C997"
+      startBlock: 8928152
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mapping.ts
-      entities:
-        - Market
       abis:
-        - name: Deploy
-          file: ./abis/Deploy.json
-        - name: ERC20
-          file: ./abis/erc20.json
-  - name: Jug
-    kind: ethereum/contract
-    network: mainnet
-    source:
-      abi: Jug
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/common/setters.ts
+        - name: DSProxyFactory
+          file: ./abis/DSProxyFactory.json
       entities:
-        - Market
-      abis:
-        - name: Jug
-          file: ./abis/Jug.json
-        - name: Deploy
-          file: ./abis/Deploy.json
-        - name: ERC20
-          file: ./abis/erc20.json
-  - name: Spot
-    kind: ethereum/contract
-    network: mainnet
-    source:
-      abi: Spot
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/common/setters.ts
-      entities:
-        - Market
-      abis:
-        - name: Spot
-          file: ./abis/Spot.json
-        - name: Deploy
-          file: ./abis/Deploy.json
-        - name: ERC20
-          file: ./abis/erc20.json
-  - name: Cat
-    kind: ethereum/contract
-    network: mainnet
-    source:
-      abi: Cat
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/common/setters.ts
-      entities:
-        - Market
-      abis:
-        - name: Cat
-          file: ./abis/Cat.json
-        - name: Deploy
-          file: ./abis/Deploy.json
-        - name: ERC20
-          file: ./abis/erc20.json
-  - name: GemJoin
-    kind: ethereum/contract
-    network: mainnet
-    source:
-      abi: GemJoin
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mapping.ts
-      entities:
-        - Market
-      abis:
-        - name: GemJoin
-          file: ./abis/GemJoin.json
-        - name: ERC20
-          file: ./abis/erc20.json
+        - _Proxy
       eventHandlers:
-        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: '0x6924500900000000000000000000000000000000000000000000000000000000'
-          handler: handleCage
-  - name: DsProxy
+        - event: Created(indexed address,indexed address,address,address)
+          handler: handleCreateProxy
+
+templates:
+  - name: Flip
     kind: ethereum/contract
     network: mainnet
     source:
-      abi: DsProxy
+      abi: Flip
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/common/getters.ts
+      file: ./src/mapping.ts
       entities:
         - Market
       abis:
-        - name: DsProxy
-          file: ./abis/DsProxy.json
-        - name: ERC20
-          file: ./abis/erc20.json
+        - name: Flip
+          file: ./abis/Flip.json
+      eventHandlers:
+        # collateral auction
+        # Flip.tend(uint256,uint256,uint256)
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x4b43ed1200000000000000000000000000000000000000000000000000000000"
+          handler: handleFlipBids
+        # Flip.dent(uint256,uint256,uint256)
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x5ff3a38200000000000000000000000000000000000000000000000000000000"
+          handler: handleFlipBids
+        # An auction can end with either of the two functions
+        # Flip.deal(uint256)
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0xc959c42b00000000000000000000000000000000000000000000000000000000"
+          handler: handleFlipEndAuction
+        # Flip.yank(uint256)
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x26e027f100000000000000000000000000000000000000000000000000000000"
+          handler: handleFlipEndAuction
+
+  - name: Clip
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Clip
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mapping.ts
+      entities:
+        - Market
+      abis:
+        - name: Clip
+          file: ./abis/Clip.json
+      eventHandlers:
+        # collateral auction
+        - event: Take(indexed uint256,uint256,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleClipTakeBid
