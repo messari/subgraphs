@@ -9,7 +9,7 @@ import {
   LogExchangeRate,
   LogAccrue,
 } from "../generated/templates/Cauldron/Cauldron";
-import { Deposit, Borrow, Repay, Liquidate } from "../generated/schema";
+import { Deposit, Borrow, Repay, Liquidate, Withdraw } from "../generated/schema";
 import { NEG_INT_ONE, DEFAULT_DECIMALS, BIGDECIMAL_ONE, ABRA_ACCOUNTS } from "./common/constants";
 import { bigIntToBigDecimal, divBigDecimal } from "./common/utils/numbers";
 import {
@@ -84,7 +84,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   if (event.params.from.toHexString() != event.params.to.toHexString()) {
     createLiquidateEvent(event);
   }
-  let withdrawalEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
+  let withdrawalEvent = new Withdraw(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
   if (!market) {
     return;

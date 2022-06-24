@@ -52,6 +52,14 @@
         }
       }
     },
+    "beefy-finance": {
+      "beefy-finance": {
+        "aurora": {
+          "template": "beefy.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "belt-finance": {
       "belt-finance": {
         "bsc": {
@@ -195,8 +203,8 @@
         }
       }
     },
-    "curve": {
-      "curve": {
+    "curve-finance": {
+      "curve-finance": {
         "arbitrum": {
           "template": "curve.template.yaml",
           "deploy-on-merge": false
@@ -222,7 +230,7 @@
           "deploy-on-merge": false
         },
         "xdai": {
-          "template": "apeswap.template.yaml",
+          "template": "curve.template.yaml",
           "deploy-on-merge": false
         }
       }
@@ -231,6 +239,14 @@
       "ellipsis-finance": {
         "bsc": {
           "template": "ellipsis.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "inverse-finance": {
+      "inverse-finance": {
+        "mainnet": {
+          "template": "inverse.finance.template.yaml",
           "deploy-on-merge": false
         }
       }
