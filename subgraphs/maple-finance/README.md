@@ -126,7 +126,7 @@ Diagrams of the protocol, specifically focusing on key things needed for the Sub
 
 ### Taking Loan Flow
 
-![Taking Loan](./docs/TakingLoan.jpg)
+![Taking a loan](https://user-images.githubusercontent.com/9797920/175491683-de0cae25-58fd-4f05-a579-eb02fea2297e.jpg)
 
 ### Repaying Loan (Principal and Interest)
 
