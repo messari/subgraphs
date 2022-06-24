@@ -4,81 +4,61 @@
 
 Below, the methodologies for key fields in the protocol are surfaces for convience.
 
+Note that all cumulatives USD values are origination values (i.e values at the time the accumulation occured), they are not current values. This means that the cumulative values are monotonically increacing over time. If current values are desired for the cumulatives, they can be derived from the cumulative token values.
+
 In depth methodologies for every parameter in the protocol can be found here: [Schema Map](https://fluffy-cobalt-78d.notion.site/Schema-Map-59607afc87ac4891a7dc8c407e18f48d)
 
 ### Market methodologies
 
 #### Total Value Locked (TVL) USD
 
-total amount on the supply side that is earning interest; it does not include accrued staking rewards
+Total amount on the supply side that is earning interest
 
-`Outstanding Loans + Liquidity Available(as loan) + Staked Assets Balance`
+`Total Depsit Balance USD + Total Stake Balance USD`
 
-#### Cumulative Deposit USD
-
-Sum across Pool:
-
-`Cumulative Deposit USD`
-
-Except: stake deposits(not loanable)
-
-#### Cumulative Withdraw USD
-
-Sum across Pool:
-
-`Cumulative Withdraw USD`
-
-Except: stake deposits(not loanable)
+This does not include accrued staking rewards
 
 #### Total Deposit Balance USD
 
-Sum across Pool:
+`Cumulative Deposit USD - Cumulative Withdraw USD - Cumulative Pool Losses USD`
 
-`Cumulative Deposit USD - Cumulative Withdraw USD - Default Suffered(from Loan Defaults))`
+Pool Losses occur when a default is suffered by the pool, it comes out of the deposit amount
 
 #### Total Borrow Balance USD
 
-`Total Borrow Outstanding - Locker and Pool Losses(from Loan Defaults)`
+`Cumulative Withdraw USD - Cumulative Principal Repay USD - Loan Defaults USD`
 
-Liquidated collatoral is interpreted the same as paying principal since form the pool perspective there is no difference. Losses to stake locker and pool are absorbed and removed from total borrow.
-
-#### Cumulative Borrow USD
-
-Sum across Pool:
-
-`Cumulative Borrow USD`
+Liquidated collatoral is interpreted the same as paying principal since from the pool perspective there is no difference. Defaults to stake locker and pool are absorbed and removed from total borrow.
 
 #### Cumulative Liquidate USD
 
-Sum across Pool:
+`Cumulative Stake Locker Losses USD + Cumulative Pool Losses USD`
 
-`Cumulative Liquidate USD`
-
-stake locker lossess + pool lossess. Collatoral liquidation is not counted towards cumulative liquidate and is instead considered the same as a prinicipal repayment since from the pool perspetive there is no difference.
+Collatoral liquidation is not counted towards cumulative liquidate, and is instead considered the same as a principal repayment since from the pool perspective there is no difference.
 
 #### Cumulative Supply Side Revenue USD
 
-Sum across Pool:
+`Cumulative Establishment Fees To Pool Delegate USD + Cumulative Interest To Market USD`
 
-`sum of all interest paid and establishment fees paid to the Pool Delegate + sum of all interested earned by Lenders + sum of all interest earned by Stakers`
-
-this doesn’t include MPL token distribution (optional APY boost) or profits earned by the Keeper for liquidations (V2 and V3 loans only)
+Interest To Market USD is all interest going to the suppliers and the stake locker, this doesn't include MPL token distribution.
 
 #### Cumulative Protocol Side Revenue USD
 
-`sum of all establishment fees from borrowers paid to Maple Treasury`
+`Cumulative Establishment Fees To Maple Treasury USD`
 
-Fees are percentage of the drawdown amount; lump sum for V1 and V2 loans and amortized over repayments for V3 loans
+Establishment Fees To Maple Treasury USD is a percentage of the drawdown amount; lump sum for V1 and V2 loans and amortized over repayments for V3 loans.
 
 #### Cumulative Total Revenue USD
 
-`Cumulative Supply Side Revenue + Cumulative Protocol Side Revenue`
+`Cumulative Supply Side Revenue USD + Cumulative Protocol Side Revenue USD`
 
 ---
 
 ### Protocol methodologies
 
-### Total Unique Users
+Each field in Protocol is the sum across all Markets of the corresponding Market field.
+
+#### Total Unique Users
 
 The number of Unique Adresses that interacted with the protocol through transaction
 
@@ -93,60 +73,6 @@ The number of Unique Adresses that interacted with the protocol through transact
 `Unstake`
 
 `Repay`
-
-#### Total Value Locked USD
-
-Sum across all Markets:
-
-`Sum of Protocol-Side Revenue USD`
-
-#### Total Deposit Balance USD
-
-Sum across all Markets:
-
-`Total Deposit Balance USD`
-
-#### Cumulative Deposit USD
-
-Sum across all Markets:
-
-`Cumulative Deposit USD`
-
-#### Total Borrow Balance USD
-
-Sum across all Markets:
-
-`Total Borrow Balance USD`
-
-#### Cumulative Borrow USD
-
-Sum across all Markets:
-
-`Cumulative Borrow USD`
-
-#### Cumulative Liquidate USD
-
-Sum across all Markets:
-
-`Stake Locker Lossess + Pool lossess`
-
-#### Cumulative Supply Side Revenue USD
-
-Sum across all Markets:
-
-`Cumulative Supply Side Revenue USD`
-
-#### Cumulative Protocol Side Revenue USD
-
-Sum across all Markets:
-
-`Cumulative Protocol Side Revenue USD`
-
-#### Cumulative Total Revenue USD
-
-Sum across all Markets:
-
-`Cumulative Total Revenue USD`
 
 ## Protocol Diagrams
 
