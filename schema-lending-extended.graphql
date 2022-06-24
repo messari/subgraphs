@@ -293,10 +293,10 @@ type LendingProtocol implements Protocol @entity {
   totalPoolCount: Int!
 
   " Total number of open positions "
-  totalPositionsCount: Int!
+  openPositionCount: Int!
 
   " Total number of positions (open and closed) "
-  cumulativePositionsCount: Int!
+  cumulativePositionCount: Int!
 
   ##### Account / Position Data #####
 
