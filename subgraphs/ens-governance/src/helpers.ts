@@ -14,7 +14,7 @@ import {
   TokenHolder,
 } from "../generated/schema";
 
-export const ZERO_ADDRESS = Address.fromString(
+export const ZERO_ADDRESS = Address.fromHexString(
   "0x0000000000000000000000000000000000000000"
 );
 export const BIGINT_ZERO = BigInt.fromI32(0);
