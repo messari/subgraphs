@@ -1,4 +1,4 @@
-# Dodo V2 (DEX) Subgraph Methodology v1.0
+# Dodo V2 (DEX) Subgraph Methodology v1.0.0
 
 DODO is a decentralized trading platform that uses an innovative Proactive Market Maker (PMM) algorithm to provide efficient on-chain liquidity for Web3 assets.
 
@@ -6,10 +6,7 @@ When the quantity of an asset becomes low, the algorithm automatically increases
 
 Besides this, DODO also lets you issue your own tokens, and provides a set of tools and smart contracts for NFT creation, trading, and fragmentation.
 
-
 ## Useful Links
-
-
 
 * Exchange
     * [https://dodoex.io/](https://dodoex.io/) 
