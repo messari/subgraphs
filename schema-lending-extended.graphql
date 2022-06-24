@@ -1020,7 +1020,7 @@ type PositionSnapshot @entity {
 }
 
 ##################################
-##### Transaction-Level Data #####
+##### Event-Level Data #####
 ##################################
 
 """
@@ -1031,36 +1031,8 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-interface Event {
-  " { Transaction hash }-{ Log index } "
-  id: ID!
 
-  " Transaction hash of the transaction that emitted this event "
-  hash: String!
-
-  " Nonce of the transaction that emitted this event "
-  nonce: BigInt!
-
-  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
-
-  " The protocol this transaction belongs to "
-  protocol: LendingProtocol!
-
-  " Address that received the tokens "
-  to: Account!
-
-  " Address that sent the tokens "
-  from: Account!
-
-  " Block number of this event "
-  blockNumber: BigInt!
-
-  " Timestamp of this event "
-  timestamp: BigInt!
-}
-
-type Deposit implements Event @entity {
+type Deposit @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1103,7 +1075,7 @@ type Deposit implements Event @entity {
   amountUSD: BigDecimal!
 }
 
-type Withdraw implements Event @entity {
+type Withdraw @entity {
   " { Transaction hash }-{ Log index }"
   id: ID!
 
@@ -1151,7 +1123,7 @@ type Withdraw implements Event @entity {
 }
 
 # For CDPs, use this for mint events
-type Borrow implements Event @entity {
+type Borrow @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1195,7 +1167,7 @@ type Borrow implements Event @entity {
 }
 
 # For CDPs, use this for burn events
-type Repay implements Event @entity {
+type Repay @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1238,7 +1210,7 @@ type Repay implements Event @entity {
   amountUSD: BigDecimal!
 }
 
-type Liquidate implements Event @entity {
+type Liquidate @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
