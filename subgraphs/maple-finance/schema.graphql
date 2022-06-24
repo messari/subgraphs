@@ -307,7 +307,7 @@ type LendingProtocol implements Protocol @entity {
 
     ##### Internal parameters #####
 
-    " Treasury fee as a percentage value (e.g. 80% for DAI in Aave). This is the establishment fee to the treasury."
+    " Treasury fee stored in decimals (e.g. 0.01 for 1%). This is the establishment fee to the treasury."
     _treasuryFee: BigDecimal!
 }
 
