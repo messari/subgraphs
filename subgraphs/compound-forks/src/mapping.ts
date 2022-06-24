@@ -788,6 +788,7 @@ export function _handleAccrueInterest(
   comptrollerAddr: Address,
   interestAccumulated: BigInt,
   totalBorrows: BigInt,
+  updateMarketPrices: boolean,
   event: ethereum.Event
 ): void {
   let marketID = event.address.toHexString();
@@ -810,7 +811,9 @@ export function _handleAccrueInterest(
     interestAccumulated,
     totalBorrows,
     event.block.number,
-    event.block.timestamp
+    event.block.timestamp,
+    updateMarketPrices,
+    comptrollerAddr
   );
   updateProtocol(comptrollerAddr);
 
@@ -1235,13 +1238,16 @@ function updateMarketSnapshots(
   marketDailySnapshot.save();
 }
 
+// updateMarketPrices: true when every market price is updated on AccrueInterest()
 export function updateMarket(
   updateMarketData: UpdateMarketData,
   marketID: string,
   interestAccumulatedMantissa: BigInt,
   newTotalBorrow: BigInt,
   blockNumber: BigInt,
-  blockTimestamp: BigInt
+  blockTimestamp: BigInt,
+  updateMarketPrices: boolean,
+  comptrollerAddress: Address
 ): void {
   let market = Market.load(marketID);
   if (!market) {
@@ -1257,6 +1263,11 @@ export function updateMarket(
     return;
   }
 
+  if (updateMarketPrices) {
+    updateAllMarketPrices(comptrollerAddress);
+  }
+
+  // update this market's price no matter what
   let underlyingTokenPriceUSD = getTokenPriceUSD(
     updateMarketData.getUnderlyingPriceResult,
     underlyingToken.decimals
@@ -1732,4 +1743,27 @@ function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
     snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
+}
+
+function updateAllMarketPrices(comptrollerAddr: Address): void {
+  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  if (!protocol) {
+    log.warning("[updateAllMarketPrices] protocol not found: {}", [
+      comptrollerAddr.toHexString(),
+    ]);
+    return;
+  }
+
+  for (let i = 0; i < protocol._marketIDs.length; i++) {
+    let market = Market.load(protocol._marketIDs[i]);
+    if (!market) {
+      break;
+    }
+
+    // update market price
+    getTokenPriceUSD(
+      updateMarketData.getUnderlyingPriceResult,
+      underlyingToken.decimals
+    );
+  }
 }
