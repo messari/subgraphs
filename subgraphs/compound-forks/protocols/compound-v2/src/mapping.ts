@@ -57,6 +57,7 @@ import {
   snapshotFinancials,
   snapshotMarket,
   TokenData,
+  updateAllMarketPrices,
   UpdateMarketData,
   _getOrCreateProtocol,
   _handleActionPaused,
@@ -374,7 +375,9 @@ function handleAccrueInterest(
     interestAccumulated,
     totalBorrows,
     event.block.number,
-    event.block.timestamp
+    event.block.timestamp,
+    false, // do not update all prices
+    comptrollerAddr
   );
   updateProtocol(comptrollerAddr);
 
@@ -393,7 +396,9 @@ function updateMarket(
   interestAccumulatedMantissa: BigInt,
   newTotalBorrow: BigInt,
   blockNumber: BigInt,
-  blockTimestamp: BigInt
+  blockTimestamp: BigInt,
+  updateMarketPrices: boolean,
+  comptrollerAddress: Address
 ): void {
   let market = Market.load(marketID);
   if (!market) {
@@ -407,6 +412,10 @@ function updateMarket(
       market.inputToken,
     ]);
     return;
+  }
+
+  if (updateMarketPrices) {
+    updateAllMarketPrices(comptrollerAddress, blockNumber);
   }
 
   // compound v2 specific price calculation (see ./prices.ts)
@@ -497,6 +506,7 @@ function updateMarket(
   market.totalValueLockedUSD = underlyingSupplyUSD;
   market.totalDepositBalanceUSD = underlyingSupplyUSD;
 
+  market._borrowBalance = newTotalBorrow;
   market.totalBorrowBalanceUSD = newTotalBorrow
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))

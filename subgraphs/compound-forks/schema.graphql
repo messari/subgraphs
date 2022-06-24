@@ -585,6 +585,9 @@ type Market @entity {
 
   ### Add-Ons ###
   _reserveFactor: BigDecimal!
+
+  " The amount of borrowed asset in underlying "
+  _borrowBalance: BigInt!
 }
 
 #################################
