@@ -1,0 +1,309 @@
+[
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_smartApprove",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_dodoSellHelper",
+          "type": "address"
+        },
+        {
+          "internalType": "address payable",
+          "name": "_weth",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "contract IERC20",
+          "name": "fromToken",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "contract IERC20",
+          "name": "toToken",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "fromAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "returnAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timeStamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "OrderHistory",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferPrepared",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "fallback",
+      "payable": true
+    },
+    {
+      "inputs": [],
+      "name": "_NEW_OWNER_",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "_OWNER_",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "_WETH_",
+      "outputs": [
+        {
+          "internalType": "address payable",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "claimOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "dodoSellHelper",
+      "outputs": [
+        {
+          "internalType": "contract IDODOSellHelper",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "smartApprove",
+      "outputs": [
+        {
+          "internalType": "contract ISmartApprove",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive",
+      "payable": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "fromToken",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC20",
+          "name": "toToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fromTokenAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minReturnAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address[]",
+          "name": "dodoPairs",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "directions",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256",
+          "name": "deadline",
+          "type": "uint256"
+        }
+      ],
+      "name": "dodoSwap",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "returnAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function",
+      "payable": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "fromToken",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IERC20",
+          "name": "toToken",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "approveTarget",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fromTokenAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minReturnAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "callDataConcat",
+          "type": "bytes"
+        },
+        {
+          "internalType": "uint256",
+          "name": "deadline",
+          "type": "uint256"
+        }
+      ],
+      "name": "externalSwap",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "returnAmount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function",
+      "payable": true
+    }
+  ]

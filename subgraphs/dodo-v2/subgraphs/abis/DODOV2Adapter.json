@@ -1,0 +1,1142 @@
+{
+  "contractName": "DODOV2Adapter",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "pool",
+          "type": "address"
+        }
+      ],
+      "name": "sellBase",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "pool",
+          "type": "address"
+        }
+      ],
+      "name": "sellQuote",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.9+commit.3e3065ac\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"pool\",\"type\":\"address\"}],\"name\":\"sellBase\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"pool\",\"type\":\"address\"}],\"name\":\"sellQuote\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/adapter/DODOV2Adapter.sol\":\"DODOV2Adapter\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/adapter/DODOV2Adapter.sol\":{\"keccak256\":\"0x7df38eeb2d638ed5d0f9292eeb879808599f9f035fcd56702ad50c707e0a2761\",\"license\":\"Apache-2.0\",\"urls\":[\"bzz-raw://5cd66dc8ecbc25b0574f06b4ed9862986ee9de8bb1aabc4854aa6c5e62f1d69c\",\"dweb:/ipfs/QmP2Zqyz9iwrgDzv8DX8aFWzi8KBbnnbCuj5MrXaEjYsfA\"]},\"/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/intf/IDODOAdapter.sol\":{\"keccak256\":\"0xb2fd2805b31787c4a8719973d532e5010ea0f32b1523dc67203517f6bee89d04\",\"license\":\"Apache-2.0\",\"urls\":[\"bzz-raw://dbbeb4538ba965a770bd50a94c3ba9921d7ab563466114d15a86ebe405dca294\",\"dweb:/ipfs/QmTpwM2tKQxG3hnzuiHEXES9yzQc4JYWas4MdkzE4bQS7V\"]},\"/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/intf/IDODOV2.sol\":{\"keccak256\":\"0xf16b21ca2a2bc6cdb411499b90c66fd0798ce9571fb30ecf848242235ae7325b\",\"license\":\"Apache-2.0\",\"urls\":[\"bzz-raw://c0ec9635cb58a2165c20a8217bad70bcd5afd7fcd867d93b14bca255be577454\",\"dweb:/ipfs/QmfWVHawtREQeT9cHEznxkJojNsgEr3XzgKj6pABcXFw3D\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506101af806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80637c9a7c971461003b578063815846951461006b575b600080fd5b6100696004803603604081101561005157600080fd5b506001600160a01b0381358116916020013516610099565b005b6100696004803603604081101561008157600080fd5b506001600160a01b0381358116916020013516610121565b806001600160a01b031663dd93f59a836040518263ffffffff1660e01b815260040180826001600160a01b03166001600160a01b03168152602001915050602060405180830381600087803b1580156100f157600080fd5b505af1158015610105573d6000803e3d6000fd5b505050506040513d602081101561011b57600080fd5b50505050565b806001600160a01b031663bd6015b4836040518263ffffffff1660e01b815260040180826001600160a01b03166001600160a01b03168152602001915050602060405180830381600087803b1580156100f157600080fdfea2646970667358221220a8b9559ba9140a5fe919247ce366e6e3fee7ee69680bad01fe6f9ee5779921b364736f6c63430006090033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c80637c9a7c971461003b578063815846951461006b575b600080fd5b6100696004803603604081101561005157600080fd5b506001600160a01b0381358116916020013516610099565b005b6100696004803603604081101561008157600080fd5b506001600160a01b0381358116916020013516610121565b806001600160a01b031663dd93f59a836040518263ffffffff1660e01b815260040180826001600160a01b03166001600160a01b03168152602001915050602060405180830381600087803b1580156100f157600080fd5b505af1158015610105573d6000803e3d6000fd5b505050506040513d602081101561011b57600080fd5b50505050565b806001600160a01b031663bd6015b4836040518263ffffffff1660e01b815260040180826001600160a01b03166001600160a01b03168152602001915050602060405180830381600087803b1580156100f157600080fdfea2646970667358221220a8b9559ba9140a5fe919247ce366e6e3fee7ee69680bad01fe6f9ee5779921b364736f6c63430006090033",
+  "immutableReferences": {},
+  "sourceMap": "203:265:36:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "203:265:36:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;359:107;;;;;;;;;;;;;;;;-1:-1:-1;;;;;;359:107:36;;;;;;;;;;:::i;:::-;;248:105;;;;;;;;;;;;;;;;-1:-1:-1;;;;;;248:105:36;;;;;;;;;;:::i;359:107::-;440:4;-1:-1:-1;;;;;432:23:36;;456:2;432:27;;;;;;;;;;;;;-1:-1:-1;;;;;432:27:36;-1:-1:-1;;;;;432:27:36;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;;;359:107:36:o;248:105::-;328:4;-1:-1:-1;;;;;320:22:36;;343:2;320:26;;;;;;;;;;;;;-1:-1:-1;;;;;320:26:36;-1:-1:-1;;;;;320:26:36;;;;;;;;;;;;;;;;;;;;;;;;;;",
+  "source": "/*\n\n    Copyright 2020 DODO ZOO.\n    SPDX-License-Identifier: Apache-2.0\n\n*/\n\npragma solidity 0.6.9;\n\nimport {IDODOV2} from \"../intf/IDODOV2.sol\";\nimport {IDODOAdapter} from \"../intf/IDODOAdapter.sol\";\n\ncontract DODOV2Adapter is IDODOAdapter {\n    function sellBase(address to, address pool) external override {\n        IDODOV2(pool).sellBase(to);\n    }\n\n    function sellQuote(address to, address pool) external override {\n        IDODOV2(pool).sellQuote(to);\n    }\n}",
+  "sourcePath": "/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/adapter/DODOV2Adapter.sol",
+  "ast": {
+    "absolutePath": "/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/adapter/DODOV2Adapter.sol",
+    "exportedSymbols": {
+      "DODOV2Adapter": [
+        14960
+      ]
+    },
+    "id": 14961,
+    "license": "Apache-2.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 14921,
+        "literals": [
+          "solidity",
+          "0.6",
+          ".9"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "78:22:36"
+      },
+      {
+        "absolutePath": "/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/intf/IDODOV2.sol",
+        "file": "../intf/IDODOV2.sol",
+        "id": 14923,
+        "nodeType": "ImportDirective",
+        "scope": 14961,
+        "sourceUnit": 17253,
+        "src": "102:44:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "argumentTypes": null,
+              "id": 14922,
+              "name": "IDODOV2",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": null,
+              "src": "110:7:36",
+              "typeDescriptions": {
+                "typeIdentifier": null,
+                "typeString": null
+              }
+            },
+            "local": null
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/intf/IDODOAdapter.sol",
+        "file": "../intf/IDODOAdapter.sol",
+        "id": 14925,
+        "nodeType": "ImportDirective",
+        "scope": 14961,
+        "sourceUnit": 16753,
+        "src": "147:54:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "argumentTypes": null,
+              "id": 14924,
+              "name": "IDODOAdapter",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": null,
+              "src": "155:12:36",
+              "typeDescriptions": {
+                "typeIdentifier": null,
+                "typeString": null
+              }
+            },
+            "local": null
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 14926,
+              "name": "IDODOAdapter",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 16752,
+              "src": "229:12:36",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_IDODOAdapter_$16752",
+                "typeString": "contract IDODOAdapter"
+              }
+            },
+            "id": 14927,
+            "nodeType": "InheritanceSpecifier",
+            "src": "229:12:36"
+          }
+        ],
+        "contractDependencies": [
+          16752
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 14960,
+        "linearizedBaseContracts": [
+          14960,
+          16752
+        ],
+        "name": "DODOV2Adapter",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "baseFunctions": [
+              16744
+            ],
+            "body": {
+              "id": 14942,
+              "nodeType": "Block",
+              "src": "310:43:36",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 14939,
+                        "name": "to",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 14929,
+                        "src": "343:2:36",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 14936,
+                            "name": "pool",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 14931,
+                            "src": "328:4:36",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 14935,
+                          "name": "IDODOV2",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 17252,
+                          "src": "320:7:36",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_IDODOV2_$17252_$",
+                            "typeString": "type(contract IDODOV2)"
+                          }
+                        },
+                        "id": 14937,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "320:13:36",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IDODOV2_$17252",
+                          "typeString": "contract IDODOV2"
+                        }
+                      },
+                      "id": 14938,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "sellBase",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 17081,
+                      "src": "320:22:36",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$_t_uint256_$",
+                        "typeString": "function (address) external returns (uint256)"
+                      }
+                    },
+                    "id": 14940,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "320:26:36",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 14941,
+                  "nodeType": "ExpressionStatement",
+                  "src": "320:26:36"
+                }
+              ]
+            },
+            "documentation": null,
+            "functionSelector": "81584695",
+            "id": 14943,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sellBase",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 14933,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "301:8:36"
+            },
+            "parameters": {
+              "id": 14932,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14929,
+                  "mutability": "mutable",
+                  "name": "to",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 14943,
+                  "src": "266:10:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 14928,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "266:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 14931,
+                  "mutability": "mutable",
+                  "name": "pool",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 14943,
+                  "src": "278:12:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 14930,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "278:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "265:26:36"
+            },
+            "returnParameters": {
+              "id": 14934,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "310:0:36"
+            },
+            "scope": 14960,
+            "src": "248:105:36",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "baseFunctions": [
+              16751
+            ],
+            "body": {
+              "id": 14958,
+              "nodeType": "Block",
+              "src": "422:44:36",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 14955,
+                        "name": "to",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 14945,
+                        "src": "456:2:36",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 14952,
+                            "name": "pool",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 14947,
+                            "src": "440:4:36",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 14951,
+                          "name": "IDODOV2",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 17252,
+                          "src": "432:7:36",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_IDODOV2_$17252_$",
+                            "typeString": "type(contract IDODOV2)"
+                          }
+                        },
+                        "id": 14953,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "432:13:36",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IDODOV2_$17252",
+                          "typeString": "contract IDODOV2"
+                        }
+                      },
+                      "id": 14954,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "sellQuote",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 17088,
+                      "src": "432:23:36",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$_t_uint256_$",
+                        "typeString": "function (address) external returns (uint256)"
+                      }
+                    },
+                    "id": 14956,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "432:27:36",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 14957,
+                  "nodeType": "ExpressionStatement",
+                  "src": "432:27:36"
+                }
+              ]
+            },
+            "documentation": null,
+            "functionSelector": "7c9a7c97",
+            "id": 14959,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sellQuote",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 14949,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "413:8:36"
+            },
+            "parameters": {
+              "id": 14948,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14945,
+                  "mutability": "mutable",
+                  "name": "to",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 14959,
+                  "src": "378:10:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 14944,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "378:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 14947,
+                  "mutability": "mutable",
+                  "name": "pool",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 14959,
+                  "src": "390:12:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 14946,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "390:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "377:26:36"
+            },
+            "returnParameters": {
+              "id": 14950,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "422:0:36"
+            },
+            "scope": 14960,
+            "src": "359:107:36",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 14961,
+        "src": "203:265:36"
+      }
+    ],
+    "src": "78:390:36"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/adapter/DODOV2Adapter.sol",
+    "exportedSymbols": {
+      "DODOV2Adapter": [
+        14960
+      ]
+    },
+    "id": 14961,
+    "license": "Apache-2.0",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 14921,
+        "literals": [
+          "solidity",
+          "0.6",
+          ".9"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "78:22:36"
+      },
+      {
+        "absolutePath": "/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/intf/IDODOV2.sol",
+        "file": "../intf/IDODOV2.sol",
+        "id": 14923,
+        "nodeType": "ImportDirective",
+        "scope": 14961,
+        "sourceUnit": 17253,
+        "src": "102:44:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "argumentTypes": null,
+              "id": 14922,
+              "name": "IDODOV2",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": null,
+              "src": "110:7:36",
+              "typeDescriptions": {
+                "typeIdentifier": null,
+                "typeString": null
+              }
+            },
+            "local": null
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/niutaotao/projects/dodo/contractV2/contracts/SmartRoute/intf/IDODOAdapter.sol",
+        "file": "../intf/IDODOAdapter.sol",
+        "id": 14925,
+        "nodeType": "ImportDirective",
+        "scope": 14961,
+        "sourceUnit": 16753,
+        "src": "147:54:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "argumentTypes": null,
+              "id": 14924,
+              "name": "IDODOAdapter",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": null,
+              "src": "155:12:36",
+              "typeDescriptions": {
+                "typeIdentifier": null,
+                "typeString": null
+              }
+            },
+            "local": null
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 14926,
+              "name": "IDODOAdapter",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 16752,
+              "src": "229:12:36",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_IDODOAdapter_$16752",
+                "typeString": "contract IDODOAdapter"
+              }
+            },
+            "id": 14927,
+            "nodeType": "InheritanceSpecifier",
+            "src": "229:12:36"
+          }
+        ],
+        "contractDependencies": [
+          16752
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 14960,
+        "linearizedBaseContracts": [
+          14960,
+          16752
+        ],
+        "name": "DODOV2Adapter",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "baseFunctions": [
+              16744
+            ],
+            "body": {
+              "id": 14942,
+              "nodeType": "Block",
+              "src": "310:43:36",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 14939,
+                        "name": "to",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 14929,
+                        "src": "343:2:36",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 14936,
+                            "name": "pool",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 14931,
+                            "src": "328:4:36",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 14935,
+                          "name": "IDODOV2",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 17252,
+                          "src": "320:7:36",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_IDODOV2_$17252_$",
+                            "typeString": "type(contract IDODOV2)"
+                          }
+                        },
+                        "id": 14937,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "320:13:36",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IDODOV2_$17252",
+                          "typeString": "contract IDODOV2"
+                        }
+                      },
+                      "id": 14938,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "sellBase",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 17081,
+                      "src": "320:22:36",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$_t_uint256_$",
+                        "typeString": "function (address) external returns (uint256)"
+                      }
+                    },
+                    "id": 14940,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "320:26:36",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 14941,
+                  "nodeType": "ExpressionStatement",
+                  "src": "320:26:36"
+                }
+              ]
+            },
+            "documentation": null,
+            "functionSelector": "81584695",
+            "id": 14943,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sellBase",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 14933,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "301:8:36"
+            },
+            "parameters": {
+              "id": 14932,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14929,
+                  "mutability": "mutable",
+                  "name": "to",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 14943,
+                  "src": "266:10:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 14928,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "266:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 14931,
+                  "mutability": "mutable",
+                  "name": "pool",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 14943,
+                  "src": "278:12:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 14930,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "278:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "265:26:36"
+            },
+            "returnParameters": {
+              "id": 14934,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "310:0:36"
+            },
+            "scope": 14960,
+            "src": "248:105:36",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "baseFunctions": [
+              16751
+            ],
+            "body": {
+              "id": 14958,
+              "nodeType": "Block",
+              "src": "422:44:36",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 14955,
+                        "name": "to",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 14945,
+                        "src": "456:2:36",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 14952,
+                            "name": "pool",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 14947,
+                            "src": "440:4:36",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 14951,
+                          "name": "IDODOV2",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 17252,
+                          "src": "432:7:36",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_IDODOV2_$17252_$",
+                            "typeString": "type(contract IDODOV2)"
+                          }
+                        },
+                        "id": 14953,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "432:13:36",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IDODOV2_$17252",
+                          "typeString": "contract IDODOV2"
+                        }
+                      },
+                      "id": 14954,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "sellQuote",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 17088,
+                      "src": "432:23:36",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$_t_uint256_$",
+                        "typeString": "function (address) external returns (uint256)"
+                      }
+                    },
+                    "id": 14956,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "432:27:36",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 14957,
+                  "nodeType": "ExpressionStatement",
+                  "src": "432:27:36"
+                }
+              ]
+            },
+            "documentation": null,
+            "functionSelector": "7c9a7c97",
+            "id": 14959,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sellQuote",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 14949,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "413:8:36"
+            },
+            "parameters": {
+              "id": 14948,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 14945,
+                  "mutability": "mutable",
+                  "name": "to",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 14959,
+                  "src": "378:10:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 14944,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "378:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 14947,
+                  "mutability": "mutable",
+                  "name": "pool",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 14959,
+                  "src": "390:12:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 14946,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "390:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "377:26:36"
+            },
+            "returnParameters": {
+              "id": 14950,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "422:0:36"
+            },
+            "scope": 14960,
+            "src": "359:107:36",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 14961,
+        "src": "203:265:36"
+      }
+    ],
+    "src": "78:390:36"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.9+commit.3e3065ac.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.2",
+  "updatedAt": "2021-01-20T03:10:14.934Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

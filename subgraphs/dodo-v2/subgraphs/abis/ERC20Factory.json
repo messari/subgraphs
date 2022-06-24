@@ -1,0 +1,155 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "cloneFactory",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "erc20Template",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "mintableErc20Template",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "erc20",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isMintable",
+        "type": "bool"
+      }
+    ],
+    "name": "NewERC20",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "_CLONE_FACTORY_",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_ERC20_TEMPLATE_",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_MINTABLE_ERC20_TEMPLATE_",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalSupply",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "symbol",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "decimals",
+        "type": "uint256"
+      }
+    ],
+    "name": "createStdERC20",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "newERC20",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "initSupply",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "symbol",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "decimals",
+        "type": "uint256"
+      }
+    ],
+    "name": "createMintableERC20",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "newMintableERC20",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
