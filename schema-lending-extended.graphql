@@ -1049,9 +1049,9 @@ type Deposit @entity {
   protocol: LendingProtocol!
 
   " Market that tokens are deposited into "
-  to: Account!
+  to: Market!
 
-  " Address that deposited tokens "
+  " Account that deposited tokens "
   from: Account!
 
   " Block number of this event "
@@ -1091,11 +1091,11 @@ type Withdraw @entity {
   " The protocol this transaction belongs to "
   protocol: LendingProtocol!
 
-  " Address that received tokens "
+  " Account that received tokens "
   to: Account!
 
   " Market that tokens are withdrawn from "
-  from: Account!
+  from: Market!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1139,11 +1139,11 @@ type Borrow @entity {
   " The protocol this transaction belongs to "
   protocol: LendingProtocol!
 
-  " Address that received tokens "
+  " Account that received tokens "
   to: Account!
 
   " Market that tokens are borrowed from "
-  from: Account!
+  from: Market!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1184,9 +1184,9 @@ type Repay @entity {
   protocol: LendingProtocol!
 
   " Market that tokens are repaid to "
-  to: Account!
+  to: Market!
 
-  " Address that sent tokens "
+  " Account that sent tokens "
   from: Account!
 
   " Block number of this event "
@@ -1227,12 +1227,12 @@ type Liquidate @entity {
   protocol: LendingProtocol!
 
   " Market that tokens are repaid to "
-  to: String!
+  to: Market!
 
-  " Address that carried out the liquidation "
+  " Account that carried out the liquidation "
   from: Account!
 
-  " Address that got liquidated "
+  " Account that got liquidated "
   liquidatee: Account!
 
   " Block number of this event "
