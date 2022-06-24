@@ -1,7 +1,9 @@
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { ENSGovernor } from "../generated/ENSGovernor/ENSGovernor";
 import {
   Delegate,
   Governance,
+  GovernanceFramework,
   Proposal,
   TokenHolder,
 } from "../generated/schema";
@@ -57,6 +59,35 @@ export function addressesToHexStrings(addresses: Address[]): string[] {
     hexStringAddress.push(addresses[i].toHexString());
   }
   return hexStringAddress;
+}
+
+export function getGovernanceFramework(
+  contractAddress: string
+): GovernanceFramework {
+  let governanceFramework = GovernanceFramework.load(contractAddress);
+
+  if (governanceFramework == null) {
+    governanceFramework = new GovernanceFramework(contractAddress);
+    let contract = ENSGovernor.bind(Address.fromString(contractAddress));
+
+    governanceFramework.name = contract.name();
+    governanceFramework.type = "OZ_GOVERNOR";
+    governanceFramework.version = contract.version();
+
+    governanceFramework.contractAddress = contractAddress;
+    governanceFramework.tokenAddress = contract.timelock().toHexString();
+    governanceFramework.timelockAddress = contract.token().toHexString();
+
+    governanceFramework.votingDelay = contract.votingDelay();
+    governanceFramework.votingPeriod = contract.votingPeriod();
+    governanceFramework.proposalThreshold = contract.proposalThreshold();
+    governanceFramework.quorumNumerator = contract.quorumNumerator();
+    governanceFramework.quorumDenominator = contract.quorumDenominator();
+
+    governanceFramework.save();
+  }
+
+  return governanceFramework;
 }
 
 export function getGovernance(): Governance {
