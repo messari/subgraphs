@@ -7,8 +7,6 @@ import { yearnOracleGetTokenPriceInUSD } from "./oracles/yearn";
 import { ZERO_BD, OracleType, MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS, ZERO_ADDRESS, ZERO_BI } from "../constants";
 import { parseUnits, readCallResult } from "../utils";
 
-import * as constants from "./common/constants";
-import { CustomPriceType } from "./common/types";
 import { getCurvePriceUsdc } from "./routers/CurveRouter";
 import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
 import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
@@ -23,7 +21,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
 
     // 1. Maple Oracle
     let mapleLensPrice = mapleOracleGetTokenPriceInUSD(token);
-    if (mapleLensPrice) {
+    if (mapleLensPrice && mapleLensPrice.notEqual(ZERO_BD)) {
         token._lastPriceOracle = OracleType.MAPLE;
         token.lastPriceUSD = mapleLensPrice;
         token.save();
@@ -32,7 +30,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
 
     // 2. ChainLink Feed Registry
     let chainLinkPrice = chainlinkOracleGetTokenPriceInUSD(token);
-    if (chainLinkPrice) {
+    if (chainLinkPrice && chainLinkPrice.notEqual(ZERO_BD)) {
         token._lastPriceOracle = OracleType.CHAIN_LINK;
         token.lastPriceUSD = chainLinkPrice;
         token.save();
@@ -41,7 +39,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
 
     // 3. Yearn Lens Oracle
     let yearnLensPrice = yearnOracleGetTokenPriceInUSD(token);
-    if (yearnLensPrice) {
+    if (yearnLensPrice && yearnLensPrice.notEqual(ZERO_BD)) {
         token._lastPriceOracle = OracleType.YEARN_LENS;
         token.lastPriceUSD = yearnLensPrice;
         token.save();
@@ -133,7 +131,9 @@ export function getBptTokenPriceUSD(event: ethereum.Event, bptToken: Token): Big
         balanceUSD = balanceUSD.plus(tokenAmountUSD);
     }
 
-    const pricePerBptUSD = totalBptSupply.notEqual(ZERO_BI) ? balanceUSD.div(totalBptSupply.toBigDecimal()) : ZERO_BD;
+    const pricePerBptUSD = totalBptSupply.notEqual(ZERO_BI)
+        ? balanceUSD.div(parseUnits(totalBptSupply, bptToken.decimals))
+        : ZERO_BD;
 
     return pricePerBptUSD;
 }
