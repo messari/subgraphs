@@ -77,31 +77,32 @@ export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
 export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     const loan = getOrCreateLoan(event, event.address);
     const drawdownAmount = event.params.amount_;
+    const treasuryFeePaid = bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(getOrCreateProtocol()._treasuryFee));
 
     ////
     // Create borrow
     ////
-    const borrow = createBorrow(event, loan, drawdownAmount);
-
-    ////
-    // Update loan
-    ////
-    loan.drawnDown = loan.drawnDown.plus(borrow.amount);
-    loan.save();
+    const borrow = createBorrow(event, loan, drawdownAmount, treasuryFeePaid);
 
     ////
     // Update market
     ////
     const protocol = getOrCreateProtocol();
     const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    const treasuryFee = bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee));
     const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
     market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(
         bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
     );
-    const protocolRevenueUSD = getTokenAmountInUSD(event, inputToken, treasuryFee);
+    const protocolRevenueUSD = getTokenAmountInUSD(event, inputToken, treasuryFeePaid);
     market._cumulativeProtocolSideRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(protocolRevenueUSD);
     market.save();
+
+    ////
+    // Update loan
+    ////
+    loan.drawnDown = loan.drawnDown.plus(borrow.amount);
+    loan.treasuryFeePaid = loan.treasuryFeePaid.plus(treasuryFeePaid);
+    loan.save();
 
     ////
     // Update protocol
@@ -114,7 +115,7 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     ////
     const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
     financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-        getTokenAmountInUSD(event, inputToken, treasuryFee)
+        getTokenAmountInUSD(event, inputToken, treasuryFeePaid)
     );
     financialsDailySnapshot.save();
 

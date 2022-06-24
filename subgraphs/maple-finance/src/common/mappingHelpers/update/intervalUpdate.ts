@@ -224,6 +224,7 @@ export function intervalUpdateFinancialsDailySnapshot(event: ethereum.Event): vo
     financialsSnapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
     financialsSnapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
     financialsSnapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+    financialsSnapshot._treasuryFee = protocol._treasuryFee;
 
     financialsSnapshot.save();
     // Daily accumulators are event driven updates

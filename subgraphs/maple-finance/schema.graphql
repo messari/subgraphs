@@ -480,6 +480,9 @@ type FinancialsDailySnapshot @entity {
 
     " Sum of all historical liquidations in USD "
     cumulativeLiquidateUSD: BigDecimal!
+
+    " Treasury fee stored in decimals (e.g. 0.01 for 1%). This is the establishment fee to the treasury."
+    _treasuryFee: BigDecimal!
 }
 
 ###############################
@@ -1005,6 +1008,12 @@ type Borrow implements Event @entity {
 
     " Loan the borrow is happening from "
     _loan: _Loan!
+
+    " Amount of treasury fee paid in asset "
+    _treasuryFeePaid: BigInt!
+
+    " Amount of treasury fee paid in USD "
+    _treasuryFeePaidUSD: BigDecimal!
 }
 
 # For CDPs, use this for burn events
@@ -1060,6 +1069,9 @@ type Repay implements Event @entity {
 
     " Amount of treasury fee paid in pool input tokens "
     _treasuryFeePaid: BigInt!
+
+    " Amount of treasury fee paid in USD "
+    _treasuryFeePaidUSD: BigInt!
 }
 
 type Liquidate implements Event @entity {
@@ -1341,6 +1353,9 @@ type _Loan @entity {
 
     " Amount of default remaining after liquidations that the stake and pool must cover in market input tokens "
     defaultSuffered: BigInt!
+
+    " Amount of treasury fee paid in market input tokens "
+    treasuryFeePaid: BigInt!
 }
 
 type _MplReward @entity {

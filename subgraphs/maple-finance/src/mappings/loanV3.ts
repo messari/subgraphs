@@ -81,7 +81,7 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     ////
     // Create borrow
     ////
-    const borrow = createBorrow(event, loan, drawdownAmount);
+    const borrow = createBorrow(event, loan, drawdownAmount, ZERO_BI);
 
     ////
     // Update loan
@@ -106,9 +106,12 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
 
     const repay = createRepay(event, loan, principalPaid, interestPaid, treasuryFee);
 
+    ////
     // Update loan
+    ////
     loan.principalPaid = loan.principalPaid.plus(repay._principalPaid);
     loan.interestPaid = loan.interestPaid.plus(repay._interestPaid);
+    loan.treasuryFeePaid = loan.treasuryFeePaid.plus(treasuryFee);
     loan.save();
 
     ////
