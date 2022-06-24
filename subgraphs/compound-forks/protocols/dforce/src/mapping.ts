@@ -20,7 +20,7 @@ import {
   getOrElse,
   _handleActionPaused,
   snapshotFinancials,
-} from "../../src/mapping";
+} from "../../../src/mapping";
 import {
   cTokenDecimals,
   BIGINT_ZERO,
@@ -28,7 +28,7 @@ import {
   exponentToBigDecimal,
   BIGDECIMAL_ZERO,
   SECONDS_PER_DAY,
-} from "../../src/constants";
+} from "../../../src/constants";
 import {
   LendingProtocol,
   Token,
@@ -36,17 +36,17 @@ import {
   _MarketStatus,
   RewardToken,
   FinancialsDailySnapshot,
-} from "../../generated/schema";
-import { ERC20 } from "../../generated/Comptroller/ERC20";
+} from "../../../generated/schema";
+import { ERC20 } from "../../../generated/Comptroller/ERC20";
 
 // otherwise import from the specific subgraph root
-import { CToken } from "../generated/Comptroller/CToken";
-import { PriceOracle } from "../generated/Comptroller/PriceOracle";
-import { Comptroller } from "../generated/Comptroller/Comptroller";
+import { CToken } from "../../../generated/Comptroller/CToken";
+import { PriceOracle } from "../../../generated/Comptroller/PriceOracle";
+import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import {
   CToken as CTokenTemplate,
   Reward as RewardTemplate,
-} from "../generated/templates";
+} from "../../../generated/templates";
 import {
   getNetworkSpecificConstant,
   ZERO_ADDRESS,
@@ -62,11 +62,11 @@ import {
   RewardDistributor,
   RewardDistributed,
   NewRewardToken,
-} from "../generated/templates/Reward/RewardDistributor";
+} from "../../../generated/templates/Reward/RewardDistributor";
 import {
   stablecoin,
   Transfer as StablecoinTransfer,
-} from "../generated/USX/stablecoin";
+} from "../../../generated/USX/stablecoin";
 import {
   NewPriceOracle,
   MarketAdded,
@@ -77,7 +77,7 @@ import {
   RedeemPaused,
   BorrowPaused,
   TransferPaused,
-} from "../generated/Comptroller/Comptroller";
+} from "../../../generated/Comptroller/Comptroller";
 import {
   Mint,
   Redeem,
@@ -86,7 +86,7 @@ import {
   LiquidateBorrow,
   UpdateInterest as AccrueInterest,
   NewReserveRatio,
-} from "../generated/templates/CToken/CToken";
+} from "../../../generated/templates/CToken/CToken";
 
 // Constant values
 let constant = getNetworkSpecificConstant();

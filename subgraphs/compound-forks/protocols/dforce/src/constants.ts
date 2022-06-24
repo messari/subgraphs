@@ -12,7 +12,7 @@ import {
   MATIC_BLOCKS_PER_YEAR,
   AVALANCHE_BLOCKS_PER_YEAR,
   Network,
-} from "../../src/constants";
+} from "../../../src/constants";
 
 // optimism does not have constant # blocks/year
 // rewarddistributor is paused on optimism and
