@@ -1,5 +1,5 @@
-import { Address } from "@graphprotocol/graph-ts";
-import { decimal, integer } from "@protofire/subgraph-toolkit";
+import { Address, ByteArray } from "@graphprotocol/graph-ts";
+import { ADDRESS_ZERO, decimal, integer } from "@protofire/subgraph-toolkit";
 import { VaultContract } from "../../generated/ControllerListener/VaultContract";
 import { Vault } from "../../generated/schema"
 import { protocol } from "./protocol";
@@ -38,20 +38,27 @@ export namespace vaults {
 
 	export function getValuesForVault(vaultAddress: Address): VaultValuesResult {
 		let contract = VaultContract.bind(vaultAddress)
+		let underlyingResult = contract.try_underlying()
+		let value = !underlyingResult.reverted ? underlyingResult.value : Address.fromHexString(ADDRESS_ZERO) as Address
+
+
 		return new VaultValuesResult(
 			shared.readValue<string>(contract.try_symbol(), `fallBackValueFor ${vaultAddress.toHexString()}`),
 			shared.readValue<string>(contract.try_name(), `fallBackValueFor ${vaultAddress.toHexString()}`),
+			value
 		)
 	}
 
 	export class VaultValuesResult {
 		symbol: string;
 		name: string;
+		underLyingToken: Address;
 		constructor(
-			_symbol: string, _name: string
+			_symbol: string, _name: string, _underLyingToken: Address
 		) {
 			this.symbol = _symbol
 			this.name = _name
+			this.underLyingToken = _underLyingToken
 		}
 	}
 }

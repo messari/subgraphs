@@ -51,6 +51,16 @@ export namespace tokens {
 		)
 	}
 
+
+	export function setValuesForToken(_token: Token, values: TokenValuesresult): Token {
+		let token = _token
+		token.name = values.name
+		token.symbol = values.symbol
+		token.decimals = values.decimals
+		return token
+	}
+
+
 	export class TokenValuesresult {
 		// TODO how to reduce verbosity on ResultType Classes
 		name: string
