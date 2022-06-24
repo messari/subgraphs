@@ -205,6 +205,7 @@ export function createRepay(
     repay._principalPaid = principalPaid;
     repay._interestPaid = interestPaid;
     repay._treasuryFeePaid = treasuryFeePaid;
+    repay._treasuryFeePaidUSD = getTokenAmountInUSD(event, asset, treasuryFeePaid);
     repay.amount = principalPaid.plus(interestPaid).plus(treasuryFeePaid);
     repay.amountUSD = getTokenAmountInUSD(event, asset, repay.amount);
 

@@ -3,7 +3,7 @@ import { Market, _MplReward, _StakeLocker } from "../../../../generated/schema";
 import { PoolLib } from "../../../../generated/templates/Pool/PoolLib";
 
 import { MAPLE_POOL_LIB_ADDRESS, SEC_PER_DAY, TEN_BD, ZERO_BD, ZERO_BI } from "../../constants";
-import { getTokenAmountInUSD, getTokenPriceInUSD } from "../../prices/prices";
+import { getBptTokenAmountInUSD, getTokenAmountInUSD, getTokenPriceInUSD } from "../../prices/prices";
 import { bigDecimalToBigInt, powBigDecimal, readCallResult } from "../../utils";
 import { getOrCreateMarket, getOrCreateMplReward, getOrCreateStakeLocker } from "../getOrCreate/markets";
 import { getOrCreateProtocol } from "../getOrCreate/protocol";
@@ -31,12 +31,15 @@ function intervalUpdateMplReward(event: ethereum.Event, mplReward: _MplReward): 
 function intervalUpdateStakeLocker(event: ethereum.Event, stakeLocker: _StakeLocker): void {
     if (stakeLocker.lastUpdatedBlockNumber != event.block.number) {
         const market = getOrCreateMarket(event, Address.fromString(stakeLocker.market));
+        const stakeToken = getOrCreateToken(Address.fromString(stakeLocker.stakeToken));
         stakeLocker.stakeTokenBalance = stakeLocker.cumulativeStake
             .minus(stakeLocker.cumulativeUnstake)
             .minus(stakeLocker.cumulativeLosses);
 
+        stakeLocker.stakeTokenBalanceUSD = getBptTokenAmountInUSD(event, stakeToken, stakeLocker.stakeTokenBalance);
+
         const poolLibContract = PoolLib.bind(MAPLE_POOL_LIB_ADDRESS);
-        stakeLocker.stakeTokenBalanceInPoolInputTokens = readCallResult(
+        stakeLocker.stakeTokenSwapOutBalanceInPoolInputTokens = readCallResult(
             poolLibContract.try_getSwapOutValueLocker(
                 Address.fromString(stakeLocker.stakeToken),
                 Address.fromString(market.inputToken),
@@ -91,11 +94,8 @@ function intervalUpdateMarket(event: ethereum.Event, market: Market): Market {
             .times(powBigDecimal(TEN_BD, outputToken.decimals - inputToken.decimals))
             .times(market.exchangeRate);
 
-        market.totalValueLockedUSD = getTokenAmountInUSD(
-            event,
-            inputToken,
-            market.inputTokenBalance.plus(stakeLocker.stakeTokenBalanceInPoolInputTokens)
-        );
+        const inputTokenBalanceUSD = getTokenAmountInUSD(event, inputToken, market.inputTokenBalance);
+        market.totalValueLockedUSD = stakeLocker.stakeTokenBalanceUSD.plus(inputTokenBalanceUSD);
 
         market.totalDepositBalanceUSD = getTokenAmountInUSD(event, inputToken, market._totalDepositBalance);
 

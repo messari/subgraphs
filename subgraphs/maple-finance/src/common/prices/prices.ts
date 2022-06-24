@@ -4,8 +4,8 @@ import { Token } from "../../../generated/schema";
 import { chainlinkOracleGetTokenPriceInUSD } from "./oracles/chainlink";
 import { mapleOracleGetTokenPriceInUSD } from "./oracles/maple";
 import { yearnOracleGetTokenPriceInUSD } from "./oracles/yearn";
-import { ZERO_BD, OracleType, MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS } from "../constants";
-import { parseUnits } from "../utils";
+import { ZERO_BD, OracleType, MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS, ZERO_ADDRESS, ZERO_BI } from "../constants";
+import { parseUnits, readCallResult } from "../utils";
 
 import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
@@ -14,6 +14,8 @@ import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
 import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
+import { BalancerPool } from "../../../generated/templates/Pool/BalancerPool";
+import { getOrCreateToken } from "../mappingHelpers/getOrCreate/supporting";
 
 export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDecimal {
     const network = dataSource.network();
@@ -23,7 +25,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     let mapleLensPrice = mapleOracleGetTokenPriceInUSD(token);
     if (mapleLensPrice) {
         token._lastPriceOracle = OracleType.MAPLE;
-        token.lastPriceUSD=mapleLensPrice;
+        token.lastPriceUSD = mapleLensPrice;
         token.save();
         return mapleLensPrice;
     }
@@ -32,7 +34,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     let chainLinkPrice = chainlinkOracleGetTokenPriceInUSD(token);
     if (chainLinkPrice) {
         token._lastPriceOracle = OracleType.CHAIN_LINK;
-        token.lastPriceUSD=chainLinkPrice;
+        token.lastPriceUSD = chainLinkPrice;
         token.save();
         return chainLinkPrice;
     }
@@ -41,7 +43,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     let yearnLensPrice = yearnOracleGetTokenPriceInUSD(token);
     if (yearnLensPrice) {
         token._lastPriceOracle = OracleType.YEARN_LENS;
-        token.lastPriceUSD=yearnLensPrice;
+        token.lastPriceUSD = yearnLensPrice;
         token.save();
         return yearnLensPrice;
     }
@@ -50,7 +52,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     let calculationsCurvePrice = getTokenPriceFromCalculationCurve(tokenAddress, network);
     if (!calculationsCurvePrice.reverted) {
         token._lastPriceOracle = OracleType.CURVE_CALC;
-        token.lastPriceUSD=calculationsCurvePrice.usdPrice;
+        token.lastPriceUSD = calculationsCurvePrice.usdPrice;
         token.save();
         return calculationsCurvePrice.usdPrice;
     }
@@ -59,7 +61,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(tokenAddress, network);
     if (!calculationsSushiSwapPrice.reverted) {
         token._lastPriceOracle = OracleType.SUSHISWAP_CALC;
-        token.lastPriceUSD=calculationsSushiSwapPrice.usdPrice;
+        token.lastPriceUSD = calculationsSushiSwapPrice.usdPrice;
         token.save();
         return calculationsSushiSwapPrice.usdPrice;
     }
@@ -68,7 +70,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     let curvePrice = getCurvePriceUsdc(tokenAddress, network);
     if (!curvePrice.reverted) {
         token._lastPriceOracle = OracleType.CURVE_ROUTE;
-        token.lastPriceUSD=curvePrice.usdPrice;
+        token.lastPriceUSD = curvePrice.usdPrice;
         token.save();
         return curvePrice.usdPrice;
     }
@@ -77,7 +79,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     let uniswapPrice = getPriceUsdcUniswap(tokenAddress, network);
     if (!uniswapPrice.reverted) {
         token._lastPriceOracle = OracleType.UNISWAP_ROUTE;
-        token.lastPriceUSD=uniswapPrice.usdPrice;
+        token.lastPriceUSD = uniswapPrice.usdPrice;
         token.save();
         return uniswapPrice.usdPrice;
     }
@@ -86,7 +88,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     let sushiswapPrice = getPriceUsdcSushiswap(tokenAddress, network);
     if (!sushiswapPrice.reverted) {
         token._lastPriceOracle = OracleType.SUSHISWAP_ROUTE;
-        token.lastPriceUSD=sushiswapPrice.usdPrice;
+        token.lastPriceUSD = sushiswapPrice.usdPrice;
         token.save();
         return sushiswapPrice.usdPrice;
     }
@@ -98,7 +100,46 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
 }
 
 export function getTokenAmountInUSD(event: ethereum.Event, token: Token, amount: BigInt): BigDecimal {
-    const tokenPrice = getTokenPriceInUSD(event, token);
+    const tokenPriceUSD = getTokenPriceInUSD(event, token);
 
-    return parseUnits(amount, token.decimals).times(tokenPrice);
+    return parseUnits(amount, token.decimals).times(tokenPriceUSD);
+}
+
+export function getBptTokenPriceUSD(event: ethereum.Event, bptToken: Token): BigDecimal {
+    const balancerContract = BalancerPool.bind(Address.fromString(bptToken.id));
+
+    const inputTokenAddresses = readCallResult(
+        balancerContract.try_getCurrentTokens(),
+        new Array<Address>(),
+        balancerContract.try_getCurrentTokens.name
+    );
+
+    const totalBptSupply = readCallResult(
+        balancerContract.try_totalSupply(),
+        ZERO_BI,
+        balancerContract.try_totalSupply.name
+    );
+
+    let balanceUSD = ZERO_BD;
+    for (let i = 0; i < inputTokenAddresses.length; i++) {
+        const address = inputTokenAddresses[i];
+        const token = getOrCreateToken(address);
+        const tokenBalance = readCallResult(
+            balancerContract.try_getBalance(address),
+            ZERO_BI,
+            balancerContract.try_getBalance.name
+        );
+        const tokenAmountUSD = getTokenAmountInUSD(event, token, tokenBalance);
+        balanceUSD = balanceUSD.plus(tokenAmountUSD);
+    }
+
+    const pricePerBptUSD = totalBptSupply.notEqual(ZERO_BI) ? balanceUSD.div(totalBptSupply.toBigDecimal()) : ZERO_BD;
+
+    return pricePerBptUSD;
+}
+
+export function getBptTokenAmountInUSD(event: ethereum.Event, bptToken: Token, amount: BigInt): BigDecimal {
+    const tokenPriceUSD = getBptTokenPriceUSD(event, bptToken);
+
+    return parseUnits(amount, bptToken.decimals).times(tokenPriceUSD);
 }

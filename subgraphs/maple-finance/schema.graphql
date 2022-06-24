@@ -1071,7 +1071,7 @@ type Repay implements Event @entity {
     _treasuryFeePaid: BigInt!
 
     " Amount of treasury fee paid in USD "
-    _treasuryFeePaidUSD: BigInt!
+    _treasuryFeePaidUSD: BigDecimal!
 }
 
 type Liquidate implements Event @entity {
@@ -1187,8 +1187,11 @@ type _StakeLocker @entity {
     " Amount of stake tokens in the stake locker "
     stakeTokenBalance: BigInt!
 
-    " Amount of pool input token equivilent in the stake locker "
-    stakeTokenBalanceInPoolInputTokens: BigInt!
+    " Balance of stake tokens in USD in the stake locker "
+    stakeTokenBalanceUSD: BigDecimal!
+
+    " Amount of pool input token equivilent in the stake locker if all bpt were swapped "
+    stakeTokenSwapOutBalanceInPoolInputTokens: BigInt!
 
     " Block the stake locker was last updated "
     lastUpdatedBlockNumber: BigInt!
