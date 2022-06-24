@@ -1,8 +1,6 @@
 type Governance @entity {
   "Unique entity used to keep track of common aggregated data"
   id: ID!
-  "Number of proposals created"
-  proposals: BigInt!
 
   "Total number of token holders currently"
   currentTokenHolders: BigInt!
@@ -17,17 +15,52 @@ type Governance @entity {
   "Total number of votes delegated expressed as a BigDecimal normalized value for the Compound Token"
   delegatedVotes: BigDecimal!
 
+  "Total number of proposals created"
+  proposals: BigInt!
   "Number of proposals currently queued for execution"
   proposalsQueued: BigInt!
   "Number of proposals currently executed"
   proposalsExecuted: BigInt!
   "Number of proposals currently canceled"
   proposalsCanceled: BigInt!
+}
 
-  "Quorum fraction numerator value. (quorum = totalSupply * numerator / denominator)"
-  quorumNumerator: BigInt
-  "Quorum fraction denominator value. (quorum = totalSupply * numerator / denominator)"
-  quorumDenominator: BigInt
+type GovernanceFramework @entity {
+  "Governance framework contract address"
+  id: ID!
+  "Name of the governance framework"
+  name: String!
+  "Type of governance framework"
+  type: GovernanceFrameworkType!
+  "Version of the governance framework"
+  version: String!
+
+  "Governance framework contract address"
+  contractAddress: String!
+  "The contract address associated with the governance token used for voting on the governance framework proposals"
+  tokenAddress: String!
+  "The contract address associated with the contract that manages the delay of administrative actions for the governance framework"
+  timelockAddress: String!
+
+  "The delay before voting on a proposal may take place in blocks"
+  votingDelay: BigInt!
+  "The duration of voting on a proposal in blocks"
+  votingPeriod: BigInt!
+  "The number of votes required in order for a voter to become a proposer"
+  proposalThreshold: BigInt!
+
+  "The number of votes for a proposal to succeed. (quorum = totalSupply * numerator / denominator)"
+  _quorum: BigDecimal
+  "Quorum fraction numerator value"
+  quorumNumerator: BigInt!
+  "Quorum fraction denominator value"
+  quorumDenominator: BigInt!
+}
+
+enum GovernanceFrameworkType {
+  GovernorAlpha
+  GovernorBravo
+  OZGovernor
 }
 
 type Proposal @entity {
@@ -35,6 +68,7 @@ type Proposal @entity {
   id: ID!
   "Governor Alpha Proposal description in markdown format"
   description: String
+
   "Delegate that proposed the change"
   proposer: Delegate!
   "State of the proposal"
