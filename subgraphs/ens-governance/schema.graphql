@@ -31,9 +31,8 @@ type Governance @entity {
 }
 
 type Proposal @entity {
+  "Internal proposal ID, in this implementation it seems to be a autoincremental id"
   id: ID!
-  "This is the on-chain ID associated with the proposal"
-  proposalId: BigInt!
   "Governor Alpha Proposal description in markdown format"
   description: String
   "Delegate that proposed the change"
