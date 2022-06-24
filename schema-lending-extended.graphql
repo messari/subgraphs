@@ -897,31 +897,31 @@ type Account @entity {
   depositCount: Int!
 
   " All deposit events of this account "
-  deposits: [Deposit!]! @derivedFrom(field: "from")
+  deposits: [Deposit!]! @derivedFrom(field: "account")
 
   " Number of withdrawals this account made "
   withdrawCount: Int!
 
   " All withdraw events of this account "
-  withdraws: [Withdraw!]! @derivedFrom(field: "to")
+  withdraws: [Withdraw!]! @derivedFrom(field: "account")
 
   " Number of borrows this account made "
   borrowCount: Int!
 
   " All borrow events of this account "
-  borrows: [Borrow!]! @derivedFrom(field: "to")
+  borrows: [Borrow!]! @derivedFrom(field: "account")
 
   " Number of repays this account made "
   repayCount: Int!
 
   " All repay events of this account "
-  repays: [Repay!]! @derivedFrom(field: "from")
+  repays: [Repay!]! @derivedFrom(field: "account")
 
   " Number of times this account liquidated a position "
   liquidateCount: Int!
 
   " All liquidation events where this account was the liquidator "
-  liquidates: [Liquidate!]! @derivedFrom(field: "from")
+  liquidates: [Liquidate!]! @derivedFrom(field: "liquidator")
 
   " Number of times this account has been liquidated "
   liquidationCount: Int!
@@ -971,31 +971,31 @@ type Position @entity {
   depositCount: Int!
 
   " All deposit events of this position "
-  deposits: [Deposit!]!
+  deposits: [Deposit!]! @derivedFrom(field: "position")
 
   " Number of withdrawals related to this position "
   withdrawCount: Int!
 
   " All withdraw events of this position "
-  withdraws: [Withdraw!]!
+  withdraws: [Withdraw!]! @derivedFrom(field: "position")
 
   " Number of borrows related to this position "
   borrowCount: Int!
 
   " All borrow events of this position "
-  borrows: [Borrow!]!
+  borrows: [Borrow!]! @derivedFrom(field: "position")
 
   " Number of repays related to this position "
   repayCount: Int!
 
   " All repay events of this position "
-  repays: [Repay!]!
+  repays: [Repay!]! @derivedFrom(field: "position")
 
   " Number of liquidations related to this position "
   liquidationCount: Int!
 
   " Liquidation event related to this position (if exists) "
-  liquidations: [Liquidate!]!
+  liquidations: [Liquidate!]! @derivedFrom(field: "position")
 
   " Position daily snapshots for open positions "
   dailySnapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
@@ -1045,25 +1045,20 @@ type Deposit @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
-  " The protocol this transaction belongs to "
-  protocol: LendingProtocol!
-
-  " Market that tokens are deposited into "
-  to: Market!
-
-  " Account that deposited tokens "
-  from: Account!
-
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
+  " Account that deposited tokens "
+  account: Account!
 
-  " The market this transaction interacted with "
+  " The market tokens are deposited to "
   market: Market!
+
+  " The user position changed by this event "
+  position: Position!
 
   " Token deposited "
   asset: Token!
@@ -1088,25 +1083,20 @@ type Withdraw @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
-  " The protocol this transaction belongs to "
-  protocol: LendingProtocol!
-
-  " Account that received tokens "
-  to: Account!
-
-  " Market that tokens are withdrawn from "
-  from: Market!
-
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
+  " Account that withdrew tokens "
+  account: Account!
 
-  " The market this transaction interacted with "
+  " The market tokens are withdrew from "
   market: Market!
+
+  " The user position changed by this event "
+  position: Position!
 
   " Token withdrawn "
   asset: Token!
@@ -1136,25 +1126,20 @@ type Borrow @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
-  " The protocol this transaction belongs to "
-  protocol: LendingProtocol!
-
-  " Account that received tokens "
-  to: Account!
-
-  " Market that tokens are borrowed from "
-  from: Market!
-
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
+  " Account that borrowed/minted tokens "
+  account: Account!
 
-  " The market this transaction interacted with "
+  " The market tokens are borrowed/minted from "
   market: Market!
+
+  " The user position changed by this event "
+  position: Position!
 
   " Token borrowed "
   asset: Token!
@@ -1180,33 +1165,28 @@ type Repay @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
-  " The protocol this transaction belongs to "
-  protocol: LendingProtocol!
-
-  " Market that tokens are repaid to "
-  to: Market!
-
-  " Account that sent tokens "
-  from: Account!
-
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
+  " Account that repaid/burned tokens "
+  account: Account!
 
-  " The market this transaction interacted with "
+  " The market tokens are repaid/burned to "
   market: Market!
 
-  " Token repaid "
+  " The user position changed by this event "
+  position: Position!
+
+  " Token repaid/burned "
   asset: Token!
 
-  " Amount of token repaid in native units "
+  " Amount of token repaid/burned in native units "
   amount: BigInt!
 
-  " Amount of token repaid in USD "
+  " Amount of token repaid/burned in USD "
   amountUSD: BigDecimal!
 }
 
@@ -1223,28 +1203,23 @@ type Liquidate @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
-  " The protocol this transaction belongs to "
-  protocol: LendingProtocol!
-
-  " Market that tokens are repaid to "
-  to: Market!
-
-  " Account that carried out the liquidation "
-  from: Account!
-
-  " Account that got liquidated "
-  liquidatee: Account!
-
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
+  " Account that carried out the liquidation "
+  liquidator: Account!
+
+  " Account that got liquidated "
+  liquidatee: Account!
 
   " The market of the collateral being used "
   market: Market!
+
+  " The user position changed by this event "
+  position: Position!
 
   " Asset repaid (borrowed) "
   asset: Token!
