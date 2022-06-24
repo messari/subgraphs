@@ -80,3 +80,7 @@ N/A
   - Rewards contracts: https://github.com/aave/aave-v3-periphery
 - Deployed addresses: https://docs.aave.com/developers/deployed-contracts/v3-mainnet
 - Existing Subgraph: https://github.com/aave/protocol-subgraphs
+
+## Smart Contracts Interactions
+
+![Aave V3](../../docs/images/protocols/aave-v3.png "Aave V3")
