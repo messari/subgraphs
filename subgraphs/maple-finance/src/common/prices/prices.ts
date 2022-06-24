@@ -21,27 +21,30 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
 
     // 1. Maple Oracle
     let mapleLensPrice = mapleOracleGetTokenPriceInUSD(token);
-    if (mapleLensPrice && mapleLensPrice.notEqual(ZERO_BD)) {
+    if (mapleLensPrice) {
         token._lastPriceOracle = OracleType.MAPLE;
         token.lastPriceUSD = mapleLensPrice;
+        token.lastPriceBlockNumber = event.block.number;
         token.save();
         return mapleLensPrice;
     }
 
     // 2. ChainLink Feed Registry
     let chainLinkPrice = chainlinkOracleGetTokenPriceInUSD(token);
-    if (chainLinkPrice && chainLinkPrice.notEqual(ZERO_BD)) {
+    if (chainLinkPrice) {
         token._lastPriceOracle = OracleType.CHAIN_LINK;
         token.lastPriceUSD = chainLinkPrice;
+        token.lastPriceBlockNumber = event.block.number;
         token.save();
         return chainLinkPrice;
     }
 
     // 3. Yearn Lens Oracle
     let yearnLensPrice = yearnOracleGetTokenPriceInUSD(token);
-    if (yearnLensPrice && yearnLensPrice.notEqual(ZERO_BD)) {
+    if (yearnLensPrice) {
         token._lastPriceOracle = OracleType.YEARN_LENS;
         token.lastPriceUSD = yearnLensPrice;
+        token.lastPriceBlockNumber = event.block.number;
         token.save();
         return yearnLensPrice;
     }
@@ -51,6 +54,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     if (!calculationsCurvePrice.reverted) {
         token._lastPriceOracle = OracleType.CURVE_CALC;
         token.lastPriceUSD = calculationsCurvePrice.usdPrice;
+        token.lastPriceBlockNumber = event.block.number;
         token.save();
         return calculationsCurvePrice.usdPrice;
     }
@@ -60,6 +64,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     if (!calculationsSushiSwapPrice.reverted) {
         token._lastPriceOracle = OracleType.SUSHISWAP_CALC;
         token.lastPriceUSD = calculationsSushiSwapPrice.usdPrice;
+        token.lastPriceBlockNumber = event.block.number;
         token.save();
         return calculationsSushiSwapPrice.usdPrice;
     }
@@ -69,6 +74,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     if (!curvePrice.reverted) {
         token._lastPriceOracle = OracleType.CURVE_ROUTE;
         token.lastPriceUSD = curvePrice.usdPrice;
+        token.lastPriceBlockNumber = event.block.number;
         token.save();
         return curvePrice.usdPrice;
     }
@@ -78,6 +84,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     if (!uniswapPrice.reverted) {
         token._lastPriceOracle = OracleType.UNISWAP_ROUTE;
         token.lastPriceUSD = uniswapPrice.usdPrice;
+        token.lastPriceBlockNumber = event.block.number;
         token.save();
         return uniswapPrice.usdPrice;
     }
@@ -87,6 +94,7 @@ export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDeci
     if (!sushiswapPrice.reverted) {
         token._lastPriceOracle = OracleType.SUSHISWAP_ROUTE;
         token.lastPriceUSD = sushiswapPrice.usdPrice;
+        token.lastPriceBlockNumber = event.block.number;
         token.save();
         return sushiswapPrice.usdPrice;
     }
