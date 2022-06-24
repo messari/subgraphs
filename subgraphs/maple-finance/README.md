@@ -2,7 +2,7 @@
 
 ## Calculation Methodology v1.0.0
 
-Below, the methodologies for key fields in the protocol are surfaces for convience.
+Below, the methodologies for key fields in the protocol are surfaced for convience.
 
 Note that all cumulatives USD values are origination values (i.e values at the time the accumulation occured), they are not current values. This means that the cumulative values are monotonically increacing over time. If current values are desired for the cumulatives, they can be derived from the cumulative token values.
 
@@ -14,21 +14,21 @@ In depth methodologies for every parameter in the protocol can be found here: [S
 
 Total amount on the supply side that is earning interest
 
-`Total Depsit Balance USD + Total Stake Balance USD`
+`Total Deposit Balance USD + Total Stake Balance USD + Total Unclaimed Supplier Interest USD`
 
-This does not include accrued staking rewards
+This does not include accrued staking rewards.
 
 #### Total Deposit Balance USD
 
 `Cumulative Deposit USD - Cumulative Withdraw USD - Cumulative Pool Losses USD`
 
-Pool Losses occur when a default is suffered by the pool, it comes out of the deposit amount
+Pool Losses occur when a default is suffered by the pool, it is absorbed by the deposit amount.
 
 #### Total Borrow Balance USD
 
 `Cumulative Withdraw USD - Cumulative Principal Repay USD - Loan Defaults USD`
 
-Liquidated collatoral is interpreted the same as paying principal since from the pool perspective there is no difference. Defaults to stake locker and pool are absorbed and removed from total borrow.
+Liquidated collatoral is interpreted the same as paying principal since from the pool perspective there is no difference. Defaults to the Stake Locker and Pool are absorbed and removed from total borrow.
 
 #### Cumulative Liquidate USD
 
@@ -40,7 +40,7 @@ Collatoral liquidation is not counted towards cumulative liquidate, and is inste
 
 `Cumulative Establishment Fees To Pool Delegate USD + Cumulative Interest To Market USD`
 
-Interest To Market USD is all interest going to the suppliers and the stake locker, this doesn't include MPL token distribution.
+Interest To Market USD is all interest going to the Suppliers and the Stake Locker, this doesn't include MPL token distribution.
 
 #### Cumulative Protocol Side Revenue USD
 
@@ -68,11 +68,11 @@ The number of Unique Adresses that interacted with the protocol through transact
 
 `Withdraw`
 
+`Repay`
+
 `Stake`
 
 `Unstake`
-
-`Repay`
 
 ## Protocol Diagrams
 
