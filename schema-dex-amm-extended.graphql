@@ -612,7 +612,7 @@ type LiquidityPoolHourlySnapshot @entity {
 }
 
 ##################################
-##### Transaction-Level Data #####
+##### Event-Level Data #####
 ##################################
 
 """
@@ -623,33 +623,8 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-interface Event {
-  " { Event type }-{ Transaction hash }-{ Log index } "
-  id: ID!
 
-  " Transaction hash of the transaction that emitted this event "
-  hash: String!
-
-  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
-
-  " The protocol this transaction belongs to "
-  protocol: DexAmmProtocol!
-
-  " Address that received the tokens "
-  to: String!
-
-  " Address that sent the tokens "
-  from: String!
-
-  " Block number of this event "
-  blockNumber: BigInt!
-
-  " Timestamp of this event "
-  timestamp: BigInt!
-}
-
-type Deposit implements Event @entity {
+type Deposit @entity {
   " deposit-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -693,7 +668,7 @@ type Deposit implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity {
+type Withdraw @entity {
   " withdraw-{ Transaction hash }-{ Log index }"
   id: ID!
 
@@ -737,7 +712,7 @@ type Withdraw implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Swap implements Event @entity {
+type Swap @entity {
   " swap-{ Transaction hash }-{ Log index } "
   id: ID!
 
