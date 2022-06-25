@@ -124,21 +124,31 @@ export function getGovernanceFramework(
   return governanceFramework;
 }
 
-export function getProposal(id: string): Proposal {
+export function getOrCreateProposal(
+  id: string,
+  createIfNotFound: boolean = true
+): Proposal {
   let proposal = Proposal.load(id);
 
-  if (proposal == null) {
+  if (proposal == null && createIfNotFound) {
     proposal = new Proposal(id);
     proposal.save();
+
+    let governance = getGovernance();
+    governance.proposals = governance.proposals.plus(BIGINT_ONE);
+    governance.save();
   }
 
-  return proposal;
+  return proposal as Proposal;
 }
 
-export function getDelegate(address: Bytes): Delegate {
+export function getOrCreateDelegate(
+  address: Bytes,
+  createIfNotFound: boolean = true
+): Delegate {
   let delegate = Delegate.load(address);
 
-  if (delegate == null) {
+  if (!delegate && createIfNotFound) {
     delegate = new Delegate(address);
     delegate.delegatedVotesRaw = BIGINT_ZERO;
     delegate.delegatedVotes = BIGDECIMAL_ZERO;
@@ -154,7 +164,7 @@ export function getDelegate(address: Bytes): Delegate {
     delegate.save();
   }
 
-  return delegate;
+  return delegate as Delegate;
 }
 
 export function getTokenHolder(address: Bytes): TokenHolder {
