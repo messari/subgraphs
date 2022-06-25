@@ -20,7 +20,7 @@ import {
   getPoolFee,
   getOrCreateToken,
 } from "./getters";
-import { setPoolBalances, setPoolOutputTokenSupply, setPoolTVL, setProtocolTVL } from "./setters";
+import { setPoolBalances, setPoolTVL, setProtocolTVL } from "./setters";
 import { bigIntToBigDecimal } from "./utils/numbers";
 
 // Update FinancialsDailySnapshots entity
@@ -146,7 +146,7 @@ export function updatePoolMetrics(poolAddress: string, event: ethereum.Event): v
 export function updatePool(liquidityPool: LiquidityPool, event: ethereum.Event): void {
   liquidityPool.outputTokenPriceUSD = getLpTokenPriceUSD(liquidityPool, event.block.timestamp);
   setPoolBalances(liquidityPool);
-  setPoolOutputTokenSupply(liquidityPool);
+  //setPoolOutputTokenSupply(liquidityPool);
   setPoolTVL(liquidityPool, event.block.timestamp); // updates pool token weights too
   setProtocolTVL(); // updates the protocol totalValueLockedUSD, along with the pool's tvl being updated
   liquidityPool.save();

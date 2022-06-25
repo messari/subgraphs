@@ -4,6 +4,9 @@
     "factory": {
       "address": "0x5757371414417b8c6caad45baef941abc7d3ab32",
       "startBlock": 4931780
-    }
+    },
+    "graftEnabled": false,
+    "subgraphId": "",
+    "graftStartBlock": 0
   }
   

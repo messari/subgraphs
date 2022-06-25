@@ -105,7 +105,7 @@ function ErrorDisplay({
     const errorsToRender = errorMessagesSplit.map((msg) => {
       return { message: msg, type: "DEPLOY", level: "critical", fieldName: "" };
     });
-    return <IssuesDisplay issuesArrayProps={errorsToRender} />;
+    return <IssuesDisplay issuesArrayProps={errorsToRender} allLoaded={true} oneLoaded={true} />;
   }
 
   if (errorMsgs.length >= 1) {

@@ -76,3 +76,11 @@ export function getLpTokenPriceUSD(pool: LiquidityPool, timestamp: BigInt): BigD
 export function createTokenSnapshotID(tokenAddr: Address, timestamp: BigInt): string {
   return tokenAddr.toHexString() + "-" + timestamp.div(BigInt.fromI32(SNAPSHOT_SECONDS)).toString();
 }
+
+export function getTokenPrice(token: Address, pool: LiquidityPool, timestamp: BigInt): BigDecimal {
+  if (!pool.isV2) {
+    const latestPrice = getPoolAssetPrice(pool, timestamp);
+    return latestPrice;
+  }
+  return getTokenPriceSnapshot(token, timestamp);
+}

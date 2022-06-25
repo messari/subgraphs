@@ -4,94 +4,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: optUSD
-    network: optimism
+    name: ftmUSD
+    network: fantom
     source:
-      address: "0x5847f8177221268d279Cf377D0E01aB3FD993628"
+      address: "0xBea9F78090bDB9e662d8CB301A00ad09A5b756e9"
       abi: Swap
-      startBlock: 2404204
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - Token
-        - LiquidityPoolFee
-        - DexAmmProtocol
-        - UsageMetricsDailySnapshot
-        - UsageMetricsHourlySnapshot
-        - FinancialsDailySnapshot
-        - LiquidityPool
-        - LiquidityPoolDailySnapshot
-        - LiquidityPoolHourlySnapshot
-        - Deposit
-        - Withdraw
-        - Swap
-        - Account
-        - ActiveAccount
-      abis:
-        - name: Swap
-          file: ./abis/Swap.json
-        - name: SwapV1
-          file: ./abis/SwapV1.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: ERC20NameBytes
-          file: ./abis/ERC20NameBytes.json
-        - name: ERC20SymbolBytes
-          file: ./abis/ERC20SymbolBytes.json
-        # Prices
-        - name: _ERC20
-          file: ./abis/Prices/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: AddLiquidity(indexed address,uint256[],uint256[],uint256,uint256)
-          handler: handleAddLiquidity
-        - event: NewAdminFee(uint256)
-          handler: handleNewAdminFee
-        - event: NewSwapFee(uint256)
-          handler: handleNewSwapFee
-        - event: RemoveLiquidity(indexed address,uint256[],uint256)
-          handler: handleRemoveLiquidity
-        - event: RemoveLiquidityImbalance(indexed address,uint256[],uint256[],uint256,uint256)
-          handler: handleRemoveLiquidityImbalance
-        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256,uint256)
-          handler: handleRemoveLiquidityOne
-        - event: TokenSwap(indexed address,uint256,uint256,uint128,uint128)
-          handler: handleTokenSwap
-        - event: TokenSwapUnderlying(indexed address,uint256,uint256,uint128,uint128)
-          handler: handleTokenSwapUnderlying
-      file: ./src/mappings/swap.ts
-  - kind: ethereum/contract
-    name: FRAX
-    network: optimism
-    source:
-      address: "0xc55E8C79e5A6c3216D4023769559D06fa9A7732e"
-      abi: Swap
-      startBlock: 2404225
+      startBlock: 28679173
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -170,7 +88,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Swap
-    network: optimism
+    network: fantom
     source:
       abi: Swap
     mapping:
@@ -203,6 +121,12 @@ templates:
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
+        - name: MiniChefV2
+          file: ./abis/MiniChefV2.json
+        - name: SwapDeployer
+          file: ./abis/SwapDeployer.json
+        - name: SimpleRewarder
+          file: ./abis/SimpleRewarder.json
         # Prices
         - name: _ERC20
           file: ./abis/Prices/ERC20.json

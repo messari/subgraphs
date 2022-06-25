@@ -1,6 +1,6 @@
 import * as MAINNET from "../config/mainnet";
 import * as FANTOM from "../config/fantom";
-import * as ARBITRUM_ONE from "../config/arbitrum_one";
+import * as ARBITRUM_ONE from "../config/arbitrumOne";
 
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 import { UniswapPair__getReservesResult } from "../../../generated/UniswapV2Factory/UniswapPair";
@@ -86,8 +86,8 @@ CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
   FANTOM.CURVE_POOL_REGISTRY_ADDRESS
 );
 CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
-  FANTOM.NETWORK_STRING,
-  FANTOM.CURVE_POOL_REGISTRY_ADDRESS
+  ARBITRUM_ONE.NETWORK_STRING,
+  ARBITRUM_ONE.CURVE_POOL_REGISTRY_ADDRESS
 );
 
 ///////////////////////////////////////////////////////////////////////////

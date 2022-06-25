@@ -29,6 +29,8 @@ import {
   addMarketBorrowVolume,
   addMarketDepositVolume,
   addMarketLiquidateVolume,
+  addMarketRepayVolume,
+  addMarketWithdrawVolume,
   getOrCreateMarket,
 } from "./market";
 import { getETHToken, getLUSDToken } from "./token";
@@ -93,6 +95,7 @@ export function createWithdraw(
   withdraw.amountUSD = amountUSD;
   withdraw.save();
   updateUsageMetrics(event, recipient);
+  addMarketWithdrawVolume(event, amountUSD);
   incrementProtocolWithdrawCount(event);
 }
 
@@ -155,6 +158,7 @@ export function createRepay(
   repay.amountUSD = amountUSD;
   repay.save();
   updateUsageMetrics(event, sender);
+  addMarketRepayVolume(event, amountUSD);
   incrementProtocolRepayCount(event);
 }
 
@@ -179,10 +183,11 @@ export function createLiquidate(
   // but there is no data for this, so this is set to stability pool address
   liquidate.to = STABILITY_POOL;
   liquidate.from = liquidator.toHexString();
+  liquidate.liquidatee = liquidator.toHexString();
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.market = getOrCreateMarket().id;
-  liquidate.asset = getETHToken().id;
+  liquidate.asset = getLUSDToken().id;
   liquidate.amount = amountLiquidated;
   liquidate.amountUSD = amountLiquidatedUSD;
   liquidate.profitUSD = profitUSD;

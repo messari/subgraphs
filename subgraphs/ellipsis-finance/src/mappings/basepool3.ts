@@ -16,11 +16,13 @@ import {
   updateUsageMetrics,
 } from "../common/metrics";
 import { bigIntToBigDecimal } from "../common/utils/numbers";
+import { handleLiquidityEvent, handleLiquidityRemoveOne } from "../services/liquidity";
 import { handleExchange } from "../services/swaps";
 
 export function handleAddLiquidity3(event: AddLiquidity): void {
   let pool = getOrCreatePool(event.address, event);
 
+  handleLiquidityEvent('deposit',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event)
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
@@ -31,6 +33,7 @@ export function handleAddLiquidity3(event: AddLiquidity): void {
 export function handleRemoveLiquidity3(event: RemoveLiquidity): void {
   let pool = getOrCreatePool(event.address, event);
 
+  handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event)
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -40,6 +43,7 @@ export function handleRemoveLiquidity3(event: RemoveLiquidity): void {
 export function handleRemoveLiquidityImbalance3(event: RemoveLiquidityImbalance): void {
   let pool = getOrCreatePool(event.address, event);
 
+  handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event)
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
@@ -49,7 +53,7 @@ export function handleRemoveLiquidityImbalance3(event: RemoveLiquidityImbalance)
 
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
   let pool = getOrCreatePool(event.address, event);
-
+  handleLiquidityRemoveOne(pool, event.params.token_amount, event.params.provider, event);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated

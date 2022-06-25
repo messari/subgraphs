@@ -1,9 +1,18 @@
 # Uniswap Forks 
 
 ## Protocols:
-- Uniswap V2
-    - Mainnet
-        - Uniswap V2 serves as a base for the deployment of the other subgraphs. The others are forks of uniswap and inherit the baseline functionality for pool creation, pool management, and events like swaps, deposits, and withdraws. The code for  these functionailities are the same code used for all forks specified. 
+- Apeswap
+    - BSC, Matic
+        - The two chains use the code from uniswap V2. Additionally, there is a Masterchef and MasterchefV2 contract. BSC only uses the Masterchef contract, while MasterchefV2 is used on the Matic chain. The masterchef contracts are slightly different for Apeswap vs. Sushiswap in the naming of certain functions. It looks like Apeswap forked from Pancakeswap. This is why they each have a separate folder for Masterchef. 
+- Quickswap
+    - Matic
+        - Uses the same codebase as Uniswap-V2 for the factory and pools stored in the uniswap-forks/src folder
+- Solarbeam
+    - Moonriver
+        - Uses the uniswap-v2 codebase as Uniswap V2 for factory and pools. Additionally, it uses a masterchef contract that is templated from Sushiswap's implementation.
+- Spiritswap
+    - Moonbeam
+        - Uses the uniswap-v2 codebase as Uniswap V2 for factory and pools. Additionally, it uses a masterchef contract that is templated from Sushiswap's implementation.
 - Sushiswap
     - Mainnet
         - The only code that differs between uniswap is the use of the masterchef contract. This contract allows users to deposit LP tokens to earn rewards. Mainnet usees both the Masterchef and MasterchefV2 contract for these purposes.
@@ -11,9 +20,16 @@
         - Similarly, these chains inherit the same code from uniswap. However, these chains only use the Miniswap contract for staking LP and earning rewards. It works very similar to the Masterchef contracts. 
     - BSC, Avalanche
         - These two sushiswap chains deploy in just the same way as Uniswap V2. Just with different configurations. 
-- Apeswap
-    - BSC, Matic
-        - The two chains use the code from uniswap V2. Additionally, there is a Masterchef and MasterchefV2 contract. BSC only uses the Masterchef contract, while MasterchefV2 is used on the Matic chain. The masterchef contracts are slightly different for Apeswap vs. Sushiswap in the naming of certain functions. This is why they each have a separate folder for Masterchef. 
+- Trader Joe
+    - Avalanche
+        - Uses the uniswap-v2 codebase as Uniswap V2 for factory and pools. Additionally, it uses a masterchefV2 contract that is templated from Sushiswap's implementation and a masterchefV3 contract that is deployed at a later start block.
+- Uniswap V2
+    - Mainnet
+        - Uniswap V2 serves as a base for the deployment of the other subgraphs. The others are forks of uniswap and inherit the baseline functionality for pool creation, pool management, and events like swaps, deposits, and withdraws. The code for  these functionailities are the same code used for all forks specified. 
+- VVS
+    - Cronos
+        - Uses the uniswap-v2 codebase as Uniswap V2 for factory and pools. Additionally, it uses a masterchef contract that is templated from Sushiswap's implementation.
+        - This is not deployed on the hosted service. It is deployed on cronos. This is the query URL https://graph.cronoslabs.com/subgraphs/name/vvs-finance-cronos/first-subgraph
 
 
 ## Project Layout:

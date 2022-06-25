@@ -1,7 +1,7 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigDecimal, ethereum, BigInt, Address } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../config/paramConfig";
-import { UsageMetricsDailySnapshot, Account, Token, ActiveAccount, UsageMetricsHourlySnapshot, _HelperStore, DexAmmProtocol, LiquidityPool } from "../../generated/schema";
+import { NetworkConfigs } from "../../configurations/configure";
+import { Account, Token, ActiveAccount, _HelperStore, DexAmmProtocol, LiquidityPool } from "../../generated/schema";
 import { Pool } from "../../generated/templates/Pool/Pool";
 import { SECONDS_PER_DAY, INT_ZERO, INT_ONE, BIGDECIMAL_ONE, UsageType, SECONDS_PER_HOUR, INT_TWO, BIGINT_ZERO, BIGINT_NEG_ONE } from "./constants";
 import {
@@ -48,6 +48,7 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   usageMetricsDaily.blockNumber = event.block.number;
   usageMetricsDaily.timestamp = event.block.timestamp;
   usageMetricsDaily.dailyTransactionCount += INT_ONE;
+  usageMetricsDaily.totalPoolCount = protocol.totalPoolCount;
 
   usageMetricsHourly.blockNumber = event.block.number;
   usageMetricsHourly.timestamp = event.block.timestamp;
@@ -139,14 +140,14 @@ export function updateTokenWhitelists(token0: Token, token1: Token, poolAddress:
   let tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
 
   // update white listed pools
-  if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenWhitelist0.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist0.id)) {
     let newPools = tokenWhitelist1.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist1.whitelistPools = newPools;
     tokenWhitelist1.save();
   }
 
-  if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenWhitelist1.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist1.id)) {
     let newPools = tokenWhitelist0.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist0.whitelistPools = newPools;
@@ -235,14 +236,20 @@ export function updateVolumeAndFees(
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
 
-  let supplyFeeAmountUSD = trackedAmountUSD[INT_TWO].times(percToDec(supplyFee.feePercentage!));
-  let protocolFeeAmountUSD = trackedAmountUSD[INT_TWO].times(percToDec(protocolFee.feePercentage!));
+  let supplyFeeAmountUSD = trackedAmountUSD[INT_TWO].times(percToDec(supplyFee.feePercentage));
+  let protocolFeeAmountUSD = trackedAmountUSD[INT_TWO].times(percToDec(protocolFee.feePercentage));
   let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
 
   // Update fees collected during swaps
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+  pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  pool.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+
 
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
   financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
@@ -251,6 +258,24 @@ export function updateVolumeAndFees(
   financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+
+
+  poolMetricsDaily.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  poolMetricsDaily.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsDaily.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+
+  poolMetricsDaily.dailyTotalRevenueUSD = poolMetricsDaily.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  poolMetricsDaily.dailySupplySideRevenueUSD = poolMetricsDaily.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  poolMetricsDaily.dailyProtocolSideRevenueUSD = poolMetricsDaily.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+
+  poolMetricsHourly.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  poolMetricsHourly.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsHourly.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+
+  poolMetricsHourly.hourlyTotalRevenueUSD = poolMetricsHourly.hourlyTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  poolMetricsHourly.hourlySupplySideRevenueUSD = poolMetricsHourly.hourlySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  poolMetricsHourly.hourlyProtocolSideRevenueUSD = poolMetricsHourly.hourlyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
   financialMetrics.save();
   poolMetricsDaily.save();
@@ -267,7 +292,7 @@ export function updateProtocolFees(event: ethereum.Event): void {
   let protocolFee = getLiquidityPoolFee(pool.fees[1]);
 
   // Get the total proportion of swap value collected as a fee
-  let totalPoolFee = tradingFee.feePercentage!.plus(protocolFee.feePercentage!);
+  let totalPoolFee = tradingFee.feePercentage.plus(protocolFee.feePercentage);
 
   // Value5 is the feeProtocol variabe in the slot0 struct of the pool contract
   let feeProtocol = poolContract.slot0().value5;

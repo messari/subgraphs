@@ -26,6 +26,12 @@ export function handleSetVault(call: SetVaultCall): void {
 
   vault.name = vaultContract.name();
   vault.symbol = vaultContract.symbol();
+
+  vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+  vault.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+  vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+  vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+
   vault.protocol = constants.ETHEREUM_PROTOCOL_ID;
 
   const inputToken = getOrCreateToken(inputTokenAddress);
@@ -56,6 +62,7 @@ export function handleSetVault(call: SetVaultCall): void {
   vaultIds.push(vaultAddress.toHexString())
   
   protocol._vaultIds = vaultIds;
+  protocol.totalPoolCount += 1;
   protocol.save();
 
   log.warning("[SetVault] - TxHash: {}, VaultId: {}, StrategyId: {}", [
