@@ -1,10 +1,11 @@
-import { ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { ethereum, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   Account,
   ActiveEventAccount,
   Borrow,
   Deposit,
   Liquidate,
+  Market,
   Position,
   PositionSnapshot,
   Repay,
@@ -50,6 +51,16 @@ export function getOrCreatePosition(
 ): Position {
   let positionIdPrefix = `${accountId}-${marketId}-${side}`;
   let account = getOrCreateAccount(accountId, event);
+
+  log.info("[getOrCreatePosition][Hash:{}][Prefix:{}]OpenCount:{}|Pos:{}|ClosedPos:{}|Pos:{}", [
+    event.transaction.hash.toHexString(),
+    positionIdPrefix.toString(),
+    account.openPositionCount.toString(),
+    account.openPositions.toString(),
+    account.closedPositionCount.toString(),
+    account.closedPositions.toString(),
+  ]);
+
   for (let curr = 0; curr < account.openPositionCount; curr += 1) {
     let op = account.openPositions.at(curr);
     if (op.startsWith(positionIdPrefix)) {
@@ -67,25 +78,8 @@ export function getOrCreatePosition(
 
   let positionId = `${accountId}-${marketId}-${side}-${count}`;
   let position = new Position(positionId);
-  position.account = accountId;
-  position.market = marketId;
 
-  position.hashOpened = event.transaction.hash.toHexString();
-  position.blockNumberOpened = event.block.number;
-  position.timestampOpened = event.block.timestamp;
-  position.side = side;
-  position.balance = BIGINT_ZERO;
-  position.depositCount = 0;
-  position.deposits = [];
-  position.withdrawCount = 0;
-  position.withdraws = [];
-  position.borrowCount = 0;
-  position.borrows = [];
-  position.repayCount = 0;
-  position.repays = [];
-  position.liquidationCount = 0;
-  position.liquidations = [];
-  position.save();
+  log.info("[getOrCreatePosition][Hash:{}][ID:{}] Created!", [event.transaction.hash.toHexString(), positionId]);
 
   account.openPositionCount += 1;
   account.openPositions = addToArrayAtIndex(account.openPositions, positionId, 0);
@@ -108,6 +102,29 @@ export function getOrCreatePosition(
   protocol.openPositionCount += 1;
   protocol.cumulativePositionCount += 1;
   protocol.save();
+
+  position.account = accountId;
+  position.market = marketId;
+  position.side = side;
+  position.count = count;
+  position.hashOpened = event.transaction.hash.toHexString();
+  position.blockNumberOpened = event.block.number;
+  position.timestampOpened = event.block.timestamp;
+  position.balance = BIGINT_ZERO;
+  position.isCollateral = market!.canUseAsCollateral;
+  position.depositCount = 0;
+  position.withdrawCount = 0;
+  position.borrowCount = 0;
+  position.repayCount = 0;
+  position.liquidationCount = 0;
+  position.save();
+
+  log.info("created new position {}, protocol openCount: {}, account openCount: {}, Txhash: {}", [
+    positionId,
+    protocol.openPositionCount.toString(),
+    account.openPositionCount.toString(),
+    event.transaction.hash.toHexString(),
+  ]);
   return position;
 }
 
@@ -175,14 +192,17 @@ export function updatePositions(
   if (!market) {
     return;
   }
-  let account = getOrCreateAccount(accountId, event);
-  let protocol = getOrCreateLendingProtocol();
-  //  position is the current open position or a newly create open position
   let position = getOrCreatePosition("LENDER", marketId, accountId, event);
+  if (["BORROW", "REPAY"].includes(eventType)) {
+    position = getOrCreatePosition("BORROWER", marketId, accountId, event);
+  }
+
+  let closePositionToggle = false;
+  let account = getOrCreateAccount(accountId, event);
+  //  position is the current open position or a newly create open position
 
   if (eventType == "DEPOSIT") {
     addAccountToProtocol(eventType, account, event);
-    position.isCollateral = market.canUseAsCollateral;
     account.depositCount = account.depositCount + 1;
     position.depositCount = position.depositCount + 1;
     position.balance = position.balance.plus(amount);
@@ -190,7 +210,6 @@ export function updatePositions(
     deposit.position = position.id;
     deposit.save();
   } else if (eventType == "WITHDRAW") {
-    position.isCollateral = market.canUseAsCollateral;
     account.withdrawCount = account.depositCount + 1;
     position.withdrawCount = position.withdrawCount + 1;
     position.balance = position.balance.minus(amount);
@@ -199,19 +218,16 @@ export function updatePositions(
       let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionLogIndex
         .plus(BIGINT_ONE)
         .toString()}`;
-      let liquidation = new Liquidate(liqudationEventId);
-      liquidation.position = position.id;
-      liquidation.save();
+      updateLiqudationEvent(liqudationEventId, position.id);
     }
     let withdraw = new Withdraw(eventId);
     withdraw.position = position.id;
     withdraw.save();
     if (position.balance.equals(BIGINT_ZERO)) {
-      closePosition(position, accountId, marketId, event);
+      closePositionToggle = true;
     }
   } else if (eventType == "BORROW") {
     addAccountToProtocol(eventType, account, event);
-    position = getOrCreatePosition("BORROWER", marketId, accountId, event);
     account.borrowCount = account.borrowCount + 1;
     position.borrowCount = position.borrowCount + 1;
     position.balance = position.balance.plus(amount);
@@ -219,33 +235,29 @@ export function updatePositions(
     borrow.position = position.id;
     borrow.save();
   } else if (eventType == "REPAY") {
-    position = getOrCreatePosition("BORROWER", marketId, accountId, event);
     account.repayCount = account.repayCount + 1;
     position.repayCount = position.repayCount + 1;
-    position.repays = addToArrayAtIndex(position.repays, eventId, 0);
     position.balance = position.balance.minus(amount);
     if (liquidation) {
       position.liquidationCount = position.liquidationCount + 1;
       let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionLogIndex.toString()}`;
-      let liquidation = new Liquidate(liqudationEventId);
-      liquidation.position = position.id;
-      liquidation.save();
+      updateLiqudationEvent(liqudationEventId, position.id);
     }
 
     let repay = new Repay(eventId);
     repay.position = position.id;
     repay.save();
-
     if (position.balance.equals(BIGINT_ZERO)) {
-      closePosition(position, accountId, marketId, event);
+      closePositionToggle = true;
     }
   }
 
   account.save();
   position.save();
-  market.save();
-  protocol.save();
   takePositionSnapshot(position, event);
+  if (closePositionToggle) {
+    closePosition(position, account, market, event);
+  }
 }
 
 export function takePositionSnapshot(position: Position, event: ethereum.Event): void {
@@ -260,22 +272,20 @@ export function takePositionSnapshot(position: Position, event: ethereum.Event):
   snapshot.save();
 }
 
-export function closePosition(position: Position, accountId: string, marketId: string, event: ethereum.Event): void {
-  let account = getOrCreateAccount(accountId, event);
+export function closePosition(position: Position, account: Account, market: Market, event: ethereum.Event): void {
   let account_index = account.openPositions.indexOf(position.id);
-  account.openPositions = removeFromArrayAtIndex(account.openPositions, account_index);
-  account.closedPositions = addToArrayAtIndex(account.openPositions, position.id, 0);
   account.openPositionCount -= 1;
+  account.openPositions = removeFromArrayAtIndex(account.openPositions, account_index);
   account.closedPositionCount += 1;
+  account.closedPositions = addToArrayAtIndex(account.closedPositions, position.id, 0);
   account.save();
 
-  let market = getMarket(marketId);
-  let market_index = market!.openPositions.indexOf(position.id);
-  market!.openPositions = removeFromArrayAtIndex(market!.openPositions, market_index);
-  market!.closedPositions = addToArrayAtIndex(market!.openPositions, position.id, 0);
-  market!.openPositionCount -= 1;
-  market!.closedPositionCount += 1;
-  market!.save();
+  let market_index = market.openPositions.indexOf(position.id);
+  market.openPositionCount -= 1;
+  market.openPositions = removeFromArrayAtIndex(market.openPositions, market_index);
+  market.closedPositionCount += 1;
+  market.closedPositions = addToArrayAtIndex(market.closedPositions, position.id, 0);
+  market.save();
 
   let protocol = getOrCreateLendingProtocol();
   protocol.openPositionCount -= 1;
@@ -285,4 +295,10 @@ export function closePosition(position: Position, accountId: string, marketId: s
   position.blockNumberClosed = event.block.number;
   position.timestampClosed = event.block.timestamp;
   position.save();
+}
+
+function updateLiqudationEvent(liqudationEventId: string, positionId: string): void {
+  let liquidation = new Liquidate(liqudationEventId);
+  liquidation.position = positionId;
+  liquidation.save();
 }

@@ -938,6 +938,7 @@ type Position @entity {
   " { Account address }-{ Market address }-{ Position Side }-{ Counter } "
   id: ID!
 
+  count: Int
   " Account that owns this position "
   account: Account!
 
@@ -1062,7 +1063,7 @@ type Deposit @entity {
   market: Market!
 
   " The user position changed by this event "
-  position: Position!
+  position: Position
 
   " Token deposited "
   asset: Token!
@@ -1100,7 +1101,7 @@ type Withdraw @entity {
   market: Market!
 
   " The user position changed by this event "
-  position: Position!
+  position: Position
 
   " Token withdrawn "
   asset: Token!
@@ -1143,7 +1144,7 @@ type Borrow @entity {
   market: Market!
 
   " The user position changed by this event "
-  position: Position!
+  position: Position
 
   " Token borrowed "
   asset: Token!
@@ -1182,7 +1183,7 @@ type Repay @entity {
   market: Market!
 
   " The user position changed by this event "
-  position: Position!
+  position: Position
 
   " Token repaid/burned "
   asset: Token!
@@ -1199,43 +1200,43 @@ type Liquidate @entity {
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: String
 
   " Nonce of the transaction that emitted this event "
-  nonce: BigInt!
+  nonce: BigInt
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
+  logIndex: Int
 
   " Block number of this event "
-  blockNumber: BigInt!
+  blockNumber: BigInt
 
   " Timestamp of this event "
-  timestamp: BigInt!
+  timestamp: BigInt
 
   " Account that carried out the liquidation "
-  liquidator: Account!
+  liquidator: Account
 
   " Account that got liquidated "
-  liquidatee: Account!
+  liquidatee: Account
 
   " The market of the collateral being used "
-  market: Market!
+  market: Market
 
   " The user position changed by this event "
-  position: Position!
+  position: Position
 
   " Asset repaid (borrowed) "
-  asset: Token!
+  asset: Token
 
   " Amount of collateral liquidated in native units "
-  amount: BigInt!
+  amount: BigInt
 
   " Amount of collateral liquidated in USD "
-  amountUSD: BigDecimal!
+  amountUSD: BigDecimal
 
   " Amount of profit from liquidation in USD "
-  profitUSD: BigDecimal!
+  profitUSD: BigDecimal
 }
 
 # Helper entity for calculating daily/hourly active users

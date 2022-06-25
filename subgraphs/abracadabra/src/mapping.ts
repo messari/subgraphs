@@ -191,14 +191,13 @@ export function handleLiquidation(event: LogRepay): void {
     return;
   }
   let financialsDailySnapshot = getOrCreateFinancials(event);
-  let protocol = getOrCreateLendingProtocol();
   let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
   let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
   let CauldronContract = Cauldron.bind(event.address);
   let tokenPriceUSD = collateralToken.lastPriceUSD;
   let collateralAmount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
     Address.fromString(collateralToken.id),
-    liquidateEvent.amount,
+    liquidateEvent.amount!,
     false,
   );
   let collateralAmountUSD = bigIntToBigDecimal(collateralAmount, collateralToken.decimals).times(tokenPriceUSD!);
@@ -218,42 +217,42 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.amount = collateralAmount;
   liquidateEvent.amountUSD = collateralAmountUSD;
   liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
+  liquidateEvent.save();
 
-  let liqudidatedAccount = getOrCreateAccount(liquidateEvent.liquidatee, event);
+  let liqudidatedAccount = getOrCreateAccount(liquidateEvent.liquidatee!, event);
   liqudidatedAccount.liquidateCount = liqudidatedAccount.liquidateCount + 1;
   liqudidatedAccount.save();
   addAccountToProtocol("LIQUIDATEE", liqudidatedAccount, event);
 
-  let liquidatorAccount = getOrCreateAccount(liquidateEvent.liquidator, event);
+  let liquidatorAccount = getOrCreateAccount(liquidateEvent.liquidator!, event);
   liquidatorAccount.liquidationCount = liquidatorAccount.liquidationCount + 1;
   liquidatorAccount.save();
   addAccountToProtocol("LIQUIDATOR", liquidatorAccount, event);
 
   usageHourlySnapshot.hourlyLiquidateCount += 1;
-  usageDailySnapshot.dailyLiquidateCount += 1;
-  let marketCumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
-  marketCumulativeLiquidateUSD = marketCumulativeLiquidateUSD.plus(collateralAmountUSD);
+  usageHourlySnapshot.save();
 
-  let protocolCumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(collateralAmountUSD);
+  usageDailySnapshot.dailyLiquidateCount += 1;
+  usageDailySnapshot.save();
 
   marketHourlySnapshot.hourlyLiquidateUSD = marketHourlySnapshot.hourlyLiquidateUSD.plus(collateralAmountUSD);
   marketDailySnapshot.dailyLiquidateUSD = marketDailySnapshot.dailyLiquidateUSD.plus(collateralAmountUSD);
   financialsDailySnapshot.dailyLiquidateUSD = financialsDailySnapshot.dailyLiquidateUSD.plus(collateralAmountUSD);
 
+  let marketCumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(collateralAmountUSD);
   market.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
   marketHourlySnapshot.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
   marketDailySnapshot.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
-  financialsDailySnapshot.cumulativeLiquidateUSD = protocolCumulativeLiquidateUSD;
-  protocol.cumulativeLiquidateUSD = protocolCumulativeLiquidateUSD;
-
-  liquidateEvent.save();
-  usageHourlySnapshot.save();
-  usageDailySnapshot.save();
-  market.save();
   marketHourlySnapshot.save();
   marketDailySnapshot.save();
-  financialsDailySnapshot.save();
+  market.save();
+
+  let protocol = getOrCreateLendingProtocol();
+  let protocolCumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(collateralAmountUSD);
+  financialsDailySnapshot.cumulativeLiquidateUSD = protocolCumulativeLiquidateUSD;
+  protocol.cumulativeLiquidateUSD = protocolCumulativeLiquidateUSD;
   protocol.save();
+  financialsDailySnapshot.save();
 }
 
 export function handleLogRepay(event: LogRepay): void {
