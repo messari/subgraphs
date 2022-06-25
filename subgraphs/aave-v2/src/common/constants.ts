@@ -1,50 +1,24 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
-////////////////////////
-///// Schema Enums /////
-////////////////////////
-
 // The network names corresponding to the Network enum in the schema.
-// They are mainly intended for convenience on the data consumer side.
-// The enum values are derived from Coingecko slugs (converted to uppercase
-// and replaced hyphens with underscores for Postgres enum compatibility)
-export namespace SchemaNetwork {
-  export const ARBITRUM = "ARBITRUM_ONE";
+// They also correspond to the ones in `dataSource.network()` after converting to lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
+export namespace Network {
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BINANCE_SMART_CHAIN";
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const NEAR = "NEAR";
-  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
-  export const XDAI = "XDAI";
-}
-
-// The network names corresponding to the ones in `dataSource.network()`
-// They should mainly be used for the ease of comparison.
-// Note that they cannot be used as enums since they are lower case.
-// See below for a complete list:
-// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
-export namespace SubgraphNetwork {
-  export const ARBITRUM = "arbitrum-one";
-  export const AVALANCHE = "avalanche";
-  export const AURORA = "aurora";
-  export const BSC = "bnb";
-  export const CELO = "celo";
-  export const ETHEREUM = "mainnet";
-  export const FANTOM = "fantom";
-  export const FUSE = "fuse";
-  export const MOONBEAM = "moonbeam";
-  export const MOONRIVER = "moonriver";
-  export const NEAR = "near-mainnet";
-  export const OPTIMISM = "optimism";
-  export const POLYGON = "matic";
-  export const XDAI = "xdai";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {
@@ -55,25 +29,30 @@ export namespace ProtocolType {
   export const GENERIC = "GENERIC";
 }
 
-export namespace VaultFeeType {
-  export const MANAGEMENT_FEE = "MANAGEMENT_FEE";
-  export const PERFORMANCE_FEE = "PERFORMANCE_FEE";
-  export const DEPOSIT_FEE = "DEPOSIT_FEE";
-  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
-}
-
-export namespace LiquidityPoolFeeType {
-  export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE";
-  export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE";
-  export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE";
-  export const FIXED_LP_FEE = "FIXED_LP_FEE";
-  export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE";
-  export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
-  export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
-}
 export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";
   export const BORROW = "BORROW";
+}
+
+export namespace LendingType {
+  export const CDP = "CDP";
+  export const POOLED = "POOLED";
+}
+
+export namespace RiskType {
+  export const GLOBAL = "GLOBAL";
+  export const ISOLATED = "ISOLATED";
+}
+
+export namespace InterestRateType {
+  export const STABLE = "STABLE";
+  export const VARIABLE = "VARIABLE";
+  export const FIXED = "FIXED";
+}
+
+export namespace InterestRateSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
 }
 
 //////////////////////////////
@@ -102,6 +81,7 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
@@ -126,7 +106,8 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 ///// Date/Time /////
 /////////////////////
 
-export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
+export const SECONDS_PER_HOUR = 60 * 60;
+export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
@@ -137,22 +118,17 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 
 // This is the LendingPoolAddressesProviderRegistry contract address
 export const PROTOCOL_ADDRESS = "0x52D306e36E3B6B02c153d0266ff0f85d18BCD413";
-
 export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
-
 export const PRICE_ORACLE_ADDRESS = "0xa50ba011c48153de246e5192c8f9258a2ba79ca9";
-
 export const INCENTIVE_CONTROLLER_ADDRESS = "0xd784927Ff2f95ba542BfC824c8a8a98F3495f6b5";
-
 // For the Ethereum Mainnet, this is stkAAVE. Will need to set this in a config file depending on whether the network is Matic or Avax
 export const REWARD_TOKEN_ADDRESS = "0x4da27a545c0c5b758a6ba100e3a049001de870f5";
-
 export const LENDING_POOL_ADDRESS = "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9";
 
-export const SUBGRAPH_VERSION = "1.1.32";
-export const SCHEMA_VERSION = "1.1.0";
-export const METHODOLOGY_VERSION = "1.0.0";
-export const PROTOCOL_NAME = "Aave-v2";
-export const PROTOCOL_SLUG = "aave-v2";
-export const LENDING_TYPE = "POOLED";
-export const RISK_TYPE = "ISOLATED";
+export namespace Protocol {
+  export const NAME = "Aave v2";
+  export const SLUG = "aave-v2";
+  export const SCHEMA_VERSION = "1.3.0";
+  export const SUBGRAPH_VERSION = "1.2.0";
+  export const METHODOLOGY_VERSION = "1.0.0";
+}
