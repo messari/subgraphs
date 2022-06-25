@@ -99,7 +99,7 @@ Not applicable.
 
 ![dforce-lending](../../docs/images/protocols/dforce.png "dforce-lending")
 
-(Credit: [dForce Network](https://lh6.googleusercontent.com/ZEc8wddU1Etx-ay_fwnat2dgje8yGcOd8EK1vo5JSxJp3GM7qK5bD-bCvf3zxv4m1j5ClAfoCKiPzWNcqjS_XRjrThyz7vGA-ACalWb2XmwqEwGcLMQLSxVtySU7NPGjxPNOqqoB))
+(Credit: [dForce Network](https://developers.dforce.network/lend/lend-and-synth))
 
 ## dForce Network Lending Protocol
 
