@@ -556,6 +556,16 @@
         }
       }
     },
+    "network": {
+      "arweave": {
+        "arweave-mainnet": {
+          "template": "arweave.template.yaml",
+          "messari": "messari/TODO",
+          "dmelotik": "dmelotik/network-arweave-mainnet",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "gamma-strategies": {
       "gamma-strategies": {
         "arbitrum": {
