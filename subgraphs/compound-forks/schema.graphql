@@ -288,7 +288,7 @@ type LendingProtocol implements Protocol @entity {
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
 
-    #### Add-Ons ####
+  #### Add-Ons ####
   " oracle for the protocol "
   _priceOracle: String!
 
@@ -387,7 +387,7 @@ type FinancialsDailySnapshot @entity {
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -600,7 +600,7 @@ type MarketDailySnapshot @entity {
 
   " The pool this snapshot belongs to "
   market: Market!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -696,7 +696,7 @@ type MarketHourlySnapshot @entity {
 
   " The pool this snapshot belongs to "
   market: Market!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -1077,7 +1077,7 @@ type _CircularBuffer @entity {
 
 # Helper entity for determining market.isActive status (dforce)
 # market.isActive = false if either mintPaused, redeemPaused, transferPaused = true
-type _MarketStatus @entity {
+type _DforceMarketStatus @entity {
   " Smart contract address of the market "
   id: ID!
   " Is mint paused for the market "

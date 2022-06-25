@@ -33,7 +33,7 @@ import {
   LendingProtocol,
   Token,
   Market,
-  _MarketStatus,
+  _DforceMarketStatus,
   RewardToken,
   FinancialsDailySnapshot,
 } from "../../../generated/schema";
@@ -201,7 +201,7 @@ export function handleMintPaused(event: MintPaused): void {
   let marketID = event.params.iToken.toHexString();
   let market = Market.load(marketID);
   if (market == null) {
-    log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
+    log.warning("[handleMintPaused] Market not found: {}", [marketID]);
     return;
   }
 
@@ -224,7 +224,7 @@ export function handleRedeemPaused(event: RedeemPaused): void {
   let marketID = event.params.iToken.toHexString();
   let market = Market.load(marketID);
   if (market == null) {
-    log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
+    log.warning("[handleRedeemPaused] Market not found: {}", [marketID]);
     return;
   }
 
@@ -251,7 +251,7 @@ export function handleTransferPaused(event: TransferPaused): void {
     let marketID = markets[i];
     let market = Market.load(marketID);
     if (market == null) {
-      log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
+      log.warning("[handleTransferPaused] Market not found: {}", [marketID]);
       return;
     }
 
@@ -277,7 +277,7 @@ export function handleBorrowPaused(event: BorrowPaused): void {
     market.canBorrowFrom = !event.params.paused;
     market.save();
   } else {
-    log.warning("Market {} does not exist.", [marketId]);
+    log.warning("[handleBorrowPaused] Market {} does not exist.", [marketId]);
   }
 }
 
@@ -410,7 +410,7 @@ export function handleNewRewardToken(event: NewRewardToken): void {
     let marketID = markets[i];
     let market = Market.load(marketID);
     if (market == null) {
-      log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
+      log.warning("[handleNewRewardToken] Market not found: {}", [marketID]);
       return;
     }
     market.rewardTokens = [rewardTokenIds[0], rewardTokenIds[1]];
@@ -588,11 +588,11 @@ function getOrCreateProtocol(): LendingProtocol {
 }
 
 // helper entity to determine market status
-export function getOrCreateMarketStatus(marketId: string): _MarketStatus {
-  let marketStatus = _MarketStatus.load(marketId);
+export function getOrCreateMarketStatus(marketId: string): _DforceMarketStatus {
+  let marketStatus = _DforceMarketStatus.load(marketId);
 
   if (marketStatus == null) {
-    marketStatus = new _MarketStatus(marketId);
+    marketStatus = new _DforceMarketStatus(marketId);
 
     marketStatus.mintPaused = false;
     marketStatus.redeemPaused = false;
