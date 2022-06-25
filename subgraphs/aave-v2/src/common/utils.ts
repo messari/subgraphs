@@ -62,23 +62,27 @@ export function updateTVL(
   // proportion of this market is deducted before adding the new market TVL to the protocol
   // Otherwise, the difference in asset USD/ETH price  since saving would deduct the incorrect
   // proportion from the protocol TVL
+  
+  market.totalDepositBalanceUSD = market.totalValueLockedUSD;
+
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
+    market.totalValueLockedUSD
+  );
+
   market.totalValueLockedUSD = market.inputTokenPriceUSD.times(
     newMarketTVL
       .toBigDecimal()
       .div(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
   );
   market.totalDepositBalanceUSD = market.totalValueLockedUSD;
+  market.save();
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    market.totalValueLockedUSD
-  );
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
     market.totalValueLockedUSD
   );
   protocol.totalDepositBalanceUSD = protocol.totalValueLockedUSD;
 
   protocol.save();
-  market.save();
 }
 
 export function updateOutputTokenSupply(event: ethereum.Event): void {
