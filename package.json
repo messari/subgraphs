@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "minimist": "^1.2.6"
+    "minimist": "^1.2.6",
+    "mustache": "^4.2.0"
   }
 }

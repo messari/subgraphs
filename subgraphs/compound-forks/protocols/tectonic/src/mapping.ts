@@ -70,8 +70,6 @@ export function handleMarketListed(event: MarketListed): void {
   let protocol = getOrCreateProtocol();
   let cTokenContract = CToken.bind(event.params.cToken);
 
-
-
   let cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO

@@ -17,7 +17,6 @@ export const nativeToken = new TokenData(
   18
 );
 
-
 export const nativeCToken = new TokenData(
   Address.fromString("0xeAdf7c01DA7E93FdB5f16B0aa9ee85f978e89E95"),
   "Tectonic CRO",
