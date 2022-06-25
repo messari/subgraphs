@@ -143,7 +143,7 @@ export function handleArweaveBlock(block: arweave.Block): void {
     BIGINT_ZERO,
     BIGINT_ZERO,
     BigInt.fromI32(block.txs.length),
-    blockRewards // TODO: not what we think of rewards: 
+    blockRewards // TODO: not what we think of rewards:
   );
   createBlock(blockData);
 
