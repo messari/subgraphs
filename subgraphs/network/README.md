@@ -147,6 +147,7 @@ class Block {
 - `juno` and `osmosis` is not yet supported on the graph (as of 6/18/2022)
 - `cronos` needs to have a startBlock of 1 to work, so I had to keep it seperate from the evm chains
   - Also, the hosted service does not support `cronos` so you have to deploy here: https://portal.cronoslabs.com/
+- TODO: explain how eth rewards can be calculated using subgraph data
 
 ## Resources and Links
 
