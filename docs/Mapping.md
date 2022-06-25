@@ -148,6 +148,7 @@ Here are some known issues with subgraph tooling that you may run into:
 - Note that **call-handlers** are not available on some EVM sidechains (e.g. Avalanche, Harmony, Polygon, etc). So you won't be able to use **call-handlers** in your subgraphs when indexing on these chains.
 - As of [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) there is a new enviornment variable called `GRAPH_MAX_GAS_PER_HANDLER`. This sets a maximum gas limit on handlers. This does not refer to on-chain gas limits, but a measure of the computation exerted per handler. You will get a subgraph error if this limit is exceeded. 
     >A place you may find this is using the built-in `.pow()` with large numbers.
+- Different graph-cli versions handle missing required fields defined in schema differently. Deploying a subgraph with missing required field with [`graph-cli v0.30.1`](https://github.com/graphprotocol/graph-node/releases/tag/v0.30.1) will fail with error `missing value for non-nullable field`, while it will succeed with [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) as it automatically sets default values for those missing fields.
 
 ### AssemblyScript Issues
 
