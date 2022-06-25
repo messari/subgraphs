@@ -3,6 +3,7 @@ import {
   getOrCreateLendingProtocol,
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
+  getOrCreateFinancialsDailySnapshot,
 } from "../common/initializers";
 import * as constants from "../common/constants";
 import { bigIntToBigDecimal } from "../common/utils";
@@ -11,7 +12,11 @@ import { InterestRate, Market, Token } from "../../generated/schema";
 import { StableDebtToken as SToken } from "../../generated/templates/LendingPool/StableDebtToken";
 import { VariableDebtToken as VToken } from "../../generated/templates/LendingPool/VariableDebtToken";
 
-export function calculateRevenues(event: ethereum.Event, market: Market, token: Token): void {
+export function calculateRevenues(
+  event: ethereum.Event,
+  market: Market,
+  token: Token
+): void {
   // Calculate and save the fees and revenue on both market and protocol level
   // Additionally calculate the total borrow amount on market and protocol
   // Pull S and V debt tokens to get the amount currently borrowed as stable debt or variable debt
@@ -22,6 +27,7 @@ export function calculateRevenues(event: ethereum.Event, market: Market, token: 
 
   const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
   const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(event.block);
 
   if (!variableTokenSupply.reverted && !stableTokenSupply.reverted) {
     log.info(
@@ -97,19 +103,39 @@ export function calculateRevenues(event: ethereum.Event, market: Market, token: 
   const staFees = staAmountUSD.times(stableBorrowRate.rate);
 
   // Add these values together, save to market and add protocol total
+  let oldCumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   market.cumulativeTotalRevenueUSD = staFees.plus(varFees).truncate(3);
+  marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailyTotalRevenueUSD.plus(
+    market.cumulativeTotalRevenueUSD.minus(oldCumulativeTotalRevenueUSD)
+  );
+  marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlyTotalRevenueUSD.plus(
+    market.cumulativeTotalRevenueUSD.minus(oldCumulativeTotalRevenueUSD)
+  );
+  financialDailySnapshot.dailyTotalRevenueUSD = financialDailySnapshot.dailyTotalRevenueUSD.plus(
+    market.cumulativeTotalRevenueUSD.minus(oldCumulativeTotalRevenueUSD)
+  )
   protocol.cumulativeTotalRevenueUSD = protoMinusMarketFees.plus(
     market.cumulativeTotalRevenueUSD
   );
 
+  let oldCumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
   market.cumulativeProtocolSideRevenueUSD = market.cumulativeTotalRevenueUSD
     .times(bigIntToBigDecimal(market.reserveFactor, 4))
     .truncate(3);
-
+  marketDailySnapshot.dailyProtocolSideRevenueUSD = marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+    market.cumulativeProtocolSideRevenueUSD.minus(oldCumulativeProtocolSideRevenueUSD)
+  );
+  marketHourlySnapshot.hourlyProtocolSideRevenueUSD = marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+    market.cumulativeProtocolSideRevenueUSD.minus(oldCumulativeProtocolSideRevenueUSD)
+  );
+  financialDailySnapshot.dailyProtocolSideRevenueUSD = financialDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+    market.cumulativeProtocolSideRevenueUSD.minus(oldCumulativeProtocolSideRevenueUSD)
+  )
   protocol.cumulativeProtocolSideRevenueUSD = protoMinusMarketProtoRevenue.plus(
     market.cumulativeProtocolSideRevenueUSD
   );
 
+  let oldCumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
   market.cumulativeSupplySideRevenueUSD = market.cumulativeTotalRevenueUSD
     .times(
       constants.BIGDECIMAL_ONE.minus(
@@ -117,7 +143,15 @@ export function calculateRevenues(event: ethereum.Event, market: Market, token: 
       )
     )
     .truncate(3);
-
+  marketDailySnapshot.dailySupplySideRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
+    market.cumulativeSupplySideRevenueUSD.minus(oldCumulativeSupplySideRevenueUSD)
+  );
+  marketHourlySnapshot.hourlySupplySideRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
+    market.cumulativeSupplySideRevenueUSD.minus(oldCumulativeSupplySideRevenueUSD)
+  );
+  financialDailySnapshot.dailySupplySideRevenueUSD = financialDailySnapshot.dailySupplySideRevenueUSD.plus(
+    market.cumulativeSupplySideRevenueUSD.minus(oldCumulativeSupplySideRevenueUSD)
+  )
   protocol.cumulativeSupplySideRevenueUSD = protoMinusMarketSupplyRevenue.plus(
     market.cumulativeSupplySideRevenueUSD
   );
@@ -136,6 +170,9 @@ export function calculateRevenues(event: ethereum.Event, market: Market, token: 
     market.cumulativeBorrowUSD
   );
 
+  financialDailySnapshot.save();
+  marketHourlySnapshot.save();
+  marketDailySnapshot.save();
   protocol.save();
   market.save();
 }

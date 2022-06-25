@@ -115,27 +115,16 @@ export function getOrCreateLendingProtocol(lendingProtocolId: string): LendingPr
 export function getOrCreateFinancialsDailySnapshot(
   block: ethereum.Block
 ): FinancialsDailySnapshot {
+  const protocolId = getProtocolIdFromCtx();
+  const protocol = getOrCreateLendingProtocol(protocolId);
+
   const id = `${block.timestamp.toI64() / constants.SECONDS_PER_DAY}`;
   let financialsSnapshot = FinancialsDailySnapshot.load(id);
 
   if (!financialsSnapshot) {
     financialsSnapshot = new FinancialsDailySnapshot(id);
-    const protocolId = getProtocolIdFromCtx();
-    const protocol = getOrCreateLendingProtocol(protocolId);
-    financialsSnapshot.protocol = protocol.id;
 
-    financialsSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-    financialsSnapshot.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
-    financialsSnapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
-    financialsSnapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
-    financialsSnapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
-    financialsSnapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
-    financialsSnapshot.cumulativeSupplySideRevenueUSD =
-      protocol.cumulativeSupplySideRevenueUSD;
-    financialsSnapshot.cumulativeProtocolSideRevenueUSD =
-      protocol.cumulativeProtocolSideRevenueUSD;
-    financialsSnapshot.cumulativeTotalRevenueUSD =
-      protocol.cumulativeTotalRevenueUSD;
+    financialsSnapshot.protocol = protocol.id;
 
     financialsSnapshot.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialsSnapshot.dailyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -147,10 +136,24 @@ export function getOrCreateFinancialsDailySnapshot(
     financialsSnapshot.dailyWithdrawUSD = constants.BIGDECIMAL_ZERO;
     financialsSnapshot.dailyRepayUSD = constants.BIGDECIMAL_ZERO;
 
-    financialsSnapshot.blockNumber = block.number;
-    financialsSnapshot.timestamp = block.timestamp;
     financialsSnapshot.save();
   }
+
+  financialsSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  financialsSnapshot.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
+  financialsSnapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+  financialsSnapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
+  financialsSnapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+  financialsSnapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+  financialsSnapshot.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialsSnapshot.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financialsSnapshot.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
+  
+  financialsSnapshot.blockNumber = block.number;
+  financialsSnapshot.timestamp = block.timestamp;
 
   return financialsSnapshot;
 }
