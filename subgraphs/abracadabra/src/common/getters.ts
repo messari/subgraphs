@@ -330,8 +330,8 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.cumulativeUniqueBorrowers = 0;
   LendingProtocolEntity.cumulativeUniqueLiquidators = 0;
   LendingProtocolEntity.cumulativeUniqueLiquidatees = 0;
-  LendingProtocolEntity.totalPositionsCount = 0;
-  LendingProtocolEntity.cumulativePositionsCount = 0;
+  LendingProtocolEntity.openPositionCount = 0;
+  LendingProtocolEntity.cumulativePositionCount = 0;
 
   LendingProtocolEntity.save();
   return LendingProtocolEntity;
