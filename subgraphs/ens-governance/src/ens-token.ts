@@ -6,7 +6,7 @@ import {
 } from "../generated/ENSToken/ENSToken";
 import {
   getTokenHolder,
-  getDelegate,
+  getOrCreateDelegate,
   toDecimal,
   getGovernance,
   BIGINT_ZERO,
@@ -17,8 +17,8 @@ import {
 // DelegateChanged(indexed address,indexed address,indexed address)
 export function handleDelegateChanged(event: DelegateChanged): void {
   let tokenHolder = getTokenHolder(event.params.delegator);
-  let previousDelegate = getDelegate(event.params.fromDelegate);
-  let newDelegate = getDelegate(event.params.toDelegate);
+  let previousDelegate = getOrCreateDelegate(event.params.fromDelegate);
+  let newDelegate = getOrCreateDelegate(event.params.toDelegate);
 
   tokenHolder.delegate = newDelegate.id;
   tokenHolder.save();
@@ -41,7 +41,7 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
 
   let votesDifference = newBalance.minus(previousBalance);
 
-  let delegate = getDelegate(delegateAddress);
+  let delegate = getOrCreateDelegate(delegateAddress);
   delegate.delegatedVotesRaw = newBalance;
   delegate.delegatedVotes = toDecimal(newBalance);
   delegate.save();

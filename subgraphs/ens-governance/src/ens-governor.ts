@@ -1,4 +1,4 @@
-import { Bytes, log } from "@graphprotocol/graph-ts";
+import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import {
   ProposalCanceled,
   ProposalCreated,
@@ -12,8 +12,8 @@ import { Vote } from "../generated/schema";
 import {
   BIGINT_ONE,
   getGovernance,
-  getDelegate,
-  getProposal,
+  getOrCreateDelegate,
+  getOrCreateProposal,
   getVoteChoiceByValue,
   getGovernanceFramework,
   ProposalState,
@@ -22,7 +22,7 @@ import {
 
 // ProposalCanceled(proposalId)
 export function handleProposalCanceled(event: ProposalCanceled): void {
-  let proposal = getProposal(event.params.proposalId.toString());
+  let proposal = getOrCreateProposal(event.params.proposalId.toString());
   proposal.state = ProposalState.CANCELED;
   proposal.cancellationBlock = event.block.number;
   proposal.cancellationTime = event.block.timestamp;
@@ -36,8 +36,12 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
-  let proposal = getProposal(event.params.proposalId.toString());
-  let proposer = getDelegate(event.params.proposer);
+  log.info("Proposal #{} created by {}", [
+    event.params.proposalId.toString(),
+    event.params.proposer.toHexString(),
+  ]);
+  let proposal = getOrCreateProposal(event.params.proposalId.toString());
+  let proposer = getOrCreateDelegate(event.params.proposer, false);
 
   // Checking if the proposer was a delegate already accounted for, if not we should log an error
   // since it shouldn't be possible for a delegate to propose anything without first being "created"
@@ -50,6 +54,9 @@ export function handleProposalCreated(event: ProposalCreated): void {
       ]
     );
   }
+
+  // Creating it anyway since we will want to account for this event data, even though it should've never happened
+  proposer = getOrCreateDelegate(event.params.proposer);
 
   proposal.proposer = proposer.id;
   proposal.targets = addressesToBytes(event.params.targets);
@@ -76,7 +83,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
 // ProposalExecuted(proposalId)
 export function handleProposalExecuted(event: ProposalExecuted): void {
   // Update proposal status + execution metadata
-  let proposal = getProposal(event.params.proposalId.toString());
+  let proposal = getOrCreateProposal(event.params.proposalId.toString());
   proposal.state = ProposalState.EXECUTED;
   proposal.executionETA = null;
   proposal.executionBlock = event.block.number;
@@ -93,7 +100,7 @@ export function handleProposalExecuted(event: ProposalExecuted): void {
 // ProposalQueued(proposalId, eta)
 export function handleProposalQueued(event: ProposalQueued): void {
   // Update proposal status + execution metadata
-  let proposal = getProposal(event.params.proposalId.toString());
+  let proposal = getOrCreateProposal(event.params.proposalId.toString());
   proposal.state = ProposalState.QUEUED;
   proposal.executionETA = event.params.eta;
   proposal.save();
@@ -139,7 +146,7 @@ export function handleVoteCast(event: VoteCast): void {
   vote.choice = getVoteChoiceByValue(event.params.support);
   vote.save();
 
-  let proposal = getProposal(proposalId);
+  let proposal = getOrCreateProposal(proposalId);
   if (proposal.state == ProposalState.PENDING) {
     proposal.state = ProposalState.ACTIVE;
   }
@@ -155,7 +162,7 @@ export function handleVoteCast(event: VoteCast): void {
   proposal.save();
 
   // Add 1 to participant's proposal voting count
-  let voter = getDelegate(voterAddress);
+  let voter = getOrCreateDelegate(voterAddress);
   voter.numberVotes = voter.numberVotes + 1;
   voter.save();
 }
