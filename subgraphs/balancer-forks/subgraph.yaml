@@ -1,0 +1,97 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Vault
+    network: optimism
+    source:
+      address: "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
+      abi: Vault
+      startBlock: 7003430
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - DexAmmProtocol
+        - Token
+        - LiquidityPool
+        - Swap
+        - DailyActiveAccount
+        - Account
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: WeightedPool
+          file: ./abis/WeightedPool.json
+        - name: ConvergentCurvePool
+          file: ./abis/ConvergentCurvePool.json
+        - name: LinearPool
+          file: ./abis/LinearPool.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: PoolRegistered(indexed bytes32,indexed address,uint8)
+          handler: handlePoolRegister
+        - event: TokensRegistered(indexed bytes32,address[],address[])
+          handler: handleTokensRegister
+        - event: PoolBalanceChanged(indexed bytes32,indexed address,address[],int256[],uint256[])
+          handler: handlePoolBalanceChanged
+        - event: Swap(indexed bytes32,indexed address,indexed address,uint256,uint256)
+          handler: handleSwap
+templates:
+  - kind: ethereum/contract
+    name: WeightedPool
+    network: optimism
+    source:
+      abi: WeightedPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - WeightedPool
+        - LiquidityPoolFee
+      abis:
+        - name: WeightedPool
+          file: ./abis/WeightedPool.json
+      eventHandlers:
+        - event: SwapFeePercentageChanged(uint256)
+          handler: handleSwapFeePercentageChange

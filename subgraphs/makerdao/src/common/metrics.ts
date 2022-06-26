@@ -18,7 +18,6 @@ import {
   getOrCreateLendingProtocol,
   getMarket,
   getOrCreateMarketHourlySnapshot,
-  getOrCreateToken,
 } from "./getters";
 import { getMarketFromIlk } from "../common/getters";
 import { Vat } from "../../generated/Vat/Vat";
@@ -80,8 +79,14 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 // Update MarketDailySnapshot entity
 export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   let market = getMarketFromIlk(ilk);
+  if (!market) {
+    return;
+  }
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
+  if (!marketHourlySnapshot || !marketDailySnapshot) {
+    return;
+  }
   let protocol = getOrCreateLendingProtocol();
 
   marketHourlySnapshot.protocol = protocol.id;
@@ -96,6 +101,9 @@ export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   marketHourlySnapshot.inputTokenBalance = market.inputTokenBalance;
   marketHourlySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketHourlySnapshot.outputTokenSupply = market.outputTokenSupply;
+  marketHourlySnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketHourlySnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketHourlySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   marketHourlySnapshot.outputTokenPriceUSD = BIGDECIMAL_ONE;
 
   marketDailySnapshot.protocol = protocol.id;
@@ -110,6 +118,9 @@ export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   marketDailySnapshot.inputTokenBalance = market.inputTokenBalance;
   marketDailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketDailySnapshot.outputTokenSupply = market.outputTokenSupply;
+  marketDailySnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketDailySnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketDailySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   marketDailySnapshot.outputTokenPriceUSD = BIGDECIMAL_ONE;
 
   marketHourlySnapshot.save();
@@ -146,8 +157,10 @@ export function updateTVL(): void {
   for (let i: i32 = 0; i < marketIDList.length; i++) {
     let marketAddress = marketIDList[i];
     let market = getMarket(marketAddress);
-    let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
-    let marketTVLusd = bigIntToBigDecimal(market.inputTokenBalance, WAD).times(inputToken.lastPriceUSD); // prices are always up to date via the spot contract
+    if (!market) {
+      return;
+    }
+    let marketTVLusd = bigIntToBigDecimal(market.inputTokenBalance, WAD).times(market.inputTokenPriceUSD); // prices are always up to date via the spot contract
     protocolMintedTokenSupply = protocolMintedTokenSupply.plus(market.outputTokenSupply);
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(marketTVLusd);
   }

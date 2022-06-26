@@ -77,6 +77,14 @@ Entity IDs are usually defined by either an address, a transaction hash, a log i
 
 Note that entity types that derive from the same interface cannot have the same IDs. For example, a `Withdraw` entity and a `Deposit` entity cannot have the same ID since they both implement the `Event` interface. In this case, we prefix the ID by `withdraw-` or `deposit-` in order to make them unique. You can use the helper function `prefixID(string, string)` in `common/utils/strings.ts` to make this easier.
 
+Certain protocols may require adjustments to the ID of specific entities to handle edge cases (e.g. single-sided liquidity pools or single-sided staking). Feel free to make adjustments necessary to best fit the situation. Make sure these are documented in the README of the specific subgraphs.
+
+Here are some examples:
+
+- Convex doesn't have vault contracts for individual vaults. The Vault IDs for Convex is stored as { the Booster contract address }-{ pool ID }.
+- Bancor v3 creates a reward program that has start and end date for a few tokens deposited (DAI, ETH, etc). The reward is always in BNT. So the ID is being stored as " { Reward token type }-{ Smart contract address of the deposited token }-{ start }-{ end } " such as `DEPOSIT-<DAI ADDRESS>-16xxxxxx-16xxxxxxx`.
+- For pools that support single-sided staking, we can store each side as a separate pool, set `isSingleSided` as true, and differentiate with their ID (e.g. { Address of parent pool }- { Address/pid of staking pool }).
+
 ## Transaction vs. Event
 
 The most granular data we index in the subgraphs are Event entities. They are very similar to the events in Ethereum event logs but not exactly the same. Conceptually, an Event entity uniquely represents a user action that has occurred in a protocol.
@@ -92,6 +100,33 @@ When indexing smart contract calls that represent a user action but do not emit 
 ### From & To
 
 Note that the `from` and `to` field is defined differently per entity and may not necessarily correspond to that of the underlying transaction. For example, the `to` field is always the interacted smart contract address in the transaction but can be the user (caller) in the `Withdraw` entity, as the asset flows from the pool to the user. In general, `from` and `to` are defined according to the flow of the token/asset involved.
+
+## Account & Positions
+
+### Positions
+
+All positions are per market per account. We track two sides of the market separately:
+
+- When a deposit is made, a `LENDER` position is opened.
+- When a deposit is withdrew, the position is closed.
+- When a borrow is made, a `BORROWER` position is opened.
+- When a borrow is repaid, the position is closed.
+- Depending on the amount being liquidated, the position may either be closed, or stay open.
+
+When a deposit position is open, any additional deposits or withdraws updates the existing `Position` entity, instead of creating a new one. If a deposit occurs after an open `LENDER` position has been closed off, a new `LENDER` position gets created.
+
+Example 1: Compound
+
+1. User deposits 10 ETH
+2. User borrows 1000 USDC
+3. User borrows 200 SUSHI
+4. User withdraws 1 ETH
+
+The open positions should be:
+
+- LENDER: 9 ETH
+- BORROWER: 1000 USDC
+- BORROWER: 200 SUSHI
 
 ## Yield and Reward Tokens
 

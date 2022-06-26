@@ -12,15 +12,16 @@ export const schema = (version: string): string => {
       return schema110();
     case Versions.Schema120:
       return schema120();
+    case Versions.Schema130:
     default:
-      return schema120();
+      return schema130();
   }
 };
 
 export const schema100 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        vaults(first: 100, skip: $skipAmt) {
+        vaults(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
             id
             name
             fees{
@@ -50,7 +51,7 @@ export const schema100 = (): string => {
 export const schema110 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        vaults(first: 100, skip: $skipAmt) {
+        vaults(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
             id
             name
             fees{
@@ -77,10 +78,10 @@ export const schema110 = (): string => {
     }`;
 };
 
-export const schema120 = (): string => {
+export const schema130 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        vaults(first: 100, skip: $skipAmt) {
+        vaults(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
             id
         name
         symbol
@@ -111,6 +112,54 @@ export const schema120 = (): string => {
         }
         depositLimit
         totalValueLockedUSD
+        stakedOutputTokenAmount
+        pricePerShare
+        inputTokenBalance
+        outputTokenSupply
+        outputTokenPriceUSD
+        rewardTokenEmissionsAmount
+        rewardTokenEmissionsUSD
+        }
+    }`;
+};
+
+export const schema120 = (): string => {
+  return `
+    query Data($skipAmt: Int!) {
+        vaults(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+            id
+        name
+        symbol
+        fees {
+          feeType
+          feePercentage
+        }
+        inputToken {
+          id
+          decimals
+          name
+          symbol
+        }
+        outputToken {
+          id
+          decimals
+          name
+          symbol
+        }
+        rewardTokens {
+          id
+          token {
+            id
+            decimals
+            name
+            symbol
+          }
+        }
+        depositLimit
+        totalValueLockedUSD
+        cumulativeSupplySideRevenueUSD
+        cumulativeProtocolSideRevenueUSD
+        cumulativeTotalRevenueUSD
         stakedOutputTokenAmount
         pricePerShare
         inputTokenBalance

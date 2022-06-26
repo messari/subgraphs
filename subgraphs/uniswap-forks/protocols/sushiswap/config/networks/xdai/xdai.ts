@@ -1,6 +1,6 @@
 import { Address, BigDecimal } from '@graphprotocol/graph-ts';
 import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
+import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
 import { Configurations } from '../../../../../configurations/configurations/interface';
 import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
 import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
@@ -59,14 +59,12 @@ export class SushiswapXdaiConfigurations implements Configurations {
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
-      "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1",
-      "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
-      "0x8e5bbbb09ed1ebde8674cda39a0c169401db4252",
-      "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83",
-      "0x4ecaba5870353805a9f068101a40e0f32ed605c6",
-      "0x82dfe19164729949fd66da1a37bc70dd6c4746ce",
-      "0x44fa8e6f47987339850636f88629646662444217",
-      "0xfe7ed09c4956f7cdb54ec4ffcb9818db2d7025b8"
+      "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1", // wETH
+      "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // wXDAI
+      "0x8e5bbbb09ed1ebde8674cda39a0c169401db4252", // wBTC
+      "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // USDC
+      "0x4ecaba5870353805a9f068101a40e0f32ed605c6", // USDT
+      "0x44fa8e6f47987339850636f88629646662444217", // DAI
     ]);
   }
   getStableCoins(): string[] {
@@ -84,5 +82,11 @@ export class SushiswapXdaiConfigurations implements Configurations {
   }
   getUntrackedPairs(): string[] {
     return toLowerCaseList([]);
+  }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
+  getMinimumLiquidityThreshold(): BigDecimal {
+    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
   }
 }

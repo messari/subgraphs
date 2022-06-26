@@ -8,6 +8,7 @@ import {
   ACTIVE_POOL,
   ACTIVE_POOL_CREATED_BLOCK,
   ACTIVE_POOL_CREATED_TIMESTAMP,
+  BIGDECIMAL_ZERO,
   LIQUIDATION_FEE_PERCENT,
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
@@ -17,6 +18,7 @@ import {
   addProtocolBorrowVolume,
   addProtocolDepositVolume,
   addProtocolLiquidateVolume,
+  getOrCreateFinancialsSnapshot,
   getOrCreateLiquityProtocol,
   updateProtocolBorrowBalance,
   updateProtocolUSDLocked,
@@ -38,6 +40,9 @@ export function getOrCreateMarket(): Market {
     market.liquidationThreshold = MAXIMUM_LTV;
     market.liquidationPenalty = LIQUIDATION_FEE_PERCENT;
     market.inputToken = getETHToken().id;
+    market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     market.rates = [getOrCreateStableBorrowerInterestRate(ACTIVE_POOL).id];
     market.createdTimestamp = ACTIVE_POOL_CREATED_TIMESTAMP;
     market.createdBlockNumber = ACTIVE_POOL_CREATED_BLOCK;
@@ -58,8 +63,20 @@ export function getOrCreateMarketSnapshot(
     marketSnapshot.protocol = market.protocol;
     marketSnapshot.market = market.id;
     marketSnapshot.rates = market.rates;
+
+    marketSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    marketSnapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
   }
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketSnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketSnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -86,8 +103,20 @@ export function getOrCreateMarketHourlySnapshot(
     marketSnapshot.protocol = market.protocol;
     marketSnapshot.market = market.id;
     marketSnapshot.rates = market.rates;
+
+    marketSnapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    marketSnapshot.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyRepayUSD = BIGDECIMAL_ZERO;
   }
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketSnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketSnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -147,6 +176,48 @@ export function addMarketDepositVolume(
     hourlySnapshot.hourlyDepositUSD.plus(depositedUSD);
   hourlySnapshot.save();
   addProtocolDepositVolume(event, depositedUSD);
+}
+
+export function addMarketWithdrawVolume(
+  event: ethereum.Event,
+  withdrawUSD: BigDecimal
+): void {
+  const protocol = getOrCreateLiquityProtocol();
+  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
+  financialsSnapshot.dailyWithdrawUSD =
+    financialsSnapshot.dailyWithdrawUSD.plus(withdrawUSD);
+  financialsSnapshot.save();
+
+  const market = getOrCreateMarket();
+  const dailySnapshot = getOrCreateMarketSnapshot(event, market);
+  dailySnapshot.dailyWithdrawUSD =
+    dailySnapshot.dailyWithdrawUSD.plus(withdrawUSD);
+  dailySnapshot.save();
+
+  const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+  hourlySnapshot.hourlyWithdrawUSD =
+    hourlySnapshot.hourlyWithdrawUSD.plus(withdrawUSD);
+  hourlySnapshot.save();
+}
+
+export function addMarketRepayVolume(
+  event: ethereum.Event,
+  repayUSD: BigDecimal
+): void {
+  const protocol = getOrCreateLiquityProtocol();
+  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
+  financialsSnapshot.dailyRepayUSD =
+    financialsSnapshot.dailyRepayUSD.plus(repayUSD);
+  financialsSnapshot.save();
+
+  const market = getOrCreateMarket();
+  const dailySnapshot = getOrCreateMarketSnapshot(event, market);
+  dailySnapshot.dailyRepayUSD = dailySnapshot.dailyRepayUSD.plus(repayUSD);
+  dailySnapshot.save();
+
+  const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+  hourlySnapshot.hourlyRepayUSD = hourlySnapshot.hourlyRepayUSD.plus(repayUSD);
+  hourlySnapshot.save();
 }
 
 export function addMarketLiquidateVolume(

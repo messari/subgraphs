@@ -1,5 +1,5 @@
 import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { Market, Liquidate } from "../../generated/schema";
+import { Market, Liquidate, LiquidateProxy } from "../../generated/schema";
 import { Cauldron, LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
 import { getMIMAddress, getOrCreateInterestRate, getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
 import {
@@ -39,19 +39,31 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
   let MarketEntity = new Market(marketAddress);
   let MarketContract = Cauldron.bind(Address.fromString(marketAddress));
   let collateralCall = MarketContract.try_collateral();
+  let protocol = getOrCreateLendingProtocol();
   if (!collateralCall.reverted) {
     let inputToken = getOrCreateToken(collateralCall.value);
-    MarketEntity.protocol = getOrCreateLendingProtocol().id;
+    MarketEntity.protocol = protocol.id;
     MarketEntity.inputToken = inputToken.id;
     MarketEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
     MarketEntity.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     MarketEntity.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
     MarketEntity.inputTokenBalance = BIGINT_ZERO;
-    MarketEntity.outputToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).id;
     MarketEntity.outputTokenSupply = BIGINT_ZERO;
     MarketEntity.outputTokenPriceUSD = BIGDECIMAL_ONE;
     MarketEntity.createdTimestamp = blockTimestamp;
     MarketEntity.createdBlockNumber = blockNumber;
+    MarketEntity.maximumLTV = BIGDECIMAL_ZERO;
+    MarketEntity.inputTokenPriceUSD = inputToken.lastPriceUSD!;
+    MarketEntity.liquidationThreshold = BIGDECIMAL_ZERO;
+    MarketEntity.liquidationPenalty = BIGDECIMAL_ZERO;
+    MarketEntity.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    MarketEntity.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    MarketEntity.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    MarketEntity.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    MarketEntity.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    MarketEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    MarketEntity.debtMultiplier = BIGDECIMAL_ZERO;
+    MarketEntity.rates = [];
     MarketEntity.name = inputToken.name + " Market";
     MarketEntity.isActive = true;
     MarketEntity.canUseAsCollateral = true;
@@ -186,11 +198,13 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     }
   }
   MarketEntity.save();
+  protocol.totalPoolCount = protocol.totalPoolCount + 1;
+  protocol.save();
   updateProtocolMarketList(marketAddress);
 }
 
 export function createLiquidateEvent(event: LogRemoveCollateral): void {
-  let liquidation = new Liquidate(
+  let liquidation = new LiquidateProxy(
     "liquidate-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString(),
   );
   liquidation.amount = event.params.share;

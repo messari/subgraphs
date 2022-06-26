@@ -5,13 +5,20 @@ import { toDate } from "../../utils";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export function StackedChart(tokens: any[], tokenWeightsArray: any[], poolTitle: string) {
+interface StackedChartProps {
+  tokens: any[];
+  tokenWeightsArray: any[];
+  poolTitle: string;
+}
+
+export function StackedChart({ tokens, tokenWeightsArray, poolTitle }: StackedChartProps) {
   const dates: string[] = [];
 
   const tokenWeightsValues = tokenWeightsArray.map((x) => {
+    const hourly = poolTitle.toUpperCase().includes("HOURLY");
     const currentTokenValues = x.map((weight: { [x: string]: any }) => {
       if (dates.length < x.length) {
-        dates.push(toDate(weight.date));
+        dates.push(toDate(weight.date, hourly));
       }
       return Number(weight.value);
     });

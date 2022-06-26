@@ -32,6 +32,7 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
+  ADDRESS_ZERO,
 } from "../common/constants";
 import { DsProxy } from "../../generated/templates/DsProxy/DsProxy";
 
@@ -88,6 +89,7 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics.protocol = protocol.id;
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
     usageMetrics.dailyTransactionCount = 0;
     usageMetrics.dailyDepositCount = 0;
     usageMetrics.dailyBorrowCount = 0;
@@ -99,11 +101,13 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
   return usageMetrics;
 }
 
-export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot {
+export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot | null {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let marketMetrics = MarketHourlySnapshot.load(marketAddress.concat("-").concat(id.toString()));
   let market = getMarket(marketAddress);
-
+  if (!market){
+    return null
+  }
   if (!marketMetrics) {
     marketMetrics = new MarketHourlySnapshot(marketAddress.concat("-").concat(id.toString()));
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
@@ -127,17 +131,30 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAdd
     marketMetrics.hourlyDepositUSD = BIGDECIMAL_ZERO;
     marketMetrics.hourlyBorrowUSD = BIGDECIMAL_ZERO;
     marketMetrics.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyRepayUSD = BIGDECIMAL_ZERO;
+
+    marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+    marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+    marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+
+    marketMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     marketMetrics.save();
   }
 
   return marketMetrics;
 }
 
-export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot {
+export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot | null {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
   let market = getMarket(marketAddress);
-
+  if (!market){
+    return null
+  }
   if (!marketMetrics) {
     marketMetrics = new MarketDailySnapshot(marketAddress.concat("-").concat(id.toString()));
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
@@ -161,6 +178,16 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddr
     marketMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
     marketMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
     marketMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
+    
+    marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+    marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+    marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+
+    marketMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
 
     marketMetrics.save();
   }
@@ -192,6 +219,8 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.save();
   }
@@ -216,6 +245,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.network = Network.MAINNET;
   LendingProtocolEntity.type = ProtocolType.LENDING;
   LendingProtocolEntity.cumulativeUniqueUsers = 0;
+  LendingProtocolEntity.totalPoolCount = 0;
   LendingProtocolEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
   LendingProtocolEntity.lendingType = LendingType.CDP;
   LendingProtocolEntity.mintedTokens = [getOrCreateToken(Address.fromString(DAI)).id];
@@ -227,29 +257,29 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
 ///////// Helpers /////////
 ///////////////////////////
 
-function getIlkMarketAddress(ilk: Bytes): string {
+function getIlkMarketAddress(ilk: Bytes): Address {
   let ilkEntity = _Ilk.load(ilk.toString());
   if (!ilkEntity) {
-    return ZERO_ADDRESS;
+    return ADDRESS_ZERO;
   }
-  return ilkEntity.marketAddress;
+  return Address.fromString(ilkEntity.marketAddress);
 }
 
-export function getMarketFromIlk(ilk: Bytes): Market {
-  let marketAddress = getIlkMarketAddress(ilk);
-  let market = Market.load(marketAddress);
-  if (market) {
-    return market;
+export function getMarketFromIlk(ilk: Bytes): Market | null {
+  const marketAddress = getIlkMarketAddress(ilk);
+  const market = Market.load(marketAddress.toHexString());
+  if (!market) {
+    return null;
   }
-  return new Market(marketAddress);
+  return market
 }
 
-export function getMarket(marketAddress: string): Market {
+export function getMarket(marketAddress: string): Market | null {
   let market = Market.load(marketAddress);
-  if (market) {
-    return market;
+  if (!market) {
+    return null;
   }
-  return new Market(marketAddress);
+  return market;
 }
 
 export function getProxy(proxyAddress: Address): _Proxy {

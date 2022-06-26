@@ -1,6 +1,6 @@
 import { Address, BigDecimal } from '@graphprotocol/graph-ts';
 import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
+import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
 import { Configurations } from '../../../../../configurations/configurations/interface';
 import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
 import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
@@ -59,11 +59,12 @@ export class SushiswapFantomConfigurations implements Configurations {
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
-      "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83",
-      "0xad84341756bf337f5a0164515b1f6f993d194e1f",
-      "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e",
-      "0x74b23882a30290451a17c44f4f05243b6b58c76d",
-      "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
+      "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83", // wFTM
+      "0x74b23882a30290451a17c44f4f05243b6b58c76d", // wETH
+      "0xad84341756bf337f5a0164515b1f6f993d194e1f", // fUSD
+      "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e", // DAI
+      "0x049d68029688eAbF473097a2fC38ef61633A3C7A", // USDT
+      "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
     ]);
   }
   getStableCoins(): string[] {
@@ -71,6 +72,7 @@ export class SushiswapFantomConfigurations implements Configurations {
       "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
       "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", // DAI
       "0x049d68029688eAbF473097a2fC38ef61633A3C7A", // USDT
+      "0xad84341756bf337f5a0164515b1f6f993d194e1f", // fUSD
     ]);
   }
   getStableOraclePools(): string[] {
@@ -82,5 +84,11 @@ export class SushiswapFantomConfigurations implements Configurations {
   }
   getUntrackedPairs(): string[] {
     return toLowerCaseList([]);
+  }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
+  getMinimumLiquidityThreshold(): BigDecimal {
+    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
   }
 }

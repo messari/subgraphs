@@ -1,0 +1,68 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: ENSGovernor
+    network: mainnet
+    source:
+      address: "0x323A76393544d5ecca80cd6ef2A560C6a395b7E3"
+      abi: ENSGovernor
+      startBlock: 13533772
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: ENSGovernor
+          file: ./abis/ENSGovernor.json
+      eventHandlers:
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleProposalQueued
+        - event: QuorumNumeratorUpdated(uint256,uint256)
+          handler: handleQuorumNumeratorUpdated
+        - event: TimelockChange(address,address)
+          handler: handleTimelockChange
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+      file: ./src/ens-governor.ts
+  - kind: ethereum
+    name: ENSToken
+    network: mainnet
+    source:
+      address: "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72"
+      abi: ENSToken
+      startBlock: 13820618
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: ENSToken
+          file: ./abis/ENSToken.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/ens-token.ts

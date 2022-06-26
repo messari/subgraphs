@@ -1,6 +1,6 @@
 import { Address, BigDecimal } from '@graphprotocol/graph-ts';
 import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
+import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
 import { Configurations } from '../../../../../configurations/configurations/interface';
 import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
 import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
@@ -59,10 +59,11 @@ export class SushiswapArbitrumConfigurations implements Configurations {
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
-      "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-      "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
-      "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
-      "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
+      "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // wETH
+      "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f", // wBTC
+      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
+      "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9", // USDT
+      "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"  // USDC
     ]);
   }
   getStableCoins(): string[] {
@@ -80,5 +81,11 @@ export class SushiswapArbitrumConfigurations implements Configurations {
   }
   getUntrackedPairs(): string[] {
     return toLowerCaseList([]);
+  }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
+  getMinimumLiquidityThreshold(): BigDecimal {
+    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
   }
 }

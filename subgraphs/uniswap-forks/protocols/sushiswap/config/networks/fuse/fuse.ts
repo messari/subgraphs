@@ -1,6 +1,6 @@
 import { Address, BigDecimal } from '@graphprotocol/graph-ts';
 import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
+import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
 import { Configurations } from '../../../../../configurations/configurations/interface';
 import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
 import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
@@ -59,13 +59,13 @@ export class SushiswapFuseConfigurations implements Configurations {
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
-      "0x0be9e53fd7edac9f859882afdda116645287c629",
-      "0xa722c13135930332eb3d749b2f0906559d2c5b99",
-      "0x33284f95ccb7b948d9d352e1439561cf83d8d00d",
-      "0x620fd5fa44be6af63715ef4e65ddfa0387ad13f5",
-      "0x94ba7a27c7a95863d1bdc7645ac2951e0cca06ba",
-      "0xfadbbf8ce7d5b7041be672561bba99f79c532e10",
-      "0x249be57637d8b013ad64785404b24aebae9b098b" 
+      "0x0be9e53fd7edac9f859882afdda116645287c629", // wFUSE
+      "0xa722c13135930332eb3d749b2f0906559d2c5b99", // wETH
+      "0x33284f95ccb7b948d9d352e1439561cf83d8d00d", // wBTC
+      "0x620fd5fa44be6af63715ef4e65ddfa0387ad13f5", // USDC
+      "0x94ba7a27c7a95863d1bdc7645ac2951e0cca06ba", // DAI
+      "0xfadbbf8ce7d5b7041be672561bba99f79c532e10", // USDT
+      "0x249be57637d8b013ad64785404b24aebae9b098b"  // fUSD
     ]);
   }
   getStableCoins(): string[] {
@@ -73,6 +73,7 @@ export class SushiswapFuseConfigurations implements Configurations {
       "0x620fd5fa44BE6af63715Ef4E65DDFA0387aD13F5", // USDC
       "0x94Ba7A27c7A95863d1bdC7645AC2951E0cca06bA", // DAI
       "0xFaDbBF8Ce7D5b7041bE672561bbA99f79c532e10", // USDT
+      "0x249be57637d8b013ad64785404b24aebae9b098b"  // fUSD
     ]);
   }
   getStableOraclePools(): string[] {
@@ -84,5 +85,11 @@ export class SushiswapFuseConfigurations implements Configurations {
   }
   getUntrackedPairs(): string[] {
     return toLowerCaseList([]);
+  }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
+  getMinimumLiquidityThreshold(): BigDecimal {
+    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
   }
 }

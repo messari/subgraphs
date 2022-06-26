@@ -10,17 +10,24 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
-  export const AVALANCHE = "AVALANCHE";
+  export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
   export const AURORA = "AURORA";
+  export const AVALANCHE = "AVALANCHE";
+  export const BOBA = "BOBA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
+  export const COSMOS = "COSMOS";
+  export const CRONOS = "CRONOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY";
+  export const JUNO = "JUNO";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
+  export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
 }
@@ -51,7 +58,7 @@ export namespace RewardTokenType {
 export namespace InterestRateType {
   export const STABLE = "STABLE";
   export const VARIABLE = "VARIABLE";
-  export const FIXED_TERM = "FIXED_TERM";
+  export const FIXED = "FIXED";
 }
 
 export namespace InterestRateSide {
@@ -59,12 +66,24 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
+export namespace ActivityType {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
+
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
 
+export const INT_NEGATIVE_ONE = -1 as i32;
+export const INT_ZERO = 0 as i32;
+export const INT_ONE = 1 as i32;
+export const INT_TWO = 2 as i32;
+export const INT_FOUR = 4 as i32;
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
@@ -74,7 +93,8 @@ export const BIGDECIMAL_HUNDRED = new BigDecimal(BigInt.fromI32(100));
 ///// Date/Time /////
 /////////////////////
 
-export const SECONDS_PER_YEAR = 60 * 60 * 24 * 365;
+export const DAYS_PER_YEAR = 365;
+export const SECONDS_PER_YEAR = 60 * 60 * 24 * DAYS_PER_YEAR;
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const SECONDS_PER_HOUR = 60 * 60; // 3600
 
