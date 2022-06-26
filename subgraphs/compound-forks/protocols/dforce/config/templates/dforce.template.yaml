@@ -1,0 +1,167 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Comptroller
+    network: {{ network }}
+    source:
+      address: "{{ comptrollerAddr }}"
+      abi: Comptroller
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Protocol
+        - Market
+        - Token
+      abis:
+        - name: Comptroller
+          file: ./abis/dforce/Comptroller.json
+        - name: CToken
+          file: ./abis/dforce/CToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: PriceOracle
+          file: ./abis/dforce/PriceOracle.json
+      eventHandlers:
+        - event: MarketAdded(address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleMarketAdded
+        - event: NewPriceOracle(address,address)
+          handler: handleNewPriceOracle
+        - event: NewCollateralFactor(address,uint256,uint256)
+          handler: handleNewCollateralFactor
+        - event: NewLiquidationIncentive(uint256,uint256)
+          handler: handleNewLiquidationIncentive
+        - event: MintPaused(address,bool)
+          handler: handleMintPaused
+        - event: RedeemPaused(address,bool)
+          handler: handleRedeemPaused
+        - event: BorrowPaused(address,bool)
+          handler: handleDistributedBorrowerComp
+        - event: TransferPaused(bool)
+          handler: handleTransferPaused
+        - event: NewRewardDistributor(address,address)
+          handler: handleNewRewardDistributor
+      file: ./protocols/dforce/src/mapping.ts
+
+  - kind: ethereum/contract
+    name: USX
+    network: {{ network }}
+    source:
+      address: "{{ USXAddr }}"
+      abi: stablecoin
+      startBlock: {{ USXStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LendingProtocol
+        - FinancialsDailySnapshot
+      abis:
+        - name: Comptroller
+          file: ./abis/dforce/Comptroller.json
+        - name: stablecoin
+          file: ./abis/dforce/stablecoin.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleStablecoinTransfer
+      file: ./protocols/dforce/src/mapping.ts
+
+  - kind: ethereum/contract
+    name: EUX
+    network: {{ network }}
+    source:
+      address: "{{ EUXAddr }}"
+      abi: stablecoin
+      startBlock: {{ EUXStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LendingProtocol
+        - FinancialsDailySnapshot
+      abis:
+        - name: Comptroller
+          file: ./abis/dforce/Comptroller.json
+        - name: stablecoin
+          file: ./abis/dforce/stablecoin.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleStablecoinTransfer
+      file: ./protocols/dforce/src/mapping.ts
+
+templates:
+  - name: CToken
+    kind: ethereum/contract
+    network: {{ network }}
+    source:
+      abi: CToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
+      abis:
+        - name: CToken
+          file: ./abis/dforce/CToken.json
+        - name: Comptroller
+          file: ./abis/dforce/Comptroller.json
+        - name: PriceOracle
+          file: ./abis/dforce/PriceOracle.json
+      eventHandlers:
+        - event: Mint(address,address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: Flashloan(address,uint256,uint256,uint256,uint256)
+          handler: handleFlashload
+        - event: UpdateInterest(uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleUpdateInterest
+        - event: NewReserveRatio(uint256,uint256)
+          handler: handleNewReserveFactor
+      file: ./protocols/dforce/src/mapping.ts
+
+  - kind: ethereum/contract
+    name: Reward
+    network: {{ network }}
+    source:
+      abi: RewardDistributor
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
+      abis:
+        - name: Comptroller
+          file: ./abis/dforce/Comptroller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: PriceOracle
+          file: ./abis/dforce/PriceOracle.json
+        - name: RewardDistributor
+          file: ./abis/dforce/RewardDistributor.json
+      eventHandlers:
+        - event: RewardDistributed(address,address,uint256,uint256)
+          handler: handleRewardDistributed
+        - event: NewRewardToken(address,address)
+          handler: handleNewRewardToken
+      file: ./protocols/dforce/src/mapping.ts
