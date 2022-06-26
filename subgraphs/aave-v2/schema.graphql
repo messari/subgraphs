@@ -231,6 +231,9 @@ type LendingProtocol implements Protocol @entity {
   " Tokens that can be minted. Only applies to CDP "
   mintedTokens: [Token!]
 
+  " String of the address of the current price oracle on the protocol "
+  protocolPriceOracle: String!
+
   ##### Quantitative Data #####
 
   " Number of cumulative unique users "

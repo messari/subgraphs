@@ -1,6 +1,5 @@
 import * as utils from "./utils";
 import * as constants from "./constants";
-import { getUsdPricePerToken } from "../prices";
 import {
   Token,
   Market,
@@ -18,6 +17,18 @@ import { getMarketRates } from "../modules/Market";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./tokens";
 import { Address, BigDecimal, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { getCurrentRewardEmissions, getCurrentRewardEmissionsUSD } from "../modules/Rewards";
+import { IPriceOracleGetter } from "../../generated/templates/LendingPool/IPriceOracleGetter";
+import { getAssetPriceInUSDC } from "../modules/Price";
+
+export function getPriceOracle(): IPriceOracleGetter {
+  // priceOracle is set the address of the price oracle contract of the 
+  // address provider contract, pulled from context
+  // const protocolId = getProtocolIdFromCtx();
+  const lendingProtocol = getOrCreateLendingProtocol(constants.PROTOCOL_ADDRESS);
+  const priceOracle = lendingProtocol.protocolPriceOracle;
+  
+  return IPriceOracleGetter.bind(Address.fromString(priceOracle));
+}
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -105,6 +116,7 @@ export function getOrCreateLendingProtocol(lendingProtocolId: string): LendingPr
     lendingProtocol.totalBorrowBalanceUSD = constants.BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeBorrowUSD = constants.BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeLiquidateUSD = constants.BIGDECIMAL_ZERO;
+    lendingProtocol.protocolPriceOracle = constants.PRICE_ORACLE_ADDRESS;
 
     lendingProtocol.save();
   }
@@ -240,9 +252,9 @@ export function getOrCreateMarket(
     market.save();
   }
 
-  const currentPrice = getUsdPricePerToken(Address.fromString(market.id));
-  market.inputTokenPriceUSD = currentPrice.usdPrice.div(currentPrice.decimalsBaseTen);
-  market.outputTokenPriceUSD = currentPrice.usdPrice.div(currentPrice.decimalsBaseTen);
+  const currentPrice = getAssetPriceInUSDC(Address.fromString(market.id));
+  market.inputTokenPriceUSD = currentPrice;
+  market.outputTokenPriceUSD = currentPrice;
 
   // No need to execute the below code until block 12317479 when 
   // incentive controller was deployed and started calculating rewards

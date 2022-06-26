@@ -29,13 +29,13 @@ export function createLiquidateEntity(
 
   liquidate.to = debtAsset;
   liquidate.market = market.id;
-  liquidate.from = event.transaction.from.toHexString();
+  liquidate.from = liquidator;
   liquidate.hash = event.transaction.hash.toHexString();
   liquidate.logIndex = event.logIndex.toI32();
   liquidate.protocol = protocol.id;
   liquidate.asset = collateralAsset;
   liquidate.amount = amount;
-  liquidate.liquidatee = liquidator;
+  liquidate.liquidatee = event.transaction.from.toHexString();
 
   const amountUSD = market.inputTokenPriceUSD.times(
     amount

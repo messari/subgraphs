@@ -1,11 +1,14 @@
 import * as utils from "../common/utils";
 import { Market } from "../../generated/schema";
 import * as constants from "../common/constants";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { amountInUSD, getAssetPriceInUSDC } from "./Price";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../common/initializers";
 import { AToken } from "../../generated/templates/AToken/AToken";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { AaveIncentivesController as IncentivesControllerContract } from "../../generated/templates/LendingPoolAddressesProvider/AaveIncentivesController";
-import { getOrCreateRewardToken } from "../common/initializers";
-import { getUsdPrice } from "../prices";
 
 export function getIncentiveControllerAddress(
   outputTokenAddress: Address
@@ -85,19 +88,26 @@ export function getCurrentRewardEmissionsUSD(market: Market): BigDecimal[] {
     rewardTokenAddr,
     constants.RewardTokenType.DEPOSIT
   );
+  const rewardTokenDecimals = getOrCreateToken(
+    Address.fromString(rewardToken.token)
+  ).decimals;
+
+  const rewardPriceInUSDC = getAssetPriceInUSDC(rewardTokenAddr);
 
   // index 0 is for the deposit reward
-  const depositRewardPriceInUSDC = getUsdPrice(
-    rewardTokenAddr,
-    market.rewardTokenEmissionsAmount![0].toBigDecimal()
+  const depositRewardPriceInUSDC = amountInUSD(
+    rewardPriceInUSDC,
+    rewardTokenDecimals,
+    market.rewardTokenEmissionsAmount![0]
   );
 
   rewardEmissionsUSD[0] = depositRewardPriceInUSDC;
 
   // index 1 for the borrow reward
-  const borrowRewardPriceInUSDC = getUsdPrice(
-    rewardTokenAddr,
-    market.rewardTokenEmissionsAmount![1].toBigDecimal()
+  const borrowRewardPriceInUSDC = amountInUSD(
+    rewardPriceInUSDC,
+    rewardTokenDecimals,
+    market.rewardTokenEmissionsAmount![1]
   );
   rewardEmissionsUSD[1] = borrowRewardPriceInUSDC;
 
