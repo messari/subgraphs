@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import {
   DelegateChanged,
   DelegateVotesChanged,
@@ -16,9 +16,11 @@ import {
 
 // DelegateChanged(indexed address,indexed address,indexed address)
 export function handleDelegateChanged(event: DelegateChanged): void {
-  let tokenHolder = getTokenHolder(event.params.delegator);
-  let previousDelegate = getOrCreateDelegate(event.params.fromDelegate);
-  let newDelegate = getOrCreateDelegate(event.params.toDelegate);
+  let tokenHolder = getTokenHolder(event.params.delegator.toHexString());
+  let previousDelegate = getOrCreateDelegate(
+    event.params.fromDelegate.toHexString()
+  );
+  let newDelegate = getOrCreateDelegate(event.params.toDelegate.toHexString());
 
   tokenHolder.delegate = newDelegate.id;
   tokenHolder.save();
@@ -41,7 +43,7 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
 
   let votesDifference = newBalance.minus(previousBalance);
 
-  let delegate = getOrCreateDelegate(delegateAddress);
+  let delegate = getOrCreateDelegate(delegateAddress.toHexString());
   delegate.delegatedVotesRaw = newBalance;
   delegate.delegatedVotes = toDecimal(newBalance);
   delegate.save();
@@ -63,8 +65,8 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
 
 // Transfer(indexed address,indexed address,uint256)
 export function handleTransfer(event: Transfer): void {
-  const from = event.params.from;
-  const to = event.params.to;
+  const from = event.params.from.toHexString();
+  const to = event.params.to.toHexString();
   const value = event.params.value;
 
   let fromHolder = getTokenHolder(from);
@@ -80,7 +82,7 @@ export function handleTransfer(event: Transfer): void {
 
     if (fromHolder.tokenBalanceRaw < BIGINT_ZERO) {
       log.error("Negative balance on holder {} with balance {}", [
-        fromHolder.id.toHexString(),
+        fromHolder.id,
         fromHolder.tokenBalanceRaw.toString(),
       ]);
     }

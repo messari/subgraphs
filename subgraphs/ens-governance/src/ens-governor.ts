@@ -17,7 +17,7 @@ import {
   getVoteChoiceByValue,
   getGovernanceFramework,
   ProposalState,
-  addressesToBytes,
+  addressesToStrings,
 } from "./helpers";
 
 // ProposalCanceled(proposalId)
@@ -36,12 +36,11 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
-  log.info("Proposal #{} created by {}", [
-    event.params.proposalId.toString(),
-    event.params.proposer.toHexString(),
-  ]);
   let proposal = getOrCreateProposal(event.params.proposalId.toString());
-  let proposer = getOrCreateDelegate(event.params.proposer, false);
+  let proposer = getOrCreateDelegate(
+    event.params.proposer.toHexString(),
+    false
+  );
 
   // Checking if the proposer was a delegate already accounted for, if not we should log an error
   // since it shouldn't be possible for a delegate to propose anything without first being "created"
@@ -56,10 +55,14 @@ export function handleProposalCreated(event: ProposalCreated): void {
   }
 
   // Creating it anyway since we will want to account for this event data, even though it should've never happened
-  proposer = getOrCreateDelegate(event.params.proposer);
+  proposer = getOrCreateDelegate(event.params.proposer.toHexString());
+  log.info("Proposal #{} created by {}", [
+    event.params.proposalId.toString(),
+    proposer.id,
+  ]);
 
   proposal.proposer = proposer.id;
-  proposal.targets = addressesToBytes(event.params.targets);
+  proposal.targets = addressesToStrings(event.params.targets);
   proposal.values = event.params.values;
   proposal.signatures = event.params.signatures;
   proposal.calldatas = event.params.calldatas;
@@ -115,27 +118,24 @@ export function handleProposalQueued(event: ProposalQueued): void {
 export function handleQuorumNumeratorUpdated(
   event: QuorumNumeratorUpdated
 ): void {
-  let governanceFramework = getGovernanceFramework(event.address);
+  let governanceFramework = getGovernanceFramework(event.address.toHexString());
   governanceFramework.quorumNumerator = event.params.newQuorumNumerator;
   governanceFramework.save();
 }
 
 // TimelockChange (address oldTimelock, address newTimelock)
 export function handleTimelockChange(event: TimelockChange): void {
-  let governanceFramework = getGovernanceFramework(event.address);
-  governanceFramework.timelockAddress = event.params.newTimelock;
+  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  governanceFramework.timelockAddress = event.params.newTimelock.toHexString();
   governanceFramework.save();
 }
 
 // VoteCast(account, proposalId, support, weight, reason);
 export function handleVoteCast(event: VoteCast): void {
   const proposalId = event.params.proposalId.toString();
-  const voterAddress = event.params.voter;
+  const voterAddress = event.params.voter.toHexString();
 
-  let voteId = voterAddress
-    .toHexString()
-    .concat("-")
-    .concat(proposalId);
+  let voteId = voterAddress.concat("-").concat(proposalId);
   let vote = new Vote(voteId);
   vote.proposal = proposalId;
   vote.voter = voterAddress;

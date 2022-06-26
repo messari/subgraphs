@@ -14,9 +14,7 @@ import {
   TokenHolder,
 } from "../generated/schema";
 
-export const ZERO_ADDRESS = Address.fromHexString(
-  "0x0000000000000000000000000000000000000000"
-);
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_FIVE = BigInt.fromI32(5);
@@ -65,10 +63,10 @@ export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
   );
 }
 
-export function addressesToBytes(addresses: Address[]): Array<Bytes> {
-  const byteAddresses = new Array<Bytes>();
+export function addressesToStrings(addresses: Address[]): Array<string> {
+  const byteAddresses = new Array<string>();
   for (let i = 0; i < addresses.length; i++) {
-    byteAddresses.push(addresses[i] as Bytes);
+    byteAddresses.push(addresses[i].toHexString());
   }
   return byteAddresses;
 }
@@ -96,21 +94,21 @@ export function getGovernance(): Governance {
 }
 
 export function getGovernanceFramework(
-  contractAddress: Bytes
+  contractAddress: string
 ): GovernanceFramework {
   let governanceFramework = GovernanceFramework.load(contractAddress);
 
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
-    let contract = ENSGovernor.bind(Address.fromBytes(contractAddress));
+    let contract = ENSGovernor.bind(Address.fromString(contractAddress));
 
     governanceFramework.name = contract.name();
     governanceFramework.type = "OZGovernor";
     governanceFramework.version = contract.version();
 
     governanceFramework.contractAddress = contractAddress;
-    governanceFramework.tokenAddress = contract.timelock();
-    governanceFramework.timelockAddress = contract.token();
+    governanceFramework.tokenAddress = contract.timelock().toHexString();
+    governanceFramework.timelockAddress = contract.token().toHexString();
 
     governanceFramework.votingDelay = contract.votingDelay();
     governanceFramework.votingPeriod = contract.votingPeriod();
@@ -143,7 +141,7 @@ export function getOrCreateProposal(
 }
 
 export function getOrCreateDelegate(
-  address: Bytes,
+  address: string,
   createIfNotFound: boolean = true
 ): Delegate {
   let delegate = Delegate.load(address);
@@ -167,7 +165,7 @@ export function getOrCreateDelegate(
   return delegate as Delegate;
 }
 
-export function getTokenHolder(address: Bytes): TokenHolder {
+export function getTokenHolder(address: string): TokenHolder {
   let tokenHolder = TokenHolder.load(address);
 
   if (tokenHolder == null) {
