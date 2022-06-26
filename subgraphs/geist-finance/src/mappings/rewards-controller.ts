@@ -1,13 +1,22 @@
 import { log } from "@graphprotocol/graph-ts";
-import { BalanceUpdated, AaveIncentivesController } from "../../generated/RewardsController/AaveIncentivesController";
+import {
+  BalanceUpdated,
+  AaveIncentivesController,
+} from "../../generated/RewardsController/AaveIncentivesController";
 import { getMarketById, updateMarketRewardTokens } from "../common/market";
 import { getReserveOrNull } from "../common/reserve";
 import { getOrCreateRewardToken } from "../common/token";
-import { BIGINT_ZERO, InterestRateType, RewardTokenType } from "../common/utils/constants";
+import {
+  BIGINT_ZERO,
+  InterestRateType,
+  RewardTokenType,
+} from "../common/utils/constants";
 import { INCENTIVE_CONTROLLER_ADDRESS } from "../common/utils/addresses";
 
 export function handleBalanceUpdated(event: BalanceUpdated): void {
-  const incentivesController = AaveIncentivesController.bind(INCENTIVE_CONTROLLER_ADDRESS);
+  const incentivesController = AaveIncentivesController.bind(
+    INCENTIVE_CONTROLLER_ADDRESS
+  );
 
   const try_allocPoint = incentivesController.try_poolInfo(event.params.token);
 
@@ -15,13 +24,14 @@ export function handleBalanceUpdated(event: BalanceUpdated): void {
   let distributionEnd = BIGINT_ZERO;
   if (!try_allocPoint.reverted) {
     const allocPoint = try_allocPoint.value.value1;
-    const try_rewardPerSecond = incentivesController.try_emissionSchedule(allocPoint);
+    const try_rewardPerSecond = incentivesController.try_emissionSchedule(
+      allocPoint
+    );
     if (!try_rewardPerSecond.reverted) {
-        distributionEnd = try_rewardPerSecond.value.value0;
-        rewardPerSecond = try_rewardPerSecond.value.value1;
+      distributionEnd = try_rewardPerSecond.value.value0;
+      rewardPerSecond = try_rewardPerSecond.value.value1;
     }
   }
-
 
   const asset = event.params.token.toHexString();
   const reserve = getReserveOrNull(event.params.token);

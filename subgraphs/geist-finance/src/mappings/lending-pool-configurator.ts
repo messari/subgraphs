@@ -7,7 +7,6 @@ import {
   BorrowingDisabledOnReserve,
   ReserveActivated,
   ReserveDeactivated,
-  ReserveFactorChanged,
   ReserveFrozen,
   ReserveUnfrozen,
 } from "../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
@@ -15,9 +14,7 @@ import {
 import { createMarket, getMarket } from "../common/market";
 import { createReserve } from "../common/reserve";
 
-import { bigIntToBigDecimal, rayToWad } from "../common/utils/numbers";
-
-import { Market } from "../../generated/schema";
+import { bigIntToBigDecimal } from "../common/utils/numbers";
 
 import {
   GToken,
@@ -28,12 +25,9 @@ import {
 import { getOrCreateToken } from "../common/token";
 
 import {
-  BIGDECIMAL_ZERO,
   BIGDECIMAL_HUNDRED,
   BIGINT_ZERO,
-  INT_ONE,
   INT_TWO,
-  INT_ZERO,
 } from "../common/utils/constants";
 
 export function getLendingPoolFromCtx(): string {

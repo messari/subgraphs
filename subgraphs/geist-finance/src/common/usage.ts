@@ -5,11 +5,7 @@ import {
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
-import {
-  INT_ZERO,
-  SECONDS_PER_DAY,
-  SECONDS_PER_HOUR,
-} from "./utils/constants";
+import { INT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./utils/constants";
 import { getOrCreateLendingProtocol } from "./protocol";
 
 export function getOrCreateUsageMetricsSnapshot(
@@ -68,8 +64,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   const day = `${timestamp / SECONDS_PER_DAY}`;
   const hour = `${timestamp / SECONDS_PER_HOUR}`;
   const usageMetricsDailySnapshot = getOrCreateUsageMetricsSnapshot(event);
-  const usageMetricsHourlySnapshot =
-    getOrCreateUsageMetricsHourlySnapshot(event);
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event
+  );
 
   let accountId = from.toHexString();
   let account = Account.load(accountId);
@@ -108,8 +105,9 @@ export function incrementProtocolDepositCount(event: ethereum.Event): void {
   usageMetricsDailySnapshot.dailyDepositCount += 1;
   usageMetricsDailySnapshot.dailyTransactionCount += 1;
   usageMetricsDailySnapshot.save();
-  const usageMetricsHourlySnapshot =
-    getOrCreateUsageMetricsHourlySnapshot(event);
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event
+  );
   usageMetricsHourlySnapshot.hourlyDepositCount += 1;
   usageMetricsHourlySnapshot.hourlyTransactionCount += 1;
   usageMetricsHourlySnapshot.save();
@@ -120,8 +118,9 @@ export function incrementProtocolBorrowCount(event: ethereum.Event): void {
   usageMetricsDailySnapshot.dailyBorrowCount += 1;
   usageMetricsDailySnapshot.dailyTransactionCount += 1;
   usageMetricsDailySnapshot.save();
-  const usageMetricsHourlySnapshot =
-    getOrCreateUsageMetricsHourlySnapshot(event);
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event
+  );
   usageMetricsHourlySnapshot.hourlyBorrowCount += 1;
   usageMetricsHourlySnapshot.hourlyTransactionCount += 1;
   usageMetricsHourlySnapshot.save();
@@ -132,8 +131,9 @@ export function incrementProtocolWithdrawCount(event: ethereum.Event): void {
   usageMetricsDailySnapshot.dailyWithdrawCount += 1;
   usageMetricsDailySnapshot.dailyTransactionCount += 1;
   usageMetricsDailySnapshot.save();
-  const usageMetricsHourlySnapshot =
-    getOrCreateUsageMetricsHourlySnapshot(event);
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event
+  );
   usageMetricsHourlySnapshot.hourlyWithdrawCount += 1;
   usageMetricsHourlySnapshot.hourlyTransactionCount += 1;
   usageMetricsHourlySnapshot.save();
@@ -144,8 +144,9 @@ export function incrementProtocolRepayCount(event: ethereum.Event): void {
   usageMetricsDailySnapshot.dailyRepayCount += 1;
   usageMetricsDailySnapshot.dailyTransactionCount += 1;
   usageMetricsDailySnapshot.save();
-  const usageMetricsHourlySnapshot =
-    getOrCreateUsageMetricsHourlySnapshot(event);
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event
+  );
   usageMetricsHourlySnapshot.hourlyRepayCount += 1;
   usageMetricsHourlySnapshot.hourlyTransactionCount += 1;
   usageMetricsHourlySnapshot.save();
@@ -156,8 +157,9 @@ export function incrementProtocolLiquidateCount(event: ethereum.Event): void {
   usageMetricsDailySnapshot.dailyLiquidateCount += 1;
   usageMetricsDailySnapshot.dailyTransactionCount += 1;
   usageMetricsDailySnapshot.save();
-  const usageMetricsHourlySnapshot =
-    getOrCreateUsageMetricsHourlySnapshot(event);
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event
+  );
   usageMetricsHourlySnapshot.hourlyLiquidateCount += 1;
   usageMetricsHourlySnapshot.hourlyTransactionCount += 1;
   usageMetricsHourlySnapshot.save();

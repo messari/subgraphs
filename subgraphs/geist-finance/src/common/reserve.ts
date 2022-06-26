@@ -96,8 +96,9 @@ export function updateReserveVariableDebtSupply(
   newLiquidityIndex: BigInt
 ): void {
   const reserve = getReserve(event.address);
-  reserve.scaledVariableDebtSupply =
-    reserve.scaledVariableDebtSupply.plus(change);
+  reserve.scaledVariableDebtSupply = reserve.scaledVariableDebtSupply.plus(
+    change
+  );
   reserve.variableDebtSupply = rayMul(
     reserve.scaledVariableDebtSupply,
     newLiquidityIndex

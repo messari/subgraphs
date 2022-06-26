@@ -188,8 +188,9 @@ export function addMarketDepositVolume(
   dailySnapshot.dailyDepositUSD = dailySnapshot.dailyDepositUSD.plus(amountUSD);
   dailySnapshot.save();
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  hourlySnapshot.hourlyDepositUSD =
-    hourlySnapshot.hourlyDepositUSD.plus(amountUSD);
+  hourlySnapshot.hourlyDepositUSD = hourlySnapshot.hourlyDepositUSD.plus(
+    amountUSD
+  );
   hourlySnapshot.save();
   addProtocolDepositVolume(event, amountUSD);
 }
@@ -200,12 +201,14 @@ export function addMarketWithdrawVolume(
   amountUSD: BigDecimal
 ): void {
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
-  dailySnapshot.dailyWithdrawUSD =
-    dailySnapshot.dailyWithdrawUSD.plus(amountUSD);
+  dailySnapshot.dailyWithdrawUSD = dailySnapshot.dailyWithdrawUSD.plus(
+    amountUSD
+  );
   dailySnapshot.save();
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  hourlySnapshot.hourlyWithdrawUSD =
-    hourlySnapshot.hourlyWithdrawUSD.plus(amountUSD);
+  hourlySnapshot.hourlyWithdrawUSD = hourlySnapshot.hourlyWithdrawUSD.plus(
+    amountUSD
+  );
   hourlySnapshot.save();
   addProtocolWithdrawVolume(event, amountUSD);
 }
@@ -218,12 +221,14 @@ export function addMarketLiquidateVolume(
   market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(amountUSD);
   market.save();
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
-  dailySnapshot.dailyLiquidateUSD =
-    dailySnapshot.dailyLiquidateUSD.plus(amountUSD);
+  dailySnapshot.dailyLiquidateUSD = dailySnapshot.dailyLiquidateUSD.plus(
+    amountUSD
+  );
   dailySnapshot.save();
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  hourlySnapshot.hourlyLiquidateUSD =
-    hourlySnapshot.hourlyLiquidateUSD.plus(amountUSD);
+  hourlySnapshot.hourlyLiquidateUSD = hourlySnapshot.hourlyLiquidateUSD.plus(
+    amountUSD
+  );
   hourlySnapshot.save();
   addProtocolLiquidateVolume(event, amountUSD);
 }
@@ -239,8 +244,9 @@ export function addMarketBorrowVolume(
   dailySnapshot.dailyBorrowUSD = dailySnapshot.dailyBorrowUSD.plus(amountUSD);
   dailySnapshot.save();
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  hourlySnapshot.hourlyBorrowUSD =
-    hourlySnapshot.hourlyBorrowUSD.plus(amountUSD);
+  hourlySnapshot.hourlyBorrowUSD = hourlySnapshot.hourlyBorrowUSD.plus(
+    amountUSD
+  );
   hourlySnapshot.save();
   addProtocolBorrowVolume(event, amountUSD);
 }
@@ -302,22 +308,28 @@ export function addMarketSupplySideRevenue(
   market: Market,
   revenueAmountUSD: BigDecimal
 ): void {
-  market.cumulativeSupplySideRevenueUSD =
-    market.cumulativeSupplySideRevenueUSD.plus(revenueAmountUSD);
-  market.cumulativeTotalRevenueUSD =
-    market.cumulativeTotalRevenueUSD.plus(revenueAmountUSD);
+  market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(
+    revenueAmountUSD
+  );
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(
+    revenueAmountUSD
+  );
   market.save();
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
-  dailySnapshot.dailySupplySideRevenueUSD =
-    dailySnapshot.dailySupplySideRevenueUSD.plus(revenueAmountUSD);
-  dailySnapshot.dailyTotalRevenueUSD =
-    dailySnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
+  dailySnapshot.dailySupplySideRevenueUSD = dailySnapshot.dailySupplySideRevenueUSD.plus(
+    revenueAmountUSD
+  );
+  dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
+    revenueAmountUSD
+  );
   dailySnapshot.save();
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  hourlySnapshot.hourlySupplySideRevenueUSD =
-    hourlySnapshot.hourlySupplySideRevenueUSD.plus(revenueAmountUSD);
-  hourlySnapshot.hourlyTotalRevenueUSD =
-    hourlySnapshot.hourlyTotalRevenueUSD.plus(revenueAmountUSD);
+  hourlySnapshot.hourlySupplySideRevenueUSD = hourlySnapshot.hourlySupplySideRevenueUSD.plus(
+    revenueAmountUSD
+  );
+  hourlySnapshot.hourlyTotalRevenueUSD = hourlySnapshot.hourlyTotalRevenueUSD.plus(
+    revenueAmountUSD
+  );
   hourlySnapshot.save();
   addSupplySideRevenue(event, revenueAmountUSD);
 }
@@ -327,22 +339,28 @@ export function addMarketProtocolSideRevenue(
   market: Market,
   revenueAmountUSD: BigDecimal
 ): void {
-  market.cumulativeProtocolSideRevenueUSD =
-    market.cumulativeProtocolSideRevenueUSD.plus(revenueAmountUSD);
-  market.cumulativeTotalRevenueUSD =
-    market.cumulativeTotalRevenueUSD.plus(revenueAmountUSD);
+  market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(
+    revenueAmountUSD
+  );
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(
+    revenueAmountUSD
+  );
   market.save();
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
-  dailySnapshot.dailyProtocolSideRevenueUSD =
-    dailySnapshot.dailyProtocolSideRevenueUSD.plus(revenueAmountUSD);
-  dailySnapshot.dailyTotalRevenueUSD =
-    dailySnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
+  dailySnapshot.dailyProtocolSideRevenueUSD = dailySnapshot.dailyProtocolSideRevenueUSD.plus(
+    revenueAmountUSD
+  );
+  dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
+    revenueAmountUSD
+  );
   dailySnapshot.save();
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  hourlySnapshot.hourlyProtocolSideRevenueUSD =
-    hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(revenueAmountUSD);
-  hourlySnapshot.hourlyTotalRevenueUSD =
-    hourlySnapshot.hourlyTotalRevenueUSD.plus(revenueAmountUSD);
+  hourlySnapshot.hourlyProtocolSideRevenueUSD = hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+    revenueAmountUSD
+  );
+  hourlySnapshot.hourlyTotalRevenueUSD = hourlySnapshot.hourlyTotalRevenueUSD.plus(
+    revenueAmountUSD
+  );
   hourlySnapshot.save();
   addProtocolSideRevenue(event, revenueAmountUSD);
 }

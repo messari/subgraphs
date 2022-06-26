@@ -1,4 +1,9 @@
-import { Address, dataSource, DataSourceContext, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  dataSource,
+  DataSourceContext,
+  log,
+} from "@graphprotocol/graph-ts";
 
 import {
   ProxyCreated,
@@ -17,12 +22,13 @@ import {
 import { getOrCreateLendingProtocol } from "../common/protocol";
 import { setPriceOracleAddress } from "../common/price";
 
-import { PROTOCOL_ADDRESS } from "../common/utils/constants";
 import { ZERO_ADDRESS } from "../common/utils/addresses";
-import { AddressesProviderRegistered, LendingPoolAddressesProviderRegistry } from "../../generated/LendingPoolAddressesProviderRegistry/LendingPoolAddressesProviderRegistry";
+import {
+  AddressesProviderRegistered,
+  LendingPoolAddressesProviderRegistry,
+} from "../../generated/LendingPoolAddressesProviderRegistry/LendingPoolAddressesProviderRegistry";
 
 import { PROTOCOL_ID_KEY } from "../common/utils/constants";
-
 
 export function handleAddressesProviderRegistered(
   event: AddressesProviderRegistered
@@ -60,10 +66,7 @@ export function handleProxyCreated(event: ProxyCreated): void {
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
   setPriceOracleAddress(event.address, event.params.newAddress);
   // Also set for zero address as fallback for RewardsController which does not have poolAddressesProviderId in context
-  setPriceOracleAddress(
-    ZERO_ADDRESS,
-    event.params.newAddress
-  );
+  setPriceOracleAddress(ZERO_ADDRESS, event.params.newAddress);
 }
 
 export function handleLendingPoolUpdated(event: LendingPoolUpdated): void {
@@ -77,7 +80,6 @@ export function handleLendingPoolConfiguratorUpdated(
   const context = initiateContext(event.address);
   startIndexingLendingPoolConfigurator(event.params.newAddress, context);
 }
-
 
 export function startIndexingLendingPool(
   poolAddress: Address,

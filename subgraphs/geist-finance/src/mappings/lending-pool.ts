@@ -16,8 +16,6 @@ import {
   createWithdraw,
 } from "../common/event";
 import { updateMarketRates } from "../common/market";
-import { updateReserveAccruedToTreasury } from "../common/reserve";
-
 
 export function handleBorrow(event: Borrow): void {
   createBorrow(
@@ -39,7 +37,6 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.user
   );
 }
-
 
 export function handleRepay(event: Repay): void {
   createRepay(
