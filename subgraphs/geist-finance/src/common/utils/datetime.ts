@@ -1,5 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../constants";
+import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./constants";
 
 export let minute = BigInt.fromI32(60);
 export let hour = BigInt.fromI32(3600);

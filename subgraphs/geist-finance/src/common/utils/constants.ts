@@ -129,6 +129,7 @@ export const ONE_BD = BigDecimal.fromString("1");
 export const BIGDECIMAL_ZERO = BigDecimal.fromString("0");
 export const BIGDECIMAL_ONE = BigDecimal.fromString("1");
 export const BIGDECIMAL_TWO = BigDecimal.fromString("2");
+export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
@@ -140,6 +141,7 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
 export const SECONDS_PER_DAY = 86400; // 86400
 export const SECONDS_PER_HOUR = 3600; // 3600
+export const BIGINT_SECONDS_PER_DAY = BigInt.fromI32(SECONDS_PER_DAY);
 
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(86400000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
@@ -169,10 +171,14 @@ export const UNSTAKE_INTERACTION = "UNSTAKE";
 export const LIQUIDATION_INTERACTION = "LIQUIDATION";
 
 // Version and general info about protocol
-export const SUBGRAPH_VERSION = "1.2.0";
-export const SCHEMA_VERSION = "1.2.1";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.2.0";
+export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.1.0"
 export const PROTOCOL_NAME = "Geist-Finance";
 export const PROTOCOL_SLUG = "geist-finance";
 export const LENDING_TYPE = "POOLED";
 export const RISK_TYPE = "ISOLATED";
+
+
+export const PROTOCOL_ID_KEY = "protocolId";
+export const POOL_ADDRESSES_PROVIDER_ID_KEY = "poolAddressesProviderId";

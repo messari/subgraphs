@@ -24,7 +24,30 @@ dataSources:
         - event: AddressesProviderRegistered(indexed address)
           handler: handleAddressesProviderRegistered
       file: src/mappings/lending-pool-address-provider.ts
-
+  - kind: ethereum
+    name: RewardsController
+    network: fantom
+    source:
+      abi: AaveIncentivesController
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - RewardsController
+      abis:
+        - name: AaveIncentivesController
+          file: ./abis/AaveIncentivesController.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+      eventHandlers:
+        - event: BalanceUpdated(indexed address,indexed address,uint256,uint256)
+          handler: handleBalanceUpdated
+      file: src/mappings/rewards-controller.ts
 templates:
   - kind: ethereum/contract
     name: LendingPoolAddressesProvider
@@ -85,6 +108,10 @@ templates:
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
         - name: AaveIncentivesController
           file: ./abis/AaveIncentivesController.json
         - name: AaveProtocolDataProvider
@@ -142,6 +169,10 @@ templates:
           file: ./abis/AaveIncentivesController.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
         - name: AaveProtocolDataProvider
           file: ./abis/AaveProtocolDataProvider.json
         - name: SpookySwapGEISTFTM
@@ -185,4 +216,46 @@ templates:
           handler: handleGTokenBurn
         - event: Mint(indexed address,uint256,uint256)
           handler: handleGTokenMint
-      file: src/mappings/gToken.ts
+      file: src/mappings/gtoken.ts
+  - kind: ethereum
+    name: StableDebtToken
+    network: fantom
+    source:
+      abi: StableDebtToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableDebtToken
+          file: ./abis/StableDebtToken.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+      eventHandlers:
+        - event: Burn(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleBurn
+        - event: Mint(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleMint
+      file: src/mappings/stable-debt-token.ts
+  - kind: ethereum
+    name: VariableDebtToken
+    network: fantom
+    source:
+      abi: VariableDebtToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: VariableDebtToken
+          file: ./abis/VariableDebtToken.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+      eventHandlers:
+        - event: Burn(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleBurn
+        - event: Mint(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleMint
+      file: src/mappings/variable-debt-token.ts

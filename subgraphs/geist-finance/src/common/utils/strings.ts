@@ -50,3 +50,7 @@ export function enumToPrefix(snake: string): string {
 export function prefixID(enumString: string, ID: string): string {
   return enumToPrefix(enumString) + ID;
 }
+
+export function uppercaseNetwork(network: string): string {
+  return network.toUpperCase().replace("-", "_");
+}

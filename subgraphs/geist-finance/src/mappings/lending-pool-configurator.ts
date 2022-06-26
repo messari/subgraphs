@@ -8,19 +8,33 @@ import {
   ReserveActivated,
   ReserveDeactivated,
   ReserveFactorChanged,
+  ReserveFrozen,
+  ReserveUnfrozen,
 } from "../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
 
-import { initializeMarket } from "./helpers";
+import { createMarket, getMarket } from "../common/market";
+import { createReserve } from "../common/reserve";
 
 import { bigIntToBigDecimal, rayToWad } from "../common/utils/numbers";
 
 import { Market } from "../../generated/schema";
 
-import { GToken as GTokenTemplate } from "../../generated/templates";
+import {
+  GToken,
+  StableDebtToken,
+  VariableDebtToken,
+} from "../../generated/templates";
 
-import { getOrCreateToken } from "../common/getters";
+import { getOrCreateToken } from "../common/token";
 
-import { BIGDECIMAL_ZERO } from "../common/constants";
+import {
+  BIGDECIMAL_ZERO,
+  BIGDECIMAL_HUNDRED,
+  BIGINT_ZERO,
+  INT_ONE,
+  INT_TWO,
+  INT_ZERO,
+} from "../common/utils/constants";
 
 export function getLendingPoolFromCtx(): string {
   // Get the lending pool with context
@@ -29,144 +43,78 @@ export function getLendingPoolFromCtx(): string {
 }
 
 export function handleReserveInitialized(event: ReserveInitialized): void {
-  // This function handles market entity from reserve creation event
-  // Attempt to load or create the market implementation
-
-  GTokenTemplate.create(event.params.aToken);
-  const market = initializeMarket(
-    event.block.number,
-    event.block.timestamp,
-    event.params.asset.toHexString()
+  const asset = event.params.asset;
+  createMarket(event, asset, event.params.aToken);
+  getOrCreateToken(event.params.stableDebtToken, asset.toHexString());
+  getOrCreateToken(event.params.variableDebtToken, asset.toHexString());
+  createReserve(event);
+  GToken.createWithContext(event.params.aToken, dataSource.context());
+  StableDebtToken.createWithContext(
+    event.params.stableDebtToken,
+    dataSource.context()
   );
-
-  // Set the aToken contract from the param aToken
-  getOrCreateToken(event.params.aToken);
-  market.outputToken = event.params.aToken.toHexString();
-  // Set the s/vToken addresses from params
-  market.save();
+  VariableDebtToken.createWithContext(
+    event.params.variableDebtToken,
+    dataSource.context()
+  );
 }
 
 export function handleCollateralConfigurationChanged(
   event: CollateralConfigurationChanged
 ): void {
-  // Adjust market LTV, liquidation, and collateral data when a reserve's collateral configuration has changed
-  const marketAddr = event.params.asset.toHexString();
-  log.info(
-    "MarketAddr in lendingPoolConfigurator.ts handleCollateralConfigurationChanged" +
-      marketAddr,
-    []
-  );
-  const market = initializeMarket(
-    event.block.number,
-    event.block.timestamp,
-    marketAddr
-  ) as Market;
-  market.maximumLTV = new BigDecimal(event.params.ltv);
-  market.liquidationThreshold = new BigDecimal(
-    event.params.liquidationThreshold
-  );
-  // The liquidation bonus value is equal to the liquidation penalty, the naming is a matter of which side of the liquidation a user is on
-  // The liquidationBonus parameter comes out as above 100%, represented by a 5 digit integer over 10000 (100%).
-  // To extract the expected value in the liquidationPenalty field: convert to BigDecimal, subtract by 10000 and divide by 100
-  market.liquidationPenalty = new BigDecimal(event.params.liquidationBonus);
-  if (market.liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
-    market.liquidationPenalty = market.liquidationPenalty
-      .minus(BigDecimal.fromString("10000"))
-      .div(BigDecimal.fromString("100"));
-  } else {
-    market.liquidationPenalty = BIGDECIMAL_ZERO;
+  const market = getMarket(event.params.asset);
+  market.canUseAsCollateral = false;
+  if (event.params.liquidationThreshold.gt(BIGINT_ZERO)) {
+    market.canUseAsCollateral = true;
   }
+  market.maximumLTV = bigIntToBigDecimal(event.params.ltv, INT_TWO);
+  market.liquidationPenalty = bigIntToBigDecimal(
+    event.params.liquidationBonus,
+    INT_TWO
+  ).minus(BIGDECIMAL_HUNDRED);
+  market.liquidationThreshold = bigIntToBigDecimal(
+    event.params.liquidationThreshold,
+    INT_TWO
+  );
   market.save();
 }
 
-export function handleBorrowingEnabledOnReserve(
-  event: BorrowingEnabledOnReserve
-): void {
-  // Upon enabling borrowing on this market, set market.canBorrowFrom to true
-  const marketAddr = event.params.asset.toHexString();
-  log.info(
-    "MarketAddr in lendingPoolConfigurator.ts handleBorrowingEnabledReserve" +
-      marketAddr,
-    []
-  );
-  const market = initializeMarket(
-    event.block.number,
-    event.block.timestamp,
-    marketAddr
-  ) as Market;
-  market.canBorrowFrom = true;
-  market.save();
-}
-
-export function handleBorrowingDisabledOnReserve(
-  event: BorrowingDisabledOnReserve
-): void {
-  // Upon disabling borrowing on this market, set market.canBorrowFrom to false
-  const marketAddr = event.params.asset.toHexString();
-  log.info(
-    "MarketAddr in lendingPoolConfigurator.ts handleBorrowingDisabledOnReserve" +
-      marketAddr,
-    []
-  );
-  const market = initializeMarket(
-    event.block.number,
-    event.block.timestamp,
-    marketAddr
-  ) as Market;
-  market.canBorrowFrom = false;
-  market.save();
-}
-
-export function handleReserveActivated(event: ReserveActivated): void {
-  // Upon activating this lending pool, set market.isActive to true
-  const marketAddr = event.params.asset.toHexString();
-  log.info(
-    "MarketAddr in lendingPoolConfigurator.ts handleReserveActivated" +
-      marketAddr,
-    []
-  );
-  const market = initializeMarket(
-    event.block.number,
-    event.block.timestamp,
-    marketAddr
-  ) as Market;
+export function handleReserveActived(event: ReserveActivated): void {
+  const market = getMarket(event.params.asset);
   market.isActive = true;
   market.save();
 }
 
 export function handleReserveDeactivated(event: ReserveDeactivated): void {
-  // Upon deactivating this lending pool, set market.isActive to false
-  const marketAddr = event.params.asset.toHexString();
-  log.info(
-    "MarketAddr in lendingPoolConfigurator.ts handleReserveDeactivated" +
-      marketAddr,
-    []
-  );
-  const market = initializeMarket(
-    event.block.number,
-    event.block.timestamp,
-    marketAddr
-  ) as Market;
+  const market = getMarket(event.params.asset);
   market.isActive = false;
   market.save();
 }
 
-export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
-  // Handle the reserve factor change event
-  const marketAddr = event.params.asset.toHexString();
-  log.info(
-    "RESERVE FACTOR MarketAddr in lendingPoolConfigurator.ts handleReserveFactorChanged " +
-      marketAddr +
-      " " +
-      event.params.factor.toString(),
-    []
-  );
-  const market = initializeMarket(
-    event.block.number,
-    event.block.timestamp,
-    marketAddr
-  ) as Market;
-  // Set the reserve factor as an integer * 100 of a percent (ie 2500 represents 25% of the reserve)
-  market.exchangeRate = bigIntToBigDecimal(event.params.factor, 4);
+export function handleReserveBorrowingEnabled(
+  event: BorrowingEnabledOnReserve
+): void {
+  const market = getMarket(event.params.asset);
+  market.canBorrowFrom = true;
+  market.save();
+}
+
+export function handleReserveBorrowingDisabled(
+  event: BorrowingDisabledOnReserve
+): void {
+  const market = getMarket(event.params.asset);
+  market.canBorrowFrom = false;
+  market.save();
+}
+
+export function handleReserveFrozen(event: ReserveFrozen): void {
+  const market = getMarket(event.params.asset);
+  market.isActive = false;
+  market.save();
+}
+
+export function handleReserveUnfrozen(event: ReserveUnfrozen): void {
+  const market = getMarket(event.params.asset);
+  market.isActive = true;
   market.save();
 }

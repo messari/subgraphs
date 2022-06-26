@@ -1,25 +1,37 @@
-import { Burn, Mint } from "../../generated/templates/GToken/GToken";
+import { Burn, Mint, BalanceTransfer } from "../../generated/templates/GToken/GToken";
 
-import { updateOutputTokenSupply } from "./helpers";
+import {
+  addMarketProtocolSideRevenue,
+  getMarketById,
+} from "../common/market";
+import { rayDiv } from "../common/utils/numbers";
+import { amountInUSD } from "../common/price";
+import { getTokenById } from "../common/token";
+import { BIGINT_ZERO } from "../common/utils/constants";
+import { getReserve, updateReserveATokenSupply } from "../common/reserve";
 
-import { log } from "@graphprotocol/graph-ts";
 
-export function handleGTokenMint(event: Mint): void {
-  // Event handler for GToken mints. This gets triggered upon deposits
-  log.info("Minting gToken from={}, tx from={}, address={}", [
-    event.params.from.toHexString(),
-    event.transaction.from.toHexString(),
-    event.address.toHexString(),
-  ]);
-  updateOutputTokenSupply(event);
+export function handleBurn(event: Burn): void {
+  let amount = event.params.value;
+  amount = rayDiv(amount, event.params.index);
+  updateReserveATokenSupply(
+    event,
+    BIGINT_ZERO.minus(amount),
+    event.params.index
+  );
 }
 
-export function handleGTokenBurn(event: Burn): void {
-  // Event handler for GToken burns. This gets triggered upon withdraws
-  log.info("Burning gToken from={}, tx from={}, address={}", [
-    event.params.from.toHexString(),
-    event.transaction.from.toHexString(),
-    event.address.toHexString(),
-  ]);
-  updateOutputTokenSupply(event);
+export function handleMint(event: Mint): void {
+  let amount = event.params.value;
+  amount = rayDiv(amount, event.params.index);
+  updateReserveATokenSupply(event, amount, event.params.index);
+}
+
+export function handleBalanceTransfer(event: BalanceTransfer): void {
+  const reserve = getReserve(event.address);
+  // Liquidation protocol fee gets transferred directly to treasury during liquidation (if activated)
+  if (reserve.treasuryAddress == event.params.to.toHexString()) {
+    const valueUSD = amountInUSD(event.params.value, getTokenById(reserve.id));
+    addMarketProtocolSideRevenue(event, getMarketById(reserve.id), valueUSD);
+  }
 }

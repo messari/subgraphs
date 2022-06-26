@@ -1,4 +1,4 @@
-import { Address, DataSourceContext, log } from "@graphprotocol/graph-ts";
+import { Address, dataSource, DataSourceContext, log } from "@graphprotocol/graph-ts";
 
 import {
   ProxyCreated,
@@ -14,19 +14,34 @@ import {
   LendingPoolAddressesProvider as LendingPoolAddressesProviderTemplate,
 } from "../../generated/templates";
 
-import { getOrCreateProtocol } from "./helpers";
+import { getOrCreateLendingProtocol } from "../common/protocol";
+import { setPriceOracleAddress } from "../common/price";
 
-import { PROTOCOL_ADDRESS } from "../common/constants";
+import { PROTOCOL_ADDRESS } from "../common/utils/constants";
+import { ZERO_ADDRESS } from "../common/utils/addresses";
+import { AddressesProviderRegistered, LendingPoolAddressesProviderRegistry } from "../../generated/LendingPoolAddressesProviderRegistry/LendingPoolAddressesProviderRegistry";
 
-import { AddressesProviderRegistered } from "../../generated/LendingPoolAddressesProviderRegistry/LendingPoolAddressesProviderRegistry";
+import { PROTOCOL_ID_KEY } from "../common/utils/constants";
+
 
 export function handleAddressesProviderRegistered(
   event: AddressesProviderRegistered
 ): void {
-  const address = event.params.newAddress;
-  // start indexing the address provider
-  getOrCreateProtocol(PROTOCOL_ADDRESS);
-  LendingPoolAddressesProviderTemplate.create(address);
+  const poolAddressesProviderRegistry = LendingPoolAddressesProviderRegistry.bind(
+    event.address
+  );
+  if (poolAddressesProviderRegistry.getAddressesProvidersList().length > 1) {
+    // TODO: add support for additional pools, when it becomes necessary
+    log.error("Additional pool address providers not supported", []);
+    return;
+  }
+
+  const context = new DataSourceContext();
+  context.setString(PROTOCOL_ID_KEY, dataSource.address().toHexString());
+  LendingPoolAddressesProviderTemplate.createWithContext(
+    event.params.newAddress,
+    context
+  );
 }
 
 export function handleProxyCreated(event: ProxyCreated): void {
@@ -43,11 +58,12 @@ export function handleProxyCreated(event: ProxyCreated): void {
 }
 
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
-  log.info("Price oracle updated to new address={}", [
-    event.params.newAddress.toHexString(),
-  ]);
-  const lendingProtocol = getOrCreateProtocol(PROTOCOL_ADDRESS);
-  lendingProtocol.save();
+  setPriceOracleAddress(event.address, event.params.newAddress);
+  // Also set for zero address as fallback for RewardsController which does not have poolAddressesProviderId in context
+  setPriceOracleAddress(
+    ZERO_ADDRESS,
+    event.params.newAddress
+  );
 }
 
 export function handleLendingPoolUpdated(event: LendingPoolUpdated): void {
@@ -61,6 +77,7 @@ export function handleLendingPoolConfiguratorUpdated(
   const context = initiateContext(event.address);
   startIndexingLendingPoolConfigurator(event.params.newAddress, context);
 }
+
 
 export function startIndexingLendingPool(
   poolAddress: Address,
@@ -100,7 +117,7 @@ function initiateContext(addrProvider: Address): DataSourceContext {
   }
 
   // Initialize the protocol entity
-  const lendingProtocol = getOrCreateProtocol(PROTOCOL_ADDRESS);
+  const lendingProtocol = getOrCreateLendingProtocol();
   log.info("Creating context with lending pool={} with ID={}", [
     lendingPool,
     lendingProtocol.id,
