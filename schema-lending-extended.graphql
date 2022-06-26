@@ -301,16 +301,16 @@ type LendingProtocol implements Protocol @entity {
   ##### Account / Position Data #####
 
   " Any account that has made a deposit before "
-  depositors: [Account!]
+  depositors: [Account!]!
 
   " Any account that has made a borrow before "
-  borrowers: [Account!]
+  borrowers: [Account!]!
 
   " Any account that has made a liquidation before "
-  liquidators: [Account!]
+  liquidators: [Account!]!
 
   " Any account that has been liquidated before "
-  liquidatees: [Account!]
+  liquidatees: [Account!]!
 
   ##### Snapshots #####
 
