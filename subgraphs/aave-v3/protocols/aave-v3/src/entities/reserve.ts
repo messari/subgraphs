@@ -1,9 +1,9 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { _Reserve } from "../../generated/schema";
-import { AToken } from "../../generated/templates/AToken/AToken";
-import { ReserveInitialized } from "../../generated/templates/PoolConfigurator/PoolConfigurator";
-import { BIGINT_ZERO } from "../utils/constants";
-import { RAY, rayMul } from "../utils/numbers";
+import { _Reserve } from "../../../../generated/schema";
+import { AToken } from "../../../../generated/templates/AToken/AToken";
+import { ReserveInitialized } from "../../../../generated/templates/PoolConfigurator/PoolConfigurator";
+import { BIGINT_ZERO } from "../../../../src/utils/constants";
+import { RAY, rayMul } from "../../../../src/utils/numbers";
 import {
   addMarketProtocolSideRevenue,
   addMarketSupplySideRevenue,

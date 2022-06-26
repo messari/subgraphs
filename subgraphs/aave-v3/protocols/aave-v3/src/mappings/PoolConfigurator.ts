@@ -3,7 +3,7 @@ import {
   AToken,
   StableDebtToken,
   VariableDebtToken,
-} from "../../generated/templates";
+} from "../../../../generated/templates";
 import {
   CollateralConfigurationChanged,
   ReserveActive,
@@ -11,12 +11,12 @@ import {
   ReserveFrozen,
   ReserveInitialized,
   ReservePaused,
-} from "../../generated/templates/PoolConfigurator/PoolConfigurator";
+} from "../../../../generated/templates/PoolConfigurator/PoolConfigurator";
 import { createMarket, getMarket } from "../entities/market";
 import { createReserve } from "../entities/reserve";
 import { getOrCreateToken } from "../entities/token";
-import { BIGDECIMAL_HUNDRED, BIGINT_ZERO, INT_TWO } from "../utils/constants";
-import { bigIntToBigDecimal } from "../utils/numbers";
+import { BIGDECIMAL_HUNDRED, BIGINT_ZERO, INT_TWO } from "../../../../src/utils/constants";
+import { bigIntToBigDecimal } from "../../../../src/utils/numbers";
 
 export function handleReserveInitialized(event: ReserveInitialized): void {
   const asset = event.params.asset;

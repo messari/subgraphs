@@ -1,14 +1,14 @@
 import { Address, dataSource } from "@graphprotocol/graph-ts";
-import { Pool, PoolConfigurator } from "../../generated/templates";
+import { Pool, PoolConfigurator } from "../../../../generated/templates";
 import {
   PriceOracleUpdated,
   ProxyCreated,
-} from "../../generated/templates/PoolAddressesProvider/PoolAddressesProvider";
+} from "../../../../generated/templates/PoolAddressesProvider/PoolAddressesProvider";
 import { setPriceOracleAddress } from "../entities/price";
 import {
   POOL_ADDRESSES_PROVIDER_ID_KEY,
   ZERO_ADDRESS,
-} from "../utils/constants";
+} from "../../../../src/utils/constants";
 
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
   setPriceOracleAddress(event.address, event.params.newAddress);

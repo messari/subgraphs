@@ -1,10 +1,10 @@
 import {
   Burn,
   Mint,
-} from "../../generated/templates/VariableDebtToken/VariableDebtToken";
+} from "../../../../generated/templates/VariableDebtToken/VariableDebtToken";
 import { updateReserveVariableDebtSupply } from "../entities/reserve";
-import { BIGINT_ZERO } from "../utils/constants";
-import { rayDiv } from "../utils/numbers";
+import { BIGINT_ZERO } from "../../../../src/utils/constants";
+import { rayDiv } from "../../../../src/utils/numbers";
 
 export function handleBurn(event: Burn): void {
   let amount = event.params.value.plus(event.params.balanceIncrease);

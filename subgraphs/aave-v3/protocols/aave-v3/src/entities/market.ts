@@ -4,8 +4,8 @@ import {
   MarketDailySnapshot,
   MarketHourlySnapshot,
   RewardToken,
-} from "../../generated/schema";
-import { ReserveDataUpdated } from "../../generated/templates/Pool/Pool";
+} from "../../../../generated/schema";
+import { ReserveDataUpdated } from "../../../../generated/templates/Pool/Pool";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -13,8 +13,8 @@ import {
   BIGINT_ZERO,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
-} from "../utils/constants";
-import { bigIntToBigDecimal } from "../utils/numbers";
+} from "../../../../src/utils/constants";
+import { bigIntToBigDecimal } from "../../../../src/utils/numbers";
 import { amountInUSD, getAssetPrice } from "./price";
 import {
   addProtocolBorrowVolume,

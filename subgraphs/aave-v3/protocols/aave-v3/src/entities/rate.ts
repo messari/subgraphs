@@ -1,12 +1,12 @@
 import { BigDecimal } from "@graphprotocol/graph-ts";
-import { InterestRate } from "../../generated/schema";
-import { ReserveDataUpdated } from "../../generated/templates/Pool/Pool";
+import { InterestRate } from "../../../../generated/schema";
+import { ReserveDataUpdated } from "../../../../generated/templates/Pool/Pool";
 import {
   BIGDECIMAL_HUNDRED,
   InterestRateSide,
   InterestRateType,
-} from "../utils/constants";
-import { bigIntToBigDecimal, rayToWad } from "../utils/numbers";
+} from "../../../../src/utils/constants";
+import { bigIntToBigDecimal, rayToWad } from "../../../../src/utils/numbers";
 
 export function createBorrowerStableRate(
   marketId: string,

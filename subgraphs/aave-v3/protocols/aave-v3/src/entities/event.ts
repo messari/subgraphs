@@ -5,8 +5,8 @@ import {
   Liquidate,
   Repay,
   Withdraw,
-} from "../../generated/schema";
-import { BIGINT_ZERO } from "../utils/constants";
+} from "../../../../generated/schema";
+import { BIGINT_ZERO } from "../../../../src/utils/constants";
 import {
   addMarketBorrowVolume,
   addMarketDepositVolume,
@@ -33,7 +33,7 @@ export function createDeposit(
   reserve: Address,
   user: Address,
   amount: BigInt
-): void {
+): Deposit {
   if (amount.le(BIGINT_ZERO)) {
     log.critical("Invalid deposit amount: {}", [amount.toString()]);
   }
@@ -57,6 +57,7 @@ export function createDeposit(
   updateUsageMetrics(event, event.transaction.from);
   addMarketDepositVolume(event, market, deposit.amountUSD);
   incrementProtocolDepositCount(event);
+  return deposit;
 }
 
 export function createWithdraw(
@@ -64,7 +65,7 @@ export function createWithdraw(
   reserve: Address,
   to: Address,
   amount: BigInt
-): void {
+): Withdraw {
   if (amount.le(BIGINT_ZERO)) {
     log.critical("Invalid withdraw amount: {}", [amount.toString()]);
   }
@@ -88,6 +89,7 @@ export function createWithdraw(
   updateUsageMetrics(event, to);
   addMarketWithdrawVolume(event, market, withdraw.amountUSD);
   incrementProtocolWithdrawCount(event);
+  return withdraw;
 }
 
 export function createBorrow(
@@ -95,7 +97,7 @@ export function createBorrow(
   reserve: Address,
   borrower: Address,
   amount: BigInt
-): void {
+): Borrow {
   if (amount.le(BIGINT_ZERO)) {
     log.critical("Invalid borrow amount: {}", [amount.toString()]);
   }
@@ -119,6 +121,7 @@ export function createBorrow(
   updateUsageMetrics(event, borrower);
   addMarketBorrowVolume(event, market, borrow.amountUSD);
   incrementProtocolBorrowCount(event);
+  return borrow;
 }
 
 export function createRepay(
@@ -126,7 +129,7 @@ export function createRepay(
   reserve: Address,
   repayer: Address,
   amount: BigInt
-): void {
+): Repay {
   if (amount.le(BIGINT_ZERO)) {
     log.critical("Invalid repay amount: {}", [amount.toString()]);
   }
@@ -150,6 +153,7 @@ export function createRepay(
   updateUsageMetrics(event, repayer);
   addMarketRepayVolume(event, market, repay.amountUSD);
   incrementProtocolRepayCount(event);
+  return repay;
 }
 
 export function createLiquidate(
@@ -160,7 +164,7 @@ export function createLiquidate(
   debtAmount: BigInt,
   liquidator: Address,
   liquidatee: Address
-): void {
+): Liquidate {
   const market = getMarket(collateralAsset);
   const debtToken = getOrCreateToken(debtAsset);
   const collateralToken = getOrCreateToken(collateralAsset);
@@ -187,4 +191,5 @@ export function createLiquidate(
   addMarketSupplySideRevenue(event, market, liquidate.profitUSD);
   addMarketLiquidateVolume(event, market, liquidate.amountUSD);
   incrementProtocolLiquidateCount(event);
+  return liquidate;
 }

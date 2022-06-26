@@ -1,8 +1,8 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { RewardToken, Token } from "../../generated/schema";
-import { IERC20Detailed } from "../../generated/templates/PoolConfigurator/IERC20Detailed";
-import { IERC20DetailedBytes } from "../../generated/templates/PoolConfigurator/IERC20DetailedBytes";
-import { prefixID } from "../utils/strings";
+import { RewardToken, Token } from "../../../../generated/schema";
+import { IERC20Detailed } from "../../../../generated/templates/PoolConfigurator/IERC20Detailed";
+import { IERC20DetailedBytes } from "../../../../generated/templates/PoolConfigurator/IERC20DetailedBytes";
+import { prefixID } from "../../../../src/utils/strings";
 
 export const UNKNOWN_TOKEN_VALUE = "unknown";
 

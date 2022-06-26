@@ -1,7 +1,7 @@
 import {
   Burn,
   Mint,
-} from "../../generated/templates/StableDebtToken/StableDebtToken";
+} from "../../../../generated/templates/StableDebtToken/StableDebtToken";
 import { updateReserveStableDebtSupply } from "../entities/reserve";
 
 export function handleBurn(event: Burn): void {

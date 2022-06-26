@@ -8,7 +8,7 @@ import {
   ReserveDataUpdated,
   Supply,
   Withdraw,
-} from "../../generated/templates/Pool/Pool";
+} from "../../../../generated/templates/Pool/Pool";
 import {
   createBorrow,
   createDeposit,
@@ -18,8 +18,8 @@ import {
 } from "../entities/event";
 import { updateMarketRates } from "../entities/market";
 import { updateReserveAccruedToTreasury } from "../entities/reserve";
-import { BIGINT_ZERO } from "../utils/constants";
-import { rayDiv } from "../utils/numbers";
+import { BIGINT_ZERO } from "../../../../src/utils/constants";
+import { rayDiv } from "../../../../src/utils/numbers";
 
 export function handleBorrow(event: Borrow): void {
   createBorrow(

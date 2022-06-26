@@ -22,7 +22,7 @@ dataSources:
       eventHandlers:
         - event: AddressesProviderRegistered(indexed address,indexed uint256)
           handler: handleAddressesProviderRegistered
-      file: ./src/mappings/PoolAddressesProviderRegistry.ts
+      file: ./protocols/aave-v3/src/mappings/PoolAddressesProviderRegistry.ts
   - kind: ethereum
     name: RewardsController
     network: {{ network }}
@@ -48,7 +48,7 @@ dataSources:
       eventHandlers:
         - event: AssetConfigUpdated(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleAssetConfigUpdated
-      file: src/mappings/RewardsController.ts
+      file: ./protocols/aave-v3/src/mappings/RewardsController.ts
 templates:
   - kind: ethereum
     name: PoolAddressesProvider
@@ -70,7 +70,7 @@ templates:
           handler: handlePriceOracleUpdated
         - event: ProxyCreated(indexed bytes32,indexed address,indexed address)
           handler: handleProxyCreated
-      file: ./src/mappings/PoolAddressesProvider.ts
+      file: ./protocols/aave-v3/src/mappings/PoolAddressesProvider.ts
   - kind: ethereum
     name: Pool
     network: {{ network }}
@@ -105,7 +105,7 @@ templates:
           handler: handleSupply
         - event: Withdraw(indexed address,indexed address,indexed address,uint256)
           handler: handleWithdraw
-      file: ./src/mappings/Pool.ts
+      file: ./protocols/aave-v3/src/mappings/Pool.ts
   - kind: ethereum
     name: PoolConfigurator
     network: {{ network }}
@@ -138,7 +138,7 @@ templates:
           handler: handleReserveInitialized
         - event: ReservePaused(indexed address,bool)
           handler: handleReservePaused
-      file: ./src/mappings/PoolConfigurator.ts
+      file: ./protocols/aave-v3/src/mappings/PoolConfigurator.ts
   - kind: ethereum
     name: AToken
     network: {{ network }}
@@ -161,7 +161,7 @@ templates:
           handler: handleMint
         - event: BalanceTransfer(indexed address,indexed address,uint256,uint256)
           handler: handleBalanceTransfer
-      file: ./src/mappings/AToken.ts
+      file: ./protocols/aave-v3/src/mappings/AToken.ts
   - kind: ethereum
     name: StableDebtToken
     network: {{ network }}
@@ -182,7 +182,7 @@ templates:
           handler: handleBurn
         - event: Mint(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleMint
-      file: ./src/mappings/StableDebtToken.ts
+      file: ./protocols/aave-v3/src/mappings/StableDebtToken.ts
   - kind: ethereum
     name: VariableDebtToken
     network: {{ network }}
@@ -203,4 +203,4 @@ templates:
           handler: handleBurn
         - event: Mint(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleMint
-      file: ./src/mappings/VariableDebtToken.ts
+      file: ./protocols/aave-v3/src/mappings/VariableDebtToken.ts

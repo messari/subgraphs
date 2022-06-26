@@ -2,7 +2,7 @@ import { BigDecimal, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import {
   FinancialsDailySnapshot,
   LendingProtocol,
-} from "../../generated/schema";
+} from "../../../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   INT_ZERO,
@@ -16,7 +16,7 @@ import {
   PROTOCOL_SUBGRAPH_VERSION,
   RiskType,
   SECONDS_PER_DAY,
-} from "../utils/constants";
+} from "../../../../src/utils/constants";
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
   const id = dataSource.context().getString(PROTOCOL_ID_KEY);

@@ -5,15 +5,15 @@ import {
   dataSource,
   log,
 } from "@graphprotocol/graph-ts";
-import { Token, _PoolAddressesProvider } from "../../generated/schema";
-import { AaveOracle } from "../../generated/templates/Pool/AaveOracle";
+import { Token, _PoolAddressesProvider } from "../../../../generated/schema";
+import { AaveOracle } from "../../../../generated/templates/Pool/AaveOracle";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   POOL_ADDRESSES_PROVIDER_ID_KEY,
   ZERO_ADDRESS,
-} from "../utils/constants";
-import { bigIntToBigDecimal } from "../utils/numbers";
+} from "../../../../src/utils/constants";
+import { bigIntToBigDecimal } from "../../../../src/utils/numbers";
 import { getTokenById } from "./token";
 
 export function setPriceOracleAddress(

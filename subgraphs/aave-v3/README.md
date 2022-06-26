@@ -81,6 +81,12 @@ N/A
 - Deployed addresses: https://docs.aave.com/developers/deployed-contracts/v3-mainnet
 - Existing Subgraph: https://github.com/aave/protocol-subgraphs
 
+## Usage
+
+### Prepare
+
+`npm run prepare:yaml --TEMPLATE=aave-v3.template.yaml --PROTOCOL=aave-v3 --NETWORK=matic`
+
 ## Smart Contracts Interactions
 
 ![Aave V3](../../docs/images/protocols/aave-v3.png "Aave V3")

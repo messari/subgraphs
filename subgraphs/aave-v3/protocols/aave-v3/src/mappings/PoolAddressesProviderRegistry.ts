@@ -2,9 +2,9 @@ import { dataSource, DataSourceContext, log } from "@graphprotocol/graph-ts";
 import {
   AddressesProviderRegistered,
   PoolAddressesProviderRegistry,
-} from "../../generated/PoolAddressesProviderRegistry/PoolAddressesProviderRegistry";
-import { PoolAddressesProvider } from "../../generated/templates";
-import { PROTOCOL_ID_KEY } from "../utils/constants";
+} from "../../../../generated/PoolAddressesProviderRegistry/PoolAddressesProviderRegistry";
+import { PoolAddressesProvider } from "../../../../generated/templates";
+import { PROTOCOL_ID_KEY } from "../../../../src/utils/constants";
 
 export function handleAddressesProviderRegistered(
   event: AddressesProviderRegistered

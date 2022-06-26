@@ -2,7 +2,7 @@ import {
   BalanceTransfer,
   Burn,
   Mint,
-} from "../../generated/templates/AToken/AToken";
+} from "../../../../generated/templates/AToken/AToken";
 import {
   addMarketProtocolSideRevenue,
   getMarketById,
@@ -10,8 +10,8 @@ import {
 import { amountInUSD } from "../entities/price";
 import { getReserve, updateReserveATokenSupply } from "../entities/reserve";
 import { getTokenById } from "../entities/token";
-import { BIGINT_ZERO } from "../utils/constants";
-import { rayDiv } from "../utils/numbers";
+import { BIGINT_ZERO } from "../../../../src/utils/constants";
+import { rayDiv } from "../../../../src/utils/numbers";
 
 export function handleBurn(event: Burn): void {
   let amount = event.params.value.plus(event.params.balanceIncrease);

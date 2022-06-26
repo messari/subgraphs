@@ -4,12 +4,12 @@ import {
   ActiveAccount,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
-} from "../../generated/schema";
+} from "../../../../generated/schema";
 import {
   INT_ZERO,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
-} from "../utils/constants";
+} from "../../../../src/utils/constants";
 import { getOrCreateLendingProtocol } from "./protocol";
 
 export function getOrCreateUsageMetricsSnapshot(

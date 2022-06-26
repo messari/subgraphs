@@ -1,9 +1,9 @@
 import { log } from "@graphprotocol/graph-ts";
-import { AssetConfigUpdated } from "../../generated/RewardsController/RewardsController";
+import { AssetConfigUpdated } from "../../../../generated/RewardsController/RewardsController";
 import { getMarketById, updateMarketRewardTokens } from "../entities/market";
 import { getReserveOrNull } from "../entities/reserve";
 import { getOrCreateRewardToken } from "../entities/token";
-import { InterestRateType, RewardTokenType } from "../utils/constants";
+import { InterestRateType, RewardTokenType } from "../../../../src/utils/constants";
 
 export function handleAssetConfigUpdated(event: AssetConfigUpdated): void {
   const asset = event.params.asset.toHexString();
