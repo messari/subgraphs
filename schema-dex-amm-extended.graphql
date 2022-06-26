@@ -611,6 +611,128 @@ type LiquidityPoolHourlySnapshot @entity {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
+##############################
+##### Account-Level Data #####
+##############################
+
+type Account @entity {
+  " { Account address } "
+  id: ID!
+
+  " Number of positions this account has "
+  positionCount: Int!
+
+  " All positions that belong to this account "
+  positions: [Position!]! @derivedFrom(field: "account")
+
+  " All open positions this account has "
+  openPositions: [Position!]!
+
+  " Number of open positions this account has "
+  openPositionCount: Int!
+
+  " All closed positions this account has "
+  closedPositions: [Position!]!
+
+  " Number of closed positions this account has "
+  closedPositionCount: Int!
+
+  " Number of deposits this account made "
+  depositCount: Int!
+
+  " All deposit events of this account "
+  deposits: [Deposit!]! @derivedFrom(field: "account")
+
+  " Number of withdrawals this account made "
+  withdrawCount: Int!
+
+  " All withdraw events of this account "
+  withdraws: [Withdraw!]! @derivedFrom(field: "account")
+
+  " Number of times this account has traded/swapped"
+  swapCount: Int!
+
+  " All swap events of this account "
+  swaps: [Swap!]! @derivedFrom(field: "account")
+}
+
+type Position @entity {
+  " { Account address }-{ Market address } "
+  id: ID!
+
+  " Account that owns this position "
+  account: Account!
+
+  " The liquidity pool in which this position was opened "
+  pool: LiquidityPool!
+
+  " The hash of the transaction that opened this position "
+  hashOpened: String!
+
+  " The hash of the transaction that closed this position "
+  hashClosed: String
+
+  " Block number of when the position was opened "
+  blockNumberOpened: BigInt!
+
+  " Timestamp when the position was opened "
+  timestampOpened: BigInt!
+
+  " Block number of when the position was closed (0 if still open) "
+  blockNumberClosed: BigInt
+
+  " Timestamp when the position was closed (0 if still open) "
+  timestampClosed: BigInt
+
+  " Input token balances in this position, in native amounts "
+  inputTokenBalances: [BigInt!]!
+
+  " Output token balance in this position, in native amounts "
+  outputTokenBalance: BigInt
+
+  " Total reward token accumulated under this position, in native amounts "
+  cumulativeRewardTokenAmounts: [BigInt!]
+
+  " Number of deposits related to this position "
+  depositCount: Int!
+
+  " All deposit events of this position "
+  deposits: [Deposit!]! @derivedFrom(field: "position")
+
+  " Number of withdrawals related to this position "
+  withdrawCount: Int!
+
+  " All withdraw events of this position "
+  withdraws: [Withdraw!]! @derivedFrom(field: "position")
+
+  " Position daily snapshots for open positions "
+  dailySnapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
+}
+
+# Note that we only take snapshot for open positions
+type PositionSnapshot @entity {
+  " { Position ID }-{ # of days since Unix epoch time } "
+  id: ID!
+
+  " Position of this snapshot "
+  position: Position!
+
+  " Input token balances in this position, in native amounts "
+  inputTokenBalances: [BigInt!]!
+
+  " Output token balance in this position, in native amounts "
+  outputTokenBalance: BigInt
+
+  " Total reward token accumulated under this position, in native amounts "
+  cumulativeRewardTokenAmounts: [BigInt!]
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
 ##################################
 ##### Event-Level Data #####
 ##################################
@@ -631,11 +753,20 @@ type Deposit @entity {
   " Transaction hash of the transaction that emitted this event "
   hash: String!
 
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
+
+  " Account that emitted this event "
+  account: Account!
+
+  " The pool involving this event "
+  pool: LiquidityPool!
 
   " Address that received the tokens "
   to: String!
@@ -663,9 +794,6 @@ type Deposit @entity {
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
-
-  " The pool involving this transaction "
-  pool: LiquidityPool!
 }
 
 type Withdraw @entity {
@@ -675,17 +803,20 @@ type Withdraw @entity {
   " Transaction hash of the transaction that emitted this event "
   hash: String!
 
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Address that received the tokens "
-  to: String!
+  " Account that emitted this event "
+  account: Account!
 
-  " Address that sent the tokens "
-  from: String!
+  " The pool involving this event "
+  pool: LiquidityPool!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -707,9 +838,6 @@ type Withdraw @entity {
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
-
-  " The pool involving this transaction "
-  pool: LiquidityPool!
 }
 
 type Swap @entity {
@@ -719,17 +847,20 @@ type Swap @entity {
   " Transaction hash of the transaction that emitted this event "
   hash: String!
 
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Address that received the tokens "
-  to: String!
+  " Account that emitted this event "
+  account: Account!
 
-  " Address that sent the tokens "
-  from: String!
+  " The pool involving this event "
+  pool: LiquidityPool!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -754,16 +885,6 @@ type Swap @entity {
 
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
-
-  " The pool involving this transaction "
-  pool: LiquidityPool!
-}
-
-# An account is a unique Ethereum address
-# Helps to accumulate total unique users
-type Account @entity {
-  " Address of the account "
-  id: ID!
 }
 
 # Helper entity for calculating daily/hourly active users
