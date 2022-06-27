@@ -66,10 +66,10 @@ enum GovernanceFrameworkType {
 type Proposal @entity {
   "Internal proposal ID, in this implementation it seems to be a autoincremental id"
   id: ID!
-  "Governor Alpha Proposal description in markdown format"
+  "Proposal description in markdown format"
   description: String
 
-  "Delegate that proposed the change"
+  "Delegate that proposed the proposal"
   proposer: Delegate!
   "State of the proposal"
   state: ProposalState!
