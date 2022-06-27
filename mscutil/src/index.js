@@ -5,11 +5,21 @@ const fs = require ('fs');
 const fse = require('fs-extra');
 const yaml = require('js-yaml');
 const directoryTree = require('directory-tree');
-
-var cmds = ["price-oracle","abis","common","mappings","ethereum-abis","subgraph-manifest","schema","package-cfg","debug"];
+    
+var cmds = [
+    "price-oracle",
+    "abis",
+    "common",
+    "mappings",
+    "ethereum-abis",
+    "subgraph-manifest",
+    "schema",
+    "package-cfg",
+];
 var appRoot = process.env.PWD;
 var modRoot = path.dirname(__dirname);
 var refRoot = modRoot+"/_reference_";
+var sgRefRoot = path.dirname(path.dirname(__dirname))+'/subgraphs/_reference_';
 
 const run = async argv => {
     var args = process.argv.slice(2);
@@ -38,10 +48,11 @@ const run = async argv => {
 	    install(element)
 	})
 	break;
-    case 'debug':
-	console.log(appRoot)
-	console.log(modRoot)
-	console.log(refRoot)
+      case 'debug':
+	console.log('appRoot: '+appRoot)
+	console.log('modRoot: '+modRoot)
+	console.log('refRoot: '+refRoot)
+	console.log('sgRefRoot: '+sgRefRoot)
 	break;
       default:
         dispUsage();
@@ -53,13 +64,13 @@ function dispUsage() {
 	console.error("Usage: mscutil [install | remove] ["+cmds.join(" | ")+"]\n       mscutil [install-all | remove-all]")
 }
 
-function cprp(src,dest) {
+function symlink(src,dest) {
     var res = fs.symlink(src, dest, function (err) {
 	if(err) {
 	    console.error(err);
 	    return false;
 	} else {
-	    console.log("cp -rp "+src+" "+dest)
+	    console.log("Linking "+src+" "+dest)
 	    return true;
 	}
     });
@@ -75,7 +86,7 @@ function installDefaultManifest() {
 
 function installDefaultSchema() {
   fse.copySync(
-    refRoot+"/schema.graphql",
+    sgRefRoot+"/schema.graphql",
     appRoot+"/schema.graphql",
   )
 }
@@ -99,21 +110,21 @@ function install(submod) {
 	}
         break;
       case 'price-oracle':
-	// ./abis/Prices/
+	// ./abis/Prices/ - Create directory if nonexistent
 	if (!fse.existsSync(appRoot+"/abis/")) {
 	    fse.mkdirSync(appRoot+"/abis/");
 	}
-	cprp(refRoot+"/abis/Prices/",appRoot+"/abis/Prices");
-	// ./src/prices/
+	symlink(sgRefRoot+"/abis/Prices/",appRoot+"/abis/Prices");
+	// ./src/prices/ - Create directory if nonexistent
 	if (!fs.existsSync(appRoot+"/src/")) {
 	    fs.mkdirSync(appRoot+"/src/");
 	}
-	cprp(refRoot+"/src/prices/",appRoot+"/src/prices");
+	symlink(sgRefRoot+"/src/prices/",appRoot+"/src/prices");
 	// ./subgraph.yaml insertion
         j = JSON.parse(fs.readFileSync(refRoot+'/config/priceOracleABIs.json'))
         abis = j.priceOracleABIs
         jy = yaml.load(abis);
-
+	
 	try {
 		y = yaml.load(fs.readFileSync(appRoot+'/subgraph.yaml'))
 	} catch (e) {
@@ -142,10 +153,10 @@ function install(submod) {
 	if (!fs.existsSync(appRoot+"/abis/")) {
 	    fs.mkdirSync(appRoot+"/abis/");
 	}
-	var tree = directoryTree(refRoot+'/abis',{extensions:/\.json/});
+	var tree = directoryTree(sgRefRoot+'/abis',{extensions:/\.json/});
 	tree.children.forEach(file => function() {
 	  if(file.children) return
-	  cprp(file.path,appRoot+'/abis/'+file.name);
+	  symlink(file.path,appRoot+'/abis/'+file.name);
 	}());
 	break;
       case 'common':
@@ -153,20 +164,20 @@ function install(submod) {
 	    fs.mkdirSync(appRoot+"/src/");
 	}
         // ./src/common/
-	cprp(refRoot+"/src/common/",appRoot+"/src/common");
+	symlink(sgRefRoot+"/src/common/",appRoot+"/src/common");
 	break;
       case 'mappings':
         // ./src/common/mappings
 	if (!fs.existsSync(appRoot+"/src/")) {
 	    fs.mkdirSync(appRoot+"/src/");
 	}
-	cprp(refRoot+"/src/mappings",appRoot+"/src/mappings");
+	symlink(sgRefRoot+"/src/mappings",appRoot+"/src/mappings");
 	break;
       case 'ethereum-abis':
 	if (!fse.existsSync(appRoot+"/abis/")) {
 	    fse.mkdirSync(appRoot+"/abis/");
 	}
-	cprp(refRoot+"/abis/Ethereum/",appRoot+"/abis/Ethereum");
+	symlink(refRoot+"/abis/Ethereum/",appRoot+"/abis/Ethereum");
         break;
       case 'schema':
 	try {
@@ -204,9 +215,9 @@ function remove(submod) {
 	//TODO refactor and confirm if files or folders will be overwritten
       case 'price-oracle':
 	// ./abis/Prices/
-	fse.removeSync(appRoot+"/abis/Prices", { recursive: true, force: true });
+	fse.removeSync(appRoot+"/abis/Prices");
 	// ./src/prices/
-	fse.removeSync(appRoot+"/src/prices", { recursive: true, force: true });
+	fse.removeSync(appRoot+"/src/prices");
 	// ./subgraph.yaml insertion
         j = JSON.parse(fs.readFileSync(refRoot+'/config/priceOracleABIs.json'))
         abis = j.priceOracleABIs
@@ -234,29 +245,28 @@ function remove(submod) {
 	break;
       case 'abis':
         // ./abis/*.json
-	var tree = directoryTree(refRoot+'/abis',{extensions:/\.json/});
+	var tree = directoryTree(sgRefRoot+'/abis',{extensions:/\.json/});
 	tree.children.forEach(file => function() {
 	  if(file.children) return;
 	  fse.unlinkSync(appRoot+'/abis/'+file.name);
 	}());
 	break;
-	break;
       case 'common':
         // ./src/common/
-	fse.removeSync(appRoot+"/src/common", { recursive: true, force: true });
+	fse.removeSync(appRoot+"/src/common");
 	break;
       case 'mappings':
         // ./src/mappings
-	fse.removeSync(appRoot+"/src/mappings", { recursive: true, force: true });
+	fse.removeSync(appRoot+"/src/mappings");
 	break;
       case 'ethereum-abis':
-	fse.removeSync(appRoot+"/src/abis/Ethereum", { recursive: true, force: true });
+	fse.removeSync(appRoot+"/abis/Ethereum");
 	break;
       case 'schema':
-	fse.removeSync(appRoot+"/schema.graphql", { recursive: true, force: true });
+	fse.removeSync(appRoot+"/schema.graphql");
 	break;
       case 'package-cfg':
-	fse.removeSync(appRoot+"/package.json", { recursive: true, force: true });
+	fse.removeSync(appRoot+"/package.json");
 	break;
       default:
         dispUsage();
