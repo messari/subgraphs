@@ -56,10 +56,6 @@ export function handleProposalCreated(event: ProposalCreated): void {
 
   // Creating it anyway since we will want to account for this event data, even though it should've never happened
   proposer = getOrCreateDelegate(event.params.proposer.toHexString());
-  log.info("Proposal #{} created by {}", [
-    event.params.proposalId.toString(),
-    proposer.id,
-  ]);
 
   proposal.proposer = proposer.id;
   proposal.targets = addressesToStrings(event.params.targets);

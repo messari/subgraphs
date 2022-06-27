@@ -49,11 +49,11 @@ type GovernanceFramework @entity {
   "The number of votes required in order for a voter to become a proposer"
   proposalThreshold: BigInt!
 
-  "The number of votes for a proposal to succeed. (quorum = totalSupply * numerator / denominator)"
-  _quorum: BigDecimal
-  "Quorum fraction numerator value"
+  "The number of votes for a proposal to succeed."
+  quorumVotes: BigInt
+  "Quorum fraction numerator value. (OZ: quorum = totalSupply * numerator / denominator)"
   quorumNumerator: BigInt!
-  "Quorum fraction denominator value"
+  "Quorum fraction denominator value. (OZ: quorum = totalSupply * numerator / denominator)"
   quorumDenominator: BigInt!
 }
 
