@@ -10,10 +10,30 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "requestedPriceMantissa", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "anchorPriceMantissa", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "cappedPriceMantissa", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "requestedPriceMantissa",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "anchorPriceMantissa",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "cappedPriceMantissa",
+        "type": "uint256"
+      }
     ],
     "name": "CappedPricePosted",
     "type": "event"
@@ -21,9 +41,24 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "uint256", "name": "error", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "info", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "detail", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "error",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "info",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "detail",
+        "type": "uint256"
+      }
     ],
     "name": "Failure",
     "type": "event"
@@ -31,8 +66,18 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "oldAnchorAdmin", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "newAnchorAdmin", "type": "address" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "oldAnchorAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newAnchorAdmin",
+        "type": "address"
+      }
     ],
     "name": "NewAnchorAdmin",
     "type": "event"
@@ -40,10 +85,30 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "anchorAdmin", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "oldScaledPrice", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "newScaledPrice", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "anchorAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldScaledPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newScaledPrice",
+        "type": "uint256"
+      }
     ],
     "name": "NewPendingAnchor",
     "type": "event"
@@ -51,8 +116,18 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "oldPendingAnchorAdmin", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "newPendingAnchorAdmin", "type": "address" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "oldPendingAnchorAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newPendingAnchorAdmin",
+        "type": "address"
+      }
     ],
     "name": "NewPendingAnchorAdmin",
     "type": "event"
@@ -60,8 +135,18 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "oldPoster", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "newPoster", "type": "address" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "oldPoster",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newPoster",
+        "type": "address"
+      }
     ],
     "name": "NewPoster",
     "type": "event"
@@ -69,11 +154,36 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "msgSender", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "error", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "info", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "detail", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "msgSender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "error",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "info",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "detail",
+        "type": "uint256"
+      }
     ],
     "name": "OracleFailure",
     "type": "event"
@@ -81,10 +191,30 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "previousPriceMantissa", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "requestedPriceMantissa", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "newPriceMantissa", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "previousPriceMantissa",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "requestedPriceMantissa",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newPriceMantissa",
+        "type": "uint256"
+      }
     ],
     "name": "PricePosted",
     "type": "event"
@@ -92,10 +222,30 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "oldReader", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "newReader", "type": "address" },
-      { "indexed": false, "internalType": "int256", "name": "decimalsDifference", "type": "int256" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "oldReader",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newReader",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "int256",
+        "name": "decimalsDifference",
+        "type": "int256"
+      }
     ],
     "name": "ReaderPosted",
     "type": "event"
@@ -103,8 +253,18 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "aggregator", "type": "address" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "aggregator",
+        "type": "address"
+      }
     ],
     "name": "SetAssetAggregator",
     "type": "event"
@@ -112,8 +272,18 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "contract IStatusOracle", "name": "statusOracle", "type": "address" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "contract IStatusOracle",
+        "name": "statusOracle",
+        "type": "address"
+      }
     ],
     "name": "SetAssetStatusOracle",
     "type": "event"
@@ -121,26 +291,68 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "address", "name": "exchangeRateModel", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "exchangeRate", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "maxSwingRate", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "maxSwingDuration", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "exchangeRateModel",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "exchangeRate",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxSwingRate",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxSwingDuration",
+        "type": "uint256"
+      }
     ],
     "name": "SetExchangeRate",
     "type": "event"
   },
   {
     "anonymous": false,
-    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "maxSwing", "type": "uint256" }],
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxSwing",
+        "type": "uint256"
+      }
+    ],
     "name": "SetMaxSwing",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "maxSwing", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxSwing",
+        "type": "uint256"
+      }
     ],
     "name": "SetMaxSwingForAsset",
     "type": "event"
@@ -148,17 +360,44 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address", "name": "asset", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "oldMaxSwingRate", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "newMaxSwingRate", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "maxSwingDuration", "type": "uint256" }
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldMaxSwingRate",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newMaxSwingRate",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxSwingDuration",
+        "type": "uint256"
+      }
     ],
     "name": "SetMaxSwingRate",
     "type": "event"
   },
   {
     "anonymous": false,
-    "inputs": [{ "indexed": false, "internalType": "bool", "name": "newState", "type": "bool" }],
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "newState",
+        "type": "bool"
+      }
+    ],
     "name": "SetPaused",
     "type": "event"
   },
@@ -193,40 +432,52 @@
   {
     "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "name": "_assetPrices",
-    "outputs": [{ "internalType": "uint256", "name": "mantissa", "type": "uint256" }],
+    "outputs": [
+      { "internalType": "uint256", "name": "mantissa", "type": "uint256" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_asset", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_asset", "type": "address" }
+    ],
     "name": "_disableAssetAggregator",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address[]", "name": "_assets", "type": "address[]" }],
+    "inputs": [
+      { "internalType": "address[]", "name": "_assets", "type": "address[]" }
+    ],
     "name": "_disableAssetAggregatorBatch",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_asset", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_asset", "type": "address" }
+    ],
     "name": "_disableAssetStatusOracle",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address[]", "name": "_assets", "type": "address[]" }],
+    "inputs": [
+      { "internalType": "address[]", "name": "_assets", "type": "address[]" }
+    ],
     "name": "_disableAssetStatusOracleBatch",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_asset", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_asset", "type": "address" }
+    ],
     "name": "_disableExchangeRate",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
@@ -235,7 +486,11 @@
   {
     "inputs": [
       { "internalType": "address", "name": "_asset", "type": "address" },
-      { "internalType": "contract IAggregator", "name": "_aggregator", "type": "address" }
+      {
+        "internalType": "contract IAggregator",
+        "name": "_aggregator",
+        "type": "address"
+      }
     ],
     "name": "_setAssetAggregator",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
@@ -245,7 +500,11 @@
   {
     "inputs": [
       { "internalType": "address[]", "name": "_assets", "type": "address[]" },
-      { "internalType": "contract IAggregator[]", "name": "_aggregators", "type": "address[]" }
+      {
+        "internalType": "contract IAggregator[]",
+        "name": "_aggregators",
+        "type": "address[]"
+      }
     ],
     "name": "_setAssetAggregatorBatch",
     "outputs": [],
@@ -255,7 +514,11 @@
   {
     "inputs": [
       { "internalType": "address", "name": "_asset", "type": "address" },
-      { "internalType": "contract IStatusOracle", "name": "_statusOracle", "type": "address" }
+      {
+        "internalType": "contract IStatusOracle",
+        "name": "_statusOracle",
+        "type": "address"
+      }
     ],
     "name": "_setAssetStatusOracle",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
@@ -265,7 +528,11 @@
   {
     "inputs": [
       { "internalType": "address[]", "name": "_assets", "type": "address[]" },
-      { "internalType": "contract IStatusOracle[]", "name": "_statusOracles", "type": "address[]" }
+      {
+        "internalType": "contract IStatusOracle[]",
+        "name": "_statusOracles",
+        "type": "address[]"
+      }
     ],
     "name": "_setAssetStatusOracleBatch",
     "outputs": [],
@@ -273,7 +540,9 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "_maxSwing", "type": "uint256" }],
+    "inputs": [
+      { "internalType": "uint256", "name": "_maxSwing", "type": "uint256" }
+    ],
     "name": "_setMaxSwing",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
@@ -300,7 +569,9 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "bool", "name": "_requestedState", "type": "bool" }],
+    "inputs": [
+      { "internalType": "bool", "name": "_requestedState", "type": "bool" }
+    ],
     "name": "_setPaused",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
@@ -309,7 +580,11 @@
   {
     "inputs": [
       { "internalType": "address", "name": "_asset", "type": "address" },
-      { "internalType": "uint256", "name": "_newScaledPrice", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_newScaledPrice",
+        "type": "uint256"
+      }
     ],
     "name": "_setPendingAnchor",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
@@ -317,14 +592,22 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_newPendingAnchorAdmin", "type": "address" }],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_newPendingAnchorAdmin",
+        "type": "address"
+      }
+    ],
     "name": "_setPendingAnchorAdmin",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_newPoster", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_newPoster", "type": "address" }
+    ],
     "name": "_setPoster",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
@@ -333,7 +616,9 @@
   {
     "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "name": "aggregator",
-    "outputs": [{ "internalType": "contract IAggregator", "name": "", "type": "address" }],
+    "outputs": [
+      { "internalType": "contract IAggregator", "name": "", "type": "address" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -358,30 +643,44 @@
     "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "name": "exchangeRates",
     "outputs": [
-      { "internalType": "address", "name": "exchangeRateModel", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "exchangeRateModel",
+        "type": "address"
+      },
       { "internalType": "uint256", "name": "exchangeRate", "type": "uint256" },
       { "internalType": "uint256", "name": "maxSwingRate", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxSwingDuration", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "maxSwingDuration",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_asset", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_asset", "type": "address" }
+    ],
     "name": "getAssetAggregatorPrice",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_asset", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_asset", "type": "address" }
+    ],
     "name": "getAssetPrice",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_asset", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_asset", "type": "address" }
+    ],
     "name": "getAssetPriceStatus",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
@@ -405,21 +704,27 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_asset", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_asset", "type": "address" }
+    ],
     "name": "getReaderPrice",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_asset", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_asset", "type": "address" }
+    ],
     "name": "getUnderlyingPrice",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_asset", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_asset", "type": "address" }
+    ],
     "name": "getUnderlyingPriceAndStatus",
     "outputs": [
       { "internalType": "uint256", "name": "", "type": "uint256" },
@@ -431,7 +736,9 @@
   {
     "inputs": [],
     "name": "maxSwing",
-    "outputs": [{ "internalType": "uint256", "name": "mantissa", "type": "uint256" }],
+    "outputs": [
+      { "internalType": "uint256", "name": "mantissa", "type": "uint256" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -445,7 +752,9 @@
   {
     "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "name": "maxSwings",
-    "outputs": [{ "internalType": "uint256", "name": "mantissa", "type": "uint256" }],
+    "outputs": [
+      { "internalType": "uint256", "name": "mantissa", "type": "uint256" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -489,7 +798,11 @@
     "name": "readers",
     "outputs": [
       { "internalType": "address", "name": "asset", "type": "address" },
-      { "internalType": "int256", "name": "decimalsDifference", "type": "int256" }
+      {
+        "internalType": "int256",
+        "name": "decimalsDifference",
+        "type": "int256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -497,8 +810,16 @@
   {
     "inputs": [
       { "internalType": "address", "name": "_asset", "type": "address" },
-      { "internalType": "address", "name": "_exchangeRateModel", "type": "address" },
-      { "internalType": "uint256", "name": "_maxSwingDuration", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "_exchangeRateModel",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxSwingDuration",
+        "type": "uint256"
+      }
     ],
     "name": "setExchangeRate",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
@@ -508,7 +829,11 @@
   {
     "inputs": [
       { "internalType": "address", "name": "_asset", "type": "address" },
-      { "internalType": "uint256", "name": "_maxSwingDuration", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_maxSwingDuration",
+        "type": "uint256"
+      }
     ],
     "name": "setMaxSwingRate",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
@@ -518,7 +843,11 @@
   {
     "inputs": [
       { "internalType": "address", "name": "_asset", "type": "address" },
-      { "internalType": "uint256", "name": "_requestedPriceMantissa", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "_requestedPriceMantissa",
+        "type": "uint256"
+      }
     ],
     "name": "setPrice",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
@@ -528,10 +857,16 @@
   {
     "inputs": [
       { "internalType": "address[]", "name": "_assets", "type": "address[]" },
-      { "internalType": "uint256[]", "name": "_requestedPriceMantissas", "type": "uint256[]" }
+      {
+        "internalType": "uint256[]",
+        "name": "_requestedPriceMantissas",
+        "type": "uint256[]"
+      }
     ],
     "name": "setPrices",
-    "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -548,7 +883,13 @@
   {
     "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "name": "statusOracle",
-    "outputs": [{ "internalType": "contract IStatusOracle", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "contract IStatusOracle",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },

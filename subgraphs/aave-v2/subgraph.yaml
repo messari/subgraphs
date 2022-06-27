@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
@@ -53,7 +53,6 @@ templates:
         # - event: AddressSet(bytes32,indexed address,bool) #new
         #   handler: handleAddressSet
       file: ./src/mappings/lendingPoolAddressProvider.ts
-
   - kind: ethereum/contract
     name: LendingPool
     network: mainnet
