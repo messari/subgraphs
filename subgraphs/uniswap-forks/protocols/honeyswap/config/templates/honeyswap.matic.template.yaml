@@ -7,9 +7,9 @@ dataSources:
     name: Factory
     network: {{network}}
     source:
-      address: "{{factory.address}}"
+      address: "{{address}}"
       abi: Factory
-      startBlock: {{factory.startBlock}}
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -47,10 +47,12 @@ dataSources:
         - name: TokenABI
           file: ./abis/honeyswap/ERC20.json
       eventHandlers:
+        - event: PoolAdded(indexed address,uint256)
+          handler: handlePoolAdded
+        - event: PoolRemoved(indexed address)
+          handler: handlePoolRemoved
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: RewardsWithdraw(indexed uint256,uint256)
-          handler: handleWithdraw
       file: ./protocols/honeyswap/src/mappings/honeyfarm/reward.ts
 templates:
   - kind: ethereum/contract

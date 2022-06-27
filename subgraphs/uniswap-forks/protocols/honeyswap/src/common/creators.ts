@@ -1,9 +1,9 @@
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { _HelperStore, _TokenWhitelist, _LiquidityPoolAmount, LiquidityPool, LiquidityPoolFee } from "../../../../generated/schema";
+import { _HelperStore, _TokenWhitelist, _LiquidityPoolAmount, LiquidityPool, LiquidityPoolFee, RewardToken } from "../../../../generated/schema";
 import { Pair as PairTemplate } from "../../../../generated/templates";
 import { BIGDECIMAL_ZERO, INT_ZERO, BIGINT_ZERO, LiquidityPoolFeeType, FeeSwitch, BIGDECIMAL_TWO, BIGDECIMAL_ONE } from "../../../../src/common/constants";
 import { createPoolFees } from "../../../../src/common/creators"
-import { getOrCreateDex, getOrCreateToken, getOrCreateLPToken } from "../../../../src/common/getters";
+import { getOrCreateDex, getOrCreateToken, getOrCreateLPToken, getOrCreateRewardToken, getLiquidityPool } from "../../../../src/common/getters";
 import { updateTokenWhitelists } from "../../../../src/common/updateMetrics";
 import { NetworkConfigs } from "../../../../configurations/configure";
 
@@ -56,7 +56,7 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   pool.inputTokenWeights = [BIGDECIMAL_ONE.div(BIGDECIMAL_TWO), BIGDECIMAL_ONE.div(BIGDECIMAL_TWO)];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool.rewardTokens = [NetworkConfigs.getRewardToken()];
+  pool.rewardTokens = [];
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
@@ -93,4 +93,23 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   LPtoken.save();
   poolAmounts.save();
   poolDeposits.save();
+}
+
+export function createPoolRewardToken(poolAddress: string): void {
+  let pool = getLiquidityPool(poolAddress);
+  // let rewardToken = getOrCreateRewardToken(NetworkConfigs.getRewardToken());
+
+  let rewardTokens = pool.rewardTokens;
+  rewardTokens!.push(NetworkConfigs.getRewardToken());
+  pool.rewardTokens = rewardTokens;
+
+  pool.save();
+}
+
+export function removePoolRewardToken(poolAddress: string): void {
+  let pool = getLiquidityPool(poolAddress);
+
+  pool.rewardTokens = [];
+
+  pool.save();
 }
