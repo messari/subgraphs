@@ -18,6 +18,7 @@ import {
   getGovernanceFramework,
   ProposalState,
   addressesToStrings,
+  BIGINT_ZERO,
 } from "./helpers";
 
 // ProposalCanceled(proposalId)
@@ -58,6 +59,9 @@ export function handleProposalCreated(event: ProposalCreated): void {
   proposer = getOrCreateDelegate(event.params.proposer.toHexString());
 
   proposal.proposer = proposer.id;
+  proposal.againstVotes = BIGINT_ZERO;
+  proposal.forVotes = BIGINT_ZERO;
+  proposal.abstainVotes = BIGINT_ZERO;
   proposal.targets = addressesToStrings(event.params.targets);
   proposal.values = event.params.values;
   proposal.signatures = event.params.signatures;
