@@ -15,13 +15,11 @@ interface PoolDropDownProps {
 export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDropDownProps) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
   // Create the array of pool selections in the drop down
   const options = markets.map((market: any) => {
     return market.id + " / " + market.name;
   });
   // Get the array entry for the current selected pool
-
   const pool = markets.find((m: any) => m.id === poolId) || { name: "Selected Pool" };
   let inputTextValue = "Select a pool";
   if (poolId) {

@@ -86,7 +86,6 @@ function PoolTab({
 
   const entityData = data[poolKeySingular];
   let poolDropDown = null;
-
   if (poolsList) {
     poolDropDown = (
       <PoolDropDown

@@ -557,8 +557,8 @@ export const schema120 = (): Schema => {
     }`;
 
   const poolsQuery = `
-      query Data($skipCount: Int) {
-        liquidityPools(first: 100, skip: $skipCount) {
+      query Data {
+        liquidityPools(first: 100) {
           id
           name
         }
@@ -856,13 +856,13 @@ export const schema130 = (): Schema => {
     }`;
 
   const poolsQuery = `
-    query Data($skipCount: Int) {
-      liquidityPools(first: 100, skip: $skipCount) {
-        id
-        name
+      query Data {
+        liquidityPools(first: 100) {
+          id
+          name
+        }
       }
-    }
-  `;
+    `;
 
   const poolTimeseriesQuery = `
       query Data($poolId: String) {

@@ -13,6 +13,7 @@ export const schema = (version: string): string => {
     case Versions.Schema120:
       return schema120();
     case Versions.Schema130:
+      return schema130();
     default:
       return schema130();
   }
