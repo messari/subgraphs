@@ -1,0 +1,26 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Lido
+    network: mainnet
+    source:
+      address: "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
+      abi: Lido
+      startBlock: 14000000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LidoSubmission
+      abis:
+        - name: Lido
+          file: ./abis/Lido.json
+        - name: ERC20
+          file: ./abis/ERC20.json          
+      eventHandlers:
+        - event: Submitted(indexed address,uint256,address)
+          handler: handleSubmit
+      file: ./src/lido.ts
