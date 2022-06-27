@@ -52,6 +52,14 @@
         }
       }
     },
+    "beefy-finance": {
+      "beefy-finance": {
+        "aurora": {
+          "template": "beefy.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "belt-finance": {
       "belt-finance": {
         "bsc": {
@@ -136,6 +144,44 @@
           "deploy-on-merge": true
         }
       },
+      "dforce": {
+        "arbitrum": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-arbitrum",
+          "tnkrxyz": "tnkrxyz/dforce-arbitrum",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-avalanche",
+          "tnkrxyz": "tnkrxyz/dforce-avalanche",
+          "deploy-on-merge": true
+        },
+        "bsc": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-bsc",
+          "tnkrxyz": "tnkrxyz/dforce-bsc",
+          "deploy-on-merge": true
+        },
+        "mainnet": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-ethereum",
+          "tnkrxyz": "tnkrxyz/dforce",
+          "deploy-on-merge": true
+        },
+        "optimism": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-optimism",
+          "tnkrxyz": "tnkrxyz/dforce-optimism",
+          "deploy-on-merge": true
+        },
+        "matic": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-polygon",
+          "tnkrxyz": "tnkrxyz/dforce-polygon",
+          "deploy-on-merge": true
+        }
+      },
       "iron-bank": {
         "avalanche": {
           "template": "iron-bank.template.yaml",
@@ -195,8 +241,8 @@
         }
       }
     },
-    "curve": {
-      "curve": {
+    "curve-finance": {
+      "curve-finance": {
         "arbitrum": {
           "template": "curve.template.yaml",
           "deploy-on-merge": false
@@ -222,7 +268,7 @@
           "deploy-on-merge": false
         },
         "xdai": {
-          "template": "apeswap.template.yaml",
+          "template": "curve.template.yaml",
           "deploy-on-merge": false
         }
       }
@@ -231,6 +277,14 @@
       "ellipsis-finance": {
         "bsc": {
           "template": "ellipsis.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "inverse-finance": {
+      "inverse-finance": {
+        "mainnet": {
+          "template": "inverse.finance.template.yaml",
           "deploy-on-merge": false
         }
       }

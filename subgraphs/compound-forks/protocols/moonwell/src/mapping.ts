@@ -36,6 +36,7 @@ import {
   RewardTokenType,
   BIGDECIMAL_ZERO,
   exponentToBigDecimal,
+  SECONDS_PER_DAY,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -266,7 +267,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Moonwell",
     "moonwell",
     "1.3.0",
-    "1.0.9",
+    "1.0.10",
     "1.0.0",
     Network.MOONRIVER,
     comptroller.try_liquidationIncentiveMantissa(),
@@ -442,7 +443,7 @@ function getRewardTokenEmission(
   }
   let rewardAmountPerSecond = rewardSpeedsResult.value;
   let rewardAmount = rewardAmountPerSecond.times(
-    BigInt.fromI32(SECONDS_PER_YEAR)
+    BigInt.fromI32(SECONDS_PER_DAY)
   );
   let rewardUSD = rewardAmount
     .toBigDecimal()
