@@ -148,6 +148,21 @@ class Block {
 - `cronos` needs to have a startBlock of 1 to work, so I had to keep it seperate from the evm chains
   - Also, the hosted service does not support `cronos` so you have to deploy here: https://portal.cronoslabs.com/
 - TODO: explain how eth rewards can be calculated using subgraph data
+- `aurora` will take ~3 months to fully sync
+
+### Deployment
+
+Once everything is setup properly deploying is very easy.
+
+```bash
+# This example will deploy rari-fuse on all networks to the hosted service under "dmelotik" in deploymentConfigurations.json
+npm run deploy --SUBGRAPH=network --PROTOCOL=evm --LOCATION=dmelotik
+
+# This will do the same, but only deploying the mainnet subgraph
+npm run deploy --SUBGRAPH=network --PROTOCOL=evm --NETWORK=juno --LOCATION=dmelotik
+```
+
+> Setting `deploy-on-merge` to `true` in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) will run the above commands on subgraphs that have changed to messari's hosted service.
 
 ## Resources and Links
 
