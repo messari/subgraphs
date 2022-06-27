@@ -14,6 +14,7 @@ import {
   LendingPoolConfiguratorUpdated,
   LendingPoolAddressesProvider as AddressProviderContract,
 } from "../../generated/templates/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
+import { IPriceOracleGetter } from "../../generated/templates/LendingPool/IPriceOracleGetter";
 import { AddressesProviderRegistered } from "../../generated/LendingPoolAddressesProviderRegistry/LendingPoolAddressesProviderRegistry";
 
 export function handleAddressesProviderRegistered(
@@ -47,7 +48,7 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
   const lendingProtocol = getOrCreateLendingProtocol(
     constants.PROTOCOL_ADDRESS
   );
-  lendingProtocol.protocolPriceOracle = event.params.newAddress.toHexString();
+  lendingProtocol._protocolPriceOracle = event.params.newAddress.toHexString();
   lendingProtocol.save();
 }
 
@@ -105,7 +106,15 @@ function initiateContext(addrProvider: Address): DataSourceContext {
     contract.try_getPriceOracle(),
     Address.fromString(constants.PRICE_ORACLE_ADDRESS)
   );
-  lendingProtocol.protocolPriceOracle = priceOracle.toHexString();
+  lendingProtocol._protocolPriceOracle = priceOracle.toHexString();
+
+  const priceOracleContract = IPriceOracleGetter.bind(priceOracle);
+  const fallbackPriceOracle = utils.readValue<Address>(
+    priceOracleContract.try_getFallbackOracle(),
+    Address.fromString(constants.ZERO_ADDRESS)
+  );
+  lendingProtocol._fallbackPriceOracle = fallbackPriceOracle.toHexString();
+
   lendingProtocol.save();
 
   const context = new DataSourceContext();

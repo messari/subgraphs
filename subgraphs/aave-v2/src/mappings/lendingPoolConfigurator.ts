@@ -44,7 +44,7 @@ export function handleCollateralConfigurationChanged(event: CollateralConfigurat
   const marketAddress = event.params.asset.toHexString();
   const market = getOrCreateMarket(event, marketAddress);
 
-  market.maximumLTV = new BigDecimal(event.params.ltv);
+  market.maximumLTV = event.params.ltv.toBigDecimal().div(BIGDECIMAL_HUNDRED);
   market.liquidationThreshold = event.params.liquidationThreshold.toBigDecimal().div(BIGDECIMAL_HUNDRED);
   
   // The liquidation bonus value is equal to the liquidation penalty, the naming is a matter of which side of the liquidation a user is on

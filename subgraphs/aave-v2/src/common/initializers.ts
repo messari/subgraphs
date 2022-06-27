@@ -14,20 +14,30 @@ import {
   UsageMetricsDailySnapshot,
 } from "../../generated/schema";
 import { getMarketRates } from "../modules/Market";
+import { getAssetPriceInUSDC } from "../modules/Price";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./tokens";
 import { Address, BigDecimal, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { getCurrentRewardEmissions, getCurrentRewardEmissionsUSD } from "../modules/Rewards";
 import { IPriceOracleGetter } from "../../generated/templates/LendingPool/IPriceOracleGetter";
-import { getAssetPriceInUSDC } from "../modules/Price";
 
 export function getPriceOracle(): IPriceOracleGetter {
   // priceOracle is set the address of the price oracle contract of the 
   // address provider contract, pulled from context
   // const protocolId = getProtocolIdFromCtx();
   const lendingProtocol = getOrCreateLendingProtocol(constants.PROTOCOL_ADDRESS);
-  const priceOracle = lendingProtocol.protocolPriceOracle;
+  const priceOracle = lendingProtocol._protocolPriceOracle;
   
   return IPriceOracleGetter.bind(Address.fromString(priceOracle));
+}
+
+export function getFallbackPriceOracle(): IPriceOracleGetter {
+  // priceOracle is set the address of the price oracle contract of the 
+  // address provider contract, pulled from context
+  // const protocolId = getProtocolIdFromCtx();
+  const lendingProtocol = getOrCreateLendingProtocol(constants.PROTOCOL_ADDRESS);
+  const fallbackPriceOracle = lendingProtocol._fallbackPriceOracle;
+
+  return IPriceOracleGetter.bind(Address.fromString(fallbackPriceOracle));
 }
 
 export function getOrCreateAccount(id: string): Account {
@@ -116,7 +126,7 @@ export function getOrCreateLendingProtocol(lendingProtocolId: string): LendingPr
     lendingProtocol.totalBorrowBalanceUSD = constants.BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeBorrowUSD = constants.BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeLiquidateUSD = constants.BIGDECIMAL_ZERO;
-    lendingProtocol.protocolPriceOracle = constants.PRICE_ORACLE_ADDRESS;
+    lendingProtocol._protocolPriceOracle = constants.PRICE_ORACLE_ADDRESS;
 
     lendingProtocol.save();
   }

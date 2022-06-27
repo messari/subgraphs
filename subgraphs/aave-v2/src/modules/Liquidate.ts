@@ -15,6 +15,7 @@ import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 export function createLiquidateEntity(
   event: ethereum.Event,
   market: Market,
+  user: string,
   debtAsset: string,
   collateralAsset: string,
   liquidator: string,
@@ -35,7 +36,7 @@ export function createLiquidateEntity(
   liquidate.protocol = protocol.id;
   liquidate.asset = collateralAsset;
   liquidate.amount = amount;
-  liquidate.liquidatee = event.transaction.from.toHexString();
+  liquidate.liquidatee = user;
 
   const amountUSD = market.inputTokenPriceUSD.times(
     amount

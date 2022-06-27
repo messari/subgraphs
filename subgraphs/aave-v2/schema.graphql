@@ -232,7 +232,10 @@ type LendingProtocol implements Protocol @entity {
   mintedTokens: [Token!]
 
   " String of the address of the current price oracle on the protocol "
-  protocolPriceOracle: String!
+  _protocolPriceOracle: String!
+
+  " String of the address of the current fallback price oracle on the protocol "
+  _fallbackPriceOracle: String!
 
   ##### Quantitative Data #####
 

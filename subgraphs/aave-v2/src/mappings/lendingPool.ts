@@ -136,6 +136,7 @@ export function handleRepay(event: Repay): void {
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
+  const user = event.params.user.toHexString();
   const debtAsset = event.params.debtAsset.toHexString();
   const collateralAsset = event.params.collateralAsset.toHexString();
   const liquidator = event.params.liquidator.toHexString();
@@ -146,6 +147,7 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   createLiquidateEntity(
     event,
     market,
+    user,
     debtAsset,
     collateralAsset,
     liquidator,
