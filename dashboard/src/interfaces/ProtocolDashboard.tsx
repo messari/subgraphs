@@ -11,6 +11,7 @@ import { useNavigate } from "react-router";
 import { isValidHttpUrl, NewClient } from "../utils";
 import AllDataTabs from "./AllDataTabs";
 import { DashboardHeader } from "../graphs/DashboardHeader";
+import useQueryAll from "../hooks/useQueryAll";
 
 function ProtocolDashboard() {
   const [searchParams] = useSearchParams();
@@ -126,15 +127,16 @@ function ProtocolDashboard() {
       { client, variables: { protocolId: protocolIdString } },
     );
 
-  const [
-    getPoolsListData,
-    { data: poolsListData, loading: poolListLoading, error: poolsListError, refetch: poolsListRefetch },
-  ] = useLazyQuery(
-    gql`
-      ${poolsQuery}
-    `,
-    { client },
-  );
+  const {
+    data: poolsListData,
+    loading: poolListLoading,
+    error: poolsListError,
+  } = useQueryAll({
+    uri: subgraphToQuery.url,
+    query: poolsQuery,
+    attrName: "liquidityPools",
+  });
+
   const [
     getPoolTimeseriesData,
     {
@@ -248,12 +250,6 @@ function ProtocolDashboard() {
   }, [hourlyUsageError]);
 
   useEffect(() => {
-    if (poolsListError) {
-      poolsListRefetch();
-    }
-  }, [poolsListError]);
-
-  useEffect(() => {
     if (poolTimeseriesError) {
       poolTimeseriesRefetch();
     }
@@ -266,12 +262,12 @@ function ProtocolDashboard() {
   }, [poolOverviewError]);
 
   useEffect(() => {
-    if (tabValue === "2") {
-      getPoolsOverviewData();
-    } else if (tabValue === "3" || tabValue === "4") {
-      getPoolsListData();
-    }
-  }, [tabValue, getPoolsOverviewData, getPoolsListData]);
+    (async () => {
+      if (tabValue === "2") {
+        getPoolsOverviewData();
+      }
+    })();
+  }, [tabValue, getPoolsOverviewData]);
 
   useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
@@ -317,7 +313,7 @@ function ProtocolDashboard() {
         subgraphToQueryURL={subgraphToQuery.url}
         schemaVersion={schemaVersion}
       />
-      {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (
+      {(protocolSchemaQueryLoading || loading || poolListLoading) && !!subgraphToQuery.url ? (
         <CircularProgress sx={{ margin: 6 }} size={50} />
       ) : null}
       <ErrorDisplay
@@ -326,46 +322,47 @@ function ProtocolDashboard() {
         subgraphToQuery={subgraphToQuery}
         setSubgraphToQuery={(x) => setSubgraphToQuery(x)}
       />
-      {!!data && (
-        <AllDataTabs
-          data={data}
-          entitiesData={entitiesData}
-          tabValue={tabValue}
-          events={events}
-          pools={pools}
-          poolsListData={poolsListData}
-          poolListLoading={poolListLoading}
-          poolsListError={poolsListError}
-          poolNames={PoolNames[data.protocols[0].type]}
-          poolId={poolId}
-          poolData={poolData}
-          protocolFields={protocolFields}
-          protocolTableData={protocolTableData}
-          subgraphToQueryURL={subgraphToQuery.url}
-          skipAmt={skipAmt}
-          poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
-          poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
-          protocolTimeseriesData={{
-            financialsDailySnapshots: financialsData?.financialsDailySnapshots,
-            usageMetricsDailySnapshots: dailyUsageData?.usageMetricsDailySnapshots,
-            usageMetricsHourlySnapshots: hourlyUsageData?.usageMetricsHourlySnapshots,
-          }}
-          protocolTimeseriesLoading={{
-            financialsDailySnapshots: financialsLoading,
-            usageMetricsDailySnapshots: dailyUsageLoading,
-            usageMetricsHourlySnapshots: hourlyUsageLoading,
-          }}
-          protocolTimeseriesError={{
-            financialsDailySnapshots: financialsError,
-            usageMetricsDailySnapshots: dailyUsageError,
-            usageMetricsHourlySnapshots: hourlyUsageError,
-          }}
-          setPoolId={(x) => setPoolId(x)}
-          handleTabChange={(x, y) => handleTabChange(x, y)}
-          setProtocolId={(x) => setprotocolId(x)}
-          paginate={(x) => paginate(x)}
-        />
-      )}
+      {!!data &&
+        JSON.stringify(poolsListData) !== "{}" && ( // TODO: make check more robust
+          <AllDataTabs
+            data={data}
+            entitiesData={entitiesData}
+            tabValue={tabValue}
+            events={events}
+            pools={pools}
+            poolsListData={poolsListData}
+            poolListLoading={poolListLoading}
+            poolsListError={poolsListError}
+            poolNames={PoolNames[data.protocols[0].type]}
+            poolId={poolId}
+            poolData={poolData}
+            protocolFields={protocolFields}
+            protocolTableData={protocolTableData}
+            subgraphToQueryURL={subgraphToQuery.url}
+            skipAmt={skipAmt}
+            poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
+            poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
+            protocolTimeseriesData={{
+              financialsDailySnapshots: financialsData?.financialsDailySnapshots,
+              usageMetricsDailySnapshots: dailyUsageData?.usageMetricsDailySnapshots,
+              usageMetricsHourlySnapshots: hourlyUsageData?.usageMetricsHourlySnapshots,
+            }}
+            protocolTimeseriesLoading={{
+              financialsDailySnapshots: financialsLoading,
+              usageMetricsDailySnapshots: dailyUsageLoading,
+              usageMetricsHourlySnapshots: hourlyUsageLoading,
+            }}
+            protocolTimeseriesError={{
+              financialsDailySnapshots: financialsError,
+              usageMetricsDailySnapshots: dailyUsageError,
+              usageMetricsHourlySnapshots: hourlyUsageError,
+            }}
+            setPoolId={(x) => setPoolId(x)}
+            handleTabChange={(x, y) => handleTabChange(x, y)}
+            setProtocolId={(x) => setprotocolId(x)}
+            paginate={(x) => paginate(x)}
+          />
+        )}
     </div>
   );
 }
