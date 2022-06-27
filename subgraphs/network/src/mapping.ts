@@ -6,7 +6,6 @@ import {
   Bytes,
   BigInt,
   BigDecimal,
-  log,
 } from "@graphprotocol/graph-ts";
 import { Author, Chunk } from "../generated/schema";
 import { BIGINT_ZERO, INT_NINE, INT_ZERO } from "./constants";
@@ -18,88 +17,37 @@ import { exponentToBigDecimal } from "./utils";
 /////////////////
 
 export class BlockData {
-  height: BigInt;
-  hash: Bytes;
-  timestamp: BigInt;
-  author: Bytes;
-  size: BigInt;
-  baseFeePerGas: BigInt;
-  difficulty: BigInt;
-  gasLimit: BigInt;
-  gasUsed: BigInt;
-  gasPrice: BigInt;
-  burntFees: BigInt;
-  chunkCount: BigInt;
-  transactionCount: BigInt;
-  rewards: BigInt;
   constructor(
-    height: BigInt,
-    hash: Bytes,
-    timestamp: BigInt,
-    author: Bytes,
-    difficulty: BigInt,
-    gasLimit: BigInt,
-    gasUsed: BigInt,
-    size: BigInt,
-    gasPrice: BigInt,
-    baseFeePerGas: BigInt,
-    burntFees: BigInt,
-    chunkCount: BigInt,
-    transactionCount: BigInt,
-    rewards: BigInt
-  ) {
-    this.height = height;
-    this.hash = hash;
-    this.timestamp = timestamp;
-    this.author = author;
-    this.size = size;
-    this.baseFeePerGas = baseFeePerGas;
-    this.difficulty = difficulty;
-    this.gasLimit = gasLimit;
-    this.gasUsed = gasUsed;
-    this.gasPrice = gasPrice;
-    this.burntFees = burntFees;
-    this.chunkCount = chunkCount;
-    this.transactionCount = transactionCount;
-    this.rewards = rewards;
-  }
+    public readonly height: BigInt,
+    public readonly hash: Bytes,
+    public readonly timestamp: BigInt,
+    public readonly author: Bytes,
+    public readonly difficulty: BigInt,
+    public readonly gasLimit: BigInt,
+    public readonly gasUsed: BigInt,
+    public readonly size: BigInt,
+    public readonly gasPrice: BigInt,
+    public readonly baseFeePerGas: BigInt,
+    public readonly burntFees: BigInt,
+    public readonly chunkCount: BigInt,
+    public readonly transactionCount: BigInt,
+    public readonly rewards: BigInt
+  ) {}
 }
 
 export class UpdateNetworkData {
-  height: BigInt;
-  timestamp: BigInt;
-  newDifficulty: BigInt;
-  newGasUsed: BigInt;
-  gasLimit: BigInt;
-  newBurntFees: BigInt;
-  newRewards: BigInt;
-  newTransactions: BigInt;
-  newSize: BigInt;
-  totalSupply: BigInt;
-
   constructor(
-    height: BigInt,
-    timestamp: BigInt,
-    newDifficulty: BigInt,
-    newGasUsed: BigInt,
-    gasLimit: BigInt,
-    newBurntFees: BigInt,
-    newRewards: BigInt,
-    newTransactions: BigInt,
-    newSize: BigInt,
-    totalSupply: BigInt
-  ) {
-    this.height = height;
-    this.timestamp = timestamp;
-    this.newDifficulty = newDifficulty;
-    this.newGasUsed = newGasUsed;
-    this.gasLimit = gasLimit;
-    this.newBurntFees = newBurntFees;
-    this.newRewards = newRewards;
-    this.newTransactions = newTransactions;
-    this.newSize = newSize;
-    this.totalSupply = totalSupply;
-  }
+    public readonly height: BigInt,
+    public readonly timestamp: BigInt,
+    public readonly newDifficulty: BigInt,
+    public readonly newGasUsed: BigInt,
+    public readonly gasLimit: BigInt,
+    public readonly newBurntFees: BigInt,
+    public readonly newRewards: BigInt,
+    public readonly newTransactions: BigInt,
+    public readonly newSize: BigInt,
+    public readonly totalSupply: BigInt
+  ) {}
 }
 
 ////////////////////////
@@ -107,7 +55,6 @@ export class UpdateNetworkData {
 ////////////////////////
 
 export function handleArweaveBlock(block: arweave.Block): void {
-  // TODO: check in subgraph to ensure correctness
   let blockDifficulty = BigInt.fromString(
     BigDecimal.fromString(parseInt(block.diff.toHexString(), 16).toString())
       .truncate(0)
@@ -117,13 +64,6 @@ export function handleArweaveBlock(block: arweave.Block): void {
   let blockSize = BigInt.fromString(
     BigDecimal.fromString(
       parseInt(block.blockSize.toHexString(), 16).toString()
-    )
-      .truncate(0)
-      .toString()
-  );
-  let blockRewards = BigInt.fromString(
-    BigDecimal.fromString(
-      parseInt(block.rewardPool.toHexString(), 16).toString()
     )
       .truncate(0)
       .toString()
@@ -143,7 +83,7 @@ export function handleArweaveBlock(block: arweave.Block): void {
     BIGINT_ZERO,
     BIGINT_ZERO,
     BigInt.fromI32(block.txs.length),
-    blockRewards // TODO: not what we think of rewards:
+    BIGINT_ZERO // the "rewards" in the blockhandler is a pool of rewards ready to distribute
   );
   createBlock(blockData);
 
@@ -155,7 +95,7 @@ export function handleArweaveBlock(block: arweave.Block): void {
     BIGINT_ZERO,
     BIGINT_ZERO,
     BIGINT_ZERO,
-    blockRewards,
+    BIGINT_ZERO,
     BigInt.fromI32(block.txs.length),
     blockSize,
     BIGINT_ZERO
