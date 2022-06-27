@@ -23,7 +23,7 @@ export function getAssetPriceInUSDC(tokenAddress: Address): BigDecimal {
       oracle.try_getAssetPrice(Address.fromString(USDC_TOKEN_ADDRESS)),
       BIGINT_ZERO,
     );
-  
+
     return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
   }
 

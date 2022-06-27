@@ -14,20 +14,20 @@ import {
   LendingPoolAddressesProvider as AddressProviderContract,
 } from "../../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 
-// export function handleProxyCreated(event: ProxyCreated): void {
-//   // Event handler for lending pool or configurator contract creation
-//   const pool = event.params.id.toString();
-//   const address = event.params.newAddress;
-//   const context = initiateContext(event.address);
+export function handleProxyCreated(event: ProxyCreated): void {
+  // Event handler for lending pool or configurator contract creation
+  const pool = event.params.id.toString();
+  const address = event.params.newAddress;
+  const context = initiateContext(event.address);
 
-//   log.info("[ProxyCreated]: {}", [pool]);
+  log.info("[ProxyCreated]: {}", [pool]);
 
-//   if (pool == "LENDING_POOL") {
-//     startIndexingLendingPool(address, context);
-//   } else if (pool == "LENDING_POOL_CONFIGURATOR") {
-//     startIndexingLendingPoolConfigurator(address, context);
-//   }
-// }
+  if (pool == "LENDING_POOL") {
+    startIndexingLendingPool(address, context);
+  } else if (pool == "LENDING_POOL_CONFIGURATOR") {
+    startIndexingLendingPoolConfigurator(address, context);
+  }
+}
 
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
   log.info("[PriceOracleUpdated] OracleAddress: {}", [event.params.newAddress.toHexString()]);
@@ -76,10 +76,7 @@ function initiateContext(addrProvider: Address): DataSourceContext {
   // Initialize the protocol entity
   const lendingProtocol = getOrCreateLendingProtocol();
 
-  const priceOracle = utils.readValue<Address>(
-    contract.try_getPriceOracle(),
-    Address.fromString(ZERO_ADDRESS),
-  );
+  const priceOracle = utils.readValue<Address>(contract.try_getPriceOracle(), Address.fromString(ZERO_ADDRESS));
 
   lendingProtocol._protocolPriceOracle = priceOracle.toHexString();
   lendingProtocol.save();

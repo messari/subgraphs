@@ -38,6 +38,20 @@ graph build
 
 To deploy follow the steps above. You may put your hosted service endpoint in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) just how messari's is set to take advantage of the commands.
 
+## Aave Transaction Flow
+
+When a transaction occurs in the `lendingPool` the following events are emitted in this order.
+
+1. A `transfer` event occurs (from the null address)
+   1. This signifies new interest in the market since the last transaction
+2. Next a `reserveDataUpdated` event is emitted
+   1. This is equivalent to `AccrueInterest` in compound.
+   2. This event is used to update all of the rates, prices, and balances in the subgraph.
+3. To get current supply balance we take use a contract call to `totalSupply()` in the respective aToken
+4. To get the current borrow balance we call `totalSupply()` in both the VariableDebtToken and StableDebtToken
+5. Finally we handle the actual transaction event (ie, deposit, borrow, repay, withdraw, liquidate)
+   1. This handler is designed to only update the metrics that have to do with those events. No other metrics are touched here. Everything should be taken care of before this.
+
 ### Resources
 
 - Aave V2 Contract Addresses: https://docs.aave.com/developers/v/2.0/deployed-contracts/deployed-contracts

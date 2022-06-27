@@ -1,8 +1,4 @@
-import {
-  getOrCreateMarket,
-  getOrCreateLendingProtocol,
-  getOrCreateMarketDailySnapshot,
-} from "./initializers";
+import { getOrCreateMarket, getOrCreateLendingProtocol, getOrCreateMarketDailySnapshot } from "./initializers";
 import * as constants from "./constants";
 import { Market, Token } from "../../../../generated/schema";
 import { AToken } from "../../../../generated/templates/AToken/AToken";

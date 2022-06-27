@@ -122,7 +122,7 @@ export namespace Protocol {
   export const NAME = "Aave v2";
   export const SLUG = "aave-v2";
   export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.2.1";
+  export const SUBGRAPH_VERSION = "1.2.2";
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 
@@ -144,21 +144,10 @@ export class NetworkSpecificConstant {
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   let network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
-    let address = dataSource.address();
-    if (address == MAINNET_ADDRESS) {
-      return new NetworkSpecificConstant(
-        Address.fromString("0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"),
-        Network.MAINNET,
-      );
-    } else if (address == AMM_ADDRESS) {
-      return new NetworkSpecificConstant(
-        Address.fromString("0xAcc030EF66f9dFEAE9CbB0cd1B25654b82cFA8d5"),
-        Network.MAINNET,
-      );
-    } else {
-      log.error("[getNetworkSpecificConstant] Unsupported address: {}", [address.toHexString()]);
-      return new NetworkSpecificConstant(Address.fromString(ZERO_ADDRESS), "");
-    }
+    return new NetworkSpecificConstant(
+      Address.fromString("0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"),
+      Network.MAINNET,
+    );
   } else if (equalsIgnoreCase(network, Network.AVALANCHE)) {
     return new NetworkSpecificConstant(
       Address.fromString("0xb6A86025F0FE1862B372cb0ca18CE3EDe02A318f"),

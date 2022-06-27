@@ -25,6 +25,8 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // This event handler updates the deposit/borrow rates on a market
   //  when the state of a reserve is updated
 
+  log.warning("reserve: {}", [event.transaction.hash.toHexString()]);
+
   const reserveAddress = event.params.reserve.toHexString();
   const market = getOrCreateMarket(event, reserveAddress);
 

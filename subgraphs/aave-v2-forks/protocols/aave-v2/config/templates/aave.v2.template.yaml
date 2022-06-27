@@ -19,8 +19,8 @@ dataSources:
         - name: LendingPoolAddressesProvider
           file: ./abis/LendingPoolAddressesProvider.json
       eventHandlers:
-        # - event: ProxyCreated(bytes32,indexed address)
-        #   handler: handleProxyCreated
+        - event: ProxyCreated(bytes32,indexed address)
+          handler: handleProxyCreated
         - event: PriceOracleUpdated(indexed address)
           handler: handlePriceOracleUpdated
         - event: LendingPoolUpdated(indexed address)
@@ -160,4 +160,6 @@ templates:
           handler: handleATokenBurn
         - event: Mint(indexed address,uint256,uint256)
           handler: handleATokenMint
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleATokenTransfer
       file: ./protocols/aave-v2/src/mappings/aToken.ts

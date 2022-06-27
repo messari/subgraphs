@@ -1,4 +1,17 @@
-import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, BIGINT_ZERO, getNetworkSpecificConstant, LendingType, Protocol, ProtocolType, RewardTokenType, RiskType, SECONDS_PER_DAY, SECONDS_PER_HOUR, ZERO_ADDRESS } from "./constants";
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  getNetworkSpecificConstant,
+  LendingType,
+  Protocol,
+  ProtocolType,
+  RewardTokenType,
+  RiskType,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+  ZERO_ADDRESS,
+} from "./constants";
 import {
   Token,
   Market,
@@ -72,7 +85,7 @@ export function getOrCreateToken(address: Address): Token {
 }
 
 export function getOrCreateRewardToken(address: Address, type: string): RewardToken {
-  let id: string = `${type}-${address}`;
+  let id: string = type.concat("-").concat(address.toHexString());
   let rewardToken = RewardToken.load(id);
 
   if (!rewardToken) {
@@ -140,8 +153,6 @@ export function getOrCreateFinancialsDailySnapshot(block: ethereum.Block): Finan
 
     financialsSnapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
     financialsSnapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
-
-    financialsSnapshot.save();
   }
 
   financialsSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
@@ -234,9 +245,8 @@ export function getOrCreateMarket(event: ethereum.Event, marketId: string): Mark
     market.save();
   }
 
-  const currentPrice = getAssetPriceInUSDC(Address.fromString(market.id));
-  market.inputTokenPriceUSD = currentPrice;
-  market.outputTokenPriceUSD = currentPrice;
+  market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+  market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
 
   // No need to execute the below code until block 12317479 when
   // incentive controller was deployed and started calculating rewards
@@ -264,8 +274,6 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, market: Ma
     marketSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     marketSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     marketSnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-
-    marketSnapshot.save();
   }
   marketSnapshot.protocol = market.protocol;
   marketSnapshot.market = market.id;
@@ -310,8 +318,6 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, market: M
     marketSnapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     marketSnapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     marketSnapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
-
-    marketSnapshot.save();
   }
   marketSnapshot.protocol = market.protocol;
   marketSnapshot.market = market.id;
