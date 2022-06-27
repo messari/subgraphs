@@ -44,8 +44,6 @@ dataSources:
       abis:
         - name: HoneyFarm
           file: ./abis/honeyswap/HoneyFarm.json
-        - name: TokenABI
-          file: ./abis/honeyswap/ERC20.json
       eventHandlers:
         - event: PoolAdded(indexed address,uint256)
           handler: handlePoolAdded
