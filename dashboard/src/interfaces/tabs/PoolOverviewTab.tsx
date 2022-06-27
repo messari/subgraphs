@@ -18,6 +18,7 @@ const ChangePageEle = styled("div")`
 `;
 
 interface PoolOverviewTabProps {
+  totalPoolCount?: number;
   pools: any[];
   protocolType: string;
   subgraphToQueryURL: string;
@@ -30,6 +31,7 @@ interface PoolOverviewTabProps {
 
 // This component is for each individual subgraph
 function PoolOverviewTab({
+  totalPoolCount,
   pools,
   setPoolId,
   protocolType,
@@ -41,8 +43,9 @@ function PoolOverviewTab({
   const [tableIssues, setTableIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>(
     [],
   );
+  const [currentPage, setCurrentPage] = useState(1);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
-
+  console.log(totalPoolCount);
   const navigate = useNavigate();
   const href = new URL(window.location.href);
   const p = new URLSearchParams(href.search);
@@ -68,6 +71,7 @@ function PoolOverviewTab({
           paginate(skipAmt + 50);
           p.set("skipAmt", (skipAmt + 50).toString());
           navigate("?" + p.toString());
+          setCurrentPage((prev) => prev + 1);
           setTableIssues([]);
         }}
       >
@@ -86,6 +90,7 @@ function PoolOverviewTab({
           paginate(0);
           p.delete("skipAmt");
           navigate("?" + p.toString());
+          setCurrentPage((prev) => prev - 1);
           setTableIssues([]);
         }}
       >
@@ -101,6 +106,7 @@ function PoolOverviewTab({
           paginate(skipAmt - 50);
           p.set("skipAmt", (skipAmt - 50).toString());
           navigate("?" + p.toString());
+          setCurrentPage((prev) => prev - 1);
           setTableIssues([]);
         }}
       >
@@ -141,6 +147,7 @@ function PoolOverviewTab({
       />
       <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
         {prevButton}
+        <span>{totalPoolCount ? `Page ${currentPage} out of ${Math.ceil(totalPoolCount / 50)}` : null}</span>
         {nextButton}
       </div>
     </>
