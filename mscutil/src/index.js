@@ -101,7 +101,6 @@ function installDefaultPackage() {
 
 function install(submod) {    
     switch (submod) {
-	//TODO refactor and confirm if files or folders will be overwritten
       case 'subgraph-manifest':
 	try {
 		fs.readFileSync(appRoot+'/subgraph.yaml')
@@ -140,7 +139,7 @@ function install(submod) {
 		    }
 		  }());
 		}())
-		var output = yaml.dump(y); // TODO warning: no comments afterward.
+		var output = yaml.dump(y);
 		fs.closeSync(fs.openSync(appRoot+'/subgraph.yaml', "w"));
 		fs.writeFileSync(appRoot+'/subgraph.yaml',output,function(err) { console.error(err); });
 	} else {
@@ -212,7 +211,8 @@ function install(submod) {
 function remove(submod) {
     // Always ask for a confirmation before proceeding.  Later, check git.
     switch (submod) {
-	//TODO refactor and confirm if files or folders will be overwritten
+	//Note: Removal is non-recursive, or otherwise uses _reference_ specific paths.
+	//Confirmation not needed, but unique pathing strongly recommended.
       case 'price-oracle':
 	// ./abis/Prices/
 	fse.removeSync(appRoot+"/abis/Prices");
@@ -236,7 +236,7 @@ function remove(submod) {
 		    source.mapping.abis = sma;
 		  }());
 		}())
-		var output = yaml.dump(y); // TODO warning: no comments afterward.
+		var output = yaml.dump(y);
 		fs.closeSync(fs.openSync(appRoot+'/subgraph.yaml', "w"));
 		fs.writeFileSync(appRoot+'/subgraph.yaml',output,function(err) { console.error(err); });
 	} else {
