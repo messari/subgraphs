@@ -57,92 +57,46 @@ enum EventType {
 ////////////////////////
 
 export class ProtocolData {
-  comptrollerAddr: Address;
-  name: string;
-  slug: string;
-  schemaVersion: string;
-  subgraphVersion: string;
-  methodologyVersion: string;
-  network: string;
-  liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>;
-  oracleResult: ethereum.CallResult<Address>;
   constructor(
-    comptrollerAddr: Address,
-    name: string,
-    slug: string,
-    schemaVersion: string,
-    subgraphVersion: string,
-    methodologyVersion: string,
-    network: string,
-    liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>,
-    oracleResult: ethereum.CallResult<Address>
-  ) {
-    this.comptrollerAddr = comptrollerAddr;
-    this.name = name;
-    this.slug = slug;
-    this.schemaVersion = schemaVersion;
-    this.subgraphVersion = subgraphVersion;
-    this.methodologyVersion = methodologyVersion;
-    this.network = network;
-    this.liquidationIncentiveMantissaResult =
-      liquidationIncentiveMantissaResult;
-    this.oracleResult = oracleResult;
-  }
+    public readonly comptrollerAddr: Address,
+    public readonly name: string,
+    public readonly slug: string,
+    public readonly schemaVersion: string,
+    public readonly subgraphVersion: string,
+    public readonly methodologyVersion: string,
+    public readonly network: string,
+    public readonly liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>,
+    public readonly oracleResult: ethereum.CallResult<Address>
+  ) {}
 }
 
 export class TokenData {
-  address: Address;
-  name: string;
-  symbol: string;
-  decimals: i32;
-  constructor(address: Address, name: string, symbol: string, decimals: i32) {
-    this.address = address;
-    this.name = name;
-    this.symbol = symbol;
-    this.decimals = decimals;
-  }
+  constructor(
+    public readonly address: Address,
+    public readonly name: string,
+    public readonly symbol: string,
+    public readonly decimals: i32
+  ) {}
 }
 
 export class MarketListedData {
-  protocol: LendingProtocol;
-  token: TokenData;
-  cToken: TokenData;
-  cTokenReserveFactorMantissa: BigInt;
   constructor(
-    protocol: LendingProtocol,
-    token: TokenData,
-    cToken: TokenData,
-    cTokenReserveFactorMantissa: BigInt
-  ) {
-    this.protocol = protocol;
-    this.token = token;
-    this.cToken = cToken;
-    this.cTokenReserveFactorMantissa = cTokenReserveFactorMantissa;
-  }
+    public readonly protocol: LendingProtocol,
+    public readonly token: TokenData,
+    public readonly cToken: TokenData,
+    public readonly cTokenReserveFactorMantissa: BigInt
+  ) {}
 }
 
 export class UpdateMarketData {
-  totalSupplyResult: ethereum.CallResult<BigInt>;
-  exchangeRateStoredResult: ethereum.CallResult<BigInt>;
-  supplyRateResult: ethereum.CallResult<BigInt>;
-  borrowRateResult: ethereum.CallResult<BigInt>;
-  getUnderlyingPriceResult: ethereum.CallResult<BigInt>;
-  unitPerYear: i32;
   constructor(
-    totalSupplyResult: ethereum.CallResult<BigInt>,
-    exchangeRateStoredResult: ethereum.CallResult<BigInt>,
-    supplyRateResult: ethereum.CallResult<BigInt>,
-    borrowRateResult: ethereum.CallResult<BigInt>,
-    getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
-    unitPerYear: i32
-  ) {
-    this.totalSupplyResult = totalSupplyResult;
-    this.exchangeRateStoredResult = exchangeRateStoredResult;
-    this.supplyRateResult = supplyRateResult;
-    this.borrowRateResult = borrowRateResult;
-    this.getUnderlyingPriceResult = getUnderlyingPriceResult;
-    this.unitPerYear = unitPerYear;
-  }
+    public readonly totalSupplyResult: ethereum.CallResult<BigInt>,
+    public readonly exchangeRateStoredResult: ethereum.CallResult<BigInt>,
+    public readonly supplyRateResult: ethereum.CallResult<BigInt>,
+    public readonly borrowRateResult: ethereum.CallResult<BigInt>,
+    public readonly getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
+    public readonly unitPerYear: i32
+  ) {}
 }
 
 ////////////////////////////////////
