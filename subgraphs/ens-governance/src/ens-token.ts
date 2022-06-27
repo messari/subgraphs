@@ -5,7 +5,7 @@ import {
   Transfer,
 } from "../generated/ENSToken/ENSToken";
 import {
-  getTokenHolder,
+  getOrCreateTokenHolder,
   getOrCreateDelegate,
   toDecimal,
   getGovernance,
@@ -16,7 +16,9 @@ import {
 
 // DelegateChanged(indexed address,indexed address,indexed address)
 export function handleDelegateChanged(event: DelegateChanged): void {
-  let tokenHolder = getTokenHolder(event.params.delegator.toHexString());
+  let tokenHolder = getOrCreateTokenHolder(
+    event.params.delegator.toHexString()
+  );
   let previousDelegate = getOrCreateDelegate(
     event.params.fromDelegate.toHexString()
   );
@@ -69,8 +71,8 @@ export function handleTransfer(event: Transfer): void {
   const to = event.params.to.toHexString();
   const value = event.params.value;
 
-  let fromHolder = getTokenHolder(from);
-  let toHolder = getTokenHolder(to);
+  let fromHolder = getOrCreateTokenHolder(from);
+  let toHolder = getOrCreateTokenHolder(to);
   let governance = getGovernance();
 
   // Deduct from from holder balance + decrement gov token holders

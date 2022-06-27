@@ -86,8 +86,6 @@ export function getGovernance(): Governance {
     governance.proposalsQueued = BIGINT_ZERO;
     governance.proposalsExecuted = BIGINT_ZERO;
     governance.proposalsCanceled = BIGINT_ZERO;
-
-    governance.save();
   }
 
   return governance;
@@ -115,8 +113,6 @@ export function getGovernanceFramework(
     governanceFramework.proposalThreshold = contract.proposalThreshold();
     governanceFramework.quorumNumerator = contract.quorumNumerator();
     governanceFramework.quorumDenominator = contract.quorumDenominator();
-
-    governanceFramework.save();
   }
 
   return governanceFramework;
@@ -124,13 +120,16 @@ export function getGovernanceFramework(
 
 export function getOrCreateProposal(
   id: string,
-  createIfNotFound: boolean = true
+  createIfNotFound: boolean = true,
+  save: boolean = false
 ): Proposal {
   let proposal = Proposal.load(id);
 
-  if (proposal == null && createIfNotFound) {
+  if (!proposal && createIfNotFound) {
     proposal = new Proposal(id);
-    proposal.save();
+    if (save) {
+      proposal.save();
+    }
 
     let governance = getGovernance();
     governance.proposals = governance.proposals.plus(BIGINT_ONE);
@@ -142,7 +141,8 @@ export function getOrCreateProposal(
 
 export function getOrCreateDelegate(
   address: string,
-  createIfNotFound: boolean = true
+  createIfNotFound: boolean = true,
+  save: boolean = true
 ): Delegate {
   let delegate = Delegate.load(address);
 
@@ -150,30 +150,38 @@ export function getOrCreateDelegate(
     delegate = new Delegate(address);
     delegate.delegatedVotesRaw = BIGINT_ZERO;
     delegate.delegatedVotes = BIGDECIMAL_ZERO;
-    delegate.numberVotes = 0;
     delegate.tokenHoldersRepresentedAmount = 0;
+    delegate.numberVotes = 0;
+    if (save) {
+      delegate.save();
+    }
 
     if (address != ZERO_ADDRESS) {
       let governance = getGovernance();
       governance.totalDelegates = governance.totalDelegates.plus(BIGINT_ONE);
       governance.save();
     }
-
-    delegate.save();
   }
 
   return delegate as Delegate;
 }
 
-export function getTokenHolder(address: string): TokenHolder {
+export function getOrCreateTokenHolder(
+  address: string,
+  createIfNotFound: boolean = true,
+  save: boolean = true
+): TokenHolder {
   let tokenHolder = TokenHolder.load(address);
 
-  if (tokenHolder == null) {
+  if (!tokenHolder && createIfNotFound) {
     tokenHolder = new TokenHolder(address);
     tokenHolder.tokenBalanceRaw = BIGINT_ZERO;
     tokenHolder.tokenBalance = BIGDECIMAL_ZERO;
     tokenHolder.totalTokensHeldRaw = BIGINT_ZERO;
     tokenHolder.totalTokensHeld = BIGDECIMAL_ZERO;
+    if (save) {
+      tokenHolder.save();
+    }
 
     if (address != ZERO_ADDRESS) {
       let governance = getGovernance();
@@ -182,9 +190,7 @@ export function getTokenHolder(address: string): TokenHolder {
       );
       governance.save();
     }
-
-    tokenHolder.save();
   }
 
-  return tokenHolder;
+  return tokenHolder as TokenHolder;
 }
