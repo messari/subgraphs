@@ -135,14 +135,18 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_minter", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_minter", "type": "address" }
+    ],
     "name": "_addMinter",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_minter", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_minter", "type": "address" }
+    ],
     "name": "_removeMinter",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -222,7 +226,9 @@
   {
     "inputs": [],
     "name": "getMinters",
-    "outputs": [{ "internalType": "address[]", "name": "_minters", "type": "address[]" }],
+    "outputs": [
+      { "internalType": "address[]", "name": "_minters", "type": "address[]" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -274,14 +280,18 @@
   {
     "inputs": [],
     "name": "owner",
-    "outputs": [{ "internalType": "address payable", "name": "", "type": "address" }],
+    "outputs": [
+      { "internalType": "address payable", "name": "", "type": "address" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "pendingOwner",
-    "outputs": [{ "internalType": "address payable", "name": "", "type": "address" }],
+    "outputs": [
+      { "internalType": "address payable", "name": "", "type": "address" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
