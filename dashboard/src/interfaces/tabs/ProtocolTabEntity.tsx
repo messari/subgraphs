@@ -94,6 +94,33 @@ function ProtocolTabEntity({
                 }
                 dataFieldMetrics[fieldName].negative.count += 1;
               }
+              if (fieldName.endsWith("TotalRevenueUSD") && !dataFieldMetrics[fieldName].revSumMismatchId) {
+                // store ID of first instance where total rev != supply + protocol rev
+                const fieldSplit = fieldName.split("TotalRevenueUSD");
+                if (
+                  !new BigNumber(dataFieldMetrics[`${fieldSplit[0]}ProtocolSideRevenueUSD`].sum)
+                    .plus(new BigNumber(dataFieldMetrics[`${fieldSplit[0]}SupplySideRevenueUSD`].sum))
+                    .isEqualTo(new BigNumber(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].sum))
+                ) {
+                  dataFieldMetrics[fieldName].revSumMismatchId = timeseriesInstance.id;
+                }
+              }
+              if (fieldName.endsWith("TransactionCount") && !dataFieldMetrics[fieldName].txSumMismatchId) {
+                // store ID of first instance where total tx != sum of all individual tx
+                const individualTxCountKeys = Object.keys(dataFieldMetrics).filter(
+                  (field) =>
+                    (field.startsWith("daily") || field.startsWith("hourly")) &&
+                    field.endsWith("Count") &&
+                    !field.endsWith("TransactionCount"),
+                );
+                const individualTxSum = individualTxCountKeys.reduce(
+                  (prev, currentKey) => prev.plus(new BigNumber(dataFieldMetrics[currentKey].sum)),
+                  new BigNumber(0),
+                );
+                if (!individualTxSum.isEqualTo(new BigNumber(dataFieldMetrics[fieldName].sum))) {
+                  dataFieldMetrics[fieldName].txSumMismatchId = timeseriesInstance.id;
+                }
+              }
               if (fieldName.includes("umulative")) {
                 if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
                   dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
@@ -249,42 +276,24 @@ function ProtocolTabEntity({
                 }
                 issues.push({ type: "SUM", message: "", fieldName: label, level });
               }
-              if (field.endsWith("TotalRevenueUSD")) {
+              if (dataFieldMetrics[field].revSumMismatchId) {
                 // if total revenue != protocol + supply revenue, add a warning
                 const fieldSplit = field.split("TotalRevenueUSD");
-                if (
-                  !new BigNumber(dataFieldMetrics[`${fieldSplit[0]}ProtocolSideRevenueUSD`].sum)
-                    .plus(new BigNumber(dataFieldMetrics[`${fieldSplit[0]}SupplySideRevenueUSD`].sum))
-                    .isEqualTo(new BigNumber(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].sum))
-                ) {
-                  issues.push({
-                    type: "TOTAL_REV",
-                    message: JSON.stringify(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].sum),
-                    level: "warning",
-                    fieldName: label,
-                  });
-                }
+                issues.push({
+                  type: "TOTAL_REV",
+                  message: JSON.stringify(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].revSumMismatchId),
+                  level: "warning",
+                  fieldName: label,
+                });
               }
-              if (field.endsWith("TransactionCount")) {
+              if (dataFieldMetrics[field].txSumMismatchId) {
                 // if total transactions != sum of all individual transactions, add a warning
-                const individualTxCountKeys = Object.keys(dataFieldMetrics).filter(
-                  (field) =>
-                    (field.startsWith("daily") || field.startsWith("hourly")) &&
-                    field.endsWith("Count") &&
-                    !field.endsWith("TransactionCount"),
-                );
-                const individualTxSum = individualTxCountKeys.reduce(
-                  (prev, currentKey) => prev.plus(new BigNumber(dataFieldMetrics[currentKey].sum)),
-                  new BigNumber(0),
-                );
-                if (!individualTxSum.isEqualTo(new BigNumber(dataFieldMetrics[field].sum))) {
-                  issues.push({
-                    type: "TOTAL_TX",
-                    message: JSON.stringify(dataFieldMetrics[field].sum),
-                    level: "warning",
-                    fieldName: label,
-                  });
-                }
+                issues.push({
+                  type: "TOTAL_TX",
+                  message: JSON.stringify(dataFieldMetrics[field].txSumMismatchId),
+                  level: "warning",
+                  fieldName: label,
+                });
               }
               if (
                 issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE")?.length === 0 &&

@@ -39,11 +39,11 @@ const messagesByLevel = (
       }
       if (issuesArray[x].type === "TOTAL_REV") {
         issuesMsg = `
-          ${issuesArray[x].fieldName} sum value does not equal protocol + supply revenue on snapshot id ${issuesArray[x].message}.`;
+          ${issuesArray[x].fieldName} sum value does not equal protocol + supply revenue starting from snapshot id ${issuesArray[x].message}.`;
       }
       if (issuesArray[x].type === "TOTAL_TX") {
         issuesMsg = `
-          ${issuesArray[x].fieldName} sum value does not equal sum of individual transactions on snapshot id ${issuesArray[x].message}.`;
+          ${issuesArray[x].fieldName} sum value does not equal sum of individual transactions starting from snapshot id ${issuesArray[x].message}.`;
       }
       if (issuesArray[x].type === "TVL-") {
         issuesMsg = `${issuesArray[x].fieldName} is below 1000.`;
