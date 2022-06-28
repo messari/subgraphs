@@ -291,7 +291,7 @@ type LendingProtocol implements Protocol @entity {
   ##### Add Ons #####
 
    " String of the address of the current price oracle on the protocol "
-  _protocolPriceOracle: String!
+  priceOracle: String!
 }
 
 ###############################
@@ -595,6 +595,9 @@ type Market @entity {
 
   " The stable debt token address correlated to the reserve asset "
   sToken: Token!
+
+  " An aggregate metric of the average borrow rate across all borrows "
+  liquidityIndex: BigInt!
 }
 
 #################################

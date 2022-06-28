@@ -2,16 +2,26 @@
 
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Market } from "../generated/schema";
+import { AToken } from "../generated/templates/AToken/AToken";
+import { StableDebtToken } from "../generated/templates/LendingPool/StableDebtToken";
+import { VariableDebtToken } from "../generated/templates/LendingPool/VariableDebtToken";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
+  bigIntToBigDecimal,
   BIGINT_ZERO,
   exponentToBigDecimal,
+  InterestRateSide,
+  InterestRateType,
   INT_FOUR,
   INT_TWO,
+  rayToWad,
+  RAY_OFFSET,
 } from "./constants";
 import {
+  createInterestRate,
+  getAssetPriceInUSDC,
   getOrCreateLendingProtocol,
   getOrCreateToken,
 } from "./helpers";
@@ -43,9 +53,9 @@ export function _handlePriceOracleUpdated(
   log.info("[PriceOracleUpdated] OracleAddress: {}", [
     newPriceOracle.toHexString(),
   ]);
-  const lendingProtocol = getOrCreateLendingProtocol(protocolData);
-  lendingProtocol._protocolPriceOracle = newPriceOracle.toHexString();
-  lendingProtocol.save();
+  let protocol = getOrCreateLendingProtocol(protocolData);
+  protocol.priceOracle = newPriceOracle.toHexString();
+  protocol.save();
 }
 
 export function _handleReserveInitialized(
@@ -102,6 +112,7 @@ export function _handleReserveInitialized(
   market.rewardTokenEmissionsUSD = [];
   market.sToken = stableDebtTokenEntity.id;
   market.vToken = variableDebtTokenEntity.id;
+  market.liquidityIndex = BIGINT_ZERO;
   market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
   market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
@@ -217,3 +228,127 @@ export function _handleReserveFactorChanged(
 ////////////////////////////////
 ///// Transaction Handlers /////
 ////////////////////////////////
+
+export function _handleReserveDataUpdated(
+  liquidityRate: BigInt, // deposit rate in ray
+  liquidityIndex: BigInt,
+  variableBorrowRate: BigInt,
+  stableBorrowRate: BigInt,
+  protocolData: ProtocolData,
+  marketId: Address
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.error("[ReserveDataUpdated] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
+  // get input token and decimals
+  let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+
+  // update market prices
+  let assetPriceUSD = getAssetPriceInUSDC(
+    Address.fromString(market.inputToken),
+    Address.fromString(protocol.priceOracle)
+  );
+  market.inputTokenPriceUSD = assetPriceUSD;
+  market.outputTokenPriceUSD = assetPriceUSD;
+
+  // get current borrow balance
+  let stableDebtContract = StableDebtToken.bind(
+    Address.fromString(market.sToken)
+  );
+  let variableDebtContract = VariableDebtToken.bind(
+    Address.fromString(market.vToken)
+  );
+  let stableBorrowBalance = stableDebtContract.try_totalSupply();
+  let variableBorrowBalance = variableDebtContract.try_totalSupply();
+
+  if (stableBorrowBalance.reverted || variableBorrowBalance.reverted) {
+    log.warning(
+      "[ReserveDataUpdated] Error getting borrow balance on market: {}",
+      [marketId.toHexString()]
+    );
+    return;
+  }
+
+  let totalBorrowBalance = stableBorrowBalance.value
+    .plus(variableBorrowBalance.value)
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals));
+  market.totalBorrowBalanceUSD = totalBorrowBalance.times(assetPriceUSD);
+
+  // update total supply balance
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  let tryTotalSupply = aTokenContract.try_totalSupply();
+  if (tryTotalSupply.reverted) {
+    log.warning(
+      "[ReserveDataUpdated] Error getting total supply on market: {}",
+      [marketId.toHexString()]
+    );
+    return;
+  }
+  let tryScaledSupply = aTokenContract.try_scaledTotalSupply();
+  if (tryScaledSupply.reverted) {
+    log.warning(
+      "[ReserveDataUpdated] Error getting scaled total supply on market: {}",
+      [marketId.toHexString()]
+    );
+    return;
+  }
+
+  market.inputTokenBalance = tryTotalSupply.value;
+  market.totalDepositBalanceUSD = market.inputTokenBalance
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals))
+    .times(assetPriceUSD);
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+
+  // calculate new revenue
+  // New Interest = totalScaledSupply * (difference in liquidity index)
+  let liquidityIndexDiff = liquidityIndex
+    .minus(market.liquidityIndex)
+    .toBigDecimal()
+    .div(exponentToBigDecimal(RAY_OFFSET));
+  let newRevenueBD = tryScaledSupply.value
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals));
+  let totalRevenueDeltaUSD = newRevenueBD.times(assetPriceUSD);
+  let protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(
+    market.reserveFactor.div(exponentToBigDecimal(INT_TWO))
+  );
+  let supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
+    protocolSideRevenueDeltaUSD
+  );
+
+  // update rates
+  let sBorrowRate = createInterestRate(
+    market.id,
+    InterestRateSide.BORROWER,
+    InterestRateType.STABLE,
+    bigIntToBigDecimal(rayToWad(stableBorrowRate))
+  );
+
+  let vBorrowRate = createInterestRate(
+    market.id,
+    InterestRateSide.BORROWER,
+    InterestRateType.VARIABLE,
+    bigIntToBigDecimal(rayToWad(variableBorrowRate))
+  );
+
+  let depositRate = createInterestRate(
+    market.id,
+    InterestRateSide.LENDER,
+    InterestRateType.VARIABLE,
+    bigIntToBigDecimal(rayToWad(liquidityRate))
+  );
+
+  market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
+
+  // update financial snapshot / Market dailly & hourly snapshots
+
+  // update rewards if past certain block number
+}

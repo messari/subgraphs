@@ -65,6 +65,7 @@ import {
   _handleCollateralConfigurationChanged,
   _handlePriceOracleUpdated,
   _handleReserveActivated,
+  _handleReserveDataUpdated,
   _handleReserveDeactivated,
   _handleReserveInitialized,
 } from "../../../src/mapping";
@@ -234,11 +235,14 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
-  // This event handler updates the deposit/borrow rates on a market
-  //  when the state of a reserve is updated
-
-  log.warning("reserve: {}", [event.transaction.hash.toHexString()]);
-
+  _handleReserveDataUpdated(
+    event.params.liquidityRate,
+    event.params.liquidityIndex,
+    event.params.variableBorrowRate,
+    event.params.stableBorrowRate,
+    getProtocolData(),
+    event.params.reserve
+  );
   let reserveAddress = event.params.reserve.toHexString();
   let market = getOrCreateMarket(event, reserveAddress);
 
