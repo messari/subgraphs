@@ -8,10 +8,18 @@ import {
 } from "../common/initializers";
 import * as constants from "../common/constants";
 import { getOrCreateToken } from "../common/initializers";
-import { Withdraw as WithdrawEntity, Market } from "../../../../generated/schema";
+import {
+  Withdraw as WithdrawEntity,
+  Market,
+} from "../../../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-export function createWithdrawEntity(event: ethereum.Event, market: Market, reserve: string, amount: BigInt): void {
+export function createWithdrawEntity(
+  event: ethereum.Event,
+  market: Market,
+  reserve: string,
+  amount: BigInt
+): void {
   const protocol = getOrCreateLendingProtocol();
   const inputToken = getOrCreateToken(Address.fromString(reserve));
 
@@ -28,7 +36,9 @@ export function createWithdrawEntity(event: ethereum.Event, market: Market, rese
   withdraw.amount = amount;
 
   const amountUSD = market.inputTokenPriceUSD.times(
-    amount.toBigDecimal().div(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()),
+    amount
+      .toBigDecimal()
+      .div(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
   );
 
   withdraw.amountUSD = amountUSD;
@@ -44,17 +54,30 @@ export function createWithdrawEntity(event: ethereum.Event, market: Market, rese
   updateSnapshotsAfterWithdraw(event, market, amountUSD);
 }
 
-export function updateSnapshotsAfterWithdraw(event: ethereum.Event, market: Market, amountUSD: BigDecimal): void {
+export function updateSnapshotsAfterWithdraw(
+  event: ethereum.Event,
+  market: Market,
+  amountUSD: BigDecimal
+): void {
   const dailyMarketSnapshot = getOrCreateMarketDailySnapshot(event, market);
   const hourlyMarketSnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(event.block);
-  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event.block);
-  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event.block);
+  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(
+    event.block
+  );
+  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(
+    event.block
+  );
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event.block
+  );
 
-  dailyMarketSnapshot.dailyWithdrawUSD = dailyMarketSnapshot.dailyWithdrawUSD.plus(amountUSD);
-  hourlyMarketSnapshot.hourlyWithdrawUSD = hourlyMarketSnapshot.hourlyWithdrawUSD.plus(amountUSD);
+  dailyMarketSnapshot.dailyWithdrawUSD =
+    dailyMarketSnapshot.dailyWithdrawUSD.plus(amountUSD);
+  hourlyMarketSnapshot.hourlyWithdrawUSD =
+    hourlyMarketSnapshot.hourlyWithdrawUSD.plus(amountUSD);
 
-  financialDailySnapshot.dailyWithdrawUSD = financialDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
+  financialDailySnapshot.dailyWithdrawUSD =
+    financialDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
 
   usageMetricsDailySnapshot.dailyWithdrawCount += 1;
   usageMetricsHourlySnapshot.hourlyWithdrawCount += 1;

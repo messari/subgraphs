@@ -578,7 +578,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "dForce v2",
     "dforce-v2",
     "1.3.0",
-    "1.0.1",
+    "1.0.2",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),

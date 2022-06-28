@@ -26,7 +26,9 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (block.timestamp.toI64() / constants.SECONDS_PER_DAY)
+  let dailyActiveAccountId = (
+    block.timestamp.toI64() / constants.SECONDS_PER_DAY
+  )
     .toString()
     .concat("-")
     .concat(from.toHexString());
@@ -55,9 +57,12 @@ export function updateFinancials(block: ethereum.Block): void {
   financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
   financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
   financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
-  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
 
   financialMetrics.blockNumber = block.number;
   financialMetrics.timestamp = block.timestamp;

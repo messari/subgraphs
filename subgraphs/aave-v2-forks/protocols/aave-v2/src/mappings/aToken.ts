@@ -1,6 +1,10 @@
 import { log } from "@graphprotocol/graph-ts";
 import { updateOutputTokenSupply } from "../common/utils";
-import { Burn, Mint, Transfer } from "../../../../generated/templates/AToken/AToken";
+import {
+  Burn,
+  Mint,
+  Transfer,
+} from "../../../../generated/templates/AToken/AToken";
 import { ZERO_ADDRESS } from "../common/constants";
 
 // THE MINT/BURN HANDLERS ARE WHAT MANAGE THE OUTPUT TOKEN SUPPLY
@@ -17,7 +21,10 @@ export function handleATokenMint(event: Mint): void {
 
 export function handleATokenBurn(event: Burn): void {
   // Event handler for AToken burns. This gets triggered upon withdraws
-  log.info("[ATokenBurm] Txn: {}, From: {}", [event.transaction.hash.toHexString(), event.params.from.toHexString()]);
+  log.info("[ATokenBurm] Txn: {}, From: {}", [
+    event.transaction.hash.toHexString(),
+    event.params.from.toHexString(),
+  ]);
   updateOutputTokenSupply(event);
 }
 

@@ -11,7 +11,12 @@ import {
 import * as constants from "../common/constants";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-export function createBorrowEntity(event: ethereum.Event, market: Market, reserve: string, amount: BigInt): void {
+export function createBorrowEntity(
+  event: ethereum.Event,
+  market: Market,
+  reserve: string,
+  amount: BigInt
+): void {
   const protocol = getOrCreateLendingProtocol();
   const inputToken = getOrCreateToken(Address.fromString(reserve));
 
@@ -28,7 +33,9 @@ export function createBorrowEntity(event: ethereum.Event, market: Market, reserv
   borrow.amount = amount;
 
   const amountUSD = market.inputTokenPriceUSD.times(
-    amount.toBigDecimal().div(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()),
+    amount
+      .toBigDecimal()
+      .div(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
   );
 
   borrow.amountUSD = amountUSD;
@@ -39,7 +46,8 @@ export function createBorrowEntity(event: ethereum.Event, market: Market, reserv
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
 
   protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(amountUSD);
-  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(amountUSD);
+  protocol.totalBorrowBalanceUSD =
+    protocol.totalBorrowBalanceUSD.plus(amountUSD);
 
   protocol.save();
   borrow.save();
@@ -48,17 +56,30 @@ export function createBorrowEntity(event: ethereum.Event, market: Market, reserv
   updateSnapshotsAfterBorrow(event, market, amountUSD);
 }
 
-export function updateSnapshotsAfterBorrow(event: ethereum.Event, market: Market, amountUSD: BigDecimal): void {
+export function updateSnapshotsAfterBorrow(
+  event: ethereum.Event,
+  market: Market,
+  amountUSD: BigDecimal
+): void {
   const dailyMarketSnapshot = getOrCreateMarketDailySnapshot(event, market);
   const hourlyMarketSnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(event.block);
-  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event.block);
-  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event.block);
+  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(
+    event.block
+  );
+  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(
+    event.block
+  );
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event.block
+  );
 
-  dailyMarketSnapshot.dailyBorrowUSD = dailyMarketSnapshot.dailyBorrowUSD.plus(amountUSD);
-  hourlyMarketSnapshot.hourlyBorrowUSD = hourlyMarketSnapshot.hourlyBorrowUSD.plus(amountUSD);
+  dailyMarketSnapshot.dailyBorrowUSD =
+    dailyMarketSnapshot.dailyBorrowUSD.plus(amountUSD);
+  hourlyMarketSnapshot.hourlyBorrowUSD =
+    hourlyMarketSnapshot.hourlyBorrowUSD.plus(amountUSD);
 
-  financialDailySnapshot.dailyBorrowUSD = financialDailySnapshot.dailyBorrowUSD.plus(amountUSD);
+  financialDailySnapshot.dailyBorrowUSD =
+    financialDailySnapshot.dailyBorrowUSD.plus(amountUSD);
 
   usageMetricsDailySnapshot.dailyBorrowCount += 1;
   usageMetricsHourlySnapshot.hourlyBorrowCount += 1;

@@ -50,7 +50,7 @@ When a transaction occurs in the `lendingPool` the following events are emitted 
 3. To get current supply balance we take use a contract call to `totalSupply()` in the respective aToken
 4. To get the current borrow balance we call `totalSupply()` in both the VariableDebtToken and StableDebtToken
 5. Finally we handle the actual transaction event (ie, deposit, borrow, repay, withdraw, liquidate)
-   1. This handler is designed to only update the metrics that have to do with those events. No other metrics are touched here. Everything should be taken care of before this.
+   1. This handler is designed to only update the metrics that have to do with those events. ie, usage and daily/hourly event amounts
 
 ### Resources
 

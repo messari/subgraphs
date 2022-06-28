@@ -18,7 +18,11 @@ import { createDepositEntity } from "../modules/Deposit";
 import { createWithdrawEntity } from "../modules/Withdraw";
 import { createLiquidateEntity } from "../modules/Liquidate";
 import { updateFinancials, updateUsageMetrics } from "../modules/Metrics";
-import { createInterestRate, getOrCreateMarket, getOrCreateToken } from "../common/initializers";
+import {
+  createInterestRate,
+  getOrCreateMarket,
+  getOrCreateToken,
+} from "../common/initializers";
 import { log } from "@graphprotocol/graph-ts";
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
@@ -34,24 +38,28 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     market.id,
     constants.InterestRateSide.BORROWER,
     constants.InterestRateType.STABLE,
-    utils.bigIntToBigDecimal(utils.rayToWad(event.params.stableBorrowRate)),
+    utils.bigIntToBigDecimal(utils.rayToWad(event.params.stableBorrowRate))
   );
 
   let variableBorrowRate = createInterestRate(
     market.id,
     constants.InterestRateSide.BORROWER,
     constants.InterestRateType.VARIABLE,
-    utils.bigIntToBigDecimal(utils.rayToWad(event.params.variableBorrowRate)),
+    utils.bigIntToBigDecimal(utils.rayToWad(event.params.variableBorrowRate))
   );
 
   let depositRate = createInterestRate(
     market.id,
     constants.InterestRateSide.LENDER,
     constants.InterestRateType.VARIABLE,
-    utils.bigIntToBigDecimal(utils.rayToWad(event.params.liquidityRate)),
+    utils.bigIntToBigDecimal(utils.rayToWad(event.params.liquidityRate))
   );
 
-  market.rewardTokens = [stableBorrowRate.id, variableBorrowRate.id, depositRate.id];
+  market.rewardTokens = [
+    stableBorrowRate.id,
+    variableBorrowRate.id,
+    depositRate.id,
+  ];
 
   market.save();
 }
@@ -122,7 +130,15 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   const market = getOrCreateMarket(event, collateralAsset);
   const token = getOrCreateToken(event.params.collateralAsset);
 
-  createLiquidateEntity(event, market, user, debtAsset, collateralAsset, liquidator, amount);
+  createLiquidateEntity(
+    event,
+    market,
+    user,
+    debtAsset,
+    collateralAsset,
+    liquidator,
+    amount
+  );
 
   updateTVL(market, token, amount, false);
   calculateRevenues(event, market, token);
@@ -130,7 +146,9 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   updateFinancials(event.block);
 }
 
-export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollateralEnabled): void {
+export function handleReserveUsedAsCollateralEnabled(
+  event: ReserveUsedAsCollateralEnabled
+): void {
   // This Event handler enables a reserve/market to be used as collateral
   const marketAddr = event.params.reserve.toHexString();
   const market = getOrCreateMarket(event, marketAddr);
@@ -138,7 +156,9 @@ export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollate
   market.save();
 }
 
-export function handleReserveUsedAsCollateralDisabled(event: ReserveUsedAsCollateralDisabled): void {
+export function handleReserveUsedAsCollateralDisabled(
+  event: ReserveUsedAsCollateralDisabled
+): void {
   // This Event handler disables a reserve/market being used as collateral
   const marketAddr = event.params.reserve.toHexString();
   const market = getOrCreateMarket(event, marketAddr);

@@ -11,7 +11,12 @@ import { getOrCreateToken } from "../common/initializers";
 import { Deposit as DepositEntity, Market } from "../../../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-export function createDepositEntity(event: ethereum.Event, market: Market, reserve: string, amount: BigInt): void {
+export function createDepositEntity(
+  event: ethereum.Event,
+  market: Market,
+  reserve: string,
+  amount: BigInt
+): void {
   const protocol = getOrCreateLendingProtocol();
   const inputToken = getOrCreateToken(Address.fromString(reserve));
 
@@ -28,7 +33,9 @@ export function createDepositEntity(event: ethereum.Event, market: Market, reser
   deposit.amount = amount;
 
   const amountUSD = market.inputTokenPriceUSD.times(
-    amount.toBigDecimal().div(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()),
+    amount
+      .toBigDecimal()
+      .div(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
   );
 
   deposit.amountUSD = amountUSD;
@@ -40,7 +47,8 @@ export function createDepositEntity(event: ethereum.Event, market: Market, reser
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
 
   protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(amountUSD);
-  protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(amountUSD);
+  protocol.totalDepositBalanceUSD =
+    protocol.totalDepositBalanceUSD.plus(amountUSD);
 
   protocol.save();
   deposit.save();
@@ -49,17 +57,30 @@ export function createDepositEntity(event: ethereum.Event, market: Market, reser
   updateSnapshotsAfterDeposit(event, market, amountUSD);
 }
 
-export function updateSnapshotsAfterDeposit(event: ethereum.Event, market: Market, amountUSD: BigDecimal): void {
+export function updateSnapshotsAfterDeposit(
+  event: ethereum.Event,
+  market: Market,
+  amountUSD: BigDecimal
+): void {
   const dailyMarketSnapshot = getOrCreateMarketDailySnapshot(event, market);
   const hourlyMarketSnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(event.block);
-  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event.block);
-  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event.block);
+  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(
+    event.block
+  );
+  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(
+    event.block
+  );
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event.block
+  );
 
-  dailyMarketSnapshot.dailyDepositUSD = dailyMarketSnapshot.dailyDepositUSD.plus(amountUSD);
-  hourlyMarketSnapshot.hourlyDepositUSD = hourlyMarketSnapshot.hourlyDepositUSD.plus(amountUSD);
+  dailyMarketSnapshot.dailyDepositUSD =
+    dailyMarketSnapshot.dailyDepositUSD.plus(amountUSD);
+  hourlyMarketSnapshot.hourlyDepositUSD =
+    hourlyMarketSnapshot.hourlyDepositUSD.plus(amountUSD);
 
-  financialDailySnapshot.dailyDepositUSD = financialDailySnapshot.dailyDepositUSD.plus(amountUSD);
+  financialDailySnapshot.dailyDepositUSD =
+    financialDailySnapshot.dailyDepositUSD.plus(amountUSD);
 
   usageMetricsDailySnapshot.dailyDepositCount += 1;
   usageMetricsHourlySnapshot.hourlyDepositCount += 1;

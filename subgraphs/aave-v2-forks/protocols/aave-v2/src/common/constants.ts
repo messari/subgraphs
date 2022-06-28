@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  dataSource,
+  log,
+} from "@graphprotocol/graph-ts";
 
 // The network names corresponding to the Network enum in the schema.
 // They also correspond to the ones in `dataSource.network()` after converting to lower case.
@@ -88,7 +94,7 @@ export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 
 export const INT_NEGATIVE_ONE = -1 as i32;
@@ -112,7 +118,9 @@ export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const MS_PER_YEAR = DAYS_PER_YEAR.times(
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+);
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -131,32 +139,42 @@ export namespace Protocol {
 ////////////////////////////
 
 // used to differentiate between different mainnet implementations
-export const MAINNET_ADDRESS = Address.fromString("0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5");
-export const AMM_ADDRESS = Address.fromString("0xAcc030EF66f9dFEAE9CbB0cd1B25654b82cFA8d5");
+export const MAINNET_ADDRESS = Address.fromString(
+  "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"
+);
+export const AMM_ADDRESS = Address.fromString(
+  "0xAcc030EF66f9dFEAE9CbB0cd1B25654b82cFA8d5"
+);
 
 export class NetworkSpecificConstant {
   constructor(
     public readonly protocolAddress: Address, // aka, LendingPoolAddressesProvider
-    public readonly network: string,
+    public readonly network: string
   ) {}
 }
 
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
+  log.warning("Grabbed network constants", []); // TODO- remove
   let network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
       Address.fromString("0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"),
-      Network.MAINNET,
+      Network.MAINNET
     );
   } else if (equalsIgnoreCase(network, Network.AVALANCHE)) {
     return new NetworkSpecificConstant(
       Address.fromString("0xb6A86025F0FE1862B372cb0ca18CE3EDe02A318f"),
-      Network.AVALANCHE,
+      Network.AVALANCHE
     );
   } else if (equalsIgnoreCase(network, Network.MATIC)) {
-    return new NetworkSpecificConstant(Address.fromString("0xd05e3E715d945B59290df0ae8eF85c1BdB684744"), Network.MATIC);
+    return new NetworkSpecificConstant(
+      Address.fromString("0xd05e3E715d945B59290df0ae8eF85c1BdB684744"),
+      Network.MATIC
+    );
   } else {
-    log.error("[getNetworkSpecificConstant] Unsupported network: {}", [network]);
+    log.error("[getNetworkSpecificConstant] Unsupported network: {}", [
+      network,
+    ]);
     return new NetworkSpecificConstant(Address.fromString(ZERO_ADDRESS), "");
   }
 }

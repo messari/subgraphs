@@ -2,17 +2,22 @@ import * as utils from "../common/utils";
 import { Market } from "../../../../generated/schema";
 import * as constants from "../common/constants";
 import { amountInUSD, getAssetPriceInUSDC } from "./Price";
-import { getOrCreateRewardToken, getOrCreateToken } from "../common/initializers";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../common/initializers";
 import { AToken } from "../../../../generated/templates/AToken/AToken";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { AaveIncentivesController as IncentivesControllerContract } from "../../../../generated/templates/LendingPool/AaveIncentivesController";
 
-export function getIncentiveControllerAddress(outputTokenAddress: Address): Address {
+export function getIncentiveControllerAddress(
+  outputTokenAddress: Address
+): Address {
   const aTokenContract = AToken.bind(outputTokenAddress);
 
   return utils.readValue<Address>(
     aTokenContract.try_getIncentivesController(),
-    Address.fromString(constants.ZERO_ADDRESS),
+    Address.fromString(constants.ZERO_ADDRESS)
   );
 }
 
@@ -21,7 +26,9 @@ export function emissionsPerDay(rewardRatePerSecond: BigInt): BigInt {
   // and get the emissions per day
   const BIGINT_SECONDS_PER_DAY = BigInt.fromI32(<i32>constants.SECONDS_PER_DAY);
 
-  return rewardRatePerSecond.times(BIGINT_SECONDS_PER_DAY).div(constants.BIGINT_TEN_TO_EIGHTEENTH);
+  return rewardRatePerSecond
+    .times(BIGINT_SECONDS_PER_DAY)
+    .div(constants.BIGINT_TEN_TO_EIGHTEENTH);
 }
 
 export function getCurrentRewardEmissions(market: Market): BigInt[] {
@@ -30,28 +37,36 @@ export function getCurrentRewardEmissions(market: Market): BigInt[] {
 
   // Attempt to get the incentives controller contract
   const outputTokenAddress = Address.fromString(market.outputToken!);
-  const incentivesController = getIncentiveControllerAddress(outputTokenAddress);
+  const incentivesController =
+    getIncentiveControllerAddress(outputTokenAddress);
 
   // From the incentives controller contract, get pull the 'assets' values
   // from the market aToken, sToken, and vToken
-  const incentivesControllerContract = IncentivesControllerContract.bind(incentivesController);
+  const incentivesControllerContract =
+    IncentivesControllerContract.bind(incentivesController);
 
-  const controllerAssets = incentivesControllerContract.try_assets(outputTokenAddress);
+  const controllerAssets =
+    incentivesControllerContract.try_assets(outputTokenAddress);
 
-  if (controllerAssets.reverted) return [borrowRewardEmissions, depositRewardEmissions];
+  if (controllerAssets.reverted)
+    return [borrowRewardEmissions, depositRewardEmissions];
 
   // Get the emissions per day for the aToken rewards for deposits
   const assetDataSupply = controllerAssets.value.value0;
   depositRewardEmissions = emissionsPerDay(assetDataSupply);
 
-  const assetDataBorrowStable = incentivesControllerContract.try_assets(Address.fromString(market._sToken)).value
-    .value0;
-  const assetDataBorrowVariable = incentivesControllerContract.try_assets(Address.fromString(market._vToken)).value
-    .value0;
+  const assetDataBorrowStable = incentivesControllerContract.try_assets(
+    Address.fromString(market._sToken)
+  ).value.value0;
+  const assetDataBorrowVariable = incentivesControllerContract.try_assets(
+    Address.fromString(market._vToken)
+  ).value.value0;
 
   // Get the emissions per second for both the sToken and vToken rewards,
   // average them and get the daily emissions for borrows
-  const borrowRewardsAvgRate = assetDataBorrowStable.plus(assetDataBorrowVariable).div(constants.BIGINT_TWO);
+  const borrowRewardsAvgRate = assetDataBorrowStable
+    .plus(assetDataBorrowVariable)
+    .div(constants.BIGINT_TWO);
 
   borrowRewardEmissions = emissionsPerDay(borrowRewardsAvgRate);
 
@@ -66,8 +81,13 @@ export function getCurrentRewardEmissionsUSD(market: Market): BigDecimal[] {
 
   // The DEPOSIT reward token is used as the default.
   // Both the deposit and borrow reward token decimals are the same
-  const rewardToken = getOrCreateRewardToken(rewardTokenAddr, constants.RewardTokenType.DEPOSIT);
-  const rewardTokenDecimals = getOrCreateToken(Address.fromString(rewardToken.token)).decimals;
+  const rewardToken = getOrCreateRewardToken(
+    rewardTokenAddr,
+    constants.RewardTokenType.DEPOSIT
+  );
+  const rewardTokenDecimals = getOrCreateToken(
+    Address.fromString(rewardToken.token)
+  ).decimals;
 
   const rewardPriceInUSDC = getAssetPriceInUSDC(rewardTokenAddr);
 
@@ -75,7 +95,7 @@ export function getCurrentRewardEmissionsUSD(market: Market): BigDecimal[] {
   const depositRewardPriceInUSDC = amountInUSD(
     rewardPriceInUSDC,
     rewardTokenDecimals,
-    market.rewardTokenEmissionsAmount![0],
+    market.rewardTokenEmissionsAmount![0]
   );
 
   rewardEmissionsUSD[0] = depositRewardPriceInUSDC;
@@ -84,7 +104,7 @@ export function getCurrentRewardEmissionsUSD(market: Market): BigDecimal[] {
   const borrowRewardPriceInUSDC = amountInUSD(
     rewardPriceInUSDC,
     rewardTokenDecimals,
-    market.rewardTokenEmissionsAmount![1],
+    market.rewardTokenEmissionsAmount![1]
   );
   rewardEmissionsUSD[1] = borrowRewardPriceInUSDC;
 

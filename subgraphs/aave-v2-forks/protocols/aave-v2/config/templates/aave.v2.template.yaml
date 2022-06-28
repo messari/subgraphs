@@ -27,7 +27,7 @@ dataSources:
           handler: handleLendingPoolUpdated
         - event: LendingPoolConfiguratorUpdated(indexed address)
           handler: handleLendingPoolConfiguratorUpdated
-      file: ./protocols/aave-v2/src/mappings/lendingPoolAddressProvider.ts
+      file: ./protocols/aave-v2/src/mapping.ts
 templates:
   - kind: ethereum/contract
     name: LendingPool
@@ -58,12 +58,12 @@ templates:
           file: ./abis/StableDebtToken.json
         - name: LendingPool
           file: ./abis/LendingPool.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: ERC20NameBytes
-          file: ./abis/ERC20NameBytes.json
-        - name: ERC20SymbolBytes
-          file: ./abis/ERC20SymbolBytes.json
+        # - name: ERC20
+        #   file: ./abis/ERC20.json
+        # - name: ERC20NameBytes
+        #   file: ./abis/ERC20NameBytes.json
+        # - name: ERC20SymbolBytes
+        #   file: ./abis/ERC20SymbolBytes.json
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
       eventHandlers:
@@ -83,7 +83,7 @@ templates:
           handler: handleReserveUsedAsCollateralEnabled
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
-      file: ./protocols/aave-v2/src/mappings/lendingPool.ts
+      file: ./protocols/aave-v2/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator
     network: mainnet
@@ -103,8 +103,8 @@ templates:
         - Position
         - PositionSnapshot
       abis:
-        - name: AaveIncentivesController
-          file: ./abis/aave-v2/AaveIncentivesController.json
+        # - name: AaveIncentivesController
+        #   file: ./abis/aave-v2/AaveIncentivesController.json
         - name: AToken
           file: ./abis/AToken.json
         - name: LendingPoolConfigurator
@@ -117,8 +117,8 @@ templates:
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
-        - name: IPriceOracleGetter
-          file: ./abis/IPriceOracleGetter.json
+        # - name: IPriceOracleGetter
+        #   file: ./abis/IPriceOracleGetter.json
       eventHandlers:
         - event: ReserveInitialized(indexed address,indexed address,address,address,address)
           handler: handleReserveInitialized
@@ -134,7 +134,7 @@ templates:
           handler: handleReserveDeactivated
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
-      file: ./protocols/aave-v2/src/mappings/lendingPoolConfigurator.ts
+      file: ./protocols/aave-v2/src/mapping.ts
   - kind: ethereum/contract
     name: AToken
     network: mainnet
@@ -149,17 +149,17 @@ templates:
       abis:
         - name: AToken
           file: ./abis/AToken.json
-        - name: AaveIncentivesController
-          file: ./abis/aave-v2/AaveIncentivesController.json
-        - name: LendingPool
-          file: ./abis/LendingPool.json
-        - name: IPriceOracleGetter
-          file: ./abis/IPriceOracleGetter.json
+        # - name: AaveIncentivesController
+        #   file: ./abis/aave-v2/AaveIncentivesController.json
+        # - name: LendingPool
+        #   file: ./abis/LendingPool.json
+        # - name: IPriceOracleGetter
+        #   file: ./abis/IPriceOracleGetter.json
       eventHandlers:
-        - event: Burn(indexed address,indexed address,uint256,uint256)
-          handler: handleATokenBurn
-        - event: Mint(indexed address,uint256,uint256)
-          handler: handleATokenMint
+        # - event: Burn(indexed address,indexed address,uint256,uint256)
+        #   handler: handleATokenBurn
+        # - event: Mint(indexed address,uint256,uint256)
+        #   handler: handleATokenMint
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleATokenTransfer
-      file: ./protocols/aave-v2/src/mappings/aToken.ts
+      file: ./protocols/aave-v2/src/mapping.ts

@@ -28,8 +28,17 @@ import {
 import { getMarketRates } from "../modules/Market";
 import { getAssetPriceInUSDC } from "../modules/Price";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./tokens";
-import { Address, BigDecimal, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
-import { getCurrentRewardEmissions, getCurrentRewardEmissionsUSD } from "../modules/Rewards";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  dataSource,
+  ethereum,
+} from "@graphprotocol/graph-ts";
+import {
+  getCurrentRewardEmissions,
+  getCurrentRewardEmissionsUSD,
+} from "../modules/Rewards";
 import { IPriceOracleGetter } from "../../../../generated/templates/LendingPool/IPriceOracleGetter";
 
 // Network constants
@@ -84,7 +93,10 @@ export function getOrCreateToken(address: Address): Token {
   return token;
 }
 
-export function getOrCreateRewardToken(address: Address, type: string): RewardToken {
+export function getOrCreateRewardToken(
+  address: Address,
+  type: string
+): RewardToken {
   let id: string = type.concat("-").concat(address.toHexString());
   let rewardToken = RewardToken.load(id);
 
@@ -133,7 +145,9 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   return lendingProtocol;
 }
 
-export function getOrCreateFinancialsDailySnapshot(block: ethereum.Block): FinancialsDailySnapshot {
+export function getOrCreateFinancialsDailySnapshot(
+  block: ethereum.Block
+): FinancialsDailySnapshot {
   const protocol = getOrCreateLendingProtocol();
 
   const id = `${block.timestamp.toI64() / SECONDS_PER_DAY}`;
@@ -161,9 +175,12 @@ export function getOrCreateFinancialsDailySnapshot(block: ethereum.Block): Finan
   financialsSnapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
   financialsSnapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
   financialsSnapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
-  financialsSnapshot.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  financialsSnapshot.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-  financialsSnapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  financialsSnapshot.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialsSnapshot.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financialsSnapshot.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
 
   financialsSnapshot.blockNumber = block.number;
   financialsSnapshot.timestamp = block.timestamp;
@@ -175,7 +192,7 @@ export function createInterestRate(
   marketAddress: string,
   rateSide: string,
   rateType: string,
-  rate: BigDecimal,
+  rate: BigDecimal
 ): InterestRate {
   const id: string = `${rateSide}-${rateType}-${marketAddress}`;
   const interestRate = new InterestRate(id);
@@ -189,7 +206,10 @@ export function createInterestRate(
   return interestRate;
 }
 
-export function getOrCreateMarket(event: ethereum.Event, marketId: string): Market {
+export function getOrCreateMarket(
+  event: ethereum.Event,
+  marketId: string
+): Market {
   let market = Market.load(marketId);
 
   if (!market) {
@@ -229,8 +249,14 @@ export function getOrCreateMarket(event: ethereum.Event, marketId: string): Mark
 
     // TODO: fix this
     const rewardTokenFromIncController = Address.fromString(ZERO_ADDRESS);
-    const depositRewardToken = getOrCreateRewardToken(rewardTokenFromIncController, RewardTokenType.DEPOSIT);
-    const borrowRewardToken = getOrCreateRewardToken(rewardTokenFromIncController, RewardTokenType.BORROW);
+    const depositRewardToken = getOrCreateRewardToken(
+      rewardTokenFromIncController,
+      RewardTokenType.DEPOSIT
+    );
+    const borrowRewardToken = getOrCreateRewardToken(
+      rewardTokenFromIncController,
+      RewardTokenType.BORROW
+    );
 
     market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
     market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
@@ -258,7 +284,10 @@ export function getOrCreateMarket(event: ethereum.Event, marketId: string): Mark
   return market;
 }
 
-export function getOrCreateMarketDailySnapshot(event: ethereum.Event, market: Market): MarketDailySnapshot {
+export function getOrCreateMarketDailySnapshot(
+  event: ethereum.Event,
+  market: Market
+): MarketDailySnapshot {
   const id = `${market.id}-${event.block.timestamp.toI64() / SECONDS_PER_DAY}`;
   let marketSnapshot = MarketDailySnapshot.load(id);
 
@@ -284,8 +313,10 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, market: Ma
   marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
   marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
-  marketSnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
-  marketSnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketSnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketSnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
   marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
 
   marketSnapshot.inputTokenBalance = market.inputTokenBalance;
@@ -302,7 +333,10 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, market: Ma
   return marketSnapshot;
 }
 
-export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, market: Market): MarketHourlySnapshot {
+export function getOrCreateMarketHourlySnapshot(
+  event: ethereum.Event,
+  market: Market
+): MarketHourlySnapshot {
   const id = `${market.id}-${event.block.timestamp.toI64() / SECONDS_PER_HOUR}`;
   let marketSnapshot = MarketHourlySnapshot.load(id);
 
@@ -330,8 +364,10 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, market: M
   marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
 
-  marketSnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
-  marketSnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketSnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  marketSnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
   marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
 
   marketSnapshot.inputTokenBalance = market.inputTokenBalance;
@@ -348,7 +384,9 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, market: M
   return marketSnapshot;
 }
 
-export function getOrCreateUsageMetricsDailySnapshot(block: ethereum.Block): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricsDailySnapshot(
+  block: ethereum.Block
+): UsageMetricsDailySnapshot {
   let id: string = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
 
@@ -378,8 +416,12 @@ export function getOrCreateUsageMetricsDailySnapshot(block: ethereum.Block): Usa
   return usageMetrics;
 }
 
-export function getOrCreateUsageMetricsHourlySnapshot(block: ethereum.Block): UsageMetricsHourlySnapshot {
-  let metricsID: string = (block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
+export function getOrCreateUsageMetricsHourlySnapshot(
+  block: ethereum.Block
+): UsageMetricsHourlySnapshot {
+  let metricsID: string = (
+    block.timestamp.toI64() / SECONDS_PER_HOUR
+  ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
 
   if (!usageMetrics) {

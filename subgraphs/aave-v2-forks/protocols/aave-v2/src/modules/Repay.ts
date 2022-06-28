@@ -11,7 +11,12 @@ import { getOrCreateToken } from "../common/initializers";
 import { Repay as RepayEntity, Market } from "../../../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-export function createRepayEntity(event: ethereum.Event, market: Market, reserve: string, amount: BigInt): void {
+export function createRepayEntity(
+  event: ethereum.Event,
+  market: Market,
+  reserve: string,
+  amount: BigInt
+): void {
   const protocol = getOrCreateLendingProtocol();
   const inputToken = getOrCreateToken(Address.fromString(reserve));
 
@@ -28,7 +33,9 @@ export function createRepayEntity(event: ethereum.Event, market: Market, reserve
   repay.amount = amount;
 
   const amountUSD = market.inputTokenPriceUSD.times(
-    amount.toBigDecimal().div(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()),
+    amount
+      .toBigDecimal()
+      .div(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
   );
 
   repay.amountUSD = amountUSD;
@@ -39,7 +46,8 @@ export function createRepayEntity(event: ethereum.Event, market: Market, reserve
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.minus(amountUSD);
 
   protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.minus(amountUSD);
-  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.minus(amountUSD);
+  protocol.totalBorrowBalanceUSD =
+    protocol.totalBorrowBalanceUSD.minus(amountUSD);
 
   protocol.save();
   market.save();
@@ -48,17 +56,30 @@ export function createRepayEntity(event: ethereum.Event, market: Market, reserve
   updateSnapshotsAfterRepay(event, market, amountUSD);
 }
 
-export function updateSnapshotsAfterRepay(event: ethereum.Event, market: Market, amountUSD: BigDecimal): void {
+export function updateSnapshotsAfterRepay(
+  event: ethereum.Event,
+  market: Market,
+  amountUSD: BigDecimal
+): void {
   const dailyMarketSnapshot = getOrCreateMarketDailySnapshot(event, market);
   const hourlyMarketSnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(event.block);
-  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event.block);
-  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event.block);
+  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(
+    event.block
+  );
+  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(
+    event.block
+  );
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event.block
+  );
 
-  dailyMarketSnapshot.dailyRepayUSD = dailyMarketSnapshot.dailyRepayUSD.plus(amountUSD);
-  hourlyMarketSnapshot.hourlyRepayUSD = hourlyMarketSnapshot.hourlyRepayUSD.plus(amountUSD);
+  dailyMarketSnapshot.dailyRepayUSD =
+    dailyMarketSnapshot.dailyRepayUSD.plus(amountUSD);
+  hourlyMarketSnapshot.hourlyRepayUSD =
+    hourlyMarketSnapshot.hourlyRepayUSD.plus(amountUSD);
 
-  financialDailySnapshot.dailyRepayUSD = financialDailySnapshot.dailyRepayUSD.plus(amountUSD);
+  financialDailySnapshot.dailyRepayUSD =
+    financialDailySnapshot.dailyRepayUSD.plus(amountUSD);
 
   usageMetricsDailySnapshot.dailyRepayCount += 1;
   usageMetricsHourlySnapshot.hourlyRepayCount += 1;

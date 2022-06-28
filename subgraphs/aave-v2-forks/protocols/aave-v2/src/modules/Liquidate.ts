@@ -8,7 +8,10 @@ import {
 } from "../common/initializers";
 import * as constants from "../common/constants";
 import { getOrCreateToken } from "../common/initializers";
-import { Liquidate as LiquidateEntity, Market } from "../../../../generated/schema";
+import {
+  Liquidate as LiquidateEntity,
+  Market,
+} from "../../../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function createLiquidateEntity(
@@ -18,7 +21,7 @@ export function createLiquidateEntity(
   debtAsset: string,
   collateralAsset: string,
   liquidator: string,
-  amount: BigInt,
+  amount: BigInt
 ): void {
   const protocol = getOrCreateLendingProtocol();
   const inputToken = getOrCreateToken(Address.fromString(collateralAsset));
@@ -37,10 +40,14 @@ export function createLiquidateEntity(
   liquidate.liquidatee = user;
 
   const amountUSD = market.inputTokenPriceUSD.times(
-    amount.toBigDecimal().div(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()),
+    amount
+      .toBigDecimal()
+      .div(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
   );
   liquidate.amountUSD = amountUSD;
-  liquidate.profitUSD = amountUSD.times(market.liquidationPenalty).div(BigDecimal.fromString("100"));
+  liquidate.profitUSD = amountUSD
+    .times(market.liquidationPenalty)
+    .div(BigDecimal.fromString("100"));
 
   liquidate.timestamp = event.block.timestamp;
   liquidate.blockNumber = event.block.number;
@@ -48,8 +55,10 @@ export function createLiquidateEntity(
   market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.minus(amountUSD);
   market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(amountUSD);
 
-  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.minus(amountUSD);
-  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(amountUSD);
+  protocol.totalBorrowBalanceUSD =
+    protocol.totalBorrowBalanceUSD.minus(amountUSD);
+  protocol.cumulativeLiquidateUSD =
+    protocol.cumulativeLiquidateUSD.plus(amountUSD);
 
   protocol.save();
   liquidate.save();
@@ -58,17 +67,30 @@ export function createLiquidateEntity(
   updateSnapshotsAfterLiquidate(event, market, amountUSD);
 }
 
-export function updateSnapshotsAfterLiquidate(event: ethereum.Event, market: Market, amountUSD: BigDecimal): void {
+export function updateSnapshotsAfterLiquidate(
+  event: ethereum.Event,
+  market: Market,
+  amountUSD: BigDecimal
+): void {
   const dailyMarketSnapshot = getOrCreateMarketDailySnapshot(event, market);
   const hourlyMarketSnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(event.block);
-  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event.block);
-  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event.block);
+  const financialDailySnapshot = getOrCreateFinancialsDailySnapshot(
+    event.block
+  );
+  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(
+    event.block
+  );
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    event.block
+  );
 
-  dailyMarketSnapshot.dailyLiquidateUSD = dailyMarketSnapshot.dailyLiquidateUSD.plus(amountUSD);
-  hourlyMarketSnapshot.hourlyLiquidateUSD = hourlyMarketSnapshot.hourlyLiquidateUSD.plus(amountUSD);
+  dailyMarketSnapshot.dailyLiquidateUSD =
+    dailyMarketSnapshot.dailyLiquidateUSD.plus(amountUSD);
+  hourlyMarketSnapshot.hourlyLiquidateUSD =
+    hourlyMarketSnapshot.hourlyLiquidateUSD.plus(amountUSD);
 
-  financialDailySnapshot.dailyLiquidateUSD = financialDailySnapshot.dailyLiquidateUSD.plus(amountUSD);
+  financialDailySnapshot.dailyLiquidateUSD =
+    financialDailySnapshot.dailyLiquidateUSD.plus(amountUSD);
 
   usageMetricsDailySnapshot.dailyLiquidateCount += 1;
   usageMetricsHourlySnapshot.hourlyLiquidateCount += 1;

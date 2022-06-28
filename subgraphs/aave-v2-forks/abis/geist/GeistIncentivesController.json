@@ -1,10 +1,26 @@
 [
   {
     "inputs": [
-      { "internalType": "uint128[]", "name": "_startTimeOffset", "type": "uint128[]" },
-      { "internalType": "uint128[]", "name": "_rewardsPerSecond", "type": "uint128[]" },
-      { "internalType": "address", "name": "_poolConfigurator", "type": "address" },
-      { "internalType": "contract IMultiFeeDistribution", "name": "_rewardMinter", "type": "address" },
+      {
+        "internalType": "uint128[]",
+        "name": "_startTimeOffset",
+        "type": "uint128[]"
+      },
+      {
+        "internalType": "uint128[]",
+        "name": "_rewardsPerSecond",
+        "type": "uint128[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_poolConfigurator",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IMultiFeeDistribution",
+        "name": "_rewardMinter",
+        "type": "address"
+      },
       { "internalType": "uint256", "name": "_maxMintable", "type": "uint256" }
     ],
     "stateMutability": "nonpayable",
@@ -13,10 +29,30 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": true, "internalType": "address", "name": "token", "type": "address" },
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "balance", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "totalSupply", "type": "uint256" }
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "balance",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalSupply",
+        "type": "uint256"
+      }
     ],
     "name": "BalanceUpdated",
     "type": "event"
@@ -24,8 +60,18 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" },
-      { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
     ],
     "name": "OwnershipTransferred",
     "type": "event"
@@ -43,7 +89,11 @@
   {
     "inputs": [
       { "internalType": "address[]", "name": "_tokens", "type": "address[]" },
-      { "internalType": "uint256[]", "name": "_allocPoints", "type": "uint256[]" }
+      {
+        "internalType": "uint256[]",
+        "name": "_allocPoints",
+        "type": "uint256[]"
+      }
     ],
     "name": "batchUpdateAllocPoint",
     "outputs": [],
@@ -73,7 +123,9 @@
       { "internalType": "address[]", "name": "_tokens", "type": "address[]" }
     ],
     "name": "claimableReward",
-    "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -81,8 +133,16 @@
     "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "name": "emissionSchedule",
     "outputs": [
-      { "internalType": "uint128", "name": "startTimeOffset", "type": "uint128" },
-      { "internalType": "uint128", "name": "rewardsPerSecond", "type": "uint128" }
+      {
+        "internalType": "uint128",
+        "name": "startTimeOffset",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "rewardsPerSecond",
+        "type": "uint128"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -132,9 +192,21 @@
     "outputs": [
       { "internalType": "uint256", "name": "totalSupply", "type": "uint256" },
       { "internalType": "uint256", "name": "allocPoint", "type": "uint256" },
-      { "internalType": "uint256", "name": "lastRewardTime", "type": "uint256" },
-      { "internalType": "uint256", "name": "accRewardPerShare", "type": "uint256" },
-      { "internalType": "contract IOnwardIncentivesController", "name": "onwardIncentives", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "lastRewardTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "accRewardPerShare",
+        "type": "uint256"
+      },
+      {
+        "internalType": "contract IOnwardIncentivesController",
+        "name": "onwardIncentives",
+        "type": "address"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -153,11 +225,23 @@
     "stateMutability": "view",
     "type": "function"
   },
-  { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
   {
     "inputs": [],
     "name": "rewardMinter",
-    "outputs": [{ "internalType": "contract IMultiFeeDistribution", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "contract IMultiFeeDistribution",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -181,14 +265,24 @@
   {
     "inputs": [
       { "internalType": "address", "name": "_token", "type": "address" },
-      { "internalType": "contract IOnwardIncentivesController", "name": "_incentives", "type": "address" }
+      {
+        "internalType": "contract IOnwardIncentivesController",
+        "name": "_incentives",
+        "type": "address"
+      }
     ],
     "name": "setOnwardIncentives",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
-  { "inputs": [], "name": "start", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+  {
+    "inputs": [],
+    "name": "start",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
   {
     "inputs": [],
     "name": "startTime",
@@ -204,7 +298,9 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",

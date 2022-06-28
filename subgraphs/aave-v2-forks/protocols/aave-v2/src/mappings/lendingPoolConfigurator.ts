@@ -38,13 +38,17 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
   market.save();
 }
 
-export function handleCollateralConfigurationChanged(event: CollateralConfigurationChanged): void {
+export function handleCollateralConfigurationChanged(
+  event: CollateralConfigurationChanged
+): void {
   // Adjust market LTV, liquidation, and collateral data when a reserve's collateral configuration has changed
   const marketAddress = event.params.asset.toHexString();
   const market = getOrCreateMarket(event, marketAddress);
 
   market.maximumLTV = event.params.ltv.toBigDecimal().div(BIGDECIMAL_HUNDRED);
-  market.liquidationThreshold = event.params.liquidationThreshold.toBigDecimal().div(BIGDECIMAL_HUNDRED);
+  market.liquidationThreshold = event.params.liquidationThreshold
+    .toBigDecimal()
+    .div(BIGDECIMAL_HUNDRED);
 
   // The liquidation bonus value is equal to the liquidation penalty, the naming is a matter of which side of the liquidation a user is on
   // The liquidationBonus parameter comes out as above 100%, represented by a 5 digit integer over 10000 (100%).
@@ -60,7 +64,9 @@ export function handleCollateralConfigurationChanged(event: CollateralConfigurat
   market.save();
 }
 
-export function handleBorrowingEnabledOnReserve(event: BorrowingEnabledOnReserve): void {
+export function handleBorrowingEnabledOnReserve(
+  event: BorrowingEnabledOnReserve
+): void {
   const marketAddress = event.params.asset.toHexString();
   const market = getOrCreateMarket(event, marketAddress);
   market.canBorrowFrom = true;
@@ -69,7 +75,9 @@ export function handleBorrowingEnabledOnReserve(event: BorrowingEnabledOnReserve
   log.info("[BorowEnabledOnReserve] MarketId: {}", [marketAddress]);
 }
 
-export function handleBorrowingDisabledOnReserve(event: BorrowingDisabledOnReserve): void {
+export function handleBorrowingDisabledOnReserve(
+  event: BorrowingDisabledOnReserve
+): void {
   const marketAddress = event.params.asset.toHexString();
   const market = getOrCreateMarket(event, marketAddress);
   market.canBorrowFrom = false;
@@ -105,5 +113,8 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
   market.reserveFactor = event.params.factor;
   market.save();
 
-  log.info("[ReserveFactorChanged] MarketId: {}, reserveFactor: {}", [marketAddress, market.reserveFactor.toString()]);
+  log.info("[ReserveFactorChanged] MarketId: {}, reserveFactor: {}", [
+    marketAddress,
+    market.reserveFactor.toString(),
+  ]);
 }

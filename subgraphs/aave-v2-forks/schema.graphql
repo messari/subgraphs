@@ -554,12 +554,6 @@ type Market @entity {
   " Creation block number "
   createdBlockNumber: BigInt!
 
-  " The variable debt token address correlated to the reserve asset "
-  _vToken: String!
-
-  " The stable debt token address correlated to the reserve asset "
-  _sToken: String!
-
   ##### Snapshots #####
 
   " Market daily snapshots "
@@ -595,6 +589,12 @@ type Market @entity {
 
   " Total amount of tokens locked up in variable rate borrows "
   totalVariableValueLocked: BigInt!
+
+  " The variable debt token address correlated to the reserve asset "
+  vToken: Token!
+
+  " The stable debt token address correlated to the reserve asset "
+  sToken: Token!
 }
 
 #################################

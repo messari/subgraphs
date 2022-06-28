@@ -1,10 +1,17 @@
-import { getOrCreateMarket, getOrCreateLendingProtocol, getOrCreateMarketDailySnapshot } from "./initializers";
+import {
+  getOrCreateMarket,
+  getOrCreateLendingProtocol,
+  getOrCreateMarketDailySnapshot,
+} from "./initializers";
 import * as constants from "./constants";
 import { Market, Token } from "../../../../generated/schema";
 import { AToken } from "../../../../generated/templates/AToken/AToken";
 import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T): T {
+export function readValue<T>(
+  callResult: ethereum.CallResult<T>,
+  defaultValue: T
+): T {
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
@@ -18,11 +25,14 @@ export function wadToRay(a: BigInt): BigInt {
   return result;
 }
 
-export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDecimal {
+export function bigIntToBigDecimal(
+  quantity: BigInt,
+  decimals: i32 = 18
+): BigDecimal {
   return quantity.divDecimal(
     BigInt.fromI32(10)
       .pow(decimals as u8)
-      .toBigDecimal(),
+      .toBigDecimal()
   );
 }
 
@@ -36,7 +46,12 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
   return result.toBigDecimal();
 }
 
-export function updateTVL(market: Market, token: Token, amountInTokens: BigInt, toSubtract: bool): void {
+export function updateTVL(
+  market: Market,
+  token: Token,
+  amountInTokens: BigInt,
+  toSubtract: bool
+): void {
   const protocol = getOrCreateLendingProtocol();
 
   // Update the total value locked in a market and the
@@ -56,15 +71,21 @@ export function updateTVL(market: Market, token: Token, amountInTokens: BigInt, 
 
   market.totalDepositBalanceUSD = market.totalValueLockedUSD;
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(market.totalValueLockedUSD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
+    market.totalValueLockedUSD
+  );
 
   market.totalValueLockedUSD = market.inputTokenPriceUSD.times(
-    newMarketTVL.toBigDecimal().div(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal()),
+    newMarketTVL
+      .toBigDecimal()
+      .div(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
   );
   market.totalDepositBalanceUSD = market.totalValueLockedUSD;
   market.save();
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+    market.totalValueLockedUSD
+  );
   protocol.totalDepositBalanceUSD = protocol.totalValueLockedUSD;
 
   protocol.save();
@@ -73,7 +94,10 @@ export function updateTVL(market: Market, token: Token, amountInTokens: BigInt, 
 export function updateOutputTokenSupply(event: ethereum.Event): void {
   const outputTokenAddr = event.address;
   const aTokenContract = AToken.bind(outputTokenAddr);
-  const tokenSupply = readValue<BigInt>(aTokenContract.try_totalSupply(), constants.BIGINT_ZERO);
+  const tokenSupply = readValue<BigInt>(
+    aTokenContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
 
   if (tokenSupply.equals(constants.BIGINT_ZERO)) {
     return;
