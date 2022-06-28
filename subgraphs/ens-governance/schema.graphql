@@ -27,7 +27,7 @@ type Governance @entity {
 
 type GovernanceFramework @entity {
   "Governance framework contract address"
-  id: Bytes!
+  id: String!
   "Name of the governance framework"
   name: String!
   "Type of governance framework"
@@ -36,11 +36,11 @@ type GovernanceFramework @entity {
   version: String!
 
   "Governance framework contract address"
-  contractAddress: Bytes!
+  contractAddress: String!
   "The contract address associated with the governance token used for voting on the governance framework proposals"
-  tokenAddress: Bytes!
+  tokenAddress: String!
   "The contract address associated with the contract that manages the delay of administrative actions for the governance framework"
-  timelockAddress: Bytes!
+  timelockAddress: String!
 
   "The delay before voting on a proposal may take place in blocks"
   votingDelay: BigInt!
@@ -49,11 +49,11 @@ type GovernanceFramework @entity {
   "The number of votes required in order for a voter to become a proposer"
   proposalThreshold: BigInt!
 
-  "The number of votes for a proposal to succeed. (quorum = totalSupply * numerator / denominator)"
-  _quorum: BigDecimal
-  "Quorum fraction numerator value"
+  "The number of votes for a proposal to succeed."
+  quorumVotes: BigInt
+  "Quorum fraction numerator value. (OZ: quorum = totalSupply * numerator / denominator)"
   quorumNumerator: BigInt!
-  "Quorum fraction denominator value"
+  "Quorum fraction denominator value. (OZ: quorum = totalSupply * numerator / denominator)"
   quorumDenominator: BigInt!
 }
 
@@ -103,7 +103,7 @@ type Proposal @entity {
   cancellationTime: BigInt
 
   "Targets data for the change"
-  targets: [Bytes!]
+  targets: [String!]
   "Values data for the change"
   values: [BigInt!]
   "Signature data for the change"
@@ -146,7 +146,7 @@ enum VoteChoice {
 
 type TokenHolder @entity {
   "A TokenHolder is any address that holds any amount of tokens, the id used is the blockchain address."
-  id: Bytes!
+  id: String!
   "Delegate address of the token holder which will participate in votings. Delegates don't need to hold any tokens and can even be the token holder itself."
   delegate: Delegate
 
@@ -162,7 +162,7 @@ type TokenHolder @entity {
 
 type Delegate @entity {
   "A Delegate is any address that has been delegated with voting tokens by a token holder, id is the blockchain address of said delegate"
-  id: Bytes!
+  id: String!
 
   "Amount of votes delegated to this delegate to be used on proposal votings expressed in the smallest unit of the token"
   delegatedVotesRaw: BigInt!
