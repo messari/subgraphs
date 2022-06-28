@@ -8,9 +8,10 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   exponentToBigDecimal,
+  INT_FOUR,
+  INT_TWO,
 } from "./constants";
 import {
-  getMarketRates,
   getOrCreateLendingProtocol,
   getOrCreateToken,
 } from "./helpers";
@@ -93,7 +94,7 @@ export function _handleReserveInitialized(
   market.outputTokenSupply = BIGINT_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.exchangeRate = BIGDECIMAL_ONE; // this is constant
-  market.reserveFactor = BIGINT_ZERO;
+  market.reserveFactor = BIGDECIMAL_ZERO;
   market.totalStableValueLocked = BIGINT_ZERO;
   market.totalVariableValueLocked = BIGINT_ZERO;
   market.rewardTokens = []; // updated once used
@@ -136,10 +137,80 @@ export function _handleCollateralConfigurationChanged(
   market.liquidationPenalty = liquidationPenalty.toBigDecimal();
   if (market.liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
     market.liquidationPenalty = market.liquidationPenalty
-      .minus(exponentToBigDecimal(4))
+      .minus(exponentToBigDecimal(INT_FOUR))
       .div(BIGDECIMAL_HUNDRED);
   }
 
+  market.save();
+}
+
+export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.error("[BorrowingEnabledOnReserve] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  market.canBorrowFrom = true;
+  market.save();
+}
+
+export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.error("[BorrowingDisabledOnReserve] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  market.canBorrowFrom = false;
+  market.save();
+}
+
+export function _handleReserveActivated(marketId: Address): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.error("[ReserveActivated] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  market.isActive = true;
+  market.save();
+}
+
+export function _handleReserveDeactivated(marketId: Address): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.error("[ReserveDeactivated] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  market.isActive = false;
+  market.save();
+}
+
+export function _handleReserveFactorChanged(
+  marketId: Address,
+  reserveFactor: BigInt
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.error("[ReserveFactorChanged] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  market.reserveFactor = reserveFactor
+    .toBigDecimal()
+    .div(exponentToBigDecimal(INT_TWO));
   market.save();
 }
 

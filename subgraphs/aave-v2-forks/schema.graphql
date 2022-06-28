@@ -582,7 +582,7 @@ type Market @entity {
   ##### Add Ons #####
 
   " The reserve factor as a percentage "
-  reserveFactor: BigInt!
+  reserveFactor: BigDecimal!
 
   " Total amount of tokens locked up in stable rate borrows "
   totalStableValueLocked: BigInt!

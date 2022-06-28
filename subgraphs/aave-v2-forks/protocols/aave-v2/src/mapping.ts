@@ -23,16 +23,9 @@ import {
 } from "./common/constants";
 import {
   createInterestRate,
-  getOrCreateLendingProtocol,
   getOrCreateMarket,
   getOrCreateToken,
 } from "./common/initializers";
-import {
-  bigIntToBigDecimal,
-  rayToWad,
-  readValue,
-  updateTVL,
-} from "./common/utils";
 import {
   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
   LendingPool as LendingPoolTemplate,
@@ -67,21 +60,27 @@ import { createLiquidateEntity } from "./modules/Liquidate";
 import { Transfer } from "../../../generated/templates/AToken/AToken";
 import {
   ProtocolData,
+  _handleBorrowingDisabledOnReserve,
+  _handleBorrowingEnabledOnReserve,
   _handleCollateralConfigurationChanged,
   _handlePriceOracleUpdated,
+  _handleReserveActivated,
+  _handleReserveDeactivated,
   _handleReserveInitialized,
 } from "../../../src/mapping";
+import { getOrCreateLendingProtocol } from "../../../src/helpers";
+import { readValue } from "../../../src/constants";
 
 function getProtocolData(): ProtocolData {
-  let constants = getNetworkSpecificConstant();
+  let letants = getNetworkSpecificConstant();
   return new ProtocolData(
-    constants.protocolAddress.toHexString(),
+    letants.protocolAddress.toHexString(),
     Protocol.NAME,
     Protocol.SLUG,
     Protocol.SCHEMA_VERSION,
     Protocol.SUBGRAPH_VERSION,
     Protocol.METHODOLOGY_VERSION,
-    constants.network
+    letants.network
   );
 }
 
@@ -94,22 +93,22 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
 }
 
 export function handleLendingPoolUpdated(event: LendingPoolUpdated): void {
-  const context = initiateContext(event.address);
+  let context = initiateContext(event.address);
   startIndexingLendingPool(event.params.newAddress, context);
 }
 
 export function handleLendingPoolConfiguratorUpdated(
   event: LendingPoolConfiguratorUpdated
 ): void {
-  const context = initiateContext(event.address);
+  let context = initiateContext(event.address);
   startIndexingLendingPoolConfigurator(event.params.newAddress, context);
 }
 
 export function handleProxyCreated(event: ProxyCreated): void {
   // Event handler for lending pool or configurator contract creation
-  const pool = event.params.id.toString();
-  const address = event.params.newAddress;
-  const context = initiateContext(event.address);
+  let pool = event.params.id.toString();
+  let address = event.params.newAddress;
+  let context = initiateContext(event.address);
 
   log.info("[ProxyCreated]: {}", [pool]);
 
@@ -143,10 +142,10 @@ export function startIndexingLendingPoolConfigurator(
 function initiateContext(addrProvider: Address): DataSourceContext {
   // Add Lending Pool address, price oracle contract address,
   // and protocol id to the context for general accessibility
-  const contract = AddressProviderContract.bind(addrProvider);
+  let contract = AddressProviderContract.bind(addrProvider);
   log.info("AddrProvContract: " + addrProvider.toHexString(), []);
   // Get the lending pool
-  const trylendingPool = contract.try_getLendingPool();
+  let trylendingPool = contract.try_getLendingPool();
   let lendingPool = "";
   if (!trylendingPool.reverted) {
     lendingPool = trylendingPool.value.toHexString();
@@ -154,9 +153,9 @@ function initiateContext(addrProvider: Address): DataSourceContext {
   }
 
   // Initialize the protocol entity
-  const lendingProtocol = getOrCreateLendingProtocol();
+  let lendingProtocol = getOrCreateLendingProtocol(getProtocolData());
 
-  const priceOracle = readValue<Address>(
+  let priceOracle = readValue<Address>(
     contract.try_getPriceOracle(),
     Address.fromString(ZERO_ADDRESS)
   );
@@ -164,7 +163,7 @@ function initiateContext(addrProvider: Address): DataSourceContext {
   lendingProtocol._protocolPriceOracle = priceOracle.toHexString();
   lendingProtocol.save();
 
-  const context = new DataSourceContext();
+  let context = new DataSourceContext();
   context.setString("lendingPool", lendingPool);
 
   return context;
@@ -176,7 +175,7 @@ function initiateContext(addrProvider: Address): DataSourceContext {
 
 export function getLendingPoolFromCtx(): string {
   // Get the lending pool with context
-  const context = dataSource.context();
+  let context = dataSource.context();
   return context.getString("lendingPool");
 }
 
@@ -209,56 +208,25 @@ export function handleCollateralConfigurationChanged(
 export function handleBorrowingEnabledOnReserve(
   event: BorrowingEnabledOnReserve
 ): void {
-  const marketAddress = event.params.asset.toHexString();
-  const market = getOrCreateMarket(event, marketAddress);
-  market.canBorrowFrom = true;
-  market.save();
-
-  log.info("[BorowEnabledOnReserve] MarketId: {}", [marketAddress]);
+  _handleBorrowingEnabledOnReserve(event.params.asset);
 }
 
 export function handleBorrowingDisabledOnReserve(
   event: BorrowingDisabledOnReserve
 ): void {
-  const marketAddress = event.params.asset.toHexString();
-  const market = getOrCreateMarket(event, marketAddress);
-  market.canBorrowFrom = false;
-  market.save();
-
-  log.info("[BorowDisabledOnReserve] MarketId: {}", [marketAddress]);
+  _handleBorrowingDisabledOnReserve(event.params.asset);
 }
 
 export function handleReserveActivated(event: ReserveActivated): void {
-  const marketAddress = event.params.asset.toHexString();
-  const market = getOrCreateMarket(event, marketAddress);
-  market.isActive = true;
-  market.save();
-
-  log.info("[ReserveActivated] MarketId: {}", [marketAddress]);
+  _handleReserveActivated(event.params.asset);
 }
 
 export function handleReserveDeactivated(event: ReserveDeactivated): void {
-  const marketAddress = event.params.asset.toHexString();
-  const market = getOrCreateMarket(event, marketAddress);
-  market.isActive = false;
-  market.save();
-
-  log.info("[ReserveDeactivated] MarketId: {}", [marketAddress]);
+  _handleReserveDeactivated(event.params.asset);
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
-  const marketAddress = event.params.asset.toHexString();
-  const market = getOrCreateMarket(event, marketAddress);
-
-  // Set the reserve factor as an integer * 100 of a percent
-  // (ie 2500 represents 25% of the reserve)
-  market.reserveFactor = event.params.factor;
-  market.save();
-
-  log.info("[ReserveFactorChanged] MarketId: {}, reserveFactor: {}", [
-    marketAddress,
-    market.reserveFactor.toString(),
-  ]);
+  _handleReserveFactorChanged(event.params.asset, event.params.factor);
 }
 
 /////////////////////////////////
@@ -271,8 +239,8 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
   log.warning("reserve: {}", [event.transaction.hash.toHexString()]);
 
-  const reserveAddress = event.params.reserve.toHexString();
-  const market = getOrCreateMarket(event, reserveAddress);
+  let reserveAddress = event.params.reserve.toHexString();
+  let market = getOrCreateMarket(event, reserveAddress);
 
   let stableBorrowRate = createInterestRate(
     market.id,
@@ -306,10 +274,10 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
 export function handleDeposit(event: Deposit): void {
   log.warning("Deposit handled: {}", [event.transaction.hash.toHexString()]); // TODO remove
-  const amount = event.params.amount;
-  const token = getOrCreateToken(event.params.reserve);
-  const reserveAddress = event.params.reserve.toHexString();
-  const market = getOrCreateMarket(event, reserveAddress);
+  let amount = event.params.amount;
+  let token = getOrCreateToken(event.params.reserve);
+  let reserveAddress = event.params.reserve.toHexString();
+  let market = getOrCreateMarket(event, reserveAddress);
 
   createDepositEntity(event, market, reserveAddress, amount);
 
@@ -320,10 +288,10 @@ export function handleDeposit(event: Deposit): void {
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  const amount = event.params.amount;
-  const token = getOrCreateToken(event.params.reserve);
-  const reserveAddress = event.params.reserve.toHexString();
-  const market = getOrCreateMarket(event, reserveAddress);
+  let amount = event.params.amount;
+  let token = getOrCreateToken(event.params.reserve);
+  let reserveAddress = event.params.reserve.toHexString();
+  let market = getOrCreateMarket(event, reserveAddress);
 
   createWithdrawEntity(event, market, reserveAddress, amount);
 
@@ -334,10 +302,10 @@ export function handleWithdraw(event: Withdraw): void {
 }
 
 export function handleBorrow(event: Borrow): void {
-  const amount = event.params.amount;
-  const token = getOrCreateToken(event.params.reserve);
-  const reserveAddress = event.params.reserve.toHexString();
-  const market = getOrCreateMarket(event, reserveAddress);
+  let amount = event.params.amount;
+  let token = getOrCreateToken(event.params.reserve);
+  let reserveAddress = event.params.reserve.toHexString();
+  let market = getOrCreateMarket(event, reserveAddress);
 
   createBorrowEntity(event, market, reserveAddress, amount);
 
@@ -348,10 +316,10 @@ export function handleBorrow(event: Borrow): void {
 }
 
 export function handleRepay(event: Repay): void {
-  const amount = event.params.amount;
-  const token = getOrCreateToken(event.params.reserve);
-  const reserveAddress = event.params.reserve.toHexString();
-  const market = getOrCreateMarket(event, reserveAddress);
+  let amount = event.params.amount;
+  let token = getOrCreateToken(event.params.reserve);
+  let reserveAddress = event.params.reserve.toHexString();
+  let market = getOrCreateMarket(event, reserveAddress);
 
   createRepayEntity(event, market, reserveAddress, amount);
 
@@ -362,13 +330,13 @@ export function handleRepay(event: Repay): void {
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
-  const user = event.params.user.toHexString();
-  const debtAsset = event.params.debtAsset.toHexString();
-  const collateralAsset = event.params.collateralAsset.toHexString();
-  const liquidator = event.params.liquidator.toHexString();
-  const amount = event.params.liquidatedCollateralAmount;
-  const market = getOrCreateMarket(event, collateralAsset);
-  const token = getOrCreateToken(event.params.collateralAsset);
+  let user = event.params.user.toHexString();
+  let debtAsset = event.params.debtAsset.toHexString();
+  let collateralAsset = event.params.collateralAsset.toHexString();
+  let liquidator = event.params.liquidator.toHexString();
+  let amount = event.params.liquidatedCollateralAmount;
+  let market = getOrCreateMarket(event, collateralAsset);
+  let token = getOrCreateToken(event.params.collateralAsset);
 
   createLiquidateEntity(
     event,
@@ -390,8 +358,8 @@ export function handleReserveUsedAsCollateralEnabled(
   event: ReserveUsedAsCollateralEnabled
 ): void {
   // This Event handler enables a reserve/market to be used as collateral
-  const marketAddr = event.params.reserve.toHexString();
-  const market = getOrCreateMarket(event, marketAddr);
+  let marketAddr = event.params.reserve.toHexString();
+  let market = getOrCreateMarket(event, marketAddr);
   market.canUseAsCollateral = true;
   market.save();
 }
@@ -400,8 +368,8 @@ export function handleReserveUsedAsCollateralDisabled(
   event: ReserveUsedAsCollateralDisabled
 ): void {
   // This Event handler disables a reserve/market being used as collateral
-  const marketAddr = event.params.reserve.toHexString();
-  const market = getOrCreateMarket(event, marketAddr);
+  let marketAddr = event.params.reserve.toHexString();
+  let market = getOrCreateMarket(event, marketAddr);
   market.canUseAsCollateral = false;
   market.save();
 }
@@ -410,6 +378,7 @@ export function handleReserveUsedAsCollateralDisabled(
 ///// aToken Handlers /////
 ///////////////////////////
 
+// TODO: won't do anything use diff method
 export function handleATokenTransfer(event: Transfer): void {
   // Event handler for AToken transfers. This gets triggered upon transfers
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
