@@ -250,6 +250,7 @@ function ProtocolTabEntity({
                 issues.push({ type: "SUM", message: "", fieldName: label, level });
               }
               if (field.endsWith("TotalRevenueUSD")) {
+                // if total revenue != protocol + supply revenue, add a warning
                 const fieldSplit = field.split("TotalRevenueUSD");
                 if (
                   !new BigNumber(dataFieldMetrics[`${fieldSplit[0]}ProtocolSideRevenueUSD`].sum)
@@ -257,8 +258,29 @@ function ProtocolTabEntity({
                     .isEqualTo(new BigNumber(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].sum))
                 ) {
                   issues.push({
-                    type: "TOTAL",
+                    type: "TOTAL_REV",
                     message: JSON.stringify(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].sum),
+                    level: "warning",
+                    fieldName: label,
+                  });
+                }
+              }
+              if (field.endsWith("TransactionCount")) {
+                // if total transactions != sum of all individual transactions, add a warning
+                const individualTxCountKeys = Object.keys(dataFieldMetrics).filter(
+                  (field) =>
+                    (field.startsWith("daily") || field.startsWith("hourly")) &&
+                    field.endsWith("Count") &&
+                    !field.endsWith("TransactionCount"),
+                );
+                const individualTxSum = individualTxCountKeys.reduce(
+                  (prev, currentKey) => prev.plus(new BigNumber(dataFieldMetrics[currentKey].sum)),
+                  new BigNumber(0),
+                );
+                if (!individualTxSum.isEqualTo(new BigNumber(dataFieldMetrics[field].sum))) {
+                  issues.push({
+                    type: "TOTAL_TX",
+                    message: JSON.stringify(dataFieldMetrics[field].sum),
                     level: "warning",
                     fieldName: label,
                   });
