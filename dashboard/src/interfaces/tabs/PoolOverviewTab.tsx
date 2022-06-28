@@ -45,7 +45,7 @@ function PoolOverviewTab({
   );
   const [currentPage, setCurrentPage] = useState(1);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
-  console.log(totalPoolCount);
+
   const navigate = useNavigate();
   const href = new URL(window.location.href);
   const p = new URLSearchParams(href.search);

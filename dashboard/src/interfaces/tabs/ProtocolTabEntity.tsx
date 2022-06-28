@@ -5,6 +5,7 @@ import { negativeFieldList } from "../../constants";
 import { convertTokenDecimals } from "../../utils";
 import { useEffect } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
+import { BigNumber } from "bignumber.js";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
@@ -247,6 +248,21 @@ function ProtocolTabEntity({
                   }
                 }
                 issues.push({ type: "SUM", message: "", fieldName: label, level });
+              }
+              if (field.endsWith("TotalRevenueUSD")) {
+                const fieldSplit = field.split("TotalRevenueUSD");
+                if (
+                  !new BigNumber(dataFieldMetrics[`${fieldSplit[0]}ProtocolSideRevenueUSD`].sum)
+                    .plus(new BigNumber(dataFieldMetrics[`${fieldSplit[0]}SupplySideRevenueUSD`].sum))
+                    .isEqualTo(new BigNumber(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].sum))
+                ) {
+                  issues.push({
+                    type: "TOTAL",
+                    message: JSON.stringify(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].sum),
+                    level: "warning",
+                    fieldName: label,
+                  });
+                }
               }
               if (
                 issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE")?.length === 0 &&

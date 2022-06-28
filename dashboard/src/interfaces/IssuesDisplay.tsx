@@ -37,6 +37,10 @@ const messagesByLevel = (
         issuesMsg = `
           ${issuesArray[x].fieldName} cumulative value dropped on snapshot id ${issuesArray[x].message}. Cumulative values should always increase.`;
       }
+      if (issuesArray[x].type === "TOTAL") {
+        issuesMsg = `
+          ${issuesArray[x].fieldName} sum value does not equal protocol + supply revenue on snapshot id ${issuesArray[x].message}.`;
+      }
       if (issuesArray[x].type === "TVL-") {
         issuesMsg = `${issuesArray[x].fieldName} is below 1000.`;
       }
