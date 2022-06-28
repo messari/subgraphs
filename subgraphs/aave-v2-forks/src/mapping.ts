@@ -315,7 +315,8 @@ export function _handleReserveDataUpdated(
     .div(exponentToBigDecimal(RAY_OFFSET));
   let newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken.decimals));
+    .div(exponentToBigDecimal(inputToken.decimals))
+    .times(liquidityIndexDiff);
   let totalRevenueDeltaUSD = newRevenueBD.times(assetPriceUSD);
   let protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(
     market.reserveFactor.div(exponentToBigDecimal(INT_TWO))
@@ -323,6 +324,19 @@ export function _handleReserveDataUpdated(
   let supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
     protocolSideRevenueDeltaUSD
   );
+  market.cumulativeTotalRevenueUSD =
+    market.cumulativeTotalRevenueUSD.plus(totalRevenueDeltaUSD);
+  market.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueDeltaUSD);
+  market.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
+
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(totalRevenueDeltaUSD);
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueDeltaUSD);
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
 
   // update rates
   let sBorrowRate = createInterestRate(
