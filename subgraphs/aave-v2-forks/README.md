@@ -42,14 +42,13 @@ To deploy follow the steps above. You may put your hosted service endpoint in [d
 
 When a transaction occurs in the `lendingPool` the following events are emitted in this order.
 
-1. A `transfer` event occurs (from the null address)
-   1. This signifies new interest in the market since the last transaction
-2. Next a `reserveDataUpdated` event is emitted
+1. Next a `reserveDataUpdated` event is emitted
    1. This is equivalent to `AccrueInterest` in compound.
-   2. This event is used to update all of the rates, prices, and balances in the subgraph.
-3. To get current supply balance we take use a contract call to `totalSupply()` in the respective aToken
-4. To get the current borrow balance we call `totalSupply()` in both the VariableDebtToken and StableDebtToken
-5. Finally we handle the actual transaction event (ie, deposit, borrow, repay, withdraw, liquidate)
+   2. New Revenue = ScaledTotalSupply * (currentLiquidityIndex - lastLiquidityIndex)
+   3. This event is used to update all of the rates, prices, and balances in the subgraph.
+2. To get current supply balance we take use a contract call to `totalSupply()` in the respective aToken
+3. To get the current borrow balance we call `totalSupply()` in both the VariableDebtToken and StableDebtToken
+4. Finally we handle the actual transaction event (ie, deposit, borrow, repay, withdraw, liquidate)
    1. This handler is designed to only update the metrics that have to do with those events. ie, usage and daily/hourly event amounts
 
 ### Resources

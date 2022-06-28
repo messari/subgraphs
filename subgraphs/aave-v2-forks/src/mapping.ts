@@ -313,6 +313,7 @@ export function _handleReserveDataUpdated(
     .minus(market.liquidityIndex)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
+  market.liquidityIndex = liquidityIndex; // must update to current liquidity index
   let newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals))
@@ -324,6 +325,7 @@ export function _handleReserveDataUpdated(
   let supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
     protocolSideRevenueDeltaUSD
   );
+
   market.cumulativeTotalRevenueUSD =
     market.cumulativeTotalRevenueUSD.plus(totalRevenueDeltaUSD);
   market.cumulativeProtocolSideRevenueUSD =

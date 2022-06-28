@@ -243,37 +243,6 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     getProtocolData(),
     event.params.reserve
   );
-  let reserveAddress = event.params.reserve.toHexString();
-  let market = getOrCreateMarket(event, reserveAddress);
-
-  let stableBorrowRate = createInterestRate(
-    market.id,
-    InterestRateSide.BORROWER,
-    InterestRateType.STABLE,
-    bigIntToBigDecimal(rayToWad(event.params.stableBorrowRate))
-  );
-
-  let variableBorrowRate = createInterestRate(
-    market.id,
-    InterestRateSide.BORROWER,
-    InterestRateType.VARIABLE,
-    bigIntToBigDecimal(rayToWad(event.params.variableBorrowRate))
-  );
-
-  let depositRate = createInterestRate(
-    market.id,
-    InterestRateSide.LENDER,
-    InterestRateType.VARIABLE,
-    bigIntToBigDecimal(rayToWad(event.params.liquidityRate))
-  );
-
-  market.rewardTokens = [
-    stableBorrowRate.id,
-    variableBorrowRate.id,
-    depositRate.id,
-  ];
-
-  market.save();
 }
 
 export function handleDeposit(event: Deposit): void {
