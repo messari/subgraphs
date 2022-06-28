@@ -57,7 +57,7 @@ import { createWithdrawEntity } from "./modules/Withdraw";
 import { createBorrowEntity } from "./modules/Borrow";
 import { createRepayEntity } from "./modules/Repay";
 import { createLiquidateEntity } from "./modules/Liquidate";
-import { Transfer } from "../../../generated/templates/AToken/AToken";
+import { AToken, Transfer } from "../../../generated/templates/AToken/AToken";
 import {
   ProtocolData,
   _handleBorrowingDisabledOnReserve,
@@ -67,10 +67,13 @@ import {
   _handleReserveActivated,
   _handleReserveDataUpdated,
   _handleReserveDeactivated,
+  _handleReserveFactorChanged,
   _handleReserveInitialized,
 } from "../../../src/mapping";
 import { getOrCreateLendingProtocol } from "../../../src/helpers";
 import { readValue } from "../../../src/constants";
+import { Market } from "../../../generated/schema";
+import { AaveIncentivesController } from "../../../generated/templates/LendingPool/AaveIncentivesController";
 
 function getProtocolData(): ProtocolData {
   let letants = getNetworkSpecificConstant();
@@ -243,6 +246,41 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     getProtocolData(),
     event.params.reserve
   );
+
+  // update rewards if there is an incentive controller
+  let market = Market.load(event.params.reserve.toHexString());
+  if (!market) {
+    log.warning("[handleReserveDataUpdated] Market not found", [event.params.reserve.toHexString()]);
+    return;
+  }
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  let tryIncentiveController = aTokenContract.try_getIncentivesController();
+  if (!tryIncentiveController.reverted) {
+    let incentiveControllerContract = AaveIncentivesController.bind(tryIncentiveController.value);
+    if () {
+      
+    }
+  }
+}
+
+export function handleReserveUsedAsCollateralEnabled(
+  event: ReserveUsedAsCollateralEnabled
+): void {
+  // This Event handler enables a reserve/market to be used as collateral
+  let marketAddr = event.params.reserve.toHexString();
+  let market = getOrCreateMarket(event, marketAddr);
+  market.canUseAsCollateral = true;
+  market.save();
+}
+
+export function handleReserveUsedAsCollateralDisabled(
+  event: ReserveUsedAsCollateralDisabled
+): void {
+  // This Event handler disables a reserve/market being used as collateral
+  let marketAddr = event.params.reserve.toHexString();
+  let market = getOrCreateMarket(event, marketAddr);
+  market.canUseAsCollateral = false;
+  market.save();
 }
 
 export function handleDeposit(event: Deposit): void {
@@ -327,25 +365,7 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   updateFinancials(event.block);
 }
 
-export function handleReserveUsedAsCollateralEnabled(
-  event: ReserveUsedAsCollateralEnabled
-): void {
-  // This Event handler enables a reserve/market to be used as collateral
-  let marketAddr = event.params.reserve.toHexString();
-  let market = getOrCreateMarket(event, marketAddr);
-  market.canUseAsCollateral = true;
-  market.save();
-}
 
-export function handleReserveUsedAsCollateralDisabled(
-  event: ReserveUsedAsCollateralDisabled
-): void {
-  // This Event handler disables a reserve/market being used as collateral
-  let marketAddr = event.params.reserve.toHexString();
-  let market = getOrCreateMarket(event, marketAddr);
-  market.canUseAsCollateral = false;
-  market.save();
-}
 
 ///////////////////////////
 ///// aToken Handlers /////

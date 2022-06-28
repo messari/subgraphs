@@ -340,6 +340,8 @@ export function _handleReserveDataUpdated(
   protocol.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
 
+  log.warning("[ReserveDataUpdated] New revenue: {}", [totalRevenueDeltaUSD.toString()]);
+
   // update rates
   let sBorrowRate = createInterestRate(
     market.id,
@@ -367,4 +369,6 @@ export function _handleReserveDataUpdated(
   // update financial snapshot / Market dailly & hourly snapshots
 
   // update rewards if past certain block number
+  if ()
+
 }
