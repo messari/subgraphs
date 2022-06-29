@@ -70,8 +70,8 @@ export function createWithdraw(event: ethereum.Event, amount: BigInt): void {
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.logIndex.toI32();
   withdraw.protocol = getOrCreateLendingProtocol().id;
-  withdraw.to = market.id;
-  withdraw.from = event.transaction.from.toHexString();
+  withdraw.to = event.transaction.from.toHexString();
+  withdraw.from = market.id;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
   withdraw.market = market.id;
@@ -98,11 +98,11 @@ export function createBorrow(event: ethereum.Event, amount: BigInt): void {
   borrow.hash = event.transaction.hash.toHexString();
   borrow.logIndex = event.logIndex.toI32();
   borrow.protocol = getOrCreateLendingProtocol().id;
-  borrow.to = market.id;
-  borrow.from = event.transaction.from.toHexString();
+  borrow.to = event.transaction.from.toHexString();
+  borrow.from = market.id;
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
-  borrow.market = getMarket(event.address).id;
+  borrow.market = market.id;
   borrow.asset = mai.id;
   borrow.amount = amount;
   borrow.amountUSD = bigIntToBigDecimal(amount, mai.decimals);
@@ -149,7 +149,8 @@ export function createLiquidate(
   debtRepaid: BigInt,
   amountLiquidated: BigInt,
   closingFee: BigInt,
-  liquidator: Address
+  liquidator: Address,
+  liquidatee: string
 ): void {
   const market = getMarket(event.address);
   const mai = getMaiToken();
@@ -166,9 +167,9 @@ export function createLiquidate(
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.market = market.id;
-  liquidate.asset = collateral.id;
+  liquidate.asset = mai.id;
   liquidate.amount = amountLiquidated;
-  liquidate.liquidatee = liquidator.toHexString();
+  liquidate.liquidatee = liquidatee;
   liquidate.amountUSD = bigIntToBigDecimal(
     amountLiquidated,
     collateral.decimals
