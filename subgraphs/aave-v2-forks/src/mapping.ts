@@ -311,19 +311,26 @@ export function _handleReserveDataUpdated(
   let variableDebtContract = VariableDebtToken.bind(
     Address.fromString(market.vToken)
   );
-  let stableBorrowBalance = stableDebtContract.try_totalSupply();
-  let variableBorrowBalance = variableDebtContract.try_totalSupply();
+  let trySBorrowBalance = stableDebtContract.try_totalSupply();
+  let tryVBorrowBalance = variableDebtContract.try_totalSupply();
+  let sBorrowBalance = BIGINT_ZERO;
+  let vBorrowBalance = BIGINT_ZERO;
 
-  if (stableBorrowBalance.reverted || variableBorrowBalance.reverted) {
-    log.warning(
-      "[ReserveDataUpdated] Error getting borrow balance on market: {}",
-      [marketId.toHexString()]
-    );
+  if (!trySBorrowBalance.reverted) {
+    sBorrowBalance = trySBorrowBalance.value;
+  }
+  if (!tryVBorrowBalance.reverted) {
+    vBorrowBalance = tryVBorrowBalance.value;
+  }
+
+  // broken is both revert
+  if (trySBorrowBalance.reverted && tryVBorrowBalance.reverted) {
+    log.warning("[ReserveDataUpdated] No borrow balance found", []);
     return;
   }
 
-  let totalBorrowBalance = stableBorrowBalance.value
-    .plus(variableBorrowBalance.value)
+  let totalBorrowBalance = sBorrowBalance
+    .plus(vBorrowBalance)
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals));
   market.totalBorrowBalanceUSD = totalBorrowBalance.times(assetPriceUSD);
