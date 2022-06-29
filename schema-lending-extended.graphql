@@ -979,13 +979,13 @@ type PositionSnapshot @entity {
   " { Position ID }-{ Transaction hash }-{ Log index } "
   id: ID!
 
-  " Transaction hash of the transaction that emitted this event "
+  " Transaction hash of the transaction that triggered this snapshot "
   hash: String!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
-  " Nonce of the transaction that emitted this event "
+  " Nonce of the transaction that triggered this snapshot "
   nonce: BigInt!
 
   " Position of this snapshot "
