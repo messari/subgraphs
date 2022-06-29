@@ -1,5 +1,7 @@
 import {
   Address,
+  BigDecimal,
+  BigInt,
   dataSource,
   DataSourceContext,
   log,
@@ -11,7 +13,12 @@ import {
   ProxyCreated,
   LendingPoolAddressesProvider as AddressProviderContract,
 } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
-import { Protocol } from "./constants";
+import {
+  GEIST_FTM_LP_ADDRESS,
+  GFTM_ADDRESS,
+  Protocol,
+  REWARD_TOKEN_ADDRESS,
+} from "./constants";
 import {
   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
   LendingPool as LendingPoolTemplate,
@@ -56,13 +63,12 @@ import {
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
-  getAssetPriceInUSDC,
   getOrCreateLendingProtocol,
   getOrCreateRewardToken,
-  getOrCreateToken,
 } from "../../../src/helpers";
 import {
-    DEFAULT_DECIMALS,
+  BIGDECIMAL_ZERO,
+  DEFAULT_DECIMALS,
   exponentToBigDecimal,
   readValue,
   RewardTokenType,
@@ -71,6 +77,7 @@ import {
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { ChefIncentivesController } from "../../../generated/templates/LendingPool/ChefIncentivesController";
+import { SpookySwapOracle } from "../../../generated/templates/LendingPool/SpookySwapOracle";
 
 function getProtocolData(): ProtocolData {
   return new ProtocolData(
@@ -244,56 +251,50 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     return;
   }
 
-  // TODO figure out geist rewards
+  let gTokenContract = GToken.bind(Address.fromString(market.outputToken!));
+  let tryIncentiveController = gTokenContract.try_getIncentivesController();
+  if (!tryIncentiveController.reverted) {
+    let incentiveControllerContract = ChefIncentivesController.bind(
+      tryIncentiveController.value
+    );
+    let tryPoolInfo = incentiveControllerContract.try_poolInfo(
+      Address.fromString(market.outputToken!)
+    );
+    if (!tryPoolInfo.reverted) {
+      let tryEmissions = incentiveControllerContract.try_emissionSchedule(
+        tryPoolInfo.value.value1
+      ); // parameter is allocPoint
+      if (!tryEmissions.reverted) {
+        // create reward tokens
+        let depositRewardToken = getOrCreateRewardToken(
+          Address.fromString(REWARD_TOKEN_ADDRESS),
+          RewardTokenType.DEPOSIT
+        );
+        let borrowRewardToken = getOrCreateRewardToken(
+          Address.fromString(REWARD_TOKEN_ADDRESS),
+          RewardTokenType.BORROW
+        );
+        market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
 
-  // let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  // let tryIncentiveController = aTokenContract.try_getIncentivesController();
-  // if (!tryIncentiveController.reverted) {
-  //   let incentiveControllerContract = AaveIncentivesController.bind(
-  //     tryIncentiveController.value
-  //   );
-  //   let tryRewardInfo = incentiveControllerContract.try_assets(
-  //     Address.fromString(market.outputToken!)
-  //   );
-  //   if (!tryRewardInfo.reverted) {
-  //     let tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
-  //     if (!tryRewardAsset.reverted) {
-  //       // create reward tokens
-  //       let depositRewardToken = getOrCreateRewardToken(
-  //         tryRewardAsset.value,
-  //         RewardTokenType.DEPOSIT
-  //       );
-  //       let borrowRewardToken = getOrCreateRewardToken(
-  //         tryRewardAsset.value,
-  //         RewardTokenType.BORROW
-  //       );
-  //       let rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
-  //       market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
+        // update reward token fields
+        let rewardsPerDay = tryEmissions.value.value1.times(
+          BigInt.fromI32(SECONDS_PER_DAY)
+        );
+        let rewardTokenPriceUSD = getGeistPriceUSD();
+        let rewardsPerDayUSD = rewardsPerDay
+          .toBigDecimal()
+          .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+          .times(rewardTokenPriceUSD);
 
-  //       // now get or create reward token and update fields
-  //       let protocol = getOrCreateLendingProtocol(protocolData);
-  //       let rewardsPerDay = tryRewardInfo.value.value0.times(
-  //         BigInt.fromI32(SECONDS_PER_DAY)
-  //       );
-  //       let rewardTokenPriceUSD = getAssetPriceInUSDC(
-  //         tryRewardAsset.value,
-  //         Address.fromString(protocol.priceOracle)
-  //       );
-  //       let rewardsPerDayUSD = rewardsPerDay
-  //         .toBigDecimal()
-  //         .div(exponentToBigDecimal(rewardDecimals))
-  //         .times(rewardTokenPriceUSD);
-
-  //       // set rewards to arrays
-  //       market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
-  //       market.rewardTokenEmissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
-  //     }
-  //   }
-  // }
+        // set rewards to arrays
+        market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
+        market.rewardTokenEmissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
+      }
+    }
+  }
   market.save();
 
   // update gToken price
-  let gTokenContract = GToken.bind(Address.fromString(market.outputToken!));
   let tryPrice = gTokenContract.try_getAssetPrice();
   if (tryPrice.reverted) {
     log.warning(
@@ -378,4 +379,43 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidator,
     event.params.user
   );
+}
+
+///////////////////
+///// Helpers /////
+///////////////////
+
+//
+//
+// GEIST price is generated from FTM-GEIST reserve on SpookySwap
+function getGeistPriceUSD(): BigDecimal {
+  let geistFtmLP = SpookySwapOracle.bind(
+    Address.fromString(GEIST_FTM_LP_ADDRESS)
+  );
+
+  let reserves = geistFtmLP.try_getReserves();
+
+  if (reserves.reverted) {
+    log.error("[getGeistPriceUSD] Unable to get price for asset", [
+      REWARD_TOKEN_ADDRESS,
+    ]);
+    return BIGDECIMAL_ZERO;
+  }
+  let reserveFTM = reserves.value.value0;
+  let reserveGEIST = reserves.value.value1;
+
+  let priceGEISTinFTM = reserveFTM
+    .div(reserveGEIST)
+    .toBigDecimal()
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+
+  // get FTM price
+  let gTokenContract = GToken.bind(Address.fromString(GFTM_ADDRESS));
+  let tryPrice = gTokenContract.try_getAssetPrice();
+  return tryPrice.reverted
+    ? BIGDECIMAL_ZERO
+    : tryPrice.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+        .times(priceGEISTinFTM);
 }

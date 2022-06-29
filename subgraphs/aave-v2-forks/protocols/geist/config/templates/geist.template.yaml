@@ -45,6 +45,8 @@ templates:
       abis:
         - name: ChefIncentivesController
           file: ./abis/geist/ChefIncentivesController.json
+        - name: SpookySwapOracle
+          file: ./abis/geist/SpookySwapOracle.json
         - name: GToken
           file: ./abis/geist/GToken.json
         - name: AToken

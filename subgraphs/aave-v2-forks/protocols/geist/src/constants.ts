@@ -1,10 +1,14 @@
 import { Network } from "../../../src/constants";
 
-//////////////////////////////
-///// Ethereum Addresses /////
-//////////////////////////////
+/////////////////////
+///// Addresses /////
+/////////////////////
 
-export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+export const REWARD_TOKEN_ADDRESS =
+  "0xd8321AA83Fb0a4ECd6348D4577431310A6E0814d"; // GEIST token
+export const GEIST_FTM_LP_ADDRESS =
+  "0x668AE94D0870230AC007a01B471D02b2c94DDcB9";
+export const GFTM_ADDRESS = "0x39b3bd37208cbade74d0fcbdbb12d606295b430a";
 
 /////////////////////////////
 ///// Protocol Specific /////
