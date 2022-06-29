@@ -59,13 +59,13 @@ export function calculatePrice(
   if (isUSDStable(tokenOutAddress) && isUSDStable(tokenInAddress)) {
     let tokenOut = Token.load(tokenOutAddress.toHexString());
     if (tokenOut) {
-      tokenOut.lastPriceUSD =BIGDECIMAL_ONE;
+      tokenOut.lastPriceUSD = BIGDECIMAL_ONE;
       tokenOut.save();
     }
 
     let tokenIn = Token.load(tokenInAddress.toHexString());
     if (tokenIn) {
-      tokenIn.lastPriceUSD =BIGDECIMAL_ONE;
+      tokenIn.lastPriceUSD = BIGDECIMAL_ONE;
       tokenIn.save();
     }
     return null;
@@ -75,7 +75,7 @@ export function calculatePrice(
   if (isUSDStable(tokenOutAddress)) {
     let tokenOut = Token.load(tokenOutAddress.toHexString());
     if (tokenOut) {
-      tokenOut.lastPriceUSD =BIGDECIMAL_ONE;
+      tokenOut.lastPriceUSD = BIGDECIMAL_ONE;
       tokenOut.save();
     }
     return new TokenInfo(tokenInAddress, calculateTokenValueInUsd(amountIn, amountOut, weightIn, weightOut));
@@ -83,7 +83,7 @@ export function calculatePrice(
   if (isUSDStable(tokenInAddress)) {
     let tokenIn = Token.load(tokenInAddress.toHexString());
     if (tokenIn) {
-      tokenIn.lastPriceUSD =BIGDECIMAL_ONE;
+      tokenIn.lastPriceUSD = BIGDECIMAL_ONE;
       tokenIn.save();
     }
     return new TokenInfo(tokenOutAddress, calculateTokenValueInUsd(amountOut, amountIn, weightOut, weightIn));
