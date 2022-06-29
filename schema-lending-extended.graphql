@@ -969,10 +969,24 @@ type Position @entity {
   dailySnapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
 
+# Unlike other snapshots that are taken at a fixed time interval. Position
+# snapshots should be taken after every event, including the opening and
+# closing events. This will prevent an ever growing number of snapshots
+# for positions that are not moving. As we are only recording the balance
+# in token amounts instead of in USD, this will work well.
 # Note that we only take snapshot for open positions
 type PositionSnapshot @entity {
-  " { Position ID }-{ # of days since Unix epoch time } "
+  " { Position ID }-{ Transaction hash }-{ Log index } "
   id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
 
   " Position of this snapshot "
   position: Position!
