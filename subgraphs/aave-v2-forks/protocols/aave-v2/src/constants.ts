@@ -35,8 +35,7 @@ export const ARC_ADDRESS = Address.fromString(
 );
 export const RWA_ADDRESS = Address.fromString(
   "0xB953a066377176092879a151C07798B3946EEa4b"
-  );
-
+);
 
 export class NetworkSpecificConstant {
   constructor(
