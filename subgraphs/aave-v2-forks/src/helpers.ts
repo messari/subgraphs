@@ -288,6 +288,9 @@ export function updateFinancials(
     snapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
     snapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
     snapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
+    snapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
 
   // update snapshot fields

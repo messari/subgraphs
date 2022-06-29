@@ -88,7 +88,9 @@ export function _handleReserveInitialized(
   // get protocol
   let protocol = getOrCreateLendingProtocol(protocolData);
   protocol.totalPoolCount++;
-  protocol.marketIDs.push(underlyingToken.toHexString());
+  let markets = protocol.marketIDs;
+  markets.push(underlyingToken.toHexString());
+  protocol.marketIDs = markets;
   protocol.save();
 
   // Create a new Market
@@ -467,6 +469,8 @@ export function _handleDeposit(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let deposit = new Deposit(id);
 
+  deposit.blockNumber = event.block.number;
+  deposit.timestamp = event.block.timestamp;
   deposit.to = market.id;
   deposit.from = event.transaction.from.toHexString();
   deposit.market = marketId.toHexString();
@@ -530,6 +534,8 @@ export function _handleWithdraw(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let withdraw = new Withdraw(id);
 
+  withdraw.blockNumber = event.block.number;
+  withdraw.timestamp = event.block.timestamp;
   withdraw.to = event.transaction.from.toHexString();
   withdraw.from = market.id;
   withdraw.market = market.id;
@@ -583,6 +589,8 @@ export function _handleBorrow(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let borrow = new Borrow(id);
 
+  borrow.blockNumber = event.block.number;
+  borrow.timestamp = event.block.timestamp;
   borrow.to = event.transaction.from.toHexString();
   borrow.from = market.id;
   borrow.market = market.id;
@@ -646,6 +654,8 @@ export function _handleRepay(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let repay = new Repay(id);
 
+  repay.blockNumber = event.block.number;
+  repay.timestamp = event.block.timestamp;
   repay.to = market.id;
   repay.from = event.transaction.from.toHexString();
   repay.market = market.id;
@@ -702,6 +712,8 @@ export function _handleLiquidate(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let liquidate = new Liquidate(id);
 
+  liquidate.blockNumber = event.block.number;
+  liquidate.timestamp = event.block.timestamp;
   liquidate.to = debtAsset.toHexString();
   liquidate.from = liquidator.toHexString();
   liquidate.market = market.id;
