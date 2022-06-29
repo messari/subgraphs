@@ -15,5 +15,8 @@
   "protocolName": "Balancer v2",
   "protocolSlug": "balancer-v2",
   "defaultNetwork": "ARBITRUM_ONE",
-  "isBalancer": true
+  "isBalancer": true,
+  "graftEnabled": false,
+  "subgraphId": "QmVw2ruPhJZkzWT5QUA9bskyaF3vfzwTohfUpkNdiEzeeb",
+  "graftStartBlock": "1539300"
 }

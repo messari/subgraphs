@@ -16,6 +16,7 @@ import {
   BIGINT_ZERO,
   FBEETS,
   MASTERCHEFV2_ADDRESS,
+  OHMYBEETS,
   REWARD_TOKEN,
   SECONDS_PER_DAY,
 } from "../common/constants";
@@ -85,6 +86,12 @@ export function handleLogUpdatePool(event: LogUpdatePool): void {
     if (FBEETS.toHexString() == poolAddress.value.toHexString()) {
       pool = createLiquidityPool(event, poolAddress.value.toHexString(), "FreshBeets", "FBEETS", [
         FBEETS.toHexString(),
+      ]);
+    }
+    if (OHMYBEETS.toHexString() == poolAddress.value.toHexString()) {
+      //BeethovenxOhmEmissionToken (OHMYBEETS)
+      pool = createLiquidityPool(event, poolAddress.value.toHexString(), "BeethovenxOhmEmissionToken", "OHMYBEETS", [
+        OHMYBEETS.toHexString(),
       ]);
     }
   }
