@@ -52,6 +52,43 @@
         }
       }
     },
+    "balancer-forks": {
+      "balancer-v2": {
+        "arbitrum": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/balancer-v2-arbitrum",
+          "sevenshi": "sevenshi/balancer-v2-arbitrum",
+          "deploy-on-merge": true
+        },
+        "matic": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/balancer-v2-polygon",
+          "sevenshi": "sevenshi/balancer-v2-matic",
+          "deploy-on-merge": true
+        },
+        "mainnet": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/balancer-v2-ethereum",
+          "sevenshi": "sevenshi/balancer-v2-ethereum",
+          "deploy-on-merge": true
+        }
+
+      },
+      "beethoven-x": {
+        "optimism": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/beethoven-x-optimism",
+          "sevenshi": "sevenshi/beets-optimism",
+          "deploy-on-merge": true
+        },
+        "fantom": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/beethoven-x-fantom",
+          "sevenshi": "sevenshi/beets-fantom",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "beefy-finance": {
       "beefy-finance": {
         "aurora": {
