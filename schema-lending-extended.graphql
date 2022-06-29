@@ -966,7 +966,7 @@ type Position @entity {
   liquidations: [Liquidate!]! @derivedFrom(field: "position")
 
   " Position daily snapshots for open positions "
-  dailySnapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
+  snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
 
 # Unlike other snapshots that are taken at a fixed time interval. Position
