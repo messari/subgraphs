@@ -14,7 +14,7 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - LendingPoolAddressesProvider
+        - LendingProtocol
       abis:
         - name: LendingPoolAddressesProvider
           file: ./abis/LendingPoolAddressesProvider.json
@@ -51,7 +51,7 @@ templates:
         - name: AaveIncentivesController
           file: ./abis/aave-v2/AaveIncentivesController.json
         - name: AToken
-          file: ./abis/AToken.json
+          file: ./abis/aave-v2/AToken.json
         - name: VariableDebtToken
           file: ./abis/VariableDebtToken.json
         - name: StableDebtToken
@@ -104,7 +104,7 @@ templates:
         - PositionSnapshot
       abis:
         - name: AToken
-          file: ./abis/AToken.json
+          file: ./abis/aave-v2/AToken.json
         - name: LendingPoolConfigurator
           file: ./abis/LendingPoolConfigurator.json
         - name: LendingPool
