@@ -341,19 +341,19 @@
       "saddle-finance": {
         "arbitrum": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "mainnet": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "optimism": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -361,7 +361,7 @@
       "tokemak": {
         "mainnet": {
           "template": "tokemak.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -394,37 +394,37 @@
         "arbitrum": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-arbitrum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "avalanche": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-avalanche",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "bsc": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-bsc",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-fantom",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "matic": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-polygon",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "moonriver": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-moonriver",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "optimism": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-optimism",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "xdai": {
           "template": "qidao.template.yaml",

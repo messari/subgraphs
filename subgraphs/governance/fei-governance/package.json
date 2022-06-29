@@ -1,0 +1,16 @@
+{
+  "name": "fei-governance",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ fei-governance",
+    "create-local": "graph create --node http://localhost:8020/ fei-governance",
+    "remove-local": "graph remove --node http://localhost:8020/ fei-governance",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 fei-governance"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.31.0",
+    "@graphprotocol/graph-ts": "0.27.0"
+  }
+}
