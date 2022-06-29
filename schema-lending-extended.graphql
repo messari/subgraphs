@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol (Extended)
-# Version: 2.0.0
+# Version: 2.0.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -297,20 +297,6 @@ type LendingProtocol implements Protocol @entity {
 
   " Total number of positions (open and closed) "
   cumulativePositionCount: Int!
-
-  ##### Account / Position Data #####
-
-  " Any account that has made a deposit before "
-  depositors: [Account!]!
-
-  " Any account that has made a borrow before "
-  borrowers: [Account!]!
-
-  " Any account that has made a liquidation before "
-  liquidators: [Account!]!
-
-  " Any account that has been liquidated before "
-  liquidatees: [Account!]!
 
   ##### Snapshots #####
 
@@ -621,26 +607,14 @@ type Market @entity {
   " Number of positions in this market "
   positionCount: Int!
 
-  " All open positions in this market "
-  openPositions: [Position!]!
-
   " Number of open positions in this market "
   openPositionCount: Int!
-
-  " All closed positions in this market "
-  closedPositions: [Position!]!
 
   " Number of closed positions in this market "
   closedPositionCount: Int!
 
-  " All lending positions in this market "
-  lendingPositions: [Position!]!
-
   " Number of lending positions in this market "
   lendingPositionCount: Int!
-
-  " All borrowing positions in this market "
-  borrowingPositions: [Position!]!
 
   " Number of borrowing positions in this market "
   borrowingPositionCount: Int!
@@ -881,14 +855,8 @@ type Account @entity {
   " All positions that belong to this account "
   positions: [Position!]! @derivedFrom(field: "account")
 
-  " All open positions this account has "
-  openPositions: [Position!]!
-
   " Number of open positions this account has "
   openPositionCount: Int!
-
-  " All closed positions this account has "
-  closedPositions: [Position!]!
 
   " Number of closed positions this account has "
   closedPositionCount: Int!
