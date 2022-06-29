@@ -8,8 +8,8 @@ export function getTokenOrCreate(
   block: ethereum.Block
 ): Token {
   const tokenId = tokenAddress.toHexString();
-
   let token = Token.load(tokenId);
+
   if (!token) {
     token = new Token(tokenId);
     token.name = fetchTokenName(tokenAddress);
@@ -18,6 +18,8 @@ export function getTokenOrCreate(
   }
 
   // should this be inside (!token)
+  // - inside makes more sense at this time
+  // - but adding more attributes on token (Eg price calculation and updates) might make save here better
   token.save();
   return token;
 }

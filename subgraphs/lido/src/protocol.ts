@@ -1,7 +1,4 @@
 import { Protocol } from "../generated/schema";
-import { BIGDECIMAL_ZERO } from "./utils/constants";
-import { BigDecimal } from "@graphprotocol/graph-ts";
-
 import {
     PROTOCOL_NAME,
     PROTOCOL_SLUG,
@@ -11,8 +8,10 @@ import {
     PROTOCOL_CONTRACT,
     Network,
     ProtocolType,
+    BIGDECIMAL_ZERO
 } from "./utils/constants";
 
+// TODO: Do we want to allow the protocol contract as a param?
 export function getOrCreateProtocol(): Protocol {
     let protocol = Protocol.load(PROTOCOL_CONTRACT);
 
@@ -24,22 +23,18 @@ export function getOrCreateProtocol(): Protocol {
         protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
         protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
         protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
-
         protocol.network = Network.MAINNET;
         protocol.type = ProtocolType.GENERIC;
-        protocol.totalPoolCount = 1; // 
+
+        // Quantitative Data
+        protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+        protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+        protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+        protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+        protocol.cumulativeUniqueUsers = 0;
 
         protocol.save();
     }
 
     return protocol;
-}
-
-export function updateProtocolTotalValueLockedUSD(): void {
-    let totalValueLockedUSD = BIGDECIMAL_ZERO;
-    // single vault, no loop needed
-    // totalValueLockedUSD
-    // calculate sum of deposits
-    // calculate sum of deposits to ETH2 deposit contract from "LIDO + stETH" contract
-
 }

@@ -8,13 +8,15 @@ dataSources:
     source:
       address: "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
       abi: Lido
-      startBlock: 14000000
+      startBlock: 14006700
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - LidoSubmission
+        - Protocol
+        - Token
       abis:
         - name: Lido
           file: ./abis/Lido.json
