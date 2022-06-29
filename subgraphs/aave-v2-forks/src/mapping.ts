@@ -1,7 +1,15 @@
 // generic aave-v2 handlers
 
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { Deposit, Market, Token } from "../generated/schema";
+import {
+  Borrow,
+  Deposit,
+  Liquidate,
+  Market,
+  Repay,
+  Token,
+  Withdraw,
+} from "../generated/schema";
 import { AToken } from "../generated/templates/AToken/AToken";
 import { StableDebtToken } from "../generated/templates/LendingPool/StableDebtToken";
 import { VariableDebtToken } from "../generated/templates/LendingPool/VariableDebtToken";
@@ -27,6 +35,7 @@ import {
   getOrCreateToken,
   snapshotUsage,
   updateFinancials,
+  updateMarketSnapshots,
   updateSnapshots,
 } from "./helpers";
 
@@ -426,6 +435,16 @@ export function _handleReserveDataUpdated(
     protocolSideRevenueDeltaUSD,
     supplySideRevenueDeltaUSD
   );
+
+  // update revenue in market snapshots
+  updateMarketSnapshots(
+    event.block.number,
+    event.block.timestamp,
+    market,
+    totalRevenueDeltaUSD,
+    supplySideRevenueDeltaUSD,
+    protocolSideRevenueDeltaUSD
+  );
 }
 
 export function _handleDeposit(
@@ -460,6 +479,7 @@ export function _handleDeposit(
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
+  deposit.save();
 
   // update metrics
   protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
@@ -486,7 +506,245 @@ export function _handleDeposit(
     marketId.toHexString(),
     deposit.amountUSD,
     EventType.DEPOSIT,
+    event.block.timestamp
+  );
+}
+
+export function _handleWithdraw(
+  event: ethereum.Event,
+  amount: BigInt,
+  marketId: Address,
+  protocolData: ProtocolData
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.warning("[Withdraw] Market not found on protocol: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+  let inputToken = Token.load(market.inputToken);
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
+  // create withdraw entity
+  let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
+  let withdraw = new Withdraw(id);
+
+  withdraw.to = event.transaction.from.toHexString();
+  withdraw.from = market.id;
+  withdraw.market = market.id;
+  withdraw.hash = event.transaction.hash.toHexString();
+  withdraw.logIndex = event.logIndex.toI32();
+  withdraw.protocol = protocol.id;
+  withdraw.asset = inputToken!.id;
+  withdraw.amount = amount;
+  withdraw.amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken!.decimals))
+    .times(market.inputTokenPriceUSD);
+  withdraw.save();
+
+  // update usage metrics
+  snapshotUsage(
+    protocol,
     event.block.number,
+    event.block.timestamp,
+    withdraw.to,
+    EventType.WITHDRAW
+  );
+
+  // udpate market daily / hourly snapshots / financialSnapshots
+  updateSnapshots(
+    protocol,
+    marketId.toHexString(),
+    withdraw.amountUSD,
+    EventType.WITHDRAW,
+    event.block.timestamp
+  );
+}
+
+export function _handleBorrow(
+  event: ethereum.Event,
+  amount: BigInt,
+  marketId: Address,
+  protocolData: ProtocolData
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.warning("[Borrow] Market not found on protocol: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+  let inputToken = Token.load(market.inputToken);
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
+  // create borrow entity
+  let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
+  let borrow = new Borrow(id);
+
+  borrow.to = event.transaction.from.toHexString();
+  borrow.from = market.id;
+  borrow.market = market.id;
+  borrow.hash = event.transaction.hash.toHexString();
+  borrow.logIndex = event.logIndex.toI32();
+  borrow.protocol = protocol.id;
+  borrow.asset = inputToken!.id;
+  borrow.amount = amount;
+  borrow.amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken!.decimals))
+    .times(market.inputTokenPriceUSD);
+  borrow.save();
+
+  // update metrics
+  protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(
+    borrow.amountUSD
+  );
+  protocol.save();
+  market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(
+    borrow.amountUSD
+  );
+  market.save();
+
+  // update usage metrics
+  snapshotUsage(
+    protocol,
+    event.block.number,
+    event.block.timestamp,
+    borrow.to,
+    EventType.BORROW
+  );
+
+  // udpate market daily / hourly snapshots / financialSnapshots
+  updateSnapshots(
+    protocol,
+    marketId.toHexString(),
+    borrow.amountUSD,
+    EventType.BORROW,
+    event.block.timestamp
+  );
+}
+
+export function _handleRepay(
+  event: ethereum.Event,
+  amount: BigInt,
+  marketId: Address,
+  protocolData: ProtocolData
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.warning("[Repay] Market not found on protocol: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+  let inputToken = Token.load(market.inputToken);
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
+  // create repay entity
+  let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
+  let repay = new Repay(id);
+
+  repay.to = market.id;
+  repay.from = event.transaction.from.toHexString();
+  repay.market = market.id;
+  repay.hash = event.transaction.hash.toHexString();
+  repay.logIndex = event.logIndex.toI32();
+  repay.protocol = protocol.id;
+  repay.asset = inputToken!.id;
+  repay.amount = amount;
+  repay.amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken!.decimals))
+    .times(market.inputTokenPriceUSD);
+  repay.save();
+
+  // update usage metrics
+  snapshotUsage(
+    protocol,
+    event.block.number,
+    event.block.timestamp,
+    repay.from,
+    EventType.REPAY
+  );
+
+  // udpate market daily / hourly snapshots / financialSnapshots
+  updateSnapshots(
+    protocol,
+    marketId.toHexString(),
+    repay.amountUSD,
+    EventType.REPAY,
+    event.block.timestamp
+  );
+}
+
+export function _handleLiquidate(
+  event: ethereum.Event,
+  amount: BigInt,
+  marketId: Address, // collateral market
+  protocolData: ProtocolData,
+  debtAsset: Address,
+  liquidator: Address,
+  user: Address // account liquidated
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.warning("[Liquidate] Market not found on protocol: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+  let inputToken = Token.load(market.inputToken);
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
+  // create liquidate entity
+  let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
+  let liquidate = new Liquidate(id);
+
+  liquidate.to = debtAsset.toHexString();
+  liquidate.from = liquidator.toHexString();
+  liquidate.market = market.id;
+  liquidate.hash = event.transaction.hash.toHexString();
+  liquidate.logIndex = event.logIndex.toI32();
+  liquidate.protocol = protocol.id;
+  liquidate.asset = inputToken!.id;
+  liquidate.amount = amount;
+  liquidate.amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken!.decimals))
+    .times(market.inputTokenPriceUSD);
+  liquidate.liquidatee = user.toHexString();
+  liquidate.profitUSD = liquidate.amountUSD.times(
+    market.liquidationPenalty.div(BIGDECIMAL_HUNDRED)
+  );
+  liquidate.save();
+
+  // update metrics
+  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
+    liquidate.amountUSD
+  );
+  protocol.save();
+  market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(
+    liquidate.amountUSD
+  );
+  market.save();
+
+  // update usage metrics
+  snapshotUsage(
+    protocol,
+    event.block.number,
+    event.block.timestamp,
+    liquidate.from,
+    EventType.LIQUIDATE
+  );
+
+  // udpate market daily / hourly snapshots / financialSnapshots
+  updateSnapshots(
+    protocol,
+    marketId.toHexString(),
+    liquidate.amountUSD,
+    EventType.LIQUIDATE,
     event.block.timestamp
   );
 }

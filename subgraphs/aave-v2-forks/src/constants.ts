@@ -63,11 +63,11 @@ export namespace InterestRateSide {
 }
 
 export namespace EventType {
-  export const DEPOSIT = "DEPOSIT";
-  export const WITHDRAW = "WITHDRAW";
-  export const BORROW = "BORROW";
-  export const REPAY = "REPAY";
-  export const LIQUIDATE = "LIQUIDATE";
+  export const DEPOSIT = 1;
+  export const WITHDRAW = 2;
+  export const BORROW = 3;
+  export const REPAY = 4;
+  export const LIQUIDATE = 5;
 }
 
 export namespace ActivityType {

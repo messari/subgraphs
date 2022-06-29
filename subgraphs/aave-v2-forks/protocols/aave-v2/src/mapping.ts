@@ -1,6 +1,5 @@
 import {
   Address,
-  BigDecimal,
   BigInt,
   dataSource,
   DataSourceContext,
@@ -13,24 +12,7 @@ import {
   ProxyCreated,
   LendingPoolAddressesProvider as AddressProviderContract,
 } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
-import {
-  BIGDECIMAL_HUNDRED,
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  getNetworkSpecificConstant,
-  InterestRateSide,
-  InterestRateType,
-  Protocol,
-  SECONDS_PER_DAY,
-  ZERO_ADDRESS,
-} from "./common/constants";
-import {
-  createInterestRate,
-  getOrCreateMarket,
-  getOrCreateMarketDailySnapshot,
-  getOrCreateRewardToken,
-  getOrCreateToken,
-} from "./common/initializers";
+import { getNetworkSpecificConstant, Protocol } from "./constants";
 import {
   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
   LendingPool as LendingPoolTemplate,
@@ -55,21 +37,17 @@ import {
   ReserveUsedAsCollateralEnabled,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
-import { createDepositEntity } from "./modules/Deposit";
-import { calculateRevenues } from "./modules/Revenue";
-import { updateFinancials, updateUsageMetrics } from "./modules/Metrics";
-import { createWithdrawEntity } from "./modules/Withdraw";
-import { createBorrowEntity } from "./modules/Borrow";
-import { createRepayEntity } from "./modules/Repay";
-import { createLiquidateEntity } from "./modules/Liquidate";
-import { AToken, Transfer } from "../../../generated/templates/AToken/AToken";
+import { AToken } from "../../../generated/templates/AToken/AToken";
 import {
   ProtocolData,
+  _handleBorrow,
   _handleBorrowingDisabledOnReserve,
   _handleBorrowingEnabledOnReserve,
   _handleCollateralConfigurationChanged,
   _handleDeposit,
+  _handleLiquidate,
   _handlePriceOracleUpdated,
+  _handleRepay,
   _handleReserveActivated,
   _handleReserveDataUpdated,
   _handleReserveDeactivated,
@@ -77,15 +55,20 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleWithdraw,
 } from "../../../src/mapping";
 import {
   getAssetPriceInUSDC,
   getOrCreateLendingProtocol,
+  getOrCreateRewardToken,
+  getOrCreateToken,
 } from "../../../src/helpers";
 import {
   exponentToBigDecimal,
   readValue,
   RewardTokenType,
+  SECONDS_PER_DAY,
+  ZERO_ADDRESS,
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/templates/LendingPool/AaveIncentivesController";
@@ -179,7 +162,7 @@ function initiateContext(addrProvider: Address): DataSourceContext {
     Address.fromString(ZERO_ADDRESS)
   );
 
-  lendingProtocol._protocolPriceOracle = priceOracle.toHexString();
+  lendingProtocol.priceOracle = priceOracle.toHexString();
   lendingProtocol.save();
 
   let context = new DataSourceContext();
@@ -254,15 +237,6 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   let protocolData = getProtocolData();
-  _handleReserveDataUpdated(
-    event,
-    event.params.liquidityRate,
-    event.params.liquidityIndex,
-    event.params.variableBorrowRate,
-    event.params.stableBorrowRate,
-    protocolData,
-    event.params.reserve
-  );
 
   // update rewards if there is an incentive controller
   let market = Market.load(event.params.reserve.toHexString());
@@ -272,9 +246,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     ]);
     return;
   }
-  let emissionsBI = [BIGINT_ZERO, BIGINT_ZERO];
-  let emissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-  let rewardTokens = null;
+
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let tryIncentiveController = aTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
@@ -297,7 +269,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
           RewardTokenType.BORROW
         );
         let rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
-        rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
+        market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
 
         // now get or create reward token and update fields
         let protocol = getOrCreateLendingProtocol(protocolData);
@@ -314,17 +286,22 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
           .times(rewardTokenPriceUSD);
 
         // set rewards to arrays
-        emissionsBI = [rewardsPerDay, rewardsPerDay];
-        emissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
+        market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
+        market.rewardTokenEmissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
       }
     }
   }
-
-  // update market entity
-  market.rewardTokenEmissionsAmount = emissionsBI;
-  market.rewardTokenEmissionsUSD = emissionsUSD;
-  market.rewardTokens = rewardTokens;
   market.save();
+
+  _handleReserveDataUpdated(
+    event,
+    event.params.liquidityRate,
+    event.params.liquidityIndex,
+    event.params.variableBorrowRate,
+    event.params.stableBorrowRate,
+    protocolData,
+    event.params.reserve
+  );
 }
 
 export function handleReserveUsedAsCollateralEnabled(
@@ -351,83 +328,40 @@ export function handleDeposit(event: Deposit): void {
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  let amount = event.params.amount;
-  let token = getOrCreateToken(event.params.reserve);
-  let reserveAddress = event.params.reserve.toHexString();
-  let market = getOrCreateMarket(event, reserveAddress);
-
-  createWithdrawEntity(event, market, reserveAddress, amount);
-
-  updateTVL(market, token, amount, true);
-  calculateRevenues(event, market, token);
-  updateUsageMetrics(event.block, event.transaction.from);
-  updateFinancials(event.block);
+  _handleWithdraw(
+    event,
+    event.params.amount,
+    event.params.reserve,
+    getProtocolData()
+  );
 }
 
 export function handleBorrow(event: Borrow): void {
-  let amount = event.params.amount;
-  let token = getOrCreateToken(event.params.reserve);
-  let reserveAddress = event.params.reserve.toHexString();
-  let market = getOrCreateMarket(event, reserveAddress);
-
-  createBorrowEntity(event, market, reserveAddress, amount);
-
-  updateTVL(market, token, amount, true);
-  calculateRevenues(event, market, token);
-  updateUsageMetrics(event.block, event.transaction.from);
-  updateFinancials(event.block);
+  _handleBorrow(
+    event,
+    event.params.amount,
+    event.params.reserve,
+    getProtocolData()
+  );
 }
 
 export function handleRepay(event: Repay): void {
-  let amount = event.params.amount;
-  let token = getOrCreateToken(event.params.reserve);
-  let reserveAddress = event.params.reserve.toHexString();
-  let market = getOrCreateMarket(event, reserveAddress);
-
-  createRepayEntity(event, market, reserveAddress, amount);
-
-  updateTVL(market, token, amount, false);
-  calculateRevenues(event, market, token);
-  updateUsageMetrics(event.block, event.transaction.from);
-  updateFinancials(event.block);
+  _handleRepay(
+    event,
+    event.params.amount,
+    event.params.reserve,
+    getProtocolData()
+  );
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
-  let user = event.params.user.toHexString();
-  let debtAsset = event.params.debtAsset.toHexString();
-  let collateralAsset = event.params.collateralAsset.toHexString();
-  let liquidator = event.params.liquidator.toHexString();
-  let amount = event.params.liquidatedCollateralAmount;
-  let market = getOrCreateMarket(event, collateralAsset);
-  let token = getOrCreateToken(event.params.collateralAsset);
-
-  createLiquidateEntity(
+  _handleLiquidate(
     event,
-    market,
-    user,
-    debtAsset,
-    collateralAsset,
-    liquidator,
-    amount
+    event.params.liquidatedCollateralAmount,
+    event.params.collateralAsset,
+    getProtocolData(),
+    event.params.debtAsset,
+    event.params.liquidator,
+    event.params.user
   );
-
-  updateTVL(market, token, amount, false);
-  calculateRevenues(event, market, token);
-  updateUsageMetrics(event.block, event.transaction.from);
-  updateFinancials(event.block);
-}
-
-///////////////////////////
-///// aToken Handlers /////
-///////////////////////////
-
-// TODO: won't do anything use diff method
-export function handleATokenTransfer(event: Transfer): void {
-  // Event handler for AToken transfers. This gets triggered upon transfers
-  if (event.params.from.toHexString() == ZERO_ADDRESS) {
-    log.warning("[ATokenTransfer] Txn: {}, amount: {}", [
-      event.transaction.hash.toHexString(),
-      event.params.value.toString(),
-    ]);
-  }
 }
