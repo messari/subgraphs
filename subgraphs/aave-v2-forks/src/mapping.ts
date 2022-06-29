@@ -1,7 +1,7 @@
 // generic aave-v2 handlers
 
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { Market } from "../generated/schema";
+import { Deposit, Market, Token } from "../generated/schema";
 import { AToken } from "../generated/templates/AToken/AToken";
 import { StableDebtToken } from "../generated/templates/LendingPool/StableDebtToken";
 import { VariableDebtToken } from "../generated/templates/LendingPool/VariableDebtToken";
@@ -11,6 +11,7 @@ import {
   BIGDECIMAL_ZERO,
   bigIntToBigDecimal,
   BIGINT_ZERO,
+  EventType,
   exponentToBigDecimal,
   InterestRateSide,
   InterestRateType,
@@ -24,6 +25,9 @@ import {
   getAssetPriceInUSDC,
   getOrCreateLendingProtocol,
   getOrCreateToken,
+  snapshotUsage,
+  updateFinancials,
+  updateSnapshots,
 } from "./helpers";
 
 //////////////////////////
@@ -66,16 +70,17 @@ export function _handleReserveInitialized(
   variableDebtToken: Address,
   protocolData: ProtocolData
 ): void {
-  // get protocol
-  let protocol = getOrCreateLendingProtocol(protocolData);
-  protocol.totalPoolCount++;
-  protocol.save();
-
   // create tokens
   let underlyingTokenEntity = getOrCreateToken(underlyingToken);
   let outputTokenEntity = getOrCreateToken(outputToken);
   let stableDebtTokenEntity = getOrCreateToken(stableDebtToken);
   let variableDebtTokenEntity = getOrCreateToken(variableDebtToken);
+
+  // get protocol
+  let protocol = getOrCreateLendingProtocol(protocolData);
+  protocol.totalPoolCount++;
+  protocol.marketIDs.push(underlyingToken.toHexString());
+  protocol.save();
 
   // Create a new Market
   let market = new Market(underlyingToken.toHexString());
@@ -225,11 +230,40 @@ export function _handleReserveFactorChanged(
   market.save();
 }
 
+export function _handleReserveUsedAsCollateralEnabled(marketId: Address): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.error("[ReserveUsedAsCollateralEnabled] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  market.canUseAsCollateral = true;
+  market.save();
+}
+
+export function _handleReserveUsedAsCollateralDisabled(
+  marketId: Address
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.error("[ReserveUsedAsCollateralDisabled] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  market.canUseAsCollateral = false;
+  market.save();
+}
+
 ////////////////////////////////
 ///// Transaction Handlers /////
 ////////////////////////////////
 
 export function _handleReserveDataUpdated(
+  event: ethereum.Event,
   liquidityRate: BigInt, // deposit rate in ray
   liquidityIndex: BigInt,
   variableBorrowRate: BigInt,
@@ -340,7 +374,9 @@ export function _handleReserveDataUpdated(
   protocol.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
 
-  log.warning("[ReserveDataUpdated] New revenue: {}", [totalRevenueDeltaUSD.toString()]);
+  log.warning("[ReserveDataUpdated] New revenue: {}", [
+    totalRevenueDeltaUSD.toString(),
+  ]); // TODO remove
 
   // update rates
   let sBorrowRate = createInterestRate(
@@ -365,10 +401,92 @@ export function _handleReserveDataUpdated(
   );
 
   market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
+  market.save();
 
-  // update financial snapshot / Market dailly & hourly snapshots
+  // update protocol TVL / BorrowUSD / SupplyUSD
+  let tvl = BIGDECIMAL_ZERO;
+  let depositUSD = BIGDECIMAL_ZERO;
+  let borrowUSD = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol.marketIDs.length; i++) {
+    let thisMarket = Market.load(protocol.marketIDs[i])!;
+    tvl = tvl.plus(thisMarket.totalValueLockedUSD);
+    depositUSD = depositUSD.plus(thisMarket.totalDepositBalanceUSD);
+    borrowUSD = borrowUSD.plus(thisMarket.totalBorrowBalanceUSD);
+  }
+  protocol.totalValueLockedUSD = tvl;
+  protocol.totalDepositBalanceUSD = depositUSD;
+  protocol.totalBorrowBalanceUSD = borrowUSD;
+  protocol.save();
 
-  // update rewards if past certain block number
-  if ()
+  // update financial snapshot
+  updateFinancials(
+    event,
+    protocol,
+    totalRevenueDeltaUSD,
+    protocolSideRevenueDeltaUSD,
+    supplySideRevenueDeltaUSD
+  );
+}
 
+export function _handleDeposit(
+  event: ethereum.Event,
+  amount: BigInt,
+  marketId: Address,
+  protocolData: ProtocolData
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.warning("[Deposit] Market not found on protocol: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+  let inputToken = Token.load(market.inputToken);
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
+  // create deposit entity
+  let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
+  let deposit = new Deposit(id);
+
+  deposit.to = market.id;
+  deposit.from = event.transaction.from.toHexString();
+  deposit.market = marketId.toHexString();
+  deposit.hash = event.transaction.hash.toHexString();
+  deposit.logIndex = event.logIndex.toI32();
+  deposit.protocol = protocol.id;
+  deposit.asset = inputToken!.id;
+  deposit.amount = amount;
+  deposit.amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken!.decimals))
+    .times(market.inputTokenPriceUSD);
+
+  // update metrics
+  protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
+    deposit.amountUSD
+  );
+  protocol.save();
+  market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(
+    deposit.amountUSD
+  );
+  market.save();
+
+  // update usage metrics
+  snapshotUsage(
+    protocol,
+    event.block.number,
+    event.block.timestamp,
+    deposit.from,
+    EventType.DEPOSIT
+  );
+
+  // udpate market daily / hourly snapshots / financialSnapshots
+  updateSnapshots(
+    protocol,
+    marketId.toHexString(),
+    deposit.amountUSD,
+    EventType.DEPOSIT,
+    event.block.number,
+    event.block.timestamp
+  );
 }

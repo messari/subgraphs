@@ -62,6 +62,19 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
+export namespace EventType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const BORROW = "BORROW";
+  export const REPAY = "REPAY";
+  export const LIQUIDATE = "LIQUIDATE";
+}
+
+export namespace ActivityType {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
+
 /////////////////////
 ///// Addresses /////
 /////////////////////
@@ -88,6 +101,8 @@ export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_HUNDRED = new BigDecimal(BigInt.fromI32(100));
 
 export const RAY_OFFSET = 27;
+export const SECONDS_PER_HOUR = 60 * 60;
+export const SECONDS_PER_DAY = 60 * 60 * 24;
 
 /////////////////////////////
 ///// Utility Functions /////

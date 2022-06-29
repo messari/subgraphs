@@ -1,6 +1,7 @@
 import {
   Address,
   BigDecimal,
+  BigInt,
   dataSource,
   DataSourceContext,
   log,
@@ -15,15 +16,19 @@ import {
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   getNetworkSpecificConstant,
   InterestRateSide,
   InterestRateType,
   Protocol,
+  SECONDS_PER_DAY,
   ZERO_ADDRESS,
 } from "./common/constants";
 import {
   createInterestRate,
   getOrCreateMarket,
+  getOrCreateMarketDailySnapshot,
+  getOrCreateRewardToken,
   getOrCreateToken,
 } from "./common/initializers";
 import {
@@ -63,15 +68,25 @@ import {
   _handleBorrowingDisabledOnReserve,
   _handleBorrowingEnabledOnReserve,
   _handleCollateralConfigurationChanged,
+  _handleDeposit,
   _handlePriceOracleUpdated,
   _handleReserveActivated,
   _handleReserveDataUpdated,
   _handleReserveDeactivated,
   _handleReserveFactorChanged,
   _handleReserveInitialized,
+  _handleReserveUsedAsCollateralDisabled,
+  _handleReserveUsedAsCollateralEnabled,
 } from "../../../src/mapping";
-import { getOrCreateLendingProtocol } from "../../../src/helpers";
-import { readValue } from "../../../src/constants";
+import {
+  getAssetPriceInUSDC,
+  getOrCreateLendingProtocol,
+} from "../../../src/helpers";
+import {
+  exponentToBigDecimal,
+  readValue,
+  RewardTokenType,
+} from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/templates/LendingPool/AaveIncentivesController";
 
@@ -238,64 +253,101 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
+  let protocolData = getProtocolData();
   _handleReserveDataUpdated(
+    event,
     event.params.liquidityRate,
     event.params.liquidityIndex,
     event.params.variableBorrowRate,
     event.params.stableBorrowRate,
-    getProtocolData(),
+    protocolData,
     event.params.reserve
   );
 
   // update rewards if there is an incentive controller
   let market = Market.load(event.params.reserve.toHexString());
   if (!market) {
-    log.warning("[handleReserveDataUpdated] Market not found", [event.params.reserve.toHexString()]);
+    log.warning("[handleReserveDataUpdated] Market not found", [
+      event.params.reserve.toHexString(),
+    ]);
     return;
   }
+  let emissionsBI = [BIGINT_ZERO, BIGINT_ZERO];
+  let emissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  let rewardTokens = null;
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let tryIncentiveController = aTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
-    let incentiveControllerContract = AaveIncentivesController.bind(tryIncentiveController.value);
-    if () {
-      
+    let incentiveControllerContract = AaveIncentivesController.bind(
+      tryIncentiveController.value
+    );
+    let tryRewardInfo = incentiveControllerContract.try_assets(
+      Address.fromString(market.outputToken!)
+    );
+    if (!tryRewardInfo.reverted) {
+      let tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
+      if (!tryRewardAsset.reverted) {
+        // create reward tokens
+        let depositRewardToken = getOrCreateRewardToken(
+          tryRewardAsset.value,
+          RewardTokenType.DEPOSIT
+        );
+        let borrowRewardToken = getOrCreateRewardToken(
+          tryRewardAsset.value,
+          RewardTokenType.BORROW
+        );
+        let rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
+        rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
+
+        // now get or create reward token and update fields
+        let protocol = getOrCreateLendingProtocol(protocolData);
+        let rewardsPerDay = tryRewardInfo.value.value0.times(
+          BigInt.fromI32(SECONDS_PER_DAY)
+        );
+        let rewardTokenPriceUSD = getAssetPriceInUSDC(
+          tryRewardAsset.value,
+          Address.fromString(protocol.priceOracle)
+        );
+        let rewardsPerDayUSD = rewardsPerDay
+          .toBigDecimal()
+          .div(exponentToBigDecimal(rewardDecimals))
+          .times(rewardTokenPriceUSD);
+
+        // set rewards to arrays
+        emissionsBI = [rewardsPerDay, rewardsPerDay];
+        emissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
+      }
     }
   }
+
+  // update market entity
+  market.rewardTokenEmissionsAmount = emissionsBI;
+  market.rewardTokenEmissionsUSD = emissionsUSD;
+  market.rewardTokens = rewardTokens;
+  market.save();
 }
 
 export function handleReserveUsedAsCollateralEnabled(
   event: ReserveUsedAsCollateralEnabled
 ): void {
   // This Event handler enables a reserve/market to be used as collateral
-  let marketAddr = event.params.reserve.toHexString();
-  let market = getOrCreateMarket(event, marketAddr);
-  market.canUseAsCollateral = true;
-  market.save();
+  _handleReserveUsedAsCollateralEnabled(event.params.reserve);
 }
 
 export function handleReserveUsedAsCollateralDisabled(
   event: ReserveUsedAsCollateralDisabled
 ): void {
   // This Event handler disables a reserve/market being used as collateral
-  let marketAddr = event.params.reserve.toHexString();
-  let market = getOrCreateMarket(event, marketAddr);
-  market.canUseAsCollateral = false;
-  market.save();
+  _handleReserveUsedAsCollateralDisabled(event.params.reserve);
 }
 
 export function handleDeposit(event: Deposit): void {
-  log.warning("Deposit handled: {}", [event.transaction.hash.toHexString()]); // TODO remove
-  let amount = event.params.amount;
-  let token = getOrCreateToken(event.params.reserve);
-  let reserveAddress = event.params.reserve.toHexString();
-  let market = getOrCreateMarket(event, reserveAddress);
-
-  createDepositEntity(event, market, reserveAddress, amount);
-
-  updateTVL(market, token, amount, false);
-  calculateRevenues(event, market, token);
-  updateUsageMetrics(event.block, event.transaction.from);
-  updateFinancials(event.block);
+  _handleDeposit(
+    event,
+    event.params.amount,
+    event.params.reserve,
+    getProtocolData()
+  );
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -364,8 +416,6 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   updateUsageMetrics(event.block, event.transaction.from);
   updateFinancials(event.block);
 }
-
-
 
 ///////////////////////////
 ///// aToken Handlers /////

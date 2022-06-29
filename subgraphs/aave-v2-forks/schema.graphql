@@ -292,6 +292,9 @@ type LendingProtocol implements Protocol @entity {
 
    " String of the address of the current price oracle on the protocol "
   priceOracle: String!
+
+  " A list of all markets in the snapshot "
+  marketIDs: [String!]!
 }
 
 ###############################
