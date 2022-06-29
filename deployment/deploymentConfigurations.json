@@ -79,7 +79,6 @@
           "messari": "messari/geist-fantom",
           "dmelotik": "dmelotik/geist-fantom",
           "deploy-on-merge": true
-        },
         }
       }
     },
