@@ -10,7 +10,7 @@ import {
   Token,
   Withdraw,
 } from "../generated/schema";
-import { AToken } from "../generated/templates/AToken/AToken";
+import { AToken } from "../generated/templates/LendingPool/AToken";
 import { StableDebtToken } from "../generated/templates/LendingPool/StableDebtToken";
 import { VariableDebtToken } from "../generated/templates/LendingPool/VariableDebtToken";
 import {

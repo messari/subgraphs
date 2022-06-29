@@ -16,7 +16,6 @@ import { getNetworkSpecificConstant, Protocol } from "./constants";
 import {
   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
   LendingPool as LendingPoolTemplate,
-  AToken as ATokenTemplate,
 } from "../../../generated/templates";
 import {
   BorrowingDisabledOnReserve,
@@ -37,7 +36,7 @@ import {
   ReserveUsedAsCollateralEnabled,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
-import { AToken } from "../../../generated/templates/AToken/AToken";
+import { AToken } from "../../../generated/templates/LendingPool/AToken";
 import {
   ProtocolData,
   _handleBorrow,
@@ -185,7 +184,6 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
   // This function handles market entity from reserve creation event
   // Attempt to load or create the market implementation
 
-  ATokenTemplate.create(event.params.aToken);
   _handleReserveInitialized(
     event,
     event.params.asset,
