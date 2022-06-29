@@ -1,6 +1,12 @@
 // generic aave-v2 handlers
 
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import {
   Borrow,
   Deposit,
@@ -30,7 +36,6 @@ import {
 } from "./constants";
 import {
   createInterestRate,
-  getAssetPriceInUSDC,
   getOrCreateLendingProtocol,
   getOrCreateToken,
   snapshotUsage,
@@ -280,7 +285,8 @@ export function _handleReserveDataUpdated(
   variableBorrowRate: BigInt,
   stableBorrowRate: BigInt,
   protocolData: ProtocolData,
-  marketId: Address
+  marketId: Address,
+  assetPriceUSD: BigDecimal
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -295,10 +301,6 @@ export function _handleReserveDataUpdated(
   let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
 
   // update market prices
-  let assetPriceUSD = getAssetPriceInUSDC(
-    Address.fromString(market.inputToken),
-    Address.fromString(protocol.priceOracle)
-  );
   market.inputTokenPriceUSD = assetPriceUSD;
   market.outputTokenPriceUSD = assetPriceUSD;
 
@@ -346,7 +348,7 @@ export function _handleReserveDataUpdated(
   }
 
   market.inputTokenBalance = tryTotalSupply.value;
-  market.outputTokenSupply = market.inputTokenBalance;
+  market.outputTokenSupply = tryTotalSupply.value;
   market.totalDepositBalanceUSD = market.inputTokenBalance
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals))
