@@ -385,9 +385,9 @@ export function _handleReserveDataUpdated(
   protocol.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
 
-  log.warning("[ReserveDataUpdated] New revenue: {}", [
+  log.info("[ReserveDataUpdated] New revenue: {}", [
     totalRevenueDeltaUSD.toString(),
-  ]); // TODO remove
+  ]);
 
   // update rates
   let sBorrowRate = createInterestRate(
