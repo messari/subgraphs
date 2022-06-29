@@ -1,5 +1,6 @@
 import {
   Address,
+  BigDecimal,
   BigInt,
   dataSource,
   DataSourceContext,
@@ -12,7 +13,11 @@ import {
   ProxyCreated,
   LendingPoolAddressesProvider as AddressProviderContract,
 } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
-import { getNetworkSpecificConstant, Protocol } from "./constants";
+import {
+  getNetworkSpecificConstant,
+  Protocol,
+  USDC_TOKEN_ADDRESS,
+} from "./constants";
 import {
   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
   LendingPool as LendingPoolTemplate,
@@ -57,13 +62,15 @@ import {
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
-  getAssetPriceInUSDC,
   getOrCreateLendingProtocol,
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "../../../src/helpers";
 import {
+  BIGINT_ZERO,
+  equalsIgnoreCase,
   exponentToBigDecimal,
+  Network,
   readValue,
   RewardTokenType,
   SECONDS_PER_DAY,
@@ -71,6 +78,7 @@ import {
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/templates/LendingPool/AaveIncentivesController";
+import { IPriceOracleGetter } from "../../../generated/templates/LendingPool/IPriceOracleGetter";
 
 function getProtocolData(): ProtocolData {
   let letants = getNetworkSpecificConstant();
@@ -291,6 +299,12 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   }
   market.save();
 
+  let protocol = getOrCreateLendingProtocol(protocolData);
+  let assetPriceUSD = getAssetPriceInUSDC(
+    Address.fromString(market.inputToken),
+    Address.fromString(protocol.priceOracle)
+  );
+
   _handleReserveDataUpdated(
     event,
     event.params.liquidityRate,
@@ -298,7 +312,8 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.variableBorrowRate,
     event.params.stableBorrowRate,
     protocolData,
-    event.params.reserve
+    event.params.reserve,
+    assetPriceUSD
   );
 }
 
@@ -362,4 +377,47 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidator,
     event.params.user
   );
+}
+
+///////////////////
+///// Helpers /////
+///////////////////
+
+function getAssetPriceInUSDC(
+  tokenAddress: Address,
+  priceOracle: Address
+): BigDecimal {
+  let oracle = IPriceOracleGetter.bind(priceOracle);
+  let oracleResult = readValue<BigInt>(
+    oracle.try_getAssetPrice(tokenAddress),
+    BIGINT_ZERO
+  );
+
+  // if the result is zero or less, try the fallback oracle
+  if (!oracleResult.gt(BIGINT_ZERO)) {
+    let tryFallback = oracle.try_getFallbackOracle();
+    if (tryFallback) {
+      let fallbackOracle = IPriceOracleGetter.bind(tryFallback.value);
+      oracleResult = readValue<BigInt>(
+        fallbackOracle.try_getAssetPrice(tokenAddress),
+        BIGINT_ZERO
+      );
+    }
+  }
+
+  // Mainnet Oracles return the price in eth, must convert to USD through the following method
+  if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
+    let priceUSDCInEth = readValue<BigInt>(
+      oracle.try_getAssetPrice(Address.fromString(USDC_TOKEN_ADDRESS)),
+      BIGINT_ZERO
+    );
+
+    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+  }
+
+  // otherwise return the output of the price oracle
+  let inputToken = getOrCreateToken(tokenAddress);
+  return oracleResult
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals));
 }
