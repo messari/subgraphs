@@ -36,10 +36,16 @@
     },
     "aave-v2-forks": {
       "aave-v2": {
+        "ethereum-arc": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-ethereum-arc",
+          "dmelotik": "dmelotik/aave-v2-arc",
+          "deploy-on-merge": true
+        },
         "avalanche": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-avalanche",
-          "dmelotik": "dmelotik/aave-v2-ethereum-amm",
+          "dmelotik": "dmelotik/aave-v2-avalanche",
           "deploy-on-merge": true
         },
         "mainnet": {
@@ -58,6 +64,12 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-polygon",
           "dmelotik": "dmelotik/aave-v2-polygon",
+          "deploy-on-merge": true
+        },
+        "ethereum-rwa": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-ethereum-rwa",
+          "dmelotik": "dmelotik/aave-v2-rwa",
           "deploy-on-merge": true
         }
       }

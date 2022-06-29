@@ -38,8 +38,8 @@ export class NetworkSpecificConstant {
   ) {}
 }
 
+// TODO- figure out how to get different mainnet deployments to work (ie, arc, rwa, eth amm, eth)
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
-  log.warning("Grabbed network constants", []); // TODO- remove
   let network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
