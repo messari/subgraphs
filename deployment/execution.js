@@ -57,6 +57,7 @@ async function runCommands(allScripts, results, args, callback) {
     let logs = ""
     var index = 0;
     var index2 = 0;
+    var httpCounter = 1;
     let protocols = Array.from( allScripts.keys() );
 
     function next() {
@@ -64,16 +65,30 @@ async function runCommands(allScripts, results, args, callback) {
             exec(allScripts.get(protocols[index])[index2++], function(error, stdout, stderr) {
             logs = logs + "stdout: "  + stdout
             logs = logs + "stderr: "  + stderr
+            if (stderr.includes("HTTP error deploying the subgraph")) {
+                if (httpCounter >= 2) {
+                    index++;
+                    index2 = 0;
+                }
+                httpCounter++
+            }
             if (error !== null) {
-                logs = logs + "Exec error: "  + error
-                results += 'Deployment Failed: ' + protocols[index] + '\n'
-                console.log(error)
-                index++;
-                index2 = 0;
+                if (stderr.includes("HTTP error deploying the subgraph") && httpCounter <= 3) {
+                    httpCounter++
+                    console.log('HTTP error on deployment ' + httpCounter.toString() + " for " + protocols[index] + ". Trying Again...")
+                } else {
+                    logs = logs + "Exec error: "  + error
+                    results += 'Deployment Failed: ' + protocols[index] + '\n'
+                    console.log(error)
+                    index++;
+                    index2 = 0;
+                    httpCounter = 1;
+                }
             } else if (index2 == allScripts.get(protocols[index]).length) {
                 results += 'Deployment Successful: ' + protocols[index] + '\n'
                 index++;
                 index2 = 0;
+                httpCounter = 1;
             }
 
             // do the next iteration
