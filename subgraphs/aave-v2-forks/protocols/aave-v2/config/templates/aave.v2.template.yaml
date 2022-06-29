@@ -103,8 +103,6 @@ templates:
         - Position
         - PositionSnapshot
       abis:
-        # - name: AaveIncentivesController
-        #   file: ./abis/aave-v2/AaveIncentivesController.json
         - name: AToken
           file: ./abis/AToken.json
         - name: LendingPoolConfigurator
@@ -117,8 +115,6 @@ templates:
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
-        # - name: IPriceOracleGetter
-        #   file: ./abis/IPriceOracleGetter.json
       eventHandlers:
         - event: ReserveInitialized(indexed address,indexed address,address,address,address)
           handler: handleReserveInitialized
