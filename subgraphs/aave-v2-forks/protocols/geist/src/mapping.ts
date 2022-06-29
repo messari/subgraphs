@@ -1,6 +1,5 @@
 import {
   Address,
-  BigInt,
   dataSource,
   DataSourceContext,
   log,
@@ -36,7 +35,7 @@ import {
   ReserveUsedAsCollateralEnabled,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
-import { AToken } from "../../../generated/templates/LendingPool/AToken";
+import { GToken } from "../../../generated/templates/LendingPool/GToken";
 import {
   ProtocolData,
   _handleBorrow,
@@ -63,6 +62,7 @@ import {
   getOrCreateToken,
 } from "../../../src/helpers";
 import {
+    DEFAULT_DECIMALS,
   exponentToBigDecimal,
   readValue,
   RewardTokenType,
@@ -292,6 +292,20 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // }
   market.save();
 
+  // update gToken price
+  let gTokenContract = GToken.bind(Address.fromString(market.outputToken!));
+  let tryPrice = gTokenContract.try_getAssetPrice();
+  if (tryPrice.reverted) {
+    log.warning(
+      "[handleReserveDataUpdated] Token price not found in Market: {}",
+      [market.id]
+    );
+    return;
+  }
+  let assetPriceUSD = tryPrice.value
+    .toBigDecimal()
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+
   _handleReserveDataUpdated(
     event,
     event.params.liquidityRate,
@@ -299,7 +313,8 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.variableBorrowRate,
     event.params.stableBorrowRate,
     protocolData,
-    event.params.reserve
+    event.params.reserve,
+    assetPriceUSD
   );
 }
 

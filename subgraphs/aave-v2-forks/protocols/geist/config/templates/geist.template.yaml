@@ -47,6 +47,8 @@ templates:
           file: ./abis/geist/ChefIncentivesController.json
         - name: GToken
           file: ./abis/geist/GToken.json
+        - name: AToken
+          file: ./abis/aave-v2/AToken.json
         - name: VariableDebtToken
           file: ./abis/VariableDebtToken.json
         - name: StableDebtToken
