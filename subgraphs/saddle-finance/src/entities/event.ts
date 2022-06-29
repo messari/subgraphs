@@ -64,8 +64,8 @@ export function createWithdraw(
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.logIndex.toI32();
   withdraw.protocol = getOrCreateProtocol().id;
-  withdraw.to = pool.id;
-  withdraw.from = provider.toHexString();
+  withdraw.to = provider.toHexString();
+  withdraw.from = pool.id;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
   withdraw.inputTokens = pool.inputTokens;

@@ -62,9 +62,9 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 
 ## Development Status
 
-🔨 = In progress.  
-🛠 = Feature complete. Additional testing required.  
-✅ = Production-ready.  
+🔨 = In progress.
+🛠 = Feature complete. Additional testing required.
+✅ = Production-ready.
 
 | Protocol |  Status | Versions † | Deployments |
 | ------- |  :------: | --- | --- |
@@ -131,6 +131,11 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Vesper Finance | 🔨 | | |
 | Yield Yak | 🔨 | | |
 | [Yearn v2](https://yearn.fi/) | 🛠 | 1.3.0 / 1.2.0 / 1.0.0 | [![Yearn V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-ethereum) [![Yearn V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-arbitrum) [![Yearn V2 Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-fantom) |
+| **Governance** |    | |
+| ENS Governor | 🛠 | | |
+| FEI Governor | 🔨 | | |
+| Silo Finance Governor | 🔨 | | |
+| Hop Protocol Governor | 🔨 | | |
 | **Network Subgraph** |    | |
 | EVM | 🔨 | | |
 | Cosmos | 🔨 | | |
