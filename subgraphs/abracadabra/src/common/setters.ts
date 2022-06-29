@@ -69,10 +69,6 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     MarketEntity.closedPositionCount = 0;
     MarketEntity.lendingPositionCount = 0;
     MarketEntity.borrowingPositionCount = 0;
-    MarketEntity.openPositions = [];
-    MarketEntity.closedPositions = [];
-    MarketEntity.lendingPositions = [];
-    MarketEntity.borrowingPositions = [];
     MarketEntity.name = inputToken.name + " Market";
     MarketEntity.isActive = true;
     MarketEntity.canUseAsCollateral = true;

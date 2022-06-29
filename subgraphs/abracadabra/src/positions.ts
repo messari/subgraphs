@@ -88,13 +88,10 @@ export function getOrCreatePosition(
   let market = getMarket(marketId);
   market!.positionCount += 1;
   market!.openPositionCount += 1;
-  market!.openPositions = addToArrayAtIndex(market!.openPositions, positionId, 0);
   if (side == "LENDER") {
     market!.lendingPositionCount += 1;
-    market!.lendingPositions = addToArrayAtIndex(market!.lendingPositions, position.id, 0);
   } else if (side == "BORROWER") {
     market!.borrowingPositionCount += 1;
-    market!.borrowingPositions = addToArrayAtIndex(market!.borrowingPositions, position.id, 0);
   }
   market!.save();
 
@@ -261,10 +258,14 @@ export function updatePositions(
 }
 
 export function takePositionSnapshot(position: Position, event: ethereum.Event): void {
-  let dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let snapshot = new PositionSnapshot(`${position.id}-${dailyId.toString()}`);
+  let hash = event.transaction.hash.toHexString();
+  let txLogIndex = event.transactionLogIndex.toI32();
+  let snapshot = new PositionSnapshot(`${position.id}-${hash}-${txLogIndex}`);
 
   snapshot.position = position.id;
+  snapshot.hash = hash;
+  snapshot.logIndex = txLogIndex;
+  snapshot.nonce = event.transaction.nonce;
   snapshot.balance = position.balance;
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
@@ -280,11 +281,8 @@ export function closePosition(position: Position, account: Account, market: Mark
   account.closedPositions = addToArrayAtIndex(account.closedPositions, position.id, 0);
   account.save();
 
-  let market_index = market.openPositions.indexOf(position.id);
   market.openPositionCount -= 1;
-  market.openPositions = removeFromArrayAtIndex(market.openPositions, market_index);
   market.closedPositionCount += 1;
-  market.closedPositions = addToArrayAtIndex(market.closedPositions, position.id, 0);
   market.save();
 
   let protocol = getOrCreateLendingProtocol();
