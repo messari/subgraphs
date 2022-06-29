@@ -40,19 +40,13 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - Block
-        - Account
-        - Token
-        - Market
         - Transaction
-        - Transfer
-        - Position
-        - PositionSnapshot
+        - Market
       abis:
         - name: ChefIncentivesController
           file: ./abis/geist/ChefIncentivesController.json
-        - name: AToken
-          file: ./abis/AToken.json
+        - name: GToken
+          file: ./abis/geist/GToken.json
         - name: VariableDebtToken
           file: ./abis/VariableDebtToken.json
         - name: StableDebtToken
@@ -95,17 +89,10 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - Block
-        - Account
-        - Token
         - Market
-        - Transaction
-        - Transfer
-        - Position
-        - PositionSnapshot
       abis:
-        - name: AToken
-          file: ./abis/AToken.json
+        - name: GToken
+          file: ./abis/geist/GToken.json
         - name: LendingPoolConfigurator
           file: ./abis/LendingPoolConfigurator.json
         - name: LendingPool

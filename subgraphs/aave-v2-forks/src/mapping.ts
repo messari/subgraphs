@@ -346,6 +346,7 @@ export function _handleReserveDataUpdated(
   }
 
   market.inputTokenBalance = tryTotalSupply.value;
+  market.outputTokenSupply = market.inputTokenBalance;
   market.totalDepositBalanceUSD = market.inputTokenBalance
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals))
