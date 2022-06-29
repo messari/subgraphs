@@ -65,7 +65,7 @@ async function runCommands(allScripts, results, args, callback) {
             exec(allScripts.get(protocols[index])[index2++], function(error, stdout, stderr) {
             logs = logs + "stdout: "  + stdout
             logs = logs + "stderr: "  + stderr
-            if (stderr.includes("HTTP error deploying the subgraph")) {
+            if (stderr.includes("HTTP error")) {
                 if (httpCounter >= 2) {
                     index++;
                     index2 = 0;
