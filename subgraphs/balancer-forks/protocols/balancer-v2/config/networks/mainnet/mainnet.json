@@ -16,6 +16,6 @@
   "defaultNetwork": "MAINNET",
   "isBalancer": true,
   "graftEnabled": false,
-  "subgraphId": "QmWLp26LboPZGu3ZzHx4QLsWHxcrwdCJZY77FyLa4dQHnB",
-  "graftStartBlock": "13818600"
+  "subgraphId": "QmcqdR5ipUSZpoqFdZR4ecqyZ1izpDjxV93uDDsNoUR8jX",
+  "graftStartBlock": "14736560"
 }
