@@ -101,6 +101,13 @@ export namespace RewardIntervalType {
   export const NONE = "NONE";
 }
 
+export namespace MasterChef {
+  export const MINICHEF = "MINICHEF";
+  export const MASTERCHEF = "MASTERCHEF";
+  export const MASTERCHEFV2 = "MASTERCHEFV2";
+  export const MASTERCHEFV3 = "MASTERCHEFV3";
+}
+
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
