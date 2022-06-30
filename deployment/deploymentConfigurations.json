@@ -72,7 +72,6 @@
           "sevenshi": "sevenshi/balancer-v2-ethereum",
           "deploy-on-merge": true
         }
-
       },
       "beethoven-x": {
         "optimism": {
