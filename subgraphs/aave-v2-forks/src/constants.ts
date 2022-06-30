@@ -100,6 +100,7 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_HUNDRED = new BigDecimal(BigInt.fromI32(100));
 
+export const DEFAULT_DECIMALS = 18;
 export const RAY_OFFSET = 27;
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;

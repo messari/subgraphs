@@ -15,6 +15,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - LendingProtocol
+        - Market
       abis:
         - name: LendingPoolAddressesProvider
           file: ./abis/LendingPoolAddressesProvider.json
@@ -27,7 +28,7 @@ dataSources:
           handler: handleLendingPoolUpdated
         - event: LendingPoolConfiguratorUpdated(indexed address)
           handler: handleLendingPoolConfiguratorUpdated
-      file: ./protocols/aave-v2/src/mapping.ts
+      file: ./protocols/geist-finance/src/mapping.ts
 templates:
   - kind: ethereum/contract
     name: LendingPool
@@ -42,12 +43,16 @@ templates:
         - Market
         - Deposit
         - Withdraw
-        - Repay
         - Borrow
+        - Repay
         - Liquidate
       abis:
-        - name: AaveIncentivesController
-          file: ./abis/aave-v2/AaveIncentivesController.json
+        - name: ChefIncentivesController
+          file: ./abis/geist-finance/ChefIncentivesController.json
+        - name: SpookySwapOracle
+          file: ./abis/geist-finance/SpookySwapOracle.json
+        - name: GToken
+          file: ./abis/geist-finance/GToken.json
         - name: AToken
           file: ./abis/aave-v2/AToken.json
         - name: VariableDebtToken
@@ -81,7 +86,7 @@ templates:
           handler: handleReserveUsedAsCollateralEnabled
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
-      file: ./protocols/aave-v2/src/mapping.ts
+      file: ./protocols/geist-finance/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator
     network: {{ network }}
@@ -94,8 +99,8 @@ templates:
       entities:
         - Market
       abis:
-        - name: AToken
-          file: ./abis/aave-v2/AToken.json
+        - name: GToken
+          file: ./abis/geist-finance/GToken.json
         - name: LendingPoolConfigurator
           file: ./abis/LendingPoolConfigurator.json
         - name: LendingPool
@@ -121,4 +126,4 @@ templates:
           handler: handleReserveDeactivated
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
-      file: ./protocols/aave-v2/src/mapping.ts
+      file: ./protocols/geist-finance/src/mapping.ts

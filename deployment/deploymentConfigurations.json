@@ -72,6 +72,14 @@
           "dmelotik": "dmelotik/aave-v2-rwa",
           "deploy-on-merge": true
         }
+      },
+      "geist-finance": {
+        "fantom": {
+          "template": "geist.finance.template.yaml",
+          "messari": "messari/geist-finance-fantom",
+          "dmelotik": "dmelotik/geist-fantom",
+          "deploy-on-merge": true
+        }
       }
     },
     "convex-finance": {
