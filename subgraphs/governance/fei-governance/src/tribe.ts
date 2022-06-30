@@ -1,24 +1,28 @@
 import { log } from "@graphprotocol/graph-ts";
 import {
-  DelegateChanged,
-  DelegateVotesChanged,
-  Transfer,
-} from "../generated/ENSToken/ENSToken";
+  DelegateChanged as DelegateChangedEvent,
+  DelegateVotesChanged as DelegateVotesChangedEvent,
+  Transfer as TransferEvent,
+} from "../generated/Tribe/Tribe";
 import {
-  getTokenHolder,
-  getDelegate,
-  toDecimal,
-  getGovernance,
-  BIGINT_ZERO,
+  getOrCreateTokenHolder,
+  getOrCreateDelegate,
   BIGINT_ONE,
+  BIGINT_ZERO,
+  getGovernance,
+  toDecimal,
   ZERO_ADDRESS,
-} from "./helpers";
+} from "./helper";
 
 // DelegateChanged(indexed address,indexed address,indexed address)
-export function handleDelegateChanged(event: DelegateChanged): void {
-  let tokenHolder = getTokenHolder(event.params.delegator);
-  let previousDelegate = getDelegate(event.params.fromDelegate);
-  let newDelegate = getDelegate(event.params.toDelegate);
+export function handleDelegateChanged(event: DelegateChangedEvent): void {
+  let tokenHolder = getOrCreateTokenHolder(
+    event.params.delegator.toHexString()
+  );
+  let previousDelegate = getOrCreateDelegate(
+    event.params.fromDelegate.toHexString()
+  );
+  let newDelegate = getOrCreateDelegate(event.params.toDelegate.toHexString());
 
   tokenHolder.delegate = newDelegate.id;
   tokenHolder.save();
@@ -34,14 +38,16 @@ export function handleDelegateChanged(event: DelegateChanged): void {
 
 // DelegateVotesChanged(indexed address,uint256,uint256)
 // Called in succession to the above DelegateChanged event
-export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
+export function handleDelegateVotesChanged(
+  event: DelegateVotesChangedEvent
+): void {
   const delegateAddress = event.params.delegate;
   const previousBalance = event.params.previousBalance;
   const newBalance = event.params.newBalance;
 
   let votesDifference = newBalance.minus(previousBalance);
 
-  let delegate = getDelegate(delegateAddress);
+  let delegate = getOrCreateDelegate(delegateAddress.toHexString());
   delegate.delegatedVotesRaw = newBalance;
   delegate.delegatedVotes = toDecimal(newBalance);
   delegate.save();
@@ -62,13 +68,13 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
 }
 
 // Transfer(indexed address,indexed address,uint256)
-export function handleTransfer(event: Transfer): void {
-  const from = event.params.from;
-  const to = event.params.to;
-  const value = event.params.value;
+export function handleTransfer(event: TransferEvent): void {
+  const from = event.params.from.toHexString();
+  const to = event.params.to.toHexString();
+  const value = event.params.amount; // NOTE: OZ -- This is different than the OZ contract (event.params.value in OZ)
 
-  let fromHolder = getTokenHolder(from);
-  let toHolder = getTokenHolder(to);
+  let fromHolder = getOrCreateTokenHolder(from);
+  let toHolder = getOrCreateTokenHolder(to);
   let governance = getGovernance();
 
   // Deduct from from holder balance + decrement gov token holders
@@ -80,7 +86,7 @@ export function handleTransfer(event: Transfer): void {
 
     if (fromHolder.tokenBalanceRaw < BIGINT_ZERO) {
       log.error("Negative balance on holder {} with balance {}", [
-        fromHolder.id.toHexString(),
+        fromHolder.id,
         fromHolder.tokenBalanceRaw.toString(),
       ]);
     }

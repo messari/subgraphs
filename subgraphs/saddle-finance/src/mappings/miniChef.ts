@@ -7,7 +7,7 @@ import {
   LogSaddlePerSecond,
   LogSetPool,
   Withdraw,
-} from "../../generated/MiniChefV2/MiniChefV2";
+} from "../../generated/templates/Swap/MiniChefV2";
 import { handlePoolRewardsUpdated } from "../entities/pool";
 import { BIGINT_ZERO } from "../utils/constants";
 

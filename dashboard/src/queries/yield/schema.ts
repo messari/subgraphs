@@ -580,7 +580,7 @@ export const schema120 = (): Schema => {
 
   const poolsQuery = `
       query Data {
-        vaults {
+        vaults(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
           id
           name
         }
@@ -874,7 +874,7 @@ export const schema130 = (): Schema => {
 
   const poolsQuery = `
       query Data {
-        vaults {
+        vaults(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
           id
           name
         }
