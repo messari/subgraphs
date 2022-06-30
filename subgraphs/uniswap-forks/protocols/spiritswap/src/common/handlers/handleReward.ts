@@ -11,6 +11,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
   let masterChefPool = _HelperStore.load(pid.toString());
   let poolContract = MasterChefSpiritSwap.bind(event.address);
 
+  poolContract.spiritPerBlock()
   // Create entity to track masterchef pool mappings
   if (!masterChefPool) {
     masterChefPool = new _HelperStore(pid.toString());
