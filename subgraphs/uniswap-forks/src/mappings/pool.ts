@@ -4,16 +4,19 @@ import { Mint, Burn, Swap, Transfer, Sync } from "../../generated/templates/Pair
 import { createDeposit, createWithdraw, createSwapHandleVolumeAndFees } from "../common/creators";
 import { handleTransferBurn, handleTransferMint, handleTransferToPoolBurn } from "../common/handlers";
 import { updateFinancials, updateInputTokenBalances, updatePoolMetrics, updateTvlAndTokenPrices, updateUsageMetrics } from "../common/updateMetrics";
-import { BIGINT_THOUSAND, UsageType, ZERO_ADDRESS } from "../common/constants";
+import { BIGINT_THOUSAND, BIGINT_ZERO, UsageType, ZERO_ADDRESS } from "../common/constants";
+import { getLiquidityPool } from "../common/getters";
 
 export function handleTransfer(event: Transfer): void {
+  let pool = getLiquidityPool(event.address.toHexString());
+
   // ignore initial transfers for first adds
-  if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.value.equals(BIGINT_THOUSAND)) {
+  if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.value.equals(BIGINT_THOUSAND) && pool.outputTokenSupply == BIGINT_ZERO) {
     return;
   }
   // mints
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
-    handleTransferMint(event, event.params.value, event.params.to.toHexString());
+    handleTransferMint(event, pool, event.params.value, event.params.to.toHexString());
   }
   // Case where direct send first on native token withdrawls.
   // For burns, mint tokens are first transferred to the pool before transferred for burn.
@@ -24,7 +27,7 @@ export function handleTransfer(event: Transfer): void {
   }
   // burn
   if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.from == event.address) {
-    handleTransferBurn(event, event.params.value, event.params.from.toHexString());
+    handleTransferBurn(event, pool, event.params.value, event.params.from.toHexString());
   }
 }
 
