@@ -1,6 +1,6 @@
-import { Address, BigDecimal, log } from '@graphprotocol/graph-ts';
+import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
 import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
+import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
 import { Configurations } from '../../../../../configurations/configurations/interface';
 import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
 
@@ -49,6 +49,9 @@ export class UniswapV2MainnetConfigurations implements Configurations {
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.NONE;
+  }
+  getRewardTokenRate(): BigInt {
+    return BIGINT_ZERO
   }
   getReferenceToken(): string {
     return "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";

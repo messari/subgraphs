@@ -1,6 +1,6 @@
-import { log, Address, BigDecimal } from '@graphprotocol/graph-ts';
+import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
 import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
+import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
 import { Configurations } from '../../../../../configurations/configurations/interface';
 import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
 
@@ -49,6 +49,9 @@ export class ApeswapBscConfigurations implements Configurations {
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.TIMESTAMP;
+  }
+  getRewardTokenRate(): BigInt {
+    return BIGINT_ZERO
   }
   getReferenceToken(): string {
     return "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c";

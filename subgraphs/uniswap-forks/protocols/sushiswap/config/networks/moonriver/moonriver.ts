@@ -1,8 +1,8 @@
-import { Address, BigDecimal } from '@graphprotocol/graph-ts';
+import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
 import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
+import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
 import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
+import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG, MASTERCHEFV2_SUSHI_PER_BLOCK } from '../../../src/common/constants';
 import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
 
 export class SushiswapMoonriverConfigurations implements Configurations {
@@ -50,6 +50,9 @@ export class SushiswapMoonriverConfigurations implements Configurations {
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.TIMESTAMP;
+  }
+  getRewardTokenRate(): BigInt {
+    return BIGINT_ZERO
   }
   getReferenceToken(): string {
     return toLowerCase("0x639A647fbe20b6c8ac19E48E2de44ea792c62c5C");

@@ -323,7 +323,7 @@ export function _handleReserveDataUpdated(
     vBorrowBalance = tryVBorrowBalance.value;
   }
 
-  // broken is both revert
+  // broken if both revert
   if (trySBorrowBalance.reverted && tryVBorrowBalance.reverted) {
     log.warning("[ReserveDataUpdated] No borrow balance found", []);
     return;
