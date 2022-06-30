@@ -72,7 +72,7 @@ async function runCommands(allScripts, results, args, callback) {
   function next() {
     if (deploymentIndex < allDeployments.length) {
       exec(
-        allScripts.get(protocols[deploymentIndex])[scriptIndex++],
+        allScripts.get(allDeployments[deploymentIndex])[scriptIndex++],
         function (error, stdout, stderr) {
           logs = logs + "stdout: " + stdout;
           logs = logs + "stderr: " + stderr;
@@ -110,7 +110,7 @@ async function runCommands(allScripts, results, args, callback) {
             allScripts.get(allDeployments[deploymentIndex]).length
           ) {
             results +=
-              "Deployment Successful: " + protocols[deploymentIndex] + "\n";
+              "Deployment Successful: " + allDeployments[deploymentIndex] + "\n";
             deploymentIndex++;
             scriptIndex = 0;
             httpCounter = 1;
