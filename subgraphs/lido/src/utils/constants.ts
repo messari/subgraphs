@@ -10,6 +10,8 @@ export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_CONTRACT = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84";
+export const PROTOCOL_TREASURY_ID = "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c";
+export const PROTOCOL_NODE_OPERATORS_REGISTRY_ID = "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -161,5 +163,3 @@ export const ETH_NAME = "Ether";
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
-
-// export const TROVE_MANAGER = "0xA39739EF8b0231DbFA0DcdA07d7e29faAbCf4bb2";

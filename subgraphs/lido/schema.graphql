@@ -116,15 +116,6 @@ type Protocol @entity {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
-type LidoSubmission @entity {
-  id: ID!
-
-  sender: Bytes!
-  amount: BigInt!
-  referral: Bytes!
-
-}
-
 type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
@@ -225,3 +216,27 @@ type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
+
+type LidoSubmission @entity {
+  id: ID!
+
+  sender: Bytes!
+  amount: BigInt!
+  referral: Bytes!
+}
+
+# type LidoOracle @entity {
+#   id: ID!
+# 
+#   postTotalPooledEther: BigInt!
+#   preTotalPooledEther: BigInt!
+#   totalShares: BigInt!
+# }
+# 
+# type StEth @entity {
+#   id: ID!
+# 
+#   from: Bytes!
+#   to: Bytes!
+#   sharesValue: BigInt!
+# }
