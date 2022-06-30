@@ -667,15 +667,15 @@
       "yearn-v2": {
         "arbitrum": {
           "template": "yearn.v2.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "yearn.v2.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "mainnet": {
           "template": "yearn.v2.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     }
