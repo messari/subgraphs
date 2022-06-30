@@ -24,6 +24,9 @@ dataSources:
           file: ./abis/CToken.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: Core
+          file: ./abis/tectonic/Core.json
+
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed

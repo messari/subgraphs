@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, bigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -16,13 +16,24 @@ import {
   AccrueInterest,
   NewReserveFactor,
 } from "../../../generated/templates/CToken/CToken";
-import { LendingProtocol, Token } from "../../../generated/schema";
+import {
+  LendingProtocol,
+  Token,
+  Market,
+  RewardToken,
+} from "../../../generated/schema";
 import {
   cTokenDecimals,
   Network,
   BIGINT_ZERO,
+  BIGDECIMAL_ZERO,
+  BIGDECIMAL_ONE,
   SECONDS_PER_YEAR,
+  RewardTokenType,
+  exponentToBigDecimal,
+
 } from "../../../src/constants";
+
 import {
   ProtocolData,
   _getOrCreateProtocol,
@@ -45,10 +56,18 @@ import {
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
+import { Core } from "../../../generated/Comptroller/Core";
 import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
-import { comptrollerAddr, nativeCToken, nativeToken } from "./constants";
+import {
+  comptrollerAddr,
+  nativeCToken,
+  nativeToken,
+  TONICAddress,
+  tTONICAddress,
+  CRONOS_BLOCKSPERDAY
+} from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
@@ -201,6 +220,15 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
   let interestAccumulated = event.params.interestAccumulated;
   let totalBorrows = event.params.totalBorrows;
+
+  let marketID = marketAddress.toHexString();
+  let market = Market.load(marketID);
+  if (!market) {
+    log.warning("[handleAccrueInterest] Market not found: {}", [marketID]);
+    return;
+  }
+  updateRewards(event, market);
+
   _handleAccrueInterest(
     updateMarketData,
     comptrollerAddr,
@@ -224,4 +252,92 @@ function getOrCreateProtocol(): LendingProtocol {
     comptroller.try_oracle()
   );
   return _getOrCreateProtocol(protocolData);
+}
+
+function updateRewards(event: ethereum.Event, market: Market): void {
+  if (event.block.number.toI32() > 10271924) {
+    let rewardTokenBorrow: RewardToken | null = null;
+    let rewardTokenDeposit: RewardToken | null = null;
+
+    // check if market has COMP reward tokens
+    if (market.rewardTokens == null) {
+      // get or create COMP token
+      let compToken = Token.load(TONICAddress);
+      if (!compToken) {
+        let tokenContract = ERC20.bind(Address.fromString(TONICAddress));
+        compToken = new Token(TONICAddress);
+        compToken.name = getOrElse(tokenContract.try_name(), "unkown");
+        compToken.symbol = getOrElse(tokenContract.try_symbol(), "unkown");
+        compToken.decimals = getOrElse(tokenContract.try_decimals(), 0);
+        compToken.save();
+      }
+
+      let borrowID = RewardTokenType.BORROW.concat("-").concat(TONICAddress);
+      rewardTokenBorrow = RewardToken.load(borrowID);
+      if (!rewardTokenBorrow) {
+        rewardTokenBorrow = new RewardToken(borrowID);
+        rewardTokenBorrow.token = compToken.id; // COMP already made from cCOMP market
+        rewardTokenBorrow.type = RewardTokenType.BORROW;
+        rewardTokenBorrow.save();
+      }
+      let depositID = RewardTokenType.DEPOSIT.concat("-").concat(TONICAddress);
+      rewardTokenDeposit = RewardToken.load(depositID);
+      if (!rewardTokenDeposit) {
+        rewardTokenDeposit = new RewardToken(depositID);
+        rewardTokenDeposit.token = compToken.id; // COMP already made from cCOMP market
+        rewardTokenDeposit.type = RewardTokenType.DEPOSIT;
+        rewardTokenDeposit.save();
+      }
+
+      market.rewardTokens = [rewardTokenDeposit.id, rewardTokenBorrow.id];
+    }
+
+    // get COMP distribution/block
+    // let rewardDecimals = Token.load(TONICAddress)!.decimals; 
+    let rewardDecimals = 18; // TONIC 18 decimals
+    let troller = Core.bind(comptrollerAddr);
+    let blocksPerDay = BigInt.fromString(CRONOS_BLOCKSPERDAY);
+
+    let compPriceUSD = BIGDECIMAL_ZERO;
+    let supplyCompPerDay = BIGINT_ZERO;
+    let borrowCompPerDay = BIGINT_ZERO;
+
+
+    // comp speeds are the same for supply/borrow side
+    let tryCompSpeed = troller.try_tonicSpeeds(event.address);
+    supplyCompPerDay = tryCompSpeed.reverted
+      ? BIGINT_ZERO
+      : tryCompSpeed.value.times(blocksPerDay);
+    borrowCompPerDay = supplyCompPerDay;
+  
+
+    // get TONIC price
+    // tTONIC was made at this block height 1337195
+    if (event.block.number.toI32() > 1337195) {
+      let compMarket = Market.load(tTONICAddress);
+      if (!compMarket) {
+        log.warning("[updateRewards] Market not found: {}", [tTONICAddress]);
+        return;
+      }
+
+      compPriceUSD = compMarket.inputTokenPriceUSD;
+    } else {
+      // try to get TONIC price between blocks 10271924 - 10960099 using price oracle library
+
+      // As CRONOS Price oracle is not built yet, using 0 before tonic Market was created for now.
+      compPriceUSD = BIGDECIMAL_ONE;
+    }
+
+    let borrowCompPerDayUSD = borrowCompPerDay
+      .toBigDecimal()
+      .div(exponentToBigDecimal(rewardDecimals))
+      .times(compPriceUSD);
+    let supplyCompPerDayUSD = supplyCompPerDay
+      .toBigDecimal()
+      .div(exponentToBigDecimal(rewardDecimals))
+      .times(compPriceUSD);
+    market.rewardTokenEmissionsAmount = [borrowCompPerDay, supplyCompPerDay]; // same order as market.rewardTokens
+    market.rewardTokenEmissionsUSD = [borrowCompPerDayUSD, supplyCompPerDayUSD];
+    market.save();
+  }
 }

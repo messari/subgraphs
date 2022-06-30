@@ -23,3 +23,9 @@ export const nativeCToken = new TokenData(
   "tCRO",
   cTokenDecimals
 );
+
+export const TONICAddress = "0xDD73dEa10ABC2Bff99c60882EC5b2B81Bb1Dc5B2";
+
+export const tTONICAddress = "0xfe6934FDf050854749945921fAA83191Bccf20Ad";
+
+export const CRONOS_BLOCKSPERDAY = '5'
