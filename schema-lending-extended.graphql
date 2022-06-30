@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol (Extended)
-# Version: 2.0.0
+# Version: 2.0.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -297,20 +297,6 @@ type LendingProtocol implements Protocol @entity {
 
   " Total number of positions (open and closed) "
   cumulativePositionCount: Int!
-
-  ##### Account / Position Data #####
-
-  " Any account that has made a deposit before "
-  depositors: [Account!]!
-
-  " Any account that has made a borrow before "
-  borrowers: [Account!]!
-
-  " Any account that has made a liquidation before "
-  liquidators: [Account!]!
-
-  " Any account that has been liquidated before "
-  liquidatees: [Account!]!
 
   ##### Snapshots #####
 
@@ -621,26 +607,14 @@ type Market @entity {
   " Number of positions in this market "
   positionCount: Int!
 
-  " All open positions in this market "
-  openPositions: [Position!]!
-
   " Number of open positions in this market "
   openPositionCount: Int!
-
-  " All closed positions in this market "
-  closedPositions: [Position!]!
 
   " Number of closed positions in this market "
   closedPositionCount: Int!
 
-  " All lending positions in this market "
-  lendingPositions: [Position!]!
-
   " Number of lending positions in this market "
   lendingPositionCount: Int!
-
-  " All borrowing positions in this market "
-  borrowingPositions: [Position!]!
 
   " Number of borrowing positions in this market "
   borrowingPositionCount: Int!
@@ -881,14 +855,8 @@ type Account @entity {
   " All positions that belong to this account "
   positions: [Position!]! @derivedFrom(field: "account")
 
-  " All open positions this account has "
-  openPositions: [Position!]!
-
   " Number of open positions this account has "
   openPositionCount: Int!
-
-  " All closed positions this account has "
-  closedPositions: [Position!]!
 
   " Number of closed positions this account has "
   closedPositionCount: Int!
@@ -998,13 +966,27 @@ type Position @entity {
   liquidations: [Liquidate!]! @derivedFrom(field: "position")
 
   " Position daily snapshots for open positions "
-  dailySnapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
+  snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
 
+# Unlike other snapshots that are taken at a fixed time interval. Position
+# snapshots should be taken after every event, including the opening and
+# closing events. This will prevent an ever growing number of snapshots
+# for positions that are not moving. As we are only recording the balance
+# in token amounts instead of in USD, this will work well.
 # Note that we only take snapshot for open positions
 type PositionSnapshot @entity {
-  " { Position ID }-{ # of days since Unix epoch time } "
+  " { Position ID }-{ Transaction hash }-{ Log index } "
   id: ID!
+
+  " Transaction hash of the transaction that triggered this snapshot "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Nonce of the transaction that triggered this snapshot "
+  nonce: BigInt!
 
   " Position of this snapshot "
   position: Position!
