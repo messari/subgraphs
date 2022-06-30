@@ -48,7 +48,7 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-To be added
+Emissions Per Day = (`emissionsPerSecond` * `SECONDS_PER_DAY`)
 
 ### Total Unique Users
 
@@ -63,10 +63,6 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 `Liquidations`
 
 `Repayments`
-
-### Reward Token Emissions Amount
-
-To be added
 
 ### Protocol Controlled Value
 

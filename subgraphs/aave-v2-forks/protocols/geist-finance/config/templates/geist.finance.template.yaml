@@ -28,7 +28,7 @@ dataSources:
           handler: handleLendingPoolUpdated
         - event: LendingPoolConfiguratorUpdated(indexed address)
           handler: handleLendingPoolConfiguratorUpdated
-      file: ./protocols/geist/src/mapping.ts
+      file: ./protocols/geist-finance/src/mapping.ts
 templates:
   - kind: ethereum/contract
     name: LendingPool
@@ -40,15 +40,19 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - Transaction
         - Market
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
       abis:
         - name: ChefIncentivesController
-          file: ./abis/geist/ChefIncentivesController.json
+          file: ./abis/geist-finance/ChefIncentivesController.json
         - name: SpookySwapOracle
-          file: ./abis/geist/SpookySwapOracle.json
+          file: ./abis/geist-finance/SpookySwapOracle.json
         - name: GToken
-          file: ./abis/geist/GToken.json
+          file: ./abis/geist-finance/GToken.json
         - name: AToken
           file: ./abis/aave-v2/AToken.json
         - name: VariableDebtToken
@@ -82,7 +86,7 @@ templates:
           handler: handleReserveUsedAsCollateralEnabled
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
-      file: ./protocols/geist/src/mapping.ts
+      file: ./protocols/geist-finance/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator
     network: {{ network }}
@@ -96,7 +100,7 @@ templates:
         - Market
       abis:
         - name: GToken
-          file: ./abis/geist/GToken.json
+          file: ./abis/geist-finance/GToken.json
         - name: LendingPoolConfigurator
           file: ./abis/LendingPoolConfigurator.json
         - name: LendingPool
@@ -122,4 +126,4 @@ templates:
           handler: handleReserveDeactivated
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
-      file: ./protocols/geist/src/mapping.ts
+      file: ./protocols/geist-finance/src/mapping.ts

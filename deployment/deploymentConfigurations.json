@@ -73,10 +73,10 @@
           "deploy-on-merge": true
         }
       },
-      "geist": {
+      "geist-finance": {
         "fantom": {
-          "template": "geist.template.yaml",
-          "messari": "messari/geist-fantom",
+          "template": "geist.finance.template.yaml",
+          "messari": "messari/geist-finance-fantom",
           "dmelotik": "dmelotik/geist-fantom",
           "deploy-on-merge": true
         }
