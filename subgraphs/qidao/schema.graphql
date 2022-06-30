@@ -1050,4 +1050,6 @@ type _InProgressLiquidate @entity {
   debtRepaid: BigInt
   " Fee amount deducted from collateral "
   closingFee: BigInt
+  " Owner of vault being liquidated "
+  owner: String
 }

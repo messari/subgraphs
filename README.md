@@ -71,7 +71,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | **DEX AMM** |    | |
 | [Apeswap](https://apeswap.finance/) | 🛠 | 1.3.0 / 1.1.1 / 1.0.0 | [![Apeswap BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-bsc) [![Apeswap Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-polygon) |
 | [Balancer v2](https://balancer.fi/) | 🛠 | 1.3.0 / 1.1.2 / 1.0.0 | [![Balancer V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-ethereum) [![Balancer V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-arbitrum) [![Balancer V2 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-polygon)|
-| Bancor v3 | 🔨 | | |
+| [Bancor v3](https://try.bancor.network/) | 🛠 | 1.3.0 / 1.0.0 / 1.0.0 | [![Bancor V3 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/bancor-v3-ethereum) |
 | [Beethoven X](https://beets.fi/) | 🛠 | 1.3.0 / 1.1.2 / 1.0.0 | [![Beethoven X Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/beethoven-x-fantom) [![Beethoven X Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/beethoven-x-optimism)  |
 | [Curve](https://curve.fi/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Curve Finance Gnosis](./docs/images/chains/xdai.png)](https://thegraph.com/hosted-service/subgraph/messari/curve-finance-gnosis) [![Curve Finance Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/curve-finance-polygon) [![Curve Finance Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/curve-finance-arbitrum) [![Curve Finance Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/curve-finance-optimism) [![Curve Finance Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/curve-finance-fantom) [![Curve Finance Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/curve-finance-avalanche) [![Curve Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/curve-finance-ethereum) |
 | DODO v2 | 🔨 | | |
@@ -89,7 +89,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | [Uniswap v2](https://uniswap.org/) | 🛠 | 1.3.0 / 1.1.1 / 1.0.0 | [![Uniswap V2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2-ethereum) |
 | [Uniswap v3](https://uniswap.org/) | 🛠 | 1.3.0 / 1.1.1 / 1.0.0 | [![Uniswap V3](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-ethereum) [![Uniswap V3 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-polygon) [![Uniswap V3 Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-optimism) [![Uniswap V3 Arbtitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-arbitrum)|
 | **Lending Protocols** |    | |
-| [Aave v2](https://aave.com/) | 🛠 | 1.1.0 / 1.1.32 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) |
+| [Aave v2](https://aave.com/) | 🛠 | 1.3.0 / 1.2.2 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) [![Aave V2 Ethereum ARC](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum-arc) [![Aave V2 Ethereum RWA](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum-rwa) [![Aave V2 Ethereum AMM](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum-amm) [![Aave V2 Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-avalanche) [![Aave V2 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-polygons) |
 | [Aave v3](https://aave.com/) | 🔨 | 1.3.0 / 1.0.0 / 1.0.0 | [![Aave V3 Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-optimism) [![Aave V3 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-polygon) [![Aave V3 Harmony](./docs/images/chains/harmony.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-harmony) [![Aave V3 Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-fantom) [![Aave V3 Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-avalanche) [![Aave V3 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-arbitrum) |
 | [Aurigami](https://www.aurigami.finance/) | 🛠 | 1.3.0 / 1.0.6 / 1.0.0  | [![Aurigami Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/aurigami-aurora) |
 | [Bastion Protocol](https://bastionprotocol.com/) | 🛠 | 1.3.0 / 1.0.9 / 1.0.0 | [![Bastion Protocol Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/bastion-protocol-aurora) |
@@ -101,12 +101,11 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Euler Finance | 🔨 | | |
 | Geist | 🔨 | | |
 | [Iron Bank](https://app.ib.xyz/) | 🛠 | 1.3.0 / 1.0.8 / 1.0.0 | [![Iron Bank Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-fantom) [![Iron Bank Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-avalanche) [![Iron Bank Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-ethereum) |
-| Maple Finance | 🔨 | | |
+| [Maple Finance](https://www.maple.finance/) | 🛠 | 1.2.1 / 1.1.0 / 1.0.0 | [![Maple Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/maple-finance-ethereum) |
 | [Moonwell Finance](https://moonwell.fi/) | 🛠 | 1.3.0 / 1.0.10 / 1.0.0 | [![Moonwell Moonriver](./docs/images/chains/moonriver.png)](https://thegraph.com/hosted-service/subgraph/messari/moonwell-moonriver)  |
 | Notional Finance | 🔨 | | |
 | [Rari Fuse](https://app.rari.capital/fuse) | 🔨 | 1.3.0 / 1.0.16 / 1.0.0 | [![Rari Fuse Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-ethereum) [![Rari Fuse Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-arbitrum) |
 | [SCREAM](https://scream.sh/) | 🛠 | 1.3.0 / 1.0.6 / 1.0.0 | [![SCREAM Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/scream-fantom)  |
-| TrueFi |   | | |
 | [Venus Protocol](https://venus.io/) | 🛠 | 1.3.0 / 1.0.6 / 1.0.0 | [![Venus Protocol BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/venus-protocol-bsc) |
 | [Yeti Finance](https://yeti.finance/) | 🔨 | | |
 | **CDPs** |    | |
@@ -131,6 +130,11 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Vesper Finance | 🔨 | | |
 | Yield Yak | 🔨 | | |
 | [Yearn v2](https://yearn.fi/) | 🛠 | 1.3.0 / 1.2.0 / 1.0.0 | [![Yearn V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-ethereum) [![Yearn V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-arbitrum) [![Yearn V2 Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-fantom) |
+| **Governance** |    | |
+| ENS Governor | 🛠 | | |
+| FEI Governor | 🔨 | | |
+| Silo Finance Governor | 🔨 | | |
+| Hop Protocol Governor | 🔨 | | |
 | **Network Subgraph** |    | |
 | EVM | 🔨 | | |
 | Cosmos | 🔨 | | |
