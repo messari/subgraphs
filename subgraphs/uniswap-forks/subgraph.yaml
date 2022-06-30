@@ -1,37 +1,83 @@
 specVersion: 0.0.2
-repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum/contract
+  - kind: ethereum
     name: Factory
     network: matic
     source:
-      address: "0x5757371414417b8c6caad45baef941abc7d3ab32"
+      address: "0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac"
       abi: Factory
-      startBlock: 4931780
+      startBlock: 10794229
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/factory.ts
-      entities:
-        - Token
-        - DexAmmProtocol
-        - LiquidityPool
-        - LiquidityPoolFee
-        - Protocol
+      entities: []
       abis:
         - name: Factory
-          file: ./abis/quickswap/Factory.json
+          file: ./abis/sushiswap/Factory.json
         - name: TokenABI
-          file: ./abis/quickswap/ERC20.json
+          file: ./abis/sushiswap/ERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      ##callHandlers:
-        ##- function: setFeeTo(address)
-          ##handler: handleFeeTo
+      file: ./src/mappings/factory.ts
+  - kind: ethereum
+    name: MasterChef
+    network: mainnet
+    source:
+      address: "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd"
+      abi: MasterChefSushiswap
+      startBlock: 10794230
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MasterChefSushiswap
+          file: ./abis/sushiswap/MasterChefSushiswap.json
+        - name: TokenABI
+          file: ./abis/sushiswap/ERC20.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed uint256,uint256)
+          handler: handleWithdraw
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
+          handler: handleEmergencyWithdraw
+      file: ./protocols/sushiswap/src/mappings/masterchef/reward.ts
+
+  - kind: ethereum
+    name: MasterChefV2
+    network: mainnet
+    source:
+      address: "0xef0881ec094552b2e128cf945ef17a6752b4ec5d"
+      abi: MasterChefV2Sushiswap
+      startBlock: 12428169
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MasterChefV2Sushiswap
+          file: ./abis/sushiswap/MasterChefV2Sushiswap.json
+        - name: TokenABI
+          file: ./abis/sushiswap/ERC20.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleWithdraw
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleEmergencyWithdraw
+        - event: LogSetPool(indexed uint256,uint256,indexed address,bool)
+          handler: handleLogSetPool
+        - event: LogPoolAddition(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleLogPoolAddition
+      file: ./protocols/sushiswap/src/mappings/masterchef/rewardV2.ts
 templates:
   - kind: ethereum/contract
     name: Pair
@@ -43,33 +89,14 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mappings/pool.ts
-      entities:
-        - LiqudityPool
-        - Token
-        - Deposit
-        - Withdraw
-        - Swap
-        - LiquidityPool
-        - LiquidityPoolFee
-        - DexAmmProtocol
-        - Token
-        - _Transaction
-        - _Mint
-        - _Burn
-        - _PricesUSD
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - _Account
-        - _DailyActiveAccount
-        - PoolDailySnapshot
-        - _TokenTracker
+      entities: []
       abis:
         - name: Pair
-          file: ./abis/quickswap/Pair.json
+          file: ./abis/sushiswap/Pair.json
         - name: Factory
-          file: ./abis/quickswap/Factory.json
+          file: ./abis/sushiswap/Factory.json
         - name: TokenABI
-          file: ./abis/quickswap/ERC20.json
+          file: ./abis/sushiswap/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint
@@ -81,4 +108,3 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
-          

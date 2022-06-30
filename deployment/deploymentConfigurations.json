@@ -566,36 +566,36 @@
       "sushiswap": {
         "arbitrum": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "avalanche": {
           "template": "uniswap.v2.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "bsc": {
           "template": "uniswap.v2.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "celo": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "fantom": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "fuse": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "mainnet": {
-          "template": "uniswap.v2.template.yaml",
+          "template": "sushiswap.mainnet.template.yaml",
           "steegecs": "steegecs/sushiswap-mainnet",
           "messari": "messari/sushiswap-ethereum",
           "deploy-on-merge": false,
@@ -604,26 +604,26 @@
         "matic": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-matic",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "moonbeam": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "moonriver": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-moonriver",
           "messari": "messari/sushiswap-moonriver",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "xdai": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-xdai",
           "messari": "messari/sushiswap-gnosis",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         }
       },

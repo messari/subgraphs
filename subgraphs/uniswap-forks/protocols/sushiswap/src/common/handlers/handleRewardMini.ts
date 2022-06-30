@@ -1,91 +1,81 @@
-import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
-import { MiniChefSushiswap } from "../../../../../generated/MiniChef/MiniChefSushiswap";
-import { LiquidityPool, _HelperStore } from "../../../../../generated/schema";
-import { BIGINT_FIVE, BIGINT_ZERO, INT_ZERO, RECENT_BLOCK_THRESHOLD, UsageType, ZERO_ADDRESS } from "../../../../../src/common/constants";
+import { LiquidityPool, _MasterChef, _MasterChefStakingPool } from "../../../../../generated/schema";
 import { getOrCreateToken } from "../../../../../src/common/getters";
-import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
+import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../../src/price/price";
+import { MasterChef } from "../constants";
+import { getOrCreateMasterChef } from "../helpers";
 
-export function handleRewardMini(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
-  let masterChefPool = _HelperStore.load(pid.toString());
-  let poolContract = MiniChefSushiswap.bind(event.address);
+export function updateMasterChefDeposit(event: ethereum.Event, pid: BigInt, amount: BigInt): void {
+  let miniChefV2Pool = _MasterChefStakingPool.load(MasterChef.MINICHEF + "-" + pid.toString())!;
+  let miniChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
 
-  // Create entity to track masterchef pool mappings
-  if (!masterChefPool) {
-    masterChefPool = new _HelperStore(pid.toString());
-    let getlpAddress = poolContract.try_lpToken(pid);
-    let lpTokenAddress = ZERO_ADDRESS;
-    if (!getlpAddress.reverted) {
-      lpTokenAddress = getlpAddress.value.toHexString();
-    }
-    masterChefPool.valueString = lpTokenAddress;
-    masterChefPool.valueBigInt = event.block.number;
-    masterChefPool.save();
-  }
-
-  // Return if pool does not exist - Banana tokens?
-  let pool = LiquidityPool.load(masterChefPool.valueString!);
+  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress);
   if (!pool) {
     return;
   }
 
-  // Update staked amounts
-  if (usageType == UsageType.DEPOSIT) {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
-  } else {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
-  }
+  let rewardAmountPerInterval = miniChefV2.adjustedRewardTokenRate.times(miniChefV2Pool.poolAllocPoint).div(miniChefV2.totalAllocPoint);
+  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(rewardAmountPerInterval.toString());
+  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardAmountPerIntervalBigDecimal, miniChefV2.rewardTokenInterval);
 
-  // Return if you have calculated rewards recently
-  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(RECENT_BLOCK_THRESHOLD)) {
-    pool.save();
+  let nativeToken = updateNativeTokenPriceInUSD();
+  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+
+  miniChefV2Pool.lastRewardBlock = event.block.number;
+
+  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
+
+  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount)
+  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
+  pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
+
+  miniChefV2Pool.save()
+  miniChefV2.save()
+  rewardToken.save()
+  nativeToken.save()
+  pool.save()
+}
+
+export function updateMasterChefWithdraw(event: ethereum.Event, pid: BigInt, amount: BigInt): void {
+  let miniChefV2Pool = _MasterChefStakingPool.load(MasterChef.MINICHEF + "-" + pid.toString())!;
+  let miniChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
+
+  // Return if pool does not exist
+  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress);
+  if (!pool) {
     return;
   }
 
-  // Get necessary values from the master chef contract to calculate rewards
-  let getRewardTokenPerSecond = poolContract.try_sushiPerSecond();
-  let rewardTokenPerSecond: BigInt = BIGINT_ZERO;
-  if (!getRewardTokenPerSecond.reverted) {
-    rewardTokenPerSecond = getRewardTokenPerSecond.value;
-  }
-
-  let getTotalAllocPoint = poolContract.try_totalAllocPoint();
-  let totalAllocPoint: BigInt = BIGINT_ZERO;
-  if (!getTotalAllocPoint.reverted) {
-    totalAllocPoint = getTotalAllocPoint.value;
-  }
-
-  let getPoolInfo = poolContract.try_poolInfo(pid);
-  let poolAllocPoint: BigInt = BIGINT_ZERO;
-  let lastRewardTime: BigInt = BIGINT_ZERO;
-  if (!getPoolInfo.reverted) {
-    let poolInfo = getPoolInfo.value;
-    poolAllocPoint = poolInfo.value2;
-    lastRewardTime = poolInfo.value1;
-  }
-
-  // Calculate Reward Emission per sec
-  let multiplier = event.block.timestamp.minus(masterChefPool.valueBigInt!);
-  let rewardTokenRate = rewardTokenPerSecond.times(multiplier).times(poolAllocPoint).div(totalAllocPoint);
-
-  // Get the estimated rewards emitted for the upcoming day for this pool
-  let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.getRewardIntervalType());
+  let rewardAmountPerInterval = miniChefV2.adjustedRewardTokenRate.times(miniChefV2Pool.poolAllocPoint).div(miniChefV2.totalAllocPoint);
+  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(rewardAmountPerInterval.toString());
+  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardAmountPerIntervalBigDecimal, miniChefV2.rewardTokenInterval);
 
   let nativeToken = updateNativeTokenPriceInUSD();
+  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
-  let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
+  miniChefV2Pool.lastRewardBlock = event.block.number;
+
   rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
-  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.truncate(0).toString())];
-
+  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount)
+  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
   pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
 
-  masterChefPool.valueBigInt = event.block.number;
-
-  masterChefPool.save();
-  rewardToken.save();
-  nativeToken.save();
-  pool.save();
+  miniChefV2Pool.save()
+  miniChefV2.save()
+  rewardToken.save()
+  nativeToken.save()
+  pool.save()
 }
+
+// export function updateMasterChefHarvest(event: ethereum.Event, pid: BigInt, amount: BigInt): void {
+//   let masterChefPool = _MasterChefStakingPool.load(pid.toString())!;
+//   // Return if pool does not exist
+//   let pool = LiquidityPool.load(masterChefPool.poolAddress);
+//   if (!pool) {
+//     return;
+//   }
+//   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount)
+// }

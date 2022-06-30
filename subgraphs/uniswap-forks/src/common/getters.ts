@@ -301,12 +301,10 @@ export function getOrCreateRewardToken(address: string): RewardToken {
   let rewardToken = RewardToken.load(address);
   if (rewardToken == null) {
     let token = getOrCreateToken(address);
-    rewardToken = new RewardToken(address);
+    rewardToken = new RewardToken(RewardTokenType.DEPOSIT + "-" + address);
     rewardToken.token = token.id;
     rewardToken.type = RewardTokenType.DEPOSIT;
     rewardToken.save();
-
-    return rewardToken as RewardToken;
   }
   return rewardToken as RewardToken;
 }
