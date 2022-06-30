@@ -25,7 +25,7 @@ export function getOrCreateMasterChef(event: ethereum.Event, masterChefType: str
         masterChef = new _MasterChef(masterChefType);
         masterChef.totalAllocPoint = BIGINT_ZERO;
         masterChef.rewardTokenInterval = NetworkConfigs.getRewardIntervalType();
-        masterChef.rewardTokenRate = NetworkConfigs.getRewardTokenRate();
+        masterChef.rewardTokenRate = BIGINT_ZERO;
         log.warning("MasterChef Type: " + masterChefType, [])
         if (masterChefType == MasterChef.MASTERCHEFV2) {
             let masterChefV3Contract = MasterChefV2TraderJoe.bind(event.address);
