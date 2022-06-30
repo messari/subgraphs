@@ -13,7 +13,6 @@ export function updateMasterChefDeposit(event: ethereum.Event, pid: BigInt, amou
   let masterchefV2Contract = MasterChefV2Sushiswap.bind(event.address);
   let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
-  // Return if pool does not exist
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress);
   if (!pool) {
     return;

@@ -14,7 +14,6 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
   let masterChefPool = getOrCreateMasterChefStakingPool(event, MasterChef.MASTERCHEF, pid, poolContract)
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF)
 
-  // Return if pool does not exist - Banana tokens?
   let pool = LiquidityPool.load(masterChefPool.poolAddress);
   if (!pool) {
     return;

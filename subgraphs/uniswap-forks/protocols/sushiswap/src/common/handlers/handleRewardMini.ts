@@ -11,7 +11,6 @@ export function updateMasterChefDeposit(event: ethereum.Event, pid: BigInt, amou
   let miniChefV2Pool = _MasterChefStakingPool.load(MasterChef.MINICHEF + "-" + pid.toString())!;
   let miniChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
 
-  // Return if pool does not exist
   let pool = LiquidityPool.load(miniChefV2Pool.poolAddress);
   if (!pool) {
     return;
