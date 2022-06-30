@@ -84,6 +84,10 @@ dataSources:
           handler: handleWithdrawV3
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdrawV3
+        - event: Add(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleAdd
+        - event: Set(indexed uint256,uint256,indexed address,bool)
+          handler: handleSet
       file: ./protocols/trader-joe/src/mappings/masterchef/rewardV3.ts
 templates:
   - kind: ethereum/contract

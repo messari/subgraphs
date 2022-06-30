@@ -47,8 +47,12 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-        - event: Emer()
-          handler: emr
+        - event: Add(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleAdd
+        - event: Set(indexed uint256,uint256,indexed address,bool)
+          handler: handleSet
+        - event: UpdateEmissionRate(indexed address,uint256)
+          handler: handleUpdateEmissionRate
       file: ./protocols/trader-joe/src/mappings/masterchef/rewardV2.ts
   - kind: ethereum
     name: MasterChefV3
@@ -74,6 +78,10 @@ dataSources:
           handler: handleWithdrawV3
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdrawV3
+        - event: Add(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleAdd
+        - event: Set(indexed uint256,uint256,indexed address,bool)
+          handler: handleSet
       file: ./protocols/trader-joe/src/mappings/masterchef/rewardV3.ts
 templates:
   - kind: ethereum/contract
@@ -105,4 +113,3 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
-          
