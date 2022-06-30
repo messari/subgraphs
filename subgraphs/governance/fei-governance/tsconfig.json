@@ -1,8 +1,4 @@
 {
   "extends": "@graphprotocol/graph-ts/types/tsconfig.base.json",
-<<<<<<< HEAD:subgraphs/aave-v2-forks/tsconfig.json
-  "include": ["protocols/aave-v2/src", "src/"]
-=======
   "include": ["src"]
->>>>>>> e166b7fbdad649b57501617043a597278b86a144:subgraphs/governance/fei-governance/tsconfig.json
 }
