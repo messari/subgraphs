@@ -69,8 +69,7 @@ export function getOrCreateToken(address: string): Token {
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
     token.name = name.reverted ? "" : name.value;
     token.symbol = symbol.reverted ? "" : symbol.value;
-    let lastPriceUSD = fetchPrice(Address.fromString(address));
-    token.lastPriceUSD = lastPriceUSD;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
@@ -84,7 +83,6 @@ export function getLiquidityPool(poolAddress: string): LiquidityPool {
 export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
   return LiquidityPoolFee.load(id)!;
 }
-
 export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let id = event.block.timestamp.toI32() / SECONDS_PER_DAY;
