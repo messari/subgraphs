@@ -105,7 +105,6 @@
           "deploy-on-merge": true,
           "prepare:constants": true
         }
-
       },
       "beethoven-x": {
         "optimism": {
