@@ -71,11 +71,6 @@ export namespace ActivityType {
   export const HOURLY = "HOURLY";
 }
 
-export namespace PositionSide {
-  export const LENDER = "LENDER";
-  export const BORROWER = "BORROWER";
-}
-
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
