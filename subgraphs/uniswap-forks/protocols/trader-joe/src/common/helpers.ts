@@ -28,13 +28,12 @@ export function getOrCreateMasterChef(event: ethereum.Event, masterChefType: str
         masterChef.rewardTokenRate = BIGINT_ZERO;
         log.warning("MasterChef Type: " + masterChefType, [])
         if (masterChefType == MasterChef.MASTERCHEFV2) {
-            let masterChefV3Contract = MasterChefV2TraderJoe.bind(event.address);
-            masterChef.adjustedRewardTokenRate = masterChefV3Contract.joePerSec();
+            let masterChefV2Contract = MasterChefV2TraderJoe.bind(event.address);
+            masterChef.adjustedRewardTokenRate = masterChefV2Contract.joePerSec();
             log.warning("Adjusted Reward Rate: " + masterChef.adjustedRewardTokenRate.toString(), [])
         } else {
             masterChef.adjustedRewardTokenRate = BIGINT_ZERO;
         }
-        masterChef.adjustedRewardTokenRate = BIGINT_ZERO;
         masterChef.lastUpdatedRewardRate = BIGINT_ZERO
         masterChef.save()
     }
