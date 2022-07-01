@@ -7,7 +7,7 @@
 Once everything is setup properly deploying is very easy.
 
 ```bash
-# This example will deploy rari-fuse on all networks to the hosted service under "dmelotik" in deploymentConfigurations.json
+# This example will deploy all forks of aave-v2 on all networks to the hosted service under "dmelotik" in deploymentConfigurations.json
 npm run deploy --SUBGRAPH=aave-v2-forks --PROTOCOL=aave-v2 --LOCATION=dmelotik
 
 # This will do the same, but only deploying the mainnet subgraph
@@ -23,7 +23,7 @@ During development you probably won't want to fully deploy the subgraph every ti
 To setup the subgraph manifest from the template:
 
 ```bash
-# Use rari fuse as an example
+# Use aave-v2 as an example
 npm run prepare:yaml --PROTOCOL=aave-v2 --NETWORK=mainnet --TEMPLATE=aave.v2.template.yaml
 ```
 
