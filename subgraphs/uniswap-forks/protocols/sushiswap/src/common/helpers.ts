@@ -35,7 +35,6 @@ export function getOrCreateMasterChef(event: ethereum.Event, masterChefType: str
         } else {
             masterChef.adjustedRewardTokenRate = BIGINT_ZERO;
         }
-        masterChef.adjustedRewardTokenRate = BIGINT_ZERO;
         masterChef.lastUpdatedRewardRate = BIGINT_ZERO
         masterChef.save()
     }

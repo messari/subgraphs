@@ -4,7 +4,7 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: xdai
+    network: mainnet
     source:
       address: "0xc35dadb65012ec5796536bd9864ed8773abc74c4"
       abi: Factory
@@ -57,7 +57,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: xdai
+    network: mainnet
     source:
       abi: Pair
     mapping:
