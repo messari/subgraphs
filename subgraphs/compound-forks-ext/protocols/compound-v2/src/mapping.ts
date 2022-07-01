@@ -97,25 +97,42 @@ import { PriceOracle2 } from "../../../generated/Comptroller/PriceOracle2";
 export function handleMintNew(event: MintNew): void {
   let minter = event.params.minter;
   let mintAmount = event.params.mintAmount;
-  _handleMint(comptrollerAddr, minter, mintAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.minter
+  );
+  _handleMint(comptrollerAddr, minter, mintAmount, balanceOfUnderlyingResult, event);
 }
 
 export function handleRedeemNew(event: RedeemNew): void {
   let redeemer = event.params.redeemer;
   let redeemAmount = event.params.redeemAmount;
-  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.redeemer
+  );
+  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, balanceOfUnderlyingResult, event);
 }
 
 export function handleBorrowNew(event: BorrowNew): void {
   let borrower = event.params.borrower;
   let borrowAmount = event.params.borrowAmount;
-  _handleBorrow(comptrollerAddr, borrower, borrowAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleBorrow(comptrollerAddr, borrower, borrowAmount, borrowBalanceStoredResult, event);
 }
 
 export function handleRepayBorrowNew(event: RepayBorrowNew): void {
   let payer = event.params.payer;
+  let borrower = event.params.borrower
   let repayAmount = event.params.repayAmount;
-  _handleRepayBorrow(comptrollerAddr, payer, repayAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleRepayBorrow(comptrollerAddr, borrower, payer, repayAmount, borrowBalanceStoredResult, event);
 }
 
 export function handleLiquidateBorrowNew(event: LiquidateBorrowNew): void {
@@ -156,25 +173,42 @@ export function handleAccrueInterestNew(event: AccrueInterestNew): void {
 export function handleMintOld(event: MintOld): void {
   let minter = event.params.minter;
   let mintAmount = event.params.mintAmount;
-  _handleMint(comptrollerAddr, minter, mintAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.minter
+  );
+  _handleMint(comptrollerAddr, minter, mintAmount, balanceOfUnderlyingResult, event);
 }
 
 export function handleRedeemOld(event: RedeemOld): void {
   let redeemer = event.params.redeemer;
   let redeemAmount = event.params.redeemAmount;
-  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.redeemer
+  );
+  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, balanceOfUnderlyingResult, event);
 }
 
 export function handleBorrowOld(event: BorrowOld): void {
   let borrower = event.params.borrower;
   let borrowAmount = event.params.borrowAmount;
-  _handleBorrow(comptrollerAddr, borrower, borrowAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleBorrow(comptrollerAddr, borrower, borrowAmount, borrowBalanceStoredResult, event);
 }
 
 export function handleRepayBorrowOld(event: RepayBorrowOld): void {
   let payer = event.params.payer;
+  let borrower = event.params.borrower
   let repayAmount = event.params.repayAmount;
-  _handleRepayBorrow(comptrollerAddr, payer, repayAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleRepayBorrow(comptrollerAddr, borrower, payer, repayAmount, borrowBalanceStoredResult, event);
 }
 
 export function handleLiquidateBorrowOld(event: LiquidateBorrowOld): void {
