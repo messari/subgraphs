@@ -38,7 +38,7 @@
       "aave-v2": {
         "mainnet-arc": {
           "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-v2-ethereum-arc",
+          "messari": "messari/aave-arc-ethereum",
           "dmelotik": "dmelotik/aave-v2-arc",
           "deploy-on-merge": true
         },
@@ -56,7 +56,7 @@
         },
         "mainnet-amm": {
           "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-v2-ethereum-amm",
+          "messari": "messari/aave-amm-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum-amm",
           "deploy-on-merge": true
         },
@@ -68,7 +68,7 @@
         },
         "mainnet-rwa": {
           "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-v2-ethereum-rwa",
+          "messari": "messari/aave-rwa-ethereum",
           "dmelotik": "dmelotik/aave-v2-rwa",
           "deploy-on-merge": true
         }

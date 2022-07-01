@@ -89,7 +89,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | [Uniswap v2](https://uniswap.org/) | 🛠 | 1.3.0 / 1.1.1 / 1.0.0 | [![Uniswap V2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2-ethereum) |
 | [Uniswap v3](https://uniswap.org/) | 🛠 | 1.3.0 / 1.1.1 / 1.0.0 | [![Uniswap V3](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-ethereum) [![Uniswap V3 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-polygon) [![Uniswap V3 Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-optimism) [![Uniswap V3 Arbtitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-arbitrum)|
 | **Lending Protocols** |    | |
-| [Aave v2](https://aave.com/) | 🛠 | 1.3.0 / 1.2.2 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) [![Aave V2 Ethereum ARC](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum-arc) [![Aave V2 Ethereum RWA](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum-rwa) [![Aave V2 Ethereum AMM](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum-amm) [![Aave V2 Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-avalanche) [![Aave V2 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-polygons) |
+| [Aave v2](https://aave.com/) | 🛠 | 1.3.0 / 1.2.2 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) [![Aave V2 Ethereum ARC](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-arc-ethereum) [![Aave V2 Ethereum RWA](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-rwa-ethereum) [![Aave V2 Ethereum AMM](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-amm-ethereum) [![Aave V2 Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-avalanche) [![Aave V2 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-polygons) |
 | [Aave v3](https://aave.com/) | 🔨 | 1.3.0 / 1.0.0 / 1.0.0 | [![Aave V3 Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-optimism) [![Aave V3 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-polygon) [![Aave V3 Harmony](./docs/images/chains/harmony.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-harmony) [![Aave V3 Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-fantom) [![Aave V3 Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-avalanche) [![Aave V3 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v3-arbitrum) |
 | [Aurigami](https://www.aurigami.finance/) | 🛠 | 1.3.0 / 1.0.6 / 1.0.0  | [![Aurigami Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/aurigami-aurora) |
 | [Bastion Protocol](https://bastionprotocol.com/) | 🛠 | 1.3.0 / 1.0.9 / 1.0.0 | [![Bastion Protocol Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/bastion-protocol-aurora) |
@@ -131,7 +131,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Yield Yak | 🔨 | | |
 | [Yearn v2](https://yearn.fi/) | 🛠 | 1.3.0 / 1.2.0 / 1.0.0 | [![Yearn V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-ethereum) [![Yearn V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-arbitrum) [![Yearn V2 Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-fantom) |
 | **Governance** |    | |
-| ENS Governor | 🛠 | | |
+| ENS Governor | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ENS Governor](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/ens-governance) |
 | FEI Governor | 🔨 | | |
 | Silo Finance Governor | 🔨 | | |
 | Hop Protocol Governor | 🔨 | | |
@@ -141,7 +141,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | NEAR | 🔨 | | |
 | Arweave | 🔨 | | |
 | **ERC20 Subgraph** |    | |
-| TBD | 🔨 | | |
+| ERC20 | 🔨 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-ethereum) |
 | **ERC721 Subgraph** |    | |
 | TBD | 🔨 | | |
 
