@@ -373,7 +373,6 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidatedCollateralAmount,
     event.params.collateralAsset,
     getProtocolData(),
-    event.params.debtAsset,
     event.params.liquidator,
     event.params.user
   );
