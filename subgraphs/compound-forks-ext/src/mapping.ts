@@ -925,7 +925,7 @@ export function _handleLiquidateBorrow(
     event.block.number,
     event.block.timestamp,
     borrower.toHexString(),
-    EventType.Liquidate,
+    EventType.Liquidated,
     false
   );
 }
