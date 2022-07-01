@@ -141,7 +141,9 @@ export const FOREX_TOKENS = [
 // we also have the problem for v1 pools, but with both assets
 export const POLYGON_2JPY_LP_TOKEN = '0xe8dcea7fb2baf7a9f4d9af608f06d78a687f8d9a'
 export const ARBI_EURS_FXEUR_LP_TOKEN = '0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE'.toLowerCase()
+export const ETH_EURS_EURS_POOL_ADDRESS = '0x0ce6a5ff5217e38315f87032cf90686c96627caa'.toLowerCase()
 export const FOREX_ORACLES = new Map<string, Address>()
+FOREX_ORACLES.set(ETH_EURS_EURS_POOL_ADDRESS, Address.fromString('0xb49f677943BC038e9857d61E7d053CaA2C1734C1'))
 FOREX_ORACLES.set(EURT_USDT_LP_TOKEN, Address.fromString('0xb49f677943BC038e9857d61E7d053CaA2C1734C1'))
 FOREX_ORACLES.set(EURS_USDC_LP_TOKEN, Address.fromString('0xb49f677943BC038e9857d61E7d053CaA2C1734C1'))
 FOREX_ORACLES.set(EURT_LP_TOKEN, Address.fromString('0xb49f677943BC038e9857d61E7d053CaA2C1734C1'))
@@ -221,7 +223,7 @@ export const GAUGE_CONTROLLER = Address.fromString("0x2F50D538606Fa9EDD2B11E2446
 
 export const CURVE_TOKEN = Address.fromString("{{curveToken}}")
 
-export const CTOKEN_DECIMALS = 8;
+export const CTOKEN_MANTISSA = 10;
 
 export const LP_TOKEN_POOL_MAP = new Map<string, Address>()
 LP_TOKEN_POOL_MAP.set("0x445fe580ef8d70ff569ab36e80c647af338db351",Address.fromString("0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"))

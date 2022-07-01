@@ -117,7 +117,7 @@ export function getLpToken(pool: Address, registryAddress: Address): Address {
       return lpTokenResult.value
     }
     if (LP_TOKEN_POOL_MAP.has(pool.toHexString().toLowerCase())) {
-      return LP_TOKEN_POOL_MAP.get(pool.toHexString())
+      return LP_TOKEN_POOL_MAP.get(pool.toHexString())!
     }
     log.warning('getLpToken reverted: {}', [pool.toHexString()])
   }
@@ -290,7 +290,10 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
 
 export function handleAddLiquidity(event: AddLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString())
-  
+  if(!pool){
+    log.error("handleAddLiquidity tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+    return  
+  }
   handleLiquidityEvent('deposit',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
@@ -301,7 +304,10 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString())
-
+  if(!pool){
+    log.error("handleRemoveLiquidity tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+    return  
+  }
   handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
@@ -311,7 +317,10 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
   let pool = getLiquidityPool(event.address.toHexString())
-
+  if(!pool){
+    log.error("handleRemoveLiquidityOne tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+    return  
+  }
   handleLiquidityRemoveOne(pool,event.params.token_supply,event.params.token_amount,event.params.provider,event);
   setPoolBalances(pool);
   updatePool(pool, event); // also updates protocol tvl
@@ -322,7 +331,10 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 
 export function handleRemoveLiquidityImbalance(event: RemoveLiquidityImbalance): void {
   let pool = getLiquidityPool(event.address.toHexString())
-  
+  if(!pool){
+    log.error("handleRemoveLiquidityImbalance tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+    return  
+  }
   handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
@@ -333,6 +345,10 @@ export function handleRemoveLiquidityImbalance(event: RemoveLiquidityImbalance):
 
 export function handleNewFee(event: NewFee): void {
   let pool = getLiquidityPool(event.address.toHexString());
+  if(!pool){
+    log.error("handleNewFee tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+    return  
+  }
   let tradingFee = getPoolFee(pool.id,LiquidityPoolFeeType.FIXED_TRADING_FEE);
   let protocolFee = getPoolFee(pool.id,LiquidityPoolFeeType.FIXED_PROTOCOL_FEE);
   let lpFee = getPoolFee(pool.id,LiquidityPoolFeeType.FIXED_LP_FEE);

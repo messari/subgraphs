@@ -3,27 +3,30 @@ import { ERC20 } from "../../generated/templates/CurvePoolTemplate/ERC20";
 import { LiquidityPool } from "../../generated/schema";
 import { CurvePool } from "../../generated/templates/CryptoFactoryTemplate/CurvePool";
 import { CURVE_ADMIN_FEE, CURVE_POOL_FEE } from "./constants/index";
-import { getOrCreateDexAmm, getOrCreateToken, getPoolFee } from "./getters";
+import { getOrCreateDexAmm, getOrCreateToken, getPoolFee, getTotalSupply } from "./getters";
 import { bigIntToBigDecimal } from "./utils/numbers";
 import {
   BIGDECIMAL_ONE_HUNDRED,
   BIGDECIMAL_ZERO,
   FEE_DENOMINATOR_DECIMALS,
   LiquidityPoolFeeType,
-  MISPRICE_TOKENS,
+  TokenType,
 } from "./constants";
-import { getCryptoTokenPrice, getPoolAssetPrice, getTokenPrice } from "../services/snapshots";
+import { getCryptoTokenPrice, getPoolAssetPrice } from "../services/snapshots";
 import { getPlatform } from "../services/platform";
 import { CurvePoolV2 } from "../../generated/AddressProvider/CurvePoolV2";
+import { isCtoken } from "./prices/compound";
+import { isIearnToken, isYearnTokenV2 } from "./prices/yearn";
+import { isAtoken } from "./prices/aave";
 
 export function setPoolBalances(pool: LiquidityPool): void {
   let poolContract = CurvePool.bind(Address.fromString(pool.id));
-  let inputTokens = pool.inputTokens;
+  let coins = pool.coins;
   let inputTokensBalances: BigInt[] = [];
   let balanceCall = poolContract.try_balances(BigInt.fromI32(0));
   if (balanceCall.reverted) {
-    for (let i = 0; i < inputTokens.length; ++i) {
-      let token = inputTokens[i];
+    for (let i = 0; i < coins.length; ++i) {
+      let token = coins[i];
 
       let balanceCall = ERC20.bind(Address.fromString(token)).try_balanceOf(Address.fromString(pool.id));
       if (!balanceCall.reverted) {
@@ -31,7 +34,7 @@ export function setPoolBalances(pool: LiquidityPool): void {
       }
     }
   } else {
-    for (let i = 0; i < inputTokens.length; ++i) {
+    for (let i = 0; i < coins.length; ++i) {
       balanceCall = poolContract.try_balances(BigInt.fromI32(i));
       if (!balanceCall.reverted) {
         inputTokensBalances.push(balanceCall.value);
@@ -105,12 +108,7 @@ export function setPoolFees(pool: LiquidityPool): void {
 }
 
 export function setPoolOutputTokenSupply(pool: LiquidityPool): void {
-  let outputTokenSupply = ERC20.bind(Address.fromString(pool.outputToken)).try_totalSupply();
-  if (outputTokenSupply.reverted) {
-    log.warning("Call to totalSupply failed for pool = {} , lptoken = ({})", [pool.id, pool.outputToken]);
-    return;
-  }
-  pool.outputTokenSupply = outputTokenSupply.value;
+  pool.outputTokenSupply = getTotalSupply(pool);
   pool.save();
 }
 
@@ -140,18 +138,20 @@ export function setPoolTokenWeights(liquidityPool: LiquidityPool, timestamp: Big
 
 export function setPoolTVL(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
-  for (let j = 0; j < pool.inputTokens.length; j++) {
+  for (let j = 0; j < pool.coins.length; j++) {
     let balance = pool.inputTokenBalances[j];
-    let tokenAddress = Address.fromString(pool.inputTokens[j]);
+    let tokenAddress = Address.fromString(pool.coins[j]);
     let token = getOrCreateToken(tokenAddress);
     //let priceUSD = getTokenPrice(tokenAddress, pool, timestamp);
     //if (priceUSD == BIGDECIMAL_ZERO && !MISPRICE_TOKENS.includes(token.id)) {
-    log.warning("Could not get price for token = {} during tvl calculation", [tokenAddress.toHexString()]);
+    //log.warning("Could not get price for token = {} during tvl calculation", [tokenAddress.toHexString()]);
     let priceUSD = pool.isV2
       ? getCryptoTokenPrice(Address.fromString(token.id), timestamp, pool)
       : getPoolAssetPrice(pool, timestamp);
     //}
-    let amountUSD = bigIntToBigDecimal(balance, token.decimals).times(priceUSD);
+    let balDecimalized = bigIntToBigDecimal(balance,token.decimals)
+    //log.error("iterable = {},token addr = {}, token sym = {}, balance = {}, price = {}",[j.toString(), tokenAddress.toHexString(), token.symbol, balDecimalized.toString(), priceUSD.toString()])
+    let amountUSD = balDecimalized.times(priceUSD);
     totalValueLockedUSD = totalValueLockedUSD.plus(amountUSD);
   }
   pool.totalValueLockedUSD = totalValueLockedUSD;
@@ -175,6 +175,34 @@ export function setProtocolTVL(): void {
   }
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
+}
+
+export function setPoolTokenType(liquidityPool: LiquidityPool): void {
+  for (let i = 0; i < liquidityPool.inputTokens.length; i++) {
+    let tokenAddr = Address.fromString(liquidityPool.inputTokens[i]);
+    if (isCtoken(tokenAddr)) {
+      // ctoken
+      liquidityPool.tokenType = TokenType.CTOKEN;
+      liquidityPool.save();
+      return;
+    } else if (isIearnToken(tokenAddr)) {
+      // yearn v1
+      liquidityPool.tokenType = TokenType.IEARN;
+      liquidityPool.save();
+      return;
+    } else if (isAtoken(tokenAddr)) {
+      // aave
+      liquidityPool.tokenType = TokenType.AAVE;
+      liquidityPool.save();
+      return;
+    } else if (isYearnTokenV2(tokenAddr)) {
+      liquidityPool.tokenType = TokenType.YEARN_V2;
+      liquidityPool.save();
+      return;
+    }
+  }
+  liquidityPool.tokenType = "";
+  liquidityPool.save();
 }
 
 /*

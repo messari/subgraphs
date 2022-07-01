@@ -35,6 +35,7 @@ import { CryptoFactory } from "../../generated/templates/CryptoRegistryTemplate/
 import { Factory, LiquidityPool } from "../../generated/schema";
 import { addRegistryPool } from "../mapping";
 import { addCryptoRegistryPool } from "../mappingV2";
+import { getOrCreateToken } from "../common/getters";
 
 export function catchUpRegistryMainnet(): void {
   log.info("Catching up registry...", []);
@@ -42,14 +43,15 @@ export function catchUpRegistryMainnet(): void {
     log.info("Manually adding pool {}", [CATCHUP_POOLS[i].toHexString()]);
     const testMetaPool = MetaPool.bind(CATCHUP_POOLS[i]);
     const testMetaPoolResult = testMetaPool.try_base_pool();
-    const lpToken = CATCHUP_LP_TOKENS[i];
-    const lpTokenContract = ERC20.bind(lpToken);
+    const lpTokenAddress = CATCHUP_LP_TOKENS[i];
+    const lpToken = getOrCreateToken(lpTokenAddress);
+
     CurvePoolTemplate.create(CATCHUP_POOLS[i]);
     createNewPool(
       CATCHUP_POOLS[i],
-      lpToken,
-      lpTokenContract.name(),
-      lpTokenContract.symbol(),
+      lpTokenAddress,
+      lpToken.name,
+      lpToken.symbol,
       CATCHUP_POOL_TYPES[i],
       testMetaPoolResult.reverted,
       false,

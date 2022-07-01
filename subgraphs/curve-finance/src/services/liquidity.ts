@@ -1,4 +1,4 @@
-import { BigInt, ethereum, Address } from "@graphprotocol/graph-ts/index";
+import { BigInt, ethereum, Address, log } from "@graphprotocol/graph-ts/index";
 import { Deposit, LiquidityPool, Withdraw } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
 import { createEventID, getOrCreateDexAmm, getOrCreateToken } from "../common/getters";
@@ -12,6 +12,8 @@ export function handleDepositEvent(
   provider: Address,
   event: ethereum.Event,
 ): void {
+  log.error("handleDepositEvent {}, tokenAmounts {}, inputTokensLength {}",[pool.id,tokenAmounts.length.toString(),pool.inputTokens.length.toString()])
+
   let liquidityEvent = new Deposit(createEventID("deposit", event));
   liquidityEvent.hash = event.transaction.hash.toHexString();
   liquidityEvent.logIndex = event.transactionLogIndex.toI32();
@@ -25,15 +27,17 @@ export function handleDepositEvent(
   liquidityEvent.outputTokenAmount = absValBigInt(tokenSupply.minus(pool.outputTokenSupply));
   let inputTokens = liquidityEvent.inputTokens;
   let inputTokenAmounts = liquidityEvent.inputTokenAmounts;
-  let inputTokenBalances = pool.inputTokenBalances;
   let amountUSD = BIGDECIMAL_ZERO;
   for (let i = 0; i < tokenAmounts.length; i++) {
+    log.error("handleDepositEvent index {}",[i.toString()])
+    if (i > pool.coins.length - 1){
+      log.error("handleDepositEvent index {} greater than coins length {}",[i.toString(),pool.coins.length.toString()])
+    }
     let inputTokenAddress = Address.fromString(pool.coins[i]);
+    log.error("handleDepositEvent index {}, token {}",[i.toString(), inputTokenAddress.toHexString()])
     let inputToken = getOrCreateToken(inputTokenAddress);
-    let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
     let inputTokenAmount = tokenAmounts[i];
     let inputTokenPrice = getTokenPrice(inputTokenAddress, pool, event.block.timestamp);
-    inputTokenBalances[inputTokenIndex] = inputTokenBalances[inputTokenIndex].plus(inputTokenAmount);
     inputTokens.push(inputToken.id);
     inputTokenAmounts.push(inputTokenAmount);
     amountUSD = amountUSD.plus(bigIntToBigDecimal(inputTokenAmount, inputToken.decimals).times(inputTokenPrice));
@@ -42,7 +46,6 @@ export function handleDepositEvent(
   liquidityEvent.inputTokenAmounts = inputTokenAmounts;
   liquidityEvent.amountUSD = amountUSD;
 
-  //pool.inputTokenBalances = inputTokenBalances;
   pool.outputTokenSupply = tokenSupply;
 
   liquidityEvent.save();
@@ -56,6 +59,8 @@ export function handleWithdrawEvent(
   provider: Address,
   event: ethereum.Event,
 ): void {
+  log.error("handleWithdrawEvent {}, tokenAmounts {}, inputTokensLength {}",[pool.id,tokenAmounts.length.toString(),pool.inputTokens.length.toString()])
+
   let liquidityEvent = new Withdraw(createEventID("withdraw", event));
   liquidityEvent.hash = event.transaction.hash.toHexString();
   liquidityEvent.logIndex = event.transactionLogIndex.toI32();
@@ -69,15 +74,17 @@ export function handleWithdrawEvent(
   liquidityEvent.outputTokenAmount = absValBigInt(tokenSupply.minus(pool.outputTokenSupply));
   let inputTokens = liquidityEvent.inputTokens;
   let inputTokenAmounts = liquidityEvent.inputTokenAmounts;
-  let inputTokenBalances = pool.inputTokenBalances;
   let amountUSD = BIGDECIMAL_ZERO;
   for (let i = 0; i < tokenAmounts.length; i++) {
+    log.error("handleWithdrawEvent index {}",[i.toString()])
+    if (i > pool.coins.length - 1){
+      log.error("handleWithdrawEvent index {} greater than coins length {}",[i.toString(),pool.coins.length.toString()])
+    }
     let inputTokenAddress = Address.fromString(pool.coins[i]);
+    log.error("handleDepositEvent index {}, token {}",[i.toString(), inputTokenAddress.toHexString()])
     let inputToken = getOrCreateToken(inputTokenAddress);
-    let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
     let inputTokenAmount = tokenAmounts[i];
     let inputTokenPrice = getTokenPrice(inputTokenAddress, pool, event.block.timestamp);
-    inputTokenBalances[inputTokenIndex] = inputTokenBalances[inputTokenIndex].plus(inputTokenAmount);
     inputTokens.push(inputToken.id);
     inputTokenAmounts.push(inputTokenAmount);
     amountUSD = amountUSD.plus(bigIntToBigDecimal(inputTokenAmount, inputToken.decimals).times(inputTokenPrice));
@@ -86,7 +93,6 @@ export function handleWithdrawEvent(
   liquidityEvent.inputTokenAmounts = inputTokenAmounts;
   liquidityEvent.amountUSD = amountUSD;
 
-  //pool.inputTokenBalances = inputTokenBalances;
   pool.outputTokenSupply = tokenSupply;
 
   liquidityEvent.save();
@@ -101,6 +107,7 @@ export function handleLiquidityEvent(
   provider: Address,
   event: ethereum.Event,
 ): void {
+  log.error("handleLiquidityEvent for pool: {}",[pool.id])
   if (eventType == "deposit") {
     handleDepositEvent(pool, tokenSupply, tokenAmounts, provider, event);
   } else if (eventType == "withdraw") {

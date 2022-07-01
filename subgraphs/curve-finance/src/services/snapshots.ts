@@ -16,7 +16,7 @@ import { CurvePool } from "../../generated/templates/CurvePoolTemplate/CurvePool
 import { ChainlinkAggregator } from "../../generated/templates/CurvePoolTemplateV2/ChainlinkAggregator";
 import { CurvePoolV2 } from "../../generated/templates/RegistryTemplate/CurvePoolV2";
 import { getUsdRate } from "../common/pricing";
-import { BIGDECIMAL_ZERO, SNAPSHOT_SECONDS } from "../common/constants";
+import { BIGDECIMAL_ZERO, SNAPSHOT_SECONDS, TokenType } from "../common/constants";
 import { RedeemableKeep3r } from "../../generated/templates/CurvePoolTemplateV2/RedeemableKeep3r";
 import { BIG_DECIMAL_1E6, RKP3R_ADDRESS } from "../common/constants/index";
 import { getBalancerLpPriceUSD, isBalancerToken } from "../common/prices/balancer";
@@ -86,8 +86,8 @@ export function getTokenPriceSnapshot(tokenAddr: Address, timestamp: BigInt, for
   if (isYearnTokenV2(tokenAddr)) {
     return getYearnTokenV2PriceUSD(tokenAddr, timestamp);
   }
-  if (isIdleToken(tokenAddr)){
-    return getIdleTokenPriceUSD(tokenAddr,timestamp);
+  if (isIdleToken(tokenAddr)) {
+    return getIdleTokenPriceUSD(tokenAddr, timestamp);
   }
   tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(tokenAddr, timestamp));
   let priceUSD = BIGDECIMAL_ZERO;
@@ -148,8 +148,10 @@ export function getCryptoTokenPrice(tokenAddr: Address, timestamp: BigInt, pool:
 }
 
 export function getPoolAssetPrice(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
-  if (FOREX_ORACLES.has(pool.id)) {
+  if (FOREX_ORACLES.has(pool.id) || FOREX_ORACLES.has(pool.outputToken)) {
     return getTokenPriceSnapshot(Address.fromString(pool.outputToken), timestamp, true);
+  } else if (pool.tokenType == TokenType.CTOKEN) {
+    return getTokenPriceSnapshot(Address.fromString(pool.inputTokens[0]), timestamp, false);
   } else if (pool.assetType == 1) {
     return getTokenPriceSnapshot(WETH_ADDRESS, timestamp, false);
   } else if (pool.assetType == 2) {

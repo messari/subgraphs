@@ -12,9 +12,9 @@ import { MetaPool } from "../generated/templates/RegistryTemplate/MetaPool";
 import { getLpToken } from "./mapping";
 import { handleExchange } from "./services/swaps";
 import { CryptoPoolDeployed } from "../generated/templates/CryptoFactoryTemplate/CryptoFactory";
-import { AddLiquidity, RemoveLiquidity, RemoveLiquidityOne } from "../generated/templates/RegistryTemplate/CurvePool";
+import { AddLiquidity, RemoveLiquidity, RemoveLiquidityOne } from "../generated/templates/RegistryTemplate/CurvePoolV2";
 import { updateFinancials, updatePool, updatePoolMetrics, updateUsageMetrics } from "./common/metrics";
-import { getLiquidityPool } from "./common/getters";
+import { getLiquidityPool, getTotalSupply } from "./common/getters";
 import { LiquidityPool } from "../generated/schema";
 import { setGaugeData } from "./services/gauges/helpers";
 import { LiquidityGaugeDeployed } from "../generated/templates/CryptoFactoryTemplate/CryptoFactory";
@@ -115,7 +115,15 @@ export function handleTokenExchangeV2(event: TokenExchange): void {
 
 export function handleAddLiquidityV2(event: AddLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString());
-
+  if(!pool){
+    log.error("handleAddLiquidityV2 tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+    return  
+  }
+  log.error("pool {} coins len = {}",[pool.id,pool.coins.length.toString()])
+  log.error("handleAddLiquidityV2 pool {}, token_supply {}",[event.address.toHexString(),event.params.token_supply.toString()])
+  log.error("handleAddLiquidityV2 pool {}, token_amounts {}",[event.address.toHexString(),event.params.token_amounts.toString()])
+  log.error("handleAddLiquidityV2 pool {}, provider {}",[event.address.toHexString(),event.params.provider.toString()])
+  log.error("pool {} coins len = {}",[pool.id,pool.coins.length.toString()])
   handleLiquidityEvent(
     "deposit",
     pool,
@@ -124,6 +132,7 @@ export function handleAddLiquidityV2(event: AddLiquidity): void {
     event.params.provider,
     event,
   );
+  log.error("handleAddLiquidityV2 event handled for pool: {}",[event.address.toHexString()])
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -132,7 +141,10 @@ export function handleAddLiquidityV2(event: AddLiquidity): void {
 
 export function handleRemoveLiquidityV2(event: RemoveLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString());
-
+  if(!pool){
+    log.error("handleRemoveLiquidityV2 tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+    return  
+  }
   handleLiquidityEvent(
     "withdraw",
     pool,
@@ -149,8 +161,12 @@ export function handleRemoveLiquidityV2(event: RemoveLiquidity): void {
 
 export function handleRemoveLiquidityOneV2(event: RemoveLiquidityOne): void {
   let pool = getLiquidityPool(event.address.toHexString());
-
-  handleLiquidityRemoveOne(pool, event.params.token_supply, event.params.token_amount, event.params.provider, event);
+  if(!pool){
+    log.error("handleRemoveLiquidityOneV2 tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+    return  
+  }
+  let lpTokenSupply =  getTotalSupply(pool)
+  handleLiquidityRemoveOne(pool, lpTokenSupply, event.params.token_amount, event.params.provider, event);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated

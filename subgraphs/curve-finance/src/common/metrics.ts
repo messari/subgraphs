@@ -106,7 +106,7 @@ export function updatePoolMetrics(poolAddress: string, event: ethereum.Event): v
   let poolMetricsHourly = getOrCreatePoolHourlySnapshot(poolAddress, event);
   let poolMetricsDaily = getOrCreatePoolDailySnapshot(poolAddress, event);
   let pool = LiquidityPool.load(poolAddress);
-  if (!pool) {
+  if (!pool || !poolMetricsHourly || !poolMetricsDaily) {
     return;
   }
   // Update the block number and timestamp to that of the last transaction of that day

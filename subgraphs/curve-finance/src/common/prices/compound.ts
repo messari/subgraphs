@@ -3,7 +3,7 @@ import { Ctoken } from "../../../generated/AddressProvider/Ctoken";
 import { TokenSnapshot } from "../../../generated/schema";
 import { createTokenSnapshotID } from "../../services/snapshots";
 import { BIGDECIMAL_ZERO } from "../constants";
-import { CTOKEN_DECIMALS } from "../constants/index";
+import { CTOKEN_MANTISSA } from "../constants/index";
 import { getOrCreateToken } from "../getters";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getUnderlyingTokenPrice } from "./underlying";
@@ -32,7 +32,7 @@ export function getCtokenPriceUSD(tokenAddr: Address, timestamp: BigInt): BigDec
   }
   const underlyingToken = getOrCreateToken(underlyingTokenCall.value);
   const underlyingPrice = getUnderlyingTokenPrice(Address.fromString(underlyingToken.id), timestamp);
-  const exchRateMantissa = underlyingToken.decimals + CTOKEN_DECIMALS;
+  const exchRateMantissa = underlyingToken.decimals + CTOKEN_MANTISSA;
   const exchRate = bigIntToBigDecimal(exchRateCall.value, exchRateMantissa);
   const priceUSD = exchRate.times(underlyingPrice);
   tokenSnapshot.price = priceUSD;

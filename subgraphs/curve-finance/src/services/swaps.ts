@@ -150,7 +150,10 @@ export function handleExchange(
   const hourlySnapshot = getOrCreatePoolHourlySnapshot(address.toHexString(), event);
   const dailySnapshot = getOrCreatePoolDailySnapshot(address.toHexString(), event);
   const financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
-
+  if (!hourlySnapshot || !dailySnapshot){
+    log.error("pool not found {}, tx {}",[pool.id,event.transaction.hash.toHexString()])
+    return
+  }
   let hourlyVolumeByTokenAmount = hourlySnapshot.hourlyVolumeByTokenAmount;
   let hourlyVolumeByTokenUSD = hourlySnapshot.hourlyVolumeByTokenUSD;
   let dailyVolumeByTokenAmount = dailySnapshot.dailyVolumeByTokenAmount;

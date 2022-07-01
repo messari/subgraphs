@@ -20,6 +20,7 @@ import { ADDRESS_ZERO, CURVE_TOKEN } from "../../common/constants/index";
 import { CurveGauge } from "../../../generated/templates";
 import { CurveRewards } from "../../../generated/templates/CurveGauge/CurveRewards";
 
+// @ts-ignore
 export function getRewardTokenIndex(pool: LiquidityPool, tokenAddr: string): i32 {
   for (let i = 0; i < pool.rewardTokens.length; i++) {
     if (getRewardtoken(pool.rewardTokens[i]).token == tokenAddr) {

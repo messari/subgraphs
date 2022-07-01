@@ -7,7 +7,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 export const PROTOCOL_NAME = "Curve Finance";
 export const PROTOCOL_SLUG = "curve-finance";
 export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.2";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.3";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -90,6 +90,13 @@ export namespace UsageType {
   export const DEPOSIT = "DEPOSIT";
   export const WITHDRAW = "WITHDRAW";
   export const SWAP = "SWAP";
+}
+
+export namespace TokenType {
+  export const AAVE = "AAVE";
+  export const CTOKEN = "CTOKEN";
+  export const IEARN = "IEARN";
+  export const YEARN_V2 = "YEARN_V2";
 }
 
 //////////////////////////////

@@ -436,6 +436,8 @@ type LiquidityPool @entity {
 
   assetType: Int!
 
+  tokenType: String!
+
   poolType: PoolType!
 
   isV2: Boolean!

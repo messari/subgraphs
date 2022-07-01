@@ -21,7 +21,14 @@ import { getFactory } from "./factory";
 import { CryptoFactory } from "../../generated/templates/CryptoRegistryTemplate/CryptoFactory";
 import { fetchTokenDecimals } from "../common/tokens";
 import { getOrCreateToken, getPoolCoins } from "../common/getters";
-import { setPoolBalances, setPoolFees, setPoolOutputTokenSupply, setPoolTVL, setProtocolTVL } from "../common/setters";
+import {
+  setPoolBalances,
+  setPoolFees,
+  setPoolOutputTokenSupply,
+  setPoolTokenType,
+  setPoolTVL,
+  setProtocolTVL,
+} from "../common/setters";
 import { getLpTokenPriceUSD } from "./snapshots";
 import { MainRegistry } from "../../generated/AddressProvider/MainRegistry";
 import { setGaugeData } from "./gauges/helpers";
@@ -72,6 +79,7 @@ export function createNewPool(
   pool.coins = inputTokens;
   pool.inputTokens = inputTokens.sort();
   pool.save();
+  setPoolTokenType(pool);
   setPoolBalances(pool);
   setPoolTVL(pool, timestamp);
   setPoolFees(pool);

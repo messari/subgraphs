@@ -14,6 +14,10 @@ import { GaugeV3 } from "../../generated/templates/CurveGauge/GaugeV3";
 export function handleDeposit(event: Deposit): void {
   let poolId = getPoolFromGauge(event.address);
   let pool = getLiquidityPool(poolId);
+  if(!pool){
+    log.error("handleDeposit tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+    return  
+  }
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount.plus(event.params.value);
   pool.save();
   handleRewards(pool, event.block.number, event.block.timestamp);
@@ -22,6 +26,10 @@ export function handleDeposit(event: Deposit): void {
 export function handleWithdraw(event: Withdraw): void {
   let poolId = getPoolFromGauge(event.address);
   let pool = getLiquidityPool(poolId);
+  if(!pool){
+    log.error("handleWithdraw tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+    return  
+  }
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount.minus(event.params.value);
   pool.save();
   handleRewards(pool, event.block.number, event.block.timestamp);

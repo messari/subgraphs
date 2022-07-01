@@ -33,6 +33,7 @@ import {
 import { BIG_DECIMAL_ZERO, CURVE_REGISTRY } from "./constants/index";
 import { CurvePool } from "../../generated/templates/CryptoFactoryTemplate/CurvePool";
 import { CurvePoolCoin128 } from "../../generated/templates/CurvePoolTemplate/CurvePoolCoin128";
+import { ERC20 } from "../../generated/templates/CurvePoolTemplate/ERC20";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -55,10 +56,10 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getLiquidityPool(poolId: string): LiquidityPool {
+export function getLiquidityPool(poolId: string): LiquidityPool | null {
   let pool = LiquidityPool.load(poolId);
   if (!pool) {
-    return new LiquidityPool(poolId);
+    return null;
   }
   return pool;
 }
@@ -109,7 +110,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
   return usageMetrics;
 }
 
-export function getOrCreatePoolHourlySnapshot(poolAddress: string, event: ethereum.Event): LiquidityPoolHourlySnapshot {
+export function getOrCreatePoolHourlySnapshot(poolAddress: string, event: ethereum.Event): LiquidityPoolHourlySnapshot | null {
   // @ts-ignore
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let poolMetrics = LiquidityPoolHourlySnapshot.load(poolAddress.concat("-").concat(id.toString()));
@@ -122,7 +123,12 @@ export function getOrCreatePoolHourlySnapshot(poolAddress: string, event: ethere
     poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
     let hourlyVolumeByTokenAmount: BigInt[] = [];
     let hourlyVolumeByTokenUSD: BigDecimal[] = [];
-    for (let i = 0; i <= getLiquidityPool(poolAddress).inputTokens.length; i++) {
+    let pool =  getLiquidityPool(poolAddress)
+    if(!pool){
+      log.error("getOrCreatePoolDailySnapshot tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+      return null
+    }
+    for (let i = 0; i <= pool.inputTokens.length; i++) {
       hourlyVolumeByTokenAmount.push(BIGINT_ZERO);
       hourlyVolumeByTokenUSD.push(BIG_DECIMAL_ZERO);
     }
@@ -142,13 +148,17 @@ export function getOrCreatePoolHourlySnapshot(poolAddress: string, event: ethere
   return poolMetrics;
 }
 
-export function getOrCreatePoolDailySnapshot(poolAddress: string, event: ethereum.Event): LiquidityPoolDailySnapshot {
+export function getOrCreatePoolDailySnapshot(poolAddress: string, event: ethereum.Event): LiquidityPoolDailySnapshot | null {
   // @ts-ignore
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let poolMetrics = LiquidityPoolDailySnapshot.load(poolAddress.concat("-").concat(id.toString()));
 
   if (!poolMetrics) {
     let pool = getLiquidityPool(poolAddress);
+    if(!pool){
+      log.error("getOrCreatePoolDailySnapshot tx: {}, could not find pool {}",[event.transaction.hash.toHexString(),event.address.toHexString()])  
+      return null
+    }
     poolMetrics = new LiquidityPoolDailySnapshot(poolAddress.concat("-").concat(id.toString()));
     poolMetrics.protocol = CURVE_REGISTRY.toHexString();
     poolMetrics.pool = poolAddress;
@@ -306,4 +316,14 @@ export function getRewardtoken(rewardTokenId: string): RewardToken {
 
 export function createEventID(eventType: string, event: ethereum.Event): string {
   return eventType + "-" + event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+}
+
+
+export function getTotalSupply(pool: LiquidityPool): BigInt {
+  let outputTokenSupply = ERC20.bind(Address.fromString(pool.outputToken)).try_totalSupply();
+  if (outputTokenSupply.reverted){
+    log.warning("Call to totalSupply failed for pool = {} , lptoken = ({})", [pool.id, pool.outputToken]);
+    return BIGINT_ZERO
+  }
+  return outputTokenSupply.value
 }
