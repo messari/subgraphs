@@ -1,9 +1,24 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
-import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
 
 export class SushiswapArbitrumConfigurations implements Configurations {
   getNetwork(): string {
@@ -27,8 +42,12 @@ export class SushiswapArbitrumConfigurations implements Configurations {
   getFactoryAddress(): string {
     return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString(toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString(
+        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
+      )
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("3");
@@ -52,7 +71,7 @@ export class SushiswapArbitrumConfigurations implements Configurations {
     return RewardIntervalType.TIMESTAMP;
   }
   getRewardTokenRate(): BigInt {
-    return BIGINT_ZERO
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return toLowerCase("0x82aF49447D8a07e3bd95BD0d56f35241523fBab1");
@@ -66,7 +85,7 @@ export class SushiswapArbitrumConfigurations implements Configurations {
       "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f", // wBTC
       "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
       "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9", // USDT
-      "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"  // USDC
+      "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8", // USDC
     ]);
   }
   getStableCoins(): string[] {

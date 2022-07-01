@@ -1,9 +1,24 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG, MASTERCHEFV2_SUSHI_PER_BLOCK } from '../../../src/common/constants';
-import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+  MASTERCHEFV2_SUSHI_PER_BLOCK,
+} from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
 export class SushiswapMainnetConfigurations implements Configurations {
   getNetwork(): string {
     return Network.MAINNET;
@@ -26,8 +41,12 @@ export class SushiswapMainnetConfigurations implements Configurations {
   getFactoryAddress(): string {
     return toLowerCase("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac");
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString(toLowerCase("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac")));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString(
+        toLowerCase("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac")
+      )
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("3");
@@ -51,7 +70,7 @@ export class SushiswapMainnetConfigurations implements Configurations {
     return RewardIntervalType.BLOCK;
   }
   getRewardTokenRate(): BigInt {
-    return MASTERCHEFV2_SUSHI_PER_BLOCK
+    return MASTERCHEFV2_SUSHI_PER_BLOCK;
   }
   getReferenceToken(): string {
     return toLowerCase("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");

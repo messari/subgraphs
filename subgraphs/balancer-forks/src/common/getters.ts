@@ -51,6 +51,8 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.network = DEFAULT_NETWORK;
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalPoolCount = 0;
+    protocol.totalAllocPoint = BIGINT_ZERO;
+    protocol.beetsPerBlock = BIGINT_ZERO;
     protocol.save();
   }
   return protocol;

@@ -1,9 +1,4 @@
-import {
-  BigInt,
-  ethereum,
-  Address,
-  log,
-} from "@graphprotocol/graph-ts";
+import { BigInt, ethereum, Address, log } from "@graphprotocol/graph-ts";
 import { getNetworkConfigurations } from "../../../../../configurations/configurations/configurations";
 import { Deploy } from "../../../../../configurations/configurations/deploy";
 
@@ -29,17 +24,22 @@ export function handleUpdatePoolWeightImpl(event: ethereum.Event): void {
   const poolManager = PoolManager.bind(event.address);
   const poolsCount = poolManager.try_poolsCount();
   if (poolsCount.reverted) {
-    return
+    return;
   }
   const protocol = getOrCreateDex();
   for (let index: i32 = 0; index < poolsCount.value.toI32(); index++) {
     const stackTokenAddress = poolManager.poolsByIndex(BigInt.fromI32(index));
     const poolInfo = poolManager.try_pools(stackTokenAddress);
     if (poolInfo.reverted) {
-      return
+      return;
     }
     // poolInfo.value.value2  is poolAddress
-    getOrCreateStackPool(event, protocol, poolInfo.value.value2, stackTokenAddress);
+    getOrCreateStackPool(
+      event,
+      protocol,
+      poolInfo.value.value2,
+      stackTokenAddress
+    );
   }
 }
 
@@ -56,23 +56,25 @@ export function getOrCreateStackPool(
     let poolAmounts = new _LiquidityPoolAmount(poolAddress.toHexString());
     pool.name = protocol.name;
     let LPtoken = getOrCreatePair(stackTokenAddress.toHexString());
-    
+
     pool.inputTokens = [LPtoken.id];
     pool.name = protocol.name + " " + LPtoken.symbol;
     pool.symbol = LPtoken.symbol;
     poolAmounts.inputTokens = [LPtoken.id];
-    
+
     pool.protocol = protocol.id;
-    pool.outputToken = getNetworkConfigurations(Deploy.UBESWAP_CELO).getRewardToken();
+    pool.outputToken = getNetworkConfigurations(
+      Deploy.UBESWAP_CELO
+    ).getRewardToken();
     pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
     pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     pool.inputTokenBalances = [BIGINT_ZERO];
-    pool.inputTokenWeights = [
-      BIGDECIMAL_HUNDRED 
-    ];
+    pool.inputTokenWeights = [BIGDECIMAL_HUNDRED];
     pool.outputTokenSupply = BIGINT_ZERO;
     pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    pool.rewardTokens = [getNetworkConfigurations(Deploy.UBESWAP_CELO).getRewardToken()];
+    pool.rewardTokens = [
+      getNetworkConfigurations(Deploy.UBESWAP_CELO).getRewardToken(),
+    ];
     pool.stakedOutputTokenAmount = BIGINT_ZERO;
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
@@ -86,8 +88,16 @@ export function getOrCreateStackPool(
 
     // create the tracked contract based on the template
     StakingRewardsTemplate.create(poolAddress);
-    log.warning("StakingRewardsTemplate add : {}",[poolAddress.toHexString()])
-    log.warning("getOrCreateStackPool stackTokenAddress {} LPtoken id {} name {}   symbol {}",[stackTokenAddress.toHexString(),  LPtoken.id,  LPtoken.name ,LPtoken.symbol]);
+    log.warning("StakingRewardsTemplate add : {}", [poolAddress.toHexString()]);
+    log.warning(
+      "getOrCreateStackPool stackTokenAddress {} LPtoken id {} name {}   symbol {}",
+      [
+        stackTokenAddress.toHexString(),
+        LPtoken.id,
+        LPtoken.name,
+        LPtoken.symbol,
+      ]
+    );
     LPtoken.save();
     pool.save();
     poolAmounts.save();

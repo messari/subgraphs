@@ -4,7 +4,12 @@ import { TransferType } from "./constants";
 import { LiquidityPool } from "../../generated/schema";
 
 // Handle data from transfer event for mints. Used to populate deposit entity in the mint event.
-export function handleTransferMint(event: ethereum.Event, pool: LiquidityPool, value: BigInt, to: string): void {
+export function handleTransferMint(
+  event: ethereum.Event,
+  pool: LiquidityPool,
+  value: BigInt,
+  to: string
+): void {
   let transfer = getOrCreateTransfer(event);
 
   // Tracks supply of minted LP tokens
@@ -25,13 +30,15 @@ export function handleTransferMint(event: ethereum.Event, pool: LiquidityPool, v
     transfer.liquidity = value;
   }
 
-
   transfer.save();
   pool.save();
 }
 
 // Handle data from transfer event for burns. Used to populate deposit entity in the burn event.
-export function handleTransferToPoolBurn(event: ethereum.Event, from: string): void {
+export function handleTransferToPoolBurn(
+  event: ethereum.Event,
+  from: string
+): void {
   let transfer = getOrCreateTransfer(event);
 
   transfer.type = TransferType.BURN;
@@ -41,7 +48,12 @@ export function handleTransferToPoolBurn(event: ethereum.Event, from: string): v
 }
 
 // Handle data from transfer event for burns. Used to populate deposit entity in the burn event.
-export function handleTransferBurn(event: ethereum.Event, pool: LiquidityPool, value: BigInt, from: string): void {
+export function handleTransferBurn(
+  event: ethereum.Event,
+  pool: LiquidityPool,
+  value: BigInt,
+  from: string
+): void {
   let transfer = getOrCreateTransfer(event);
 
   // Tracks supply of minted LP tokens
