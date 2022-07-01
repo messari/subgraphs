@@ -2,8 +2,10 @@ import { ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefV2Sushiswap } from "../../../../../generated/MasterChefV2/MasterChefV2Sushiswap";
 import { LiquidityPool, _MasterChef, _MasterChefStakingPool } from "../../../../../generated/schema";
+import { INT_ZERO } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
+import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../../src/price/price";
 import { MasterChef } from "../constants";
 import { getOrCreateMasterChef } from "../helpers";
@@ -23,20 +25,20 @@ export function updateMasterChefDeposit(event: ethereum.Event, pid: BigInt, amou
     masterChefV2.lastUpdatedRewardRate = event.block.number
   }
 
+  let nativeToken = updateNativeTokenPriceInUSD();
+  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+
+  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
+
   let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate.times(masterChefV2Pool.poolAllocPoint).div(masterChefV2.totalAllocPoint);
   let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(rewardAmountPerInterval.toString());
   let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardAmountPerIntervalBigDecimal, masterChefV2.rewardTokenInterval);
 
-  let nativeToken = updateNativeTokenPriceInUSD();
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
-
-  masterChefV2Pool.lastRewardBlock = event.block.number;
-
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
-
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount)
   pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
-  pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
+  pool.rewardTokenEmissionsUSD = [convertTokenToDecimal(pool.rewardTokenEmissionsAmount![INT_ZERO], rewardToken.decimals).times(rewardToken.lastPriceUSD!)];
+
+  masterChefV2Pool.lastRewardBlock = event.block.number;
 
   masterChefV2Pool.save()
   masterChefV2.save()
@@ -61,20 +63,20 @@ export function updateMasterChefWithdraw(event: ethereum.Event, pid: BigInt, amo
     masterChefV2.lastUpdatedRewardRate = event.block.number
   }
 
+  let nativeToken = updateNativeTokenPriceInUSD();
+  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+
+  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
+  
   let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate.times(masterChefV2Pool.poolAllocPoint).div(masterChefV2.totalAllocPoint);
   let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(rewardAmountPerInterval.toString());
   let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardAmountPerIntervalBigDecimal, masterChefV2.rewardTokenInterval);
 
-  let nativeToken = updateNativeTokenPriceInUSD();
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
-
-  masterChefV2Pool.lastRewardBlock = event.block.number;
-
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
-
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount)
   pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
-  pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
+  pool.rewardTokenEmissionsUSD = [convertTokenToDecimal(pool.rewardTokenEmissionsAmount![INT_ZERO], rewardToken.decimals).times(rewardToken.lastPriceUSD!)];
+
+  masterChefV2Pool.lastRewardBlock = event.block.number;
 
   masterChefV2Pool.save()
   masterChefV2.save()
