@@ -1,9 +1,24 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
-import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
 
 export class SushiswapCeloConfigurations implements Configurations {
   getNetwork(): string {
@@ -27,8 +42,12 @@ export class SushiswapCeloConfigurations implements Configurations {
   getFactoryAddress(): string {
     return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString(toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString(
+        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
+      )
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("3");
@@ -52,7 +71,7 @@ export class SushiswapCeloConfigurations implements Configurations {
     return RewardIntervalType.TIMESTAMP;
   }
   getRewardTokenRate(): BigInt {
-    return BIGINT_ZERO
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return toLowerCase("0x2def4285787d58a2f811af24755a8150622f4361");
@@ -67,7 +86,7 @@ export class SushiswapCeloConfigurations implements Configurations {
       "0xef4229c8c3250c675f21bcefa42f58efbff6002a", // USDC
       "0xb020d981420744f6b0fedd22bb67cd37ce18a1d5", // USDT
       "0xe4fe50cdd716522a56204352f00aa110f731932d", // DAI
-      "0x4060573addb42883238bd6c77a02ab2b23c95f41"  // wBTC
+      "0x4060573addb42883238bd6c77a02ab2b23c95f41", // wBTC
     ]);
   }
   getStableCoins(): string[] {
@@ -75,7 +94,7 @@ export class SushiswapCeloConfigurations implements Configurations {
       "0xef4229c8c3250C675F21BCefa42f58EfbfF6002a", // USDC
       "0xe4fe50cdd716522a56204352f00aa110f731932d", // DAI
       "0xb020d981420744f6b0fedd22bb67cd37ce18a1d5", // USDT
-      "0x765de816845861e75a25fca122bb6898b8b1282a"  // Celo Dollar
+      "0x765de816845861e75a25fca122bb6898b8b1282a", // Celo Dollar
     ]);
   }
   getStableOraclePools(): string[] {

@@ -1,8 +1,20 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
 
 export class ApeswapMaticConfigurations implements Configurations {
   getNetwork(): string {
@@ -26,8 +38,10 @@ export class ApeswapMaticConfigurations implements Configurations {
   getFactoryAddress(): string {
     return "0xCf083Be4164828f00cAE704EC15a36D711491284";
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString("0xCf083Be4164828f00cAE704EC15a36D711491284"));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString("0xCf083Be4164828f00cAE704EC15a36D711491284")
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("2");
@@ -51,7 +65,7 @@ export class ApeswapMaticConfigurations implements Configurations {
     return RewardIntervalType.BLOCK;
   }
   getRewardTokenRate(): BigInt {
-    return BIGINT_ZERO
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";

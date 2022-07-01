@@ -1,8 +1,20 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
 
 export class VSSFinanceCronosConfigurations implements Configurations {
   getNetwork(): string {
@@ -26,8 +38,10 @@ export class VSSFinanceCronosConfigurations implements Configurations {
   getFactoryAddress(): string {
     return "0x3b44b2a187a7b3824131f8db5a74194d0a42fc15";
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString("0x3b44b2a187a7b3824131f8db5a74194d0a42fc15"));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString("0x3b44b2a187a7b3824131f8db5a74194d0a42fc15")
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("3.0");
@@ -51,7 +65,7 @@ export class VSSFinanceCronosConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getRewardTokenRate(): BigInt {
-    return BIGINT_ZERO
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return "0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23";
@@ -77,9 +91,9 @@ export class VSSFinanceCronosConfigurations implements Configurations {
   }
   getStableOraclePools(): string[] {
     return [
-      "0xe61Db569E231B3f5530168Aa2C9D50246525b6d6", // USDC/wCRO 
-      "0x3Eb9FF92e19b73235A393000C176c8bb150F1B20", // DAI/wCRO 
-      "0x3d2180DB9E1B909f35C398BC39EF36108C0FC8c3", // USDT/wCRO 
+      "0xe61Db569E231B3f5530168Aa2C9D50246525b6d6", // USDC/wCRO
+      "0x3Eb9FF92e19b73235A393000C176c8bb150F1B20", // DAI/wCRO
+      "0x3d2180DB9E1B909f35C398BC39EF36108C0FC8c3", // USDT/wCRO
     ];
   }
   getUntrackedPairs(): string[] {
