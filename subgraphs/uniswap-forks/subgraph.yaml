@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: matic
+    network: xdai
     source:
-      address: "0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac"
+      address: "0xc35dadb65012ec5796536bd9864ed8773abc74c4"
       abi: Factory
-      startBlock: 10794229
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -24,46 +24,20 @@ dataSources:
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
   - kind: ethereum
-    name: MasterChef
-    network: mainnet
+    name: MiniChef
+    network: xdai
     source:
-      address: "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd"
-      abi: MasterChefSushiswap
-      startBlock: 10794230
+      address: "0xdDCbf776dF3dE60163066A5ddDF2277cB445E0F3"
+      abi: MiniChefSushiswap
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: MasterChefSushiswap
-          file: ./abis/sushiswap/MasterChefSushiswap.json
-        - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
-      eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256)
-          handler: handleDeposit
-        - event: Withdraw(indexed address,indexed uint256,uint256)
-          handler: handleWithdraw
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
-          handler: handleEmergencyWithdraw
-      file: ./protocols/sushiswap/src/mappings/masterchef/reward.ts
-
-  - kind: ethereum
-    name: MasterChefV2
-    network: mainnet
-    source:
-      address: "0xef0881ec094552b2e128cf945ef17a6752b4ec5d"
-      abi: MasterChefV2Sushiswap
-      startBlock: 12428169
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: MasterChefV2Sushiswap
-          file: ./abis/sushiswap/MasterChefV2Sushiswap.json
+        - name: MiniChefSushiswap
+          file: ./abis/sushiswap/MiniChefSushiswap.json
         - name: TokenABI
           file: ./abis/sushiswap/ERC20.json
       eventHandlers:
@@ -77,11 +51,13 @@ dataSources:
           handler: handleLogSetPool
         - event: LogPoolAddition(indexed uint256,uint256,indexed address,indexed address)
           handler: handleLogPoolAddition
-      file: ./protocols/sushiswap/src/mappings/masterchef/rewardV2.ts
+        - event: LogSushiPerSecond(uint256)
+          handler: handleLogSushiPerSecond
+      file: ./protocols/sushiswap/src/mappings/masterchef/rewardMini.ts
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: matic
+    network: xdai
     source:
       abi: Pair
     mapping:

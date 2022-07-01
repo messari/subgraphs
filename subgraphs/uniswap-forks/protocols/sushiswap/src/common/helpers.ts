@@ -1,29 +1,9 @@
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { MasterChefSushiswap } from "../../../../generated/MasterChef/MasterChefSushiswap";
 import { _MasterChef, _MasterChefStakingPool } from "../../../../generated/schema";
-import { BIGINT_ONE, BIGINT_ZERO, INT_ONE, INT_ZERO } from "../../../../src/common/constants";
+import { BIGINT_ONE, BIGINT_ZERO } from "../../../../src/common/constants";
 import { NetworkConfigs } from "../../../../configurations/configure";
 import { MasterChef } from "./constants";
 import { MiniChefSushiswap } from "../../../../generated/MiniChef/MiniChefSushiswap";
-
-
-export function getOrCreateMasterChefStakingPool(event: ethereum.Event, masterChefType: string, pid: BigInt, poolContract: MasterChefSushiswap): _MasterChefStakingPool {
-    let masterChefPool = _MasterChefStakingPool.load(masterChefType + "-" + pid.toString());
-  
-    // Create entity to track masterchef pool mappings
-    if (!masterChefPool) {
-      masterChefPool = new _MasterChefStakingPool(masterChefType + "-" + pid.toString());
-      masterChefPool.poolAddress = poolContract.poolInfo(pid).value0.toHexString();
-      masterChefPool.multiplier = BIGINT_ONE;
-      masterChefPool.poolAllocPoint = BIGINT_ZERO
-      masterChefPool.lastRewardBlock = event.block.number;
-      log.warning("MASTERCHEF POOL CREATED: " + masterChefPool.poolAddress, [])
-  
-      masterChefPool.save();
-    }
-
-    return masterChefPool
-}
 
 export function createMasterChefStakingPool(event: ethereum.Event, masterChefType: string, pid: BigInt, poolAddress: Address): _MasterChefStakingPool {
     let masterChefPool = new _MasterChefStakingPool(masterChefType + "-" + pid.toString());

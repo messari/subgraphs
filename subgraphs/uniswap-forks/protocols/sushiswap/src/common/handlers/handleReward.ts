@@ -1,12 +1,12 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefSushiswap } from "../../../../../generated/MasterChef/MasterChefSushiswap";
-import { LiquidityPool, _HelperStore, _MasterChef } from "../../../../../generated/schema";
-import { RECENT_BLOCK_THRESHOLD, UsageType } from "../../../../../src/common/constants";
+import { LiquidityPool, _HelperStore, _MasterChef, _MasterChefStakingPool } from "../../../../../generated/schema";
+import { BIGINT_ONE, BIGINT_ZERO, RECENT_BLOCK_THRESHOLD, UsageType } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { getOrCreateMasterChef, getOrCreateMasterChefStakingPool } from "../helpers";
+import { getOrCreateMasterChef } from "../helpers";
 import { MasterChef } from "../constants";
 
 export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
@@ -79,4 +79,22 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
   rewardToken.save();
   nativeToken.save();
   pool.save();
+}
+
+function getOrCreateMasterChefStakingPool(event: ethereum.Event, masterChefType: string, pid: BigInt, poolContract: MasterChefSushiswap): _MasterChefStakingPool {
+  let masterChefPool = _MasterChefStakingPool.load(masterChefType + "-" + pid.toString());
+
+  // Create entity to track masterchef pool mappings
+  if (!masterChefPool) {
+    masterChefPool = new _MasterChefStakingPool(masterChefType + "-" + pid.toString());
+    masterChefPool.poolAddress = poolContract.poolInfo(pid).value0.toHexString();
+    masterChefPool.multiplier = BIGINT_ONE;
+    masterChefPool.poolAllocPoint = BIGINT_ZERO
+    masterChefPool.lastRewardBlock = event.block.number;
+    log.warning("MASTERCHEF POOL CREATED: " + masterChefPool.poolAddress, [])
+
+    masterChefPool.save();
+  }
+
+  return masterChefPool
 }
