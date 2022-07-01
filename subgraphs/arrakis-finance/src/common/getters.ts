@@ -66,6 +66,7 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics.dailyTransactionCount = INT_ZERO;
     usageMetrics.dailyDepositCount = INT_ZERO;
     usageMetrics.dailyWithdrawCount = INT_ZERO;
+    usageMetrics.totalPoolCount = INT_ZERO;
 
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
@@ -158,6 +159,12 @@ export function getOrCreateVaultDailySnapshot(
     snapshot.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
     snapshot.vault = event.address.toHex();
     snapshot.totalValueLockedUSD = BigDecimal.zero();
+    snapshot.cumulativeSupplySideRevenueUSD = BigDecimal.zero()
+    snapshot.dailySupplySideRevenueUSD = BigDecimal.zero()
+    snapshot.cumulativeProtocolSideRevenueUSD = BigDecimal.zero()
+    snapshot.dailyProtocolSideRevenueUSD = BigDecimal.zero()
+    snapshot.cumulativeTotalRevenueUSD = BigDecimal.zero()
+    snapshot.dailyTotalRevenueUSD = BigDecimal.zero()
     snapshot.inputTokenBalance = BIGINT_ZERO;
     snapshot.outputTokenSupply = BIGINT_ZERO;
     snapshot.outputTokenPriceUSD = BigDecimal.zero();
@@ -187,6 +194,12 @@ export function getOrCreateVaultHourlySnapshot(
     snapshot.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
     snapshot.vault = event.address.toHex();
     snapshot.totalValueLockedUSD = BigDecimal.zero();
+    snapshot.cumulativeSupplySideRevenueUSD = BigDecimal.zero();
+    snapshot.hourlySupplySideRevenueUSD = BigDecimal.zero()
+    snapshot.cumulativeProtocolSideRevenueUSD = BigDecimal.zero()
+    snapshot.hourlyProtocolSideRevenueUSD = BigDecimal.zero()
+    snapshot.cumulativeTotalRevenueUSD = BigDecimal.zero()
+    snapshot.hourlyTotalRevenueUSD = BigDecimal.zero()
     snapshot.inputTokenBalance = BIGINT_ZERO;
     snapshot.outputTokenSupply = BIGINT_ZERO;
     snapshot.outputTokenPriceUSD = BigDecimal.zero();
@@ -226,6 +239,7 @@ export function getOrCreateYieldAggregator(
     protocol.cumulativeSupplySideRevenueUSD = BigDecimal.zero();
     protocol.cumulativeProtocolSideRevenueUSD = BigDecimal.zero();
     protocol.cumulativeTotalRevenueUSD = BigDecimal.zero();
+    protocol.totalPoolCount = INT_ZERO
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.save();
   }

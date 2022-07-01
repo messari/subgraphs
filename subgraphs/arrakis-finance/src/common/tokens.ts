@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
-import { ERC20 } from "../../generated/UniswapV2Factory/ERC20";
-import { ERC20SymbolBytes } from "../../generated/UniswapV2Factory/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../generated/UniswapV2Factory/ERC20NameBytes";
+import { ERC20 } from "../../generated/templates/ArrakisVault/ERC20";
+import { ERC20SymbolBytes } from "../../generated/templates/ArrakisVault/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/templates/ArrakisVault/ERC20NameBytes";
 import { Address } from "@graphprotocol/graph-ts";
 
 export const INVALID_TOKEN_DECIMALS = 9999;
@@ -72,7 +72,7 @@ export function fetchTokenDecimals(tokenAddress: Address): i32 {
   let decimalResult = contract.try_decimals();
   if (!decimalResult.reverted) {
     let decimalValue = decimalResult.value;
-    return decimalValue.toI32();
+    return decimalValue;
   }
 
   // try with the static definition

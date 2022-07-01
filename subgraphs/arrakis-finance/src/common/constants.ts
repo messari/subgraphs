@@ -1,13 +1,13 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 ////////////////////
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_NAME = "Uniswap v2";
-export const PROTOCOL_SLUG = "uniswap-v2";
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.2";
+export const PROTOCOL_NAME = "Arrakis Finance";
+export const PROTOCOL_SLUG = "arrakis-finance";
+export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -134,6 +134,7 @@ export const INT_FOUR = 4 as i32;
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -158,9 +159,30 @@ export const ETH_NAME = "Ether"
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
-export const TRADING_FEE = BigDecimal.fromString("3");
-export const PROTOCOL_FEE_TO_ON = BigDecimal.fromString("0.5");
-export const LP_FEE_TO_ON = BigDecimal.fromString("2.5");
-export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0.0");
-export const LP_FEE_TO_OFF = BigDecimal.fromString("3");
+export const PROTOCOL_PERFORMANCE_FEE = BigDecimal.fromString("2.5"); // Hardcoded in contracts
+
+export const REGISTRY_ADDRESS_MAP = new TypedMap<string, Address>();
+REGISTRY_ADDRESS_MAP.set(
+  "mainnet",
+  Address.fromString("0xEA1aFf9dbFfD1580F6b81A3ad3589E66652dB7D9")
+);
+REGISTRY_ADDRESS_MAP.set(
+  "matic",
+  Address.fromString("0x37265A834e95D11c36527451c7844eF346dC342a")
+);
+
+export namespace PriceSource {
+  export const YEARN = "YEARN";
+  export const CHAINLINK = "CHAINLINK";
+  export const CURVE_CALC = "CURVE_CALC";
+  export const SUSHISWAP_CALC = "SUSHISWAP_CALC";
+  export const CURVE_ROUTER = "CURVE_ROUTER";
+  export const UNISWAP_ROUTER = "UNISWAP_ROUTER";
+  export const SUSHISWAP_ROUTER = "SUSHISWAP_ROUTER";
+}
+
+export const TOKEN_PRICE_SOURCE_SKIPS = new TypedMap<Address, Array<string>>();
+TOKEN_PRICE_SOURCE_SKIPS.set(
+  Address.fromString("0x77fba179c79de5b7653f68b5039af940ada60ce0"),
+  [PriceSource.YEARN]
+);
