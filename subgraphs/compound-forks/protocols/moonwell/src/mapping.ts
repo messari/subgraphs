@@ -11,8 +11,6 @@ import {
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
-  MarketEntered,
-  MarketExited,
 } from "../../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -58,7 +56,6 @@ import {
   UpdateMarketData,
   _handleAccrueInterest,
   getOrElse,
-  _handleMarketEntered,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
@@ -94,22 +91,6 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
   let newPriceOracle = event.params.newPriceOracle;
   _handleNewPriceOracle(protocol, newPriceOracle);
-}
-
-export function handleMarketEntered(event: MarketEntered): void {
-  _handleMarketEntered(
-    event.params.mToken.toHexString(),
-    event.params.account.toHexString(),
-    true
-  );
-}
-
-export function handleMarketExited(event: MarketExited): void {
-  _handleMarketEntered(
-    event.params.mToken.toHexString(),
-    event.params.account.toHexString(),
-    false
-  );
 }
 
 export function handleMarketListed(event: MarketListed): void {
@@ -212,61 +193,25 @@ export function handleNewReserveFactor(event: NewReserveFactor): void {
 export function handleMint(event: Mint): void {
   let minter = event.params.minter;
   let mintAmount = event.params.mintAmount;
-  let contract = CToken.bind(event.address);
-  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.minter
-  );
-  _handleMint(comptrollerAddr, minter, mintAmount, balanceOfUnderlyingResult, event);
+  _handleMint(comptrollerAddr, minter, mintAmount, event);
 }
 
 export function handleRedeem(event: Redeem): void {
   let redeemer = event.params.redeemer;
   let redeemAmount = event.params.redeemAmount;
-  let contract = CToken.bind(event.address);
-  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
-    event.params.redeemer
-  );
-  _handleRedeem(
-    comptrollerAddr,
-    redeemer,
-    redeemAmount,
-    balanceOfUnderlyingResult,
-    event
-  );
+  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, event);
 }
 
 export function handleBorrow(event: BorrowEvent): void {
   let borrower = event.params.borrower;
   let borrowAmount = event.params.borrowAmount;
-  let contract = CToken.bind(event.address);
-  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
-  );
-  _handleBorrow(
-    comptrollerAddr,
-    borrower,
-    borrowAmount,
-    borrowBalanceStoredResult,
-    event
-  );
+  _handleBorrow(comptrollerAddr, borrower, borrowAmount, event);
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
-  let borrower = event.params.borrower;
   let payer = event.params.payer;
   let repayAmount = event.params.repayAmount;
-  let contract = CToken.bind(event.address);
-  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
-    event.params.borrower
-  );
-  _handleRepayBorrow(
-    comptrollerAddr,
-    borrower,
-    payer,
-    repayAmount,
-    borrowBalanceStoredResult,
-    event
-  );
+  _handleRepayBorrow(comptrollerAddr, payer, repayAmount, event);
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
