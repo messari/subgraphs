@@ -74,36 +74,42 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-arc-ethereum",
           "dmelotik": "dmelotik/aave-v2-arc",
+          "dmelotik-ext": "dnelotik/aave-v2-arc-ext",
           "deploy-on-merge": true
         },
         "avalanche": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-avalanche",
           "dmelotik": "dmelotik/aave-v2-avalanche",
+          "dmelotik-ext": "dnelotik/aave-v2-avalanche-ext",
           "deploy-on-merge": true
         },
         "mainnet": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum",
+          "dmelotik-ext": "dnelotik/aave-v2-ethereum-ext",
           "deploy-on-merge": true
         },
         "mainnet-amm": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-amm-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum-amm",
+          "dmelotik-ext": "dnelotik/aave-v2-ethereum-amm-ext",
           "deploy-on-merge": true
         },
         "matic": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-polygon",
           "dmelotik": "dmelotik/aave-v2-polygon",
+          "dmelotik-ext": "dnelotik/aave-v2-polygon-ext",
           "deploy-on-merge": true
         },
         "mainnet-rwa": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-rwa-ethereum",
           "dmelotik": "dmelotik/aave-v2-rwa",
+          "dmelotik-ext": "dnelotik/aave-v2-rwa-ext",
           "deploy-on-merge": true
         }
       },
@@ -112,6 +118,7 @@
           "template": "geist.finance.template.yaml",
           "messari": "messari/geist-finance-fantom",
           "dmelotik": "dmelotik/geist-fantom",
+          "dmelotik-ext": "dnelotik/geist-fantom-ext",
           "deploy-on-merge": true
         }
       }

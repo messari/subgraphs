@@ -65,7 +65,13 @@ export function getOrCreateLendingProtocol(
     lendingProtocol.lendingType = LendingType.POOLED;
     lendingProtocol.riskType = RiskType.ISOLATED;
     lendingProtocol.totalPoolCount = INT_ZERO;
+    lendingProtocol.openPositionCount = INT_ZERO;
+    lendingProtocol.cumulativePositionCount = INT_ZERO;
     lendingProtocol.cumulativeUniqueUsers = INT_ZERO;
+    lendingProtocol.cumulativeUniqueDepositors = INT_ZERO;
+    lendingProtocol.cumulativeUniqueBorrowers = INT_ZERO;
+    lendingProtocol.cumulativeUniqueLiquidators = INT_ZERO;
+    lendingProtocol.cumulativeUniqueLiquidatees = INT_ZERO;
     lendingProtocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -321,7 +327,8 @@ export function snapshotUsage(
   blockNumber: BigInt,
   blockTimestamp: BigInt,
   accountID: string,
-  eventType: i32
+  eventType: i32,
+  isNewTx: boolean // used for liquidations to track daily liquidat-ors/-ees
 ): void {
   let account = Account.load(accountID);
   if (!account) {
@@ -341,16 +348,21 @@ export function snapshotUsage(
     dailySnapshot = new UsageMetricsDailySnapshot(dailySnapshotID);
     dailySnapshot.protocol = protocol.id;
     dailySnapshot.dailyActiveUsers = INT_ZERO;
-    dailySnapshot.cumulativeUniqueUsers = INT_ZERO;
     dailySnapshot.dailyTransactionCount = INT_ZERO;
     dailySnapshot.dailyDepositCount = INT_ZERO;
     dailySnapshot.dailyWithdrawCount = INT_ZERO;
     dailySnapshot.dailyBorrowCount = INT_ZERO;
     dailySnapshot.dailyRepayCount = INT_ZERO;
     dailySnapshot.dailyLiquidateCount = INT_ZERO;
-    dailySnapshot.blockNumber = blockNumber;
-    dailySnapshot.timestamp = blockTimestamp;
+    dailySnapshot.dailyActiveDepositors = INT_ZERO;
+    dailySnapshot.dailyActiveBorrowers = INT_ZERO;
+    dailySnapshot.dailyActiveLiquidators = INT_ZERO;
+    dailySnapshot.dailyActiveLiquidatees = INT_ZERO;
   }
+
+  //
+  // Active users
+  //
   let dailyAccountID = ActivityType.DAILY.concat("-")
     .concat(accountID)
     .concat("-")
@@ -362,24 +374,56 @@ export function snapshotUsage(
 
     dailySnapshot.dailyActiveUsers += 1;
   }
+
+  //
+  // Track users per event
+  //
+  let dailyActorAccountID = ActivityType.DAILY.concat("-")
+    .concat(eventType.toString())
+    .concat("-")
+    .concat(accountID)
+    .concat("-")
+    .concat(dailySnapshotID);
+  let dailyActiveActorAccount = ActiveAccount.load(dailyActorAccountID);
+  let isNewActor = dailyActiveActorAccount == null;
+  if (isNewActor) {
+    dailyActiveActorAccount = new ActiveAccount(dailyActorAccountID);
+    dailyActiveActorAccount.save();
+  }
+
   dailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-  dailySnapshot.dailyTransactionCount += 1;
+  dailySnapshot.cumulativeUniqueDepositors =
+    protocol.cumulativeUniqueDepositors;
+  dailySnapshot.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
+  dailySnapshot.cumulativeUniqueLiquidators =
+    protocol.cumulativeUniqueDepositors;
+  dailySnapshot.cumulativeUniqueLiquidatees =
+    protocol.cumulativeUniqueLiquidatees;
+  if (isNewTx) {
+    dailySnapshot.dailyTransactionCount += 1;
+  }
+
   switch (eventType) {
     case EventType.DEPOSIT:
       dailySnapshot.dailyDepositCount += 1;
+      dailySnapshot.dailyActiveDepositors += 1;
       break;
     case EventType.WITHDRAW:
       dailySnapshot.dailyWithdrawCount += 1;
       break;
     case EventType.BORROW:
       dailySnapshot.dailyBorrowCount += 1;
+      dailySnapshot.dailyActiveBorrowers += 1;
       break;
     case EventType.REPAY:
       dailySnapshot.dailyRepayCount += 1;
       break;
-    case EventType.LIQUIDATE:
+    case EventType.LIQUIDATOR:
       dailySnapshot.dailyLiquidateCount += 1;
+      dailySnapshot.dailyActiveLiquidators += 1;
       break;
+    case EventType.LIQUIDATEE:
+      dailySnapshot.dailyActiveLiquidatees += 1;
     default:
       break;
   }
@@ -419,7 +463,10 @@ export function snapshotUsage(
     hourlySnapshot.hourlyActiveUsers += 1;
   }
   hourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-  hourlySnapshot.hourlyTransactionCount += 1;
+  if (isNewTx) {
+    hourlySnapshot.hourlyTransactionCount += 1;
+  }
+
   switch (eventType) {
     case EventType.DEPOSIT:
       hourlySnapshot.hourlyDepositCount += 1;
@@ -433,7 +480,7 @@ export function snapshotUsage(
     case EventType.REPAY:
       hourlySnapshot.hourlyRepayCount += 1;
       break;
-    case EventType.LIQUIDATE:
+    case EventType.LIQUIDATOR:
       hourlySnapshot.hourlyLiquidateCount += 1;
       break;
     default:
@@ -498,7 +545,7 @@ export function updateSnapshots(
       marketDailySnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
       marketHourlySnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
       break;
-    case EventType.LIQUIDATE:
+    case EventType.LIQUIDATOR:
       marketHourlySnapshot.hourlyLiquidateUSD =
         marketHourlySnapshot.hourlyLiquidateUSD.plus(amountUSD);
       marketDailySnapshot.dailyLiquidateUSD =

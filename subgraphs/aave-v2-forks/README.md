@@ -51,6 +51,8 @@ When a transaction occurs in the `lendingPool` the following events are emitted 
 4. Finally we handle the actual transaction event (ie, deposit, borrow, repay, withdraw, liquidate)
    1. This handler is designed to only update the metrics that have to do with those events. ie, usage and daily/hourly event amounts
 
+### Position Data Upgrade
+
 ### Problems
 
 - Unable to change `protocol.id` for multiple deployments on mainnet [see code](./protocols/aave-v2/src/constants.ts)

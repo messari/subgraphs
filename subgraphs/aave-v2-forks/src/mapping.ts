@@ -31,6 +31,7 @@ import {
   InterestRateType,
   INT_FOUR,
   INT_TWO,
+  INT_ZERO,
   rayToWad,
   RAY_OFFSET,
 } from "./constants";
@@ -136,6 +137,11 @@ export function _handleReserveInitialized(
   market.liquidityIndex = BIGINT_ZERO;
   market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
+  market.positionCount = INT_ZERO;
+  market.openPositionCount = INT_ZERO;
+  market.closedPositionCount = INT_ZERO;
+  market.lendingPositionCount = INT_ZERO;
+  market.borrowingPositionCount = INT_ZERO;
   market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.rates = []; // calculated in event ReserveDataUpdated
@@ -480,20 +486,28 @@ export function _handleDeposit(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let deposit = new Deposit(id);
 
+  deposit.nonce = event.transaction.nonce;
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
+<<<<<<< HEAD
   deposit.to = market.id;
   deposit.from = account.toHexString();
+=======
+  deposit.account = event.transaction.from.toHexString();
+>>>>>>> update transactions and usagemetrics
   deposit.market = marketId.toHexString();
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
-  deposit.protocol = protocol.id;
   deposit.asset = inputToken!.id;
   deposit.amount = amount;
   deposit.amountUSD = amount
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
+
+  // TODO- handle opening a new position
+
+  // deposit.position = ...
   deposit.save();
 
   // update metrics
@@ -511,8 +525,9 @@ export function _handleDeposit(
     protocol,
     event.block.number,
     event.block.timestamp,
-    deposit.from,
-    EventType.DEPOSIT
+    deposit.account,
+    EventType.DEPOSIT,
+    true
   );
 
   // udpate market daily / hourly snapshots / financialSnapshots
@@ -548,18 +563,26 @@ export function _handleWithdraw(
 
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
+<<<<<<< HEAD
   withdraw.to = account.toHexString();
   withdraw.from = market.id;
+=======
+  withdraw.account = event.transaction.from.toHexString();
+>>>>>>> update transactions and usagemetrics
   withdraw.market = market.id;
   withdraw.hash = event.transaction.hash.toHexString();
+  withdraw.nonce = event.transaction.nonce;
   withdraw.logIndex = event.logIndex.toI32();
-  withdraw.protocol = protocol.id;
   withdraw.asset = inputToken!.id;
   withdraw.amount = amount;
   withdraw.amountUSD = amount
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
+
+  // TODO - add account metrics
+  // withdraw.position = ...
+
   withdraw.save();
 
   // update usage metrics
@@ -567,8 +590,9 @@ export function _handleWithdraw(
     protocol,
     event.block.number,
     event.block.timestamp,
-    withdraw.to,
-    EventType.WITHDRAW
+    withdraw.account,
+    EventType.WITHDRAW,
+    true
   );
 
   // udpate market daily / hourly snapshots / financialSnapshots
@@ -604,18 +628,26 @@ export function _handleBorrow(
 
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
+<<<<<<< HEAD
   borrow.to = account.toHexString();
   borrow.from = market.id;
+=======
+  borrow.nonce = event.transaction.nonce;
+  borrow.account = event.transaction.from.toHexString();
+>>>>>>> update transactions and usagemetrics
   borrow.market = market.id;
   borrow.hash = event.transaction.hash.toHexString();
   borrow.logIndex = event.logIndex.toI32();
-  borrow.protocol = protocol.id;
   borrow.asset = inputToken!.id;
   borrow.amount = amount;
   borrow.amountUSD = amount
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
+
+  // TODO - add account metrics
+  // borrow.position = ...
+
   borrow.save();
 
   // update metrics
@@ -633,8 +665,9 @@ export function _handleBorrow(
     protocol,
     event.block.number,
     event.block.timestamp,
-    borrow.to,
-    EventType.BORROW
+    borrow.account,
+    EventType.BORROW,
+    true
   );
 
   // udpate market daily / hourly snapshots / financialSnapshots
@@ -670,18 +703,26 @@ export function _handleRepay(
 
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
+<<<<<<< HEAD
   repay.to = market.id;
   repay.from = account.toHexString();
+=======
+  repay.account = event.transaction.from.toHexString();
+>>>>>>> update transactions and usagemetrics
   repay.market = market.id;
   repay.hash = event.transaction.hash.toHexString();
+  repay.nonce = event.transaction.nonce;
   repay.logIndex = event.logIndex.toI32();
-  repay.protocol = protocol.id;
   repay.asset = inputToken!.id;
   repay.amount = amount;
   repay.amountUSD = amount
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
+
+  // TODO - add account metrics
+  // repay.position = ...
+
   repay.save();
 
   // update usage metrics
@@ -689,8 +730,9 @@ export function _handleRepay(
     protocol,
     event.block.number,
     event.block.timestamp,
-    repay.from,
-    EventType.REPAY
+    repay.account,
+    EventType.REPAY,
+    true
   );
 
   // udpate market daily / hourly snapshots / financialSnapshots
@@ -708,9 +750,8 @@ export function _handleLiquidate(
   amount: BigInt,
   marketId: Address, // collateral market
   protocolData: ProtocolData,
-  debtAsset: Address,
   liquidator: Address,
-  user: Address // account liquidated
+  borrower: Address // account liquidated
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -728,22 +769,25 @@ export function _handleLiquidate(
 
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
-  liquidate.to = debtAsset.toHexString();
-  liquidate.from = liquidator.toHexString();
+  liquidate.liquidator = liquidator.toHexString();
+  liquidate.liquidatee = borrower.toHexString();
   liquidate.market = market.id;
   liquidate.hash = event.transaction.hash.toHexString();
+  liquidate.nonce = event.transaction.nonce;
   liquidate.logIndex = event.logIndex.toI32();
-  liquidate.protocol = protocol.id;
   liquidate.asset = inputToken!.id;
   liquidate.amount = amount;
   liquidate.amountUSD = amount
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
-  liquidate.liquidatee = user.toHexString();
   liquidate.profitUSD = liquidate.amountUSD.times(
     market.liquidationPenalty.div(BIGDECIMAL_HUNDRED)
   );
+
+  // TODO - add account metrics this should be the borrower (ie account)
+  // liquidate.position = ...
+
   liquidate.save();
 
   // update metrics
@@ -761,8 +805,17 @@ export function _handleLiquidate(
     protocol,
     event.block.number,
     event.block.timestamp,
-    liquidate.from,
-    EventType.LIQUIDATE
+    liquidate.liquidatee,
+    EventType.LIQUIDATEE,
+    true // only count this liquidate as new tx
+  );
+  snapshotUsage(
+    protocol,
+    event.block.number,
+    event.block.timestamp,
+    liquidate.liquidatee,
+    EventType.LIQUIDATOR, // updates dailyActiveLiquidators
+    false
   );
 
   // udpate market daily / hourly snapshots / financialSnapshots
@@ -770,7 +823,7 @@ export function _handleLiquidate(
     protocol,
     marketId.toHexString(),
     liquidate.amountUSD,
-    EventType.LIQUIDATE,
+    EventType.LIQUIDATOR,
     event.block.timestamp
   );
 }
