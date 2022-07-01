@@ -5,7 +5,8 @@ import { getOrCreateToken } from "../../../../../src/common/getters";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
-import { MasterChef } from "../../../../../src/common/constants";
+import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
+import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
 
 export function updateMasterChefDeposit(event: ethereum.Event, pid: BigInt, amount: BigInt): void {
   let masterChefV2Pool = _MasterChefStakingPool.load(MasterChef.MASTERCHEFV2 + "-" + pid.toString())!;
@@ -48,20 +49,20 @@ export function updateMasterChefWithdraw(event: ethereum.Event, pid: BigInt, amo
     return;
   }
 
-  let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate.times(masterChefV2Pool.poolAllocPoint).div(masterChefV2.totalAllocPoint);
-  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(rewardAmountPerInterval.toString());
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardAmountPerIntervalBigDecimal, masterChefV2.rewardTokenInterval);
-
   let nativeToken = updateNativeTokenPriceInUSD();
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
-  masterChefV2Pool.lastRewardBlock = event.block.number;
+  let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate.times(masterChefV2Pool.poolAllocPoint).div(masterChefV2.totalAllocPoint);
+  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(rewardAmountPerInterval.toString());
+  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardAmountPerIntervalBigDecimal, masterChefV2.rewardTokenInterval);
 
   rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount)
   pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
-  pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
+  pool.rewardTokenEmissionsUSD = [convertTokenToDecimal(pool.rewardTokenEmissionsAmount![INT_ZERO], rewardToken.decimals).times(rewardToken.lastPriceUSD!)];
+
+  masterChefV2Pool.lastRewardBlock = event.block.number;
 
   masterChefV2Pool.save()
   masterChefV2.save()
