@@ -1,12 +1,15 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, log } from "@graphprotocol/graph-ts";
+import { NetworkConfigs } from "../../../../configurations/configure";
+import { MasterChefV2TraderJoe } from "../../../../generated/MasterChefV2/MasterChefV2TraderJoe";
 import {
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../generated/schema";
-import { BIGINT_ONE, BIGINT_ZERO } from "../../../../src/common/constants";
-import { NetworkConfigs } from "../../../../configurations/configure";
-import { MasterChef } from "./constants";
-import { MiniChefSushiswap } from "../../../../generated/MiniChef/MiniChefSushiswap";
+import {
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  MasterChef,
+} from "../../../../src/common/constants";
 
 export function createMasterChefStakingPool(
   event: ethereum.Event,
@@ -39,11 +42,11 @@ export function getOrCreateMasterChef(
     masterChef = new _MasterChef(masterChefType);
     masterChef.totalAllocPoint = BIGINT_ZERO;
     masterChef.rewardTokenInterval = NetworkConfigs.getRewardIntervalType();
-    masterChef.rewardTokenRate = NetworkConfigs.getRewardTokenRate();
+    masterChef.rewardTokenRate = BIGINT_ZERO;
     log.warning("MasterChef Type: " + masterChefType, []);
-    if (masterChefType == MasterChef.MINICHEF) {
-      let miniChefV2Contract = MiniChefSushiswap.bind(event.address);
-      masterChef.adjustedRewardTokenRate = miniChefV2Contract.sushiPerSecond();
+    if (masterChefType == MasterChef.MASTERCHEFV2) {
+      let masterChefV2Contract = MasterChefV2TraderJoe.bind(event.address);
+      masterChef.adjustedRewardTokenRate = masterChefV2Contract.joePerSec();
       log.warning(
         "Adjusted Reward Rate: " +
           masterChef.adjustedRewardTokenRate.toString(),

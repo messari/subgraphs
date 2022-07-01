@@ -26,7 +26,7 @@ import {
   DEFAULT_DECIMALS,
   RewardTokenType,
   BIGINT_ZERO,
-  SECONDS_PER_HOUR
+  SECONDS_PER_HOUR,
 } from "./constants";
 
 export function getOrCreateDex(): DexAmmProtocol {
@@ -58,7 +58,9 @@ export function getLiquidityPool(poolAddress: string): LiquidityPool {
   return LiquidityPool.load(poolAddress)!;
 }
 
-export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmount {
+export function getLiquidityPoolAmounts(
+  poolAddress: string
+): _LiquidityPoolAmount {
   return _LiquidityPoolAmount.load(poolAddress)!;
 }
 
@@ -66,7 +68,9 @@ export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
   return LiquidityPoolFee.load(id)!;
 }
 
-export function getOrCreateTokenWhitelist(tokenAddress: string): _TokenWhitelist {
+export function getOrCreateTokenWhitelist(
+  tokenAddress: string
+): _TokenWhitelist {
   let tokenTracker = _TokenWhitelist.load(tokenAddress);
   // fetch info if null
   if (!tokenTracker) {
@@ -90,7 +94,9 @@ export function getOrCreateTransfer(event: ethereum.Event): _Transfer {
   return transfer;
 }
 
-export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricDailySnapshot(
+  event: ethereum.Event
+): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let id = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let dayId = id.toString();
@@ -119,7 +125,9 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
   return usageMetrics;
 }
-export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
+export function getOrCreateUsageMetricHourlySnapshot(
+  event: ethereum.Event
+): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
   let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
   let hourId = hour.toString();
@@ -147,22 +155,18 @@ export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): Usa
   return usageMetrics;
 }
 
-export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): LiquidityPoolDailySnapshot {
+export function getOrCreateLiquidityPoolDailySnapshot(
+  event: ethereum.Event
+): LiquidityPoolDailySnapshot {
   let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let dayId = day.toString();
   let poolMetrics = LiquidityPoolDailySnapshot.load(
-    event.address
-      .toHexString()
-      .concat("-")
-      .concat(dayId)
+    event.address.toHexString().concat("-").concat(dayId)
   );
 
   if (!poolMetrics) {
     poolMetrics = new LiquidityPoolDailySnapshot(
-      event.address
-        .toHexString()
-        .concat("-")
-        .concat(dayId)
+      event.address.toHexString().concat("-").concat(dayId)
     );
     poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
     poolMetrics.pool = event.address.toHexString();
@@ -189,23 +193,19 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
   return poolMetrics;
 }
 
-export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): LiquidityPoolHourlySnapshot {
+export function getOrCreateLiquidityPoolHourlySnapshot(
+  event: ethereum.Event
+): LiquidityPoolHourlySnapshot {
   let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
   let hourId = hour.toString();
   let poolMetrics = LiquidityPoolHourlySnapshot.load(
-    event.address
-      .toHexString()
-      .concat("-")
-      .concat(hourId)
+    event.address.toHexString().concat("-").concat(hourId)
   );
 
   if (!poolMetrics) {
     poolMetrics = new LiquidityPoolHourlySnapshot(
-      event.address
-        .toHexString()
-        .concat("-")
-        .concat(hourId)
+      event.address.toHexString().concat("-").concat(hourId)
     );
     poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
     poolMetrics.pool = event.address.toHexString();
@@ -232,7 +232,9 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
   return poolMetrics;
 }
 
-export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): FinancialsDailySnapshot {
+export function getOrCreateFinancialsDailySnapshot(
+  event: ethereum.Event
+): FinancialsDailySnapshot {
   // Number of days since Unix epoch
   let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let id = dayID.toString();
@@ -282,7 +284,11 @@ export function getOrCreateToken(address: string): Token {
   return token as Token;
 }
 
-export function getOrCreateLPToken(tokenAddress: string, token0: Token, token1: Token): Token {
+export function getOrCreateLPToken(
+  tokenAddress: string,
+  token0: Token,
+  token1: Token
+): Token {
   let token = Token.load(tokenAddress);
   // fetch info if null
   if (token === null) {

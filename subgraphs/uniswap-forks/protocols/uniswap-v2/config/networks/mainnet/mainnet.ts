@@ -1,8 +1,20 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
 
 export class UniswapV2MainnetConfigurations implements Configurations {
   getNetwork(): string {
@@ -26,8 +38,10 @@ export class UniswapV2MainnetConfigurations implements Configurations {
   getFactoryAddress(): string {
     return "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f")
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("3");
@@ -51,7 +65,7 @@ export class UniswapV2MainnetConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getRewardTokenRate(): BigInt {
-    return BIGINT_ZERO
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
@@ -102,8 +116,7 @@ export class UniswapV2MainnetConfigurations implements Configurations {
   }
   getUntrackedTokens(): string[] {
     return [
-      // Uncomment some of these depending on how to pricing turns out. 
-      
+      // Uncomment some of these depending on how to pricing turns out.
       // "0x77dc1f32a15f0c255b7ae0a1f67fc0b46e7b8bba", // TheOnlyInu
       // "0x5dbcf33d8c2e976c6b560249878e6f1491bca25c", // yearn Curve.fi
       // "0xe0bcc5246e1561e6f6562fcecc2db910d1af0e6f", // BUSD

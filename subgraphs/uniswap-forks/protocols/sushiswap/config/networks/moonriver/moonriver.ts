@@ -1,9 +1,25 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG, MASTERCHEFV2_SUSHI_PER_BLOCK } from '../../../src/common/constants';
-import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+  MASTERCHEFV2_SUSHI_PER_BLOCK,
+} from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
 
 export class SushiswapMoonriverConfigurations implements Configurations {
   getNetwork(): string {
@@ -27,8 +43,12 @@ export class SushiswapMoonriverConfigurations implements Configurations {
   getFactoryAddress(): string {
     return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString(toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString(
+        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
+      )
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("3");
@@ -52,7 +72,7 @@ export class SushiswapMoonriverConfigurations implements Configurations {
     return RewardIntervalType.TIMESTAMP;
   }
   getRewardTokenRate(): BigInt {
-    return BIGINT_ZERO
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return toLowerCase("0x639A647fbe20b6c8ac19E48E2de44ea792c62c5C");

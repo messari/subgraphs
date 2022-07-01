@@ -1,14 +1,13 @@
 {
-    "deployment": "VVS_FINANCE_CRONOS",
-    "network": "mainnet",
-    "factory": {
-      "address": "0x3b44b2a187a7b3824131f8db5a74194d0a42fc15",
-      "startBlock": 4100
-    },
-    "CraftsmanAddress": "0xDccd6455AE04b03d785F12196B492b18129564bc",
-    "CraftsmanStartBlock": 4100,
-    "graftEnabled": false,
-    "subgraphId": "",
-    "graftStartBlock": 0
-  }
-  
+  "deployment": "VVS_FINANCE_CRONOS",
+  "network": "mainnet",
+  "factory": {
+    "address": "0x3b44b2a187a7b3824131f8db5a74194d0a42fc15",
+    "startBlock": 4100
+  },
+  "CraftsmanAddress": "0xDccd6455AE04b03d785F12196B492b18129564bc",
+  "CraftsmanStartBlock": 4100,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
