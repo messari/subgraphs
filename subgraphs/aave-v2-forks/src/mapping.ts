@@ -502,10 +502,7 @@ export function _handleDeposit(
 
   deposit.position = positionId;
   deposit.nonce = event.transaction.nonce;
-  deposit.blockNumber = event.block.number;
-  deposit.timestamp = event.block.timestamp;
   deposit.account = account.toHexString();
-  deposit.nonce = event.transaction.nonce;
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.market = marketId.toHexString();
@@ -517,10 +514,6 @@ export function _handleDeposit(
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
-
-  // TODO- handle opening a new position
-
-  // deposit.position = ...
   deposit.save();
 
   // update metrics
@@ -576,7 +569,6 @@ export function _handleWithdraw(
 
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
-  withdraw.account = event.transaction.from.toHexString();
   withdraw.account = account.toHexString();
   withdraw.market = market.id;
   withdraw.hash = event.transaction.hash.toHexString();
