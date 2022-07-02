@@ -26,9 +26,14 @@ import {
 } from "../../../generated/schema";
 import {
   CCOMP_ADDRESS,
+  CETH_ADDRESS,
   comptrollerAddr,
   COMPTROLLER_ADDRESS,
   COMP_ADDRESS,
+  ETH_ADDRESS,
+  ETH_DECIMALS,
+  ETH_NAME,
+  ETH_SYMBOL,
   METHODOLOGY_VERSION,
   Network,
   PROTOCOL_NAME,
@@ -82,6 +87,7 @@ import {
 import { getUSDPriceOfToken } from "./prices";
 import { getUsdPricePerToken } from "./prices/index";
 import { PriceOracle2 } from "../../../generated/Comptroller/PriceOracle2";
+import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
 
 ///////////////////////////////
 //// CToken Level Handlers ////
@@ -172,24 +178,41 @@ export function handleMarketListed(event: MarketListed): void {
     BIGINT_ZERO
   );
 
-  let underlyingTokenAddrResult = cTokenContract.try_underlying();
-  if (underlyingTokenAddrResult.reverted) {
-    log.warning(
-      "[handleMarketListed] could not fetch underlying token of cToken: {}",
-      [cTokenAddr.toHexString()]
-    );
-    return;
+  // get underlying token data
+  let underlyingTokenAddr: Address;
+  let underlyingName: string;
+  let underlyingSymbol: string;
+  let underlyingDecimals: i32;
+  if (event.params.cToken == Address.fromString(CETH_ADDRESS)) {
+    // must hard code ETH bc it cannot fetch 0x0 address
+    underlyingTokenAddr = Address.fromString(ETH_ADDRESS);
+    underlyingName = ETH_NAME;
+    underlyingSymbol = ETH_SYMBOL;
+    underlyingDecimals = ETH_DECIMALS;
+  } else {
+    // grab token normally
+    let underlyingTokenAddrResult = cTokenContract.try_underlying();
+    if (underlyingTokenAddrResult.reverted) {
+      log.warning(
+        "[handleMarketListed] could not fetch underlying token of cToken: {}",
+        [cTokenAddr.toHexString()]
+      );
+      return;
+    }
+    underlyingTokenAddr = underlyingTokenAddrResult.value;
+    underlyingName = fetchTokenName(underlyingTokenAddr);
+    underlyingSymbol = fetchTokenSymbol(underlyingTokenAddr);
+    underlyingDecimals = fetchTokenDecimals(underlyingTokenAddr);
   }
-  let underlyingTokenAddr = underlyingTokenAddrResult.value;
-  let underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
+
   _handleMarketListed(
     new MarketListedData(
       protocol,
       new TokenData(
         underlyingTokenAddr,
-        getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
-        getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
-        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
+        underlyingName,
+        underlyingSymbol,
+        underlyingDecimals
       ),
       new TokenData(
         cTokenAddr,

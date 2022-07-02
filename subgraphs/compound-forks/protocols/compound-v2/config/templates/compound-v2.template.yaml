@@ -30,6 +30,10 @@ dataSources:
           file: ./abis/compound-v2/PriceOracle2.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/compound-v2/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/compound-v2/ERC20NameBytes.json
         - name: CToken
           file: ./abis/CToken.json
       eventHandlers:
