@@ -1249,3 +1249,16 @@ type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
+
+##### Add Ons #####
+
+type PositionCounter @entity {
+  " { Account address }-{ Market address }-{ Position Side } "
+  id: ID!
+  " Next count "
+  nextCount: Int!
+}
+type ActorAccount @entity {
+  " { Actor type (Depositor / Borrower / Liquidator / Liquidatee) }-{ Account address } "
+  id: ID!
+}

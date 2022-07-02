@@ -32,10 +32,12 @@ import {
   INT_FOUR,
   INT_TWO,
   INT_ZERO,
+  PositionSide,
   rayToWad,
   RAY_OFFSET,
 } from "./constants";
 import {
+  addPosition,
   createInterestRate,
   getOrCreateLendingProtocol,
   getOrCreateToken,
@@ -469,7 +471,8 @@ export function _handleDeposit(
   event: ethereum.Event,
   amount: BigInt,
   marketId: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  account: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -485,10 +488,23 @@ export function _handleDeposit(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let deposit = new Deposit(id);
 
+  // update position
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  let positionId = addPosition(
+    protocol,
+    market,
+    account.toHexString(),
+    aTokenContract.try_balanceOf(account), // try getting balance of account
+    PositionSide.LENDER,
+    EventType.DEPOSIT,
+    event
+  );
+
+  deposit.position = positionId;
   deposit.nonce = event.transaction.nonce;
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
-  deposit.account = event.transaction.from.toHexString();
+  deposit.account = account.toHexString();
   deposit.market = marketId.toHexString();
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
@@ -498,10 +514,6 @@ export function _handleDeposit(
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
-
-  // TODO- handle opening a new position
-
-  // deposit.position = ...
   deposit.save();
 
   // update metrics
@@ -538,7 +550,8 @@ export function _handleWithdraw(
   event: ethereum.Event,
   amount: BigInt,
   marketId: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  account: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -556,7 +569,7 @@ export function _handleWithdraw(
 
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
-  withdraw.account = event.transaction.from.toHexString();
+  withdraw.account = account.toHexString();
   withdraw.market = market.id;
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.nonce = event.transaction.nonce;
@@ -597,7 +610,8 @@ export function _handleBorrow(
   event: ethereum.Event,
   amount: BigInt,
   marketId: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  account: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -616,7 +630,7 @@ export function _handleBorrow(
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
   borrow.nonce = event.transaction.nonce;
-  borrow.account = event.transaction.from.toHexString();
+  borrow.account = account.toHexString();
   borrow.market = market.id;
   borrow.hash = event.transaction.hash.toHexString();
   borrow.logIndex = event.logIndex.toI32();
@@ -666,7 +680,8 @@ export function _handleRepay(
   event: ethereum.Event,
   amount: BigInt,
   marketId: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  account: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -684,7 +699,7 @@ export function _handleRepay(
 
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
-  repay.account = event.transaction.from.toHexString();
+  repay.account = account.toHexString();
   repay.market = market.id;
   repay.hash = event.transaction.hash.toHexString();
   repay.nonce = event.transaction.nonce;

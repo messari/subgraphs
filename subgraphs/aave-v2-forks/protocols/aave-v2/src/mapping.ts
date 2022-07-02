@@ -336,7 +336,8 @@ export function handleDeposit(event: Deposit): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData()
+    getProtocolData(),
+    event.params.onBehalfOf
   );
 }
 
