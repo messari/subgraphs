@@ -34,12 +34,84 @@
         }
       }
     },
-    "aave-v2": {
+    "aave-v2-forks": {
       "aave-v2": {
+        "mainnet-arc": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-arc-ethereum",
+          "dmelotik": "dmelotik/aave-v2-arc",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-avalanche",
+          "dmelotik": "dmelotik/aave-v2-avalanche",
+          "deploy-on-merge": true
+        },
         "mainnet": {
-          "template": "aave-v2.template.yaml",
+          "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum",
+          "deploy-on-merge": true
+        },
+        "mainnet-amm": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-amm-ethereum",
+          "dmelotik": "dmelotik/aave-v2-ethereum-amm",
+          "deploy-on-merge": true
+        },
+        "matic": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-polygon",
+          "dmelotik": "dmelotik/aave-v2-polygon",
+          "deploy-on-merge": true
+        },
+        "mainnet-rwa": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-rwa-ethereum",
+          "dmelotik": "dmelotik/aave-v2-rwa",
+          "deploy-on-merge": true
+        }
+      },
+      "geist-finance": {
+        "fantom": {
+          "template": "geist.finance.template.yaml",
+          "messari": "messari/geist-finance-fantom",
+          "dmelotik": "dmelotik/geist-fantom",
+          "deploy-on-merge": true
+        }
+      }
+    },
+    "aave-v3": {
+      "aave-v3": {
+        "arbitrum": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-arbitrum",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-avalanche",
+          "deploy-on-merge": true
+        },
+        "fantom": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-fantom",
+          "deploy-on-merge": true
+        },
+        "harmony": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-harmony",
+          "deploy-on-merge": true
+        },
+        "matic": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-polygon",
+          "deploy-on-merge": true
+        },
+        "optimism": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-optimism",
           "deploy-on-merge": true
         }
       }
@@ -48,6 +120,55 @@
       "convex-finance": {
         "mainnet": {
           "template": "convex.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "balancer-forks": {
+      "balancer-v2": {
+        "arbitrum": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/balancer-v2-arbitrum",
+          "sevenshi": "sevenshi/balancer-v2-arbitrum",
+          "deploy-on-merge": true,
+          "prepare:constants": true
+        },
+        "matic": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/balancer-v2-polygon",
+          "sevenshi": "sevenshi/balancer-v2-matic",
+          "deploy-on-merge": true,
+          "prepare:constants": true
+        },
+        "mainnet": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/balancer-v2-ethereum",
+          "sevenshi": "sevenshi/balancer-v2-ethereum",
+          "deploy-on-merge": true,
+          "prepare:constants": true
+        }
+      },
+      "beethoven-x": {
+        "optimism": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/beethoven-x-optimism",
+          "sevenshi": "sevenshi/beets-optimism",
+          "deploy-on-merge": true,
+          "prepare:constants": true
+        },
+        "fantom": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/beethoven-x-fantom",
+          "sevenshi": "sevenshi/beets-fantom",
+          "deploy-on-merge": true,
+          "prepare:constants": true
+        }
+      }
+    },
+    "beefy-finance": {
+      "beefy-finance": {
+        "aurora": {
+          "template": "beefy.finance.template.yaml",
           "deploy-on-merge": false
         }
       }
@@ -136,6 +257,44 @@
           "deploy-on-merge": true
         }
       },
+      "dforce": {
+        "arbitrum": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-arbitrum",
+          "tnkrxyz": "tnkrxyz/dforce-arbitrum",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-avalanche",
+          "tnkrxyz": "tnkrxyz/dforce-avalanche",
+          "deploy-on-merge": true
+        },
+        "bsc": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-bsc",
+          "tnkrxyz": "tnkrxyz/dforce-bsc",
+          "deploy-on-merge": true
+        },
+        "mainnet": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-ethereum",
+          "tnkrxyz": "tnkrxyz/dforce",
+          "deploy-on-merge": true
+        },
+        "optimism": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-optimism",
+          "tnkrxyz": "tnkrxyz/dforce-optimism",
+          "deploy-on-merge": true
+        },
+        "matic": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-polygon",
+          "tnkrxyz": "tnkrxyz/dforce-polygon",
+          "deploy-on-merge": true
+        }
+      },
       "iron-bank": {
         "avalanche": {
           "template": "iron-bank.template.yaml",
@@ -195,8 +354,8 @@
         }
       }
     },
-    "curve": {
-      "curve": {
+    "curve-finance": {
+      "curve-finance": {
         "arbitrum": {
           "template": "curve.template.yaml",
           "deploy-on-merge": false
@@ -222,7 +381,7 @@
           "deploy-on-merge": false
         },
         "xdai": {
-          "template": "apeswap.template.yaml",
+          "template": "curve.template.yaml",
           "deploy-on-merge": false
         }
       }
@@ -231,6 +390,14 @@
       "ellipsis-finance": {
         "bsc": {
           "template": "ellipsis.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "inverse-finance": {
+      "inverse-finance": {
+        "mainnet": {
+          "template": "inverse.finance.template.yaml",
           "deploy-on-merge": false
         }
       }
@@ -287,19 +454,19 @@
       "saddle-finance": {
         "arbitrum": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "mainnet": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "optimism": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -307,7 +474,7 @@
       "tokemak": {
         "mainnet": {
           "template": "tokemak.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -340,37 +507,37 @@
         "arbitrum": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-arbitrum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "avalanche": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-avalanche",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "bsc": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-bsc",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-fantom",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "matic": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-polygon",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "moonriver": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-moonriver",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "optimism": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-optimism",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "xdai": {
           "template": "qidao.template.yaml",
@@ -407,6 +574,7 @@
           "template": "quickswap.template.yaml",
           "steegecs": "steegecs/quickswap-matic",
           "messari": "messari/quickswap-polygon",
+          "deploy-on-merge": false,
           "prepare:constants": true
         }
       },
@@ -415,6 +583,7 @@
           "template": "solarbeam.template.yaml",
           "steegecs": "steegecs/solarbeam-moonriver",
           "messari": "messari/solarbeam-moonriver",
+          "deploy-on-merge": false,
           "prepare:constants": true
         }
       },
@@ -423,6 +592,7 @@
           "template": "spiritswap.template.yaml",
           "steegecs": "steegecs/spiritswap-fantom",
           "messari": "messari/spiritswap-fantom",
+          "deploy-on-merge": false,
           "prepare:constants": true
         }
       },
@@ -431,69 +601,72 @@
           "template": "spookyswap.template.yaml",
           "steegecs": "steegecs/spookyswap-fantom",
           "messari": "messari/spookyswap-fantom",
+          "deploy-on-merge": false,
           "prepare:constants": true
         }
       },
       "sushiswap": {
         "arbitrum": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "avalanche": {
           "template": "uniswap.v2.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "bsc": {
           "template": "uniswap.v2.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "celo": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "fantom": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "fuse": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "mainnet": {
-          "template": "uniswap.v2.template.yaml",
+          "template": "sushiswap.mainnet.template.yaml",
           "steegecs": "steegecs/sushiswap-mainnet",
           "messari": "messari/sushiswap-ethereum",
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "matic": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-matic",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "moonbeam": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "moonriver": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-moonriver",
           "messari": "messari/sushiswap-moonriver",
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "xdai": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-xdai",
           "messari": "messari/sushiswap-gnosis",
-          "prepare:constants": true,
-          "deploy-on-merge": true
+          "deploy-on-merge": true,
+          "prepare:constants": true
         }
       },
       "trader-joe": {
@@ -501,6 +674,7 @@
           "template": "trader.joe.template.yaml",
           "steegecs": "steegecs/trader-joe-avalanche",
           "messari": "messari/trader-joe-avalanche",
+          "deploy-on-merge": false,
           "prepare:constants": true
         }
       },
@@ -509,6 +683,7 @@
           "template": "trisolaris.template.yaml",
           "steegecs": "steegecs/trisolaris-aurora",
           "messari": "messari/trisolaris-aurora",
+          "deploy-on-merge": false,
           "prepare:constants": true
         }
       },
@@ -518,6 +693,7 @@
           "steegecs": "steegecs/ubeswap-celo",
           "messari": "messari/ubeswap-celo",
           "sevenshi": "sevenshi/ubeswap_celo",
+          "deploy-on-merge": false,
           "prepare:constants": true
         }
       },
@@ -525,7 +701,7 @@
         "mainnet": {
           "template": "uniswap.v2.template.yaml",
           "steegecs": "steegecs/uniswap-v2",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         }
       },
@@ -534,6 +710,7 @@
           "template": "vvs.finance.template.yaml",
           "steegecs": "steegecs/trisolaris-aurora",
           "messari": "messari/trisolaris-aurora",
+          "deploy-on-merge": false,
           "prepare:constants": true
         }
       },
@@ -556,15 +733,15 @@
       "yearn-v2": {
         "arbitrum": {
           "template": "yearn.v2.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "yearn.v2.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "mainnet": {
           "template": "yearn.v2.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     }

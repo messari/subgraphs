@@ -62,6 +62,12 @@ Following calculation gives the COMP distributed (in COMP) to suppliers OR borro
 
 Not applicable to Compound v2
 
+### Modified CToken ABI
+
+CTokens have 2 different ABIs. They switch at block `8983575`, and the only difference is the `AccrueInterest` event params.
+
+To handle this the `CTokenModifed` ABI just adds a new `AccrueInterest` event signature.
+
 ## Reference and Useful Links
 
 Protocol: https://compound.finance/

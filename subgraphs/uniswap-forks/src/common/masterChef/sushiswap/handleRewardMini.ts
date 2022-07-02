@@ -2,12 +2,26 @@ import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../configurations/configure";
 import { MiniChefSushiswap } from "../../../../generated/MiniChef/MiniChefSushiswap";
 import { LiquidityPool, _HelperStore } from "../../../../generated/schema";
-import { BIGINT_FIVE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "../../constants";
+import {
+  BIGINT_FIVE,
+  BIGINT_ZERO,
+  INT_ZERO,
+  UsageType,
+  ZERO_ADDRESS,
+} from "../../constants";
 import { getOrCreateToken } from "../../getters";
-import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../price/price";
+import {
+  findNativeTokenPerToken,
+  updateNativeTokenPriceInUSD,
+} from "../../../price/price";
 import { getRewardsPerDay } from "../../rewards";
 
-export function handleRewardMini(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
+export function handleRewardMini(
+  event: ethereum.Event,
+  pid: BigInt,
+  amount: BigInt,
+  usageType: string
+): void {
   let masterChefPool = _HelperStore.load(pid.toString());
   let poolContract = MiniChefSushiswap.bind(event.address);
 
@@ -67,20 +81,33 @@ export function handleRewardMini(event: ethereum.Event, pid: BigInt, amount: Big
 
   // Calculate Reward Emission per sec
   // let time = event.block.timestamp.minus(lastRewardTime);
-  let rewardTokenRate = rewardTokenPerSecond.times(poolAllocPoint).div(totalAllocPoint);
+  let rewardTokenRate = rewardTokenPerSecond
+    .times(poolAllocPoint)
+    .div(totalAllocPoint);
 
   // Get the estimated rewards emitted for the upcoming day for this pool
-  let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.getRewardIntervalType());
+  let rewardTokenRateBigDecimal = BigDecimal.fromString(
+    rewardTokenRate.toString()
+  );
+  let rewardTokenPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    rewardTokenRateBigDecimal,
+    NetworkConfigs.getRewardIntervalType()
+  );
 
   let nativeToken = updateNativeTokenPriceInUSD();
 
   let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
   rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
-  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.truncate(0).toString())];
+  pool.rewardTokenEmissionsAmount = [
+    BigInt.fromString(rewardTokenPerDay.truncate(0).toString()),
+  ];
 
-  pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
+  pool.rewardTokenEmissionsUSD = [
+    rewardTokenPerDay.times(rewardToken.lastPriceUSD!),
+  ];
 
   masterChefPool.valueBigInt = event.block.number;
 

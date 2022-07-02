@@ -48,11 +48,17 @@ dataSources:
           file: ./abis/trader-joe/ERC20.json
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
-          handler: handleDepositV2
+          handler: handleDeposit
         - event: Withdraw(indexed address,indexed uint256,uint256)
-          handler: handleWithdrawV2
+          handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
-          handler: handleEmergencyWithdrawV2
+          handler: handleEmergencyWithdraw
+        - event: Add(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleAdd
+        - event: Set(indexed uint256,uint256,indexed address,bool)
+          handler: handleSet
+        - event: UpdateEmissionRate(indexed address,uint256)
+          handler: handleUpdateEmissionRate
       file: ./protocols/trader-joe/src/mappings/masterchef/rewardV2.ts
   - kind: ethereum
     name: MasterChefV3
@@ -78,6 +84,10 @@ dataSources:
           handler: handleWithdrawV3
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdrawV3
+        - event: Add(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleAdd
+        - event: Set(indexed uint256,uint256,indexed address,bool)
+          handler: handleSet
       file: ./protocols/trader-joe/src/mappings/masterchef/rewardV3.ts
 templates:
   - kind: ethereum/contract

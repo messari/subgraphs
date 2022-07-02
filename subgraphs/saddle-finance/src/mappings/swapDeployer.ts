@@ -1,5 +1,5 @@
 import { Swap } from "../../generated/templates";
-import { NewSwapPool } from "../../generated/USDDeployer/SwapDeployer";
+import { NewSwapPool } from "../../generated/templates/Swap/SwapDeployer";
 import { createPoolFromEvent } from "../entities/pool";
 
 export function handleNewSwapPool(event: NewSwapPool): void {

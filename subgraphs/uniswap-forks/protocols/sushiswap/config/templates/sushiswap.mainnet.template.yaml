@@ -74,11 +74,15 @@ dataSources:
           file: ./abis/sushiswap/ERC20.json
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleDepositV2
+          handler: handleDeposit
         - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleWithdrawV2
+          handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleEmergencyWithdrawV2
+          handler: handleEmergencyWithdraw
+        - event: LogSetPool(indexed uint256,uint256,indexed address,bool)
+          handler: handleLogSetPool
+        - event: LogPoolAddition(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleLogPoolAddition
       file: ./protocols/sushiswap/src/mappings/masterchef/rewardV2.ts
 templates:
   - kind: ethereum/contract

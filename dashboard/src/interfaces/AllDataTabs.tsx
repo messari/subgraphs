@@ -7,6 +7,7 @@ import ProtocolTab from "./tabs/ProtocolTab";
 import { styled } from "../styled";
 import PoolOverviewTab from "./tabs/PoolOverviewTab";
 import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
+import { ProtocolTypeEntityName } from "../constants";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -85,6 +86,9 @@ function AllDataTabs({
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
 
+  const protocolType = data.protocols[0].type;
+  const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
+
   return (
     <>
       <TabContext value={tabValue}>
@@ -110,6 +114,7 @@ function AllDataTabs({
         <TabPanel value="2">
           {/* POOLOVERVIEW TAB */}
           <PoolOverviewTab
+            totalPoolCount={protocolTableData[protocolEntityNameSingular].totalPoolCount}
             skipAmt={skipAmt}
             pools={pools}
             protocolType={data.protocols[0].type}
