@@ -15,7 +15,7 @@ export namespace Protocol {
   export const NAME = "Aave v2";
   export const SLUG = "aave-v2";
   export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.2.2";
+  export const SUBGRAPH_VERSION = "1.2.3";
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 
