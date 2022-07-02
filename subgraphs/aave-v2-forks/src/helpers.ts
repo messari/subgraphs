@@ -24,6 +24,7 @@ import {
   EventType,
   SECONDS_PER_HOUR,
   SECONDS_PER_DAY,
+  PositionSide,
 } from "./constants";
 import {
   Account,
@@ -38,6 +39,8 @@ import {
   Token,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
+  PositionCounter,
+  Position,
 } from "../generated/schema";
 import { ProtocolData } from "./mapping";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
@@ -333,7 +336,6 @@ export function snapshotUsage(
   let account = Account.load(accountID);
   if (!account) {
     account = new Account(accountID);
-    account.save();
 
     protocol.cumulativeUniqueUsers += 1;
     protocol.save();
@@ -407,20 +409,25 @@ export function snapshotUsage(
     case EventType.DEPOSIT:
       dailySnapshot.dailyDepositCount += 1;
       dailySnapshot.dailyActiveDepositors += 1;
+      account.depositCount += 1;
       break;
     case EventType.WITHDRAW:
       dailySnapshot.dailyWithdrawCount += 1;
+      account.withdrawCount += 1;
       break;
     case EventType.BORROW:
       dailySnapshot.dailyBorrowCount += 1;
       dailySnapshot.dailyActiveBorrowers += 1;
+      account.borrowCount += 1;
       break;
     case EventType.REPAY:
       dailySnapshot.dailyRepayCount += 1;
+      account.repayCount += 1;
       break;
     case EventType.LIQUIDATOR:
       dailySnapshot.dailyLiquidateCount += 1;
       dailySnapshot.dailyActiveLiquidators += 1;
+      account.liquidateCount += 1; // only need to do it in this switch
       break;
     case EventType.LIQUIDATEE:
       dailySnapshot.dailyActiveLiquidatees += 1;
@@ -431,6 +438,7 @@ export function snapshotUsage(
   dailySnapshot.blockNumber = blockNumber;
   dailySnapshot.timestamp = blockTimestamp;
   dailySnapshot.save();
+  account.save();
 
   //
   // hourly snapshot
@@ -583,6 +591,133 @@ export function updateSnapshots(
   marketHourlySnapshot.save();
   financialSnapshot.save();
 }
+
+// This function does the following in this order:
+// 1- create a position if needed
+// 2- update the positions data
+// 3- create a snapshot of the position
+export function addPosition(
+  protocol: LendingProtocol,
+  market: Market,
+  account: Account,
+  balanceResult: ethereum.CallResult<BigInt>,
+  side: string,
+  eventType: i32,
+  event: ethereum.Event
+): string {
+  let counterID = accountID
+    .concat("-")
+    .concat(market.id)
+    .concat("-")
+    .concat(side);
+  let positionCounter = PositionCounter.load(counterID);
+  if (!positionCounter) {
+    positionCounter = new PositionCounter(counterID);
+    positionCounter.nextCount = 0;
+    positionCounter.save();
+  }
+  let positionID = positionCounter.id
+    .concat("-")
+    .concat(positionCounter.nextCount.toString());
+
+  let position = Position.load(positionID);
+  let openPosition = position == null;
+  if (openPosition) {
+    position = new Position(positionID);
+    position.account = accountID;
+    position.market = market.id;
+    position.hashOpened = event.transaction.hash.toHexString();
+    position.blockNumberOpened = event.block.number;
+    position.timestampOpened = event.block.timestamp;
+    position.side = side;
+    if (side == PositionSide.LENDER) {
+      position.isCollateral =
+        account._enabledCollaterals.indexOf(market.id) >= 0;
+    }
+    position.balance = BIGINT_ZERO;
+    position.depositCount = 0;
+    position.withdrawCount = 0;
+    position.borrowCount = 0;
+    position.repayCount = 0;
+    position.liquidationCount = 0;
+    position.save();
+  }
+  position = position!;
+  if (balanceResult.reverted) {
+    log.warning("[addPosition] Fetch balance of {} from {} reverted", [
+      account.id,
+      market.id,
+    ]);
+  } else {
+    position.balance = balanceResult.value;
+  }
+  if (eventType == EventType.Deposit) {
+    position.depositCount += 1;
+  } else if (eventType == EventType.Borrow) {
+    position.borrowCount += 1;
+  }
+  position.save();
+
+  if (openPosition) {
+    //
+    // update account position
+    //
+    account.positionCount += 1;
+    account.openPositionCount += 1;
+    account.save();
+
+    //
+    // update market position
+    //
+    market.positionCount += 1;
+    market.openPositionCount += 1;
+
+    if (eventType == EventType.Deposit) {
+      market.lendingPositionCount += 1;
+    } else if (eventType == EventType.Borrow) {
+      market.borrowingPositionCount += 1;
+    }
+    market.save();
+
+    //
+    // update protocol position
+    //
+    protocol.cumulativePositionCount += 1;
+    protocol.openPositionCount += 1;
+    if (eventType == EventType.Deposit) {
+      let depositorActorID = "depositor".concat("-").concat(account.id);
+      let depositorActor = _ActorAccount.load(depositorActorID);
+      if (!depositorActor) {
+        depositorActor = new _ActorAccount(depositorActorID);
+        depositorActor.save();
+
+        protocol.cumulativeUniqueDepositors += 1;
+        protocol.save();
+      }
+    } else if (eventType == EventType.Borrow) {
+      let borrowerActorID = "borrower".concat("-").concat(account.id);
+      let borrowerActor = _ActorAccount.load(borrowerActorID);
+      if (!borrowerActor) {
+        borrowerActor = new _ActorAccount(borrowerActorID);
+        borrowerActor.save();
+
+        protocol.cumulativeUniqueBorrowers += 1;
+        protocol.save();
+      }
+    }
+  }
+
+  //
+  // take position snapshot
+  //
+  snapshotPosition(position, event);
+
+  return positionID;
+}
+
+////////////////////////////
+///// Internal Helpers /////
+////////////////////////////
 
 function getOrCreateMarketDailySnapshot(
   marketID: string,
