@@ -375,7 +375,9 @@ export function _handleReserveDataUpdated(
     .plus(vBorrowBalance)
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals));
+  log.warning("post add: balance {} price {}", [totalBorrowBalance.toString(), assetPriceUSD.toString()]);
   market.totalBorrowBalanceUSD = totalBorrowBalance.times(assetPriceUSD);
+  log.warning("post multiply", []);
 
   // update total supply balance
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
