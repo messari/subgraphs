@@ -1,8 +1,20 @@
-import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_ONE_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
 
 export class HoneyswapXdaiConfigurations implements Configurations {
   getNetwork(): string {
@@ -26,8 +38,10 @@ export class HoneyswapXdaiConfigurations implements Configurations {
   getFactoryAddress(): string {
     return "0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7";
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString("0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7"));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString("0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7")
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("3");

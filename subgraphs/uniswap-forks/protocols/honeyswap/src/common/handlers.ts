@@ -1,13 +1,34 @@
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../configurations/configure";
 import { HoneyFarm } from "../../../../generated/HoneyFarm/HoneyFarm";
 import { LiquidityPool, _HelperStore } from "../../../../generated/schema";
-import { BIGINT_ZERO, INT_ZERO, RECENT_BLOCK_THRESHOLD, UsageType } from "../../../../src/common/constants";
-import { getLiquidityPool, getOrCreateToken } from "../../../../src/common/getters";
+import {
+  BIGINT_ZERO,
+  INT_ZERO,
+  RECENT_BLOCK_THRESHOLD,
+  UsageType,
+} from "../../../../src/common/constants";
+import {
+  getLiquidityPool,
+  getOrCreateToken,
+} from "../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../src/common/rewards";
-import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../src/price/price";
+import {
+  findNativeTokenPerToken,
+  updateNativeTokenPriceInUSD,
+} from "../../../../src/price/price";
 
-export function handleReward(event: ethereum.Event, tokenId: BigInt, usageType: string): void {
+export function handleReward(
+  event: ethereum.Event,
+  tokenId: BigInt,
+  usageType: string
+): void {
   let poolContract = HoneyFarm.bind(event.address);
   let getDepositInfo = poolContract.try_depositInfo(tokenId);
   let lpTokenAddress = Address.zero();
@@ -18,7 +39,10 @@ export function handleReward(event: ethereum.Event, tokenId: BigInt, usageType: 
     amount = depositInfo.value0;
   }
 
-  log.debug("DEPOSIT INFO: lpTokenAddress: {}, amount: {}", [lpTokenAddress.toHexString(), amount.toString()]);
+  log.debug("DEPOSIT INFO: lpTokenAddress: {}, amount: {}", [
+    lpTokenAddress.toHexString(),
+    amount.toString(),
+  ]);
 
   // Return if pool does not exist
   let pool = LiquidityPool.load(lpTokenAddress.toHexString());
@@ -58,31 +82,60 @@ export function handleReward(event: ethereum.Event, tokenId: BigInt, usageType: 
     totalAllocPoint = getTotalAllocPoint.value;
   }
 
-  log.debug("DIST INFO: prevRewardTime: {}, event.block.timestamp: {}, lastRwardTime: {}", [honeyFarmPool.valueBigInt!.toString(), event.block.timestamp.toString(), lastRewardTime.toString()]);
+  log.debug(
+    "DIST INFO: prevRewardTime: {}, event.block.timestamp: {}, lastRwardTime: {}",
+    [
+      honeyFarmPool.valueBigInt!.toString(),
+      event.block.timestamp.toString(),
+      lastRewardTime.toString(),
+    ]
+  );
 
-  let getDistribution = poolContract.try_getDistribution(honeyFarmPool.valueBigInt!, event.block.timestamp);
+  let getDistribution = poolContract.try_getDistribution(
+    honeyFarmPool.valueBigInt!,
+    event.block.timestamp
+  );
   let distribution: BigInt = BIGINT_ZERO;
   if (!getDistribution.reverted) {
     distribution = getDistribution.value;
   }
 
-  log.debug("POOL INFO: poolAllocPoint: {}, totalAllocPoint: {}, lastRewardTime: {}, timestamp: {}, distribution: {}", [poolAllocPoint.toString(), totalAllocPoint.toString(), lastRewardTime.toString(), event.block.timestamp.toString(), distribution.toString()]);
+  log.debug(
+    "POOL INFO: poolAllocPoint: {}, totalAllocPoint: {}, lastRewardTime: {}, timestamp: {}, distribution: {}",
+    [
+      poolAllocPoint.toString(),
+      totalAllocPoint.toString(),
+      lastRewardTime.toString(),
+      event.block.timestamp.toString(),
+      distribution.toString(),
+    ]
+  );
 
   // Calculate Reward Emission
   let rewardTokenRate = distribution.times(poolAllocPoint).div(totalAllocPoint);
-  
+
   // Get the estimated rewards emitted for the upcoming day for this pool
   let rewardTokenRateBigDecimal = new BigDecimal(rewardTokenRate);
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.getRewardIntervalType());
+  let rewardTokenPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    rewardTokenRateBigDecimal,
+    NetworkConfigs.getRewardIntervalType()
+  );
 
-  log.debug("REWARD CALC: rewardTokenRate: {}, rewardTokenPerDay: {}", [rewardTokenRate.toString(), rewardTokenPerDay.toString()]);
+  log.debug("REWARD CALC: rewardTokenRate: {}, rewardTokenPerDay: {}", [
+    rewardTokenRate.toString(),
+    rewardTokenPerDay.toString(),
+  ]);
 
   // let nativeToken = updateNativeTokenPriceInUSD();
 
   // let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
   // rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
-  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.truncate(0).toString())];
+  pool.rewardTokenEmissionsAmount = [
+    BigInt.fromString(rewardTokenPerDay.truncate(0).toString()),
+  ];
 
   // pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
 

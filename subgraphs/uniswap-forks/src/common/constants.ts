@@ -145,9 +145,7 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
 
-export const MINIMUM_LIQUIDITY_ONE_THOUSAND = new BigDecimal(
-  BIGINT_THOUSAND
-);
+export const MINIMUM_LIQUIDITY_ONE_THOUSAND = new BigDecimal(BIGINT_THOUSAND);
 export const MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND = new BigDecimal(
   BIGINT_ONE_HUNDRED_THOUSAND
 );

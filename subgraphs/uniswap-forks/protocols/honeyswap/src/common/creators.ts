@@ -1,15 +1,38 @@
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { _HelperStore, _TokenWhitelist, _LiquidityPoolAmount, LiquidityPool, LiquidityPoolFee, RewardToken } from "../../../../generated/schema";
+import {
+  _HelperStore,
+  _TokenWhitelist,
+  _LiquidityPoolAmount,
+  LiquidityPool,
+  LiquidityPoolFee,
+  RewardToken,
+} from "../../../../generated/schema";
 import { Pair as PairTemplate } from "../../../../generated/templates";
-import { BIGDECIMAL_ZERO, INT_ZERO, BIGINT_ZERO, LiquidityPoolFeeType, FeeSwitch, BIGDECIMAL_TWO, BIGDECIMAL_ONE } from "../../../../src/common/constants";
-import { createPoolFees } from "../../../../src/common/creators"
-import { getOrCreateDex, getOrCreateToken, getOrCreateLPToken, getOrCreateRewardToken, getLiquidityPool } from "../../../../src/common/getters";
+import {
+  BIGDECIMAL_ZERO,
+  INT_ZERO,
+  BIGINT_ZERO,
+  LiquidityPoolFeeType,
+  FeeSwitch,
+  BIGDECIMAL_TWO,
+  BIGDECIMAL_ONE,
+} from "../../../../src/common/constants";
+import { createPoolFees } from "../../../../src/common/creators";
+import {
+  getOrCreateDex,
+  getOrCreateToken,
+  getOrCreateLPToken,
+  getOrCreateRewardToken,
+  getLiquidityPool,
+} from "../../../../src/common/getters";
 import { updateTokenWhitelists } from "../../../../src/common/updateMetrics";
 import { NetworkConfigs } from "../../../../configurations/configure";
 
 function createHalvedPoolFees(poolAddress: string): string[] {
   let poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
-  let poolProtocolFee = new LiquidityPoolFee(poolAddress.concat("-protocol-fee"));
+  let poolProtocolFee = new LiquidityPoolFee(
+    poolAddress.concat("-protocol-fee")
+  );
   let poolTradingFee = new LiquidityPoolFee(poolAddress.concat("-trading-fee"));
 
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
@@ -18,13 +41,17 @@ function createHalvedPoolFees(poolAddress: string): string[] {
 
   if (NetworkConfigs.getFeeOnOff() == FeeSwitch.ON) {
     poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn().div(BIGDECIMAL_TWO);
-    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOn().div(BIGDECIMAL_TWO);
+    poolProtocolFee.feePercentage =
+      NetworkConfigs.getProtocolFeeToOn().div(BIGDECIMAL_TWO);
   } else {
-    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOff().div(BIGDECIMAL_TWO);
-    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOff().div(BIGDECIMAL_TWO);
+    poolLpFee.feePercentage =
+      NetworkConfigs.getLPFeeToOff().div(BIGDECIMAL_TWO);
+    poolProtocolFee.feePercentage =
+      NetworkConfigs.getProtocolFeeToOff().div(BIGDECIMAL_TWO);
   }
 
-  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee().div(BIGDECIMAL_TWO);
+  poolTradingFee.feePercentage =
+    NetworkConfigs.getTradeFee().div(BIGDECIMAL_TWO);
 
   poolLpFee.save();
   poolProtocolFee.save();
@@ -34,7 +61,12 @@ function createHalvedPoolFees(poolAddress: string): string[] {
 }
 
 // Create a liquidity pool from PairCreated contract call
-export function createLiquidityPool(event: ethereum.Event, poolAddress: string, token0Address: string, token1Address: string): void {
+export function createLiquidityPool(
+  event: ethereum.Event,
+  poolAddress: string,
+  token0Address: string,
+  token1Address: string
+): void {
   let protocol = getOrCreateDex();
 
   // create the tokens and tokentracker
@@ -53,14 +85,17 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.inputTokenWeights = [BIGDECIMAL_ONE.div(BIGDECIMAL_TWO), BIGDECIMAL_ONE.div(BIGDECIMAL_TWO)];
+  pool.inputTokenWeights = [
+    BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
+    BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
+  ];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.rewardTokens = [];
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-  pool.isSingleSided = false
+  pool.isSingleSided = false;
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
   pool.name = protocol.name + " " + LPtoken.symbol;
@@ -70,7 +105,10 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   // Halve pool fees for WETH pairs
-  if (NetworkConfigs.getReferenceToken() == token0Address || NetworkConfigs.getReferenceToken() == token1Address) {
+  if (
+    NetworkConfigs.getReferenceToken() == token0Address ||
+    NetworkConfigs.getReferenceToken() == token1Address
+  ) {
     pool.fees = createHalvedPoolFees(poolAddress);
   } else {
     pool.fees = createPoolFees(poolAddress);

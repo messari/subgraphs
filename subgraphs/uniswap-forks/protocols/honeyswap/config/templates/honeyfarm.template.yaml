@@ -25,4 +25,4 @@ dataSources:
           handler: handlePoolRemoved
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-      file: ./protocols/honeyswap/src/mappings/honeyfarm/reward.ts
+      file: ./protocols/honeyswap/src/mappings/honeyfarm.ts

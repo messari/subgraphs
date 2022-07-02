@@ -186,7 +186,8 @@ export function getRewardsPerDay(
     // Wideness of the window in blocks.
     let windowBlocksCount = BigDecimal.fromString(
       (
-        currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + INT_ONE]
+        currentBlockNumberI32 -
+        blocks[circularBuffer.windowStartIndex + INT_ONE]
       ).toString()
     );
 
@@ -202,7 +203,7 @@ export function getRewardsPerDay(
     // Update BlockTracker with new values.
     circularBuffer.blocksPerDay = normalizedBlockSpeed;
   }
-  
+
   circularBuffer.blocks = blocks;
   circularBuffer.save();
 

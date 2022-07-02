@@ -96,7 +96,7 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.HONEYSWAP_XDAI: {
       return new HoneyswapXdaiConfigurations();
-    } 
+    }
     case Deploy.HONEYSWAP_MATIC: {
       return new HoneyswapMaticConfigurations();
     }

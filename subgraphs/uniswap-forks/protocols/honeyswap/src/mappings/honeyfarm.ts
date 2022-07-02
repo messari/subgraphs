@@ -1,8 +1,15 @@
 import { log } from "@graphprotocol/graph-ts";
-import { PoolAdded as PoolAddedEvent, PoolRemoved as PoolRemovedEvent, Transfer as TransferEvent} from "../../../../../generated/HoneyFarm/HoneyFarm";
-import { createPoolRewardToken, removePoolRewardToken } from "../../common/creators";
-import { UsageType, ZERO_ADDRESS } from "../../../../../src/common/constants";
-import { handleReward } from "../../common/handlers";
+import {
+  PoolAdded as PoolAddedEvent,
+  PoolRemoved as PoolRemovedEvent,
+  Transfer as TransferEvent,
+} from "../../../../generated/HoneyFarm/HoneyFarm";
+import {
+  createPoolRewardToken,
+  removePoolRewardToken,
+} from "../common/creators";
+import { UsageType, ZERO_ADDRESS } from "../../../../src/common/constants";
+import { handleReward } from "../common/handlers";
 
 export function handlePoolAdded(event: PoolAddedEvent): void {
   log.debug("poolToken added: {}", [event.params.poolToken.toHexString()]);
@@ -21,7 +28,10 @@ export function handleTransfer(event: TransferEvent): void {
   }
 
   // burn event representing closing a deposit (withdraw event)
-  if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.from == event.address) {
+  if (
+    event.params.to.toHexString() == ZERO_ADDRESS &&
+    event.params.from == event.address
+  ) {
     handleReward(event, event.params.tokenId, UsageType.WITHDRAW);
   }
 }
