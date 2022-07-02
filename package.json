@@ -1,7 +1,12 @@
 {
   "dependencies": {
-    "@graphprotocol/graph-ts": "^0.27.0",
-    "minimist": "^1.2.6",
-    "mustache": "^4.2.0"
+    "minimist": "^1.2.6"
+  },
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "pretty-quick": "^3.1.3"
+  },
+  "scripts": {
+    "prepare": "husky install"
   }
 }
