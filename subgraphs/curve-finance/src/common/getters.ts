@@ -87,16 +87,16 @@ export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): Usa
   return usageMetrics;
 }
 
-export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricDailySnapshot(timestamp: BigInt): UsageMetricsDailySnapshot {
   // @ts-ignore // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
-
+  let protocol = getOrCreateDexAmm();
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-    usageMetrics.protocol = CURVE_REGISTRY.toHexString();
+    usageMetrics.protocol = protocol.id;
 
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
@@ -104,6 +104,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
     usageMetrics.dailyWithdrawCount = 0;
     usageMetrics.dailySwapCount = 0;
     usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
     usageMetrics.save();
   }
 
@@ -132,6 +133,16 @@ export function getOrCreatePoolHourlySnapshot(poolAddress: string, event: ethere
       hourlyVolumeByTokenAmount.push(BIGINT_ZERO);
       hourlyVolumeByTokenUSD.push(BIG_DECIMAL_ZERO);
     }
+
+    poolMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+
+    poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+
+    poolMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+
     poolMetrics.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
     poolMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
     poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
@@ -170,6 +181,15 @@ export function getOrCreatePoolDailySnapshot(poolAddress: string, event: ethereu
       dailyVolumeByTokenAmount.push(BIGINT_ZERO);
       dailyVolumeByTokenUSD.push(BIG_DECIMAL_ZERO);
     }
+    poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+
+    poolMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+
+    poolMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+
     poolMetrics.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
     poolMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
     poolMetrics.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
@@ -320,9 +340,9 @@ export function createEventID(eventType: string, event: ethereum.Event): string 
 
 
 export function getTotalSupply(pool: LiquidityPool): BigInt {
-  let outputTokenSupply = ERC20.bind(Address.fromString(pool.outputToken)).try_totalSupply();
+  let outputTokenSupply = ERC20.bind(Address.fromString(pool.outputToken!)).try_totalSupply();
   if (outputTokenSupply.reverted){
-    log.warning("Call to totalSupply failed for pool = {} , lptoken = ({})", [pool.id, pool.outputToken]);
+    log.warning("Call to totalSupply failed for pool = {} , lptoken = ({})", [pool.id, pool.outputToken!]);
     return BIGINT_ZERO
   }
   return outputTokenSupply.value

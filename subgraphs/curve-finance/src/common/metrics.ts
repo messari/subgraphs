@@ -1,4 +1,5 @@
 import { BigDecimal, Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { PoolAdded } from "../../generated/AddressProvider/CryptoRegistry";
 import { Account, ActiveAccount, LiquidityPool } from "../../generated/schema";
 import { getLpTokenPriceUSD, getPoolAssetPrice } from "../services/snapshots";
 import {
@@ -43,7 +44,7 @@ export function updateUsageMetrics(event: ethereum.Event, action: string = ""): 
   let hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR; //@ts-ignore
   let dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let usageHourlyMetrics = getOrCreateUsageMetricHourlySnapshot(event);
-  let usageDailyMetrics = getOrCreateUsageMetricDailySnapshot(event);
+  let usageDailyMetrics = getOrCreateUsageMetricDailySnapshot(event.block.timestamp);
 
   let user = event.transaction.from;
   // Update the block number and timestamp to that of the last transaction of that day
@@ -163,6 +164,11 @@ export function updateProtocolRevenueV2(
   volumeUSD: BigDecimal,
   event: ethereum.Event,
 ): void {
+  let poolHourlySnapshot = getOrCreatePoolHourlySnapshot(liquidityPool.id,event);
+  let poolDailySnapshot = getOrCreatePoolDailySnapshot(liquidityPool.id,event);
+  if (!poolHourlySnapshot || !poolDailySnapshot){
+    return
+  }
   let protocol = getOrCreateDexAmm();
   let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
 
@@ -180,6 +186,29 @@ export function updateProtocolRevenueV2(
   let protocolRevenue = volumeUSD.div(BIGDECIMAL_ONE.minus(protocolFee)).minus(volumeUSD);
   let totalRevenueUSD = volumeUSD.div(BIGDECIMAL_ONE.minus(totalFee)).minus(volumeUSD);
 
+  liquidityPool.cumulativeSupplySideRevenueUSD = liquidityPool.cumulativeSupplySideRevenueUSD.plus(supplySideRevenue);
+  liquidityPool.cumulativeProtocolSideRevenueUSD = liquidityPool.cumulativeProtocolSideRevenueUSD.plus(protocolRevenue);
+  liquidityPool.cumulativeTotalRevenueUSD = liquidityPool.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+  liquidityPool.save();
+
+  poolHourlySnapshot.hourlySupplySideRevenueUSD = poolHourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenue);
+  poolHourlySnapshot.cumulativeSupplySideRevenueUSD = liquidityPool.cumulativeSupplySideRevenueUSD;
+
+  poolHourlySnapshot.hourlyProtocolSideRevenueUSD = poolHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(protocolRevenue);
+  poolHourlySnapshot.cumulativeSupplySideRevenueUSD = liquidityPool.cumulativeSupplySideRevenueUSD;
+
+  poolHourlySnapshot.hourlyTotalRevenueUSD = poolHourlySnapshot.hourlyTotalRevenueUSD.plus(totalRevenueUSD);
+  poolHourlySnapshot.cumulativeTotalRevenueUSD = liquidityPool.cumulativeTotalRevenueUSD;
+
+  poolDailySnapshot.dailySupplySideRevenueUSD = poolDailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+  poolDailySnapshot.cumulativeSupplySideRevenueUSD = liquidityPool.cumulativeSupplySideRevenueUSD;
+
+  poolDailySnapshot.dailyProtocolSideRevenueUSD = poolDailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenue);
+  poolDailySnapshot.cumulativeSupplySideRevenueUSD = liquidityPool.cumulativeSupplySideRevenueUSD;
+
+  poolDailySnapshot.dailyTotalRevenueUSD = poolDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+  poolDailySnapshot.cumulativeTotalRevenueUSD = liquidityPool.cumulativeTotalRevenueUSD;
+
   financialSnapshot.dailySupplySideRevenueUSD = financialSnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
   financialSnapshot.dailyProtocolSideRevenueUSD = financialSnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenue);
   financialSnapshot.dailyTotalRevenueUSD = financialSnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
@@ -188,6 +217,7 @@ export function updateProtocolRevenueV2(
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolRevenue);
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
 
+  liquidityPool.save();
   financialSnapshot.save();
   protocol.save();
 }
@@ -200,6 +230,11 @@ export function updateProtocolRevenue(
   if (liquidityPool.isV2) {
     updateProtocolRevenueV2(liquidityPool, volumeUSD, event);
     return;
+  }
+  let poolHourlySnapshot = getOrCreatePoolHourlySnapshot(liquidityPool.id,event);
+  let poolDailySnapshot = getOrCreatePoolDailySnapshot(liquidityPool.id,event);
+  if (!poolHourlySnapshot || !poolDailySnapshot){
+    return
   }
   let protocol = getOrCreateDexAmm();
   let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
@@ -217,6 +252,29 @@ export function updateProtocolRevenue(
   let protocolRevenue = protocolFee.times(volumeUSD);
   let totalRevenueUSD = totalFee.times(volumeUSD);
 
+  liquidityPool.cumulativeSupplySideRevenueUSD = liquidityPool.cumulativeSupplySideRevenueUSD.plus(supplySideRevenue);
+  liquidityPool.cumulativeProtocolSideRevenueUSD = liquidityPool.cumulativeProtocolSideRevenueUSD.plus(protocolRevenue);
+  liquidityPool.cumulativeTotalRevenueUSD = liquidityPool.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+  liquidityPool.save();
+
+  poolHourlySnapshot.hourlySupplySideRevenueUSD = poolHourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenue);
+  poolHourlySnapshot.cumulativeSupplySideRevenueUSD = liquidityPool.cumulativeSupplySideRevenueUSD;
+
+  poolHourlySnapshot.hourlyProtocolSideRevenueUSD = poolHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(protocolRevenue);
+  poolHourlySnapshot.cumulativeSupplySideRevenueUSD = liquidityPool.cumulativeSupplySideRevenueUSD;
+
+  poolHourlySnapshot.hourlyTotalRevenueUSD = poolHourlySnapshot.hourlyTotalRevenueUSD.plus(totalRevenueUSD);
+  poolHourlySnapshot.cumulativeTotalRevenueUSD = liquidityPool.cumulativeTotalRevenueUSD;
+
+  poolDailySnapshot.dailySupplySideRevenueUSD = poolDailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+  poolDailySnapshot.cumulativeSupplySideRevenueUSD = liquidityPool.cumulativeSupplySideRevenueUSD;
+
+  poolDailySnapshot.dailyProtocolSideRevenueUSD = poolDailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenue);
+  poolDailySnapshot.cumulativeSupplySideRevenueUSD = liquidityPool.cumulativeSupplySideRevenueUSD;
+
+  poolDailySnapshot.dailyTotalRevenueUSD = poolDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+  poolDailySnapshot.cumulativeTotalRevenueUSD = liquidityPool.cumulativeTotalRevenueUSD;
+
   financialSnapshot.dailySupplySideRevenueUSD = financialSnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
   financialSnapshot.dailyProtocolSideRevenueUSD = financialSnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenue);
   financialSnapshot.dailyTotalRevenueUSD = financialSnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
@@ -225,6 +283,8 @@ export function updateProtocolRevenue(
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolRevenue);
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
 
+  poolHourlySnapshot.save();
+  poolDailySnapshot.save();
   financialSnapshot.save();
   protocol.save();
 }

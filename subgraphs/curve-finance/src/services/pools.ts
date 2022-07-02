@@ -27,11 +27,13 @@ import {
   setPoolOutputTokenSupply,
   setPoolTokenType,
   setPoolTVL,
+  setProtocolPoolCount,
   setProtocolTVL,
 } from "../common/setters";
 import { getLpTokenPriceUSD } from "./snapshots";
 import { MainRegistry } from "../../generated/AddressProvider/MainRegistry";
 import { setGaugeData } from "./gauges/helpers";
+import { BIGDECIMAL_ZERO } from "../common/constants";
 
 export function checkIfPoolExists(poolId: string): boolean {
   let pool = LiquidityPool.load(poolId);
@@ -64,6 +66,7 @@ export function createNewPool(
   pool.name = name;
   pool.platform = platform.id;
   pool.outputToken = getOrCreateToken(lpToken).id;
+  pool.isSingleSided = false;
   pool.symbol = symbol;
   pool.metapool = metapool;
   pool.isV2 = isV2;
@@ -78,6 +81,9 @@ export function createNewPool(
   const inputTokens = getPoolCoins(pool);
   pool.coins = inputTokens;
   pool.inputTokens = inputTokens.sort();
+  pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
   pool.save();
   setPoolTokenType(pool);
   setPoolBalances(pool);
@@ -85,8 +91,8 @@ export function createNewPool(
   setPoolFees(pool);
   setPoolOutputTokenSupply(pool);
   setGaugeData(pool);
-  pool.save();
   setProtocolTVL();
+  setProtocolPoolCount(timestamp)
 }
 
 export function createNewFactoryPool( // @ts-ignore

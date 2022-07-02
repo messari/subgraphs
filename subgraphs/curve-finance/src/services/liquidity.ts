@@ -24,7 +24,7 @@ export function handleDepositEvent(
   liquidityEvent.timestamp = event.block.timestamp;
   liquidityEvent.pool = pool.id;
   liquidityEvent.outputToken = pool.outputToken;
-  liquidityEvent.outputTokenAmount = absValBigInt(tokenSupply.minus(pool.outputTokenSupply));
+  liquidityEvent.outputTokenAmount = absValBigInt(tokenSupply.minus(pool.outputTokenSupply!));
   let inputTokens = liquidityEvent.inputTokens;
   let inputTokenAmounts = liquidityEvent.inputTokenAmounts;
   let amountUSD = BIGDECIMAL_ZERO;
@@ -71,7 +71,7 @@ export function handleWithdrawEvent(
   liquidityEvent.timestamp = event.block.timestamp;
   liquidityEvent.pool = pool.id;
   liquidityEvent.outputToken = pool.outputToken;
-  liquidityEvent.outputTokenAmount = absValBigInt(tokenSupply.minus(pool.outputTokenSupply));
+  liquidityEvent.outputTokenAmount = absValBigInt(tokenSupply.minus(pool.outputTokenSupply!));
   let inputTokens = liquidityEvent.inputTokens;
   let inputTokenAmounts = liquidityEvent.inputTokenAmounts;
   let amountUSD = BIGDECIMAL_ZERO;
@@ -143,7 +143,7 @@ export function handleLiquidityRemoveOne(
   let price = getLpTokenPriceUSD(pool, event.block.timestamp);
   withdrawEvent.amountUSD = bigIntToBigDecimal(
     tokenAmount,
-    getOrCreateToken(Address.fromString(pool.outputToken)).decimals,
+    getOrCreateToken(Address.fromString(pool.outputToken!)).decimals,
   ).times(price);
   withdrawEvent.inputTokenAmounts = inputTokenAmounts;
   pool.outputTokenSupply = tokenSupply;

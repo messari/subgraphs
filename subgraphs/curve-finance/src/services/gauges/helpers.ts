@@ -22,8 +22,8 @@ import { CurveRewards } from "../../../generated/templates/CurveGauge/CurveRewar
 
 // @ts-ignore
 export function getRewardTokenIndex(pool: LiquidityPool, tokenAddr: string): i32 {
-  for (let i = 0; i < pool.rewardTokens.length; i++) {
-    if (getRewardtoken(pool.rewardTokens[i]).token == tokenAddr) {
+  for (let i = 0; i < pool.rewardTokens!.length; i++) {
+    if (getRewardtoken(pool.rewardTokens![i]).token == tokenAddr) {
       return i;
     }
   }
@@ -80,7 +80,7 @@ export function setRewardTokensV2(pool: LiquidityPool): void {
     const rewardTokenAddr = rewardTokenCall.value;
     if (rewardTokenAddr != ADDRESS_ZERO) {
       const rewardToken = getOrCreateRewardToken(rewardTokenAddr);
-      rewardTokens.push(rewardToken.id);
+      rewardTokens!.push(rewardToken.id);
       pool.rewardTokens = rewardTokens;
       pool.save();
     }
@@ -98,7 +98,7 @@ export function setRewardTokensV3(pool: LiquidityPool): void {
         break;
       }
       let rewardToken = getOrCreateRewardToken(rewardTokenAddressCall.value);
-      rewardTokens.push(rewardToken.id);
+      rewardTokens!.push(rewardToken.id);
     }
   }
   pool.rewardTokens = rewardTokens;
@@ -144,11 +144,11 @@ export function initEmissionsArrays(pool: LiquidityPool): void {
   let rewardTokens = pool.rewardTokens;
   let rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
-  for (let i = 0; i < pool.rewardTokens.length; i++) {
-    rewardTokenEmissionsAmount[i] = BIGINT_ZERO;
-    rewardTokenEmissionsUSD[i] = BIGDECIMAL_ZERO;
+  for (let i = 0; i < pool.rewardTokens!.length; i++) {
+    rewardTokenEmissionsAmount![i] = BIGINT_ZERO;
+    rewardTokenEmissionsUSD![i] = BIGDECIMAL_ZERO;
   }
-  pool.rewardTokens = rewardTokens.sort();
+  pool.rewardTokens = rewardTokens!.sort();
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   pool.save();

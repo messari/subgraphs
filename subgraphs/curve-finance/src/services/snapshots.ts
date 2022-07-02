@@ -148,8 +148,8 @@ export function getCryptoTokenPrice(tokenAddr: Address, timestamp: BigInt, pool:
 }
 
 export function getPoolAssetPrice(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
-  if (FOREX_ORACLES.has(pool.id) || FOREX_ORACLES.has(pool.outputToken)) {
-    return getTokenPriceSnapshot(Address.fromString(pool.outputToken), timestamp, true);
+  if (FOREX_ORACLES.has(pool.id) || FOREX_ORACLES.has(pool.outputToken!)) {
+    return getTokenPriceSnapshot(Address.fromString(pool.outputToken!), timestamp, true);
   } else if (pool.tokenType == TokenType.CTOKEN) {
     return getTokenPriceSnapshot(Address.fromString(pool.inputTokens[0]), timestamp, false);
   } else if (pool.assetType == 1) {

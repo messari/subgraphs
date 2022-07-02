@@ -3,7 +3,7 @@ import { ERC20 } from "../../generated/templates/CurvePoolTemplate/ERC20";
 import { LiquidityPool } from "../../generated/schema";
 import { CurvePool } from "../../generated/templates/CryptoFactoryTemplate/CurvePool";
 import { CURVE_ADMIN_FEE, CURVE_POOL_FEE } from "./constants/index";
-import { getOrCreateDexAmm, getOrCreateToken, getPoolFee, getTotalSupply } from "./getters";
+import { getOrCreateDexAmm, getOrCreateToken, getOrCreateUsageMetricDailySnapshot, getPoolFee, getTotalSupply } from "./getters";
 import { bigIntToBigDecimal } from "./utils/numbers";
 import {
   BIGDECIMAL_ONE_HUNDRED,
@@ -219,3 +219,15 @@ export function setGaugeType(pool: LiquidityPool): void {
     pool.save()
   }
 }*/
+
+export function setProtocolPoolCount(timestamp: BigInt): void {
+  let protocol = getOrCreateDexAmm();
+  let usageMetrics = getOrCreateUsageMetricDailySnapshot(timestamp);
+  let totalPoolCount = protocol.totalPoolCount + 1;
+
+  usageMetrics.totalPoolCount = totalPoolCount;
+  protocol.totalPoolCount = totalPoolCount;
+  
+  usageMetrics.save();
+  protocol.save();
+}
