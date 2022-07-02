@@ -167,8 +167,20 @@ interface Protocol {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  " Number of cumulative liquidity providers "
+  cumulativeUniqueLPs: Int!
+
+  " Number of cumulative traders "
+  cumulativeUniqueTraders: Int!
+
   " Total number of pools "
   totalPoolCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
 
   ##### Snapshots #####
 
@@ -441,6 +453,20 @@ type LiquidityPool @entity {
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
+  ##### Account/Position Data #####
+
+  " All positions in this market "
+  positions: [Position!]! @derivedFrom(field: "pool")
+
+  " Number of positions in this market "
+  positionCount: Int!
+
+  " Number of open positions in this market "
+  openPositionCount: Int!
+
+  " Number of closed positions in this market "
+  closedPositionCount: Int!
+
   ##### Snapshots #####
 
   " Liquidity pool daily snapshots "
@@ -706,13 +732,27 @@ type Position @entity {
   withdraws: [Withdraw!]! @derivedFrom(field: "position")
 
   " Position daily snapshots for open positions "
-  dailySnapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
+  snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
 
+# Unlike other snapshots that are taken at a fixed time interval. Position
+# snapshots should be taken after every event, including the opening and
+# closing events. This will prevent an ever growing number of snapshots
+# for positions that are not moving. As we are only recording the balance
+# in token amounts instead of in USD, this will work well.
 # Note that we only take snapshot for open positions
 type PositionSnapshot @entity {
-  " { Position ID }-{ # of days since Unix epoch time } "
+  " { Position ID }-{ Transaction hash }-{ Log index } "
   id: ID!
+
+  " Transaction hash of the transaction that triggered this snapshot "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Nonce of the transaction that triggered this snapshot "
+  nonce: BigInt!
 
   " Position of this snapshot "
   position: Position!
@@ -759,6 +799,12 @@ type Deposit @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
+  " Gas limit of the transaction that emitted this event "
+  gasLimit: BigInt!
+
+  " Gas price of the transaction that emitted this event "
+  gasPrice: BigInt!
+
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
@@ -767,12 +813,6 @@ type Deposit @entity {
 
   " The pool involving this event "
   pool: LiquidityPool!
-
-  " Address that received the tokens "
-  to: String!
-
-  " Address that sent the tokens "
-  from: String!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -808,6 +848,12 @@ type Withdraw @entity {
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
+  " Gas limit of the transaction that emitted this event "
+  gasLimit: BigInt!
+
+  " Gas price of the transaction that emitted this event "
+  gasPrice: BigInt!
 
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
@@ -852,6 +898,12 @@ type Swap @entity {
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
+  " Gas limit of the transaction that emitted this event "
+  gasLimit: BigInt!
+
+  " Gas price of the transaction that emitted this event "
+  gasPrice: BigInt!
 
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
