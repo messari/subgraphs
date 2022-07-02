@@ -22,10 +22,8 @@ dataSources:
       abis:
         - name: Comptroller
           file: ./abis/Comptroller.json
-        - name: CTokenNew
-          file: ./abis/compound-v2/CTokenNew.json
-        - name: CTokenOld
-          file: ./abis/compound-v2/CTokenOld.json
+        - name: CTokenModified
+          file: ./abis/compound-v2/CTokenModified.json
         - name: PriceOracle1
           file: ./abis/compound-v2/PriceOracle1.json
         - name: PriceOracle2
@@ -46,12 +44,11 @@ dataSources:
         - event: ActionPaused(address,string,bool)
           handler: handleActionPaused
 templates:
-  # Implemented at block 8983575
-  - name: CTokenNew
+  - name: CTokenModified
     kind: ethereum/contract
     network: {{ network }}
     source:
-      abi: CTokenNew
+      abi: CTokenModified
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -66,10 +63,8 @@ templates:
       abis:
         - name: Comptroller
           file: ./abis/Comptroller.json
-        - name: CTokenNew
-          file: ./abis/compound-v2/CTokenNew.json
-        - name: CTokenOld
-          file: ./abis/compound-v2/CTokenOld.json
+        - name: CTokenModified # modified ABI to handle both AccrueInteres signatures
+          file: ./abis/compound-v2/CTokenModified.json
         - name: PriceOracle1
           file: ./abis/compound-v2/PriceOracle1.json
         - name: PriceOracle2
@@ -116,99 +111,18 @@ templates:
           file: ./abis/prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
-          handler: handleMintNew
+          handler: handleMint
         - event: Redeem(address,uint256,uint256)
-          handler: handleRedeemNew
+          handler: handleRedeem
         - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrowNew
+          handler: handleBorrow
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrowNew
+          handler: handleRepayBorrow
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrowNew
+          handler: handleLiquidateBorrow
         - event: NewReserveFactor(uint256,uint256)
-          handler: handleNewReserveFactorNew
-        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleNewReserveFactor
+        - event: AccrueInterestNew(uint256,uint256,uint256,uint256)
           handler: handleAccrueInterestNew
-  # Used until block 8983575
-  - name: CTokenOld
-    kind: ethereum/contract
-    network: {{ network }}
-    source:
-      abi: CTokenOld
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./protocols/compound-v2/src/mapping.ts
-      entities:
-        - Event
-        - Market
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - MarketDailySnapshot
-      abis:
-        - name: Comptroller
-          file: ./abis/Comptroller.json
-        - name: CTokenNew
-          file: ./abis/compound-v2/CTokenNew.json
-        - name: CTokenOld
-          file: ./abis/compound-v2/CTokenOld.json
-        - name: PriceOracle1
-          file: ./abis/compound-v2/PriceOracle1.json
-        - name: PriceOracle2
-          file: ./abis/compound-v2/PriceOracle2.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CToken
-          file: ./abis/CToken.json
-
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # ERC20
-        - name: _ERC20
-          file: ./abis/prices/ERC20.json
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Mint(address,uint256,uint256)
-          handler: handleMintOld
-        - event: Redeem(address,uint256,uint256)
-          handler: handleRedeemOld
-        - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrowOld
-        - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrowOld
-        - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrowOld
-        - event: NewReserveFactor(uint256,uint256)
-          handler: handleNewReserveFactorOld
-        - event: AccrueInterest(uint256,uint256,uint256)
+        - event: AccrueInterestOld(uint256,uint256,uint256)
           handler: handleAccrueInterestOld

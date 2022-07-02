@@ -8,24 +8,16 @@ import {
   NewPriceOracle,
 } from "../../../generated/Comptroller/Comptroller";
 import {
-  Mint as MintNew,
-  Redeem as RedeemNew,
-  Borrow as BorrowNew,
-  RepayBorrow as RepayBorrowNew,
-  LiquidateBorrow as LiquidateBorrowNew,
-  AccrueInterest as AccrueInterestNew,
-  NewReserveFactor as NewReserveFactorNew,
-} from "../../../generated/templates/CTokenNew/CTokenNew";
-import {
-  Mint as MintOld,
-  Redeem as RedeemOld,
-  Borrow as BorrowOld,
-  RepayBorrow as RepayBorrowOld,
-  LiquidateBorrow as LiquidateBorrowOld,
-  AccrueInterest as AccrueInterestOld,
-  NewReserveFactor as NewReserveFactorOld,
-} from "../../../generated/templates/CTokenOld/CTokenOld";
-import { CTokenOld, CTokenNew } from "../../../generated/templates";
+  Mint,
+  Redeem,
+  Borrow,
+  RepayBorrow,
+  LiquidateBorrow,
+  NewReserveFactor,
+  AccrueInterestOld,
+  AccrueInterestNew,
+} from "../../../generated/templates/CTokenModified/CTokenModified";
+import { CToken } from "../../../generated/templates/CTokenModified/CToken";
 import {
   LendingProtocol,
   Market,
@@ -72,7 +64,7 @@ import {
   _handleRedeem,
   _handleRepayBorrow,
 } from "../../../src/mapping";
-import { CToken } from "../../../generated/Comptroller/CToken";
+import { CTokenModified } from "../../../generated/templates";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
@@ -91,35 +83,35 @@ import { getUSDPriceOfToken } from "./prices";
 import { getUsdPricePerToken } from "./prices/index";
 import { PriceOracle2 } from "../../../generated/Comptroller/PriceOracle2";
 
-//////////////////////////////////
-//// CTokenNew Level Handlers ////
-//////////////////////////////////
+///////////////////////////////
+//// CToken Level Handlers ////
+///////////////////////////////
 
-export function handleMintNew(event: MintNew): void {
+export function handleMint(event: Mint): void {
   let minter = event.params.minter;
   let mintAmount = event.params.mintAmount;
   _handleMint(comptrollerAddr, minter, mintAmount, event);
 }
 
-export function handleRedeemNew(event: RedeemNew): void {
+export function handleRedeem(event: Redeem): void {
   let redeemer = event.params.redeemer;
   let redeemAmount = event.params.redeemAmount;
   _handleRedeem(comptrollerAddr, redeemer, redeemAmount, event);
 }
 
-export function handleBorrowNew(event: BorrowNew): void {
+export function handleBorrow(event: Borrow): void {
   let borrower = event.params.borrower;
   let borrowAmount = event.params.borrowAmount;
   _handleBorrow(comptrollerAddr, borrower, borrowAmount, event);
 }
 
-export function handleRepayBorrowNew(event: RepayBorrowNew): void {
+export function handleRepayBorrow(event: RepayBorrow): void {
   let payer = event.params.payer;
   let repayAmount = event.params.repayAmount;
   _handleRepayBorrow(comptrollerAddr, payer, repayAmount, event);
 }
 
-export function handleLiquidateBorrowNew(event: LiquidateBorrowNew): void {
+export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let cTokenCollateral = event.params.cTokenCollateral;
   let liquidator = event.params.liquidator;
   let borrower = event.params.borrower;
@@ -136,7 +128,7 @@ export function handleLiquidateBorrowNew(event: LiquidateBorrowNew): void {
   );
 }
 
-export function handleNewReserveFactorNew(event: NewReserveFactorNew): void {
+export function handleNewReserveFactor(event: NewReserveFactor): void {
   let marketID = event.address.toHexString();
   let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
   _handleNewReserveFactor(marketID, newReserveFactorMantissa);
@@ -148,57 +140,6 @@ export function handleAccrueInterestNew(event: AccrueInterestNew): void {
     event.params.interestAccumulated,
     event.params.totalBorrows
   );
-}
-
-//////////////////////////////////
-//// CTokenOld Level Handlers ////
-//////////////////////////////////
-
-export function handleMintOld(event: MintOld): void {
-  let minter = event.params.minter;
-  let mintAmount = event.params.mintAmount;
-  _handleMint(comptrollerAddr, minter, mintAmount, event);
-}
-
-export function handleRedeemOld(event: RedeemOld): void {
-  let redeemer = event.params.redeemer;
-  let redeemAmount = event.params.redeemAmount;
-  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, event);
-}
-
-export function handleBorrowOld(event: BorrowOld): void {
-  let borrower = event.params.borrower;
-  let borrowAmount = event.params.borrowAmount;
-  _handleBorrow(comptrollerAddr, borrower, borrowAmount, event);
-}
-
-export function handleRepayBorrowOld(event: RepayBorrowOld): void {
-  let payer = event.params.payer;
-  let repayAmount = event.params.repayAmount;
-  _handleRepayBorrow(comptrollerAddr, payer, repayAmount, event);
-}
-
-export function handleLiquidateBorrowOld(event: LiquidateBorrowOld): void {
-  let cTokenCollateral = event.params.cTokenCollateral;
-  let liquidator = event.params.liquidator;
-  let borrower = event.params.borrower;
-  let seizeTokens = event.params.seizeTokens;
-  let repayAmount = event.params.repayAmount;
-  _handleLiquidateBorrow(
-    comptrollerAddr,
-    cTokenCollateral,
-    liquidator,
-    borrower,
-    seizeTokens,
-    repayAmount,
-    event
-  );
-}
-
-export function handleNewReserveFactorOld(event: NewReserveFactorOld): void {
-  let marketID = event.address.toHexString();
-  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
-  _handleNewReserveFactor(marketID, newReserveFactorMantissa);
 }
 
 export function handleAccrueInterestOld(event: AccrueInterestOld): void {
@@ -214,13 +155,9 @@ export function handleAccrueInterestOld(event: AccrueInterestOld): void {
 ////////////////////////////////////
 
 export function handleMarketListed(event: MarketListed): void {
-  // create CToken with new abi
-  if (event.block.number.toI32() >= 8983575) {
-    CTokenNew.create(event.params.cToken);
-  } else {
-    // create CToken with old abi
-    CTokenOld.create(event.params.cToken);
-  }
+  // CToken ABI changes at block 8983575
+  // To handle we modified the ABI to include both accrueInterest event signatures
+  CTokenModified.create(event.params.cToken);
   let cTokenAddr = event.params.cToken;
   let cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
