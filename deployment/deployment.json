@@ -275,7 +275,7 @@
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-ethereum",
           "dmelotik": "dmelotik/cream-finance-ethereum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "polygon": {
           "template": "cream-finance.template.yaml",
@@ -389,7 +389,7 @@
           "template": "venus.template.yaml",
           "messari": "messari/venus-protocol-bsc",
           "dmelotik": "dmelotik/venus",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },

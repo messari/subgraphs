@@ -270,6 +270,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
+    true, // update all market prices on call
     event
   );
 }

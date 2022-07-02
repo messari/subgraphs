@@ -281,6 +281,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
+    false, // do not update all prices
     event
   );
 }

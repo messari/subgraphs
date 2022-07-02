@@ -302,7 +302,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
-    // true, TODO: a note that when updateAllMarketPrices() is turned on this should be set to true
+    true,
     event
   );
 }
