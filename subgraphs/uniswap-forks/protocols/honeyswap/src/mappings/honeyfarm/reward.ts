@@ -1,16 +1,16 @@
+import { log } from "@graphprotocol/graph-ts";
 import { PoolAdded as PoolAddedEvent, PoolRemoved as PoolRemovedEvent, Transfer as TransferEvent} from "../../../../../generated/HoneyFarm/HoneyFarm";
 import { createPoolRewardToken, removePoolRewardToken } from "../../common/creators";
 import { UsageType, ZERO_ADDRESS } from "../../../../../src/common/constants";
 import { handleReward } from "../../common/handlers";
-import { log } from "@graphprotocol/graph-ts";
 
 export function handlePoolAdded(event: PoolAddedEvent): void {
-  log.warning("poolToken added: {}", [event.params.poolToken.toHexString()]);
+  log.debug("poolToken added: {}", [event.params.poolToken.toHexString()]);
   createPoolRewardToken(event.params.poolToken.toHexString());
 }
 
 export function handlePoolRemoved(event: PoolRemovedEvent): void {
-  log.warning("poolToken removed: {}", [event.params.poolToken.toHexString()]);
+  log.debug("poolToken removed: {}", [event.params.poolToken.toHexString()]);
   removePoolRewardToken(event.params.poolToken.toHexString());
 }
 

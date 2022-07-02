@@ -18,7 +18,7 @@ export function handleReward(event: ethereum.Event, tokenId: BigInt, usageType: 
     amount = depositInfo.value0;
   }
 
-  log.warning("DEPOSIT INFO: lpTokenAddress: {}, amount: {}", [lpTokenAddress.toHexString(), amount.toString()]);
+  log.debug("DEPOSIT INFO: lpTokenAddress: {}, amount: {}", [lpTokenAddress.toHexString(), amount.toString()]);
 
   // Return if pool does not exist
   let pool = LiquidityPool.load(lpTokenAddress.toHexString());
@@ -58,7 +58,7 @@ export function handleReward(event: ethereum.Event, tokenId: BigInt, usageType: 
     totalAllocPoint = getTotalAllocPoint.value;
   }
 
-  log.warning("DIST INFO: prevRewardTime: {}, event.block.timestamp: {}, lastRwardTime: {}", [honeyFarmPool.valueBigInt!.toString(), event.block.timestamp.toString(), lastRewardTime.toString()]);
+  log.debug("DIST INFO: prevRewardTime: {}, event.block.timestamp: {}, lastRwardTime: {}", [honeyFarmPool.valueBigInt!.toString(), event.block.timestamp.toString(), lastRewardTime.toString()]);
 
   let getDistribution = poolContract.try_getDistribution(honeyFarmPool.valueBigInt!, event.block.timestamp);
   let distribution: BigInt = BIGINT_ZERO;
@@ -66,7 +66,7 @@ export function handleReward(event: ethereum.Event, tokenId: BigInt, usageType: 
     distribution = getDistribution.value;
   }
 
-  log.warning("POOL INFO: poolAllocPoint: {}, totalAllocPoint: {}, lastRewardTime: {}, timestamp: {}, distribution: {}", [poolAllocPoint.toString(), totalAllocPoint.toString(), lastRewardTime.toString(), event.block.timestamp.toString(), distribution.toString()]);
+  log.debug("POOL INFO: poolAllocPoint: {}, totalAllocPoint: {}, lastRewardTime: {}, timestamp: {}, distribution: {}", [poolAllocPoint.toString(), totalAllocPoint.toString(), lastRewardTime.toString(), event.block.timestamp.toString(), distribution.toString()]);
 
   // Calculate Reward Emission
   let rewardTokenRate = distribution.times(poolAllocPoint).div(totalAllocPoint);
@@ -75,7 +75,7 @@ export function handleReward(event: ethereum.Event, tokenId: BigInt, usageType: 
   let rewardTokenRateBigDecimal = new BigDecimal(rewardTokenRate);
   let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.getRewardIntervalType());
 
-  log.warning("REWARD CALC: rewardTokenRate: {}, rewardTokenPerDay: {}", [rewardTokenRate.toString(), rewardTokenPerDay.toString()]);
+  log.debug("REWARD CALC: rewardTokenRate: {}, rewardTokenPerDay: {}", [rewardTokenRate.toString(), rewardTokenPerDay.toString()]);
 
   // let nativeToken = updateNativeTokenPriceInUSD();
 

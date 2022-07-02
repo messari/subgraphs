@@ -14,12 +14,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: 
-        - Token
-        - DexAmmProtocol
-        - LiquidityPool
-        - LiquidityPoolFee
-        - Protocol
+      entities: []
       abis:
         - name: HoneyFarm
           file: ./abis/honeyswap/HoneyFarm.json
