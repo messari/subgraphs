@@ -2,12 +2,27 @@ import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefTrisolaris } from "../../../../../generated/MasterChef/MasterChefTrisolaris";
 import { LiquidityPool, _HelperStore } from "../../../../../generated/schema";
-import { BIGINT_FIVE, BIGINT_ONE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "../../../../../src/common/constants";
+import {
+  BIGINT_FIVE,
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  INT_ZERO,
+  UsageType,
+  ZERO_ADDRESS,
+} from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
-import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../../src/price/price";
+import {
+  findNativeTokenPerToken,
+  updateNativeTokenPriceInUSD,
+} from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 
-export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
+export function handleReward(
+  event: ethereum.Event,
+  pid: BigInt,
+  amount: BigInt,
+  usageType: string
+): void {
   let masterChefPool = _HelperStore.load(pid.toString());
   let poolContract = MasterChefTrisolaris.bind(event.address);
 

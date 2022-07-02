@@ -1,6 +1,4 @@
-import {
-  ActiveAccount,
-} from "../../generated/schema";
+import { ActiveAccount } from "../../generated/schema";
 import {
   getOrCreateVault,
   getOrCreateAccount,
@@ -68,6 +66,21 @@ export function updateVaultSnapshots(
     vaultAddress.toHexString(),
     block
   );
+
+  vaultDailySnapshots.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD;
+  vaultHourlySnapshots.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD;
+
+  vaultDailySnapshots.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD;
+  vaultHourlySnapshots.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD;
+
+  vaultDailySnapshots.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD;
+  vaultHourlySnapshots.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD;
 
   vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;

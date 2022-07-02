@@ -40,7 +40,8 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
     liquidate.debtRepaid!,
     event.params.amount,
     liquidate.closingFee!,
-    event.transaction.from
+    event.transaction.from,
+    liquidate.owner!
   );
   store.remove("_InProgressLiquidate", liquidate.id);
 }
@@ -73,5 +74,6 @@ export function handleBuyRiskyVault(event: BuyRiskyVault): void {
   );
   liquidate.debtRepaid = event.params.amountPaid;
   liquidate.closingFee = closingFee;
+  liquidate.owner = event.params.owner.toHexString();
   liquidate.save();
 }

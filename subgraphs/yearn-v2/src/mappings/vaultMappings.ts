@@ -342,6 +342,9 @@ export function handleStrategyReported_v1(
     vaultAddress,
     strategyAddress
   );
+
+  updateFinancials(event.block);
+  updateVaultSnapshots(vaultAddress, event.block);
 }
 
 export function handleStrategyReported_v2(
@@ -359,6 +362,9 @@ export function handleStrategyReported_v2(
     vaultAddress,
     strategyAddress
   );
+
+  updateFinancials(event.block);
+  updateVaultSnapshots(vaultAddress, event.block);
 }
 
 export function handleDepositEvent(event: DepositEvent): void {
