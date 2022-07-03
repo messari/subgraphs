@@ -1,0 +1,142 @@
+[
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "liquidityProvider", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "depositDate", "type": "uint256" }
+        ],
+        "name": "DepositDateUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "loan", "type": "address" },
+            { "indexed": false, "internalType": "address", "name": "debtLocker", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amountFunded", "type": "uint256" }
+        ],
+        "name": "LoanFunded",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "_bPool", "type": "address" },
+            { "internalType": "address", "name": "liquidityAsset", "type": "address" },
+            { "internalType": "address", "name": "staker", "type": "address" },
+            { "internalType": "address", "name": "stakeLocker", "type": "address" }
+        ],
+        "name": "BPTVal",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "DL_FACTORY",
+        "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "MAX_UINT256",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "WAD",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256[7]", "name": "claimInfo", "type": "uint256[7]" },
+            { "internalType": "uint256", "name": "delegateFee", "type": "uint256" },
+            { "internalType": "uint256", "name": "stakingFee", "type": "uint256" }
+        ],
+        "name": "calculateClaimAndPortions",
+        "outputs": [
+            { "internalType": "uint256", "name": "poolDelegatePortion", "type": "uint256" },
+            { "internalType": "uint256", "name": "stakeLockerPortion", "type": "uint256" },
+            { "internalType": "uint256", "name": "principalClaim", "type": "uint256" },
+            { "internalType": "uint256", "name": "interestClaim", "type": "uint256" }
+        ],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "amt", "type": "uint256" },
+            { "internalType": "uint256", "name": "liquidityAssetDecimals", "type": "uint256" }
+        ],
+        "name": "fromWad",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "_bPool", "type": "address" },
+            { "internalType": "address", "name": "liquidityAsset", "type": "address" },
+            { "internalType": "address", "name": "staker", "type": "address" },
+            { "internalType": "address", "name": "stakeLocker", "type": "address" },
+            { "internalType": "uint256", "name": "liquidityAssetAmountRequired", "type": "uint256" }
+        ],
+        "name": "getPoolSharesRequired",
+        "outputs": [
+            { "internalType": "uint256", "name": "poolAmountInRequired", "type": "uint256" },
+            { "internalType": "uint256", "name": "stakerBalance", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "_bPool", "type": "address" },
+            { "internalType": "address", "name": "liquidityAsset", "type": "address" },
+            { "internalType": "address", "name": "staker", "type": "address" },
+            { "internalType": "address", "name": "stakeLocker", "type": "address" }
+        ],
+        "name": "getSwapOutValue",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "_bPool", "type": "address" },
+            { "internalType": "address", "name": "liquidityAsset", "type": "address" },
+            { "internalType": "address", "name": "stakeLocker", "type": "address" }
+        ],
+        "name": "getSwapOutValueLocker",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "custodian", "type": "address" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" },
+            { "internalType": "uint256", "name": "newTotalAllowance", "type": "uint256" },
+            { "internalType": "uint256", "name": "fdtBal", "type": "uint256" }
+        ],
+        "name": "increaseCustodyAllowanceChecks",
+        "outputs": [],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "from", "type": "address" },
+            { "internalType": "address", "name": "to", "type": "address" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "transferByCustodianChecks",
+        "outputs": [],
+        "stateMutability": "pure",
+        "type": "function"
+    }
+]

@@ -1,16 +1,64 @@
-import { Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw } from "../../../../../generated/MasterChefV3/MasterChefV3TraderJoe";
-import { _HelperStore } from "../../../../../generated/schema";
-import { UsageType } from "../../../../../src/common/constants";
-import { handleRewardV3 } from "../../common/handlers/handleRewardV3";
+// import { log } from "@graphprotocol/graph-ts";
+import {
+  Deposit,
+  Withdraw,
+  EmergencyWithdraw,
+  Add,
+  Set,
+} from "../../../../../generated/MasterChefV3/MasterChefV3TraderJoe";
+import {
+  _HelperStore,
+  _MasterChefStakingPool,
+} from "../../../../../generated/schema";
+import { MasterChef } from "../../../../../src/common/constants";
+import {
+  updateMasterChefDeposit,
+  updateMasterChefWithdraw,
+} from "../../common/handlers/handleRewardV2";
+import {
+  createMasterChefStakingPool,
+  updateMasterChefTotalAllocation,
+} from "../../common/helpers";
 
-export function handleDepositV3(event: DepositEvent): void {
-  handleRewardV3(event, event.params.pid, event.params.amount, UsageType.DEPOSIT);
+export function handleDeposit(event: Deposit): void {
+  updateMasterChefDeposit(event, event.params.pid, event.params.amount);
 }
 
-export function handleWithdrawV3(event: WithdrawEvent): void {
-  handleRewardV3(event, event.params.pid, event.params.amount, UsageType.WITHDRAW);
+export function handleWithdraw(event: Withdraw): void {
+  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
 }
 
-export function handleEmergencyWithdrawV3(event: EmergencyWithdraw): void {
-  handleRewardV3(event, event.params.pid, event.params.amount, UsageType.WITHDRAW);
+export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
+  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
+}
+
+export function handleAdd(event: Add): void {
+  let masterChefV3Pool = createMasterChefStakingPool(
+    event,
+    MasterChef.MASTERCHEFV3,
+    event.params.pid,
+    event.params.lpToken
+  );
+  updateMasterChefTotalAllocation(
+    event,
+    masterChefV3Pool.poolAllocPoint,
+    event.params.allocPoint,
+    MasterChef.MASTERCHEFV3
+  );
+  masterChefV3Pool.poolAllocPoint = event.params.allocPoint;
+  masterChefV3Pool.save();
+}
+
+export function handleSet(event: Set): void {
+  let masterChefV3Pool = _MasterChefStakingPool.load(
+    MasterChef.MASTERCHEFV3 + "-" + event.params.pid.toString()
+  )!;
+  updateMasterChefTotalAllocation(
+    event,
+    masterChefV3Pool.poolAllocPoint,
+    event.params.allocPoint,
+    MasterChef.MASTERCHEFV3
+  );
+  masterChefV3Pool.poolAllocPoint = event.params.allocPoint;
+  masterChefV3Pool.save();
 }

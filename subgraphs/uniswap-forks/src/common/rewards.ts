@@ -9,7 +9,14 @@ import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { _CircularBuffer } from "../../generated/schema";
 import { Network } from "./constants";
-import { BIGDECIMAL_ZERO, INT_FOUR, INT_NEGATIVE_ONE, INT_ONE, INT_TWO, INT_ZERO } from "./constants";
+import {
+  BIGDECIMAL_ZERO,
+  INT_FOUR,
+  INT_NEGATIVE_ONE,
+  INT_ONE,
+  INT_TWO,
+  INT_ZERO,
+} from "./constants";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WINDOW_SIZE_SECONDS, TIMESTAMP_STORAGE_INTERVALS, and BUFFER_SIZE can be modified. These are just recommended values - 'somewhat' arbitrary. //
@@ -62,12 +69,18 @@ export namespace RewardIntervalType {
 // Forecast period. This gives you the time period that you want to estimate count of blocks per interval, based on moving average block speed.
 // 86400 = 1 Day
 export const RATE_IN_SECONDS = 86400;
-export const RATE_IN_SECONDS_BD = BigDecimal.fromString(RATE_IN_SECONDS.toString());
+export const RATE_IN_SECONDS_BD = BigDecimal.fromString(
+  RATE_IN_SECONDS.toString()
+);
 
 // Estimated seconds per block of the protocol
-export const STARTING_BLOCKS_PER_DAY = RATE_IN_SECONDS_BD.div(getStartingBlockRate());
+export const STARTING_BLOCKS_PER_DAY = RATE_IN_SECONDS_BD.div(
+  getStartingBlockRate()
+);
 
-export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.toString());
+export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(
+  WINDOW_SIZE_SECONDS.toString()
+);
 
 // Call this function in event handlers frequently enough so that it calls on blocks frequently enough
 /**
@@ -77,7 +90,12 @@ export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.
  * @param {BigInt} rewardType          - Describes whether rewards are given per block or timestamp
  * @returns {BigDecimal}               - Returns estimated blocks for specified rate
  */
-export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: BigInt, rewardRate: BigDecimal, rewardType: string): BigDecimal {
+export function getRewardsPerDay(
+  currentTimestamp: BigInt,
+  currentBlockNumber: BigInt,
+  rewardRate: BigDecimal,
+  rewardType: string
+): BigDecimal {
   let circularBuffer = getOrCreateCircularBuffer();
 
   // Create entity for the current block
@@ -87,7 +105,9 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
   let blocks = circularBuffer.blocks;
 
   // Interval between index and the index of the start of the window block
-  let windowWidth = abs(circularBuffer.windowStartIndex - circularBuffer.nextIndex);
+  let windowWidth = abs(
+    circularBuffer.windowStartIndex - circularBuffer.nextIndex
+  );
   if (windowWidth == INT_ZERO) {
     if (circularBuffer.nextIndex >= circularBuffer.bufferSize) {
       blocks[INT_ZERO] = currentTimestampI32;
@@ -118,7 +138,10 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
     recentSavedTimestamp = blocks[circularBuffer.nextIndex - INT_TWO];
   }
 
-  if (currentTimestampI32 - recentSavedTimestamp <= TIMESTAMP_STORAGE_INTERVAL) {
+  if (
+    currentTimestampI32 - recentSavedTimestamp <=
+    TIMESTAMP_STORAGE_INTERVAL
+  ) {
     if (rewardType == RewardIntervalType.TIMESTAMP) {
       return rewardRate.times(RATE_IN_SECONDS_BD);
     } else {
@@ -137,12 +160,15 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
   let startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
 
   // Make sure to still have 2 blocks to calculate rate (This shouldn't happen past the beginning).
-  while (abs(circularBuffer.nextIndex - circularBuffer.windowStartIndex) > INT_FOUR) {
+  while (
+    abs(circularBuffer.nextIndex - circularBuffer.windowStartIndex) > INT_FOUR
+  ) {
     let windowIndexBlockTimestamp = blocks[circularBuffer.windowStartIndex];
 
     // Shift the start of the window if the current timestamp moves out of desired rate window
     if (windowIndexBlockTimestamp < startTimestamp) {
-      circularBuffer.windowStartIndex = circularBuffer.windowStartIndex + INT_TWO;
+      circularBuffer.windowStartIndex =
+        circularBuffer.windowStartIndex + INT_TWO;
       if (circularBuffer.windowStartIndex >= circularBuffer.bufferSize) {
         circularBuffer.windowStartIndex = INT_ZERO;
       }
@@ -152,16 +178,25 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
   }
 
   // Wideness of the window in seconds.
-  let windowSecondsCount = BigDecimal.fromString((currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString());
+  let windowSecondsCount = BigDecimal.fromString(
+    (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString()
+  );
 
   // Wideness of the window in blocks.
-  let windowBlocksCount = BigDecimal.fromString((currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + INT_ONE]).toString());
+  let windowBlocksCount = BigDecimal.fromString(
+    (
+      currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + INT_ONE]
+    ).toString()
+  );
 
   // Estimate block speed for the window in seconds.
-  let unnormalizedBlockSpeed = WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
+  let unnormalizedBlockSpeed =
+    WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
 
   // block speed converted to specified rate.
-  let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD).times(unnormalizedBlockSpeed);
+  let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
+    WINDOW_SIZE_SECONDS_BD
+  ).times(unnormalizedBlockSpeed);
 
   // Update BlockTracker with new values.
   circularBuffer.blocksPerDay = normalizedBlockSpeed;
@@ -205,7 +240,7 @@ function getStartingBlockRate(): BigDecimal {
 
   if (NetworkConfigs.getNetwork() == Network.MAINNET) {
     return BigDecimal.fromString("13.39");
-  } else if (NetworkConfigs.getNetwork()== Network.ARBITRUM_ONE) {
+  } else if (NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE) {
     return BigDecimal.fromString("15");
   } else if (NetworkConfigs.getNetwork() == Network.AURORA) {
     return BigDecimal.fromString("1.03");
@@ -224,14 +259,14 @@ function getStartingBlockRate(): BigDecimal {
   } else if (NetworkConfigs.getNetwork() == Network.XDAI) {
     return BigDecimal.fromString("5");
   } else if (NetworkConfigs.getNetwork() == Network.MOONBEAM) {
-    return BigDecimal.fromString("13.39")
+    return BigDecimal.fromString("13.39");
   } else if (NetworkConfigs.getNetwork() == Network.MOONRIVER) {
-    return BigDecimal.fromString("13.39")
+    return BigDecimal.fromString("13.39");
   } else if (NetworkConfigs.getNetwork() == Network.AVALANCHE) {
-    return BigDecimal.fromString("13.39")
+    return BigDecimal.fromString("13.39");
   } else if (NetworkConfigs.getNetwork() == Network.CRONOS) {
-    return BigDecimal.fromString("5.5")
-  } 
+    return BigDecimal.fromString("5.5");
+  }
 
   // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")
   // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")

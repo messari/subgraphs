@@ -91,6 +91,7 @@ import {
   INT_TWO,
   mantissaFactor,
   mantissaFactorBD,
+  Network,
   RewardTokenType,
 } from "../../../src/constants";
 import {
@@ -491,7 +492,8 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     event.block.number,
     event.block.timestamp,
     trollerAddr,
-    blocksPerDayBD
+    blocksPerDayBD,
+    PROTOCOL_NETWORK == Network.ARBITRUM_ONE ? true : false // update all prices if network is arbitrum
   );
   updateProtocol(Address.fromString(FACTORY_CONTRACT));
 
@@ -592,7 +594,8 @@ function updateMarket(
   blockNumber: BigInt,
   blockTimestamp: BigInt,
   comptroller: Address,
-  blocksPerDay: BigDecimal
+  blocksPerDay: BigDecimal,
+  updateMarketPrices: boolean
 ): void {
   let market = Market.load(marketID);
   if (!market) {
@@ -608,6 +611,11 @@ function updateMarket(
     return;
   }
 
+  if (updateMarketPrices) {
+    updateAllMarketPrices(comptroller, blockNumber);
+  }
+
+  // update this market's price no matter what
   // grab price of ETH then multiply by underlying price
   let customETHPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
   let ethPriceUSD = customETHPrice.usdPrice.div(customETHPrice.decimalsBaseTen);
@@ -717,6 +725,7 @@ function updateMarket(
   market.totalValueLockedUSD = underlyingSupplyUSD;
   market.totalDepositBalanceUSD = underlyingSupplyUSD;
 
+  market._borrowBalance = newTotalBorrow;
   market.totalBorrowBalanceUSD = newTotalBorrow
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
@@ -939,4 +948,69 @@ function updateRewards(
   market.rewardTokenEmissionsAmount = rewardEmissions;
   market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
   market.save();
+}
+
+function updateAllMarketPrices(
+  comptrollerAddr: Address,
+  blockNumber: BigInt
+): void {
+  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  if (!protocol) {
+    log.warning("[updateAllMarketPrices] protocol not found: {}", [
+      comptrollerAddr.toHexString(),
+    ]);
+    return;
+  }
+  let priceOracle = PriceOracle.bind(Address.fromString(protocol._priceOracle));
+
+  for (let i = 0; i < protocol._marketIDs.length; i++) {
+    let market = Market.load(protocol._marketIDs[i]);
+    if (!market) {
+      break;
+    }
+    let underlyingToken = Token.load(market.inputToken);
+    if (!underlyingToken) {
+      break;
+    }
+
+    // update market price
+    let customETHPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
+    let ethPriceUSD = customETHPrice.usdPrice.div(
+      customETHPrice.decimalsBaseTen
+    );
+    let tryUnderlyingPrice = priceOracle.try_getUnderlyingPrice(
+      Address.fromString(market.id)
+    );
+
+    let underlyingTokenPriceUSD: BigDecimal;
+    if (tryUnderlyingPrice.reverted) {
+      break;
+    } else {
+      let mantissaDecimalFactor = 18 - underlyingToken.decimals + 18;
+      let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
+      let priceInEth = tryUnderlyingPrice.value.toBigDecimal().div(bdFactor);
+      underlyingTokenPriceUSD = priceInEth.times(ethPriceUSD); // get price in USD
+    }
+
+    underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
+    underlyingToken.lastPriceBlockNumber = blockNumber;
+    underlyingToken.save();
+
+    market.inputTokenPriceUSD = underlyingTokenPriceUSD;
+
+    // update TVL, supplyUSD, borrowUSD
+    market.totalDepositBalanceUSD = market.inputTokenBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(underlyingTokenPriceUSD);
+    market.totalBorrowBalanceUSD = market._borrowBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(underlyingTokenPriceUSD);
+    market.totalValueLockedUSD = market.inputTokenBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(underlyingTokenPriceUSD);
+    market.save();
+  }
 }

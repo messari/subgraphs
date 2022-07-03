@@ -11,7 +11,8 @@
     "wbtc": "0x321162Cd933E2Be498Cd2267a90534A804051b11",
     "wftm": "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83",
     "beets": "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e",
-    "fbeets": "0xfcef8a994209d6916EB2C86cDD2AFD60Aa6F54b1"
+    "fbeets": "0xfcef8a994209d6916EB2C86cDD2AFD60Aa6F54b1",
+    "ohmybeets": "0xD34C004771F7b88D8d405327db3d06EB5086Ef26"
   },
   "masterChefV2": "0x8166994d9ebBe5829EC86Bd81258149B87faCfd3",
   "masterChefV2StartBlock": "18508300",
@@ -21,6 +22,6 @@
   "isBeets": true,
   "rewardToken": "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e",
   "graftEnabled": false,
-  "subgraphId": "QmStcMg9DrT5BgarALkqKfXivJxDRDspsAJsqW9NW3xWuQ",
-  "graftStartBlock": "22912324"
+  "subgraphId": "QmcqFpUohNUbwHzsXKhwwuK4jjwKr4DJ2hcGTmJz575Wy4",
+  "graftStartBlock": "25274593"
 }
