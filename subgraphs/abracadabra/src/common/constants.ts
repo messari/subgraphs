@@ -69,6 +69,14 @@ export namespace InterestRateSide {
   export const LENDER = "LENDER";
   export const BORROW = "BORROWER";
 }
+export namespace EventType {
+  export const BORROW = "BORROW";
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const REPAY = "REPAY";
+  export const LIQUIDATEE = "LIQUIDATEE";
+  export const LIQUIDATOR = "LIQUIDATOR";
+}
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////

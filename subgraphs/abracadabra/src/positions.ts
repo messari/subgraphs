@@ -11,7 +11,7 @@ import {
   Repay,
   Withdraw,
 } from "../generated/schema";
-import { BIGINT_ONE, BIGINT_ZERO, SECONDS_PER_DAY } from "./common/constants";
+import { BIGINT_ONE, BIGINT_ZERO, EventType, InterestRateSide, SECONDS_PER_DAY } from "./common/constants";
 import { getMarket, getOrCreateLendingProtocol, getOrCreateUsageMetricsDailySnapshot } from "./common/getters";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "./common/utils/arrays";
 
@@ -134,7 +134,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
 
   let dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
 
-  if (eventType == "DEPOSIT") {
+  if (eventType == EventType.DEPOSIT) {
     if (protocol.depositors.indexOf(account.id) < 0) {
       protocol.depositors = addToArrayAtIndex(protocol.depositors, account.id, 0);
       protocol.cumulativeUniqueDepositors = protocol.depositors.length;
@@ -143,7 +143,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveDepositors += 1;
     }
-  } else if (eventType == "BORROW") {
+  } else if (eventType == EventType.BORROW) {
     if (protocol.borrowers.indexOf(account.id) < 0) {
       protocol.borrowers = addToArrayAtIndex(protocol.borrowers, account.id, 0);
       protocol.cumulativeUniqueBorrowers = protocol.borrowers.length;
@@ -152,7 +152,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveBorrowers += 1;
     }
-  } else if (eventType == "LIQUIDATOR") {
+  } else if (eventType == EventType.LIQUIDATOR) {
     if (protocol.liquidators.indexOf(account.id) < 0) {
       protocol.liquidators = addToArrayAtIndex(protocol.liquidators, account.id, 0);
       protocol.cumulativeUniqueLiquidators = protocol.liquidators.length;
@@ -161,7 +161,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveLiquidators += 1;
     }
-  } else if (eventType == "LIQUIDATEE") {
+  } else if (eventType == EventType.LIQUIDATEE) {
     if (protocol.liquidatees.indexOf(account.id) < 0) {
       protocol.liquidatees = addToArrayAtIndex(protocol.liquidatees, account.id, 0);
       protocol.cumulativeUniqueLiquidatees += 1;
@@ -189,16 +189,16 @@ export function updatePositions(
   if (!market) {
     return;
   }
-  let position = getOrCreatePosition("LENDER", marketId, accountId, event);
-  if (["BORROW", "REPAY"].includes(eventType)) {
-    position = getOrCreatePosition("BORROWER", marketId, accountId, event);
+  let position = getOrCreatePosition(InterestRateSide.LENDER, marketId, accountId, event);
+  if ([EventType.BORROW, EventType.REPAY].includes(eventType)) {
+    position = getOrCreatePosition(InterestRateSide.BORROW, marketId, accountId, event);
   }
+  //  position is the current open position or a newly create open position
 
   let closePositionToggle = false;
   let account = getOrCreateAccount(accountId, event);
-  //  position is the current open position or a newly create open position
 
-  if (eventType == "DEPOSIT") {
+  if (eventType == EventType.DEPOSIT) {
     addAccountToProtocol(eventType, account, event);
     account.depositCount = account.depositCount + 1;
     position.depositCount = position.depositCount + 1;
@@ -206,7 +206,7 @@ export function updatePositions(
     let deposit = new Deposit(eventId);
     deposit.position = position.id;
     deposit.save();
-  } else if (eventType == "WITHDRAW") {
+  } else if (eventType == EventType.WITHDRAW) {
     account.withdrawCount = account.depositCount + 1;
     position.withdrawCount = position.withdrawCount + 1;
     position.balance = position.balance.minus(amount);
@@ -223,7 +223,7 @@ export function updatePositions(
     if (position.balance.equals(BIGINT_ZERO)) {
       closePositionToggle = true;
     }
-  } else if (eventType == "BORROW") {
+  } else if (eventType == EventType.BORROW) {
     addAccountToProtocol(eventType, account, event);
     account.borrowCount = account.borrowCount + 1;
     position.borrowCount = position.borrowCount + 1;
@@ -231,7 +231,7 @@ export function updatePositions(
     let borrow = new Borrow(eventId);
     borrow.position = position.id;
     borrow.save();
-  } else if (eventType == "REPAY") {
+  } else if (eventType == EventType.REPAY) {
     account.repayCount = account.repayCount + 1;
     position.repayCount = position.repayCount + 1;
     position.balance = position.balance.minus(amount);

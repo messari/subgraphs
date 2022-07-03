@@ -9,6 +9,7 @@ import {
   BIGDECIMAL_ONE,
   SECONDS_PER_HOUR,
   BIGINT_ZERO,
+  EventType,
 } from "./constants";
 import {
   getOrCreateMarketDailySnapshot,
@@ -299,7 +300,7 @@ export function updateMarketStats(
   marketDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
-  if (eventType == "DEPOSIT") {
+  if (eventType == EventType.DEPOSIT) {
     let inputTokenBalance = market.inputTokenBalance.plus(amount);
     market.inputTokenBalance = inputTokenBalance;
     market.totalValueLockedUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD!);
@@ -314,7 +315,7 @@ export function updateMarketStats(
     marketHourlySnapshot.hourlyDepositUSD = marketHourlySnapshot.hourlyDepositUSD.plus(amountUSD);
     marketDailySnapshot.dailyDepositUSD = marketDailySnapshot.dailyDepositUSD.plus(amountUSD);
     financialsDailySnapshot.dailyDepositUSD = financialsDailySnapshot.dailyDepositUSD.plus(amountUSD);
-  } else if (eventType == "WITHDRAW") {
+  } else if (eventType == EventType.WITHDRAW) {
     let inputTokenBalance = market.inputTokenBalance.minus(amount);
     market.inputTokenBalance = inputTokenBalance;
     market.totalValueLockedUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD!);
@@ -323,7 +324,7 @@ export function updateMarketStats(
     usageHourlySnapshot.hourlyWithdrawCount += 1;
     usageDailySnapshot.dailyWithdrawCount += 1;
     financialsDailySnapshot.dailyWithdrawUSD = financialsDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
-  } else if (eventType == "BORROW") {
+  } else if (eventType == EventType.BORROW) {
     let outputTokenSupply = market.outputTokenSupply.plus(amount);
     market.outputTokenSupply = outputTokenSupply;
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, token.decimals).times(priceUSD!);
@@ -337,7 +338,7 @@ export function updateMarketStats(
     marketHourlySnapshot.hourlyBorrowUSD = marketHourlySnapshot.hourlyBorrowUSD.plus(amountUSD);
     marketDailySnapshot.dailyBorrowUSD = marketDailySnapshot.dailyBorrowUSD.plus(amountUSD);
     financialsDailySnapshot.dailyBorrowUSD = financialsDailySnapshot.dailyBorrowUSD.plus(amountUSD);
-  } else if (eventType == "REPAY") {
+  } else if (eventType == EventType.REPAY) {
     let outputTokenSupply = market.outputTokenSupply.minus(amount);
     market.outputTokenSupply = outputTokenSupply;
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, token.decimals).times(priceUSD!);
