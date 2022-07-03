@@ -1,12 +1,11 @@
 {
-    "deployment": "SOLARBEAM_MOONRIVER",
-    "network": "moonriver",
-    "address": "0x049581aEB6Fe262727f290165C29BDAB065a1B68",
-    "startBlock": 424144,
-    "MasterChefAddress": "0x7e6e03822d0077f3c417d33caeac900fc2645679",
-    "MasterChefStartBlock": 499476,
-    "graftEnabled": false,
-    "subgraphId": "",
-    "graftStartBlock": 0
-  }
-  
+  "deployment": "SOLARBEAM_MOONRIVER",
+  "network": "moonriver",
+  "address": "0x049581aEB6Fe262727f290165C29BDAB065a1B68",
+  "startBlock": 424144,
+  "MasterChefAddress": "0x7e6e03822d0077f3c417d33caeac900fc2645679",
+  "MasterChefStartBlock": 499476,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

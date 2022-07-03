@@ -29,7 +29,8 @@ export function handleLiquidateVault(event: LiquidateVault): void {
     event.params.debtRepaid,
     event.params.collateralLiquidated,
     event.params.closingFee,
-    event.params.buyer
+    event.params.buyer,
+    event.params.owner.toHexString()
   );
 }
 

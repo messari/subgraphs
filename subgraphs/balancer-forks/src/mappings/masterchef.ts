@@ -16,6 +16,7 @@ import {
   BIGINT_ZERO,
   FBEETS,
   MASTERCHEFV2_ADDRESS,
+  OHMYBEETS,
   REWARD_TOKEN,
   SECONDS_PER_DAY,
 } from "../common/constants";
@@ -87,6 +88,12 @@ export function handleLogUpdatePool(event: LogUpdatePool): void {
         FBEETS.toHexString(),
       ]);
     }
+    if (OHMYBEETS.toHexString() == poolAddress.value.toHexString()) {
+      //BeethovenxOhmEmissionToken (OHMYBEETS)
+      pool = createLiquidityPool(event, poolAddress.value.toHexString(), "BeethovenxOhmEmissionToken", "OHMYBEETS", [
+        OHMYBEETS.toHexString(),
+      ]);
+    }
   }
   pool!.outputTokenSupply = event.params.lpSupply;
   pool!.save();
@@ -126,6 +133,7 @@ function createLiquidityPool(
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  pool.isSingleSided = false;
   if (REWARD_TOKEN != "") {
     let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
     pool.rewardTokens = [rewardToken.id];

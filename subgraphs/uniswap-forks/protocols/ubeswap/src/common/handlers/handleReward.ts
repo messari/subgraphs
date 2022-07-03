@@ -1,15 +1,15 @@
+import { BigInt, ethereum, Address } from "@graphprotocol/graph-ts";
 import {
-  BigInt,
-  ethereum,
-  Address,
-} from "@graphprotocol/graph-ts";
-import { LiquidityPool, Token, _HelperStore } from "../../../../../generated/schema";
+  LiquidityPool,
+  Token,
+  _HelperStore,
+} from "../../../../../generated/schema";
 import { UniswapV2Pair } from "../../../../../generated/templates/StakingRewards/UniswapV2Pair";
 import {
   INT_ZERO,
   DEFAULT_DECIMALS,
   BIGINT_ZERO,
-  BIGDECIMAL_ZERO
+  BIGDECIMAL_ZERO,
 } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import {
@@ -18,10 +18,7 @@ import {
 } from "../../../../../src/price/price";
 import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
 
-export function handleStakedImpl(
-  event: ethereum.Event,
-  amount: BigInt
-): void {
+export function handleStakedImpl(event: ethereum.Event, amount: BigInt): void {
   // Return if pool does not exist
   let pool = LiquidityPool.load(event.address.toHexString());
   if (!pool) {
@@ -32,7 +29,10 @@ export function handleStakedImpl(
   let nativeToken = updateNativeTokenPriceInUSD();
   stakeToken.lastPriceUSD = findNativeTokenPerToken(stakeToken, nativeToken);
   if (stakeToken.lastPriceUSD) {
-    pool.totalValueLockedUSD = convertTokenToDecimal(pool.stakedOutputTokenAmount!, stakeToken.decimals).times(stakeToken.lastPriceUSD!);
+    pool.totalValueLockedUSD = convertTokenToDecimal(
+      pool.stakedOutputTokenAmount!,
+      stakeToken.decimals
+    ).times(stakeToken.lastPriceUSD!);
   }
 
   pool.save();
@@ -52,7 +52,10 @@ export function handleWithdrawnImpl(
   let nativeToken = updateNativeTokenPriceInUSD();
   stakeToken.lastPriceUSD = findNativeTokenPerToken(stakeToken, nativeToken);
   if (stakeToken.lastPriceUSD) {
-    pool.totalValueLockedUSD = convertTokenToDecimal(pool.stakedOutputTokenAmount!, stakeToken.decimals).times(stakeToken.lastPriceUSD!);
+    pool.totalValueLockedUSD = convertTokenToDecimal(
+      pool.stakedOutputTokenAmount!,
+      stakeToken.decimals
+    ).times(stakeToken.lastPriceUSD!);
   }
   pool.save();
 }
@@ -69,8 +72,12 @@ export function handleRewardPaidImpl(
   let nativeToken = updateNativeTokenPriceInUSD();
   let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
   rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
-  pool.rewardTokenEmissionsAmount![0] = pool.rewardTokenEmissionsAmount![0].plus(amount);
-  pool.rewardTokenEmissionsUSD![0] = convertTokenToDecimal(pool.rewardTokenEmissionsAmount![0], rewardToken.decimals).times(rewardToken.lastPriceUSD!);
+  pool.rewardTokenEmissionsAmount![0] =
+    pool.rewardTokenEmissionsAmount![0].plus(amount);
+  pool.rewardTokenEmissionsUSD![0] = convertTokenToDecimal(
+    pool.rewardTokenEmissionsAmount![0],
+    rewardToken.decimals
+  ).times(rewardToken.lastPriceUSD!);
   nativeToken.save();
   rewardToken.save();
   pool.save();
