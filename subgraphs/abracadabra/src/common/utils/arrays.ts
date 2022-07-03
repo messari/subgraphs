@@ -10,9 +10,12 @@ export function removeFromArrayAtIndex<T>(x: T[], index: i32): T[] {
   return retval;
 }
 
-export function addToArrayAtIndex<T>(x: T[], item: T, index: i32): T[] {
+export function addToArrayAtIndex<T>(x: T[], item: T, index: i32 = -1): T[] {
   if (x.length == 0) {
     return [item];
+  }
+  if (index == -1 || index > x.length) {
+    index = x.length;
   }
   let retval = new Array<T>();
   let i = 0;
