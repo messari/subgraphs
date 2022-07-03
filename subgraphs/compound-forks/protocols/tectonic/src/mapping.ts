@@ -16,6 +16,8 @@ import {
   AccrueInterest,
   NewReserveFactor,
 } from "../../../generated/templates/CToken/CToken";
+
+
 import {
   LendingProtocol,
   Token,
@@ -203,6 +205,9 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   );
 }
 
+// export function _handleAccrueInterest_Tectonic(event: ): 
+
+
 export function handleAccrueInterest(event: AccrueInterest): void {
   let marketAddress = event.address;
   let cTokenContract = CToken.bind(marketAddress);
@@ -255,7 +260,6 @@ function getOrCreateProtocol(): LendingProtocol {
 }
 
 function updateRewards(event: ethereum.Event, market: Market): void {
-  if (event.block.number.toI32() > 10271924) {
     let rewardTokenBorrow: RewardToken | null = null;
     let rewardTokenDeposit: RewardToken | null = null;
 
@@ -290,6 +294,7 @@ function updateRewards(event: ethereum.Event, market: Market): void {
       }
 
       market.rewardTokens = [rewardTokenDeposit.id, rewardTokenBorrow.id];
+      market.save();
     }
 
     // get COMP distribution/block
@@ -313,7 +318,7 @@ function updateRewards(event: ethereum.Event, market: Market): void {
 
     // get TONIC price
     // tTONIC was made at this block height 1337195
-    if (event.block.number.toI32() > 1337195) {
+    if (event.block.number.toI32() > 1337194) {
       let compMarket = Market.load(tTONICAddress);
       if (!compMarket) {
         log.warning("[updateRewards] Market not found: {}", [tTONICAddress]);
@@ -325,7 +330,7 @@ function updateRewards(event: ethereum.Event, market: Market): void {
       // try to get TONIC price between blocks 10271924 - 10960099 using price oracle library
 
       // As CRONOS Price oracle is not built yet, using 0 before tonic Market was created for now.
-      compPriceUSD = BIGDECIMAL_ONE;
+      compPriceUSD = BIGDECIMAL_ZERO;
     }
 
     let borrowCompPerDayUSD = borrowCompPerDay
@@ -340,4 +345,7 @@ function updateRewards(event: ethereum.Event, market: Market): void {
     market.rewardTokenEmissionsUSD = [borrowCompPerDayUSD, supplyCompPerDayUSD];
     market.save();
   }
-}
+
+
+
+  
