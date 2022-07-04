@@ -8,7 +8,6 @@ import {
     PROTOCOL_METHODOLOGY_VERSION,
     PROTOCOL_ID,
     Network,
-    BIGINT_ZERO,
     ProtocolType,
     BIGDECIMAL_ZERO
 } from "./utils/constants";

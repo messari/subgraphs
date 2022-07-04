@@ -11,6 +11,7 @@
 // [ ] block.number, block.timestamp missing
 // [ ] Token lastPriceUSD and lastPriceBlockNumber
 // [ ] RewardTokenType, RewardToken should be null (possbile with enum?), null
+// [ ] Pool count
 
 
 import { Submitted, Transfer } from "../../generated/Lido/Lido";

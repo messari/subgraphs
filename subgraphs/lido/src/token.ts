@@ -18,7 +18,6 @@ export function getOrCreateToken(
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.decimals = fetchTokenDecimals(tokenAddress) as i32;
 
-    token.save();
   }
 
   return token;

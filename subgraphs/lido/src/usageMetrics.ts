@@ -72,6 +72,8 @@ export function getOrCreateUsageMetricsDailySnapshot(
       usageMetrics.dailyActiveUsers = 0;
       usageMetrics.cumulativeUniqueUsers = 0;
       usageMetrics.dailyTransactionCount = 0;
+      usageMetrics.totalPoolCount = 0;
+
       usageMetrics.blockNumber = block.number;
       usageMetrics.timestamp = block.timestamp;
 

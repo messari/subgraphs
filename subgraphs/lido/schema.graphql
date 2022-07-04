@@ -167,7 +167,7 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of pools "
   totalPoolCount: Int!
 
-  # " Block number of this snapshot "
+  " Block number of this snapshot "
   blockNumber: BigInt!
 
   " Timestamp of this snapshot "
