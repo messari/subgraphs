@@ -34,6 +34,40 @@
         }
       }
     },
+    "abracadabra-ext": {
+      "abracadabra": {
+        "arbitrum": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-arbitrum-ext",
+          "messari": "messari/abracadabra-money-arbitrum-ext",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-avalanche-ext",
+          "messari": "messari/abracadabra-money-avalanche-ext",
+          "deploy-on-merge": true
+        },
+        "bsc": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-bsc-ext",
+          "messari": "messari/abracadabra-money-bsc-ext",
+          "deploy-on-merge": true
+        },
+        "fantom": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-fantom-ext",
+          "messari": "messari/abracadabra-money-fantom-ext",
+          "deploy-on-merge": true
+        },
+        "mainnet": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-ethereum-ext",
+          "messari": "messari/abracadabra-money-ethereum-ext",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "aave-v2-forks": {
       "aave-v2": {
         "mainnet-arc": {
