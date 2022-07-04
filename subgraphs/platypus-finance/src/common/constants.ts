@@ -162,7 +162,7 @@ export class poolDetail {
   name: string;
   symbol: string;
   address: string;
-  ignore: bool;
+  ignore: boolean;
 
   // Initialize a Token Definition with its attributes
   constructor(name: string, symbol: string, address: string, ignore: string) {
@@ -197,7 +197,7 @@ export class poolDetail {
       ["Alt Pool MIM", "MIM-USDC Pool", "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7", "false"],
       ["Alt Pool YUSD", "YUSD-USDC Pool", "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83", "false"],
       ["Alt Pool sAVAX", "sAVAX-AVAX Pool", "0x4658EA7e9960D6158a261104aAA160cC953bb6ba", "false"],
-      ["Alt Pool BTC.b-WBTC.e", "BTC.b-WBTC.e Pool", "0x27912AE6Ba9a54219d8287C3540A8969FF35500B", "false"],
+      ["Alt Pool BTC.b-WBTC.e", "BTC.b-WBTC.e Pool", "0x39dE4e02F76Dbd4352Ec2c926D8d64Db8aBdf5b2", "false"],
       ["Factory Pool H2O", "H2O-USDC Pool", "0x233Ba46B01d2FbF1A31bDBc500702E286d6de218", "false"],
       ["Factory Pool TSD", "TSD-USDC Pool", "0x91BB10D68C72d64a7cE10482b453153eEa03322C", "false"],
       ["Factory Pool MONEY", "MONEY-USDC Pool", "0x27912AE6Ba9a54219d8287C3540A8969FF35500B", "false"],
