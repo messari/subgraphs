@@ -50,13 +50,10 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   usageMetricsHourly.hourlyTransactionCount += INT_ONE;
 
   if (usageType == UsageType.DEPOSIT) {
-    usageMetricsDaily.dailyDepositCount += INT_ONE;
     usageMetricsHourly.hourlyDepositCount += INT_ONE;
   } else if (usageType == UsageType.WITHDRAW) {
-    usageMetricsDaily.dailyWithdrawCount += INT_ONE;
     usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
   } else if (usageType == UsageType.SWAP) {
-    usageMetricsDaily.dailySwapCount += INT_ONE;
     usageMetricsHourly.hourlySwapCount += INT_ONE;
   }
 

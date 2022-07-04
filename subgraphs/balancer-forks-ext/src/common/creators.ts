@@ -1,6 +1,6 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
-import { LiquidityPool, Deposit, Withdraw, Swap, LiquidityPoolFee } from "../../generated/schema";
+import { LiquidityPool, Deposit, Withdraw, Swap, LiquidityPoolFee, Account } from "../../generated/schema";
 
 import {
   getLiquidityPool,
@@ -10,7 +10,15 @@ import {
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "./getters";
-import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, REWARD_TOKEN, ZERO_ADDRESS } from "./constants";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  INT_ZERO,
+  LiquidityPoolFeeType,
+  REWARD_TOKEN,
+  ZERO_ADDRESS,
+} from "./constants";
 import { updateTokenPrice, updateVolumeAndFee } from "./metrics";
 import { valueInUSD } from "./pricing";
 import { convertTokenToDecimal } from "./utils/utils";
@@ -60,6 +68,9 @@ export function createLiquidityPool(
   pool.rewardTokenEmissionsUSD = [];
   pool.inputTokenWeights = [];
   pool.allocPoint = BIGINT_ZERO;
+  pool.positionCount = INT_ZERO;
+  pool.openPositionCount = INT_ZERO;
+  pool.closedPositionCount = INT_ZERO;
 
   if (REWARD_TOKEN != "") {
     let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
@@ -176,8 +187,8 @@ export function createSwapHandleVolume(
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();
   swap.protocol = protocol.id;
-  swap.to = poolAddress;
-  swap.from = event.transaction.from.toHexString();
+  swap.pool = poolAddress;
+  swap.account = event.transaction.from.toHexString();
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;
   swap.tokenIn = tokenIn;
@@ -236,8 +247,8 @@ export function createDepositMulti(event: PoolBalanceChanged, poolAddress: strin
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
   deposit.protocol = protocol.id;
-  deposit.to = pool.id;
-  deposit.from = event.transaction.from.toHexString();
+  deposit.pool = pool.id;
+  deposit.account = event.transaction.from.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = pool.inputTokens;
@@ -291,8 +302,8 @@ export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: stri
   withdrawal.hash = event.transaction.hash.toHexString();
   withdrawal.logIndex = event.logIndex.toI32();
   withdrawal.protocol = protocol.id;
-  withdrawal.to = event.transaction.from.toHexString();
-  withdrawal.from = pool.id;
+  withdrawal.account = event.transaction.from.toHexString();
+  withdrawal.pool = pool.id;
   withdrawal.blockNumber = event.block.number;
   withdrawal.timestamp = event.block.timestamp;
   withdrawal.inputTokens = pool.inputTokens;

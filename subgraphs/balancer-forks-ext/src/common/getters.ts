@@ -49,6 +49,10 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
+    protocol.cumulativeUniqueLPs = INT_ZERO;
+    protocol.cumulativeUniqueTraders = INT_ZERO;
+    protocol.openPositionCount = INT_ZERO;
+    protocol.cumulativePositionCount = INT_ZERO;
     protocol.network = DEFAULT_NETWORK;
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalPoolCount = 0;
@@ -86,6 +90,7 @@ export function getLiquidityPool(poolAddress: string): LiquidityPool {
 export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
   return LiquidityPoolFee.load(id)!;
 }
+
 export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let id = event.block.timestamp.toI32() / SECONDS_PER_DAY;
@@ -100,9 +105,6 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
     usageMetrics.dailyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.dailyTransactionCount = INT_ZERO;
-    usageMetrics.dailyDepositCount = INT_ZERO;
-    usageMetrics.dailyWithdrawCount = INT_ZERO;
-    usageMetrics.dailySwapCount = INT_ZERO;
 
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
