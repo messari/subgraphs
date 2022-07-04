@@ -9,9 +9,6 @@ export const PROTOCOL_SLUG = "lido";
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
-export const PROTOCOL_CONTRACT = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84";
-export const PROTOCOL_TREASURY_ID = "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c";
-export const PROTOCOL_NODE_OPERATORS_REGISTRY_ID = "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -124,6 +121,7 @@ export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
@@ -163,3 +161,7 @@ export const ETH_NAME = "Ether";
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
+
+export const PROTOCOL_ID = "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84";
+export const PROTOCOL_TREASURY_ID = "0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c";
+export const PROTOCOL_NODE_OPERATORS_REGISTRY_ID = "0x55032650b14df07b85bF18A3a3eC8E0Af2e028d5";

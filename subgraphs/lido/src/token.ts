@@ -1,11 +1,13 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { Token } from '../generated/schema';
+import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { Token, RewardToken } from '../generated/schema';
+import { RewardTokenType } from "./utils/constants";
 import { ERC20 } from '../generated/Lido/ERC20';
+import { bigIntToBigDecimal } from "./utils/numbers";
+import { ETH_ADDRESS, ETH_NAME, ETH_SYMBOL } from "./utils/constants";
 
 
-export function getTokenOrCreate(
+export function getOrCreateToken(
   tokenAddress: Address,
-  block: ethereum.Block
 ): Token {
   const tokenId = tokenAddress.toHexString();
   let token = Token.load(tokenId);
@@ -15,13 +17,27 @@ export function getTokenOrCreate(
     token.name = fetchTokenName(tokenAddress);
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.decimals = fetchTokenDecimals(tokenAddress) as i32;
+
+    token.save();
   }
 
-  // should this be inside (!token)
-  // - inside makes more sense at this time
-  // - but adding more attributes on token (Eg price calculation and updates) might make save here better
-  token.save();
   return token;
+}
+
+export function getOrCreateRewardToken(address: Address): RewardToken {
+  let rewardTokenId = address.toHexString();
+  let rewardToken = RewardToken.load(rewardTokenId);
+
+  if (!rewardToken) {
+    let token = getOrCreateToken(address);
+    rewardToken = new RewardToken(rewardTokenId);
+
+    rewardToken.token = token.id;
+    rewardToken.type = RewardTokenType.DEPOSIT;
+
+    rewardToken.save();
+  }
+  return rewardToken as RewardToken;
 }
 
 function fetchTokenName(tokenAddress: Address): string {

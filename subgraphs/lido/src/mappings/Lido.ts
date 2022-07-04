@@ -1,8 +1,20 @@
+// List of All Tasks
+// [X] Pricing conversions for all schema variables
+// [ ] Code-reorganzation - pool first vs protoccol frst
+// [ ] coed-reorg - getOrCreate together or entities together
+// [ ] Verify if buggy - TVL - staking rewards
+// [ ] Code stylessstandards - prettier, lines, etc
+// [ ] CI/CD?
+// [ ] Validatioon
+// [ ] PROTOCOL_ID param/arg for pool, protocol
+// [ ] Gather protocol, token, pool metdata ddynamically where appropriate
+// [ ] block.number, block.timestamp missing
+// [ ] Token lastPriceUSD and lastPriceBlockNumber
+// [ ] RewardTokenType, RewardToken should be null (possbile with enum?), null
+
+
 import { Submitted, Transfer } from "../../generated/Lido/Lido";
-import { LidoSubmission } from "../../generated/schema";
-import { getTokenOrCreate } from "../token";
 import { 
-  PROTOCOL_CONTRACT,
   PROTOCOL_TREASURY_ID,
   PROTOCOL_NODE_OPERATORS_REGISTRY_ID,
   ZERO_ADDRESS
@@ -11,46 +23,21 @@ import { Address, log } from "@graphprotocol/graph-ts";
 import { updateUsageMetrics } from "../usageMetrics";
 import { 
   updateTotalValueLockedUSD,
-  updateProtocolSideRevenueMetrics,
+  updateProtocolAndSupplySideRevenueMetrics,
 } from "../financialMetrics";
 
 export function handleSubmit(event: Submitted): void {
     // TODO: move to right place
     log.info("==========> BEGIN: {}", [""]);
 
-    getTokenOrCreate(Address.fromString(PROTOCOL_CONTRACT), event.block);
-    log.info("==========> getTokenOrCreateComplete: {}", [""]);
-
     updateUsageMetrics(event.block, event.params.sender);
     log.info("==========> updateUsageMetricsComplete: {}", [""]);
 
     updateTotalValueLockedUSD(event.block, event.params.amount);
     log.info("==========> updateTotalValueLockedUSD: {}", [""]);
-    
-    let entity = new LidoSubmission(
-      event.transaction.hash.toHex() + '-' + event.logIndex.toString()
-    );
-  
-    entity.sender = event.params.sender;
-    entity.amount = event.params.amount;
-    entity.referral = event.params.referral;
-
-    entity.save();
 }
 
 export function handleTransfer(event: Transfer): void {
-
-  // // entity.from = event.params.from
-  // // entity.to = event.params.to
-  // // entity.value = event.params.value
-
-  // // entity.block = event.block.number
-  // // entity.blockTime = event.block.timestamp
-  // // entity.transactionHash = event.transaction.hash
-  // // entity.transactionIndex = event.transaction.index
-  // // entity.logIndex = event.logIndex
-  // // entity.transactionLogIndex = event.transactionLogIndex
-
   let sender = event.params.from;
   let recipient = event.params.to;
   let value = event.params.value;
@@ -61,7 +48,7 @@ export function handleTransfer(event: Transfer): void {
   let isMintToNodeOperatorsRegistry = fromZeros && recipient == Address.fromString(PROTOCOL_NODE_OPERATORS_REGISTRY_ID);
 
   if (isMintToTreasury || isMintToNodeOperatorsRegistry) {
-    updateProtocolSideRevenueMetrics(event.block, recipient, value);
+    updateProtocolAndSupplySideRevenueMetrics(event.block, value);
   }
 
   log.info("~~~~~~~~~~~~> END: {}", [""]);

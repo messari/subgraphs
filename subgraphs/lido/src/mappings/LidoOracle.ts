@@ -6,16 +6,6 @@ import { updateTotalRevenueMetrics } from "../financialMetrics";
 
 export function handlePostTotalShares(event: PostTotalShares): void {
     log.info(" -------------> BEGIN UpdateTotalRevenueMetrics {}", [""]);
-    updateTotalRevenueMetrics(event.block, event.params.postTotalPooledEther, event.params.preTotalPooledEther);
+    updateTotalRevenueMetrics(event.block, event.params.postTotalPooledEther, event.params.preTotalPooledEther, event.params.totalShares);
     log.info(" -------------> END UpdateTotalRevenueMetrics {}", [""]);
-
-    // let entity = new LidoOracle(
-    //   event.transaction.hash.toHex() + '-' + event.logIndex.toString()
-    // )
-  
-    // entity.postTotalPooledEther = event.params.postTotalPooledEther;
-    // entity.preTotalPooledEther = event.params.preTotalPooledEther;
-    // entity.totalShares = event.params.totalShares;
-
-    // entity.save();
 }
