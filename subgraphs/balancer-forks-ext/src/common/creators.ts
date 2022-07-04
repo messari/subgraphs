@@ -55,6 +55,12 @@ export function createLiquidityPool(
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
   pool.isSingleSided = false;
+  pool.rewardTokens = [];
+  pool.rewardTokenEmissionsAmount = [];
+  pool.rewardTokenEmissionsUSD = [];
+  pool.inputTokenWeights = [];
+  pool.allocPoint = BIGINT_ZERO;
+
   if (REWARD_TOKEN != "") {
     let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
     pool.rewardTokens = [rewardToken.id];
@@ -65,7 +71,7 @@ export function createLiquidityPool(
   pool.allocPoint = BIGINT_ZERO;
 
   pool.save();
-  protocol.totalPoolCount = protocol.totalPoolCount + 1;
+  protocol.totalPoolCount += 1;
   protocol.save();
 }
 
@@ -170,6 +176,8 @@ export function createSwapHandleVolume(
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();
   swap.protocol = protocol.id;
+  swap.to = poolAddress;
+  swap.from = event.transaction.from.toHexString();
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;
   swap.tokenIn = tokenIn;

@@ -31,6 +31,7 @@ import {
   RewardTokenType,
 } from "./constants";
 import { fetchPrice } from "./pricing";
+import { addToArrayAtIndex } from "./utils/arrays";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());
@@ -155,29 +156,23 @@ export function getOrCreateLiquidityPoolDailySnapshot(
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    let dailyVolumeByTokenAmount: BigInt[] = [];
-    let dailyVolumeByTokenUSD: BigDecimal[] = [];
-    let inputTokenBalances: BigInt[] = [];
-    let inputTokenWeights: BigDecimal[] = [];
+    poolMetrics.dailyVolumeByTokenAmount = [];
+    poolMetrics.dailyVolumeByTokenUSD = [];
+    poolMetrics.inputTokenBalances = [];
+    poolMetrics.inputTokenWeights = [];
     for (let index = 0; index < pool!.inputTokens.length; index++) {
-      dailyVolumeByTokenAmount.push(BIGINT_ZERO);
-      dailyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
-      inputTokenBalances.push(BIGINT_ZERO);
-      inputTokenWeights.push(BIGDECIMAL_ZERO);
+      poolMetrics.dailyVolumeByTokenAmount = addToArrayAtIndex(poolMetrics.dailyVolumeByTokenAmount, BIGINT_ZERO, -1);
+      poolMetrics.dailyVolumeByTokenUSD = addToArrayAtIndex(poolMetrics.dailyVolumeByTokenUSD, BIGDECIMAL_ZERO, -1);
+      poolMetrics.inputTokenBalances = addToArrayAtIndex(poolMetrics.inputTokenBalances, BIGINT_ZERO, -1);
+      poolMetrics.inputTokenWeights = addToArrayAtIndex(poolMetrics.inputTokenWeights, BIGDECIMAL_ZERO, -1);
     }
     poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-
     poolMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-
-    poolMetrics.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
-    poolMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
-    poolMetrics.inputTokenBalances = inputTokenBalances;
-    poolMetrics.inputTokenWeights = inputTokenWeights;
-
+    poolMetrics.rewardTokenEmissionsUSD = pool!.rewardTokenEmissionsUSD;
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;
 
@@ -229,7 +224,15 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
 
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;
-
+    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.rewardTokenEmissionsAmount = [];
+    poolMetrics.rewardTokenEmissionsUSD = [];
     poolMetrics.save();
   }
 
