@@ -1,0 +1,20 @@
+{
+  "name": "vesper",
+  "license": "MIT",
+  "scripts": {
+    "prepare": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "codegen": "rm -rf generated && graph codegen",
+
+    "build": "rm -rf build && graph build",
+    "deploy": "graph deploy --product hosted-service harsh9200/vesper-finance",
+
+    "create-local": "graph create --node http://localhost:8020/ harsh9200/vesper-finance",
+    "remove-local": "graph remove --node http://localhost:8020/ harsh9200/vesper-finance",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 harsh9200/vesper-finance"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.29.0",
+    "@graphprotocol/graph-ts": "^0.26.0",
+    "mustache": "4.1.0"
+  }
+}
