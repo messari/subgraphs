@@ -981,8 +981,14 @@ type Position @entity {
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 
-  " Last liquidity index for position balance, for LENDER positions "
-  liquidityIndex: BigInt
+  " Last liquidity index for variable position balance "
+  _liquidityIndex: BigInt
+
+  " Variable debt balance for BORROWER position "
+  _variableDebtBalance: BigInt
+
+  " Stable debt balance for BORROWER position"
+  _stableDebtBalance: BigInt
 }
 
 # Unlike other snapshots that are taken at a fixed time interval. Position

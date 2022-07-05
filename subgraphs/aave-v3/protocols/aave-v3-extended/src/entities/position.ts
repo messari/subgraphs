@@ -5,11 +5,7 @@ import {
   Position,
   PositionSnapshot,
 } from "../../../../generated/schema";
-import {
-  BIGINT_TEN,
-  BIGINT_ZERO,
-  INT_ZERO,
-} from "../../../../src/utils/constants";
+import { BIGINT_ZERO, INT_ZERO } from "../../../../src/utils/constants";
 import { rayDiv, rayMul } from "../../../../src/utils/numbers";
 import { PositionSide } from "../utils/constants";
 import { getOrCreateAccount } from "./account";
@@ -66,6 +62,9 @@ export function getOrCreateUserPosition(
   position.liquidationCount = INT_ZERO;
   if (PositionSide.LENDER == positionSide) {
     position.isCollateral = true;
+  } else {
+    position._stableDebtBalance = BIGINT_ZERO;
+    position._variableDebtBalance = BIGINT_ZERO;
   }
   position.save();
   const openPositions = account.openPositions;
@@ -112,9 +111,9 @@ export function updateUserLenderPosition(
     market,
     PositionSide.LENDER
   );
-  if (position.liquidityIndex) {
+  if (position._liquidityIndex) {
     // Get scaled balance using previous liquidity index
-    position.balance = rayDiv(position.balance, position.liquidityIndex!);
+    position.balance = rayDiv(position.balance, position._liquidityIndex!);
   }
   position.balance = position.balance.plus(scaledBalanceChange);
   // Calculate new balance using new liquidity index
@@ -122,16 +121,17 @@ export function updateUserLenderPosition(
   if (position.balance.lt(BIGINT_ZERO)) {
     setBalanceToZero(position);
   }
-  position.liquidityIndex = liquidityIndex;
+  position._liquidityIndex = liquidityIndex;
   position.save();
   getOrCreatePositionSnapshot(event, position);
 }
 
-export function updateUserBorrowerPosition(
+export function updateUserVariableBorrowerPosition(
   event: ethereum.Event,
   user: Address,
   market: Market,
-  balanceChange: BigInt
+  scaledBalanceChange: BigInt,
+  liquidityIndex: BigInt
 ): void {
   const account = getOrCreateAccount(user);
   const position = getOrCreateUserPosition(
@@ -140,7 +140,48 @@ export function updateUserBorrowerPosition(
     market,
     PositionSide.BORROWER
   );
-  position.balance = position.balance.plus(balanceChange);
+  if (position._liquidityIndex) {
+    // Get scaled balance using previous liquidity index
+    position._variableDebtBalance = rayDiv(
+      position._variableDebtBalance!,
+      position._liquidityIndex!
+    );
+  }
+  position._variableDebtBalance =
+    position._variableDebtBalance!.plus(scaledBalanceChange);
+  // Calculate new balance using new liquidity index
+  position._variableDebtBalance = rayMul(
+    position._variableDebtBalance!,
+    liquidityIndex
+  );
+  position.balance = position._variableDebtBalance!.plus(
+    position._stableDebtBalance!
+  );
+  if (position.balance.lt(BIGINT_ZERO)) {
+    setBalanceToZero(position);
+  }
+  position._liquidityIndex = liquidityIndex;
+  position.save();
+  getOrCreatePositionSnapshot(event, position);
+}
+
+export function updateUserStableBorrowerPosition(
+  event: ethereum.Event,
+  user: Address,
+  market: Market,
+  newTotalBalance: BigInt
+): void {
+  const account = getOrCreateAccount(user);
+  const position = getOrCreateUserPosition(
+    event,
+    account,
+    market,
+    PositionSide.BORROWER
+  );
+  position._stableDebtBalance = newTotalBalance;
+  position.balance = position._stableDebtBalance!.plus(
+    position._variableDebtBalance!
+  );
   if (position.balance.lt(BIGINT_ZERO)) {
     setBalanceToZero(position);
   }
@@ -227,7 +268,7 @@ function closePosition(
 }
 
 function setBalanceToZero(position: Position): void {
-  if (position.balance.lt(BIGINT_ZERO.minus(BIGINT_TEN))) {
+  if (position.balance.lt(BIGINT_ZERO)) {
     log.error("Negative balance in position {}, balance: {}, setting to zero", [
       position.id,
       position.balance.toString(),
