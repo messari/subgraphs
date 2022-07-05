@@ -463,7 +463,8 @@ export function _handleDeposit(
   event: ethereum.Event,
   amount: BigInt,
   marketId: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  account: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -482,7 +483,7 @@ export function _handleDeposit(
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.to = market.id;
-  deposit.from = event.transaction.from.toHexString();
+  deposit.from = account.toHexString();
   deposit.market = marketId.toHexString();
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
@@ -528,7 +529,8 @@ export function _handleWithdraw(
   event: ethereum.Event,
   amount: BigInt,
   marketId: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  account: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -546,7 +548,7 @@ export function _handleWithdraw(
 
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
-  withdraw.to = event.transaction.from.toHexString();
+  withdraw.to = account.toHexString();
   withdraw.from = market.id;
   withdraw.market = market.id;
   withdraw.hash = event.transaction.hash.toHexString();
@@ -583,7 +585,8 @@ export function _handleBorrow(
   event: ethereum.Event,
   amount: BigInt,
   marketId: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  account: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -601,7 +604,7 @@ export function _handleBorrow(
 
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
-  borrow.to = event.transaction.from.toHexString();
+  borrow.to = account.toHexString();
   borrow.from = market.id;
   borrow.market = market.id;
   borrow.hash = event.transaction.hash.toHexString();
@@ -648,7 +651,8 @@ export function _handleRepay(
   event: ethereum.Event,
   amount: BigInt,
   marketId: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  account: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -667,7 +671,7 @@ export function _handleRepay(
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
   repay.to = market.id;
-  repay.from = event.transaction.from.toHexString();
+  repay.from = account.toHexString();
   repay.market = market.id;
   repay.hash = event.transaction.hash.toHexString();
   repay.logIndex = event.logIndex.toI32();
