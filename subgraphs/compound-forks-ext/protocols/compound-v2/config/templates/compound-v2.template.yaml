@@ -22,18 +22,18 @@ dataSources:
       abis:
         - name: Comptroller
           file: ./abis/Comptroller.json
-        - name: CTokenNew
-          file: ./abis/compound-v2/CTokenNew.json
-        - name: CTokenOld
-          file: ./abis/compound-v2/CTokenOld.json
+        - name: CToken
+          file: ./abis/CToken.json
         - name: PriceOracle1
           file: ./abis/compound-v2/PriceOracle1.json
         - name: PriceOracle2
           file: ./abis/compound-v2/PriceOracle2.json
         - name: ERC20
           file: ./abis/ERC20.json
-        - name: CToken
-          file: ./abis/CToken.json
+        - name: ERC20SymbolBytes
+          file: ./abis/compound-v2/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/compound-v2/ERC20NameBytes.json
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
@@ -46,12 +46,11 @@ dataSources:
         - event: ActionPaused(address,string,bool)
           handler: handleActionPaused
 templates:
-  # Implemented at block 8983575
-  - name: CTokenNew
+  - name: CToken
     kind: ethereum/contract
     network: {{ network }}
     source:
-      abi: CTokenNew
+      abi: CToken
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -66,14 +65,12 @@ templates:
       abis:
         - name: Comptroller
           file: ./abis/Comptroller.json
-        - name: CTokenNew
-          file: ./abis/compound-v2/CTokenNew.json
-        - name: CTokenOld
-          file: ./abis/compound-v2/CTokenOld.json
         - name: PriceOracle1
           file: ./abis/compound-v2/PriceOracle1.json
         - name: PriceOracle2
           file: ./abis/compound-v2/PriceOracle2.json
+        - name: PriceOracle
+          file: ./abis/PriceOracle.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: CToken
@@ -116,20 +113,19 @@ templates:
           file: ./abis/prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
-          handler: handleMintNew
+          handler: handleMint
         - event: Redeem(address,uint256,uint256)
-          handler: handleRedeemNew
+          handler: handleRedeem
         - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrowNew
+          handler: handleBorrow
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrowNew
+          handler: handleRepayBorrow
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrowNew
+          handler: handleLiquidateBorrow
         - event: NewReserveFactor(uint256,uint256)
-          handler: handleNewReserveFactorNew
+          handler: handleNewReserveFactor
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
           handler: handleAccrueInterestNew
-  # Used until block 8983575
   - name: CTokenOld
     kind: ethereum/contract
     network: {{ network }}
@@ -149,8 +145,6 @@ templates:
       abis:
         - name: Comptroller
           file: ./abis/Comptroller.json
-        - name: CTokenNew
-          file: ./abis/compound-v2/CTokenNew.json
         - name: CTokenOld
           file: ./abis/compound-v2/CTokenOld.json
         - name: PriceOracle1
@@ -198,17 +192,5 @@ templates:
         - name: CalculationsSushiSwap
           file: ./abis/prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Mint(address,uint256,uint256)
-          handler: handleMintOld
-        - event: Redeem(address,uint256,uint256)
-          handler: handleRedeemOld
-        - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrowOld
-        - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrowOld
-        - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrowOld
-        - event: NewReserveFactor(uint256,uint256)
-          handler: handleNewReserveFactorOld
         - event: AccrueInterest(uint256,uint256,uint256)
           handler: handleAccrueInterestOld
