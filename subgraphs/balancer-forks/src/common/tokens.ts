@@ -1,6 +1,5 @@
 import { ERC20 } from "../../generated/Vault/ERC20";
-import { LinearPool } from "../../generated/Vault/LinearPool";
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { getOrCreateToken } from "./getters";
 
 export function fetchTokenSymbol(tokenAddress: Address): string {

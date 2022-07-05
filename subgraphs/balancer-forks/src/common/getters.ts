@@ -170,6 +170,13 @@ export function getOrCreateLiquidityPoolDailySnapshot(
     poolMetrics.inputTokenBalances = inputTokenBalances;
     poolMetrics.inputTokenWeights = inputTokenWeights;
 
+    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;
 
@@ -209,6 +216,14 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
     poolMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
     poolMetrics.inputTokenBalances = inputTokenBalances;
     poolMetrics.inputTokenWeights = inputTokenWeights;
+
+    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    poolMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
 
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;

@@ -187,20 +187,18 @@ export function updateTokenPrice(
   tokenOutIndex: i32,
   blockNumber: BigInt,
 ): void {
-  let hasWeights = pool.inputTokenWeights.length > 0;
+  let hasWeights = pool.inputTokenWeights.length > 1;
 
   let weightTokenOut: BigDecimal | null = null;
   let weightTokenIn: BigDecimal | null = null;
   let tokenInDecimalsAmount = scaleDown(tokenInAmount, tokenIn);
   let tokenOutDecimalsAmount = scaleDown(tokenOutAmount, tokenOut);
-
   if (hasWeights) {
     weightTokenOut = pool.inputTokenWeights[tokenOutIndex];
     weightTokenIn = pool.inputTokenWeights[tokenInIndex];
     tokenInDecimalsAmount = scaleDown(pool.inputTokenBalances[tokenInIndex], tokenIn);
     tokenOutDecimalsAmount = scaleDown(pool.inputTokenBalances[tokenOutIndex], tokenOut);
   }
-
   let tokenInfo: TokenInfo | null = calculatePrice(
     tokenIn,
     tokenInDecimalsAmount,

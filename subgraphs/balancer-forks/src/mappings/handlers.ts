@@ -1,4 +1,4 @@
-import { BigInt, BigDecimal, Address, log, Bytes, ByteArray, bigInt, bigDecimal } from "@graphprotocol/graph-ts";
+import { BigInt, BigDecimal, Address } from "@graphprotocol/graph-ts";
 import {
   Swap as SwapEvent,
   PoolBalanceChanged,
@@ -87,6 +87,7 @@ function createPool(event: PoolRegistered): string {
   let poolAddress: Address = event.params.poolAddress;
 
   let poolContract = WeightedPool.bind(poolAddress);
+
   let poolIdCall = poolContract.try_getPoolId();
   if (poolIdCall.reverted) {
     return "";
@@ -104,6 +105,8 @@ function createPool(event: PoolRegistered): string {
     return "";
   }
   let symbol = symbolCall.value;
+
+  poolContract.try_getNormalizedWeights;
 
   let vaultContract = Vault.bind(VAULT_ADDRESS);
 
@@ -129,7 +132,6 @@ function createPool(event: PoolRegistered): string {
 
 export function handlePoolRegister(event: PoolRegistered): void {
   let poolAddress = createPool(event);
-  updateWeight(poolAddress);
 }
 
 export function handleTokensRegister(event: TokensRegistered): void {
@@ -146,8 +148,8 @@ export function handleTokensRegister(event: TokensRegistered): void {
   let pool = getLiquidityPool(poolAddress);
   pool.inputTokens = tokens;
   pool.inputTokenBalances = tokensAmount;
+  updateWeight(pool);
   pool.save();
-  updateWeight(pool.id);
 }
 
 export function handleSwapFeePercentageChange(event: SwapFeePercentageChanged): void {

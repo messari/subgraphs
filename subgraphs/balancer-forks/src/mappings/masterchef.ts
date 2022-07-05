@@ -24,6 +24,7 @@ import { DEFAULT_DECIMALS } from "../prices/common/constants";
 import { convertTokenToDecimal } from "../common/utils/utils";
 import { LiquidityPool, RewardToken } from "../../generated/schema";
 import { fetchPrice } from "../common/pricing";
+import { updateWeight } from "../common/weight";
 
 export function handleUpdateEmissionRate(event: UpdateEmissionRate): void {
   log.info("[MasterChef] Log update emission rate {} {}", [
@@ -140,7 +141,7 @@ function createLiquidityPool(
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   }
-  pool.inputTokenWeights = [BIGDECIMAL_ONE];
+  updateWeight(pool);
   pool.save();
   protocol.totalPoolCount = protocol.totalPoolCount + 1;
   protocol.save();

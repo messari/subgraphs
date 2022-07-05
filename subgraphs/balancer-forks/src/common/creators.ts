@@ -39,7 +39,13 @@ export function createLiquidityPool(
   let pool = new LiquidityPool(poolAddress);
 
   pool.protocol = protocol.id;
-  pool.inputTokens = inputTokens;
+
+  if (inputTokens.length == 0) {
+    pool.inputTokens = [" "];
+  } else {
+    pool.inputTokens = inputTokens;
+  }
+
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = inputTokenBalances;
@@ -55,13 +61,14 @@ export function createLiquidityPool(
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
   pool.isSingleSided = false;
+  pool.allocPoint = BIGINT_ZERO;
   if (REWARD_TOKEN != "") {
     let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
     pool.rewardTokens = [rewardToken.id];
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   }
-
+  updateWeight(pool);
   pool.save();
   protocol.totalPoolCount = protocol.totalPoolCount + 1;
   protocol.save();
@@ -119,19 +126,19 @@ export function createSwapHandleVolume(
   let dailyVolumeByTokenUSD: BigDecimal[] = poolMetricsDaily.dailyVolumeByTokenUSD;
   let hourlyVolumeByTokenAmount: BigInt[] = poolMetricsHourly.hourlyVolumeByTokenAmount;
   let hourlyVolumeByTokenUSD: BigDecimal[] = poolMetricsHourly.hourlyVolumeByTokenUSD;
-  for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
+  for (let i = 0; i < pool.inputTokens.length; i++) {
     if (tokenIn == pool.inputTokens[i]) {
-      inputTokenBalances[i] = pool.inputTokenBalances[i].plus(amountIn);
-      dailyVolumeByTokenAmount[i] = poolMetricsDaily.dailyVolumeByTokenAmount[i].plus(amountIn);
-      hourlyVolumeByTokenAmount[i] = poolMetricsHourly.hourlyVolumeByTokenAmount[i].plus(amountIn);
-      dailyVolumeByTokenUSD[i] = poolMetricsDaily.dailyVolumeByTokenUSD[i].plus(amountInConverted);
-      hourlyVolumeByTokenUSD[i] = poolMetricsHourly.hourlyVolumeByTokenUSD[i].plus(amountInConverted);
+      inputTokenBalances[i] = inputTokenBalances[i].plus(amountIn);
+      dailyVolumeByTokenAmount[i] = dailyVolumeByTokenAmount[i].plus(amountIn);
+      hourlyVolumeByTokenAmount[i] = hourlyVolumeByTokenAmount[i].plus(amountIn);
+      dailyVolumeByTokenUSD[i] = dailyVolumeByTokenUSD[i].plus(amountInConverted);
+      hourlyVolumeByTokenUSD[i] = hourlyVolumeByTokenUSD[i].plus(amountInConverted);
       tokenInIndex = i;
     }
 
     if (tokenOut == pool.inputTokens[i]) {
-      inputTokenBalances[i] = pool.inputTokenBalances[i].minus(amountOut);
-      poolMetricsDaily.dailyVolumeByTokenAmount[i] = dailyVolumeByTokenAmount[i].plus(amountOut);
+      inputTokenBalances[i] = inputTokenBalances[i].minus(amountOut);
+      dailyVolumeByTokenAmount[i] = dailyVolumeByTokenAmount[i].plus(amountOut);
       hourlyVolumeByTokenAmount[i] = hourlyVolumeByTokenAmount[i].plus(amountOut);
       dailyVolumeByTokenUSD[i] = dailyVolumeByTokenUSD[i].plus(amountOutConverted);
       hourlyVolumeByTokenUSD[i] = hourlyVolumeByTokenUSD[i].plus(amountOutConverted);
@@ -170,12 +177,13 @@ export function createSwapHandleVolume(
   swap.amountOut = amountOut;
   swap.amountOutUSD = valueInUSD(amountOutConverted, Address.fromString(tokenOut));
   swap.pool = pool.id;
-
+  swap.from = tokenIn;
+  swap.to = tokenOut;
   // get amount that should be tracked only - div 2 because cant count both input and output as volume
   let trackedAmountUSD = swap.amountInUSD;
   updateVolumeAndFee(event, protocol, pool, trackedAmountUSD);
-  updateWeight(pool.id);
-
+  updateWeight(pool);
+  pool.save();
   poolMetricsDaily.dailyVolumeUSD = poolMetricsDaily.dailyVolumeUSD.plus(trackedAmountUSD);
   poolMetricsHourly.hourlyVolumeUSD = poolMetricsHourly.hourlyVolumeUSD.plus(trackedAmountUSD);
   poolMetricsHourly.save();
