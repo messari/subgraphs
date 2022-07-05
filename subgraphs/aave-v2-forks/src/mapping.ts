@@ -810,11 +810,57 @@ export function _handleLiquidate(
   liquidate.profitUSD = liquidate.amountUSD.times(
     market.liquidationPenalty.div(BIGDECIMAL_HUNDRED)
   );
-
-  // TODO - add account metrics this should be the borrower (ie account)
-  // liquidate.position = ...
-
   liquidate.save();
+
+  // create account
+  // update protocol
+  //
+  let liquidatorAccountID = liquidator.toHexString();
+  let liquidatorAccount = Account.load(liquidatorAccountID);
+  if (!liquidatorAccount) {
+    liquidatorAccount = createAccount(liquidatorAccountID);
+    liquidatorAccount.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  let liquidatorActorID = "liquidator".concat("-").concat(liquidatorAccountID);
+  let liquidatorActor = _ActorAccount.load(liquidatorActorID);
+  if (!liquidatorActor) {
+    liquidatorActor = new _ActorAccount(liquidatorActorID);
+    liquidatorActor.save();
+
+    protocol.cumulativeUniqueLiquidators += 1;
+    protocol.save();
+  }
+
+  let liquidateeAccountID = borrower.toHexString();
+  let liquidateeAccount = Account.load(liquidateeAccountID);
+  if (!liquidateeAccount) {
+    liquidateeAccount = createAccount(liquidateeAccountID);
+    liquidateeAccount.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  let liquidateeActorID = "liquidatee".concat("-").concat(liquidateeAccountID);
+  let liquidateeActor = _ActorAccount.load(liquidateeActorID);
+  if (!liquidateeActor) {
+    liquidateeActor = new _ActorAccount(liquidateeActorID);
+    liquidateeActor.save();
+
+    protocol.cumulativeUniqueLiquidatees += 1;
+    protocol.save();
+  }
+
+  //
+  // update account
+  //
+  liquidatorAccount.liquidateCount += 1;
+  liquidatorAccount.save();
+
+  liquidateeAccount.liquidationCount += 1;
+  liquidateeAccount.save();
 
   // update metrics
   protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
@@ -839,7 +885,7 @@ export function _handleLiquidate(
     protocol,
     event.block.number,
     event.block.timestamp,
-    liquidate.liquidatee,
+    liquidate.liquidator,
     EventType.LIQUIDATOR, // updates dailyActiveLiquidators
     false
   );

@@ -713,7 +713,7 @@ export function addPosition(
   return positionID;
 }
 
-export function substractPosition(
+export function subtractPosition(
   protocol: LendingProtocol,
   market: Market,
   accountID: string,
@@ -722,16 +722,22 @@ export function substractPosition(
   eventType: i32,
   event: ethereum.Event
 ): string | null {
-  // get account and update
+  // get account
+  let account = Account.load(accountID);
+  if (!account) {
+    account = new Account(accountID);
+
+    protocol.cumulativeUniqueUsers += 1;
+  }
 
   let counterID = account.id
     .concat("-")
     .concat(market.id)
     .concat("-")
     .concat(side);
-  let positionCounter = _PositionCounter.load(counterID);
+  let positionCounter = PositionCounter.load(counterID);
   if (!positionCounter) {
-    log.warning("[substractPosition] position counter {} not found", [
+    log.warning("[subtractPosition] position counter {} not found", [
       counterID,
     ]);
     return null;
@@ -741,23 +747,26 @@ export function substractPosition(
     .concat(positionCounter.nextCount.toString());
   let position = Position.load(positionID);
   if (!position) {
-    log.warning("[substractPosition] position {} not found", [positionID]);
+    log.warning("[subtractPosition] position {} not found", [positionID]);
     return null;
   }
 
   if (balanceResult.reverted) {
-    log.warning("[substractPosition] Fetch balance of {} from {} reverted", [
+    log.warning("[subtractPosition] Fetch balance of {} from {} reverted", [
       account.id,
       market.id,
     ]);
   } else {
     position.balance = balanceResult.value;
   }
-  if (eventType == EventType.Withdraw) {
+  if (eventType == EventType.WITHDRAW) {
     position.withdrawCount += 1;
-  } else if (eventType == EventType.Repay) {
+    account.withdrawCount += 1;
+  } else if (eventType == EventType.REPAY) {
     position.repayCount += 1;
+    account.repayCount += 1;
   }
+  account.save();
   position.save();
 
   let closePosition = position.balance == BIGINT_ZERO;
