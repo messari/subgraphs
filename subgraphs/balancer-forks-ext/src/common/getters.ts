@@ -12,6 +12,7 @@ import {
   LiquidityPoolDailySnapshot,
   UsageMetricsHourlySnapshot,
   RewardToken,
+  Stat,
 } from "../../generated/schema";
 import {
   INT_ZERO,
@@ -32,6 +33,28 @@ import {
 } from "./constants";
 import { fetchPrice } from "./pricing";
 import { addToArrayAtIndex } from "./utils/arrays";
+
+export function getStat(id: string): Stat {
+  let stat = Stat.load(id);
+
+  if (!stat) {
+    let stat = new Stat(id);
+    stat.count = BIGINT_ZERO;
+    stat.meanAmount = BIGINT_ZERO;
+    stat.medianAmount = BIGINT_ZERO;
+    stat.maxAmount = BIGINT_ZERO;
+    stat.minAmount = BIGINT_ZERO;
+    stat.varAmount = BIGDECIMAL_ZERO;
+    stat.meanUSD = BIGDECIMAL_ZERO;
+    stat.medianUSD = BIGDECIMAL_ZERO;
+    stat.maxUSD = BIGDECIMAL_ZERO;
+    stat.minUSD = BIGDECIMAL_ZERO;
+    stat.varUSD = BIGDECIMAL_ZERO;
+    stat.save();
+  }
+
+  return stat!;
+}
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());
@@ -109,6 +132,11 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.totalPoolCount = 0;
+
+    usageMetrics.swapStats = getStat(`${usageMetrics.protocol}-swap-${id}`).id;
+    usageMetrics.depositStats = getStat(`${usageMetrics.protocol}-deposit-${id}`).id;
+    usageMetrics.withdrawStats = getStat(`${usageMetrics.protocol}-withdraw-${id}`).id;
+
     usageMetrics.save();
   }
 
@@ -175,6 +203,11 @@ export function getOrCreateLiquidityPoolDailySnapshot(
     poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.rewardTokenEmissionsUSD = pool!.rewardTokenEmissionsUSD;
+
+    poolMetrics.swapStats = getStat(`pool-${poolAddress}-swap-${day}`).id;
+    poolMetrics.depositStats = getStat(`pool-${poolAddress}-deposit-${day}`).id;
+    poolMetrics.withdrawStats = getStat(`pool-${poolAddress}-withdraw-${day}`).id;
+
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;
 
