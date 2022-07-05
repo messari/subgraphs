@@ -41,6 +41,7 @@ import {
   UsageMetricsHourlySnapshot,
   PositionCounter,
   Position,
+  ActorAccount,
 } from "../generated/schema";
 import { ProtocolData } from "./mapping";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
@@ -333,14 +334,6 @@ export function snapshotUsage(
   eventType: i32,
   isNewTx: boolean // used for liquidations to track daily liquidat-ors/-ees
 ): void {
-  let account = Account.load(accountID);
-  if (!account) {
-    account = new Account(accountID);
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-
   //
   // daily snapshot
   //
@@ -409,25 +402,20 @@ export function snapshotUsage(
     case EventType.DEPOSIT:
       dailySnapshot.dailyDepositCount += 1;
       dailySnapshot.dailyActiveDepositors += 1;
-      account.depositCount += 1;
       break;
     case EventType.WITHDRAW:
       dailySnapshot.dailyWithdrawCount += 1;
-      account.withdrawCount += 1;
       break;
     case EventType.BORROW:
       dailySnapshot.dailyBorrowCount += 1;
       dailySnapshot.dailyActiveBorrowers += 1;
-      account.borrowCount += 1;
       break;
     case EventType.REPAY:
       dailySnapshot.dailyRepayCount += 1;
-      account.repayCount += 1;
       break;
     case EventType.LIQUIDATOR:
       dailySnapshot.dailyLiquidateCount += 1;
       dailySnapshot.dailyActiveLiquidators += 1;
-      account.liquidateCount += 1; // only need to do it in this switch
       break;
     case EventType.LIQUIDATEE:
       dailySnapshot.dailyActiveLiquidatees += 1;
@@ -438,7 +426,6 @@ export function snapshotUsage(
   dailySnapshot.blockNumber = blockNumber;
   dailySnapshot.timestamp = blockTimestamp;
   dailySnapshot.save();
-  account.save();
 
   //
   // hourly snapshot
@@ -599,12 +586,20 @@ export function updateSnapshots(
 export function addPosition(
   protocol: LendingProtocol,
   market: Market,
-  account: Account,
+  accountID: string,
   balanceResult: ethereum.CallResult<BigInt>,
   side: string,
   eventType: i32,
   event: ethereum.Event
 ): string {
+  // get account
+  let account = Account.load(accountID);
+  if (!account) {
+    account = new Account(accountID);
+
+    protocol.cumulativeUniqueUsers += 1;
+  }
+
   let counterID = accountID
     .concat("-")
     .concat(market.id)
@@ -632,7 +627,7 @@ export function addPosition(
     position.side = side;
     if (side == PositionSide.LENDER) {
       position.isCollateral =
-        account._enabledCollaterals.indexOf(market.id) >= 0;
+        account.enabledCollaterals.indexOf(market.id) >= 0;
     }
     position.balance = BIGINT_ZERO;
     position.depositCount = 0;
@@ -651,12 +646,15 @@ export function addPosition(
   } else {
     position.balance = balanceResult.value;
   }
-  if (eventType == EventType.Deposit) {
+  if (eventType == EventType.DEPOSIT) {
     position.depositCount += 1;
-  } else if (eventType == EventType.Borrow) {
+    account.depositCount += 1;
+  } else if (eventType == EventType.BORROW) {
     position.borrowCount += 1;
+    account.borrowCount += 1;
   }
   position.save();
+  account.save();
 
   if (openPosition) {
     //
@@ -672,9 +670,9 @@ export function addPosition(
     market.positionCount += 1;
     market.openPositionCount += 1;
 
-    if (eventType == EventType.Deposit) {
+    if (eventType == EventType.DEPOSIT) {
       market.lendingPositionCount += 1;
-    } else if (eventType == EventType.Borrow) {
+    } else if (eventType == EventType.BORROW) {
       market.borrowingPositionCount += 1;
     }
     market.save();
@@ -684,21 +682,21 @@ export function addPosition(
     //
     protocol.cumulativePositionCount += 1;
     protocol.openPositionCount += 1;
-    if (eventType == EventType.Deposit) {
+    if (eventType == EventType.DEPOSIT) {
       let depositorActorID = "depositor".concat("-").concat(account.id);
-      let depositorActor = _ActorAccount.load(depositorActorID);
+      let depositorActor = ActorAccount.load(depositorActorID);
       if (!depositorActor) {
-        depositorActor = new _ActorAccount(depositorActorID);
+        depositorActor = new ActorAccount(depositorActorID);
         depositorActor.save();
 
         protocol.cumulativeUniqueDepositors += 1;
         protocol.save();
       }
-    } else if (eventType == EventType.Borrow) {
+    } else if (eventType == EventType.BORROW) {
       let borrowerActorID = "borrower".concat("-").concat(account.id);
-      let borrowerActor = _ActorAccount.load(borrowerActorID);
+      let borrowerActor = ActorAccount.load(borrowerActorID);
       if (!borrowerActor) {
-        borrowerActor = new _ActorAccount(borrowerActorID);
+        borrowerActor = new ActorAccount(borrowerActorID);
         borrowerActor.save();
 
         protocol.cumulativeUniqueBorrowers += 1;
@@ -709,6 +707,98 @@ export function addPosition(
 
   //
   // take position snapshot
+  //
+  snapshotPosition(position, event);
+
+  return positionID;
+}
+
+export function substractPosition(
+  protocol: LendingProtocol,
+  market: Market,
+  accountID: string,
+  balanceResult: ethereum.CallResult<BigInt>,
+  side: string,
+  eventType: i32,
+  event: ethereum.Event
+): string | null {
+  // get account and update
+
+  let counterID = account.id
+    .concat("-")
+    .concat(market.id)
+    .concat("-")
+    .concat(side);
+  let positionCounter = _PositionCounter.load(counterID);
+  if (!positionCounter) {
+    log.warning("[substractPosition] position counter {} not found", [
+      counterID,
+    ]);
+    return null;
+  }
+  let positionID = positionCounter.id
+    .concat("-")
+    .concat(positionCounter.nextCount.toString());
+  let position = Position.load(positionID);
+  if (!position) {
+    log.warning("[substractPosition] position {} not found", [positionID]);
+    return null;
+  }
+
+  if (balanceResult.reverted) {
+    log.warning("[substractPosition] Fetch balance of {} from {} reverted", [
+      account.id,
+      market.id,
+    ]);
+  } else {
+    position.balance = balanceResult.value;
+  }
+  if (eventType == EventType.Withdraw) {
+    position.withdrawCount += 1;
+  } else if (eventType == EventType.Repay) {
+    position.repayCount += 1;
+  }
+  position.save();
+
+  let closePosition = position.balance == BIGINT_ZERO;
+  if (closePosition) {
+    //
+    // update position counter
+    //
+    positionCounter.nextCount += 1;
+    positionCounter.save();
+
+    //
+    // close position
+    //
+    position.hashClosed = event.transaction.hash.toHexString();
+    position.blockNumberClosed = event.block.number;
+    position.timestampClosed = event.block.timestamp;
+    position.save();
+
+    //
+    // update account position
+    //
+    account.openPositionCount -= 1;
+    account.closedPositionCount += 1;
+    account.save();
+
+    //
+    // update market position
+    //
+    market.openPositionCount -= 1;
+    market.closedPositionCount += 1;
+    market.save();
+
+    //
+    // update protocol position
+    //
+    protocol.openPositionCount -= 1;
+    protocol.save();
+  }
+
+  //
+  // update position snapshot
   //
   snapshotPosition(position, event);
 

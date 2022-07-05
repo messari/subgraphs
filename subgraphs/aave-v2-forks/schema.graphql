@@ -924,6 +924,11 @@ type Account @entity {
 
   " All liquidation events where this account got liquidated "
   liquidations: [Liquidate!]! @derivedFrom(field: "liquidatee")
+
+  ##### Add Ons #####
+
+  " Markets that the account is using as collateral "
+  enabledCollaterals: [Market!]!
 }
 
 type Position @entity {

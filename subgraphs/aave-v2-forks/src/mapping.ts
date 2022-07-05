@@ -8,6 +8,7 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
+  Account,
   Borrow,
   Deposit,
   Liquidate,
@@ -160,7 +161,7 @@ export function _handleCollateralConfigurationChanged(
   // Adjust market LTV, liquidation, and collateral data when a reserve's collateral configuration has changed
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[CollateralConfigurationChanged] Market not found: {}", [
+    log.warning("[CollateralConfigurationChanged] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -187,7 +188,7 @@ export function _handleCollateralConfigurationChanged(
 export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[BorrowingEnabledOnReserve] Market not found: {}", [
+    log.warning("[BorrowingEnabledOnReserve] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -200,7 +201,7 @@ export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
 export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[BorrowingDisabledOnReserve] Market not found: {}", [
+    log.warning("[BorrowingDisabledOnReserve] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -213,7 +214,7 @@ export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
 export function _handleReserveActivated(marketId: Address): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[ReserveActivated] Market not found: {}", [
+    log.warning("[ReserveActivated] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -226,7 +227,7 @@ export function _handleReserveActivated(marketId: Address): void {
 export function _handleReserveDeactivated(marketId: Address): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[ReserveDeactivated] Market not found: {}", [
+    log.warning("[ReserveDeactivated] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -242,7 +243,7 @@ export function _handleReserveFactorChanged(
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[ReserveFactorChanged] Market not found: {}", [
+    log.warning("[ReserveFactorChanged] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -254,32 +255,60 @@ export function _handleReserveFactorChanged(
   market.save();
 }
 
-export function _handleReserveUsedAsCollateralEnabled(marketId: Address): void {
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.error("[ReserveUsedAsCollateralEnabled] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
-
-  market.canUseAsCollateral = true;
-  market.save();
-}
-
-export function _handleReserveUsedAsCollateralDisabled(
-  marketId: Address
+export function _handleReserveUsedAsCollateralEnabled(
+  marketId: Address,
+  accountID: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[ReserveUsedAsCollateralDisabled] Market not found: {}", [
+    log.warning("[ReserveUsedAsCollateralEnabled] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
   }
 
-  market.canUseAsCollateral = false;
-  market.save();
+  // grab account
+  let account = Account.load(accountID.toHexString());
+  if (!account) {
+    log.warning("[ReserveUsedAsCollateralEnabled] Account not found: {}", [
+      accountID.toHexString(),
+    ]);
+    return;
+  }
+  let markets = account.enabledCollaterals;
+  markets.push(market.id);
+  account.enabledCollaterals = markets;
+  account.save();
+}
+
+export function _handleReserveUsedAsCollateralDisabled(
+  marketId: Address,
+  accountID: Address
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.warning("[ReserveUsedAsCollateralDisabled] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  // grab account
+  let account = Account.load(accountID.toHexString());
+  if (!account) {
+    log.warning("[ReserveUsedAsCollateralEnabled] Account not found: {}", [
+      accountID.toHexString(),
+    ]);
+    return;
+  }
+  let markets = account.enabledCollaterals;
+  let index = markets.indexOf(market.id);
+  if (index >= 0) {
+    // drop 1 element at given index
+    markets.splice(index, 1);
+  }
+  account.enabledCollaterals = markets;
+  account.save();
 }
 
 ////////////////////////////////
@@ -298,7 +327,7 @@ export function _handleReserveDataUpdated(
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[ReserveDataUpdated] Market not found: {}", [
+    log.warning("[ReserveDataUpdated] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -567,6 +596,7 @@ export function _handleWithdraw(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let withdraw = new Withdraw(id);
 
+  withdraw.position = positionId;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
   withdraw.account = account.toHexString();
@@ -580,10 +610,6 @@ export function _handleWithdraw(
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
-
-  // TODO - add account metrics
-  // withdraw.position = ...
-
   withdraw.save();
 
   // update usage metrics
@@ -627,6 +653,19 @@ export function _handleBorrow(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let borrow = new Borrow(id);
 
+  // update position
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  let positionId = addPosition(
+    protocol,
+    market,
+    account.toHexString(),
+    aTokenContract.try_balanceOf(account), // try getting balance of account
+    PositionSide.BORROWER,
+    EventType.BORROW,
+    event
+  );
+
+  borrow.position = positionId;
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
   borrow.account = account.toHexString();
@@ -640,10 +679,6 @@ export function _handleBorrow(
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
-
-  // TODO - add account metrics
-  // borrow.position = ...
-
   borrow.save();
 
   // update metrics

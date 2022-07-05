@@ -321,14 +321,20 @@ export function handleReserveUsedAsCollateralEnabled(
   event: ReserveUsedAsCollateralEnabled
 ): void {
   // This Event handler enables a reserve/market to be used as collateral
-  _handleReserveUsedAsCollateralEnabled(event.params.reserve);
+  _handleReserveUsedAsCollateralEnabled(
+    event.params.reserve,
+    event.params.user
+  );
 }
 
 export function handleReserveUsedAsCollateralDisabled(
   event: ReserveUsedAsCollateralDisabled
 ): void {
   // This Event handler disables a reserve/market being used as collateral
-  _handleReserveUsedAsCollateralDisabled(event.params.reserve);
+  _handleReserveUsedAsCollateralDisabled(
+    event.params.reserve,
+    event.params.user
+  );
 }
 
 export function handleDeposit(event: Deposit): void {
