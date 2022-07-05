@@ -1,11 +1,12 @@
 import { Address } from "@graphprotocol/graph-ts";
 import {
+  AToken,
   BalanceTransfer,
   Burn,
   Mint,
 } from "../../../../generated/templates/AToken/AToken";
 import { BIGINT_ZERO } from "../../../../src/utils/constants";
-import { rayDiv } from "../../../../src/utils/numbers";
+import { rayMul } from "../../../../src/utils/numbers";
 import { createDeposit, createWithdraw } from "../entities/event";
 import {
   addMarketProtocolSideRevenue,
@@ -18,36 +19,36 @@ import { getReserve, updateReserveATokenSupply } from "../entities/reserve";
 import { getTokenById } from "../entities/token";
 
 export function handleBurn(event: Burn): void {
-  const amount = event.params.value.plus(event.params.balanceIncrease);
-  const scaledAmount = rayDiv(amount, event.params.index);
-  updateReserveATokenSupply(
-    event,
-    BIGINT_ZERO.minus(scaledAmount),
-    event.params.index
-  );
+  const contract = AToken.bind(event.address);
+  const result = contract.getScaledUserBalanceAndSupply(event.params.from);
+  const scaledTotalSupply = result.value1;
+  updateReserveATokenSupply(event, scaledTotalSupply, event.params.index);
 
+  const userBalance = rayMul(result.value0, event.params.index);
   const reserve = getReserve(event.address);
   updateUserLenderPosition(
     event,
     event.params.from,
     getMarketById(reserve.id),
-    BIGINT_ZERO.minus(scaledAmount),
-    event.params.index
+    userBalance
   );
 }
 
 export function handleMint(event: Mint): void {
-  const amount = event.params.value.minus(event.params.balanceIncrease);
-  const scaledAmount = rayDiv(amount, event.params.index);
-  updateReserveATokenSupply(event, scaledAmount, event.params.index);
+  const contract = AToken.bind(event.address);
+  const result = contract.getScaledUserBalanceAndSupply(
+    event.params.onBehalfOf
+  );
+  const scaledTotalSupply = result.value1;
+  updateReserveATokenSupply(event, scaledTotalSupply, event.params.index);
 
+  const userBalance = rayMul(result.value0, event.params.index);
   const reserve = getReserve(event.address);
   updateUserLenderPosition(
     event,
     event.params.onBehalfOf,
     getMarketById(reserve.id),
-    scaledAmount,
-    event.params.index
+    userBalance
   );
 }
 
@@ -61,7 +62,7 @@ export function handleBalanceTransfer(event: BalanceTransfer): void {
     if (event.params.value.equals(BIGINT_ZERO)) {
       return;
     }
-    const scaledAmount = rayDiv(event.params.value, event.params.index);
+    const contract = AToken.bind(event.address);
     const marketAddress = Address.fromString(reserve.id);
     // Handle transfer as withdraw + deposit
     createWithdraw(event, marketAddress, event.params.from, event.params.value);
@@ -69,16 +70,14 @@ export function handleBalanceTransfer(event: BalanceTransfer): void {
       event,
       event.params.from,
       getMarket(marketAddress),
-      BIGINT_ZERO.minus(scaledAmount),
-      event.params.index
+      contract.balanceOf(event.params.from)
     );
     createDeposit(event, marketAddress, event.params.to, event.params.value);
     updateUserLenderPosition(
       event,
       event.params.to,
       getMarket(marketAddress),
-      scaledAmount,
-      event.params.index
+      contract.balanceOf(event.params.to)
     );
   }
 }

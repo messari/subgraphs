@@ -14,7 +14,7 @@ export function handleBurn(event: Burn): void {
     event,
     event.params.from,
     getMarketById(reserve.id),
-    event.params.newTotalSupply
+    event.params.currentBalance
   );
 }
 
@@ -26,6 +26,6 @@ export function handleMint(event: Mint): void {
     event,
     event.params.onBehalfOf,
     getMarketById(reserve.id),
-    event.params.newTotalSupply
+    event.params.currentBalance
   );
 }

@@ -101,8 +101,7 @@ export function updateUserLenderPosition(
   event: ethereum.Event,
   user: Address,
   market: Market,
-  scaledBalanceChange: BigInt,
-  liquidityIndex: BigInt
+  newTotalBalance: BigInt
 ): void {
   const account = getOrCreateAccount(user);
   const position = getOrCreateUserPosition(
@@ -111,17 +110,10 @@ export function updateUserLenderPosition(
     market,
     PositionSide.LENDER
   );
-  if (position._liquidityIndex) {
-    // Get scaled balance using previous liquidity index
-    position.balance = rayDiv(position.balance, position._liquidityIndex!);
-  }
-  position.balance = position.balance.plus(scaledBalanceChange);
-  // Calculate new balance using new liquidity index
-  position.balance = rayMul(position.balance, liquidityIndex);
+  position.balance = newTotalBalance;
   if (position.balance.lt(BIGINT_ZERO)) {
     setBalanceToZero(position);
   }
-  position._liquidityIndex = liquidityIndex;
   position.save();
   getOrCreatePositionSnapshot(event, position);
 }
@@ -130,8 +122,7 @@ export function updateUserVariableBorrowerPosition(
   event: ethereum.Event,
   user: Address,
   market: Market,
-  scaledBalanceChange: BigInt,
-  liquidityIndex: BigInt
+  newTotalBalance: BigInt
 ): void {
   const account = getOrCreateAccount(user);
   const position = getOrCreateUserPosition(
@@ -140,27 +131,13 @@ export function updateUserVariableBorrowerPosition(
     market,
     PositionSide.BORROWER
   );
-  if (position._liquidityIndex) {
-    // Get scaled balance using previous liquidity index
-    position._variableDebtBalance = rayDiv(
-      position._variableDebtBalance!,
-      position._liquidityIndex!
-    );
-  }
-  position._variableDebtBalance =
-    position._variableDebtBalance!.plus(scaledBalanceChange);
-  // Calculate new balance using new liquidity index
-  position._variableDebtBalance = rayMul(
-    position._variableDebtBalance!,
-    liquidityIndex
-  );
+  position._variableDebtBalance = newTotalBalance;
   position.balance = position._variableDebtBalance!.plus(
     position._stableDebtBalance!
   );
   if (position.balance.lt(BIGINT_ZERO)) {
     setBalanceToZero(position);
   }
-  position._liquidityIndex = liquidityIndex;
   position.save();
   getOrCreatePositionSnapshot(event, position);
 }
