@@ -104,7 +104,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | [Maple Finance](https://www.maple.finance/) | 🛠 | 1.2.1 / 1.1.0 / 1.0.0 | [![Maple Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/maple-finance-ethereum) |
 | [Moonwell Finance](https://moonwell.fi/) | 🛠 | 1.3.0 / 1.0.10 / 1.0.0 | [![Moonwell Moonriver](./docs/images/chains/moonriver.png)](https://thegraph.com/hosted-service/subgraph/messari/moonwell-moonriver)  |
 | Notional Finance | 🔨 | | |
-| [Rari Fuse](https://app.rari.capital/fuse) | 🔨 | 1.3.0 / 1.0.16 / 1.0.0 | [![Rari Fuse Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-ethereum) [![Rari Fuse Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-arbitrum) |
+| [Rari Fuse](https://app.rari.capital/fuse) | 🔨 | 1.3.0 / 1.0.18 / 1.0.0 | [![Rari Fuse Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-ethereum) [![Rari Fuse Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-arbitrum) |
 | [SCREAM](https://scream.sh/) | 🛠 | 1.3.0 / 1.0.6 / 1.0.0 | [![SCREAM Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/scream-fantom)  |
 | [Venus Protocol](https://venus.io/) | 🛠 | 1.3.0 / 1.0.6 / 1.0.0 | [![Venus Protocol BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/venus-protocol-bsc) |
 | [Yeti Finance](https://yeti.finance/) | 🔨 | | |
