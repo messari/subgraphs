@@ -42,6 +42,7 @@ import {
   PositionCounter,
   Position,
   ActorAccount,
+  PositionSnapshot,
 } from "../generated/schema";
 import { ProtocolData } from "./mapping";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
@@ -401,24 +402,32 @@ export function snapshotUsage(
   switch (eventType) {
     case EventType.DEPOSIT:
       dailySnapshot.dailyDepositCount += 1;
-      dailySnapshot.dailyActiveDepositors += 1;
+      if (isNewActor) {
+        dailySnapshot.dailyActiveDepositors += 1;
+      }
       break;
     case EventType.WITHDRAW:
       dailySnapshot.dailyWithdrawCount += 1;
       break;
     case EventType.BORROW:
       dailySnapshot.dailyBorrowCount += 1;
-      dailySnapshot.dailyActiveBorrowers += 1;
+      if (isNewActor) {
+        dailySnapshot.dailyActiveBorrowers += 1;
+      }
       break;
     case EventType.REPAY:
       dailySnapshot.dailyRepayCount += 1;
       break;
     case EventType.LIQUIDATOR:
       dailySnapshot.dailyLiquidateCount += 1;
-      dailySnapshot.dailyActiveLiquidators += 1;
+      if (isNewActor) {
+        dailySnapshot.dailyActiveLiquidators += 1;
+      }
       break;
     case EventType.LIQUIDATEE:
-      dailySnapshot.dailyActiveLiquidatees += 1;
+      if (isNewActor) {
+        dailySnapshot.dailyActiveLiquidatees += 1;
+      }
     default:
       break;
   }
@@ -586,21 +595,13 @@ export function updateSnapshots(
 export function addPosition(
   protocol: LendingProtocol,
   market: Market,
-  accountID: string,
+  account: Account,
   balanceResult: ethereum.CallResult<BigInt>,
   side: string,
   eventType: i32,
   event: ethereum.Event
 ): string {
-  // get account
-  let account = Account.load(accountID);
-  if (!account) {
-    account = new Account(accountID);
-
-    protocol.cumulativeUniqueUsers += 1;
-  }
-
-  let counterID = accountID
+  let counterID = account.id
     .concat("-")
     .concat(market.id)
     .concat("-")
@@ -619,7 +620,7 @@ export function addPosition(
   let openPosition = position == null;
   if (openPosition) {
     position = new Position(positionID);
-    position.account = accountID;
+    position.account = account.id;
     position.market = market.id;
     position.hashOpened = event.transaction.hash.toHexString();
     position.blockNumberOpened = event.block.number;
@@ -648,13 +649,10 @@ export function addPosition(
   }
   if (eventType == EventType.DEPOSIT) {
     position.depositCount += 1;
-    account.depositCount += 1;
   } else if (eventType == EventType.BORROW) {
     position.borrowCount += 1;
-    account.borrowCount += 1;
   }
   position.save();
-  account.save();
 
   if (openPosition) {
     //
@@ -716,20 +714,12 @@ export function addPosition(
 export function subtractPosition(
   protocol: LendingProtocol,
   market: Market,
-  accountID: string,
+  account: Account,
   balanceResult: ethereum.CallResult<BigInt>,
   side: string,
   eventType: i32,
   event: ethereum.Event
 ): string | null {
-  // get account
-  let account = Account.load(accountID);
-  if (!account) {
-    account = new Account(accountID);
-
-    protocol.cumulativeUniqueUsers += 1;
-  }
-
   let counterID = account.id
     .concat("-")
     .concat(market.id)
@@ -814,6 +804,22 @@ export function subtractPosition(
   return positionID;
 }
 
+export function createAccount(accountID: string): Account {
+  let account = new Account(accountID);
+  account.positionCount = 0;
+  account.openPositionCount = 0;
+  account.closedPositionCount = 0;
+  account.depositCount = 0;
+  account.withdrawCount = 0;
+  account.borrowCount = 0;
+  account.repayCount = 0;
+  account.liquidateCount = 0;
+  account.liquidationCount = 0;
+  account.enabledCollaterals = [];
+  account.save();
+  return account;
+}
+
 ////////////////////////////
 ///// Internal Helpers /////
 ////////////////////////////
@@ -891,4 +897,22 @@ function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
     snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
+}
+
+function snapshotPosition(position: Position, event: ethereum.Event): void {
+  let snapshot = new PositionSnapshot(
+    position.id
+      .concat("-")
+      .concat(event.transaction.hash.toHexString())
+      .concat("-")
+      .concat(event.logIndex.toString())
+  );
+  snapshot.hash = event.transaction.hash.toHexString();
+  snapshot.logIndex = event.logIndex.toI32();
+  snapshot.nonce = event.transaction.nonce;
+  snapshot.position = position.id;
+  snapshot.balance = position.balance;
+  snapshot.blockNumber = event.block.number;
+  snapshot.timestamp = event.block.timestamp;
+  snapshot.save();
 }
