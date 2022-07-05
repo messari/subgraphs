@@ -504,16 +504,7 @@ export function _handleDeposit(
   deposit.nonce = event.transaction.nonce;
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  deposit.to = market.id;
-  deposit.from = account.toHexString();
-=======
-  deposit.account = event.transaction.from.toHexString();
->>>>>>> update transactions and usagemetrics
-=======
   deposit.account = account.toHexString();
->>>>>>> add changes
   deposit.market = marketId.toHexString();
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
@@ -578,16 +569,7 @@ export function _handleWithdraw(
 
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  withdraw.to = account.toHexString();
-  withdraw.from = market.id;
-=======
-  withdraw.account = event.transaction.from.toHexString();
->>>>>>> update transactions and usagemetrics
-=======
   withdraw.account = account.toHexString();
->>>>>>> add changes
   withdraw.market = market.id;
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.nonce = event.transaction.nonce;
@@ -647,17 +629,8 @@ export function _handleBorrow(
 
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
-<<<<<<< HEAD
-  borrow.to = account.toHexString();
-  borrow.from = market.id;
-=======
   borrow.nonce = event.transaction.nonce;
-<<<<<<< HEAD
-  borrow.account = event.transaction.from.toHexString();
->>>>>>> update transactions and usagemetrics
-=======
   borrow.account = account.toHexString();
->>>>>>> add changes
   borrow.market = market.id;
   borrow.hash = event.transaction.hash.toHexString();
   borrow.logIndex = event.logIndex.toI32();
@@ -726,16 +699,7 @@ export function _handleRepay(
 
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
-<<<<<<< HEAD
-<<<<<<< HEAD
-  repay.to = market.id;
-  repay.from = account.toHexString();
-=======
-  repay.account = event.transaction.from.toHexString();
->>>>>>> update transactions and usagemetrics
-=======
   repay.account = account.toHexString();
->>>>>>> add changes
   repay.market = market.id;
   repay.hash = event.transaction.hash.toHexString();
   repay.nonce = event.transaction.nonce;
