@@ -9,7 +9,12 @@ export function handlePairCreated(event: PairCreated): void {
     event.params.token0.toHexString(),
     event.params.token1.toHexString(),
   ]);
-  createLiquidityPool(event, event.params.pair.toHexString(), event.params.token0.toHexString(), event.params.token1.toHexString());
+  createLiquidityPool(
+    event,
+    event.params.pair.toHexString(),
+    event.params.token0.toHexString(),
+    event.params.token1.toHexString()
+  );
 }
 
 // The call handler is used to update feeTo as on or off for each pool

@@ -338,7 +338,8 @@ export function handleDeposit(event: Deposit): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData()
+    getProtocolData(),
+    event.params.onBehalfOf
   );
 }
 
@@ -347,7 +348,8 @@ export function handleWithdraw(event: Withdraw): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData()
+    getProtocolData(),
+    event.params.to
   );
 }
 
@@ -356,7 +358,8 @@ export function handleBorrow(event: Borrow): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData()
+    getProtocolData(),
+    event.params.onBehalfOf
   );
 }
 
@@ -365,7 +368,8 @@ export function handleRepay(event: Repay): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData()
+    getProtocolData(),
+    event.params.user // address that is getting debt reduced
   );
 }
 

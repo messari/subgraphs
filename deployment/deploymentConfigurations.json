@@ -34,11 +34,45 @@
         }
       }
     },
+    "abracadabra-ext": {
+      "abracadabra": {
+        "arbitrum": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-arbitrum-ext",
+          "messari": "messari/abracadabra-money-arbitrum-ext",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-avalanche-ext",
+          "messari": "messari/abracadabra-money-avalanche-ext",
+          "deploy-on-merge": true
+        },
+        "bsc": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-bsc-ext",
+          "messari": "messari/abracadabra-money-bsc-ext",
+          "deploy-on-merge": true
+        },
+        "fantom": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-fantom-ext",
+          "messari": "messari/abracadabra-money-fantom-ext",
+          "deploy-on-merge": true
+        },
+        "mainnet": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-ethereum-ext",
+          "messari": "messari/abracadabra-money-ethereum-ext",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "aave-v2-forks": {
       "aave-v2": {
         "mainnet-arc": {
           "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-v2-ethereum-arc",
+          "messari": "messari/aave-arc-ethereum",
           "dmelotik": "dmelotik/aave-v2-arc",
           "deploy-on-merge": true
         },
@@ -56,7 +90,7 @@
         },
         "mainnet-amm": {
           "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-v2-ethereum-amm",
+          "messari": "messari/aave-amm-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum-amm",
           "deploy-on-merge": true
         },
@@ -68,7 +102,7 @@
         },
         "mainnet-rwa": {
           "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-v2-ethereum-rwa",
+          "messari": "messari/aave-rwa-ethereum",
           "dmelotik": "dmelotik/aave-v2-rwa",
           "deploy-on-merge": true
         }
@@ -86,7 +120,7 @@
       "aave-v3": {
         "arbitrum": {
           "template": "aave-v3.template.yaml",
-          "messari": "messari/aave-v3-matic",
+          "messari": "messari/aave-v3-arbitrum",
           "deploy-on-merge": true
         },
         "avalanche": {
@@ -106,7 +140,7 @@
         },
         "matic": {
           "template": "aave-v3.template.yaml",
-          "messari": "messari/aave-v3-matic",
+          "messari": "messari/aave-v3-polygon",
           "deploy-on-merge": true
         },
         "optimism": {

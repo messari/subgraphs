@@ -1,9 +1,24 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { BIGINT_ZERO, FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
-import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
 
 export class SolarbeamMoonriverConfigurations implements Configurations {
   getNetwork(): string {
@@ -27,8 +42,12 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
   getFactoryAddress(): string {
     return toLowerCase("0x049581aEB6Fe262727f290165C29BDAB065a1B68");
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString(toLowerCase("0x049581aEB6Fe262727f290165C29BDAB065a1B68")));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString(
+        toLowerCase("0x049581aEB6Fe262727f290165C29BDAB065a1B68")
+      )
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("2.5");
@@ -52,7 +71,7 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
     return RewardIntervalType.BLOCK;
   }
   getRewardTokenRate(): BigInt {
-    return BIGINT_ZERO
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return toLowerCase("0x98878b06940ae243284ca214f92bb71a2b032b8a"); // wMOVR
@@ -75,7 +94,7 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
   }
   getStableOraclePools(): string[] {
     return toLowerCaseList([
-      "0xe537f70a8b62204832b8ba91940b77d3f79aeb81" // USDC/wMOVR
+      "0xe537f70a8b62204832b8ba91940b77d3f79aeb81", // USDC/wMOVR
     ]);
   }
   getUntrackedPairs(): string[] {

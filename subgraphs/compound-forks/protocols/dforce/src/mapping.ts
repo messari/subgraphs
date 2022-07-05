@@ -1,4 +1,10 @@
-import { Address, BigInt, log, BigDecimal } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  log,
+  BigDecimal,
+  dataSource,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   ProtocolData,
@@ -28,6 +34,7 @@ import {
   exponentToBigDecimal,
   BIGDECIMAL_ZERO,
   SECONDS_PER_DAY,
+  Network,
 } from "../../../src/constants";
 import {
   LendingProtocol,
@@ -349,6 +356,7 @@ export function handleUpdateInterest(event: AccrueInterest): void {
     comptrollerAddr,
     event.params.interestAccumulated,
     event.params.totalBorrows,
+    network == Network.MAINNET ? true : false,
     event
   );
 }
