@@ -76,3 +76,10 @@ export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 
 export const PROTOCOL_ID = "0xa4F1671d3Aee73C05b552d57f2d16d3cfcBd0217";
+export const VUSDC_POOL = Address.fromString(
+  "0x0c49066c0808ee8c673553b7cbd99bcc9abf113d"
+);
+export const VWBTC_POOL = Address.fromString(
+  "0x4b2e76ebbc9f2923d83f5fbde695d8733db1a17b"
+);
+

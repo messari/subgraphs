@@ -45,3 +45,15 @@ export function updateProtocolTotalValueLockedUSD(): void {
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
 }
+
+export function updateProtocolAfterNewVault(vaultAddress: Address): void {
+  const protocol = getOrCreateYieldAggregator();
+
+  let vaultIds = protocol._vaultIds;
+  vaultIds.push(vaultAddress.toHexString());
+  protocol._vaultIds = vaultIds;
+
+  protocol.totalPoolCount += 1;
+
+  protocol.save();
+}

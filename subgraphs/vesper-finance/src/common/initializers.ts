@@ -13,7 +13,7 @@ import {
 import * as utils from "./utils";
 import * as constants from "./constants";
 import { Vault as VaultStore } from "../../generated/schema";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Pool as VaultContract } from "../../generated/templates/PoolRewards/Pool";
 import { PoolAccountant as PoolAccountantTemplate } from "../../generated/templates";
 import { ERC20 as ERC20Contract } from "../../generated/templates/PoolRewards/ERC20";
@@ -340,7 +340,19 @@ export function getOrCreateVault(
     if (poolAccountant.notEqual(constants.NULL.TYPE_ADDRESS))
       PoolAccountantTemplate.create(poolAccountant);
 
+    utils.updateProtocolAfterNewVault(vaultAddress);
+
     vault.save();
+
+    log.warning(
+      "[NewVault] vault: {}, name: {}, inputToken: {}, poolAccountant: {}",
+      [
+        vaultAddress.toHexString(),
+        vault.name!,
+        inputToken.id,
+        poolAccountant.toHexString(),
+      ]
+    );
   }
 
   return vault;

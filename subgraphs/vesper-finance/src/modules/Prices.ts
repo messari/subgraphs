@@ -9,10 +9,7 @@ import * as constants from "../common/constants";
 import { getPriceUsdcRecommended } from "../Prices/routers/CurveRouter";
 import { Pool as VaultContract } from "../../generated/templates/PoolRewards/Pool";
 
-export function getPriceOfOutputTokens(
-  vaultAddress: Address,
-  amount: BigInt
-): BigDecimal {
+export function getPriceOfOutputTokens(vaultAddress: Address): BigDecimal {
   const network = dataSource.network();
   const vaultContract = VaultContract.bind(vaultAddress);
 
@@ -34,13 +31,11 @@ export function getPriceOfOutputTokens(
   );
 
   let virtualPrice = getPriceUsdcRecommended(tokenAddress, network);
-  let vaultTokenDecimals = utils.getTokenDecimals(vaultAddress);
+  let inputTokenDecimals = utils.getTokenDecimals(tokenAddress);
 
   let price = pricePerShare
     .toBigDecimal()
-    .times(amount.toBigDecimal())
-    .div(vaultTokenDecimals)
-    .div(vaultTokenDecimals)
+    .div(inputTokenDecimals)
     .times(virtualPrice.usdPrice)
     .div(virtualPrice.decimalsBaseTen);
 
