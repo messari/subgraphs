@@ -54,8 +54,7 @@ export function updateUsageMetrics(
 ): void {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let hour: i64 =
-    (event.block.timestamp.toI64() - id * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
+  let hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let dailyMetrics = getOrCreateUsageDailySnapshot(event);
   let hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
 
