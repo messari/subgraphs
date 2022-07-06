@@ -553,6 +553,40 @@
           "dmelotik": "dmelotik/network-arweave-mainnet",
           "deploy-on-merge": true
         }
+      },
+      "cosmos": {
+        "cosmoshub": {
+          "template": "cosmos.template.yaml",
+          "messari": "messari/TODO",
+          "dmelotik": "dmelotik/network-cosmos-hub",
+          "deploy-on-merge": true
+        }
+      },
+      "evm": {
+        "arbitrum": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-arbitrum",
+          "dmelotik": "dmelotik/network-arbitrum-one",
+          "deploy-on-merge": true  
+        },
+        "aurora": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-aurora",
+          "dmelotik": "dmelotik/network-aurora",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-avalanche",
+          "dmelotik": "dmelotik/network-avalanche",
+          "deploy-on-merge": true
+        },
+        "boba": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-boba",
+          "dmelotik": "dmelotik/network-boba",
+          "deploy-on-merge": true
+        }
       }
     },
     "gamma-strategies": {
