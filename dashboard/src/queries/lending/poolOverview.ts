@@ -13,8 +13,10 @@ export const schema = (version: string): string => {
     case Versions.Schema120:
       return schema120();
     case Versions.Schema130:
-    default:
       return schema130();
+    case Versions.Schema201:
+    default:
+      return schema201();
   }
 };
 
@@ -202,6 +204,71 @@ export const schema130 = (): string => {
             exchangeRate
             rewardTokenEmissionsAmount
             rewardTokenEmissionsUSD
+        }
+    }`;
+};
+
+export const schema201 = (): string => {
+  return `
+    query Data($skipAmt: Int!) {
+        markets(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+            id
+            name
+            inputToken {
+              id
+              decimals
+              name
+              symbol
+            }
+            outputToken {
+              id
+              decimals
+              name
+              symbol
+            }
+            rewardTokens {
+              id
+              token {
+                id
+                decimals
+                name
+                symbol
+              }
+            }
+            rates {
+              id
+              side
+              rate
+              type
+            }
+            isActive
+            canUseAsCollateral
+            canBorrowFrom
+            maximumLTV
+            liquidationThreshold
+            liquidationPenalty
+            totalValueLockedUSD
+            cumulativeSupplySideRevenueUSD
+            cumulativeProtocolSideRevenueUSD
+            cumulativeTotalRevenueUSD
+            totalDepositBalanceUSD
+            cumulativeDepositUSD
+            totalBorrowBalanceUSD
+            cumulativeBorrowUSD
+            cumulativeLiquidateUSD
+            inputTokenBalance
+            inputTokenPriceUSD
+            outputTokenSupply
+            outputTokenPriceUSD
+            exchangeRate
+            rewardTokenEmissionsAmount
+            rewardTokenEmissionsUSD
+
+            positionCount
+            openPositionCount
+            closedPositionCount
+            lendingPositionCount
+            borrowingPositionCount
         }
     }`;
 };

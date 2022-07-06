@@ -32,6 +32,9 @@ function ProtocolDashboard() {
   const [poolId, setPoolId] = useState<string>(poolIdString);
   const [skipAmt, paginate] = useState<number>(skipAmtParam);
 
+  const [positionSnapshots, setPositionSnapshots] = useState();
+  const [positionsLoading, setPositionsLoading] = useState(false);
+
   ChartJS.register(...registerables);
   const client = useMemo(() => {
     return new ApolloClient({
@@ -83,6 +86,7 @@ function ProtocolDashboard() {
     protocolTableQuery,
     poolsQuery,
     poolTimeseriesQuery,
+    positionsQuery = "",
   } = schema(protocolSchemaData?.protocols[0].type, schemaVersion);
 
   const queryMain = gql`
@@ -117,6 +121,20 @@ function ProtocolDashboard() {
     `,
     { client },
   );
+
+  if (positionsQuery) {
+    (async () => {
+      const { data, loading } = await client.query({
+        query: gql`query {
+  
+          ${positionsQuery}
+        }
+        `,
+      });
+      setPositionSnapshots(data.positionSnapshots);
+      setPositionsLoading(loading);
+    })();
+  }
 
   const [getProtocolTableData, { data: protocolTableData, loading: protocolTableLoading, error: protocolTableError }] =
     useLazyQuery(
@@ -349,11 +367,13 @@ function ProtocolDashboard() {
             financialsDailySnapshots: financialsData?.financialsDailySnapshots,
             usageMetricsDailySnapshots: dailyUsageData?.usageMetricsDailySnapshots,
             usageMetricsHourlySnapshots: hourlyUsageData?.usageMetricsHourlySnapshots,
+            positionSnapshots,
           }}
           protocolTimeseriesLoading={{
             financialsDailySnapshots: financialsLoading,
             usageMetricsDailySnapshots: dailyUsageLoading,
             usageMetricsHourlySnapshots: hourlyUsageLoading,
+            positionsLoading,
           }}
           protocolTimeseriesError={{
             financialsDailySnapshots: financialsError,
