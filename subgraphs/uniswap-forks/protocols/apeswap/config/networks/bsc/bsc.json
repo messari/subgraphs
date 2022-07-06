@@ -3,7 +3,7 @@
   "network": "bsc",
   "address": "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6",
   "startBlock": 4855900,
-  "masterChefAddress": "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd",
+  "masterChefAddress": "0x5c8D727b265DBAfaba67E050f2f739cAeEB4A6F9",
   "masterChefStartBlock": 4855342,
   "graftEnabled": false,
   "subgraphId": "",
