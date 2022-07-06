@@ -21,7 +21,10 @@ import {
 } from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
-import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
+import {
+  convertTokenToDecimal,
+  roundToWholeNumber,
+} from "../../../../../src/common/utils/utils";
 
 export function handleReward(
   event: ethereum.Event,
@@ -109,7 +112,7 @@ export function handleReward(
   );
 
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(poolRewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(poolRewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
