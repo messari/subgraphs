@@ -1,14 +1,20 @@
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum
     name: Factory
-    network: matic
+    network: {{network}}
     source:
-      address: "0xCf083Be4164828f00cAE704EC15a36D711491284"
+      address: "{{address}}"
       abi: Factory
-      startBlock: 15298800
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -25,11 +31,11 @@ dataSources:
       file: ./src/mappings/factory.ts
   - kind: ethereum
     name: MiniChefV2
-    network: matic
+    network: {{network}}
     source:
-      address: "0x54aff400858Dcac39797a81894D9920f16972D1D"
+      address: "{{miniChefV2Address}}"
       abi: MiniChefV2Apeswap
-      startBlock: 15797921
+      startBlock: {{miniChefV2StartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -59,7 +65,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: matic
+    network: {{network}}
     source:
       abi: Pair
     mapping:
