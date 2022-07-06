@@ -14,9 +14,10 @@ import {
   LendingPoolAddressesProvider as AddressProviderContract,
 } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
-  getNetworkSpecificConstant,
+  GEIST_FTM_LP_ADDRESS,
+  GFTM_ADDRESS,
   Protocol,
-  USDC_TOKEN_ADDRESS,
+  REWARD_TOKEN_ADDRESS,
 } from "./constants";
 import {
   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
@@ -41,7 +42,7 @@ import {
   ReserveUsedAsCollateralEnabled,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
-import { AToken } from "../../../generated/templates/LendingPool/AToken";
+import { GToken } from "../../../generated/templates/LendingPool/GToken";
 import {
   ProtocolData,
   _handleBorrow,
@@ -64,32 +65,29 @@ import {
 import {
   getOrCreateLendingProtocol,
   getOrCreateRewardToken,
-  getOrCreateToken,
 } from "../../../src/helpers";
 import {
-  BIGINT_ZERO,
-  equalsIgnoreCase,
+  BIGDECIMAL_ZERO,
+  DEFAULT_DECIMALS,
   exponentToBigDecimal,
-  Network,
   readValue,
   RewardTokenType,
   SECONDS_PER_DAY,
   ZERO_ADDRESS,
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
-import { AaveIncentivesController } from "../../../generated/templates/LendingPool/AaveIncentivesController";
-import { IPriceOracleGetter } from "../../../generated/templates/LendingPool/IPriceOracleGetter";
+import { ChefIncentivesController } from "../../../generated/templates/LendingPool/ChefIncentivesController";
+import { SpookySwapOracle } from "../../../generated/templates/LendingPool/SpookySwapOracle";
 
 function getProtocolData(): ProtocolData {
-  let letants = getNetworkSpecificConstant();
   return new ProtocolData(
-    letants.protocolAddress.toHexString(),
+    Protocol.PROTOCOL_ADDRESS,
     Protocol.NAME,
     Protocol.SLUG,
     Protocol.SCHEMA_VERSION,
     Protocol.SUBGRAPH_VERSION,
     Protocol.METHODOLOGY_VERSION,
-    letants.network
+    Protocol.NETWORK
   );
 }
 
@@ -253,42 +251,39 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     return;
   }
 
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  let tryIncentiveController = aTokenContract.try_getIncentivesController();
+  let gTokenContract = GToken.bind(Address.fromString(market.outputToken!));
+  let tryIncentiveController = gTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
-    let incentiveControllerContract = AaveIncentivesController.bind(
+    let incentiveControllerContract = ChefIncentivesController.bind(
       tryIncentiveController.value
     );
-    let tryRewardInfo = incentiveControllerContract.try_assets(
+    let tryPoolInfo = incentiveControllerContract.try_poolInfo(
       Address.fromString(market.outputToken!)
     );
-    if (!tryRewardInfo.reverted) {
-      let tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
-      if (!tryRewardAsset.reverted) {
+    if (!tryPoolInfo.reverted) {
+      let tryEmissions = incentiveControllerContract.try_emissionSchedule(
+        tryPoolInfo.value.value1
+      ); // parameter is allocPoint
+      if (!tryEmissions.reverted) {
         // create reward tokens
         let depositRewardToken = getOrCreateRewardToken(
-          tryRewardAsset.value,
+          Address.fromString(REWARD_TOKEN_ADDRESS),
           RewardTokenType.DEPOSIT
         );
         let borrowRewardToken = getOrCreateRewardToken(
-          tryRewardAsset.value,
+          Address.fromString(REWARD_TOKEN_ADDRESS),
           RewardTokenType.BORROW
         );
-        let rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
         market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
 
-        // now get or create reward token and update fields
-        let protocol = getOrCreateLendingProtocol(protocolData);
-        let rewardsPerDay = tryRewardInfo.value.value0.times(
+        // update reward token fields
+        let rewardsPerDay = tryEmissions.value.value1.times(
           BigInt.fromI32(SECONDS_PER_DAY)
         );
-        let rewardTokenPriceUSD = getAssetPriceInUSDC(
-          tryRewardAsset.value,
-          Address.fromString(protocol.priceOracle)
-        );
+        let rewardTokenPriceUSD = getGeistPriceUSD();
         let rewardsPerDayUSD = rewardsPerDay
           .toBigDecimal()
-          .div(exponentToBigDecimal(rewardDecimals))
+          .div(exponentToBigDecimal(DEFAULT_DECIMALS))
           .times(rewardTokenPriceUSD);
 
         // set rewards to arrays
@@ -299,11 +294,18 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   }
   market.save();
 
-  let protocol = getOrCreateLendingProtocol(protocolData);
-  let assetPriceUSD = getAssetPriceInUSDC(
-    Address.fromString(market.inputToken),
-    Address.fromString(protocol.priceOracle)
-  );
+  // update gToken price
+  let tryPrice = gTokenContract.try_getAssetPrice();
+  if (tryPrice.reverted) {
+    log.warning(
+      "[handleReserveDataUpdated] Token price not found in Market: {}",
+      [market.id]
+    );
+    return;
+  }
+  let assetPriceUSD = tryPrice.value
+    .toBigDecimal()
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
 
   _handleReserveDataUpdated(
     event,
@@ -321,14 +323,20 @@ export function handleReserveUsedAsCollateralEnabled(
   event: ReserveUsedAsCollateralEnabled
 ): void {
   // This Event handler enables a reserve/market to be used as collateral
-  _handleReserveUsedAsCollateralEnabled(event.params.reserve);
+  _handleReserveUsedAsCollateralEnabled(
+    event.params.reserve,
+    event.params.user
+  );
 }
 
 export function handleReserveUsedAsCollateralDisabled(
   event: ReserveUsedAsCollateralDisabled
 ): void {
   // This Event handler disables a reserve/market being used as collateral
-  _handleReserveUsedAsCollateralDisabled(event.params.reserve);
+  _handleReserveUsedAsCollateralDisabled(
+    event.params.reserve,
+    event.params.user
+  );
 }
 
 export function handleDeposit(event: Deposit): void {
@@ -367,7 +375,7 @@ export function handleRepay(event: Repay): void {
     event.params.amount,
     event.params.reserve,
     getProtocolData(),
-    event.params.user
+    event.params.user // address that is getting debt reduced
   );
 }
 
@@ -377,9 +385,9 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidatedCollateralAmount,
     event.params.collateralAsset,
     getProtocolData(),
-    event.params.debtAsset,
     event.params.liquidator,
-    event.params.user
+    event.params.user,
+    event.params.debtAsset
   );
 }
 
@@ -387,41 +395,37 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 ///// Helpers /////
 ///////////////////
 
-function getAssetPriceInUSDC(
-  tokenAddress: Address,
-  priceOracle: Address
-): BigDecimal {
-  let oracle = IPriceOracleGetter.bind(priceOracle);
-  let oracleResult = readValue<BigInt>(
-    oracle.try_getAssetPrice(tokenAddress),
-    BIGINT_ZERO
+//
+//
+// GEIST price is generated from FTM-GEIST reserve on SpookySwap
+function getGeistPriceUSD(): BigDecimal {
+  let geistFtmLP = SpookySwapOracle.bind(
+    Address.fromString(GEIST_FTM_LP_ADDRESS)
   );
 
-  // if the result is zero or less, try the fallback oracle
-  if (!oracleResult.gt(BIGINT_ZERO)) {
-    let tryFallback = oracle.try_getFallbackOracle();
-    if (tryFallback) {
-      let fallbackOracle = IPriceOracleGetter.bind(tryFallback.value);
-      oracleResult = readValue<BigInt>(
-        fallbackOracle.try_getAssetPrice(tokenAddress),
-        BIGINT_ZERO
-      );
-    }
+  let reserves = geistFtmLP.try_getReserves();
+
+  if (reserves.reverted) {
+    log.error("[getGeistPriceUSD] Unable to get price for asset", [
+      REWARD_TOKEN_ADDRESS,
+    ]);
+    return BIGDECIMAL_ZERO;
   }
+  let reserveFTM = reserves.value.value0;
+  let reserveGEIST = reserves.value.value1;
 
-  // Mainnet Oracles return the price in eth, must convert to USD through the following method
-  if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
-    let priceUSDCInEth = readValue<BigInt>(
-      oracle.try_getAssetPrice(Address.fromString(USDC_TOKEN_ADDRESS)),
-      BIGINT_ZERO
-    );
-
-    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
-  }
-
-  // otherwise return the output of the price oracle
-  let inputToken = getOrCreateToken(tokenAddress);
-  return oracleResult
+  let priceGEISTinFTM = reserveFTM
+    .div(reserveGEIST)
     .toBigDecimal()
-    .div(exponentToBigDecimal(inputToken.decimals));
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+
+  // get FTM price
+  let gTokenContract = GToken.bind(Address.fromString(GFTM_ADDRESS));
+  let tryPrice = gTokenContract.try_getAssetPrice();
+  return tryPrice.reverted
+    ? BIGDECIMAL_ZERO
+    : tryPrice.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+        .times(priceGEISTinFTM);
 }
