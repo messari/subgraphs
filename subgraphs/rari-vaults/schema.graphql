@@ -342,9 +342,6 @@ type Vault @entity {
   " { Smart contract address of the vault }-{ Smart contract address of the input token } "
   id: ID!
 
-  " Smart contract address of the vault "
-  id: ID!
-
   " The protocol this vault belongs to "
   protocol: YieldAggregator!
 

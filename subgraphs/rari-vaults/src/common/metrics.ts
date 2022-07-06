@@ -57,11 +57,13 @@ export function updateUsageMetrics(
   let hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let dailyMetrics = getOrCreateUsageDailySnapshot(event);
   let hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
+  let protocol = getOrCreateYieldAggregator();
 
   // Update the block number and timestamp to that of the last transaction of that day
   dailyMetrics.blockNumber = event.block.number;
   dailyMetrics.timestamp = event.block.timestamp;
   dailyMetrics.dailyTransactionCount += 1;
+  dailyMetrics.totalPoolCount = protocol.totalPoolCount;
 
   // update hourlyMetrics
   hourlyMetrics.blockNumber = event.block.number;
@@ -70,7 +72,6 @@ export function updateUsageMetrics(
 
   let accountId = from.toHexString();
   let account = Account.load(accountId);
-  let protocol = getOrCreateYieldAggregator();
   if (!account) {
     account = new Account(accountId);
     account.save();
