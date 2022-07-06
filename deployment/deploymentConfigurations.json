@@ -34,6 +34,40 @@
         }
       }
     },
+    "abracadabra-ext": {
+      "abracadabra": {
+        "arbitrum": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-arbitrum-ext",
+          "messari": "messari/abracadabra-money-arbitrum-ext",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-avalanche-ext",
+          "messari": "messari/abracadabra-money-avalanche-ext",
+          "deploy-on-merge": true
+        },
+        "bsc": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-bsc-ext",
+          "messari": "messari/abracadabra-money-bsc-ext",
+          "deploy-on-merge": true
+        },
+        "fantom": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-fantom-ext",
+          "messari": "messari/abracadabra-money-fantom-ext",
+          "deploy-on-merge": true
+        },
+        "mainnet": {
+          "template": "abracadabra.money.template.yaml",
+          "nemani": "nemani/abracadabra-money-ethereum-ext",
+          "messari": "messari/abracadabra-money-ethereum-ext",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "aave-v2-forks": {
       "aave-v2": {
         "mainnet-arc": {
@@ -82,6 +116,54 @@
         }
       }
     },
+    "aave-v2-forks-ext": {
+      "aave-v2": {
+        "mainnet-arc": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-arc-ethereum-extended",
+          "dmelotik": "dmelotik/aave-v2-arc-ext",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-avalanche-extended",
+          "dmelotik": "dmelotik/aave-v2-avalanche-ext",
+          "deploy-on-merge": true
+        },
+        "mainnet": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-ethereum-extended",
+          "dmelotik": "dmelotik/aave-v2-mainnet-ext",
+          "deploy-on-merge": true
+        },
+        "mainnet-amm": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-amm-ethereum-extended",
+          "dmelotik": "dmelotik/aave-v2-ethereum-amm-ext",
+          "deploy-on-merge": true
+        },
+        "matic": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-polygon-extended",
+          "dmelotik": "dmelotik/aave-v2-polygon-ext",
+          "deploy-on-merge": true
+        },
+        "mainnet-rwa": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-rwa-ethereum-extended",
+          "dmelotik": "dmelotik/aave-v2-rwa-ext",
+          "deploy-on-merge": true
+        }
+      },
+      "geist-finance": {
+        "fantom": {
+          "template": "geist.finance.template.yaml",
+          "messari": "messari/geist-finance-fantom-extended",
+          "dmelotik": "dmelotik/geist-finance-ext",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "aave-v3": {
       "aave-v3": {
         "arbitrum": {
@@ -113,6 +195,38 @@
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-optimism",
           "deploy-on-merge": true
+        }
+      },
+      "aave-v3-extended": {
+        "arbitrum": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-arbitrum-extended",
+          "deploy-on-merge": false
+        },
+        "avalanche": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-avalanche-extended",
+          "deploy-on-merge": true
+        },
+        "fantom": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-fantom-extended",
+          "deploy-on-merge": false
+        },
+        "harmony": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-harmony-extended",
+          "deploy-on-merge": false
+        },
+        "matic": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-polygon-extended",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-optimism-extended",
+          "deploy-on-merge": false
         }
       }
     },
