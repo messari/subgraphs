@@ -120,9 +120,9 @@ export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString('10').pow(18);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 
 export const INT_NEGATIVE_ONE = -1 as i32;
@@ -146,14 +146,16 @@ export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const MS_PER_YEAR = DAYS_PER_YEAR.times(
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+);
 
 ////////////////
 ///// Misc /////
 ////////////////
 
-export const ETH_SYMBOL = "ETH"
-export const ETH_NAME = "Ether"
+export const ETH_SYMBOL = "ETH";
+export const ETH_NAME = "Ether";
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -170,6 +172,10 @@ REGISTRY_ADDRESS_MAP.set(
   "matic",
   Address.fromString("0x37265A834e95D11c36527451c7844eF346dC342a")
 );
+REGISTRY_ADDRESS_MAP.set(
+  "matic",
+  Address.fromString("0x2845c6929d621e32B7596520C8a1E5a37e616F09")
+);
 
 export namespace PriceSource {
   export const YEARN = "YEARN";
@@ -183,6 +189,15 @@ export namespace PriceSource {
 
 export const TOKEN_PRICE_SOURCE_SKIPS = new TypedMap<Address, Array<string>>();
 TOKEN_PRICE_SOURCE_SKIPS.set(
-  Address.fromString("0x77fba179c79de5b7653f68b5039af940ada60ce0"),
-  [PriceSource.YEARN]
+  Address.fromString("0x30b2de4a95f397545c6509402f235b1be0fa9a14"), // FAITH
+  // Skip all as bad price is being returned
+  [
+    PriceSource.YEARN,
+    PriceSource.CHAINLINK,
+    PriceSource.CURVE_CALC,
+    PriceSource.SUSHISWAP_CALC,
+    PriceSource.CURVE_ROUTER,
+    PriceSource.UNISWAP_ROUTER,
+    PriceSource.SUSHISWAP_ROUTER
+  ]
 );

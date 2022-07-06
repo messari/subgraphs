@@ -1,14 +1,22 @@
 specVersion: 0.0.4
+{{#grafting}}
+features:
+  - grafting
+graft:
+  base: {{graftBase}}
+  block: {{graftBlock}}
+{{/grafting}}
 schema:
   file: ./schema.graphql
 dataSources:
+  {{#factory}}
   - kind: ethereum
     name: ArrakisFactory
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0xea1aff9dbffd1580f6b81a3ad3589e66652db7d9"
+      address: "{{address}}"
       abi: ArrakisFactoryV1
-      startBlock: 12735383
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -31,10 +39,41 @@ dataSources:
         - event: PoolCreated(indexed address,indexed address,indexed address)
           handler: handlePoolCreated
       file: ./src/mappings/handlers/vault.ts
+  {{/factory}}
+  {{#gaugeRegistry}}
+  - kind: ethereum
+    name: GaugeRegistry
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: GaugeRegistry
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+      abis:
+        - name: GaugeRegistry
+          file: ./abis/GaugeRegistry.json
+        - name: LiquidityGaugeV4
+          file: ./abis/LiquidityGaugeV4.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: AddGauge(address,address)
+          handler: handleAddGauge
+      file: ./src/mappings/handlers/liquidityGauge.ts
+  {{/gaugeRegistry}}
 templates:
   - name: ArrakisVault
     kind: ethereum/contract
-    network: mainnet
+    network: {{network}}
     source:
       abi: ArrakisVaultV1
     mapping:
@@ -100,7 +139,7 @@ templates:
           handler: handleUpdateManagerParams
   - name: LiquidityGauge
     kind: ethereum/contract
-    network: mainnet
+    network: {{network}}
     source:
       abi: LiquidityGaugeV4
     mapping:

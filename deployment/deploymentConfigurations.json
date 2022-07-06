@@ -74,6 +74,15 @@
         }
       }
     },
+    "arrakis-finance":{
+      "arrakis-finance": {
+        "mainnet": {
+          "template": "arrakis.finance.template.yaml",
+          "loc": "l0c4t0r/laboratory4",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "convex-finance": {
       "convex-finance": {
         "mainnet": {

@@ -671,7 +671,7 @@ type ActiveAccount @entity {
 }
 
 
-# Keeps track of underlying tokens for hypervisor vaults
+# Keeps track of underlying tokens for vaults
 type _UnderlyingToken @entity {
   " Vault address "
   id: ID!
@@ -685,6 +685,27 @@ type _UnderlyingToken @entity {
   lastAmount1: BigInt!
   " Last block number when amounts were updated "
   lastAmountBlockNumber: BigInt!
+}
+
+# Keeps track of which vault tokens a liquidity gauge accepts as deposit
+type _LiquidityGauge @entity {
+  "Liquidity gauge address"
+  id: ID!
+  "Address of vault tokens the gauge accept deposits from"
+  vault: Vault!
+  " Reward tokens distributed from the vault "
+  rewardTokens: [_GaugeRewardToken!]! @derivedFrom(field: "gauge")
+}
+
+type _GaugeRewardToken @entity {
+  " { Gauge Address }-{ Reward Token Address }"
+  id: ID!
+  " Address of liquidity gauge "
+  gauge: _LiquidityGauge!
+  " Address of reward token "
+  rewardToken: RewardToken!
+  " Index of reward token in rewardToken array of vault "
+  rewardTokenIndex: Int!
 }
 
 # Track FeesEarned events that are the source of revenue

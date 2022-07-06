@@ -14,6 +14,12 @@ export function getUsdPricePerToken(
   tokenAddr: Address,
   skipSources: Array<string> = []
 ): CustomPriceType {
+
+  // Temporary workaround until polygon support for price libs
+  if (dataSource.network() == "matic") {
+    return new CustomPriceType();
+  }
+
   // Check if tokenAddr is a NULL Address
   if (tokenAddr.toHex() == constants.ZERO_ADDRESS_STRING) {
     return new CustomPriceType();

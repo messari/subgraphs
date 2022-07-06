@@ -1,4 +1,3 @@
-// import { log } from "@graphprotocol/graph-ts"
 import {
   Address,
   BigDecimal,
@@ -13,6 +12,7 @@ import {
   YieldAggregator,
   VaultDailySnapshot,
   VaultHourlySnapshot,
+  RewardToken,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -28,6 +28,7 @@ import {
   PROTOCOL_SUBGRAPH_VERSION,
   PROTOCOL_METHODOLOGY_VERSION,
   REGISTRY_ADDRESS_MAP,
+  RewardTokenType,
 } from "../common/constants";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils/datetime";
 
@@ -44,6 +45,18 @@ export function getOrCreateToken(tokenAddress: Address): Token {
     token.save();
   }
   return token;
+}
+
+export function getOrCreateRewardToken(address: Address): RewardToken {
+  let rewardToken = RewardToken.load(address.toHexString());
+  if (!rewardToken) {
+    let token = getOrCreateToken(address);
+    rewardToken = new RewardToken(address.toHexString());
+    rewardToken.token = token.id;
+    rewardToken.type = RewardTokenType.DEPOSIT;
+    rewardToken.save();
+  }
+  return rewardToken as RewardToken;
 }
 
 export function getOrCreateUsageMetricDailySnapshot(
@@ -146,18 +159,19 @@ export function getOrCreateFinancialsDailySnapshot(
 }
 
 export function getOrCreateVaultDailySnapshot(
-  event: ethereum.Event
+  vaultAddress: Address,
+  block: ethereum.Block
 ): VaultDailySnapshot {
-  const snapshotId = event.address
+  const snapshotId = vaultAddress
     .toHex()
     .concat("-")
-    .concat(getDaysSinceEpoch(event.block.timestamp.toI32()));
+    .concat(getDaysSinceEpoch(block.timestamp.toI32()));
 
   let snapshot = VaultDailySnapshot.load(snapshotId);
   if (!snapshot) {
     snapshot = new VaultDailySnapshot(snapshotId);
     snapshot.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
-    snapshot.vault = event.address.toHex();
+    snapshot.vault = vaultAddress.toHex();
     snapshot.totalValueLockedUSD = BigDecimal.zero();
     snapshot.cumulativeSupplySideRevenueUSD = BigDecimal.zero()
     snapshot.dailySupplySideRevenueUSD = BigDecimal.zero()
@@ -172,8 +186,8 @@ export function getOrCreateVaultDailySnapshot(
     snapshot.stakedOutputTokenAmount = null;
     snapshot.rewardTokenEmissionsAmount = null;
     snapshot.rewardTokenEmissionsUSD = null;
-    snapshot.blockNumber = event.block.number;
-    snapshot.timestamp = event.block.timestamp;
+    snapshot.blockNumber = block.number;
+    snapshot.timestamp = block.timestamp;
     snapshot.save();
   }
 
@@ -181,18 +195,19 @@ export function getOrCreateVaultDailySnapshot(
 }
 
 export function getOrCreateVaultHourlySnapshot(
-  event: ethereum.Event
+  vaultAddress: Address,
+  block: ethereum.Block
 ): VaultHourlySnapshot {
-  const snapshotId = event.address
+  const snapshotId = vaultAddress
     .toHex()
     .concat("-")
-    .concat(getHoursSinceEpoch(event.block.timestamp.toI32()));
+    .concat(getHoursSinceEpoch(block.timestamp.toI32()));
 
   let snapshot = VaultHourlySnapshot.load(snapshotId);
   if (!snapshot) {
     snapshot = new VaultHourlySnapshot(snapshotId);
     snapshot.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
-    snapshot.vault = event.address.toHex();
+    snapshot.vault = vaultAddress.toHex();
     snapshot.totalValueLockedUSD = BigDecimal.zero();
     snapshot.cumulativeSupplySideRevenueUSD = BigDecimal.zero();
     snapshot.hourlySupplySideRevenueUSD = BigDecimal.zero()
@@ -207,8 +222,8 @@ export function getOrCreateVaultHourlySnapshot(
     snapshot.stakedOutputTokenAmount = null;
     snapshot.rewardTokenEmissionsAmount = null;
     snapshot.rewardTokenEmissionsUSD = null;
-    snapshot.blockNumber = event.block.number;
-    snapshot.timestamp = event.block.timestamp;
+    snapshot.blockNumber = block.number;
+    snapshot.timestamp = block.timestamp;
     snapshot.save();
   }
 

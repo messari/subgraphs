@@ -1,30 +1,31 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-import { PoolCreated } from "../../generated/ArrakisFactory/ArrakisFactoryV1";
-import { ArrakisVault as ArrakisVaultTemplate } from "../../generated/templates";
+import { PoolCreated } from "../../../generated/ArrakisFactory/ArrakisFactoryV1";
+import { ArrakisVault as ArrakisVaultTemplate } from "../../../generated/templates";
 import {
   Burned,
   FeesEarned,
   Minted,
   UpdateManagerParams,
-} from "../../generated/templates/ArrakisVault/ArrakisVaultV1";
+} from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
+import { InitializeCall } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
 import {
   PROTOCOL_PERFORMANCE_FEE,
   UsageType,
   VaultFeeType,
-} from "../common/constants";
-import { getOrCreateYieldAggregator } from "../common/getters";
+} from "../../common/constants";
+import { getOrCreateYieldAggregator } from "../../common/getters";
 import {
   createDeposit,
   createFeesEarned,
   createWithdraw,
-} from "./helpers/events";
-import { updateRevenue, updateTvl } from "./helpers/financials";
-import { updateUsageMetrics } from "./helpers/usageMetrics";
+} from "../helpers/events";
+import { updateRevenue, updateTvl } from "../helpers/financials";
+import { updateUsageMetrics } from "../helpers/usageMetrics";
 import {
   getOrCreateVault,
   getOrCreateVaultFee,
   updateVaultSnapshots,
-} from "./helpers/vaults";
+} from "../helpers/vaults";
 
 export function handlePoolCreated(event: PoolCreated): void {
   let protocol = getOrCreateYieldAggregator(event.address);
@@ -50,7 +51,7 @@ export function handleMinted(event: Minted): void {
 
   updateUsageMetrics(event.params.receiver, UsageType.DEPOSIT, event); // minted shares are attributed to receiver
   updateTvl(event);
-  updateVaultSnapshots(event);
+  updateVaultSnapshots(event.address, event.block);
 }
 
 export function handleBurned(event: Burned): void {
@@ -65,13 +66,14 @@ export function handleBurned(event: Burned): void {
 
   updateUsageMetrics(event.transaction.from, UsageType.WITHDRAW, event); // Burned shares are attributed to msg.sender
   updateTvl(event);
-  updateVaultSnapshots(event);
+  updateVaultSnapshots(event.address, event.block);
 }
 
 export function handleFeesEarned(event: FeesEarned): void {
   createFeesEarned(event);
   updateRevenue(event);
   updateTvl(event);
+  updateVaultSnapshots(event.address, event.block);
 }
 
 export function handleUpdateManagerParams(event: UpdateManagerParams): void {
@@ -83,5 +85,5 @@ export function handleUpdateManagerParams(event: UpdateManagerParams): void {
     event.params.managerFeeBPS / 100
   ).toBigDecimal();
   vaultPerformanceFee.feePercentage = PROTOCOL_PERFORMANCE_FEE.plus(managerFee);
-  vaultPerformanceFee.save()
+  vaultPerformanceFee.save();
 }

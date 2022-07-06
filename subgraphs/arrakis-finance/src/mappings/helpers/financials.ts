@@ -1,5 +1,5 @@
 import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
-import { FeesEarned, Rebalance } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
+import { FeesEarned } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { ArrakisVaultV1 as ArrakisVaultContract } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
 import { getOrCreateUnderlyingToken, getOrCreateVault } from "./vaults";
 import {
@@ -103,8 +103,8 @@ export function updateRevenue(event: FeesEarned): void {
     REGISTRY_ADDRESS_MAP.get(dataSource.network())!
   );
   let vault = getOrCreateVault(event.address, event.block);
-  let vaultDailySnapshot = getOrCreateVaultDailySnapshot(event);
-  let vaultHourlySnapshot = getOrCreateVaultHourlySnapshot(event);
+  let vaultDailySnapshot = getOrCreateVaultDailySnapshot(event.address, event.block);
+  let vaultHourlySnapshot = getOrCreateVaultHourlySnapshot(event.address, event.block);
   let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
 
   // Update protocol cumulative revenue
