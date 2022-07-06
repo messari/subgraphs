@@ -1,4 +1,10 @@
-import { Address, bigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  bigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -17,7 +23,6 @@ import {
   NewReserveFactor,
 } from "../../../generated/templates/CToken/CToken";
 
-
 import {
   LendingProtocol,
   Token,
@@ -33,7 +38,6 @@ import {
   SECONDS_PER_YEAR,
   RewardTokenType,
   exponentToBigDecimal,
-
 } from "../../../src/constants";
 
 import {
@@ -68,9 +72,12 @@ import {
   nativeToken,
   TONICAddress,
   tTONICAddress,
-  CRONOS_BLOCKSPERDAY
+  CRONOS_BLOCKSPERDAY,
+  ORACLE_ADDRESS,
+  WCROUSDC_ADDRESS,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
+import { VVSlp } from "../../../generated/templates/CToken/VVSlp";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
@@ -205,8 +212,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   );
 }
 
-// export function _handleAccrueInterest_Tectonic(event: ): 
-
+// export function _handleAccrueInterest_Tectonic(event: ):
 
 export function handleAccrueInterest(event: AccrueInterest): void {
   let marketAddress = event.address;
@@ -261,92 +267,114 @@ function getOrCreateProtocol(): LendingProtocol {
 }
 
 function updateRewards(event: ethereum.Event, market: Market): void {
-    let rewardTokenBorrow: RewardToken | null = null;
-    let rewardTokenDeposit: RewardToken | null = null;
+  let rewardTokenBorrow: RewardToken | null = null;
+  let rewardTokenDeposit: RewardToken | null = null;
 
-    // check if market has COMP reward tokens
-    if (market.rewardTokens == null) {
-      // get or create COMP token
-      let compToken = Token.load(TONICAddress);
-      if (!compToken) {
-        let tokenContract = ERC20.bind(Address.fromString(TONICAddress));
-        compToken = new Token(TONICAddress);
-        compToken.name = getOrElse(tokenContract.try_name(), "unkown");
-        compToken.symbol = getOrElse(tokenContract.try_symbol(), "unkown");
-        compToken.decimals = getOrElse(tokenContract.try_decimals(), 0);
-        compToken.save();
-      }
-
-      let borrowID = RewardTokenType.BORROW.concat("-").concat(TONICAddress);
-      rewardTokenBorrow = RewardToken.load(borrowID);
-      if (!rewardTokenBorrow) {
-        rewardTokenBorrow = new RewardToken(borrowID);
-        rewardTokenBorrow.token = compToken.id; // COMP already made from cCOMP market
-        rewardTokenBorrow.type = RewardTokenType.BORROW;
-        rewardTokenBorrow.save();
-      }
-      let depositID = RewardTokenType.DEPOSIT.concat("-").concat(TONICAddress);
-      rewardTokenDeposit = RewardToken.load(depositID);
-      if (!rewardTokenDeposit) {
-        rewardTokenDeposit = new RewardToken(depositID);
-        rewardTokenDeposit.token = compToken.id; // COMP already made from cCOMP market
-        rewardTokenDeposit.type = RewardTokenType.DEPOSIT;
-        rewardTokenDeposit.save();
-      }
-
-      market.rewardTokens = [rewardTokenDeposit.id, rewardTokenBorrow.id];
-      market.save();
+  // check if market has COMP reward tokens
+  if (market.rewardTokens == null) {
+    // get or create COMP token
+    let compToken = Token.load(TONICAddress);
+    if (!compToken) {
+      let tokenContract = ERC20.bind(Address.fromString(TONICAddress));
+      compToken = new Token(TONICAddress);
+      compToken.name = getOrElse(tokenContract.try_name(), "unkown");
+      compToken.symbol = getOrElse(tokenContract.try_symbol(), "unkown");
+      compToken.decimals = getOrElse(tokenContract.try_decimals(), 0);
+      compToken.save();
     }
 
-    // get COMP distribution/block
-    // let rewardDecimals = Token.load(TONICAddress)!.decimals; 
-    let rewardDecimals = 18; // TONIC 18 decimals
-    let troller = Core.bind(comptrollerAddr);
-    let blocksPerDay = BigInt.fromString(CRONOS_BLOCKSPERDAY);
-
-    let compPriceUSD = BIGDECIMAL_ZERO;
-    let supplyCompPerDay = BIGINT_ZERO;
-    let borrowCompPerDay = BIGINT_ZERO;
-
-
-    // comp speeds are the same for supply/borrow side
-    let tryCompSpeed = troller.try_tonicSpeeds(event.address);
-    supplyCompPerDay = tryCompSpeed.reverted
-      ? BIGINT_ZERO
-      : tryCompSpeed.value.times(blocksPerDay);
-    borrowCompPerDay = supplyCompPerDay;
-  
-
-    // get TONIC price
-    // tTONIC was made at this block height 1337195
-    if (event.block.number.toI32() > 1337194) {
-      let compMarket = Market.load(tTONICAddress);
-      if (!compMarket) {
-        log.warning("[updateRewards] Market not found: {}", [tTONICAddress]);
-        return;
-      }
-
-      compPriceUSD = compMarket.inputTokenPriceUSD;
-    } else {
-      // try to get TONIC price between blocks 10271924 - 10960099 using price oracle library
-
-      // As CRONOS Price oracle is not built yet, using 0 before tonic Market was created for now.
-      compPriceUSD = BIGDECIMAL_ZERO;
+    let borrowID = RewardTokenType.BORROW.concat("-").concat(TONICAddress);
+    rewardTokenBorrow = RewardToken.load(borrowID);
+    if (!rewardTokenBorrow) {
+      rewardTokenBorrow = new RewardToken(borrowID);
+      rewardTokenBorrow.token = compToken.id; // COMP already made from cCOMP market
+      rewardTokenBorrow.type = RewardTokenType.BORROW;
+      rewardTokenBorrow.save();
+    }
+    let depositID = RewardTokenType.DEPOSIT.concat("-").concat(TONICAddress);
+    rewardTokenDeposit = RewardToken.load(depositID);
+    if (!rewardTokenDeposit) {
+      rewardTokenDeposit = new RewardToken(depositID);
+      rewardTokenDeposit.token = compToken.id; // COMP already made from cCOMP market
+      rewardTokenDeposit.type = RewardTokenType.DEPOSIT;
+      rewardTokenDeposit.save();
     }
 
-    let borrowCompPerDayUSD = borrowCompPerDay
-      .toBigDecimal()
-      .div(exponentToBigDecimal(rewardDecimals))
-      .times(compPriceUSD);
-    let supplyCompPerDayUSD = supplyCompPerDay
-      .toBigDecimal()
-      .div(exponentToBigDecimal(rewardDecimals))
-      .times(compPriceUSD);
-    market.rewardTokenEmissionsAmount = [borrowCompPerDay, supplyCompPerDay]; // same order as market.rewardTokens
-    market.rewardTokenEmissionsUSD = [borrowCompPerDayUSD, supplyCompPerDayUSD];
+    market.rewardTokens = [rewardTokenDeposit.id, rewardTokenBorrow.id];
     market.save();
   }
 
+  // get TONIC distribution/block
+  // let rewardDecimals = Token.load(TONICAddress)!.decimals;
+  let rewardDecimals = 18; // TONIC 18 decimals
+  let troller = Core.bind(comptrollerAddr);
+  let blocksPerDay = BigInt.fromString(CRONOS_BLOCKSPERDAY);
 
+  let compPriceUSD = BIGDECIMAL_ZERO;
+  let supplyCompPerDay = BIGINT_ZERO;
+  let borrowCompPerDay = BIGINT_ZERO;
 
-  
+  // Tonic speeds are the same for supply/borrow side
+  let tryCompSpeed = troller.try_tonicSpeeds(event.address);
+  supplyCompPerDay = tryCompSpeed.reverted
+    ? BIGINT_ZERO
+    : tryCompSpeed.value.times(blocksPerDay);
+  borrowCompPerDay = supplyCompPerDay;
+
+  // get TONIC price
+  // tTONIC was made at this block height 1337195
+  // if (event.block.number.toI32() > 1337194) {
+  //   let compMarket = Market.load(tTONICAddress);
+  //   if (!compMarket) {
+  //     log.warning("[updateRewards] Market not found: {}", [tTONICAddress]);
+  //     return;
+  //   }
+
+  //   compPriceUSD = compMarket.inputTokenPriceUSD;
+  // }
+  if (
+    event.block.number.toI32() > 687810 &&
+    event.block.number.toI32() <= 1337194
+  ) {
+    let liquidity_pool_TONIC = VVSlp.bind(Address.fromString(ORACLE_ADDRESS));
+    let liquidity_pool_CRO = VVSlp.bind(Address.fromString(WCROUSDC_ADDRESS));
+
+    let current_price_TONICCRO = getOrElse(
+      liquidity_pool_TONIC.try_price1CumulativeLast(),
+      BIGINT_ZERO
+    );
+    let current_price_CRO = getOrElse(
+      liquidity_pool_CRO.try_price1CumulativeLast(),
+      BIGINT_ZERO
+    );
+
+    compPriceUSD = current_price_TONICCRO
+      .div(current_price_CRO)
+      .toBigDecimal()
+      .div(exponentToBigDecimal(rewardDecimals));
+  } else if (event.block.number.toI32() > 1337194) {
+    let compMarket = Market.load(tTONICAddress);
+    if (!compMarket) {
+      log.warning("[updateRewards] Market not found: {}", [tTONICAddress]);
+      return;
+    }
+    compPriceUSD = compMarket.inputTokenPriceUSD;
+  } else {
+    // try to get TONIC price between blocks start - 1337194
+
+    // As CRONOS Price oracle is not built yet, using 0 before tonic Market was created for now.
+    compPriceUSD = BIGDECIMAL_ZERO;
+  }
+
+  let borrowCompPerDayUSD = borrowCompPerDay
+    .toBigDecimal()
+    .div(exponentToBigDecimal(rewardDecimals))
+    .times(compPriceUSD);
+  let supplyCompPerDayUSD = supplyCompPerDay
+    .toBigDecimal()
+    .div(exponentToBigDecimal(rewardDecimals))
+    .times(compPriceUSD);
+  market.rewardTokenEmissionsAmount = [borrowCompPerDay, supplyCompPerDay]; // same order as market.rewardTokens
+  market.rewardTokenEmissionsUSD = [borrowCompPerDayUSD, supplyCompPerDayUSD];
+  market.save();
+}
