@@ -586,6 +586,86 @@
           "messari": "messari/network-boba",
           "dmelotik": "dmelotik/network-boba",
           "deploy-on-merge": true
+        },
+        "bsc": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-bsc",
+          "dmelotik": "dmelotik/network-bsc",
+          "deploy-on-merge": true
+        },
+        "celo": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-celo",
+          "dmelotik": "dmelotik/network-celo",
+          "deploy-on-merge": true
+        },
+        "clover": {
+          "template": "evm.template.yaml",
+          "messari": "messari/TODO",
+          "dmelotik": "dmelotik/network-clover",
+          "deploy-on-merge": true
+        },
+        "fantom": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-fantom",
+          "dmelotik": "dmelotik/network-fantom",
+          "deploy-on-merge": true
+        },
+        "fuse": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-fuse",
+          "dmelotik": "dmelotik/network-fuse",
+          "deploy-on-merge": true
+        },
+        "harmony": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-harmony",
+          "dmelotik": "dmelotik/network-harmony",
+          "deploy-on-merge": true
+        },
+        "mainnet": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-ethereum",
+          "dmelotik": "dmelotik/network-ethereum",
+          "deploy-on-merge": true
+        },
+        "matic": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-polygon",
+          "dmelotik": "dmelotik/network-polygon",
+          "deploy-on-merge": true
+        },
+        "moonbeam": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-moonbeam",
+          "dmelotik": "dmelotik/network-moonbeam",
+          "deploy-on-merge": true
+        },
+        "moonriver": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-moonriver",
+          "dmelotik": "dmelotik/network-moonriver",
+          "deploy-on-merge": true
+        },
+        "optimism": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-optimism",
+          "dmelotik": "dmelotik/network-optimism",
+          "deploy-on-merge": true
+        },
+        "xdai": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-gnosis",
+          "dmelotik": "dmelotik/network-xdai",
+          "deploy-on-merge": true
+        }
+      },
+      "near": {
+        "near-mainnet": {
+          "template": "near.template.yaml",
+          "messari": "messari/TODO",
+          "dmelotik": "dmelotik/network-near-mainnet",
+          "deploy-on-merge": true
         }
       }
     },
