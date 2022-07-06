@@ -583,10 +583,11 @@ export function _handleDeposit(
   // udpate market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
-    marketId.toHexString(),
+    market,
     deposit.amountUSD,
     EventType.DEPOSIT,
-    event.block.timestamp
+    event.block.timestamp,
+    event.block.number
   );
 }
 
@@ -669,10 +670,11 @@ export function _handleWithdraw(
   // udpate market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
-    marketId.toHexString(),
+    market,
     withdraw.amountUSD,
     EventType.WITHDRAW,
-    event.block.timestamp
+    event.block.timestamp,
+    event.block.number
   );
 }
 
@@ -760,10 +762,11 @@ export function _handleBorrow(
   // udpate market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
-    marketId.toHexString(),
+    market,
     borrow.amountUSD,
     EventType.BORROW,
-    event.block.timestamp
+    event.block.timestamp,
+    event.block.number
   );
 }
 
@@ -846,10 +849,11 @@ export function _handleRepay(
   // udpate market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
-    marketId.toHexString(),
+    market,
     repay.amountUSD,
     EventType.REPAY,
-    event.block.timestamp
+    event.block.timestamp,
+    event.block.number
   );
 }
 
@@ -859,7 +863,8 @@ export function _handleLiquidate(
   marketId: Address, // collateral market
   protocolData: ProtocolData,
   liquidator: Address,
-  borrower: Address // account liquidated
+  borrower: Address, // account liquidated
+  repayToken: Address // token repaid to cover debt
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -875,6 +880,64 @@ export function _handleLiquidate(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let liquidate = new Liquidate(id);
 
+  // update liquidators account
+  let liquidatorAccount = Account.load(liquidator.toHexString());
+  if (!liquidatorAccount) {
+    liquidatorAccount = createAccount(liquidator.toHexString());
+    liquidatorAccount.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  liquidatorAccount.liquidateCount += 1;
+  let liquidatorActorID = "liquidator"
+    .concat("-")
+    .concat(liquidator.toHexString());
+  let liquidatorActor = ActorAccount.load(liquidatorActorID);
+  if (!liquidatorActor) {
+    liquidatorActor = new ActorAccount(liquidatorActorID);
+    liquidatorActor.save();
+
+    protocol.cumulativeUniqueLiquidators += 1;
+    protocol.save();
+  }
+
+  // get borrower account
+  let account = Account.load(borrower.toHexString());
+  if (!account) {
+    account = createAccount(borrower.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.liquidationCount += 1;
+  account.save();
+
+  let repayTokenMarket = Market.load(repayToken.toHexString());
+  if (!repayTokenMarket) {
+    log.warning("[Liquidate] Repay token market not found on protocol: {}", [
+      repayToken.toHexString(),
+    ]);
+  }
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  let positionID = subtractPosition(
+    protocol,
+    market,
+    account,
+    aTokenContract.try_balanceOf(borrower), // try getting balance of account
+    PositionSide.LENDER,
+    EventType.LIQUIDATEE,
+    event
+  );
+  if (!positionID) {
+    log.warning("[handleLiquidate] Position not found for account: {}", [
+      borrower.toHexString(),
+    ]);
+    return;
+  }
+
+  liquidate.position = positionID!;
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.liquidator = liquidator.toHexString();
@@ -893,65 +956,6 @@ export function _handleLiquidate(
     market.liquidationPenalty.div(BIGDECIMAL_HUNDRED)
   );
   liquidate.save();
-
-  // create account
-  // update protocol
-  let liquidatorAccountID = liquidator.toHexString();
-  let liquidatorAccount = Account.load(liquidatorAccountID);
-  if (!liquidatorAccount) {
-    liquidatorAccount = createAccount(liquidatorAccountID);
-    liquidatorAccount.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-  let liquidatorActorID = "liquidator".concat("-").concat(liquidatorAccountID);
-  let liquidatorActor = ActorAccount.load(liquidatorActorID);
-  if (!liquidatorActor) {
-    liquidatorActor = new ActorAccount(liquidatorActorID);
-    liquidatorActor.save();
-
-    protocol.cumulativeUniqueLiquidators += 1;
-    protocol.save();
-  }
-
-  let liquidateeAccountID = borrower.toHexString();
-  let liquidateeAccount = Account.load(liquidateeAccountID);
-  if (!liquidateeAccount) {
-    liquidateeAccount = createAccount(liquidateeAccountID);
-    liquidateeAccount.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-  let liquidateeActorID = "liquidatee".concat("-").concat(liquidateeAccountID);
-  let liquidateeActor = ActorAccount.load(liquidateeActorID);
-  if (!liquidateeActor) {
-    liquidateeActor = new ActorAccount(liquidateeActorID);
-    liquidateeActor.save();
-
-    protocol.cumulativeUniqueLiquidatees += 1;
-    protocol.save();
-  }
-
-  //
-  // update account
-  //
-  liquidatorAccount.liquidateCount += 1;
-  liquidatorAccount.save();
-
-  liquidateeAccount.liquidationCount += 1;
-  liquidateeAccount.save();
-
-  // update metrics
-  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
-    liquidate.amountUSD
-  );
-  protocol.save();
-  market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(
-    liquidate.amountUSD
-  );
-  market.save();
 
   // update usage metrics
   snapshotUsage(
@@ -974,9 +978,10 @@ export function _handleLiquidate(
   // udpate market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
-    marketId.toHexString(),
+    market,
     liquidate.amountUSD,
     EventType.LIQUIDATOR,
-    event.block.timestamp
+    event.block.timestamp,
+    event.block.number
   );
 }
