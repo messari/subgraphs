@@ -799,6 +799,43 @@ type ActiveAccount @entity {
 
 #Added Entities
 
+type _MasterChef @entity {
+  " pid referenced in the MasterChef Contract "
+  id: ID!
+
+  " Total allocation point of all staking pools "
+  totalAllocPoint: BigInt!
+
+  " Amount of reward tokens emitted per block or timestamp "
+  rewardTokenRate: BigInt!
+
+  " Indicates whether rewards are indicated by block or timestamp  "
+  rewardTokenInterval: String!
+
+  " Reward token rate given after you adjust for allocations either burned or not applicable "
+  adjustedRewardTokenRate: BigInt!
+
+  " Last time the adjusted reward token rate was updated "
+  lastUpdatedRewardRate: BigInt!
+}
+
+type _MasterChefStakingPool @entity {
+  " pid referenced in the MasterChef Contract "
+  id: ID!
+
+  " Address of the liquidity pool per the MasterChef PID "
+  poolAddress: String! 
+
+  " Allocation point of this MasterChef Staking pool "
+  poolAllocPoint: BigInt!
+
+  " Reward Multiplier for a given staking pool "
+  multiplier: BigInt!
+
+  " Last block where rewards were given out "
+  lastRewardBlock: BigInt!
+}
+
 " Thia entity is used to track data from the transfer events. Mainly, I want to track the executor of the deposit/withdraw and the liquidity minted/burned "
 type _Transfer @entity {
   id: ID! # txn hash

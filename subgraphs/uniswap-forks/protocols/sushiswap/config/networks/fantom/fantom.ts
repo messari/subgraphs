@@ -1,9 +1,24 @@
-import { Address, BigDecimal } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
-import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
 
 export class SushiswapFantomConfigurations implements Configurations {
   getNetwork(): string {
@@ -27,8 +42,12 @@ export class SushiswapFantomConfigurations implements Configurations {
   getFactoryAddress(): string {
     return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString(toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString(
+        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
+      )
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("3");
@@ -50,6 +69,9 @@ export class SushiswapFantomConfigurations implements Configurations {
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.TIMESTAMP;
+  }
+  getRewardTokenRate(): BigInt {
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return toLowerCase("0x74b23882a30290451A17c44f4F05243b6b58C76d");
@@ -86,9 +108,18 @@ export class SushiswapFantomConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0x0751f7661f4b5a012cae6afe38e594a6f10d4313", // TAAKIN
+      "0xf6129f6705b826dbafaa26e03aad9dd20b9235c6", // ICECREAM
+      "0xc61b68d68ba5118afd9048728b4977ebe57130a0", // SUNDAY ICECREAM
+      "0x07a5b3d0cb418d07d9ad12cbdb30b5c5c6778531", // DEFI SYSTEM FOR REFERENCE
+      "0xe297e06761a5489380538a0308b6f9b4a53bea45", // fWTI Oil
+      "0xdaa10abbc76151893cda500580cd78cc0b807c47", // Fast Moon
+      "0x0ebdd4cdc95ec1e20d7fddc8aaedba0c840e4975", // Bull Moon
+      "0x6160240896d8039b2d901cd59dea95396c94a1c2", // Adult Entertainment Token
+    ];
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+    return MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND;
   }
 }

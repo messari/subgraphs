@@ -1,13 +1,13 @@
 import { TabContext, TabPanel } from "@mui/lab";
 import { CircularProgress, Tab, Tabs } from "@mui/material";
 import React from "react";
-import { ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 import EventsTab from "./tabs/EventsTab";
 import PoolTab from "./tabs/PoolTab";
 import ProtocolTab from "./tabs/ProtocolTab";
 import { styled } from "../styled";
 import PoolOverviewTab from "./tabs/PoolOverviewTab";
 import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
+import { ProtocolTypeEntityName } from "../constants";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -66,9 +66,8 @@ function AllDataTabs({
   handleTabChange,
   setPoolId,
   setProtocolId,
-  paginate
+  paginate,
 }: AllDataTabsProps) {
-
   let protocolDropDown = null;
   if (data.protocols.length > 1) {
     protocolDropDown = (
@@ -86,6 +85,9 @@ function AllDataTabs({
   if (!protocolTableData) {
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
+
+  const protocolType = data.protocols[0].type;
+  const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
 
   return (
     <>
@@ -112,6 +114,7 @@ function AllDataTabs({
         <TabPanel value="2">
           {/* POOLOVERVIEW TAB */}
           <PoolOverviewTab
+            totalPoolCount={protocolTableData[protocolEntityNameSingular].totalPoolCount}
             skipAmt={skipAmt}
             pools={pools}
             protocolType={data.protocols[0].type}

@@ -122,7 +122,8 @@ function PoolTab({
           dataFields={poolData}
           setIssues={(x) => setTableIssues(x)}
           issuesProps={tableIssues}
-        />)
+        />
+      );
     }
     if (poolTimeseriesData) {
       const poolEntityElements = Object.keys(poolTimeseriesData).map((entityName: string) => {

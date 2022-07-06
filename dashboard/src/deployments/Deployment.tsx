@@ -1,7 +1,7 @@
-import React, { MouseEventHandler, useContext, useMemo } from "react";
+import { MouseEventHandler, useContext, useMemo } from "react";
 import { latestSchemaVersion } from "../constants";
 import { useNavigate } from "react-router";
-import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject, useQuery } from "@apollo/client";
+import { ApolloClient, NormalizedCacheObject, useQuery } from "@apollo/client";
 import { NewClient, parseSubgraphName, toPercent } from "../utils";
 import { ProtocolQuery } from "../queries/protocolQuery";
 import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
@@ -53,7 +53,7 @@ const StyledDeployment = styled(Card)<{
   `;
 });
 
-const CardRow = styled("div") <{ $warning?: boolean }>`
+const CardRow = styled("div")<{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -85,7 +85,11 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   // Pull the subgraph name to use as the variable input for the indexing status query
   const subgraphName = parseSubgraphName(deployment);
   const deploymentId = deployment.split("id/")[1];
-  const { data: status, error: errorIndexing, loading: statusLoading } = useQuery(SubgraphStatusQuery(deployment), {
+  const {
+    data: status,
+    error: errorIndexing,
+    loading: statusLoading,
+  } = useQuery(SubgraphStatusQuery(deployment), {
     variables: { subgraphName, deploymentIds: [deploymentId ? deploymentId : ""] },
     client: clientIndexing,
   });
@@ -161,10 +165,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   }
   const indexed = synced
     ? 100
-    : toPercent(
-      statusData.chains[0].latestBlock.number,
-      statusData.chains[0].chainHeadBlock.number,
-    );
+    : toPercent(statusData.chains[0].latestBlock.number, statusData.chains[0].chainHeadBlock.number);
 
   const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
@@ -202,8 +203,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
             <span>Indexed:</span> <span>{indexed}%</span>
           </CardRow>
           <CardRow>
-            <span>Latest Block:</span>{" "}
-            <span>{statusData.chains[0].latestBlock.number}</span>
+            <span>Latest Block:</span> <span>{statusData.chains[0].latestBlock.number}</span>
           </CardRow>
           <CardRow>
             <span>Current chain block:</span>
@@ -219,8 +219,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
             <span>Non fatal error count:</span> <span>{nonFatalErrors.length}</span>
           </CardRow>
           <CardRow>
-            <span>Entity count:</span>{" "}
-            <span>{parseInt(statusData.entityCount).toLocaleString()}</span>
+            <span>Entity count:</span> <span>{parseInt(statusData.entityCount).toLocaleString()}</span>
           </CardRow>
         </CardContent>
         {(nonFatalErrors.length > 0 || fatalError) && (

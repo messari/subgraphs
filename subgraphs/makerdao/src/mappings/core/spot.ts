@@ -36,7 +36,7 @@ export function handlePoke(event: Poke): void {
   if (!market) {
     return;
   }
-  let tokenAddress = market.inputToken!;
+  let tokenAddress = market.inputToken;
   let priceUSD = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.val), DEFAULT_DECIMALS);
   market.inputTokenPriceUSD = priceUSD;
   market.save();

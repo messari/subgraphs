@@ -1,13 +1,10 @@
-import { Box, CircularProgress, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
-import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
-import SchemaTable from "../SchemaTable";
 import { convertTokenDecimals } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
-import IssuesDisplay from "../IssuesDisplay";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 
 function addDataPoint(
@@ -392,9 +389,7 @@ function PoolTabEntity({
             });
           }
         } catch (err) {
-          if (
-            issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0
-          ) {
+          if (issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0) {
             let message = "JAVASCRIPT ERROR";
             if (err instanceof Error) {
               message = err.message;

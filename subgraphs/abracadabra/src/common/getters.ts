@@ -96,6 +96,8 @@ export function getOrCreateUsageMetricsHourlySnapshot(event: ethereum.Event): Us
     usageMetrics.hourlyWithdrawCount = 0;
     usageMetrics.hourlyRepayCount = 0;
     usageMetrics.hourlyLiquidateCount = 0;
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.save();
   }
   return usageMetrics;
@@ -121,6 +123,8 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics.dailyRepayCount = 0;
     usageMetrics.dailyLiquidateCount = 0;
     usageMetrics.totalPoolCount = 0;
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.save();
   }
   return usageMetrics;
@@ -138,6 +142,7 @@ export function getOrCreateMarketHourlySnapshot(
     if (!market) {
       return null;
     }
+
     marketMetrics = new MarketHourlySnapshot(marketAddress.concat("-").concat(id.toString()));
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
     marketMetrics.market = marketAddress;
@@ -153,15 +158,24 @@ export function getOrCreateMarketHourlySnapshot(
     marketMetrics.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
     marketMetrics.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
     marketMetrics.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+    marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+    marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+    marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+
+    marketMetrics.inputTokenPriceUSD = market.inputTokenPriceUSD;
+    marketMetrics.exchangeRate = market.exchangeRate;
+    marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+    marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
 
     marketMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
     marketMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     marketMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyRepayUSD = BIGDECIMAL_ZERO;
 
-    marketMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-    marketMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    marketMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-
+    marketMetrics.rates = [];
+    marketMetrics.blockNumber = event.block.number;
+    marketMetrics.timestamp = event.block.timestamp;
     marketMetrics.save();
   }
 
@@ -194,18 +208,25 @@ export function getOrCreateMarketDailySnapshot(
     marketMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
     marketMetrics.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
     marketMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
-    marketMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
-    marketMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
     marketMetrics.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+    marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+    marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+    marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+
+    marketMetrics.inputTokenPriceUSD = market.inputTokenPriceUSD;
+    marketMetrics.exchangeRate = market.exchangeRate;
+    marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+    marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
 
     marketMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     marketMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     marketMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
 
-    marketMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-    marketMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    marketMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-
+    marketMetrics.rates = [];
+    marketMetrics.blockNumber = event.block.number;
+    marketMetrics.timestamp = event.block.timestamp;
     marketMetrics.save();
   }
 
@@ -243,6 +264,10 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
     financialMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    financialMetrics.protocolControlledValueUSD = protocol.protocolControlledValueUSD;
+    financialMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
+
     financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
     financialMetrics.save();
   }
@@ -278,6 +303,16 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.lendingType = LendingType.CDP;
   LendingProtocolEntity.mintedTokens = [getMIMAddress(dataSource.network())];
   LendingProtocolEntity.totalPoolCount = 0;
+
+  LendingProtocolEntity.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  LendingProtocolEntity.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  LendingProtocolEntity.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  LendingProtocolEntity.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+  LendingProtocolEntity.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+  LendingProtocolEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+  LendingProtocolEntity.protocolControlledValueUSD = BIGDECIMAL_ZERO;
+  LendingProtocolEntity.marketIDList = [];
+
   LendingProtocolEntity.save();
   return LendingProtocolEntity;
 }

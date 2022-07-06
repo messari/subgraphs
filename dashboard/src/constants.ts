@@ -9,12 +9,13 @@ export namespace Versions {
   export const Schema100 = "1.0.0";
   export const Schema110 = "1.1.0";
   export const Schema120 = "1.2.0";
+  export const Schema130 = "1.3.0";
 
   // Array to list out the different schema versions available
-  export const SchemaVersions = [Schema100, Schema110, Schema120];
+  export const SchemaVersions = [Schema100, Schema110, Schema120, Schema130];
 }
 
-export const latestSchemaVersion = "1.2.1";
+export const latestSchemaVersion = "1.3.0";
 export const SubgraphBaseUrl = "https://api.thegraph.com/subgraphs/name/";
 export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",
