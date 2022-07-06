@@ -86,7 +86,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: avalanche
+    network: xdai
     source:
       abi: Pair
     mapping:

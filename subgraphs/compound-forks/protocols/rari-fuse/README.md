@@ -73,6 +73,8 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 - Arbitrum One:
   - Market `0xc0c997227922004da3a47185ac2be1d648db0062` has a very high TVL (~$100m). This is likely due to the fact that 10% of the total supply of the `inputToken` is in this vault and there are only 5 holders. Price of this asset is probably hard to calculate.
     - A potential fix is to recalculate TVL in every market each time `AccrueInterest` emits. This would slow down syncing as lots of contract calls would be introduced.
+  - `fMIM` seems to have price oracle manipulation between 2/1/22 - 2/4/22 so I took the average price and overrided any transactions within those timestamps
+
 
 ## Reference and Useful Links
 

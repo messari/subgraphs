@@ -14,10 +14,10 @@ import {
   RepayBorrow,
   LiquidateBorrow,
   NewReserveFactor,
-  AccrueInterestOld,
-  AccrueInterestNew,
-} from "../../../generated/templates/CTokenModified/CTokenModified";
-import { CToken } from "../../../generated/templates/CTokenModified/CToken";
+  AccrueInterest as AccrueInterestNew,
+} from "../../../generated/templates/CToken/CToken";
+import { AccrueInterest as AccrueInterestOld } from "../../../generated/templates/CTokenOld/CTokenOld";
+import { CToken as CTokenContract } from "../../../generated/templates/CToken/CToken";
 import {
   LendingProtocol,
   Market,
@@ -26,9 +26,14 @@ import {
 } from "../../../generated/schema";
 import {
   CCOMP_ADDRESS,
+  CETH_ADDRESS,
   comptrollerAddr,
   COMPTROLLER_ADDRESS,
   COMP_ADDRESS,
+  ETH_ADDRESS,
+  ETH_DECIMALS,
+  ETH_NAME,
+  ETH_SYMBOL,
   METHODOLOGY_VERSION,
   Network,
   PROTOCOL_NAME,
@@ -64,7 +69,7 @@ import {
   _handleRedeem,
   _handleRepayBorrow,
 } from "../../../src/mapping";
-import { CTokenModified } from "../../../generated/templates";
+import { CToken, CTokenOld } from "../../../generated/templates";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
@@ -82,6 +87,7 @@ import {
 import { getUSDPriceOfToken } from "./prices";
 import { getUsdPricePerToken } from "./prices/index";
 import { PriceOracle2 } from "../../../generated/Comptroller/PriceOracle2";
+import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
 
 ///////////////////////////////
 //// CToken Level Handlers ////
@@ -156,8 +162,11 @@ export function handleAccrueInterestOld(event: AccrueInterestOld): void {
 
 export function handleMarketListed(event: MarketListed): void {
   // CToken ABI changes at block 8983575
-  // To handle we modified the ABI to include both accrueInterest event signatures
-  CTokenModified.create(event.params.cToken);
+  // To handle we must create the old CToken in order to capture the old acrueInterest signature
+  if (event.block.number.toI32() <= 8983575) {
+    CTokenOld.create(event.params.cToken);
+  }
+  CToken.create(event.params.cToken);
   let cTokenAddr = event.params.cToken;
   let cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
@@ -166,30 +175,47 @@ export function handleMarketListed(event: MarketListed): void {
   // this is a new cToken, a new underlying token, and a new market
 
   let protocol = getOrCreateProtocol();
-  let cTokenContract = CToken.bind(event.params.cToken);
+  let cTokenContract = CTokenContract.bind(event.params.cToken);
   let cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
 
-  let underlyingTokenAddrResult = cTokenContract.try_underlying();
-  if (underlyingTokenAddrResult.reverted) {
-    log.warning(
-      "[handleMarketListed] could not fetch underlying token of cToken: {}",
-      [cTokenAddr.toHexString()]
-    );
-    return;
+  // get underlying token data
+  let underlyingTokenAddr: Address;
+  let underlyingName: string;
+  let underlyingSymbol: string;
+  let underlyingDecimals: i32;
+  if (event.params.cToken == Address.fromString(CETH_ADDRESS)) {
+    // must hard code ETH bc it cannot fetch 0x0 address
+    underlyingTokenAddr = Address.fromString(ETH_ADDRESS);
+    underlyingName = ETH_NAME;
+    underlyingSymbol = ETH_SYMBOL;
+    underlyingDecimals = ETH_DECIMALS;
+  } else {
+    // grab token normally
+    let underlyingTokenAddrResult = cTokenContract.try_underlying();
+    if (underlyingTokenAddrResult.reverted) {
+      log.warning(
+        "[handleMarketListed] could not fetch underlying token of cToken: {}",
+        [cTokenAddr.toHexString()]
+      );
+      return;
+    }
+    underlyingTokenAddr = underlyingTokenAddrResult.value;
+    underlyingName = fetchTokenName(underlyingTokenAddr);
+    underlyingSymbol = fetchTokenSymbol(underlyingTokenAddr);
+    underlyingDecimals = fetchTokenDecimals(underlyingTokenAddr);
   }
-  let underlyingTokenAddr = underlyingTokenAddrResult.value;
-  let underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
+
   _handleMarketListed(
     new MarketListedData(
       protocol,
       new TokenData(
         underlyingTokenAddr,
-        getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
-        getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
-        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
+        underlyingName,
+        underlyingSymbol,
+        underlyingDecimals
       ),
       new TokenData(
         cTokenAddr,
@@ -259,7 +285,7 @@ function handleAccrueInterest(
   totalBorrows: BigInt
 ): void {
   let marketAddress = event.address;
-  let cTokenContract = CToken.bind(marketAddress);
+  let cTokenContract = CTokenContract.bind(marketAddress);
   let protocol = getOrCreateProtocol();
   let oracleContract = PriceOracle2.bind(
     Address.fromString(protocol._priceOracle)
