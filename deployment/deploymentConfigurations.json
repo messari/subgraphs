@@ -148,6 +148,38 @@
           "messari": "messari/aave-v3-optimism",
           "deploy-on-merge": true
         }
+      },
+      "aave-v3-extended": {
+        "arbitrum": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-arbitrum-extended",
+          "deploy-on-merge": false
+        },
+        "avalanche": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-avalanche-extended",
+          "deploy-on-merge": true
+        },
+        "fantom": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-fantom-extended",
+          "deploy-on-merge": false
+        },
+        "harmony": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-harmony-extended",
+          "deploy-on-merge": false
+        },
+        "matic": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-polygon-extended",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "aave-v3-extended.template.yaml",
+          "messari": "messari/aave-v3-optimism-extended",
+          "deploy-on-merge": false
+        }
       }
     },
     "convex-finance": {
