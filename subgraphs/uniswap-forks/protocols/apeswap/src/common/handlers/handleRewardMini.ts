@@ -14,7 +14,10 @@ import {
 } from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
-import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
+import {
+  convertTokenToDecimal,
+  roundToWholeNumber,
+} from "../../../../../src/common/utils/utils";
 
 export function updateMasterChefDeposit(
   event: ethereum.Event,
@@ -22,15 +25,17 @@ export function updateMasterChefDeposit(
   amount: BigInt
 ): void {
   let masterChefV2Pool = _MasterChefStakingPool.load(
-    MasterChef.MASTERCHEFV2 + "-" + pid.toString()
+    MasterChef.MINICHEF + "-" + pid.toString()
   )!;
   let masterchefV2Contract = MiniChefV2Apeswap.bind(event.address);
-  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
 
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress);
   if (!pool) {
     return;
   }
+
+  // log.warning("HELLO1", [])
 
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
     let getBananaPerSecond = masterchefV2Contract.try_bananaPerSecond();
@@ -60,8 +65,9 @@ export function updateMasterChefDeposit(
 
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
+
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
       pool.rewardTokenEmissionsAmount![INT_ZERO],
@@ -84,10 +90,10 @@ export function updateMasterChefWithdraw(
   amount: BigInt
 ): void {
   let masterChefV2Pool = _MasterChefStakingPool.load(
-    MasterChef.MASTERCHEFV2 + "-" + pid.toString()
+    MasterChef.MINICHEF + "-" + pid.toString()
   )!;
   let masterchefV2Contract = MiniChefV2Apeswap.bind(event.address);
-  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
 
   // Return if pool does not exist
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress);
@@ -123,7 +129,7 @@ export function updateMasterChefWithdraw(
 
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
