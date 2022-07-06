@@ -153,32 +153,32 @@
         "arbitrum": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-extended-arbitrum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "avalanche": {
           "template": "aave-v3-extended.template.yaml",
-          "messari": "messari/aave-v3-extended-avalanche",
+          "messari": "messari/aave-v3-avalanche-extended",
           "deploy-on-merge": true
         },
         "fantom": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-extended-fantom",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "harmony": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-extended-harmony",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "matic": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-extended-polygon",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "optimism": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-extended-optimism",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
