@@ -1,110 +1,110 @@
-import { Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { 
+import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { getOrCreateProtocol } from "./entities/protocol";
+import {
   Account,
   ActiveAccount,
-  FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
- } from "../generated/schema";
-import * as constants from "./utils/constants";
-import { getOrCreateProtocol } from "./protocol";
+} from "../generated/schema";
+import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./utils/constants";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
-    const accountId = from.toHexString();
-    let account = Account.load(accountId);
-
-    if (!account) {
-        account = new Account(accountId);
-        account.save();
-
-        const protocol = getOrCreateProtocol();
-        protocol.cumulativeUniqueUsers += 1;
-        protocol.save();
-    }
+  const accountId = from.toHexString();
+  let account = Account.load(accountId);
+  if (!account) {
+    account = new Account(accountId);
+    account.save();
 
     const protocol = getOrCreateProtocol();
-    const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
-    const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
 
-    usageMetricsDailySnapshot.blockNumber = block.number;
-    usageMetricsHourlySnapshot.blockNumber = block.number;
+  const protocol = getOrCreateProtocol();
+  const usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
+  const usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    block
+  );
 
-    usageMetricsDailySnapshot.timestamp = block.timestamp;
-    usageMetricsHourlySnapshot.timestamp = block.timestamp;
+  usageMetricsDailySnapshot.dailyTransactionCount += 1;
+  usageMetricsHourlySnapshot.hourlyTransactionCount += 1;
 
-    usageMetricsDailySnapshot.dailyTransactionCount += 1;
-    usageMetricsHourlySnapshot.hourlyTransactionCount += 1;
+  usageMetricsDailySnapshot.cumulativeUniqueUsers =
+    protocol.cumulativeUniqueUsers;
+  usageMetricsHourlySnapshot.cumulativeUniqueUsers =
+    protocol.cumulativeUniqueUsers;
 
-    usageMetricsDailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-    usageMetricsHourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  let dailyActiveAccountId = (block.timestamp.toI64() / SECONDS_PER_DAY)
+    .toString()
+    .concat("-")
+    .concat(accountId);
 
+  let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
+  if (!dailyActiveAccount) {
+    dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
+    dailyActiveAccount.save();
 
-    let dailyActiveAccountId = (block.timestamp.toI64() / constants.SECONDS_PER_DAY)
-      .toString()
-      .concat("-")
-      .concat(accountId);
-    
-    let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
+    usageMetricsDailySnapshot.dailyActiveUsers += 1;
+    usageMetricsHourlySnapshot.hourlyActiveUsers += 1;
+  }
 
-    if (!dailyActiveAccount) {
-      dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
-      dailyActiveAccount.save();
+  usageMetricsDailySnapshot.blockNumber = block.number;
+  usageMetricsHourlySnapshot.blockNumber = block.number;
 
-      usageMetricsDailySnapshot.dailyActiveUsers += 1;
-      usageMetricsHourlySnapshot.hourlyActiveUsers += 1;
-    }
+  usageMetricsDailySnapshot.timestamp = block.timestamp;
+  usageMetricsHourlySnapshot.timestamp = block.timestamp;
 
-    usageMetricsDailySnapshot.save();
-    usageMetricsHourlySnapshot.save();
+  usageMetricsDailySnapshot.save();
+  usageMetricsHourlySnapshot.save();
 }
 
 export function getOrCreateUsageMetricsDailySnapshot(
-    block: ethereum.Block
-  ): UsageMetricsDailySnapshot {
-    let dayId: string = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
-    let usageMetrics = UsageMetricsDailySnapshot.load(dayId);
-  
-    if (!usageMetrics) {
-      const protocol = getOrCreateProtocol();
-      usageMetrics = new UsageMetricsDailySnapshot(dayId);
-      usageMetrics.protocol = protocol.id;
-  
-      usageMetrics.dailyActiveUsers = 0;
-      usageMetrics.cumulativeUniqueUsers = 0;
-      usageMetrics.dailyTransactionCount = 0;
-      usageMetrics.totalPoolCount = 0;
+  block: ethereum.Block
+): UsageMetricsDailySnapshot {
+  let dayId: string = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  let usageMetrics = UsageMetricsDailySnapshot.load(dayId);
 
-      usageMetrics.blockNumber = block.number;
-      usageMetrics.timestamp = block.timestamp;
+  if (!usageMetrics) {
+    const protocol = getOrCreateProtocol();
+    usageMetrics = new UsageMetricsDailySnapshot(dayId);
 
-      usageMetrics.save();
-    }
-  
-    return usageMetrics;
+    usageMetrics.protocol = protocol.id;
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
+
+    usageMetrics.dailyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
+    usageMetrics.dailyTransactionCount = 0;
+
+    usageMetrics.blockNumber = block.number;
+    usageMetrics.timestamp = block.timestamp;
   }
-  
-  export function getOrCreateUsageMetricsHourlySnapshot(
-    block: ethereum.Block
-  ): UsageMetricsHourlySnapshot {
-    let hourId: string = (block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString();
-    // let dayId: number = (block.timestamp.toI64() / constants.SECONDS_PER_DAY);
-    let usageMetrics = UsageMetricsHourlySnapshot.load(hourId);
-  
-    if (!usageMetrics) {
-      const protocol = getOrCreateProtocol();
-      usageMetrics = new UsageMetricsHourlySnapshot(hourId);
-    //   usageMetrics.dayId = dayId;
 
-      usageMetrics.protocol = protocol.id;
-      usageMetrics.hourlyActiveUsers = 0;
-      usageMetrics.cumulativeUniqueUsers = 0;
-      usageMetrics.hourlyTransactionCount = 0;
-      usageMetrics.blockNumber = block.number;
-      usageMetrics.timestamp = block.timestamp;
-  
-      usageMetrics.save();
-    }
-  
-    return usageMetrics;
+  usageMetrics.save();
+
+  return usageMetrics;
+}
+
+export function getOrCreateUsageMetricsHourlySnapshot(
+  block: ethereum.Block
+): UsageMetricsHourlySnapshot {
+  let hourId: string = (block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
+  let usageMetrics = UsageMetricsHourlySnapshot.load(hourId);
+
+  if (!usageMetrics) {
+    const protocol = getOrCreateProtocol();
+    usageMetrics = new UsageMetricsHourlySnapshot(hourId);
+
+    usageMetrics.protocol = protocol.id;
+
+    usageMetrics.hourlyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
+    usageMetrics.hourlyTransactionCount = 0;
+
+    usageMetrics.blockNumber = block.number;
+    usageMetrics.timestamp = block.timestamp;
   }
-  
+
+  usageMetrics.save();
+
+  return usageMetrics;
+}

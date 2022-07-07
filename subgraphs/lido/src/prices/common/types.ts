@@ -19,7 +19,10 @@ export class CustomPriceType {
     this._decimals = new Wrapped(constants.BIGINT_ZERO.toI32() as u8);
   }
 
-  static initialize(_usdPrice: BigDecimal, _decimals: i32 = 0): CustomPriceType {
+  static initialize(
+    _usdPrice: BigDecimal,
+    _decimals: i32 = 0
+  ): CustomPriceType {
     let result = new CustomPriceType();
     result._usdPrice = new Wrapped(_usdPrice);
     result._decimals = new Wrapped(_decimals as u8);

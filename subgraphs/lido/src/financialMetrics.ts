@@ -1,173 +1,319 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { getOrCreateProtocol } from "./protocol";
-import {
-    FinancialsDailySnapshot,
-    PoolDailySnapshot,
-    PoolHourlySnapshot
-} from "../generated/schema";
+import { log, Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { getUsdPrice, getUsdPricePerToken } from "./prices";
 import { bigIntToBigDecimal } from "./utils/numbers";
+import { getOrCreateProtocol } from "./entities/protocol";
+import { getOrCreatePool } from "./entities/pool";
 import {
-    BIGDECIMAL_ZERO,
-    BIGINT_TEN_TO_EIGHTEENTH,
-    BIGINT_ZERO,
-    ETH_ADDRESS,
-    PROTOCOL_ID,
-    SECONDS_PER_DAY,
-    SECONDS_PER_HOUR
+  FinancialsDailySnapshot,
+  PoolDailySnapshot,
+  PoolHourlySnapshot,
+} from "../generated/schema";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_TEN_TO_EIGHTEENTH,
+  BIGINT_ZERO,
+  ETH_ADDRESS,
+  PROTOCOL_ID,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
 } from "./utils/constants";
-import { getOrCreatePool } from "./pool";
-import { getUsdPrice } from "./prices";
+import { getOrCreateToken } from "./entities/token";
 
-// TODO
-// 1. Update financialMetrics to USD from ETH (dependency on getUSD price)
-// 2. How do we factor in slashing here? Will it be -value?
-// - should TVL instead be tracked at eth2_deposit contract?
+export function updateProtocolAndPoolTvl(
+  block: ethereum.Block,
+  amount: BigInt
+): void {
+  const pool = getOrCreatePool(block.number, block.timestamp);
+  const protocol = getOrCreateProtocol();
+  const financialMetrics = getOrCreateFinancialDailyMetrics(block);
 
-export function updateTotalValueLockedUSD(block: ethereum.Block, amount: BigInt): void {
-    const protocol = getOrCreateProtocol();
-    // TODO do we want to pass protocol and pool after initialization in mapping?
-    const pool = getOrCreatePool(
-        Address.fromString(PROTOCOL_ID),
-        block.number,
-        block.timestamp
-    );
-    const financialMetrics = getOrCreateFinancialDailyMetrics(block);
+  // inputToken is ETH, price with ETH
+  const amountUSD = getUsdPrice(
+    Address.fromString(ETH_ADDRESS),
+    bigIntToBigDecimal(amount)
+  );
 
-    // stETH vs ETH prices
-    const amountUSD = getUsdPrice(
-        Address.fromString(ETH_ADDRESS),
-        bigIntToBigDecimal(amount)
-    );
+  // Protocol
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(amountUSD);
+  protocol.save();
 
-    protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(amountUSD);
-    protocol.save();
+  // Financials Daily
+  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  financialMetrics.save();
 
-    pool.totalValueLockedUSD = protocol.totalValueLockedUSD;
-    pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount)];
-    pool.save();
+  // Pool
+  pool.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount)];
+  pool.save();
 
-    financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-    financialMetrics.save();
+  // Pool Daily and Hourly
+  // updatePoolSnapshots(event.block) is called separately when protocol and supply side
+  // revenue metrics are being calculated to consolidate the snapshots
+}
+
+export function updatePoolSnapshotsTvl(block: ethereum.Block): void {
+  const pool = getOrCreatePool(block.number, block.timestamp);
+  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(
+    Address.fromString(PROTOCOL_ID),
+    block
+  );
+  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(
+    Address.fromString(PROTOCOL_ID),
+    block
+  );
+
+  // Pool Daily
+  poolMetricsDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
+  poolMetricsDailySnapshot.inputTokenBalances = pool.inputTokenBalances;
+  poolMetricsDailySnapshot.save();
+
+  // Pool Hourly
+  poolMetricsHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
+  poolMetricsHourlySnapshot.inputTokenBalances = pool.inputTokenBalances;
+  poolMetricsHourlySnapshot.save();
 }
 
 // Can we get this from from LIDO rather than LIDOOracle?
 export function updateTotalRevenueMetrics(
-    block: ethereum.Block,
-    postTotalPooledEther: BigInt,
-    preTotalPooledEther: BigInt,
-    totalShares: BigInt
+  block: ethereum.Block,
+  postTotalPooledEther: BigInt,
+  preTotalPooledEther: BigInt,
+  totalShares: BigInt
 ): void {
-    const pool = getOrCreatePool(
-        Address.fromString(PROTOCOL_ID),
-        block.number,
-        block.timestamp
-    );
-    const protocol = getOrCreateProtocol();
-    const financialMetrics = getOrCreateFinancialDailyMetrics(block);
+  const pool = getOrCreatePool(block.number, block.timestamp);
+  const protocol = getOrCreateProtocol();
+  const financialMetrics = getOrCreateFinancialDailyMetrics(block);
+  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(
+    Address.fromString(PROTOCOL_ID),
+    block
+  );
+  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(
+    Address.fromString(PROTOCOL_ID),
+    block
+  );
 
-    const stakedRewards = postTotalPooledEther.minus(preTotalPooledEther).div(BIGINT_TEN_TO_EIGHTEENTH);  
-    const stakedRewardsUSD = getUsdPrice(
-        Address.fromString(ETH_ADDRESS),
-        bigIntToBigDecimal(stakedRewards)
-    );
+  // Staking Rewards
+  const stakingRewards = bigIntToBigDecimal(
+    postTotalPooledEther.minus(preTotalPooledEther)
+  );
+  const stakingRewardsUSD = stakingRewards.times(
+    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
+      .lastPriceUSD!
+  );
 
-    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(stakedRewardsUSD);
-    protocol.save();
+  // Protocol
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
+    stakingRewardsUSD
+  );
+  protocol.save();
 
-    pool.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-    pool.outputTokenSupply = totalShares;
-    pool.save();
+  // Financials Daily
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
+    stakingRewardsUSD
+  );
+  financialMetrics.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.save();
 
-    financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(stakedRewardsUSD);
-    financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-    financialMetrics.save();
+  // Pool
+  pool.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  pool.outputTokenSupply = totalShares;
+  pool.outputTokenPriceUSD = getOrCreateToken(
+    Address.fromString(PROTOCOL_ID),
+    block.number
+  ).lastPriceUSD;
+  pool.save();
+
+  // Pool Daily
+  poolMetricsDailySnapshot.cumulativeTotalRevenueUSD =
+    pool.cumulativeTotalRevenueUSD;
+  poolMetricsDailySnapshot.dailyTotalRevenueUSD = poolMetricsDailySnapshot.dailyTotalRevenueUSD.plus(
+    stakingRewardsUSD
+  );
+  poolMetricsDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
+  poolMetricsDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsDailySnapshot.save();
+
+  poolMetricsHourlySnapshot.cumulativeTotalRevenueUSD =
+    pool.cumulativeTotalRevenueUSD;
+  poolMetricsHourlySnapshot.hourlyTotalRevenueUSD = poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.plus(
+    stakingRewardsUSD
+  );
+  poolMetricsHourlySnapshot.outputTokenSupply = pool.outputTokenSupply;
+  poolMetricsHourlySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsHourlySnapshot.save();
 }
 
-export function updateProtocolAndSupplySideRevenueMetrics(
-    block: ethereum.Block,
-    amount: BigInt
+export function updateProtocolSideRevenueMetrics(
+  block: ethereum.Block,
+  amount: BigInt
 ): void {
-    const pool = getOrCreatePool(
-        Address.fromString(PROTOCOL_ID),
-        block.number,
-        block.timestamp
-    );
-    const protocol = getOrCreateProtocol();
-    const financialMetrics = getOrCreateFinancialDailyMetrics(block);
-    
-    const amountUSD = getUsdPrice(
-        Address.fromString(ETH_ADDRESS),
-        bigIntToBigDecimal(amount)
-    );
+  const pool = getOrCreatePool(block.number, block.timestamp);
+  const protocol = getOrCreateProtocol();
+  const financialMetrics = getOrCreateFinancialDailyMetrics(block);
+  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(
+    Address.fromString(PROTOCOL_ID),
+    block
+  );
+  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(
+    Address.fromString(PROTOCOL_ID),
+    block
+  );
 
-    const updatedCumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(amountUSD);
-    protocol.cumulativeProtocolSideRevenueUSD = updatedCumulativeProtocolSideRevenueUSD;
-    // TODO: Buggy? since totalRevenue is coming from Oracle. Should we rely on Transfers / Transfer shares?
-    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(updatedCumulativeProtocolSideRevenueUSD);
-    protocol.save();
+  // Rewards are minted in stETH, price in stETH
+  // TODO: Do we want to price this in ETH?
+  // TODO: TBD: Can we get Node Operators list through contract call?
+  //            If not, we double treasury amount because we both treasuryRevenue and nodeOperatorsRevenue is 5%.
+  const amountUSD = getUsdPrice(
+    Address.fromString(PROTOCOL_ID),
+    bigIntToBigDecimal(amount.plus(amount))
+  );
 
-    pool.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-    pool.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-    pool.save();
+  // Protocol
+  const updatedCumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
+    amountUSD
+  );
+  protocol.cumulativeProtocolSideRevenueUSD = updatedCumulativeProtocolSideRevenueUSD;
+  protocol.save();
 
-    const updatedDailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(amountUSD);
-    financialMetrics.dailyProtocolSideRevenueUSD = updatedDailyProtocolSideRevenueUSD;
-    financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-    // TODO: Buggy? since totalRevenue is coming from Oracle. Should we rely on Transfers / Transfer shares?
-    financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailyTotalRevenueUSD.minus(updatedDailyProtocolSideRevenueUSD);
-    financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-    financialMetrics.save();
+  // Financial Daily
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
+    amountUSD
+  );
+  financialMetrics.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.save();
+
+  // Pool
+  pool.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  pool.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  pool.save();
+
+  // Pool Daily
+  poolMetricsDailySnapshot.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD;
+  const updatedPoolMetricsDailyProtocolSideRevenueUSD = poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+    amountUSD
+  );
+  poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD = updatedPoolMetricsDailyProtocolSideRevenueUSD;
+  poolMetricsDailySnapshot.save();
+
+  // Pool Hourly
+  poolMetricsHourlySnapshot.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD;
+  const updatedPoolMetricsHourlyProtocolSideRevenueUSD = poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+    amountUSD
+  );
+  poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD = updatedPoolMetricsHourlyProtocolSideRevenueUSD;
+  poolMetricsHourlySnapshot.save();
+}
+
+export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
+  const pool = getOrCreatePool(block.number, block.timestamp);
+  const protocol = getOrCreateProtocol();
+  const financialMetrics = getOrCreateFinancialDailyMetrics(block);
+  const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(
+    Address.fromString(PROTOCOL_ID),
+    block
+  );
+  const poolMetricsHourlySnapshot = getOrCreatePoolsHourlySnapshot(
+    Address.fromString(PROTOCOL_ID),
+    block
+  );
+
+  // Protocol
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(
+    protocol.cumulativeProtocolSideRevenueUSD
+  );
+  protocol.save();
+
+  // Financial Daily
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailyTotalRevenueUSD.minus(
+    financialMetrics.dailyProtocolSideRevenueUSD
+  );
+  financialMetrics.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.save();
+
+  // Pool
+  pool.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  pool.save();
+
+  // Pool Daily
+  poolMetricsDailySnapshot.cumulativeSupplySideRevenueUSD =
+    pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsDailySnapshot.dailySupplySideRevenueUSD = poolMetricsDailySnapshot.dailyTotalRevenueUSD.minus(
+    poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD
+  );
+  poolMetricsDailySnapshot.save();
+
+  // Pool Hourly
+  poolMetricsHourlySnapshot.cumulativeSupplySideRevenueUSD =
+    pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsHourlySnapshot.hourlySupplySideRevenueUSD = poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.minus(
+    poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD
+  );
+  poolMetricsHourlySnapshot.save();
 }
 
 export function getOrCreateFinancialDailyMetrics(
-    block: ethereum.Block
-  ): FinancialsDailySnapshot {
-    // Number of days since Unix epoch
-    const id = `${block.timestamp.toI64() / SECONDS_PER_DAY}`;
-    let financialMetrics = FinancialsDailySnapshot.load(id);
+  block: ethereum.Block
+): FinancialsDailySnapshot {
+  let dayId: string = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  let financialMetrics = FinancialsDailySnapshot.load(dayId);
 
-    if (!financialMetrics) {
-      financialMetrics = new FinancialsDailySnapshot(id);
-      financialMetrics.protocol = PROTOCOL_ID;
+  if (!financialMetrics) {
+    financialMetrics = new FinancialsDailySnapshot(dayId);
+    financialMetrics.protocol = PROTOCOL_ID;
 
-      financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-      financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-      financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-      financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-      financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-      financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-      financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    }
+    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  }
 
-    financialMetrics.blockNumber = block.number;
-    financialMetrics.timestamp = block.timestamp;
+  // Set block number and timestamp to the latest for snapshots
+  financialMetrics.blockNumber = block.number;
+  financialMetrics.timestamp = block.timestamp;
 
-    financialMetrics.save();
-    
-    return financialMetrics;
+  financialMetrics.save();
+
+  return financialMetrics;
 }
 
-export function getOrCreatePoolsDailyMetrics(poolAddress: Address, block: ethereum.Block): PoolDailySnapshot {
-  let dayId: string = poolAddress.toHexString().concat((block.timestamp.toI64() / SECONDS_PER_DAY).toString());
+export function getOrCreatePoolsDailySnapshot(
+  poolAddress: Address,
+  block: ethereum.Block
+): PoolDailySnapshot {
+  let dayId: string = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
   let poolMetrics = PoolDailySnapshot.load(dayId);
 
   if (!poolMetrics) {
     poolMetrics = new PoolDailySnapshot(dayId);
-    poolMetrics.protocol = PROTOCOL_ID;
-    poolMetrics.pool = poolAddress.toHexString();
+    poolMetrics.protocol = getOrCreateProtocol().id;
+    poolMetrics.pool = getOrCreatePool(block.number, block.timestamp).id;
 
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     poolMetrics.inputTokenBalances = [BIGINT_ZERO];
     poolMetrics.outputTokenSupply = BIGINT_ZERO;
     poolMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     poolMetrics.stakedOutputTokenAmount = BIGINT_ZERO;
-
   }
 
+  // Set block number and timestamp to the latest for snapshots
   poolMetrics.blockNumber = block.number;
   poolMetrics.timestamp = block.timestamp;
 
@@ -176,28 +322,33 @@ export function getOrCreatePoolsDailyMetrics(poolAddress: Address, block: ethere
   return poolMetrics;
 }
 
-
-export function getOrCreatePoolsHourlyMetrics(poolAddress: Address, block: ethereum.Block): PoolHourlySnapshot {
-  let hourId: string = poolAddress.toHexString().concat((block.timestamp.toI64() / SECONDS_PER_HOUR).toString());
+export function getOrCreatePoolsHourlySnapshot(
+  poolAddress: Address,
+  block: ethereum.Block
+): PoolHourlySnapshot {
+  let hourId: string = (block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
   let poolMetrics = PoolHourlySnapshot.load(hourId);
 
   if (!poolMetrics) {
     poolMetrics = new PoolHourlySnapshot(hourId);
-    poolMetrics.protocol = PROTOCOL_ID;
-    poolMetrics.pool = poolAddress.toHexString();
+    poolMetrics.protocol = getOrCreateProtocol().id;
+    poolMetrics.pool = getOrCreatePool(block.number, block.timestamp).id;
 
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     poolMetrics.inputTokenBalances = [BIGINT_ZERO];
     poolMetrics.outputTokenSupply = BIGINT_ZERO;
     poolMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     poolMetrics.stakedOutputTokenAmount = BIGINT_ZERO;
-
   }
 
+  // Set block number and timestamp to the latest for snapshots
   poolMetrics.blockNumber = block.number;
   poolMetrics.timestamp = block.timestamp;
 
