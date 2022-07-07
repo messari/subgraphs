@@ -12,16 +12,16 @@ const DeploymentsLayout = styled("div")`
 `;
 
 function DeploymentsPage() {
-  const [ProtocolsToQuery, setProtocolsToQuery] = useState<{ [type: string]: { [proto: string]: { [network: string]: string } } }>({})
+  const [ProtocolsToQuery, setProtocolsToQuery] = useState<{
+    [type: string]: { [proto: string]: { [network: string]: string } };
+  }>({});
   const getData = () => {
-    fetch('/deployments.json'
-      , {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      }
-    )
+    fetch("/deployments.json", {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
       .then(function (res) {
         return res.json();
       })
@@ -29,15 +29,13 @@ function DeploymentsPage() {
         setProtocolsToQuery(json);
       })
       .catch((err) => {
-        console.log(err)
-        fetch('/deployments.json'
-          , {
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            }
-          }
-        )
+        console.log(err);
+        fetch("/deployments.json", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
           .then(function (res) {
             return res.json();
           })
@@ -48,10 +46,10 @@ function DeploymentsPage() {
             window.location.reload();
           });
       });
-  }
+  };
   useEffect(() => {
-    getData()
-  }, [])
+    getData();
+  }, []);
 
   const navigate = useNavigate();
   const clientIndexing = NewClient("https://api.thegraph.com/index-node/graphql");
@@ -78,11 +76,12 @@ function DeploymentsPage() {
             {Object.keys(ProtocolsToQuery[key]).map((prot) => (
               <SubgraphDeployments
                 clientIndexing={clientIndexing}
-                key={key + '-' + prot}
+                key={key + "-" + prot}
                 protocol={{ name: prot, deploymentMap: ProtocolsToQuery[key][prot] }}
               />
             ))}
-          </>))}
+          </>
+        ))}
       </DeploymentsLayout>
     </DeploymentsContextProvider>
   );

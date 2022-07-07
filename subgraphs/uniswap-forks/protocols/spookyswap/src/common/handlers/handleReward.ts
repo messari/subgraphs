@@ -2,12 +2,28 @@ import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefSpookyswap } from "../../../../../generated/MasterChef/MasterChefSpookyswap";
 import { LiquidityPool, _HelperStore } from "../../../../../generated/schema";
-import { BIGINT_FIVE, BIGINT_ONE, BIGINT_ZERO, INT_ZERO, RECENT_BLOCK_THRESHOLD, UsageType, ZERO_ADDRESS } from "../../../../../src/common/constants";
+import {
+  BIGINT_FIVE,
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  INT_ZERO,
+  RECENT_BLOCK_THRESHOLD,
+  UsageType,
+  ZERO_ADDRESS,
+} from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
-import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../../src/price/price";
+import {
+  findNativeTokenPerToken,
+  updateNativeTokenPriceInUSD,
+} from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 
-export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
+export function handleReward(
+  event: ethereum.Event,
+  pid: BigInt,
+  amount: BigInt,
+  usageType: string
+): void {
   let masterChefPool = _HelperStore.load(pid.toString());
   let poolContract = MasterChefSpookyswap.bind(event.address);
 
@@ -38,7 +54,11 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
   }
 
   // Return if you have calculated rewards recently
-  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(RECENT_BLOCK_THRESHOLD)) {
+  if (
+    event.block.number
+      .minus(masterChefPool.valueBigInt!)
+      .lt(RECENT_BLOCK_THRESHOLD)
+  ) {
     pool.save();
     return;
   }
@@ -74,16 +94,27 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
     .times(poolAllocPoint)
     .div(totalAllocPoint);
 
-  let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.getRewardIntervalType());
+  let rewardTokenRateBigDecimal = BigDecimal.fromString(
+    rewardTokenRate.toString()
+  );
+  let rewardTokenPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    rewardTokenRateBigDecimal,
+    NetworkConfigs.getRewardIntervalType()
+  );
 
   let nativeToken = updateNativeTokenPriceInUSD();
 
   let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
   rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
-  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
-  pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
+  pool.rewardTokenEmissionsAmount = [
+    BigInt.fromString(rewardTokenPerDay.toString()),
+  ];
+  pool.rewardTokenEmissionsUSD = [
+    rewardTokenPerDay.times(rewardToken.lastPriceUSD!),
+  ];
 
   masterChefPool.valueBigInt = event.block.number;
 

@@ -20,7 +20,7 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 // convert emitted values to tokens count
 export function convertTokenToDecimal(
   tokenAmount: BigInt,
-  exchangeDecimals: i32,
+  exchangeDecimals: i32
 ): BigDecimal {
   if (exchangeDecimals == INT_ZERO) {
     return tokenAmount.toBigDecimal();
@@ -47,7 +47,10 @@ export function toBytesArray(arr: string[]): Bytes[] {
   return byteArr;
 }
 
-export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T): T {
+export function readValue<T>(
+  callResult: ethereum.CallResult<T>,
+  defaultValue: T
+): T {
   return callResult.reverted ? defaultValue : callResult.value;
 }
 

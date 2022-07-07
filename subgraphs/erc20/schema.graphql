@@ -1,0 +1,269 @@
+# Subgraph Schema: ERC20 Tokens
+# Version: 1.0.0
+
+#############################
+####### Token Metadata ######
+#############################
+
+type Token @entity {
+  " Smart contract address of the token "
+  id: ID!
+
+  " Name of the token, mirrored from the smart contract "
+  name: String!
+
+  " Symbol of the token, mirrored from the smart contract "
+  symbol: String!
+
+  " The number of decimal places this token uses, default to 18 "
+  decimals: Int!
+
+  " Number of unique token holders "
+  holderCount: BigInt!
+
+  " Total number of token transfer events "
+  transferCount: BigInt!
+
+  " Total number of token mint events "
+  mintCount: BigInt!
+
+  " Total number of token burn events "
+  burnCount: BigInt!
+
+  " Total token supply "
+  totalSupply: BigDecimal!
+
+  " Total token burned "
+  totalBurned: BigDecimal!
+
+  " Total token minted "
+  totalMinted: BigDecimal!
+
+  " List of token transfers "
+  transfers: [Transfer!]! @derivedFrom(field: "token")
+
+  " Token holder's balance "
+  holdersBalance: [AccountBalance!]! @derivedFrom(field: "token")
+
+  ##### Snapshots #####
+
+  " Daily snapshot for this token "
+  dailyTokenSnapshot: [TokenDailySnapshot!]! @derivedFrom(field: "token")
+
+  " Hourly snapshot for this token "
+  hourlyTokenSnapshot: [TokenHourlySnapshot!]! @derivedFrom(field: "token")
+}
+
+###############################
+####### Token Timeseries ######
+###############################
+
+type TokenDailySnapshot @entity {
+  " { Token Address }-{ # of days since Unix epoch time } "
+  id: ID!
+
+  " Token this snapshot is associated with "
+  token: Token!
+
+  " Daily total Supply of the token "
+  dailyTotalSupply: BigInt!
+
+  " # of accounts holding this token "
+  dailyHolderCount: Int!
+
+  " # of unique daily active users/holders "
+  dailyActiveUsers: Int!
+
+  " # of cumulative unique users/holders "
+  cumulativeUniqueUsers: Int!
+
+  " Total number of events occurred in a day "
+  dailyEventCount: Int!
+
+  " Total number of mints in a day "
+  dailyMintCount: Int!
+
+  " Total number of token minted in a day "
+  dailyMintAmount: BigInt!
+
+  " Total number of burns in a day "
+  dailyBurnCount: Int!
+
+  " Total number of token burnt in a day "
+  dailyBurnAmount: BigInt!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+type TokenHourlySnapshot @entity {
+  " { Token Address }-{ # of hours since Unix epoch time } "
+  id: ID!
+
+  " Token this snapshot is associated with "
+  token: Token!
+
+  " Hourly total Supply of the token "
+  hourlyTotalSupply: BigInt!
+
+  " # of accounts holding this token "
+  hourlyHolderCount: Int!
+
+  " # of unique hourly active users "
+  hourlyActiveUsers: Int!
+
+  " # of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Total number of events occurred in an hour "
+  hourlyEventCount: Int!
+
+  " Total number of mints in a hour "
+  hourlyMintCount: Int!
+
+  " Total amount of token minted in a hour "
+  hourlyMintAmount: BigInt!
+
+  " Total number of burns in a hour "
+  hourlyBurnCount: Int!
+
+  " Total number of token burnt in a hour "
+  hourlyBurnAmount: BigInt!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+##################################
+##### Event-Level Data #####
+##################################
+
+interface Event {
+  " { Token ID }-{ Transaction hash }-{ Log index } "
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The token this event belongs to "
+  token: Token!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: Int!
+
+  " Address that received the tokens "
+  to: String!
+
+  " Address that sent the tokens "
+  from: String!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+}
+
+type Transfer implements Event @entity {
+  " { Token ID }-{ Transaction hash }-{ Log index } "
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The token this event belongs to "
+  token: Token!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: Int!
+
+  " Account that received the tokens "
+  to: Account!
+
+  " Account that sent the tokens "
+  from: Account!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+}
+
+##################################
+######## Account MetaData ########
+##################################
+
+# An account is a unique Ethereum address
+type Account @entity {
+  " Address of the account "
+  id: ID!
+
+  " Token transfers to this account "
+  transferTo: [Transfer!]! @derivedFrom(field: "to")
+
+  " Token transfers from this account "
+  transferFrom: [Transfer!]! @derivedFrom(field: "from")
+
+  " Token balances that this account holds "
+  balances: [AccountBalance!]! @derivedFrom(field: "account")
+
+  " Token balances snapshot that this account holds "
+  balancesSnapshot: [AccountBalanceDailySnapshot!]! @derivedFrom(field: "account")
+}
+
+type AccountBalance @entity {
+  " { Address Of the Account }-{ Address of the Token }"
+  id: ID!
+
+  " Account address "
+  account: Account!
+
+  " Token address "
+  token: Token!
+
+  " Current account balance "
+  amount: BigDecimal!
+
+  " Block number in which the balance was last modified "
+  blockNumber: BigInt!
+
+  " Timestamp in which the balance was last modified "
+  timestamp: BigInt!
+}
+
+###############################
+###### Account Timeseries #####
+###############################
+
+type AccountBalanceDailySnapshot @entity {
+  " { Address Of the Account }-{ Address of the Token }-{ # of hours since Unix epoch time } "
+  id: ID!
+
+  " Account address "
+  account: Account!
+
+  " Token address "
+  token: Token!
+
+  " Current account balance "
+  amount: BigDecimal!
+
+  " Block number in which the balance was last modified "
+  blockNumber: BigInt!
+
+  " Timestamp in which the balance was last modified "
+  timestamp: BigInt!
+}

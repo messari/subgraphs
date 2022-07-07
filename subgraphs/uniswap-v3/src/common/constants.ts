@@ -5,8 +5,6 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ////////////////////
 
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.1";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -70,6 +68,18 @@ export namespace UsageType {
   export const SWAP = "SWAP";
 }
 
+export namespace FeeSwitch {
+  export const ON = "ON";
+  export const OFF = "OFF";
+  // Pool addresses are also stored in the HelperStore
+}
+
+export namespace RewardIntervalType {
+  export const BLOCK = "BLOCK";
+  export const TIMESTAMP = "TIMESTAMP";
+  export const NONE = "NONE";
+}
+
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const DEFAULT_DECIMALS = 18;
@@ -109,6 +119,3 @@ export const SECONDS_PER_HOUR = 60 * 60;
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
 export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
-
-// minimum liquidity required to count towards tracked volume for pairs with small # of Lps
-export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString("250000");

@@ -89,6 +89,7 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics.protocol = protocol.id;
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
     usageMetrics.dailyTransactionCount = 0;
     usageMetrics.dailyDepositCount = 0;
     usageMetrics.dailyBorrowCount = 0;
@@ -130,6 +131,17 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAdd
     marketMetrics.hourlyDepositUSD = BIGDECIMAL_ZERO;
     marketMetrics.hourlyBorrowUSD = BIGDECIMAL_ZERO;
     marketMetrics.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyRepayUSD = BIGDECIMAL_ZERO;
+
+    marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+    marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+    marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+
+    marketMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     marketMetrics.save();
   }
 
@@ -166,6 +178,16 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddr
     marketMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
     marketMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
     marketMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
+    
+    marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+    marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+    marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+
+    marketMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
 
     marketMetrics.save();
   }
@@ -197,6 +219,8 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.save();
   }
@@ -221,6 +245,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.network = Network.MAINNET;
   LendingProtocolEntity.type = ProtocolType.LENDING;
   LendingProtocolEntity.cumulativeUniqueUsers = 0;
+  LendingProtocolEntity.totalPoolCount = 0;
   LendingProtocolEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
   LendingProtocolEntity.lendingType = LendingType.CDP;
   LendingProtocolEntity.mintedTokens = [getOrCreateToken(Address.fromString(DAI)).id];

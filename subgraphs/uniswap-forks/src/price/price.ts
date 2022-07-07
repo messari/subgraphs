@@ -1,7 +1,21 @@
 import { BigDecimal } from "@graphprotocol/graph-ts/index";
-import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateToken, getOrCreateTokenWhitelist } from "../common/getters";
-import { Token, _HelperStore, _LiquidityPoolAmount } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGINT_ZERO } from "../common/constants";
+import {
+  getLiquidityPool,
+  getLiquidityPoolAmounts,
+  getOrCreateToken,
+  getOrCreateTokenWhitelist,
+} from "../common/getters";
+import {
+  Token,
+  _HelperStore,
+  _LiquidityPoolAmount,
+} from "../../generated/schema";
+import {
+  BIGDECIMAL_ZERO,
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_TWO,
+  BIGINT_ZERO,
+} from "../common/constants";
 import { safeDiv } from "../common/utils/utils";
 import { NetworkConfigs } from "../../configurations/configure";
 
@@ -11,7 +25,9 @@ export function updateNativeTokenPriceInUSD(): Token {
   let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   // fetch average price of NATIVE_TOKEN_ADDRESS from STABLE_ORACLES
   for (let i = 0; i < NetworkConfigs.getStableOraclePools().length; i++) {
-    let pool = _LiquidityPoolAmount.load(NetworkConfigs.getStableOraclePools()[i]);
+    let pool = _LiquidityPoolAmount.load(
+      NetworkConfigs.getStableOraclePools()[i]
+    );
     if (!pool) continue;
     if (pool.inputTokens[0] == NetworkConfigs.getReferenceToken()) {
       if (pool.inputTokenBalances[1] > stableAmount) {
@@ -34,7 +50,10 @@ export function updateNativeTokenPriceInUSD(): Token {
  * @todo update to be derived Native Token (add stablecoin estimates)
  **/
 
-export function findNativeTokenPerToken(token: Token, nativeToken: Token): BigDecimal {
+export function findNativeTokenPerToken(
+  token: Token,
+  nativeToken: Token
+): BigDecimal {
   if (token.id == NetworkConfigs.getReferenceToken()) {
     return nativeToken.lastPriceUSD!;
   }
@@ -57,27 +76,46 @@ export function findNativeTokenPerToken(token: Token, nativeToken: Token): BigDe
       let poolAmounts = getLiquidityPoolAmounts(poolAddress);
       let pool = getLiquidityPool(poolAddress);
 
-      if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {        
-        if (pool.inputTokens[0] == token.id && pool.totalValueLockedUSD.gt(NetworkConfigs.getMinimumLiquidityThreshold())) {
-
+      if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
+        if (
+          pool.inputTokens[0] == token.id &&
+          pool.totalValueLockedUSD.gt(
+            NetworkConfigs.getMinimumLiquidityThreshold()
+          )
+        ) {
           // whitelist token is token1
           let whitelistToken = getOrCreateToken(pool.inputTokens[1]);
           // get the derived NativeToken in pool
-          let whitelistTokenLocked = poolAmounts.inputTokenBalances[1].times(whitelistToken.lastPriceUSD!);
+          let whitelistTokenLocked = poolAmounts.inputTokenBalances[1].times(
+            whitelistToken.lastPriceUSD!
+          );
           if (whitelistTokenLocked.gt(largestLiquidityWhitelistTokens)) {
             largestLiquidityWhitelistTokens = whitelistTokenLocked;
             // token1 per our token * nativeToken per token1
-            priceSoFar = safeDiv(poolAmounts.inputTokenBalances[1], poolAmounts.inputTokenBalances[0]).times(whitelistToken.lastPriceUSD! as BigDecimal);
+            priceSoFar = safeDiv(
+              poolAmounts.inputTokenBalances[1],
+              poolAmounts.inputTokenBalances[0]
+            ).times(whitelistToken.lastPriceUSD! as BigDecimal);
           }
         }
-        if (pool.inputTokens[1] == token.id && pool.totalValueLockedUSD.gt(NetworkConfigs.getMinimumLiquidityThreshold())) {
+        if (
+          pool.inputTokens[1] == token.id &&
+          pool.totalValueLockedUSD.gt(
+            NetworkConfigs.getMinimumLiquidityThreshold()
+          )
+        ) {
           let whitelistToken = getOrCreateToken(pool.inputTokens[0]);
           // get the derived nativeToken in pool
-          let whitelistTokenLocked = poolAmounts.inputTokenBalances[0].times(whitelistToken.lastPriceUSD!);
+          let whitelistTokenLocked = poolAmounts.inputTokenBalances[0].times(
+            whitelistToken.lastPriceUSD!
+          );
           if (whitelistTokenLocked.gt(largestLiquidityWhitelistTokens)) {
             largestLiquidityWhitelistTokens = whitelistTokenLocked;
             // token0 per our token * NativeToken per token0
-            priceSoFar = safeDiv(poolAmounts.inputTokenBalances[0], poolAmounts.inputTokenBalances[1]).times(whitelistToken.lastPriceUSD! as BigDecimal);
+            priceSoFar = safeDiv(
+              poolAmounts.inputTokenBalances[0],
+              poolAmounts.inputTokenBalances[1]
+            ).times(whitelistToken.lastPriceUSD! as BigDecimal);
           }
         }
       }
@@ -94,7 +132,13 @@ export function findNativeTokenPerToken(token: Token, nativeToken: Token): BigDe
  * Also, return the value of the valume for each token if it is contained in the whitelist
  */
 
-export function getTrackedVolumeUSD(pool: _LiquidityPoolAmount, tokenAmount0: BigDecimal, token0: Token, tokenAmount1: BigDecimal, token1: Token): BigDecimal[] {
+export function getTrackedVolumeUSD(
+  pool: _LiquidityPoolAmount,
+  tokenAmount0: BigDecimal,
+  token0: Token,
+  tokenAmount1: BigDecimal,
+  token1: Token
+): BigDecimal[] {
   let price0USD = token0.lastPriceUSD!;
   let price1USD = token1.lastPriceUSD!;
 
@@ -104,46 +148,89 @@ export function getTrackedVolumeUSD(pool: _LiquidityPoolAmount, tokenAmount0: Bi
   }
 
   let poolDeposits = _HelperStore.load(pool.id);
-  if (poolDeposits == null) return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  if (poolDeposits == null)
+    return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   // if less than 5 LPs, require high minimum reserve amount amount or return 0
   // Updated from original subgraph. Number of deposits may not equal number of liquidity providers
   if (poolDeposits.valueInt < 5) {
     let reserve0USD = pool.inputTokenBalances[0].times(price0USD);
     let reserve1USD = pool.inputTokenBalances[1].times(price1USD);
-    if (NetworkConfigs.getWhitelistTokens().includes(token0.id) && NetworkConfigs.getWhitelistTokens().includes(token1.id)) {
-      if (reserve0USD.plus(reserve1USD).lt(NetworkConfigs.getMinimumLiquidityThreshold())) {
+    if (
+      NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
+      NetworkConfigs.getWhitelistTokens().includes(token1.id)
+    ) {
+      if (
+        reserve0USD
+          .plus(reserve1USD)
+          .lt(NetworkConfigs.getMinimumLiquidityThreshold())
+      ) {
         return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
       }
     }
-    if (NetworkConfigs.getWhitelistTokens().includes(token0.id) && !NetworkConfigs.getWhitelistTokens().includes(token1.id)) {
-      if (reserve0USD.times(BIGDECIMAL_TWO).lt(NetworkConfigs.getMinimumLiquidityThreshold())) {
+    if (
+      NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
+      !NetworkConfigs.getWhitelistTokens().includes(token1.id)
+    ) {
+      if (
+        reserve0USD
+          .times(BIGDECIMAL_TWO)
+          .lt(NetworkConfigs.getMinimumLiquidityThreshold())
+      ) {
         return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
       }
     }
-    if (!NetworkConfigs.getWhitelistTokens().includes(token0.id) && NetworkConfigs.getWhitelistTokens().includes(token1.id)) {
-      if (reserve1USD.times(BIGDECIMAL_TWO).lt(NetworkConfigs.getMinimumLiquidityThreshold())) {
+    if (
+      !NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
+      NetworkConfigs.getWhitelistTokens().includes(token1.id)
+    ) {
+      if (
+        reserve1USD
+          .times(BIGDECIMAL_TWO)
+          .lt(NetworkConfigs.getMinimumLiquidityThreshold())
+      ) {
         return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
       }
     }
   }
 
   // both are whitelist tokens, return sum of both amounts
-  if (NetworkConfigs.getWhitelistTokens().includes(token0.id) && NetworkConfigs.getWhitelistTokens().includes(token1.id)) {
+  if (
+    NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
+    NetworkConfigs.getWhitelistTokens().includes(token1.id)
+  ) {
     let token0ValueUSD = tokenAmount0.times(price0USD);
     let token1ValueUSD = tokenAmount1.times(price1USD);
 
-    return [token0ValueUSD, token1ValueUSD, token0ValueUSD.plus(token1ValueUSD).div(BIGDECIMAL_TWO)];
+    return [
+      token0ValueUSD,
+      token1ValueUSD,
+      token0ValueUSD.plus(token1ValueUSD).div(BIGDECIMAL_TWO),
+    ];
   }
 
   // take double value of the whitelisted token amount
-  if (NetworkConfigs.getWhitelistTokens().includes(token0.id) && !NetworkConfigs.getWhitelistTokens().includes(token1.id)) {
-    return [tokenAmount0.times(price0USD), BIGDECIMAL_ZERO, tokenAmount0.times(price0USD)];
+  if (
+    NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
+    !NetworkConfigs.getWhitelistTokens().includes(token1.id)
+  ) {
+    return [
+      tokenAmount0.times(price0USD),
+      BIGDECIMAL_ZERO,
+      tokenAmount0.times(price0USD),
+    ];
   }
 
   // take double value of the whitelisted token amount
-  if (!NetworkConfigs.getWhitelistTokens().includes(token0.id) && NetworkConfigs.getWhitelistTokens().includes(token1.id)) {
-    return [BIGDECIMAL_ZERO, tokenAmount1.times(price1USD), tokenAmount1.times(price1USD)];
+  if (
+    !NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
+    NetworkConfigs.getWhitelistTokens().includes(token1.id)
+  ) {
+    return [
+      BIGDECIMAL_ZERO,
+      tokenAmount1.times(price1USD),
+      tokenAmount1.times(price1USD),
+    ];
   }
 
   // neither token is on white list, tracked amount is 0

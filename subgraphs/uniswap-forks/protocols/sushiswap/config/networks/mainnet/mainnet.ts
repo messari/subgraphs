@@ -1,9 +1,25 @@
-import { Address, BigDecimal } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
-import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+  MASTERCHEFV2_SUSHI_PER_BLOCK,
+} from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
+
 export class SushiswapMainnetConfigurations implements Configurations {
   getNetwork(): string {
     return Network.MAINNET;
@@ -26,8 +42,12 @@ export class SushiswapMainnetConfigurations implements Configurations {
   getFactoryAddress(): string {
     return toLowerCase("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac");
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString(toLowerCase("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac")));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString(
+        toLowerCase("0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac")
+      )
+    );
   }
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("3");
@@ -49,6 +69,9 @@ export class SushiswapMainnetConfigurations implements Configurations {
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.BLOCK;
+  }
+  getRewardTokenRate(): BigInt {
+    return MASTERCHEFV2_SUSHI_PER_BLOCK;
   }
   getReferenceToken(): string {
     return toLowerCase("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
@@ -108,9 +131,16 @@ export class SushiswapMainnetConfigurations implements Configurations {
     return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return [
+      "0xbd2f0cd039e0bfcf88901c98c0bfac5ab27566e3", // Dynamic Dollar Set
+      "0x618679df9efcd19694bb1daa8d00718eacfa2883", // XYZ Govenance Token
+      "0xea7cc765ebc94c4805e3bff28d7e4ae48d06468a", // Near Pad Token
+      "0x749b964f3dd571b177fc6e415a07f62b05047da4", // Bad Trip Token
+      "0xd417144312dbf50465b1c641d016962017ef6240", // Covalent query Token
+      "0xe9f84de264e91529af07fa2c746e934397810334", // Sake Token
+    ];
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+    return MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND;
   }
 }

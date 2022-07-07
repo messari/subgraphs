@@ -1,4 +1,4 @@
-import { BigDecimal } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Factory } from "../../generated/Factory/Factory";
 
 export interface Configurations {
@@ -17,7 +17,8 @@ export interface Configurations {
   getLPFeeToOff(): BigDecimal;
   getFeeOnOff(): string;
   getRewardIntervalType(): string;
-  getReferenceToken(): string
+  getRewardTokenRate(): BigInt;
+  getReferenceToken(): string;
   getRewardToken(): string;
   getWhitelistTokens(): string[];
   getStableCoins(): string[];

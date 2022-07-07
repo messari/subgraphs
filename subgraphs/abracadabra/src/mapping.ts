@@ -1,5 +1,5 @@
 import { Address, dataSource, log } from "@graphprotocol/graph-ts";
-import { DegenBox, LogDeploy } from "../generated/bentoBox/DegenBox";
+import { DegenBox, LogDeploy } from "../generated/BentoBox/DegenBox";
 import {
   LogAddCollateral,
   LogBorrow,
@@ -9,7 +9,7 @@ import {
   LogExchangeRate,
   LogAccrue,
 } from "../generated/templates/Cauldron/Cauldron";
-import { Deposit, Borrow, Repay, Liquidate } from "../generated/schema";
+import { Deposit, Borrow, Repay, Liquidate, Withdraw } from "../generated/schema";
 import { NEG_INT_ONE, DEFAULT_DECIMALS, BIGDECIMAL_ONE, ABRA_ACCOUNTS } from "./common/constants";
 import { bigIntToBigDecimal, divBigDecimal } from "./common/utils/numbers";
 import {
@@ -84,7 +84,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   if (event.params.from.toHexString() != event.params.to.toHexString()) {
     createLiquidateEvent(event);
   }
-  let withdrawalEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
+  let withdrawalEvent = new Withdraw(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
   if (!market) {
     return;
@@ -179,6 +179,7 @@ export function handleLiquidation(event: LogRepay): void {
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
+  let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
   let CauldronContract = Cauldron.bind(event.address);
   let tokenPriceUSD = collateralToken.lastPriceUSD;
   let collateralAmount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
@@ -199,7 +200,7 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.blockNumber = event.block.number;
   liquidateEvent.timestamp = event.block.timestamp;
   liquidateEvent.market = market.id;
-  liquidateEvent.asset = collateralToken.id;
+  liquidateEvent.asset = mimToken.id;
   liquidateEvent.amount = collateralAmount;
   liquidateEvent.amountUSD = collateralAmountUSD;
   liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);

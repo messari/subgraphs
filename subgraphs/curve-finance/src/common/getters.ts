@@ -28,6 +28,7 @@ import {
   PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SLUG,
   PROTOCOL_NAME,
+  SECONDS_PER_HOUR,
 } from "../common/constants";
 import { BIG_DECIMAL_ZERO, CURVE_REGISTRY } from "./constants/index";
 import { CurvePool } from "../../generated/templates/CryptoFactoryTemplate/CurvePool";
@@ -64,7 +65,7 @@ export function getLiquidityPool(poolId: string): LiquidityPool {
 
 export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
   // @ts-ignore // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsHourlySnapshot.load(id.toString());
@@ -110,7 +111,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
 export function getOrCreatePoolHourlySnapshot(poolAddress: string, event: ethereum.Event): LiquidityPoolHourlySnapshot {
   // @ts-ignore
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let poolMetrics = LiquidityPoolHourlySnapshot.load(poolAddress.concat("-").concat(id.toString()));
 
   if (!poolMetrics) {

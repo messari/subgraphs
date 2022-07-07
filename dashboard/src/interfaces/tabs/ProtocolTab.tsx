@@ -91,12 +91,8 @@ function ProtocolTab({
 
   const tableIssuesInit = tableIssues;
   if (
-    tableIssues.filter(
-      (x) =>
-        x.fieldName ===
-        `${protocolEntityNameSingular}-totalValueLockedUSD` &&
-        x.type === "TVL-",
-    ).length === 0 &&
+    tableIssues.filter((x) => x.fieldName === `${protocolEntityNameSingular}-totalValueLockedUSD` && x.type === "TVL-")
+      .length === 0 &&
     Number(protocolTableData[protocolEntityNameSingular].totalValueLockedUSD) < 1000
   ) {
     tableIssuesInit.push({
