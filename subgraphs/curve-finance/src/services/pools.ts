@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts/index";
+import { Address, BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts/index";
 import { BasePool, LiquidityPool } from "../../generated/schema";
 import { CurvePoolCoin128 } from "../../generated/templates/CurvePoolTemplate/CurvePoolCoin128";
 import { CurvePool } from "../../generated/templates/RegistryTemplate/CurvePool";
@@ -84,6 +84,10 @@ export function createNewPool(
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  let rewardTokenEmissionsAmount: BigInt[] = [];
+  let rewardTokenEmissionsUSD: BigDecimal[] = [];
+  pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+  pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   pool.save();
   setPoolTokenType(pool);
   setPoolBalances(pool);
