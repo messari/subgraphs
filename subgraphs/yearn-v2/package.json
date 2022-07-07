@@ -5,7 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
 
-    "prepare:yaml": "mustache protocols/yearn-v2/config/networks/mainnet/mainnet.json protocols/yearn-v2/config/templates/yearn.v2.template.yaml > subgraph.yaml",
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
     "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
 
