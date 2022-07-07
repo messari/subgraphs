@@ -66,10 +66,12 @@ export function handleUniversalFeePaid(event: UniversalFeePaidEvent): void {
 
   let inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
+
   const protocolSideRevenueUSD = event.params.fee
     .toBigDecimal()
+    .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen)
     .div(inputTokenPrice.decimalsBaseTen);
 
   updateRevenueSnapshots(
@@ -82,10 +84,7 @@ export function handleUniversalFeePaid(event: UniversalFeePaidEvent): void {
 
 export function handleUpdatedUniversalFee(
   event: UpdatedUniversalFeeEvent
-): void {
-  event.params.newUniversalFee;
-  event.params.oldUniversalFee;
-}
+): void {}
 
 export function handleUpdatedWithdrawFee(event: UpdatedWithdrawFeeEvent): void {
   const vaultAddress = event.address;
@@ -116,10 +115,12 @@ export function handleEarningReported(event: EarningReportedEvent): void {
 
   let inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
+
   const supplySideRevenueUSD = event.params.profit
     .toBigDecimal()
+    .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen)
     .div(inputTokenPrice.decimalsBaseTen);
 
   updateRevenueSnapshots(

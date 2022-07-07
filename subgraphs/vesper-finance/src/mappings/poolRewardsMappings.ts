@@ -30,10 +30,11 @@ export function handleRewardAdded(event: RewardAddedEvent): void {
   const vault = getOrCreateVault(vaultAddress, event.block);
 
   let rewardTokenPrice = getUsdPricePerToken(rewardToken);
+  let rewardTokenDecimals = utils.getTokenDecimals(rewardToken);
   const supplySideRevenueUSD = rewardAmount
     .toBigDecimal()
+    .div(rewardTokenDecimals)
     .times(rewardTokenPrice.usdPrice)
-    .div(rewardTokenPrice.decimalsBaseTen)
     .div(rewardTokenPrice.decimalsBaseTen);
 
   updateRevenueSnapshots(

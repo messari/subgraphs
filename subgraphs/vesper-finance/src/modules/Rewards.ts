@@ -56,6 +56,10 @@ export function updateRewardTokenEmissions(
   const vault = getOrCreateVault(vaultAddress, block);
   const rewardToken = getOrCreateRewardToken(rewardTokenAddress);
 
+  if (!vault.rewardTokens) {
+    vault.rewardTokens = [];
+  }
+
   let rewardTokens = vault.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
@@ -63,7 +67,15 @@ export function updateRewardTokenEmissions(
   }
 
   const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
+
+  if (!vault.rewardTokenEmissionsAmount) {
+    vault.rewardTokenEmissionsAmount = [];
+  }
   let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
+
+  if (!vault.rewardTokenEmissionsUSD) {
+    vault.rewardTokenEmissionsUSD = [];
+  }
   let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
 
   const rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);

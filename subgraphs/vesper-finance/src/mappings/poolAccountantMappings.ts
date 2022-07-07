@@ -22,10 +22,12 @@ export function handleEarningReported(event: EarningReportedEvent): void {
 
   let inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
+
   const supplySideRevenueUSD = event.params.profit
     .toBigDecimal()
+    .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen)
     .div(inputTokenPrice.decimalsBaseTen);
 
   updateRevenueSnapshots(
@@ -48,10 +50,12 @@ export function handleLossReported(event: LossReportedEvent): void {
 
   let inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
+
   const supplySideLossUSD = event.params.loss
     .toBigDecimal()
+    .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen)
     .div(inputTokenPrice.decimalsBaseTen)
     .times(constants.BIGDECIMAL_NEGATIVE_ONE);
 
