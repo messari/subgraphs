@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: mainnet
+    network: avalanche
     source:
-      address: "0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac"
+      address: "0x9ad6c38be94206ca50bb0d90783181662f0cfa10"
       abi: Factory
-      startBlock: 10794229
+      startBlock: 2486392
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -16,30 +16,30 @@ dataSources:
       entities: []
       abis:
         - name: Factory
-          file: ./abis/sushiswap/Factory.json
+          file: ./abis/trader-joe/Factory.json
         - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
+          file: ./abis/trader-joe/ERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
   - kind: ethereum
-    name: MasterChef
-    network: mainnet
+    name: MasterChefV2
+    network: avalanche
     source:
-      address: "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd"
-      abi: MasterChefSushiswap
-      startBlock: 10794230
+      address: "0xd6a4F121CA35509aF06A0Be99093d08462f53052"
+      abi: MasterChefV2TraderJoe
+      startBlock: 2486444
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: MasterChefSushiswap
-          file: ./abis/sushiswap/MasterChefSushiswap.json
+        - name: MasterChefV2TraderJoe
+          file: ./abis/trader-joe/MasterChefV2TraderJoe.json
         - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
+          file: ./abis/trader-joe/ERC20.json
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
           handler: handleDeposit
@@ -47,41 +47,46 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-      file: ./protocols/sushiswap/src/mappings/masterchef/reward.ts
-
+        - event: Add(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleAdd
+        - event: Set(indexed uint256,uint256,indexed address,bool)
+          handler: handleSet
+        - event: UpdateEmissionRate(indexed address,uint256)
+          handler: handleUpdateEmissionRate
+      file: ./protocols/trader-joe/src/mappings/masterchef/rewardV2.ts
   - kind: ethereum
-    name: MasterChefV2
-    network: mainnet
+    name: MasterChefV3
+    network: avalanche
     source:
-      address: "0xef0881ec094552b2e128cf945ef17a6752b4ec5d"
-      abi: MasterChefV2Sushiswap
-      startBlock: 12428169
+      address: "0x188bed1968b795d5c9022f6a0bb5931ac4c18f00"
+      abi: MasterChefV3TraderJoe
+      startBlock: 6034473
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: MasterChefV2Sushiswap
-          file: ./abis/sushiswap/MasterChefV2Sushiswap.json
+        - name: MasterChefV3TraderJoe
+          file: ./abis/trader-joe/MasterChefV3TraderJoe.json
         - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
+          file: ./abis/trader-joe/ERC20.json
       eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleDeposit
-        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleWithdraw
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleEmergencyWithdraw
-        - event: LogSetPool(indexed uint256,uint256,indexed address,bool)
-          handler: handleLogSetPool
-        - event: LogPoolAddition(indexed uint256,uint256,indexed address,indexed address)
-          handler: handleLogPoolAddition
-      file: ./protocols/sushiswap/src/mappings/masterchef/rewardV2.ts
+        - event: Deposit(indexed address,indexed uint256,uint256)
+          handler: handleDepositV3
+        - event: Withdraw(indexed address,indexed uint256,uint256)
+          handler: handleWithdrawV3
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
+          handler: handleEmergencyWithdrawV3
+        - event: Add(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleAdd
+        - event: Set(indexed uint256,uint256,indexed address,bool)
+          handler: handleSet
+      file: ./protocols/trader-joe/src/mappings/masterchef/rewardV3.ts
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: xdai
+    network: avalanche
     source:
       abi: Pair
     mapping:
@@ -92,11 +97,11 @@ templates:
       entities: []
       abis:
         - name: Pair
-          file: ./abis/sushiswap/Pair.json
+          file: ./abis/spiritswap/Pair.json
         - name: Factory
-          file: ./abis/sushiswap/Factory.json
+          file: ./abis/spiritswap/Factory.json
         - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
+          file: ./abis/spiritswap/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint

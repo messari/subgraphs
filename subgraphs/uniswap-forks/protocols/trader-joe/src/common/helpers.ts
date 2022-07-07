@@ -25,7 +25,7 @@ export function createMasterChefStakingPool(
   masterChefPool.multiplier = BIGINT_ONE;
   masterChefPool.poolAllocPoint = BIGINT_ZERO;
   masterChefPool.lastRewardBlock = event.block.number;
-  log.warning("MASTERCHEF POOL CREATED: " + masterChefPool.poolAddress, []);
+  log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
   masterChefPool.save();
 

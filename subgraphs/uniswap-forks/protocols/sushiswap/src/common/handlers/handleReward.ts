@@ -42,8 +42,25 @@ export function handleReward(
   );
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
+  // Return if the contract call was reverted
+  if (!masterChefPool.poolAddress) {
+    let getPoolInfo = poolContract.try_poolInfo(pid);
+    if (!getPoolInfo.reverted) {
+      masterChefPool.poolAddress = getPoolInfo.value.value0.toHexString();
+    }
+    masterChefPool.save();
+
+    if (!masterChefPool.poolAddress) {
+      log.warning(
+        "poolInfo reverted: Could not find pool address for masterchef pool",
+        []
+      );
+      return;
+    }
+  }
+
   // If comes back null then it must be a uniswap v2 pool
-  let pool = LiquidityPool.load(masterChefPool.poolAddress);
+  let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
     return;
   }
@@ -163,13 +180,11 @@ function getOrCreateMasterChefStakingPool(
     masterChefPool = new _MasterChefStakingPool(
       masterChefType + "-" + pid.toString()
     );
-    masterChefPool.poolAddress = poolContract
-      .poolInfo(pid)
-      .value0.toHexString();
+
     masterChefPool.multiplier = BIGINT_ONE;
     masterChefPool.poolAllocPoint = BIGINT_ZERO;
     masterChefPool.lastRewardBlock = event.block.number;
-    log.warning("MASTERCHEF POOL CREATED: " + masterChefPool.poolAddress, []);
+    log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
     masterChefPool.save();
   }
