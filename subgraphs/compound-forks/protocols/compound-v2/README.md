@@ -66,7 +66,7 @@ Not applicable to Compound v2
 
 CTokens have 2 different ABIs. They switch at block `8983575`, and the only difference is the `AccrueInterest` event params.
 
-To handle this the `CTokenModifed` ABI just adds a new `AccrueInterest` event signature.
+To handle this `CToken` will contain all of the transaction events and new `accrueInterest` event. Then there is `CTokenOld` that handles the old `AccrueInterest` event.
 
 ## Reference and Useful Links
 
