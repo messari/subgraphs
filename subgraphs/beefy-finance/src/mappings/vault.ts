@@ -202,9 +202,7 @@ export function handleDeposit(event: Deposit): void {
 }
 export function handleWithdraw(event: Withdraw): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
-  //const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl).abs();
-  const strategyContract = BeefyStrategy.bind(event.address);
-  const withdrawnAmount = event.params.tvl.minus(strategyContract.balanceOf());
+  const withdrawnAmount = event.params.tvl.minus(vault.inputTokenBalance);
   createWithdraw(event, withdrawnAmount, vault.id);
   updateVaultAndSnapshots(vault, event.block);
   updateProtocolRevenueFromWithdraw(event, vault, withdrawnAmount);

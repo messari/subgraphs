@@ -42,10 +42,6 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Withdrawals`
 
-### Reward Token Emissions Amount
-
-To be added
-
 ### Protocol Controlled Value
 
 Sum across all valuts:

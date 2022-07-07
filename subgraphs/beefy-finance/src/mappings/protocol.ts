@@ -5,7 +5,6 @@ import {
   dataSource,
   ethereum,
 } from "@graphprotocol/graph-ts";
-import { UniswapFeeRouter__removeLiquidityWithPermitResult } from "../../generated/aave-aave-eol/UniswapFeeRouter";
 import {
   BeefyStrategy,
   ChargedFees,
@@ -36,7 +35,6 @@ export function updateProtocolUsage(
 ): void {
   const protocol = getBeefyFinanceOrCreate(vault.id);
   protocol.totalValueLockedUSD = getTvlUsd(protocol);
-  protocol.protocolControlledValueUSD = protocol.totalValueLockedUSD;
   protocol.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers.plus(
     isNewUser(event.transaction.from)
   );
