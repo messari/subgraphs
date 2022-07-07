@@ -167,20 +167,8 @@ interface Protocol {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
-  " Number of cumulative liquidity providers "
-  cumulativeUniqueLPs: Int!
-
-  " Number of cumulative traders "
-  cumulativeUniqueTraders: Int!
-
   " Total number of pools "
   totalPoolCount: Int!
-
-  " Total number of open positions "
-  openPositionCount: Int!
-
-  " Total number of positions (open and closed) "
-  cumulativePositionCount: Int!
 
   ##### Snapshots #####
 
@@ -242,8 +230,20 @@ type DexAmmProtocol implements Protocol @entity {
   " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
+  " Number of cumulative liquidity providers "
+  cumulativeUniqueLPs: Int!
+
+  " Number of cumulative traders "
+  cumulativeUniqueTraders: Int!
+
   " Total number of pools "
   totalPoolCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
 
   ##### Snapshots #####
 
@@ -824,6 +824,9 @@ type Deposit @entity {
   " Account that emitted this event "
   account: Account!
 
+  " The user position changed by this event "
+  position: Position!
+
   " The pool involving this event "
   pool: LiquidityPool!
 
@@ -874,6 +877,9 @@ type Withdraw @entity {
   " Account that emitted this event "
   account: Account!
 
+  " The user position changed by this event "
+  position: Position!
+
   " The pool involving this event "
   pool: LiquidityPool!
 
@@ -923,6 +929,9 @@ type Swap @entity {
 
   " Account that emitted this event "
   account: Account!
+
+  " The user position changed by this event "
+  position: Position!
 
   " The pool involving this event "
   pool: LiquidityPool!
