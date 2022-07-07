@@ -46,49 +46,28 @@ export function createVaultFromStrategy(
   vault.name = fetchTokenName(vaultAddress);
   vault.symbol = fetchTokenSymbol(vaultAddress);
   vault.strategy = strategyAddress.toHex();
-  let call = vaultContract.try_balance();
-  if (call.reverted) {
-    vault.inputTokenBalance = BIGINT_ZERO;
-  } else {
-    vault.inputTokenBalance = call.value;
-  }
+  vault.inputTokenBalance = BIGINT_ZERO;
+
   let want = strategyContract.try_want();
   if (want.reverted) {
     want = vaultContract.try_token();
   }
   if (want.reverted) {
     vault.inputToken = getTokenOrCreate(ZERO_ADDRESS, event.block).id;
-    vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
   } else {
-    const inputToken = getTokenOrCreate(want.value, event.block);
-    vault.inputToken = inputToken.id;
-    vault.totalValueLockedUSD = inputToken.lastPriceUSD
-      .times(vault.inputTokenBalance.toBigDecimal())
-      .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
+    vault.inputToken = getTokenOrCreate(want.value, event.block).id;
   }
+  vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
+
   vault.outputToken = getTokenOrCreate(vaultAddress, event.block).id;
   vault.fees = getFees(vault.id, strategyContract);
   vault.createdTimestamp = event.block.timestamp;
   vault.createdBlockNumber = event.block.number;
-  call = vaultContract.try_totalSupply();
-  if (call.reverted) {
-    vault.outputTokenSupply = BIGINT_ZERO;
-  } else {
-    vault.outputTokenSupply = call.value;
-  }
-  call = vaultContract.try_getPricePerFullShare();
-  if (call.reverted) {
-    vault.pricePerShare = BIGINT_ZERO;
-  } else {
-    vault.pricePerShare = call.value.div(
-      BigInt.fromI32(vaultContract.decimals())
-    );
-  }
-  const outputSupply = vault.outputTokenSupply;
-  if (outputSupply && outputSupply != BIGINT_ZERO)
-    vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
-      outputSupply.toBigDecimal()
-    );
+
+  vault.outputTokenSupply = BIGINT_ZERO;
+  vault.pricePerShare = BIGINT_ZERO;
+  vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+
   const beefy = getBeefyFinanceOrCreate(vault.id);
   vault.protocol = beefy.id;
   vault.save();
@@ -190,13 +169,9 @@ export function getFees(
 
 export function handleDeposit(event: Deposit): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
-  if (!vault.deposits) {
-    const depositedAmount = event.params.tvl;
-    createDeposit(event, depositedAmount, vault.id);
-  } else {
-    const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
-    createDeposit(event, depositedAmount, vault.id);
-  }
+  const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
+  createDeposit(event, depositedAmount, vault.id);
+
   updateVaultAndSnapshots(vault, event.block);
   updateProtocolUsage(event, vault, true, false);
 }

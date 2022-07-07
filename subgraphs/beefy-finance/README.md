@@ -42,11 +42,9 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Withdrawals`
 
-### Protocol Controlled Value
+### Deposits
 
-Sum across all valuts:
-
-`Vault controlled value`
+Since deposit event has only the `tvl` parameter, deposited amount is calculated by subtracting the last tvl registered by the subgraph to the current input token balance
 
 ## Useful Links and references
 
