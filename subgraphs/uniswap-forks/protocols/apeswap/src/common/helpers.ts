@@ -3,13 +3,8 @@ import {
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../generated/schema";
-import {
-  BIGINT_ONE,
-  BIGINT_ZERO,
-  MasterChef,
-} from "../../../../src/common/constants";
+import { BIGINT_ONE, BIGINT_ZERO } from "../../../../src/common/constants";
 import { NetworkConfigs } from "../../../../configurations/configure";
-import { MiniChefSushiswap } from "../../../../generated/MiniChef/MiniChefSushiswap";
 
 export function createMasterChefStakingPool(
   event: ethereum.Event,
@@ -25,7 +20,7 @@ export function createMasterChefStakingPool(
   masterChefPool.multiplier = BIGINT_ONE;
   masterChefPool.poolAllocPoint = BIGINT_ZERO;
   masterChefPool.lastRewardBlock = event.block.number;
-  log.warning("MASTERCHEF POOL CREATED: " + masterChefPool.poolAddress, []);
+  log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
   masterChefPool.save();
 

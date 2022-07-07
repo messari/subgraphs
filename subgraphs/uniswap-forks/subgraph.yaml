@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: bsc
+    network: matic
     source:
-      address: "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6"
+      address: "0xCf083Be4164828f00cAE704EC15a36D711491284"
       abi: Factory
-      startBlock: 4855900
+      startBlock: 15298800
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -24,12 +24,12 @@ dataSources:
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
   - kind: ethereum
-    name: MasterChef
-    network: bsc
+    name: MiniChefV2
+    network: matic
     source:
-      address: "0x5c8D727b265DBAfaba67E050f2f739cAeEB4A6F9"
-      abi: MasterChefApeswap
-      startBlock: 4855342
+      address: "0x54aff400858Dcac39797a81894D9920f16972D1D"
+      abi: MiniChefV2Apeswap
+      startBlock: 15797921
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -38,22 +38,28 @@ dataSources:
         - _CircularBuffer
         - RewardToken
       abis:
-        - name: MasterChefApeswap
-          file: ./abis/apeswap/MasterChefApeswap.json
+        - name: MiniChefV2Apeswap
+          file: ./abis/apeswap/MiniChefV2Apeswap.json
         - name: TokenABI
           file: ./abis/apeswap/ERC20.json
       eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256)
+        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
           handler: handleDeposit
-        - event: Withdraw(indexed address,indexed uint256,uint256)
+        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleWithdraw
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdraw
-      file: ./protocols/apeswap/src/mappings/masterchef/reward.ts
+        - event: LogSetPool(indexed uint256,uint256,indexed address,bool)
+          handler: handleLogSetPool
+        - event: LogPoolAddition(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleLogPoolAddition
+        - event: LogBananaPerSecond(uint256)
+          handler: handleLogBananaPerSecond
+      file: ./protocols/apeswap/src/mappings/masterchef/rewardMini.ts
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: bsc
+    network: matic
     source:
       abi: Pair
     mapping:
@@ -80,4 +86,3 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
-          
