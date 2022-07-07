@@ -5,7 +5,6 @@ import {
   _LiquidityPoolAmount,
   LiquidityPool,
   LiquidityPoolFee,
-  RewardToken,
 } from "../../../../generated/schema";
 import { Pair as PairTemplate } from "../../../../generated/templates";
 import {
@@ -135,11 +134,8 @@ export function createLiquidityPool(
 
 export function createPoolRewardToken(poolAddress: string): void {
   let pool = getLiquidityPool(poolAddress);
-  // let rewardToken = getOrCreateRewardToken(NetworkConfigs.getRewardToken());
 
-  let rewardTokens = pool.rewardTokens;
-  rewardTokens!.push(NetworkConfigs.getRewardToken());
-  pool.rewardTokens = rewardTokens;
+  pool.rewardTokens = [getOrCreateRewardToken(poolAddress).id];
 
   pool.save();
 }

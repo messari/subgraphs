@@ -8,22 +8,10 @@ import {
 import { NetworkConfigs } from "../../../../configurations/configure";
 import { HoneyFarm } from "../../../../generated/HoneyFarm/HoneyFarm";
 import { LiquidityPool, _HelperStore } from "../../../../generated/schema";
-import {
-  BIGINT_ZERO,
-  INT_ZERO,
-  RECENT_BLOCK_THRESHOLD,
-  UsageType,
-} from "../../../../src/common/constants";
-import {
-  getLiquidityPool,
-  getOrCreateToken,
-} from "../../../../src/common/getters";
+import { BIGINT_ZERO, UsageType } from "../../../../src/common/constants";
 import { getRewardsPerDay } from "../../../../src/common/rewards";
-import {
-  findNativeTokenPerToken,
-  updateNativeTokenPriceInUSD,
-} from "../../../../src/price/price";
 
+// TODO: Fix reward emissions calculations (rewardTokenRate) and add token pricing
 export function handleReward(
   event: ethereum.Event,
   tokenId: BigInt,
@@ -128,20 +116,11 @@ export function handleReward(
     rewardTokenPerDay.toString(),
   ]);
 
-  // let nativeToken = updateNativeTokenPriceInUSD();
-
-  // let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
-  // rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
-
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(rewardTokenPerDay.truncate(0).toString()),
   ];
 
-  // pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
-
   honeyFarmPool.valueBigInt = event.block.timestamp;
 
-  // rewardToken.save();
-  // nativeToken.save();
   pool.save();
 }
