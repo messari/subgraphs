@@ -369,6 +369,8 @@ export function _handleReserveDataUpdated(
     return;
   }
 
+  log.warning("pre borrow. assetPrice: {}", [assetPriceUSD.toString()]);
+
   let totalBorrowBalance = sBorrowBalance
     .plus(vBorrowBalance)
     .toBigDecimal()
@@ -394,6 +396,8 @@ export function _handleReserveDataUpdated(
     return;
   }
 
+  log.warning("pre deposit: balance: {}", [(market.inputTokenBalance.toBigDecimal().div(exponentToBigDecimal(inputToken.decimals))).toString()]);
+
   market.inputTokenBalance = tryTotalSupply.value;
   market.outputTokenSupply = tryTotalSupply.value;
   market.totalDepositBalanceUSD = market.inputTokenBalance
@@ -404,6 +408,7 @@ export function _handleReserveDataUpdated(
 
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
+  log.warning("pre rev", []);
   let liquidityIndexDiff = liquidityIndex
     .minus(market.liquidityIndex)
     .toBigDecimal()
