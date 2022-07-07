@@ -160,9 +160,24 @@ export function getRewardsPerDay(
   let startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
 
   // Make sure to still have 2 blocks to calculate rate (This shouldn't happen past the beginning).
-  while (
-    abs(circularBuffer.nextIndex - circularBuffer.windowStartIndex) > INT_FOUR
-  ) {
+  while (true) {
+    if (circularBuffer.nextIndex > circularBuffer.windowStartIndex) {
+      if (
+        circularBuffer.nextIndex - circularBuffer.windowStartIndex <=
+        INT_FOUR
+      ) {
+        break;
+      }
+    } else {
+      if (
+        BUFFER_SIZE -
+          circularBuffer.windowStartIndex +
+          circularBuffer.nextIndex <=
+        INT_FOUR
+      ) {
+        break;
+      }
+    }
     let windowIndexBlockTimestamp = blocks[circularBuffer.windowStartIndex];
 
     // Shift the start of the window if the current timestamp moves out of desired rate window
