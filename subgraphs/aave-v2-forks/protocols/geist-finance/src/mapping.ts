@@ -38,8 +38,6 @@ import {
   LiquidationCall,
   Repay,
   ReserveDataUpdated,
-  ReserveUsedAsCollateralDisabled,
-  ReserveUsedAsCollateralEnabled,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
 import { GToken } from "../../../generated/templates/LendingPool/GToken";
@@ -317,20 +315,6 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     event.params.reserve,
     assetPriceUSD
   );
-}
-
-export function handleReserveUsedAsCollateralEnabled(
-  event: ReserveUsedAsCollateralEnabled
-): void {
-  // This Event handler enables a reserve/market to be used as collateral
-  _handleReserveUsedAsCollateralEnabled(event.params.reserve);
-}
-
-export function handleReserveUsedAsCollateralDisabled(
-  event: ReserveUsedAsCollateralDisabled
-): void {
-  // This Event handler disables a reserve/market being used as collateral
-  _handleReserveUsedAsCollateralDisabled(event.params.reserve);
 }
 
 export function handleDeposit(event: Deposit): void {

@@ -103,9 +103,9 @@ export function _handleReserveInitialized(
 
   market.protocol = protocol.name;
   market.name = outputTokenEntity.name;
-  market.isActive = false;
-  market.canUseAsCollateral = false;
-  market.canBorrowFrom = false;
+  market.isActive = true;
+  market.canUseAsCollateral = true;
+  market.canBorrowFrom = true;
   market.maximumLTV = BIGDECIMAL_ZERO;
   market.liquidationThreshold = BIGDECIMAL_ZERO;
   market.liquidationPenalty = BIGDECIMAL_ZERO;
@@ -152,7 +152,7 @@ export function _handleCollateralConfigurationChanged(
   // Adjust market LTV, liquidation, and collateral data when a reserve's collateral configuration has changed
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[CollateralConfigurationChanged] Market not found: {}", [
+    log.warning("[CollateralConfigurationChanged] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -179,7 +179,7 @@ export function _handleCollateralConfigurationChanged(
 export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[BorrowingEnabledOnReserve] Market not found: {}", [
+    log.warning("[BorrowingEnabledOnReserve] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -192,7 +192,7 @@ export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
 export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[BorrowingDisabledOnReserve] Market not found: {}", [
+    log.warning("[BorrowingDisabledOnReserve] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -205,7 +205,7 @@ export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
 export function _handleReserveActivated(marketId: Address): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[ReserveActivated] Market not found: {}", [
+    log.warning("[ReserveActivated] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -218,7 +218,7 @@ export function _handleReserveActivated(marketId: Address): void {
 export function _handleReserveDeactivated(marketId: Address): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[ReserveDeactivated] Market not found: {}", [
+    log.warning("[ReserveDeactivated] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -234,7 +234,7 @@ export function _handleReserveFactorChanged(
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[ReserveFactorChanged] Market not found: {}", [
+    log.warning("[ReserveFactorChanged] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -243,34 +243,6 @@ export function _handleReserveFactorChanged(
   market.reserveFactor = reserveFactor
     .toBigDecimal()
     .div(exponentToBigDecimal(INT_TWO));
-  market.save();
-}
-
-export function _handleReserveUsedAsCollateralEnabled(marketId: Address): void {
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.error("[ReserveUsedAsCollateralEnabled] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
-
-  market.canUseAsCollateral = true;
-  market.save();
-}
-
-export function _handleReserveUsedAsCollateralDisabled(
-  marketId: Address
-): void {
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.error("[ReserveUsedAsCollateralDisabled] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
-
-  market.canUseAsCollateral = false;
   market.save();
 }
 
@@ -290,7 +262,7 @@ export function _handleReserveDataUpdated(
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.error("[ReserveDataUpdated] Market not found: {}", [
+    log.warning("[ReserveDataUpdated] Market not found: {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -518,10 +490,11 @@ export function _handleDeposit(
   // udpate market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
-    marketId.toHexString(),
+    market,
     deposit.amountUSD,
     EventType.DEPOSIT,
-    event.block.timestamp
+    event.block.timestamp,
+    event.block.number
   );
 }
 
@@ -574,10 +547,11 @@ export function _handleWithdraw(
   // udpate market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
-    marketId.toHexString(),
+    market,
     withdraw.amountUSD,
     EventType.WITHDRAW,
-    event.block.timestamp
+    event.block.timestamp,
+    event.block.number
   );
 }
 
@@ -640,10 +614,11 @@ export function _handleBorrow(
   // udpate market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
-    marketId.toHexString(),
+    market,
     borrow.amountUSD,
     EventType.BORROW,
-    event.block.timestamp
+    event.block.timestamp,
+    event.block.number
   );
 }
 
@@ -696,10 +671,11 @@ export function _handleRepay(
   // udpate market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
-    marketId.toHexString(),
+    market,
     repay.amountUSD,
     EventType.REPAY,
-    event.block.timestamp
+    event.block.timestamp,
+    event.block.number
   );
 }
 
@@ -768,9 +744,10 @@ export function _handleLiquidate(
   // udpate market daily / hourly snapshots / financialSnapshots
   updateSnapshots(
     protocol,
-    marketId.toHexString(),
+    market,
     liquidate.amountUSD,
     EventType.LIQUIDATE,
-    event.block.timestamp
+    event.block.timestamp,
+    event.block.number
   );
 }
