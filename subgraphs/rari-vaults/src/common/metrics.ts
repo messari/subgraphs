@@ -1,5 +1,5 @@
 // // update snapshots and metrics
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Account,
   ActiveAccount,
@@ -16,6 +16,7 @@ import {
   getOrCreateYieldAggregator,
 } from "./getters";
 import {
+  ActivityType,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   TransactionType,
@@ -53,16 +54,17 @@ export function updateUsageMetrics(
   transaction: string
 ): void {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let hour: i64 =
-    (event.block.timestamp.toI64() - id * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
+  let day = (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  let hour = (event.block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
   let dailyMetrics = getOrCreateUsageDailySnapshot(event);
   let hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
+  let protocol = getOrCreateYieldAggregator();
 
   // Update the block number and timestamp to that of the last transaction of that day
   dailyMetrics.blockNumber = event.block.number;
   dailyMetrics.timestamp = event.block.timestamp;
   dailyMetrics.dailyTransactionCount += 1;
+  dailyMetrics.totalPoolCount = protocol.totalPoolCount;
 
   // update hourlyMetrics
   hourlyMetrics.blockNumber = event.block.number;
@@ -71,7 +73,6 @@ export function updateUsageMetrics(
 
   let accountId = from.toHexString();
   let account = Account.load(accountId);
-  let protocol = getOrCreateYieldAggregator();
   if (!account) {
     account = new Account(accountId);
     account.save();
@@ -83,7 +84,10 @@ export function updateUsageMetrics(
   dailyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = from.toHexString() + "-" + id.toString();
+  let dailyActiveAccountId = ActivityType.DAILY.concat("-")
+    .concat(from.toHexString())
+    .concat("-")
+    .concat(day);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -92,7 +96,10 @@ export function updateUsageMetrics(
   }
 
   // create active account for hourlyMetrics
-  let hourlyActiveAccountId = dailyActiveAccountId + "-" + hour.toString();
+  let hourlyActiveAccountId = ActivityType.HOURLY.concat("-")
+    .concat(from.toHexString())
+    .concat("-")
+    .concat(hour);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -114,12 +121,21 @@ export function updateVaultDailyMetrics(
 ): void {
   let vaultMetrics = getOrCreateVaultDailySnapshot(event, vaultId);
   let vault = Vault.load(vaultId);
+  if (!vault) {
+    log.warning("[updateVaultDailyMetrics] Vault not found: {}", [vaultId]);
+    return;
+  }
 
-  vaultMetrics.totalValueLockedUSD = vault!.totalValueLockedUSD;
-  vaultMetrics.inputTokenBalance = vault!.inputTokenBalance;
-  vaultMetrics.outputTokenSupply = vault!.outputTokenSupply!;
-  vaultMetrics.outputTokenPriceUSD = vault!.outputTokenPriceUSD;
-  vaultMetrics.pricePerShare = vault!.pricePerShare;
+  vaultMetrics.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultMetrics.inputTokenBalance = vault.inputTokenBalance;
+  vaultMetrics.outputTokenSupply = vault.outputTokenSupply!;
+  vaultMetrics.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  vaultMetrics.pricePerShare = vault.pricePerShare;
+  vaultMetrics.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD;
+  vaultMetrics.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD;
+  vaultMetrics.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
 
   // update block and timestamp
   vaultMetrics.blockNumber = event.block.number;
@@ -135,12 +151,21 @@ export function updateVaultHourlyMetrics(
 ): void {
   let vaultMetrics = getOrCreateVaultHourlySnapshot(event, vaultId);
   let vault = Vault.load(vaultId);
+  if (!vault) {
+    log.warning("[updateVaultHourlyMetrics] Vault not found: {}", [vaultId]);
+    return;
+  }
 
-  vaultMetrics.totalValueLockedUSD = vault!.totalValueLockedUSD;
-  vaultMetrics.inputTokenBalance = vault!.inputTokenBalance;
-  vaultMetrics.outputTokenSupply = vault!.outputTokenSupply!;
-  vaultMetrics.outputTokenPriceUSD = vault!.outputTokenPriceUSD;
-  vaultMetrics.pricePerShare = vault!.pricePerShare;
+  vaultMetrics.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultMetrics.inputTokenBalance = vault.inputTokenBalance;
+  vaultMetrics.outputTokenSupply = vault.outputTokenSupply!;
+  vaultMetrics.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  vaultMetrics.pricePerShare = vault.pricePerShare;
+  vaultMetrics.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD;
+  vaultMetrics.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD;
+  vaultMetrics.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
 
   // update block and timestamp
   vaultMetrics.blockNumber = event.block.number;

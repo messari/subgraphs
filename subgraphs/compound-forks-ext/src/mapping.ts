@@ -492,7 +492,7 @@ export function _handleRedeem(
   account.withdrawCount += 1;
   account.save();
 
-  let positionID = substractPosition(
+  let positionID = subtractPosition(
     protocol,
     market,
     account,
@@ -502,6 +502,7 @@ export function _handleRedeem(
     event
   );
   if (!positionID) {
+    log.warning("[handleRedeem] Failed to find position: {}", []);
     return;
   }
 
@@ -691,7 +692,7 @@ export function _handleRepayBorrow(
     protocol.save();
   }
 
-  let positionID = substractPosition(
+  let positionID = subtractPosition(
     protocol,
     market,
     borrowerAccount,
@@ -700,8 +701,8 @@ export function _handleRepayBorrow(
     EventType.Repay,
     event
   );
-  // TODO: do not return
   if (!positionID) {
+    log.warning("[handleRepayBorrow] Failed to find position", []);
     return;
   }
 
@@ -2015,12 +2016,12 @@ function addPosition(
   return positionID;
 }
 
-// A series of side effects on position substracted
+// A series of side effects on position subtracted
 // They include:
 // * Close a position when needed or reuse the exisitng position
 // * Update position related data in protocol, market, account
 // * Take position snapshot
-function substractPosition(
+function subtractPosition(
   protocol: LendingProtocol,
   market: Market,
   account: Account,
@@ -2036,7 +2037,7 @@ function substractPosition(
     .concat(side);
   let positionCounter = _PositionCounter.load(counterID);
   if (!positionCounter) {
-    log.warning("[substractPosition] position counter {} not found", [
+    log.warning("[subtractPosition] position counter {} not found", [
       counterID,
     ]);
     return null;
@@ -2046,12 +2047,12 @@ function substractPosition(
     .concat(positionCounter.nextCount.toString());
   let position = Position.load(positionID);
   if (!position) {
-    log.warning("[substractPosition] position {} not found", [positionID]);
+    log.warning("[subtractPosition] position {} not found", [positionID]);
     return null;
   }
 
   if (balanceResult.reverted) {
-    log.warning("[substractPosition] Fetch balance of {} from {} reverted", [
+    log.warning("[subtractPosition] Fetch balance of {} from {} reverted", [
       account.id,
       market.id,
     ]);

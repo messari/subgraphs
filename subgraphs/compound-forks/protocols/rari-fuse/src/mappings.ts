@@ -39,6 +39,7 @@ import {
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
+  FMIM_ADDRESS,
   getNetworkSpecificConstant,
   GOHM_ADDRESS,
   METHODOLOGY_VERSION,
@@ -638,6 +639,16 @@ function updateMarket(
       .toBigDecimal()
       .div(bdFactor);
     underlyingTokenPriceUSD = priceInEth.times(ethPriceUSD); // get price in USD
+  }
+
+  // Protect fMIM from price oracle manipulation on 2/1/22-2/4/22
+  // The average price on those days is $0.99632525
+  if (
+    marketID.toLowerCase() == FMIM_ADDRESS.toLowerCase() &&
+    blockTimestamp.toI32() >= 1643695208 && // beginning of day 2/1
+    blockTimestamp.toI32() <= 1643954408 // EOD 2/4
+  ) {
+    underlyingTokenPriceUSD = BigDecimal.fromString("0.99632525");
   }
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;

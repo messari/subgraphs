@@ -134,3 +134,4 @@ export const SCHEMA_VERSION = "1.3.0";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const USDC_DECIMALS = 6;
 export const comptrollerAddr = Address.fromString(COMPTROLLER_ADDRESS);
+export const ETH_DECIMALS = 18;

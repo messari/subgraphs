@@ -26,6 +26,7 @@ export function getOrCreateStrategy(
   if (!strategy) {
     strategy = new _Strategy(_strategyAddress.toHexString());
     strategy.lastReport = constants.BIGINT_ZERO;
+    strategy.totalDebt = constants.BIGINT_ZERO;
     strategy.vaultAddress = vaultAddress;
     strategy.performanceFee = performanceFee;
   }
@@ -287,6 +288,11 @@ export function getOrCreateVault(
     vault.createdTimestamp = block.timestamp;
 
     vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    
+    vault.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+    
     vault.lastReport = constants.BIGINT_ZERO;
     vault.totalAssets = constants.BIGINT_ZERO;
 

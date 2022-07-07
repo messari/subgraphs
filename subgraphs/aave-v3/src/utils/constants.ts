@@ -166,6 +166,6 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-/// Context keys
+// Context keys
 export const PROTOCOL_ID_KEY = "protocolId";
 export const POOL_ADDRESSES_PROVIDER_ID_KEY = "poolAddressesProviderId";
