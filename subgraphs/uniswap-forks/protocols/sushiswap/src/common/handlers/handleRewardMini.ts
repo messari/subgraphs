@@ -39,8 +39,8 @@ export function updateMasterChefDeposit(
   let rewardAmountPerInterval = miniChefV2.adjustedRewardTokenRate
     .times(miniChefV2Pool.poolAllocPoint)
     .div(miniChefV2.totalAllocPoint);
-  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
-    rewardAmountPerInterval.toString()
+  let rewardAmountPerIntervalBigDecimal = new BigDecimal(
+    rewardAmountPerInterval
   );
   let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
@@ -93,8 +93,8 @@ export function updateMasterChefWithdraw(
   let rewardAmountPerInterval = miniChefV2.adjustedRewardTokenRate
     .times(miniChefV2Pool.poolAllocPoint)
     .div(miniChefV2.totalAllocPoint);
-  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
-    rewardAmountPerInterval.toString()
+  let rewardAmountPerIntervalBigDecimal = new BigDecimal(
+    rewardAmountPerInterval
   );
   let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
