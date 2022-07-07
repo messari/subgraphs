@@ -664,7 +664,9 @@
       "rari-vaults": {
         "mainnet": {
           "template": "rari-vaults.template.yaml",
-          "deploy-on-merge": false
+          "messari": "messari/rari-vaults-ethereum",
+          "dmelotik": "dmelotik/rari-vaults",
+          "deploy-on-merge": true
         }
       }
     },
