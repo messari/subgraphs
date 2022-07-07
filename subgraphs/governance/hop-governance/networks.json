@@ -1,0 +1,10 @@
+{
+  "mainnet": {
+    "HOPGovernor": {
+      "address": "0xed8Bdb5895B8B7f9Fdb3C087628FD8410E853D48"
+    },
+    "HOPToken": {
+      "address": "0xc5102fE9359FD9a28f877a67E36B0F050d81a3CC"
+    }
+  }
+}
