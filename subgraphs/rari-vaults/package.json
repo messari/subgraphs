@@ -10,8 +10,8 @@
     "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.28.1",
-    "@graphprotocol/graph-ts": "0.26.0"
+    "@graphprotocol/graph-cli": "^0.32.0",
+    "@graphprotocol/graph-ts": "^0.27.0"
   },
   "devDependencies": {
     "mustache": "^3.1.0",
