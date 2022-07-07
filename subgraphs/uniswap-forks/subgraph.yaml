@@ -1,8 +1,9 @@
 specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: Factory
     network: xdai
     source:
@@ -13,7 +14,13 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: []
+      file: ./src/mappings/factory.ts
+      entities:
+        - Token
+        - DexAmmProtocol
+        - LiquidityPool
+        - LiquidityPoolFee
+        - Protocol
       abis:
         - name: Factory
           file: ./abis/honeyswap/Factory.json
@@ -22,31 +29,6 @@ dataSources:
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-  - kind: ethereum/contract
-    name: HoneyFarm
-    network: xdai
-    source:
-      address: "0xB44825cF0d8D4dD552f2434056c41582415AaAa1"
-      abi: HoneyFarm
-      startBlock: 16285152
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: HoneyFarm
-          file: ./abis/honeyswap/HoneyFarm.json
-        - name: TokenABI
-          file: ./abis/honeyswap/ERC20.json
-      eventHandlers:
-        - event: PoolAdded(indexed address,uint256)
-          handler: handlePoolAdded
-        - event: PoolRemoved(indexed address)
-          handler: handlePoolRemoved
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-      file: ./protocols/honeyswap/src/mappings/honeyfarm.ts
 templates:
   - kind: ethereum/contract
     name: Pair
@@ -58,7 +40,26 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mappings/pool.ts
-      entities: []
+      entities:
+        - LiqudityPool
+        - Token
+        - Deposit
+        - Withdraw
+        - Swap
+        - LiquidityPool
+        - LiquidityPoolFee
+        - DexAmmProtocol
+        - Token
+        - _Transaction
+        - _Mint
+        - _Burn
+        - _PricesUSD
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - _Account
+        - _DailyActiveAccount
+        - PoolDailySnapshot
+        - _TokenTracker
       abis:
         - name: Pair
           file: ./abis/honeyswap/Pair.json
