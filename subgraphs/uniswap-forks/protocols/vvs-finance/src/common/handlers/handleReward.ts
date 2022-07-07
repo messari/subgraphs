@@ -42,7 +42,7 @@ export function handleReward(
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
   // If comes back null then it must be a uniswap v2 pool
-  let pool = LiquidityPool.load(masterChefPool.poolAddress);
+  let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
     return;
   }
@@ -151,7 +151,7 @@ function getOrCreateMasterChefStakingPool(
     masterChefPool.multiplier = BIGINT_ONE;
     masterChefPool.poolAllocPoint = BIGINT_ZERO;
     masterChefPool.lastRewardBlock = event.block.number;
-    log.warning("MASTERCHEF POOL CREATED: " + masterChefPool.poolAddress, []);
+    log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
     masterChefPool.save();
   }
