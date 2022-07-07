@@ -1,0 +1,24 @@
+{
+    "query": "{
+        poolHourlySnapshots (orderBy: id, orderDirection: desc) {
+            id
+            protocol { id }
+            pool { id }
+            blockNumber
+            timestamp
+            totalValueLockedUSD
+            cumulativeSupplySideRevenueUSD
+            hourlySupplySideRevenueUSD
+            cumulativeProtocolSideRevenueUSD
+            hourlyProtocolSideRevenueUSD
+            cumulativeTotalRevenueUSD
+            hourlyTotalRevenueUSD
+            inputTokenBalances
+            outputTokenSupply
+            outputTokenPriceUSD
+            stakedOutputTokenAmount
+            rewardTokenEmissionsAmount
+            rewardTokenEmissionsUSD
+        }
+    }"
+}

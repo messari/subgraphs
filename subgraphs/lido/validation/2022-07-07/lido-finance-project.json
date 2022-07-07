@@ -1,0 +1,52 @@
+{
+  "name": "Lido Finance",
+  "project_id": "lido-finance",
+  "description_who": "LDO tokenholders own and govern the protocol. They currently take a cut of the total return on investment (protocol revenue). Lido’s investors include ParaFi Capital, Bitscale Capital, KR1, etc.",
+  "description_how": "Stakers deposit funds into Lido and receive a return on investment in the form of staking rewards (supply-side revenue).",
+  "description_what": "Lido is a non-custodial staking protocol built on Ethereum and other blockchains. Lido was founded by a pseudo-anonymous team and launched in 2020.",
+  "smart_contract_registry": "https://raw.githubusercontent.com/token-terminal/smart-contract-registry/main/projects/lido-finance.json",
+  "symbol": "LDO",
+  "logo": "lidofinance.png",
+  "categories": [
+    "Asset Management",
+    "DeFi",
+    "Other"
+  ],
+  "status_label": "PUBLIC",
+  "is_new": false,
+  "metric_availability": {
+    "pe": true,
+    "ps": true,
+    "gmv": false,
+    "tvl": true,
+    "price": true,
+    "revenue": true,
+    "deposits": false,
+    "treasury": true,
+    "market_cap": true,
+    "composition": {
+      "gmv": false,
+      "tvl": false,
+      "revenue": false,
+      "deposits": false,
+      "treasury": true,
+      "revenue_total": false,
+      "token_incentives": false
+    },
+    "active_users": false,
+    "tokenholders": true,
+    "revenue_total": true,
+    "pe_circulating": true,
+    "ps_circulating": true,
+    "pe_fully_diluted": true,
+    "ps_fully_diluted": true,
+    "revenue_protocol": true,
+    "token_incentives": false,
+    "volmc_circulating": true,
+    "revenue_supply_side": true,
+    "volmc_fully_diluted": true,
+    "token_trading_volume": true,
+    "market_cap_circulating": true,
+    "market_cap_fully_diluted": true
+  }
+}
