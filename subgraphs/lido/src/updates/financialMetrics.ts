@@ -1,13 +1,13 @@
-import { log, Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { getUsdPrice, getUsdPricePerToken } from "./prices";
-import { bigIntToBigDecimal } from "./utils/numbers";
-import { getOrCreateProtocol } from "./entities/protocol";
-import { getOrCreatePool } from "./entities/pool";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { getUsdPrice, getUsdPricePerToken } from "../prices";
+import { bigIntToBigDecimal } from "../utils/numbers";
+import { getOrCreateProtocol } from "../entities/protocol";
+import { getOrCreatePool } from "../entities/pool";
 import {
   FinancialsDailySnapshot,
   PoolDailySnapshot,
   PoolHourlySnapshot,
-} from "../generated/schema";
+} from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_TEN_TO_EIGHTEENTH,
@@ -16,8 +16,8 @@ import {
   PROTOCOL_ID,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
-} from "./utils/constants";
-import { getOrCreateToken } from "./entities/token";
+} from "../utils/constants";
+import { getOrCreateToken } from "../entities/token";
 
 export function updateProtocolAndPoolTvl(
   block: ethereum.Block,
@@ -48,7 +48,7 @@ export function updateProtocolAndPoolTvl(
 
   // Pool Daily and Hourly
   // updatePoolSnapshots(event.block) is called separately when protocol and supply side
-  // revenue metrics are being calculated to consolidate the snapshots
+  // revenue metrics are being calculated to consolidate all revenue metrics into same snapshots
 }
 
 export function updatePoolSnapshotsTvl(block: ethereum.Block): void {
@@ -73,7 +73,6 @@ export function updatePoolSnapshotsTvl(block: ethereum.Block): void {
   poolMetricsHourlySnapshot.save();
 }
 
-// Can we get this from from LIDO rather than LIDOOracle?
 export function updateTotalRevenueMetrics(
   block: ethereum.Block,
   postTotalPooledEther: BigInt,
@@ -134,6 +133,7 @@ export function updateTotalRevenueMetrics(
   poolMetricsDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsDailySnapshot.save();
 
+  // Pool Hourly
   poolMetricsHourlySnapshot.cumulativeTotalRevenueUSD =
     pool.cumulativeTotalRevenueUSD;
   poolMetricsHourlySnapshot.hourlyTotalRevenueUSD = poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.plus(
@@ -161,12 +161,9 @@ export function updateProtocolSideRevenueMetrics(
   );
 
   // Rewards are minted in stETH, price in stETH
-  // TODO: Do we want to price this in ETH?
-  // TODO: TBD: Can we get Node Operators list through contract call?
-  //            If not, we double treasury amount because we both treasuryRevenue and nodeOperatorsRevenue is 5%.
   const amountUSD = getUsdPrice(
     Address.fromString(PROTOCOL_ID),
-    bigIntToBigDecimal(amount.plus(amount))
+    bigIntToBigDecimal(amount)
   );
 
   // Protocol

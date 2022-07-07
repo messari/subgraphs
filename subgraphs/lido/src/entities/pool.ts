@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Pool } from "../../generated/schema";
 import { getOrCreateProtocol } from "./protocol";
 import { getOrCreateToken } from "./token";

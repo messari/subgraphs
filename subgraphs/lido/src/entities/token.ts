@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
 import { ERC20 } from "../../generated/Lido/ERC20";
 import { getUsdPricePerToken } from "../prices";
@@ -30,7 +30,7 @@ export function getOrCreateToken(
     }
   }
 
-  // Optional lastPriceUSD and lastPriceBlockNumber
+  // Optional lastPriceUSD and lastPriceBlockNumber, but used in financialMetrics
   const price = getUsdPricePerToken(tokenAddress);
   if (price.reverted) {
     token.lastPriceUSD = BIGDECIMAL_ZERO;

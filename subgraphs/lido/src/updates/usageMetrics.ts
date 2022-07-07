@@ -1,12 +1,12 @@
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { getOrCreateProtocol } from "./entities/protocol";
+import { getOrCreateProtocol } from "../entities/protocol";
 import {
   Account,
   ActiveAccount,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
-} from "../generated/schema";
-import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./utils/constants";
+} from "../../generated/schema";
+import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../utils/constants";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   const accountId = from.toHexString();

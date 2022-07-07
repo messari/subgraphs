@@ -1,18 +1,20 @@
-import { Lido, Submitted, Transfer } from "../../generated/Lido/Lido";
-import { Address } from "@graphprotocol/graph-ts";
-import { updateUsageMetrics } from "../usageMetrics";
+import { Submitted, Transfer } from "../../generated/Lido/Lido";
+import { NodeOperatorsRegistry } from "../../generated/Lido/NodeOperatorsRegistry";
+import { Address, log } from "@graphprotocol/graph-ts";
+import { updateUsageMetrics } from "../updates/usageMetrics";
 import {
   updateProtocolSideRevenueMetrics,
-  updateSupplySideRevenueMetrics,
   updatePoolSnapshotsTvl,
   updateProtocolAndPoolTvl,
-} from "../financialMetrics";
+} from "../updates/financialMetrics";
 import {
   PROTOCOL_TREASURY_ID,
   PROTOCOL_NODE_OPERATORS_REGISTRY_ID,
   ZERO_ADDRESS,
   ETH_ADDRESS,
   PROTOCOL_ID,
+  BIGINT_ZERO,
+  LiquidityPoolFeeType,
 } from "../utils/constants";
 import { getOrCreateToken } from "../entities/token";
 
@@ -30,15 +32,25 @@ export function handleTransfer(event: Transfer): void {
   let recipient = event.params.to;
   let value = event.params.value;
 
+  let nodeOperators: Address[] = [];
+  let nodeOperatorsRegistry = NodeOperatorsRegistry.bind(
+    Address.fromString(PROTOCOL_NODE_OPERATORS_REGISTRY_ID)
+  );
+  let callResult = nodeOperatorsRegistry.try_getRewardsDistribution(
+    BIGINT_ZERO
+  );
+  if (callResult.reverted) {
+    log.info("NodeOperatorsRegistry call reverted", []);
+  } else {
+    nodeOperators = callResult.value.getRecipients();
+  }
+
   let fromZeros = sender == Address.fromString(ZERO_ADDRESS);
   let isMintToTreasury =
     fromZeros && recipient == Address.fromString(PROTOCOL_TREASURY_ID);
-  // FIX: BUGGGGGG
-  let isMintToNodeOperatorsRegistry =
-    fromZeros &&
-    recipient == Address.fromString(PROTOCOL_NODE_OPERATORS_REGISTRY_ID);
+  let isMintToNodeOperators = fromZeros && nodeOperators.includes(recipient);
 
-  if (isMintToTreasury || isMintToNodeOperatorsRegistry) {
+  if (isMintToTreasury || isMintToNodeOperators) {
     updatePoolSnapshotsTvl(event.block);
     updateProtocolSideRevenueMetrics(event.block, value);
   }
