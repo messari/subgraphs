@@ -33,8 +33,8 @@ export const WINDOW_SIZE_SECONDS = 86400;
 
 // BUFFER_SIZE determined the size of the array
 // Makes the buffer the maximum amount of blocks that can be stored given the block rate and storage interval
-// Recommended value is (RATE_IN_SECODNDS / TIMESTAMP_STORAGE_INTERVAL) - > Round up to nearest even integer
-export const BUFFER_SIZE = 144;
+// Recommended value is (RATE_IN_SECODNDS / TIMESTAMP_STORAGE_INTERVAL) * 2 - > Round up to nearest even integer
+export const BUFFER_SIZE = 288;
 
 // Add this entity to the schema.
 // type _CircularBuffer @entity {
