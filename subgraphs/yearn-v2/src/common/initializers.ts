@@ -26,6 +26,7 @@ export function getOrCreateStrategy(
   if (!strategy) {
     strategy = new _Strategy(_strategyAddress.toHexString());
     strategy.lastReport = constants.BIGINT_ZERO;
+    strategy.totalDebt = constants.BIGINT_ZERO;
     strategy.vaultAddress = vaultAddress;
     strategy.performanceFee = performanceFee;
   }
