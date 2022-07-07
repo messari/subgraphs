@@ -175,6 +175,7 @@ export function handleDeposit(event: Deposit): void {
   updateVaultAndSnapshots(vault, event.block);
   updateProtocolUsage(event, vault, true, false);
 }
+
 export function handleWithdraw(event: Withdraw): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
   const withdrawnAmount = event.params.tvl.minus(vault.inputTokenBalance);
@@ -182,11 +183,13 @@ export function handleWithdraw(event: Withdraw): void {
   updateVaultAndSnapshots(vault, event.block);
   updateProtocolRevenueFromWithdraw(event, vault, withdrawnAmount);
 }
+
 export function handleStratHarvestWithAmount(event: StratHarvest): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
   updateVaultAndSnapshots(vault, event.block);
   updateProtocolRevenueFromHarvest(event, event.params.wantHarvested, vault);
 }
+
 export function handleStratHarvest(event: StratHarvest): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
   const strategyContract = BeefyStrategy.bind(event.address);
@@ -197,7 +200,6 @@ export function handleStratHarvest(event: StratHarvest): void {
     updateProtocolRevenueFromHarvest(event, amountHarvested, vault);
   } else {
     updateVaultAndSnapshots(vault, event.block);
-    updateProtocolUsage(event, vault, false, false);
   }
 }
 
