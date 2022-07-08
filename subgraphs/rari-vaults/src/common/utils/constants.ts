@@ -5,22 +5,30 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ////////////////////////
 
 // The network names corresponding to the Network enum in the schema.
+// The network names corresponding to the Network enum in the schema.
 // They also correspond to the ones in `dataSource.network()` after converting to lower case.
 // See below for a complete list:
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
-  export const AVALANCHE = "AVALANCHE";
+  export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
   export const AURORA = "AURORA";
+  export const AVALANCHE = "AVALANCHE";
+  export const BOBA = "BOBA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
+  export const COSMOS = "COSMOS";
+  export const CRONOS = "CRONOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY";
+  export const JUNO = "JUNO";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
+  export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
 }
@@ -85,6 +93,11 @@ export namespace RariPool {
   export const YIELD_POOL = "Yield Pool";
   export const STABLE_POOL = "Stable Pool"; // USDC and DAI
   export const ETHER_POOL = "Ether Pool";
+}
+
+export namespace ActivityType {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
 }
 
 //////////////////////////////
@@ -233,8 +246,8 @@ export const ETHER_VAULT_SYMBOL = "REPT"; // REPT = rariether pool token
 export const RARI_DEPLOYER = "0xb8f02248d53f7edfa38e79263e743e9390f81942"; // using as "protocol address" b/c no factory contract
 export const PROTOCOL_NAME = "Rari Vaults";
 export const PROTOCOL_SLUG = "rari-vaults";
-export const SCHEMA_VERSION = "1.2.1";
-export const SUBGRAPH_VERSION = "1.3.25";
+export const SCHEMA_VERSION = "1.3.0";
+export const SUBGRAPH_VERSION = "1.4.0";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_NETWORK = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.YIELD;

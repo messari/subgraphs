@@ -36,7 +36,6 @@ export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
 }
 
 export function handleAdd(event: Add): void {
-  log.warning("HELLO", []);
   let masterChefV2Pool = createMasterChefStakingPool(
     event,
     MasterChef.MASTERCHEFV2,

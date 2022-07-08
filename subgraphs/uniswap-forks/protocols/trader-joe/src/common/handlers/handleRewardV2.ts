@@ -25,7 +25,7 @@ export function updateMasterChefDeposit(
   )!;
   let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
-  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress);
+  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }
@@ -79,7 +79,7 @@ export function updateMasterChefWithdraw(
   let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress);
+  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }

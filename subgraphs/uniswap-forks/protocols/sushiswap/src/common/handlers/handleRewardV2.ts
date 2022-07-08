@@ -9,7 +9,10 @@ import {
 import { INT_ZERO } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
+import {
+  convertTokenToDecimal,
+  roundToWholeNumber,
+} from "../../../../../src/common/utils/utils";
 import {
   findNativeTokenPerToken,
   updateNativeTokenPriceInUSD,
@@ -28,13 +31,16 @@ export function updateMasterChefDeposit(
   let masterchefV2Contract = MasterChefV2Sushiswap.bind(event.address);
   let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
-  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress);
+  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }
 
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
-    masterChefV2.adjustedRewardTokenRate = masterchefV2Contract.sushiPerBlock();
+    let getSushiPerBlock = masterchefV2Contract.try_sushiPerBlock();
+    if (!getSushiPerBlock.reverted) {
+      masterChefV2.adjustedRewardTokenRate = getSushiPerBlock.value;
+    }
     masterChefV2.lastUpdatedRewardRate = event.block.number;
   }
 
@@ -58,7 +64,7 @@ export function updateMasterChefDeposit(
 
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
@@ -88,7 +94,7 @@ export function updateMasterChefWithdraw(
   let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress);
+  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }
@@ -118,7 +124,7 @@ export function updateMasterChefWithdraw(
 
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
@@ -139,7 +145,7 @@ export function updateMasterChefWithdraw(
 // export function updateMasterChefHarvest(event: ethereum.Event, pid: BigInt, amount: BigInt): void {
 //   let masterChefPool = _MasterChefStakingPool.load(pid.toString())!;
 //   // Return if pool does not exist
-//   let pool = LiquidityPool.load(masterChefPool.poolAddress);
+//   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
 //   if (!pool) {
 //     return;
 //   }

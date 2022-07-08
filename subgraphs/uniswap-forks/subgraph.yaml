@@ -1,8 +1,9 @@
 specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: Factory
     network: avalanche
     source:
@@ -13,7 +14,13 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: []
+      file: ./src/mappings/factory.ts
+      entities:
+        - Token
+        - DexAmmProtocol
+        - LiquidityPool
+        - LiquidityPoolFee
+        - Protocol
       abis:
         - name: Factory
           file: ./abis/trader-joe/Factory.json
@@ -22,7 +29,9 @@ dataSources:
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      file: ./src/mappings/factory.ts
+      ##callHandlers:
+      ##- function: setFeeTo(address)
+      ##handler: handleFeeTo
   - kind: ethereum
     name: MasterChefV2
     network: avalanche
@@ -34,18 +43,20 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: []
+      entities:
+        - _CircularBuffer
+        - RewardToken
       abis:
         - name: MasterChefV2TraderJoe
           file: ./abis/trader-joe/MasterChefV2TraderJoe.json
         - name: TokenABI
           file: ./abis/trader-joe/ERC20.json
       eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256)
+        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
           handler: handleDeposit
-        - event: Withdraw(indexed address,indexed uint256,uint256)
+        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleWithdraw
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdraw
         - event: Add(indexed uint256,uint256,indexed address,indexed address)
           handler: handleAdd
@@ -86,7 +97,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: xdai
+    network: avalanche
     source:
       abi: Pair
     mapping:
@@ -94,7 +105,26 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mappings/pool.ts
-      entities: []
+      entities:
+        - LiqudityPool
+        - Token
+        - Deposit
+        - Withdraw
+        - Swap
+        - LiquidityPool
+        - LiquidityPoolFee
+        - DexAmmProtocol
+        - Token
+        - _Transaction
+        - _Mint
+        - _Burn
+        - _PricesUSD
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - _Account
+        - _DailyActiveAccount
+        - PoolDailySnapshot
+        - _TokenTracker
       abis:
         - name: Pair
           file: ./abis/spiritswap/Pair.json
