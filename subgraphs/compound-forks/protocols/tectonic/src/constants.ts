@@ -34,7 +34,7 @@ export const RATE_IN_SECONDS_BD = BigDecimal.fromString(
 );
 
 export const CRONOS_BLOCKSPERDAY = RATE_IN_SECONDS_BD.div(
-  BigDecimal.fromString("5")
+  BigDecimal.fromString("5.7")
 );
 
 export const ORACLE_ADDRESS = "0x4B377121d968Bf7a62D51B96523d59506e7c2BF0";
