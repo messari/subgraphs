@@ -1,5 +1,4 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateProtocol } from "../entities/protocol";
 import { getOrCreatePool } from "../entities/pool";
@@ -28,9 +27,9 @@ export function updateProtocolAndPoolTvl(
   const financialMetrics = getOrCreateFinancialDailyMetrics(block);
 
   // inputToken is ETH, price with ETH
-  const amountUSD = getUsdPrice(
-    Address.fromString(ETH_ADDRESS),
-    bigIntToBigDecimal(amount)
+  const amountUSD = bigIntToBigDecimal(amount).times(
+    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
+      .lastPriceUSD!
   );
 
   // Protocol
@@ -161,9 +160,9 @@ export function updateProtocolSideRevenueMetrics(
   );
 
   // Rewards are minted in stETH, price in stETH
-  const amountUSD = getUsdPrice(
-    Address.fromString(PROTOCOL_ID),
-    bigIntToBigDecimal(amount)
+  const amountUSD = bigIntToBigDecimal(amount).times(
+    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
+      .lastPriceUSD!
   );
 
   // Protocol

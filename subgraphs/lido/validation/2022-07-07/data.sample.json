@@ -1,10 +1,8 @@
 {
     "query": "{
-       poolHourlySnapshots (where: { timestamp_gt: 1656979200, timestamp_lt: 1657065600 }) {
+       poolHourlySnapshots (where: { timestamp: \"1621599407\" }) {
             id
-            protocol {
-
-             }
+            protocol { id }
             pool { id }
             blockNumber
             timestamp
