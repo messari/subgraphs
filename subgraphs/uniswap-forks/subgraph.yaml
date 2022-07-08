@@ -1,8 +1,9 @@
 specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: Factory
     network: avalanche
     source:
@@ -13,7 +14,13 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: []
+      file: ./src/mappings/factory.ts
+      entities:
+        - Token
+        - DexAmmProtocol
+        - LiquidityPool
+        - LiquidityPoolFee
+        - Protocol
       abis:
         - name: Factory
           file: ./abis/trader-joe/Factory.json
@@ -22,7 +29,9 @@ dataSources:
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      file: ./src/mappings/factory.ts
+      ##callHandlers:
+      ##- function: setFeeTo(address)
+      ##handler: handleFeeTo
   - kind: ethereum
     name: MasterChefV2
     network: avalanche
@@ -94,7 +103,26 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mappings/pool.ts
-      entities: []
+      entities:
+        - LiqudityPool
+        - Token
+        - Deposit
+        - Withdraw
+        - Swap
+        - LiquidityPool
+        - LiquidityPoolFee
+        - DexAmmProtocol
+        - Token
+        - _Transaction
+        - _Mint
+        - _Burn
+        - _PricesUSD
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - _Account
+        - _DailyActiveAccount
+        - PoolDailySnapshot
+        - _TokenTracker
       abis:
         - name: Pair
           file: ./abis/spiritswap/Pair.json
