@@ -29,23 +29,32 @@ export namespace vaults {
 			entity.depositLimit = integer.ZERO;
 			entity.fees = [];
 
-
-
-
 		}
 		return entity as Vault
+	}
+
+	export function addFee(entity: Vault, feeId: string): Vault {
+		let e = entity
+		let _vaultFees = e.fees
+		_vaultFees.push(feeId)
+		e.fees = _vaultFees
+		return e
 	}
 
 	export function getValuesForVault(vaultAddress: Address): VaultValuesResult {
 		let contract = VaultContract.bind(vaultAddress)
 		let underlyingResult = contract.try_underlying()
-		let value = !underlyingResult.reverted ? underlyingResult.value : Address.fromHexString(ADDRESS_ZERO) as Address
+		let underlying = !underlyingResult.reverted ? underlyingResult.value : Address.fromHexString(ADDRESS_ZERO) as Address
+
+		let controllerAddressResult = contract.try_controller()
+		let controllerAddress = !underlyingResult.reverted ? underlyingResult.value : Address.fromHexString(ADDRESS_ZERO) as Address
 
 
 		return new VaultValuesResult(
 			shared.readValue<string>(contract.try_symbol(), `fallBackValueFor ${vaultAddress.toHexString()}`),
 			shared.readValue<string>(contract.try_name(), `fallBackValueFor ${vaultAddress.toHexString()}`),
-			value
+			underlying,
+			controllerAddress
 		)
 	}
 
@@ -53,12 +62,14 @@ export namespace vaults {
 		symbol: string;
 		name: string;
 		underLyingToken: Address;
+		controllerAddress: Address;
 		constructor(
-			_symbol: string, _name: string, _underLyingToken: Address
+			_symbol: string, _name: string, _underLyingToken: Address, _controllerAddress: Address
 		) {
 			this.symbol = _symbol
 			this.name = _name
 			this.underLyingToken = _underLyingToken
+			this.controllerAddress = _controllerAddress
 		}
 	}
 }
