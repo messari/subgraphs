@@ -321,10 +321,17 @@ function updateTONICRewards(event: AccrueInterest, market: Market): void {
     : tryTonicSpeed.value.times(blocksPerDay);
   borrowTonicPerDay = supplyTonicPerDay;
 
-  if (
-    event.block.number.toI32() > 687810 &&
-    event.block.number.toI32() <= 1337194
-  ) {
+  if (event.block.number.gt(BigInt.fromI32(1337194))) {
+    let TonicMarket = Market.load(tTONICAddress);
+    if (!TonicMarket) {
+      log.warning("[updateRewards] Market not found: {}", [tTONICAddress]);
+      return;
+    }
+    TonicPriceUSD = TonicMarket.inputTokenPriceUSD;
+    log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
+  }
+  else if 
+    (event.block.number.gt(BigInt.fromI32(687810))) {
     let liquidity_pool_TONIC = VVSlp.bind(Address.fromString(ORACLE_ADDRESS));
     let liquidity_pool_CRO = VVSlp.bind(Address.fromString(WCROUSDC_ADDRESS));
 
@@ -341,14 +348,6 @@ function updateTONICRewards(event: AccrueInterest, market: Market): void {
       .div(current_price_CRO)
       .toBigDecimal()
       .div(exponentToBigDecimal(rewardDecimals));
-    log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
-  } else if (event.block.number.toI32() > 1337194) {
-    let TonicMarket = Market.load(tTONICAddress);
-    if (!TonicMarket) {
-      log.warning("[updateRewards] Market not found: {}", [tTONICAddress]);
-      return;
-    }
-    TonicPriceUSD = TonicMarket.inputTokenPriceUSD;
     log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
   } else {
     // try to get TONIC price between blocks start - 687810
