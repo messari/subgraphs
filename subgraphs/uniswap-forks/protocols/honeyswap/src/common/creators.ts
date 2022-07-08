@@ -137,7 +137,9 @@ export function createLiquidityPool(
 export function createPoolRewardToken(poolAddress: string): void {
   let pool = getLiquidityPool(poolAddress);
 
-  pool.rewardTokens = [getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id];
+  pool.rewardTokens = [
+    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+  ];
 
   pool.save();
 }
