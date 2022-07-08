@@ -180,6 +180,8 @@ dataSources:
       eventHandlers:
         - event: Harvest(uint256,indexed uint256)
           handler: handleHarvest
+        - event: CurveHarvest(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleCurveHarvest
         - event: FarmHarvest(uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleFarmHarvest
         - event: HarvestState(uint256,uint256,uint256,uint256,uint256,uint256,uint256)
@@ -268,6 +270,8 @@ templates:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
+        - event: CurveHarvest(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleCurveHarvest
         - event: Harvest(uint256,indexed uint256)
           handler: handleHarvest
         - event: FarmHarvest(uint256,uint256,uint256,uint256,uint256,uint256)

@@ -2,6 +2,7 @@ import {
   Harvest,
   FarmHarvest,
   HarvestState,
+  CurveHarvest,
   TreeDistribution,
   PerformanceFeeStrategist,
   PerformanceFeeGovernance,
@@ -20,7 +21,7 @@ export function handleHarvest(event: Harvest): void {
   const strategyAddress = event.address;
   const strategyContract = StrategyContract.bind(strategyAddress);
 
-  const vaultAddress = utils.getVaultAddressFromContext();
+  const vaultAddress = utils.getVaultAddressFromStrategy(strategyAddress);
   const vault = getOrCreateVault(vaultAddress, event.block);
 
   const wantToken = utils.readValue<Address>(
@@ -43,12 +44,57 @@ export function handleHarvest(event: Harvest): void {
   );
 
   log.warning(
-    "[Harvest] Strategy: {}, token: {}, amount: {}, amountUSD: {}, TxnHash",
+    "[Harvest] Strategy: {}, token: {}, amount: {}, amountUSD: {}, TxnHash: {}",
     [
       strategyAddress.toHexString(),
       wantToken.toHexString(),
       harvestedAmount.toString(),
       supplySideRevenueUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+}
+
+export function handleCurveHarvest(event: CurveHarvest): void {
+  const feesToStrategist = event.params.strategistPerformanceFee;
+  const feesToGovernance = event.params.governancePerformanceFee;
+
+  const strategyAddress = event.address;
+  const strategyContract = StrategyContract.bind(strategyAddress);
+
+  const vaultAddress = utils.getVaultAddressFromStrategy(strategyAddress);
+  const vault = getOrCreateVault(vaultAddress, event.block);
+
+  const wantTokenAddress = utils.readValue<Address>(
+    strategyContract.try_want(),
+    constants.NULL.TYPE_ADDRESS
+  );
+  // TODO: Calculate RewardEmissions Per Day.
+
+  const wantTokenPrice = getUsdPricePerToken(wantTokenAddress);
+  const wantTokenDecimals = utils.getTokenDecimals(wantTokenAddress);
+
+  const protocolSideRevenueUSD = feesToStrategist
+    .plus(feesToGovernance)
+    .toBigDecimal()
+    .div(wantTokenDecimals)
+    .times(wantTokenPrice.usdPrice)
+    .div(wantTokenPrice.decimalsBaseTen);
+
+  updateRevenueSnapshots(
+    vault,
+    constants.BIGDECIMAL_ZERO,
+    protocolSideRevenueUSD,
+    event.block
+  );
+
+  log.warning(
+    "[CurveHarvest] Vault: {}, Strategy: {}, protocolSideRevenueUSD: {}, TxnHash: {}",
+    [
+      vaultAddress.toHexString(),
+      strategyAddress.toHexString(),
+      protocolSideRevenueUSD.toString(),
+      event.transaction.hash.toHexString(),
     ]
   );
 }
@@ -79,13 +125,13 @@ export function handleFarmHarvest(event: FarmHarvest): void {
     .div(rewardTokenDecimals)
     .times(farmTokenPrice.usdPrice)
     .div(farmTokenPrice.decimalsBaseTen);
-  
+
   const supplySideRevenueUSD = rewardTokenEmissionAmount
     .toBigDecimal()
     .div(rewardTokenDecimals)
     .times(farmTokenPrice.usdPrice)
     .div(farmTokenPrice.decimalsBaseTen);
-  
+
   updateRevenueSnapshots(
     vault,
     supplySideRevenueUSD,
