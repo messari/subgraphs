@@ -1,5 +1,5 @@
 /////////////////////
-// VERSION 1.0.2 ////
+// VERSION 1.0.3 ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The purpose of this program is to dynamically estimate the blocks generated for the 24 HR period following the most recent update. //
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
@@ -33,8 +33,8 @@ export const WINDOW_SIZE_SECONDS = 86400;
 
 // BUFFER_SIZE determined the size of the array
 // Makes the buffer the maximum amount of blocks that can be stored given the block rate and storage interval
-// Recommended value is (RATE_IN_SECODNDS / TIMESTAMP_STORAGE_INTERVAL) - > Round up to nearest even integer
-export const BUFFER_SIZE = 144;
+// Recommended value is (RATE_IN_SECODNDS / TIMESTAMP_STORAGE_INTERVAL) * 2 - > Round up to nearest even integer
+export const BUFFER_SIZE = 288;
 
 // Add this entity to the schema.
 // type _CircularBuffer @entity {
@@ -160,9 +160,24 @@ export function getRewardsPerDay(
   let startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
 
   // Make sure to still have 2 blocks to calculate rate (This shouldn't happen past the beginning).
-  while (
-    abs(circularBuffer.nextIndex - circularBuffer.windowStartIndex) > INT_FOUR
-  ) {
+  while (true) {
+    if (circularBuffer.nextIndex > circularBuffer.windowStartIndex) {
+      if (
+        circularBuffer.nextIndex - circularBuffer.windowStartIndex <=
+        INT_FOUR
+      ) {
+        break;
+      }
+    } else {
+      if (
+        BUFFER_SIZE -
+          circularBuffer.windowStartIndex +
+          circularBuffer.nextIndex <=
+        INT_FOUR
+      ) {
+        break;
+      }
+    }
     let windowIndexBlockTimestamp = blocks[circularBuffer.windowStartIndex];
 
     // Shift the start of the window if the current timestamp moves out of desired rate window

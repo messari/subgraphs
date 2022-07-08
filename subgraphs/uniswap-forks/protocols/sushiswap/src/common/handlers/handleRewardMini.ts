@@ -26,7 +26,7 @@ export function updateMasterChefDeposit(
   )!;
   let miniChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
 
-  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress);
+  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }
@@ -80,7 +80,7 @@ export function updateMasterChefWithdraw(
   let miniChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress);
+  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }
@@ -126,7 +126,7 @@ export function updateMasterChefWithdraw(
 // export function updateMasterChefHarvest(event: ethereum.Event, pid: BigInt, amount: BigInt): void {
 //   let masterChefPool = _MasterChefStakingPool.load(pid.toString())!;
 //   // Return if pool does not exist
-//   let pool = LiquidityPool.load(masterChefPool.poolAddress);
+//   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
 //   if (!pool) {
 //     return;
 //   }
