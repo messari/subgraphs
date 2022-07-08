@@ -14,7 +14,7 @@ export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 export namespace Protocol {
   export const NAME = "Aave v2";
   export const SLUG = "aave-v2";
-  export const SCHEMA_VERSION = "1.3.0";
+  export const SCHEMA_VERSION = "2.0.1";
   export const SUBGRAPH_VERSION = "1.2.3";
   export const METHODOLOGY_VERSION = "1.0.0";
 }

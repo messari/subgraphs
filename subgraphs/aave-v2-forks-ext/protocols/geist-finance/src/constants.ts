@@ -17,7 +17,7 @@ export const GFTM_ADDRESS = "0x39b3bd37208cbade74d0fcbdbb12d606295b430a";
 export namespace Protocol {
   export const NAME = "Geist Finance";
   export const SLUG = "geist-finance";
-  export const SCHEMA_VERSION = "1.3.0";
+  export const SCHEMA_VERSION = "2.0.1";
   export const SUBGRAPH_VERSION = "1.0.1";
   export const METHODOLOGY_VERSION = "1.0.0";
   export const PROTOCOL_ADDRESS = "0x6c793c628Fe2b480c5e6FB7957dDa4b9291F9c9b";

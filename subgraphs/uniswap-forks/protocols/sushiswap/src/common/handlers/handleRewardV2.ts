@@ -9,7 +9,10 @@ import {
 import { INT_ZERO } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
+import {
+  convertTokenToDecimal,
+  roundToWholeNumber,
+} from "../../../../../src/common/utils/utils";
 import {
   findNativeTokenPerToken,
   updateNativeTokenPriceInUSD,
@@ -34,7 +37,10 @@ export function updateMasterChefDeposit(
   }
 
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
-    masterChefV2.adjustedRewardTokenRate = masterchefV2Contract.sushiPerBlock();
+    let getSushiPerBlock = masterchefV2Contract.try_sushiPerBlock();
+    if (!getSushiPerBlock.reverted) {
+      masterChefV2.adjustedRewardTokenRate = getSushiPerBlock.value;
+    }
     masterChefV2.lastUpdatedRewardRate = event.block.number;
   }
 
@@ -58,7 +64,7 @@ export function updateMasterChefDeposit(
 
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
@@ -118,7 +124,7 @@ export function updateMasterChefWithdraw(
 
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(

@@ -71,6 +71,7 @@ export function toLowerCase(string: string): string {
   return string.toLowerCase();
 }
 
+// Round BigDecimal to whole number
 export function roundToWholeNumber(n: BigDecimal): BigDecimal {
   return n.truncate(0);
 }

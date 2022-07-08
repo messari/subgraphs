@@ -24,7 +24,7 @@ export function updateMasterChefDeposit(
   let masterChefV3Pool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV3 + "-" + pid.toString()
   )!;
-  let masterchefV2Contract = MasterChefV3TraderJoe.bind(event.address);
+  let masterchefV3Contract = MasterChefV3TraderJoe.bind(event.address);
   let masterChefV3 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV3);
 
   let pool = LiquidityPool.load(masterChefV3Pool.poolAddress);
@@ -33,7 +33,10 @@ export function updateMasterChefDeposit(
   }
 
   if (masterChefV3.lastUpdatedRewardRate != event.block.number) {
-    masterChefV3.adjustedRewardTokenRate = masterchefV2Contract.joePerSec();
+    let getJoePerSec = masterchefV3Contract.try_joePerSec();
+    if (!getJoePerSec.reverted) {
+      masterChefV3.adjustedRewardTokenRate = getJoePerSec.value;
+    }
     masterChefV3.lastUpdatedRewardRate = event.block.number;
   }
 
@@ -80,29 +83,32 @@ export function updateMasterChefWithdraw(
   pid: BigInt,
   amount: BigInt
 ): void {
-  let masterChefV2Pool = _MasterChefStakingPool.load(
+  let masterChefV3Pool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV3 + "-" + pid.toString()
   )!;
-  let masterchefV2Contract = MasterChefV3TraderJoe.bind(event.address);
-  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV3);
+  let masterchefV3Contract = MasterChefV3TraderJoe.bind(event.address);
+  let masterChefV3 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV3);
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress);
+  let pool = LiquidityPool.load(masterChefV3Pool.poolAddress);
   if (!pool) {
     return;
   }
 
-  if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
-    masterChefV2.adjustedRewardTokenRate = masterchefV2Contract.joePerSec();
-    masterChefV2.lastUpdatedRewardRate = event.block.number;
+  if (masterChefV3.lastUpdatedRewardRate != event.block.number) {
+    let getJoePerSec = masterchefV3Contract.try_joePerSec();
+    if (!getJoePerSec.reverted) {
+      masterChefV3.adjustedRewardTokenRate = getJoePerSec.value;
+    }
+    masterChefV3.lastUpdatedRewardRate = event.block.number;
   }
 
   let nativeToken = updateNativeTokenPriceInUSD();
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
-  let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
-    .times(masterChefV2Pool.poolAllocPoint)
-    .div(masterChefV2.totalAllocPoint);
+  let rewardAmountPerInterval = masterChefV3.adjustedRewardTokenRate
+    .times(masterChefV3Pool.poolAllocPoint)
+    .div(masterChefV3.totalAllocPoint);
   let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
@@ -110,7 +116,7 @@ export function updateMasterChefWithdraw(
     event.block.timestamp,
     event.block.number,
     rewardAmountPerIntervalBigDecimal,
-    masterChefV2.rewardTokenInterval
+    masterChefV3.rewardTokenInterval
   );
 
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
@@ -124,10 +130,10 @@ export function updateMasterChefWithdraw(
     ).times(rewardToken.lastPriceUSD!),
   ];
 
-  masterChefV2Pool.lastRewardBlock = event.block.number;
+  masterChefV3Pool.lastRewardBlock = event.block.number;
 
-  masterChefV2Pool.save();
-  masterChefV2.save();
+  masterChefV3Pool.save();
+  masterChefV3.save();
   rewardToken.save();
   nativeToken.save();
   pool.save();

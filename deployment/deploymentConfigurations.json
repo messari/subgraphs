@@ -116,6 +116,54 @@
         }
       }
     },
+    "aave-v2-forks-ext": {
+      "aave-v2": {
+        "mainnet-arc": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-arc-ethereum-extended",
+          "dmelotik": "dmelotik/aave-v2-arc-ext",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-avalanche-extended",
+          "dmelotik": "dmelotik/aave-v2-avalanche-ext",
+          "deploy-on-merge": true
+        },
+        "mainnet": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-ethereum-extended",
+          "dmelotik": "dmelotik/aave-v2-mainnet-ext",
+          "deploy-on-merge": true
+        },
+        "mainnet-amm": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-amm-ethereum-extended",
+          "dmelotik": "dmelotik/aave-v2-ethereum-amm-ext",
+          "deploy-on-merge": true
+        },
+        "matic": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-polygon-extended",
+          "dmelotik": "dmelotik/aave-v2-polygon-ext",
+          "deploy-on-merge": true
+        },
+        "mainnet-rwa": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-rwa-ethereum-extended",
+          "dmelotik": "dmelotik/aave-v2-rwa-ext",
+          "deploy-on-merge": true
+        }
+      },
+      "geist-finance": {
+        "fantom": {
+          "template": "geist.finance.template.yaml",
+          "messari": "messari/geist-finance-fantom-extended",
+          "dmelotik": "dmelotik/geist-finance-ext",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "aave-v3": {
       "aave-v3": {
         "arbitrum": {
@@ -616,7 +664,9 @@
       "rari-vaults": {
         "mainnet": {
           "template": "rari-vaults.template.yaml",
-          "deploy-on-merge": false
+          "messari": "messari/rari-vaults-ethereum",
+          "dmelotik": "dmelotik/rari-vaults",
+          "deploy-on-merge": true
         }
       }
     },
@@ -674,32 +724,32 @@
       "sushiswap": {
         "arbitrum": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "avalanche": {
           "template": "uniswap.v2.template.yaml",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "bsc": {
           "template": "uniswap.v2.template.yaml",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "celo": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "fantom": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "fuse": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "mainnet": {
@@ -712,26 +762,26 @@
         "matic": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-matic",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "moonbeam": {
           "template": "sushiswap.alt.template.yaml",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "moonriver": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-moonriver",
           "messari": "messari/sushiswap-moonriver",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "xdai": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-xdai",
           "messari": "messari/sushiswap-gnosis",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         }
       },
@@ -767,7 +817,7 @@
         "mainnet": {
           "template": "uniswap.v2.template.yaml",
           "steegecs": "steegecs/uniswap-v2",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         }
       },
