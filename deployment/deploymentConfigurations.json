@@ -673,13 +673,13 @@
     "uniswap-forks": {
       "apeswap": {
         "bsc": {
-          "template": "apeswap.template.yaml",
+          "template": "apeswap.bsc.template.yaml",
           "steegecs": "steegecs/apeswap-bsc",
           "deploy-on-merge": false,
           "prepare:constants": true
         },
         "matic": {
-          "template": "apeswap.template.yaml",
+          "template": "apeswap.matic.template.yaml",
           "steegecs": "steegecs/apeswap-matic",
           "deploy-on-merge": false,
           "prepare:constants": true

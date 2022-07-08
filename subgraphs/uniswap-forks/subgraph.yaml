@@ -43,18 +43,20 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: []
+      entities:
+        - _CircularBuffer
+        - RewardToken
       abis:
         - name: MasterChefV2TraderJoe
           file: ./abis/trader-joe/MasterChefV2TraderJoe.json
         - name: TokenABI
           file: ./abis/trader-joe/ERC20.json
       eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256)
+        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
           handler: handleDeposit
-        - event: Withdraw(indexed address,indexed uint256,uint256)
+        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleWithdraw
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdraw
         - event: Add(indexed uint256,uint256,indexed address,indexed address)
           handler: handleAdd
