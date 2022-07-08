@@ -27,7 +27,9 @@ import {
   getOrCreateFinancials,
   getOrCreateToken,
   getOrCreateVault,
+  getOrCreateVaultDailySnapshot,
   getOrCreateVaultFee,
+  getOrCreateVaultHourlySnapshot,
   getOrCreateVaultInterest,
   getOrCreateYieldAggregator,
 } from "../common/getters";
@@ -244,6 +246,11 @@ export function updateRevenues(
     event.block.number
   );
 
+  // setup revenues
+  let newSupplyRevenueUSD = BIGDECIMAL_ZERO;
+  let newProtooclRevenueUSD = extraFee;
+  let newTotalRevenueUSD = extraFee;
+
   // get raw interest accrued based on vault address
   let tryTotalInterest: ethereum.CallResult<BigInt>;
   if (vault._vaultInterest == YIELD_VAULT_ADDRESS) {
@@ -297,31 +304,56 @@ export function updateRevenues(
         BIGDECIMAL_ONE.minus(performanceFee)
       );
 
-      // add new interests
-      financialMetrics.dailyTotalRevenueUSD =
-        financialMetrics.dailyTotalRevenueUSD.plus(newTotalInterest);
-      financialMetrics.dailyProtocolSideRevenueUSD =
-        financialMetrics.dailyProtocolSideRevenueUSD.plus(newFees);
-      financialMetrics.dailySupplySideRevenueUSD =
-        financialMetrics.dailySupplySideRevenueUSD.plus(newInterest);
-      protocol.cumulativeTotalRevenueUSD =
-        protocol.cumulativeTotalRevenueUSD.plus(newTotalInterest);
-      protocol.cumulativeProtocolSideRevenueUSD =
-        protocol.cumulativeProtocolSideRevenueUSD.plus(newFees);
-      protocol.cumulativeSupplySideRevenueUSD =
-        protocol.cumulativeSupplySideRevenueUSD.plus(newInterest);
+      // calculate new interests
+      newSupplyRevenueUSD = newSupplyRevenueUSD.plus(newInterest);
+      newProtooclRevenueUSD = newProtooclRevenueUSD.plus(newFees);
+      newTotalRevenueUSD = newTotalRevenueUSD.plus(newTotalInterest);
     }
   }
 
-  // add on extra fees (ie, withdrawal fees)
-  financialMetrics.dailyProtocolSideRevenueUSD =
-    financialMetrics.dailyProtocolSideRevenueUSD.plus(extraFee);
-  financialMetrics.dailyTotalRevenueUSD =
-    financialMetrics.dailyTotalRevenueUSD.plus(extraFee);
+  // update vault revenues
+  vault.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD.plus(newSupplyRevenueUSD);
+  vault.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD.plus(newProtooclRevenueUSD);
+  vault.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+
+  // update total revenues
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD.plus(newSupplyRevenueUSD);
   protocol.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD.plus(extraFee);
+    protocol.cumulativeProtocolSideRevenueUSD.plus(newProtooclRevenueUSD);
   protocol.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD.plus(extraFee);
+    protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+
+  // update financial revenues
+  financialMetrics.dailySupplySideRevenueUSD =
+    financialMetrics.dailySupplySideRevenueUSD.plus(newSupplyRevenueUSD);
+  financialMetrics.dailyProtocolSideRevenueUSD =
+    financialMetrics.dailyProtocolSideRevenueUSD.plus(newProtooclRevenueUSD);
+  financialMetrics.dailyTotalRevenueUSD =
+    financialMetrics.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+
+  // update daily snapshot revenues
+  let dailySnapshot = getOrCreateVaultDailySnapshot(event, vault.id);
+  dailySnapshot.dailyProtocolSideRevenueUSD =
+    dailySnapshot.dailyProtocolSideRevenueUSD.plus(newProtooclRevenueUSD);
+  dailySnapshot.dailySupplySideRevenueUSD =
+    dailySnapshot.dailySupplySideRevenueUSD.plus(newSupplyRevenueUSD);
+  dailySnapshot.dailyTotalRevenueUSD =
+    dailySnapshot.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+  dailySnapshot.save();
+
+  // update hourly snapshot revenues
+  let hourlySnapshot = getOrCreateVaultHourlySnapshot(event, vault.id);
+  hourlySnapshot.cumulativeProtocolSideRevenueUSD =
+    hourlySnapshot.cumulativeProtocolSideRevenueUSD.plus(newProtooclRevenueUSD);
+  hourlySnapshot.cumulativeSupplySideRevenueUSD =
+    hourlySnapshot.cumulativeSupplySideRevenueUSD.plus(newSupplyRevenueUSD);
+  hourlySnapshot.cumulativeTotalRevenueUSD =
+    hourlySnapshot.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+  hourlySnapshot.save();
 
   vault.save();
   protocol.save();

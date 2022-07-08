@@ -22,7 +22,10 @@ import {
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
 import { MasterChef } from "../constants";
-import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
+import {
+  convertTokenToDecimal,
+  roundToWholeNumber,
+} from "../../../../../src/common/utils/utils";
 
 export function handleReward(
   event: ethereum.Event,
@@ -39,6 +42,7 @@ export function handleReward(
   );
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
+  // If comes back null then it must be a uniswap v2 pool
   let pool = LiquidityPool.load(masterChefPool.poolAddress);
   if (!pool) {
     return;
@@ -51,7 +55,7 @@ export function handleReward(
     pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   }
 
-  // Return if you have calculated rewards recently
+  // Return if you have calculated rewards recently - Performance Boost
   if (
     event.block.number
       .minus(masterChefPool.lastRewardBlock)
@@ -62,26 +66,40 @@ export function handleReward(
   }
 
   // Get necessary values from the master chef contract to calculate rewards
-  let poolInfo = poolContract.poolInfo(pid);
-  masterChefPool.poolAllocPoint = poolInfo.value1;
+  let getPoolInfo = poolContract.try_poolInfo(pid);
+  if (!getPoolInfo.reverted) {
+    let poolInfo = getPoolInfo.value;
+    masterChefPool.poolAllocPoint = poolInfo.value1;
+  }
 
-  // Mutliplier including block mulitplier
-  let fullMultiplier = poolContract
-    .getMultiplier(masterChefPool.lastRewardBlock, event.block.number)
-    .div(masterChefPool.lastRewardBlock.minus(event.block.number));
-
-  // Divide out the block multiplier so only the bonus multiplier is left
-  masterChefPool.multiplier = fullMultiplier.div(
-    masterChefPool.lastRewardBlock.minus(event.block.number)
+  // Get the bonus multiplier if it is applicable
+  let getMuliplier = poolContract.try_getMultiplier(
+    event.block.number.minus(BIGINT_ONE),
+    event.block.number
   );
-  masterChef.totalAllocPoint = poolContract.totalAllocPoint();
+  if (!getMuliplier.reverted) {
+    masterChefPool.multiplier = getMuliplier.value;
+  }
+
+  // Get the total allocation for all pools
+  let getTotalAlloc = poolContract.try_totalAllocPoint();
+  if (!getTotalAlloc.reverted) {
+    masterChef.totalAllocPoint = getTotalAlloc.value;
+  }
 
   // Address where allocation is moved to over time to reduce inflation
-  let masterPoolAllocPID45 = poolContract.poolInfo(BigInt.fromI32(45)).value1;
+  let getPoolInfo45 = poolContract.try_poolInfo(BigInt.fromI32(45));
+  let masterPoolAllocPID45: BigInt = BIGINT_ZERO;
+  if (!getPoolInfo45.reverted) {
+    masterPoolAllocPID45 = getPoolInfo45.value.value1;
+  }
 
   // Allocation from the MasterChefV2 Contract
-  let masterPoolAllocPID250 = poolContract.poolInfo(BigInt.fromI32(250)).value1;
-
+  let getPoolInfo250 = poolContract.try_poolInfo(BigInt.fromI32(250));
+  let masterPoolAllocPID250: BigInt = BIGINT_ZERO;
+  if (!getPoolInfo250.reverted) {
+    masterPoolAllocPID250 = getPoolInfo250.value.value1;
+  }
   // Total allocation to staking pools that are giving out rewards to users
   let usedTotalAllocation = masterChef.totalAllocPoint
     .minus(masterPoolAllocPID45)
@@ -103,9 +121,7 @@ export function handleReward(
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
   rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
-  let poolRewardTokenRateBigDecimal = BigDecimal.fromString(
-    poolRewardTokenRate.toString()
-  );
+  let poolRewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
   let poolRewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
@@ -114,7 +130,7 @@ export function handleReward(
   );
 
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(poolRewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(poolRewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
