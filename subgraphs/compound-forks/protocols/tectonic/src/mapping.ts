@@ -320,6 +320,7 @@ function updateTONICRewards(event: AccrueInterest, market: Market): void {
     ? BIGINT_ZERO
     : tryTonicSpeed.value.times(blocksPerDay);
   borrowTonicPerDay = supplyTonicPerDay;
+  log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
 
   if (event.block.number.gt(BigInt.fromI32(1337194))) {
     let TonicMarket = Market.load(tTONICAddress);
@@ -356,6 +357,8 @@ function updateTONICRewards(event: AccrueInterest, market: Market): void {
     TonicPriceUSD = BIGDECIMAL_ZERO;
     log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
   }
+
+  log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
 
   let borrowTonicPerDayUSD = borrowTonicPerDay
     .toBigDecimal()
