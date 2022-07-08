@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { cTokenDecimals } from "../../../src/constants";
 import { TokenData } from "../../../src/mapping";
 
@@ -28,7 +28,14 @@ export const TONICAddress = "0xDD73dEa10ABC2Bff99c60882EC5b2B81Bb1Dc5B2";
 
 export const tTONICAddress = "0xfe6934FDf050854749945921fAA83191Bccf20Ad";
 
-export const CRONOS_BLOCKSPERDAY = "5";
+export const RATE_IN_SECONDS = 86400;
+export const RATE_IN_SECONDS_BD = BigDecimal.fromString(
+  RATE_IN_SECONDS.toString()
+);
+
+export const CRONOS_BLOCKSPERDAY = RATE_IN_SECONDS_BD.div(
+  BigDecimal.fromString("5")
+);
 
 export const ORACLE_ADDRESS = "0x4B377121d968Bf7a62D51B96523d59506e7c2BF0";
 

@@ -212,8 +212,6 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   );
 }
 
-// export function _handleAccrueInterest_Tectonic(event: ):
-
 export function handleAccrueInterest(event: AccrueInterest): void {
   let marketAddress = event.address;
   let cTokenContract = CToken.bind(marketAddress);
@@ -238,7 +236,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     log.warning("[handleAccrueInterest] Market not found: {}", [marketID]);
     return;
   }
-  updateRewards(event, market);
+  updateTONICRewards(event, market);
 
   _handleAccrueInterest(
     updateMarketData,
@@ -266,28 +264,28 @@ function getOrCreateProtocol(): LendingProtocol {
   return _getOrCreateProtocol(protocolData);
 }
 
-function updateRewards(event: ethereum.Event, market: Market): void {
+function updateTONICRewards(event: AccrueInterest, market: Market): void {
   let rewardTokenBorrow: RewardToken | null = null;
   let rewardTokenDeposit: RewardToken | null = null;
 
-  // check if market has COMP reward tokens
+  // check if market has Tonic reward tokens
   if (market.rewardTokens == null) {
-    // get or create COMP token
-    let compToken = Token.load(TONICAddress);
-    if (!compToken) {
+    // get or create Tonic token
+    let TonicToken = Token.load(TONICAddress);
+    if (!TonicToken) {
       let tokenContract = ERC20.bind(Address.fromString(TONICAddress));
-      compToken = new Token(TONICAddress);
-      compToken.name = getOrElse(tokenContract.try_name(), "unkown");
-      compToken.symbol = getOrElse(tokenContract.try_symbol(), "unkown");
-      compToken.decimals = getOrElse(tokenContract.try_decimals(), 0);
-      compToken.save();
+      TonicToken = new Token(TONICAddress);
+      TonicToken.name = getOrElse(tokenContract.try_name(), "unkown");
+      TonicToken.symbol = getOrElse(tokenContract.try_symbol(), "unkown");
+      TonicToken.decimals = getOrElse(tokenContract.try_decimals(), 0);
+      TonicToken.save();
     }
 
     let borrowID = RewardTokenType.BORROW.concat("-").concat(TONICAddress);
     rewardTokenBorrow = RewardToken.load(borrowID);
     if (!rewardTokenBorrow) {
       rewardTokenBorrow = new RewardToken(borrowID);
-      rewardTokenBorrow.token = compToken.id; // COMP already made from cCOMP market
+      rewardTokenBorrow.token = TonicToken.id; // Tonic already made from cTonic market
       rewardTokenBorrow.type = RewardTokenType.BORROW;
       rewardTokenBorrow.save();
     }
@@ -295,7 +293,7 @@ function updateRewards(event: ethereum.Event, market: Market): void {
     rewardTokenDeposit = RewardToken.load(depositID);
     if (!rewardTokenDeposit) {
       rewardTokenDeposit = new RewardToken(depositID);
-      rewardTokenDeposit.token = compToken.id; // COMP already made from cCOMP market
+      rewardTokenDeposit.token = TonicToken.id; // Tonic already made from cTonic market
       rewardTokenDeposit.type = RewardTokenType.DEPOSIT;
       rewardTokenDeposit.save();
     }
@@ -308,30 +306,21 @@ function updateRewards(event: ethereum.Event, market: Market): void {
   // let rewardDecimals = Token.load(TONICAddress)!.decimals;
   let rewardDecimals = 18; // TONIC 18 decimals
   let troller = Core.bind(comptrollerAddr);
-  let blocksPerDay = BigInt.fromString(CRONOS_BLOCKSPERDAY);
+  let blocksPerDay = BigInt.fromString(
+    CRONOS_BLOCKSPERDAY.truncate(0).toString()
+  );
 
-  let compPriceUSD = BIGDECIMAL_ZERO;
-  let supplyCompPerDay = BIGINT_ZERO;
-  let borrowCompPerDay = BIGINT_ZERO;
+  let TonicPriceUSD = BIGDECIMAL_ZERO;
+  let supplyTonicPerDay = BIGINT_ZERO;
+  let borrowTonicPerDay = BIGINT_ZERO;
 
   // Tonic speeds are the same for supply/borrow side
-  let tryCompSpeed = troller.try_tonicSpeeds(event.address);
-  supplyCompPerDay = tryCompSpeed.reverted
+  let tryTonicSpeed = troller.try_tonicSpeeds(event.address);
+  supplyTonicPerDay = tryTonicSpeed.reverted
     ? BIGINT_ZERO
-    : tryCompSpeed.value.times(blocksPerDay);
-  borrowCompPerDay = supplyCompPerDay;
+    : tryTonicSpeed.value.times(blocksPerDay);
+  borrowTonicPerDay = supplyTonicPerDay;
 
-  // get TONIC price
-  // tTONIC was made at this block height 1337195
-  // if (event.block.number.toI32() > 1337194) {
-  //   let compMarket = Market.load(tTONICAddress);
-  //   if (!compMarket) {
-  //     log.warning("[updateRewards] Market not found: {}", [tTONICAddress]);
-  //     return;
-  //   }
-
-  //   compPriceUSD = compMarket.inputTokenPriceUSD;
-  // }
   if (
     event.block.number.toI32() > 687810 &&
     event.block.number.toI32() <= 1337194
@@ -348,33 +337,36 @@ function updateRewards(event: ethereum.Event, market: Market): void {
       BIGINT_ZERO
     );
 
-    compPriceUSD = current_price_TONICCRO
+    TonicPriceUSD = current_price_TONICCRO
       .div(current_price_CRO)
       .toBigDecimal()
       .div(exponentToBigDecimal(rewardDecimals));
+    log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
   } else if (event.block.number.toI32() > 1337194) {
-    let compMarket = Market.load(tTONICAddress);
-    if (!compMarket) {
+    let TonicMarket = Market.load(tTONICAddress);
+    if (!TonicMarket) {
       log.warning("[updateRewards] Market not found: {}", [tTONICAddress]);
       return;
     }
-    compPriceUSD = compMarket.inputTokenPriceUSD;
+    TonicPriceUSD = TonicMarket.inputTokenPriceUSD;
+    log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
   } else {
-    // try to get TONIC price between blocks start - 1337194
+    // try to get TONIC price between blocks start - 687810
 
     // As CRONOS Price oracle is not built yet, using 0 before tonic Market was created for now.
-    compPriceUSD = BIGDECIMAL_ZERO;
+    TonicPriceUSD = BIGDECIMAL_ZERO;
+    log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
   }
 
-  let borrowCompPerDayUSD = borrowCompPerDay
+  let borrowTonicPerDayUSD = borrowTonicPerDay
     .toBigDecimal()
     .div(exponentToBigDecimal(rewardDecimals))
-    .times(compPriceUSD);
-  let supplyCompPerDayUSD = supplyCompPerDay
+    .times(TonicPriceUSD);
+  let supplyTonicPerDayUSD = supplyTonicPerDay
     .toBigDecimal()
     .div(exponentToBigDecimal(rewardDecimals))
-    .times(compPriceUSD);
-  market.rewardTokenEmissionsAmount = [borrowCompPerDay, supplyCompPerDay]; // same order as market.rewardTokens
-  market.rewardTokenEmissionsUSD = [borrowCompPerDayUSD, supplyCompPerDayUSD];
+    .times(TonicPriceUSD);
+  market.rewardTokenEmissionsAmount = [borrowTonicPerDay, supplyTonicPerDay]; // same order as market.rewardTokens
+  market.rewardTokenEmissionsUSD = [borrowTonicPerDayUSD, supplyTonicPerDayUSD];
   market.save();
 }
