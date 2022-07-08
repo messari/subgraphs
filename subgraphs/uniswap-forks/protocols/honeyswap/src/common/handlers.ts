@@ -11,6 +11,7 @@ import { LiquidityPool, _HelperStore } from "../../../../generated/schema";
 import { BIGINT_ZERO, UsageType } from "../../../../src/common/constants";
 import { getRewardsPerDay } from "../../../../src/common/rewards";
 
+// WIP: HoneyFarm reward handlers currently not used in Honeyswap subgraph deployment
 // TODO: Fix reward emissions calculations (rewardTokenRate) and add token pricing
 export function handleReward(
   event: ethereum.Event,
