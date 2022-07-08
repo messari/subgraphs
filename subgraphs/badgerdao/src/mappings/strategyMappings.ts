@@ -29,11 +29,12 @@ export function handleHarvest(event: Harvest): void {
     constants.NULL.TYPE_ADDRESS
   );
   const wantTokenPrice = getUsdPricePerToken(wantToken);
+  const wantTokenDecimals = utils.getTokenDecimals(wantToken);
 
   const supplySideRevenueUSD = harvestedAmount
     .toBigDecimal()
+    .div(wantTokenDecimals)
     .times(wantTokenPrice.usdPrice)
-    .div(wantTokenPrice.decimalsBaseTen)
     .div(wantTokenPrice.decimalsBaseTen);
 
   updateRevenueSnapshots(
