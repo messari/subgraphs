@@ -301,11 +301,18 @@ export function _handleReserveDataUpdated(
     return;
   }
 
+  log.warning("pre borrow. assetPrice: {}", [assetPriceUSD.toString()]);
+
   let totalBorrowBalance = sBorrowBalance
     .plus(vBorrowBalance)
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals));
+  log.warning("post add: balance {} price {}", [
+    totalBorrowBalance.toString(),
+    assetPriceUSD.toString(),
+  ]);
   market.totalBorrowBalanceUSD = totalBorrowBalance.times(assetPriceUSD);
+  log.warning("post multiply", []);
 
   // update total supply balance
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
@@ -326,6 +333,13 @@ export function _handleReserveDataUpdated(
     return;
   }
 
+  log.warning("pre deposit: balance: {}", [
+    market.inputTokenBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(inputToken.decimals))
+      .toString(),
+  ]);
+
   market.inputTokenBalance = tryTotalSupply.value;
   market.outputTokenSupply = tryTotalSupply.value;
   market.totalDepositBalanceUSD = market.inputTokenBalance
@@ -336,6 +350,7 @@ export function _handleReserveDataUpdated(
 
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
+  log.warning("pre rev", []);
   let liquidityIndexDiff = liquidityIndex
     .minus(market.liquidityIndex)
     .toBigDecimal()
