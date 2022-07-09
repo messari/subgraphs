@@ -3,7 +3,8 @@ import { PoolCreated } from "../../generated//Factory/Factory";
 import { Address } from "@graphprotocol/graph-ts";
 import { createLiquidityPool } from "../common/creators";
 
-// Liquidity pool is created. Create a pool entity and start monitoring the newly deployed pool contract.
+// Liquidity pool is created from the Factory contract.
+// Create a pool entity and start monitoring events from the newly deployed pool contract specified in the subgraph.yaml.
 export function handlePoolCreated(event: PoolCreated): void {
   // temp fix
   if (

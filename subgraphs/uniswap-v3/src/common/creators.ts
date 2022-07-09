@@ -93,7 +93,7 @@ export function createLiquidityPool(
   let poolDeposits = new _HelperStore(poolAddress);
   poolDeposits.valueInt = INT_ZERO;
 
-  // create the tracked contract based on the template
+  // Create and track the newly created pool contract based on the template specified in the subgraph.yaml file.
   PoolTemplate.create(Address.fromString(poolAddress));
 
   pool.save();
