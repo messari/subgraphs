@@ -33,7 +33,7 @@ import {
   SECONDS_PER_HOUR,
   UsageType,
 } from "./constants";
-import { convertTokenToDecimal } from "./utils/utils";
+import { convertTokenToDecimal, percToDec } from "./utils/utils";
 import {
   findNativeTokenPerToken,
   updateNativeTokenPriceInUSD,
@@ -41,6 +41,7 @@ import {
 import { NetworkConfigs } from "../../configurations/configure";
 
 // Update FinancialsDailySnapshots entity
+// Updated on Swap, Burn, and Mint events.
 export function updateFinancials(event: ethereum.Event): void {
   let financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
 
@@ -56,6 +57,7 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 // Update usage metrics entities
+// Updated on Swap, Burn, and Mint events.
 export function updateUsageMetrics(
   event: ethereum.Event,
   fromAddress: Address,
@@ -127,6 +129,7 @@ export function updateUsageMetrics(
 }
 
 // Update UsagePoolDailySnapshot entity
+// Updated on Swap, Burn, and Mint events.
 export function updatePoolMetrics(event: ethereum.Event): void {
   // get or create pool metrics
   let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
@@ -158,6 +161,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
 }
 
 // These whiteslists are used to track what pools the tokens are a part of. Used in price calculations.
+// Updated at the time of pool created (poolCreated event)
 export function updateTokenWhitelists(
   token0: Token,
   token1: Token,
@@ -182,7 +186,7 @@ export function updateTokenWhitelists(
   }
 }
 
-// Upate token balances based on reserves emitted from the sync event.
+// Upate token balances based on reserves emitted from the Sync event.
 export function updateInputTokenBalances(
   poolAddress: string,
   reserve0: BigInt,
@@ -204,11 +208,8 @@ export function updateInputTokenBalances(
   pool.save();
 }
 
-// Update tvl an token prices
-export function updateTvlAndTokenPrices(
-  poolAddress: string,
-  blockNumber: BigInt
-): void {
+// Update tvl an token prices in the Sync event.
+export function updateTvlAndTokenPrices(poolAddress: string): void {
   let pool = getLiquidityPool(poolAddress);
 
   let protocol = getOrCreateDex();
@@ -263,10 +264,8 @@ export function updateTvlAndTokenPrices(
   nativeToken.save();
 }
 
-function percToDec(percentage: BigDecimal): BigDecimal {
-  return percentage.div(BIGDECIMAL_HUNDRED);
-}
-
+// Update the volume and fees from financial metrics snapshot, pool metrics snapshot, protocol, and pool entities.
+// Updated on Swap event.
 export function updateVolumeAndFees(
   event: ethereum.Event,
   protocol: DexAmmProtocol,
