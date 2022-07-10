@@ -127,9 +127,7 @@ export function Deposit(
     .div(inputTokenPrice.decimalsBaseTen);
 
   let pricePerShare = getPricePerShare(vaultAddress);
-  vault.pricePerShare = pricePerShare
-    .toBigDecimal()
-    .div(inputTokenDecimals.toBigDecimal());
+  vault.pricePerShare = pricePerShare.toBigDecimal();
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(vaultAddress);
 
   vault.save();
