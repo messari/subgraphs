@@ -249,7 +249,19 @@ export function handleAccrueInterest(event: AccrueInterest): void {
 }
 
 function getOrCreateProtocol(): LendingProtocol {
+
   let comptroller = Comptroller.bind(comptrollerAddr);
+  let oracle = comptroller.try_oracle();
+  if (oracle.reverted) {
+    log.debug("[getOrCreateProtocol] oracleResult reverted", []);
+  } else {
+    let _priceOracle = oracle.value.toHexString();
+    log.debug("[getOrCreateProtocol] oracleResult ", [_priceOracle]);
+
+  }
+
+
+
   let protocolData = new ProtocolData(
     comptrollerAddr,
     "Tectonic",
@@ -260,7 +272,8 @@ function getOrCreateProtocol(): LendingProtocol {
     Network.CRONOS,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()
-  );
+  )
+
   return _getOrCreateProtocol(protocolData);
 }
 
@@ -320,16 +333,16 @@ function updateTONICRewards(event: AccrueInterest, market: Market): void {
     ? BIGINT_ZERO
     : tryTonicSpeed.value.times(blocksPerDay);
   borrowTonicPerDay = supplyTonicPerDay;
-  log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
+  log.debug("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
 
   if (event.block.number.gt(BigInt.fromI32(1337194))) {
     let TonicMarket = Market.load(tTONICAddress);
     if (!TonicMarket) {
-      log.warning("[updateRewards] Market not found: {}", [tTONICAddress]);
+      log.debug("[updateRewards] Market not found: {}", [tTONICAddress]);
       return;
     }
     TonicPriceUSD = TonicMarket.inputTokenPriceUSD;
-    log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
+    log.debug("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
   }
   else if 
     (event.block.number.gt(BigInt.fromI32(687810))) {
@@ -349,16 +362,15 @@ function updateTONICRewards(event: AccrueInterest, market: Market): void {
       .div(current_price_CRO)
       .toBigDecimal()
       .div(exponentToBigDecimal(rewardDecimals));
-    log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
+    log.debug("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
   } else {
     // try to get TONIC price between blocks start - 687810
-
     // As CRONOS Price oracle is not built yet, using 0 before tonic Market was created for now.
     TonicPriceUSD = BIGDECIMAL_ZERO;
-    log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
+    log.debug("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
   }
 
-  log.warning("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
+  log.debug("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
 
   let borrowTonicPerDayUSD = borrowTonicPerDay
     .toBigDecimal()
