@@ -37,6 +37,23 @@ export function handleReward(
   );
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
+  // Check if the liquidity pool address is available. Try to get it if not or return if the contract call was reverted
+  if (!masterChefPool.poolAddress) {
+    let getPoolInfo = poolContract.try_poolInfo(pid);
+    if (!getPoolInfo.reverted) {
+      masterChefPool.poolAddress = getPoolInfo.value.value0.toHexString();
+    }
+    masterChefPool.save();
+
+    if (!masterChefPool.poolAddress) {
+      log.warning(
+        "poolInfo reverted: Could not find pool address for masterchef pool",
+        []
+      );
+      return;
+    }
+  }
+
   // If the pool comes back null just return
   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
@@ -143,9 +160,7 @@ function getOrCreateMasterChefStakingPool(
     masterChefPool = new _MasterChefStakingPool(
       masterChefType + "-" + pid.toString()
     );
-    masterChefPool.poolAddress = poolContract
-      .poolInfo(pid)
-      .value0.toHexString();
+
     masterChefPool.multiplier = BIGINT_ONE;
     masterChefPool.poolAllocPoint = BIGINT_ZERO;
     masterChefPool.lastRewardBlock = event.block.number;

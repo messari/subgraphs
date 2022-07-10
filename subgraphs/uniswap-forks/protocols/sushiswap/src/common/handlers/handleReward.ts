@@ -40,7 +40,7 @@ export function handleReward(
   );
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
-  // Return if the contract call was reverted
+  // Check if the liquidity pool address is available. Try to get it if not or return if the contract call was reverted
   if (!masterChefPool.poolAddress) {
     let getPoolInfo = poolContract.try_poolInfo(pid);
     if (!getPoolInfo.reverted) {
