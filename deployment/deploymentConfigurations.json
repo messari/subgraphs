@@ -846,6 +846,15 @@
           "deploy-on-merge": true
         }
       }
+    },
+    "vesper-finance": {
+      "vesper-finance": {
+        "mainnet": {
+          "template": "vesper.finance.template.yaml",
+          "messari": "messari/vesper-ethereum",
+          "deploy-on-merge": true
+        }
+      }
     }
   }
 }
