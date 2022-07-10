@@ -1,3 +1,5 @@
+// [] Hourly Revenue missing
+
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
 import { ERC20 } from "../../generated/Lido/ERC20";
@@ -72,13 +74,3 @@ function fetchTokenDecimals(tokenAddress: Address): number {
     return call.value;
   }
 }
-
-// %%%%%%%%% usdPrice: 1552329 , data_source: Lid
-// %%%%%%%%% usdPrice decimals: 6 , data_source: Lido
-// %%%%%%%%% usdPrice decimalBaseTen: 1000000 , data_source: Lido
-// %%%%%%%%% usdPrice decimalBaseTen: 1.552329 , data_source: Lido
-
-// %%%%%%%%% usdPrice: 2775814757 , data_source: Lido
-// %%%%%%%%% usdPrice decimals: 6 , data_source: Lido
-// %%%%%%%%% usdPrice decimalBaseTen: 2775.814757 , data_source: Lido
-// %%%%%%%%% usdPrice decimalBaseTen: 1000000 , data_source: Lido

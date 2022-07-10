@@ -32,22 +32,27 @@ export function updateProtocolAndPoolTvl(
       .lastPriceUSD!
   );
 
-  // Protocol
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(amountUSD);
-  protocol.save();
-
-  // Financials Daily
-  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.save();
-
   // Pool
-  pool.totalValueLockedUSD = protocol.totalValueLockedUSD;
   pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount)];
+  pool.totalValueLockedUSD = bigIntToBigDecimal(
+    pool.inputTokenBalances[0]
+  ).times(
+    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
+      .lastPriceUSD!
+  );
   pool.save();
 
   // Pool Daily and Hourly
   // updatePoolSnapshots(event.block) is called separately when protocol and supply side
   // revenue metrics are being calculated to consolidate all revenue metrics into same snapshots
+
+  // Protocol
+  protocol.totalValueLockedUSD = pool.totalValueLockedUSD;
+  protocol.save();
+
+  // Financials Daily
+  financialMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+  financialMetrics.save();
 }
 
 export function updatePoolSnapshotsTvl(block: ethereum.Block): void {
@@ -99,22 +104,10 @@ export function updateTotalRevenueMetrics(
       .lastPriceUSD!
   );
 
-  // Protocol
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    stakingRewardsUSD
-  );
-  protocol.save();
-
-  // Financials Daily
-  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
-    stakingRewardsUSD
-  );
-  financialMetrics.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD;
-  financialMetrics.save();
-
   // Pool
-  pool.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
+    stakingRewardsUSD
+  );
   pool.outputTokenSupply = totalShares;
   pool.outputTokenPriceUSD = getOrCreateToken(
     Address.fromString(PROTOCOL_ID),
@@ -141,6 +134,16 @@ export function updateTotalRevenueMetrics(
   poolMetricsHourlySnapshot.outputTokenSupply = pool.outputTokenSupply;
   poolMetricsHourlySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsHourlySnapshot.save();
+
+  // Protocol
+  protocol.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  protocol.save();
+
+  // Financials Daily
+  financialMetrics.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  financialMetrics.dailyTotalRevenueUSD =
+    poolMetricsDailySnapshot.dailyTotalRevenueUSD;
+  financialMetrics.save();
 }
 
 export function updateProtocolSideRevenueMetrics(
@@ -159,52 +162,46 @@ export function updateProtocolSideRevenueMetrics(
     block
   );
 
-  // Rewards are minted in stETH, price in stETH
+  // TODO: Rewards are minted in stETH shares, we should price with stETH. CONFIRM.
   const amountUSD = bigIntToBigDecimal(amount).times(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
   );
 
-  // Protocol
-  const updatedCumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    amountUSD
-  );
-  protocol.cumulativeProtocolSideRevenueUSD = updatedCumulativeProtocolSideRevenueUSD;
-  protocol.save();
-
-  // Financial Daily
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
-    amountUSD
-  );
-  financialMetrics.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.save();
-
   // Pool
-  pool.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-  pool.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(
+    amountUSD
+  );
   pool.save();
 
   // Pool Daily
   poolMetricsDailySnapshot.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
-  const updatedPoolMetricsDailyProtocolSideRevenueUSD = poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+  poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD = poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
     amountUSD
   );
-  poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD = updatedPoolMetricsDailyProtocolSideRevenueUSD;
   poolMetricsDailySnapshot.save();
 
   // Pool Hourly
   poolMetricsHourlySnapshot.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
-  const updatedPoolMetricsHourlyProtocolSideRevenueUSD = poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+  poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD = poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
     amountUSD
   );
-  poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD = updatedPoolMetricsHourlyProtocolSideRevenueUSD;
   poolMetricsHourlySnapshot.save();
+
+  // Protocol
+  protocol.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD;
+  protocol.save();
+
+  // Financial Daily
+  financialMetrics.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
+    amountUSD
+  );
+  financialMetrics.save();
 }
 
 export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
@@ -220,22 +217,10 @@ export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
     block
   );
 
-  // Protocol
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(
-    protocol.cumulativeProtocolSideRevenueUSD
-  );
-  protocol.save();
-
-  // Financial Daily
-  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailyTotalRevenueUSD.minus(
-    financialMetrics.dailyProtocolSideRevenueUSD
-  );
-  financialMetrics.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.save();
-
   // Pool
-  pool.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  pool.cumulativeSupplySideRevenueUSD = pool.cumulativeTotalRevenueUSD.minus(
+    pool.cumulativeProtocolSideRevenueUSD
+  );
   pool.save();
 
   // Pool Daily
@@ -253,6 +238,18 @@ export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
     poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD
   );
   poolMetricsHourlySnapshot.save();
+
+  // Protocol
+  protocol.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  protocol.save();
+
+  // Financial Daily
+  financialMetrics.cumulativeSupplySideRevenueUSD =
+    pool.cumulativeSupplySideRevenueUSD;
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailyTotalRevenueUSD.minus(
+    financialMetrics.dailyProtocolSideRevenueUSD
+  );
+  financialMetrics.save();
 }
 
 export function getOrCreateFinancialDailyMetrics(

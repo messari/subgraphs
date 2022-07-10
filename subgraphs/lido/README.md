@@ -266,6 +266,124 @@ SUM(`Treasury Revenue (ETH)`) OVER `time` + SUM(`Node Operators Revenue (ETH)`) 
 `Unique Users`
 
 
+## Protocol Diagrams
+
+![Staking Pool Overview](https://blog.lido.fi/content/images/2020/11/01.png)
+
+
+## Validation
+
+Validation done against other data sources (tokenterminal, defillama): [Lido Finance - Messari Subgraph - Validation Sheet](https://docs.google.com/spreadsheets/d/1fiKfv9KLoWbRK1W6ejhWiySIzbd5CDyWs5so-tvJcHo/edit#gid=0).
+
+A helper validation script was created to compare data in the terminal: [review.sh](https://github.com/fortysevenlabs/messari-subgraphs/tree/master/subgraphs/lido/validation/2022-07-07/review.sh).
+
+**Runing the helper script**
+The script akes an epoch timestamp in the day, normalizes the date per token terminal date format, makes queries (subgraph, tokenterminal) and prints the output.
+```
+./review.sh {epoch_timestamp} {subgraph_query_url} 
+./review.sh 1657045800 https://api.thegraph.com/subgraphs/name/fortysevenlabs/lido
+```
+
+**Files** 
+
+* Structure
+
+    ```
+    validation
+    └── {date}
+        ├── full-metrics.json
+        ├── lido-finance-project.json
+        ├── metrics.json
+        └── review.sh
+    ```
+ 
+* Token Terminal Metrics (and Samples)
+
+    * **metrics-daily.json** - daily metric values, see sample below
+    ```
+    {
+        "project_id": "lido-finance",
+        "timestamp": "2022-07-04T00:00:00.000Z",
+        "active_users": null,
+        "business_type": "interest",
+        "deposits": null,
+        "gmv": null,
+        "market_cap_circulating": 232787544.26598746,
+        "market_cap_fully_diluted": 501204356.71843535,
+        "pe_circulating": 10.114905445579968,
+        "pe_fully_diluted": 21.777946466616125,
+        "price": 0.5012043567184353,
+        "project": "Lido Finance",
+        "ps_circulating": 1.0114905445579967,
+        "ps_fully_diluted": 2.1777946466616127,
+        "revenue_protocol": 56549.80000931314,
+        "revenue_supply_side": 508948.2000838183,
+        "revenue_total": 565498.0000931314,
+        "token_incentives": null,
+        "token_trading_volume": 16187416.610178523,
+        "tokenholders": 16268,
+        "treasury": 108013901.4348732,
+        "tvl": 4624675259.240275,
+        "volmc_circulating": 0.0695372970285836,
+        "volmc_fully_diluted": 0.03229703890876636
+    }
+    ```
+
+    * **metrics-aggregates.json** - aggregates for each available metric, see sample below
+    ```
+    "revenue_total": {
+      "values": {
+        "latest": 591638.2247886488,
+        "max": 1283408.9217863563
+      },
+      "sums": {
+        "1d": 591638.2247886488,
+        "7d": 3801974.0384223517,
+        "30d": 18230313.019791126,
+        "90d": 83039425.02801158,
+        "180d": 157171362.6796032,
+        "365d": 280335074.4713445,
+        "all": 300694642.4476183
+      },
+      "averages": {
+        "1d": 591638.2247886488,
+        "7d": 543139.1483460503,
+        "30d": 607677.1006597042,
+        "90d": 922660.2780890175,
+        "180d": 873174.2371089066,
+        "365d": 768041.2999214916,
+        "all": null
+      },
+      "changes": {
+        "1d": 0.05691777970848855,
+        "7d": 0.17276281877458688,
+        "30d": -0.34239173121466204,
+        "90d": -0.49199632652903247,
+        "180d": -0.2259560682991053,
+        "365d": 2.44463209675667,
+        "all": null
+      },
+      "trends": {
+        "1d": 0.05691777970848855,
+        "7d": -0.06525895356191369,
+        "30d": -0.3606337929222101,
+        "90d": 0.12015721777412214,
+        "180d": 0.28707332304856736,
+        "365d": 12.769205456522135,
+        "all": null
+      },
+      "moving_averages_annualized": {
+        "1d": null,
+        "7d": null,
+        "30d": 221802141.74079204,
+        "90d": null,
+        "180d": null,
+        "365d": null,
+        "all": null
+      }
+    }
+    ```
+
 ## Useful links and references
 
 https://docs.lido.fi/

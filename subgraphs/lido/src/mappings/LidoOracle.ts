@@ -2,7 +2,7 @@ import { PostTotalShares } from "../../generated/LidoOracle/LidoOracle";
 import {
   updateTotalRevenueMetrics,
   updateSupplySideRevenueMetrics,
-} from "../updates/financialMetrics";
+} from "../entityUpdates/financialMetrics";
 
 export function handlePostTotalShares(event: PostTotalShares): void {
   updateTotalRevenueMetrics(

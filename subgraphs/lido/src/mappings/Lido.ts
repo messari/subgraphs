@@ -1,12 +1,12 @@
 import { Submitted, Transfer } from "../../generated/Lido/Lido";
 import { NodeOperatorsRegistry } from "../../generated/Lido/NodeOperatorsRegistry";
 import { Address, log } from "@graphprotocol/graph-ts";
-import { updateUsageMetrics } from "../updates/usageMetrics";
+import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
 import {
   updateProtocolSideRevenueMetrics,
   updatePoolSnapshotsTvl,
   updateProtocolAndPoolTvl,
-} from "../updates/financialMetrics";
+} from "../entityUpdates/financialMetrics";
 import {
   PROTOCOL_TREASURY_ID,
   PROTOCOL_NODE_OPERATORS_REGISTRY_ID,
