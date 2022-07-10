@@ -22,7 +22,6 @@ import {
   getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
 import {
-  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
@@ -35,7 +34,7 @@ import {
 } from "./constants";
 import { convertTokenToDecimal, percToDec } from "./utils/utils";
 import {
-  findNativeTokenPerToken,
+  findUSDPricePerToken,
   updateNativeTokenPriceInUSD,
 } from "../price/price";
 import { NetworkConfigs } from "../../configurations/configure";
@@ -219,8 +218,8 @@ export function updateTvlAndTokenPrices(poolAddress: string): void {
 
   let nativeToken = updateNativeTokenPriceInUSD();
 
-  token0.lastPriceUSD = findNativeTokenPerToken(token0, nativeToken);
-  token1.lastPriceUSD = findNativeTokenPerToken(token1, nativeToken);
+  token0.lastPriceUSD = findUSDPricePerToken(token0, nativeToken);
+  token1.lastPriceUSD = findUSDPricePerToken(token1, nativeToken);
 
   // Subtract the old pool tvl
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(

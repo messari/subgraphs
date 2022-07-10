@@ -5,7 +5,7 @@
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import { log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { _CircularBuffer } from "../../generated/schema";
 import { Network } from "./constants";

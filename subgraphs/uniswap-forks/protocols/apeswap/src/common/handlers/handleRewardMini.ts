@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MiniChefV2Apeswap } from "../../../../../generated/MiniChefV2/MiniChefV2Apeswap";
 import {
@@ -8,10 +8,6 @@ import {
 } from "../../../../../generated/schema";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
-import {
-  findNativeTokenPerToken,
-  updateNativeTokenPriceInUSD,
-} from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
 import {
@@ -19,6 +15,7 @@ import {
   roundToWholeNumber,
 } from "../../../../../src/common/utils/utils";
 
+// Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
 export function updateMasterChefDeposit(
   event: ethereum.Event,
   pid: BigInt,
@@ -35,8 +32,7 @@ export function updateMasterChefDeposit(
     return;
   }
 
-  // log.warning("HELLO1", [])
-
+  // Get the amount of Banana tokens emitted for all pools per second.
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
     let getBananaPerSecond = masterchefV2Contract.try_bananaPerSecond();
     if (!getBananaPerSecond.reverted) {
@@ -45,17 +41,19 @@ export function updateMasterChefDeposit(
     }
   }
 
-  let nativeToken = updateNativeTokenPriceInUSD();
+  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
-
+  // Calculate Reward Emission per second to a specific pool
+  // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
   let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
     .times(masterChefV2Pool.poolAllocPoint)
     .div(masterChefV2.totalAllocPoint);
   let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
+
+  // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
   let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
@@ -63,6 +61,7 @@ export function updateMasterChefDeposit(
     masterChefV2.rewardTokenInterval
   );
 
+  // Update the amount of staked tokens after deposit
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
@@ -84,6 +83,7 @@ export function updateMasterChefDeposit(
   pool.save();
 }
 
+// Updated Liquidity pool staked amount and emmissions on a withdraw from the masterchef contract.
 export function updateMasterChefWithdraw(
   event: ethereum.Event,
   pid: BigInt,
@@ -101,6 +101,7 @@ export function updateMasterChefWithdraw(
     return;
   }
 
+  // Get the amount of Banana tokens emitted for all pools per second.
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
     let getBananaPerSecond = masterchefV2Contract.try_bananaPerSecond();
     if (!getBananaPerSecond.reverted) {
@@ -109,17 +110,19 @@ export function updateMasterChefWithdraw(
     }
   }
 
-  let nativeToken = updateNativeTokenPriceInUSD();
+  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
-
+  // Calculate Reward Emission per second to a specific pool
+  // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
   let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
     .times(masterChefV2Pool.poolAllocPoint)
     .div(masterChefV2.totalAllocPoint);
   let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
+
+  // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
   let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
@@ -127,6 +130,7 @@ export function updateMasterChefWithdraw(
     masterChefV2.rewardTokenInterval
   );
 
+  // Update the amount of staked tokens after withdraw
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),

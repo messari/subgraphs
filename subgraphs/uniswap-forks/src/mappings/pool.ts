@@ -88,7 +88,7 @@ export function handleSync(event: Sync): void {
   updateTvlAndTokenPrices(event.address.toHexString());
 }
 
-//
+// Handle a mint event emitted from a pool contract. Considered a deposit into the given liquidity pool.
 export function handleMint(event: Mint): void {
   createDeposit(event, event.params.amount0, event.params.amount1);
   updateUsageMetrics(event, event.params.sender, UsageType.DEPOSIT);
@@ -96,6 +96,7 @@ export function handleMint(event: Mint): void {
   updatePoolMetrics(event);
 }
 
+// Handle a burn event emitted from a pool contract. Considered a withdraw into the given liquidity pool.
 export function handleBurn(event: Burn): void {
   createWithdraw(event, event.params.amount0, event.params.amount1);
   updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
@@ -103,6 +104,7 @@ export function handleBurn(event: Burn): void {
   updatePoolMetrics(event);
 }
 
+// Handle a swap event emitted from a pool contract.
 export function handleSwap(event: Swap): void {
   createSwapHandleVolumeAndFees(
     event,

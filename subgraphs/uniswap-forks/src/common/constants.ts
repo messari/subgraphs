@@ -147,7 +147,7 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
 
-// Imported into configurations typescript file to set minimum liquidity thresholds for following prices;
+// Imported into configurations typescript file to set minimum liquidity thresholds for estimating price using a liquidity pool;
 export const MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND = new BigDecimal(
   BIGINT_ONE_HUNDRED_THOUSAND
 );
