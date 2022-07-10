@@ -80,13 +80,14 @@ export function updateRewardTokenEmissions(
   let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
 
   const rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);
-
+  const rewardTokenDecimals = utils.getTokenDecimals(rewardTokenAddress);
+  
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
     .toBigDecimal()
+    .div(rewardTokenDecimals)
     .times(rewardTokenPrice.usdPrice)
-    .times(rewardTokenPrice.decimalsBaseTen)
-    .times(rewardTokenPrice.decimalsBaseTen);
+    .div(rewardTokenPrice.decimalsBaseTen);
 
   vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
