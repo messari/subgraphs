@@ -14,7 +14,10 @@ import {
   RECENT_BLOCK_THRESHOLD,
   UsageType,
 } from "../../../../../src/common/constants";
-import { getOrCreateToken } from "../../../../../src/common/getters";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
 import {
@@ -167,6 +170,14 @@ function getOrCreateMasterChefStakingPool(
     masterChefPool.poolAllocPoint = BIGINT_ZERO;
     masterChefPool.lastRewardBlock = event.block.number;
     log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
+
+    let pool = LiquidityPool.load(masterChefPool.poolAddress!);
+    if (pool) {
+      pool.rewardTokens = [
+        getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+      ];
+      pool.save();
+    }
 
     masterChefPool.save();
   }
