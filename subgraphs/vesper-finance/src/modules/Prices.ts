@@ -6,7 +6,7 @@ import {
 } from "@graphprotocol/graph-ts";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { getPriceUsdcRecommended } from "../Prices/routers/CurveRouter";
+import { getPriceUsdcRecommended } from "../prices/routers/CurveRouter";
 import { Pool as VaultContract } from "../../generated/templates/PoolRewards/Pool";
 
 export function getPricePerShare(vaultAddress: Address): BigInt {

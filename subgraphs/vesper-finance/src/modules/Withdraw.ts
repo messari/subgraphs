@@ -17,10 +17,10 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import { getPriceOfOutputTokens } from "./Prices";
 import { updateRevenueSnapshots } from "./Revenue";
+import { getUsdPricePerToken } from "../prices/index";
 import { Pool as VaultContract } from "../../generated/templates/PoolAccountant/Pool";
 
 export function createWithdrawTransaction(
