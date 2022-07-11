@@ -236,7 +236,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     log.warning("[handleAccrueInterest] Market not found: {}", [marketID]);
     return;
   }
-  updateTONICRewards(event, market);
+  updateTONICRewards(event, market, protocol);
 
   _handleAccrueInterest(
     updateMarketData,
@@ -250,14 +250,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
 
 function getOrCreateProtocol(): LendingProtocol {
   let comptroller = Comptroller.bind(comptrollerAddr);
-  let oracle = comptroller.try_oracle();
-  if (oracle.reverted) {
-    log.debug("[getOrCreateProtocol] oracleResult reverted", []);
-  } else {
-    let _priceOracle = oracle.value.toHexString();
-    log.debug("[getOrCreateProtocol] oracleResult ", [_priceOracle]);
-  }
-
   let protocolData = new ProtocolData(
     comptrollerAddr,
     "Tectonic",
@@ -273,7 +265,7 @@ function getOrCreateProtocol(): LendingProtocol {
   return _getOrCreateProtocol(protocolData);
 }
 
-function updateTONICRewards(event: AccrueInterest, market: Market): void {
+function updateTONICRewards(event: AccrueInterest, market: Market, protocol : LendingProtocol): void {
   let rewardTokenBorrow: RewardToken | null = null;
   let rewardTokenDeposit: RewardToken | null = null;
 
@@ -330,26 +322,20 @@ function updateTONICRewards(event: AccrueInterest, market: Market): void {
     : tryTonicSpeed.value.times(blocksPerDay);
   borrowTonicPerDay = supplyTonicPerDay;
 
-  if (event.block.number.gt(BigInt.fromI32(570298))) {
-    let comptroller = Comptroller.bind(comptrollerAddr);
-    let oracle = comptroller.try_oracle();
-    if (oracle.reverted) {
-      log.warning("[updateTonicrewards] oracleResult reverted", []);
-    } else {
-      let _priceOracle = oracle.value.toHexString();
-      let oracleContract = PriceOracle.bind(Address.fromString(_priceOracle));
-      let price = oracleContract.try_getUnderlyingPrice(
-        Address.fromString(tTONICAddress)
-      );
-      if (price.reverted) {
+
+  if (event.block.number.gt(BigInt.fromI32(1337194))) {
+    let oracleContract = PriceOracle.bind(Address.fromString(protocol._priceOracle));
+    let price = oracleContract.try_getUnderlyingPrice(Address.fromString(tTONICAddress));
+    if (price.reverted) {
         log.warning("[updateTonicrewards] getUnderlyingPrice reverted", []);
-      } else {
+    } else {
         TonicPriceUSD = price.value
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals));
       }
-    }
   }
+
+
 
   let borrowTonicPerDayUSD = borrowTonicPerDay
     .toBigDecimal()
