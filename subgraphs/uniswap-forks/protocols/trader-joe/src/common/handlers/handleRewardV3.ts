@@ -7,15 +7,12 @@ import {
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import { getOrCreateToken } from "../../../../../src/common/getters";
-import {
-  findNativeTokenPerToken,
-  updateNativeTokenPriceInUSD,
-} from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
 import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
 
+// Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
 export function updateMasterChefDeposit(
   event: ethereum.Event,
   pid: BigInt,
@@ -27,11 +24,13 @@ export function updateMasterChefDeposit(
   let masterchefV3Contract = MasterChefV3TraderJoe.bind(event.address);
   let masterChefV3 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV3);
 
+  // Return if pool does not exist
   let pool = LiquidityPool.load(masterChefV3Pool.poolAddress!);
   if (!pool) {
     return;
   }
 
+  // Get the amount of Joe tokens emitted for all pools per second.
   if (masterChefV3.lastUpdatedRewardRate != event.block.number) {
     let getJoePerSec = masterchefV3Contract.try_joePerSec();
     if (!getJoePerSec.reverted) {
@@ -40,17 +39,19 @@ export function updateMasterChefDeposit(
     masterChefV3.lastUpdatedRewardRate = event.block.number;
   }
 
-  let nativeToken = updateNativeTokenPriceInUSD();
+  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
-
+  // Calculate Reward Emission per second to a specific pool
+  // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
   let rewardAmountPerInterval = masterChefV3.adjustedRewardTokenRate
     .times(masterChefV3Pool.poolAllocPoint)
     .div(masterChefV3.totalAllocPoint);
   let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
+
+  // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
   let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
@@ -58,6 +59,7 @@ export function updateMasterChefDeposit(
     masterChefV3.rewardTokenInterval
   );
 
+  // Update the amount of staked tokens after deposit
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(rewardTokenPerDay.toString()),
@@ -78,6 +80,7 @@ export function updateMasterChefDeposit(
   pool.save();
 }
 
+// Updated Liquidity pool staked amount and emmissions on a withdraw from the masterchef contract.
 export function updateMasterChefWithdraw(
   event: ethereum.Event,
   pid: BigInt,
@@ -103,15 +106,19 @@ export function updateMasterChefWithdraw(
     masterChefV3.lastUpdatedRewardRate = event.block.number;
   }
 
-  let nativeToken = updateNativeTokenPriceInUSD();
+  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
+  // Calculate Reward Emission per second to a specific pool
+  // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
   let rewardAmountPerInterval = masterChefV3.adjustedRewardTokenRate
     .times(masterChefV3Pool.poolAllocPoint)
     .div(masterChefV3.totalAllocPoint);
   let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
+
+  // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
   let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
@@ -119,6 +126,7 @@ export function updateMasterChefWithdraw(
     masterChefV3.rewardTokenInterval
   );
 
+  // Update the amount of staked tokens after deposit
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(rewardTokenPerDay.toString()),

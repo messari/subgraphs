@@ -11,12 +11,11 @@ import {
   ZERO_ADDRESS,
 } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
-import {
-  findNativeTokenPerToken,
-  updateNativeTokenPriceInUSD,
-} from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 
+// Called on both deposits and withdraws into the MasterApe/MasterChef pool.
+// Tracks staked LP tokens, and estimates the emissions of LP tokens for the liquidity pool associated with the staked LP.
+// Emissions are estimated using rewards.ts and are projected for a 24 hour period.
 export function handleReward(
   event: ethereum.Event,
   pid: BigInt,
@@ -111,10 +110,8 @@ export function handleReward(
     NetworkConfigs.getRewardIntervalType()
   );
 
-  let nativeToken = updateNativeTokenPriceInUSD();
-
+  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(rewardTokenPerDay.toString()),

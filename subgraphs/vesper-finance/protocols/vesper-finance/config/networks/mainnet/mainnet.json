@@ -1,0 +1,210 @@
+{
+  "chain": "mainnet",
+  "pools": [
+    {
+      "name": "vUSDC-v2-grow",
+      "address": "0xB1C0d6EFD3bAb0FC3CA648a12C15d0827e3bcde5",
+      "startBlock": 12201459
+    },
+    {
+      "name": "vLINK-grow",
+      "address": "0x0a27E910Aee974D05000e05eab8a4b8Ebd93D40C",
+      "startBlock": 12144811
+    },
+    {
+      "name": "vVSP-governance",
+      "address": "0xbA4cFE5741b357FA371b506e5db0774aBFeCf8Fc",
+      "startBlock": 11868095
+    },
+    {
+      "name": "vBetaWBTC-grow",
+      "address": "0x74Cc5BC20B0c396dF5680eE4aeB6169A6288a8aF",
+      "startBlock": 11616578
+    },
+    {
+      "name": "vBetaUSDC-grow",
+      "address": "0x1e86044468b92c310800d4B350E0F83387a7097F",
+      "startBlock": 11607534
+    },
+    {
+      "name": "vDAI-grow-1",
+      "address": "0xcA0c34A3F35520B9490C1d58b35A19AB64014D80",
+      "startBlock": 11594191
+    },
+    {
+      "name": "vBetaETH-grow",
+      "address": "0x2C361913e2dA663e1898162Ec01497C46eb87AbF",
+      "startBlock": 11543581
+    },
+    {
+      "name": "vUSDC-grow",
+      "address": "0x0C49066C0808Ee8c673553B7cbd99BCC9ABf113d",
+      "startBlock": 11475256
+    },
+    {
+      "name": "vWBTC-grow",
+      "address": "0x4B2e76EbBc9f2923d83F5FBDe695D8733db1a17B",
+      "startBlock": 11475198
+    },
+    {
+      "name": "vETH-grow",
+      "address": "0x103cc17C2B1586e5Cd9BaD308690bCd0BBe54D5e",
+      "startBlock": 11475126
+    },
+    {
+      "name": "vUSDT-grow-1",
+      "address": "0x95c0b30C6276e67Ae95127aF458573a63113BdFF",
+      "startBlock": 12525156
+    },
+    {
+      "name": "vUNI-grow-1",
+      "address": "0xf858a354AD255D21e17C56f8F2b10Ed67dfb40aE",
+      "startBlock": 12520468
+    },
+    {
+      "name": "vUSDC-v3-grow",
+      "address": "0x777A7850251b7A301cfA1E7b1d8a9c4a9C49Cf85",
+      "startBlock": 12479096
+    },
+    {
+      "name": "veUSDC-LMR-earn",
+      "address": "0xA7C21fD948c44830541b8561B31ABDe09CC32719",
+      "startBlock": 14837480
+    },
+    {
+      "name": "vaAPE-grow",
+      "address": "0xA5Bc6eB0A7E6738e2F2Ac6c92280b32771aC52Ad",
+      "startBlock": 14476894
+    },
+    {
+      "name": "vaMUSD-grow",
+      "address": "0x83c608b3997db00B5C6D93746785857Cd22d4495",
+      "startBlock": 14142575
+    },
+    {
+      "name": "veDAI-PUNK-earn",
+      "address": "0xeBcF77CCE55ed6091F82aEE3c5539841E4D75F49",
+      "startBlock": 14047362
+    },
+    {
+      "name": "veDAI-SHIB-earn",
+      "address": "0x6F8D5FD58F5F825FdBF4f3301c0BDd361653488c",
+      "startBlock": 14029990
+    },
+    {
+      "name": "veLINK-DAI-earn",
+      "address": "0x252c805e999115158174dFC997BF5C1342aaDfF2",
+      "startBlock": 13954585
+    },
+    {
+      "name": "veDAI-LINK-earn",
+      "address": "0x83A99dAFf5f84B278D3150A36385fCDf04a0fecf",
+      "startBlock": 13952095
+    },
+    {
+      "name": "vaLINK-grow",
+      "address": "0xef4F4604106de23CDadfEAE08fcC34602cB475C1",
+      "startBlock": 13851009
+    },
+    {
+      "name": "veDAI-VSP-earn",
+      "address": "0x8209f3a03730c035163B4414c1545a3137D5B402",
+      "startBlock": 13779909
+    },
+    {
+      "name": "veDAI-DPI-earn",
+      "address": "0xe4Fe646A43DAEC8323922cA3e4Fe782d70805d93",
+      "startBlock": 13755461
+    },
+    {
+      "name": "vaUSDC-grow",
+      "address": "0xa8b607Aa09B6A2E306F93e74c282Fb13f6A80452",
+      "startBlock": 13729330
+    },
+    {
+      "name": "veDAI-ETH-earn",
+      "address": "0xabfF8F065318a8CF0dE66Bd1E90E976381859Ef0",
+      "startBlock": 13727647
+    },
+    {
+      "name": "veDAI-WBTC-earn",
+      "address": "0x35B225880df01cde935Db463D0e70a9e737D516E",
+      "startBlock": 13722797
+    },
+    {
+      "name": "vaALUSD-grow",
+      "address": "0x8BCdd6a8168d658dFA19721eaB7470e43398Db25",
+      "startBlock": 13646810
+    },
+    {
+      "name": "vaDPI-grow",
+      "address": "0x9b91ab47cefC35dbe4DDCC7983fFA1fB40795663",
+      "startBlock": 13642194
+    },
+    {
+      "name": "vaFRAX-grow",
+      "address": "0xc14900dFB1Aa54e7674e1eCf9ce02b3b35157ba5",
+      "startBlock": 13641116
+    },
+    {
+      "name": "vaFEI-grow",
+      "address": "0x2B6c40Ef15Db0D78D08A7D1b4E12d57E88a3e324",
+      "startBlock": 13627965
+    },
+    {
+      "name": "veWBTC-DAI-earn",
+      "address": "0x7a74B6D3A07D3249Ea2FBb58e47F0DaF6d6a2ebf",
+      "startBlock": 13528484
+    },
+    {
+      "name": "vaWBTC-grow",
+      "address": "0x01e1d41C1159b745298724c5Fd3eAfF3da1C6efD",
+      "startBlock": 13266362
+    },
+    {
+      "name": "vfrsDAI-vfr-s",
+      "address": "0xb4C912714f07FcD078d17479010f705F807bB115",
+      "startBlock": 13090878
+    },
+    {
+      "name": "vfrcDAI-vfr-c",
+      "address": "0x0b1E5e449CA0d7D8937d038e298737e023e86Dc5",
+      "startBlock": 13090326
+    },
+    {
+      "name": "vaETH-grow",
+      "address": "0xd1C117319B3595fbc39b471AB1fd485629eb05F2",
+      "startBlock": 13044797
+    },
+    {
+      "name": "vDAI-grow-2",
+      "address": "0xB4eDcEFd59750144882170FCc52ffeD40BfD5f7d",
+      "startBlock": 12953312
+    },
+    {
+      "name": "veETH-DAI-earn",
+      "address": "0xA89566489E932a2d334b9eFF7884Feb21a07d2B3",
+      "startBlock": 12794991
+    },
+    {
+      "name": "vaDAI-grow",
+      "address": "0x0538C8bAc84E95A9dF8aC10Aad17DbE81b9E36ee",
+      "startBlock": 12782830
+    },
+    {
+      "name": "vDAI-grow-3",
+      "address": "0x8b3C8626cbfaA71d44bd76C1304214f4858E3639",
+      "startBlock": 12731861
+    },
+    {
+      "name": "vUSDT-grow-2",
+      "address": "0xBA680a906d8f624a5F11fba54D3C672f09F26e47",
+      "startBlock": 12725974
+    },
+    {
+      "name": "vUNI-grow-2",
+      "address": "0xfF43C327410F960261057ba1DA787eD78B42c257",
+      "startBlock": 12725830
+    }
+  ]
+}

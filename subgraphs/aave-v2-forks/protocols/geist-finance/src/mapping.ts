@@ -56,8 +56,6 @@ import {
   _handleReserveDeactivated,
   _handleReserveFactorChanged,
   _handleReserveInitialized,
-  _handleReserveUsedAsCollateralDisabled,
-  _handleReserveUsedAsCollateralEnabled,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {

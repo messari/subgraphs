@@ -27,6 +27,7 @@ export function createMasterChefStakingPool(
   return masterChefPool;
 }
 
+// Create the masterchef contract that contains data used to calculate rewards for all pools.
 export function getOrCreateMasterChef(
   event: ethereum.Event,
   masterChefType: string
@@ -46,6 +47,7 @@ export function getOrCreateMasterChef(
   return masterChef;
 }
 
+// Update the total allocation for all pools whenever the allocation points are updated for a pool.
 export function updateMasterChefTotalAllocation(
   event: ethereum.Event,
   oldPoolAlloc: BigInt,
