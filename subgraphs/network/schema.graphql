@@ -27,6 +27,35 @@ enum SubgraphNetwork {
   XDAI # aka Gnosis Chain
 }
 
+
+type STATS @entity {
+  " Number of times entity has been used in a time data entity "
+	count: BigInt!
+
+	" The average of all the values "
+	mean: BigInt!
+  " The middle value when ordered from least to greatest "
+	median: BigInt!
+
+	" The maximum value in this entity "
+	max: BigInt!
+  " The minimum value in this data set "
+	min: BigInt!
+
+  "  " 
+	var: BigInt!
+	q3: BigInt!
+	q1: BigInt
+
+  ##### Add Ons #####
+  
+  " values in order from smallest to largest "
+  values: [BigInt!]!
+
+  " The sum of all the values "
+  sum: BigInt!
+}
+
 ##########################
 #### Network Metadata ####
 ##########################
