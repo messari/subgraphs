@@ -265,7 +265,11 @@ function getOrCreateProtocol(): LendingProtocol {
   return _getOrCreateProtocol(protocolData);
 }
 
-function updateTONICRewards(event: AccrueInterest, market: Market, protocol : LendingProtocol): void {
+function updateTONICRewards(
+  event: AccrueInterest,
+  market: Market,
+  protocol: LendingProtocol
+): void {
   let rewardTokenBorrow: RewardToken | null = null;
   let rewardTokenDeposit: RewardToken | null = null;
 
@@ -322,20 +326,21 @@ function updateTONICRewards(event: AccrueInterest, market: Market, protocol : Le
     : tryTonicSpeed.value.times(blocksPerDay);
   borrowTonicPerDay = supplyTonicPerDay;
 
-
   if (event.block.number.gt(BigInt.fromI32(1337194))) {
-    let oracleContract = PriceOracle.bind(Address.fromString(protocol._priceOracle));
-    let price = oracleContract.try_getUnderlyingPrice(Address.fromString(tTONICAddress));
+    let oracleContract = PriceOracle.bind(
+      Address.fromString(protocol._priceOracle)
+    );
+    let price = oracleContract.try_getUnderlyingPrice(
+      Address.fromString(tTONICAddress)
+    );
     if (price.reverted) {
-        log.warning("[updateTonicrewards] getUnderlyingPrice reverted", []);
+      log.warning("[updateTonicrewards] getUnderlyingPrice reverted", []);
     } else {
-        TonicPriceUSD = price.value
-          .toBigDecimal()
-          .div(exponentToBigDecimal(rewardDecimals));
-      }
+      TonicPriceUSD = price.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(rewardDecimals));
+    }
   }
-
-
 
   let borrowTonicPerDayUSD = borrowTonicPerDay
     .toBigDecimal()
