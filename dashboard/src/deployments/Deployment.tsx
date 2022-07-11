@@ -53,7 +53,7 @@ const StyledDeployment = styled(Card)<{
   `;
 });
 
-const CardRow = styled("div")<{ $warning?: boolean }>`
+const CardRow = styled("div") <{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -163,9 +163,10 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
       </StyledDeployment>
     );
   }
+  console.log(networkName, deployment, subgraphID, statusData.chains[0].latestBlock?.number, statusData)
   const indexed = synced
     ? 100
-    : toPercent(statusData.chains[0].latestBlock.number, statusData.chains[0].chainHeadBlock.number);
+    : toPercent(statusData.chains[0]?.latestBlock?.number || 0, statusData.chains[0].chainHeadBlock.number);
 
   const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
@@ -203,7 +204,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
             <span>Indexed:</span> <span>{indexed}%</span>
           </CardRow>
           <CardRow>
-            <span>Latest Block:</span> <span>{statusData.chains[0].latestBlock.number}</span>
+            <span>Latest Block:</span> <span>{statusData.chains[0]?.latestBlock?.number || 'N/A'}</span>
           </CardRow>
           <CardRow>
             <span>Current chain block:</span>

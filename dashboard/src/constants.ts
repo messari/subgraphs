@@ -21,21 +21,25 @@ export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",
   LENDING: "market",
   YIELD: "vault",
+  GENERIC: "pool"
 };
 export const PoolNames: Record<string, string> = {
   EXCHANGE: "liquidityPools",
   LENDING: "markets",
   YIELD: "vaults",
+  GENERIC: "pools"
 };
 export const ProtocolTypeEntityName: Record<string, string> = {
   EXCHANGE: "dexAmmProtocol",
   LENDING: "lendingProtocol",
   YIELD: "yieldAggregator",
+  GENERIC: "protocol"
 };
 export const ProtocolTypeEntityNames: Record<string, string> = {
   EXCHANGE: "dexAmmProtocols",
   LENDING: "lendingProtocols",
   YIELD: "yieldAggregators",
+  GENERIC: "pools"
 };
 export interface Schema {
   entities: string[];
