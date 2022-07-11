@@ -249,7 +249,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
 }
 
 function getOrCreateProtocol(): LendingProtocol {
-
   let comptroller = Comptroller.bind(comptrollerAddr);
   let oracle = comptroller.try_oracle();
   if (oracle.reverted) {
@@ -257,10 +256,7 @@ function getOrCreateProtocol(): LendingProtocol {
   } else {
     let _priceOracle = oracle.value.toHexString();
     log.debug("[getOrCreateProtocol] oracleResult ", [_priceOracle]);
-
   }
-
-
 
   let protocolData = new ProtocolData(
     comptrollerAddr,
@@ -272,7 +268,7 @@ function getOrCreateProtocol(): LendingProtocol {
     Network.CRONOS,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()
-  )
+  );
 
   return _getOrCreateProtocol(protocolData);
 }
@@ -298,7 +294,7 @@ function updateTONICRewards(event: AccrueInterest, market: Market): void {
     rewardTokenBorrow = RewardToken.load(borrowID);
     if (!rewardTokenBorrow) {
       rewardTokenBorrow = new RewardToken(borrowID);
-      rewardTokenBorrow.token = TonicToken.id; // Tonic already made from cTonic market
+      rewardTokenBorrow.token = TonicToken.id; // Tonic already made from tTonic market
       rewardTokenBorrow.type = RewardTokenType.BORROW;
       rewardTokenBorrow.save();
     }
@@ -306,7 +302,7 @@ function updateTONICRewards(event: AccrueInterest, market: Market): void {
     rewardTokenDeposit = RewardToken.load(depositID);
     if (!rewardTokenDeposit) {
       rewardTokenDeposit = new RewardToken(depositID);
-      rewardTokenDeposit.token = TonicToken.id; // Tonic already made from cTonic market
+      rewardTokenDeposit.token = TonicToken.id; // Tonic already made from tTonic market
       rewardTokenDeposit.type = RewardTokenType.DEPOSIT;
       rewardTokenDeposit.save();
     }
@@ -333,44 +329,27 @@ function updateTONICRewards(event: AccrueInterest, market: Market): void {
     ? BIGINT_ZERO
     : tryTonicSpeed.value.times(blocksPerDay);
   borrowTonicPerDay = supplyTonicPerDay;
-  log.debug("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
 
-  if (event.block.number.gt(BigInt.fromI32(1337194))) {
-    let TonicMarket = Market.load(tTONICAddress);
-    if (!TonicMarket) {
-      log.debug("[updateRewards] Market not found: {}", [tTONICAddress]);
-      return;
+  if (event.block.number.gt(BigInt.fromI32(570298))) {
+    let comptroller = Comptroller.bind(comptrollerAddr);
+    let oracle = comptroller.try_oracle();
+    if (oracle.reverted) {
+      log.warning("[updateTonicrewards] oracleResult reverted", []);
+    } else {
+      let _priceOracle = oracle.value.toHexString();
+      let oracleContract = PriceOracle.bind(Address.fromString(_priceOracle));
+      let price = oracleContract.try_getUnderlyingPrice(
+        Address.fromString(tTONICAddress)
+      );
+      if (price.reverted) {
+        log.warning("[updateTonicrewards] getUnderlyingPrice reverted", []);
+      } else {
+        TonicPriceUSD = price.value
+          .toBigDecimal()
+          .div(exponentToBigDecimal(rewardDecimals));
+      }
     }
-    TonicPriceUSD = TonicMarket.inputTokenPriceUSD;
-    log.debug("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
   }
-  else if 
-    (event.block.number.gt(BigInt.fromI32(687810))) {
-    let liquidity_pool_TONIC = VVSlp.bind(Address.fromString(ORACLE_ADDRESS));
-    let liquidity_pool_CRO = VVSlp.bind(Address.fromString(WCROUSDC_ADDRESS));
-
-    let current_price_TONICCRO = getOrElse(
-      liquidity_pool_TONIC.try_price1CumulativeLast(),
-      BIGINT_ZERO
-    );
-    let current_price_CRO = getOrElse(
-      liquidity_pool_CRO.try_price1CumulativeLast(),
-      BIGINT_ZERO
-    );
-
-    TonicPriceUSD = current_price_TONICCRO
-      .div(current_price_CRO)
-      .toBigDecimal()
-      .div(exponentToBigDecimal(rewardDecimals));
-    log.debug("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
-  } else {
-    // try to get TONIC price between blocks start - 687810
-    // As CRONOS Price oracle is not built yet, using 0 before tonic Market was created for now.
-    TonicPriceUSD = BIGDECIMAL_ZERO;
-    log.debug("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
-  }
-
-  log.debug("[TONIC price] Price: {}", [TonicPriceUSD.toString()]);
 
   let borrowTonicPerDayUSD = borrowTonicPerDay
     .toBigDecimal()
