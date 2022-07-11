@@ -69,7 +69,7 @@ type TokenDailySnapshot @entity {
   " Daily total Supply of the token "
   dailyTotalSupply: BigDecimal!
 
-  " # of accounts holding this token "
+  " number of accounts holding this token "
   dailyHolderCount: BigInt!
 
   " number of unique daily active users/holders "
