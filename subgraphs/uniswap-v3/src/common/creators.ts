@@ -102,6 +102,7 @@ export function createLiquidityPool(
   poolDeposits.valueInt = INT_ZERO;
 
   protocol.totalPoolCount = protocol.totalPoolCount + INT_ONE;
+  protocol.save();
 
   // Create and track the newly created pool contract based on the template specified in the subgraph.yaml file.
   PoolTemplate.create(Address.fromString(poolAddress));
@@ -112,7 +113,6 @@ export function createLiquidityPool(
     protocol._regenesis == false
   ) {
     populateEmptyPools(event);
-    protocol._regenesis = true;
   }
 
   pool.save();
@@ -121,7 +121,6 @@ export function createLiquidityPool(
   LPtoken.save();
   poolAmounts.save();
   poolDeposits.save();
-  protocol.save();
 }
 
 // create pool fee entities based on the fee structure received from pairCreated event.

@@ -1,4 +1,4 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../configurations/configure";
 import {
   LiquidityPool,
@@ -33,6 +33,7 @@ import { POOL_MAPPINGS } from "./poolMappings";
 export function populateEmptyPools(event: ethereum.Event): void {
   let protocol = getOrCreateDex();
   let length = POOL_MAPPINGS.length;
+
   for (let i = 0; i < length; ++i) {
     let poolMapping = POOL_MAPPINGS[i];
     let poolAddress = poolMapping[1].toHexString();
@@ -109,10 +110,13 @@ export function populateEmptyPools(event: ethereum.Event): void {
     // Create and track the newly created pool contract based on the template specified in the subgraph.yaml file.
     PoolTemplate.create(Address.fromString(poolAddress));
 
+    poolDeposits.save();
     poolAmounts.save();
     token0.save();
     token1.save();
     pool.save();
   }
+
+  protocol._regenesis = true;
   protocol.save();
 }

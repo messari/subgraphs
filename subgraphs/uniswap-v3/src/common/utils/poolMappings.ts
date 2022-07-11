@@ -7,7 +7,6 @@
  * 1: new address
  * 2: token0 address
  * 3: token1 address
- * 4: feeTier
  */
 
 import { Address } from "@graphprotocol/graph-ts";
