@@ -5,7 +5,8 @@ import {
 import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { getRewardsPerDay } from "../common/Reward";
+import { BigInt, Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { PoolRewards as PoolRewardsContract } from "../../generated/templates/PoolRewards/PoolRewards";
 
 export function updateRewardToken(
@@ -28,16 +29,16 @@ export function updateRewardToken(
       constants.BIGINT_ZERO
     );
 
-    let rewardRatePerDay = rewardRate.times(
-      BigInt.fromI32(constants.SECONDS_PER_DAY as u8)
+    let rewardRatePerDay = getRewardsPerDay(
+      block.timestamp,
+      block.number,
+      rewardRate.toBigDecimal(),
+      constants.RewardIntervalType.TIMESTAMP
     );
 
-    updateRewardTokenEmissions(
-      rewardToken,
-      vaultAddress,
-      rewardRatePerDay,
-      block
-    );
+    let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
+
+    updateRewardTokenEmissions(rewardToken, vaultAddress, rewardPerDay, block);
 
     log.warning("[Rewards] Vault: {}, RewardToken: {}, RewardRate: {}", [
       vaultAddress.toHexString(),
@@ -79,13 +80,14 @@ export function updateRewardTokenEmissions(
   let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
 
   const rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);
-
+  const rewardTokenDecimals = utils.getTokenDecimals(rewardTokenAddress);
+  
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
     .toBigDecimal()
+    .div(rewardTokenDecimals)
     .times(rewardTokenPrice.usdPrice)
-    .times(rewardTokenPrice.decimalsBaseTen)
-    .times(rewardTokenPrice.decimalsBaseTen);
+    .div(rewardTokenPrice.decimalsBaseTen);
 
   vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;

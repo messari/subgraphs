@@ -48,6 +48,11 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
+export namespace RewardIntervalType {
+  export const BLOCK = "BLOCK";
+  export const TIMESTAMP = "TIMESTAMP";
+}
+
 export namespace NULL {
   export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
   export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
@@ -57,7 +62,7 @@ export namespace Protocol {
   export const NAME = "Vesper Finance";
   export const SLUG = "vesper-finance";
   export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.2.0";
+  export const SUBGRAPH_VERSION = "1.0.0";
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 

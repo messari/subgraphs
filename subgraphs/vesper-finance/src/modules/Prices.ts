@@ -9,8 +9,7 @@ import * as constants from "../common/constants";
 import { getPriceUsdcRecommended } from "../Prices/routers/CurveRouter";
 import { Pool as VaultContract } from "../../generated/templates/PoolRewards/Pool";
 
-export function getPriceOfOutputTokens(vaultAddress: Address): BigDecimal {
-  const network = dataSource.network();
+export function getPricePerShare(vaultAddress: Address): BigInt {
   const vaultContract = VaultContract.bind(vaultAddress);
 
   let pricePerShare = utils.readValue<BigInt>(
@@ -24,6 +23,15 @@ export function getPriceOfOutputTokens(vaultAddress: Address): BigDecimal {
       constants.BIGINT_ZERO
     );
   }
+
+  return pricePerShare;
+}
+
+export function getPriceOfOutputTokens(vaultAddress: Address): BigDecimal {
+  const network = dataSource.network();
+  const vaultContract = VaultContract.bind(vaultAddress);
+
+  const pricePerShare = getPricePerShare(vaultAddress);
 
   const tokenAddress = utils.readValue<Address>(
     vaultContract.try_token(),

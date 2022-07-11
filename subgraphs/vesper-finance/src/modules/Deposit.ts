@@ -19,7 +19,7 @@ import {
 import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
-import { getPriceOfOutputTokens } from "./Prices";
+import { getPriceOfOutputTokens, getPricePerShare } from "./Prices";
 import { Pool as VaultContract } from "../../generated/templates/PoolAccountant/Pool";
 
 export function createDepositTransaction(
@@ -126,6 +126,8 @@ export function Deposit(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
+  let pricePerShare = getPricePerShare(vaultAddress);
+  vault.pricePerShare = pricePerShare.toBigDecimal();
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(vaultAddress);
 
   vault.save();

@@ -82,6 +82,12 @@ export function updateVaultSnapshots(
   vaultDailySnapshots.pricePerShare = vault.pricePerShare;
   vaultHourlySnapshots.pricePerShare = vault.pricePerShare;
 
+  vaultDailySnapshots.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  vaultHourlySnapshots.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+
+  vaultDailySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+  vaultHourlySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+
   vaultDailySnapshots.cumulativeProtocolSideRevenueUSD =
     vault.cumulativeProtocolSideRevenueUSD;
   vaultHourlySnapshots.cumulativeProtocolSideRevenueUSD =
