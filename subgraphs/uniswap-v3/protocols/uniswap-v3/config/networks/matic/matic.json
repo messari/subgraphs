@@ -1,6 +1,8 @@
 {
-    "network": "matic",
-    "startBlock": 22757546,
-    "deployment": "UNISWAP_V3_MATIC"
-  }
-  
+  "network": "matic",
+  "startBlock": 22757546,
+  "deployment": "UNISWAP_V3_MATIC",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
