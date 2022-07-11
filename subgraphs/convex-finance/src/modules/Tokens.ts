@@ -1,9 +1,9 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { RewardTokenInfo } from "../../generated/schema";
-import { getOrCreateRewardToken } from "../common/initializer";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { getOrCreateRewardToken } from "../common/initializers";
 import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 
 export function getOrCreateRewardTokenInfo(
   poolId: BigInt,
@@ -51,7 +51,7 @@ export function getExtraRewardTokens(
   ) {
     const extraBaseRewardPoolAddress = utils.readValue<Address>(
       baseRewardPoolContract.try_extraRewards(BigInt.fromI32(rewardTokenIdx)),
-      constants.ZERO_ADDRESS
+      constants.NULL.TYPE_ADDRESS
     );
 
     const extraBaseRewardPoolContract = BaseRewardPool.bind(
@@ -59,10 +59,10 @@ export function getExtraRewardTokens(
     );
     const extraRewardTokenAddress = utils.readValue<Address>(
       extraBaseRewardPoolContract.try_rewardToken(),
-      constants.ZERO_ADDRESS
+      constants.NULL.TYPE_ADDRESS
     );
 
-    if (extraRewardTokenAddress.toHex() == constants.ZERO_ADDRESS_STRING)
+    if (extraRewardTokenAddress.toHex() == constants.NULL.TYPE_STRING)
       continue;
 
     getOrCreateRewardTokenInfo(
@@ -86,7 +86,7 @@ export function getRewardTokens(
 
   const crvRewardToken = utils.readValue<Address>(
     baseRewardPoolContract.try_rewardToken(),
-    constants.ZERO_ADDRESS
+    constants.NULL.TYPE_ADDRESS
   );
 
   // Create Reward Token Info for CRV Reward

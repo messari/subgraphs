@@ -1,25 +1,26 @@
 import {
-  updateFinancialsAfterReport,
-  updateVaultSnapshotsAfterReport,
-} from "./Metric";
-import {
   log,
   BigInt,
   Address,
   ethereum,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
+import {
+  getOrCreateVault,
+  getOrCreateRewardToken,
+} from "../common/initializers";
 import { getTotalFees } from "./Fees";
 import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
+import { updateRevenueSnapshots } from "./Revenue";
+import { getRewardsPerDay } from "../common/rewards";
 import { getOrCreateRewardTokenInfo } from "./Tokens";
-import { CustomPriceType } from "../Prices/common/types";
-import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
-import { RewardTokenInfo, Vault as VaultStore } from "../../generated/schema";
+import { ERC20 as ERC20Contract } from "../../generated/Booster/ERC20";
+import { BaseRewardPool as RewardPoolContract } from "../../generated/Booster/BaseRewardPool";
 
 export function getHistoricalRewards(rewardTokenPool: Address): BigInt {
-  const rewardsContract = BaseRewardPool.bind(rewardTokenPool);
+  const rewardsContract = RewardPoolContract.bind(rewardTokenPool);
   const historicalRewards = utils.readValue<BigInt>(
     rewardsContract.try_historicalRewards(),
     constants.BIGINT_ZERO
@@ -28,56 +29,13 @@ export function getHistoricalRewards(rewardTokenPool: Address): BigInt {
   return historicalRewards;
 }
 
-export function updateRewardTokenEmission(
-  vault: VaultStore,
-  totalRewards: BigInt,
-  rewardTokenInfo: RewardTokenInfo,
-  rewardTokenIdx: i32,
-  rewardTokenDecimals: BigDecimal,
-  latestRewardsTimestamp: BigInt,
-  rewardTokenPricePerToken: CustomPriceType
-): void {
-  const gapInDays = latestRewardsTimestamp
-    .minus(rewardTokenInfo.lastRewardTimestamp)
-    .div(constants.BIGINT_SECONDS_PER_DAY);
-
-  if (gapInDays == constants.BIGINT_ZERO) return;
-
-  const rewardEmissionPerDay = totalRewards.div(gapInDays);
-
-  let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
-  let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
-
-  rewardTokenEmissionsAmount[rewardTokenIdx] = rewardEmissionPerDay;
-  rewardTokenEmissionsUSD[rewardTokenIdx] = rewardEmissionPerDay
-    .toBigDecimal()
-    .times(rewardTokenPricePerToken.usdPrice)
-    .div(rewardTokenPricePerToken.decimalsBaseTen)
-    .div(rewardTokenDecimals);
-
-  vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
-  vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
-
-  vault.save();
-
-  log.warning(
-    "[RewardTokenEmission] gapInDays: {}, rewardEmissionPerDay: {}, rewardEmissionPerDayUSD: {}",
-    [
-      gapInDays.toString(),
-      rewardEmissionPerDay
-        .toBigDecimal()
-        .div(rewardTokenDecimals)
-        .toString(),
-      vault.rewardTokenEmissionsUSD![rewardTokenIdx].toString(),
-    ]
-  );
-}
-
 export function getExtraRewardsRevenue(
   poolId: BigInt,
-  block: ethereum.Block,
-  vault: VaultStore
+  block: ethereum.Block
 ): BigDecimal {
+  const vault = getOrCreateVault(poolId, block);
+  if (!vault) return constants.BIGDECIMAL_ZERO;
+
   let extraRewardsRevenueUSD = constants.BIGDECIMAL_ZERO;
   let rewardsTokensLength = vault.rewardTokens!.length;
 
@@ -90,10 +48,8 @@ export function getExtraRewardsRevenue(
       vault.rewardTokens![rewardTokenIdx]
     );
 
-    const rewardTokenDecimals = constants.BIGINT_TEN.pow(
-      utils.getTokenDecimals(extraRewardTokenAddress) as u8
-    ).toBigDecimal();
     const rewardTokenPrice = getUsdPricePerToken(extraRewardTokenAddress);
+    const rewardTokenDecimals = utils.getTokenDecimals(extraRewardTokenAddress);
 
     const rewardTokenInfoStore = getOrCreateRewardTokenInfo(
       poolId,
@@ -113,16 +69,6 @@ export function getExtraRewardsRevenue(
       .div(rewardTokenPrice.decimalsBaseTen)
       .div(rewardTokenDecimals);
     extraRewardsRevenueUSD = extraRewardsRevenueUSD.plus(totalRewardsUSD);
-
-    updateRewardTokenEmission(
-      vault,
-      totalRewards,
-      rewardTokenInfoStore,
-      rewardTokenIdx,
-      rewardTokenDecimals,
-      block.timestamp,
-      rewardTokenPrice
-    );
 
     rewardTokenInfoStore.lastRewardTimestamp = block.timestamp;
     rewardTokenInfoStore._previousExtraHistoricalRewards = historicalRewards;
@@ -144,11 +90,10 @@ export function getExtraRewardsRevenue(
 
 export function _EarmarkRewards(
   poolId: BigInt,
-  vaultId: string,
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
-  const vault = VaultStore.load(vaultId);
+  const vault = getOrCreateVault(poolId, block);
   if (!vault) return;
 
   const crvRewardTokenAddress = Address.fromString(vault.rewardTokens![0]);
@@ -158,10 +103,8 @@ export function _EarmarkRewards(
     crvRewardTokenAddress
   );
 
-  const crvRewardTokenDecimals = constants.BIGINT_TEN.pow(
-    utils.getTokenDecimals(crvRewardTokenAddress) as u8
-  ).toBigDecimal();
   const crvRewardTokenPrice = getUsdPricePerToken(crvRewardTokenAddress);
+  const crvRewardTokenDecimals = utils.getTokenDecimals(crvRewardTokenAddress);
 
   const historicalCvxCrvStakerRewards = getHistoricalRewards(
     Address.fromString(crvRewardTokenInfoStore.rewardTokenPool)
@@ -183,17 +126,7 @@ export function _EarmarkRewards(
   const callFee = totalRewards.times(totalFeesConvex.callIncentive); // incentive to users who spend gas to make calls
   const platformFee = totalRewards.times(totalFeesConvex.platformFee); // possible fee to build treasury
 
-  updateRewardTokenEmission(
-    vault,
-    totalRewardsAfterFeesCut,
-    crvRewardTokenInfoStore,
-    0,
-    crvRewardTokenDecimals,
-    block.timestamp,
-    crvRewardTokenPrice
-  );
-
-  const extraRewardsUSD = getExtraRewardsRevenue(poolId, block, vault);
+  const extraRewardsUSD = getExtraRewardsRevenue(poolId, block);
 
   let supplySideRevenueUSD = totalRewardsAfterFeesCut
     .toBigDecimal()
@@ -209,36 +142,15 @@ export function _EarmarkRewards(
     .times(crvRewardTokenPrice.usdPrice)
     .div(crvRewardTokenPrice.decimalsBaseTen);
 
-  let totalRevenueUSD = supplySideRevenueUSD.plus(protocolSideRevenueUSD);
-
   crvRewardTokenInfoStore.lastRewardTimestamp = block.timestamp;
   crvRewardTokenInfoStore._previousExtraHistoricalRewards = historicalCvxCrvStakerRewards;
   crvRewardTokenInfoStore.save();
 
-  vault.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  vault.cumulativeProtocolSideRevenueUSD = vault.cumulativeProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  vault.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  vault.save();
-
-  updateFinancialsAfterReport(
-    block,
-    totalRevenueUSD,
-    supplySideRevenueUSD,
-    protocolSideRevenueUSD
-  );
-
-  updateVaultSnapshotsAfterReport(
+  updateRevenueSnapshots(
     vault,
-    block,
-    totalRevenueUSD,
     supplySideRevenueUSD,
-    protocolSideRevenueUSD
+    protocolSideRevenueUSD,
+    block
   );
 
   log.warning(
@@ -253,4 +165,194 @@ export function _EarmarkRewards(
       transaction.hash.toHexString(),
     ]
   );
+}
+
+export function updateConvexRewardToken(
+  poolId: BigInt,
+  crvRewardRate: BigInt,
+  block: ethereum.Block
+): void {
+  const convexTokenContract = ERC20Contract.bind(
+    constants.CONVEX_TOKEN_ADDRESS
+  );
+
+  let cvxTokenDecimals = utils.getTokenDecimals(constants.CONVEX_TOKEN_ADDRESS);
+  let cvxTokenSupply = utils
+    .readValue<BigInt>(
+      convexTokenContract.try_totalSupply(),
+      constants.BIGINT_ZERO
+    )
+    .toBigDecimal()
+    .div(cvxTokenDecimals);
+
+  let currentCliff = cvxTokenSupply.div(constants.CVX_CLIFF_SIZE);
+
+  let cvxRewardRate: BigDecimal = constants.BIGDECIMAL_ZERO;
+  if (currentCliff.lt(constants.CVX_CLIFF_COUNT)) {
+    let remaining = constants.CVX_CLIFF_COUNT.minus(currentCliff);
+
+    cvxRewardRate = crvRewardRate
+      .toBigDecimal()
+      .times(remaining)
+      .div(constants.CVX_CLIFF_COUNT);
+
+    let amountTillMax = constants.CVX_MAX_SUPPLY.minus(cvxTokenSupply);
+    if (cvxRewardRate.gt(amountTillMax)) {
+      cvxRewardRate = amountTillMax;
+    }
+  }
+
+  let cvxRewardRatePerDay = getRewardsPerDay(
+    block.timestamp,
+    block.number,
+    cvxRewardRate,
+    constants.RewardIntervalType.TIMESTAMP
+  );
+  let rewardPerDay = BigInt.fromString(cvxRewardRatePerDay.toString());
+
+  updateRewardTokenEmissions(
+    poolId,
+    constants.CONVEX_TOKEN_ADDRESS,
+    rewardPerDay,
+    block
+  );
+
+  log.warning("[CVX_Rewards] poolId: {}, RewardRate: {}", [
+    poolId.toString(),
+    cvxRewardRatePerDay.toString(),
+  ]);
+}
+
+export function updateRewardToken(
+  poolId: BigInt,
+  poolRewardsAddress: Address,
+  block: ethereum.Block
+): void {
+  const rewardsContract = RewardPoolContract.bind(poolRewardsAddress);
+
+  let rewardToken = utils.readValue<Address>(
+    rewardsContract.try_rewardToken(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  let rewardRate = utils.readValue<BigInt>(
+    rewardsContract.try_rewardRate(),
+    constants.BIGINT_ZERO
+  );
+
+  if (rewardToken.equals(constants.CRV_TOKEN_ADDRESS)) {
+    updateConvexRewardToken(poolId, rewardRate, block);
+  }
+
+  let rewardRatePerDay = getRewardsPerDay(
+    block.timestamp,
+    block.number,
+    rewardRate.toBigDecimal(),
+    constants.RewardIntervalType.TIMESTAMP
+  );
+  let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
+
+  updateRewardTokenEmissions(poolId, rewardToken, rewardPerDay, block);
+
+  log.warning("[Rewards] poolId: {}, RewardToken: {}, RewardRate: {}", [
+    poolId.toString(),
+    rewardToken.toHexString(),
+    rewardRatePerDay.toString(),
+  ]);
+
+  updateExtraRewardTokens(poolId, poolRewardsAddress, block);
+}
+
+export function updateExtraRewardTokens(
+  poolId: BigInt,
+  poolRewardsAddress: Address,
+  block: ethereum.Block
+): void {
+  const rewardsContract = RewardPoolContract.bind(poolRewardsAddress);
+
+  let extraRewardTokensLength = utils.readValue<BigInt>(
+    rewardsContract.try_extraRewardsLength(),
+    constants.BIGINT_ZERO
+  );
+
+  for (let i = 0; i < extraRewardTokensLength.toI32(); i += 1) {
+    let extraRewardToken = utils.readValue<Address>(
+      rewardsContract.try_extraRewards(BigInt.fromI32(i)),
+      constants.NULL.TYPE_ADDRESS
+    );
+
+    let rewardRate = utils.readValue<BigInt>(
+      rewardsContract.try_rewards(extraRewardToken),
+      constants.BIGINT_ZERO
+    );
+
+    let rewardRatePerDay = getRewardsPerDay(
+      block.timestamp,
+      block.number,
+      rewardRate.toBigDecimal(),
+      constants.RewardIntervalType.TIMESTAMP
+    );
+
+    let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
+
+    updateRewardTokenEmissions(poolId, extraRewardToken, rewardPerDay, block);
+
+    log.warning(
+      "[ExtraRewards] poolId: {}, ExtraRewardToken: {}, RewardRate: {}",
+      [
+        poolId.toString(),
+        extraRewardToken.toHexString(),
+        rewardRatePerDay.toString(),
+      ]
+    );
+  }
+}
+
+export function updateRewardTokenEmissions(
+  poolId: BigInt,
+  rewardTokenAddress: Address,
+  rewardTokenPerDay: BigInt,
+  block: ethereum.Block
+): void {
+  const vault = getOrCreateVault(poolId, block);
+  if (!vault) return;
+
+  const rewardToken = getOrCreateRewardToken(rewardTokenAddress);
+
+  if (!vault.rewardTokens) {
+    vault.rewardTokens = [];
+  }
+
+  let rewardTokens = vault.rewardTokens!;
+  if (!rewardTokens.includes(rewardToken.id)) {
+    rewardTokens.push(rewardToken.id);
+    vault.rewardTokens = rewardTokens;
+  }
+
+  const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
+
+  if (!vault.rewardTokenEmissionsAmount) {
+    vault.rewardTokenEmissionsAmount = [];
+  }
+  let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
+
+  if (!vault.rewardTokenEmissionsUSD) {
+    vault.rewardTokenEmissionsUSD = [];
+  }
+  let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
+
+  const rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);
+  const rewardTokenDecimals = utils.getTokenDecimals(rewardTokenAddress);
+
+  rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
+  rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
+    .toBigDecimal()
+    .div(rewardTokenDecimals)
+    .times(rewardTokenPrice.usdPrice)
+    .div(rewardTokenPrice.decimalsBaseTen);
+
+  vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+  vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+
+  vault.save();
 }

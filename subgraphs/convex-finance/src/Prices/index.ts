@@ -1,11 +1,9 @@
 import {
+  log,
   Address,
   BigDecimal,
-  BigInt,
   dataSource,
-  log,
 } from "@graphprotocol/graph-ts";
-
 import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
 import { getForexUsdRate } from "./custom/ForexTokens";

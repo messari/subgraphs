@@ -102,9 +102,9 @@ templates:
           file: ./abis/Ethereum/BaseRewardPool.json
         - name: ERC20
           file: ./abis/Ethereum/ERC20.json
-      callHandlers:
-        - function: addExtraReward(address)
-          handler: handleAddExtraReward
-        - function: clearExtraRewards()
-          handler: handleClearExtraRewards
+      eventHandlers:
+        - event: RewardAdded(uint256)
+          handler: handleRewardAdded
+        - event: RewardPaid(indexed address,uint256)
+          handler: handleRewardPaid
       file: ./src/mappings/rewardMappings.ts

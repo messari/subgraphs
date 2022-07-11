@@ -1,89 +1,57 @@
 import * as utils from "../common/utils";
+import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
-import { Vault as VaultStore } from "../../generated/schema";
-import { getOrCreateRewardTokenInfo } from "../modules/Tokens";
+import { updateRewardToken } from "../modules/Rewards";
+import { getOrCreateVault } from "../common/initializers";
+import { updateRevenueSnapshots } from "../modules/Revenue";
 import {
-  AddExtraRewardCall,
-  ClearExtraRewardsCall,
+  RewardPaid,
+  RewardAdded,
 } from "../../generated/templates/PoolCrvRewards/BaseRewardPool";
-import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
-import { Address, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import { updateFinancials, updateUsageMetrics } from "../modules/Metric";
+import { BaseRewardPool as BaseRewardPoolContract } from "../../generated/Booster/BaseRewardPool";
 
-export function handleAddExtraReward(call: AddExtraRewardCall): void {
+export function handleRewardAdded(event: RewardAdded): void {
   const context = dataSource.context();
-  const poolId = context.getString("poolId");
+  const poolId = BigInt.fromString(context.getString("poolId"));
 
-  const vaultId = constants.CONVEX_BOOSTER_ADDRESS.toHexString()
-    .concat("-")
-    .concat(poolId.toString());
+  const rewardAmount = event.params.reward;
+  const poolRewardsAddress = event.address;
 
-  const vault = VaultStore.load(vaultId);
+  const vault = getOrCreateVault(poolId, event.block);
   if (!vault) return;
 
-  const newRewardPoolAddress = call.inputs._reward;
-  const newRewardPoolContract = BaseRewardPool.bind(newRewardPoolAddress);
-
-  const newRewardTokenAddress = utils.readValue<Address>(
-    newRewardPoolContract.try_rewardToken(),
-    constants.ZERO_ADDRESS
+  const rewardsContract = BaseRewardPoolContract.bind(poolRewardsAddress);
+  const rewardToken = utils.readValue<Address>(
+    rewardsContract.try_rewardToken(),
+    constants.NULL.TYPE_ADDRESS
   );
+  let rewardTokenPrice = getUsdPricePerToken(rewardToken);
+  let rewardTokenDecimals = utils.getTokenDecimals(rewardToken);
 
-  getOrCreateRewardTokenInfo(
-    BigInt.fromString(poolId),
-    call.block,
-    newRewardTokenAddress,
-    newRewardPoolAddress
+  const supplySideRevenueUSD = rewardAmount
+    .toBigDecimal()
+    .div(rewardTokenDecimals)
+    .times(rewardTokenPrice.usdPrice)
+    .div(rewardTokenPrice.decimalsBaseTen);
+
+  updateRevenueSnapshots(
+    vault,
+    supplySideRevenueUSD,
+    constants.BIGDECIMAL_ZERO,
+    event.block
   );
-
-  let rewardTokens = vault.rewardTokens;
-  if (rewardTokens) {
-    rewardTokens.push(newRewardTokenAddress.toHexString());
-    vault.rewardTokens = rewardTokens;
-  } else vault.rewardTokens = [newRewardTokenAddress.toHexString()];
-
-  let emissionAmount = vault.rewardTokenEmissionsAmount;
-  if (emissionAmount) {
-    emissionAmount.push(constants.BIGINT_ZERO);
-    vault.rewardTokenEmissionsAmount = emissionAmount;
-  } else vault.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
-
-  let emissionAmountUSD = vault.rewardTokenEmissionsUSD;
-  if (emissionAmountUSD) {
-    emissionAmountUSD.push(constants.BIGDECIMAL_ZERO);
-    vault.rewardTokenEmissionsUSD = emissionAmountUSD;
-  } else vault.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
-
-  vault.save();
-
-  log.warning("[AddExtraRewards] PoolId: {}, rewardTokens: [{}], TxHash: {}", [
-    poolId.toString(),
-    vault.rewardTokens!.join(", "),
-    call.transaction.hash.toHexString(),
-  ]);
+  updateRewardToken(poolId, poolRewardsAddress, event.block);
 }
 
-export function handleClearExtraRewards(call: ClearExtraRewardsCall): void {
+export function handleRewardPaid(event: RewardPaid): void {
   const context = dataSource.context();
-  const poolId = context.getString("poolId");
-  const vaultId = constants.CONVEX_BOOSTER_ADDRESS.toHexString()
-    .concat("-")
-    .concat(poolId.toString());
+  const poolId = BigInt.fromString(context.getString("poolId"));
 
-  const vault = VaultStore.load(vaultId);
-  if (!vault) return;
+  const poolRewardsAddress = event.address;
 
-  const crvRewardsAddress = dataSource.address();
-  const rewardsContract = BaseRewardPool.bind(crvRewardsAddress);
-  let rewardToken = utils.readValue<Address>(
-    rewardsContract.try_rewardToken(),
-    constants.ZERO_ADDRESS
-  );
-
-  vault.rewardTokens = [rewardToken.toHexString()];
-  vault.save();
-
-  log.warning("[ClearExtraRewards] PoolId: {}, TxHash: {}", [
-    poolId.toString(),
-    call.transaction.hash.toHexString(),
-  ]);
+  updateFinancials(event.block);
+  updateUsageMetrics(event.block, event.transaction.from);
+  updateRewardToken(poolId, poolRewardsAddress, event.block);
 }
