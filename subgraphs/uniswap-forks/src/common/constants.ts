@@ -1,4 +1,4 @@
-import { log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////
 ///// Versions /////
@@ -143,10 +143,19 @@ export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const SECONDS_PER_HOUR = 60 * 60;
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const MS_PER_YEAR = DAYS_PER_YEAR.times(
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+);
 
-export const MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND = new BigDecimal(BIGINT_ONE_HUNDRED_THOUSAND);
-export const MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND = new BigDecimal(BIGINT_TWO_HUNDRED_FIFTY_THOUSAND);
-export const MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND = new BigDecimal(BIGINT_FOUR_HUNDRED_THOUSAND);
+// Imported into configurations typescript file to set minimum liquidity thresholds for estimating price using a liquidity pool;
+export const MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND = new BigDecimal(
+  BIGINT_ONE_HUNDRED_THOUSAND
+);
+export const MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND = new BigDecimal(
+  BIGINT_TWO_HUNDRED_FIFTY_THOUSAND
+);
+export const MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND = new BigDecimal(
+  BIGINT_FOUR_HUNDRED_THOUSAND
+);
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";

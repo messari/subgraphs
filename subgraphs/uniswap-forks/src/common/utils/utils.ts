@@ -75,3 +75,7 @@ export function toLowerCase(string: string): string {
 export function roundToWholeNumber(n: BigDecimal): BigDecimal {
   return n.truncate(0);
 }
+
+export function percToDec(percentage: BigDecimal): BigDecimal {
+  return percentage.div(BIGDECIMAL_HUNDRED);
+}

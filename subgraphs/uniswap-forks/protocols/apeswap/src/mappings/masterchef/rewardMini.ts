@@ -21,18 +21,22 @@ import {
   updateMasterChefTotalAllocation,
 } from "../../common/helpers";
 
+// A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {
   updateMasterChefDeposit(event, event.params.pid, event.params.amount);
 }
 
+// A withdraw or unstaking for the pool specific MasterChef.
 export function handleWithdraw(event: Withdraw): void {
   updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
 }
 
+// A withdraw or unstaking for the pool specific MasterChef.
 export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
   updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
 }
 
+// Handle the addition of a new pool to the MasterChef. New staking pool.
 export function handleLogPoolAddition(event: LogPoolAddition): void {
   let miniChefPool = createMasterChefStakingPool(
     event,
@@ -50,6 +54,7 @@ export function handleLogPoolAddition(event: LogPoolAddition): void {
   miniChefPool.save();
 }
 
+// Update the allocation points of the pool.
 export function handleLogSetPool(event: LogSetPool): void {
   let miniChefPool = _MasterChefStakingPool.load(
     MasterChef.MINICHEF + "-" + event.params.pid.toString()
@@ -64,6 +69,7 @@ export function handleLogSetPool(event: LogSetPool): void {
   miniChefPool.save();
 }
 
+// Update the total emissions rate of rewards for the masterchef contract.
 export function handleLogBananaPerSecond(event: LogBananaPerSecond): void {
   let miniChefPool = getOrCreateMasterChef(event, MasterChef.MINICHEF);
   miniChefPool.rewardTokenRate = event.params.bananaPerSecond;

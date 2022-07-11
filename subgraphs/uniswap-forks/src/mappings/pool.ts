@@ -32,6 +32,9 @@ import {
 } from "../common/constants";
 import { getLiquidityPool } from "../common/getters";
 
+// Handle transfers event.
+// The transfers are either occur as a part of the Mint or Burn event process.
+// The tokens being transferred in these events are the LP tokens from the liquidity pool that emitted this event.
 export function handleTransfer(event: Transfer): void {
   let pool = getLiquidityPool(event.address.toHexString());
 
@@ -73,15 +76,19 @@ export function handleTransfer(event: Transfer): void {
   }
 }
 
+// Handle Sync event.
+// Emitted after every Swap, Mint, and Burn event.
+// Gives information about the rebalancing of tokens used to update tvl, balances, and token pricing
 export function handleSync(event: Sync): void {
   updateInputTokenBalances(
     event.address.toHexString(),
     event.params.reserve0,
     event.params.reserve1
   );
-  updateTvlAndTokenPrices(event.address.toHexString(), event.block.number);
+  updateTvlAndTokenPrices(event.address.toHexString());
 }
 
+// Handle a mint event emitted from a pool contract. Considered a deposit into the given liquidity pool.
 export function handleMint(event: Mint): void {
   createDeposit(event, event.params.amount0, event.params.amount1);
   updateUsageMetrics(event, event.params.sender, UsageType.DEPOSIT);
@@ -89,6 +96,7 @@ export function handleMint(event: Mint): void {
   updatePoolMetrics(event);
 }
 
+// Handle a burn event emitted from a pool contract. Considered a withdraw into the given liquidity pool.
 export function handleBurn(event: Burn): void {
   createWithdraw(event, event.params.amount0, event.params.amount1);
   updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
@@ -96,6 +104,7 @@ export function handleBurn(event: Burn): void {
   updatePoolMetrics(event);
 }
 
+// Handle a swap event emitted from a pool contract.
 export function handleSwap(event: Swap): void {
   createSwapHandleVolumeAndFees(
     event,

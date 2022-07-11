@@ -11,10 +11,6 @@ import {
   ZERO_ADDRESS,
 } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
-import {
-  findNativeTokenPerToken,
-  updateNativeTokenPriceInUSD,
-} from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 
 export function handleReward(
@@ -112,10 +108,8 @@ export function handleReward(
     NetworkConfigs.getRewardIntervalType()
   );
 
-  let nativeToken = updateNativeTokenPriceInUSD();
-
+  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(rewardTokenPerDay.toString()),

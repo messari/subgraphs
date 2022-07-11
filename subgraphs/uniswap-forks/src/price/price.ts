@@ -19,6 +19,9 @@ import {
 import { safeDiv } from "../common/utils/utils";
 import { NetworkConfigs } from "../../configurations/configure";
 
+// Update the token price of the native token for the specific protocol/network (see network specific configs)
+// Update the token by referencing the native token against pools with the reference token and a stable coin
+// Estimate the price against the pool with the highest liquidity
 export function updateNativeTokenPriceInUSD(): Token {
   let nativeAmount = BIGDECIMAL_ZERO;
   let stableAmount = BIGDECIMAL_ZERO;
@@ -46,11 +49,10 @@ export function updateNativeTokenPriceInUSD(): Token {
 }
 
 /**
- * Search through graph to find derived Native Token token.
- * @todo update to be derived Native Token (add stablecoin estimates)
+ * This derives the price of a token in USD using pools where it is paired with a whitelisted token and pair is above the minimum liquidity threshold (helps prevent bad pricing).
+ * You can find the possible whitelisted tokens used for comparision in the network configuration typescript file.
  **/
-
-export function findNativeTokenPerToken(
+export function findUSDPricePerToken(
   token: Token,
   nativeToken: Token
 ): BigDecimal {

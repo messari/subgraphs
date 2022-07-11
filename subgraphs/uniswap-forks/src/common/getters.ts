@@ -47,7 +47,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.network = NetworkConfigs.getNetwork();
     protocol.type = ProtocolType.EXCHANGE;
-    protocol.totalPoolCount = 0;
+    protocol.totalPoolCount = INT_ZERO;
 
     protocol.save();
   }
