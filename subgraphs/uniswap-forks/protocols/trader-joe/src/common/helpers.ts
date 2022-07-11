@@ -2,6 +2,7 @@ import { Address, ethereum, BigInt, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../configurations/configure";
 import { MasterChefV2TraderJoe } from "../../../../generated/MasterChefV2/MasterChefV2TraderJoe";
 import {
+  LiquidityPool,
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../generated/schema";
@@ -10,6 +11,7 @@ import {
   BIGINT_ZERO,
   MasterChef,
 } from "../../../../src/common/constants";
+import { getOrCreateRewardToken } from "../../../../src/common/getters";
 
 export function createMasterChefStakingPool(
   event: ethereum.Event,
@@ -26,6 +28,14 @@ export function createMasterChefStakingPool(
   masterChefPool.poolAllocPoint = BIGINT_ZERO;
   masterChefPool.lastRewardBlock = event.block.number;
   log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
+
+  let pool = LiquidityPool.load(masterChefPool.poolAddress!);
+  if (pool) {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
+    pool.save();
+  }
 
   masterChefPool.save();
 
