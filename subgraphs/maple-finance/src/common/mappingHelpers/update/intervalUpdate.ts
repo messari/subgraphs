@@ -15,124 +15,119 @@ import {
 import { getOrCreateRewardToken, getOrCreateToken } from "../getOrCreate/supporting";
 
 function intervalUpdateMplReward(event: ethereum.Event, mplReward: _MplReward): void {
-    if (mplReward.lastUpdatedBlockNumber != event.block.number) {
-        const rewardActive = event.block.timestamp < mplReward.periodFinishedTimestamp;
-        if (rewardActive) {
-            mplReward.rewardTokenEmissionAmountPerDay = mplReward.rewardRatePerSecond.times(SEC_PER_DAY);
-        } else {
-            mplReward.rewardTokenEmissionAmountPerDay = ZERO_BI;
-        }
-
-        mplReward.lastUpdatedBlockNumber = event.block.number;
-        mplReward.save();
+    const rewardActive = event.block.timestamp < mplReward.periodFinishedTimestamp;
+    if (rewardActive) {
+        mplReward.rewardTokenEmissionAmountPerDay = mplReward.rewardRatePerSecond.times(SEC_PER_DAY);
+    } else {
+        mplReward.rewardTokenEmissionAmountPerDay = ZERO_BI;
     }
+
+    mplReward.lastUpdatedBlockNumber = event.block.number;
+    mplReward.save();
 }
 
 function intervalUpdateStakeLocker(event: ethereum.Event, stakeLocker: _StakeLocker): void {
-    if (stakeLocker.lastUpdatedBlockNumber != event.block.number) {
-        const market = getOrCreateMarket(event, Address.fromString(stakeLocker.market));
-        const stakeToken = getOrCreateToken(Address.fromString(stakeLocker.stakeToken));
-        stakeLocker.stakeTokenBalance = stakeLocker.cumulativeStake
-            .minus(stakeLocker.cumulativeUnstake)
-            .minus(stakeLocker.cumulativeLosses);
+    const market = getOrCreateMarket(event, Address.fromString(stakeLocker.market));
+    const stakeToken = getOrCreateToken(Address.fromString(stakeLocker.stakeToken));
+    const unrecognizedLosses = stakeLocker.cumulativeLosses.minus(stakeLocker.recognizedLosses);
+    stakeLocker.stakeTokenBalance = stakeLocker.cumulativeStake
+        .minus(stakeLocker.cumulativeUnstake)
+        .minus(unrecognizedLosses);
 
-        stakeLocker.stakeTokenBalanceUSD = getBptTokenAmountInUSD(event, stakeToken, stakeLocker.stakeTokenBalance);
+    stakeLocker.stakeTokenBalanceUSD = getBptTokenAmountInUSD(event, stakeToken, stakeLocker.stakeTokenBalance);
 
-        const poolLibContract = PoolLib.bind(MAPLE_POOL_LIB_ADDRESS);
-        stakeLocker.stakeTokenSwapOutBalanceInPoolInputTokens = readCallResult(
-            poolLibContract.try_getSwapOutValueLocker(
-                Address.fromString(stakeLocker.stakeToken),
-                Address.fromString(market.inputToken),
-                Address.fromString(stakeLocker.id)
-            ),
-            ZERO_BI,
-            poolLibContract.try_getSwapOutValueLocker.name
-        );
+    const poolLibContract = PoolLib.bind(MAPLE_POOL_LIB_ADDRESS);
+    stakeLocker.stakeTokenSwapOutBalanceInPoolInputTokens = readCallResult(
+        poolLibContract.try_getSwapOutValueLocker(
+            Address.fromString(stakeLocker.stakeToken),
+            Address.fromString(market.inputToken),
+            Address.fromString(stakeLocker.id)
+        ),
+        ZERO_BI,
+        poolLibContract.try_getSwapOutValueLocker.name
+    );
 
-        stakeLocker.lastUpdatedBlockNumber = event.block.number;
-        stakeLocker.save();
-    }
+    stakeLocker.lastUpdatedBlockNumber = event.block.number;
+    stakeLocker.save();
 }
 
 function intervalUpdateMarket(event: ethereum.Event, market: Market): Market {
-    if (market._lastUpdatedBlockNumber != event.block.number) {
-        const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
-        const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
-        const outputToken = getOrCreateToken(Address.fromString(market.outputToken));
-        const lpMplReward = market._mplRewardMplLp
-            ? getOrCreateMplReward(event, Address.fromString(<string>market._mplRewardMplLp))
-            : null;
-        const stakeMplReward = market._mplRewardMplStake
-            ? getOrCreateMplReward(event, Address.fromString(<string>market._mplRewardMplStake))
-            : null;
+    const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
+    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+    const outputToken = getOrCreateToken(Address.fromString(market.outputToken));
+    const lpMplReward = market._mplRewardMplLp
+        ? getOrCreateMplReward(event, Address.fromString(<string>market._mplRewardMplLp))
+        : null;
+    const stakeMplReward = market._mplRewardMplStake
+        ? getOrCreateMplReward(event, Address.fromString(<string>market._mplRewardMplStake))
+        : null;
 
-        market._totalDepositBalance = market._cumulativeDeposit
-            .minus(market._cumulativeWithdraw)
-            .minus(market._cumulativePoolLosses);
+    market._totalDepositBalance = market._cumulativeDeposit
+        .minus(market._cumulativeWithdraw)
+        .minus(market._cumulativePoolLosses);
 
-        market._totalInterestBalance = market._cumulativeInterest.minus(market._cumulativeInterestClaimed);
+    market._totalInterestBalance = market._cumulativeInterest.minus(market._cumulativeInterestClaimed);
 
-        market.inputTokenBalance = market._totalDepositBalance.plus(market._totalInterestBalance);
+    market.inputTokenBalance = market._totalDepositBalance.plus(market._totalInterestBalance);
 
-        market.outputTokenSupply = bigDecimalToBigInt(
-            market._totalDepositBalance.toBigDecimal().div(market._initialExchangeRate)
-        );
+    market.outputTokenSupply = bigDecimalToBigInt(
+        market._totalDepositBalance.toBigDecimal().div(market._initialExchangeRate)
+    );
 
-        market._cumulativeLiquidate = stakeLocker.cumulativeLossesInPoolInputToken.plus(market._cumulativePoolLosses);
+    market._cumulativeLiquidate = stakeLocker.cumulativeLossesInPoolInputToken.plus(market._cumulativePoolLosses);
 
-        market._totalBorrowBalance = market._cumulativeBorrow
-            .minus(market._cumulativePrincipalRepay)
-            .minus(market._cumulativeLiquidate);
+    market._totalBorrowBalance = market._cumulativeBorrow
+        .minus(market._cumulativePrincipalRepay)
+        .minus(market._cumulativeLiquidate);
 
-        if (market.outputTokenSupply.gt(ZERO_BI)) {
-            market.exchangeRate = market.inputTokenBalance.toBigDecimal().div(market.outputTokenSupply.toBigDecimal());
-        }
-
-        market.inputTokenPriceUSD = getTokenPriceInUSD(event, inputToken);
-
-        market.outputTokenPriceUSD = market.inputTokenPriceUSD
-            .times(powBigDecimal(TEN_BD, outputToken.decimals - inputToken.decimals))
-            .times(market.exchangeRate);
-
-        const inputTokenBalanceUSD = getTokenAmountInUSD(event, inputToken, market.inputTokenBalance);
-        market.totalValueLockedUSD = stakeLocker.stakeTokenBalanceUSD.plus(inputTokenBalanceUSD);
-
-        market.totalDepositBalanceUSD = getTokenAmountInUSD(event, inputToken, market._totalDepositBalance);
-
-        market.totalBorrowBalanceUSD = getTokenAmountInUSD(event, inputToken, market._totalBorrowBalance);
-
-        market._cumulativeTotalRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(
-            market._cumulativeSupplySideRevenueUSD
-        );
-
-        let rewardTokenEmissionAmount = new Array<BigInt>();
-        let rewardTokenEmissionUSD = new Array<BigDecimal>();
-        for (let i = 0; i < market.rewardTokens.length; i++) {
-            let tokenEmission = ZERO_BI;
-            let tokenEmissionUSD = ZERO_BD;
-            const rewardToken = getOrCreateRewardToken(Address.fromString(market.rewardTokens[i]));
-            const rewardTokenToken = getOrCreateToken(Address.fromString(rewardToken.token));
-
-            if (lpMplReward && (<_MplReward>lpMplReward).rewardToken == rewardToken.id) {
-                tokenEmission = tokenEmission.plus((<_MplReward>lpMplReward).rewardTokenEmissionAmountPerDay);
-            }
-
-            if (stakeMplReward && (<_MplReward>stakeMplReward).rewardToken == rewardToken.id) {
-                tokenEmission = tokenEmission.plus((<_MplReward>stakeMplReward).rewardTokenEmissionAmountPerDay);
-            }
-
-            tokenEmissionUSD = getTokenAmountInUSD(event, rewardTokenToken, tokenEmission);
-
-            rewardTokenEmissionAmount.push(tokenEmission);
-            rewardTokenEmissionUSD.push(tokenEmissionUSD);
-        }
-        market.rewardTokenEmissionsAmount = rewardTokenEmissionAmount;
-        market.rewardTokenEmissionsUSD = rewardTokenEmissionUSD;
-
-        market._lastUpdatedBlockNumber = event.block.number;
-
-        market.save();
+    if (market.outputTokenSupply.gt(ZERO_BI)) {
+        market.exchangeRate = market.inputTokenBalance.toBigDecimal().div(market.outputTokenSupply.toBigDecimal());
     }
+
+    market.inputTokenPriceUSD = getTokenPriceInUSD(event, inputToken);
+
+    market.outputTokenPriceUSD = market.inputTokenPriceUSD
+        .times(powBigDecimal(TEN_BD, outputToken.decimals - inputToken.decimals))
+        .times(market.exchangeRate);
+
+    const inputTokenBalanceUSD = getTokenAmountInUSD(event, inputToken, market.inputTokenBalance);
+    market.totalValueLockedUSD = stakeLocker.stakeTokenBalanceUSD.plus(inputTokenBalanceUSD);
+
+    market.totalDepositBalanceUSD = getTokenAmountInUSD(event, inputToken, market._totalDepositBalance);
+
+    market.totalBorrowBalanceUSD = getTokenAmountInUSD(event, inputToken, market._totalBorrowBalance);
+
+    market._cumulativeTotalRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(
+        market._cumulativeSupplySideRevenueUSD
+    );
+
+    let rewardTokenEmissionAmount = new Array<BigInt>();
+    let rewardTokenEmissionUSD = new Array<BigDecimal>();
+    for (let i = 0; i < market.rewardTokens.length; i++) {
+        let tokenEmission = ZERO_BI;
+        let tokenEmissionUSD = ZERO_BD;
+        const rewardToken = getOrCreateRewardToken(Address.fromString(market.rewardTokens[i]));
+        const rewardTokenToken = getOrCreateToken(Address.fromString(rewardToken.token));
+
+        if (lpMplReward && (<_MplReward>lpMplReward).rewardToken == rewardToken.id) {
+            tokenEmission = tokenEmission.plus((<_MplReward>lpMplReward).rewardTokenEmissionAmountPerDay);
+        }
+
+        if (stakeMplReward && (<_MplReward>stakeMplReward).rewardToken == rewardToken.id) {
+            tokenEmission = tokenEmission.plus((<_MplReward>stakeMplReward).rewardTokenEmissionAmountPerDay);
+        }
+
+        tokenEmissionUSD = getTokenAmountInUSD(event, rewardTokenToken, tokenEmission);
+
+        rewardTokenEmissionAmount.push(tokenEmission);
+        rewardTokenEmissionUSD.push(tokenEmissionUSD);
+    }
+    market.rewardTokenEmissionsAmount = rewardTokenEmissionAmount;
+    market.rewardTokenEmissionsUSD = rewardTokenEmissionUSD;
+
+    market._lastUpdatedBlockNumber = event.block.number;
+
+    market.save();
 
     return market;
 }
@@ -264,21 +259,19 @@ export function intervalUpdate(event: ethereum.Event, market: Market): void {
     intervalUpdateMarket(event, marketAfter);
 
     // If market hasn't already been updated this block
-    if (market._lastUpdatedBlockNumber != event.block.number) {
-        ////
-        // Interval update protocol
-        ////
-        intervalUpdateProtocol(event, market, marketAfter);
+    ////
+    // Interval update protocol
+    ////
+    intervalUpdateProtocol(event, market, marketAfter);
 
-        ////
-        // Interval update market snapshots
-        ////
-        intervalUpdateMarketHourlySnapshot(event, market);
-        intervalUpdateMarketDailySnapshot(event, market);
+    ////
+    // Interval update market snapshots
+    ////
+    intervalUpdateMarketHourlySnapshot(event, market);
+    intervalUpdateMarketDailySnapshot(event, market);
 
-        ////
-        // Interval update financials snapshot
-        ////
-        intervalUpdateFinancialsDailySnapshot(event);
-    }
+    ////
+    // Interval update financials snapshot
+    ////
+    intervalUpdateFinancialsDailySnapshot(event);
 }

@@ -647,6 +647,9 @@ type Market @entity {
     " Sum of all historical pool losses in market input tokens "
     _cumulativePoolLosses: BigInt!
 
+    " Sum of all pool losses that have been recognized in market input tokens "
+    _recognizedPoolLosses: BigInt!
+
     " Sum of all historical pool delegate revenue in market input tokens "
     _cumulativePoolDelegateRevenue: BigInt!
 
@@ -1178,6 +1181,9 @@ type _StakeLocker @entity {
     " Cumulative losses in stakeToken sustained by the pool "
     cumulativeLosses: BigInt!
 
+    " Recognized losses in stakeTokens "
+    recognizedLosses: BigInt!
+
     " Cumulative losses in pool input tokens sustained by the pool "
     cumulativeLossesInPoolInputToken: BigInt!
 
@@ -1400,9 +1406,6 @@ type _AccountMarket @entity {
 
     " Market the account is connected to "
     market: Market!
-
-    " Unrecognized losses in the markets input token "
-    unrecognizedLosses: BigInt!
 
     " Recognized losses in the markets input token "
     recognizedLosses: BigInt!
