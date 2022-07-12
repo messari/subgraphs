@@ -98,10 +98,14 @@ templates:
         - Pool
         - PoolRewards
       abis:
-        - name: BaseRewardPool
-          file: ./abis/Ethereum/BaseRewardPool.json
+        - name: Booster
+          file: ./abis/Ethereum/Booster.json
         - name: ERC20
           file: ./abis/Ethereum/ERC20.json
+        - name: Pool
+          file: ./abis/Ethereum/Pool.json
+        - name: BaseRewardPool
+          file: ./abis/Ethereum/BaseRewardPool.json
         
         ###########################################
         ############## Price Oracle ###############
