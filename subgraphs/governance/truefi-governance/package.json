@@ -1,0 +1,16 @@
+{
+  "name": "truefi-governance",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ danielkhoo/truefi-governance",
+    "create-local": "graph create --node http://localhost:8020/ danielkhoo/truefi-governance",
+    "remove-local": "graph remove --node http://localhost:8020/ danielkhoo/truefi-governance",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 danielkhoo/truefi-governance"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.32.0",
+    "@graphprotocol/graph-ts": "0.27.0"
+  }
+}
