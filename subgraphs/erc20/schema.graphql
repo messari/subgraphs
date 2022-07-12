@@ -18,11 +18,11 @@ type Token @entity {
   " The number of decimal places this token uses, default to 18 "
   decimals: Int!
 
-  " Token flags"
-  flags: [String!]!
+  " Total number of unique token holders who are currently holding more the token "
+  currentHolderCount: BigInt!
 
-  " Number of unique token holders "
-  holderCount: BigInt!
+  " Total number of cumulative unique token holders who held or are holding the token "
+  cumulativeHolderCount: BigInt!
 
   " Total number of token transfer events "
   transferCount: BigInt!
@@ -52,7 +52,6 @@ type Token @entity {
 
   " Daily snapshot for this token "
   dailyTokenSnapshot: [TokenDailySnapshot!]! @derivedFrom(field: "token")
-
 }
 
 ###############################
@@ -69,14 +68,11 @@ type TokenDailySnapshot @entity {
   " Daily total Supply of the token "
   dailyTotalSupply: BigDecimal!
 
-  " number of accounts holding this token "
+  " number of accounts holding the token "
   dailyHolderCount: BigInt!
 
-  " number of unique daily active users/holders "
-  dailyActiveUsers: BigInt!
-
-  " number of cumulative unique users/holders "
-  cumulativeUniqueUsers: BigInt!
+  " number of cumulative unique holders "
+  cumulativeHolderCount: BigInt!
 
   " Total number of events occurred in a day "
   dailyEventCount: Int!
@@ -119,11 +115,8 @@ type TokenHourlySnapshot @entity {
   " number of accounts holding this token "
   hourlyHolderCount: BigInt!
 
-  " number of unique hourly active users "
-  hourlyActiveUsers: BigInt!
-
-  " number of cumulative unique users "
-  cumulativeUniqueUsers: BigInt!
+  " number of cumulative unique holders "
+  cumulativeHolderCount: BigInt!
 
   " Total number of events occurred in an hour "
   hourlyEventCount: Int!
@@ -237,7 +230,8 @@ type Account @entity {
   balances: [AccountBalance!]! @derivedFrom(field: "account")
 
   " Token balances snapshot that this account holds "
-  balancesSnapshot: [AccountBalanceDailySnapshot!]! @derivedFrom(field: "account")
+  balancesSnapshot: [AccountBalanceDailySnapshot!]!
+    @derivedFrom(field: "account")
 }
 
 type AccountBalance @entity {

@@ -5,8 +5,7 @@ features:
 schema:
   file: ./schema.graphql
 dataSources:
-  # This approach uses a particular event emitted once very early to trigger the initial erc20 token
-  # list.
+  # This approach uses a particular event emitted once very early to trigger the initial erc20 token list.
   - kind: ethereum
     name: TokenRegistry
     network: mainnet
