@@ -38,7 +38,6 @@ export function updateMasterChefDeposit(
     pool.rewardTokens = [
       getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
     ];
-    pool.save();
   }
 
   // Get the amount of Joe tokens emitted for all pools per second.
@@ -111,7 +110,6 @@ export function updateMasterChefWithdraw(
     pool.rewardTokens = [
       getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
     ];
-    pool.save();
   }
 
   if (masterChefV3.lastUpdatedRewardRate != event.block.number) {

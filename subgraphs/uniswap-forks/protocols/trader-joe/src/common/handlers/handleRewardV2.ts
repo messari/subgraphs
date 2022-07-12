@@ -36,7 +36,6 @@ export function updateMasterChefDeposit(
     pool.rewardTokens = [
       getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
     ];
-    pool.save();
   }
 
   let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
@@ -99,7 +98,6 @@ export function updateMasterChefWithdraw(
     pool.rewardTokens = [
       getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
     ];
-    pool.save();
   }
 
   let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
