@@ -51,7 +51,8 @@ export function handleLogPoolAddition(event: LogPoolAddition): void {
   let masterchef = getOrCreateMasterChef(event, MasterChef.MINICHEF);
   if (masterchef.lastUpdatedRewardRate == BIGINT_ZERO) {
     masterchef.lastUpdatedRewardRate = event.block.number;
-    masterchef.adjustedRewardTokenRate = MiniChefSushiswap.sushiPerSecond();
+    let miniChefV2Contract = MiniChefSushiswap.bind(event.address);
+    masterchef.adjustedRewardTokenRate = miniChefV2Contract.sushiPerSecond();
     masterchef.save();
   }
   updateMasterChefTotalAllocation(
