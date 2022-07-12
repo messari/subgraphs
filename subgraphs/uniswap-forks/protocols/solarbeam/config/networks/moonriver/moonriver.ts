@@ -50,19 +50,19 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
     );
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("2.5");
+    return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.5");
+    return BigDecimal.fromString("0.05");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("2.0");
+    return BigDecimal.fromString("0.20");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("2.5");
+    return BigDecimal.fromString("0.25");
   }
   getFeeOnOff(): string {
     return FeeSwitch.ON;
