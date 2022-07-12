@@ -230,6 +230,16 @@
         }
       }
     },
+    "arrakis-finance":{
+      "arrakis-finance": {
+        "mainnet": {
+          "template": "arrakis.finance.template.yaml",
+          "messari": "messari/arrakis-finance-ethereum",
+          "loc": "l0c4t0r/laboratory4",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "convex-finance": {
       "convex-finance": {
         "mainnet": {
