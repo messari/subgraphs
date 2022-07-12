@@ -34,44 +34,56 @@ export function updateConvexRewardToken(
   const convexTokenContract = ERC20Contract.bind(
     constants.CONVEX_TOKEN_ADDRESS
   );
-
   let cvxTokenDecimals = utils.getTokenDecimals(constants.CONVEX_TOKEN_ADDRESS);
   let cvxTokenSupply = utils
     .readValue<BigInt>(
       convexTokenContract.try_totalSupply(),
       constants.BIGINT_ZERO
     )
-    .toBigDecimal()
-    .div(cvxTokenDecimals);
+    .toBigDecimal();
 
   let currentCliff = cvxTokenSupply.div(constants.CVX_CLIFF_SIZE);
 
-  let cvxRewardPerDay: BigDecimal = constants.BIGDECIMAL_ZERO;
-  if (currentCliff.lt(constants.CVX_CLIFF_COUNT)) {
-    let remaining = constants.CVX_CLIFF_COUNT.minus(currentCliff);
+  let cvxRewardRate: BigDecimal = constants.BIGDECIMAL_ZERO;
+  if (currentCliff.lt(constants.CVX_CLIFF_COUNT.times(cvxTokenDecimals))) {
+    let remaining = constants.CVX_CLIFF_COUNT.times(cvxTokenDecimals).minus(
+      currentCliff
+    );
 
-    cvxRewardPerDay = crvRewardPerDay
+    cvxRewardRate = crvRewardPerDay
       .toBigDecimal()
       .times(remaining)
-      .div(constants.CVX_CLIFF_COUNT);
+      .div(constants.CVX_CLIFF_COUNT.times(cvxTokenDecimals));
 
-    let amountTillMax = constants.CVX_MAX_SUPPLY.minus(cvxTokenSupply);
-    if (cvxRewardPerDay.gt(amountTillMax)) {
-      cvxRewardPerDay = amountTillMax;
+    let amountTillMax = constants.CVX_MAX_SUPPLY.times(cvxTokenDecimals).minus(
+      cvxTokenSupply
+    );
+    if (cvxRewardRate.gt(amountTillMax)) {
+      cvxRewardRate = amountTillMax;
     }
   }
+
+  let cvxRewardRatePerDay = getRewardsPerDay(
+    block.timestamp,
+    block.number,
+    cvxRewardRate,
+    constants.RewardIntervalType.TIMESTAMP
+  );
+  let cvxRewardPerDay = BigInt.fromString(
+    cvxRewardRatePerDay.truncate(0).toString()
+  );
 
   updateRewardTokenEmissions(
     poolId,
     constants.CONVEX_TOKEN_ADDRESS,
-    BigInt.fromString(cvxRewardPerDay.toString()),
+    cvxRewardPerDay,
     block
   );
 
-  log.warning("[CVX_Rewards] poolId: {}, RewardRate: {}", [
-    poolId.toString(),
-    cvxRewardPerDay.toString(),
-  ]);
+  log.warning(
+    "[CVX_Rewards] poolId: {}, cvxRewardRate: {}, cvxRewardPerDay: {}",
+    [poolId.toString(), cvxRewardRate.toString(), cvxRewardPerDay.toString()]
+  );
 }
 
 export function updateRewardToken(
@@ -91,6 +103,10 @@ export function updateRewardToken(
     constants.BIGINT_ZERO
   );
 
+  if (rewardToken.equals(constants.CRV_TOKEN_ADDRESS)) {
+    updateConvexRewardToken(poolId, rewardRate, block);
+  }
+
   let rewardRatePerDay = getRewardsPerDay(
     block.timestamp,
     block.number,
@@ -98,10 +114,6 @@ export function updateRewardToken(
     constants.RewardIntervalType.TIMESTAMP
   );
   let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
-
-  if (rewardToken.equals(constants.CRV_TOKEN_ADDRESS)) {
-    updateConvexRewardToken(poolId, rewardPerDay, block);
-  }
 
   updateRewardTokenEmissions(poolId, rewardToken, rewardPerDay, block);
 
@@ -127,32 +139,43 @@ export function updateExtraRewardTokens(
   );
 
   for (let i = 0; i < extraRewardTokensLength.toI32(); i += 1) {
-    let extraRewardToken = utils.readValue<Address>(
+    let extraRewardPoolAddress = utils.readValue<Address>(
       rewardsContract.try_extraRewards(BigInt.fromI32(i)),
       constants.NULL.TYPE_ADDRESS
     );
 
-    let rewardRate = utils.readValue<BigInt>(
-      rewardsContract.try_rewards(extraRewardToken),
+    const extraRewardContract = RewardPoolContract.bind(extraRewardPoolAddress);
+
+    let extraRewardTokenAddress = utils.readValue<Address>(
+      extraRewardContract.try_rewardToken(),
+      constants.NULL.TYPE_ADDRESS
+    );
+    let extraTokenRewardRate = utils.readValue<BigInt>(
+      extraRewardContract.try_rewardRate(),
       constants.BIGINT_ZERO
     );
 
     let rewardRatePerDay = getRewardsPerDay(
       block.timestamp,
       block.number,
-      rewardRate.toBigDecimal(),
+      extraTokenRewardRate.toBigDecimal(),
       constants.RewardIntervalType.TIMESTAMP
     );
 
     let rewardPerDay = BigInt.fromString(rewardRatePerDay.toString());
 
-    updateRewardTokenEmissions(poolId, extraRewardToken, rewardPerDay, block);
+    updateRewardTokenEmissions(
+      poolId,
+      extraRewardTokenAddress,
+      rewardPerDay,
+      block
+    );
 
     log.warning(
       "[ExtraRewards] poolId: {}, ExtraRewardToken: {}, RewardRate: {}",
       [
         poolId.toString(),
-        extraRewardToken.toHexString(),
+        extraRewardTokenAddress.toHexString(),
         rewardRatePerDay.toString(),
       ]
     );

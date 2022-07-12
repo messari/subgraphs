@@ -42,9 +42,9 @@ export function handleRewardAdded(event: RewardAdded): void {
     .toBigDecimal();
 
   let totalFeesConvex = getTotalFees();
-  let totalRewardsEarned = rewardsEarned.div(
-    constants.BIGDECIMAL_ONE.minus(totalFeesConvex.totalFees())
-  );
+  let totalRewardsEarned = rewardsEarned
+    .div(constants.BIGDECIMAL_ONE.minus(totalFeesConvex.totalFees()))
+    .truncate(0);
 
   let lockFee = totalRewardsEarned.times(totalFeesConvex.lockIncentive); // incentive to crv stakers
   let callFee = totalRewardsEarned.times(totalFeesConvex.callIncentive); // incentive to users who spend gas to make calls
@@ -53,18 +53,22 @@ export function handleRewardAdded(event: RewardAdded): void {
 
   let supplySideRevenue = rewardsEarned
     .plus(lockFee)
-    .div(crvRewardTokenDecimals);
+    .div(crvRewardTokenDecimals)
+    .truncate(0);
   const supplySideRevenueUSD = supplySideRevenue
     .times(crvRewardTokenPrice.usdPrice)
-    .div(crvRewardTokenPrice.decimalsBaseTen);
+    .div(crvRewardTokenPrice.decimalsBaseTen)
+    .truncate(1);
 
   let protocolSideRevenue = stakerFee
     .plus(callFee)
     .plus(platformFee)
-    .div(crvRewardTokenDecimals);
+    .div(crvRewardTokenDecimals)
+    .truncate(0);
   const protocolSideRevenueUSD = protocolSideRevenue
     .times(crvRewardTokenPrice.usdPrice)
-    .div(crvRewardTokenPrice.decimalsBaseTen);
+    .div(crvRewardTokenPrice.decimalsBaseTen)
+    .truncate(1);
 
   rewardPoolInfo.historicalRewards = afterHistoricalRewards;
   rewardPoolInfo.lastRewardTimestamp = event.block.timestamp;
@@ -79,7 +83,7 @@ export function handleRewardAdded(event: RewardAdded): void {
   updateRewardToken(poolId, crvRewardPoolAddress, event.block);
 
   log.warning(
-    "crvRewardPool: {}, totalRewardsEarned: {}, crvRewardsEarned: {}, supplySideRevenue: {}, supplySideRevenueUSD: {}, protocolSideRevenue: {}, protocolSideRevenueUSD: {}, TxHash: {}",
+    "[RewardAdded] Pool: {}, totalRewardsEarned: {}, crvRewardsEarned: {}, supplySideRevenue: {}, supplySideRevenueUSD: {}, protocolSideRevenue: {}, protocolSideRevenueUSD: {}, TxHash: {}",
     [
       crvRewardPoolAddress.toHexString(),
       totalRewardsEarned.toString(),
