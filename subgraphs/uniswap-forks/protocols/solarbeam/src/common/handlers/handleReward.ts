@@ -67,7 +67,6 @@ export function handleReward(
     pool.rewardTokens = [
       getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
     ];
-    pool.save();
   }
 
   // Update staked amounts
