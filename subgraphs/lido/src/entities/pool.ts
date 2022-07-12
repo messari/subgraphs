@@ -19,8 +19,8 @@ export function getOrCreatePool(
     pool.name = "Liquid Staked Ether 2.0";
     pool.symbol = "stETH";
     pool.protocol = protocol.id;
-    pool.createdTimestamp = blockNumber;
-    pool.createdBlockNumber = blockTimestamp;
+    pool.createdTimestamp = blockTimestamp;
+    pool.createdBlockNumber = blockNumber;
 
     // Tokens
     pool.inputTokens = [

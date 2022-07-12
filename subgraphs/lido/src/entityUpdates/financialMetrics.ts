@@ -303,7 +303,6 @@ export function getOrCreatePoolsDailySnapshot(
     poolMetrics.inputTokenBalances = [BIGINT_ZERO];
     poolMetrics.outputTokenSupply = BIGINT_ZERO;
     poolMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    poolMetrics.stakedOutputTokenAmount = BIGINT_ZERO;
   }
 
   // Set block number and timestamp to the latest for snapshots
@@ -338,7 +337,6 @@ export function getOrCreatePoolsHourlySnapshot(
     poolMetrics.inputTokenBalances = [BIGINT_ZERO];
     poolMetrics.outputTokenSupply = BIGINT_ZERO;
     poolMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    poolMetrics.stakedOutputTokenAmount = BIGINT_ZERO;
   }
 
   // Set block number and timestamp to the latest for snapshots

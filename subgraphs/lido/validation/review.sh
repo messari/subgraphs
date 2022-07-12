@@ -11,8 +11,8 @@ EPOCH_TOMORROW=`gdate --date "$ZULU_TT_TODAY + 1 day" +%s`
 printf "\n[+] Timestamps................"
 printf "\n...Input Timestamp: $1"
 printf "\n...Zulu (Input): $ZULU_TODAY"
-printf "\n...Zulu Timestamp for Token Terminal: $ZULU_TT_TODAY"
-printf "\n...Zulu Timestamp for Token Terminal: $ZULU_TT_TOMOROW"
+printf "\n...Zulu Today Timestamp for Token Terminal: $ZULU_TT_TODAY"
+printf "\n...Zulu Tomorrow Timestamp for Token Terminal: $ZULU_TT_TOMOROW"
 printf "\n...Epoch Timestamp for Subgraph Query: $EPOCH_TODAY"
 printf "\n...Epoch +1 day Timestamp for Subgraph Query: $EPOCH_TOMORROW"
 
@@ -60,7 +60,7 @@ cat << EOF > query.json
                 blockNumber
                 timestamp
             }
-            hourlyUsageMetrics (where: {timestamp_gt: $EPOCH_TODAY, timestamp_lt: $EPOCH_TOMORROW }) { 
+            hourlyUsageMetrics (orderBy: id, orderDirection: desc, first: 1, where: {timestamp_gt: $EPOCH_TODAY, timestamp_lt: $EPOCH_TOMORROW }) { 
                 id
                 hourlyActiveUsers
                 cumulativeUniqueUsers
@@ -139,15 +139,19 @@ for each in "${@:3}"; do
     printf "\n ......getting... $each\n"
     curl -s -L -H "Content-Type: application/json" -X POST -d @query.json $2 | \
         jq --arg param "$each" -r ".[].protocols[] | \
-            .$each, \
-            .financialMetrics[].$each, \
-            .dailyUsageMetrics[].$each, \
-            .hourlyUsageMetrics[].$each, \
-            .pools[].$each, \
-            .pools[].dailySnapshots[].$each, \
-            .pools[].hourlySnapshots[].$each" | \
-        grep -v null
+            {\"protocol.$each\": .$each, \
+            \"financialMetrics[].$each\": .financialMetrics[].$each, \
+            \"pools[].$each\": .pools[].$each, \
+            \"pools[].dailySnapshots[].$each\": .pools[].dailySnapshots[].$each, \
+            \"pools[].hourlySnapshots[].$each\": .pools[].hourlySnapshots[].$each}"
+
 done
+
+printf "\n ......getting usage metrics... \n"
+curl -s -L -H "Content-Type: application/json" -X POST -d @query.json $2 | \
+    jq ".[].protocols[] | .dailyUsageMetrics[], .hourlyUsageMetrics[]"
+        # {\".dailyUsageMetrics\": .dailyUsageMetrics[], \
+        # \".hourlyUsageMetrics\": .hourlyUsageMetrics[]}"
 
 
 # Print tokenterminal metrics
