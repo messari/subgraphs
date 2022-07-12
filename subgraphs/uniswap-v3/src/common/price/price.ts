@@ -96,7 +96,11 @@ export function updateNativeTokenPriceInUSD(): Token {
       }
     }
   }
-  if (stableAmount.notEqual(BIGDECIMAL_ZERO)) {
+
+  if (
+    stableAmount.notEqual(BIGDECIMAL_ZERO) &&
+    largestPool.tokenPrices[tokenIndicator]
+  ) {
     nativeToken.lastPriceUSD = largestPool.tokenPrices[tokenIndicator];
   }
 

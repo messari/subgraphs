@@ -78,6 +78,7 @@ export function populateEmptyPools(event: ethereum.Event): void {
 
     poolAmounts.inputTokens = [token0.id, token1.id];
     poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+    poolAmounts.tokenPrices = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
     // populate the TVL by call contract balanceOf
     let token0Contract = ERC20.bind(

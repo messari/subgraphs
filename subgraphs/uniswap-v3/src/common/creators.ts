@@ -96,6 +96,7 @@ export function createLiquidityPool(
 
   poolAmounts.inputTokens = [token0.id, token1.id];
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  poolAmounts.tokenPrices = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   // Used to track the number of deposits in a liquidity pool
   let poolDeposits = new _HelperStore(poolAddress);
