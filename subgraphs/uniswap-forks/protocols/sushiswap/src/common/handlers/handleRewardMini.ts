@@ -5,11 +5,10 @@ import {
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { INT_ZERO } from "../../../../../src/common/constants";
+import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
-import { MasterChef } from "../constants";
 import { getOrCreateMasterChef } from "../helpers";
 
 // Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.

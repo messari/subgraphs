@@ -1,35 +1,69 @@
 import {
-  Deposit as DepositEventV2,
-  Withdraw as WithdrawEventV2,
-  EmergencyWithdraw as EmergencyWithdrawV2,
-} from "../../../../../generated/MasterChefV2/MasterChefV2Spookyswap";
-import { _HelperStore } from "../../../../../generated/schema";
-import { UsageType } from "../../../../../src/common/constants";
-import { handleRewardV2 } from "../../common/handlers/handleRewardV2";
+  Deposit,
+  EmergencyWithdraw,
+  LogPoolAddition,
+  LogSetPool,
+  Withdraw,
+} from "../../../../../generated/MasterChefV2/MasterChefV2Sushiswap";
+import { _MasterChefStakingPool } from "../../../../../generated/schema";
+import {
+  createMasterChefStakingPool,
+  updateMasterChefTotalAllocation,
+} from "../../common/helpers";
+import {
+  updateMasterChefDeposit,
+  updateMasterChefWithdraw,
+} from "../../common/handlers/handleRewardV2";
+import { MasterChef } from "../../../../../src/common/constants";
 
-export function handleDepositV2(event: DepositEventV2): void {
-  handleRewardV2(
-    event,
-    event.params.pid,
-    event.params.amount,
-    UsageType.DEPOSIT
-  );
+// A deposit or stake for the pool specific MasterChef.
+export function handleDeposit(event: Deposit): void {
+  updateMasterChefDeposit(event, event.params.pid, event.params.amount);
 }
 
-export function handleWithdrawV2(event: WithdrawEventV2): void {
-  handleRewardV2(
-    event,
-    event.params.pid,
-    event.params.amount,
-    UsageType.WITHDRAW
-  );
+// A withdraw or unstaking for the pool specific MasterChef.
+export function handleWithdraw(event: Withdraw): void {
+  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
 }
 
-export function handleEmergencyWithdrawV2(event: EmergencyWithdrawV2): void {
-  handleRewardV2(
-    event,
-    event.params.pid,
-    event.params.amount,
-    UsageType.WITHDRAW
-  );
+// A withdraw or unstaking for the pool specific MasterChef.
+export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
+  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
 }
+
+// Handle the addition of a new pool to the MasterChef. New staking pool.
+export function handleLogPoolAddition(event: LogPoolAddition): void {
+  let masterChefPool = createMasterChefStakingPool(
+    event,
+    MasterChef.MASTERCHEFV2,
+    event.params.pid,
+    event.params.lpToken
+  );
+  updateMasterChefTotalAllocation(
+    event,
+    masterChefPool.poolAllocPoint,
+    event.params.allocPoint,
+    MasterChef.MASTERCHEFV2
+  );
+  masterChefPool.poolAllocPoint = event.params.allocPoint;
+  masterChefPool.save();
+}
+
+// Update the allocation points of the pool.
+export function handleLogSetPool(event: LogSetPool): void {
+  let masterChefPool = _MasterChefStakingPool.load(
+    MasterChef.MASTERCHEFV2 + "-" + event.params.pid.toString()
+  )!;
+  updateMasterChefTotalAllocation(
+    event,
+    masterChefPool.poolAllocPoint,
+    event.params.allocPoint,
+    MasterChef.MASTERCHEFV2
+  );
+  masterChefPool.poolAllocPoint = event.params.allocPoint;
+  masterChefPool.save();
+}
+
+// export function handleHarvest(event: Harvest): void {
+//  updateMasterChefHarvest(event, event.params.pid, event.params.amount)
+// }

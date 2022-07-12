@@ -11,6 +11,7 @@ import {
   BIGINT_ONE,
   BIGINT_ZERO,
   INT_ZERO,
+  MasterChef,
   RECENT_BLOCK_THRESHOLD,
   UsageType,
 } from "../../../../../src/common/constants";
@@ -20,7 +21,6 @@ import {
 } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
-import { MasterChef } from "../constants";
 import {
   convertTokenToDecimal,
   roundToWholeNumber,
