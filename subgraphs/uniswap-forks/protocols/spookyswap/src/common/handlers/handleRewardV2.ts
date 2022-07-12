@@ -37,7 +37,6 @@ export function updateMasterChefDeposit(
     pool.rewardTokens = [
       getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
     ];
-    pool.save();
   }
 
   // Get the amount of reward tokens emitted per block at this point in time.
@@ -110,7 +109,6 @@ export function updateMasterChefWithdraw(
     pool.rewardTokens = [
       getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
     ];
-    pool.save();
   }
 
   // Get the amount of reward tokens emitted per block at this point in time.
