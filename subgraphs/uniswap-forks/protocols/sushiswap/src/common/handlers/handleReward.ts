@@ -43,7 +43,6 @@ export function handleReward(
   );
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
-  log.warning("HELLO", []);
   // Check if the liquidity pool address is available. Try to get it if not or return if the contract call was reverted
   if (!masterChefPool.poolAddress) {
     let getPoolInfo = poolContract.try_poolInfo(pid);
@@ -60,7 +59,6 @@ export function handleReward(
       return;
     }
   }
-  log.warning("HELLO1", []);
 
   // If comes back null then it is probably a uniswap v2 pool.
   // MasterChef was used for UniV2 LP tokens before SushiSwap liquidity pools were created.
@@ -74,7 +72,6 @@ export function handleReward(
     pool.save();
   }
 
-  log.warning("HELLO2", []);
   // Update staked amounts
   if (usageType == UsageType.DEPOSIT) {
     pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
