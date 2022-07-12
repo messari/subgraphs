@@ -6,7 +6,6 @@ import {
   Withdraw,
 } from "../../../../../generated/MasterChefV2/MasterChefV2Sushiswap";
 import { _MasterChefStakingPool } from "../../../../../generated/schema";
-import { MasterChef } from "../../common/constants";
 import {
   createMasterChefStakingPool,
   updateMasterChefTotalAllocation,
@@ -15,6 +14,7 @@ import {
   updateMasterChefDeposit,
   updateMasterChefWithdraw,
 } from "../../common/handlers/handleRewardV2";
+import { MasterChef } from "../../../../../src/common/constants";
 
 // A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {

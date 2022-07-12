@@ -6,7 +6,7 @@ import {
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { INT_ZERO } from "../../../../../src/common/constants";
+import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
 import {
   getOrCreateRewardToken,
   getOrCreateToken,
@@ -16,7 +16,6 @@ import {
   convertTokenToDecimal,
   roundToWholeNumber,
 } from "../../../../../src/common/utils/utils";
-import { MasterChef } from "../constants";
 import { getOrCreateMasterChef } from "../helpers";
 
 // Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
@@ -113,14 +112,20 @@ export function updateMasterChefWithdraw(
     ];
   }
 
+  // Get the amount of reward tokens emitted per block at this point in time.
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
-    masterChefV2.adjustedRewardTokenRate = masterchefV2Contract.sushiPerBlock();
+    let getSushiPerBlock = masterchefV2Contract.try_sushiPerBlock();
+    if (!getSushiPerBlock.reverted) {
+      masterChefV2.adjustedRewardTokenRate = getSushiPerBlock.value;
+    }
     masterChefV2.lastUpdatedRewardRate = event.block.number;
   }
 
   let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
+  // Calculate Reward Emission per second to a specific pool
+  // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block.
   let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
     .times(masterChefV2Pool.poolAllocPoint)
     .div(masterChefV2.totalAllocPoint);

@@ -5,7 +5,7 @@ import {
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { INT_ZERO } from "../../../../../src/common/constants";
+import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
 import {
   getOrCreateRewardToken,
   getOrCreateToken,
