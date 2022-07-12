@@ -17,27 +17,37 @@ import {
   BIGDECIMAL_ONE,
   BIGINT_ZERO,
   BIGDECIMAL_TWO,
-  Q192,
   INT_ONE,
   INT_ZERO,
+  Q192,
+  PRECISION,
 } from "../constants";
-import { exponentToBigDecimal, safeDiv } from "../utils/utils";
+import {
+  exponentToBigDecimal,
+  exponentToBigInt,
+  safeDiv,
+} from "../utils/utils";
 import { NetworkConfigs } from "../../../configurations/configure";
 
-// This to get the token prices using their square root price squared divided by 2 ** 192.
+// Divide numbers too large for floating point or BigDecimal
+
 export function sqrtPriceX96ToTokenPrices(
   sqrtPriceX96: BigInt,
   token0: Token,
   token1: Token
 ): BigDecimal[] {
-  let num = sqrtPriceX96.times(sqrtPriceX96).toBigDecimal();
-  let denom = BigDecimal.fromString(Q192.toString());
+  let num = sqrtPriceX96.times(sqrtPriceX96);
+  let denom = Q192;
   let price1 = num
+    .times(PRECISION)
     .div(denom)
-    .times(exponentToBigDecimal(token0.decimals))
-    .div(exponentToBigDecimal(token1.decimals));
+    .times(exponentToBigInt(token0.decimals))
+    .div(exponentToBigInt(token1.decimals))
+    .toBigDecimal()
+    .div(PRECISION.toBigDecimal());
 
   let price0 = safeDiv(BIGDECIMAL_ONE, price1);
+
   return [price0, price1];
 }
 

@@ -94,7 +94,9 @@ export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_192 = BigInt.fromI32(192);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 export const BIGINT_MILLION = BigInt.fromI32(1000000);
-export const BIGINT_MAX = BigInt.fromString("115792089237316195423570985008687907853269984665640564039457584007913129639935");
+export const BIGINT_MAX = BigInt.fromString(
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+);
 export const BIGDECIMAL_NEG_ONE = new BigDecimal(BIGINT_NEG_ONE);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
@@ -105,7 +107,10 @@ export const BIGDECIMAL_192 = new BigDecimal(BIGINT_192);
 export const BIGDECIMAL_TEN_THOUSAND = new BigDecimal(BIGINT_TEN_THOUSAND);
 export const BIGDECIMAL_MILLION = new BigDecimal(BIGINT_MILLION);
 
-export const Q192 = BigDecimal.fromString("6277101735386680763835789423207666416102355444464034512896");
+export const Q192 = BigInt.fromString(
+  "6277101735386680763835789423207666416102355444464034512896"
+);
+export const PRECISION = BigInt.fromString("100000000000000000");
 
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
@@ -117,5 +122,7 @@ export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const SECONDS_PER_HOUR = 60 * 60;
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const MS_PER_YEAR = DAYS_PER_YEAR.times(
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+);
 export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
