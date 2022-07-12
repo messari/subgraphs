@@ -61,6 +61,11 @@ export function handleReward(
   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
+    pool.save();
   }
 
   // Update staked amounts
@@ -168,14 +173,6 @@ function getOrCreateMasterChefStakingPool(
     masterChefPool.poolAllocPoint = BIGINT_ZERO;
     masterChefPool.lastRewardBlock = event.block.number;
     log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
-
-    let pool = LiquidityPool.load(masterChefPool.poolAddress!);
-    if (pool) {
-      pool.rewardTokens = [
-        getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-      ];
-      pool.save();
-    }
 
     masterChefPool.save();
   }

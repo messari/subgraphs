@@ -6,8 +6,6 @@ import {
 } from "../../../../generated/schema";
 import { BIGINT_ONE, BIGINT_ZERO } from "../../../../src/common/constants";
 import { NetworkConfigs } from "../../../../configurations/configure";
-import { MasterChef } from "./constants";
-import { MiniChefSushiswap } from "../../../../generated/MiniChef/MiniChefSushiswap";
 import { getOrCreateRewardToken } from "../../../../src/common/getters";
 
 export function createMasterChefStakingPool(
@@ -51,18 +49,7 @@ export function getOrCreateMasterChef(
     masterChef.totalAllocPoint = BIGINT_ZERO;
     masterChef.rewardTokenInterval = NetworkConfigs.getRewardIntervalType();
     masterChef.rewardTokenRate = NetworkConfigs.getRewardTokenRate();
-    log.warning("MasterChef Type: " + masterChefType, []);
-    if (masterChefType == MasterChef.MINICHEF) {
-      let miniChefV2Contract = MiniChefSushiswap.bind(event.address);
-      masterChef.adjustedRewardTokenRate = miniChefV2Contract.sushiPerSecond();
-      log.warning(
-        "Adjusted Reward Rate: " +
-          masterChef.adjustedRewardTokenRate.toString(),
-        []
-      );
-    } else {
-      masterChef.adjustedRewardTokenRate = BIGINT_ZERO;
-    }
+    masterChef.adjustedRewardTokenRate = BIGINT_ZERO;
     masterChef.lastUpdatedRewardRate = BIGINT_ZERO;
     masterChef.save();
   }

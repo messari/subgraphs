@@ -65,6 +65,11 @@ export function handleReward(
   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
+    pool.save();
   }
 
   // Update staked amounts
@@ -135,6 +140,17 @@ export function handleReward(
     .times(masterChef.rewardTokenRate);
   masterChef.lastUpdatedRewardRate = event.block.number;
 
+  log.warning("USED TOTAL ALLOCATION: " + usedTotalAllocation.toString(), []);
+  log.warning("TOTAL ALLOCATION: " + masterChef.totalAllocPoint.toString(), []);
+  log.warning(
+    "USED TOTAL ALLOCATION: " + masterChef.rewardTokenRate.toString(),
+    []
+  );
+  log.warning(
+    "ADJUSTED REWARD RATE: " + masterChef.adjustedRewardTokenRate.toString(),
+    []
+  );
+
   // Calculate Reward Emission per Block
   let poolRewardTokenRate = masterChef.adjustedRewardTokenRate
     .times(masterChefPool.poolAllocPoint)
@@ -191,14 +207,6 @@ function getOrCreateMasterChefStakingPool(
     masterChefPool.poolAllocPoint = BIGINT_ZERO;
     masterChefPool.lastRewardBlock = event.block.number;
     log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
-
-    let pool = LiquidityPool.load(masterChefPool.poolAddress!);
-    if (pool) {
-      pool.rewardTokens = [
-        getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-      ];
-      pool.save();
-    }
 
     masterChefPool.save();
   }
