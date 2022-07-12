@@ -549,7 +549,7 @@
       "arweave": {
         "arweave-mainnet": {
           "template": "arweave.template.yaml",
-          "messari": "messari/TODO",
+          "messari": "messari/network-arweave-mainnet",
           "dmelotik": "dmelotik/network-arweave-mainnet",
           "deploy-on-merge": true
         }
@@ -557,8 +557,14 @@
       "cosmos": {
         "cosmoshub": {
           "template": "cosmos.template.yaml",
-          "messari": "messari/TODO",
+          "messari": "messari/network-cosmos",
           "dmelotik": "dmelotik/network-cosmos-hub",
+          "deploy-on-merge": true
+        },
+        "osmosis": {
+          "template": "cosmos.template.yaml",
+          "messari": "messari/network-osmosis",
+          "dmelotik": "dmelotik/network-osmosis",
           "deploy-on-merge": true
         }
       },
@@ -663,7 +669,7 @@
       "near": {
         "near-mainnet": {
           "template": "near.template.yaml",
-          "messari": "messari/TODO",
+          "messari": "messari/network-near",
           "dmelotik": "dmelotik/network-near-mainnet",
           "deploy-on-merge": true
         }
