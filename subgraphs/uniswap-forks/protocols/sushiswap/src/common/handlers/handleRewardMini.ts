@@ -11,7 +11,10 @@ import {
   getOrCreateToken,
 } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
+import {
+  convertTokenToDecimal,
+  roundToWholeNumber,
+} from "../../../../../src/common/utils/utils";
 import { MasterChef } from "../constants";
 import { getOrCreateMasterChef } from "../helpers";
 
@@ -59,7 +62,7 @@ export function updateMasterChefDeposit(
   // Update the amount of staked tokens after deposit
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
@@ -122,7 +125,7 @@ export function updateMasterChefWithdraw(
   // Update the amount of staked tokens after deposit
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(

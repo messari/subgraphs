@@ -19,7 +19,10 @@ import {
   getOrCreateToken,
 } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
+import {
+  convertTokenToDecimal,
+  roundToWholeNumber,
+} from "../../../../../src/common/utils/utils";
 import { getOrCreateMasterChef } from "../helpers";
 
 // Called on both deposits and withdraws into the MasterApe/MasterChef pool.
@@ -126,7 +129,7 @@ export function handleReward(
   let poolRewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let poolRewardTokenPerDay = getRewardsPerDay(
+  let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
     poolRewardTokenRateBigDecimal,
@@ -134,7 +137,7 @@ export function handleReward(
   );
 
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(poolRewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
