@@ -1,28 +1,93 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { Deposit as DepositEventMini, Withdraw as WithdrawEventMini, EmergencyWithdraw as EmergencyWithdrawMini } from "../../../../../generated/MiniChef/MiniChefSushiswap";
-import { _HelperStore } from "../../../../../generated/schema";
-import { UsageType } from "../../../../../src/common/constants";
-import { handleRewardMini } from "../../common/handlers/handleRewardMini";
+import {
+  Deposit,
+  EmergencyWithdraw,
+  LogPoolAddition,
+  LogSetPool,
+  LogSushiPerSecond,
+  Withdraw,
+  MiniChefSushiswap,
+} from "../../../../../generated/MiniChef/MiniChefSushiswap";
+import {
+  _HelperStore,
+  _MasterChef,
+  _MasterChefStakingPool,
+} from "../../../../../generated/schema";
+import { MasterChef } from "../../common/constants";
+import {
+  createMasterChefStakingPool,
+  getOrCreateMasterChef,
+  updateMasterChefTotalAllocation,
+} from "../../common/helpers";
+import {
+  updateMasterChefDeposit,
+  updateMasterChefWithdraw,
+} from "../../common/handlers/handleRewardMini";
+import { BIGINT_ZERO } from "../../../../../src/common/constants";
 
-export function handleDepositMini(event: DepositEventMini): void {
-  handleRewardMini(event, event.params.pid, event.params.amount, UsageType.DEPOSIT);
+// A deposit or stake for the pool specific MasterChef.
+export function handleDeposit(event: Deposit): void {
+  updateMasterChefDeposit(event, event.params.pid, event.params.amount);
 }
 
-export function handleWithdrawMini(event: WithdrawEventMini): void {
-  handleRewardMini(event, event.params.pid, event.params.amount, UsageType.WITHDRAW);
+// A withdraw or unstaking for the pool specific MasterChef.
+export function handleWithdraw(event: Withdraw): void {
+  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
 }
 
-export function handleEmergencyWithdrawMini(event: EmergencyWithdrawMini): void {
-  handleRewardMini(event, event.params.pid, event.params.amount, UsageType.WITHDRAW);
+// A withdraw or unstaking for the pool specific MasterChef.
+export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
+  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
 }
 
-// export function logPoolAddition(event: LogPoolAddition): void {
-//   let pidPoolMapping = new _HelperStore(event.params.pid.toString());
-//   pidPoolMapping.valueString = event.params.lpToken.toHexString();
-//   pidPoolMapping.save();
-// }
-// export function logPoolAdditionV2(event: LogPoolAdditionV2): void {
-//   let pidPoolMapping = new _HelperStore(event.params.pid.toString());
-//   pidPoolMapping.valueString = event.params.lpToken.toHexString();
-//   pidPoolMapping.save();
+// Handle the addition of a new pool to the MasterChef. New staking pool.
+export function handleLogPoolAddition(event: LogPoolAddition): void {
+  let miniChefPool = createMasterChefStakingPool(
+    event,
+    MasterChef.MINICHEF,
+    event.params.pid,
+    event.params.lpToken
+  );
+  let masterchef = getOrCreateMasterChef(event, MasterChef.MINICHEF);
+  if (masterchef.lastUpdatedRewardRate == BIGINT_ZERO) {
+    masterchef.lastUpdatedRewardRate = event.block.number;
+    let miniChefV2Contract = MiniChefSushiswap.bind(event.address);
+    masterchef.adjustedRewardTokenRate = miniChefV2Contract.sushiPerSecond();
+    masterchef.save();
+  }
+  updateMasterChefTotalAllocation(
+    event,
+    miniChefPool.poolAllocPoint,
+    event.params.allocPoint,
+    MasterChef.MINICHEF
+  );
+  miniChefPool.poolAllocPoint = event.params.allocPoint;
+  miniChefPool.save();
+}
+
+// Update the allocation points of the pool.
+export function handleLogSetPool(event: LogSetPool): void {
+  let miniChefPool = _MasterChefStakingPool.load(
+    MasterChef.MINICHEF + "-" + event.params.pid.toString()
+  )!;
+  updateMasterChefTotalAllocation(
+    event,
+    miniChefPool.poolAllocPoint,
+    event.params.allocPoint,
+    MasterChef.MINICHEF
+  );
+  miniChefPool.poolAllocPoint = event.params.allocPoint;
+  miniChefPool.save();
+}
+
+// Update the total emissions rate of rewards for the masterchef contract.
+export function handleLogSushiPerSecond(event: LogSushiPerSecond): void {
+  let miniChefPool = getOrCreateMasterChef(event, MasterChef.MINICHEF);
+  miniChefPool.rewardTokenRate = event.params.sushiPerSecond;
+  miniChefPool.adjustedRewardTokenRate = event.params.sushiPerSecond;
+  miniChefPool.save();
+}
+
+// export function handleHarvest(event: Harvest): void {
+//  updateMasterChefHarvest(event, event.params.pid, event.params.amount)
 // }

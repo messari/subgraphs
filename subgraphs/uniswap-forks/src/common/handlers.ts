@@ -1,10 +1,15 @@
-import { ethereum, BigInt, log } from "@graphprotocol/graph-ts";
-import { getLiquidityPool, getOrCreateTransfer } from "./getters";
+import { ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { getOrCreateTransfer } from "./getters";
 import { TransferType } from "./constants";
 import { LiquidityPool } from "../../generated/schema";
 
-// Handle data from transfer event for mints. Used to populate deposit entity in the mint event.
-export function handleTransferMint(event: ethereum.Event, pool: LiquidityPool, value: BigInt, to: string): void {
+// Handle data from transfer event for mints. Used to populate Deposit entity in the Mint event.
+export function handleTransferMint(
+  event: ethereum.Event,
+  pool: LiquidityPool,
+  value: BigInt,
+  to: string
+): void {
   let transfer = getOrCreateTransfer(event);
 
   // Tracks supply of minted LP tokens
@@ -25,13 +30,21 @@ export function handleTransferMint(event: ethereum.Event, pool: LiquidityPool, v
     transfer.liquidity = value;
   }
 
-
   transfer.save();
   pool.save();
 }
 
-// Handle data from transfer event for burns. Used to populate deposit entity in the burn event.
-export function handleTransferToPoolBurn(event: ethereum.Event, from: string): void {
+/**
+ * There are two Transfer event handlers for Burns because when the LP token is burned,
+ * there the LP tokens are first transfered to the liquidity pool, and then the LP tokens are burned
+ * to the null address from the particular liquidity pool.
+ */
+
+// Handle data from transfer event for burns. Used to populate Deposit entity in the Burn event.
+export function handleTransferToPoolBurn(
+  event: ethereum.Event,
+  from: string
+): void {
   let transfer = getOrCreateTransfer(event);
 
   transfer.type = TransferType.BURN;
@@ -40,14 +53,19 @@ export function handleTransferToPoolBurn(event: ethereum.Event, from: string): v
   transfer.save();
 }
 
-// Handle data from transfer event for burns. Used to populate deposit entity in the burn event.
-export function handleTransferBurn(event: ethereum.Event, pool: LiquidityPool, value: BigInt, from: string): void {
+// Handle data from transfer event for burns. Used to populate Deposit entity in the Burn event.
+export function handleTransferBurn(
+  event: ethereum.Event,
+  pool: LiquidityPool,
+  value: BigInt,
+  from: string
+): void {
   let transfer = getOrCreateTransfer(event);
 
   // Tracks supply of minted LP tokens
   pool.outputTokenSupply = pool.outputTokenSupply!.minus(value);
 
-  // Uses address from the transfer to pool part of the burn. Otherwise create with this transfer event.
+  // Uses address from the transfer to pool part of the burn. Set transfer type from this handler.
   if (transfer.type == TransferType.BURN) {
     transfer.liquidity = value;
   } else {

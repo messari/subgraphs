@@ -1,0 +1,28 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: HoneyFarm
+    network: {{network}}
+    source:
+      address: "{{honeyFarmAddress}}"
+      abi: HoneyFarm
+      startBlock: {{honeyFarmStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: HoneyFarm
+          file: ./abis/honeyswap/HoneyFarm.json
+      eventHandlers:
+        - event: PoolAdded(indexed address,uint256)
+          handler: handlePoolAdded
+        - event: PoolRemoved(indexed address)
+          handler: handlePoolRemoved
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./protocols/honeyswap/src/mappings/honeyfarm.ts

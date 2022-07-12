@@ -1,0 +1,10 @@
+{
+    "network": "mainnet",
+    "factory": [
+        {
+            "address": "0xea1aff9dbffd1580f6b81a3ad3589e66652db7d9",
+            "startBlock": 12735383
+        }
+    ],
+    "hasLiquidityGauge": false
+}

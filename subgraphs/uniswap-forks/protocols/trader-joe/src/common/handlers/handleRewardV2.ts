@@ -1,97 +1,127 @@
-import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
-import { MasterChefV2TraderJoe } from "../../../../../generated/MasterChefV2/MasterChefV2TraderJoe";
-import { LiquidityPool, _HelperStore } from "../../../../../generated/schema";
-import { BIGINT_FIVE, BIGINT_ONE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "../../../../../src/common/constants";
+import {
+  LiquidityPool,
+  _HelperStore,
+  _MasterChefStakingPool,
+} from "../../../../../generated/schema";
 import { getOrCreateToken } from "../../../../../src/common/getters";
-import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
+import { getOrCreateMasterChef } from "../helpers";
+import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
+import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
 
-export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
-  let masterChefPool = _HelperStore.load(pid.toString());
-  let poolContract = MasterChefV2TraderJoe.bind(event.address);
+// Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
+export function updateMasterChefDeposit(
+  event: ethereum.Event,
+  pid: BigInt,
+  amount: BigInt
+): void {
+  let masterChefV2Pool = _MasterChefStakingPool.load(
+    MasterChef.MASTERCHEFV2 + "-" + pid.toString()
+  )!;
+  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
-  // Create entity to track masterchef pool mappings
-  if (!masterChefPool) {
-    masterChefPool = new _HelperStore(pid.toString());
-    let poolInfo = poolContract.try_poolInfo(pid);
-    let lpTokenAddress = ZERO_ADDRESS;
-    if (!poolInfo.reverted) {
-      lpTokenAddress = poolInfo.value.value1.toHexString();
-    }
-    masterChefPool.valueString = lpTokenAddress;
-    masterChefPool.valueBigInt = event.block.number;
-    masterChefPool.save();
-  }
-
-  // Return if pool does not exist - Banana tokens?
-  let pool = LiquidityPool.load(masterChefPool.valueString!);
+  // Return if pool does not exist
+  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }
 
-  // Update staked amounts
-  if (usageType == UsageType.DEPOSIT) {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
-  } else {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
-  }
+  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
+  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
-  // Return if you have calculated rewards recently
-  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(BIGINT_FIVE)) {
-    pool.save();
+  // Calculate Reward Emission per second to a specific pool
+  // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
+  let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
+    .times(masterChefV2Pool.poolAllocPoint)
+    .div(masterChefV2.totalAllocPoint);
+  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
+    rewardAmountPerInterval.toString()
+  );
+
+  // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
+  let rewardTokenPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    rewardAmountPerIntervalBigDecimal,
+    masterChefV2.rewardTokenInterval
+  );
+
+  // Update the amount of staked tokens after deposit
+  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
+  pool.rewardTokenEmissionsAmount = [
+    BigInt.fromString(rewardTokenPerDay.toString()),
+  ];
+  pool.rewardTokenEmissionsUSD = [
+    convertTokenToDecimal(
+      pool.rewardTokenEmissionsAmount![INT_ZERO],
+      rewardToken.decimals
+    ).times(rewardToken.lastPriceUSD!),
+  ];
+
+  masterChefV2Pool.lastRewardBlock = event.block.number;
+
+  masterChefV2Pool.save();
+  masterChefV2.save();
+  rewardToken.save();
+  nativeToken.save();
+  pool.save();
+}
+
+// Updated Liquidity pool staked amount and emmissions on a withdraw from the masterchef contract.
+export function updateMasterChefWithdraw(
+  event: ethereum.Event,
+  pid: BigInt,
+  amount: BigInt
+): void {
+  let masterChefV2Pool = _MasterChefStakingPool.load(
+    MasterChef.MASTERCHEFV2 + "-" + pid.toString()
+  )!;
+  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+
+  // Return if pool does not exist
+  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
+  if (!pool) {
     return;
   }
 
-  // Get necessary values from the master chef contract to calculate rewards
-  let getPoolInfo = poolContract.try_poolInfo(pid);
-  let poolAllocPoint: BigInt = BIGINT_ZERO;
-  let lastRewardBlock: BigInt = BIGINT_ZERO;
-  if (!getPoolInfo.reverted) {
-    let poolInfo = getPoolInfo.value;
-    poolAllocPoint = poolInfo.value1;
-    lastRewardBlock = poolInfo.value2;
-  }
+  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
+  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
-  let getRewardTokenPerBlock = poolContract.try_joePerSec();
-  let rewardTokenPerBlock: BigInt = BIGINT_ZERO;
-  if (!getRewardTokenPerBlock.reverted) {
-    rewardTokenPerBlock = getRewardTokenPerBlock.value;
-  }
+  // Calculate Reward Emission per second to a specific pool
+  // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
+  let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
+    .times(masterChefV2Pool.poolAllocPoint)
+    .div(masterChefV2.totalAllocPoint);
+  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
+    rewardAmountPerInterval.toString()
+  );
 
-  let multiplier = event.block.number.minus(masterChefPool.valueBigInt!)
+  // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
+  let rewardTokenPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    rewardAmountPerIntervalBigDecimal,
+    masterChefV2.rewardTokenInterval
+  );
 
-  let getTotalAllocPoint = poolContract.try_totalAllocPoint();
-  let totalAllocPoint: BigInt = BIGINT_ZERO;
-  if (!getTotalAllocPoint.reverted) {
-    totalAllocPoint = getTotalAllocPoint.value;
-  }
+  // Update the amount of staked tokens after withdraw
+  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
+  pool.rewardTokenEmissionsAmount = [
+    BigInt.fromString(rewardTokenPerDay.toString()),
+  ];
+  pool.rewardTokenEmissionsUSD = [
+    convertTokenToDecimal(
+      pool.rewardTokenEmissionsAmount![INT_ZERO],
+      rewardToken.decimals
+    ).times(rewardToken.lastPriceUSD!),
+  ];
 
-  log.warning("multiplier: " + multiplier.toString(), []);
-  log.warning("rewardTokenPerBlock: " + rewardTokenPerBlock.toString(), []);
-  log.warning("poolAllocPoint: " + poolAllocPoint.toString(), []);
-  log.warning("totalAllocPoint: " + totalAllocPoint.toString(), []);
+  masterChefV2Pool.lastRewardBlock = event.block.number;
 
-  // Calculate Reward Emission per Block
-  let rewardTokenRate = multiplier
-    .times(rewardTokenPerBlock)
-    .times(poolAllocPoint)
-    .div(totalAllocPoint);
-
-  let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.getRewardIntervalType());
-
-  let nativeToken = updateNativeTokenPriceInUSD();
-
-  let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
-
-  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
-  pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
-
-  masterChefPool.valueBigInt = event.block.number;
-
-  masterChefPool.save();
+  masterChefV2Pool.save();
+  masterChefV2.save();
   rewardToken.save();
   nativeToken.save();
   pool.save();

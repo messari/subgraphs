@@ -91,7 +91,26 @@ function AllDataTabs({
 
   const protocolType = data.protocols[0].type;
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
-
+  console.log("glub", protocolTableData, protocolEntityNameSingular, ProtocolTypeEntityName, protocolType);
+  let eventsTab = null;
+  let eventsTabButton = null;
+  if (protocolType !== "GENERIC") {
+    eventsTabButton = <Tab label="Events" value="4" />;
+    eventsTab = (
+      <TabPanel value="4">
+        {/* EVENTS TAB */}
+        <EventsTab
+          data={data}
+          events={events}
+          poolId={poolId}
+          poolsList={poolsListData}
+          poolListLoading={poolListLoading}
+          poolNames={poolNames}
+          setPoolId={(x) => setPoolId(x)}
+        />
+      </TabPanel>
+    );
+  }
   return (
     <>
       <TabContext value={tabValue}>
@@ -99,7 +118,7 @@ function AllDataTabs({
           <Tab label="Protocol" value="1" />
           <Tab label="Pool Overview" value="2" />
           <Tab label="Pool" value="3" />
-          <Tab label="Events" value="4" />
+          {eventsTabButton}
           {positionsQuery && <Tab label="Positions" value="5" />}
         </StyledTabs>
         {protocolDropDown}
@@ -147,18 +166,7 @@ function AllDataTabs({
             setPoolId={(x) => setPoolId(x)}
           />
         </TabPanel>
-        <TabPanel value="4">
-          {/* EVENTS TAB */}
-          <EventsTab
-            data={data}
-            events={events}
-            poolId={poolId}
-            poolsList={poolsListData}
-            poolListLoading={poolListLoading}
-            poolNames={poolNames}
-            setPoolId={(x) => setPoolId(x)}
-          />
-        </TabPanel>
+        {eventsTab}
         {positionsQuery && (
           <TabPanel value="5">
             {/* POSITIONS TAB */}
