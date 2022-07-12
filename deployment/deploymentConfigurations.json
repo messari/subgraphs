@@ -78,8 +78,9 @@
       "arrakis-finance": {
         "mainnet": {
           "template": "arrakis.finance.template.yaml",
+          "messari": "messari/arrakis-finance-ethereum",
           "loc": "l0c4t0r/laboratory4",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
