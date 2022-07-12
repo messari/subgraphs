@@ -7,7 +7,6 @@ import {
   Minted,
   UpdateManagerParams,
 } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
-import { InitializeCall } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
 import {
   PROTOCOL_PERFORMANCE_FEE,
   UsageType,
