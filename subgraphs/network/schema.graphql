@@ -63,7 +63,7 @@ type STATS @entity {
 	min: BigInt!
 
   " The standard deviation of all values within this entity " 
-	var: BigDecimal!
+	variance: BigDecimal!
 
   " This is the upper quartile where 75% of the values lie "
 	q3: BigDecimal!
