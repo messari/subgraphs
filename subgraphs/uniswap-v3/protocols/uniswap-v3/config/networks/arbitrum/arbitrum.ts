@@ -39,7 +39,9 @@ export class UniswapV3ArbitrumConfigurations implements Configurations {
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x1F98431c8aD98523631AE4a59f267346ea31F984")
+      Address.fromString(
+        "0x1F98431c8aD98523631AE4a59f267346ea31F984".toLowerCase()
+      )
     );
   }
   getFeeOnOff(): string {

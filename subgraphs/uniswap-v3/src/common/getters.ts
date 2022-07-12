@@ -25,6 +25,7 @@ import {
   SECONDS_PER_DAY,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
+  Network,
 } from "./constants";
 
 export function getOrCreateDex(): DexAmmProtocol {
@@ -65,6 +66,14 @@ export function getOrCreateToken(address: string): Token {
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
     token.name = name.reverted ? "" : name.value;
     token.symbol = symbol.reverted ? "" : symbol.value;
+    if (
+      token.id == "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1".toLowerCase() &&
+      NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
+    ) {
+      token.name = "WETH";
+      token.symbol = "WETH";
+      token.decimals = DEFAULT_DECIMALS;
+    }
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
