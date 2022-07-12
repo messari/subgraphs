@@ -27,10 +27,28 @@ enum SubgraphNetwork {
   XDAI # aka Gnosis Chain
 }
 
+enum DataType {
+  AUTHORS
+  DIFFICULTY 
+  GAS_USED 
+  GAS_LIMIT 
+  BURNT_FEES
+  REWARDS 
+  SIZE 
+  CHUNKS 
+  SUPPLY 
+  TRANSACTIONS 
+  BLOCK_INTERVAL
+  GAS_PRICE
+}
+
 # Stores statistical analytics for given metrics
 type STATS @entity {
+  " { id of the snapshot this belongs to } - { DataType } "
+  id: ID!
+
   " Number of times entity has been used in a time data entity "
-	count: BigInt!
+	count: Int!
 
 	" The average of all the values "
 	mean: BigInt!
@@ -45,13 +63,13 @@ type STATS @entity {
 	min: BigInt!
 
   " The standard deviation of all values within this entity " 
-	var: BigInt!
+	var: BigDecimal!
 
   " This is the upper quartile where 75% of the values lie "
-	q3: BigInt!
+	q3: BigDecimal!
 
   " This is the lower quartile where 25% of the values lie "
-	q1: BigInt
+	q1: BigDecimal
   
   " List of values in order from smallest to largest "
   values: [BigInt!]!
@@ -80,7 +98,7 @@ type Network @entity {
   #### Quantitative Data ####
 
   " Number of cumulative unique authors (see type Author for explanation) "
-  cumulativeUniqueAuthors: Int!
+  cumulativeUniqueAuthors: Int
 
   " The total number of blocks in the blockchain "
   blockHeight: Int!
@@ -89,10 +107,10 @@ type Network @entity {
   cumulativeDifficulty: BigInt
 
   " Total gas used "
-  cumulativeGasUsed: BigInt!
+  cumulativeGasUsed: BigInt
 
   " Current gas limit "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Total burnt fees on the network in native asset "
   cumulativeBurntFees: BigInt
@@ -147,10 +165,10 @@ type DailySnapshot @entity {
   timestamp: BigInt!
 
   " Number of cumulative unique authors (see type Author for explanation) "
-  cumulativeUniqueAuthors: Int!
+  cumulativeUniqueAuthors: Int
 
   " Statistical analysis of unique daily active authors "
-  dailyAuthors: STATS!
+  dailyAuthors: STATS
 
   " Total difficulty up until this day "
   cumulativeDifficulty: BigInt
@@ -159,49 +177,52 @@ type DailySnapshot @entity {
   dailyDifficulty: STATS
 
   " Total gas used up until this day "
-  cumulativeGasUsed: BigInt!
+  cumulativeGasUsed: BigInt
 
   " Statistical analysis of gas used during this day"
-  dailyGasUsed: STATS!
+  dailyGasUsed: STATS
 
   " Statistical analysis of gas limit across blocks this day"
-  dailyGasLimit: STATS!
+  dailyGasLimit: STATS
 
   " Total amount of fees burned "
   cumulativeBurntFees: BigInt
 
   " Statisical amount of burnt fees for this day "
-  dailyBurntFees: STATS!
+  dailyBurntFees: STATS
 
   " Total amount of rewards emitted "
   cumulativeRewards: BigInt
 
   " Statistical analysis of rewards emitted on this day "
-  dailyRewards: STATS!
+  dailyRewards: STATS
 
   " Total size of the entire network in this day (in native units) "
   cumulativeSize: BigInt
 
   " Statistical analysis of size in bytes of a block during this day "
-  dailyMeanBlockSize: BigDecimal!
+  dailySize: STATS
 
   " Statistical analysis of chunks per block during this day "
-  dailyChunks: Int!
+  dailyChunks: STATS
 
   " Total amount of the native asset in circulation during this day "
   totalSupply: BigInt
 
   " Statisitcal analysis of the daily supply "
-  dailySupplyIncrease: STATS
+  dailySupply: STATS
 
   " Statistical analysis of transactions per day "
   dailyTransactions: STATS
 
   " Statisical analysis of the block interval during this day "
-  dailyBlockInterval: STATS!
+  dailyBlockInterval: STATS
 
   " gas price at the end of this hour in network native gas units "
   gasPrice: BigInt
+
+  " Statistical analysis of the gas price during this day "
+  dailyGasPrice: STATS
 }
 
 type HourlySnapshot @entity {
@@ -320,40 +341,40 @@ type Block @entity(immutable: true) {
   timestamp: BigInt!
 
   " Author of this block (the entity that successfully found this block) "
-  author: Author!
+  author: Author
 
   " Data size of the block in Bytes "
-  size: BigInt!
+  size: BigInt
 
   " Minimum gasUsed multiplier for transaction to be included (note, post London upgrade) "
-  baseFeePerGas: BigInt!
+  baseFeePerGas: BigInt
 
   " Amount of effort required to create this block "
-  difficulty: BigInt!
+  difficulty: BigInt
 
   " Total gas limit provided from all transactions this block "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Total gas used in this block "
-  gasUsed: BigInt!
+  gasUsed: BigInt
 
   " Percentage of gas filled in this block (e.g. gasUsed / gasLimit) "
-  blockUtilization: BigDecimal!
+  blockUtilization: BigDecimal
 
   " The price of gas in this block in network native gas units "
-  gasPrice: BigInt!
+  gasPrice: BigInt
 
   " Burnt fees in native asset (baseFeePerGas * gasUsed) (note, post London upgrade) "
-  burntFees: BigInt!
+  burntFees: BigInt
 
   " Number of chunks in this block (e.g. shards on NEAR) "
-  chunkCount: Int!
+  chunkCount: Int
 
   " Number of transactions in this block "
-  transactionCount: Int!
+  transactionCount: Int
 
   " Rewards emitted in this block "
-  rewards: BigInt!
+  rewards: BigInt
 }
 
 # This is the node that found the next block (e.g. miner or validator)
@@ -365,7 +386,7 @@ type Author @entity {
   cumulativeBlocksCreated: Int!
 
   " Total difficulty secured on blockchain "
-  cumulativeDifficulty: BigInt!
+  cumulativeDifficulty: BigInt
 
   " A mapping to every block that this author has generated "
   blocks: [Block!]! @derivedFrom(field: "author")
@@ -391,16 +412,16 @@ type Chunk @entity(immutable: true) {
   block: Block!
 
   " The gas used in this chunk "
-  gasUsed: BigInt!
+  gasUsed: BigInt
 
   " The gas limit in this chunk "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " The fees burnt in this chunk, also the total amount of fees "
-  burntFees: BigInt!
+  burntFees: BigInt
 
   " Gas utilization within this chunk (e.g. gasUsed / gasLimit) "
-  chunkUtilization: BigDecimal!
+  chunkUtilization: BigDecimal
 }
 
 type _CircularBuffer @entity {
