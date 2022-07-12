@@ -61,6 +61,11 @@ export function handleReward(
   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
+    pool.save();
   }
 
   // Update staked amounts
