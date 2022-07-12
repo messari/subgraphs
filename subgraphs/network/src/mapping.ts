@@ -21,7 +21,7 @@ export class BlockData {
     public readonly height: BigInt,
     public readonly hash: Bytes,
     public readonly timestamp: BigInt,
-    public readonly author: Bytes,
+    public readonly author: Bytes | null,
     public readonly difficulty: BigInt,
     public readonly gasLimit: BigInt,
     public readonly gasUsed: BigInt,
