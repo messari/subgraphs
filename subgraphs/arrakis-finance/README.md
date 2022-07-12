@@ -1,8 +1,9 @@
 # Arrakis Finance Subgraph
 
-### Vault Input Token, Pirce per share
+### Vault Input Token, Price per share
+
 Arrakis finance vaults work with two input tokens that corresponds to the underlying Uniswap v3 pool. To track this using our standardised schema, the `inputToken` is set as the `outputToken` of the vault.  The `_UnderlyingToken` entity tracks the actual two tokens used.
-Due to the above, the pricePerShare has been set to null in this subgraph.
+Due to the above, the `pricePerShare` has been set to null in this subgraph.
 
 ### Total Value Locked (TVL) USD
 
@@ -11,6 +12,7 @@ Sum across all Vaults:
 `Vault TVL`
 
 ### Total Revenue USD
+
 The source of revenue from each vault comes from trading fees collected by providing liquidity to the underlying uniswap v3 pool. Trading fees are collected whenever `rebalance`, `executiveRebalance` or `burn` (withdraw) is called on the vault, and is tracked via the FeesEarned event.
 
 Sum across all Vaults:
@@ -18,17 +20,19 @@ Sum across all Vaults:
 '`Total Fees collected`'
 
 ### Protocol-Side Revenue USD
+
 The protocol-side revenue consists of two components:
 1. Arrakis Finance performance fee (2.5%)
 2. Manager performance fee (variable)
+
 Arrakis finance collects these fees as a percentage of trading fees collected by its vaults. This Arrakis Finance fee is hardcoded in the vault contract, while the manager fee is variable and can be set by specific vault managers. The USD value of the fees are calculated at the point of collection.
 
 Sum across all Vaults:
 
 `(Vault Revenue * Vault Performance Fee)`
 
-
 ### Supply-Side Revenue USD
+
 The rest of the of trading fees are accrued to LPs of the vault and re-invested automatically during each `rebalance` and `executiveRebalance` call.  The USD value of this is calculated at the time of the rebalance call.
 
 Sum across all Vaults
