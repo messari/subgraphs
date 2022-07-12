@@ -197,26 +197,29 @@ export function getRewardsPerDay(
     (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString()
   );
 
-  // Wideness of the window in blocks.
-  let windowBlocksCount = BigDecimal.fromString(
-    (
-      currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + INT_ONE]
-    ).toString()
-  );
+  if (windowSecondsCount.notEqual(BIGDECIMAL_ZERO)) {
+    // Wideness of the window in blocks.
+    let windowBlocksCount = BigDecimal.fromString(
+      (
+        currentBlockNumberI32 -
+        blocks[circularBuffer.windowStartIndex + INT_ONE]
+      ).toString()
+    );
 
-  // Estimate block speed for the window in seconds.
-  let unnormalizedBlockSpeed =
-    WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
+    // Estimate block speed for the window in seconds.
+    let unnormalizedBlockSpeed =
+      WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
 
-  // block speed converted to specified rate.
-  let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
-    WINDOW_SIZE_SECONDS_BD
-  ).times(unnormalizedBlockSpeed);
+    // block speed converted to specified rate.
+    let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
+      WINDOW_SIZE_SECONDS_BD
+    ).times(unnormalizedBlockSpeed);
 
-  // Update BlockTracker with new values.
-  circularBuffer.blocksPerDay = normalizedBlockSpeed;
+    // Update BlockTracker with new values.
+    circularBuffer.blocksPerDay = normalizedBlockSpeed;
+  }
+
   circularBuffer.blocks = blocks;
-
   circularBuffer.save();
 
   if (rewardType == RewardIntervalType.TIMESTAMP) {
