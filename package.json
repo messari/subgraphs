@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "minimist": "^1.2.6"
+    "minimist": "^1.2.6",
+    "mustache": "^4.2.0"
   },
   "devDependencies": {
     "husky": "^8.0.0",

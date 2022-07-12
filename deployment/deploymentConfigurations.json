@@ -321,6 +321,12 @@
           "deploy-on-merge": true
         }
       },
+      "tectonic": {
+        "cronos": {
+          "template": "tectonic.template.yaml",
+          "deploy-on-merge": false
+        }
+      },
       "bastion-protocol": {
         "aurora": {
           "template": "bastion-protocol.template.yaml",
