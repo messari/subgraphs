@@ -123,7 +123,10 @@ function ProtocolTabEntity({
                   (prev, currentKey) => prev.plus(new BigNumber(timeseriesInstance[currentKey])),
                   new BigNumber(0),
                 );
-                const totalTx = new BigNumber(dataFieldMetrics[fieldName].sum);
+
+                const totalTxKey = Object.keys(timeseriesInstance).find((field) => field.endsWith("TransactionCount"));
+                const totalTx = new BigNumber(totalTxKey || 0);
+
                 if (!individualTxSum.isEqualTo(totalTx)) {
                   const divergence = totalTx.minus(individualTxSum).div(totalTx).times(100).toNumber().toFixed(1);
                   dataFieldMetrics[fieldName].txSumMismatch = {
@@ -289,7 +292,7 @@ function ProtocolTabEntity({
                 }
                 issues.push({ type: "SUM", message: "", fieldName: label, level });
               }
-              if (dataFieldMetrics[field].revSumMismatch) {
+              if (dataFieldMetrics[field].revSumMismatch && dataFieldMetrics[field].revSumMismatch.divergence > 5) {
                 // if total revenue != protocol + supply revenue, add a warning
                 const fieldSplit = field.split("TotalRevenueUSD");
                 issues.push({
@@ -299,7 +302,7 @@ function ProtocolTabEntity({
                   fieldName: label,
                 });
               }
-              if (dataFieldMetrics[field].txSumMismatch) {
+              if (dataFieldMetrics[field].txSumMismatch && dataFieldMetrics[field].txSumMismatch.divergence > 5) {
                 // if total transactions != sum of all individual transactions, add a warning
                 issues.push({
                   type: "TOTAL_TX",

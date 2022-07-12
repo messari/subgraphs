@@ -13,8 +13,10 @@ export const schema = (version: string): Schema => {
     case Versions.Schema120:
       return schema120();
     case Versions.Schema130:
-    default:
       return schema130();
+    case Versions.Schema201:
+    default:
+      return schema201();
   }
 };
 
@@ -1228,5 +1230,336 @@ export const schema130 = (): Schema => {
     dailyUsageQuery,
     protocolTableQuery,
     poolsQuery,
+  };
+};
+
+export const schema201 = (): Schema => {
+  const prevSchema = schema130();
+  const entities = [...prevSchema.entities, "positionSnapshot"];
+  const entitiesData = {
+    // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
+    financialsDailySnapshots: prevSchema.entitiesData.financialsDailySnapshots,
+    usageMetricsDailySnapshots: {
+      ...prevSchema.entitiesData.usageMetricsDailySnapshots,
+      cumulativeUniqueDepositors: "Int!",
+      cumulativeUniqueBorrowers: "Int!",
+      cumulativeUniqueLiquidators: "Int!",
+      cumulativeUniqueLiquidatees: "Int!",
+      dailyActiveDepositors: "Int!",
+      dailyActiveBorrowers: "Int!",
+      dailyActiveLiquidators: "Int!",
+      dailyActiveLiquidatees: "Int!",
+    },
+    marketDailySnapshots: prevSchema.entitiesData.marketDailySnapshots,
+    usageMetricsHourlySnapshots: prevSchema.entitiesData.usageMetricsHourlySnapshots,
+    marketHourlySnapshots: prevSchema.entitiesData.marketHourlySnapshots,
+  };
+
+  const adjustedMarketDailyFields = Object.keys(entitiesData.marketDailySnapshots);
+  const adjustedMarketHourlyFields = Object.keys(entitiesData.marketHourlySnapshots);
+  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf("rates")] = "rates{id,side,rate,type}";
+  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf("rates")] = "rates{id,side,rate,type}";
+
+  const finanQuery =
+    "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.financialsDailySnapshots).join(",") +
+    "}";
+  const usageDailyQuery =
+    "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.usageMetricsDailySnapshots).join(",") +
+    "}";
+  const usageHourlyQuery =
+    "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.usageMetricsHourlySnapshots).join(",") +
+    "}";
+
+  const marketDailyQuery =
+    "marketDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" +
+    adjustedMarketDailyFields.join(",") +
+    "}";
+  const marketHourlyQuery =
+    "marketHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" +
+    adjustedMarketHourlyFields.join(",") +
+    "}";
+
+  const eventsFields = ["hash", "nonce", "position", "timestamp", "amount", "amountUSD"];
+
+  const events: string[] = ["deposits", "withdraws", "borrows", "repays", "liquidates"];
+  const eventsQuery: any[] = events.map((event) => {
+    let options = "";
+    const baseStr =
+      event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { ";
+    let fields = eventsFields.join(", ");
+    if (event === "liquidates") {
+      fields += ", profitUSD, liquidatee{id}, liquidator{id}, position{id}";
+    } else {
+      fields += ", account{id}, position{id}";
+    }
+    return baseStr + fields + " }";
+  });
+
+  const poolData: { [x: string]: string } = {
+    ...prevSchema.poolData,
+    positionCount: "Int!",
+    openPositionCount: "Int!",
+    closedPositionCount: "Int!",
+    lendingPositionCount: "Int!",
+    borrowingPositionCount: "Int!",
+  };
+
+  const financialsQuery = `
+    query Data {
+      ${finanQuery}
+    }`;
+  const hourlyUsageQuery = `
+    query Data {
+      ${usageHourlyQuery}
+    }`;
+  const dailyUsageQuery = `
+    query Data {
+      ${usageDailyQuery}
+    }`;
+
+  const protocolTableQuery = `
+    query Data($protocolId: String) {
+      lendingProtocol(id:$protocolId) {
+        id      
+        name
+        slug
+        schemaVersion
+        subgraphVersion
+        methodologyVersion
+        network
+        type
+        lendingType
+        riskType
+        mintedTokens {
+          id
+          decimals
+        }
+        cumulativeUniqueUsers
+        totalValueLockedUSD
+        cumulativeSupplySideRevenueUSD
+        cumulativeProtocolSideRevenueUSD
+        cumulativeTotalRevenueUSD
+        totalPoolCount
+        protocolControlledValueUSD
+        cumulativeSupplySideRevenueUSD
+        cumulativeProtocolSideRevenueUSD
+        cumulativeTotalRevenueUSD
+        totalDepositBalanceUSD
+        cumulativeDepositUSD
+        totalBorrowBalanceUSD
+        cumulativeBorrowUSD
+        cumulativeLiquidateUSD
+        mintedTokenSupplies
+        cumulativeUniqueDepositors
+        cumulativeUniqueBorrowers
+        cumulativeUniqueLiquidators
+        cumulativeUniqueLiquidatees
+        openPositionCount
+        cumulativePositionCount
+      }
+    }`;
+
+  const poolsQuery = `
+      query Data {
+        markets(first: 100, orderBy: totalValueLockedUSD, orderDirection: desc) {
+          id
+          name
+        }
+      }
+    `;
+
+  const poolTimeseriesQuery = `
+  query Data($poolId: String) {
+    ${marketDailyQuery}
+    ${marketHourlyQuery}
+  }
+  `;
+
+  const positionsQuery = `
+      positions(first: 1000) {
+        id
+        account {
+          id
+        }
+        hashOpened
+        hashClosed
+        timestampOpened
+        timestampClosed
+        blockNumberOpened
+        blockNumberClosed
+        side
+        isCollateral
+        balance
+        depositCount
+        withdrawCount
+        borrowCount
+        repayCount
+        liquidationCount
+        liquidations {
+          hash
+        }
+        repays {
+          hash
+        }
+        borrows {
+          hash
+        }
+        withdraws {
+          hash
+        }
+        deposits {
+          hash
+        }
+      }
+  `;
+
+  const query = `
+  query Data($poolId: String, $protocolId: String){
+    _meta {
+      block {
+        number
+      }
+      deployment
+    }
+    protocols {
+      id
+      name
+      type
+      schemaVersion
+      subgraphVersion
+      methodologyVersion
+    }
+    
+    lendingProtocols {
+      id      
+      name
+      slug
+      schemaVersion
+      subgraphVersion
+      methodologyVersion
+      network
+      type
+      lendingType
+      riskType
+      mintedTokens {
+        id
+        decimals
+      }
+      cumulativeUniqueUsers
+      cumulativeUniqueDepositors
+      cumulativeUniqueBorrowers
+      cumulativeUniqueLiquidators
+      cumulativeUniqueLiquidatees
+      openPositionCount
+      cumulativePositionCount
+      totalValueLockedUSD
+      protocolControlledValueUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeTotalRevenueUSD
+      totalPoolCount
+      totalDepositBalanceUSD
+      cumulativeDepositUSD
+      totalBorrowBalanceUSD
+      cumulativeBorrowUSD
+      cumulativeLiquidateUSD
+      mintedTokenSupplies
+      cumulativeUniqueDepositors
+      cumulativeUniqueBorrowers
+      cumulativeUniqueLiquidators
+      cumulativeUniqueLiquidatees
+      openPositionCount
+      cumulativePositionCount
+    }
+
+    ${eventsQuery}
+    market(id:$poolId){
+      id
+      name
+      inputToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      outputToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      rewardTokens {
+        id
+        token {
+          id
+          decimals
+          name
+          symbol
+        }
+      }
+      rates {
+        id
+        side
+        rate
+        type
+      }
+      isActive
+      canUseAsCollateral
+      canBorrowFrom
+      maximumLTV
+      liquidationThreshold
+      liquidationPenalty
+      totalValueLockedUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeTotalRevenueUSD
+      totalDepositBalanceUSD
+      cumulativeDepositUSD
+      totalBorrowBalanceUSD
+      cumulativeBorrowUSD
+      cumulativeLiquidateUSD
+      inputTokenBalance
+      inputTokenPriceUSD
+      outputTokenSupply
+      outputTokenPriceUSD
+      exchangeRate
+      rewardTokenEmissionsAmount
+      rewardTokenEmissionsUSD
+      positionCount
+      openPositionCount
+      closedPositionCount
+      lendingPositionCount
+      borrowingPositionCount
+      ${positionsQuery}
+    }
+  }`;
+
+  const protocolFields = {
+    ...prevSchema.protocolFields,
+    cumulativeUniqueDepositors: "Int!",
+    cumulativeUniqueBorrowers: "Int!",
+    cumulativeUniqueLiquidators: "Int!",
+    cumulativeUniqueLiquidatees: "Int!",
+    openPositionCount: "Int!",
+    cumulativePositionCount: "Int!",
+  };
+
+  return {
+    entities,
+    entitiesData,
+    query,
+    poolData,
+    events,
+    protocolFields,
+    poolTimeseriesQuery,
+    financialsQuery,
+    hourlyUsageQuery,
+    dailyUsageQuery,
+    protocolTableQuery,
+    poolsQuery,
+    positionsQuery,
   };
 };
