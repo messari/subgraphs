@@ -1398,6 +1398,21 @@ export const schema201 = (): Schema => {
         borrowCount
         repayCount
         liquidationCount
+        liquidations {
+          hash
+        }
+        repays {
+          hash
+        }
+        borrows {
+          hash
+        }
+        withdraws {
+          hash
+        }
+        deposits {
+          hash
+        }
       }
   `;
 

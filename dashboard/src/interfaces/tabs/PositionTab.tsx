@@ -59,6 +59,11 @@ export default function PositionTab({
             if (key === "account") {
               valueStr = valueStr.id;
             }
+
+            const relatedEvents = ["liquidations", "borrows", "withdraws", "repays", "deposits"];
+            if (relatedEvents.includes(key)) {
+              valueStr = valueStr.map((val: any) => val.hash).join(",");
+            }
             if (key === "date") {
               valueStr = params.value;
             }
@@ -72,7 +77,7 @@ export default function PositionTab({
                 if (key === "id") {
                   return;
                 }
-                if (key.toUpperCase().includes("HASH")) {
+                if (key.toUpperCase().includes("HASH") || relatedEvents.includes(key)) {
                   return "https://etherscan.io/tx/";
                 }
                 if (key.toUpperCase().includes("ACCOUNT")) {
