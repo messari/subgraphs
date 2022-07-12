@@ -2,6 +2,7 @@ import {
   Harvest,
   FarmHarvest,
   HarvestState,
+  HarvestState1,
   CurveHarvest,
   TreeDistribution,
   PerformanceFeeStrategist,
@@ -22,6 +23,11 @@ export function handleHarvest(event: Harvest): void {
   const strategyContract = StrategyContract.bind(strategyAddress);
 
   const vaultAddress = utils.getVaultAddressFromStrategy(strategyAddress);
+
+  if (vaultAddress.equals(constants.BDIGG_VAULT_ADDRESS)) {
+    return;
+  }
+
   const vault = getOrCreateVault(vaultAddress, event.block);
 
   const wantToken = utils.readValue<Address>(
@@ -45,11 +51,54 @@ export function handleHarvest(event: Harvest): void {
   );
 
   log.warning(
-    "[Harvest] Strategy: {}, token: {}, amount: {}, amountUSD: {}, TxnHash: {}",
+    "[Harvest] Vault: {}, Strategy: {}, token: {}, amount: {}, amountUSD: {}, TxnHash: {}",
     [
+      vaultAddress.toHexString(),
       strategyAddress.toHexString(),
       wantToken.toHexString(),
       harvestedAmount.toString(),
+      supplySideRevenueUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+}
+
+export function handleDiggHarvestState(event: HarvestState1): void {
+  // Emitted by `bDIGG` vault
+
+  const strategyAddress = event.address;
+  const strategyContract = StrategyContract.bind(strategyAddress);
+
+  const vaultAddress = utils.getVaultAddressFromStrategy(strategyAddress);
+  const vault = getOrCreateVault(vaultAddress, event.block);
+
+  const harvestedAmount = event.params.diggIncrease;
+
+  const diggTokenAddress = utils.readValue<Address>(
+    strategyContract.try_want(),
+    constants.NULL.TYPE_ADDRESS
+  );
+  const diggTokenDecimals = utils.getTokenDecimals(diggTokenAddress);
+
+  const diggTokenPrice = getUsdPricePerToken(diggTokenAddress);
+  const supplySideRevenueUSD = harvestedAmount
+    .toBigDecimal()
+    .div(diggTokenDecimals)
+    .times(diggTokenPrice.usdPrice)
+    .div(diggTokenPrice.decimalsBaseTen);
+
+  updateRevenueSnapshots(
+    vault,
+    supplySideRevenueUSD,
+    constants.BIGDECIMAL_ZERO,
+    event.block
+  );
+
+  log.warning(
+    "[DiggHarvestState] Vault: {}, Strategy: {}, supplySideRevenueUSD: {}, TxnHash: {}",
+    [
+      vaultAddress.toHexString(),
+      strategyAddress.toHexString(),
       supplySideRevenueUSD.toString(),
       event.transaction.hash.toHexString(),
     ]

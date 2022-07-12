@@ -71,7 +71,9 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 
 export const PROTOCOL_ID = "0x63cF44B2548e4493Fd099222A1eC79F3344D9682";
-
+export const BDIGG_VAULT_ADDRESS = Address.fromString(
+  "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a"
+);
 export namespace NULL {
   export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
   export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);

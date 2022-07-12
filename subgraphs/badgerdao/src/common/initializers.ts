@@ -333,7 +333,6 @@ export function getOrCreateVault(
     vault.outputToken = outputToken.id;
     vault.outputTokenSupply = constants.BIGINT_ZERO;
     vault.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
-    vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
     vault.pricePerShare = utils
       .readValue<BigInt>(
@@ -345,6 +344,12 @@ export function getOrCreateVault(
 
     vault.createdBlockNumber = block.number;
     vault.createdTimestamp = block.timestamp;
+
+    vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+
+    vault.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
     const strategyAddress = utils.getStrategyAddressFromVault(vaultAddress);
     const strategyContract = StrategyContract.bind(strategyAddress);
