@@ -1,48 +1,96 @@
+import {
+  getOrCreateVault,
+  getOrCreateRewardPoolInfo,
+} from "../common/initializers";
 import * as utils from "../common/utils";
+import { getTotalFees } from "../modules/Fees";
 import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
-import { updateRewardToken } from "../modules/Rewards";
-import { getOrCreateVault } from "../common/initializers";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import {
   RewardPaid,
   RewardAdded,
 } from "../../generated/templates/PoolCrvRewards/BaseRewardPool";
-import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import { BigInt, dataSource, log } from "@graphprotocol/graph-ts";
 import { updateFinancials, updateUsageMetrics } from "../modules/Metric";
-import { BaseRewardPool as BaseRewardPoolContract } from "../../generated/Booster/BaseRewardPool";
+import { getHistoricalRewards, updateRewardToken } from "../modules/Rewards";
 
 export function handleRewardAdded(event: RewardAdded): void {
   const context = dataSource.context();
   const poolId = BigInt.fromString(context.getString("poolId"));
 
-  const rewardAmount = event.params.reward;
-  const poolRewardsAddress = event.address;
+  const crvRewardPoolAddress = event.address;
+
+  let crvRewardTokenAddress = constants.CRV_TOKEN_ADDRESS;
+  let crvRewardTokenPrice = getUsdPricePerToken(crvRewardTokenAddress);
+  let crvRewardTokenDecimals = utils.getTokenDecimals(crvRewardTokenAddress);
 
   const vault = getOrCreateVault(poolId, event.block);
   if (!vault) return;
 
-  const rewardsContract = BaseRewardPoolContract.bind(poolRewardsAddress);
-  const rewardToken = utils.readValue<Address>(
-    rewardsContract.try_rewardToken(),
-    constants.NULL.TYPE_ADDRESS
+  const rewardPoolInfo = getOrCreateRewardPoolInfo(
+    poolId,
+    crvRewardPoolAddress,
+    event.block
   );
-  let rewardTokenPrice = getUsdPricePerToken(rewardToken);
-  let rewardTokenDecimals = utils.getTokenDecimals(rewardToken);
 
-  const supplySideRevenueUSD = rewardAmount
-    .toBigDecimal()
-    .div(rewardTokenDecimals)
-    .times(rewardTokenPrice.usdPrice)
-    .div(rewardTokenPrice.decimalsBaseTen);
+  let beforeHistoricalRewards = rewardPoolInfo.historicalRewards;
+  let afterHistoricalRewards = getHistoricalRewards(crvRewardPoolAddress);
+
+  let rewardsEarned = afterHistoricalRewards
+    .minus(beforeHistoricalRewards)
+    .toBigDecimal();
+
+  let totalFeesConvex = getTotalFees();
+  let totalRewardsEarned = rewardsEarned.div(
+    constants.BIGDECIMAL_ONE.minus(totalFeesConvex.totalFees())
+  );
+
+  let lockFee = totalRewardsEarned.times(totalFeesConvex.lockIncentive); // incentive to crv stakers
+  let callFee = totalRewardsEarned.times(totalFeesConvex.callIncentive); // incentive to users who spend gas to make calls
+  let stakerFee = totalRewardsEarned.times(totalFeesConvex.stakerIncentive); // incentive to native token stakers
+  let platformFee = totalRewardsEarned.times(totalFeesConvex.platformFee); // possible fee to build treasury
+
+  let supplySideRevenue = rewardsEarned
+    .plus(lockFee)
+    .div(crvRewardTokenDecimals);
+  const supplySideRevenueUSD = supplySideRevenue
+    .times(crvRewardTokenPrice.usdPrice)
+    .div(crvRewardTokenPrice.decimalsBaseTen);
+
+  let protocolSideRevenue = stakerFee
+    .plus(callFee)
+    .plus(platformFee)
+    .div(crvRewardTokenDecimals);
+  const protocolSideRevenueUSD = protocolSideRevenue
+    .times(crvRewardTokenPrice.usdPrice)
+    .div(crvRewardTokenPrice.decimalsBaseTen);
+
+  rewardPoolInfo.historicalRewards = afterHistoricalRewards;
+  rewardPoolInfo.lastRewardTimestamp = event.block.timestamp;
+  rewardPoolInfo.save();
 
   updateRevenueSnapshots(
     vault,
     supplySideRevenueUSD,
-    constants.BIGDECIMAL_ZERO,
+    protocolSideRevenueUSD,
     event.block
   );
-  updateRewardToken(poolId, poolRewardsAddress, event.block);
+  updateRewardToken(poolId, crvRewardPoolAddress, event.block);
+
+  log.warning(
+    "crvRewardPool: {}, totalRewardsEarned: {}, crvRewardsEarned: {}, supplySideRevenue: {}, supplySideRevenueUSD: {}, protocolSideRevenue: {}, protocolSideRevenueUSD: {}, TxHash: {}",
+    [
+      crvRewardPoolAddress.toHexString(),
+      totalRewardsEarned.toString(),
+      rewardsEarned.toString(),
+      supplySideRevenue.toString(),
+      supplySideRevenueUSD.toString(),
+      protocolSideRevenue.toString(),
+      protocolSideRevenueUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
 }
 
 export function handleRewardPaid(event: RewardPaid): void {

@@ -20,7 +20,6 @@ import { withdraw } from "../modules/Withdraw";
 import * as constants from "../common/constants";
 import { CustomFeesType } from "../common/types";
 import { VaultFee } from "../../generated/schema";
-import { _EarmarkRewards } from "../modules/Rewards";
 
 export function handleAddPool(call: AddPoolCall): void {
   // Update PoolId
@@ -61,11 +60,7 @@ export function handleWithdrawn(event: WithdrawnEvent): void {
   updateVaultSnapshots(poolId, event.block);
 }
 
-export function handleEarmarkRewards(call: EarmarkRewardsCall): void {
-  const poolId = call.inputs._pid;
-  
-  _EarmarkRewards(poolId, call.transaction, call.block);
-}
+export function handleEarmarkRewards(call: EarmarkRewardsCall): void {}
 
 export function handleSetFees(call: SetFeesCall): void {
   const lockFees = call.inputs._lockFees;

@@ -3,6 +3,7 @@ import {
   Account,
   RewardToken,
   YieldAggregator,
+  _RewardPoolInfo,
   VaultDailySnapshot,
   Vault as VaultStore,
   VaultHourlySnapshot,
@@ -264,6 +265,29 @@ export function getOrCreateFinancialDailySnapshots(
   return financialMetrics;
 }
 
+export function getOrCreateRewardPoolInfo(
+  poolId: BigInt,
+  crvRewardPoolAddress: Address,
+  block: ethereum.Block
+): _RewardPoolInfo {
+  const rewardPoolInfoId = poolId
+    .toString()
+    .concat("-")
+    .concat(crvRewardPoolAddress.toHexString());
+
+  let rewardPoolInfo = _RewardPoolInfo.load(rewardPoolInfoId);
+
+  if (!rewardPoolInfo) {
+    rewardPoolInfo = new _RewardPoolInfo(rewardPoolInfoId);
+
+    rewardPoolInfo.historicalRewards = constants.BIGINT_ZERO;
+    rewardPoolInfo.lastRewardTimestamp = block.timestamp;
+    rewardPoolInfo.save();
+  }
+
+  return rewardPoolInfo;
+}
+
 export function getOrCreateVault(
   poolId: BigInt,
   block: ethereum.Block
@@ -335,9 +359,9 @@ export function getOrCreateVault(
     vault._pool = poolAddress.toHexString();
     vault._gauge = poolInfo.gauge.toHexString();
     vault._lpToken = poolInfo.lpToken.toHexString();
-    
+
     vault.depositLimit = constants.BIGINT_ZERO;
-    
+
     const context = new DataSourceContext();
     context.setString("poolId", poolId.toString());
     PoolCrvRewardsTemplate.createWithContext(poolInfo.crvRewards, context);

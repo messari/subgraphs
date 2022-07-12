@@ -691,18 +691,15 @@ type ActiveAccount @entity {
 }
 
 # Helper entity for fetching RewardPool from rewardToken
-type RewardTokenInfo @entity {
-  " { Pool ID }-{ RewardToken } "
+type _RewardPoolInfo @entity {
+  " { Pool ID }-{ RewardPool } "
   id: ID!
 
-  " Base reward Pool Address "
-  rewardTokenPool: String!
+  " Historical Rewards of the Pool "
+  historicalRewards: BigInt!
 
   " Timestamp of last Reward "
   lastRewardTimestamp: BigInt!
-
-  " Historical Extra Rewards of the pool "
-  _previousExtraHistoricalRewards: BigInt!
 }
 
 type _CircularBuffer @entity {
