@@ -38,8 +38,7 @@ export function handleReward(
   let masterChefPool = getOrCreateMasterChefStakingPool(
     event,
     MasterChef.MASTERCHEF,
-    pid,
-    poolContract
+    pid
   );
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
@@ -158,8 +157,7 @@ export function handleReward(
 function getOrCreateMasterChefStakingPool(
   event: ethereum.Event,
   masterChefType: string,
-  pid: BigInt,
-  poolContract: MasterChefApeswap
+  pid: BigInt
 ): _MasterChefStakingPool {
   let masterChefPool = _MasterChefStakingPool.load(
     masterChefType + "-" + pid.toString()

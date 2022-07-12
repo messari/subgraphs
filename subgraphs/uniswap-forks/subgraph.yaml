@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: fantom
+    network: moonriver
     source:
-      address: "0x152ee697f2e276fa89e96742e9bb9ab1f2e61be3"
+      address: "0x049581aEB6Fe262727f290165C29BDAB065a1B68"
       abi: Factory
-      startBlock: 3795376
+      startBlock: 424144
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -16,9 +16,9 @@ dataSources:
       entities: []
       abis:
         - name: Factory
-          file: ./abis/spookyswap/Factory.json
+          file: ./abis/solarbeam/Factory.json
         - name: TokenABI
-          file: ./abis/spookyswap/IERC20.json
+          file: ./abis/solarbeam/ERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
@@ -26,11 +26,11 @@ dataSources:
 
   - kind: ethereum
     name: MasterChef
-    network: fantom
+    network: moonriver
     source:
-      address: "0x2b2929e785374c651a81a63878ab22742656dcdd"
-      abi: MasterChefSpookyswap
-      startBlock: 4267037
+      address: "0x7e6e03822d0077f3c417d33caeac900fc2645679"
+      abi: MasterChefSolarbeam
+      startBlock: 499476
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -39,10 +39,10 @@ dataSources:
         - _CircularBuffer
         - RewardToken
       abis:
-        - name: MasterChefSpookyswap
-          file: ./abis/spookyswap/MasterChefSpookyswap.json
+        - name: MasterChefSolarbeam
+          file: ./abis/solarbeam/MasterChefSolarbeam.json
         - name: TokenABI
-          file: ./abis/spookyswap/IERC20.json
+          file: ./abis/solarbeam/ERC20.json
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
           handler: handleDeposit
@@ -50,40 +50,11 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-      file: ./protocols/spookyswap/src/mappings/masterchef/reward.ts
-
-  - kind: ethereum
-    name: MasterChefV2
-    network: fantom
-    source:
-      address: "0x18b4f774fdc7bf685daeef66c2990b1ddd9ea6ad"
-      abi: MasterChefV2Spookyswap
-      startBlock: 34757343
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: 
-        - _CircularBuffer
-        - RewardToken
-      abis:
-        - name: MasterChefV2Spookyswap
-          file: ./abis/spookyswap/MasterChefV2Spookyswap.json
-        - name: TokenABI
-          file: ./abis/spookyswap/IERC20.json
-      eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleDepositV2
-        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleWithdrawV2
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleEmergencyWithdrawV2
-      file: ./protocols/spookyswap/src/mappings/masterchef/rewardV2.ts
- 
+      file: ./protocols/solarbeam/src/mappings/masterchef/reward.ts
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: fantom
+    network: moonriver
     source:
       abi: Pair
     mapping:
@@ -94,11 +65,11 @@ templates:
       entities: []
       abis:
         - name: Pair
-          file: ./abis/spookyswap/Pair.json
+          file: ./abis/solarbeam/Pair.json
         - name: Factory
-          file: ./abis/spookyswap/Factory.json
+          file: ./abis/solarbeam/Factory.json
         - name: TokenABI
-          file: ./abis/spookyswap/IERC20.json
+          file: ./abis/solarbeam/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint
