@@ -7,7 +7,10 @@ import {
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
-import { getOrCreateToken } from "../../../../../src/common/getters";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
 import {
@@ -30,6 +33,11 @@ export function updateMasterChefDeposit(
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
+    pool.save();
   }
 
   // Get the amount of Banana tokens emitted for all pools per second.
@@ -99,6 +107,11 @@ export function updateMasterChefWithdraw(
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
+    pool.save();
   }
 
   // Get the amount of Banana tokens emitted for all pools per second.

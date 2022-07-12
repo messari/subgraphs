@@ -5,7 +5,10 @@ import {
   _HelperStore,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { getOrCreateToken } from "../../../../../src/common/getters";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
@@ -26,6 +29,11 @@ export function updateMasterChefDeposit(
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
+    pool.save();
   }
 
   let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
@@ -84,6 +92,11 @@ export function updateMasterChefWithdraw(
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
+    pool.save();
   }
 
   let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
