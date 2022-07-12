@@ -23,6 +23,7 @@ dataSources:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
+
   - kind: ethereum
     name: MasterChef
     network: moonriver
@@ -34,7 +35,9 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: []
+      entities:
+        - _CircularBuffer
+        - RewardToken
       abis:
         - name: MasterChefSolarbeam
           file: ./abis/solarbeam/MasterChefSolarbeam.json
@@ -78,4 +81,3 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
-          

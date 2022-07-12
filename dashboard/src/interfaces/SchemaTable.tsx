@@ -260,6 +260,9 @@ function SchemaTable({ entityData, schemaName, dataFields, issuesProps, setIssue
               return entityData.inputTokens[idx].name || "TOKEN [" + idx + "]";
             });
             dataType += " [" + tokenNames.join(",") + "]";
+          } else if (fieldName.toUpperCase() === "POSITIONS") {
+            // ignore positions
+            return null;
           }
 
           if (isPercentageField) {
