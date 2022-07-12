@@ -137,6 +137,7 @@ templates:
           handler: handleFeesEarned
         - event: UpdateManagerParams(uint16,address,uint16,uint16,uint32)
           handler: handleUpdateManagerParams
+  {{#hasLiquidityGauge}}
   - name: LiquidityGauge
     kind: ethereum/contract
     network: {{network}}
@@ -202,3 +203,4 @@ templates:
           handler: handleWithdraw
         - event: RewardDataUpdate(indexed address,uint256)
           handler: handleRewardDataUpdate
+  {{/hasLiquidityGauge}}

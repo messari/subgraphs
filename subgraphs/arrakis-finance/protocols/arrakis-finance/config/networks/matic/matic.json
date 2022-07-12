@@ -11,5 +11,6 @@
             "address": "0xd526d8de90d54e9ea16c0da810a2dd3fd0e8f930",
             "startBlock": 25909103
         }
-    ]
+    ],
+    "hasLiquidityGauge": true
 }
