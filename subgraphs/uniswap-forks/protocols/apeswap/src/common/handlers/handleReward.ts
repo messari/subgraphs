@@ -174,14 +174,6 @@ function getOrCreateMasterChefStakingPool(
     masterChefPool.lastRewardBlock = event.block.number;
     log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
-    let pool = LiquidityPool.load(masterChefPool.poolAddress!);
-    if (pool) {
-      pool.rewardTokens = [
-        getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-      ];
-      pool.save();
-    }
-
     masterChefPool.save();
   }
 

@@ -43,6 +43,7 @@ export function handleReward(
   );
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
+  log.warning("HELLO", []);
   // Check if the liquidity pool address is available. Try to get it if not or return if the contract call was reverted
   if (!masterChefPool.poolAddress) {
     let getPoolInfo = poolContract.try_poolInfo(pid);
@@ -59,6 +60,7 @@ export function handleReward(
       return;
     }
   }
+  log.warning("HELLO1", []);
 
   // If comes back null then it is probably a uniswap v2 pool.
   // MasterChef was used for UniV2 LP tokens before SushiSwap liquidity pools were created.
@@ -72,6 +74,7 @@ export function handleReward(
     pool.save();
   }
 
+  log.warning("HELLO2", []);
   // Update staked amounts
   if (usageType == UsageType.DEPOSIT) {
     pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
@@ -140,6 +143,17 @@ export function handleReward(
     .times(masterChef.rewardTokenRate);
   masterChef.lastUpdatedRewardRate = event.block.number;
 
+  log.warning("USED TOTAL ALLOCATION: " + usedTotalAllocation.toString(), []);
+  log.warning("TOTAL ALLOCATION: " + masterChef.totalAllocPoint.toString(), []);
+  log.warning(
+    "USED TOTAL ALLOCATION: " + masterChef.rewardTokenRate.toString(),
+    []
+  );
+  log.warning(
+    "ADJUSTED REWARD RATE: " + masterChef.adjustedRewardTokenRate.toString(),
+    []
+  );
+
   // Calculate Reward Emission per Block
   let poolRewardTokenRate = masterChef.adjustedRewardTokenRate
     .times(masterChefPool.poolAllocPoint)
@@ -196,14 +210,6 @@ function getOrCreateMasterChefStakingPool(
     masterChefPool.poolAllocPoint = BIGINT_ZERO;
     masterChefPool.lastRewardBlock = event.block.number;
     log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
-
-    let pool = LiquidityPool.load(masterChefPool.poolAddress!);
-    if (pool) {
-      pool.rewardTokens = [
-        getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-      ];
-      pool.save();
-    }
 
     masterChefPool.save();
   }
