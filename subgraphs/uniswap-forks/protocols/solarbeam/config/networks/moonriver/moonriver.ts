@@ -4,6 +4,7 @@ import {
   BIGINT_ZERO,
   FeeSwitch,
   MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  MINIMUM_LIQUIDITY_THREE_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
@@ -84,6 +85,8 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
       "0x98878b06940ae243284ca214f92bb71a2b032b8a", // wMOVR
       "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d", // USDC
       "0xb44a9b6905af7c801311e8f4e76932ee959c663c", // USDT
+      "0x5d9ab5522c64e1f6ef5e3627eccc093f56167818", //BUSD
+      "0x1a93b23281cc1cde4c4741353f3064709a16197d", //FRAX
     ]);
   }
   getStableCoins(): string[] {
@@ -104,6 +107,6 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
     return [];
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+    return MINIMUM_LIQUIDITY_THREE_THOUSAND;
   }
 }
