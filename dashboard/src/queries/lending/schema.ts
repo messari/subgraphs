@@ -1253,21 +1253,12 @@ export const schema201 = (): Schema => {
     marketDailySnapshots: prevSchema.entitiesData.marketDailySnapshots,
     usageMetricsHourlySnapshots: prevSchema.entitiesData.usageMetricsHourlySnapshots,
     marketHourlySnapshots: prevSchema.entitiesData.marketHourlySnapshots,
-    positionSnapshots: {
-      id: "ID!",
-      position: "Position!",
-      balance: "BigInt!",
-      blockNumber: "BigInt!",
-      timestamp: "BigInt!",
-    },
   };
 
   const adjustedMarketDailyFields = Object.keys(entitiesData.marketDailySnapshots);
   const adjustedMarketHourlyFields = Object.keys(entitiesData.marketHourlySnapshots);
   adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf("rates")] = "rates{id,side,rate,type}";
   adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf("rates")] = "rates{id,side,rate,type}";
-  const adjustedPositionFields = Object.keys(entitiesData.positionSnapshots);
-  adjustedPositionFields[adjustedPositionFields.indexOf("position")] = "position{id}";
 
   const finanQuery =
     "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
@@ -1280,10 +1271,6 @@ export const schema201 = (): Schema => {
   const usageHourlyQuery =
     "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
     Object.keys(entitiesData.usageMetricsHourlySnapshots).join(",") +
-    "}";
-  const positionsQuery =
-    "positionSnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
-    adjustedPositionFields.join(",") +
     "}";
 
   const marketDailyQuery =
@@ -1304,7 +1291,9 @@ export const schema201 = (): Schema => {
       event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { ";
     let fields = eventsFields.join(", ");
     if (event === "liquidates") {
-      fields += ", profitUSD, liquidatee";
+      fields += ", profitUSD, liquidatee{id}, liquidator{id}, position{id}";
+    } else {
+      fields += ", account{id}, position{id}";
     }
     return baseStr + fields + " }";
   });
@@ -1387,6 +1376,29 @@ export const schema201 = (): Schema => {
     ${marketDailyQuery}
     ${marketHourlyQuery}
   }
+  `;
+
+  const positionsQuery = `
+      positions(first: 1000) {
+        id
+        account {
+          id
+        }
+        hashOpened
+        hashClosed
+        timestampOpened
+        timestampClosed
+        blockNumberOpened
+        blockNumberClosed
+        side
+        isCollateral
+        balance
+        depositCount
+        withdrawCount
+        borrowCount
+        repayCount
+        liquidationCount
+      }
   `;
 
   const query = `
@@ -1501,12 +1513,12 @@ export const schema201 = (): Schema => {
       exchangeRate
       rewardTokenEmissionsAmount
       rewardTokenEmissionsUSD
-      positions
       positionCount
       openPositionCount
       closedPositionCount
       lendingPositionCount
       borrowingPositionCount
+      ${positionsQuery}
     }
   }`;
 

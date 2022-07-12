@@ -122,20 +122,6 @@ function ProtocolDashboard() {
     { client },
   );
 
-  if (positionsQuery) {
-    (async () => {
-      const { data, loading } = await client.query({
-        query: gql`query {
-  
-          ${positionsQuery}
-        }
-        `,
-      });
-      setPositionSnapshots(data.positionSnapshots);
-      setPositionsLoading(loading);
-    })();
-  }
-
   const [getProtocolTableData, { data: protocolTableData, loading: protocolTableLoading, error: protocolTableError }] =
     useLazyQuery(
       gql`
@@ -184,6 +170,8 @@ function ProtocolDashboard() {
     tabNum = "3";
   } else if (tabString.toUpperCase() === "EVENTS") {
     tabNum = "4";
+  } else if (tabString.toUpperCase() === "POSITIONS") {
+    tabNum = "5";
   }
 
   const [tabValue, setTabValue] = useState(tabNum);
@@ -210,6 +198,9 @@ function ProtocolDashboard() {
     } else if (newValue === "4") {
       poolParam = `&poolId=${poolIdFromParam || poolId}`;
       tabName = "events";
+    } else if (newValue === "5") {
+      poolParam = `&poolId=${poolIdFromParam || poolId}`;
+      tabName = "positions";
     }
     navigate(`?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}`);
     setTabValue(newValue);
@@ -286,7 +277,7 @@ function ProtocolDashboard() {
   useEffect(() => {
     if (tabValue === "2") {
       getPoolsOverviewData();
-    } else if (tabValue === "3" || tabValue === "4") {
+    } else if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
       getPoolsListData();
     }
   }, [tabValue, getPoolsOverviewData, getPoolsListData]);
@@ -363,17 +354,16 @@ function ProtocolDashboard() {
           skipAmt={skipAmt}
           poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
           poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
+          positionsQuery={positionsQuery}
           protocolTimeseriesData={{
             financialsDailySnapshots: financialsData?.financialsDailySnapshots,
             usageMetricsDailySnapshots: dailyUsageData?.usageMetricsDailySnapshots,
             usageMetricsHourlySnapshots: hourlyUsageData?.usageMetricsHourlySnapshots,
-            positionSnapshots,
           }}
           protocolTimeseriesLoading={{
             financialsDailySnapshots: financialsLoading,
             usageMetricsDailySnapshots: dailyUsageLoading,
             usageMetricsHourlySnapshots: hourlyUsageLoading,
-            positionsLoading,
           }}
           protocolTimeseriesError={{
             financialsDailySnapshots: financialsError,

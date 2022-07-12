@@ -105,7 +105,6 @@ function ProtocolTab({
       fieldName: `${protocolEntityNameSingular}-totalValueLockedUSD`,
     });
   }
-  console.log("hey", protocolTableData);
   return (
     <>
       <IssuesDisplay issuesArrayProps={issuesToDisplay} oneLoaded={oneLoaded} allLoaded={allLoaded} />
