@@ -7,7 +7,10 @@ import {
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
-import { getOrCreateToken } from "../../../../../src/common/getters";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import {
   convertTokenToDecimal,
@@ -31,6 +34,10 @@ export function updateMasterChefDeposit(
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
   }
 
   // Get the amount of reward tokens emitted per block at this point in time.
@@ -99,6 +106,10 @@ export function updateMasterChefWithdraw(
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
   }
 
   // Get the amount of reward tokens emitted per block at this point in time.

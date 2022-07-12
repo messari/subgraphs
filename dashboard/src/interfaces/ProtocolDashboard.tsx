@@ -32,6 +32,9 @@ function ProtocolDashboard() {
   const [poolId, setPoolId] = useState<string>(poolIdString);
   const [skipAmt, paginate] = useState<number>(skipAmtParam);
 
+  const [positionSnapshots, setPositionSnapshots] = useState();
+  const [positionsLoading, setPositionsLoading] = useState(false);
+
   ChartJS.register(...registerables);
   const client = useMemo(() => {
     return new ApolloClient({
@@ -83,6 +86,7 @@ function ProtocolDashboard() {
     protocolTableQuery,
     poolsQuery,
     poolTimeseriesQuery,
+    positionsQuery = "",
   } = schema(protocolSchemaData?.protocols[0].type, schemaVersion);
 
   const queryMain = gql`
@@ -166,6 +170,8 @@ function ProtocolDashboard() {
     tabNum = "3";
   } else if (tabString.toUpperCase() === "EVENTS") {
     tabNum = "4";
+  } else if (tabString.toUpperCase() === "POSITIONS") {
+    tabNum = "5";
   }
 
   const [tabValue, setTabValue] = useState(tabNum);
@@ -192,6 +198,9 @@ function ProtocolDashboard() {
     } else if (newValue === "4") {
       poolParam = `&poolId=${poolIdFromParam || poolId}`;
       tabName = "events";
+    } else if (newValue === "5") {
+      poolParam = `&poolId=${poolIdFromParam || poolId}`;
+      tabName = "positions";
     }
     navigate(`?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}`);
     setTabValue(newValue);
@@ -268,7 +277,7 @@ function ProtocolDashboard() {
   useEffect(() => {
     if (tabValue === "2") {
       getPoolsOverviewData();
-    } else if (tabValue === "3" || tabValue === "4") {
+    } else if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
       getPoolsListData();
     }
   }, [tabValue, getPoolsOverviewData, getPoolsListData]);
@@ -345,6 +354,7 @@ function ProtocolDashboard() {
           skipAmt={skipAmt}
           poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
           poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
+          positionsQuery={positionsQuery}
           protocolTimeseriesData={{
             financialsDailySnapshots: financialsData?.financialsDailySnapshots,
             usageMetricsDailySnapshots: dailyUsageData?.usageMetricsDailySnapshots,
