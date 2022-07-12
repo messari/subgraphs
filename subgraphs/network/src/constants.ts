@@ -60,6 +60,21 @@ export namespace SubgraphNetwork {
   export const XDAI = "xdai";
 }
 
+export namespace DataType {
+  export const AUTHORS = "AUTHORS";
+  export const DIFFICULTY = "DIFFICULTY";
+  export const GAS_USED = "GAS_USED";
+  export const GAS_LIMIT = "GAS_LIMIT";
+  export const BURNT_FEES = "BURNT_FEES";
+  export const REWARDS = "REWARDS";
+  export const SIZE = "SIZE";
+  export const CHUNKS = "CHUNKS";
+  export const SUPPLY = "SUPPLY";
+  export const TRANSACTIONS = "TRANSACTIONS";
+  export const BLOCK_INTERVAL = "BLOCK_INTERVAL";
+  export const GAS_PRICE = "GAS_PRICE";
+}
+
 export namespace IntervalType {
   export const DAILY = "DAILY";
   export const HOURLY = "HOURLY";
