@@ -27,29 +27,33 @@ enum SubgraphNetwork {
   XDAI # aka Gnosis Chain
 }
 
-
+# Stores statistical analytics for given metrics
 type STATS @entity {
   " Number of times entity has been used in a time data entity "
 	count: BigInt!
 
 	" The average of all the values "
 	mean: BigInt!
+
   " The middle value when ordered from least to greatest "
 	median: BigInt!
 
 	" The maximum value in this entity "
 	max: BigInt!
+
   " The minimum value in this data set "
 	min: BigInt!
 
-  "  " 
+  " The standard deviation of all values within this entity " 
 	var: BigInt!
-	q3: BigInt!
-	q1: BigInt
 
-  ##### Add Ons #####
+  " This is the upper quartile where 75% of the values lie "
+	q3: BigInt!
+
+  " This is the lower quartile where 25% of the values lie "
+	q1: BigInt
   
-  " values in order from smallest to largest "
+  " List of values in order from smallest to largest "
   values: [BigInt!]!
 
   " The sum of all the values "
@@ -82,7 +86,7 @@ type Network @entity {
   blockHeight: Int!
 
   " Total difficulty to reach the current block "
-  cumulativeDifficulty: BigInt!
+  cumulativeDifficulty: BigInt
 
   " Total gas used "
   cumulativeGasUsed: BigInt!
@@ -91,22 +95,25 @@ type Network @entity {
   gasLimit: BigInt!
 
   " Total burnt fees on the network in native asset "
-  cumulativeBurntFees: BigInt!
+  cumulativeBurntFees: BigInt
 
   " Total rewards emitted on the network in native asset "
-  cumulativeRewards: BigInt!
+  cumulativeRewards: BigInt
 
   " Total number of transactions that have occured on this network "
-  cumulativeTransactions: Int!
+  cumulativeTransactions: Int
 
   " Total size of the network in native units (e.g. Bytes in Arweave and Ethereum) "
-  cumulativeSize: BigInt!
+  cumulativeSize: BigInt
 
   " Current supply of the native asset "
-  totalSupply: BigInt!
+  totalSupply: BigInt
 
   " Current blocks per day emission "
   blocksPerDay: BigDecimal!
+
+  " Statistical analysis of blocks/day from daily snapshots "
+  dailyBlocks: STATS!
 
   #### Snapshots ####
 
@@ -133,8 +140,8 @@ type DailySnapshot @entity {
   " Block height at this day (aka, blockNumber) "
   blockHeight: Int!
 
-  " First timestamp of this entity (used to calculate averages) "
-  firstTimestamp: BigInt!
+  " Blocks created during this day (note, this is different from blocksPerDay) "
+  dailyBlocks: Int!
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
@@ -142,84 +149,59 @@ type DailySnapshot @entity {
   " Number of cumulative unique authors (see type Author for explanation) "
   cumulativeUniqueAuthors: Int!
 
+  " Statistical analysis of unique daily active authors "
+  dailyAuthors: STATS!
+
   " Total difficulty up until this day "
-  cumulativeDifficulty: BigInt!
+  cumulativeDifficulty: BigInt
+
+  " Statistical analysis of difficulty during this day "
+  dailyDifficulty: STATS
+
+  " Total gas used up until this day "
+  cumulativeGasUsed: BigInt!
+
+  " Statistical analysis of gas used during this day"
+  dailyGasUsed: STATS!
+
+  " Statistical analysis of gas limit across blocks this day"
+  dailyGasLimit: STATS!
 
   " Total amount of fees burned "
-  cumulativeBurntFees: BigInt!
+  cumulativeBurntFees: BigInt
+
+  " Statisical amount of burnt fees for this day "
+  dailyBurntFees: STATS!
 
   " Total amount of rewards emitted "
-  cumulativeRewards: BigInt!
+  cumulativeRewards: BigInt
+
+  " Statistical analysis of rewards emitted on this day "
+  dailyRewards: STATS!
 
   " Total size of the entire network in this day (in native units) "
-  cumulativeSize: BigInt!
+  cumulativeSize: BigInt
 
-  " Total amount of the native asset in circulation during this day "
-  totalSupply: BigInt!
-
-  " gas price at the end of this hour in network native gas units "
-  gasPrice: BigInt!
-
-  #### Daily Metrics ####
-
-  " Number of unique daily active authors "
-  dailyActiveAuthors: Int!
-
-  " Blocks created during this day (note, this is different from blocksPerDay) "
-  dailyBlocks: Int!
-
-  " Difficulty during this day "
-  dailyDifficulty: BigInt!
-
-  " Average difficulty for this day "
-  dailyMeanDifficulty: BigDecimal!
-
-  " Sum of all gas used during this day "
-  dailyCumulativeGasUsed: BigInt!
-
-  " Sum of all gas limit during this day "
-  dailyCumulativeGasLimit: BigInt!
-
-  " Block utilization aggregated across this day "
-  dailyBlockUtilization: BigDecimal!
-
-  " Mean of gas used per block during this day "
-  dailyMeanGasUsed: BigDecimal!
-
-  " Mean of gas limit per block during this day "
-  dailyMeanGasLimit: BigDecimal!
-
-  " Amount of burnt fees for this day "
-  dailyBurntFees: BigInt!
-
-  " New rewards emitted on this day "
-  dailyRewards: BigInt!
-
-  " Daily mean block reward emitted "
-  dailyMeanRewards: BigDecimal!
-
-  " New supply added during this day "
-  dailySupplyIncrease: BigInt!
-
-  " Daily mean block interval time in seconds during this hour "
-  dailyMeanBlockInterval: BigDecimal!
-
-  " Cumulative size of all blocks created in this day "
-  dailyCumulativeSize: BigInt!
-
-  " Daily mean size in bytes of a block during this day "
+  " Statistical analysis of size in bytes of a block during this day "
   dailyMeanBlockSize: BigDecimal!
 
-  " Daily chunk count "
-  dailyChunkCount: Int!
+  " Statistical analysis of chunks per block during this day "
+  dailyChunks: Int!
 
-  " Number of transactions during this day "
-  dailyTransactionCount: Int!
+  " Total amount of the native asset in circulation during this day "
+  totalSupply: BigInt
 
-  #### Helpers ####
+  " Statisitcal analysis of the daily supply "
+  dailySupplyIncrease: STATS
 
-  " Keep track of the first supply of this snapshot "
-  firstSupply: BigInt!
+  " Statistical analysis of transactions per day "
+  dailyTransactions: STATS
+
+  " Statisical analysis of the block interval during this day "
+  dailyBlockInterval: STATS!
+
+  " gas price at the end of this hour in network native gas units "
+  gasPrice: BigInt
 }
 
 type HourlySnapshot @entity {
