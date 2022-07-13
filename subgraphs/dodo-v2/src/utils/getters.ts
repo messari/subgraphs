@@ -32,7 +32,8 @@ import {
   CPFactory_ADDRESS,
   DPPFactory_ADDRESS,
   DSPFactory_ADDRESS,
-  STABLE_COINS
+  STABLE_COINS,
+  currentNetwork
 } from "../constants/constant";
 
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
@@ -75,29 +76,28 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getOrCreateDexAmm(poolAdd: Address): DexAmmProtocol {
-  let proto = getProtocolFromPool(poolAdd);
-  let protocol = DexAmmProtocol.load(proto);
+export function getOrCreateDexAmm(): DexAmmProtocol {
+  let protocol = DexAmmProtocol.load(DVMFactory_ADDRESS);
+  let cNet = '';
 
-  let name = "";
+  if(currentNetwork == "mainnet"){
+    cNet = Network.MAINNET
+  } else if(currentNetwork == "matic") {
+    cNet = Network.POLYGON
+  } else if(currentNetwork == "bsc"){
+    cNet = Network.BSC
+  }
 
-  if (!protocol) {
-    protocol = new DexAmmProtocol(proto);
-    if (proto == DVMFactory_ADDRESS) {
-      name = "DODO V2 - DVM Factory";
-    } else if (proto == CPFactory_ADDRESS) {
-      name = "DODO V2 - CrowdPool Factory";
-    } else if (proto == DPPFactory_ADDRESS) {
-      name = "DODO V2 - DPP Factory";
-    } else if (proto == DSPFactory_ADDRESS) {
-      name = "DODO V2 - DSP Factory";
-    }
-    protocol.name = name;
+  if (protocol) {
+    return protocol;
+  } else {
+    let protocol = new DexAmmProtocol(DVMFactory_ADDRESS);
+    protocol.name = "DODO V2";
     protocol.slug = "messari-dodo";
     protocol.schemaVersion = "1.2.0";
     protocol.subgraphVersion = "0.2.1";
     protocol.methodologyVersion = "1.0.0";
-    protocol.network = Network.MAINNET;
+    protocol.network = cNet;
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalValueLockedUSD = ZERO_BD;
     protocol.protocolControlledValueUSD = ZERO_BD;
@@ -108,8 +108,8 @@ export function getOrCreateDexAmm(poolAdd: Address): DexAmmProtocol {
     protocol.cumulativeUniqueUsers = 0;
 
     protocol.save();
+    return protocol;
   }
-  return protocol;
 }
 
 export function getOrCreatePool(
@@ -119,7 +119,7 @@ export function getOrCreatePool(
   timestamp: BigInt,
   blockNumber: BigInt
 ): LiquidityPool {
-  let dodo = getOrCreateDexAmm(poolAddress);
+  let dodo = getOrCreateDexAmm();
   let pool = LiquidityPool.load(poolAddress.toHex());
   let it = getOrCreateToken(baseAdd);
   let ot = getOrCreateToken(quoteAdd);
@@ -166,7 +166,7 @@ export function getOrCreateDailyUsageSnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-    usageMetrics.protocol = getProtocolFromPool(event.address);
+    usageMetrics.protocol = DVMFactory_ADDRESS;
 
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = prevCount;
@@ -195,7 +195,7 @@ export function getOrCreateHourlyUsageSnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
-    usageMetrics.protocol = getProtocolFromPool(event.address);
+    usageMetrics.protocol = DVMFactory_ADDRESS;
 
     usageMetrics.hourlyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = prevCount;
@@ -222,7 +222,7 @@ export function getOrCreateFinancials(
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = getProtocolFromPool(event.address);
+    financialMetrics.protocol = DVMFactory_ADDRESS;
     financialMetrics.totalValueLockedUSD = ZERO_BD;
     financialMetrics.protocolControlledValueUSD = ZERO_BD;
     financialMetrics.dailyVolumeUSD = ZERO_BD;
@@ -263,7 +263,7 @@ export function getOrCreatePoolDailySnapshot(
       event.block.timestamp
     );
 
-    poolMetrics.protocol = getProtocolFromPool(event.address);
+    poolMetrics.protocol = DVMFactory_ADDRESS;
     poolMetrics.pool = pool.id;
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;
@@ -310,7 +310,7 @@ export function getLiquidityPoolHourlySnapshot(
     );
 
     setPriceLP(event.block.timestamp, event.block.number, event.address);
-    poolMetrics.protocol = getProtocolFromPool(event.address);
+    poolMetrics.protocol = DVMFactory_ADDRESS;
     poolMetrics.pool = pool.id;
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;
@@ -334,35 +334,6 @@ export function getLiquidityPoolHourlySnapshot(
   return poolMetrics;
 }
 
-export function getProtocolFromPool(poolAddress: Address): string {
-  let pool = DVM.bind(poolAddress);
-  let callResult = pool.try_version();
-  let version = "";
-
-  if (callResult.reverted) {
-    log.warning("[getProtocolFromPool] pool get version reverted, pool address of failed call: {}", [poolAddress.toHexString()]);
-  } else {
-    version = callResult.value;
-    log.info("[getProtocolFromPool] pool get version returned: {}", [version]);
-  }
-
-  let factoryAdd = "";
-  if (
-    version == "DVM 1.0.0" ||
-    version == "DVM 1.0.1" ||
-    version == "DVM 1.0.2"
-  ) {
-    factoryAdd = DVMFactory_ADDRESS;
-  } else if (version == "DPP 1.0.0") {
-    factoryAdd = DPPFactory_ADDRESS;
-  } else if (version == "DSP 1.0.0" || version == "DSP 1.0.1") {
-    factoryAdd = DSPFactory_ADDRESS;
-  } else {
-    factoryAdd = CPFactory_ADDRESS;
-  }
-  return factoryAdd;
-}
-
 export function getUSDprice(tokenAddress: Address, amount: BigInt): BigDecimal {
   let token = getOrCreateToken(tokenAddress);
   let modAmount = modulateDecimals(amount, token.decimals)
@@ -370,40 +341,4 @@ export function getUSDprice(tokenAddress: Address, amount: BigInt): BigDecimal {
   token.lastPriceUSD = getUSDPricePerToken(tokenAddress);
   token.save();
   return price;
-}
-
-export function getOrCreateDexAmmADD(protoAdd: Address): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(protoAdd.toHexString());
-
-  let name = "";
-
-  if (!protocol) {
-    protocol = new DexAmmProtocol(protoAdd.toHexString());
-    if (protoAdd.toHexString() == DVMFactory_ADDRESS) {
-      name = "DODO V2 - DVM Factory";
-    } else if (protoAdd.toHexString() == CPFactory_ADDRESS) {
-      name = "DODO V2 - CrowdPool Factory";
-    } else if (protoAdd.toHexString() == DPPFactory_ADDRESS) {
-      name = "DODO V2 - DPP Factory";
-    } else if (protoAdd.toHexString() == DSPFactory_ADDRESS) {
-      name = "DODO V2 - DSP Factory";
-    }
-    protocol.name = name;
-    protocol.slug = "messari-dodo";
-    protocol.schemaVersion = "1.2.1";
-    protocol.subgraphVersion = "0.1.0";
-    protocol.methodologyVersion = "1.0.0";
-    protocol.network = Network.MAINNET;
-    protocol.type = ProtocolType.EXCHANGE;
-    protocol.totalValueLockedUSD = ZERO_BD;
-    protocol.protocolControlledValueUSD = ZERO_BD;
-    protocol.cumulativeVolumeUSD = ZERO_BD;
-    protocol.cumulativeSupplySideRevenueUSD = ZERO_BD;
-    protocol.cumulativeProtocolSideRevenueUSD = ZERO_BD;
-    protocol.cumulativeTotalRevenueUSD = ZERO_BD;
-    protocol.cumulativeUniqueUsers = 0;
-
-    protocol.save();
-  }
-  return protocol;
 }

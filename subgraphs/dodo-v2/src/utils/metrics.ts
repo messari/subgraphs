@@ -42,8 +42,7 @@ import {
   getOrCreateFinancials,
   getOrCreatePool,
   getOrCreateToken,
-  getUSDprice,
-  getOrCreateDexAmmADD
+  getUSDprice
 } from "./getters";
 
 
@@ -66,24 +65,16 @@ export function updateFinancials(
   let protoSideRevb4 = usdTranVal * usdValOfFees[0];
   let protoSideRev = protoSideRevb4 * BigDecimal.fromString(".05");
   let supplySideRev = supplySideRevb4 + (protoSideRevb4 * BigDecimal.fromString(".95"));
-
   let totalRev = supplySideRev + protoSideRev;
-
-  let dvmP = getOrCreateDexAmmADD(Address.fromString(DVMFactory_ADDRESS));
-  let cpP = getOrCreateDexAmmADD(Address.fromString(CPFactory_ADDRESS));
-  let dppP = getOrCreateDexAmmADD(Address.fromString(DPPFactory_ADDRESS));
-  let dspP = getOrCreateDexAmmADD(Address.fromString(DSPFactory_ADDRESS));
-
+  let dvmP = getOrCreateDexAmm();
   let prevTotalValueLockedUSD = dvmP.totalValueLockedUSD;
   let newTotalValueLockedUSD = ZERO_BD;
-
 
   if(gainedVal) {
      newTotalValueLockedUSD = prevTotalValueLockedUSD + change;
   } else {
     newTotalValueLockedUSD = prevTotalValueLockedUSD - change;
   }
-
 
   dvmP.totalValueLockedUSD = newTotalValueLockedUSD;
   dvmP.protocolControlledValueUSD = ZERO_BD;
@@ -93,47 +84,21 @@ export function updateFinancials(
   dvmP.cumulativeVolumeUSD += usdTranVal;
   dvmP.save();
 
-  cpP.totalValueLockedUSD = newTotalValueLockedUSD;
-  cpP.protocolControlledValueUSD = ZERO_BD;
-  cpP.cumulativeSupplySideRevenueUSD += supplySideRev;
-  cpP.cumulativeProtocolSideRevenueUSD += protoSideRev;
-  cpP.cumulativeTotalRevenueUSD += totalRev;
-  cpP.cumulativeVolumeUSD += usdTranVal;
-  cpP.save();
-
-  dppP.totalValueLockedUSD = newTotalValueLockedUSD;
-  dppP.protocolControlledValueUSD = ZERO_BD;
-  dppP.cumulativeSupplySideRevenueUSD += supplySideRev;
-  dppP.cumulativeProtocolSideRevenueUSD += protoSideRev;
-  dppP.cumulativeTotalRevenueUSD += totalRev;
-  dppP.cumulativeVolumeUSD += usdTranVal;
-  dppP.save();
-
-  dspP.totalValueLockedUSD = newTotalValueLockedUSD;
-  dspP.protocolControlledValueUSD = ZERO_BD;
-  dspP.cumulativeSupplySideRevenueUSD += supplySideRev;
-  dspP.cumulativeProtocolSideRevenueUSD += protoSideRev;
-  dspP.cumulativeTotalRevenueUSD += totalRev;
-  dspP.cumulativeVolumeUSD += usdTranVal;
-  dspP.save();
-
-  let protocol = getOrCreateDexAmm(event.address);
-
   let financialMetrics = getOrCreateFinancials(event);
-  financialMetrics.protocol = protocol.id;
+  financialMetrics.protocol = dvmP.id;
   financialMetrics.protocolControlledValueUSD = ZERO_BD;
   financialMetrics.dailyVolumeUSD += usdTVL;
   financialMetrics.dailySupplySideRevenueUSD += supplySideRev;
   financialMetrics.dailyProtocolSideRevenueUSD += protoSideRev;
   financialMetrics.dailyTotalRevenueUSD += totalRev;
-  financialMetrics.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
+  financialMetrics.cumulativeVolumeUSD = dvmP.cumulativeVolumeUSD;
   financialMetrics.totalValueLockedUSD = newTotalValueLockedUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
+    dvmP.cumulativeSupplySideRevenueUSD;
   financialMetrics.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
+    dvmP.cumulativeProtocolSideRevenueUSD;
   financialMetrics.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD;
+    dvmP.cumulativeTotalRevenueUSD;
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
 
@@ -150,26 +115,13 @@ export function updateUsageMetrics(
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let accountId = from.toHexString();
   let account = Account.load(accountId);
-  let protocol = getOrCreateDexAmm(event.address);
-
-  let dvmP = getOrCreateDexAmmADD(Address.fromString(DVMFactory_ADDRESS));
-  let cpP = getOrCreateDexAmmADD(Address.fromString(CPFactory_ADDRESS));
-  let dppP = getOrCreateDexAmmADD(Address.fromString(DPPFactory_ADDRESS));
-  let dspP = getOrCreateDexAmmADD(Address.fromString(DSPFactory_ADDRESS));
+  let protocol = getOrCreateDexAmm();
 
   if (!account) {
     account = new Account(accountId);
     account.save();
     protocol.cumulativeUniqueUsers += 1;
-    dvmP.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-    cpP.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-    dppP.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-    dspP.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
     protocol.save();
-    dvmP.save();
-    cpP.save();
-    dppP.save();
-    dspP.save();
   }
 
   let usageMetricsDaily = getOrCreateDailyUsageSnapshot(
@@ -226,7 +178,7 @@ export function updatePoolMetrics(
 ): void {
   let poolMetrics = getOrCreatePoolDailySnapshot(event);
   let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
-  let protocol = getOrCreateDexAmm(event.address);
+  let protocol = getOrCreateDexAmm();
   let token1 = ERC20.bind(tokenAdds[0]);
   let token2 = ERC20.bind(tokenAdds[1]);
   let poolInstance = DVM.bind(poolAdd);
@@ -255,6 +207,11 @@ export function updatePoolMetrics(
     lpSupplyVal = BigInt.fromString("0")
   } else {
     lpSupplyVal = lpSupply.value
+  }
+  //somehow this is returning negative values on some pools. Shouldnt be
+  // possible given the logic but Added a check to attempt to fix
+  if(lpSupplyVal < BigInt.fromString("0")) {
+    lpSupplyVal = BigInt.fromString("0");
   }
 
   let lpToken = getOrCreateToken(poolAdd);
@@ -366,25 +323,14 @@ export function updateFinancialsERC20(
     event: ethereum.Event
 ): void {
 
-  let dvmP = getOrCreateDexAmmADD(Address.fromString(DVMFactory_ADDRESS));
-  let cpP = getOrCreateDexAmmADD(Address.fromString(CPFactory_ADDRESS));
-  let dppP = getOrCreateDexAmmADD(Address.fromString(DPPFactory_ADDRESS));
-  let dspP = getOrCreateDexAmmADD(Address.fromString(DSPFactory_ADDRESS));
+  let dvmP = getOrCreateDexAmm();
 
   let usdVal = getUSDprice(Address.fromString(WRAPPED_FEE_TOKEN), BigInt.fromString(TOKEN_CREATION_FEE));
   dvmP.cumulativeTotalRevenueUSD += usdVal;
   dvmP.save();
 
-  cpP.cumulativeTotalRevenueUSD += usdVal;
-  cpP.save();
 
-  dppP.cumulativeTotalRevenueUSD += usdVal;
-  dppP.save();
-
-  dspP.cumulativeTotalRevenueUSD += usdVal;
-  dspP.save();
-
-  let protocol = getOrCreateDexAmm(event.address);
+  let protocol = getOrCreateDexAmm();
 
   let financialMetrics = getOrCreateFinancials(event);
   financialMetrics.protocol = protocol.id;
