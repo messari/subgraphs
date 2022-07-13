@@ -121,3 +121,37 @@ export function updateProtocolAfterNewVault(vaultAddress: string): void {
 
   protocol.save();
 }
+
+export function getConvexTokenMintAmount(crvRewardAmount: BigInt): BigDecimal {
+  const convexTokenContract = ERC20Contract.bind(
+    constants.CONVEX_TOKEN_ADDRESS
+  );
+  let cvxTokenDecimals = getTokenDecimals(constants.CONVEX_TOKEN_ADDRESS);
+  let cvxTokenSupply = readValue<BigInt>(
+    convexTokenContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  ).toBigDecimal();
+
+  let currentCliff = cvxTokenSupply.div(constants.CVX_CLIFF_SIZE);
+
+  let cvxRewardAmount: BigDecimal = constants.BIGDECIMAL_ZERO;
+  if (currentCliff.lt(constants.CVX_CLIFF_COUNT.times(cvxTokenDecimals))) {
+    let remaining = constants.CVX_CLIFF_COUNT.times(cvxTokenDecimals).minus(
+      currentCliff
+    );
+
+    cvxRewardAmount = crvRewardAmount
+      .toBigDecimal()
+      .times(remaining)
+      .div(constants.CVX_CLIFF_COUNT.times(cvxTokenDecimals));
+
+    let amountTillMax = constants.CVX_MAX_SUPPLY.times(cvxTokenDecimals).minus(
+      cvxTokenSupply
+    );
+    if (cvxRewardAmount.gt(amountTillMax)) {
+      cvxRewardAmount = amountTillMax;
+    }
+  }
+
+  return cvxRewardAmount;
+}

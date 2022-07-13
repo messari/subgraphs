@@ -1,11 +1,4 @@
 import {
-  log,
-  BigInt,
-  Address,
-  ethereum,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
-import {
   getOrCreateVault,
   getOrCreateRewardToken,
 } from "../common/initializers";
@@ -13,7 +6,7 @@ import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import { getRewardsPerDay } from "../common/rewards";
-import { ERC20 as ERC20Contract } from "../../generated/Booster/ERC20";
+import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { BaseRewardPool as RewardPoolContract } from "../../generated/Booster/BaseRewardPool";
 
 export function getHistoricalRewards(rewardTokenPool: Address): BigInt {
@@ -31,37 +24,7 @@ export function updateConvexRewardToken(
   crvRewardPerDay: BigInt,
   block: ethereum.Block
 ): void {
-  const convexTokenContract = ERC20Contract.bind(
-    constants.CONVEX_TOKEN_ADDRESS
-  );
-  let cvxTokenDecimals = utils.getTokenDecimals(constants.CONVEX_TOKEN_ADDRESS);
-  let cvxTokenSupply = utils
-    .readValue<BigInt>(
-      convexTokenContract.try_totalSupply(),
-      constants.BIGINT_ZERO
-    )
-    .toBigDecimal();
-
-  let currentCliff = cvxTokenSupply.div(constants.CVX_CLIFF_SIZE);
-
-  let cvxRewardRate: BigDecimal = constants.BIGDECIMAL_ZERO;
-  if (currentCliff.lt(constants.CVX_CLIFF_COUNT.times(cvxTokenDecimals))) {
-    let remaining = constants.CVX_CLIFF_COUNT.times(cvxTokenDecimals).minus(
-      currentCliff
-    );
-
-    cvxRewardRate = crvRewardPerDay
-      .toBigDecimal()
-      .times(remaining)
-      .div(constants.CVX_CLIFF_COUNT.times(cvxTokenDecimals));
-
-    let amountTillMax = constants.CVX_MAX_SUPPLY.times(cvxTokenDecimals).minus(
-      cvxTokenSupply
-    );
-    if (cvxRewardRate.gt(amountTillMax)) {
-      cvxRewardRate = amountTillMax;
-    }
-  }
+  let cvxRewardRate = utils.getConvexTokenMintAmount(crvRewardPerDay);
 
   let cvxRewardRatePerDay = getRewardsPerDay(
     block.timestamp,
@@ -81,7 +44,7 @@ export function updateConvexRewardToken(
   );
 
   log.warning(
-    "[CVX_Rewards] poolId: {}, cvxRewardRate: {}, cvxRewardPerDay: {}",
+    "[cvxRewards] poolId: {}, cvxRewardRate: {}, cvxRewardPerDay: {}",
     [poolId.toString(), cvxRewardRate.toString(), cvxRewardPerDay.toString()]
   );
 }

@@ -37,12 +37,22 @@ export function handleRewardAdded(event: RewardAdded): void {
   let beforeHistoricalRewards = rewardPoolInfo.historicalRewards;
   let afterHistoricalRewards = getHistoricalRewards(crvRewardPoolAddress);
 
-  let rewardsEarned = afterHistoricalRewards
-    .minus(beforeHistoricalRewards)
-    .toBigDecimal();
+  let rewardsEarned = afterHistoricalRewards.minus(beforeHistoricalRewards);
+
+  let cvxRewardTokenAddress = constants.CONVEX_TOKEN_ADDRESS;
+  let cvxRewardTokenPrice = getUsdPricePerToken(cvxRewardTokenAddress);
+  let cvxRewardTokenDecimals = utils.getTokenDecimals(cvxRewardTokenAddress);
+
+  let cvxRewardsEarned = utils.getConvexTokenMintAmount(rewardsEarned);
+  let cvxRewardEarnedUsd = cvxRewardsEarned
+    .div(cvxRewardTokenDecimals)
+    .times(cvxRewardTokenPrice.usdPrice)
+    .div(cvxRewardTokenPrice.decimalsBaseTen)
+    .truncate(1);
 
   let totalFeesConvex = getTotalFees();
   let totalRewardsEarned = rewardsEarned
+    .toBigDecimal()
     .div(constants.BIGDECIMAL_ONE.minus(totalFeesConvex.totalFees()))
     .truncate(0);
 
@@ -52,12 +62,14 @@ export function handleRewardAdded(event: RewardAdded): void {
   let platformFee = totalRewardsEarned.times(totalFeesConvex.platformFee); // possible fee to build treasury
 
   let supplySideRevenue = rewardsEarned
+    .toBigDecimal()
     .plus(lockFee)
     .div(crvRewardTokenDecimals)
     .truncate(0);
   const supplySideRevenueUSD = supplySideRevenue
     .times(crvRewardTokenPrice.usdPrice)
     .div(crvRewardTokenPrice.decimalsBaseTen)
+    .plus(cvxRewardEarnedUsd)
     .truncate(1);
 
   let protocolSideRevenue = stakerFee
@@ -83,11 +95,15 @@ export function handleRewardAdded(event: RewardAdded): void {
   updateRewardToken(poolId, crvRewardPoolAddress, event.block);
 
   log.warning(
-    "[RewardAdded] Pool: {}, totalRewardsEarned: {}, crvRewardsEarned: {}, supplySideRevenue: {}, supplySideRevenueUSD: {}, protocolSideRevenue: {}, protocolSideRevenueUSD: {}, TxHash: {}",
+    "[RewardAdded] Pool: {}, totalRewardsEarned: {}, crvRewardsEarned: {}, cvxRewardsEarned: {}, \
+    cvxRewardsEarnedUSD: {}, supplySideRevenue: {}, supplySideRevenueUSD: {}, protocolSideRevenue: {}, \
+    protocolSideRevenueUSD: {}, TxHash: {}",
     [
       crvRewardPoolAddress.toHexString(),
       totalRewardsEarned.toString(),
       rewardsEarned.toString(),
+      cvxRewardsEarned.toString(),
+      cvxRewardEarnedUsd.toString(),
       supplySideRevenue.toString(),
       supplySideRevenueUSD.toString(),
       protocolSideRevenue.toString(),
