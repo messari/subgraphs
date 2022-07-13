@@ -450,6 +450,12 @@
           "messari": "messari/moonwell-moonriver",
           "dmelotik": "dmelotik/moonwell",
           "deploy-on-merge": true
+        },
+        "moonbeam": {
+          "template": "moonwell.template.yaml",
+          "messari": "messari/moonwell-moonbeam",
+          "dmelotik": "dmelotik/moonwell-moonbeam",
+          "deploy-on-merge": true
         }
       },
       "rari-fuse": {

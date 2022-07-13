@@ -216,7 +216,13 @@ export function handleMint(event: Mint): void {
   let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
-  _handleMint(comptrollerAddr, minter, mintAmount, balanceOfUnderlyingResult, event);
+  _handleMint(
+    comptrollerAddr,
+    minter,
+    mintAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleRedeem(event: Redeem): void {
