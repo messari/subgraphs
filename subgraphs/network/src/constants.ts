@@ -71,6 +71,7 @@ export namespace DataType {
   export const CHUNKS = "CHUNKS";
   export const SUPPLY = "SUPPLY";
   export const TRANSACTIONS = "TRANSACTIONS";
+  export const BLOCKS = "BLOCKS";
   export const BLOCK_INTERVAL = "BLOCK_INTERVAL";
   export const GAS_PRICE = "GAS_PRICE";
 }

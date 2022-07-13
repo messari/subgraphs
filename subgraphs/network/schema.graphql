@@ -29,15 +29,16 @@ enum SubgraphNetwork {
 
 enum DataType {
   AUTHORS
-  DIFFICULTY 
-  GAS_USED 
-  GAS_LIMIT 
+  DIFFICULTY
+  GAS_USED
+  GAS_LIMIT
   BURNT_FEES
-  REWARDS 
-  SIZE 
-  CHUNKS 
-  SUPPLY 
-  TRANSACTIONS 
+  REWARDS
+  SIZE
+  CHUNKS
+  SUPPLY
+  TRANSACTIONS
+  BLOCKS
   BLOCK_INTERVAL
   GAS_PRICE
 }
@@ -48,29 +49,29 @@ type STATS @entity {
   id: ID!
 
   " Number of times entity has been used in a time data entity "
-	count: Int!
+  count: Int!
 
-	" The average of all the values "
-	mean: BigInt!
+  " The average of all the values "
+  mean: BigInt!
 
   " The middle value when ordered from least to greatest "
-	median: BigInt!
+  median: BigInt!
 
-	" The maximum value in this entity "
-	max: BigInt!
+  " The maximum value in this entity "
+  max: BigInt!
 
   " The minimum value in this data set "
-	min: BigInt!
+  min: BigInt!
 
-  " The standard deviation of all values within this entity " 
-	variance: BigDecimal!
+  " The standard deviation of all values within this entity "
+  variance: BigDecimal!
 
   " This is the upper quartile where 75% of the values lie "
-	q3: BigDecimal!
+  q3: BigDecimal!
 
   " This is the lower quartile where 25% of the values lie "
-	q1: BigDecimal
-  
+  q1: BigDecimal!
+
   " List of values in order from smallest to largest "
   values: [BigInt!]!
 
