@@ -2,11 +2,13 @@ import { Box, Tooltip } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
+import { blockExplorers } from '../../constants';
 
 interface TableChartProps {
   datasetLabel: string;
   dataTable: any;
   protocolType: string;
+  protocolNetwork: string;
   handleTabChange: (event: any, newValue: string) => void;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
   skipAmt: number;
@@ -24,6 +26,7 @@ export const TablePoolOverview = ({
   datasetLabel,
   dataTable,
   protocolType,
+  protocolNetwork,
   handleTabChange,
   setPoolId,
   skipAmt,
@@ -93,10 +96,11 @@ export const TablePoolOverview = ({
               params.value.length,
             )}`;
           }
+          const blockExplorerUrlBase = blockExplorers[protocolNetwork.toUpperCase()];
           return (
             <Tooltip title={params.value}>
               <span
-                onClick={() => (window.location.href = "https://etherscan.io/address/" + params.value)}
+                onClick={() => (window.location.href = blockExplorerUrlBase + 'address/' + params.value)}
                 style={tableCellTruncate}
               >
                 {poolIdStr}

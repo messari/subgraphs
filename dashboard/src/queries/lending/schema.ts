@@ -494,7 +494,6 @@ export const schema120 = (): Schema => {
       dailyLiquidateUSD: "BigDecimal!",
       cumulativeLiquidateUSD: "BigDecimal!",
       mintedTokenSupplies: "[BigInt!]",
-      protocolControlledValueUSD: "BigDecimal",
       timestamp: "BigInt!",
     },
     usageMetricsDailySnapshots: {
@@ -666,7 +665,6 @@ export const schema120 = (): Schema => {
         }
         cumulativeUniqueUsers
         totalValueLockedUSD
-        protocolControlledValueUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
@@ -729,7 +727,6 @@ export const schema120 = (): Schema => {
       }
       cumulativeUniqueUsers
       totalValueLockedUSD
-      protocolControlledValueUSD
       cumulativeSupplySideRevenueUSD
       cumulativeProtocolSideRevenueUSD
       cumulativeTotalRevenueUSD
@@ -808,7 +805,6 @@ export const schema120 = (): Schema => {
     mintedTokens: "[Token!]",
     cumulativeUniqueUsers: "Int!",
     totalValueLockedUSD: "BigDecimal!",
-    protocolControlledValueUSD: "BigDecimal",
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",
@@ -864,7 +860,6 @@ export const schema130 = (): Schema => {
       dailyLiquidateUSD: "BigDecimal!",
       cumulativeLiquidateUSD: "BigDecimal!",
       mintedTokenSupplies: "[BigInt!]",
-      protocolControlledValueUSD: "BigDecimal",
       timestamp: "BigInt!",
     },
     usageMetricsDailySnapshots: {
@@ -1056,7 +1051,6 @@ export const schema130 = (): Schema => {
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
         totalPoolCount
-        protocolControlledValueUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
@@ -1119,7 +1113,6 @@ export const schema130 = (): Schema => {
       }
       cumulativeUniqueUsers
       totalValueLockedUSD
-      protocolControlledValueUSD
       cumulativeSupplySideRevenueUSD
       cumulativeProtocolSideRevenueUSD
       cumulativeTotalRevenueUSD
@@ -1202,7 +1195,6 @@ export const schema130 = (): Schema => {
     mintedTokens: "[Token!]",
     cumulativeUniqueUsers: "Int!",
     totalValueLockedUSD: "BigDecimal!",
-    protocolControlledValueUSD: "BigDecimal",
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",

@@ -21,6 +21,7 @@ interface PoolOverviewTabProps {
   totalPoolCount?: number;
   pools: any[];
   protocolType: string;
+  protocolNetwork: string;
   subgraphToQueryURL: string;
   poolOverviewRequest: { [x: string]: any };
   skipAmt: number;
@@ -35,6 +36,7 @@ function PoolOverviewTab({
   pools,
   setPoolId,
   protocolType,
+  protocolNetwork,
   poolOverviewRequest,
   handleTabChange,
   paginate,
@@ -137,6 +139,7 @@ function PoolOverviewTab({
         datasetLabel=""
         dataTable={pools}
         protocolType={protocolType}
+        protocolNetwork={protocolNetwork}
         skipAmt={skipAmt}
         issueProps={tableIssues}
         setPoolId={(x) => setPoolId(x)}

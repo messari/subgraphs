@@ -7,7 +7,7 @@ import ProtocolTab from "./tabs/ProtocolTab";
 import { styled } from "../styled";
 import PoolOverviewTab from "./tabs/PoolOverviewTab";
 import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
-import { ProtocolTypeEntityName } from "../constants";
+import { ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -87,8 +87,10 @@ function AllDataTabs({
   }
 
   const protocolType = data.protocols[0].type;
+  const protocolEntityNamesPlural = ProtocolTypeEntityNames[protocolType]
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
-  console.log('glub', protocolTableData, protocolEntityNameSingular, ProtocolTypeEntityName, protocolType)
+  const network = data[protocolEntityNamesPlural][0].network
+
   let eventsTab = null;
   let eventsTabButton = null;
   if (protocolType !== 'GENERIC') {
@@ -99,6 +101,7 @@ function AllDataTabs({
         <EventsTab
           data={data}
           events={events}
+          protocolNetwork={network}
           poolId={poolId}
           poolsList={poolsListData}
           poolListLoading={poolListLoading}
@@ -137,6 +140,7 @@ function AllDataTabs({
             skipAmt={skipAmt}
             pools={pools}
             protocolType={data.protocols[0].type}
+            protocolNetwork={network}
             poolOverviewRequest={poolOverviewRequest}
             subgraphToQueryURL={subgraphToQueryURL}
             setPoolId={(x) => setPoolId(x)}

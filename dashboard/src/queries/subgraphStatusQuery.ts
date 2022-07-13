@@ -8,9 +8,57 @@ export const SubgraphStatusQuery = (url: string): DocumentNode => {
   }
 }
 
+export const getPendingSubgraphId = gql`
+query Status($subgraphName: String) {
+  indexingStatusForPendingVersion(subgraphName: $subgraphName) {
+    subgraph
+    health
+    entityCount
+  }
+}
+`;
+
 export const nameQuery = gql`
   query Status($subgraphName: String) {
     indexingStatusForCurrentVersion(subgraphName: $subgraphName) {
+      subgraph
+      node
+      synced
+      health
+      fatalError {
+        message
+        block {
+          number
+          hash
+        }
+        handler
+      }
+      nonFatalErrors {
+        message
+        block {
+          number
+          hash
+        }
+        handler
+      }
+      chains {
+        network
+        chainHeadBlock {
+          number
+        }
+        earliestBlock {
+          number
+        }
+        latestBlock {
+          number
+        }
+        lastHealthyBlock {
+          number
+        }
+      }
+      entityCount
+    }
+    indexingStatusForPendingVersion(subgraphName: $subgraphName) {
       subgraph
       node
       synced
