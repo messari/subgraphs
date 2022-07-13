@@ -846,6 +846,15 @@
           "deploy-on-merge": true
         }
       }
+    },
+    "openzeppelin-governor-forks": {
+      "truefi-governance": {
+        "mainnet": {
+          "template": "truefi-governance.template.yaml",
+          "danielkhoo": "danielkhoo/truefi-governance",
+          "deploy-on-merge": false
+        }
+      }
     }
   }
 }

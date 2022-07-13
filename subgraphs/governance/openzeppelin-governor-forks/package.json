@@ -1,0 +1,24 @@
+{
+  "name": "openzeppelin-governor-forks",
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write .",
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
+    "prepare:build": "graph codegen && graph build",
+    "create-local": "graph create --node http://localhost:8020/ ${npm_config_name}",
+    "remove-local": "graph remove --node http://localhost:8020/ ${npm_config_name}",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ${npm_config_name}",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
+    "deploy": "node ../../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-ts": "^0.27.0",
+    "minimist": "^1.2.6"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.30.1",
+    "mustache": "^4.2.0",
+    "prettier": "^2.6.0"
+  }
+}
