@@ -22,25 +22,25 @@ export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",
   LENDING: "market",
   YIELD: "vault",
-  GENERIC: "pool"
+  GENERIC: "pool",
 };
 export const PoolNames: Record<string, string> = {
   EXCHANGE: "liquidityPools",
   LENDING: "markets",
   YIELD: "vaults",
-  GENERIC: "pools"
+  GENERIC: "pools",
 };
 export const ProtocolTypeEntityName: Record<string, string> = {
   EXCHANGE: "dexAmmProtocol",
   LENDING: "lendingProtocol",
   YIELD: "yieldAggregator",
-  GENERIC: "protocol"
+  GENERIC: "protocol",
 };
 export const ProtocolTypeEntityNames: Record<string, string> = {
   EXCHANGE: "dexAmmProtocols",
   LENDING: "lendingProtocols",
   YIELD: "yieldAggregators",
-  GENERIC: "protocols"
+  GENERIC: "protocols",
 };
 export interface Schema {
   entities: string[];
@@ -83,8 +83,8 @@ export const blockExplorers: Record<string, string> = {
   CELO: "https://explorer.celo.org/",
   FUSE: "https://explorer.fuse.io/",
   HARMONY: "https://explorer.harmony.one/",
-  CRONOS: "https://cronoscan.com/"
-}
+  CRONOS: "https://cronoscan.com/",
+};
 
 // negativeFieldList contains field names that can be negative
 export const negativeFieldList = [];

@@ -48,24 +48,26 @@ export const SubgraphDeployments = ({
       <LazyLoad height={260} offset={80}>
         <DeploymentContainer>
           {deployments.map(({ network, deployment }) => {
-            return (<>
-              <Deployment
-                key={network}
-                clientIndexing={clientIndexing}
-                subgraphID={name}
-                networkName={network}
-                deployment={deployment}
-                currentDeployment={true}
-              />
-              <Deployment
-                key={network}
-                clientIndexing={clientIndexing}
-                subgraphID={name}
-                networkName={network}
-                deployment={deployment}
-                currentDeployment={false}
-              />
-            </>);
+            return (
+              <>
+                <Deployment
+                  key={network}
+                  clientIndexing={clientIndexing}
+                  subgraphID={name}
+                  networkName={network}
+                  deployment={deployment}
+                  currentDeployment={true}
+                />
+                <Deployment
+                  key={network}
+                  clientIndexing={clientIndexing}
+                  subgraphID={name}
+                  networkName={network}
+                  deployment={deployment}
+                  currentDeployment={false}
+                />
+              </>
+            );
           })}
         </DeploymentContainer>
       </LazyLoad>

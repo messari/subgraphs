@@ -18,7 +18,13 @@ const DeploymentBackground = styled("div")`
 `;
 
 const StyledDeployment = styled(Card)<{
-  $styleRules: { schemaOutdated: boolean; nonFatalErrors: boolean; fatalError: boolean; success: boolean; currentVersion: Boolean };
+  $styleRules: {
+    schemaOutdated: boolean;
+    nonFatalErrors: boolean;
+    fatalError: boolean;
+    success: boolean;
+    currentVersion: Boolean;
+  };
 }>(({ $styleRules, theme }) => {
   let statusColor = "";
   if ($styleRules.fatalError) {
@@ -53,7 +59,7 @@ const StyledDeployment = styled(Card)<{
   `;
 });
 
-const CardRow = styled("div") <{ $warning?: boolean }>`
+const CardRow = styled("div")<{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -77,14 +83,20 @@ interface DeploymentProps {
 }
 
 // This component is for each individual subgraph
-export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing, currentDeployment }: DeploymentProps) => {
-  const [endpointURL, setEndpointURL] = useState(deployment)
+export const Deployment = ({
+  networkName,
+  deployment,
+  subgraphID,
+  clientIndexing,
+  currentDeployment,
+}: DeploymentProps) => {
+  const [endpointURL, setEndpointURL] = useState(deployment);
   const deploymentsContext = useContext(DeploymentsContext);
   const navigate = useNavigate();
   const navigateToSubgraph = (url: string) => () => {
-    let versionParam = ""
+    let versionParam = "";
     if (!currentDeployment) {
-      versionParam = '&version=pending&name=' + parseSubgraphName(deployment)
+      versionParam = "&version=pending&name=" + parseSubgraphName(deployment);
     }
     navigate(`subgraph?endpoint=${url}&tab=protocol` + versionParam);
   };
@@ -113,23 +125,23 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
 
   const client = useMemo(() => NewClient(endpointURL), [endpointURL]);
   const [getSchemaData, { data, error, loading }] = useLazyQuery(ProtocolQuery, {
-    client
+    client,
   });
 
   let protocol = useMemo(() => data?.protocols, [data]);
   if (protocol?.length > 0) {
-    protocol = protocol[0]
+    protocol = protocol[0];
   }
   const { schemaVersion } = protocol ?? {};
 
   useEffect(() => {
     if (!data && statusData) {
       if (!currentDeployment) {
-        setEndpointURL('https://api.thegraph.com/subgraphs/id/' + statusData?.subgraph)
+        setEndpointURL("https://api.thegraph.com/subgraphs/id/" + statusData?.subgraph);
       }
-      getSchemaData()
+      getSchemaData();
     }
-  }, [status])
+  }, [status]);
 
   useEffect(() => {
     if (error || errorIndexing) {
@@ -169,7 +181,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
           nonFatalErrors: false,
           fatalError: false,
           success: false,
-          currentVersion: currentDeployment
+          currentVersion: currentDeployment,
         }}
       >
         <DeploymentBackground>
@@ -214,7 +226,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
         nonFatalErrors: nonFatalErrors.length > 0,
         fatalError: !!fatalError,
         success: indexedSuccess,
-        currentVersion: currentDeployment
+        currentVersion: currentDeployment,
       }}
     >
       <DeploymentBackground>
@@ -222,14 +234,15 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
           <Box display="flex" gap={2} alignItems="center">
             <NetworkLogo network={networkName} />
             <Typography variant="h6" align="center">
-              {networkName}{!currentDeployment ? ' (pending)' : null}
+              {networkName}
+              {!currentDeployment ? " (pending)" : null}
             </Typography>
           </Box>
           <CardRow className="indexed">
             <span>Indexed:</span> <span>{indexed}%</span>
           </CardRow>
           <CardRow>
-            <span>Latest Block:</span> <span>{statusData.chains[0]?.latestBlock?.number || 'N/A'}</span>
+            <span>Latest Block:</span> <span>{statusData.chains[0]?.latestBlock?.number || "N/A"}</span>
           </CardRow>
           <CardRow>
             <span>Current chain block:</span>

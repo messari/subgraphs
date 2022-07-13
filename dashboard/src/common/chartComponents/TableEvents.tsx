@@ -4,8 +4,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { convertTokenDecimals, toDate } from "../../../src/utils/index";
 import { PoolName } from "../../constants";
 import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
-import { blockExplorers } from '../../constants';
-
+import { blockExplorers } from "../../constants";
 
 const tableCellTruncate: any = {
   whiteSpace: "nowrap",

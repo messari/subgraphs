@@ -38,9 +38,9 @@ export const ProtocolDropDown = ({ setProtocolId, protocols }: ProtocolDropDownP
           p.delete("view");
           p.delete("poolId");
           if (targEle.innerText) {
-            p.set('protocolId', targEle.innerText?.split(" / ")[0])
+            p.set("protocolId", targEle.innerText?.split(" / ")[0]);
             setProtocolId(targEle.innerText?.split(" / ")[0]);
-            navigate("?" + p.toString().split('%2F').join('/'));
+            navigate("?" + p.toString().split("%2F").join("/"));
           }
         }}
         renderInput={(params) => <ComboBoxInput label="Protocol List" params={params} setTextInput={setTextInput} />}

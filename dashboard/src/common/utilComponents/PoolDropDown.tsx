@@ -55,9 +55,9 @@ export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDrop
           setTextInput(targEle.innerText);
           p.delete("view");
           if (targEle.innerText) {
-            p.set('poolId', targEle.innerText?.split(" / ")[0])
+            p.set("poolId", targEle.innerText?.split(" / ")[0]);
             setPoolId(targEle.innerText?.split(" / ")[0]);
-            navigate("?" + p.toString().split('%2F').join('/'));
+            navigate("?" + p.toString().split("%2F").join("/"));
           }
         }}
         renderInput={(params) => <ComboBoxInput label="PoolList" params={params} setTextInput={setTextInput} />}
