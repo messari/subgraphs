@@ -112,6 +112,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
     client
   });
 
+  console.log(data)
   const protocol = useMemo(() => data?.protocols[0], [data]);
   const { schemaVersion } = protocol ?? {};
 
@@ -200,7 +201,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   };
   return (
     <StyledDeployment
-      onClick={navigateToSubgraph(deployment)}
+      onClick={navigateToSubgraph(endpointURL)}
       $styleRules={{
         schemaOutdated,
         nonFatalErrors: nonFatalErrors.length > 0,
@@ -213,7 +214,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
           <Box display="flex" gap={2} alignItems="center">
             <NetworkLogo network={networkName} />
             <Typography variant="h6" align="center">
-              {networkName}
+              {networkName}{!currentDeployment ? ' (pending)' : null}
             </Typography>
           </Box>
           <CardRow className="indexed">
