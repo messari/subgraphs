@@ -68,5 +68,23 @@ export const percentageFieldList = [
   "fee",
   "percentage",
 ];
+
+export const blockExplorers: Record<string, string> = {
+  ARBITRUM: "https://arbiscan.io/",
+  AURORA: "https://aurorascan.dev/",
+  AVALANCHE: "https://snowtrace.io/",
+  BSC: "https://bscscan.com/",
+  FANTOM: "https://ftmscan.com/",
+  MAINNET: "https://etherscan.io/",
+  MATIC: "https://polygonscan.com/",
+  MOONRIVER: "https://moonriver.moonscan.io/",
+  OPTIMISM: "https://optimistic.etherscan.io/",
+  GNOSIS: "https://blockscout.com/xdai/mainnet/",
+  CELO: "https://explorer.celo.org/",
+  FUSE: "https://explorer.fuse.io/",
+  HARMONY: "https://explorer.harmony.one/",
+  CRONOS: "https://cronoscan.com/"
+}
+
 // negativeFieldList contains field names that can be negative
 export const negativeFieldList = [];

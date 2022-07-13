@@ -4,6 +4,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import { convertTokenDecimals, toDate } from "../../../src/utils/index";
 import { PoolName } from "../../constants";
 import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
+import { blockExplorers } from '../../constants';
+
 
 const tableCellTruncate: any = {
   whiteSpace: "nowrap",
@@ -13,11 +15,12 @@ const tableCellTruncate: any = {
 
 interface TableEventsProps {
   datasetLabel: string;
+  protocolNetwork: string;
   data: any;
   eventName: string;
 }
 
-export const TableEvents = ({ datasetLabel, data, eventName }: TableEventsProps) => {
+export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: TableEventsProps) => {
   const dataTable = data[eventName];
   const protocolType = data.protocols[0].type;
   const poolName = PoolName[protocolType];
@@ -121,8 +124,12 @@ export const TableEvents = ({ datasetLabel, data, eventName }: TableEventsProps)
                 params.value.length,
               )}`;
             }
+            const blockExplorerUrlBase = blockExplorers[protocolNetwork.toUpperCase()];
             if (k.toUpperCase() === "HASH") {
-              onClick = () => (window.location.href = "https://etherscan.io/tx/" + params.value);
+              onClick = () => (window.location.href = blockExplorerUrlBase + "tx/" + params.value);
+            }
+            if (k.toUpperCase() === "FROM" || k.toUpperCase() === "TO") {
+              onClick = () => (window.location.href = blockExplorerUrlBase + "address/" + params.value);
             }
             if (k.toUpperCase().includes("USD")) {
               valueStr = "$" + Number(Number(params.value).toFixed(2)).toLocaleString();

@@ -397,7 +397,6 @@ export const schema120 = (): Schema => {
     financialsDailySnapshots: {
       id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
-      protocolControlledValueUSD: "BigDecimal",
       dailyVolumeUSD: "BigDecimal!",
       cumulativeVolumeUSD: "BigDecimal!",
       dailySupplySideRevenueUSD: "BigDecimal!",
@@ -513,10 +512,10 @@ export const schema120 = (): Schema => {
       event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}" + options + ") { ";
     let fields = eventsFields.join(",");
     if (event === "swaps") {
-      fields += ", amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}";
+      fields += ", hash, amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}";
     } else {
       fields +=
-        ", amountUSD, inputTokens{id, decimals}, inputTokenAmounts, outputToken{id, decimals}, outputTokenAmount";
+        ", hash, amountUSD, inputTokens{id, decimals}, inputTokenAmounts, outputToken{id, decimals}, outputTokenAmount";
     }
 
     return baseStr + fields + " }";
@@ -547,7 +546,6 @@ export const schema120 = (): Schema => {
         network
         type
         totalValueLockedUSD
-        protocolControlledValueUSD
         cumulativeVolumeUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
@@ -588,7 +586,22 @@ export const schema120 = (): Schema => {
       schemaVersion
       subgraphVersion
     }
-
+    dexAmmProtocols {
+      id
+      name
+      network
+      slug
+      schemaVersion
+      subgraphVersion
+      totalValueLockedUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeTotalRevenueUSD
+      cumulativeUniqueUsers
+      cumulativeVolumeUSD
+      methodologyVersion
+      type
+    }
     ${eventsQuery}
     liquidityPool(id: $poolId){
       id
@@ -641,7 +654,6 @@ export const schema120 = (): Schema => {
     network: "Network!",
     type: "ProtocolType!",
     totalValueLockedUSD: "BigDecimal!",
-    protocolControlledValueUSD: "BigDecimal",
     cumulativeVolumeUSD: "BigDecimal!",
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
@@ -678,7 +690,6 @@ export const schema130 = (): Schema => {
     financialsDailySnapshots: {
       id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
-      protocolControlledValueUSD: "BigDecimal",
       dailyVolumeUSD: "BigDecimal!",
       cumulativeVolumeUSD: "BigDecimal!",
       dailySupplySideRevenueUSD: "BigDecimal!",
@@ -778,8 +789,6 @@ export const schema130 = (): Schema => {
     Object.keys(entitiesData.liquidityPoolHourlySnapshots).join(",") +
     "}";
 
-  const eventsFields = ["timestamp", "blockNumber", "from"];
-
   const poolData: { [x: string]: string } = {
     id: "ID!",
     name: "String",
@@ -803,6 +812,8 @@ export const schema130 = (): Schema => {
     rewardTokenEmissionsUSD: "[BigDecimal!]",
   };
 
+  const eventsFields = ["timestamp", "blockNumber", "from"];
+
   // Query liquidityPool(pool) entity and events entities
   let events: string[] = ["deposits", "withdraws", "swaps"];
   let eventsQuery: any[] = events.map((event) => {
@@ -811,10 +822,10 @@ export const schema130 = (): Schema => {
       event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}" + options + ") { ";
     let fields = eventsFields.join(",");
     if (event === "swaps") {
-      fields += ", amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}";
+      fields += ", hash, amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}";
     } else {
       fields +=
-        ", amountUSD, inputTokens{id, decimals}, inputTokenAmounts, outputToken{id, decimals}, outputTokenAmount";
+        ", hash, amountUSD, inputTokens{id, decimals}, inputTokenAmounts, outputToken{id, decimals}, outputTokenAmount";
     }
 
     return baseStr + fields + " }";
@@ -845,7 +856,6 @@ export const schema130 = (): Schema => {
         network
         type
         totalValueLockedUSD
-        protocolControlledValueUSD
         cumulativeVolumeUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
@@ -887,7 +897,23 @@ export const schema130 = (): Schema => {
       schemaVersion
       subgraphVersion
     }
-
+    dexAmmProtocols {
+      id
+      name
+      network
+      slug
+      schemaVersion
+      subgraphVersion
+      totalPoolCount
+      totalValueLockedUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeTotalRevenueUSD
+      cumulativeUniqueUsers
+      cumulativeVolumeUSD
+      methodologyVersion
+      type
+    }
     ${eventsQuery}
     liquidityPool(id: $poolId){
       id
@@ -945,7 +971,6 @@ export const schema130 = (): Schema => {
     type: "ProtocolType!",
     totalValueLockedUSD: "BigDecimal!",
     totalPoolCount: "Int!",
-    protocolControlledValueUSD: "BigDecimal",
     cumulativeVolumeUSD: "BigDecimal!",
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",

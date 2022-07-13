@@ -53,12 +53,10 @@ export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDrop
           const targEle = event?.target as HTMLLIElement;
           setTextInput(targEle.innerText);
           searchParams.delete("view");
-          console.log("onchange");
           if (targEle.innerText) {
             setPoolId(targEle.innerText?.split(" / ")[0]);
             navigate(
-              `?endpoint=${searchParams.get("endpoint")}&tab=${searchParams.get("tab")}&poolId=${
-                targEle.innerText?.split(" / ")[0]
+              `?endpoint=${searchParams.get("endpoint")}&tab=${searchParams.get("tab")}&poolId=${targEle.innerText?.split(" / ")[0]
               }`,
             );
           }
