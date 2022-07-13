@@ -22,16 +22,16 @@ export class BlockData {
     public readonly hash: Bytes,
     public readonly timestamp: BigInt,
     public readonly author: Bytes | null,
-    public readonly difficulty: BigInt,
-    public readonly gasLimit: BigInt,
-    public readonly gasUsed: BigInt,
-    public readonly size: BigInt,
+    public readonly difficulty: BigInt | null,
+    public readonly gasLimit: BigInt | null,
+    public readonly gasUsed: BigInt | null,
+    public readonly size: BigInt | null,
     public readonly gasPrice: BigInt | null,
-    public readonly baseFeePerGas: BigInt,
-    public readonly burntFees: BigInt,
-    public readonly chunkCount: BigInt,
-    public readonly transactionCount: BigInt,
-    public readonly rewards: BigInt
+    public readonly baseFeePerGas: BigInt | null,
+    public readonly burntFees: BigInt | null,
+    public readonly chunkCount: BigInt | null,
+    public readonly transactionCount: BigInt | null,
+    public readonly rewards: BigInt | null
   ) {}
 }
 
@@ -39,14 +39,14 @@ export class UpdateNetworkData {
   constructor(
     public readonly height: BigInt,
     public readonly timestamp: BigInt,
-    public readonly newDifficulty: BigInt,
-    public readonly newGasUsed: BigInt,
-    public readonly gasLimit: BigInt,
-    public readonly newBurntFees: BigInt,
-    public readonly newRewards: BigInt,
-    public readonly newTransactions: BigInt,
-    public readonly newSize: BigInt,
-    public readonly totalSupply: BigInt
+    public readonly newDifficulty: BigInt | null,
+    public readonly newGasUsed: BigInt | null,
+    public readonly gasLimit: BigInt | null,
+    public readonly newBurntFees: BigInt | null,
+    public readonly newRewards: BigInt | null,
+    public readonly newTransactions: BigInt | null,
+    public readonly newSize: BigInt | null,
+    public readonly totalSupply: BigInt | null
   ) {}
 }
 
@@ -183,7 +183,7 @@ export function handleCosmosBlock(block: cosmos.Block): void {
 export function handleEvmBlock(block: ethereum.Block): void {
   let burntFees = block.baseFeePerGas
     ? block.baseFeePerGas!.times(block.gasUsed)
-    : BIGINT_ZERO;
+    : null;
 
   let blockData = new BlockData(
     block.number,
@@ -193,13 +193,13 @@ export function handleEvmBlock(block: ethereum.Block): void {
     block.difficulty,
     block.gasLimit,
     block.gasUsed,
-    block.size ? block.size! : BIGINT_ZERO,
+    block.size,
     null,
-    block.baseFeePerGas ? block.baseFeePerGas! : BIGINT_ZERO,
+    block.baseFeePerGas,
     burntFees,
-    BIGINT_ZERO,
-    BIGINT_ZERO,
-    BIGINT_ZERO
+    null,
+    null,
+    null
   );
   createBlock(blockData);
 
@@ -213,7 +213,7 @@ export function handleEvmBlock(block: ethereum.Block): void {
     burntFees,
     BIGINT_ZERO,
     BIGINT_ZERO,
-    block.size ? block.size! : BIGINT_ZERO,
+    block.size,
     BIGINT_ZERO
   );
   let network = updateNetwork(updateNetworkData);

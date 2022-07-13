@@ -5,10 +5,12 @@ import {
   DailySnapshot,
   HourlySnapshot,
   Network,
+  STATS,
 } from "../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  DataType,
   IntervalType,
   INT_TWO,
   INT_ZERO,
@@ -29,9 +31,12 @@ import { exponentToBigDecimal, getBlocksPerDay } from "./utils";
 export function updateNetwork(networkData: UpdateNetworkData): Network {
   let network = getOrCreateNetwork(NETWORK_NAME);
   network.blockHeight = networkData.height.toI32();
-  network.cumulativeDifficulty = network.cumulativeDifficulty.plus(
-    networkData.newDifficulty
-  );
+  if (networkData.newDifficulty) {
+    if (!network.cumulativeDifficulty) {
+      network.cumulativeDifficulty = BIGINT_ZERO;
+    }
+    network.cumulativeDifficulty = network.cumulativeDifficulty.plus(networkData.newDifficulty);
+  }
   network.cumulativeGasUsed = network.cumulativeGasUsed.plus(
     networkData.newGasUsed
   );
@@ -270,35 +275,34 @@ function getOrCreateDailySnapshot(
   if (!dailySnapshot) {
     dailySnapshot = new DailySnapshot(id);
     dailySnapshot.network = NETWORK_NAME;
-    dailySnapshot.cumulativeUniqueAuthors = INT_ZERO;
-    dailySnapshot.dailyActiveAuthors = INT_ZERO;
     dailySnapshot.blockHeight = INT_ZERO;
     dailySnapshot.timestamp = timestamp;
-    dailySnapshot.dailyBlocks = INT_ZERO;
-    dailySnapshot.cumulativeDifficulty = BIGINT_ZERO;
-    dailySnapshot.dailyDifficulty = BIGINT_ZERO;
-    dailySnapshot.dailyMeanDifficulty = BIGDECIMAL_ZERO;
-    dailySnapshot.dailyCumulativeGasUsed = BIGINT_ZERO;
-    dailySnapshot.dailyCumulativeGasLimit = BIGINT_ZERO;
-    dailySnapshot.dailyBlockUtilization = BIGDECIMAL_ZERO;
-    dailySnapshot.dailyMeanGasUsed = BIGDECIMAL_ZERO;
-    dailySnapshot.dailyMeanGasLimit = BIGDECIMAL_ZERO;
-    dailySnapshot.gasPrice = BIGINT_ZERO;
-    dailySnapshot.cumulativeBurntFees = BIGINT_ZERO;
-    dailySnapshot.dailyBurntFees = BIGINT_ZERO;
-    dailySnapshot.dailyRewards = BIGINT_ZERO;
-    dailySnapshot.cumulativeRewards = BIGINT_ZERO;
-    dailySnapshot.dailyMeanRewards = BIGDECIMAL_ZERO;
-    dailySnapshot.totalSupply = originalSupply;
-    dailySnapshot.dailySupplyIncrease = BIGINT_ZERO;
-    dailySnapshot.firstTimestamp = timestamp;
-    dailySnapshot.dailyMeanBlockInterval = BIGDECIMAL_ZERO;
-    dailySnapshot.cumulativeSize = BIGINT_ZERO;
-    dailySnapshot.dailyCumulativeSize = BIGINT_ZERO;
-    dailySnapshot.dailyMeanBlockSize = BIGDECIMAL_ZERO;
-    dailySnapshot.dailyChunkCount = INT_ZERO;
-    dailySnapshot.dailyTransactionCount = INT_ZERO;
-    dailySnapshot.firstSupply = originalSupply;
+
+    // dailySnapshot.dailyBlocks = INT_ZERO;
+    // dailySnapshot.cumulativeDifficulty = BIGINT_ZERO;
+    // dailySnapshot.dailyDifficulty = BIGINT_ZERO;
+    // dailySnapshot.dailyMeanDifficulty = BIGDECIMAL_ZERO;
+    // dailySnapshot.dailyCumulativeGasUsed = BIGINT_ZERO;
+    // dailySnapshot.dailyCumulativeGasLimit = BIGINT_ZERO;
+    // dailySnapshot.dailyBlockUtilization = BIGDECIMAL_ZERO;
+    // dailySnapshot.dailyMeanGasUsed = BIGDECIMAL_ZERO;
+    // dailySnapshot.dailyMeanGasLimit = BIGDECIMAL_ZERO;
+    // dailySnapshot.gasPrice = BIGINT_ZERO;
+    // dailySnapshot.cumulativeBurntFees = BIGINT_ZERO;
+    // dailySnapshot.dailyBurntFees = BIGINT_ZERO;
+    // dailySnapshot.dailyRewards = BIGINT_ZERO;
+    // dailySnapshot.cumulativeRewards = BIGINT_ZERO;
+    // dailySnapshot.dailyMeanRewards = BIGDECIMAL_ZERO;
+    // dailySnapshot.totalSupply = originalSupply;
+    // dailySnapshot.dailySupplyIncrease = BIGINT_ZERO;
+    // dailySnapshot.firstTimestamp = timestamp;
+    // dailySnapshot.dailyMeanBlockInterval = BIGDECIMAL_ZERO;
+    // dailySnapshot.cumulativeSize = BIGINT_ZERO;
+    // dailySnapshot.dailyCumulativeSize = BIGINT_ZERO;
+    // dailySnapshot.dailyMeanBlockSize = BIGDECIMAL_ZERO;
+    // dailySnapshot.dailyChunkCount = INT_ZERO;
+    // dailySnapshot.dailyTransactionCount = INT_ZERO;
+    // dailySnapshot.firstSupply = originalSupply;
 
     dailySnapshot.save();
   }
@@ -362,15 +366,19 @@ export function createBlock(blockData: BlockData): void {
   block.gasUsed = blockData.gasUsed;
   block.gasPrice = blockData.gasPrice;
   block.burntFees = blockData.burntFees;
-  block.chunkCount = blockData.chunkCount.toI32();
-  block.transactionCount = blockData.transactionCount.toI32();
+  block.chunkCount = blockData.chunkCount ? blockData.chunkCount.toI32() : null;
+  block.transactionCount = blockData.transactionCount
+    ? blockData.transactionCount.toI32()
+    : null;
   block.rewards = blockData.rewards;
 
   if (block.gasLimit && block.gasLimit != BIGINT_ZERO) {
     block.blockUtilization = block.gasUsed
-      .toBigDecimal()
-      .div(block.gasLimit.toBigDecimal())
-      .times(exponentToBigDecimal(INT_TWO));
+      ? block.gasUsed
+          .toBigDecimal()
+          .div(block.gasLimit.toBigDecimal())
+          .times(exponentToBigDecimal(INT_TWO))
+      : null;
   } else {
     block.blockUtilization = BIGDECIMAL_ZERO;
   }
@@ -378,26 +386,51 @@ export function createBlock(blockData: BlockData): void {
   block.save();
 }
 
-export function getOrCreateNetwork(id: string): Network {
+function getOrCreateNetwork(id: string): Network {
   let network = Network.load(id);
   if (!network) {
     network = new Network(id);
     network.schemaVersion = SCHEMA_VERSION;
     network.subgraphVersion = SUBGRAPH_VERSION;
     network.methodologyVersion = METHODOLOGY_VERSION;
-    network.cumulativeUniqueAuthors = INT_ZERO;
     network.blockHeight = INT_ZERO;
-    network.cumulativeDifficulty = BIGINT_ZERO;
-    network.cumulativeGasUsed = BIGINT_ZERO;
-    network.gasLimit = BIGINT_ZERO;
-    network.cumulativeBurntFees = BIGINT_ZERO;
-    network.cumulativeRewards = BIGINT_ZERO;
-    network.cumulativeTransactions = INT_ZERO;
-    network.cumulativeSize = BIGINT_ZERO;
-    network.totalSupply = BIGINT_ZERO;
     network.blocksPerDay = BIGDECIMAL_ZERO;
+    network.dailyBlocks = getOrCreateStats(id, DataType.BLOCKS).id;
+    
+    // network.cumulativeUniqueAuthors = INT_ZERO;
+    // network.blockHeight = INT_ZERO;
+    // network.cumulativeDifficulty = BIGINT_ZERO;
+    // network.cumulativeGasUsed = BIGINT_ZERO;
+    // network.gasLimit = BIGINT_ZERO;
+    // network.cumulativeBurntFees = BIGINT_ZERO;
+    // network.cumulativeRewards = BIGINT_ZERO;
+    // network.cumulativeTransactions = INT_ZERO;
+    // network.cumulativeSize = BIGINT_ZERO;
+    // network.totalSupply = BIGINT_ZERO;
+    // network.blocksPerDay = BIGDECIMAL_ZERO;
 
     network.save();
   }
   return network;
+}
+
+function getOrCreateStats(snapshot: string, dataType: string): STATS {
+  let id = snapshot.concat("-").concat(dataType);
+  let stats = STATS.load(id);
+  if (!stats) {
+    stats = new STATS(id);
+    stats.count = INT_ZERO;
+    stats.mean = BIGINT_ZERO;
+    stats.median = BIGINT_ZERO;
+    stats.max = BIGINT_ZERO;
+    stats.min = BIGINT_ZERO;
+    stats.variance = BIGDECIMAL_ZERO;
+    stats.q3 = BIGDECIMAL_ZERO;
+    stats.q1 = BIGDECIMAL_ZERO;
+    stats.values = [];
+    stats.sum = BIGINT_ZERO;
+    stats.save();
+  }
+
+  return stats;
 }
