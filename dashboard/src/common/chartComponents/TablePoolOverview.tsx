@@ -338,7 +338,7 @@ export const TablePoolOverview = ({
             const p = new URLSearchParams(href.search);
             p.set("tab", "pool");
             p.set("poolId", row.row.poolId);
-            navigate("?" + p.toString());
+            navigate("?" + p.toString().split('%2F').join('/'));
             setPoolId(row.row.poolId);
             handleTabChange(null, "3");
           }}

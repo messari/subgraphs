@@ -18,12 +18,12 @@ const DeploymentBackground = styled("div")`
 `;
 
 const StyledDeployment = styled(Card)<{
-  $styleRules: { schemaOutdated: boolean; nonFatalErrors: boolean; fatalError: boolean; success: boolean };
+  $styleRules: { schemaOutdated: boolean; nonFatalErrors: boolean; fatalError: boolean; success: boolean; currentVersion: Boolean };
 }>(({ $styleRules, theme }) => {
   let statusColor = "";
   if ($styleRules.fatalError) {
     statusColor = theme.palette.error.main;
-  } else if ($styleRules.schemaOutdated || $styleRules.nonFatalErrors) {
+  } else if ($styleRules.schemaOutdated || $styleRules.nonFatalErrors || !$styleRules.currentVersion) {
     statusColor = theme.palette.warning.main;
   } else if ($styleRules.success) {
     statusColor = theme.palette.success.main;
@@ -82,7 +82,11 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   const deploymentsContext = useContext(DeploymentsContext);
   const navigate = useNavigate();
   const navigateToSubgraph = (url: string) => () => {
-    navigate(`subgraph?endpoint=${url}&tab=protocol`);
+    let versionParam = ""
+    if (!currentDeployment) {
+      versionParam = '&version=pending&name=' + parseSubgraphName(deployment)
+    }
+    navigate(`subgraph?endpoint=${url}&tab=protocol` + versionParam);
   };
   // Pull the subgraph name to use as the variable input for the indexing status query
   const subgraphName = parseSubgraphName(deployment);
@@ -112,8 +116,10 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
     client
   });
 
-  console.log(data)
-  const protocol = useMemo(() => data?.protocols[0], [data]);
+  let protocol = useMemo(() => data?.protocols, [data]);
+  if (protocol?.length > 0) {
+    protocol = protocol[0]
+  }
   const { schemaVersion } = protocol ?? {};
 
   useEffect(() => {
@@ -163,6 +169,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
           nonFatalErrors: false,
           fatalError: false,
           success: false,
+          currentVersion: currentDeployment
         }}
       >
         <DeploymentBackground>
@@ -207,6 +214,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
         nonFatalErrors: nonFatalErrors.length > 0,
         fatalError: !!fatalError,
         success: indexedSuccess,
+        currentVersion: currentDeployment
       }}
     >
       <DeploymentBackground>
