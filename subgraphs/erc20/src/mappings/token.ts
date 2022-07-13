@@ -55,7 +55,7 @@ export function handleTransfer(event: Transfer): void {
         ? DEFAULT_DECIMALS
         : tokenDecimals.value;
       token.totalSupply = initialSupply.reverted
-        ? BIGDECIMAL_ZERO
+        ? token.totalSupply
         : toDecimal(initialSupply.value, token.decimals);
     }
 
@@ -71,6 +71,7 @@ export function handleTransfer(event: Transfer): void {
     if (isBurn) {
       handleBurnEvent(token, amount, event.params.from, event);
     } else if (isMint) {
+      log.error("isMint", []);
       handleMintEvent(token, amount, event.params.to, event);
     } else {
       // In this case, it will be transfer event.
@@ -154,7 +155,7 @@ export function handleMint(event: Mint): void {
 
   if (token != null) {
     let amount = toDecimal(event.params.amount, token.decimals);
-
+    log.error("handleMint", []);
     handleMintEvent(token, amount, event.params.to, event);
 
     // Update destination account balance
@@ -185,7 +186,10 @@ function handleBurnEvent(
   // Track total supply/burned
   if (token != null) {
     token.burnCount = token.burnCount.plus(BIGINT_ONE);
-    token.totalSupply = token.totalSupply.minus(amount);
+    let totalSupply = ERC20.bind(event.address).try_totalSupply();
+    token.totalSupply = totalSupply.reverted
+      ? token.totalSupply
+      : toDecimal(totalSupply.value, token.decimals);
     token.totalBurned = token.totalBurned.plus(amount);
 
     let dailySnapshot = getOrCreateTokenDailySnapshot(token, event.block);
@@ -221,7 +225,10 @@ function handleMintEvent(
   // Track total token supply/minted
   if (token != null) {
     token.mintCount = token.mintCount.plus(BIGINT_ONE);
-    token.totalSupply = token.totalSupply.plus(amount);
+    let totalSupply = ERC20.bind(event.address).try_totalSupply();
+    token.totalSupply = totalSupply.reverted
+      ? token.totalSupply
+      : toDecimal(totalSupply.value, token.decimals);
     token.totalMinted = token.totalMinted.plus(amount);
 
     let dailySnapshot = getOrCreateTokenDailySnapshot(token, event.block);
