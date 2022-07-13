@@ -11,6 +11,7 @@ import {
   BIGINT_ONE,
   BIGINT_ZERO,
   INT_ZERO,
+  MasterChef,
   RECENT_BLOCK_THRESHOLD,
   UsageType,
 } from "../../../../../src/common/constants";
@@ -20,7 +21,6 @@ import {
 } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
-import { MasterChef } from "../constants";
 import {
   convertTokenToDecimal,
   roundToWholeNumber,
@@ -65,6 +65,10 @@ export function handleReward(
   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
   }
 
   // Update staked amounts
@@ -135,6 +139,17 @@ export function handleReward(
     .times(masterChef.rewardTokenRate);
   masterChef.lastUpdatedRewardRate = event.block.number;
 
+  log.warning("USED TOTAL ALLOCATION: " + usedTotalAllocation.toString(), []);
+  log.warning("TOTAL ALLOCATION: " + masterChef.totalAllocPoint.toString(), []);
+  log.warning(
+    "USED TOTAL ALLOCATION: " + masterChef.rewardTokenRate.toString(),
+    []
+  );
+  log.warning(
+    "ADJUSTED REWARD RATE: " + masterChef.adjustedRewardTokenRate.toString(),
+    []
+  );
+
   // Calculate Reward Emission per Block
   let poolRewardTokenRate = masterChef.adjustedRewardTokenRate
     .times(masterChefPool.poolAllocPoint)
@@ -144,16 +159,16 @@ export function handleReward(
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let poolRewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
-  let poolRewardTokenPerDay = getRewardsPerDay(
+  let rewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
+  let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
-    poolRewardTokenRateBigDecimal,
+    rewardTokenRateBigDecimal,
     masterChef.rewardTokenInterval
   );
 
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(roundToWholeNumber(poolRewardTokenPerDay).toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
@@ -191,14 +206,6 @@ function getOrCreateMasterChefStakingPool(
     masterChefPool.poolAllocPoint = BIGINT_ZERO;
     masterChefPool.lastRewardBlock = event.block.number;
     log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
-
-    let pool = LiquidityPool.load(masterChefPool.poolAddress!);
-    if (pool) {
-      pool.rewardTokens = [
-        getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-      ];
-      pool.save();
-    }
 
     masterChefPool.save();
   }

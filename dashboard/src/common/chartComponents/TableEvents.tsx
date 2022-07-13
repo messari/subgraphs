@@ -31,6 +31,18 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
     const tableData: any[] = [];
     for (let i = 0; i < dataTable.length; i++) {
       const currentData = { ...dataTable[i] };
+      if (currentData?.liquidatee) {
+        currentData.liquidatee = currentData.liquidatee.id;
+      }
+      if (currentData?.liquidator) {
+        currentData.liquidator = currentData.liquidator.id;
+      }
+      if (currentData?.position) {
+        currentData.position = currentData.position.id;
+      }
+      if (currentData?.account) {
+        currentData.account = currentData.account.id;
+      }
       if (currentData?.amountInUSD) {
         currentData.amountInUSD = Number(currentData.amountInUSD);
       }
@@ -70,7 +82,7 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
           currentData.tokenIn = currentData?.tokenIn?.id;
           currentData.amountIn = amountIn.toFixed(2);
         } else {
-          currentData.tokenIn = 'N/A';
+          currentData.tokenIn = "N/A";
           currentData.amountIn = "0";
         }
         if (currentData?.tokenOut) {
@@ -78,7 +90,7 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
           currentData.tokenOut = currentData?.tokenOut?.id;
           currentData.amountOut = amountOut.toFixed(2);
         } else {
-          currentData.tokenOut = 'N/A';
+          currentData.tokenOut = "N/A";
           currentData.amountOut = "0";
         }
         tableData.push({ id: `${eventName}-${i}`, date: toDate(currentData.timestamp), ...currentData });
@@ -119,7 +131,7 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
             if (k.toUpperCase() === "FROM" || k.toUpperCase() === "TO") {
               onClick = () => (window.location.href = blockExplorerUrlBase + "address/" + params.value);
             }
-            if (k.toUpperCase().includes('USD')) {
+            if (k.toUpperCase().includes("USD")) {
               valueStr = "$" + Number(Number(params.value).toFixed(2)).toLocaleString();
             }
             return (

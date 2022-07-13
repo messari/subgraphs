@@ -611,7 +611,7 @@
       "uniswap-v3": {
         "mainnet": {
           "template": "uniswap.v3.template.yaml",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         },
         "arbitrum": {

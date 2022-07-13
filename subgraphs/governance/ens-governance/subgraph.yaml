@@ -44,7 +44,7 @@ dataSources:
     source:
       address: "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72"
       abi: ENSToken
-      startBlock: 13820618
+      startBlock: 13533418
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

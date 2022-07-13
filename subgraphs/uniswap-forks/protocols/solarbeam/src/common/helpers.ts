@@ -22,7 +22,7 @@ export function createMasterChefStakingPool(
   masterChefPool.multiplier = BIGINT_ONE;
   masterChefPool.poolAllocPoint = BIGINT_ZERO;
   masterChefPool.lastRewardBlock = event.block.number;
-  log.warning("MASTERCHEF POOL CREATED: " + pid.toString()!, []);
+  log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (pool) {
@@ -49,6 +49,7 @@ export function getOrCreateMasterChef(
     masterChef.totalAllocPoint = BIGINT_ZERO;
     masterChef.rewardTokenInterval = NetworkConfigs.getRewardIntervalType();
     masterChef.rewardTokenRate = NetworkConfigs.getRewardTokenRate();
+    log.warning("MasterChef Type: " + masterChefType, []);
     masterChef.adjustedRewardTokenRate = BIGINT_ZERO;
     masterChef.lastUpdatedRewardRate = BIGINT_ZERO;
     masterChef.save();

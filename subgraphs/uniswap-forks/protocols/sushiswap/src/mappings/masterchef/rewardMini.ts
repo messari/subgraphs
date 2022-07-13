@@ -6,13 +6,13 @@ import {
   LogSetPool,
   LogSushiPerSecond,
   Withdraw,
+  MiniChefSushiswap,
 } from "../../../../../generated/MiniChef/MiniChefSushiswap";
 import {
   _HelperStore,
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { MasterChef } from "../../common/constants";
 import {
   createMasterChefStakingPool,
   getOrCreateMasterChef,
@@ -22,6 +22,7 @@ import {
   updateMasterChefDeposit,
   updateMasterChefWithdraw,
 } from "../../common/handlers/handleRewardMini";
+import { BIGINT_ZERO, MasterChef } from "../../../../../src/common/constants";
 
 // A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {
@@ -46,6 +47,13 @@ export function handleLogPoolAddition(event: LogPoolAddition): void {
     event.params.pid,
     event.params.lpToken
   );
+  let masterchef = getOrCreateMasterChef(event, MasterChef.MINICHEF);
+  if (masterchef.lastUpdatedRewardRate == BIGINT_ZERO) {
+    masterchef.lastUpdatedRewardRate = event.block.number;
+    let miniChefV2Contract = MiniChefSushiswap.bind(event.address);
+    masterchef.adjustedRewardTokenRate = miniChefV2Contract.sushiPerSecond();
+    masterchef.save();
+  }
   updateMasterChefTotalAllocation(
     event,
     miniChefPool.poolAllocPoint,

@@ -11,9 +11,3 @@ export const PROTOCOL_SLUG = "sushiswap";
 
 export const MASTERCHEFV2_SUSHI_PER_BLOCK =
   BigInt.fromI64(20000000000000000000);
-
-export namespace MasterChef {
-  export const MASTERCHEF = "MASTERCHEF";
-  export const MASTERCHEFV2 = "MASTERCHEFV2";
-  export const MINICHEF = "MINICHEF";
-}
