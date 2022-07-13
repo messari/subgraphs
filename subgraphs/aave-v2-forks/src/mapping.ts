@@ -355,6 +355,10 @@ export function _handleReserveDataUpdated(
     .minus(market.liquidityIndex)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
+    log.warning(
+      "liquidityIndexDiff: {}",
+      [liquidityIndexDiff.toString()]
+    );
   market.liquidityIndex = liquidityIndex; // must update to current liquidity index
   let newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
