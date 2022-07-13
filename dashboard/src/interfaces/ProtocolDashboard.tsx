@@ -51,6 +51,7 @@ function ProtocolDashboard() {
       }
     }
   }
+
   const [subgraphToQuery, setSubgraphToQuery] = useState({ url: queryURL, version: "" });
   const endpointObject: { [x: string]: string } = { current: "", pending: "" };
   endpointObject[version] = queryURL;

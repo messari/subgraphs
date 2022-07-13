@@ -1728,6 +1728,7 @@ export function _getOrCreateProtocol(
         "[getOrCreateProtocol] liquidationIncentiveMantissaResult reverted",
         []
       );
+      protocol._liquidationIncentive = BIGDECIMAL_ZERO;
     } else {
       protocol._liquidationIncentive =
         protocolData.liquidationIncentiveMantissaResult.value
@@ -1950,7 +1951,7 @@ function addPosition(
       market.id,
     ]);
   } else {
-    position.balance = balanceResult.value
+    position.balance = balanceResult.value;
   }
   if (eventType == EventType.Deposit) {
     position.depositCount += 1;
@@ -2057,7 +2058,7 @@ function subtractPosition(
       market.id,
     ]);
   } else {
-    position.balance = balanceResult.value
+    position.balance = balanceResult.value;
   }
   if (eventType == EventType.Withdraw) {
     position.withdrawCount += 1;
