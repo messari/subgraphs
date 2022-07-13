@@ -1,20 +1,23 @@
-import { Submitted, Transfer } from "../../generated/Lido/Lido";
+import { Lido, Submitted, Transfer } from "../../generated/Lido/Lido";
 import { NodeOperatorsRegistry } from "../../generated/Lido/NodeOperatorsRegistry";
+import { LidoOracle } from "../../generated/LidoOracle/LidoOracle";
 import { Address, log } from "@graphprotocol/graph-ts";
 import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
 import {
-  updateProtocolSideRevenueMetrics,
-  updatePoolSnapshotsTvl,
   updateProtocolAndPoolTvl,
+  updateSnapshotsTvl,
+  updateSupplySideRevenueMetrics,
+  updateProtocolSideRevenueMetrics,
+  updateTotalRevenueMetrics,
 } from "../entityUpdates/financialMetrics";
 import {
   PROTOCOL_TREASURY_ID,
+  PROTOCOL_ORACLE_ID,
   PROTOCOL_NODE_OPERATORS_REGISTRY_ID,
   ZERO_ADDRESS,
   ETH_ADDRESS,
   PROTOCOL_ID,
   BIGINT_ZERO,
-  LiquidityPoolFeeType,
 } from "../utils/constants";
 import { getOrCreateToken } from "../entities/token";
 
@@ -23,11 +26,41 @@ export function handleSubmit(event: Submitted): void {
   getOrCreateToken(Address.fromString(ETH_ADDRESS), event.block.number);
   getOrCreateToken(Address.fromString(PROTOCOL_ID), event.block.number);
 
+  // update metrics
   updateUsageMetrics(event.block, event.params.sender);
   updateProtocolAndPoolTvl(event.block, event.params.amount);
 }
 
 export function handleTransfer(event: Transfer): void {
+  // update Token lastPrice and lastBlock
+  getOrCreateToken(Address.fromString(ETH_ADDRESS), event.block.number);
+  getOrCreateToken(Address.fromString(PROTOCOL_ID), event.block.number);
+
+  // get pre and post pooled ether
+  let preTotalPooledEther = BIGINT_ZERO;
+  let postTotalPooledEther = BIGINT_ZERO;
+  let lidoOracle = LidoOracle.bind(Address.fromString(PROTOCOL_ORACLE_ID));
+  let lastCompletedReportDeltaCallResult = lidoOracle.try_getLastCompletedReportDelta();
+
+  if (lastCompletedReportDeltaCallResult.reverted) {
+    log.info("LidoOracle call reverted", []);
+  } else {
+    preTotalPooledEther = lastCompletedReportDeltaCallResult.value.getPreTotalPooledEther();
+    postTotalPooledEther = lastCompletedReportDeltaCallResult.value.getPostTotalPooledEther();
+  }
+
+  // get total shares
+  let totalShares = BIGINT_ZERO;
+  let lido = Lido.bind(Address.fromString(PROTOCOL_ID));
+  let getTotalSharesCallResult = lido.try_getTotalShares();
+
+  if (getTotalSharesCallResult.reverted) {
+    log.info("Lido call reverted", []);
+  } else {
+    totalShares = getTotalSharesCallResult.value;
+  }
+
+  // get node operators
   let sender = event.params.from;
   let recipient = event.params.to;
   let value = event.params.value;
@@ -36,13 +69,13 @@ export function handleTransfer(event: Transfer): void {
   let nodeOperatorsRegistry = NodeOperatorsRegistry.bind(
     Address.fromString(PROTOCOL_NODE_OPERATORS_REGISTRY_ID)
   );
-  let callResult = nodeOperatorsRegistry.try_getRewardsDistribution(
+  let getRewardsDistributionCallResult = nodeOperatorsRegistry.try_getRewardsDistribution(
     BIGINT_ZERO
   );
-  if (callResult.reverted) {
+  if (getRewardsDistributionCallResult.reverted) {
     log.info("NodeOperatorsRegistry call reverted", []);
   } else {
-    nodeOperators = callResult.value.getRecipients();
+    nodeOperators = getRewardsDistributionCallResult.value.getRecipients();
   }
 
   let fromZeros = sender == Address.fromString(ZERO_ADDRESS);
@@ -50,8 +83,16 @@ export function handleTransfer(event: Transfer): void {
     fromZeros && recipient == Address.fromString(PROTOCOL_TREASURY_ID);
   let isMintToNodeOperators = fromZeros && nodeOperators.includes(recipient);
 
+  // update metrics
   if (isMintToTreasury || isMintToNodeOperators) {
-    updatePoolSnapshotsTvl(event.block);
+    updateSnapshotsTvl(event.block);
     updateProtocolSideRevenueMetrics(event.block, value);
+    updateTotalRevenueMetrics(
+      event.block,
+      preTotalPooledEther,
+      postTotalPooledEther,
+      totalShares
+    );
+    updateSupplySideRevenueMetrics(event.block);
   }
 }

@@ -9,6 +9,7 @@ dataSources:
       address: "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
       abi: Lido
       startBlock: 11473216
+      # startBlock: 15073216
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -25,6 +26,8 @@ dataSources:
           file: ./abis/Lido.json
         - name: NodeOperatorsRegistry
           file: ./abis/NodeOperatorsRegistry.json
+        - name: LidoOracle
+          file: ./abis/LidoOracle.json
         - name: ERC20
           file: ./abis/ERC20.json
         # ERC20
@@ -72,6 +75,7 @@ dataSources:
       address: "0x442af784A788A5bd6F42A01Ebe9F287a871243fb"
       abi: LidoOracle
       startBlock: 11473216
+      # startBlock: 15073216
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

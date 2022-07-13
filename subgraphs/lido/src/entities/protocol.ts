@@ -28,6 +28,7 @@ export function getOrCreateProtocol(): Protocol {
 
     // Quantitative Data
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    protocol.protocolControlledValueUSD = null;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;

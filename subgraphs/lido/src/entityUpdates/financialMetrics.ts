@@ -24,7 +24,6 @@ export function updateProtocolAndPoolTvl(
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
-  const financialMetrics = getOrCreateFinancialDailyMetrics(block);
 
   // inputToken is ETH, price with ETH
   const amountUSD = bigIntToBigDecimal(amount).times(
@@ -43,7 +42,7 @@ export function updateProtocolAndPoolTvl(
   pool.save();
 
   // Pool Daily and Hourly
-  // updatePoolSnapshots(event.block) is called separately when protocol and supply side
+  // updateSnapshotsTvl(event.block) is called separately when protocol and supply side
   // revenue metrics are being calculated to consolidate all revenue metrics into same snapshots
 
   // Protocol
@@ -51,11 +50,16 @@ export function updateProtocolAndPoolTvl(
   protocol.save();
 
   // Financials Daily
-  financialMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
-  financialMetrics.save();
+  // updateSnapshotsTvl(event.block) is called separately when protocol and supply side
+  // revenue metrics are being calculated to consolidate all revenue metrics into same snapshots
+
+  // TODO:
+  // Are these resulting in more entities?
+  // Should we consider moving Tvl to handleTransfer()?
+  // Potentially "eth2 deposit calls" from "lido" contract?
 }
 
-export function updatePoolSnapshotsTvl(block: ethereum.Block): void {
+export function updateSnapshotsTvl(block: ethereum.Block): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const poolMetricsDailySnapshot = getOrCreatePoolsDailySnapshot(
     Address.fromString(PROTOCOL_ID),
@@ -65,6 +69,7 @@ export function updatePoolSnapshotsTvl(block: ethereum.Block): void {
     Address.fromString(PROTOCOL_ID),
     block
   );
+  const financialMetrics = getOrCreateFinancialDailyMetrics(block);
 
   // Pool Daily
   poolMetricsDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -75,12 +80,16 @@ export function updatePoolSnapshotsTvl(block: ethereum.Block): void {
   poolMetricsHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsHourlySnapshot.inputTokenBalances = pool.inputTokenBalances;
   poolMetricsHourlySnapshot.save();
+
+  // Financials Daily
+  financialMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+  financialMetrics.save();
 }
 
 export function updateTotalRevenueMetrics(
   block: ethereum.Block,
-  postTotalPooledEther: BigInt,
   preTotalPooledEther: BigInt,
+  postTotalPooledEther: BigInt,
   totalShares: BigInt
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
