@@ -68,6 +68,8 @@ type Proposal @entity {
   id: ID!
   "Proposal description in markdown format"
   description: String
+  "Governance Framework that proposal is part of"
+  governanceFramework: GovernanceFramework!
 
   "Delegate that proposed the proposal"
   proposer: Delegate!

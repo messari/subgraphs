@@ -77,6 +77,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
     event.block.number >= proposal.startBlock
       ? ProposalState.ACTIVE
       : ProposalState.PENDING;
+  proposal.governanceFramework = event.address.toHexString();
   proposal.save();
 
   // Increment gov proposal count
