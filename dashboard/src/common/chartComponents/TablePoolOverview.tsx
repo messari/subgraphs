@@ -2,7 +2,7 @@ import { Box, Tooltip } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { blockExplorers } from '../../constants';
+import { blockExplorers } from "../../constants";
 
 interface TableChartProps {
   datasetLabel: string;
@@ -100,7 +100,7 @@ export const TablePoolOverview = ({
           return (
             <Tooltip title={params.value}>
               <span
-                onClick={() => (window.location.href = blockExplorerUrlBase + 'address/' + params.value)}
+                onClick={() => (window.location.href = blockExplorerUrlBase + "address/" + params.value)}
                 style={tableCellTruncate}
               >
                 {poolIdStr}
@@ -199,12 +199,16 @@ export const TablePoolOverview = ({
           return "N/A";
         });
         const tokenFieldDiff = pool.rewardTokens?.length - pool.rewardTokenEmissionsUSD?.length;
-        if (tokenFieldDiff !== 0 && issues.filter((x) => x.fieldName === `${pool.name || '#' + i + 1 + skipAmt}[${tokenFieldDiff}]` && x.type === "TOK").length === 0
+        if (
+          tokenFieldDiff !== 0 &&
+          issues.filter(
+            (x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt}[${tokenFieldDiff}]` && x.type === "TOK",
+          ).length === 0
         ) {
           issues.push({
             type: "TOK",
             level: "error",
-            fieldName: `${pool.name || '#' + i + 1 + skipAmt}[${tokenFieldDiff}]`,
+            fieldName: `${pool.name || "#" + i + 1 + skipAmt}[${tokenFieldDiff}]`,
             message: `rewardTokens [${tokenFieldDiff}]`,
           });
         }
@@ -215,13 +219,15 @@ export const TablePoolOverview = ({
             if (
               !Number(pool.totalDepositBalanceUSD) &&
               !Number(pool.totalValueLockedUSD) &&
-              issues.filter((x) => x.fieldName === `${pool.name || '#' + i + 1 + skipAmt}-pool value`).length === 0
+              issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt}-pool value`).length === 0
             ) {
               issues.push({
                 type: "VAL",
-                message: `${pool.name || '#' + i + 1 + skipAmt} does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APY nor Base Yield could be properly calculated.`,
+                message: `${
+                  pool.name || "#" + i + 1 + skipAmt
+                } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APY nor Base Yield could be properly calculated.`,
                 level: "critical",
-                fieldName: `${pool.name || '#' + i + 1 + skipAmt}-pool value`,
+                fieldName: `${pool.name || "#" + i + 1 + skipAmt}-pool value`,
               });
             } else if (pool.totalDepositBalanceUSD) {
               apr = (Number(val) / Number(pool.totalDepositBalanceUSD)) * 100 * 365;
@@ -302,26 +308,24 @@ export const TablePoolOverview = ({
           let value = ((feePercentage * volumeUSD) / Number(pool.totalValueLockedUSD)) * 100;
           if (!value || !Number(pool.totalValueLockedUSD)) {
             value = 0;
-            if (
-              issues.filter((x) => x.fieldName === `${pool.name || '#' + i + 1 + skipAmt} Base Yield`).length === 0
-            ) {
+            if (issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0) {
               issues.push({
                 type: "NAN",
                 message: "",
                 level: "critical",
-                fieldName: `${pool.name || '#' + i + 1 + skipAmt} Base Yield`,
+                fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
               });
             }
           }
           if (
             value < 0 &&
-            issues.filter((x) => x.fieldName === `${pool.name || '#' + i + 1 + skipAmt} Base Yield`).length === 0
+            issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0
           ) {
             issues.push({
               type: "RATENEG",
               message: "",
               level: "critical",
-              fieldName: `${pool.name || '#' + i + 1 + skipAmt} Base Yield`,
+              fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
             });
           }
           returnObj.baseYield = value;
@@ -338,7 +342,7 @@ export const TablePoolOverview = ({
             const p = new URLSearchParams(href.search);
             p.set("tab", "pool");
             p.set("poolId", row.row.poolId);
-            navigate("?" + p.toString());
+            navigate("?" + p.toString().split("%2F").join("/"));
             setPoolId(row.row.poolId);
             handleTabChange(null, "3");
           }}

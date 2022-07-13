@@ -15,7 +15,7 @@ const NetworkLogos: Record<string, string> = {
   celo: "https://assets.coingecko.com/coins/images/11090/small/icon-celo-CELO-color-500.png?1592293590",
   fuse: "https://assets.coingecko.com/coins/images/10347/small/vUXKHEe.png?1601523640",
   cronos: "https://assets.coingecko.com/coins/images/7310/small/oCw2s3GI_400x400.jpeg?1645172042",
-  harmony: "https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793"
+  harmony: "https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793",
 };
 
 interface NetworkLogoProps {

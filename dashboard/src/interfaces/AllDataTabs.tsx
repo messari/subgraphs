@@ -90,9 +90,9 @@ function AllDataTabs({
   }
 
   const protocolType = data.protocols[0].type;
-  const protocolEntityNamesPlural = ProtocolTypeEntityNames[protocolType]
+  const protocolEntityNamesPlural = ProtocolTypeEntityNames[protocolType];
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
-  const network = data[protocolEntityNamesPlural][0].network
+  const network = data[protocolEntityNamesPlural][0].network;
 
   let eventsTab = null;
   let eventsTabButton = null;

@@ -465,7 +465,6 @@ export const schema120 = (): Schema => {
     Object.keys(entitiesData.poolHourlySnapshots).join(",") +
     "}";
 
-
   const poolData: { [x: string]: string } = {
     id: "ID!",
     name: "String",
