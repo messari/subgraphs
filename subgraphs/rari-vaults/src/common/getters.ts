@@ -73,6 +73,7 @@ export function getOrCreateUsageDailySnapshot(
     usageMetrics.dailyWithdrawCount = 0;
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
+    usageMetrics.totalPoolCount = 0;
     usageMetrics.save();
   }
 
@@ -124,6 +125,13 @@ export function getOrCreateVaultDailySnapshot(
     vaultMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     vaultMetrics.blockNumber = event.block.number;
     vaultMetrics.timestamp = event.block.timestamp;
+    vaultMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     vaultMetrics.save();
   }
 
@@ -148,6 +156,13 @@ export function getOrCreateVaultHourlySnapshot(
     vaultMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     vaultMetrics.blockNumber = event.block.number;
     vaultMetrics.timestamp = event.block.timestamp;
+    vaultMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     vaultMetrics.save();
   }
 
@@ -202,6 +217,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
+    protocol.totalPoolCount = INT_ZERO;
 
     protocol.save();
   }
@@ -229,6 +245,7 @@ export function getOrCreateVault(
     let vaults = protocol._vaultList;
     vaults.push(id);
     protocol._vaultList = vaults;
+    protocol.totalPoolCount += 1;
     protocol.save();
 
     // get input token
@@ -279,6 +296,9 @@ export function getOrCreateVault(
     vault.outputTokenSupply = BIGINT_ZERO;
     vault.outputTokenPriceUSD = BIGDECIMAL_ZERO; // can find by dividing TVL by outputTokenSupply
     vault.pricePerShare = BIGDECIMAL_ZERO;
+    vault.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    vault.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    vault.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
     vault.save();
   }

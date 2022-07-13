@@ -37,8 +37,6 @@ import {
   LiquidationCall,
   Repay,
   ReserveDataUpdated,
-  ReserveUsedAsCollateralDisabled,
-  ReserveUsedAsCollateralEnabled,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
 import { AToken } from "../../../generated/templates/LendingPool/AToken";
@@ -57,8 +55,6 @@ import {
   _handleReserveDeactivated,
   _handleReserveFactorChanged,
   _handleReserveInitialized,
-  _handleReserveUsedAsCollateralDisabled,
-  _handleReserveUsedAsCollateralEnabled,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
@@ -317,26 +313,13 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   );
 }
 
-export function handleReserveUsedAsCollateralEnabled(
-  event: ReserveUsedAsCollateralEnabled
-): void {
-  // This Event handler enables a reserve/market to be used as collateral
-  _handleReserveUsedAsCollateralEnabled(event.params.reserve);
-}
-
-export function handleReserveUsedAsCollateralDisabled(
-  event: ReserveUsedAsCollateralDisabled
-): void {
-  // This Event handler disables a reserve/market being used as collateral
-  _handleReserveUsedAsCollateralDisabled(event.params.reserve);
-}
-
 export function handleDeposit(event: Deposit): void {
   _handleDeposit(
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData()
+    getProtocolData(),
+    event.params.onBehalfOf
   );
 }
 
@@ -345,7 +328,8 @@ export function handleWithdraw(event: Withdraw): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData()
+    getProtocolData(),
+    event.params.to
   );
 }
 
@@ -354,7 +338,8 @@ export function handleBorrow(event: Borrow): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData()
+    getProtocolData(),
+    event.params.onBehalfOf
   );
 }
 
@@ -363,7 +348,8 @@ export function handleRepay(event: Repay): void {
     event,
     event.params.amount,
     event.params.reserve,
-    getProtocolData()
+    getProtocolData(),
+    event.params.user
   );
 }
 

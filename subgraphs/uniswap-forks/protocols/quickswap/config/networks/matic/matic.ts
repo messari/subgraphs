@@ -1,9 +1,24 @@
-import { Address, BigDecimal } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
-import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
 
 export class QuickswapMaticConfigurations implements Configurations {
   getNetwork(): string {
@@ -27,29 +42,36 @@ export class QuickswapMaticConfigurations implements Configurations {
   getFactoryAddress(): string {
     return toLowerCase("0x5757371414417b8c6caad45baef941abc7d3ab32");
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString(toLowerCase("0x5757371414417b8c6caad45baef941abc7d3ab32")));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString(
+        toLowerCase("0x5757371414417b8c6caad45baef941abc7d3ab32")
+      )
+    );
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("3");
+    return BigDecimal.fromString("0.3");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.5");
+    return BigDecimal.fromString("0.05");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("2.5");
+    return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("3");
+    return BigDecimal.fromString("0.3");
   }
   getFeeOnOff(): string {
     return FeeSwitch.OFF;
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.NONE;
+  }
+  getRewardTokenRate(): BigInt {
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return toLowerCase("0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"); // wETH
@@ -75,7 +97,7 @@ export class QuickswapMaticConfigurations implements Configurations {
   getStableOraclePools(): string[] {
     return toLowerCaseList([
       "0x853ee4b2a13f8a742d64c8f088be7ba2131f670d", // USDC/wETH
-      "0x4a35582a710e1f4b2030a3f826da20bfb6703c09" // DAI/wETH
+      "0x4a35582a710e1f4b2030a3f826da20bfb6703c09", // DAI/wETH
     ]);
   }
   getUntrackedPairs(): string[] {

@@ -1,9 +1,25 @@
-import { Address, BigDecimal } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
-import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  MINIMUM_LIQUIDITY_THREE_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
 
 export class SolarbeamMoonriverConfigurations implements Configurations {
   getNetwork(): string {
@@ -27,29 +43,36 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
   getFactoryAddress(): string {
     return toLowerCase("0x049581aEB6Fe262727f290165C29BDAB065a1B68");
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString(toLowerCase("0x049581aEB6Fe262727f290165C29BDAB065a1B68")));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString(
+        toLowerCase("0x049581aEB6Fe262727f290165C29BDAB065a1B68")
+      )
+    );
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("2.5");
+    return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.5");
+    return BigDecimal.fromString("0.05");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("2.0");
+    return BigDecimal.fromString("0.20");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("2.5");
+    return BigDecimal.fromString("0.25");
   }
   getFeeOnOff(): string {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.BLOCK;
+  }
+  getRewardTokenRate(): BigInt {
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return toLowerCase("0x98878b06940ae243284ca214f92bb71a2b032b8a"); // wMOVR
@@ -62,6 +85,8 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
       "0x98878b06940ae243284ca214f92bb71a2b032b8a", // wMOVR
       "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d", // USDC
       "0xb44a9b6905af7c801311e8f4e76932ee959c663c", // USDT
+      "0x5d9ab5522c64e1f6ef5e3627eccc093f56167818", //BUSD
+      "0x1a93b23281cc1cde4c4741353f3064709a16197d", //FRAX
     ]);
   }
   getStableCoins(): string[] {
@@ -72,7 +97,7 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
   }
   getStableOraclePools(): string[] {
     return toLowerCaseList([
-      "0xe537f70a8b62204832b8ba91940b77d3f79aeb81" // USDC/wMOVR
+      "0xe537f70a8b62204832b8ba91940b77d3f79aeb81", // USDC/wMOVR
     ]);
   }
   getUntrackedPairs(): string[] {
@@ -82,6 +107,6 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
     return [];
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+    return MINIMUM_LIQUIDITY_THREE_THOUSAND;
   }
 }

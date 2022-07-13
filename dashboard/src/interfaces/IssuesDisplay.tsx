@@ -40,20 +40,12 @@ const messagesByLevel = (
       if (issuesArray[x].type === "TOTAL_REV") {
         const msgObj = JSON.parse(issuesArray[x].message);
         issuesMsg = `
-          ${issuesArray[x].fieldName} sum value (${msgObj.totalRevenue}) diverged from protocol + supply revenue (${
-          msgObj.sumRevenue
-        }) by ${msgObj.divergence}% ${
-          Number(msgObj.divergence) === 0 ? "(possible rounding error)" : ""
-        } starting from snapshot id ${msgObj.timeSeriesInstanceId}.`;
+          ${issuesArray[x].fieldName} sum value (${msgObj.totalRevenue}) diverged from protocol + supply revenue (${msgObj.sumRevenue}) by ${msgObj.divergence}% starting from snapshot id ${msgObj.timeSeriesInstanceId}.`;
       }
       if (issuesArray[x].type === "TOTAL_TX") {
         const msgObj = JSON.parse(issuesArray[x].message);
         issuesMsg = `
-          ${issuesArray[x].fieldName} sum value (${msgObj.totalTx}) diverged from sum of individual transactions (${
-          msgObj.individualTxSum
-        }) by ${msgObj.divergence}% ${
-          Number(msgObj.divergence) === 0 ? "(possible rounding error)" : ""
-        } starting from snapshot id ${msgObj.timeSeriesInstanceId}.`;
+          ${issuesArray[x].fieldName} sum value (${msgObj.totalTx}) diverged from sum of individual transactions (${msgObj.individualTxSum}) by ${msgObj.divergence}% starting from snapshot id ${msgObj.timeSeriesInstanceId}.`;
       }
       if (issuesArray[x].type === "TVL-") {
         issuesMsg = `${issuesArray[x].fieldName} is below 1000.`;

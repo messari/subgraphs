@@ -39,14 +39,12 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - Block
-        - Account
-        - Token
         - Market
-        - Transaction
-        - Transfer
-        - Position
-        - PositionSnapshot
+        - Deposit
+        - Withdraw
+        - Repay
+        - Borrow
+        - Liquidate
       abis:
         - name: AaveIncentivesController
           file: ./abis/aave-v2/AaveIncentivesController.json
@@ -79,10 +77,6 @@ templates:
           handler: handleLiquidationCall
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleReserveDataUpdated
-        - event: ReserveUsedAsCollateralEnabled(indexed address,indexed address)
-          handler: handleReserveUsedAsCollateralEnabled
-        - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
-          handler: handleReserveUsedAsCollateralDisabled
       file: ./protocols/aave-v2/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator
@@ -94,14 +88,7 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - Block
-        - Account
-        - Token
         - Market
-        - Transaction
-        - Transfer
-        - Position
-        - PositionSnapshot
       abis:
         - name: AToken
           file: ./abis/aave-v2/AToken.json

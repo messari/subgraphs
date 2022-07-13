@@ -28,7 +28,6 @@ export const poolFields = {
   network: "Network!",
   type: "ProtocolType!",
   totalValueLockedUSD: "BigDecimal!",
-  protocolControlledValueUSD: "BigDecimal",
   cumulativeSupplySideRevenueUSD: "BigDecimal!",
   cumulativeProtocolSideRevenueUSD: "BigDecimal!",
   cumulativeTotalRevenueUSD: "BigDecimal!",
@@ -441,7 +440,6 @@ export const schema120 = (): Schema => {
     financialsDailySnapshots: {
       id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
-      protocolControlledValueUSD: "BigDecimal",
       dailySupplySideRevenueUSD: "BigDecimal!",
       cumulativeSupplySideRevenueUSD: "BigDecimal!",
       dailyProtocolSideRevenueUSD: "BigDecimal!",
@@ -570,7 +568,6 @@ export const schema120 = (): Schema => {
         network
         type
         totalValueLockedUSD
-        protocolControlledValueUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
@@ -621,7 +618,6 @@ export const schema120 = (): Schema => {
         network
         type
         totalValueLockedUSD
-        protocolControlledValueUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
@@ -682,7 +678,6 @@ export const schema120 = (): Schema => {
     network: "Network!",
     type: "ProtocolType!",
     totalValueLockedUSD: "BigDecimal!",
-    protocolControlledValueUSD: "BigDecimal",
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",
@@ -718,7 +713,6 @@ export const schema130 = (): Schema => {
     financialsDailySnapshots: {
       id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
-      protocolControlledValueUSD: "BigDecimal",
       dailySupplySideRevenueUSD: "BigDecimal!",
       cumulativeSupplySideRevenueUSD: "BigDecimal!",
       dailyProtocolSideRevenueUSD: "BigDecimal!",
@@ -863,7 +857,6 @@ export const schema130 = (): Schema => {
         network
         type
         totalValueLockedUSD
-        protocolControlledValueUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
@@ -915,7 +908,6 @@ export const schema130 = (): Schema => {
         network
         type
         totalValueLockedUSD
-        protocolControlledValueUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
@@ -980,7 +972,6 @@ export const schema130 = (): Schema => {
     network: "Network!",
     type: "ProtocolType!",
     totalValueLockedUSD: "BigDecimal!",
-    protocolControlledValueUSD: "BigDecimal",
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",

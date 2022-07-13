@@ -9,6 +9,13 @@
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/balancer-v2-ethereum",
             "matic": "https://api.thegraph.com/subgraphs/name/messari/balancer-v2-polygon"
         },
+        "bancor-v3": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/bancor-v3-ethereum"
+        },
+        "beethoven-x": {
+            "fantom": "https://api.thegraph.com/subgraphs/name/messari/beethoven-x-fantom",
+            "optimism": "https://api.thegraph.com/subgraphs/name/messari/beethoven-x-optimism"
+        },
         "curve": {
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/curve-finance-arbitrum",
             "avalanche": "https://api.thegraph.com/subgraphs/name/messari/curve-finance-avalanche",
@@ -17,6 +24,12 @@
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/curve-finance-ethereum",
             "matic": "https://api.thegraph.com/subgraphs/name/messari/curve-finance-polygon",
             "optimism": "https://api.thegraph.com/subgraphs/name/messari/curve-finance-optimism"
+        },
+        "honeyswap": {
+            "gnosis": "https://api.thegraph.com/subgraphs/name/messari/honeyswap-gnosis"
+        },
+        "platypus": {
+            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/platypus-avalanche"
         },
         "quickswap": {
             "matic": "https://api.thegraph.com/subgraphs/name/messari/quickswap-polygon"
@@ -46,7 +59,8 @@
             "gnosis": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-gnosis",
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-ethereum",
             "matic": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-polygon",
-            "moonriver": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-moonriver"
+            "moonriver": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-moonriver",
+            "moonbeam": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-moonbeam"
         },
         "trader-joe": {
             "avalanche": "https://api.thegraph.com/subgraphs/name/messari/trader-joe-avalanche"
@@ -56,7 +70,7 @@
         },
         "uniswap-v3": {
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-arbitrum",
-            "mainnet": "https://api.thegraph.com/subgraphs/id/QmUvxBUcZchQ4wbWtMgE9CMqeZ8R139JKfsXxPqBoxHCC7",
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-ethereum",
             "matic": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-polygon",
             "optimism": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-optimism"
         }
@@ -64,6 +78,23 @@
     "lending-protocols": {
         "aave-v2": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/aave-v2-ethereum"
+        },
+        "aave-arc": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/aave-arc-ethereum"
+        },
+        "aave-rwa": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/aave-rwa-ethereum"
+        },
+        "aave-amm": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/aave-amm-ethereum"
+        },
+        "aave-v3": {
+            "optimism": "https://api.thegraph.com/subgraphs/name/messari/aave-v3-optimism",
+            "matic": "https://api.thegraph.com/subgraphs/name/messari/aave-v3-polygon",
+            "harmony": "https://api.thegraph.com/subgraphs/name/messari/aave-v3-harmony",
+            "fantom": "https://api.thegraph.com/subgraphs/name/messari/aave-v3-fantom",
+            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/aave-v3-avalanche",
+            "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/aave-v3-arbitrum"
         },
         "abracadabra": {
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/abracadabra-money-arbitrum",
@@ -93,8 +124,19 @@
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/cream-finance-ethereum",
             "matic": "https://api.thegraph.com/subgraphs/name/messari/cream-finance-polygon"
         },
+        "dforce": {
+            "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/dforce-arbitrum",
+            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/dforce-avalanche",
+            "bsc": "https://api.thegraph.com/subgraphs/name/messari/dforce-bsc",
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/dforce-ethereum",
+            "optimism": "https://api.thegraph.com/subgraphs/name/messari/dforce-optimism",
+            "matic": "https://api.thegraph.com/subgraphs/name/messari/dforce-polygon"
+        },
         "ellipsis-finance": {
             "bsc": "https://api.thegraph.com/subgraphs/name/messari/ellipsis-finance-bsc"
+        },
+        "geist-finance": {
+            "fantom": "https://api.thegraph.com/subgraphs/name/messari/geist-finance-fantom"
         },
         "inverse-finance": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/inverse-finance-ethereum"
@@ -110,8 +152,25 @@
         "makerdao": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/makerdao-ethereum"
         },
+        "maple-finance": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/maple-finance-ethereum"
+        },
         "moonwell": {
             "moonriver": "https://api.thegraph.com/subgraphs/name/messari/moonwell-moonriver"
+        },
+        "qidao": {
+            "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/qidao-arbitrum",
+            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/qidao-avalanche",
+            "bsc": "https://api.thegraph.com/subgraphs/name/messari/qidao-bsc",
+            "fantom": "https://api.thegraph.com/subgraphs/name/messari/qidao-fantom",
+            "gnosis": "https://api.thegraph.com/subgraphs/name/messari/qidao-gnosis",
+            "moonriver": "https://api.thegraph.com/subgraphs/name/messari/qidao-moonriver",
+            "optimism": "https://api.thegraph.com/subgraphs/name/messari/qidao-optimism",
+            "matic": "https://api.thegraph.com/subgraphs/name/messari/qidao-polygon"
+        },
+        "rari-fuse": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/rari-fuse-ethereum",
+            "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/rari-fuse-arbitrum"
         },
         "scream": {
             "fantom": "https://api.thegraph.com/subgraphs/name/messari/scream-fantom"
@@ -121,11 +180,21 @@
         }
     },
     "vaults": {
+        "arrakis-finance": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/arrakis-finance-ethereum"
+        },
+        "badgerdao": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/badgerdao-ethereum"
+        },
         "belt-finance": {
             "bsc": "https://api.thegraph.com/subgraphs/name/messari/belt-finance-bsc"
         },
         "convex": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/convex-finance-ethereum"
+        },
+        "gamma": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/gamma-ethereum",
+            "matic": "https://api.thegraph.com/subgraphs/name/messari/gamma-polygon"
         },
         "rari-vaults-v1": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/rari-vaults-ethereum"
@@ -135,6 +204,9 @@
         },
         "tokemak": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/tokemak-ethereum"
+        },
+        "vesper": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/vesper-ethereum"
         },
         "yearn-v2": {
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-arbitrum",

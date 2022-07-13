@@ -207,6 +207,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
+    true, // update all market prices on call
     event
   );
 }
@@ -218,7 +219,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Aurigami",
     "aurigami",
     "1.3.0",
-    "1.0.6",
+    "1.0.7",
     "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),
