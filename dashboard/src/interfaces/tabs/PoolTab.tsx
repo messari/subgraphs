@@ -57,12 +57,10 @@ function PoolTab({
   const poolKeySingular = PoolName[data.protocols[0].type];
   const poolKeyPlural = PoolNames[data.protocols[0].type];
 
-  let allLoaded = true;
-  Object.keys(poolTimeseriesLoading).forEach((entity: string) => {
-    if (poolTimeseriesLoading[entity]) {
-      allLoaded = false;
-    }
-  });
+  let allLoaded = false;
+  if (!poolTimeseriesLoading && (poolTimeseriesData || poolTimeseriesError)) {
+    allLoaded = true
+  }
 
   let oneLoaded = false;
   Object.keys(poolTimeseriesLoading).forEach((entity: string) => {
