@@ -25,6 +25,7 @@ import {
   BIGDECIMAL_ZERO,
   bigIntToBigDecimal,
   BIGINT_ZERO,
+  DEFAULT_DECIMALS,
   EventType,
   exponentToBigDecimal,
   InterestRateSide,
@@ -355,10 +356,7 @@ export function _handleReserveDataUpdated(
     .minus(market.liquidityIndex)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
-    log.warning(
-      "liquidityIndexDiff: {}",
-      [liquidityIndexDiff.toString()]
-    );
+  log.warning("liquidityIndexDiff: {}", [liquidityIndexDiff.toString()]);
   market.liquidityIndex = liquidityIndex; // must update to current liquidity index
   let newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
@@ -395,22 +393,34 @@ export function _handleReserveDataUpdated(
     market.id,
     InterestRateSide.BORROWER,
     InterestRateType.STABLE,
-    bigIntToBigDecimal(rayToWad(stableBorrowRate))
+    rayToWad(stableBorrowRate)
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS))
   );
+
+  log.warning("post sRate", []);
 
   let vBorrowRate = createInterestRate(
     market.id,
     InterestRateSide.BORROWER,
     InterestRateType.VARIABLE,
-    bigIntToBigDecimal(rayToWad(variableBorrowRate))
+    rayToWad(variableBorrowRate)
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS))
   );
+
+  log.warning("post vRate", []);
 
   let depositRate = createInterestRate(
     market.id,
     InterestRateSide.LENDER,
     InterestRateType.VARIABLE,
-    bigIntToBigDecimal(rayToWad(liquidityRate))
+    rayToWad(liquidityRate)
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS))
   );
+
+  log.warning("post dRate", []);
 
   market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
   market.save();
