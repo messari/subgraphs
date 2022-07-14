@@ -4,6 +4,7 @@ import pandas as pd
 from subgrounds import Subgrounds
 from itertools import cycle
 from datetime import datetime, timedelta
+import time
 
 sg = Subgrounds()
 subgraphs_urls = {
@@ -49,7 +50,6 @@ def get_data(subgraph, network, startTime, numberPools):
         liquidity_pools.inputTokens.decimals
     ])
 
-    #Group
     dec_dict = (pd.Series(dec.liquidityPools_inputTokens_decimals.values, index=dec.liquidityPools_inputTokens_name).to_dict())
     
     snapshot_cols = df[0].columns.tolist()
@@ -65,16 +65,36 @@ def get_data(subgraph, network, startTime, numberPools):
     df_2 = df[2].groupby(snapshot_cols, axis=0)['liquidityPools_dailySnapshots_inputTokenBalances'].apply(list).reset_index()
 
     df = pd.merge(df_0, pd.merge(df_1, df_2))
-
-    #Will figure out a cleaner way of doing it. I originally grouped the token properties together so there wouldn't be any duplicate rows in the dataframe
-    df['InputTokenPrice0'] = (df['liquidityPools_dailySnapshots_totalValueLockedUSD'].astype('float64') * df['liquidityPools_dailySnapshots_inputTokenWeights'].apply(lambda x:x[0]).astype('float64')) / (df['liquidityPools_dailySnapshots_inputTokenBalances'].apply(lambda x:x[0]).astype('float64') / 10**df['liquidityPools_inputTokens_name'].apply(lambda x:dec_dict[x[0]]).astype('float64'))
-    df['InputTokenPrice1'] = (df['liquidityPools_dailySnapshots_totalValueLockedUSD'].astype('float64') * df['liquidityPools_dailySnapshots_inputTokenWeights'].apply(lambda x:x[1]).astype('float64')) / (df['liquidityPools_dailySnapshots_inputTokenBalances'].apply(lambda x:x[1]).astype('float64') / 10**df['liquidityPools_inputTokens_name'].apply(lambda x:dec_dict[x[1]]).astype('float64'))
-    df['%depeg'] = ((abs(1 - df['InputTokenPrice0'].astype('float64')) / 1)).round(9)
+    df = df.rename(columns={'liquidityPools_inputTokens_name': 'input_tokens_name', 
+                            'liquidityPools_dailySnapshots_inputTokenWeights': 'daily_input_tokens_weight',
+                            'liquidityPools_dailySnapshots_inputTokenBalances': 'daily_input_tokens_balance', 
+                            'liquidityPools_dailySnapshots_totalValueLockedUSD': 'daily_tvl', 
+                            'liquidityPools_totalValueLockedUSD': 'TVL'})
+    #Will figure out a cleaner way of doing it. I originally grouped the token properties together so there wouldn't be any duplicate rows in the dataframe 
+    df['daily_input_tokens_price'] = df.apply(lambda x: calc_input_token_price(x, dec_dict), axis=1)
+    df['%depeg'] = df.apply(lambda x: calc_depeg(x), axis=1)
     df["network"] = network
     df["date"] = pd.to_datetime(df['liquidityPools_dailySnapshots_timestamp'], unit="s")
-    df = df.rename(columns={'liquidityPools_inputTokens_name': 'inputTokens', 'liquidityPools_totalValueLockedUSD': 'TVL'})
-     
+
     return df
+
+def calc_depeg(df):
+
+    return [(1 - float(df['daily_input_tokens_price'][i])) for i in range(len(df['input_tokens_name']))]
+
+def calc_input_token_price(df, dict):
+    input_token_prices = []
+    # This isn't the best solution as its looping in python but given how there is a small number of tokens shouldn't be to big a hit to performance
+    for i in range(len(df['input_tokens_name'])):
+        if(float(df['daily_input_tokens_balance'][i]) != 0):
+            input_token_price = (float(df['daily_tvl']) * float(df['daily_input_tokens_weight'][i])
+                                / (int(df['daily_input_tokens_balance'][i]) / 10**dict[df['input_tokens_name'][i]]))
+        else:
+            input_token_price = 0
+        input_token_prices.append(input_token_price)
+
+    return input_token_prices
+
 
 def plot_pools(sort, data):
     grouped = data.groupby('liquidityPools_symbol')
@@ -84,26 +104,25 @@ def plot_pools(sort, data):
     cols = st.columns(2)
     for col, pool in zip(cycle(cols), sorted_pool_snapshots):
         with col: 
-            frame = pool.explode(['inputTokens','liquidityPools_dailySnapshots_inputTokenWeights'])
-            frame.index = pd.to_datetime(frame.index)
-            frame.resample("D").mean().ffill()
+            frame = pool.explode(['input_tokens_name', '%depeg', 'daily_input_tokens_price', 'daily_input_tokens_weight'])
             tvl_chart = (alt.Chart(frame).mark_bar().encode(
                     x='date:T', 
-                    y=alt.Y('sum(liquidityPools_dailySnapshots_inputTokenWeights):Q', title="Input Token Weight"), 
-                    color='inputTokens')
+                    y=alt.Y('sum(daily_input_tokens_weight):Q',
+                            title="Input Token Weight"),
+                    color='input_tokens_name'
             ).configure_legend(
                     strokeColor='gray',
                     fillColor='#EEEEEE',
                     padding=2,
                     cornerRadius=5,
                     orient='bottom'
-            )
+            ))
 
             chart1 = alt.Chart(frame).mark_line().encode(
                 x='date:T',
-                y=alt.Y('InputTokenPrice0:Q',  
-                        title='Input Token Price (USD)'
-                ),
+                y=alt.Y('daily_input_tokens_price:Q',  
+                        title='Input Token Price (USD)'),
+                color='input_tokens_name',
             ).properties(
                 height=70,
                 width=250
@@ -111,12 +130,19 @@ def plot_pools(sort, data):
 
             chart2 = alt.Chart(frame).mark_line().encode(
                 x='date:T',
-                y=alt.Y('%depeg:Q', axis=alt.Axis(format='%')),
+                y='%depeg:Q',
+                color='input_tokens_name',
             ).properties(
                 height=70,
                 width=250
             )
-            fig = alt.vconcat(chart1, chart2)
+            fig = alt.vconcat(chart1, chart2).configure_legend(
+                    strokeColor='gray',
+                    fillColor='#EEEEEE',
+                    padding=2,
+                    cornerRadius=5,
+                    orient='bottom'
+            )
 
             st.subheader(pool['liquidityPools_symbol'].iloc[0])
             st.altair_chart(tvl_chart, use_container_width=True)
