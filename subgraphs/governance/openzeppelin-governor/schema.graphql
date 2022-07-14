@@ -67,7 +67,7 @@ type Proposal @entity {
   "Internal proposal ID, in this implementation it seems to be a autoincremental id"
   id: ID!
   "Proposal description in markdown format"
-  description: String
+  description: String!
   "Governance Framework that proposal is part of"
   governanceFramework: GovernanceFramework!
 
