@@ -18,12 +18,12 @@ import { updateRevenueSnapshots } from "../modules/Revenue";
 import { Strategy as StrategyContract } from "../../generated/templates/Strategy/Strategy";
 
 export function handleHarvest(event: Harvest): void {
-  const harvestedAmount = event.params.harvested;
   const strategyAddress = event.address;
+  const harvestedAmount = event.params.harvested;
   const strategyContract = StrategyContract.bind(strategyAddress);
 
   const vaultAddress = utils.getVaultAddressFromStrategy(strategyAddress);
-
+  
   if (vaultAddress.equals(constants.BDIGG_VAULT_ADDRESS)) {
     return;
   }

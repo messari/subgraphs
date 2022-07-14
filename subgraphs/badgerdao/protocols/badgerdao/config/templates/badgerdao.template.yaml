@@ -1,0 +1,372 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  {{#vaults}}
+  - kind: ethereum
+    name: {{ name }}
+    network: {{ chain }}
+    source:
+      address: "{{ address }}"
+      startBlock: {{ startBlock }}
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: Geyser
+          file: ./abis/Geyser.json
+        - name: BaseRewardPool
+          file: ./abis/BaseRewardPool.json
+        - name: Locker
+          file: ./abis/Locker.json
+        - name: SushiswapChef
+          file: ./abis/SushiswapChef.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Harvested(indexed address,uint256,indexed uint256,uint256)
+          handler: handleHarvested
+        - event: FullPricePerShareUpdated(uint256,indexed uint256,indexed uint256)
+          handler: handleFullPricePerShareUpdated
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDepositWithProof
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAllWithProof
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositForWithProof
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vaultMappings.ts
+  {{/vaults}}
+
+  {{#strategies}}
+  - kind: ethereum
+    name: {{ name }}
+    network: {{ chain }}
+    source:
+      abi: Strategy
+      address: "{{ address }}"
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: Geyser
+          file: ./abis/Geyser.json
+        - name: BaseRewardPool
+          file: ./abis/BaseRewardPool.json
+        - name: Locker
+          file: ./abis/Locker.json
+        - name: SushiswapChef
+          file: ./abis/SushiswapChef.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Harvest(uint256,indexed uint256)
+          handler: handleHarvest
+        - event: CurveHarvest(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleCurveHarvest
+        - event: FarmHarvest(uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleFarmHarvest
+        - event: HarvestState(uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleHarvestState
+        - event: HarvestState(uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleDiggHarvestState
+        - event: TreeDistribution(indexed address,uint256,indexed uint256,uint256)
+          handler: handleTreeDistribution
+        - event: PerformanceFeeGovernance(indexed address,indexed address,uint256,indexed uint256,uint256)
+          handler: handlePerformanceFeeGovernance
+        - event: PerformanceFeeStrategist(indexed address,indexed address,uint256,indexed uint256,uint256)
+          handler: handlePerformanceFeeStrategist
+      file: ./src/mappings/strategyMappings.ts
+  {{/strategies}}
+
+templates: 
+  - kind: ethereum
+    name: Strategy
+    network: {{ chain }}
+    source:
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: Geyser
+          file: ./abis/Geyser.json
+        - name: BaseRewardPool
+          file: ./abis/BaseRewardPool.json
+        - name: Locker
+          file: ./abis/Locker.json
+        - name: SushiswapChef
+          file: ./abis/SushiswapChef.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: CurveHarvest(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleCurveHarvest
+        - event: Harvest(uint256,indexed uint256)
+          handler: handleHarvest
+        - event: FarmHarvest(uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleFarmHarvest
+        - event: HarvestState(uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleHarvestState
+        - event: TreeDistribution(indexed address,uint256,indexed uint256,uint256)
+          handler: handleTreeDistribution
+        - event: PerformanceFeeGovernance(indexed address,indexed address,uint256,indexed uint256,uint256)
+          handler: handlePerformanceFeeGovernance
+        - event: PerformanceFeeStrategist(indexed address,indexed address,uint256,indexed uint256,uint256)
+          handler: handlePerformanceFeeStrategist
+      file: ./src/mappings/strategyMappings.ts
+  - kind: ethereum
+    name: Controller
+    network: {{ chain }}
+    source:
+      abi: Controller
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: Geyser
+          file: ./abis/Geyser.json
+        - name: BaseRewardPool
+          file: ./abis/BaseRewardPool.json
+        - name: Locker
+          file: ./abis/Locker.json
+        - name: SushiswapChef
+          file: ./abis/SushiswapChef.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      callHandlers:
+        - function: revokeStrategy(address,address)
+          handler: handleRevokeStrategy
+        - function: setStrategy(address,address)
+          handler: handleSetStrategy
+        - function: setVault(address,address)
+          handler: handleSetVault
+      file: ./src/mappings/controllerMappings.ts

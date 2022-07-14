@@ -553,6 +553,15 @@
           "deploy-on-merge": false
         }
       }
+    },
+    "badgerdao": {
+      "badgerdao": {
+        "mainnet": {
+          "template": "badgerdao.template.yaml",
+          "messari": "messari/badgerdao-ethereum",
+          "deploy-on-merge": false
+        }
+      }
     }
   }
 }
