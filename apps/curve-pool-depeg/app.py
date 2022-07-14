@@ -1,7 +1,7 @@
 import streamlit as st
 import altair as alt
 import pandas as pd
-from subgrounds import Subgrounds
+from subgrounds.subgrounds import Subgrounds
 from itertools import cycle
 from datetime import datetime, timedelta
 import time
