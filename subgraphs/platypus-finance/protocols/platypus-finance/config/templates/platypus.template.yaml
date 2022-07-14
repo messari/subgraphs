@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
 features:
   - grafting

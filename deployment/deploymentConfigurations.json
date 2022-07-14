@@ -896,7 +896,16 @@
       "badgerdao": {
         "mainnet": {
           "template": "badgerdao.template.yaml",
-          "messari": "messari/badgerdao-ethereum",
+          "messari": "messari/badgerdao-ethereum"
+        }
+      }
+    },
+    "platypus-finance": {
+      "platypus-finance": {
+        "avalanche": {
+          "template": "platypus.template.yaml",
+          "messari": "messari/platypus-finance",
+          "aditya": "aditya-todi/platypus-finance-v2",
           "deploy-on-merge": false
         }
       }
