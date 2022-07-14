@@ -316,7 +316,7 @@ function handleTransferEvent(
     token.transferCount = token.transferCount.plus(BIGINT_ONE);
 
     let dailySnapshot = getOrCreateTokenDailySnapshot(token, event.block);
-    dailySnapshot.dailyHolderCount = dailySnapshot.dailyHolderCount
+    dailySnapshot.currentHolderCount = dailySnapshot.currentHolderCount
       .minus(FromBalanceToZeroNum)
       .plus(toAddressIsNewHolderNum)
       .plus(toBalanceIsZeroNum);
@@ -332,7 +332,7 @@ function handleTransferEvent(
     dailySnapshot.timestamp = event.block.timestamp;
 
     let hourlySnapshot = getOrCreateTokenHourlySnapshot(token, event.block);
-    hourlySnapshot.hourlyHolderCount = hourlySnapshot.hourlyHolderCount
+    hourlySnapshot.currentHolderCount = hourlySnapshot.currentHolderCount
       .minus(FromBalanceToZeroNum)
       .plus(toAddressIsNewHolderNum)
       .plus(toBalanceIsZeroNum);
@@ -370,7 +370,7 @@ function getOrCreateTokenDailySnapshot(
   let newSnapshot = new TokenDailySnapshot(snapshotId);
   newSnapshot.token = token.id;
   newSnapshot.dailyTotalSupply = token.totalSupply;
-  newSnapshot.dailyHolderCount = token.currentHolderCount;
+  newSnapshot.currentHolderCount = token.currentHolderCount;
   newSnapshot.cumulativeHolderCount = token.cumulativeHolderCount;
   newSnapshot.dailyEventCount = 0;
   newSnapshot.dailyTransferCount = 0;
@@ -399,7 +399,7 @@ function getOrCreateTokenHourlySnapshot(
   newSnapshot.token = token.id;
 
   newSnapshot.hourlyTotalSupply = token.totalSupply;
-  newSnapshot.hourlyHolderCount = token.currentHolderCount;
+  newSnapshot.currentHolderCount = token.currentHolderCount;
   newSnapshot.cumulativeHolderCount = token.cumulativeHolderCount;
   newSnapshot.hourlyEventCount = 0;
   newSnapshot.hourlyTransferCount = 0;

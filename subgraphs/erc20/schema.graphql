@@ -69,7 +69,7 @@ type TokenDailySnapshot @entity {
   dailyTotalSupply: BigDecimal!
 
   " number of accounts holding the token "
-  dailyHolderCount: BigInt!
+  currentHolderCount: BigInt!
 
   " number of cumulative unique holders "
   cumulativeHolderCount: BigInt!
@@ -113,7 +113,7 @@ type TokenHourlySnapshot @entity {
   hourlyTotalSupply: BigDecimal!
 
   " number of accounts holding this token "
-  hourlyHolderCount: BigInt!
+  currentHolderCount: BigInt!
 
   " number of cumulative unique holders "
   cumulativeHolderCount: BigInt!
