@@ -49,13 +49,24 @@ export const SubgraphDeployments = ({
         <DeploymentContainer>
           {deployments.map(({ network, deployment }) => {
             return (
-              <Deployment
-                key={network}
-                clientIndexing={clientIndexing}
-                subgraphID={name}
-                networkName={network}
-                deployment={deployment}
-              />
+              <>
+                <Deployment
+                  key={network}
+                  clientIndexing={clientIndexing}
+                  subgraphID={name}
+                  networkName={network}
+                  deployment={deployment}
+                  currentDeployment={true}
+                />
+                <Deployment
+                  key={network}
+                  clientIndexing={clientIndexing}
+                  subgraphID={name}
+                  networkName={network}
+                  deployment={deployment}
+                  currentDeployment={false}
+                />
+              </>
             );
           })}
         </DeploymentContainer>

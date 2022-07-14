@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: avalanche
+    network: moonriver
     source:
-      address: "0x9ad6c38be94206ca50bb0d90783181662f0cfa10"
+      address: "0x049581aEB6Fe262727f290165C29BDAB065a1B68"
       abi: Factory
-      startBlock: 2486392
+      startBlock: 424144
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -16,30 +16,33 @@ dataSources:
       entities: []
       abis:
         - name: Factory
-          file: ./abis/trader-joe/Factory.json
+          file: ./abis/solarbeam/Factory.json
         - name: TokenABI
-          file: ./abis/trader-joe/ERC20.json
+          file: ./abis/solarbeam/ERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
+
   - kind: ethereum
-    name: MasterChefV2
-    network: avalanche
+    name: MasterChef
+    network: moonriver
     source:
-      address: "0xd6a4F121CA35509aF06A0Be99093d08462f53052"
-      abi: MasterChefV2TraderJoe
-      startBlock: 2486444
+      address: "0x7e6e03822d0077f3c417d33caeac900fc2645679"
+      abi: MasterChefSolarbeam
+      startBlock: 499476
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: []
+      entities:
+        - _CircularBuffer
+        - RewardToken
       abis:
-        - name: MasterChefV2TraderJoe
-          file: ./abis/trader-joe/MasterChefV2TraderJoe.json
+        - name: MasterChefSolarbeam
+          file: ./abis/solarbeam/MasterChefSolarbeam.json
         - name: TokenABI
-          file: ./abis/trader-joe/ERC20.json
+          file: ./abis/solarbeam/ERC20.json
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
           handler: handleDeposit
@@ -47,46 +50,11 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-        - event: Add(indexed uint256,uint256,indexed address,indexed address)
-          handler: handleAdd
-        - event: Set(indexed uint256,uint256,indexed address,bool)
-          handler: handleSet
-        - event: UpdateEmissionRate(indexed address,uint256)
-          handler: handleUpdateEmissionRate
-      file: ./protocols/trader-joe/src/mappings/masterchef/rewardV2.ts
-  - kind: ethereum
-    name: MasterChefV3
-    network: avalanche
-    source:
-      address: "0x188bed1968b795d5c9022f6a0bb5931ac4c18f00"
-      abi: MasterChefV3TraderJoe
-      startBlock: 6034473
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: MasterChefV3TraderJoe
-          file: ./abis/trader-joe/MasterChefV3TraderJoe.json
-        - name: TokenABI
-          file: ./abis/trader-joe/ERC20.json
-      eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256)
-          handler: handleDepositV3
-        - event: Withdraw(indexed address,indexed uint256,uint256)
-          handler: handleWithdrawV3
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
-          handler: handleEmergencyWithdrawV3
-        - event: Add(indexed uint256,uint256,indexed address,indexed address)
-          handler: handleAdd
-        - event: Set(indexed uint256,uint256,indexed address,bool)
-          handler: handleSet
-      file: ./protocols/trader-joe/src/mappings/masterchef/rewardV3.ts
+      file: ./protocols/solarbeam/src/mappings/masterchef/reward.ts
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: xdai
+    network: moonriver
     source:
       abi: Pair
     mapping:
@@ -97,11 +65,11 @@ templates:
       entities: []
       abis:
         - name: Pair
-          file: ./abis/spiritswap/Pair.json
+          file: ./abis/solarbeam/Pair.json
         - name: Factory
-          file: ./abis/spiritswap/Factory.json
+          file: ./abis/solarbeam/Factory.json
         - name: TokenABI
-          file: ./abis/spiritswap/ERC20.json
+          file: ./abis/solarbeam/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint

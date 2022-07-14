@@ -29,7 +29,6 @@ import {
   getOrCreateToken,
   getOrCreateLPToken,
   getLiquidityPoolAmounts,
-  getOrCreateRewardToken,
 } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import {
@@ -40,7 +39,11 @@ import {
 import { NetworkConfigs } from "../../configurations/configure";
 import { getTrackedVolumeUSD } from "../price/price";
 
-function createPoolFees(poolAddress: string): string[] {
+/**
+ * Create the fee for a pool depending on the the protocol and network specific fee structure.
+ * Specified in the typescript configuration file.
+ */
+export function createPoolFees(poolAddress: string): string[] {
   let poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
   let poolProtocolFee = new LiquidityPoolFee(
     poolAddress.concat("-protocol-fee")
@@ -68,7 +71,7 @@ function createPoolFees(poolAddress: string): string[] {
   return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
 
-// Create a liquidity pool from PairCreated contract call
+// Create a liquidity pool from PairCreated event emission.
 export function createLiquidityPool(
   event: ethereum.Event,
   poolAddress: string,
@@ -99,9 +102,7 @@ export function createLiquidityPool(
   ];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool.rewardTokens = [
-    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-  ];
+  pool.rewardTokens = [];
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
@@ -123,7 +124,7 @@ export function createLiquidityPool(
   protocol.totalPoolCount += 1;
   protocol.save();
 
-  // create the tracked contract based on the template
+  // Create and track the newly created pool contract based on the template specified in the subgraph.yaml file.
   PairTemplate.create(Address.fromString(poolAddress));
 
   pool.save();
@@ -146,7 +147,7 @@ export function createAndIncrementAccount(accountId: string): i32 {
   return INT_ZERO;
 }
 
-// Generate the deposit entity and update deposit account for the according pool.
+// Create a Deposit entity and update deposit count on a Mint event for the specific pool..
 export function createDeposit(
   event: ethereum.Event,
   amount0: BigInt,
@@ -190,7 +191,7 @@ export function createDeposit(
   deposit.save();
 }
 
-// Generate the withdraw entity
+// Create a Withdraw entity on a Burn event for the specific pool..
 export function createWithdraw(
   event: ethereum.Event,
   amount0: BigInt,

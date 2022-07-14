@@ -8,33 +8,7 @@
 
 Sum across all Vaults:
 
-`Vault total value locked`
-
-### Total Revenue USD
-
-Sum across all Vaults:
-
-`Amount harvested * price of token harvested`
-
-### Protocol-Side Revenue USD
-
-Portion of the Total Revenue allocated to the Protocol
-
-Sum across all Vaults:
-
-`Total revenue * performanceFee / 100`
-
-PerformanceFee is set as maxFee of the vault (which is usually 10%) minus strategist and harvester fee (which are set by the deployer)
-
-### Supply-Side Revenue USD
-
-Portion of the Total Revenue allocated to the Supply-Side
-
-Sum across all Vaults
-
-`Total revenue * (1 - performanceFee/100 - strategistFee/100 - harvesterFee/100)`
-
-PerformanceFee is set as maxFee of the vault (which is usually 10%) minus strategist and harvester fee (which are set by the deployer)
+`vault.totalValueLockedUSD`
 
 ### Total Unique Users
 
@@ -44,15 +18,37 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Withdrawals`
 
-### Reward Token Emissions Amount
+### Deposits
 
-To be added
+Since deposit event has only the `tvl` parameter, deposited amount is calculated by subtracting the last tvl registered by the subgraph to the current input token balance
 
-### Protocol Controlled Value
+`Deposit.amount = event.params.tvl - vault.inputTokenBalance`
 
-Sum across all valuts:
+### Whitdraws
 
-`Vault controlled value`
+Since withdraw event has only the `tvl` parameter, whitdrawn amount is calculated by subtracting the current input token balance to the last tvl registered by the subgraph
+
+`Withdraw.amount = vault.inputTokenBalance - event.params.tvl`
+
+### Harvests and Supply-Side Revenue
+
+Harvest events for the various vaults can be divided into two categories: events that return the amount harvested and events that don't. In the case amount harvested is not returned, we use the difference between current tvl and last stored tvl instead.
+
+`amountHarvested = contract.balance() - vault.inputTokenBalance`
+
+Supply-side revenue is then obtained by summing all the amount harvested (since fees to the protocol are paid separately)
+
+`protocol.cumulativeSupplySideRevenueUSD += amountHarvested * inputToken.lastPriceUSD`
+
+### Charged Fees and Protocol-Side Revenue
+
+Protocol fees are applied by `chargeFees()` function and paid in wrapped native token.
+
+`protocol.cumulativeSupplyProtocolRevenueUSD += (event.params.beefyFees + event.params.strategistFees + event.params.callFees) * nativeToken.lastPriceUSD`
+
+### Total Revenue USD
+
+`protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD + protocol.cumulativeSupplyProtocolRevenueUSD`
 
 ## Useful Links and references
 
@@ -72,3 +68,9 @@ Before deploying, run
 to build the yaml file for the correct chain; than you can deploy using
 
 `yarn deploy ${githubuser/subgraphname}`
+
+## Known Issues
+
+- On Celo, sushiswap oracle fails to fetch prices of LP tokens
+- Since the workaround to calculate deposit and withdraws amounts is not perfect (if more calls to the same vault are done in the same block there could be interferences between events) some negative amounts could occasionally come up
+- Some vaults do not emit all the needed events for a complete tracking of all the metrics, so some old data may be missing

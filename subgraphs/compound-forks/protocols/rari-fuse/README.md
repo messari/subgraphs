@@ -75,7 +75,6 @@ Count of Unique Addresses which have interacted with the protocol via any transa
     - A potential fix is to recalculate TVL in every market each time `AccrueInterest` emits. This would slow down syncing as lots of contract calls would be introduced.
   - `fMIM` seems to have price oracle manipulation between 2/1/22 - 2/4/22 so I took the average price and overrided any transactions within those timestamps
 
-
 ## Reference and Useful Links
 
 Protocol: https://rari.capital/

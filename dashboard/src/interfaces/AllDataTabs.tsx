@@ -7,7 +7,8 @@ import ProtocolTab from "./tabs/ProtocolTab";
 import { styled } from "../styled";
 import PoolOverviewTab from "./tabs/PoolOverviewTab";
 import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
-import { ProtocolTypeEntityName } from "../constants";
+import { ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
+import PositionTab from "./tabs/PositionTab";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -35,6 +36,7 @@ interface AllDataTabsProps {
   poolsListData: { [x: string]: any };
   poolListLoading: any;
   poolsListError: any;
+  positionsQuery?: string;
   handleTabChange: (event: any, newValue: string) => void;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
   setProtocolId: React.Dispatch<React.SetStateAction<string>>;
@@ -63,6 +65,7 @@ function AllDataTabs({
   protocolTimeseriesLoading,
   protocolTimeseriesError,
   poolsListError,
+  positionsQuery,
   handleTabChange,
   setPoolId,
   setProtocolId,
@@ -87,8 +90,30 @@ function AllDataTabs({
   }
 
   const protocolType = data.protocols[0].type;
+  const protocolEntityNamesPlural = ProtocolTypeEntityNames[protocolType];
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
+  const network = data[protocolEntityNamesPlural][0].network;
 
+  let eventsTab = null;
+  let eventsTabButton = null;
+  if (protocolType !== "GENERIC") {
+    eventsTabButton = <Tab label="Events" value="4" />;
+    eventsTab = (
+      <TabPanel value="4">
+        {/* EVENTS TAB */}
+        <EventsTab
+          data={data}
+          events={events}
+          protocolNetwork={network}
+          poolId={poolId}
+          poolsList={poolsListData}
+          poolListLoading={poolListLoading}
+          poolNames={poolNames}
+          setPoolId={(x) => setPoolId(x)}
+        />
+      </TabPanel>
+    );
+  }
   return (
     <>
       <TabContext value={tabValue}>
@@ -96,7 +121,8 @@ function AllDataTabs({
           <Tab label="Protocol" value="1" />
           <Tab label="Pool Overview" value="2" />
           <Tab label="Pool" value="3" />
-          <Tab label="Events" value="4" />
+          {eventsTabButton}
+          {positionsQuery && <Tab label="Positions" value="5" />}
         </StyledTabs>
         {protocolDropDown}
         <TabPanel value="1">
@@ -118,6 +144,7 @@ function AllDataTabs({
             skipAmt={skipAmt}
             pools={pools}
             protocolType={data.protocols[0].type}
+            protocolNetwork={network}
             poolOverviewRequest={poolOverviewRequest}
             subgraphToQueryURL={subgraphToQueryURL}
             setPoolId={(x) => setPoolId(x)}
@@ -143,18 +170,21 @@ function AllDataTabs({
             setPoolId={(x) => setPoolId(x)}
           />
         </TabPanel>
-        <TabPanel value="4">
-          {/* EVENTS TAB */}
-          <EventsTab
-            data={data}
-            events={events}
-            poolId={poolId}
-            poolsList={poolsListData}
-            poolListLoading={poolListLoading}
-            poolNames={poolNames}
-            setPoolId={(x) => setPoolId(x)}
-          />
-        </TabPanel>
+        {eventsTab}
+        {positionsQuery && (
+          <TabPanel value="5">
+            {/* POSITIONS TAB */}
+            <PositionTab
+              positions={data?.market?.positions}
+              poolId={poolId}
+              poolsList={poolsListData}
+              poolListLoading={poolListLoading}
+              poolsListError={poolsListError}
+              poolNames={poolNames}
+              setPoolId={(x) => setPoolId(x)}
+            />
+          </TabPanel>
+        )}
       </TabContext>
     </>
   );

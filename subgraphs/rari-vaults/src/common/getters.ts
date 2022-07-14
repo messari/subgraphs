@@ -128,6 +128,9 @@ export function getOrCreateVaultDailySnapshot(
     vaultMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     vaultMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     vaultMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
     vaultMetrics.save();
   }
@@ -156,6 +159,9 @@ export function getOrCreateVaultHourlySnapshot(
     vaultMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     vaultMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     vaultMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
     vaultMetrics.save();
   }

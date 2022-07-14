@@ -7,6 +7,7 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 interface EventsTabProps {
   data: any;
   events: string[];
+  protocolNetwork: string;
   poolId: string;
   poolsList: { [x: string]: any[] };
   poolListLoading: any;
@@ -15,7 +16,16 @@ interface EventsTabProps {
 }
 
 // This component is for each individual subgraph
-function EventsTab({ data, events, poolId, setPoolId, poolsList, poolNames, poolListLoading }: EventsTabProps) {
+function EventsTab({
+  data,
+  events,
+  protocolNetwork,
+  poolId,
+  setPoolId,
+  poolsList,
+  poolNames,
+  poolListLoading,
+}: EventsTabProps) {
   const [issuesState, setIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>([]);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = issuesState;
 
@@ -67,7 +77,15 @@ function EventsTab({ data, events, poolId, setPoolId, poolsList, poolNames, pool
             </Box>
           );
         }
-        return <TableEvents key={eventName + "Table"} datasetLabel={eventName} data={data} eventName={eventName} />;
+        return (
+          <TableEvents
+            key={eventName + "Table"}
+            protocolNetwork={protocolNetwork}
+            datasetLabel={eventName}
+            data={data}
+            eventName={eventName}
+          />
+        );
       })}
     </>
   );

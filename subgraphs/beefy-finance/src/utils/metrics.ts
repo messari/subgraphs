@@ -148,7 +148,7 @@ export function updateDailyFinancialSnapshot(
 
   dailyFinancialSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
   dailyFinancialSnapshot.protocolControlledValueUSD =
-    protocol.totalValueLockedUSD;
+    protocol.protocolControlledValueUSD;
 
   dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD;
@@ -193,7 +193,7 @@ export function createDailyFinancialSnapshot(
   dailyFinancialSnapshot.protocol = protocol.id;
   dailyFinancialSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
   dailyFinancialSnapshot.protocolControlledValueUSD =
-    dailyFinancialSnapshot.totalValueLockedUSD;
+    dailyFinancialSnapshot.protocolControlledValueUSD;
 
   dailyFinancialSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
   dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;

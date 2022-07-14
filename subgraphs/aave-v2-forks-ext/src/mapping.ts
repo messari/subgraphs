@@ -625,7 +625,7 @@ export function _handleWithdraw(
   account.save();
 
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  let positionID = subtractPosition(
+  let positionId = subtractPosition(
     protocol,
     market,
     account,
@@ -634,14 +634,14 @@ export function _handleWithdraw(
     EventType.WITHDRAW,
     event
   );
-  if (!positionID) {
+  if (positionId === null) {
     log.warning("[handleWithdraw] Position not found for account: {}", [
       accountID.toHexString(),
     ]);
     return;
   }
 
-  withdraw.position = positionID!;
+  withdraw.position = positionId;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
   withdraw.account = account.id;
@@ -804,7 +804,7 @@ export function _handleRepay(
   account.save();
 
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  let positionID = subtractPosition(
+  let positionId = subtractPosition(
     protocol,
     market,
     account,
@@ -813,14 +813,14 @@ export function _handleRepay(
     EventType.REPAY,
     event
   );
-  if (!positionID) {
+  if (positionId === null) {
     log.warning("[handleRepay] Position not found for account: {}", [
       accountID.toHexString(),
     ]);
     return;
   }
 
-  repay.position = positionID!;
+  repay.position = positionId;
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
   repay.account = account.id;
@@ -921,7 +921,7 @@ export function _handleLiquidate(
     ]);
   }
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  let positionID = subtractPosition(
+  let positionId = subtractPosition(
     protocol,
     market,
     account,
@@ -930,14 +930,14 @@ export function _handleLiquidate(
     EventType.LIQUIDATEE,
     event
   );
-  if (!positionID) {
+  if (positionId === null) {
     log.warning("[handleLiquidate] Position not found for account: {}", [
       borrower.toHexString(),
     ]);
     return;
   }
 
-  liquidate.position = positionID!;
+  liquidate.position = positionId;
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.liquidator = liquidator.toHexString();

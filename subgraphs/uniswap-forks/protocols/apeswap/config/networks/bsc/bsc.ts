@@ -44,19 +44,19 @@ export class ApeswapBscConfigurations implements Configurations {
     );
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("2");
+    return BigDecimal.fromString("0.2");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.5");
+    return BigDecimal.fromString("0.05");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("1.5");
+    return BigDecimal.fromString("0.15");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("2");
+    return BigDecimal.fromString("0.2");
   }
   getFeeOnOff(): string {
     return FeeSwitch.ON;

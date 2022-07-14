@@ -18,7 +18,7 @@
   - Mainnet
     - The only code that differs between uniswap is the use of the masterchef contract. This contract allows users to deposit LP tokens to earn rewards. Mainnet usees both the Masterchef and MasterchefV2 contract for these purposes.
   - Arbitrum, Celo, Fantom, Fuse, Matic, Moonbeam, Moonriver, Xdai
-    - Similarly, these chains inherit the same code from uniswap. However, these chains only use the Miniswap contract for staking LP and earning rewards. It works very similar to the Masterchef contracts.
+    - Similarly, these chains inherit the same code from uniswap. However, these chains only use the MiniChef contract for staking LP and earning rewards. It works very similar to the Masterchef contracts.
   - BSC, Avalanche
     - These two sushiswap chains deploy in just the same way as Uniswap V2. Just with different configurations.
 - Trader Joe
@@ -31,6 +31,9 @@
   - Cronos
     - Uses the uniswap-v2 codebase as Uniswap V2 for factory and pools. Additionally, it uses a masterchef contract that is templated from Sushiswap's implementation.
     - This is not deployed on the hosted service. It is deployed on cronos. This is the query URL https://graph.cronoslabs.com/subgraphs/name/vvs-finance-cronos/first-subgraph
+- Honeyswap
+  - xDAI (Gnosis Chain), Matic (Polygon)
+    - Uses the uniswap-v2 codebase as Uniswap V2 for factory and pools. Additionally, it uses a HoneyFarm contract (based off of MasterChef) for staking LP and earning rewards.
 
 ## Project Layout:
 

@@ -20,10 +20,15 @@ import { SolarbeamMoonriverConfigurations } from "../../protocols/solarbeam/conf
 import { TraderJoeAvalancheConfigurations } from "../../protocols/trader-joe/config/networks/avalanche/avalanche";
 import { TrisolarisAuroraConfigurations } from "../../protocols/trisolaris/config/networks/aurora/aurora";
 import { VSSFinanceCronosConfigurations } from "../../protocols/vvs-finance/config/networks/cronos/cronos";
+import { HoneyswapXdaiConfigurations } from "../../protocols/honeyswap/config/networks/xdai/xdai";
+import { HoneyswapMaticConfigurations } from "../../protocols/honeyswap/config/networks/matic/matic";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
 
+// This function is called to load in the proper configurations for a protocol/network deployment.
+// To add a new deployment, add a value to the `Deploy` namespace and add a new configuration class to the network specific typescript file in the `protocols` folder.
+// Finally, add a new entry for this deployment to the getNetworkConfigurations() function
 export function getNetworkConfigurations(deploy: i32): Configurations {
   switch (deploy) {
     case Deploy.APESWAP_BSC: {
@@ -91,6 +96,12 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.UBESWAP_CELO: {
       return new UbeswapCeloConfigurations();
+    }
+    case Deploy.HONEYSWAP_XDAI: {
+      return new HoneyswapXdaiConfigurations();
+    }
+    case Deploy.HONEYSWAP_MATIC: {
+      return new HoneyswapMaticConfigurations();
     }
     default: {
       log.critical(

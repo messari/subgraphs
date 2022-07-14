@@ -1,6 +1,8 @@
 {
-    "network": "mainnet",
-    "startBlock": 12369620,
-    "deployment": "UNISWAP_V3_MAINNET"
-  }
-  
+  "network": "mainnet",
+  "startBlock": 12369620,
+  "deployment": "UNISWAP_V3_MAINNET",
+  "graftEnabled": true,
+  "subgraphId": "QmQ6w5oXZiMeTpVSkLy4UqBVtVKmtiEMcL9ygiPZgGddg5",
+  "graftStartBlock": 13639985
+}

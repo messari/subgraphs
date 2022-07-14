@@ -1,12 +1,12 @@
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
+  LiquidityPool,
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../generated/schema";
 import { BIGINT_ONE, BIGINT_ZERO } from "../../../../src/common/constants";
 import { NetworkConfigs } from "../../../../configurations/configure";
-import { MasterChef } from "./constants";
-import { MiniChefSushiswap } from "../../../../generated/MiniChef/MiniChefSushiswap";
+import { getOrCreateRewardToken } from "../../../../src/common/getters";
 
 export function createMasterChefStakingPool(
   event: ethereum.Event,
@@ -22,13 +22,22 @@ export function createMasterChefStakingPool(
   masterChefPool.multiplier = BIGINT_ONE;
   masterChefPool.poolAllocPoint = BIGINT_ZERO;
   masterChefPool.lastRewardBlock = event.block.number;
-  log.warning("MASTERCHEF POOL CREATED: " + masterChefPool.poolAddress, []);
+  log.warning("MASTERCHEF POOL CREATED: " + pid.toString()!, []);
+
+  let pool = LiquidityPool.load(masterChefPool.poolAddress!);
+  if (pool) {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
+    pool.save();
+  }
 
   masterChefPool.save();
 
   return masterChefPool;
 }
 
+// Create the masterchef contract that contains data used to calculate rewards for all pools.
 export function getOrCreateMasterChef(
   event: ethereum.Event,
   masterChefType: string
@@ -40,24 +49,14 @@ export function getOrCreateMasterChef(
     masterChef.totalAllocPoint = BIGINT_ZERO;
     masterChef.rewardTokenInterval = NetworkConfigs.getRewardIntervalType();
     masterChef.rewardTokenRate = NetworkConfigs.getRewardTokenRate();
-    log.warning("MasterChef Type: " + masterChefType, []);
-    if (masterChefType == MasterChef.MINICHEF) {
-      let miniChefV2Contract = MiniChefSushiswap.bind(event.address);
-      masterChef.adjustedRewardTokenRate = miniChefV2Contract.sushiPerSecond();
-      log.warning(
-        "Adjusted Reward Rate: " +
-          masterChef.adjustedRewardTokenRate.toString(),
-        []
-      );
-    } else {
-      masterChef.adjustedRewardTokenRate = BIGINT_ZERO;
-    }
+    masterChef.adjustedRewardTokenRate = BIGINT_ZERO;
     masterChef.lastUpdatedRewardRate = BIGINT_ZERO;
     masterChef.save();
   }
   return masterChef;
 }
 
+// Update the total allocation for all pools whenever the allocation points are updated for a pool.
 export function updateMasterChefTotalAllocation(
   event: ethereum.Event,
   oldPoolAlloc: BigInt,

@@ -1,11 +1,11 @@
 /////////////////////
-// VERSION 1.0.2 ////
+// VERSION 1.0.3 ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The purpose of this program is to dynamically estimate the blocks generated for the 24 HR period following the most recent update. //
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import { log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { _CircularBuffer } from "../../generated/schema";
 import { Network } from "./constants";
@@ -33,8 +33,8 @@ export const WINDOW_SIZE_SECONDS = 86400;
 
 // BUFFER_SIZE determined the size of the array
 // Makes the buffer the maximum amount of blocks that can be stored given the block rate and storage interval
-// Recommended value is (RATE_IN_SECODNDS / TIMESTAMP_STORAGE_INTERVAL) - > Round up to nearest even integer
-export const BUFFER_SIZE = 144;
+// Recommended value is (RATE_IN_SECODNDS / TIMESTAMP_STORAGE_INTERVAL) * 2 - > Round up to nearest even integer
+export const BUFFER_SIZE = 288;
 
 // Add this entity to the schema.
 // type _CircularBuffer @entity {
@@ -160,9 +160,24 @@ export function getRewardsPerDay(
   let startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
 
   // Make sure to still have 2 blocks to calculate rate (This shouldn't happen past the beginning).
-  while (
-    abs(circularBuffer.nextIndex - circularBuffer.windowStartIndex) > INT_FOUR
-  ) {
+  while (true) {
+    if (circularBuffer.nextIndex > circularBuffer.windowStartIndex) {
+      if (
+        circularBuffer.nextIndex - circularBuffer.windowStartIndex <=
+        INT_FOUR
+      ) {
+        break;
+      }
+    } else {
+      if (
+        BUFFER_SIZE -
+          circularBuffer.windowStartIndex +
+          circularBuffer.nextIndex <=
+        INT_FOUR
+      ) {
+        break;
+      }
+    }
     let windowIndexBlockTimestamp = blocks[circularBuffer.windowStartIndex];
 
     // Shift the start of the window if the current timestamp moves out of desired rate window
@@ -182,26 +197,29 @@ export function getRewardsPerDay(
     (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString()
   );
 
-  // Wideness of the window in blocks.
-  let windowBlocksCount = BigDecimal.fromString(
-    (
-      currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + INT_ONE]
-    ).toString()
-  );
+  if (windowSecondsCount.notEqual(BIGDECIMAL_ZERO)) {
+    // Wideness of the window in blocks.
+    let windowBlocksCount = BigDecimal.fromString(
+      (
+        currentBlockNumberI32 -
+        blocks[circularBuffer.windowStartIndex + INT_ONE]
+      ).toString()
+    );
 
-  // Estimate block speed for the window in seconds.
-  let unnormalizedBlockSpeed =
-    WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
+    // Estimate block speed for the window in seconds.
+    let unnormalizedBlockSpeed =
+      WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
 
-  // block speed converted to specified rate.
-  let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
-    WINDOW_SIZE_SECONDS_BD
-  ).times(unnormalizedBlockSpeed);
+    // block speed converted to specified rate.
+    let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
+      WINDOW_SIZE_SECONDS_BD
+    ).times(unnormalizedBlockSpeed);
 
-  // Update BlockTracker with new values.
-  circularBuffer.blocksPerDay = normalizedBlockSpeed;
+    // Update BlockTracker with new values.
+    circularBuffer.blocksPerDay = normalizedBlockSpeed;
+  }
+
   circularBuffer.blocks = blocks;
-
   circularBuffer.save();
 
   if (rewardType == RewardIntervalType.TIMESTAMP) {

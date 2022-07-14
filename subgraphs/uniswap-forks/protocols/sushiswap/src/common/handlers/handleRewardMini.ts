@@ -5,17 +5,20 @@ import {
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { INT_ZERO } from "../../../../../src/common/constants";
-import { getOrCreateToken } from "../../../../../src/common/getters";
-import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
+import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
 import {
-  findNativeTokenPerToken,
-  updateNativeTokenPriceInUSD,
-} from "../../../../../src/price/price";
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../../../../../src/common/getters";
+import { getRewardsPerDay } from "../../../../../src/common/rewards";
+import {
+  convertTokenToDecimal,
+  roundToWholeNumber,
+} from "../../../../../src/common/utils/utils";
 import { MasterChef } from "../constants";
 import { getOrCreateMasterChef } from "../helpers";
 
+// Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
 export function updateMasterChefDeposit(
   event: ethereum.Event,
   pid: BigInt,
@@ -26,22 +29,28 @@ export function updateMasterChefDeposit(
   )!;
   let miniChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
 
-  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress);
+  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
   }
 
-  let nativeToken = updateNativeTokenPriceInUSD();
+  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
-
+  // Calculate Reward Emission per second to a specific pool
+  // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
   let rewardAmountPerInterval = miniChefV2.adjustedRewardTokenRate
     .times(miniChefV2Pool.poolAllocPoint)
     .div(miniChefV2.totalAllocPoint);
-  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
-    rewardAmountPerInterval.toString()
+  let rewardAmountPerIntervalBigDecimal = new BigDecimal(
+    rewardAmountPerInterval
   );
+
+  // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
   let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
@@ -49,9 +58,10 @@ export function updateMasterChefDeposit(
     miniChefV2.rewardTokenInterval
   );
 
+  // Update the amount of staked tokens after deposit
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
@@ -69,6 +79,7 @@ export function updateMasterChefDeposit(
   pool.save();
 }
 
+// Updated Liquidity pool staked amount and emmissions on a withdraw from the masterchef contract.
 export function updateMasterChefWithdraw(
   event: ethereum.Event,
   pid: BigInt,
@@ -80,22 +91,28 @@ export function updateMasterChefWithdraw(
   let miniChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress);
+  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress!);
   if (!pool) {
     return;
+  } else {
+    pool.rewardTokens = [
+      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+    ];
   }
 
-  let nativeToken = updateNativeTokenPriceInUSD();
+  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
-
+  // Calculate Reward Emission per second to a specific pool
+  // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
   let rewardAmountPerInterval = miniChefV2.adjustedRewardTokenRate
     .times(miniChefV2Pool.poolAllocPoint)
     .div(miniChefV2.totalAllocPoint);
-  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
-    rewardAmountPerInterval.toString()
+  let rewardAmountPerIntervalBigDecimal = new BigDecimal(
+    rewardAmountPerInterval
   );
+
+  // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
   let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
@@ -103,9 +120,10 @@ export function updateMasterChefWithdraw(
     miniChefV2.rewardTokenInterval
   );
 
+  // Update the amount of staked tokens after deposit
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
@@ -126,7 +144,7 @@ export function updateMasterChefWithdraw(
 // export function updateMasterChefHarvest(event: ethereum.Event, pid: BigInt, amount: BigInt): void {
 //   let masterChefPool = _MasterChefStakingPool.load(pid.toString())!;
 //   // Return if pool does not exist
-//   let pool = LiquidityPool.load(masterChefPool.poolAddress);
+//   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
 //   if (!pool) {
 //     return;
 //   }
