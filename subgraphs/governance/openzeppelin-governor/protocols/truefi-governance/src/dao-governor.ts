@@ -79,7 +79,8 @@ export function handleVoteCast(event: VoteCast): void {
     event.params.voter.toHexString(),
     event.params.weight,
     event.params.reason,
-    event.params.support
+    event.params.support,
+    event
   );
 }
 // Treat VoteCastWithParams same as VoteCast
@@ -89,7 +90,8 @@ export function handleVoteCastWithParams(event: VoteCastWithParams): void {
     event.params.voter.toHexString(),
     event.params.weight,
     event.params.reason,
-    event.params.support
+    event.params.support,
+    event
   );
 }
 

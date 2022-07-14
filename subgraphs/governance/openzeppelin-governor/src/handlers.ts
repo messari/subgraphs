@@ -253,7 +253,8 @@ export function _handleVoteCast(
   voterAddress: string,
   weight: BigInt,
   reason: string,
-  support: i32
+  support: i32,
+  event: ethereum.Event
 ): void {
   let voteId = voterAddress.concat("-").concat(proposalId);
   let vote = new Vote(voteId);
@@ -261,6 +262,8 @@ export function _handleVoteCast(
   vote.voter = voterAddress;
   vote.weight = weight;
   vote.reason = reason;
+  vote.block = event.block.number;
+  vote.blockTime = event.block.timestamp;
 
   // Retrieve enum string key by value (0 = Against, 1 = For, 2 = Abstain)
   vote.choice = getVoteChoiceByValue(support);

@@ -138,6 +138,11 @@ type Vote @entity(immutable: true) {
   voter: Delegate!
   "Proposal that is being voted on"
   proposal: Proposal!
+
+  "Block number vote is cast in"
+  block: BigInt
+  "Timestamp of block vote was cast in"
+  blockTime: BigInt
 }
 
 enum VoteChoice {

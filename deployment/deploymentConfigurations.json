@@ -847,7 +847,7 @@
         }
       }
     },
-    "openzeppelin-governor-forks": {
+    "openzeppelin-governor": {
       "truefi-governance": {
         "mainnet": {
           "template": "truefi-governance.template.yaml",
