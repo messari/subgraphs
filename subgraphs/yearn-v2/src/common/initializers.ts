@@ -40,7 +40,7 @@ export function getOrCreateAccount(id: string): Account {
     account = new Account(id);
     account.save();
 
-    const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+    const protocol = getOrCreateYieldAggregator();
     protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
@@ -48,8 +48,8 @@ export function getOrCreateAccount(id: string): Account {
   return account;
 }
 
-export function getOrCreateYieldAggregator(id: string): YieldAggregator {
-  let protocol = YieldAggregator.load(id);
+export function getOrCreateYieldAggregator(): YieldAggregator {
+  let protocol = YieldAggregator.load(constants.ETHEREUM_PROTOCOL_ID);
 
   if (!protocol) {
     protocol = new YieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
@@ -127,7 +127,9 @@ export function getOrCreateFinancialDailySnapshots(
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let id: string = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
+  let id: string = (
+    block.timestamp.toI64() / constants.SECONDS_PER_DAY
+  ).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
 
   if (!usageMetrics) {
@@ -143,8 +145,8 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;
 
-    const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
-    usageMetrics.totalPoolCount = protocol.totalPoolCount; 
+    const protocol = getOrCreateYieldAggregator();
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
 
     usageMetrics.save();
   }
@@ -155,7 +157,9 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let metricsID: string = (block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString();
+  let metricsID: string = (
+    block.timestamp.toI64() / constants.SECONDS_PER_HOUR
+  ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
 
   if (!usageMetrics) {
@@ -288,11 +292,11 @@ export function getOrCreateVault(
     vault.createdTimestamp = block.timestamp;
 
     vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    
+
     vault.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    
+
     vault.lastReport = constants.BIGINT_ZERO;
     vault.totalAssets = constants.BIGINT_ZERO;
 
@@ -321,6 +325,8 @@ export function getOrCreateVault(
       constants.VaultFeeType.PERFORMANCE_FEE,
       performanceFee
     );
+
+    utils.updateProtocolAfterNewVault(vaultAddress);
 
     vault.fees = [managementFeeId, performanceFeeId];
 
