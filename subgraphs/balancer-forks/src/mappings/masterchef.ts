@@ -141,6 +141,8 @@ function createLiquidityPool(
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   }
   pool.inputTokenWeights = [BIGDECIMAL_ONE];
+  pool.allocPoint = BIGINT_ZERO;
+
   pool.save();
   protocol.totalPoolCount = protocol.totalPoolCount + 1;
   protocol.save();
