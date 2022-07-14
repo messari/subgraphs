@@ -313,57 +313,57 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   );
 }
 
-export function handleDeposit(event: Deposit): void {
-  _handleDeposit(
-    event,
-    event.params.amount,
-    event.params.reserve,
-    getProtocolData(),
-    event.params.onBehalfOf
-  );
-}
+// export function handleDeposit(event: Deposit): void {
+//   _handleDeposit(
+//     event,
+//     event.params.amount,
+//     event.params.reserve,
+//     getProtocolData(),
+//     event.params.onBehalfOf
+//   );
+// }
 
-export function handleWithdraw(event: Withdraw): void {
-  _handleWithdraw(
-    event,
-    event.params.amount,
-    event.params.reserve,
-    getProtocolData(),
-    event.params.to
-  );
-}
+// export function handleWithdraw(event: Withdraw): void {
+//   _handleWithdraw(
+//     event,
+//     event.params.amount,
+//     event.params.reserve,
+//     getProtocolData(),
+//     event.params.to
+//   );
+// }
 
-export function handleBorrow(event: Borrow): void {
-  _handleBorrow(
-    event,
-    event.params.amount,
-    event.params.reserve,
-    getProtocolData(),
-    event.params.onBehalfOf
-  );
-}
+// export function handleBorrow(event: Borrow): void {
+//   _handleBorrow(
+//     event,
+//     event.params.amount,
+//     event.params.reserve,
+//     getProtocolData(),
+//     event.params.onBehalfOf
+//   );
+// }
 
-export function handleRepay(event: Repay): void {
-  _handleRepay(
-    event,
-    event.params.amount,
-    event.params.reserve,
-    getProtocolData(),
-    event.params.user
-  );
-}
+// export function handleRepay(event: Repay): void {
+//   _handleRepay(
+//     event,
+//     event.params.amount,
+//     event.params.reserve,
+//     getProtocolData(),
+//     event.params.user
+//   );
+// }
 
-export function handleLiquidationCall(event: LiquidationCall): void {
-  _handleLiquidate(
-    event,
-    event.params.liquidatedCollateralAmount,
-    event.params.collateralAsset,
-    getProtocolData(),
-    event.params.debtAsset,
-    event.params.liquidator,
-    event.params.user
-  );
-}
+// export function handleLiquidationCall(event: LiquidationCall): void {
+//   _handleLiquidate(
+//     event,
+//     event.params.liquidatedCollateralAmount,
+//     event.params.collateralAsset,
+//     getProtocolData(),
+//     event.params.debtAsset,
+//     event.params.liquidator,
+//     event.params.user
+//   );
+// }
 
 ///////////////////
 ///// Helpers /////
