@@ -1,6 +1,6 @@
-# Liquid River
+# Liquid Driver
 
-LiquidDriver is the first liquidity mining dApp providing liquidity-as-a-service in the Fantom ecosystem. 
+Liquid Driver is the first liquidity mining dApp providing liquidity-as-a-service in the Fantom ecosystem. 
 
 ## Links
 
@@ -9,9 +9,9 @@ LiquidDriver is the first liquidity mining dApp providing liquidity-as-a-service
 - Docs: https://docs.liquiddriver.finance/
 - Smart contracts: https://github.com/LiquidDriver-finance/liquiddriver-contracts
 - Deployed addresses:
-   - Factory/Master Address: 0x742474dae70fa2ab063ab786b1fbe5704e861a0c
-   - Token Address: 0x10b620b2dbac4faa7d7ffd71da486f5d44cd86f9
-   - Burner: 0x05b7109b2dae299d882c410c1a281fc194658e89
+   - Factory/Master Address: `0x742474dae70fa2ab063ab786b1fbe5704e861a0c`
+   - Token Address: `0x10b620b2dbac4faa7d7ffd71da486f5d44cd86f9`
+   - Burner: `0x05b7109b2dae299d882c410c1a281fc194658e89`
 
 ## Build
 
