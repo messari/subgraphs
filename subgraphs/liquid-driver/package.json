@@ -1,0 +1,18 @@
+{
+  "name": "liquid-driver",
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write .",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ itsjerryokolo/liquid-drive",
+    "create-local": "graph create --node http://localhost:8020/ itsjerryokolo/liquid-drive",
+    "remove-local": "graph remove --node http://localhost:8020/ itsjerryokolo/liquid-drive",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 itsjerryokolo/liquid-drive"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.21.1",
+    "@graphprotocol/graph-ts": "0.20.0",
+    "prettier": "2.6.1"
+  }
+}
