@@ -52,7 +52,7 @@ export namespace Protocol {
   export const NAME = "Yearn v2";
   export const SLUG = "yearn-v2";
   export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.2.0";
+  export const SUBGRAPH_VERSION = "1.2.1";
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 
