@@ -230,7 +230,7 @@
         }
       }
     },
-    "arrakis-finance":{
+    "arrakis-finance": {
       "arrakis-finance": {
         "mainnet": {
           "template": "arrakis.finance.template.yaml",
@@ -617,7 +617,7 @@
       "uniswap-v3": {
         "mainnet": {
           "template": "uniswap.v3.template.yaml",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": true
         },
         "arbitrum": {
