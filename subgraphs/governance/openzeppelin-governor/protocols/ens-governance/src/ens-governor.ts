@@ -7,7 +7,7 @@ import {
   QuorumNumeratorUpdated,
   TimelockChange,
   VoteCast,
-} from "../../../generated/HOPGovernor/HOPGovernor";
+} from "../../../generated/ENSGovernor/ENSGovernor";
 import {
   _handleProposalCreated,
   _handleProposalCanceled,
@@ -15,7 +15,7 @@ import {
   _handleProposalQueued,
   _handleVoteCast,
 } from "../../../src/handlers";
-import { HOPGovernor } from "../../../generated/HOPGovernor/HOPGovernor";
+import { ENSGovernor } from "../../../generated/ENSGovernor/ENSGovernor";
 import { GovernanceFramework } from "../../../generated/schema";
 
 // ProposalCanceled(proposalId)
@@ -87,7 +87,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
-    let contract = HOPGovernor.bind(Address.fromString(contractAddress));
+    let contract = ENSGovernor.bind(Address.fromString(contractAddress));
 
     governanceFramework.name = contract.name();
     governanceFramework.type = "OZGovernor";

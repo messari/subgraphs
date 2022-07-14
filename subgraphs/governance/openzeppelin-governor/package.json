@@ -4,8 +4,8 @@
   "scripts": {
     "format": "npx prettier --write .",
     "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
-    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
-    "prepare:build": "graph codegen && graph build",
+    "clean": "rm -rf generated/",
+    "prepare:build": "npm run clean && graph codegen && graph build",
     "create-local": "graph create --node http://localhost:8020/ ${npm_config_name}",
     "remove-local": "graph remove --node http://localhost:8020/ ${npm_config_name}",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ${npm_config_name}",
