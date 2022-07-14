@@ -12,8 +12,8 @@ export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.1.2";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
-export const PROTOCOL_NAME = "Beethoven X"
-export const PROTOCOL_SLUG = "beethoven-x"
+export const PROTOCOL_NAME = "Balancer v2"
+export const PROTOCOL_SLUG = "balancer-v2"
 
 
 
@@ -130,7 +130,7 @@ export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
 ///// Protocol Specific /////
 /////////////////////////////
 
-export let DEFAULT_NETWORK =  "OPTIMISM" 
+export let DEFAULT_NETWORK =  "MAINNET" 
 
 export let VAULT_ADDRESS = Address.fromString('0xBA12222222228d8Ba445958a75a0704d566BF2C8')
 
@@ -138,18 +138,15 @@ export let REWARD_TOKEN = ""
 
 
 
-export let DAI: Address = Address.fromString('0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1');
-export let USDC: Address = Address.fromString('0x7F5c764cBc14f9669B88837ca1490cCa17c31607');
-export let USDT: Address = Address.fromString('0x94b008aA00579c1307B0EF2c499aD98a8ce58e58');
-export let FRAX: Address = Address.fromString('0x2e3d870790dc77a83dd1d18184acc7439a53f475');
-export let OP: Address = Address.fromString('0x4200000000000000000000000000000000000042');
-export let WBTC: Address = Address.fromString('0x68f180fcCe6836688e9084f035309E29Bf0A2095');
-export let WETH: Address = Address.fromString('0x4200000000000000000000000000000000000006');
-export let BEETS: Address = Address.fromString('0x97513e975a7fA9072c72C92d8000B0dB90b163c5');
-export let SNX: Address = Address.fromString('0x8700daec35af8ff88c16bdf0418774cb3d7599b4');
-export let LINK: Address = Address.fromString('0x350a791bfc2c21f9ed5d10980dad2e2638ffa7f6');
-
-export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT,FRAX];
-export let BASE_ASSETS: Address[] = [WETH, OP, WBTC, BEETS,SNX,LINK];
 
 
+export let WETH: Address = Address.fromString('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2');
+export let WMATIC: Address = Address.fromString('0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0');
+export let WBTC: Address = Address.fromString('0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599');
+export let USDC: Address = Address.fromString('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48');
+export let USDT: Address = Address.fromString('0xdAC17F958D2ee523a2206206994597C13D831ec7');
+export let BAL: Address = Address.fromString('0xba100000625a3754423978a60c9317c58a424e3D');
+export let DAI: Address = Address.fromString('0x6B175474E89094C44Da98b954EedeAC495271d0F');
+
+export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT];
+export let BASE_ASSETS: Address[] = [WETH, WMATIC, WBTC, BAL];
