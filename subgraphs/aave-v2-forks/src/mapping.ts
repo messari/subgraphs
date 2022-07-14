@@ -395,7 +395,7 @@ export function _handleReserveDataUpdated(
     InterestRateType.STABLE,
     rayToWad(stableBorrowRate)
       .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS-2)) // TODO: check this is correct
   );
 
   log.warning("post sRate", []);
@@ -406,7 +406,7 @@ export function _handleReserveDataUpdated(
     InterestRateType.VARIABLE,
     rayToWad(variableBorrowRate)
       .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS-2))
   );
 
   log.warning("post vRate", []);
@@ -417,7 +417,7 @@ export function _handleReserveDataUpdated(
     InterestRateType.VARIABLE,
     rayToWad(liquidityRate)
       .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS-2))
   );
 
   log.warning("post dRate", []);
