@@ -855,6 +855,13 @@
           "deploy-on-merge": false
         }
       },
+      "fei-governance": {
+        "mainnet": {
+          "template": "fei-governance.template.yaml",
+          "danielkhoo": "danielkhoo/fei-governance",
+          "deploy-on-merge": false
+        }
+      },
       "hop-governance": {
         "mainnet": {
           "template": "hop-governance.template.yaml",
