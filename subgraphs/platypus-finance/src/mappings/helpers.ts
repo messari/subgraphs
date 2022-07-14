@@ -1,10 +1,5 @@
 import { BigInt, Address, ethereum, log } from "@graphprotocol/graph-ts";
-import {
-  _Asset,
-  Deposit,
-  Swap,
-  Withdraw,
-} from "../../generated/schema";
+import { _Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
 import { Asset as AssetTemplate } from "../../generated/templates";
 import { getOrCreateAsset, getOrCreateAssetPool, getOrCreateDexAmm, getOrCreateToken } from "../common/getters";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";

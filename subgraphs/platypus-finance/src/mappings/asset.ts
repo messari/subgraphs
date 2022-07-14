@@ -51,9 +51,11 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   assetPool.save();
 
   if (!event.params.previousPool.equals(ZERO_ADDRESS)) {
-    let helper = _LiquidityPoolAssetTokenHelper.load(getTokenHelperId(event.params.previousPool, Address.fromString(_asset.token)))!;
+    let helper = _LiquidityPoolAssetTokenHelper.load(
+      getTokenHelperId(event.params.previousPool, Address.fromString(_asset.token)),
+    )!;
     log.debug("[{}][ChangePool] from helper id {}", [event.transaction.hash.toHexString(), helper.id]);
-    helper.id = getTokenHelperId(event.params.newPool, Address.fromString(_asset.token))
+    helper.id = getTokenHelperId(event.params.newPool, Address.fromString(_asset.token));
     helper.save();
     log.debug("[{}][ChangePool] to helper id {}", [event.transaction.hash.toHexString(), helper.id]);
   }

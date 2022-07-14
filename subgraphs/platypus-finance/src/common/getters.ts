@@ -132,7 +132,12 @@ export function getTokenHelperId(poolAddress: Address, tokenAddress: Address): s
   return poolAddress.toHexString().concat("-").concat(tokenAddress.toHexString());
 }
 
-function indexAssetForPoolToken(event: ethereum.Event, poolAddress: Address, assetAddress: Address, tokenAddress: Address): void {
+function indexAssetForPoolToken(
+  event: ethereum.Event,
+  poolAddress: Address,
+  assetAddress: Address,
+  tokenAddress: Address,
+): void {
   let id = getTokenHelperId(poolAddress, tokenAddress);
   let helper = _LiquidityPoolAssetTokenHelper.load(id);
   if (!helper) {
@@ -142,7 +147,12 @@ function indexAssetForPoolToken(event: ethereum.Event, poolAddress: Address, ass
   }
 }
 
-export function getOrCreateAssetPool(event: ethereum.Event, assetAddress: Address, poolAddress: Address, tokenAddress: Address): LiquidityPool {
+export function getOrCreateAssetPool(
+  event: ethereum.Event,
+  assetAddress: Address,
+  poolAddress: Address,
+  tokenAddress: Address,
+): LiquidityPool {
   let poolId = assetAddress.toHexString();
   let pool = LiquidityPool.load(poolId);
 
@@ -174,7 +184,11 @@ export function getOrCreateAssetPool(event: ethereum.Event, assetAddress: Addres
   return pool;
 }
 
-export function getAssetAddressForPoolToken(event: ethereum.Event, poolAddress: Address, tokenAddress: Address): Address {
+export function getAssetAddressForPoolToken(
+  event: ethereum.Event,
+  poolAddress: Address,
+  tokenAddress: Address,
+): Address {
   let id = getTokenHelperId(poolAddress, tokenAddress);
   let helper = _LiquidityPoolAssetTokenHelper.load(id);
   if (helper) {
@@ -217,7 +231,12 @@ export function getOrCreateHourlyUsageMetricSnapshot(event: ethereum.Event): Usa
   return usageMetrics;
 }
 
-export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event, assetAddress: Address, poolAddress: Address, tokenAddress: Address): LiquidityPoolDailySnapshot {
+export function getOrCreateLiquidityPoolDailySnapshot(
+  event: ethereum.Event,
+  assetAddress: Address,
+  poolAddress: Address,
+  tokenAddress: Address,
+): LiquidityPoolDailySnapshot {
   let timestamp: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let id: string = assetAddress.toHexString().concat("-").concat(timestamp.toString());
 
@@ -252,7 +271,12 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event, ass
   return poolDailyMetrics;
 }
 
-export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event, assetAddress: Address, poolAddress: Address, tokenAddress: Address): LiquidityPoolHourlySnapshot {
+export function getOrCreateLiquidityPoolHourlySnapshot(
+  event: ethereum.Event,
+  assetAddress: Address,
+  poolAddress: Address,
+  tokenAddress: Address,
+): LiquidityPoolHourlySnapshot {
   let timestamp: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let id: string = assetAddress.toHexString().concat("-").concat(timestamp.toString());
 
@@ -328,11 +352,7 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
   return protocol;
 }
 
-export function getOrCreateAsset(
-  event: ethereum.Event,
-  tokenAddress: Address,
-  assetAddress: Address,
-): _Asset {
+export function getOrCreateAsset(event: ethereum.Event, tokenAddress: Address, assetAddress: Address): _Asset {
   let id = assetAddress.toHexString();
 
   let _asset = _Asset.load(id);

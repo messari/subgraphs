@@ -377,4 +377,4 @@ export function handleDepositFor(event: DepositFor): void {
   updatePoolRewards(event, Address.fromString(_asset.id));
 }
 
-export function handleEmergencyWithdraw(event: EmergencyWithdraw): void { }
+export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {}

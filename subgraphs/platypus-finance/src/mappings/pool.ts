@@ -14,8 +14,12 @@ import { createDeposit, createAsset, createWithdraw, createSwap } from "./helper
 export function handleDeposit(event: Deposit): void {
   let assetAddress = getAssetAddressForPoolToken(event, event.address, event.params.token);
   if (assetAddress.equals(ZERO_ADDRESS)) {
-    log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}",
-      [event.transaction.hash.toHexString(), assetAddress.toHexString(), event.address.toHexString(), event.params.token.toHexString()]);
+    log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}", [
+      event.transaction.hash.toHexString(),
+      assetAddress.toHexString(),
+      event.address.toHexString(),
+      event.params.token.toHexString(),
+    ]);
     return;
   }
   createDeposit(
@@ -35,8 +39,12 @@ export function handleDeposit(event: Deposit): void {
 export function handleWithdraw(event: Withdraw): void {
   let assetAddress = getAssetAddressForPoolToken(event, event.address, event.params.token);
   if (assetAddress.equals(ZERO_ADDRESS)) {
-    log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}",
-      [event.transaction.hash.toHexString(), assetAddress.toHexString(), event.address.toHexString(), event.params.token.toHexString()]);
+    log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}", [
+      event.transaction.hash.toHexString(),
+      assetAddress.toHexString(),
+      event.address.toHexString(),
+      event.params.token.toHexString(),
+    ]);
     return;
   }
   createWithdraw(
@@ -56,14 +64,22 @@ export function handleWithdraw(event: Withdraw): void {
 export function handleSwap(event: Swap): void {
   let fromAssetAddress = getAssetAddressForPoolToken(event, event.address, event.params.fromToken);
   if (fromAssetAddress.equals(ZERO_ADDRESS)) {
-    log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}",
-      [event.transaction.hash.toHexString(), fromAssetAddress.toHexString(), event.address.toHexString(), event.params.fromToken.toHexString()]);
+    log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}", [
+      event.transaction.hash.toHexString(),
+      fromAssetAddress.toHexString(),
+      event.address.toHexString(),
+      event.params.fromToken.toHexString(),
+    ]);
     return;
   }
   let toAssetAddress = getAssetAddressForPoolToken(event, event.address, event.params.toToken);
   if (toAssetAddress.equals(ZERO_ADDRESS)) {
-    log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}",
-      [event.transaction.hash.toHexString(), toAssetAddress.toHexString(), event.address.toHexString(), event.params.toToken.toHexString()]);
+    log.error("[{}][AssetNotFound] Asset {} not found in Pool {} for token {}", [
+      event.transaction.hash.toHexString(),
+      toAssetAddress.toHexString(),
+      event.address.toHexString(),
+      event.params.toToken.toHexString(),
+    ]);
     return;
   }
   fetchRetentionRatioAndHaircutRate(event, event.address);
