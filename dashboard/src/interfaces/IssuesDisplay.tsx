@@ -3,7 +3,7 @@ import { CircularProgress, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -106,7 +106,7 @@ export const IssuesDisplay = ({ issuesArrayProps, allLoaded, oneLoaded }: Issues
       <CircularProgress sx={{ margin: 6 }} size={50} />
     </>
   );
-  if (!oneLoaded && issuesArray.length === 0) {
+  if (!oneLoaded && !allLoaded && issuesArray.length === 0) {
     return <IssuesContainer $hasCritical={false}>{waitingElement}</IssuesContainer>;
   }
 

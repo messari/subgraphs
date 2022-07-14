@@ -96,7 +96,7 @@ export const TablePoolOverview = ({
               params.value.length,
             )}`;
           }
-          const blockExplorerUrlBase = blockExplorers[protocolNetwork.toUpperCase()];
+          const blockExplorerUrlBase = blockExplorers[protocolNetwork?.toUpperCase()];
           return (
             <Tooltip title={params.value}>
               <span
@@ -223,9 +223,8 @@ export const TablePoolOverview = ({
             ) {
               issues.push({
                 type: "VAL",
-                message: `${
-                  pool.name || "#" + i + 1 + skipAmt
-                } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APY nor Base Yield could be properly calculated.`,
+                message: `${pool.name || "#" + i + 1 + skipAmt
+                  } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APY nor Base Yield could be properly calculated.`,
                 level: "critical",
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt}-pool value`,
               });
@@ -333,6 +332,19 @@ export const TablePoolOverview = ({
       }
       return returnObj;
     });
+    if (dataTable.length === 0) {
+      if (issues.filter((x) => x.fieldName === "poolOverview").length === 0) {
+        issues.push({
+          message: "No pools returned in pool overview.",
+          type: "POOL",
+          level: "error",
+          fieldName: "poolOverview",
+        });
+      }
+    } else if (issues.filter((x) => x.fieldName === "poolOverview").length > 0) {
+      const idx = issues.findIndex(x => x.fieldName === "poolOverview");
+      issues.splice(idx, 1)
+    }
     return (
       <Box height={52 * (tableData.length + 1.5)} py={6} id={"tableID"}>
         <DataGrid

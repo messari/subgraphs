@@ -144,9 +144,6 @@ function SchemaTable({ entityData, schemaName, dataFields, issuesProps, setIssue
             if (entityData?.rewardTokens[idx]?.token?.decimals) {
               decimals = entityData?.rewardTokens[idx]?.token?.decimals;
               tokenNames.push(entityData.rewardTokens[idx]?.token?.name || "TOKEN [" + idx + "]");
-            } else if (entityData?.rewardTokens[idx]?.decimals) {
-              decimals = entityData?.rewardTokens[idx]?.decimals;
-              tokenNames.push(entityData.rewardTokens[idx]?.name || "TOKEN [" + idx + "]");
             }
             return convertTokenDecimals(val, decimals).toString();
           });
