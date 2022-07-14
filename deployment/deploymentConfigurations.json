@@ -854,6 +854,13 @@
           "danielkhoo": "danielkhoo/truefi-governance",
           "deploy-on-merge": false
         }
+      },
+      "hop-governance": {
+        "mainnet": {
+          "template": "hop-governance.template.yaml",
+          "danielkhoo": "danielkhoo/hop-governance",
+          "deploy-on-merge": false
+        }
       }
     }
   }
