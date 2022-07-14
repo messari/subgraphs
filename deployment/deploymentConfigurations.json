@@ -855,6 +855,13 @@
           "deploy-on-merge": false
         }
       },
+      "euler-governance": {
+        "mainnet": {
+          "template": "euler-governance.template.yaml",
+          "danielkhoo": "danielkhoo/euler-governance",
+          "deploy-on-merge": false
+        }
+      },
       "fei-governance": {
         "mainnet": {
           "template": "fei-governance.template.yaml",
