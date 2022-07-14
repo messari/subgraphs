@@ -848,10 +848,10 @@
       }
     },
     "openzeppelin-governor": {
-      "truefi-governance": {
+      "ens-governance": {
         "mainnet": {
-          "template": "truefi-governance.template.yaml",
-          "danielkhoo": "danielkhoo/truefi-governance",
+          "template": "ens-governance.template.yaml",
+          "danielkhoo": "danielkhoo/ens-governance",
           "deploy-on-merge": false
         }
       },
@@ -859,6 +859,13 @@
         "mainnet": {
           "template": "hop-governance.template.yaml",
           "danielkhoo": "danielkhoo/hop-governance",
+          "deploy-on-merge": false
+        }
+      },
+      "truefi-governance": {
+        "mainnet": {
+          "template": "truefi-governance.template.yaml",
+          "danielkhoo": "danielkhoo/truefi-governance",
           "deploy-on-merge": false
         }
       }
