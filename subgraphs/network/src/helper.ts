@@ -1,6 +1,7 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import {
   ActiveAuthor,
+  Author,
   Block,
   DailySnapshot,
   HourlySnapshot,
@@ -35,20 +36,47 @@ export function updateNetwork(networkData: UpdateNetworkData): Network {
     if (!network.cumulativeDifficulty) {
       network.cumulativeDifficulty = BIGINT_ZERO;
     }
-    network.cumulativeDifficulty = network.cumulativeDifficulty.plus(networkData.newDifficulty);
+    network.cumulativeDifficulty = network.cumulativeDifficulty.plus(
+      networkData.newDifficulty
+    );
   }
-  network.cumulativeGasUsed = network.cumulativeGasUsed.plus(
-    networkData.newGasUsed
-  );
+  if (networkData.newGasUsed) {
+    if (!network.cumulativeGasUsed) {
+      network.cumulativeGasUsed = BIGINT_ZERO;
+    }
+    network.cumulativeGasUsed = network.cumulativeGasUsed.plus(
+      networkData.newGasUsed
+    );
+  }
   network.gasLimit = networkData.gasLimit;
-  network.cumulativeBurntFees = network.cumulativeBurntFees.plus(
-    networkData.newBurntFees
-  );
-  network.cumulativeRewards = network.cumulativeRewards.plus(
-    networkData.newRewards
-  );
-  network.cumulativeTransactions += networkData.newTransactions.toI32();
-  network.cumulativeSize = network.cumulativeSize.plus(networkData.newSize);
+  if (networkData.newBurntFees) {
+    if (!network.cumulativeBurntFees) {
+      network.cumulativeBurntFees = BIGINT_ZERO;
+    }
+    network.cumulativeBurntFees = network.cumulativeBurntFees.plus(
+      networkData.newBurntFees
+    );
+  }
+  if (networkData.newRewards) {
+    if (!network.cumulativeRewards) {
+      network.cumulativeRewards = BIGINT_ZERO;
+    }
+    network.cumulativeRewards = network.cumulativeRewards.plus(
+      networkData.newRewards
+    );
+  }
+  if (networkData.newTransactions) {
+    if (!network.cumulativeTransactions) {
+      network.cumulativeTransactions = INT_ZERO;
+    }
+    network.cumulativeTransactions += networkData.newTransactions.toI32();
+  }
+  if (networkData.newSize) {
+    if (!network.cumulativeSize) {
+      network.cumulativeSize = BIGINT_ZERO;
+    }
+    network.cumulativeSize = network.cumulativeSize.plus(networkData.newSize);
+  }
   network.totalSupply = networkData.totalSupply;
 
   network.blocksPerDay = getBlocksPerDay(
@@ -63,21 +91,34 @@ export function updateNetwork(networkData: UpdateNetworkData): Network {
 // update snapshots
 export function updateMetrics(blockData: BlockData, network: Network): void {
   updateDailySnapshot(blockData, network);
-  updateHourlySnapshot(blockData, network);
+  // updateHourlySnapshot(blockData, network);
 }
 
 function updateDailySnapshot(blockData: BlockData, network: Network): void {
-  let snapshot = getOrCreateDailySnapshot(
-    blockData.timestamp,
-    network.totalSupply
-  );
+  let snapshotId = (blockData.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  let snapshot = getOrCreateDailySnapshot(blockData.timestamp);
 
   // update overlapping fields for snapshot
+  snapshot.blockHeight = network.blockHeight;
+  snapshot.dailyBlocks++;
+  snapshot.timestamp = blockData.timestamp;
+
+  // update statistical analysis fields
   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
+  if (!blockData.author) {
+    snapshot.dailyAuthors = updateStats(
+      snapshotId,
+      DataType.AUTHORS,
+      BIGINT_ONE
+    ); // TODO: check for new daily author
+  }
+
   snapshot.blockHeight = network.blockHeight;
   snapshot.timestamp = blockData.timestamp;
   snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
-  snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
+  snapshot.cumulativeGasUsed = network.cumulativeGasUsed;
+  snapshot.gasLimit = snapshot.cumulativeBurntFees =
+    network.cumulativeBurntFees;
   snapshot.cumulativeRewards = network.cumulativeRewards;
   snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
   snapshot.cumulativeRewards = network.cumulativeRewards;
@@ -262,14 +303,92 @@ function updateHourlySnapshot(blockData: BlockData, network: Network): void {
   snapshot.save();
 }
 
+export function updateAuthors(
+  authorId: Bytes,
+  network: Network,
+  difficulty: BigInt | null
+): void {
+  let author = Author.load(authorId);
+  if (!author) {
+    author = new Author(authorId);
+    author.cumulativeBlocksCreated = INT_ZERO;
+    author.cumulativeDifficulty = BIGINT_ZERO;
+    author.save();
+
+    // update unique authors
+    network.cumulativeUniqueAuthors++;
+    network.save();
+  }
+  author.cumulativeBlocksCreated++;
+  if (difficulty) {
+    if (!author.cumulativeDifficulty) {
+      author.cumulativeDifficulty = BIGINT_ZERO;
+    }
+    author.cumulativeDifficulty = author.cumulativeDifficulty.plus(difficulty);
+  }
+  author.save();
+}
+
+//
+// Update STATS entity and return the id
+// calculate the variance, q1, q3 once the daily/hourly snapshot is done
+function updateStats(id: string, dataType: string, value: BigInt): string {
+  let stats = getOrCreateStats(id, dataType);
+
+  // basic fields
+  stats.count++;
+  stats.sum = stats.sum.plus(value);
+
+  // max/min
+  stats.max = value.gt(stats.max) ? value : stats.max;
+  stats.min = value.lt(stats.min) ? value : stats.min;
+
+  // update mean / median
+  stats.values = insertInOrder(value, stats.values);
+  stats.mean = stats.sum.toBigDecimal().div(stats.count.toBigDecimal());
+  // stats.median = TODO
+}
+
+//
+// insert value into array and keep numerical order
+// Algo: quicksort modification
+// Runtime: O(n logn) average
+function insertInOrder(value: BigInt, array: BigInt[]): BigInt[] {
+  let lowBound = 0; // left bound of the search section
+  let highBound = length - 1; // right bound of the search section
+  let index = Math.round(array.length / 2);
+
+  // find position in array
+  while (true) {
+    let compareVal = array[index];
+    if (value.equals(compareVal)) {
+      // found same value, place after and return
+      return array.splice(index + 1, 0, value);
+    } else if (value.lt(compareVal)) {
+      // value is less than compareVal, search left side
+      if (index - lowBound <= 2) {
+        // insert 1 position before index
+        return array.splice(index - 1, 0, value);
+      }
+      highBound = index;
+      index = Math.round((lowBound + index) / 2); // new index is between lowBound-index
+    } else {
+      // value is greater than compareVal, search right side
+      if (highBound - index <= 2) {
+        // insert 1 position after index
+        return array.splice(index + 1, 0, value);
+      }
+      lowBound = index;
+      index = Math.round((index + highBound) / 2); // new index is between index-highBound
+    }
+  }
+}
+
 /////////////////
 //// Getters ////
 /////////////////
 
-function getOrCreateDailySnapshot(
-  timestamp: BigInt,
-  originalSupply: BigInt
-): DailySnapshot {
+function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
   let id = (timestamp.toI64() / SECONDS_PER_DAY).toString();
   let dailySnapshot = DailySnapshot.load(id);
   if (!dailySnapshot) {
@@ -396,7 +515,7 @@ function getOrCreateNetwork(id: string): Network {
     network.blockHeight = INT_ZERO;
     network.blocksPerDay = BIGDECIMAL_ZERO;
     network.dailyBlocks = getOrCreateStats(id, DataType.BLOCKS).id;
-    
+
     // network.cumulativeUniqueAuthors = INT_ZERO;
     // network.blockHeight = INT_ZERO;
     // network.cumulativeDifficulty = BIGINT_ZERO;
