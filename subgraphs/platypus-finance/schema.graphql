@@ -437,7 +437,7 @@ type LiquidityPool @entity {
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal
-  
+
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   stakedOutputTokenAmount: BigInt
 
@@ -843,15 +843,6 @@ type _CircularBuffer @entity {
 type _LiquidityPoolParamsHelper @entity {
   " Smart contract address of the pool "
   id: ID!
-
-  " The protocol this pool belongs to "
-  protocol: DexAmmProtocol!
-
-  " Address of the Dev and the Oracle "
-  Dev: String!
-  Oracle: String!
-
-  " SlippageParams for this pool"
   SlippageParamsK: BigDecimal!
   SlippageParamsN: BigDecimal!
   SlippageParamsC1: BigDecimal!
@@ -906,6 +897,4 @@ type _Asset @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
-
-  rewardUpdateTimestamp: BigInt!
 }

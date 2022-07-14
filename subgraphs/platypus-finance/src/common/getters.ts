@@ -82,7 +82,6 @@ export function getOrCreateLiquidityPoolParamsHelper(
 
   if (!poolParam) {
     poolParam = new _LiquidityPoolParamsHelper(poolAddress.toHexString());
-    poolParam.Dev = PROTOCOL_ADMIN;
     poolParam.SlippageParamsK = BigDecimal.fromString("0.00002e18");
     poolParam.SlippageParamsN = BigDecimal.fromString("7");
     poolParam.SlippageParamsC1 = BigDecimal.fromString("376927610599998308");
@@ -132,12 +131,7 @@ export function getTokenHelperId(poolAddress: Address, tokenAddress: Address): s
   return poolAddress.toHexString().concat("-").concat(tokenAddress.toHexString());
 }
 
-function indexAssetForPoolToken(
-  event: ethereum.Event,
-  poolAddress: Address,
-  assetAddress: Address,
-  tokenAddress: Address,
-): void {
+function indexAssetForPoolToken(poolAddress: Address, assetAddress: Address, tokenAddress: Address): void {
   let id = getTokenHelperId(poolAddress, tokenAddress);
   let helper = _LiquidityPoolAssetTokenHelper.load(id);
   if (!helper) {
@@ -175,9 +169,15 @@ export function getOrCreateAssetPool(
     pool.createdBlockNumber = event.block.number;
     pool.createdTimestamp = event.block.timestamp;
     pool.inputTokenWeights = [BigDecimal.fromString("100")];
+    pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+
     pool.save();
 
-    indexAssetForPoolToken(event, poolAddress, assetAddress, tokenAddress);
+    indexAssetForPoolToken(poolAddress, assetAddress, tokenAddress);
     addPoolToProtocol(poolId, pool._ignore);
   }
 
@@ -207,7 +207,15 @@ export function getOrCreateDailyUsageMetricSnapshot(event: ethereum.Event): Usag
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = PROTOCOL_ADMIN;
-
+    usageMetrics.dailyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
+    usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.dailyDepositCount = 0;
+    usageMetrics.dailyWithdrawCount = 0;
+    usageMetrics.dailySwapCount = 0;
+    usageMetrics.totalPoolCount = 0;
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.save();
   }
 
@@ -224,6 +232,14 @@ export function getOrCreateHourlyUsageMetricSnapshot(event: ethereum.Event): Usa
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
     usageMetrics.protocol = PROTOCOL_ADMIN;
+    usageMetrics.hourlyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
+    usageMetrics.hourlyTransactionCount = 0;
+    usageMetrics.hourlyDepositCount = 0;
+    usageMetrics.hourlyWithdrawCount = 0;
+    usageMetrics.hourlySwapCount = 0;
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
 
     usageMetrics.save();
   }
@@ -250,7 +266,6 @@ export function getOrCreateLiquidityPoolDailySnapshot(
     poolDailyMetrics.blockNumber = event.block.number;
     poolDailyMetrics.timestamp = event.block.timestamp;
     poolDailyMetrics.inputTokenWeights = pool.inputTokenWeights;
-
     poolDailyMetrics.inputTokenBalances = pool.inputTokenBalances;
     poolDailyMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
     poolDailyMetrics.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
@@ -264,6 +279,11 @@ export function getOrCreateLiquidityPoolDailySnapshot(
 
     poolDailyMetrics.dailyVolumeByTokenAmount = [BIGINT_ZERO];
     poolDailyMetrics.dailyVolumeByTokenUSD = [BIGDECIMAL_ZERO];
+
+    poolDailyMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolDailyMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolDailyMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolDailyMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
 
     poolDailyMetrics.save();
   }
@@ -304,6 +324,10 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
 
     poolHourlyMetrics.hourlyVolumeByTokenAmount = [BIGINT_ZERO];
     poolHourlyMetrics.hourlyVolumeByTokenUSD = [BIGDECIMAL_ZERO];
+    poolHourlyMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolHourlyMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolHourlyMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    poolHourlyMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
 
     poolHourlyMetrics.save();
   }
@@ -323,6 +347,15 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
 
     financialMetrics.blockNumber = event.block.number;
     financialMetrics.timestamp = event.block.timestamp;
+    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.save();
   }
@@ -345,7 +378,14 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.subgraphVersion = "1.3.0";
     protocol.network = Network.AVALANCHE;
     protocol.type = ProtocolType.EXCHANGE;
-
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeUniqueUsers = 0;
+    protocol.totalPoolCount = 0;
+    protocol.pools = [];
     protocol.save();
     initAltPoolTemplates();
   }
@@ -366,6 +406,10 @@ export function getOrCreateAsset(event: ethereum.Event, tokenAddress: Address, a
     _asset.blockNumber = event.block.number;
     _asset.timestamp = event.block.timestamp;
     _asset.cash = BigInt.zero();
+    _asset.amountStaked = BIGINT_ZERO;
+    _asset.rewardTokens = [];
+    _asset.rewardTokenEmissionsAmount = [];
+    _asset.rewardTokenEmissionsUSD = [];
     _asset.save();
   }
 
