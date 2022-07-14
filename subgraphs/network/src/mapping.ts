@@ -9,7 +9,12 @@ import {
 } from "@graphprotocol/graph-ts";
 import { Author, Chunk } from "../generated/schema";
 import { BIGINT_ZERO, INT_NINE, INT_ZERO } from "./constants";
-import { createBlock, updateMetrics, updateNetwork } from "./helper";
+import {
+  createBlock,
+  updateAuthors,
+  updateMetrics,
+  updateNetwork,
+} from "./helper";
 import { exponentToBigDecimal } from "./utils";
 
 /////////////////
@@ -219,23 +224,7 @@ export function handleEvmBlock(block: ethereum.Block): void {
   let network = updateNetwork(updateNetworkData);
 
   // update author entity
-  let authorId = block.author;
-  let author = Author.load(authorId);
-  if (!author) {
-    author = new Author(authorId);
-    author.cumulativeBlocksCreated = INT_ZERO;
-    author.cumulativeDifficulty = BIGINT_ZERO;
-    author.save();
-
-    // update unique authors
-    network.cumulativeUniqueAuthors++;
-    network.save();
-  }
-  author.cumulativeBlocksCreated++;
-  author.cumulativeDifficulty = author.cumulativeDifficulty.plus(
-    block.difficulty
-  );
-  author.save();
+  updateAuthors(block.author, network, block.difficulty);
 
   // create/update daily/hourly metrics
   updateMetrics(blockData, network);

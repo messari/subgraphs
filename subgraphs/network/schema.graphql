@@ -52,10 +52,10 @@ type STATS @entity {
   count: Int!
 
   " The average of all the values "
-  mean: BigInt!
+  mean: BigDecimal!
 
   " The middle value when ordered from least to greatest "
-  median: BigInt!
+  median: BigDecimal!
 
   " The maximum value in this entity "
   max: BigInt!
@@ -63,20 +63,22 @@ type STATS @entity {
   " The minimum value in this data set "
   min: BigInt!
 
-  " The standard deviation of all values within this entity "
-  variance: BigDecimal!
-
-  " This is the upper quartile where 75% of the values lie "
-  q3: BigDecimal!
-
-  " This is the lower quartile where 25% of the values lie "
-  q1: BigDecimal!
-
   " List of values in order from smallest to largest "
   values: [BigInt!]!
 
   " The sum of all the values "
   sum: BigInt!
+
+  ##### Calculated Statisitcal Fields #####
+
+  " The standard deviation of all values within this entity "
+  variance: BigDecimal
+
+  " This is the upper quartile where 75% of the values lie "
+  q3: BigDecimal
+
+  " This is the lower quartile where 25% of the values lie "
+  q1: BigDecimal
 }
 
 ##########################
