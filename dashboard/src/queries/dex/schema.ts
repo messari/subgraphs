@@ -211,6 +211,7 @@ export const schema120 = (): Schema => {
     protocols {
       id
       methodologyVersion
+      network
       name
       type
       schemaVersion
@@ -522,6 +523,7 @@ export const schema130 = (): Schema => {
     protocols {
       id
       methodologyVersion
+      network
       name
       type
       schemaVersion

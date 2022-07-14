@@ -47,6 +47,7 @@ const subgraphLogoMap: Record<string, string> = {
   "banker-joe": "https://storage.googleapis.com/subgraph-images/1654009863071banker-joe.png",
   quickswap: "https://assets.coingecko.com/coins/images/25393/small/quickswap.jpg?1651680141",
   solarbeam: "https://assets.coingecko.com/coins/images/18260/small/solarbeamlogo.png?1636080005",
+  "maple-finance": "https://assets.coingecko.com/coins/images/14097/small/Maple_Logo_Mark_Maple_Orange.png?1653381382"
 };
 
 // used for protocols with multiple versions
