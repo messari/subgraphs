@@ -42,9 +42,12 @@ function ProtocolTab({
 
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
   let protocolDataRender: any[] = [];
+
   if (protocolTimeseriesData) {
     protocolDataRender = Object.keys(protocolTimeseriesData).map((entityName: string) => {
       const currentEntityData = protocolTimeseriesData[entityName];
+      if (!currentEntityData) return null;
+
       return (
         <ProtocolTabEntity
           entityName={entityName}
@@ -102,7 +105,6 @@ function ProtocolTab({
       fieldName: `${protocolEntityNameSingular}-totalValueLockedUSD`,
     });
   }
-
   return (
     <>
       <IssuesDisplay issuesArrayProps={issuesToDisplay} oneLoaded={oneLoaded} allLoaded={allLoaded} />

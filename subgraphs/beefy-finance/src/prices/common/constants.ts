@@ -537,7 +537,7 @@ UNISWAP_ROUTER_CONTRACT_ADDRESSES.set(
 ///////////////////////////// YEARNLENS CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS = new Map<string, string>();
+export const YEARN_LENS_CONTRACT_ADDRESS = new Map<string, Address>();
 YEARN_LENS_CONTRACT_ADDRESS.set(
   MAINNET.NETWORK_STRING,
   MAINNET.YEARN_LENS_CONTRACT_ADDRESS

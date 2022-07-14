@@ -3,7 +3,7 @@ import { CircularProgress, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -36,6 +36,16 @@ const messagesByLevel = (
       if (issuesArray[x].type === "CUMULATIVE") {
         issuesMsg = `
           ${issuesArray[x].fieldName} cumulative value dropped on snapshot id ${issuesArray[x].message}. Cumulative values should always increase.`;
+      }
+      if (issuesArray[x].type === "TOTAL_REV") {
+        const msgObj = JSON.parse(issuesArray[x].message);
+        issuesMsg = `
+          ${issuesArray[x].fieldName} sum value (${msgObj.totalRevenue}) diverged from protocol + supply revenue (${msgObj.sumRevenue}) by ${msgObj.divergence}% starting from snapshot id ${msgObj.timeSeriesInstanceId}.`;
+      }
+      if (issuesArray[x].type === "TOTAL_TX") {
+        const msgObj = JSON.parse(issuesArray[x].message);
+        issuesMsg = `
+          ${issuesArray[x].fieldName} sum value (${msgObj.totalTx}) diverged from sum of individual transactions (${msgObj.individualTxSum}) by ${msgObj.divergence}% starting from snapshot id ${msgObj.timeSeriesInstanceId}.`;
       }
       if (issuesArray[x].type === "TVL-") {
         issuesMsg = `${issuesArray[x].fieldName} is below 1000.`;
@@ -96,7 +106,7 @@ export const IssuesDisplay = ({ issuesArrayProps, allLoaded, oneLoaded }: Issues
       <CircularProgress sx={{ margin: 6 }} size={50} />
     </>
   );
-  if (!oneLoaded && issuesArray.length === 0) {
+  if (!oneLoaded && !allLoaded && issuesArray.length === 0) {
     return <IssuesContainer $hasCritical={false}>{waitingElement}</IssuesContainer>;
   }
 

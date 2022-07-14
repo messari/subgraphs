@@ -1,8 +1,23 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigInt, Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { LiquidityPool, Token, Deposit, Withdraw, Swap, _HelperStore, _LiquidityPoolAmount, LiquidityPoolFee } from "../../generated/schema";
-import { Pool as PoolTemplate } from "../../generated/templates"
-import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateDex, getOrCreateLPToken, getOrCreateToken } from "./getters";
+import {
+  LiquidityPool,
+  Token,
+  Deposit,
+  Withdraw,
+  Swap,
+  _HelperStore,
+  _LiquidityPoolAmount,
+  LiquidityPoolFee,
+} from "../../generated/schema";
+import { Pool as PoolTemplate } from "../../generated/templates";
+import {
+  getLiquidityPool,
+  getLiquidityPoolAmounts,
+  getOrCreateDex,
+  getOrCreateLPToken,
+  getOrCreateToken,
+} from "./getters";
 import { NetworkConfigs } from "../../configurations/configure";
 import {
   BIGDECIMAL_NEG_ONE,
@@ -17,12 +32,23 @@ import {
   LiquidityPoolFeeType,
   PROTOCOL_FEE_TO_OFF,
 } from "./constants";
-import { getTrackedVolumeUSD, findNativeTokenPerToken, sqrtPriceX96ToTokenPrices, updateNativeTokenPriceInUSD } from "./price/price";
+import {
+  getTrackedVolumeUSD,
+  findUSDPricePerToken,
+  sqrtPriceX96ToTokenPrices,
+  updateNativeTokenPriceInUSD,
+} from "./price/price";
 import { updateTokenWhitelists, updateVolumeAndFees } from "./updateMetrics";
 import { convertFeeToPercent, convertTokenToDecimal } from "./utils/utils";
 
-// Create a liquidity pool from PairCreated contract call
-export function createLiquidityPool(event: ethereum.Event, poolAddress: string, token0Address: string, token1Address: string, fees: i32): void {
+// Create a liquidity pool from pairCreated event.
+export function createLiquidityPool(
+  event: ethereum.Event,
+  poolAddress: string,
+  token0Address: string,
+  token1Address: string,
+  fees: i32
+): void {
   let protocol = getOrCreateDex();
 
   // create the tokens and tokentracker
@@ -41,7 +67,10 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.inputTokenWeights = [BIGDECIMAL_ONE.div(BIGDECIMAL_TWO), BIGDECIMAL_ONE.div(BIGDECIMAL_TWO)];
+  pool.inputTokenWeights = [
+    BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
+    BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
+  ];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.rewardTokens = [NetworkConfigs.getRewardToken()];
@@ -64,7 +93,7 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   let poolDeposits = new _HelperStore(poolAddress);
   poolDeposits.valueInt = INT_ZERO;
 
-  // create the tracked contract based on the template
+  // Create and track the newly created pool contract based on the template specified in the subgraph.yaml file.
   PoolTemplate.create(Address.fromString(poolAddress));
 
   pool.save();
@@ -73,10 +102,11 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   LPtoken.save();
   poolAmounts.save();
   poolDeposits.save();
-  protocol.totalPoolCount =  protocol.totalPoolCount + 1 ;
+  protocol.totalPoolCount = protocol.totalPoolCount + 1;
   protocol.save();
 }
 
+// create pool fee entities based on the fee structure received from pairCreated event.
 function createPoolFees(poolAddressString: string, fee: i64): string[] {
   // LP Fee
   let poolLpFee = new LiquidityPoolFee("lp-fee-" + poolAddressString);
@@ -84,7 +114,9 @@ function createPoolFees(poolAddressString: string, fee: i64): string[] {
   poolLpFee.feePercentage = convertFeeToPercent(fee);
 
   // Protocol Fee
-  let poolProtocolFee = new LiquidityPoolFee("protocol-fee-" + poolAddressString);
+  let poolProtocolFee = new LiquidityPoolFee(
+    "protocol-fee-" + poolAddressString
+  );
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
   poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF;
 
@@ -107,7 +139,13 @@ function incrementDepositHelper(poolAddress: string): void {
   poolDeposits.save();
 }
 
-export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: BigInt): void {
+// Create a deposit from a Mint event from a particular pool contract.
+// Also, updated token balances and total value locked.
+export function createDeposit(
+  event: ethereum.Event,
+  amount0: BigInt,
+  amount1: BigInt
+): void {
   let poolAddress = event.address.toHexString();
 
   let pool = getLiquidityPool(poolAddress);
@@ -125,33 +163,35 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   // Get the value in USD of the deposit
   let amountUSD = amount0Converted
     .times(token0.lastPriceUSD!)
-    .plus(amount1Converted
-      .times(token1.lastPriceUSD!));
+    .plus(amount1Converted.times(token1.lastPriceUSD!));
 
   // reset tvl aggregates until new amounts calculated
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
+    pool.totalValueLockedUSD
+  );
 
   // Update pool balances adjusted for decimals and not adjusted
   pool.inputTokenBalances = [
-    pool.inputTokenBalances[0].plus(amount0), 
-    pool.inputTokenBalances[1].plus(amount1)
+    pool.inputTokenBalances[0].plus(amount0),
+    pool.inputTokenBalances[1].plus(amount1),
   ];
   poolAmounts.inputTokenBalances = [
-    poolAmounts.inputTokenBalances[0].plus(amount0Converted), 
-    poolAmounts.inputTokenBalances[1].plus(amount1Converted)
+    poolAmounts.inputTokenBalances[0].plus(amount0Converted),
+    poolAmounts.inputTokenBalances[1].plus(amount1Converted),
   ];
 
   // Get the total value locked in USD
   pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
     .times(token0.lastPriceUSD!)
-    .plus(poolAmounts.inputTokenBalances[1]
-      .times(token1.lastPriceUSD!));
+    .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
   // Increment for NFT minted representing the position
   pool.outputTokenSupply = pool.outputTokenSupply!.plus(BIGINT_ONE);
 
   // Add pool value back to protocol total value locked
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+    pool.totalValueLockedUSD
+  );
 
   let deposit = new Deposit(
     event.transaction.hash
@@ -174,6 +214,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.pool = pool.id;
   deposit.amountUSD = amountUSD;
 
+  // Increment the amount of deposits in the pool. Used by getTrackedVolumeUSD in price.ts.
   incrementDepositHelper(poolAddress);
 
   deposit.save();
@@ -182,7 +223,13 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   protocol.save();
 }
 
-export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: BigInt): void {
+// Create a deposit from a Burn event from a particular pool contract.
+// Also, updated token balances and total value locked.
+export function createWithdraw(
+  event: ethereum.Event,
+  amount0: BigInt,
+  amount1: BigInt
+): void {
   let poolAddress = event.address.toHexString();
 
   let pool = getLiquidityPool(poolAddress);
@@ -200,30 +247,35 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   // Get the value in USD of the deposit
   let amountUSD = amount0Converted
     .times(token0.lastPriceUSD!)
-    .plus(amount1Converted
-      .times(token1.lastPriceUSD!));
+    .plus(amount1Converted.times(token1.lastPriceUSD!));
 
   // reset tvl aggregates until new amounts calculated
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
+    pool.totalValueLockedUSD
+  );
 
   // Update pool balances adjusted for decimals and not adjusted
   pool.inputTokenBalances = [
-    pool.inputTokenBalances[0].minus(amount0), 
-    pool.inputTokenBalances[1].minus(amount1)
+    pool.inputTokenBalances[0].minus(amount0),
+    pool.inputTokenBalances[1].minus(amount1),
   ];
   poolAmounts.inputTokenBalances = [
-    poolAmounts.inputTokenBalances[0].minus(amount0Converted), 
-    poolAmounts.inputTokenBalances[1].minus(amount1Converted)
+    poolAmounts.inputTokenBalances[0].minus(amount0Converted),
+    poolAmounts.inputTokenBalances[1].minus(amount1Converted),
   ];
 
   // Get the total value locked in USD
-  pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0].times(token0.lastPriceUSD!).plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
+  pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
+    .times(token0.lastPriceUSD!)
+    .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
   // Increment for NFT minted representing the position
   pool.outputTokenSupply = pool.outputTokenSupply!.minus(BIGINT_ONE);
 
   // reset aggregates with new amounts
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+    pool.totalValueLockedUSD
+  );
 
   let withdrawal = new Withdraw(
     event.transaction.hash
@@ -252,7 +304,16 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   protocol.save();
 }
 
-export function createSwapHandleVolumeAndFees(event: ethereum.Event, amount0: BigInt, amount1: BigInt, to: Address, from: Address, sqrtPriceX96: BigInt): void {
+// Create a swap entity from a Swap event from a particular pool contract.
+// Also, updated token prices, token balances, and total value locked.
+export function createSwapHandleVolumeAndFees(
+  event: ethereum.Event,
+  amount0: BigInt,
+  amount1: BigInt,
+  to: Address,
+  from: Address,
+  sqrtPriceX96: BigInt
+): void {
   let poolAddress = event.address.toHexString();
   let protocol = getOrCreateDex();
 
@@ -286,28 +347,34 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, amount0: Bi
 
   // Update the pool with the new active liquidity, price, and tick.
   pool.inputTokenBalances = [
-    pool.inputTokenBalances[0].plus(amount0), 
-    pool.inputTokenBalances[1].plus(amount1)
+    pool.inputTokenBalances[0].plus(amount0),
+    pool.inputTokenBalances[1].plus(amount1),
   ];
   poolAmounts.inputTokenBalances = [
-    poolAmounts.inputTokenBalances[0].plus(amount0Converted), 
-    poolAmounts.inputTokenBalances[1].plus(amount1Converted)
+    poolAmounts.inputTokenBalances[0].plus(amount0Converted),
+    poolAmounts.inputTokenBalances[1].plus(amount1Converted),
   ];
 
   // update USD pricing
   let nativeToken = updateNativeTokenPriceInUSD();
   nativeToken.save();
 
-  poolAmounts.tokenPrices = sqrtPriceX96ToTokenPrices(sqrtPriceX96, token0 as Token, token1 as Token);
+  poolAmounts.tokenPrices = sqrtPriceX96ToTokenPrices(
+    sqrtPriceX96,
+    token0 as Token,
+    token1 as Token
+  );
   poolAmounts.save();
 
-  token0.lastPriceUSD = findNativeTokenPerToken(token0, nativeToken);
-  token1.lastPriceUSD = findNativeTokenPerToken(token1, nativeToken);
+  token0.lastPriceUSD = findUSDPricePerToken(token0, nativeToken);
+  token1.lastPriceUSD = findUSDPricePerToken(token1, nativeToken);
 
   token0.lastPriceBlockNumber = event.block.number;
   token1.lastPriceBlockNumber = event.block.number;
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
+    pool.totalValueLockedUSD
+  );
 
   /**
    * Things afffected by new USD rates
@@ -315,10 +382,11 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, amount0: Bi
   // Get the total value locked in USD
   pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
     .times(token0.lastPriceUSD!)
-    .plus(poolAmounts.inputTokenBalances[1]
-    .times(token1.lastPriceUSD!));
+    .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+    pool.totalValueLockedUSD
+  );
 
   // create Swap event
   let swap = new Swap(
@@ -339,13 +407,29 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, amount0: Bi
   swap.amountIn = amount0 > BIGINT_ZERO ? amount0 : amount1;
   swap.amountInUSD = amount0 > BIGINT_ZERO ? amount0USD : amount1USD;
   swap.tokenOut = amount1 > BIGINT_ZERO ? token0.id : token1.id;
-  swap.amountOut = amount1 > BIGINT_ZERO ? amount0.times(BIGINT_NEG_ONE) : amount1.times(BIGINT_NEG_ONE);
+  swap.amountOut =
+    amount1 > BIGINT_ZERO
+      ? amount0.times(BIGINT_NEG_ONE)
+      : amount1.times(BIGINT_NEG_ONE);
   swap.amountOutUSD = amount1 > BIGINT_ZERO ? amount0USD : amount1USD;
   swap.pool = pool.id;
 
   // get amount that should be tracked only - div 2 because cant count both input and output as volume
-  let trackedAmountUSD = getTrackedVolumeUSD(poolAmounts, amount0Abs, token0 as Token, amount1Abs, token1 as Token);
-  updateVolumeAndFees(event, protocol, pool, trackedAmountUSD, amount0, amount1);
+  let trackedAmountUSD = getTrackedVolumeUSD(
+    poolAmounts,
+    amount0Abs,
+    token0 as Token,
+    amount1Abs,
+    token1 as Token
+  );
+  updateVolumeAndFees(
+    event,
+    protocol,
+    pool,
+    trackedAmountUSD,
+    amount0,
+    amount1
+  );
 
   swap.save();
   token0.save();

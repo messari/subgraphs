@@ -43,6 +43,7 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "./constants";
+import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 
 enum EventType {
   Deposit,
@@ -57,92 +58,46 @@ enum EventType {
 ////////////////////////
 
 export class ProtocolData {
-  comptrollerAddr: Address;
-  name: string;
-  slug: string;
-  schemaVersion: string;
-  subgraphVersion: string;
-  methodologyVersion: string;
-  network: string;
-  liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>;
-  oracleResult: ethereum.CallResult<Address>;
   constructor(
-    comptrollerAddr: Address,
-    name: string,
-    slug: string,
-    schemaVersion: string,
-    subgraphVersion: string,
-    methodologyVersion: string,
-    network: string,
-    liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>,
-    oracleResult: ethereum.CallResult<Address>
-  ) {
-    this.comptrollerAddr = comptrollerAddr;
-    this.name = name;
-    this.slug = slug;
-    this.schemaVersion = schemaVersion;
-    this.subgraphVersion = subgraphVersion;
-    this.methodologyVersion = methodologyVersion;
-    this.network = network;
-    this.liquidationIncentiveMantissaResult =
-      liquidationIncentiveMantissaResult;
-    this.oracleResult = oracleResult;
-  }
+    public readonly comptrollerAddr: Address,
+    public readonly name: string,
+    public readonly slug: string,
+    public readonly schemaVersion: string,
+    public readonly subgraphVersion: string,
+    public readonly methodologyVersion: string,
+    public readonly network: string,
+    public readonly liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>,
+    public readonly oracleResult: ethereum.CallResult<Address>
+  ) {}
 }
 
 export class TokenData {
-  address: Address;
-  name: string;
-  symbol: string;
-  decimals: i32;
-  constructor(address: Address, name: string, symbol: string, decimals: i32) {
-    this.address = address;
-    this.name = name;
-    this.symbol = symbol;
-    this.decimals = decimals;
-  }
+  constructor(
+    public readonly address: Address,
+    public readonly name: string,
+    public readonly symbol: string,
+    public readonly decimals: i32
+  ) {}
 }
 
 export class MarketListedData {
-  protocol: LendingProtocol;
-  token: TokenData;
-  cToken: TokenData;
-  cTokenReserveFactorMantissa: BigInt;
   constructor(
-    protocol: LendingProtocol,
-    token: TokenData,
-    cToken: TokenData,
-    cTokenReserveFactorMantissa: BigInt
-  ) {
-    this.protocol = protocol;
-    this.token = token;
-    this.cToken = cToken;
-    this.cTokenReserveFactorMantissa = cTokenReserveFactorMantissa;
-  }
+    public readonly protocol: LendingProtocol,
+    public readonly token: TokenData,
+    public readonly cToken: TokenData,
+    public readonly cTokenReserveFactorMantissa: BigInt
+  ) {}
 }
 
 export class UpdateMarketData {
-  totalSupplyResult: ethereum.CallResult<BigInt>;
-  exchangeRateStoredResult: ethereum.CallResult<BigInt>;
-  supplyRateResult: ethereum.CallResult<BigInt>;
-  borrowRateResult: ethereum.CallResult<BigInt>;
-  getUnderlyingPriceResult: ethereum.CallResult<BigInt>;
-  unitPerYear: i32;
   constructor(
-    totalSupplyResult: ethereum.CallResult<BigInt>,
-    exchangeRateStoredResult: ethereum.CallResult<BigInt>,
-    supplyRateResult: ethereum.CallResult<BigInt>,
-    borrowRateResult: ethereum.CallResult<BigInt>,
-    getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
-    unitPerYear: i32
-  ) {
-    this.totalSupplyResult = totalSupplyResult;
-    this.exchangeRateStoredResult = exchangeRateStoredResult;
-    this.supplyRateResult = supplyRateResult;
-    this.borrowRateResult = borrowRateResult;
-    this.getUnderlyingPriceResult = getUnderlyingPriceResult;
-    this.unitPerYear = unitPerYear;
-  }
+    public readonly totalSupplyResult: ethereum.CallResult<BigInt>,
+    public readonly exchangeRateStoredResult: ethereum.CallResult<BigInt>,
+    public readonly supplyRateResult: ethereum.CallResult<BigInt>,
+    public readonly borrowRateResult: ethereum.CallResult<BigInt>,
+    public readonly getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
+    public readonly unitPerYear: i32
+  ) {}
 }
 
 ////////////////////////////////////
@@ -341,6 +296,7 @@ export function _handleMarketListed(
   market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  market._borrowBalance = BIGINT_ZERO;
 
   market.save();
 
@@ -788,6 +744,7 @@ export function _handleAccrueInterest(
   comptrollerAddr: Address,
   interestAccumulated: BigInt,
   totalBorrows: BigInt,
+  updateMarketPrices: boolean,
   event: ethereum.Event
 ): void {
   let marketID = event.address.toHexString();
@@ -810,7 +767,9 @@ export function _handleAccrueInterest(
     interestAccumulated,
     totalBorrows,
     event.block.number,
-    event.block.timestamp
+    event.block.timestamp,
+    updateMarketPrices,
+    comptrollerAddr
   );
   updateProtocol(comptrollerAddr);
 
@@ -1235,13 +1194,16 @@ function updateMarketSnapshots(
   marketDailySnapshot.save();
 }
 
+// updateMarketPrices: true when every market price is updated on AccrueInterest()
 export function updateMarket(
   updateMarketData: UpdateMarketData,
   marketID: string,
   interestAccumulatedMantissa: BigInt,
   newTotalBorrow: BigInt,
   blockNumber: BigInt,
-  blockTimestamp: BigInt
+  blockTimestamp: BigInt,
+  updateMarketPrices: boolean,
+  comptrollerAddress: Address
 ): void {
   let market = Market.load(marketID);
   if (!market) {
@@ -1257,6 +1219,11 @@ export function updateMarket(
     return;
   }
 
+  if (updateMarketPrices) {
+    updateAllMarketPrices(comptrollerAddress, blockNumber);
+  }
+
+  // update this market's price no matter what
   let underlyingTokenPriceUSD = getTokenPriceUSD(
     updateMarketData.getUnderlyingPriceResult,
     underlyingToken.decimals
@@ -1347,6 +1314,7 @@ export function updateMarket(
   market.totalValueLockedUSD = underlyingSupplyUSD;
   market.totalDepositBalanceUSD = underlyingSupplyUSD;
 
+  market._borrowBalance = newTotalBorrow;
   market.totalBorrowBalanceUSD = newTotalBorrow
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
@@ -1538,6 +1506,7 @@ export function _getOrCreateProtocol(
         "[getOrCreateProtocol] liquidationIncentiveMantissaResult reverted",
         []
       );
+      protocol._liquidationIncentive = BIGDECIMAL_ZERO;
     } else {
       protocol._liquidationIncentive =
         protocolData.liquidationIncentiveMantissaResult.value
@@ -1732,4 +1701,56 @@ function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
     snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
+}
+
+export function updateAllMarketPrices(
+  comptrollerAddr: Address,
+  blockNumber: BigInt
+): void {
+  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  if (!protocol) {
+    log.warning("[updateAllMarketPrices] protocol not found: {}", [
+      comptrollerAddr.toHexString(),
+    ]);
+    return;
+  }
+  let priceOracle = PriceOracle.bind(Address.fromString(protocol._priceOracle));
+
+  for (let i = 0; i < protocol._marketIDs.length; i++) {
+    let market = Market.load(protocol._marketIDs[i]);
+    if (!market) {
+      break;
+    }
+    let underlyingToken = Token.load(market.inputToken);
+    if (!underlyingToken) {
+      break;
+    }
+
+    // update market price
+    let underlyingTokenPriceUSD = getTokenPriceUSD(
+      priceOracle.try_getUnderlyingPrice(Address.fromString(market.id)),
+      underlyingToken.decimals
+    );
+
+    underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
+    underlyingToken.lastPriceBlockNumber = blockNumber;
+    underlyingToken.save();
+
+    market.inputTokenPriceUSD = underlyingTokenPriceUSD;
+
+    // update TVL, supplyUSD, borrowUSD
+    market.totalDepositBalanceUSD = market.inputTokenBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(underlyingTokenPriceUSD);
+    market.totalBorrowBalanceUSD = market._borrowBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(underlyingTokenPriceUSD);
+    market.totalValueLockedUSD = market.inputTokenBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(underlyingTokenPriceUSD);
+    market.save();
+  }
 }

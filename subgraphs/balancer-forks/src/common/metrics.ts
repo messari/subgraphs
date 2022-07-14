@@ -225,7 +225,7 @@ export function updateTokenPrice(
     }
   }
 
-  if (getOrCreateDex().network == "MATIC") return;
+  if (getOrCreateDex().network == "MATIC" || getOrCreateDex().network == "OPTIMISM") return;
 
   if (!isUSDStable(tokenIn)) {
     const token = getOrCreateToken(tokenIn.toHexString());

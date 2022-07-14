@@ -26,7 +26,7 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
-  "0x471EcE3750Da237f93B8E339c536989b8978a438"
+  "0x3Ad443d769A07f287806874F8E5405cE3Ac902b9"
 );
 
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
@@ -57,8 +57,9 @@ UNISWAP_ROUTER_ADDRESS.set(
 ///////////////////////////// YEARNLENS CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS =
-  "0x0000000000000000000000000000000000000000";
+export const YEARN_LENS_CONTRACT_ADDRESS = Address.fromString(
+  "0x0000000000000000000000000000000000000000"
+);
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CHAINLINK CONTRACT //////////////////////////
@@ -75,7 +76,7 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
 export const WHITELIST_TOKENS = new TypedMap<string, Address>();
 WHITELIST_TOKENS.set(
   "WETH",
-  Address.fromString("0x471EcE3750Da237f93B8E339c536989b8978a438")
+  Address.fromString("0x3Ad443d769A07f287806874F8E5405cE3Ac902b9")
 );
 WHITELIST_TOKENS.set(
   "ETH",

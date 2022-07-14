@@ -2,54 +2,116 @@
 
 ## Calculation Methodology v1.0.0
 
+Below, the methodologies for key fields in the protocol are surfaced for convenience.
+
+Note that all cumulatives USD values are origination values (i.e values at the time the accumulation occurred), they are not current values. This means that the cumulative values are monotonically increasing over time. If current values are desired for the cumulatives, they can be derived from the cumulative token values.
+
+In depth methodologies for every parameter in the protocol can be found here: [Schema Map](https://fluffy-cobalt-78d.notion.site/Schema-Map-59607afc87ac4891a7dc8c407e18f48d)
+
 ### Total Value Locked (TVL) USD
 
-Sum across all Pools: 
+Total amount on the supply side that is earning interest
 
-`Current Borrow Loans + Remaining Cash Available to Borrow as Loan`
+Sum across all Markets:
 
-### Total Revenue USD
+`Total Deposit Balance USD + Total Stake Balance USD + Total Unclaimed Supplier Interest USD`
 
-Sum across all Pools:
+This does not include accrued staking rewards.
 
-`Interest Earned across all loans + Establishment Fees on the Loan Amount for new loans originated + MPL/USDC BPT Deposits`
+### Total Deposit Balance USD
 
-Note: Establish fee is taken on NEW LOANS. e.g. if you borrow $500k, repay the $500k and take out another $1m, you pay fees across the $1.5m
+Sum across all Markets:
 
-### Protocol-Side Revenue USD
-Portion of the Total Revenue allocated to the Protocol
+`Cumulative Deposit USD - Cumulative Withdraw USD - Cumulative Pool Losses USD`
 
-Sum across all Pools:
+Pool Losses occur when a default is suffered by the pool, it is absorbed by the deposit amount.
 
-`Establishment Fees on the Loan Amount for new loans originated`
+### Total Borrow Balance USD
 
-Note that Establishment Fees is split between Protocol and Delegate 50/50 but full Establishment Fees to be included Protocol-side Revenue
+Sum across all Markets:
 
-### Supply-Side Revenue USD
-Portion of the Total Revenue allocated to the Supply-Side
+`Cumulative Withdraw USD - Cumulative Principal Repay USD - Loan Defaults USD`
 
-Sum across all Pools
+Liquidated collateral is interpreted the same as paying principal since from the pool perspective there is no difference. Defaults to the Stake Locker and Pool are absorbed and removed from total borrow.
 
-`Interest Earned across all loans`
+### Cumulative Liquidate USD
+
+Sum across all Markets:
+
+`Cumulative Stake Locker Losses USD + Cumulative Pool Losses USD`
+
+Collateral liquidation is not counted towards cumulative liquidate, and is instead considered the same as a principal repayment since from the pool perspective there is no difference.
+
+### Cumulative Supply Side Revenue USD
+
+Sum across all Markets:
+
+`Cumulative Establishment Fees To Pool Delegate USD + Cumulative Interest To Market USD`
+
+Interest To Market USD is all interest going to the Suppliers and the Stake Locker, this doesn't include MPL token distribution.
+
+### Cumulative Protocol Side Revenue USD
+
+Sum across all Markets:
+
+`Cumulative Establishment Fees To Maple Treasury USD`
+
+Establishment Fees To Maple Treasury USD is a percentage of the drawdown amount; lump sum for V1 and V2 loans and amortized over repayments for V3 loans.
+
+### Cumulative Total Revenue USD
+
+Sum across all Markets:
+
+`Cumulative Supply Side Revenue USD + Cumulative Protocol Side Revenue USD`
 
 ### Total Unique Users
 
-Count of  Unique Addresses which have interacted with the protocol via any transaction
+The number of Unique Addresses that interacted with the protocol through these transactions:
 
-`Deposits`
+`Deposit`
 
-`Withdraws`
+`Borrow`
 
-`Borrows`
+`Withdraw`
 
-`Repays`
+`Repay`
 
-`Liquidations`
+`Stake`
 
-###  Reward Token Emissions Amount
+`Unstake`
 
-To be added
+## Protocol Diagrams
 
-###  Protocol Controlled Value
+Diagrams of the protocol, specifically focusing on key things needed for the Subgraph. Each diagram follows this legend:
 
-To be added
+![Legend](./docs/Legend.jpg)
+
+### Protocol Map
+
+![Protocol Map](./docs/ProtocolMap.jpg)
+
+### Providing Liquidity Flow
+
+![Providing Liquidity Flow](./docs/ProvidingLiquidity.jpg)
+
+### Staking Flow
+
+![Staking](./docs/Staking.jpg)
+
+### Taking Loan Flow
+
+![Taking a loan](https://user-images.githubusercontent.com/9797920/175491683-de0cae25-58fd-4f05-a579-eb02fea2297e.jpg)
+
+### Repaying Loan (Principal and Interest)
+
+![Repay Loan](./docs/RepayLoan.jpg)
+
+### Liquidation Flow
+
+![Liquidation](./docs/Liquidation.jpg)
+
+## Validation
+
+Validation done for this subgraph against other data sources can be found here: [Validation Spreadsheet](https://docs.google.com/spreadsheets/d/1viyui7nAzUXMx68EJSW61xC251uS8zpKePzV2xijjGQ/edit?usp=sharing)
+
+Validation for subgraph self-consistency, and some helper queries for the Validation Spreadsheet are here: [Notebooks](./validation)

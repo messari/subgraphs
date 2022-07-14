@@ -1,7 +1,18 @@
-import { Autocomplete, CircularProgress, TextField, Typography } from "@mui/material";
+import { Autocomplete, Typography } from "@mui/material";
 import React, { useState } from "react";
-import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ComboBoxInput } from "./ComboBoxInput";
+
+/**
+ * simple check if a string might be an address. Does not verify that the address is a valid pool address.
+ * In the future, we can try a query to liquidityPools to validate the address exists for the protocol
+ *
+ * @param input user input in the dropdown
+ * @returns
+ */
+const isAddress = (input: string) => {
+  return input.startsWith("0x") && input.length === 42;
+};
 
 interface PoolDropDownProps {
   poolId: string;
@@ -13,7 +24,6 @@ interface PoolDropDownProps {
 }
 
 export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDropDownProps) => {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   // Create the array of pool selections in the drop down
   const options = markets.map((market: any) => {
@@ -30,23 +40,24 @@ export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDrop
   return (
     <>
       <Typography variant="h6">Select a pool</Typography>
+      <Typography>Search from the top 100 pools by TVL or filter by any pool address.</Typography>
+      <Typography>NOTE: we do not currently validate that the address is an existing pool</Typography>
       <Autocomplete
-        options={options}
+        options={isAddress(textInput) ? [textInput] : options}
         inputValue={textInput}
         sx={{ maxWidth: 1000, my: 2 }}
         onChange={(event: React.SyntheticEvent) => {
           // Upon selecting a pool from the list, get the pool id and navigate to the routing for that pool
+          const href = new URL(window.location.href);
+          const p = new URLSearchParams(href.search);
           setIssues([]);
           const targEle = event?.target as HTMLLIElement;
           setTextInput(targEle.innerText);
-          searchParams.delete("view");
+          p.delete("view");
           if (targEle.innerText) {
+            p.set("poolId", targEle.innerText?.split(" / ")[0]);
             setPoolId(targEle.innerText?.split(" / ")[0]);
-            navigate(
-              `?endpoint=${searchParams.get("endpoint")}&tab=${searchParams.get("tab")}&poolId=${
-                targEle.innerText?.split(" / ")[0]
-              }`,
-            );
+            navigate("?" + p.toString().split("%2F").join("/"));
           }
         }}
         renderInput={(params) => <ComboBoxInput label="PoolList" params={params} setTextInput={setTextInput} />}

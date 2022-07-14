@@ -10,7 +10,7 @@ import {
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "./getters";
-import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, REWARD_TOKEN } from "./constants";
+import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, REWARD_TOKEN, ZERO_ADDRESS } from "./constants";
 import { updateTokenPrice, updateVolumeAndFee } from "./metrics";
 import { valueInUSD } from "./pricing";
 import { convertTokenToDecimal } from "./utils/utils";
@@ -54,12 +54,15 @@ export function createLiquidityPool(
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  pool.isSingleSided = false;
   if (REWARD_TOKEN != "") {
     let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
     pool.rewardTokens = [rewardToken.id];
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   }
+  pool.inputTokenWeights = [];
+  pool.allocPoint = BIGINT_ZERO;
 
   pool.save();
   protocol.totalPoolCount = protocol.totalPoolCount + 1;
@@ -156,6 +159,13 @@ export function createSwapHandleVolume(
 
   // create Swap event
   let swap = new Swap(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+
+  if (event.transaction.to) {
+    swap.to = event.transaction.to!.toHexString();
+  } else {
+    swap.to = ZERO_ADDRESS;
+  }
+  swap.from = event.transaction.from.toHexString();
 
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();

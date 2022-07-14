@@ -51,6 +51,8 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.network = DEFAULT_NETWORK;
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalPoolCount = 0;
+    protocol.totalAllocPoint = BIGINT_ZERO;
+    protocol.beetsPerBlock = BIGINT_ZERO;
     protocol.save();
   }
   return protocol;
@@ -69,8 +71,7 @@ export function getOrCreateToken(address: string): Token {
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
     token.name = name.reverted ? "" : name.value;
     token.symbol = symbol.reverted ? "" : symbol.value;
-    let lastPriceUSD = fetchPrice(Address.fromString(address));
-    token.lastPriceUSD = lastPriceUSD;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
@@ -84,7 +85,6 @@ export function getLiquidityPool(poolAddress: string): LiquidityPool {
 export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
   return LiquidityPoolFee.load(id)!;
 }
-
 export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let id = event.block.timestamp.toI32() / SECONDS_PER_DAY;
@@ -165,6 +165,14 @@ export function getOrCreateLiquidityPoolDailySnapshot(
       inputTokenBalances.push(BIGINT_ZERO);
       inputTokenWeights.push(BIGDECIMAL_ZERO);
     }
+    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    poolMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     poolMetrics.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
     poolMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
     poolMetrics.inputTokenBalances = inputTokenBalances;
@@ -205,6 +213,15 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
       inputTokenBalances.push(BIGINT_ZERO);
       inputTokenWeights.push(BIGDECIMAL_ZERO);
     }
+
+    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     poolMetrics.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
     poolMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
     poolMetrics.inputTokenBalances = inputTokenBalances;
@@ -232,6 +249,7 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
 
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
+
     financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;

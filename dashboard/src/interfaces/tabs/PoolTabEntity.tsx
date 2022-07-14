@@ -224,8 +224,6 @@ function PoolTabEntity({
               const token = data[poolKeySingular]?.rewardTokens[idx];
               if (token?.token?.name) {
                 dataFieldKey = " [" + token?.token?.name + "]";
-              } else if (token?.name) {
-                dataFieldKey = " [" + token?.name + "]";
               } else {
                 dataFieldKey = " [" + idx + "]";
               }
@@ -315,9 +313,7 @@ function PoolTabEntity({
                   // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
 
                   const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
-                  if (currentRewardToken?.decimals || currentRewardToken?.decimals === 0) {
-                    value = convertTokenDecimals(val, currentRewardToken?.decimals);
-                  } else if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
+                  if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
                     value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
                   } else {
                     value = convertTokenDecimals(val, 18);
@@ -477,23 +473,13 @@ function PoolTabEntity({
           ) {
             issues.push({ type: "SUM", level: "error", fieldName: entityName + "-" + reward, message: "" });
           }
-          let currentRewardToken: { [x: string]: string } = {};
-          if (data[poolKeySingular].rewardTokens[idx]?.token) {
-            currentRewardToken = data[poolKeySingular].rewardTokens[idx].token;
-          } else {
-            currentRewardToken = data[poolKeySingular].rewardTokens[idx];
-          }
+          const currentRewardToken: { [x: string]: string } = data[poolKeySingular]?.rewardTokens[idx]?.token;
           const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol + " " : "";
           tableVals[x].value.push(`${symbol}[${idx}]: ${rewardChart[reward][x].value.toFixed(3)}`);
         });
       }
       Object.keys(rewardChart).forEach((reward: any, idx: number) => {
-        let currentRewardToken: { [x: string]: string } = {};
-        if (data[poolKeySingular].rewardTokens[idx]?.token) {
-          currentRewardToken = data[poolKeySingular].rewardTokens[idx].token;
-        } else {
-          currentRewardToken = data[poolKeySingular].rewardTokens[idx];
-        }
+        const currentRewardToken: { [x: string]: string } = data[poolKeySingular].rewardTokens[idx].token;
         const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
         const val = rewardChart[reward];
         rewardChart[`${name} [${idx}]`] = val;
@@ -652,12 +638,7 @@ function PoolTabEntity({
                 (fieldName.toUpperCase().includes("REWARDTOKEN") || fieldName.toUpperCase().includes("REWARDAPR")) &&
                 data[poolKeySingular]?.rewardTokens
               ) {
-                let currentRewardToken: { [x: string]: string } = {};
-                if (data[poolKeySingular]?.rewardTokens[arrayIndex]?.token) {
-                  currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex].token;
-                } else {
-                  currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
-                }
+                const currentRewardToken: { [x: string]: string } = data[poolKeySingular].rewardTokens[arrayIndex].token;
                 const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
                 const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol : "N/A";
                 label += " - " + symbol + ": " + name;

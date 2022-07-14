@@ -197,6 +197,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
+    false, // do not update all prices
     event
   );
 }
@@ -208,7 +209,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Iron Bank",
     "iron-bank",
     "1.3.0",
-    "1.0.8",
+    "1.0.9",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
