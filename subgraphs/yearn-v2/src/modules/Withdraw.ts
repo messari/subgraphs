@@ -110,7 +110,7 @@ export function _Withdraw(
 ): void {
   const vaultAddress = Address.fromString(vault.id);
   const vaultContract = VaultContract.bind(vaultAddress);
-  const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+  const protocol = getOrCreateYieldAggregator();
 
   if (
     sharesBurnt.toString() == "-1" ||
