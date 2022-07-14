@@ -13,12 +13,9 @@ import {
 // DelegateChanged(indexed address,indexed address,indexed address)
 export function handleDelegateChanged(event: DelegateChanged): void {
   _handleDelegateChanged(
-    {
-      delegator: event.params.delegator,
-      fromDelegate: event.params.fromDelegate,
-      toDelegate: event.params.toDelegate,
-    },
-    event
+    event.params.delegator.toHexString(),
+    event.params.fromDelegate.toHexString(),
+    event.params.toDelegate.toHexString()
   );
 }
 
@@ -26,23 +23,17 @@ export function handleDelegateChanged(event: DelegateChanged): void {
 // Called in succession to the above DelegateChanged event
 export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
   _handleDelegateVotesChanged(
-    {
-      delegate: event.params.delegate,
-      previousBalance: event.params.previousBalance,
-      newBalance: event.params.newBalance,
-    },
-    event
+    event.params.delegate.toHexString(),
+    event.params.previousBalance,
+    event.params.newBalance
   );
 }
 
-// Transfer(indexed address,indexed address,uint256)
+// // Transfer(indexed address,indexed address,uint256)
 export function handleTransfer(event: Transfer): void {
   _handleTransfer(
-    {
-      from: event.params.from,
-      to: event.params.to,
-      value: event.params.value,
-    },
-    event
+    event.params.from.toHexString(),
+    event.params.to.toHexString(),
+    event.params.value
   );
 }

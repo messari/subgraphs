@@ -148,49 +148,46 @@ export function getOrCreateTokenHolder(
   return tokenHolder as TokenHolder;
 }
 
-export interface ProposalCreatedEventParams {
-  proposalId: BigInt;
-  proposer: Address;
-  targets: Address[];
-  values: BigInt[];
-  signatures: string[];
-  calldatas: Bytes[];
-  startBlock: BigInt;
-  endBlock: BigInt;
-  description: string;
-}
 export function _handleProposalCreated(
-  params: ProposalCreatedEventParams,
+  proposalId: string,
+  proposerAddr: string,
+  targets: Address[],
+  values: BigInt[],
+  signatures: string[],
+  calldatas: Bytes[],
+  startBlock: BigInt,
+  endBlock: BigInt,
+  description: string,
   event: ethereum.Event
 ): void {
-  let proposal = getOrCreateProposal(params.proposalId.toString());
-  let proposer = getOrCreateDelegate(params.proposer.toHexString(), false);
+  let proposal = getOrCreateProposal(proposalId);
+  let proposer = getOrCreateDelegate(proposerAddr, false);
 
   // Checking if the proposer was a delegate already accounted for, if not we should log an error
   // since it shouldn't be possible for a delegate to propose anything without first being "created"
   if (proposer == null) {
     log.error(
       "Delegate participant {} not found on ProposalCreated. tx_hash: {}",
-      [params.proposer.toHexString(), event.transaction.hash.toHexString()]
+      [proposerAddr, event.transaction.hash.toHexString()]
     );
   }
 
   // Creating it anyway since we will want to account for this event data, even though it should've never happened
-  proposer = getOrCreateDelegate(params.proposer.toHexString());
+  proposer = getOrCreateDelegate(proposerAddr);
 
   proposal.proposer = proposer.id;
   proposal.againstVotes = BIGINT_ZERO;
   proposal.forVotes = BIGINT_ZERO;
   proposal.abstainVotes = BIGINT_ZERO;
-  proposal.targets = addressesToStrings(params.targets);
-  proposal.values = params.values;
-  proposal.signatures = params.signatures;
-  proposal.calldatas = params.calldatas;
+  proposal.targets = addressesToStrings(targets);
+  proposal.values = values;
+  proposal.signatures = signatures;
+  proposal.calldatas = calldatas;
   proposal.creationBlock = event.block.number;
   proposal.creationTime = event.block.timestamp;
-  proposal.startBlock = params.startBlock;
-  proposal.endBlock = params.endBlock;
-  proposal.description = params.description;
+  proposal.startBlock = startBlock;
+  proposal.endBlock = endBlock;
+  proposal.description = description;
   proposal.state =
     event.block.number >= proposal.startBlock
       ? ProposalState.ACTIVE
@@ -205,10 +202,10 @@ export function _handleProposalCreated(
 }
 
 export function _handleProposalCanceled(
-  params: { proposalId: BigInt },
+  proposalId: string,
   event: ethereum.Event
 ): void {
-  let proposal = getOrCreateProposal(params.proposalId.toString());
+  let proposal = getOrCreateProposal(proposalId);
   proposal.state = ProposalState.CANCELED;
   proposal.cancellationBlock = event.block.number;
   proposal.cancellationTime = event.block.timestamp;
@@ -221,11 +218,11 @@ export function _handleProposalCanceled(
 }
 
 export function _handleProposalExecuted(
-  params: { proposalId: BigInt },
+  proposalId: string,
   event: ethereum.Event
 ): void {
   // Update proposal status + execution metadata
-  let proposal = getOrCreateProposal(params.proposalId.toString());
+  let proposal = getOrCreateProposal(proposalId);
   proposal.state = ProposalState.EXECUTED;
   proposal.executionBlock = event.block.number;
   proposal.executionTime = event.block.timestamp;
@@ -238,14 +235,11 @@ export function _handleProposalExecuted(
   governance.save();
 }
 
-export function _handleProposalQueued(
-  params: { proposalId: BigInt; eta: BigInt },
-  event: ethereum.Event
-): void {
+export function _handleProposalQueued(proposalId: BigInt, eta: BigInt): void {
   // Update proposal status + execution metadata
-  let proposal = getOrCreateProposal(params.proposalId.toString());
+  let proposal = getOrCreateProposal(proposalId.toString());
   proposal.state = ProposalState.QUEUED;
-  proposal.executionETA = params.eta;
+  proposal.executionETA = eta;
   proposal.save();
 
   // Update governance proposal state counts
@@ -254,29 +248,22 @@ export function _handleProposalQueued(
   governance.save();
 }
 
-export interface VoteCastEventParams {
-  proposalId: BigInt;
-  voter: Address;
-  weight: BigInt;
-  reason: string;
-  support: i32;
-}
 export function _handleVoteCast(
-  params: VoteCastEventParams,
-  event: ethereum.Event
+  proposalId: string,
+  voterAddress: string,
+  weight: BigInt,
+  reason: string,
+  support: i32
 ): void {
-  const proposalId = params.proposalId.toString();
-  const voterAddress = params.voter.toHexString();
-
   let voteId = voterAddress.concat("-").concat(proposalId);
   let vote = new Vote(voteId);
   vote.proposal = proposalId;
   vote.voter = voterAddress;
-  vote.weight = params.weight;
-  vote.reason = params.reason;
+  vote.weight = weight;
+  vote.reason = reason;
 
   // Retrieve enum string key by value (0 = Against, 1 = For, 2 = Abstain)
-  vote.choice = getVoteChoiceByValue(params.support);
+  vote.choice = getVoteChoiceByValue(support);
   vote.save();
 
   let proposal = getOrCreateProposal(proposalId);
@@ -285,11 +272,11 @@ export function _handleVoteCast(
   }
 
   // Increment respective vote choice counts
-  if (params.support === 0) {
+  if (support === 0) {
     proposal.againstVotes = proposal.againstVotes.plus(BIGINT_ONE);
-  } else if (params.support === 1) {
+  } else if (support === 1) {
     proposal.forVotes = proposal.forVotes.plus(BIGINT_ONE);
-  } else if (params.support === 2) {
+  } else if (support === 2) {
     proposal.abstainVotes = proposal.abstainVotes.plus(BIGINT_ONE);
   }
   proposal.save();

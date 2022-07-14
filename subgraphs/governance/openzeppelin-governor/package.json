@@ -1,5 +1,5 @@
 {
-  "name": "openzeppelin-governor-forks",
+  "name": "openzeppelin-governor",
   "license": "MIT",
   "scripts": {
     "format": "npx prettier --write .",

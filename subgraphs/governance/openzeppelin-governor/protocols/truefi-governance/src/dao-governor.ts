@@ -23,35 +23,34 @@ import { DaoGovernor } from "../../../generated/DaoGovernor/DaoGovernor";
 import { GovernanceFramework } from "../../../generated/schema";
 
 export function handleProposalCanceled(event: ProposalCanceled): void {
-  _handleProposalCanceled({ proposalId: event.params.proposalId }, event);
+  _handleProposalCanceled(event.params.proposalId.toString(), event);
 }
 
 export function handleProposalCreated(event: ProposalCreated): void {
+  // FIXME: Prefer to use a single object arg for params
+  // e.g.  { proposalId: event.params.proposalId, proposer: event.params.proposer, ...}
+  // but graph wasm compilation breaks for unknown reasons
+
   _handleProposalCreated(
-    {
-      proposalId: event.params.proposalId,
-      proposer: event.params.proposer,
-      targets: event.params.targets,
-      values: event.params.values,
-      signatures: event.params.signatures,
-      calldatas: event.params.calldatas,
-      startBlock: event.params.startBlock,
-      endBlock: event.params.endBlock,
-      description: event.params.description,
-    },
+    event.params.proposalId.toString(),
+    event.params.proposer.toHexString(),
+    event.params.targets,
+    event.params.values,
+    event.params.signatures,
+    event.params.calldatas,
+    event.params.startBlock,
+    event.params.endBlock,
+    event.params.description,
     event
   );
 }
 
 export function handleProposalExecuted(event: ProposalExecuted): void {
-  _handleProposalExecuted({ proposalId: event.params.proposalId }, event);
+  _handleProposalExecuted(event.params.proposalId.toString(), event);
 }
 
 export function handleProposalQueued(event: ProposalQueued): void {
-  _handleProposalQueued(
-    { proposalId: event.params.proposalId, eta: event.params.eta },
-    event
-  );
+  _handleProposalQueued(event.params.proposalId, event.params.eta);
 }
 
 export function handleProposalThresholdSet(event: ProposalThresholdSet): void {
@@ -76,27 +75,21 @@ export function handleTimelockChange(event: TimelockChange): void {
 
 export function handleVoteCast(event: VoteCast): void {
   _handleVoteCast(
-    {
-      proposalId: event.params.proposalId,
-      voter: event.params.voter,
-      weight: event.params.weight,
-      reason: event.params.reason,
-      support: event.params.support,
-    },
-    event
+    event.params.proposalId.toString(),
+    event.params.voter.toHexString(),
+    event.params.weight,
+    event.params.reason,
+    event.params.support
   );
 }
 // Treat VoteCastWithParams same as VoteCast
 export function handleVoteCastWithParams(event: VoteCastWithParams): void {
   _handleVoteCast(
-    {
-      proposalId: event.params.proposalId,
-      voter: event.params.voter,
-      weight: event.params.weight,
-      reason: event.params.reason,
-      support: event.params.support,
-    },
-    event
+    event.params.proposalId.toString(),
+    event.params.voter.toHexString(),
+    event.params.weight,
+    event.params.reason,
+    event.params.support
   );
 }
 

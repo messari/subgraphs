@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 import {
   getGovernance,
@@ -8,12 +8,13 @@ import {
 } from "./handlers";
 
 export function _handleDelegateChanged(
-  params: { delegator: Address; fromDelegate: Address; toDelegate: Address },
-  event: ethereum.Event
+  delegator: string,
+  fromDelegate: string,
+  toDelegate: string
 ): void {
-  let tokenHolder = getOrCreateTokenHolder(params.delegator.toHexString());
-  let previousDelegate = getOrCreateDelegate(params.fromDelegate.toHexString());
-  let newDelegate = getOrCreateDelegate(params.toDelegate.toHexString());
+  let tokenHolder = getOrCreateTokenHolder(delegator);
+  let previousDelegate = getOrCreateDelegate(fromDelegate);
+  let newDelegate = getOrCreateDelegate(toDelegate);
 
   tokenHolder.delegate = newDelegate.id;
   tokenHolder.save();
@@ -28,16 +29,13 @@ export function _handleDelegateChanged(
 }
 
 export function _handleDelegateVotesChanged(
-  params: { delegate: Address; previousBalance: BigInt; newBalance: BigInt },
-  event: ethereum.Event
+  delegateAddress: string,
+  previousBalance: BigInt,
+  newBalance: BigInt
 ): void {
-  const delegateAddress = params.delegate;
-  const previousBalance = params.previousBalance;
-  const newBalance = params.newBalance;
-
   let votesDifference = newBalance.minus(previousBalance);
 
-  let delegate = getOrCreateDelegate(delegateAddress.toHexString());
+  let delegate = getOrCreateDelegate(delegateAddress);
   delegate.delegatedVotesRaw = newBalance;
   delegate.delegatedVotes = toDecimal(newBalance);
   delegate.save();
@@ -56,14 +54,7 @@ export function _handleDelegateVotesChanged(
   governance.save();
 }
 
-export function _handleTransfer(
-  params: { from: Address; to: Address; value: BigInt },
-  event: ethereum.Event
-): void {
-  const from = params.from.toHexString();
-  const to = params.to.toHexString();
-  const value = params.value;
-
+export function _handleTransfer(from: string, to: string, value: BigInt): void {
   let fromHolder = getOrCreateTokenHolder(from);
   let toHolder = getOrCreateTokenHolder(to);
   let governance = getGovernance();
