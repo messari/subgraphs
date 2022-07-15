@@ -1,10 +1,9 @@
 import streamlit as st
 import altair as alt
 import pandas as pd
-from subgrounds.subgrounds import Subgrounds
+from subgrounds import Subgrounds
 from itertools import cycle
 from datetime import datetime, timedelta
-import time
 
 sg = Subgrounds()
 subgraphs_urls = {
@@ -23,9 +22,9 @@ def load_subgraph(url):
 def get_data(subgraph, network, startTime, numberPools):
     #Define Query Fieldpath
     liquidity_pools = subgraph.Query.liquidityPools(
-        orberBy=subgraph.LiquidityPool.totalValueLockedUSD,
+        orderBy=subgraph.LiquidityPool.totalValueLockedUSD,
         orderDirection="desc",
-        where=[subgraph.LiquidityPool.totalValueLockedUSD > 500000],
+        where={"totalValueLockedUSD_gt": 500000, "dailySnapshots_": {"timestamp_gt": int(startTime.timestamp())}},
         first=numberPools
     )
 
@@ -70,7 +69,6 @@ def get_data(subgraph, network, startTime, numberPools):
                             'liquidityPools_dailySnapshots_inputTokenBalances': 'daily_input_tokens_balance', 
                             'liquidityPools_dailySnapshots_totalValueLockedUSD': 'daily_tvl', 
                             'liquidityPools_totalValueLockedUSD': 'TVL'})
-    #Will figure out a cleaner way of doing it. I originally grouped the token properties together so there wouldn't be any duplicate rows in the dataframe 
     df['daily_input_tokens_price'] = df.apply(lambda x: calc_input_token_price(x, dec_dict), axis=1)
     df['%depeg'] = df.apply(lambda x: calc_depeg(x), axis=1)
     df["network"] = network
@@ -80,11 +78,11 @@ def get_data(subgraph, network, startTime, numberPools):
 
 def calc_depeg(df):
 
-    return [(1 - float(df['daily_input_tokens_price'][i])) for i in range(len(df['input_tokens_name']))]
+    return [round((1 - float(df['daily_input_tokens_price'][i])), 5) for i in range(len(df['input_tokens_name']))]
 
 def calc_input_token_price(df, dict):
     input_token_prices = []
-    # This isn't the best solution as its looping in python but given how there is a small number of tokens shouldn't be to big a hit to performance
+    # This isn't the best solution as its looping in python but given how there is a small number of tokens in a pool shouldn't be to big a hit to performance
     for i in range(len(df['input_tokens_name'])):
         if(float(df['daily_input_tokens_balance'][i]) != 0):
             input_token_price = (float(df['daily_tvl']) * float(df['daily_input_tokens_weight'][i])
@@ -136,6 +134,7 @@ def plot_pools(sort, data):
                 height=70,
                 width=250
             )
+
             fig = alt.vconcat(chart1, chart2).configure_legend(
                     strokeColor='gray',
                     fillColor='#EEEEEE',
@@ -167,6 +166,3 @@ if submitted:
         start_time = datetime(1970, 1, 1)
     pools = get_data(load_subgraph(subgraphs_urls[network]), network, start_time, number_pools)
     plot_pools(sort, pools)
-#TODO: Add Interactive elements to charts
-#TODO: Interpolation
-#TODO: Format %depeg and input token price correctly
