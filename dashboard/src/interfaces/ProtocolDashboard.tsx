@@ -11,6 +11,20 @@ import { useNavigate } from "react-router";
 import { isValidHttpUrl, NewClient } from "../utils";
 import AllDataTabs from "./AllDataTabs";
 import { DashboardHeader } from "../graphs/DashboardHeader";
+import { getPendingSubgraphId } from "../queries/subgraphStatusQuery";
+import { styled } from "../styled";
+
+const BackBanner = styled("div")`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing(1)};
+  padding-left: ${({ theme }) => theme.spacing(2)};
+  padding-right: ${({ theme }) => theme.spacing(2)};
+  padding-top: ${({ theme }) => theme.spacing(1)};
+  padding-bottom: ${({ theme }) => theme.spacing(1)};
+  background: #20252c;
+  cursor: pointer;
+`;
 
 function ProtocolDashboard() {
   const [searchParams] = useSearchParams();
@@ -19,19 +33,48 @@ function ProtocolDashboard() {
   const poolIdString = searchParams.get("poolId") || "";
   const scrollToView = searchParams.get("view") || "";
   const skipAmtParam = Number(searchParams.get("skipAmt")) || 0;
+  const version = searchParams.get("version") || "current";
 
   const navigate = useNavigate();
   let queryURL = `${SubgraphBaseUrl}${subgraphParam}`;
+  let subgraphName = subgraphParam;
   if (subgraphParam) {
     const parseCheck = isValidHttpUrl(subgraphParam);
     if (parseCheck) {
       queryURL = subgraphParam;
+      if (queryURL.includes("name/") && !searchParams.get("name")) {
+        subgraphName = queryURL.split("name/")[1];
+      } else if (searchParams.get("name")) {
+        subgraphName = searchParams.get("name") || "";
+      } else {
+        subgraphName = "";
+      }
     }
   }
+
   const [subgraphToQuery, setSubgraphToQuery] = useState({ url: queryURL, version: "" });
+  const endpointObject: { [x: string]: string } = { current: "", pending: "" };
+  endpointObject[version] = queryURL;
+  if (subgraphName && !endpointObject.current) {
+    endpointObject.current = "https://api.thegraph.com/subgraphs/name/" + subgraphName;
+  }
+  const [endpoints, setEndpoints] = useState(endpointObject);
+  const [isCurrentVersion, setIsCurrentVersion] = useState(version == "current" ? true : false);
   const [poolId, setPoolId] = useState<string>(poolIdString);
   const [skipAmt, paginate] = useState<number>(skipAmtParam);
 
+  const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), [subgraphParam]);
+
+  const [getPendingSubgraph, { data: pendingVersion, error: errorSubId, loading: subIdLoading }] = useLazyQuery(
+    getPendingSubgraphId,
+    {
+      variables: { subgraphName },
+      client: clientIndexing,
+    },
+  );
+
+  const [positionSnapshots, setPositionSnapshots] = useState();
+  const [positionsLoading, setPositionsLoading] = useState(false);
   ChartJS.register(...registerables);
   const client = useMemo(() => {
     return new ApolloClient({
@@ -83,6 +126,7 @@ function ProtocolDashboard() {
     protocolTableQuery,
     poolsQuery,
     poolTimeseriesQuery,
+    positionsQuery = "",
   } = schema(protocolSchemaData?.protocols[0].type, schemaVersion);
 
   const queryMain = gql`
@@ -166,6 +210,8 @@ function ProtocolDashboard() {
     tabNum = "3";
   } else if (tabString.toUpperCase() === "EVENTS") {
     tabNum = "4";
+  } else if (tabString.toUpperCase() === "POSITIONS") {
+    tabNum = "5";
   }
 
   const [tabValue, setTabValue] = useState(tabNum);
@@ -175,6 +221,14 @@ function ProtocolDashboard() {
     const href = new URL(window.location.href);
     const p = new URLSearchParams(href.search);
     const poolIdFromParam = p.get("poolId");
+    let deploymentVersionParam = "";
+    if (!isCurrentVersion) {
+      deploymentVersionParam = "&version=pending";
+    }
+    let nameParam = "";
+    if (subgraphName) {
+      nameParam = "&name=" + subgraphName;
+    }
     let protocolParam = "";
     if (protocolId) {
       protocolParam = `&protocolId=${protocolId}`;
@@ -192,18 +246,37 @@ function ProtocolDashboard() {
     } else if (newValue === "4") {
       poolParam = `&poolId=${poolIdFromParam || poolId}`;
       tabName = "events";
+    } else if (newValue === "5") {
+      poolParam = `&poolId=${poolIdFromParam || poolId}`;
+      tabName = "positions";
     }
-    navigate(`?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}`);
+    navigate(
+      `?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}${deploymentVersionParam}`,
+    );
     setTabValue(newValue);
   };
+
+  useEffect(() => {
+    if (
+      !endpoints?.pending &&
+      pendingVersion?.indexingStatusForPendingVersion?.subgraph &&
+      pendingVersion?.indexingStatusForPendingVersion?.health === "healthy"
+    ) {
+      setEndpoints({
+        current: endpoints.current,
+        pending: "https://api.thegraph.com/subgraphs/id/" + pendingVersion?.indexingStatusForPendingVersion?.subgraph,
+      });
+    }
+  }, [pendingVersion, errorSubId]);
 
   useEffect(() => {
     // If the schema query request was successful, make the full data query
     if (protocolSchemaData) {
       getData();
       getProtocolTableData();
+      getPendingSubgraph();
     }
-  }, [protocolSchemaData, getData, getProtocolTableData]);
+  }, [protocolSchemaData, getData, getProtocolTableData, getPendingSubgraph]);
 
   useEffect(() => {
     if (protocolTableData && tabValue === "1") {
@@ -268,7 +341,7 @@ function ProtocolDashboard() {
   useEffect(() => {
     if (tabValue === "2") {
       getPoolsOverviewData();
-    } else if (tabValue === "3" || tabValue === "4") {
+    } else if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
       getPoolsListData();
     }
   }, [tabValue, getPoolsOverviewData, getPoolsListData]);
@@ -309,6 +382,81 @@ function ProtocolDashboard() {
     pools = dataPools[PoolNames[data?.protocols[0]?.type]];
   }
 
+  let toggleVersion = null;
+
+  if (endpoints?.pending) {
+    let pendingStyle: { [x: string]: any } = {
+      color: "#20252c",
+      backgroundColor: "white",
+      padding: "8px 10px",
+      borderRadius: "25px",
+      margin: "4px 6px",
+    };
+    let currentStyle: { [x: string]: any } = {};
+    if (isCurrentVersion) {
+      pendingStyle = {};
+      currentStyle = {
+        color: "#20252c",
+        backgroundColor: "white",
+        padding: "8px 10px",
+        borderRadius: "25px",
+        margin: "4px 6px",
+      };
+    }
+    let currentToggle = null;
+    if (endpoints?.current) {
+      currentToggle = (
+        <span
+          style={currentStyle}
+          onClick={() => {
+            const href = new URL(window.location.href);
+            const p = new URLSearchParams(href.search);
+            p.set("version", "current");
+            p.set("endpoint", endpoints?.current);
+            p.set("name", subgraphName);
+            p.delete("view");
+            p.delete("poolId");
+            p.delete("protocolId");
+            navigate("?" + p.toString().split("%2F").join("/"));
+            setSubgraphToQuery({ url: endpoints?.current, version: "" });
+            setIsCurrentVersion(true);
+          }}
+        >
+          CURRENT VERSION
+        </span>
+      );
+    }
+    let pendingToggle = null;
+    if (endpoints?.pending) {
+      pendingToggle = (
+        <span
+          style={pendingStyle}
+          onClick={() => {
+            const href = new URL(window.location.href);
+            const p = new URLSearchParams(href.search);
+            p.set("version", "pending");
+            p.set("endpoint", endpoints?.pending);
+            p.set("name", subgraphName);
+            p.delete("view");
+            p.delete("poolId");
+            p.delete("protocolId");
+            navigate("?" + p.toString().split("%2F").join("/"));
+            setSubgraphToQuery({ url: endpoints?.pending, version: "" });
+            setIsCurrentVersion(false);
+          }}
+        >
+          PENDING VERSION
+        </span>
+      );
+    }
+    toggleVersion = (
+      <BackBanner>
+        {currentToggle}
+        {pendingToggle}
+      </BackBanner>
+    );
+  }
+
   return (
     <div className="ProtocolDashboard">
       <DashboardHeader
@@ -317,6 +465,7 @@ function ProtocolDashboard() {
         subgraphToQueryURL={subgraphToQuery.url}
         schemaVersion={schemaVersion}
       />
+      {toggleVersion}
       {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (
         <CircularProgress sx={{ margin: 6 }} size={50} />
       ) : null}
@@ -345,6 +494,7 @@ function ProtocolDashboard() {
           skipAmt={skipAmt}
           poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
           poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
+          positionsQuery={positionsQuery}
           protocolTimeseriesData={{
             financialsDailySnapshots: financialsData?.financialsDailySnapshots,
             usageMetricsDailySnapshots: dailyUsageData?.usageMetricsDailySnapshots,

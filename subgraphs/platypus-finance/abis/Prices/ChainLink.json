@@ -194,9 +194,7 @@
       { "internalType": "uint256", "name": "roundId", "type": "uint256" }
     ],
     "name": "getAnswer",
-    "outputs": [
-      { "internalType": "int256", "name": "answer", "type": "int256" }
-    ],
+    "outputs": [{ "internalType": "int256", "name": "answer", "type": "int256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -206,9 +204,7 @@
       { "internalType": "address", "name": "quote", "type": "address" }
     ],
     "name": "getCurrentPhaseId",
-    "outputs": [
-      { "internalType": "uint16", "name": "currentPhaseId", "type": "uint16" }
-    ],
+    "outputs": [{ "internalType": "uint16", "name": "currentPhaseId", "type": "uint16" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -235,9 +231,7 @@
       { "internalType": "uint80", "name": "roundId", "type": "uint80" }
     ],
     "name": "getNextRoundId",
-    "outputs": [
-      { "internalType": "uint80", "name": "nextRoundId", "type": "uint80" }
-    ],
+    "outputs": [{ "internalType": "uint80", "name": "nextRoundId", "type": "uint80" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -309,9 +303,7 @@
       { "internalType": "uint80", "name": "roundId", "type": "uint80" }
     ],
     "name": "getPreviousRoundId",
-    "outputs": [
-      { "internalType": "uint80", "name": "previousRoundId", "type": "uint80" }
-    ],
+    "outputs": [{ "internalType": "uint80", "name": "previousRoundId", "type": "uint80" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -372,16 +364,12 @@
       { "internalType": "uint256", "name": "roundId", "type": "uint256" }
     ],
     "name": "getTimestamp",
-    "outputs": [
-      { "internalType": "uint256", "name": "timestamp", "type": "uint256" }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "timestamp", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "aggregator", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "aggregator", "type": "address" }],
     "name": "isFeedEnabled",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
@@ -393,9 +381,7 @@
       { "internalType": "address", "name": "quote", "type": "address" }
     ],
     "name": "latestAnswer",
-    "outputs": [
-      { "internalType": "int256", "name": "answer", "type": "int256" }
-    ],
+    "outputs": [{ "internalType": "int256", "name": "answer", "type": "int256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -405,9 +391,7 @@
       { "internalType": "address", "name": "quote", "type": "address" }
     ],
     "name": "latestRound",
-    "outputs": [
-      { "internalType": "uint256", "name": "roundId", "type": "uint256" }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "roundId", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -433,9 +417,7 @@
       { "internalType": "address", "name": "quote", "type": "address" }
     ],
     "name": "latestTimestamp",
-    "outputs": [
-      { "internalType": "uint256", "name": "timestamp", "type": "uint256" }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "timestamp", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },

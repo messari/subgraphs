@@ -36,11 +36,11 @@ export const ProtocolDropDown = ({ setProtocolId, protocols }: ProtocolDropDownP
           const targEle = event?.target as HTMLLIElement;
           setTextInput(targEle.innerText);
           p.delete("view");
+          p.delete("poolId");
           if (targEle.innerText) {
+            p.set("protocolId", targEle.innerText?.split(" / ")[0]);
             setProtocolId(targEle.innerText?.split(" / ")[0]);
-            navigate(
-              `?endpoint=${p.get("endpoint")}&tab=${p.get("tab")}&protocolId=${targEle.innerText?.split(" / ")[0]}`,
-            );
+            navigate("?" + p.toString().split("%2F").join("/"));
           }
         }}
         renderInput={(params) => <ComboBoxInput label="Protocol List" params={params} setTextInput={setTextInput} />}

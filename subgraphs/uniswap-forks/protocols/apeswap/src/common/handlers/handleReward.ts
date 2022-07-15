@@ -19,7 +19,10 @@ import {
   getOrCreateToken,
 } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { convertTokenToDecimal } from "../../../../../src/common/utils/utils";
+import {
+  convertTokenToDecimal,
+  roundToWholeNumber,
+} from "../../../../../src/common/utils/utils";
 import { getOrCreateMasterChef } from "../helpers";
 
 // Called on both deposits and withdraws into the MasterApe/MasterChef pool.
@@ -35,8 +38,7 @@ export function handleReward(
   let masterChefPool = getOrCreateMasterChefStakingPool(
     event,
     MasterChef.MASTERCHEF,
-    pid,
-    poolContract
+    pid
   );
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
@@ -65,7 +67,6 @@ export function handleReward(
     pool.rewardTokens = [
       getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
     ];
-    pool.save();
   }
 
   // Update staked amounts
@@ -126,7 +127,7 @@ export function handleReward(
   let poolRewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let poolRewardTokenPerDay = getRewardsPerDay(
+  let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
     poolRewardTokenRateBigDecimal,
@@ -134,7 +135,7 @@ export function handleReward(
   );
 
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(poolRewardTokenPerDay.toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
@@ -156,8 +157,7 @@ export function handleReward(
 function getOrCreateMasterChefStakingPool(
   event: ethereum.Event,
   masterChefType: string,
-  pid: BigInt,
-  poolContract: MasterChefApeswap
+  pid: BigInt
 ): _MasterChefStakingPool {
   let masterChefPool = _MasterChefStakingPool.load(
     masterChefType + "-" + pid.toString()

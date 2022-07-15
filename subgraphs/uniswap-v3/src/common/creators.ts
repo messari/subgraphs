@@ -1,5 +1,11 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { BigInt, Address, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Address,
+  ethereum,
+  log,
+  dataSource,
+} from "@graphprotocol/graph-ts";
 import {
   LiquidityPool,
   Token,
@@ -30,6 +36,7 @@ import {
   INT_ONE,
   INT_ZERO,
   LiquidityPoolFeeType,
+  Network,
   PROTOCOL_FEE_TO_OFF,
 } from "./constants";
 import {
@@ -40,6 +47,7 @@ import {
 } from "./price/price";
 import { updateTokenWhitelists, updateVolumeAndFees } from "./updateMetrics";
 import { convertFeeToPercent, convertTokenToDecimal } from "./utils/utils";
+import { populateEmptyPools } from "./utils/backfill";
 
 // Create a liquidity pool from pairCreated event.
 export function createLiquidityPool(
@@ -88,13 +96,25 @@ export function createLiquidityPool(
 
   poolAmounts.inputTokens = [token0.id, token1.id];
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  poolAmounts.tokenPrices = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   // Used to track the number of deposits in a liquidity pool
   let poolDeposits = new _HelperStore(poolAddress);
   poolDeposits.valueInt = INT_ZERO;
 
+  protocol.totalPoolCount = protocol.totalPoolCount + INT_ONE;
+  protocol.save();
+
   // Create and track the newly created pool contract based on the template specified in the subgraph.yaml file.
   PoolTemplate.create(Address.fromString(poolAddress));
+
+  // populate pre-regenesis pools if needed
+  if (
+    NetworkConfigs.getNetwork() == Network.OPTIMISM &&
+    protocol._regenesis == false
+  ) {
+    populateEmptyPools(event);
+  }
 
   pool.save();
   token0.save();
@@ -102,12 +122,10 @@ export function createLiquidityPool(
   LPtoken.save();
   poolAmounts.save();
   poolDeposits.save();
-  protocol.totalPoolCount = protocol.totalPoolCount + 1;
-  protocol.save();
 }
 
 // create pool fee entities based on the fee structure received from pairCreated event.
-function createPoolFees(poolAddressString: string, fee: i64): string[] {
+export function createPoolFees(poolAddressString: string, fee: i64): string[] {
   // LP Fee
   let poolLpFee = new LiquidityPoolFee("lp-fee-" + poolAddressString);
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;

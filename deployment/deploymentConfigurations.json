@@ -230,7 +230,7 @@
         }
       }
     },
-    "arrakis-finance":{
+    "arrakis-finance": {
       "arrakis-finance": {
         "mainnet": {
           "template": "arrakis.finance.template.yaml",
@@ -449,6 +449,12 @@
           "template": "moonwell.template.yaml",
           "messari": "messari/moonwell-moonriver",
           "dmelotik": "dmelotik/moonwell",
+          "deploy-on-merge": true
+        },
+        "moonbeam": {
+          "template": "moonwell.template.yaml",
+          "messari": "messari/moonwell-moonbeam",
+          "dmelotik": "dmelotik/moonwell-moonbeam",
           "deploy-on-merge": true
         }
       },
@@ -877,12 +883,39 @@
         }
       }
     },
+    "openzeppelin-governor": {
+      "truefi-governance": {
+        "mainnet": {
+          "template": "truefi-governance.template.yaml",
+          "danielkhoo": "danielkhoo/truefi-governance",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "vesper-finance": {
       "vesper-finance": {
         "mainnet": {
           "template": "vesper.finance.template.yaml",
           "messari": "messari/vesper-ethereum",
           "deploy-on-merge": true
+        }
+      }
+    },
+    "badgerdao": {
+      "badgerdao": {
+        "mainnet": {
+          "template": "badgerdao.template.yaml",
+          "messari": "messari/badgerdao-ethereum"
+        }
+      }
+    },
+    "platypus-finance": {
+      "platypus-finance": {
+        "avalanche": {
+          "template": "platypus.template.yaml",
+          "messari": "messari/platypus-finance",
+          "aditya": "aditya-todi/platypus-finance-v2",
+          "deploy-on-merge": false
         }
       }
     }

@@ -29,7 +29,6 @@ import {
   getOrCreateToken,
   getOrCreateLPToken,
   getLiquidityPoolAmounts,
-  getOrCreateRewardToken,
 } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import {
@@ -103,9 +102,7 @@ export function createLiquidityPool(
   ];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool.rewardTokens = [
-    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-  ];
+  pool.rewardTokens = [];
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];

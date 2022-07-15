@@ -1506,6 +1506,7 @@ export function _getOrCreateProtocol(
         "[getOrCreateProtocol] liquidationIncentiveMantissaResult reverted",
         []
       );
+      protocol._liquidationIncentive = BIGDECIMAL_ZERO;
     } else {
       protocol._liquidationIncentive =
         protocolData.liquidationIncentiveMantissaResult.value

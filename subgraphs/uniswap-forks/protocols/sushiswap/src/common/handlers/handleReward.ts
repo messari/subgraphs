@@ -11,6 +11,7 @@ import {
   BIGINT_ONE,
   BIGINT_ZERO,
   INT_ZERO,
+  MasterChef,
   RECENT_BLOCK_THRESHOLD,
   UsageType,
 } from "../../../../../src/common/constants";
@@ -20,7 +21,6 @@ import {
 } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
-import { MasterChef } from "../constants";
 import {
   convertTokenToDecimal,
   roundToWholeNumber,
@@ -69,7 +69,6 @@ export function handleReward(
     pool.rewardTokens = [
       getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
     ];
-    pool.save();
   }
 
   // Update staked amounts
@@ -160,16 +159,16 @@ export function handleReward(
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let poolRewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
-  let poolRewardTokenPerDay = getRewardsPerDay(
+  let rewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
+  let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
-    poolRewardTokenRateBigDecimal,
+    rewardTokenRateBigDecimal,
     masterChef.rewardTokenInterval
   );
 
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(roundToWholeNumber(poolRewardTokenPerDay).toString()),
+    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(

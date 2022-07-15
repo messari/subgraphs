@@ -13,7 +13,6 @@ import {
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { MasterChef } from "../../common/constants";
 import {
   createMasterChefStakingPool,
   getOrCreateMasterChef,
@@ -23,7 +22,7 @@ import {
   updateMasterChefDeposit,
   updateMasterChefWithdraw,
 } from "../../common/handlers/handleRewardMini";
-import { BIGINT_ZERO } from "../../../../../src/common/constants";
+import { BIGINT_ZERO, MasterChef } from "../../../../../src/common/constants";
 
 // A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {

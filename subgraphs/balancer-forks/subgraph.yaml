@@ -1,15 +1,15 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Vault
-    network: optimism
+    network: mainnet
     source:
       address: "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
       abi: Vault
-      startBlock: 7003430
+      startBlock: 12272146
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -78,7 +78,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: WeightedPool
-    network: optimism
+    network: mainnet
     source:
       abi: WeightedPool
     mapping:
