@@ -156,7 +156,7 @@ curl -s -L -H "Content-Type: application/json" -X POST -d @query.json $2 | \
 
 # Print tokenterminal metrics
 printf "\n\n[+] TOKEN TERMINAL.............\n"
-TIMESTAMP="$ZULU_TT_TOMORROW" jq '.[] | select(.timestamp == env.TIMESTAMP)' metrics-daily.json | grep "timestamp\|revenue\|tvl"
+TIMESTAMP="$ZULU_TT_TOMORROW" jq '.[] | select(.timestamp == env.TIMESTAMP)' metrics-daily-2022-07-10.json | grep "timestamp\|revenue\|tvl"
 
 # There is more magic we can do with shell + jq  here to customize comparison per metric further.
 

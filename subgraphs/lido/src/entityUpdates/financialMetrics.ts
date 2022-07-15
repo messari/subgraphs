@@ -9,7 +9,6 @@ import {
 } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
-  BIGINT_TEN_TO_EIGHTEENTH,
   BIGINT_ZERO,
   ETH_ADDRESS,
   PROTOCOL_ID,
@@ -104,55 +103,58 @@ export function updateTotalRevenueMetrics(
     block
   );
 
-  // Staking Rewards
-  const stakingRewards = bigIntToBigDecimal(
-    postTotalPooledEther.minus(preTotalPooledEther)
-  );
-  const stakingRewardsUSD = stakingRewards.times(
-    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
-      .lastPriceUSD!
-  );
+  // TODO: do we want get a pool object and check this in Lido.ts ?
+  if (totalShares > pool.outputTokenSupply!) {
+    // Staking Rewards
+    const stakingRewards = bigIntToBigDecimal(
+      postTotalPooledEther.minus(preTotalPooledEther)
+    );
+    const stakingRewardsUSD = stakingRewards.times(
+      getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
+        .lastPriceUSD!
+    );
 
-  // Pool
-  pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
-    stakingRewardsUSD
-  );
-  pool.outputTokenSupply = totalShares;
-  pool.outputTokenPriceUSD = getOrCreateToken(
-    Address.fromString(PROTOCOL_ID),
-    block.number
-  ).lastPriceUSD;
-  pool.save();
+    // Pool
+    pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
+      stakingRewardsUSD
+    );
+    pool.outputTokenSupply = totalShares;
+    pool.outputTokenPriceUSD = getOrCreateToken(
+      Address.fromString(PROTOCOL_ID),
+      block.number
+    ).lastPriceUSD;
+    pool.save();
 
-  // Pool Daily
-  poolMetricsDailySnapshot.cumulativeTotalRevenueUSD =
-    pool.cumulativeTotalRevenueUSD;
-  poolMetricsDailySnapshot.dailyTotalRevenueUSD = poolMetricsDailySnapshot.dailyTotalRevenueUSD.plus(
-    stakingRewardsUSD
-  );
-  poolMetricsDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
-  poolMetricsDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  poolMetricsDailySnapshot.save();
+    // Pool Daily
+    poolMetricsDailySnapshot.cumulativeTotalRevenueUSD =
+      pool.cumulativeTotalRevenueUSD;
+    poolMetricsDailySnapshot.dailyTotalRevenueUSD = poolMetricsDailySnapshot.dailyTotalRevenueUSD.plus(
+      stakingRewardsUSD
+    );
+    poolMetricsDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
+    poolMetricsDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+    poolMetricsDailySnapshot.save();
 
-  // Pool Hourly
-  poolMetricsHourlySnapshot.cumulativeTotalRevenueUSD =
-    pool.cumulativeTotalRevenueUSD;
-  poolMetricsHourlySnapshot.hourlyTotalRevenueUSD = poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.plus(
-    stakingRewardsUSD
-  );
-  poolMetricsHourlySnapshot.outputTokenSupply = pool.outputTokenSupply;
-  poolMetricsHourlySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  poolMetricsHourlySnapshot.save();
+    // Pool Hourly
+    poolMetricsHourlySnapshot.cumulativeTotalRevenueUSD =
+      pool.cumulativeTotalRevenueUSD;
+    poolMetricsHourlySnapshot.hourlyTotalRevenueUSD = poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.plus(
+      stakingRewardsUSD
+    );
+    poolMetricsHourlySnapshot.outputTokenSupply = pool.outputTokenSupply;
+    poolMetricsHourlySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+    poolMetricsHourlySnapshot.save();
 
-  // Protocol
-  protocol.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
-  protocol.save();
+    // Protocol
+    protocol.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+    protocol.save();
 
-  // Financials Daily
-  financialMetrics.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
-  financialMetrics.dailyTotalRevenueUSD =
-    poolMetricsDailySnapshot.dailyTotalRevenueUSD;
-  financialMetrics.save();
+    // Financials Daily
+    financialMetrics.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+    financialMetrics.dailyTotalRevenueUSD =
+      poolMetricsDailySnapshot.dailyTotalRevenueUSD;
+    financialMetrics.save();
+  }
 }
 
 export function updateProtocolSideRevenueMetrics(
