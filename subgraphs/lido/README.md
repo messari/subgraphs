@@ -6,7 +6,7 @@
 Lido is a staking service provider, mainly known as the largest ETH2.0 staking service provider. Lido's other staking products include:
 
 - ETH on Ethereum
-- ERC2 version of MATIC (Polygon native token) on Ethereum
+- ERC20 version of MATIC (Polygon native token) on Ethereum
 - xcKSM (ERC20 version of KSM, the native token of Kusana) on Moonbeam
 - xcDOT (ERC20 version of DOT, the native token of Polkadot) on Moonriver
 - SOL (native token of Solana) on Solana
@@ -65,7 +65,7 @@ Transactions that can be considered to be relevant to Lido on Ethereum network:
 - Wrap stETH into wstETH or unwrap
 - Stake MATIC into Lido 
 - Unstake stMATIC
-- Claim stMAITC after 3-4 days waiting period
+- Claim stMATIC after 3-4 days waiting period
 
 Note: In Lido, ETH is deposited to get stETH on a 1:1 basis. However, in dexes likes Curve or Balancer, stETH is typically trading at a small discount. Therefore, buying stETH sometimes is out of the intention to stake ETH with Lido, but at a discount. 
 
@@ -156,7 +156,7 @@ Lido has staking services for xcDOT on Moonbeam network. It follows the same mec
 ## Staking xcKSM on Moonriver
 Lido has staking services for xcKSM on Moonriver network. As Kusama is the test net for Polkadot, the mechanism of staking xcKSM on Moonriver is identical to staking xcDOT on Moonbeam. Only minor variations stated below:
 - The ERC20 compatible token for KSM is xcKSM, and when staked with Lido, depositors get stKSM
-- The unbonding period is 7 ot 8 days
+- The unbonding period is 7 to 8 days
 - Links:
   - Details of tokens: https://docs.kusama.lido.fi/extras/tokenomics
   - Protocol: https://lido.fi/kusama
