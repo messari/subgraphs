@@ -81,6 +81,9 @@ const messagesByLevel = (
       if (issuesArray[x].type === "EMPTY") {
         issuesMsg = `Entity ${issuesArray[x].fieldName} has no instances. This could mean that the pool was created but no transactions were detected on it.`;
       }
+      if (issuesArray[x].type === "BORROW") {
+        issuesMsg = `Entity ${issuesArray[x].fieldName} could not calculate BORROW Reward APR. The Pool Borrow Balance is not available.`;
+      }
       issuesMsgs.push(<li key={`${x}-${issuesArray[x].fieldName}`}>{issuesMsg}</li>);
     }
   }
