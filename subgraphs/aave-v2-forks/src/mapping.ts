@@ -340,6 +340,7 @@ export function _handleReserveDataUpdated(
       .div(exponentToBigDecimal(inputToken.decimals))
       .toString(),
   ]);
+  log.warning("input token: {} decimals; {}", [inputToken.id, inputToken.decimals.toString()]);
 
   market.inputTokenBalance = tryTotalSupply.value;
   market.outputTokenSupply = tryTotalSupply.value;

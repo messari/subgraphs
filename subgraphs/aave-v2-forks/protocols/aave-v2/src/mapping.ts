@@ -282,10 +282,15 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
           tryRewardAsset.value,
           Address.fromString(protocol.priceOracle)
         );
+
+        log.warning("rewards per day: {}, price: {}", [rewardsPerDay.toString(), rewardTokenPriceUSD.toString()]);
+
         let rewardsPerDayUSD = rewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
           .times(rewardTokenPriceUSD);
+
+        log.warning("after: {}", [rewardsPerDayUSD.toString()]);
 
         // set rewards to arrays
         market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
