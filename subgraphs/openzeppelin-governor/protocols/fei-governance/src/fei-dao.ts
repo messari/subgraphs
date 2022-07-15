@@ -10,7 +10,7 @@ import {
   VoteCast,
   VotingDelayUpdated,
   VotingPeriodUpdated,
-} from "../../../../fei-governance/generated/FeiDAO/FeiDAO";
+} from "../../../generated/FeiDAO/FeiDAO";
 import { FeiDAO } from "../../../generated/FeiDAO/FeiDAO";
 import { GovernanceFramework } from "../../../generated/schema";
 import {

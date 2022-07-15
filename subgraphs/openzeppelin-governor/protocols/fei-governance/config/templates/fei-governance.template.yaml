@@ -1,14 +1,15 @@
-specVersion: 0.0.4
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: FeiDAO
-    network: mainnet
+    network: {{ network }}
     source:
-      address: "0x0bef27feb58e857046d630b2c03dfb7bae567494"
+      address: "{{ governorContractAddress }}"
       abi: FeiDAO
-      startBlock: 13349454
+      startBlock: {{ governorContractStartBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -21,7 +22,7 @@ dataSources:
         - Delegate
       abis:
         - name: FeiDAO
-          file: ./abis/FeiDAO.json
+          file: ./abis/fei-governance/FeiDAO.json
       eventHandlers:
         - event: ProposalCanceled(uint256)
           handler: handleProposalCanceled
@@ -35,10 +36,6 @@ dataSources:
           handler: handleProposalThresholdUpdated
         - event: QuorumUpdated(uint256,uint256)
           handler: handleQuorumUpdated
-        - event: Rollback()
-          handler: handleRollback
-        - event: RollbackQueued(uint256)
-          handler: handleRollbackQueued
         - event: TimelockChange(address,address)
           handler: handleTimelockChange
         - event: VoteCast(indexed address,uint256,uint8,uint256,string)
@@ -47,14 +44,14 @@ dataSources:
           handler: handleVotingDelayUpdated
         - event: VotingPeriodUpdated(uint256,uint256)
           handler: handleVotingPeriodUpdated
-      file: ./src/fei-dao.ts
-  - kind: ethereum
+      file: ./protocols/fei-governance/src/fei-dao.ts
+  - kind: ethereum/contract
     name: Tribe
-    network: mainnet
+    network:  {{ network }}
     source:
-      address: "0xc7283b66Eb1EB5FB86327f08e1B5816b0720212B"
+      address: "{{ tokenContractAddress }}"
       abi: Tribe
-      startBlock: 12147964
+      startBlock: {{ tokenContractStartBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -67,7 +64,7 @@ dataSources:
         - Delegate
       abis:
         - name: Tribe
-          file: ./abis/Tribe.json
+          file: ./abis/fei-governance/Tribe.json
       eventHandlers:
         - event: DelegateChanged(indexed address,indexed address,indexed address)
           handler: handleDelegateChanged
@@ -75,4 +72,4 @@ dataSources:
           handler: handleDelegateVotesChanged
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./src/tribe.ts
+      file: ./protocols/fei-governance/src/tribe.ts

@@ -1,17 +1,18 @@
-specVersion: 0.0.4
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: ENSGovernor
-    network: mainnet
+    network: {{ network }}
     source:
-      address: "0x323A76393544d5ecca80cd6ef2A560C6a395b7E3"
+      address: "{{ governorContractAddress }}"
       abi: ENSGovernor
-      startBlock: 13533772
+      startBlock: {{ governorContractStartBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Governance
@@ -21,7 +22,7 @@ dataSources:
         - Delegate
       abis:
         - name: ENSGovernor
-          file: ./abis/ENSGovernor.json
+          file: ./abis/ens-governance/ENSGovernor.json
       eventHandlers:
         - event: ProposalCanceled(uint256)
           handler: handleProposalCanceled
@@ -37,17 +38,17 @@ dataSources:
           handler: handleTimelockChange
         - event: VoteCast(indexed address,uint256,uint8,uint256,string)
           handler: handleVoteCast
-      file: ./src/ens-governor.ts
-  - kind: ethereum
+      file: ./protocols/ens-governance/src/ens-governor.ts
+  - kind: ethereum/contract
     name: ENSToken
-    network: mainnet
+    network:  {{ network }}
     source:
-      address: "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72"
+      address: "{{ tokenContractAddress }}"
       abi: ENSToken
-      startBlock: 13533418
+      startBlock: {{ tokenContractStartBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.7
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Governance
@@ -57,7 +58,7 @@ dataSources:
         - Delegate
       abis:
         - name: ENSToken
-          file: ./abis/ENSToken.json
+          file: ./abis/ens-governance/ENSToken.json
       eventHandlers:
         - event: DelegateChanged(indexed address,indexed address,indexed address)
           handler: handleDelegateChanged
@@ -65,4 +66,4 @@ dataSources:
           handler: handleDelegateVotesChanged
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./src/ens-token.ts
+      file: ./protocols/ens-governance/src/ens-token.ts
