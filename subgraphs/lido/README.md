@@ -155,7 +155,7 @@ Lido has staking services for xcDOT on Moonbeam network. It follows the same mec
 
 ## Staking xcKSM on Moonriver
 Lido has staking services for xcKSM on Moonriver network. As Kusama is the test net for Polkadot, the mechanism of staking xcKSM on Moonriver is identical to staking xcDOT on Moonbeam. Only minor variations stated below:
-- The ERC20 compatible token for KSM is xcKSM, and when staked with Lido, depositors get stKSM
+- The ERC20 compatible token for KSM is xcKSM, and when staked with Lido, depositors get stKSM. Depositers can also wrap their stKSM and receive wstKSM.
 - The unbonding period is 7 to 8 days
 - Links:
   - Details of tokens: https://docs.kusama.lido.fi/extras/tokenomics
