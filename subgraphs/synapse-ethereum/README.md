@@ -1,4 +1,4 @@
-# Saddle Finance (DEX) Subgraph
+# Saddle Finance (AMM + Bridge) Ethereum Subgraph
 
 ## Calculation Methodology v1.0.0
 
@@ -65,12 +65,11 @@ Note: All pegged value asset prices are set to underlying asset price
 
 ## Smart Contract Interactions
 
-![Saddle](../../docs/images/protocols/saddle.png "Saddle Finance")
+To be added
 
 ## References and Useful Links
 
-- Protocol website: https://saddle.finance/
-- Protocol documentation: https://docs.saddle.finance
-- Smart contracts: https://github.com/saddle-finance/saddle-contract/
-- Deployed addresses: https://docs.saddle.finance/contracts
-- Existing subgraph: https://thegraph.com/hosted-service/subgraph/saddle-finance/saddle
+- Protocol website: https://synapseprotocol.com/
+- Protocol documentation: https://docs.synapseprotocol.com/
+- Smart contracts: https://github.com/synapsecns/synapse-contracts
+- Deployed addresses: https://docs.synapseprotocol.com/reference/contract-addresses
