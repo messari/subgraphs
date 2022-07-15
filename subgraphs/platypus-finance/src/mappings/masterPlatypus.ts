@@ -1,8 +1,8 @@
 import { Deposit, DepositFor, EmergencyWithdraw, Withdraw } from "../../generated/MasterPlatypus/MasterPlatypus";
 
-import { RewardToken, _Asset } from "../../generated/schema";
+import { LiquidityPool, RewardToken, _Asset } from "../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { getOrCreateAsset, getOrCreateLiquidityPool, getOrCreateRewardToken, getOrCreateToken } from "../common/getters";
+import { getOrCreateRewardToken, getOrCreateToken } from "../common/getters";
 import { MasterPlatypus } from "../../generated/MasterPlatypus/MasterPlatypus";
 import { MasterPlatypusOld } from "../../generated/MasterPlatypusOld/MasterPlatypusOld";
 import { MasterPlatypusFactory } from "../../generated/MasterPlatypusFactory/MasterPlatypusFactory";
@@ -40,7 +40,7 @@ export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset {
     ]);
   }
 
-  _asset!._index = pid;
+  // _asset!._index = pid;
   addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
 
   _asset!.save();
@@ -129,7 +129,7 @@ export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset {
     ]);
   }
 
-  _asset!._index = pid;
+  // _asset!._index = pid;
   addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
 
   _asset!.save();
@@ -219,7 +219,7 @@ export function handlePlatypus<T>(event: T, pid: BigInt): _Asset {
     ]);
   }
 
-  _asset!._index = pid;
+  // _asset!._index = pid;
   addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
 
   _asset!.save();
@@ -286,70 +286,26 @@ export function handlePlatypus<T>(event: T, pid: BigInt): _Asset {
   return _asset!;
 }
 
-export function updatePoolRewards(event: ethereum.Event, poolAddress: Address): void {
-  log.debug("[UpdateRewards][{}] get pool {}", [event.transaction.hash.toHexString(), poolAddress.toHexString()]);
+export function updatePoolRewards(event: ethereum.Event, assetAddress: Address): void {
+  log.debug("[UpdateRewards][{}] get pool {}", [event.transaction.hash.toHexString(), assetAddress.toHexString()]);
 
-  let pool = getOrCreateLiquidityPool(poolAddress, event);
-  let poolRewardTokens = new Array<string>();
-  let poolRewardTokenEmissionsAmount = new Array<BigInt>();
-  let poolRewardTokenEmissionsUSD = new Array<BigDecimal>();
-
+  let pool = LiquidityPool.load(assetAddress.toHexString())!;
   if (!pool._ignore) {
-    for (let j = 0; j < pool._assets.length; j++) {
-      let _asset = _Asset.load(pool._assets[j])!;
-      log.debug("[UpdateRewards][{}] get asset at {} => {}", [
-        event.transaction.hash.toHexString(),
-        j.toString(),
-        _asset.id,
-      ]);
-
-      if (_asset.rewardTokens) {
-        log.debug("[UpdateRewards][{}] get RTs {} for asset {} amt {}, usd {}, POOOL AMT {} POOL USD {}", [
-          event.transaction.hash.toHexString(),
-          _asset.rewardTokens!.toString(),
-          _asset.id,
-          _asset.rewardTokenEmissionsAmount!.toString(),
-          _asset.rewardTokenEmissionsUSD!.toString(),
-          poolRewardTokenEmissionsAmount.toString(),
-          poolRewardTokenEmissionsUSD.toString(),
-        ]);
-
-        for (let k = 0; k < _asset.rewardTokens!.length; k++) {
-          if (poolRewardTokenEmissionsAmount.length > k) {
-            poolRewardTokenEmissionsAmount[k] = poolRewardTokenEmissionsAmount[k].plus(
-              _asset.rewardTokenEmissionsAmount![k],
-            );
-            poolRewardTokenEmissionsUSD[k] = poolRewardTokenEmissionsUSD[k].plus(_asset.rewardTokenEmissionsUSD![k]);
-          } else {
-            poolRewardTokenEmissionsAmount.push(_asset.rewardTokenEmissionsAmount![k]);
-            poolRewardTokenEmissionsUSD.push(_asset.rewardTokenEmissionsUSD![k]);
-          }
-
-          log.debug("[UpdateRewards][{}] get RT at {} => {} AMT: {} USD: {}", [
-            event.transaction.hash.toHexString(),
-            k.toString(),
-            _asset.rewardTokens![k].toString(),
-            _asset.rewardTokenEmissionsAmount![k].toString(),
-            _asset.rewardTokenEmissionsUSD![k].toString(),
-          ]);
-        }
-
-        poolRewardTokens = _asset.rewardTokens!;
-      }
+    let _asset = _Asset.load(assetAddress.toHexString())!;
+    if (_asset.rewardTokens) {
+      pool.rewardTokens = _asset.rewardTokens;
+      pool.rewardTokenEmissionsAmount = _asset.rewardTokenEmissionsAmount;
+      pool.rewardTokenEmissionsUSD = _asset.rewardTokenEmissionsUSD;
+      pool.save();
     }
   }
 
   log.debug("[UpdateRewards][{}] pool {} : final AMT: {} USD: {}", [
     event.transaction.hash.toHexString(),
     pool.id,
-    poolRewardTokenEmissionsAmount.toString(),
-    poolRewardTokenEmissionsUSD.toString(),
+    pool.rewardTokenEmissionsAmount!.toString(),
+    pool.rewardTokenEmissionsUSD!.toString(),
   ]);
-
-  pool.rewardTokens = poolRewardTokens;
-  pool.rewardTokenEmissionsAmount = poolRewardTokenEmissionsAmount;
-  pool.rewardTokenEmissionsUSD = poolRewardTokenEmissionsUSD;
-  pool.save();
 }
 
 export function addRewardTokenToAsset(event: ethereum.Event, rtAddress: Address, _asset: _Asset): RewardToken {
@@ -402,7 +358,7 @@ export function handleDeposit(event: Deposit): void {
   _asset = getAssetForRewards<Deposit>(event);
   _asset.amountStaked = _asset.amountStaked.plus(event.params.amount);
   _asset.save();
-  updatePoolRewards(event, Address.fromString(_asset.pool));
+  updatePoolRewards(event, Address.fromString(_asset.id));
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -410,7 +366,7 @@ export function handleWithdraw(event: Withdraw): void {
   _asset = getAssetForRewards<Withdraw>(event);
   _asset.amountStaked = _asset.amountStaked.minus(event.params.amount);
   _asset.save();
-  updatePoolRewards(event, Address.fromString(_asset.pool));
+  updatePoolRewards(event, Address.fromString(_asset.id));
 }
 
 export function handleDepositFor(event: DepositFor): void {
@@ -418,7 +374,7 @@ export function handleDepositFor(event: DepositFor): void {
   _asset = getAssetForRewards<DepositFor>(event);
   _asset.amountStaked = _asset.amountStaked.plus(event.params.amount);
   _asset.save();
-  updatePoolRewards(event, Address.fromString(_asset.pool));
+  updatePoolRewards(event, Address.fromString(_asset.id));
 }
 
 export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {}

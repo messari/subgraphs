@@ -565,7 +565,7 @@ export function updateFinancialsAfterReport(
   protocolSideRevenueUSD: BigDecimal
 ): void {
   const financialMetrics = getOrCreateFinancialDailySnapshots(block);
-  const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+  const protocol = getOrCreateYieldAggregator();
 
   // TotalRevenueUSD Metrics
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(

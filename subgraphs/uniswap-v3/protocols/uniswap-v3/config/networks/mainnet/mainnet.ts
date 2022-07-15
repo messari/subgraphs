@@ -13,6 +13,7 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
+import { toLowerCase } from "../../../../../src/common/utils/utils";
 
 export class UniswapV3MainnetConfigurations implements Configurations {
   getNetwork(): string {
@@ -34,11 +35,13 @@ export class UniswapV3MainnetConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x1F98431c8aD98523631AE4a59f267346ea31F984";
+    return "0x1F98431c8aD98523631AE4a59f267346ea31F984".toLowerCase();
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x1F98431c8aD98523631AE4a59f267346ea31F984")
+      Address.fromString(
+        "0x1F98431c8aD98523631AE4a59f267346ea31F984".toLowerCase()
+      )
     );
   }
   getFeeOnOff(): string {
@@ -48,13 +51,13 @@ export class UniswapV3MainnetConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): string {
-    return "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+    return "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2".toLowerCase();
   }
   getRewardToken(): string {
     return "";
   }
   getWhitelistTokens(): string[] {
-    return [
+    return toLowerCase([
       "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", // WETH
       "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
@@ -76,31 +79,28 @@ export class UniswapV3MainnetConfigurations implements Configurations {
       "0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0", // MATIC
       "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9", // AAVE
       "0xfe2e637202056d30016725477c5da089ab0a043a", // sETH2
-    ];
+    ]);
   }
   getStableCoins(): string[] {
-    return [
+    return toLowerCase([
       "0x6b175474e89094c44da98b954eedeac495271d0f",
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "0xdac17f958d2ee523a2206206994597c13d831ec7",
       "0x0000000000085d4780b73119b644ae5ecd22b376",
       "0x956f47f50a910163d8bf957cf5846d573e7f87ca",
       "0x4dd28568d05f09b02220b09c2cb307bfd837cb95",
-    ];
+    ]);
   }
   getStableOraclePools(): string[] {
-    return [
+    return toLowerCase([
       "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8", // USDC/wETH
-    ];
+    ]);
   }
   getUntrackedPairs(): string[] {
-    return [
-      "0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248",
-      "0xfd9715a9f03678975b2e224c938fae8d481b09b2",
-    ];
+    return toLowerCase([]);
   }
   getUntrackedTokens(): string[] {
-    return [
+    return toLowerCase([
       "0xc7283b66eb1eb5fb86327f08e1b5816b0720212b", // TRIBE - Price issues
       "0x6b4c7a5e3f0b99fcd83e9c089bddd6c7fce5c611", // Million
       "0x1a4b46696b2bb4794eb3d4c26f1c55f9170fa4c5",
@@ -122,9 +122,9 @@ export class UniswapV3MainnetConfigurations implements Configurations {
       "0xc581b735a1688071a1746c968e0798d642ede491", // EuroTether
       "0x04f2694c8fcee23e8fd0dfea1d4f5bb8c352111f", // Staked Olympus
       "0x398aea1c9ceb7de800284bb399a15e0efe5a9ec2", // Escrowed Illuvium
-    ];
+    ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return BigDecimal.fromString("250000");
+    return BigDecimal.fromString("400000");
   }
 }

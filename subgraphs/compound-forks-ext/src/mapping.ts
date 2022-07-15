@@ -502,7 +502,7 @@ export function _handleRedeem(
     event
   );
   if (!positionID) {
-    log.warning("[handleRedeem] Failed to find position: {}", []);
+    log.warning("[handleRedeem] Failed to find position", []);
     return;
   }
 
