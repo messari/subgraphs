@@ -26,7 +26,7 @@
           "messari": "messari/abracadabra-money-fantom",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-ethereum",
           "messari": "messari/abracadabra-money-ethereum",
@@ -62,7 +62,7 @@
           "messari": "messari/abracadabra-money-fantom-ext",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "abracadabra.money.template.yaml",
           "nemani": "nemani/abracadabra-money-ethereum-ext",
           "messari": "messari/abracadabra-money-ethereum-ext",
@@ -73,7 +73,7 @@
     },
     "aave-v2-forks": {
       "aave-v2": {
-        "mainnet-arc": {
+        "ethereum-arc": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-arc-ethereum",
           "dmelotik": "dmelotik/aave-v2-arc",
@@ -85,25 +85,25 @@
           "dmelotik": "dmelotik/aave-v2-avalanche",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum",
           "deploy-on-merge": true
         },
-        "mainnet-amm": {
+        "ethereum-amm": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-amm-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum-amm",
           "deploy-on-merge": true
         },
-        "matic": {
+        "polygon": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-polygon",
           "dmelotik": "dmelotik/aave-v2-polygon",
           "deploy-on-merge": true
         },
-        "mainnet-rwa": {
+        "ethereum-rwa": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-rwa-ethereum",
           "dmelotik": "dmelotik/aave-v2-rwa",
@@ -121,7 +121,7 @@
     },
     "aave-v2-forks-ext": {
       "aave-v2": {
-        "mainnet-arc": {
+        "ethereum-arc": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-arc-ethereum-extended",
           "dmelotik": "dmelotik/aave-v2-arc-ext",
@@ -133,25 +133,25 @@
           "dmelotik": "dmelotik/aave-v2-avalanche-ext",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-ethereum-extended",
           "dmelotik": "dmelotik/aave-v2-mainnet-ext",
           "deploy-on-merge": true
         },
-        "mainnet-amm": {
+        "ethereum-amm": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-amm-ethereum-extended",
           "dmelotik": "dmelotik/aave-v2-ethereum-amm-ext",
           "deploy-on-merge": true
         },
-        "matic": {
+        "polygon": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-polygon-extended",
           "dmelotik": "dmelotik/aave-v2-polygon-ext",
           "deploy-on-merge": true
         },
-        "mainnet-rwa": {
+        "ethereum-rwa": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-rwa-ethereum-extended",
           "dmelotik": "dmelotik/aave-v2-rwa-ext",
@@ -189,7 +189,7 @@
           "messari": "messari/aave-v3-harmony",
           "deploy-on-merge": true
         },
-        "matic": {
+        "polygon": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-polygon",
           "deploy-on-merge": true
@@ -221,7 +221,7 @@
           "messari": "messari/aave-v3-harmony-extended",
           "deploy-on-merge": true
         },
-        "matic": {
+        "polygon": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-polygon-extended",
           "deploy-on-merge": true
@@ -235,7 +235,7 @@
     },
     "arrakis-finance": {
       "arrakis-finance": {
-        "mainnet": {
+        "ethereum": {
           "template": "arrakis.finance.template.yaml",
           "messari": "messari/arrakis-finance-ethereum",
           "deploy-on-merge": true
@@ -244,7 +244,7 @@
     },
     "convex-finance": {
       "convex-finance": {
-        "mainnet": {
+        "ethereum": {
           "template": "convex.template.yaml",
           "deploy-on-merge": false
         }
@@ -259,14 +259,14 @@
           "deploy-on-merge": true,
           "prepare:constants": true
         },
-        "matic": {
+        "polygon": {
           "template": "balancer.v2.template.yaml",
           "messari": "messari/balancer-v2-polygon",
           "sevenshi": "sevenshi/balancer-v2-matic",
           "deploy-on-merge": true,
           "prepare:constants": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "balancer.v2.template.yaml",
           "messari": "messari/balancer-v2-ethereum",
           "sevenshi": "sevenshi/balancer-v2-ethereum",
@@ -309,7 +309,7 @@
     },
     "bancor-v3": {
       "bancor-v3": {
-        "mainnet": {
+        "ethereum": {
           "template": "bancor.v3.template.yaml",
           "messari": "messari/bancor-v3-ethereum",
           "deploy-on-merge": true
@@ -356,7 +356,7 @@
         }
       },
       "compound-v2": {
-        "mainnet": {
+        "ethereum": {
           "template": "compound-v2.template.yaml",
           "messari": "messari/compound-ethereum",
           "dmelotik": "dmelotik/compound-ethereum",
@@ -376,13 +376,13 @@
           "dmelotik": "dmelotik/cream-finance-bsc",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-ethereum",
           "dmelotik": "dmelotik/cream-finance-ethereum",
           "deploy-on-merge": true
         },
-        "matic": {
+        "polygon": {
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-polygon",
           "dmelotik": "dmelotik/cream-finance-polygon",
@@ -408,7 +408,7 @@
           "tnkrxyz": "tnkrxyz/dforce-bsc",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "dforce.template.yaml",
           "messari": "messari/dforce-ethereum",
           "tnkrxyz": "tnkrxyz/dforce",
@@ -420,7 +420,7 @@
           "tnkrxyz": "tnkrxyz/dforce-optimism",
           "deploy-on-merge": true
         },
-        "matic": {
+        "polygon": {
           "template": "dforce.template.yaml",
           "messari": "messari/dforce-polygon",
           "tnkrxyz": "tnkrxyz/dforce-polygon",
@@ -440,7 +440,7 @@
           "dmelotik": "dmelotik/iron-bank-fantom",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "iron-bank.template.yaml",
           "messari": "messari/iron-bank-ethereum",
           "dmelotik": "dmelotik/iron-bank-ethereum",
@@ -468,7 +468,7 @@
           "dmelotik": "dmelotik/fuse-official",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "rari-fuse.template.yaml",
           "messari": "messari/rari-fuse-ethereum",
           "dmelotik": "dmelotik/fuse-mainnet",
@@ -506,11 +506,11 @@
           "template": "curve.template.yaml",
           "deploy-on-merge": false
         },
-        "mainnet": {
+        "ethereum": {
           "template": "curve.template.yaml",
           "deploy-on-merge": false
         },
-        "matic": {
+        "polygon": {
           "template": "curve.template.yaml",
           "deploy-on-merge": false
         },
@@ -518,7 +518,7 @@
           "template": "curve.template.yaml",
           "deploy-on-merge": false
         },
-        "xdai": {
+        "gnosis": {
           "template": "curve.template.yaml",
           "deploy-on-merge": false
         }
@@ -534,7 +534,7 @@
     },
     "inverse-finance": {
       "inverse-finance": {
-        "mainnet": {
+        "ethereum": {
           "template": "inverse.finance.template.yaml",
           "deploy-on-merge": false
         }
@@ -542,7 +542,7 @@
     },
     "liquity": {
       "liquity": {
-        "mainnet": {
+        "ethereum": {
           "template": "liquity.template.yaml",
           "deploy-on-merge": false
         }
@@ -555,12 +555,12 @@
           "messari": "messari/gamma-arbitrum",
           "deploy-on-merge": false
         },
-        "mainnet": {
+        "ethereum": {
           "template": "gamma.strategies.template.yaml",
           "messari": "messari/gamma-ethereum",
           "deploy-on-merge": true
         },
-        "matic": {
+        "polygon": {
           "template": "gamma.strategies.template.yaml",
           "messari": "messari/gamma-polygon",
           "deploy-on-merge": true
@@ -574,7 +574,7 @@
     },
     "makerdao": {
       "makerdao": {
-        "mainnet": {
+        "ethereum": {
           "template": "makerdao.template.yaml",
           "deploy-on-merge": false
         }
@@ -582,7 +582,7 @@
     },
     "stakedao": {
       "stakedao": {
-        "mainnet": {
+        "ethereum": {
           "template": "stakedao.template.yaml",
           "deploy-on-merge": false
         }
@@ -598,7 +598,7 @@
           "template": "saddle.finance.template.yaml",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "saddle.finance.template.yaml",
           "deploy-on-merge": true
         },
@@ -610,7 +610,7 @@
     },
     "tokemak": {
       "tokemak": {
-        "mainnet": {
+        "ethereum": {
           "template": "tokemak.template.yaml",
           "deploy-on-merge": true
         }
@@ -618,7 +618,7 @@
     },
     "uniswap-v3": {
       "uniswap-v3": {
-        "mainnet": {
+        "ethereum": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
           "prepare:constants": true
@@ -633,7 +633,7 @@
           "deploy-on-merge": false,
           "prepare:constants": true
         },
-        "matic": {
+        "polygon": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
           "prepare:constants": true
@@ -662,7 +662,7 @@
           "messari": "messari/qidao-fantom",
           "deploy-on-merge": false
         },
-        "matic": {
+        "polygon": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-polygon",
           "deploy-on-merge": false
@@ -677,7 +677,7 @@
           "messari": "messari/qidao-optimism",
           "deploy-on-merge": false
         },
-        "xdai": {
+        "gnosis": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-gnosis",
           "deploy-on-merge": false
@@ -686,7 +686,7 @@
     },
     "rari-vaults": {
       "rari-vaults": {
-        "mainnet": {
+        "ethereum": {
           "template": "rari-vaults.template.yaml",
           "messari": "messari/rari-vaults-ethereum",
           "dmelotik": "dmelotik/rari-vaults",
@@ -702,7 +702,7 @@
           "deploy-on-merge": false,
           "prepare:constants": true
         },
-        "matic": {
+        "polygon": {
           "template": "apeswap.matic.template.yaml",
           "steegecs": "steegecs/apeswap-matic",
           "deploy-on-merge": false,
@@ -710,7 +710,7 @@
         }
       },
       "quickswap": {
-        "matic": {
+        "polygon": {
           "template": "quickswap.template.yaml",
           "steegecs": "steegecs/quickswap-matic",
           "messari": "messari/quickswap-polygon",
@@ -776,14 +776,14 @@
           "deploy-on-merge": false,
           "prepare:constants": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "sushiswap.mainnet.template.yaml",
           "steegecs": "steegecs/sushiswap-mainnet",
           "messari": "messari/sushiswap-ethereum",
           "deploy-on-merge": false,
           "prepare:constants": true
         },
-        "matic": {
+        "polygon": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-matic",
           "deploy-on-merge": false,
@@ -801,7 +801,7 @@
           "deploy-on-merge": false,
           "prepare:constants": true
         },
-        "xdai": {
+        "gnosis": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-xdai",
           "messari": "messari/sushiswap-gnosis",
@@ -838,7 +838,7 @@
         }
       },
       "uniswap-v2": {
-        "mainnet": {
+        "ethereum": {
           "template": "uniswap.v2.template.yaml",
           "steegecs": "steegecs/uniswap-v2",
           "deploy-on-merge": false,
@@ -855,14 +855,14 @@
         }
       },
       "honeyswap": {
-        "xdai": {
+        "gnosis": {
           "template": "honeyswap.template.yaml",
           "mrbrianhobo": "mrbrianhobo/honeyswap-xdai",
           "messari": "messari/honeyswap-gnosis",
           "deploy-on-merge": false,
           "prepare:constants": true
         },
-        "matic": {
+        "polygon": {
           "template": "honeyswap.matic.template.yaml",
           "mrbrianhobo": "mrbrianhobo/honeyswap-polygon",
           "deploy-on-merge": false,
@@ -880,7 +880,7 @@
           "template": "yearn.v2.template.yaml",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "yearn.v2.template.yaml",
           "deploy-on-merge": true
         }
@@ -888,7 +888,7 @@
     },
     "openzeppelin-governor": {
       "truefi-governance": {
-        "mainnet": {
+        "ethereum": {
           "template": "truefi-governance.template.yaml",
           "danielkhoo": "danielkhoo/truefi-governance",
           "deploy-on-merge": false
@@ -897,7 +897,7 @@
     },
     "vesper-finance": {
       "vesper-finance": {
-        "mainnet": {
+        "ethereum": {
           "template": "vesper.finance.template.yaml",
           "messari": "messari/vesper-ethereum",
           "deploy-on-merge": false
@@ -906,7 +906,7 @@
     },
     "badgerdao": {
       "badgerdao": {
-        "mainnet": {
+        "ethereum": {
           "template": "badgerdao.template.yaml",
           "messari": "messari/badgerdao-ethereum"
         }
