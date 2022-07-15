@@ -912,6 +912,13 @@
           "deploy-on-merge": false
         }
       },
+      "silo-governance": {
+        "mainnet": {
+          "template": "silo-governance.template.yaml",
+          "danielkhoo": "danielkhoo/silo-governance",
+          "deploy-on-merge": false
+        }
+      },
       "truefi-governance": {
         "mainnet": {
           "template": "truefi-governance.template.yaml",
