@@ -84,10 +84,6 @@ export function getOrCreateProposal(
     if (save) {
       proposal.save();
     }
-
-    let governance = getGovernance();
-    governance.proposals = governance.proposals.plus(BIGINT_ONE);
-    governance.save();
   }
 
   return proposal as Proposal;
