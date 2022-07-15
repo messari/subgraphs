@@ -30,7 +30,7 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
     const tableData: any[] = [];
     for (let i = 0; i < dataTable.length; i++) {
       const currentData = { ...dataTable[i] };
-      if (currentData?.liquidatee) {
+      if (currentData?.liquidatee?.id) {
         currentData.liquidatee = currentData.liquidatee.id;
       }
       if (currentData?.liquidator) {
