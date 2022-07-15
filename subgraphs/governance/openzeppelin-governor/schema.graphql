@@ -82,6 +82,8 @@ type Proposal @entity {
   forVotes: BigInt!
   "Votes abstaining to the proposal"
   abstainVotes: BigInt!
+  "Total for/against/abstaining votes"
+  totalVotes: BigInt!
   "Votes associated to this proposal"
   votes: [Vote!]! @derivedFrom(field: "proposal")
 
