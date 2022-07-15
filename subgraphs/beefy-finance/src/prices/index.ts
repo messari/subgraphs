@@ -37,10 +37,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return sushiswapPrice;
   }
 
-  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
-    tokenAddr.toHexString(),
-  ]);
-
   // 1. Yearn Lens Oracle
   let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
   if (!yearnLensPrice.reverted) {
@@ -100,6 +96,10 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return curvePrice;
   }
+
+  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
+    tokenAddr.toHexString(),
+  ]);
 
   return new CustomPriceType();
 }

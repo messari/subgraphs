@@ -21,6 +21,7 @@ interface PoolOverviewTabProps {
   totalPoolCount?: number;
   pools: any[];
   protocolType: string;
+  protocolNetwork: string;
   subgraphToQueryURL: string;
   poolOverviewRequest: { [x: string]: any };
   skipAmt: number;
@@ -35,6 +36,7 @@ function PoolOverviewTab({
   pools,
   setPoolId,
   protocolType,
+  protocolNetwork,
   poolOverviewRequest,
   handleTabChange,
   paginate,
@@ -116,20 +118,6 @@ function PoolOverviewTab({
     );
   }
 
-  if (!poolOverviewRequest.poolOverviewLoading && pools.length === 0) {
-    if (skipAmt > 0) {
-      p.delete("skipAmt");
-      window.location.href = `${href.origin}${href.pathname}?${p.toString()}`;
-    } else if (issues.filter((x) => x.fieldName === "PoolOverviewTab").length === 0) {
-      issues.push({
-        message: "No pools returned in pool overview.",
-        type: "POOL",
-        level: "error",
-        fieldName: "poolOverview",
-      });
-    }
-  }
-
   return (
     <>
       <IssuesDisplay issuesArrayProps={tableIssues} allLoaded={true} oneLoaded={true} />
@@ -137,6 +125,7 @@ function PoolOverviewTab({
         datasetLabel=""
         dataTable={pools}
         protocolType={protocolType}
+        protocolNetwork={protocolNetwork}
         skipAmt={skipAmt}
         issueProps={tableIssues}
         setPoolId={(x) => setPoolId(x)}

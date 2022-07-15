@@ -67,7 +67,7 @@ type Proposal @entity {
   "Internal proposal ID, in this implementation it seems to be a autoincremental id"
   id: ID!
   "Proposal description in markdown format"
-  description: String
+  description: String!
   "Governance Framework that proposal is part of"
   governanceFramework: GovernanceFramework!
 
@@ -82,6 +82,8 @@ type Proposal @entity {
   forVotes: BigInt!
   "Votes abstaining to the proposal"
   abstainVotes: BigInt!
+  "Total for/against/abstaining votes"
+  totalVotes: BigInt!
   "Votes associated to this proposal"
   votes: [Vote!]! @derivedFrom(field: "proposal")
 

@@ -1,13 +1,18 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { YearnLensContract } from "../../../generated/aave-aave-eol/YearnLensContract";
 
-export function getYearnLensContract(network: string): YearnLensContract {
-  return YearnLensContract.bind(
-    Address.fromString(constants.YEARN_LENS_CONTRACT_ADDRESS.get(network))
-  );
+export function getYearnLensContract(
+  network: string
+): YearnLensContract | null {
+  const yearnLensAddress = constants.YEARN_LENS_CONTRACT_ADDRESS.get(network)!;
+  if (yearnLensAddress == constants.ZERO_ADDRESS) {
+    return null;
+  } else {
+    return YearnLensContract.bind(yearnLensAddress);
+  }
 }
 
 export function getTokenPriceFromYearnLens(

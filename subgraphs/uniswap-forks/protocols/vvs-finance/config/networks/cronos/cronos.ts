@@ -44,19 +44,19 @@ export class VSSFinanceCronosConfigurations implements Configurations {
     );
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("3.0");
+    return BigDecimal.fromString("0.3");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("1.0");
+    return BigDecimal.fromString("0.1");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("2.0");
+    return BigDecimal.fromString("0.2");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("3.0");
+    return BigDecimal.fromString("0.3");
   }
   getFeeOnOff(): string {
     return FeeSwitch.ON;

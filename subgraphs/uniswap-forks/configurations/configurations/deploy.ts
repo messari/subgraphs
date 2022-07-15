@@ -1,3 +1,6 @@
+// Add a numerical value associated with a deployment for each deployment.
+// The text associated with the integer should be included in the .json configuration file
+// for the protocol/network deployment in the `protocols` folder.
 export namespace Deploy {
   export const APESWAP_BSC = 0;
   export const APESWAP_MATIC = 1;
@@ -21,4 +24,6 @@ export namespace Deploy {
   export const SOLARBEAM_MOONRIVER = 19;
   export const VVS_FINANCE_CRONOS = 20;
   export const UBESWAP_CELO = 21;
+  export const HONEYSWAP_XDAI = 22;
+  export const HONEYSWAP_MATIC = 23;
 }

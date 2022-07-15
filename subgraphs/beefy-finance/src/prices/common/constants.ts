@@ -265,11 +265,8 @@ CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
 ///////////////////////////// SUSHISWAP CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const SUSHISWAP_DEFAULT_RESERVE_CALL = new SushiSwapPair__getReservesResult(
-  BIGINT_ZERO,
-  BIGINT_ZERO,
-  BIGINT_ZERO
-);
+export const SUSHISWAP_DEFAULT_RESERVE_CALL =
+  new SushiSwapPair__getReservesResult(BIGINT_ZERO, BIGINT_ZERO, BIGINT_ZERO);
 
 export const SUSHISWAP_CALCULATIONS_ADDRESS_MAP = new TypedMap<
   string,
@@ -537,7 +534,7 @@ UNISWAP_ROUTER_CONTRACT_ADDRESSES.set(
 ///////////////////////////// YEARNLENS CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS = new Map<string, string>();
+export const YEARN_LENS_CONTRACT_ADDRESS = new Map<string, Address>();
 YEARN_LENS_CONTRACT_ADDRESS.set(
   MAINNET.NETWORK_STRING,
   MAINNET.YEARN_LENS_CONTRACT_ADDRESS

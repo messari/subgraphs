@@ -10,6 +10,7 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   BIGINT_ONE,
+  BIGINT_TEN,
 } from "../constants";
 import { getLiquidityPoolFee } from "../getters";
 
@@ -17,11 +18,18 @@ export function percToDec(percentage: BigDecimal): BigDecimal {
   return percentage.div(BIGDECIMAL_HUNDRED);
 }
 
-export function calculateFee(pool: LiquidityPool, trackedAmountUSD: BigDecimal): BigDecimal[] {
+export function calculateFee(
+  pool: LiquidityPool,
+  trackedAmountUSD: BigDecimal
+): BigDecimal[] {
   let tradingFee = getLiquidityPoolFee(pool.fees[0]);
   let protocolFee = getLiquidityPoolFee(pool.fees[1]);
-  let tradingFeeAmount = trackedAmountUSD.times(percToDec(tradingFee.feePercentage));
-  let protocolFeeAmount = trackedAmountUSD.times(percToDec(protocolFee.feePercentage));
+  let tradingFeeAmount = trackedAmountUSD.times(
+    percToDec(tradingFee.feePercentage)
+  );
+  let protocolFeeAmount = trackedAmountUSD.times(
+    percToDec(protocolFee.feePercentage)
+  );
 
   return [tradingFeeAmount, protocolFeeAmount];
 }
@@ -34,6 +42,14 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
   return bd;
 }
 
+export function exponentToBigInt(decimals: i32): BigInt {
+  let bd = BIGINT_ONE;
+  for (let i = INT_ZERO; i < (decimals as i32); i = i + INT_ONE) {
+    bd = bd.times(BIGINT_TEN);
+  }
+  return bd;
+}
+
 export function exponentToBigDecimalBi(decimals: BigInt): BigDecimal {
   let bd = BIGDECIMAL_ONE;
   for (let i = BIGINT_ZERO; i.lt(decimals as BigInt); i = i.plus(BIGINT_ONE)) {
@@ -42,7 +58,10 @@ export function exponentToBigDecimalBi(decimals: BigInt): BigDecimal {
   return bd;
 }
 
-export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: i32): BigDecimal {
+export function convertTokenToDecimal(
+  tokenAmount: BigInt,
+  exchangeDecimals: i32
+): BigDecimal {
   if (exchangeDecimals == INT_ZERO) {
     return tokenAmount.toBigDecimal();
   }
@@ -57,6 +76,15 @@ export function convertFeeToPercent(fee: i64): BigDecimal {
 export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
   if (amount1.equals(BIGDECIMAL_ZERO)) {
     return BIGDECIMAL_ZERO;
+  } else {
+    return amount0.div(amount1);
+  }
+}
+
+// return 0 if denominator is 0 in division
+export function safeDivBigInt(amount0: BigInt, amount1: BigInt): BigInt {
+  if (amount1.equals(BIGINT_ZERO)) {
+    return BIGINT_ZERO;
   } else {
     return amount0.div(amount1);
   }

@@ -55,7 +55,7 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
       <Box sx={{ height: "100%" }}>
         <Box position="relative" sx={{ marginTop: "-38px" }}>
           {showDatePicker && (
-            <Box position="absolute" zIndex={2} top={30} border="1px solid white" sx={{ backgroundColor: "black" }}>
+            <Box position="absolute" zIndex={2} top={30} right={320} border="1px solid white">
               <LocalizationProvider dateAdapter={MomentAdapter}>
                 <StaticDatePicker
                   displayStaticWrapperAs="desktop"
@@ -67,10 +67,19 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
                   value={dates}
                   renderDay={(day, _selectedDates, pickersDayProps) => {
                     return (
-                      <PickersDay
-                        {...pickersDayProps}
-                        selected={dates.map((date: Moment) => date.format("l")).includes(day.format("l"))}
-                      />
+                      <div
+                        key={day.format("l")}
+                        onClick={() => {
+                          if (dates.map((date: Moment) => date.format("l")).includes(day.format("l"))) {
+                            setDates(dates.filter((date: Moment) => date.format("l") !== day.format("l")));
+                          }
+                        }}
+                      >
+                        <PickersDay
+                          {...pickersDayProps}
+                          selected={dates.map((date: Moment) => date.format("l")).includes(day.format("l"))}
+                        />
+                      </div>
                     );
                   }}
                   renderInput={(params) => <TextField {...params} />}

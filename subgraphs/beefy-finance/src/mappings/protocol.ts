@@ -5,7 +5,6 @@ import {
   dataSource,
   ethereum,
 } from "@graphprotocol/graph-ts";
-import { UniswapFeeRouter__removeLiquidityWithPermitResult } from "../../generated/aave-aave-eol/UniswapFeeRouter";
 import {
   BeefyStrategy,
   ChargedFees,
@@ -36,7 +35,6 @@ export function updateProtocolUsage(
 ): void {
   const protocol = getBeefyFinanceOrCreate(vault.id);
   protocol.totalValueLockedUSD = getTvlUsd(protocol);
-  protocol.protocolControlledValueUSD = protocol.totalValueLockedUSD;
   protocol.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers.plus(
     isNewUser(event.transaction.from)
   );
@@ -61,12 +59,10 @@ export function updateProtocolRevenueFromHarvest(
     .toBigDecimal()
     .times(token.lastPriceUSD)
     .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    transactionRevenue
-  );
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    transactionRevenue
-  );
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD.plus(transactionRevenue);
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(transactionRevenue);
   protocol.save();
 
   vault.fees = getFees(
@@ -84,9 +80,8 @@ export function updateProtocolRevenueFromChargedFees(
 ): void {
   updateProtocolUsage(event, vault, false, false);
   const protocol = getBeefyFinanceOrCreate(vault.id);
-  const native = WHITELIST_TOKENS_MAP.mustGet(dataSource.network()).mustGet(
-    "WETH"
-  );
+  const tokensMap = WHITELIST_TOKENS_MAP.get(dataSource.network());
+  const native = tokensMap!.get("WETH")!;
   const token = getTokenOrCreate(native, event.block);
   vault.fees = getFees(
     vault.id,
@@ -99,12 +94,10 @@ export function updateProtocolRevenueFromChargedFees(
     .toBigDecimal()
     .times(token.lastPriceUSD)
     .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    transactionRevenue
-  );
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    transactionRevenue
-  );
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(transactionRevenue);
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(transactionRevenue);
   protocol.save();
 
   updateDailyFinancialSnapshot(event.block, protocol);
@@ -137,12 +130,10 @@ export function updateProtocolRevenueFromWithdraw(
         .div(BIGDECIMAL_HUNDRED)
         .times(token.lastPriceUSD)
         .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
-      protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-        revenue
-      );
-      protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-        revenue
-      );
+      protocol.cumulativeProtocolSideRevenueUSD =
+        protocol.cumulativeProtocolSideRevenueUSD.plus(revenue);
+      protocol.cumulativeTotalRevenueUSD =
+        protocol.cumulativeTotalRevenueUSD.plus(revenue);
       protocol.save();
       break;
     }

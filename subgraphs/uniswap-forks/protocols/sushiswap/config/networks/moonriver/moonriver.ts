@@ -51,19 +51,19 @@ export class SushiswapMoonriverConfigurations implements Configurations {
     );
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("3");
+    return BigDecimal.fromString("0.3");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.5");
+    return BigDecimal.fromString("0.05");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("2.5");
+    return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("3");
+    return BigDecimal.fromString("0.3");
   }
   getFeeOnOff(): string {
     return FeeSwitch.ON;

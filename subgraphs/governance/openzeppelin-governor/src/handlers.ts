@@ -179,6 +179,7 @@ export function _handleProposalCreated(
   proposal.againstVotes = BIGINT_ZERO;
   proposal.forVotes = BIGINT_ZERO;
   proposal.abstainVotes = BIGINT_ZERO;
+  proposal.totalVotes = BIGINT_ZERO;
   proposal.targets = addressesToStrings(targets);
   proposal.values = values;
   proposal.signatures = signatures;
@@ -282,6 +283,8 @@ export function _handleVoteCast(
   } else if (support === 2) {
     proposal.abstainVotes = proposal.abstainVotes.plus(BIGINT_ONE);
   }
+  // Increment total
+  proposal.totalVotes = proposal.totalVotes.plus(BIGINT_ONE);
   proposal.save();
 
   // Add 1 to participant's proposal voting count

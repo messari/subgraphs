@@ -6,382 +6,12 @@ export const schema = (version: string): Schema => {
   versionGroupArr.pop();
   const versionGroup = versionGroupArr.join(".") + ".0";
   switch (versionGroup) {
-    case Versions.Schema100:
-      return schema100();
-    case Versions.Schema110:
-      return schema110();
     case Versions.Schema120:
       return schema120();
     case Versions.Schema130:
     default:
       return schema130();
   }
-};
-
-export const schema100 = (): Schema => {
-  const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "poolDailySnapshots"];
-
-  const entitiesData = {
-    financialsDailySnapshots: {
-      totalValueLockedUSD: "BigDecimal!",
-      totalVolumeUSD: "BigDecimal!",
-      protocolSideRevenueUSD: "BigDecimal!",
-      supplySideRevenueUSD: "BigDecimal!",
-      feesUSD: "BigDecimal!",
-    },
-    usageMetricsDailySnapshots: {
-      totalUniqueUsers: "Int!",
-      dailyTransactionCount: "Int!",
-      activeUsers: "Int!",
-    },
-    liquidityPoolDailySnapshots: {
-      totalValueLockedUSD: "BigDecimal!",
-      totalVolumeUSD: "BigDecimal!",
-      inputTokenBalances: "[BigInt!]!",
-      outputTokenSupply: "BigInt!",
-      outputTokenPriceUSD: "BigDecimal!",
-      rewardTokenEmissionsAmount: "[BigInt!]!",
-      rewardTokenEmissionsUSD: "[BigDecimal!]!",
-      timestamp: "BigInt!",
-    },
-  };
-  const query = `
-      query Data($poolId: String, $protocolId: String){
-        _meta {
-          block {
-            number
-          }
-          deployment
-        }
-        protocols {
-          name
-          type
-          schemaVersion
-          subgraphVersion
-        }
-        dexAmmProtocol(id: $protocolId) {
-          id
-          name
-          slug
-          schemaVersion
-          subgraphVersion
-          network
-          type
-          totalUniqueUsers
-          totalValueLockedUSD
-        }
-        dexAmmProtocols {
-          id
-          name
-          slug
-          schemaVersion
-          subgraphVersion
-          network
-          type
-          totalUniqueUsers
-          totalValueLockedUSD
-        }
-        liquidityPools {
-          id
-          name
-        }
-        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
-          totalValueLockedUSD
-          totalVolumeUSD
-          protocolSideRevenueUSD
-          supplySideRevenueUSD
-          feesUSD
-          timestamp
-        }
-        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
-          totalUniqueUsers
-          dailyTransactionCount
-          activeUsers
-          timestamp
-        }
-        poolDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {
-          totalValueLockedUSD
-          inputTokenBalances
-          outputTokenSupply
-          outputTokenPriceUSD
-          rewardTokenEmissionsAmount
-          rewardTokenEmissionsUSD
-          totalVolumeUSD
-          timestamp
-        }
-        liquidityPool(id: $poolId){
-          fees{
-            feePercentage
-            feeType
-          }
-          inputTokens {
-            name
-          }
-          outputToken {
-            name
-            decimals
-          }
-          rewardTokens {
-            id
-          }
-          name
-          symbol
-        }
-        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {
-          amountUSD
-          blockNumber
-          from
-          timestamp
-        }
-        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {
-          timestamp
-          blockNumber
-          from
-          amountUSD
-        }
-        swaps(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {
-          timestamp
-          from
-          amountIn
-          amountInUSD
-          amountOutUSD
-          amountOut
-        }
-      }
-    `;
-
-  const poolData = {
-    id: "ID!",
-    name: "String",
-    symbol: "String",
-    fees: "[LiquidityPoolFee!]!",
-    inputTokens: "[Token!]!",
-    outputToken: "Token",
-    rewardTokens: "[RewardToken!]",
-  };
-
-  const protocolFields = {
-    id: "ID!",
-    name: "String!",
-    slug: "String!",
-    schemaVersion: "String!",
-    subgraphVersion: "String!",
-    network: "Network!",
-    type: "ProtocolType!",
-    totalUniqueUsers: "Int!",
-    totalValueLockedUSD: "BigDecimal!",
-  };
-
-  const events = ["withdraws", "deposits", "swaps"];
-  return {
-    entities,
-    entitiesData,
-    query,
-    poolData,
-    events,
-    protocolFields,
-    poolTimeseriesQuery: "",
-    financialsQuery: "",
-    hourlyUsageQuery: "",
-    dailyUsageQuery: "",
-    protocolTableQuery: "",
-    poolsQuery: "",
-  };
-};
-
-export const schema110 = (): Schema => {
-  const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "poolDailySnapshots"];
-
-  const entitiesData = {
-    financialsDailySnapshots: {
-      totalValueLockedUSD: "BigDecimal!",
-      totalVolumeUSD: "BigDecimal!",
-      protocolSideRevenueUSD: "BigDecimal!",
-      supplySideRevenueUSD: "BigDecimal!",
-      totalRevenueUSD: "BigDecimal!",
-    },
-    usageMetricsDailySnapshots: {
-      totalUniqueUsers: "Int!",
-      dailyTransactionCount: "Int!",
-      activeUsers: "Int!",
-    },
-    liquidityPoolDailySnapshots: {
-      totalValueLockedUSD: "BigDecimal!",
-      totalVolumeUSD: "BigDecimal!",
-      inputTokenBalances: "[BigInt!]!",
-      outputTokenSupply: "BigInt!",
-      outputTokenPriceUSD: "BigDecimal!",
-      rewardTokenEmissionsAmount: "[BigInt!]!",
-      rewardTokenEmissionsUSD: "[BigDecimal!]!",
-      timestamp: "BigInt!",
-    },
-  };
-  const query = `
-      query Data($poolId: String, $protocolId: String){
-        _meta {
-          block {
-            number
-          }
-          deployment
-        }
-        protocols {
-          name
-          type
-          schemaVersion
-          subgraphVersion
-        }
-        dexAmmProtocol(id: $protocolId) {
-          id
-          name
-          slug
-          schemaVersion
-          subgraphVersion
-          methodologyVersion
-          network
-          type
-          totalUniqueUsers
-          totalValueLockedUSD
-          totalVolumeUSD
-        }
-        dexAmmProtocols {
-          id
-          name
-          slug
-          schemaVersion
-          subgraphVersion
-          methodologyVersion
-          network
-          type
-          totalUniqueUsers
-          totalValueLockedUSD
-          totalVolumeUSD
-        }
-        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
-          totalValueLockedUSD
-          totalVolumeUSD
-          protocolSideRevenueUSD
-          supplySideRevenueUSD
-          timestamp
-        }
-        liquidityPools {
-          id
-          name
-          fees{
-            feePercentage
-            feeType
-          }
-          inputTokens{
-            decimals
-            name
-          }
-          outputToken {
-            id
-            decimals
-          }
-          rewardTokens {
-            id
-          }
-          symbol
-        }
-        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
-          totalUniqueUsers
-          dailyTransactionCount
-          activeUsers
-          timestamp
-        }
-        poolDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {
-          totalValueLockedUSD
-          inputTokenBalances
-          outputTokenSupply
-          outputTokenPriceUSD
-          rewardTokenEmissionsAmount
-          rewardTokenEmissionsUSD
-          totalVolumeUSD
-          timestamp
-        }
-        liquidityPool(id: $poolId){
-          id
-          name
-          fees{
-            feePercentage
-            feeType
-          }
-          inputTokens{
-            decimals
-            name
-          }
-          outputToken {
-            id
-            decimals
-          }
-          rewardTokens {
-            id
-          }
-          symbol
-        }
-        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {
-          amountUSD
-          blockNumber
-          from
-          timestamp
-        }
-        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {
-          timestamp
-          blockNumber
-          from
-          amountUSD
-        }
-        swaps(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {
-          timestamp
-          from
-          amountIn
-          amountInUSD
-          amountOutUSD
-          amountOut
-        }
-      }
-      `;
-
-  const poolData = {
-    id: "ID!",
-    name: "String",
-    symbol: "String",
-    fees: "[LiquidityPoolFee!]!",
-    inputTokens: "[Token!]!",
-    outputToken: "Token",
-    rewardTokens: "[RewardToken!]",
-  };
-
-  const events = ["withdraws", "deposits", "swaps"];
-
-  const protocolFields = {
-    id: "ID!",
-    name: "String!",
-    slug: "String!",
-    schemaVersion: "String!",
-    subgraphVersion: "String!",
-    methodologyVersion: "String!",
-    network: "Network!",
-    type: "ProtocolType!",
-    totalUniqueUsers: "Int!",
-    totalValueLockedUSD: "BigDecimal!",
-    totalVolumeUSD: "BigDecimal!",
-  };
-
-  return {
-    entities,
-    entitiesData,
-    query,
-    poolData,
-    events,
-    protocolFields,
-    poolTimeseriesQuery: "",
-    financialsQuery: "",
-    hourlyUsageQuery: "",
-    dailyUsageQuery: "",
-    protocolTableQuery: "",
-    poolsQuery: "",
-  };
 };
 
 export const schema120 = (): Schema => {
@@ -397,7 +27,6 @@ export const schema120 = (): Schema => {
     financialsDailySnapshots: {
       id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
-      protocolControlledValueUSD: "BigDecimal",
       dailyVolumeUSD: "BigDecimal!",
       cumulativeVolumeUSD: "BigDecimal!",
       dailySupplySideRevenueUSD: "BigDecimal!",
@@ -513,10 +142,10 @@ export const schema120 = (): Schema => {
       event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}" + options + ") { ";
     let fields = eventsFields.join(",");
     if (event === "swaps") {
-      fields += ", amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}";
+      fields += ", hash, amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}";
     } else {
       fields +=
-        ", amountUSD, inputTokens{id, decimals}, inputTokenAmounts, outputToken{id, decimals}, outputTokenAmount";
+        ", hash, amountUSD, inputTokens{id, decimals}, inputTokenAmounts, outputToken{id, decimals}, outputTokenAmount";
     }
 
     return baseStr + fields + " }";
@@ -547,7 +176,6 @@ export const schema120 = (): Schema => {
         network
         type
         totalValueLockedUSD
-        protocolControlledValueUSD
         cumulativeVolumeUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
@@ -583,12 +211,28 @@ export const schema120 = (): Schema => {
     protocols {
       id
       methodologyVersion
+      network
       name
       type
       schemaVersion
       subgraphVersion
     }
-
+    dexAmmProtocols {
+      id
+      name
+      network
+      slug
+      schemaVersion
+      subgraphVersion
+      totalValueLockedUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeTotalRevenueUSD
+      cumulativeUniqueUsers
+      cumulativeVolumeUSD
+      methodologyVersion
+      type
+    }
     ${eventsQuery}
     liquidityPool(id: $poolId){
       id
@@ -641,7 +285,6 @@ export const schema120 = (): Schema => {
     network: "Network!",
     type: "ProtocolType!",
     totalValueLockedUSD: "BigDecimal!",
-    protocolControlledValueUSD: "BigDecimal",
     cumulativeVolumeUSD: "BigDecimal!",
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
@@ -678,7 +321,6 @@ export const schema130 = (): Schema => {
     financialsDailySnapshots: {
       id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
-      protocolControlledValueUSD: "BigDecimal",
       dailyVolumeUSD: "BigDecimal!",
       cumulativeVolumeUSD: "BigDecimal!",
       dailySupplySideRevenueUSD: "BigDecimal!",
@@ -778,8 +420,6 @@ export const schema130 = (): Schema => {
     Object.keys(entitiesData.liquidityPoolHourlySnapshots).join(",") +
     "}";
 
-  const eventsFields = ["timestamp", "blockNumber", "from"];
-
   const poolData: { [x: string]: string } = {
     id: "ID!",
     name: "String",
@@ -803,6 +443,8 @@ export const schema130 = (): Schema => {
     rewardTokenEmissionsUSD: "[BigDecimal!]",
   };
 
+  const eventsFields = ["timestamp", "blockNumber", "from"];
+
   // Query liquidityPool(pool) entity and events entities
   let events: string[] = ["deposits", "withdraws", "swaps"];
   let eventsQuery: any[] = events.map((event) => {
@@ -811,10 +453,10 @@ export const schema130 = (): Schema => {
       event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}" + options + ") { ";
     let fields = eventsFields.join(",");
     if (event === "swaps") {
-      fields += ", amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}";
+      fields += ", hash, amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}";
     } else {
       fields +=
-        ", amountUSD, inputTokens{id, decimals}, inputTokenAmounts, outputToken{id, decimals}, outputTokenAmount";
+        ", hash, amountUSD, inputTokens{id, decimals}, inputTokenAmounts, outputToken{id, decimals}, outputTokenAmount";
     }
 
     return baseStr + fields + " }";
@@ -845,7 +487,6 @@ export const schema130 = (): Schema => {
         network
         type
         totalValueLockedUSD
-        protocolControlledValueUSD
         cumulativeVolumeUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
@@ -882,12 +523,29 @@ export const schema130 = (): Schema => {
     protocols {
       id
       methodologyVersion
+      network
       name
       type
       schemaVersion
       subgraphVersion
     }
-
+    dexAmmProtocols {
+      id
+      name
+      network
+      slug
+      schemaVersion
+      subgraphVersion
+      totalPoolCount
+      totalValueLockedUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeTotalRevenueUSD
+      cumulativeUniqueUsers
+      cumulativeVolumeUSD
+      methodologyVersion
+      type
+    }
     ${eventsQuery}
     liquidityPool(id: $poolId){
       id
@@ -945,7 +603,6 @@ export const schema130 = (): Schema => {
     type: "ProtocolType!",
     totalValueLockedUSD: "BigDecimal!",
     totalPoolCount: "Int!",
-    protocolControlledValueUSD: "BigDecimal",
     cumulativeVolumeUSD: "BigDecimal!",
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",

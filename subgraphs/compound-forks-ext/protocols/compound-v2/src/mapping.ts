@@ -100,7 +100,13 @@ export function handleMint(event: Mint): void {
   let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
-  _handleMint(comptrollerAddr, minter, mintAmount, balanceOfUnderlyingResult, event);
+  _handleMint(
+    comptrollerAddr,
+    minter,
+    mintAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleRedeem(event: Redeem): void {
@@ -110,7 +116,13 @@ export function handleRedeem(event: Redeem): void {
   let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.redeemer
   );
-  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, balanceOfUnderlyingResult, event);
+  _handleRedeem(
+    comptrollerAddr,
+    redeemer,
+    redeemAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleBorrow(event: Borrow): void {
@@ -120,18 +132,31 @@ export function handleBorrow(event: Borrow): void {
   let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
-  _handleBorrow(comptrollerAddr, borrower, borrowAmount, borrowBalanceStoredResult, event);
+  _handleBorrow(
+    comptrollerAddr,
+    borrower,
+    borrowAmount,
+    borrowBalanceStoredResult,
+    event
+  );
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
   let payer = event.params.payer;
-  let borrower = event.params.borrower
+  let borrower = event.params.borrower;
   let repayAmount = event.params.repayAmount;
   let contract = CToken.bind(event.address);
   let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
-  _handleRepayBorrow(comptrollerAddr, borrower, payer, repayAmount, borrowBalanceStoredResult, event);
+  _handleRepayBorrow(
+    comptrollerAddr,
+    borrower,
+    payer,
+    repayAmount,
+    borrowBalanceStoredResult,
+    event
+  );
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
