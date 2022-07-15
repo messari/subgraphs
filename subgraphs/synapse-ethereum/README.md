@@ -1,4 +1,4 @@
-# Saddle Finance (AMM + Bridge) Ethereum Subgraph
+# Synapse Protocol (AMM + Bridge) Ethereum Subgraph
 
 ## Calculation Methodology v1.0.0
 
