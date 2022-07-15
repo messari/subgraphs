@@ -357,7 +357,7 @@
           "template": "compound-v2.template.yaml",
           "messari": "messari/compound-ethereum",
           "dmelotik": "dmelotik/compound-ethereum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       },
       "cream-finance": {
@@ -642,42 +642,42 @@
         "arbitrum": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-arbitrum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "avalanche": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-avalanche",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "bsc": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-bsc",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "fantom": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-fantom",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "matic": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-polygon",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "moonriver": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-moonriver",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "optimism": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-optimism",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "xdai": {
           "template": "qidao.template.yaml",
           "messari": "messari/qidao-gnosis",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -897,7 +897,7 @@
         "mainnet": {
           "template": "vesper.finance.template.yaml",
           "messari": "messari/vesper-ethereum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
