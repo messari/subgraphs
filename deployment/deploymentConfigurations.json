@@ -883,6 +883,15 @@
         }
       }
     },
+    "openzeppelin-governor": {
+      "truefi-governance": {
+        "mainnet": {
+          "template": "truefi-governance.template.yaml",
+          "danielkhoo": "danielkhoo/truefi-governance",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "vesper-finance": {
       "vesper-finance": {
         "mainnet": {
