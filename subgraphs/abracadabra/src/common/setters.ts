@@ -1,7 +1,7 @@
-import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { Market, Liquidate, LiquidateProxy } from "../../generated/schema";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Market, LiquidateProxy } from "../../generated/schema";
 import { Cauldron, LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
-import { getMIMAddress, getOrCreateInterestRate, getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
+import { getOrCreateInterestRate, getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
 import {
   BIGDECIMAL_ZERO,
   BIGDECIMAL_ONE,
@@ -49,7 +49,7 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     MarketEntity.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
     MarketEntity.inputTokenBalance = BIGINT_ZERO;
     MarketEntity.outputTokenSupply = BIGINT_ZERO;
-    MarketEntity.outputTokenPriceUSD = BIGDECIMAL_ONE;
+    MarketEntity.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     MarketEntity.createdTimestamp = blockTimestamp;
     MarketEntity.createdBlockNumber = blockNumber;
     MarketEntity.maximumLTV = BIGDECIMAL_ZERO;
