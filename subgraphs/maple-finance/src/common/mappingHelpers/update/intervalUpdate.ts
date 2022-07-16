@@ -97,8 +97,8 @@ function intervalUpdateMarket(event: ethereum.Event, market: Market): Market {
 
     market.totalBorrowBalanceUSD = getTokenAmountInUSD(event, inputToken, market._totalBorrowBalance);
 
-    market._cumulativeTotalRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(
-        market._cumulativeSupplySideRevenueUSD
+    market.cumulativeTotalRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(
+        market.cumulativeSupplySideRevenueUSD
     );
 
     let rewardTokenEmissionAmount = new Array<BigInt>();
@@ -147,7 +147,7 @@ function intervalUpdateProtocol(event: ethereum.Event, marketBefore: Market, mar
         marketAfter.totalBorrowBalanceUSD.minus(marketBefore.totalBorrowBalanceUSD)
     );
 
-    const deltaRevenueUSD = marketAfter._cumulativeTotalRevenueUSD.minus(marketBefore._cumulativeTotalRevenueUSD);
+    const deltaRevenueUSD = marketAfter.cumulativeTotalRevenueUSD.minus(marketBefore.cumulativeTotalRevenueUSD);
     protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(deltaRevenueUSD);
 
     ////
@@ -165,6 +165,9 @@ export function intervalUpdateMarketHourlySnapshot(event: ethereum.Event, market
 
     marketSnapshot.rates = market.rates;
     marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+    marketSnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+    marketSnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+    marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
     marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
     marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
     marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -177,6 +180,10 @@ export function intervalUpdateMarketHourlySnapshot(event: ethereum.Event, market
     marketSnapshot.exchangeRate = market.exchangeRate;
     marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
     marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+
+    marketSnapshot.hourlyTotalRevenueUSD = marketSnapshot.hourlySupplySideRevenueUSD.plus(
+        marketSnapshot.hourlyProtocolSideRevenueUSD
+    );
 
     marketSnapshot.save();
     // Hourly accumulators are event driven updates
@@ -187,6 +194,9 @@ export function intervalUpdateMarketDailySnapshot(event: ethereum.Event, market:
 
     marketSnapshot.rates = market.rates;
     marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+    marketSnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+    marketSnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+    marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
     marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
     marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
     marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -199,6 +209,10 @@ export function intervalUpdateMarketDailySnapshot(event: ethereum.Event, market:
     marketSnapshot.exchangeRate = market.exchangeRate;
     marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
     marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+
+    marketSnapshot.dailyTotalRevenueUSD = marketSnapshot.dailySupplySideRevenueUSD.plus(
+        marketSnapshot.dailyProtocolSideRevenueUSD
+    );
 
     marketSnapshot.save();
     // Daily accumulators are event driven updates
