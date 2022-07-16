@@ -48,8 +48,9 @@ The Multichain team has provided an API point for query all the Bridges:
 https://bridgeapi.anyswap.exchange/v2/serverInfo/250
 
 #### Metrics
-For metrics relevant to Bridge:
+For metrics relevant to Bridge (to add to the metrics data from Router service to form the overall Metrics of the protocol):
 - TVL on a chain is the balance of all assets in the Bridge addresses on the origination (sending) chain
+- Revenue is the difference of the amount a user sent to the Bridge address in the origination chain less then amount paid out to the user in destination chain. For the fee rate, please refer to the Fees section for details. Revenue are therefore accrued on the origination chain. However, Multichain has a also a cost component, as the protocol has bear the gas fee cost of sending the assets to the user on the destination chain. The revenue here should be net revenue of bridging fee less the gas fee cost incurred on the destination chain. (The gas fee cost on the origination chain is paid by the user.) It's not explicitly mentioned in the documentation how this fee is distributed; but since there's liquidity provider in the case of Bridge service, 100% of the fees are kept by the  protocol (only accounted and distributed amongst different parties, i.e Safety Fund, veMulti stakers and SMPC nodes.)
 - Usage of the Bridge are deposits (Transfer In) and withdrawals (Transfer Out) from thses address.
 Please note that these addresses are not smart contracts, but wallet addresses controlled by the SMPC nodes.
 
@@ -71,7 +72,7 @@ https://bridgeapi.anyswap.exchange/v3/serverinfoV3?chainId=all&version=all . Thi
 
 
 #### Metrics
-For metrics relevant to Router:
+For metrics relevant to Router (to add to the metrics data from Bridge service to form the overall Metrics of the protocol):
 
 *Usage and transactions*
 
@@ -83,6 +84,10 @@ Users of Multichain are people who either use the router services or provide liq
   
 - Supplying Liquidity to pool: This is only relevant where anyTOKEN smart contract is available for liquidity providing purposes. Supply and withdraw liquidity are Deposit and Withdraw transactions of the anyTOKEN contract. 
   - For users who did not receive the native tokens in a cross-chain transfer due to temporary lack of liquidity in the pool, they are given the anyTOKEN of that that pool, and in this case they are technically considered as having provided liquidity to the pool.
+
+*Revenue*
+- Revenue is the difference of the amount a user sent to the router address in the origination chain less then amount paid out to the user in destination chain. Revenue are therefore accrued on the origination chain. For the fee rate, please refer to the Fees section for details. However, Multichain has a also a cost component, as the protocol has bear the gas fee cost of sending the assets to the user on the destination chain. The revenue here should be net revenue of bridging fee less the gas fee cost incurred on the destination chain. (The gas fee cost on the origination chain is paid by the user.)
+- Protocol-side revenue currently is 55% of the quarterly bridge fees (10% to the protocol's Safety Fund, and 45% to veMulti stakers). Distribution to MULTI token stakers is dispersed every quarter. The rest 45% is then supply-side revenue accrued to liquidity providers.
 
 *TVL*
 - TVL: liquidity in Multichain on any chain is to sum up the native token values in all the anyTOKEN smart contracts on that chain. 
