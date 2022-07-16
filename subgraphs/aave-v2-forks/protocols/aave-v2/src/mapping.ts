@@ -261,6 +261,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     if (!tryRewardInfo.reverted) {
       let tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
       if (!tryRewardAsset.reverted) {
+        log.warning("reward asset: {}", [tryRewardAsset.value.toHexString()]);
         // create reward tokens
         let depositRewardToken = getOrCreateRewardToken(
           tryRewardAsset.value,
