@@ -35,8 +35,6 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
 
         const poolContract = PoolContract.bind(marketAddress);
 
-        poolContract.try_name;
-
         const marketName = readCallResult(poolContract.try_name(), "UNDEFINED", poolContract.try_name.name);
 
         const poolFactoryAddress = readCallResult(
@@ -120,6 +118,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
         market._cumulativeInterest = ZERO_BI;
         market._cumulativeInterestClaimed = ZERO_BI;
         market._cumulativePoolLosses = ZERO_BI;
+        market._recognizedPoolLosses = ZERO_BI;
         market._cumulativePoolDelegateRevenue = ZERO_BI;
         market._cumulativeTreasuryRevenue = ZERO_BI;
         market._totalDepositBalance = ZERO_BI;
@@ -167,6 +166,7 @@ export function getOrCreateStakeLocker(event: ethereum.Event, stakeLockerAddress
         stakeLocker.cumulativeStake = ZERO_BI;
         stakeLocker.cumulativeUnstake = ZERO_BI;
         stakeLocker.cumulativeLosses = ZERO_BI;
+        stakeLocker.recognizedLosses = ZERO_BI;
         stakeLocker.cumulativeLossesInPoolInputToken = ZERO_BI;
         stakeLocker.cumulativeInterestInPoolInputTokens = ZERO_BI;
 
@@ -398,7 +398,6 @@ export function getOrCreateAccountMarket(
         accountMarket = new _AccountMarket(id);
 
         accountMarket.market = market.id;
-        accountMarket.unrecognizedLosses = ZERO_BI;
         accountMarket.recognizedLosses = ZERO_BI;
 
         accountMarket.creationBlockNumber = event.block.number;
