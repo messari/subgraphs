@@ -14,13 +14,18 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - LidoSubmission
         - Token
+        - Pool
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
         - Protocol
-        - FinancialsDailySnapshot 
+        - FinancialsDailySnapshot
         - UsageMetricsDailySnapshot
         - UsageMetricsHourlySnapshot
       abis:
+        ###########################################
+        ########### Lido Generic ABIs #############
+        ###########################################
         - name: Lido
           file: ./abis/Lido.json
         - name: NodeOperatorsRegistry
@@ -29,6 +34,10 @@ dataSources:
           file: ./abis/LidoOracle.json
         - name: ERC20
           file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
         # ERC20
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
@@ -67,58 +76,3 @@ dataSources:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/mappings/Lido.ts
-  - kind: ethereum/contract
-    name: LidoOracle
-    network: mainnet
-    source:
-      address: "0x442af784A788A5bd6F42A01Ebe9F287a871243fb"
-      abi: LidoOracle
-      startBlock: 11473216
-      # startBlock: 15073216
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - LidoOracle
-      abis:
-        - name: LidoOracle
-          file: ./abis/LidoOracle.json
-        - name: Lido
-          file: ./abis/Lido.json
-        # ERC20
-        - name: _ERC20
-          file: ./abis/Prices/ERC20.json
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: PostTotalShares(uint256,uint256,uint256,uint256)
-          handler: handlePostTotalShares
-      file: ./src/mappings/LidoOracle.ts
