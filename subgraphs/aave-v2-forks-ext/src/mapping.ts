@@ -25,7 +25,6 @@ import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
-  bigIntToBigDecimal,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
   EventType,
