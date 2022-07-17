@@ -42,6 +42,7 @@ export function handleReward(
     pid
   );
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
+  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
   // Check if the liquidity pool address is available. Try to get it if not or return if the contract call was reverted
   if (!masterChefPool.poolAddress) {
@@ -125,6 +126,7 @@ export function handleReward(
   let masterPoolAllocPID250: BigInt = BIGINT_ZERO;
   if (!getPoolInfo250.reverted) {
     masterPoolAllocPID250 = getPoolInfo250.value.value1;
+    masterChefV2.totalAllocPoint = masterPoolAllocPID250;
   }
 
   // Total allocation to staking pools that are giving out rewards to users in MasterChef (V1)
@@ -138,6 +140,12 @@ export function handleReward(
     .div(masterChef.totalAllocPoint)
     .times(masterChef.rewardTokenRate);
   masterChef.lastUpdatedRewardRate = event.block.number;
+
+  // Calculate Adjusted Reward Emission per Block to the MasterChefV2 Contract
+  masterChefV2.adjustedRewardTokenRate = masterChefV2.totalAllocPoint
+    .div(masterChef.totalAllocPoint)
+    .times(masterChef.rewardTokenRate);
+  masterChefV2.lastUpdatedRewardRate = event.block.number;
 
   log.warning("USED TOTAL ALLOCATION: " + usedTotalAllocation.toString(), []);
   log.warning("TOTAL ALLOCATION: " + masterChef.totalAllocPoint.toString(), []);
@@ -181,6 +189,7 @@ export function handleReward(
 
   masterChefPool.save();
   masterChef.save();
+  masterChefV2.save();
   rewardToken.save();
   nativeToken.save();
   pool.save();
