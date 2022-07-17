@@ -14,6 +14,7 @@ import {
   LendingPoolAddressesProvider as AddressProviderContract,
 } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
+  AAVE_DECIMALS,
   getNetworkSpecificConstant,
   Protocol,
   USDC_TOKEN_ADDRESS,
