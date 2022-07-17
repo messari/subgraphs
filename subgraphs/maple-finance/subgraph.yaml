@@ -296,8 +296,6 @@ templates:
                 file: ./abis/Calculations/SushiSwap.json
 
           eventHandlers:
-              - event: LossesRecognized(indexed address,uint256,uint256)
-                handler: handleLossesRecognized
               - event: Transfer(indexed address,indexed address,uint256)
                 handler: handleTransfer
               - event: PoolStateChanged(uint8)
@@ -388,6 +386,8 @@ templates:
                 handler: handleStake
               - event: Unstake(indexed address,uint256)
                 handler: handleUnstake
+              - event: LossesRecognized(indexed address,uint256,uint256)
+                handler: handleLossesRecognized
 
     - name: LoanV1
       kind: ethereum/contract
@@ -723,5 +723,5 @@ templates:
               - function: updatePeriodFinish(uint256)
                 handler: handleUpdatePeriodFinish
 # graft:
-#     base: QmbHyZcV8BC2Sg3eEPpwwDV3BJXbmjxpKpdBmmGLgygAvA
-#     block: 13347805
+#     base: QmRZRW9JbWS8Pz3pSCFz4KYzdxE3hsH4o6zuzY1FEJZpAH
+#     block: 15115190
