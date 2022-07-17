@@ -287,7 +287,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
           .times(rewardTokenPriceUSD);
-          
+
         // set rewards to arrays
         market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
         market.rewardTokenEmissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
