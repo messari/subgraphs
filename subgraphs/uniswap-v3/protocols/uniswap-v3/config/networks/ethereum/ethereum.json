@@ -1,0 +1,8 @@
+{
+  "network": "mainnet",
+  "startBlock": 12369620,
+  "deployment": "UNISWAP_V3_ETHEREUM",
+  "graftEnabled": true,
+  "subgraphId": "QmYH9eXvZoLX6gox87wamg7WcdnkKqWxc5YqjLwY6KpLFu",
+  "graftStartBlock": 13639984
+}
