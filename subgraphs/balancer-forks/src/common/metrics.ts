@@ -151,8 +151,8 @@ export function updateVolumeAndFee(
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD);
 
   let tradingFeeAmountUSD = trackedAmountUSD.times(tradingFee.feePercentage!);
-  let supplyFeeAmountUSD = tradingFeeAmountUSD.times(supplyFee.feePercentage!);
-  let protocolFeeAmountUSD = tradingFeeAmountUSD.times(protocolFee.feePercentage!);
+  let supplyFeeAmountUSD = trackedAmountUSD.times(supplyFee.feePercentage!);
+  let protocolFeeAmountUSD = trackedAmountUSD.times(protocolFee.feePercentage!);
 
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
