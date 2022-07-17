@@ -282,6 +282,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
           tryRewardAsset.value,
           Address.fromString(protocol.priceOracle)
         );
+
         let rewardsPerDayUSD = rewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
