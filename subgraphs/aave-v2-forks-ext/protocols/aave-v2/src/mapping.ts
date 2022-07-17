@@ -425,6 +425,11 @@ function getAssetPriceInUSDC(
     return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
   }
 
+  // Avalanche Oracle return the price offset by 8 decimals
+  if (equalsIgnoreCase(dataSource.network(), Network.AVALANCHE)) {
+    return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
+  }
+
   // otherwise return the output of the price oracle
   let inputToken = getOrCreateToken(tokenAddress);
   return oracleResult
