@@ -1,9 +1,10 @@
 import { PoolCreated as PoolCreatedEvent } from "../../generated/templates/PoolFactory/PoolFactory";
 import { Pool as PoolTemplate, StakeLocker as StakeLockerTemplate } from "../../generated/templates";
-import { getOrCreatePoolFactory } from "../common/mappingHelpers/getOrCreate/protocol";
+import { getOrCreatePoolFactory, getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { getOrCreateMarket, getOrCreateStakeLocker } from "../common/mappingHelpers/getOrCreate/markets";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
+import { ONE_BI, ONE_I32 } from "../common/constants";
 
 export function handlePoolCreated(event: PoolCreatedEvent): void {
     const poolAddress = event.params.pool;
@@ -37,6 +38,13 @@ export function handlePoolCreated(event: PoolCreatedEvent): void {
     // Create the stake locker for this market
     ////
     getOrCreateStakeLocker(event, stakeLockerAddress);
+
+    ////
+    // Update protocol
+    ////
+    const protocol = getOrCreateProtocol();
+    protocol.totalPoolCount += ONE_I32;
+    protocol.save();
 
     ////
     // Trigger interval update

@@ -256,6 +256,7 @@ export function createLiquidate(
     liquidate.asset = market.inputToken;
     liquidate.from = market._stakeLocker;
     liquidate.to = market._liquidityLockerAddress;
+    liquidate.liquidatee = loan.borrower;
     liquidate._defaultSufferedByStakeLocker = defaultSufferedByStakeLocker;
     liquidate._defaultSufferedByPool = defaultsufferedByPool;
     liquidate.amount = liquidate._defaultSufferedByStakeLocker.plus(liquidate._defaultSufferedByPool);

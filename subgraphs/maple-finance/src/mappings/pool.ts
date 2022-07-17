@@ -110,6 +110,24 @@ export function handleTransfer(event: TransferEvent): void {
         market.save();
 
         ////
+        // Update financial snapshot
+        ////
+        const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+        financialsDailySnapshot.dailyWithdrawUSD = financialsDailySnapshot.dailyWithdrawUSD.plus(withdraw.amountUSD);
+        financialsDailySnapshot.save();
+
+        ////
+        // Update market snapshot
+        ////
+        const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
+        marketDailySnapshot.dailyWithdrawUSD = marketDailySnapshot.dailyWithdrawUSD.plus(withdraw.amountUSD);
+        marketDailySnapshot.save();
+
+        const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+        MarketHourlySnapshot.hourlyWithdrawUSD = MarketHourlySnapshot.hourlyWithdrawUSD.plus(withdraw.amountUSD);
+        MarketHourlySnapshot.save();
+
+        ////
         // Trigger interval update
         ////
         intervalUpdate(event, market);
@@ -202,38 +220,41 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
 export function handleClaim(event: ClaimEvent): void {
     const market = getOrCreateMarket(event, event.address);
     const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
-    const poolInterest = event.params.interest;
-    const poolDelegatePotion = event.params.poolDelegatePortion;
-    const stakeLockerPortion = event.params.stakeLockerPortion;
+    const poolInterestAmount = event.params.interest;
+    const poolDelegateInterestAmount = event.params.poolDelegatePortion;
+    const stakeLockerInterestAmount = event.params.stakeLockerPortion;
+    const principalRepayAmount = event.params.principal;
+
+    const principalRepayAmountUSD = getTokenAmountInUSD(event, inputToken, principalRepayAmount);
+    const totalInterestAmountUSD = getTokenAmountInUSD(
+        event,
+        inputToken,
+        poolInterestAmount.plus(poolDelegateInterestAmount).plus(stakeLockerInterestAmount)
+    );
 
     ////
     // Update stake locker
     ////
     const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
     stakeLocker.cumulativeInterestInPoolInputTokens = stakeLocker.cumulativeInterestInPoolInputTokens.plus(
-        stakeLockerPortion
+        poolDelegateInterestAmount
     );
     stakeLocker.save();
 
     ////
     // Update market
     ////
-    market._cumulativePrincipalRepay = market._cumulativePrincipalRepay.plus(event.params.principal);
-    market._cumulativeInterest = market._cumulativeInterest.plus(poolInterest);
-    market._cumulativePoolDelegateRevenue = market._cumulativePoolDelegateRevenue.plus(poolDelegatePotion);
-    const amountUSD = getTokenAmountInUSD(
-        event,
-        inputToken,
-        poolInterest.plus(poolDelegatePotion).plus(stakeLockerPortion)
-    );
-    market._cumulativeSupplySideRevenueUSD = market._cumulativeSupplySideRevenueUSD.plus(amountUSD);
+    market._cumulativePrincipalRepay = market._cumulativePrincipalRepay.plus(principalRepayAmount);
+    market._cumulativeInterest = market._cumulativeInterest.plus(poolInterestAmount);
+    market._cumulativePoolDelegateRevenue = market._cumulativePoolDelegateRevenue.plus(poolDelegateInterestAmount);
+    market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(totalInterestAmountUSD);
     market.save();
 
     ////
     // Update protocol
     ////
     const protocol = getOrCreateProtocol();
-    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(amountUSD);
+    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(totalInterestAmountUSD);
     protocol.save();
 
     ////
@@ -241,9 +262,30 @@ export function handleClaim(event: ClaimEvent): void {
     ////
     const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
     financialsDailySnapshot.dailySupplySideRevenueUSD = financialsDailySnapshot.dailySupplySideRevenueUSD.plus(
-        amountUSD
+        totalInterestAmountUSD
     );
     financialsDailySnapshot.save();
+
+    ////
+    // Update market snapshot
+    ////
+    const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
+    marketDailySnapshot.dailySupplySideRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
+        totalInterestAmountUSD
+    );
+    marketDailySnapshot.dailyRepayUSD = marketDailySnapshot.dailyRepayUSD.plus(
+        principalRepayAmountUSD.plus(totalInterestAmountUSD)
+    );
+    marketDailySnapshot.save();
+
+    const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+    marketHourlySnapshot.hourlySupplySideRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
+        totalInterestAmountUSD
+    );
+    marketHourlySnapshot.hourlyRepayUSD = marketHourlySnapshot.hourlyRepayUSD.plus(
+        principalRepayAmountUSD.plus(totalInterestAmountUSD)
+    );
+    marketHourlySnapshot.save();
 
     ////
     // Trigger interval update
