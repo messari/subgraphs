@@ -203,10 +203,6 @@ export function updateMarketSnapshots(
     timestamp,
     blockNumber
   );
-  marketDailySnapshot.protocol = market.protocol;
-  marketDailySnapshot.market = market.id;
-  marketDailySnapshot.blockNumber = blockNumber;
-  marketDailySnapshot.timestamp = timestamp;
   marketDailySnapshot.rates = getSnapshotRates(
     market.rates,
     (timestamp.toI32() / SECONDS_PER_DAY).toString()

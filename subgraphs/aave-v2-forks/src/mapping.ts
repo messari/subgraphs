@@ -23,7 +23,6 @@ import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
-  bigIntToBigDecimal,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
   EventType,
@@ -302,18 +301,11 @@ export function _handleReserveDataUpdated(
     return;
   }
 
-  log.warning("pre borrow. assetPrice: {}", [assetPriceUSD.toString()]);
-
   let totalBorrowBalance = sBorrowBalance
     .plus(vBorrowBalance)
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals));
-  log.warning("post add: balance {} price {}", [
-    totalBorrowBalance.toString(),
-    assetPriceUSD.toString(),
-  ]);
   market.totalBorrowBalanceUSD = totalBorrowBalance.times(assetPriceUSD);
-  log.warning("post multiply", []);
 
   // update total supply balance
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
@@ -334,14 +326,6 @@ export function _handleReserveDataUpdated(
     return;
   }
 
-  log.warning("pre deposit: balance: {}", [
-    market.inputTokenBalance
-      .toBigDecimal()
-      .div(exponentToBigDecimal(inputToken.decimals))
-      .toString(),
-  ]);
-  log.warning("input token: {} decimals; {}", [inputToken.id, inputToken.decimals.toString()]);
-
   market.inputTokenBalance = tryTotalSupply.value;
   market.outputTokenSupply = tryTotalSupply.value;
   market.totalDepositBalanceUSD = market.inputTokenBalance
@@ -352,12 +336,10 @@ export function _handleReserveDataUpdated(
 
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
-  log.warning("pre rev", []);
   let liquidityIndexDiff = liquidityIndex
     .minus(market.liquidityIndex)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
-  log.warning("liquidityIndexDiff: {}", [liquidityIndexDiff.toString()]);
   market.liquidityIndex = liquidityIndex; // must update to current liquidity index
   let newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
@@ -396,10 +378,8 @@ export function _handleReserveDataUpdated(
     InterestRateType.STABLE,
     rayToWad(stableBorrowRate)
       .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS-2)) // TODO: check this is correct
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
-
-  log.warning("post sRate", []);
 
   let vBorrowRate = createInterestRate(
     market.id,
@@ -407,10 +387,8 @@ export function _handleReserveDataUpdated(
     InterestRateType.VARIABLE,
     rayToWad(variableBorrowRate)
       .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS-2))
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
-
-  log.warning("post vRate", []);
 
   let depositRate = createInterestRate(
     market.id,
@@ -418,10 +396,8 @@ export function _handleReserveDataUpdated(
     InterestRateType.VARIABLE,
     rayToWad(liquidityRate)
       .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS-2))
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
-
-  log.warning("post dRate", []);
 
   market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
   market.save();
