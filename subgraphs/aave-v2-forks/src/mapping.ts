@@ -367,7 +367,7 @@ export function _handleReserveDataUpdated(
   protocol.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
 
-  log.info("[ReserveDataUpdated] New revenue: {}", [
+  log.info("[ReserveDataUpdated] New total revenue: {}", [
     totalRevenueDeltaUSD.toString(),
   ]);
 
