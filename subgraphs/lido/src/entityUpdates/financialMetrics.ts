@@ -41,21 +41,16 @@ export function updateProtocolAndPoolTvl(
   pool.save();
 
   // Pool Daily and Hourly
-  // updateSnapshotsTvl(event.block) is called separately when protocol and supply side
-  // revenue metrics are being calculated to consolidate all revenue metrics into same snapshots
+  // updateSnapshotsTvl(event.block) is called separately when protocol and supply side revenue
+  // metrics are being calculated to consolidate respective revenue metrics into same snapshots
 
   // Protocol
   protocol.totalValueLockedUSD = pool.totalValueLockedUSD;
   protocol.save();
 
   // Financials Daily
-  // updateSnapshotsTvl(event.block) is called separately when protocol and supply side
-  // revenue metrics are being calculated to consolidate all revenue metrics into same snapshots
-
-  // TODO:
-  // Are these resulting in more entities?
-  // Should we consider moving Tvl to handleTransfer()?
-  // Potentially "eth2 deposit calls" from "lido" contract?
+  // updateSnapshotsTvl(event.block) is called separately when protocol and supply side revenue
+  // metrics are being calculated to consolidate respective revenue metrics into same snapshots
 }
 
 export function updateSnapshotsTvl(block: ethereum.Block): void {
@@ -103,58 +98,55 @@ export function updateTotalRevenueMetrics(
     block
   );
 
-  // TODO: do we want get a pool object and check this in Lido.ts ?
-  if (totalShares > pool.outputTokenSupply!) {
-    // Staking Rewards
-    const stakingRewards = bigIntToBigDecimal(
-      postTotalPooledEther.minus(preTotalPooledEther)
-    );
-    const stakingRewardsUSD = stakingRewards.times(
-      getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
-        .lastPriceUSD!
-    );
+  // Staking Rewards
+  const stakingRewards = bigIntToBigDecimal(
+    postTotalPooledEther.minus(preTotalPooledEther)
+  );
+  const stakingRewardsUSD = stakingRewards.times(
+    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
+      .lastPriceUSD!
+  );
 
-    // Pool
-    pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
-      stakingRewardsUSD
-    );
-    pool.outputTokenSupply = totalShares;
-    pool.outputTokenPriceUSD = getOrCreateToken(
-      Address.fromString(PROTOCOL_ID),
-      block.number
-    ).lastPriceUSD;
-    pool.save();
+  // Pool
+  pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
+    stakingRewardsUSD
+  );
+  pool.outputTokenSupply = totalShares;
+  pool.outputTokenPriceUSD = getOrCreateToken(
+    Address.fromString(PROTOCOL_ID),
+    block.number
+  ).lastPriceUSD;
+  pool.save();
 
-    // Pool Daily
-    poolMetricsDailySnapshot.cumulativeTotalRevenueUSD =
-      pool.cumulativeTotalRevenueUSD;
-    poolMetricsDailySnapshot.dailyTotalRevenueUSD = poolMetricsDailySnapshot.dailyTotalRevenueUSD.plus(
-      stakingRewardsUSD
-    );
-    poolMetricsDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
-    poolMetricsDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-    poolMetricsDailySnapshot.save();
+  // Pool Daily
+  poolMetricsDailySnapshot.cumulativeTotalRevenueUSD =
+    pool.cumulativeTotalRevenueUSD;
+  poolMetricsDailySnapshot.dailyTotalRevenueUSD = poolMetricsDailySnapshot.dailyTotalRevenueUSD.plus(
+    stakingRewardsUSD
+  );
+  poolMetricsDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
+  poolMetricsDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsDailySnapshot.save();
 
-    // Pool Hourly
-    poolMetricsHourlySnapshot.cumulativeTotalRevenueUSD =
-      pool.cumulativeTotalRevenueUSD;
-    poolMetricsHourlySnapshot.hourlyTotalRevenueUSD = poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.plus(
-      stakingRewardsUSD
-    );
-    poolMetricsHourlySnapshot.outputTokenSupply = pool.outputTokenSupply;
-    poolMetricsHourlySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-    poolMetricsHourlySnapshot.save();
+  // Pool Hourly
+  poolMetricsHourlySnapshot.cumulativeTotalRevenueUSD =
+    pool.cumulativeTotalRevenueUSD;
+  poolMetricsHourlySnapshot.hourlyTotalRevenueUSD = poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.plus(
+    stakingRewardsUSD
+  );
+  poolMetricsHourlySnapshot.outputTokenSupply = pool.outputTokenSupply;
+  poolMetricsHourlySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsHourlySnapshot.save();
 
-    // Protocol
-    protocol.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
-    protocol.save();
+  // Protocol
+  protocol.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  protocol.save();
 
-    // Financials Daily
-    financialMetrics.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
-    financialMetrics.dailyTotalRevenueUSD =
-      poolMetricsDailySnapshot.dailyTotalRevenueUSD;
-    financialMetrics.save();
-  }
+  // Financials Daily
+  financialMetrics.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  financialMetrics.dailyTotalRevenueUSD =
+    poolMetricsDailySnapshot.dailyTotalRevenueUSD;
+  financialMetrics.save();
 }
 
 export function updateProtocolSideRevenueMetrics(
@@ -173,7 +165,7 @@ export function updateProtocolSideRevenueMetrics(
     block
   );
 
-  // TODO: Rewards are minted in stETH shares, we should price with stETH. CONFIRM.
+  // TODO: Rewards are minted in stETH shares, should we price with stETH? CONFIRM.
   const amountUSD = bigIntToBigDecimal(amount).times(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!

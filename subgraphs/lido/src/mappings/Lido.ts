@@ -1,7 +1,8 @@
-import { Lido, Submitted, Transfer } from "../../generated/Lido/Lido";
-import { NodeOperatorsRegistry } from "../../generated/Lido/NodeOperatorsRegistry";
-import { LidoOracle } from "../../generated/LidoOracle/LidoOracle";
 import { Address, log } from "@graphprotocol/graph-ts";
+import { Lido, Submitted, Transfer } from "../../generated/Lido/Lido";
+import { LidoOracle } from "../../generated/Lido/LidoOracle";
+import { NodeOperatorsRegistry } from "../../generated/Lido/NodeOperatorsRegistry";
+import { getOrCreateToken } from "../entities/token";
 import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
 import {
   updateProtocolAndPoolTvl,
@@ -19,7 +20,7 @@ import {
   PROTOCOL_ID,
   BIGINT_ZERO,
 } from "../utils/constants";
-import { getOrCreateToken } from "../entities/token";
+import { getOrCreatePool } from "../entities/pool";
 
 export function handleSubmit(event: Submitted): void {
   // update Token lastPrice and lastBlock
@@ -78,21 +79,24 @@ export function handleTransfer(event: Transfer): void {
     nodeOperators = getRewardsDistributionCallResult.value.getRecipients();
   }
 
-  let fromZeros = sender == Address.fromString(ZERO_ADDRESS);
-  let isMintToTreasury =
+  const fromZeros = sender == Address.fromString(ZERO_ADDRESS);
+  const isMintToTreasury =
     fromZeros && recipient == Address.fromString(PROTOCOL_TREASURY_ID);
-  let isMintToNodeOperators = fromZeros && nodeOperators.includes(recipient);
+  const isMintToNodeOperators = fromZeros && nodeOperators.includes(recipient);
+  const pool = getOrCreatePool(event.block.number, event.block.timestamp);
 
   // update metrics
   if (isMintToTreasury || isMintToNodeOperators) {
     updateSnapshotsTvl(event.block);
     updateProtocolSideRevenueMetrics(event.block, value);
-    updateTotalRevenueMetrics(
-      event.block,
-      preTotalPooledEther,
-      postTotalPooledEther,
-      totalShares
-    );
+    if (totalShares > pool.outputTokenSupply!) {
+      updateTotalRevenueMetrics(
+        event.block,
+        preTotalPooledEther,
+        postTotalPooledEther,
+        totalShares
+      );
+    }
     updateSupplySideRevenueMetrics(event.block);
   }
 }

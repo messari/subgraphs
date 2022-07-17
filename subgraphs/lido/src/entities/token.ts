@@ -1,5 +1,3 @@
-// [] Hourly Revenue missing
-
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
 import { ERC20 } from "../../generated/Lido/ERC20";
