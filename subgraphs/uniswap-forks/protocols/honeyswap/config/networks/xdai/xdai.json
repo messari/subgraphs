@@ -1,8 +1,0 @@
-{
-  "deployment": "HONEYSWAP_XDAI",
-  "network": "xdai",
-  "address": "0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7",
-  "startBlock": 11813490,
-  "honeyFarmAddress": "0xB44825cF0d8D4dD552f2434056c41582415AaAa1",
-  "honeyFarmStartBlock": 16285152
-}
