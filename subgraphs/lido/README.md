@@ -266,22 +266,38 @@ SUM(`Treasury Revenue (ETH)`) OVER `time` + SUM(`Node Operators Revenue (ETH)`) 
 `Unique Users`
 
 
+## Note: MISSING DATA (Dec 2020 - Apr 29, 2021)
+
+* The Lido smart contracts use an upgradeable proxy contract format to update the contracts. Initial contracts didn't have relevant public functions and events for easily calculating certain revenue metrics. The contracts were upgraded in April 2021 to make available `PostTotalShares` event and `lastCompletedReportDelta` function which allow you to conveniently calculate staking rewards (and therefore total revenue).
+* Calculating Total Revenue (and hence Supply Side Revenue) for the duration Dec 2020 - Apr 2021 is cumbersome. We (Tarun, Vincent) decided to not calculate metrics for the mentioned duration. Supporting quantitative data for our decision is provided below. For more information on the calculation methodology, see the discussion with the Lido team on their discord [here](https://discord.com/channels/761182643269795850/773584934619185154/996811044477476935).
+
+### Supporting Data
+Dec 2020 - Apr 2021
+* The totalRevenue data is missing from Jan 07 2021 (revenue start data) - April 29 2021. 
+* The cumulativeProtocolRevenue (calculated by tracking the transfers from null_address to treasury OR node operators) for this period was ~700K.
+* If cumulativeProtocolRevenue was ~700K, then the cumulativeTotalRevenue would be ~7 million and the cumulativeSupplySideRevenue would be 6.4 million. (Given protocol side revenue is 10% of total revenue, supply side revenue is 90%).
+
+May 2021 - July 2022 (present)
+* As of now, the cumulativeTotalRevenue is 304 million, cumulativeProtocolSideRevenue is 30 million and cumulativeSupplySideRevenue is 274 million.
+* This would mean, in the grand scheme of things, the cumulativeTotalRevenue and cumulativeSupplySideRevenue would ~2% difference if we are unable to fill the 4 month Jan 2021 - Apr 2021 gap in that data.
+
+The 2% difference seems acceptable given the methodology won't be straighforward to fill the gap and this methodology won't apply for calculations beyond those 4 months.
+
 ## Protocol Diagrams
 
 ![Staking Pool Overview](https://blog.lido.fi/content/images/2020/11/01.png)
 
+## Validation (in-progress)
 
-## Validation
+Validation was done against other data sources (tokenterminal, defillama) and documented in this sheet: [Lido Finance - Messari Subgraph - Validation Sheet](https://docs.google.com/spreadsheets/d/1fiKfv9KLoWbRK1W6ejhWiySIzbd5CDyWs5so-tvJcHo/edit#gid=0).
 
-Validation done against other data sources (tokenterminal, defillama): [Lido Finance - Messari Subgraph - Validation Sheet](https://docs.google.com/spreadsheets/d/1fiKfv9KLoWbRK1W6ejhWiySIzbd5CDyWs5so-tvJcHo/edit#gid=0).
-
-A helper validation script was created to compare data in the terminal: [review.sh](https://github.com/fortysevenlabs/messari-subgraphs/tree/master/subgraphs/lido/validation/2022-07-07/review.sh).
+A helper validation script was created to quickly view and compare data in the terminal: [review.sh](https://github.com/fortysevenlabs/messari-subgraphs/tree/master/subgraphs/lido/validation/review.sh).
 
 **Runing the helper script**
-The script akes an epoch timestamp in the day, normalizes the date per token terminal date format, makes queries (subgraph, tokenterminal) and prints the output.
+The intention of the script is to print relevant revenue metrics for quick comparison. The script takes a date in `YYYY-MM-DD` format, normalizes the timestampts to tokenterminal format (`2022-07-01T00:00:00.000Z`), converts the tokenterminal format to epoch times for subgraph, makes queries (subgraph, tokenterminal) and prints the output. 
 ```
-./review.sh {epoch_timestamp} {subgraph_query_url} 
-./review.sh 1657045800 https://api.thegraph.com/subgraphs/name/fortysevenlabs/lido
+./review.sh {GRAPH_API_URL} {YYYY-MM-DD}
+./review.sh https://api.thegraph.com/subgraphs/name/fortysevenlabs/lido 2022-07-01
 ```
 
 **Files** 
@@ -290,16 +306,15 @@ The script akes an epoch timestamp in the day, normalizes the date per token ter
 
     ```
     validation
-    └── {date}
-        ├── full-metrics.json
-        ├── lido-finance-project.json
-        ├── metrics.json
-        └── review.sh
+      ├── lido-finance-project.json
+      ├── metrics-daily-{date}.json
+      ├── metrics-monthly-{date}.json
+      └── review.sh
     ```
  
 * Token Terminal Metrics (and Samples)
 
-    * **metrics-daily.json** - daily metric values, see sample below
+    * **metrics-daily-{date}.json** - daily metric values, see sample below
     ```
     {
         "project_id": "lido-finance",
@@ -329,7 +344,37 @@ The script akes an epoch timestamp in the day, normalizes the date per token ter
     }
     ```
 
-    * **metrics-aggregates.json** - aggregates for each available metric, see sample below
+    * **metrics-monthly-{date}.json** - monthly metric values, see sample below
+    ```
+    {
+        "project_id": "lido-finance",
+        "timestamp": "2022-07-01T00:00:00.000Z",
+        "active_users": null,
+        "business_type": "interest",
+        "deposits": null,
+        "gmv": null,
+        "market_cap_circulating": 299253507.347208,
+        "market_cap_fully_diluted": 629531658.1241714,
+        "pe_circulating": 13.960412433611236,
+        "pe_fully_diluted": 29.331670090462787,
+        "price": 0.6295316581241713,
+        "project": "Lido Finance",
+        "ps_circulating": 1.3960412433611233,
+        "ps_fully_diluted": 2.933167009046278,
+        "revenue_protocol": 918432.1152130027,
+        "revenue_supply_side": 8265889.036917024,
+        "revenue_total": 9184321.152130026,
+        "token_incentives": null,
+        "token_trading_volume": 25201168.607745774,
+        "tokenholders": 16410,
+        "treasury": 128933022.49720491,
+        "tvl": 4945104157.166401,
+        "volmc_circulating": 0.0746432616201606,
+        "volmc_fully_diluted": 0.0355197736414646
+    }
+    ```
+
+    * **metrics-aggregates-{date}.json** - aggregates for each available metric, see sample below
     ```
     "revenue_total": {
       "values": {
