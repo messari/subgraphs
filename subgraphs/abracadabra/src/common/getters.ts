@@ -7,7 +7,6 @@ import {
   MarketDailySnapshot,
   LendingProtocol,
   Market,
-  Liquidate,
   InterestRate,
   UsageMetricsHourlySnapshot,
   MarketHourlySnapshot,

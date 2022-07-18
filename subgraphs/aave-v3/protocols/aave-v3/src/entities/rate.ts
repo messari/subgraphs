@@ -6,7 +6,11 @@ import {
   InterestRateSide,
   InterestRateType,
 } from "../../../../src/utils/constants";
-import { bigIntToBigDecimal, rayToWad } from "../../../../src/utils/numbers";
+import {
+  bigIntToBigDecimal,
+  rayAPRtoAPY,
+  rayToWad,
+} from "../../../../src/utils/numbers";
 
 export function createBorrowerStableRate(
   marketId: string,
@@ -62,23 +66,23 @@ export function createInterestRatesFromEvent(
   return [
     createBorrowerStableRate(
       marketId,
-      bigIntToBigDecimal(rayToWad(event.params.stableBorrowRate)).times(
-        BIGDECIMAL_HUNDRED
-      ),
+      bigIntToBigDecimal(
+        rayToWad(rayAPRtoAPY(event.params.stableBorrowRate))
+      ).times(BIGDECIMAL_HUNDRED),
       timestamp
     ).id,
     createBorrowerVariableRate(
       marketId,
-      bigIntToBigDecimal(rayToWad(event.params.variableBorrowRate)).times(
-        BIGDECIMAL_HUNDRED
-      ),
+      bigIntToBigDecimal(
+        rayToWad(rayAPRtoAPY(event.params.variableBorrowRate))
+      ).times(BIGDECIMAL_HUNDRED),
       timestamp
     ).id,
     createLenderVariableRate(
       marketId,
-      bigIntToBigDecimal(rayToWad(event.params.liquidityRate)).times(
-        BIGDECIMAL_HUNDRED
-      ),
+      bigIntToBigDecimal(
+        rayToWad(rayAPRtoAPY(event.params.liquidityRate))
+      ).times(BIGDECIMAL_HUNDRED),
       timestamp
     ).id,
   ];

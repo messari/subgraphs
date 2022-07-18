@@ -1,0 +1,20 @@
+{
+  "network": "mainnet",
+
+  "Registry_v1-Address": "0xe15461b18ee31b7379019dc523231c57d1cbc18c",
+  "Registry_v1-StartBlock": "11563389",
+
+  "registry_v2-isEnabled": true,
+  "registry_v2-Address": "0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804",
+  "registry_v2-StartBlock": "12045550",
+
+  "callHandlersEnabled": true,
+
+  "manualVaults": [
+    {
+      "name": "YvWBTCVault",
+      "address": "0xA696a63cc78DfFa1a63E9E50587C197387FF6C7E",
+      "startBlock": "12185980"
+    }
+  ]
+}

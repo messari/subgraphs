@@ -5,7 +5,7 @@ import { ERC20SymbolBytes } from "../../generated/templates/CurvePoolTemplate/ER
 import { ERC20NameBytes } from "../../generated/templates/CurvePoolTemplate/ERC20NameBytes";
 import { Address } from "@graphprotocol/graph-ts";
 
-export const INVALID_TOKEN_DECIMALS = 9999;
+export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
