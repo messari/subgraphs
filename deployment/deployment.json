@@ -89,7 +89,7 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum-amm": {
           "template": "aave.v2.template.yaml",
@@ -137,7 +137,7 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-ethereum-extended",
           "dmelotik": "dmelotik/aave-v2-mainnet-ext",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum-amm": {
           "template": "aave.v2.template.yaml",
