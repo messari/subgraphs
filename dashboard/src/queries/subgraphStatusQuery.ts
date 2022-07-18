@@ -6,16 +6,16 @@ export const SubgraphStatusQuery = (url: string): DocumentNode => {
   } else {
     return idQuery;
   }
-}
+};
 
 export const getPendingSubgraphId = gql`
-query Status($subgraphName: String) {
-  indexingStatusForPendingVersion(subgraphName: $subgraphName) {
-    subgraph
-    health
-    entityCount
+  query Status($subgraphName: String) {
+    indexingStatusForPendingVersion(subgraphName: $subgraphName) {
+      subgraph
+      health
+      entityCount
+    }
   }
-}
 `;
 
 export const nameQuery = gql`
@@ -100,8 +100,8 @@ export const nameQuery = gql`
 `;
 
 export const idQuery = gql`
-query Status($deploymentIds: [String]){
-  indexingStatuses(subgraphs: $deploymentIds) {
+  query Status($deploymentIds: [String]) {
+    indexingStatuses(subgraphs: $deploymentIds) {
       subgraph
       node
       synced

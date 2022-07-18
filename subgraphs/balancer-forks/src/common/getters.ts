@@ -165,6 +165,14 @@ export function getOrCreateLiquidityPoolDailySnapshot(
       inputTokenBalances.push(BIGINT_ZERO);
       inputTokenWeights.push(BIGDECIMAL_ZERO);
     }
+    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    poolMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     poolMetrics.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
     poolMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
     poolMetrics.inputTokenBalances = inputTokenBalances;
@@ -205,6 +213,15 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
       inputTokenBalances.push(BIGINT_ZERO);
       inputTokenWeights.push(BIGDECIMAL_ZERO);
     }
+
+    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+
     poolMetrics.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
     poolMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
     poolMetrics.inputTokenBalances = inputTokenBalances;
@@ -232,6 +249,7 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
 
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
+
     financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;

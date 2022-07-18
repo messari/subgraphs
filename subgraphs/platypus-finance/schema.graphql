@@ -373,11 +373,14 @@ type FinancialsDailySnapshot @entity {
 ###############################
 
 type LiquidityPool @entity {
-  " Smart contract address of the pool "
+  " Smart contract address of the asset "
   id: ID!
 
   " The protocol this pool belongs to "
   protocol: DexAmmProtocol!
+
+  " Address of the pool "
+  poolAddress: String!
 
   " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
   name: String
@@ -434,7 +437,7 @@ type LiquidityPool @entity {
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal
-  
+
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   stakedOutputTokenAmount: BigInt
 
@@ -464,8 +467,6 @@ type LiquidityPool @entity {
   swaps: [Swap!]! @derivedFrom(field: "pool")
 
   _ignore: Boolean!
-  _assets: [_Asset!]!
-  _stakedAssetsAmounts: [BigInt!]!
 }
 
 #################################
@@ -473,7 +474,7 @@ type LiquidityPool @entity {
 #################################
 
 type LiquidityPoolDailySnapshot @entity {
-  " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
+  " { Smart contract address of the asset }-{ # of days since Unix epoch time } "
   id: ID!
 
   " The protocol this snapshot belongs to "
@@ -543,14 +544,10 @@ type LiquidityPoolDailySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
-
-  _assets: [_Asset!]
-  _inputTokens: [Token!]
-  _stakedAssetsAmounts: [BigInt!]!
 }
 
 type LiquidityPoolHourlySnapshot @entity {
-  " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
+  " { Smart contract address of the asset }-{ # of hours since Unix epoch time } "
   id: ID!
 
   " The protocol this snapshot belongs to "
@@ -620,10 +617,6 @@ type LiquidityPoolHourlySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
-
-  _assets: [_Asset!]
-  _inputTokens: [Token!]
-  _stakedAssetsAmounts: [BigInt!]!
 }
 
 ##################################
@@ -797,6 +790,12 @@ type Swap implements Event @entity {
 
   " The pool involving this transaction "
   pool: LiquidityPool!
+
+  " The pool involving this transaction "
+  fromPool: LiquidityPool!
+
+  " The pool involving this transaction "
+  toPool: LiquidityPool!
 }
 
 # An account is a unique Ethereum address
@@ -844,15 +843,6 @@ type _CircularBuffer @entity {
 type _LiquidityPoolParamsHelper @entity {
   " Smart contract address of the pool "
   id: ID!
-
-  " The protocol this pool belongs to "
-  protocol: DexAmmProtocol!
-
-  " Address of the Dev and the Oracle "
-  Dev: String!
-  Oracle: String!
-
-  " SlippageParams for this pool"
   SlippageParamsK: BigDecimal!
   SlippageParamsN: BigDecimal!
   SlippageParamsC1: BigDecimal!
@@ -861,6 +851,14 @@ type _LiquidityPoolParamsHelper @entity {
   PriceDeviation: BigDecimal!
   HaircutRate: BigDecimal!
   updateBlockNumber: BigInt!
+}
+
+type _LiquidityPoolAssetTokenHelper @entity {
+  "{ Smart contract address of the pool }-{ Smart contract address of the token }"
+  id: ID!
+
+  " Asset for the pool-token "
+  asset: _Asset!
 }
 
 type _Asset @entity {
@@ -875,13 +873,11 @@ type _Asset @entity {
 
   " The number of decimal places this token uses, default to 18 "
   decimals: Int!
-  " Reference to the pool associated with the token"
-  pool: LiquidityPool!
 
   " Asset contract cash "
   cash: BigInt!
 
-  "Asset Amount staked in pool"
+  " Asset Amount staked in pool "
   amountStaked: BigInt!
 
   " Reference to the underlying token "
@@ -901,8 +897,4 @@ type _Asset @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
-
-  rewardUpdateTimestamp: BigInt!
-
-  _index: BigInt
 }

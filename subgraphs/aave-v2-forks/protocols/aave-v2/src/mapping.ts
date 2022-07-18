@@ -14,6 +14,7 @@ import {
   LendingPoolAddressesProvider as AddressProviderContract,
 } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
+  AAVE_DECIMALS,
   getNetworkSpecificConstant,
   Protocol,
   USDC_TOKEN_ADDRESS,
@@ -282,6 +283,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
           tryRewardAsset.value,
           Address.fromString(protocol.priceOracle)
         );
+
         let rewardsPerDayUSD = rewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
@@ -399,6 +401,11 @@ function getAssetPriceInUSDC(
     );
 
     return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+  }
+
+  // Avalanche Oracle return the price offset by 8 decimals
+  if (equalsIgnoreCase(dataSource.network(), Network.AVALANCHE)) {
+    return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
   }
 
   // otherwise return the output of the price oracle

@@ -1,18 +1,8 @@
 import { BigInt, Address, ethereum, log } from "@graphprotocol/graph-ts";
-import {
-  _Asset,
-  Deposit,
-  Swap,
-  Withdraw,
-  LiquidityPoolHourlySnapshot,
-  LiquidityPoolDailySnapshot,
-} from "../../generated/schema";
+import { _Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
 import { Asset as AssetTemplate } from "../../generated/templates";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "../common/constants";
-import { getOrCreateAsset, getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken } from "../common/getters";
+import { getOrCreateAsset, getOrCreateAssetPool, getOrCreateDexAmm, getOrCreateToken } from "../common/getters";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
-import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "../common/tokens";
-import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/utils/arrays";
 
 export function createAsset(
   event: ethereum.Event,
@@ -20,71 +10,9 @@ export function createAsset(
   tokenAddress: Address,
   assetAddress: Address,
 ): void {
-  let asset = getOrCreateAsset(event, poolAddress, tokenAddress, assetAddress);
-  const token = getOrCreateToken(event, tokenAddress);
-  const pool = getOrCreateLiquidityPool(poolAddress, event);
-
-  let assets: string[] = pool._assets;
-  let inputTokens: string[] = pool.inputTokens;
-  let inputTokenBalances: BigInt[] = pool.inputTokenBalances;
-  let _stakedAssetsAmounts: BigInt[] = pool._stakedAssetsAmounts;
-  // Start Watching the Asset for updates
+  getOrCreateAsset(event, tokenAddress, assetAddress);
+  getOrCreateAssetPool(event, assetAddress, poolAddress, tokenAddress);
   AssetTemplate.create(assetAddress);
-
-  assets.push(asset.id);
-  inputTokens.push(token.id);
-
-  assets = assets.sort();
-  inputTokens = inputTokens.sort();
-
-  let _index = inputTokens.indexOf(token.id);
-  log.info("new asset {} for token {}, pool {} at index {}", [asset.id, asset.token, asset.pool, _index.toString()]);
-
-  inputTokenBalances.push(BIGINT_ZERO);
-  _stakedAssetsAmounts.push(BIGINT_ZERO);
-
-  pool._assets = assets;
-  pool.inputTokens = inputTokens;
-  pool.inputTokenBalances = inputTokenBalances;
-  pool._stakedAssetsAmounts = _stakedAssetsAmounts;
-
-  pool.save();
-
-  let timestampDaily: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let idDaily: string = pool.id.concat("-").concat(timestampDaily.toString());
-  let dailySnapshot = LiquidityPoolDailySnapshot.load(idDaily);
-
-  if (dailySnapshot) {
-    dailySnapshot._assets = pool._assets;
-    dailySnapshot._inputTokens = pool.inputTokens;
-    dailySnapshot.inputTokenBalances = pool.inputTokenBalances;
-    dailySnapshot._stakedAssetsAmounts = pool._stakedAssetsAmounts;
-
-    let newSwapVolumeTokenAmount = addToArrayAtIndex(dailySnapshot.dailyVolumeByTokenAmount, BIGINT_ZERO, _index);
-    let newSwapVolumeUSD = addToArrayAtIndex(dailySnapshot.dailyVolumeByTokenUSD, BIGDECIMAL_ZERO, _index);
-
-    dailySnapshot.dailyVolumeByTokenAmount = newSwapVolumeTokenAmount;
-    dailySnapshot.dailyVolumeByTokenUSD = newSwapVolumeUSD;
-    dailySnapshot.save();
-  }
-
-  let timestampHourly: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
-  let idHourly: string = pool.id.concat("-").concat(timestampHourly.toString());
-  let hourlySnapshot = LiquidityPoolHourlySnapshot.load(idHourly);
-
-  if (hourlySnapshot) {
-    hourlySnapshot._assets = pool._assets;
-    hourlySnapshot._inputTokens = pool.inputTokens;
-    hourlySnapshot.inputTokenBalances = pool.inputTokenBalances;
-    hourlySnapshot._stakedAssetsAmounts = pool._stakedAssetsAmounts;
-
-    let newSwapVolumeTokenAmount = addToArrayAtIndex(hourlySnapshot.hourlyVolumeByTokenAmount, BIGINT_ZERO, _index);
-    let newSwapVolumeUSD = addToArrayAtIndex(hourlySnapshot.hourlyVolumeByTokenUSD, BIGDECIMAL_ZERO, _index);
-
-    hourlySnapshot.hourlyVolumeByTokenAmount = newSwapVolumeTokenAmount;
-    hourlySnapshot.hourlyVolumeByTokenUSD = newSwapVolumeUSD;
-    hourlySnapshot.save();
-  }
 }
 
 // Generate the deposit entity and update deposit account for the according pool.
@@ -92,14 +20,15 @@ export function createDeposit(
   event: ethereum.Event,
   amount: BigInt,
   inputTokenAddress: Address,
+  assetAddress: Address,
   liquidity: BigInt,
   to: Address,
   sender: Address,
 ): Deposit {
+  let protocol = getOrCreateDexAmm();
   let deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
-  let protocol = getOrCreateDexAmm();
-  let pool = getOrCreateLiquidityPool(event.address, event);
+  let pool = getOrCreateAssetPool(event, assetAddress, event.address, inputTokenAddress);
   let inputToken = getOrCreateToken(event, inputTokenAddress);
 
   deposit.hash = event.transaction.hash.toHexString();
@@ -124,6 +53,7 @@ export function createWithdraw(
   event: ethereum.Event,
   amount: BigInt,
   inputTokenAddress: Address,
+  assetAddress: Address,
   liquidity: BigInt,
   to: Address,
   sender: Address,
@@ -131,7 +61,7 @@ export function createWithdraw(
   let withdraw = new Withdraw(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
   let protocol = getOrCreateDexAmm();
-  let pool = getOrCreateLiquidityPool(event.address, event);
+  let pool = getOrCreateAssetPool(event, assetAddress, event.address, inputTokenAddress);
   let inputToken = getOrCreateToken(event, inputTokenAddress);
 
   withdraw.hash = event.transaction.hash.toHexString();
@@ -157,6 +87,8 @@ export function createSwap(
   sender: Address,
   inputTokenAddress: Address,
   outputTokenAddress: Address,
+  inputAssetAddress: Address,
+  outputAssetAddress: Address,
   inputTokenAmount: BigInt,
   actualOutputTokenAmount: BigInt,
   to: Address,
@@ -164,7 +96,6 @@ export function createSwap(
   let swap = new Swap(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
   let protocol = getOrCreateDexAmm();
-  let pool = getOrCreateLiquidityPool(event.address, event);
   let inputToken = getOrCreateToken(event, inputTokenAddress);
   let outputToken = getOrCreateToken(event, outputTokenAddress);
 
@@ -175,7 +106,9 @@ export function createSwap(
   swap.logIndex = event.logIndex.toI32();
   swap.protocol = protocol.id;
   swap.to = to.toHexString();
-  swap.pool = pool.id;
+  swap.pool = getOrCreateAssetPool(event, inputAssetAddress, event.address, inputTokenAddress).id;
+  swap.fromPool = getOrCreateAssetPool(event, inputAssetAddress, event.address, inputTokenAddress).id;
+  swap.toPool = getOrCreateAssetPool(event, outputAssetAddress, event.address, outputTokenAddress).id;
   swap.from = sender.toHexString();
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;

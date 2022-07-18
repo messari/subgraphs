@@ -134,6 +134,7 @@ function createLiquidityPool(
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
   pool.isSingleSided = false;
+  pool.fees = [];
   if (REWARD_TOKEN != "") {
     let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
     pool.rewardTokens = [rewardToken.id];
@@ -141,6 +142,8 @@ function createLiquidityPool(
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   }
   pool.inputTokenWeights = [BIGDECIMAL_ONE];
+  pool.allocPoint = BIGINT_ZERO;
+
   pool.save();
   protocol.totalPoolCount = protocol.totalPoolCount + 1;
   protocol.save();

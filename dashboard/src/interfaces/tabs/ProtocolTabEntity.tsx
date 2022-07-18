@@ -231,7 +231,7 @@ function ProtocolTabEntity({
             const req =
               "!" ===
               entitiesData[entityName][entityField].split("")[
-              entitiesData[entityName][entityField].split("").length - 1
+                entitiesData[entityName][entityField].split("").length - 1
               ];
             if (req) {
               list[entityName][entityField] = "MISSING AND REQUIRED";
@@ -396,7 +396,13 @@ function ProtocolTabEntity({
       </Grid>
     );
   } else {
-    console.log(currentTimeseriesLoading, currentTimeseriesLoading, currentEntityData, currentTimeseriesError, protocolTableData)
+    console.log(
+      currentTimeseriesLoading,
+      currentTimeseriesLoading,
+      currentEntityData,
+      currentTimeseriesError,
+      protocolTableData,
+    );
     return (
       <Grid key={entityName}>
         <Box my={3}>

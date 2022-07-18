@@ -31,6 +31,7 @@ import {
   getOrCreateUserPosition,
   incrementPositionBorrowCount,
   incrementPositionDepositCount,
+  incrementPositionLiquidationCount,
   incrementPositionRepayCount,
   incrementPositionWithdrawCount,
 } from "./position";
@@ -206,13 +207,6 @@ export function createRepay(
   addMarketRepayVolume(event, market, repay.amountUSD);
   incrementProtocolRepayCount(event);
   incrementAccountRepayCount(account);
-  repay.market = market.id;
-  repay.position = position.id;
-  repay.asset = asset.id;
-  repay.amount = amount;
-  repay.amountUSD = amountInUSD(amount, asset);
-  repay.save();
-  updateUsageMetrics(event, user);
   incrementPositionRepayCount(position);
   checkIfPositionClosed(event, account, market, position);
   return repay;
@@ -262,7 +256,7 @@ export function createLiquidate(
   addMarketLiquidateVolume(event, market, liquidate.amountUSD);
   incrementProtocolLiquidateCount(event, userAccount, liquidatorAccount);
   incrementAccountLiquidationCount(userAccount);
-  incrementPositionDepositCount(position);
+  incrementPositionLiquidationCount(position);
   incrementAccountLiquidatorCount(liquidatorAccount);
   checkIfPositionClosed(event, userAccount, market, position);
   return liquidate;

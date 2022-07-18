@@ -21,6 +21,7 @@ import {
   INT_ZERO,
   Q192,
   PRECISION,
+  BIGDECIMAL_TEN_THOUSAND,
 } from "../constants";
 import {
   exponentToBigDecimal,
@@ -96,7 +97,11 @@ export function updateNativeTokenPriceInUSD(): Token {
       }
     }
   }
-  if (stableAmount.notEqual(BIGDECIMAL_ZERO)) {
+
+  if (
+    stableAmount.gt(BIGDECIMAL_TEN_THOUSAND) &&
+    largestPool.tokenPrices[tokenIndicator]
+  ) {
     nativeToken.lastPriceUSD = largestPool.tokenPrices[tokenIndicator];
   }
 

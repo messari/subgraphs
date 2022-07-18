@@ -4,7 +4,7 @@ import { ERC20 } from "../generated/templates/LendingPool/ERC20";
 import { ERC20NameBytes } from "../generated/templates/LendingPool/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../generated/templates/LendingPool/ERC20SymbolBytes";
 
-export const INVALID_TOKEN_DECIMALS = 9999;
+export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
@@ -21,7 +21,10 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
   // non-standard ERC20 implementation
   let symbolResultBytes = contractSymbolBytes.try_symbol();
   if (!symbolResultBytes.reverted) {
-    symbolValue = symbolResultBytes.value.toString();
+    // for broken pairs that have no symbol function exposed
+    if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
+      symbolValue = symbolResultBytes.value.toString();
+    }
   }
 
   return symbolValue;
@@ -41,7 +44,10 @@ export function fetchTokenName(tokenAddress: Address): string {
   // non-standard ERC20 implementation
   let nameResultBytes = contractNameBytes.try_name();
   if (!nameResultBytes.reverted) {
-    nameValue = nameResultBytes.value.toString();
+    // for broken exchanges that have no name function exposed
+    if (!isNullEthValue(nameResultBytes.value.toHexString())) {
+      nameValue = nameResultBytes.value.toString();
+    }
   }
 
   return nameValue;
@@ -54,7 +60,15 @@ export function fetchTokenDecimals(tokenAddress: Address): i32 {
   let decimalResult = contract.try_decimals();
   if (!decimalResult.reverted) {
     let decimalValue = decimalResult.value;
-    return decimalValue as i32;
+    return decimalValue;
   }
-  return INVALID_TOKEN_DECIMALS;
+
+  return INVALID_TOKEN_DECIMALS as i32;
+}
+
+export function isNullEthValue(value: string): boolean {
+  return (
+    value ==
+    "0x0000000000000000000000000000000000000000000000000000000000000001"
+  );
 }

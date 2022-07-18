@@ -63,27 +63,22 @@ export class CustomFeesType {
   }
 
   get lockIncentive(): BigDecimal {
-    return this._lockIncentive.toBigDecimal().div(
-      constants.DENOMINATOR
-    );
+    return this._lockIncentive.toBigDecimal().div(constants.DENOMINATOR);
   }
   get callIncentive(): BigDecimal {
-    return this._callIncentive.toBigDecimal().div(
-      constants.DENOMINATOR
-    );
+    return this._callIncentive.toBigDecimal().div(constants.DENOMINATOR);
   }
   get stakerIncentive(): BigDecimal {
-    return this._stakerIncentive.toBigDecimal().div(
-      constants.DENOMINATOR
-    );
+    return this._stakerIncentive.toBigDecimal().div(constants.DENOMINATOR);
   }
   get platformFee(): BigDecimal {
-    return this._platformFee.toBigDecimal().div(
-      constants.DENOMINATOR
-    );
+    return this._platformFee.toBigDecimal().div(constants.DENOMINATOR);
   }
 
   totalFees(): BigDecimal {
-    return this.lockIncentive.plus(this.callIncentive).plus(this.stakerIncentive).plus(this.platformFee)
+    return this.lockIncentive
+      .plus(this.callIncentive)
+      .plus(this.stakerIncentive)
+      .plus(this.platformFee);
   }
 }

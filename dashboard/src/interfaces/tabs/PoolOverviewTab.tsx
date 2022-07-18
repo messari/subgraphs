@@ -118,20 +118,6 @@ function PoolOverviewTab({
     );
   }
 
-  if (!poolOverviewRequest.poolOverviewLoading && pools.length === 0) {
-    if (skipAmt > 0) {
-      p.delete("skipAmt");
-      window.location.href = `${href.origin}${href.pathname}?${p.toString()}`;
-    } else if (issues.filter((x) => x.fieldName === "PoolOverviewTab").length === 0) {
-      issues.push({
-        message: "No pools returned in pool overview.",
-        type: "POOL",
-        level: "error",
-        fieldName: "poolOverview",
-      });
-    }
-  }
-
   return (
     <>
       <IssuesDisplay issuesArrayProps={tableIssues} allLoaded={true} oneLoaded={true} />

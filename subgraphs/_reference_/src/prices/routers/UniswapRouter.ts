@@ -92,7 +92,7 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
       .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
       .toBigDecimal();
 
-    return CustomPriceType.initialize(amountOutBigDecimal, constants.DEFAULT_USDC_DECIMALS);
+    return CustomPriceType.initialize(amountOutBigDecimal, constants.USDC_DECIMALS_MAP.get(network)!);
   }
 
   return new CustomPriceType();
