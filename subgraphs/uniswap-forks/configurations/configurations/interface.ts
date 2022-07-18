@@ -1,6 +1,8 @@
-import { BigDecimal } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Factory } from "../../generated/Factory/Factory";
 
+// This interface is to be used by the configurations classes for each protocol/network deployment.
+// If a new configuration is needed for a deployment, add a new value to the configurations interface.
 export interface Configurations {
   getNetwork(): string;
   getProtocolName(): string;
@@ -17,10 +19,13 @@ export interface Configurations {
   getLPFeeToOff(): BigDecimal;
   getFeeOnOff(): string;
   getRewardIntervalType(): string;
-  getReferenceToken(): string
+  getRewardTokenRate(): BigInt;
+  getReferenceToken(): string;
   getRewardToken(): string;
   getWhitelistTokens(): string[];
   getStableCoins(): string[];
   getStableOraclePools(): string[];
   getUntrackedPairs(): string[];
+  getUntrackedTokens(): string[];
+  getMinimumLiquidityThreshold(): BigDecimal;
 }

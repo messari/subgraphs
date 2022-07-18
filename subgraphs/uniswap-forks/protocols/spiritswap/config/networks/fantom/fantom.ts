@@ -1,9 +1,24 @@
-import { Address, BigDecimal } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
-import { toLowerCase, toLowerCaseList } from '../../../../../src/common/utils/utils';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
+import {
+  toLowerCase,
+  toLowerCaseList,
+} from "../../../../../src/common/utils/utils";
 
 export class SpiritSwapFantomConfigurations implements Configurations {
   getNetwork(): string {
@@ -27,29 +42,36 @@ export class SpiritSwapFantomConfigurations implements Configurations {
   getFactoryAddress(): string {
     return toLowerCase("0xEF45d134b73241eDa7703fa787148D9C9F4950b0");
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString(toLowerCase("0xEF45d134b73241eDa7703fa787148D9C9F4950b0")));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString(
+        toLowerCase("0xEF45d134b73241eDa7703fa787148D9C9F4950b0")
+      )
+    );
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("3");
+    return BigDecimal.fromString("0.3");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.5");
+    return BigDecimal.fromString("0.05");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("2.5");
+    return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("3");
+    return BigDecimal.fromString("0.3");
   }
   getFeeOnOff(): string {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.BLOCK;
+  }
+  getRewardTokenRate(): BigInt {
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return toLowerCase("0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83");
@@ -72,10 +94,16 @@ export class SpiritSwapFantomConfigurations implements Configurations {
   }
   getStableOraclePools(): string[] {
     return toLowerCaseList([
-      "0xe7E90f5a767406efF87Fdad7EB07ef407922EC1D" // USDC/FTM
+      "0xe7E90f5a767406efF87Fdad7EB07ef407922EC1D", // USDC/FTM
     ]);
   }
   getUntrackedPairs(): string[] {
     return toLowerCaseList([]);
+  }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
+  getMinimumLiquidityThreshold(): BigDecimal {
+    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
   }
 }

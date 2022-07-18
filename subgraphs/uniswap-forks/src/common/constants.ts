@@ -1,11 +1,10 @@
-import { log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
+export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
 
 /////////////////////
 ///// Protocols /////
@@ -101,6 +100,13 @@ export namespace RewardIntervalType {
   export const NONE = "NONE";
 }
 
+export namespace MasterChef {
+  export const MINICHEF = "MINICHEF";
+  export const MASTERCHEF = "MASTERCHEF";
+  export const MASTERCHEFV2 = "MASTERCHEFV2";
+  export const MASTERCHEFV3 = "MASTERCHEFV3";
+}
+
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
@@ -112,7 +118,13 @@ export const RECENT_BLOCK_THRESHOLD = BigInt.fromI32(5);
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_MAX = BigInt.fromString("115792089237316195423570985008687907853269984665640564039457584007913129639935");
+export const BIGINT_THREE_THOUSAND = BigInt.fromI32(25000);
+export const BIGINT_ONE_HUNDRED_THOUSAND = BigInt.fromI32(100000);
+export const BIGINT_TWO_HUNDRED_FIFTY_THOUSAND = BigInt.fromI32(250000);
+export const BIGINT_FOUR_HUNDRED_THOUSAND = BigInt.fromI32(400000);
+export const BIGINT_MAX = BigInt.fromString(
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+);
 
 export const INT_NEGATIVE_ONE = -1 as i32;
 export const INT_ZERO = 0 as i32;
@@ -131,7 +143,24 @@ export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const SECONDS_PER_HOUR = 60 * 60;
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+
+export const MS_PER_YEAR = DAYS_PER_YEAR.times(
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+);
+
+// Imported into configurations typescript file to set minimum liquidity thresholds for estimating price using a liquidity pool;
+export const MINIMUM_LIQUIDITY_THREE_THOUSAND = new BigDecimal(
+  BIGINT_THREE_THOUSAND
+);
+export const MINIMUM_LIQUIDITY_ONE_THOUSAND = new BigDecimal(BIGINT_THOUSAND);
+export const MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND = new BigDecimal(
+  BIGINT_ONE_HUNDRED_THOUSAND
+);
+export const MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND = new BigDecimal(
+  BIGINT_TWO_HUNDRED_FIFTY_THOUSAND
+);
+export const MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND = new BigDecimal(
+  BIGINT_FOUR_HUNDRED_THOUSAND
+);
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString("100000");

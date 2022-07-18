@@ -42,9 +42,12 @@ function ProtocolTab({
 
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
   let protocolDataRender: any[] = [];
+
   if (protocolTimeseriesData) {
     protocolDataRender = Object.keys(protocolTimeseriesData).map((entityName: string) => {
       const currentEntityData = protocolTimeseriesData[entityName];
+      if (!currentEntityData) return null;
+
       return (
         <ProtocolTabEntity
           entityName={entityName}
@@ -91,12 +94,8 @@ function ProtocolTab({
 
   const tableIssuesInit = tableIssues;
   if (
-    tableIssues.filter(
-      (x) =>
-        x.fieldName ===
-        `${protocolEntityNameSingular}-totalValueLockedUSD` &&
-        x.type === "TVL-",
-    ).length === 0 &&
+    tableIssues.filter((x) => x.fieldName === `${protocolEntityNameSingular}-totalValueLockedUSD` && x.type === "TVL-")
+      .length === 0 &&
     Number(protocolTableData[protocolEntityNameSingular].totalValueLockedUSD) < 1000
   ) {
     tableIssuesInit.push({
@@ -106,7 +105,6 @@ function ProtocolTab({
       fieldName: `${protocolEntityNameSingular}-totalValueLockedUSD`,
     });
   }
-
   return (
     <>
       <IssuesDisplay issuesArrayProps={issuesToDisplay} oneLoaded={oneLoaded} allLoaded={allLoaded} />

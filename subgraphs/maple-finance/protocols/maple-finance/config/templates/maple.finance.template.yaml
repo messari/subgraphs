@@ -1,0 +1,727 @@
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+    file: ./schema.graphql
+features:
+    - grafting
+dataSources:
+    - kind: ethereum/contract
+      name: MapleGlobals
+      network: mainnet
+      source:
+          address: "0xC234c62c8C09687DFf0d9047e40042cd166F3600"
+          abi: MapleGlobals
+          startBlock: 12428577
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mappings/mapleGlobals.ts
+          entities:
+              - PoolFactory
+              - LendingProtocol
+          abis:
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: PoolFactory
+                file: ./abis/PoolFactory.json
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
+
+              # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
+          eventHandlers:
+              - event: GlobalsParamSet(indexed bytes32,uint256)
+                handler: handleGlobalsParamSet
+          callHandlers:
+              - function: setValidPoolFactory(address,bool)
+                handler: handleSetValidPoolFactory
+
+    - kind: ethereum/contract
+      name: MapleRewardsFactory
+      network: mainnet
+      source:
+          address: "0x0155729EbCd47Cb1fBa02bF5a8DA20FaF3860535"
+          abi: MapleRewardsFactory
+          startBlock: 12428577
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mappings/mapleRewardsFactory.ts
+          entities:
+              - Market
+              - RewardTokens
+              - _MplReward
+              - Token
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
+          abis:
+              - name: MapleRewardsFactory
+                file: ./abis/MapleRewardsFactory.json
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
+              - name: LoanV1
+                file: ./abis/LoanV1.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: MplReward
+                file: ./abis/MplRewards.json
+              - name: Pool
+                file: ./abis/Pool.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
+              - name: StakeLocker
+                file: ./abis/StakeLocker.json
+
+              # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
+          eventHandlers:
+              - event: MplRewardsCreated(indexed address,indexed address,indexed address,address)
+                handler: handleMplRewardsCreated
+
+templates:
+    - name: PoolFactory
+      kind: ethereum/contract
+      network: mainnet
+      source:
+          abi: PoolFactory
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mappings/poolFactory.ts
+          entities:
+              - Market
+              - _StakeLocker
+              - Token
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
+          abis:
+              - name: PoolFactory
+                file: ./abis/PoolFactory.json
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
+              - name: LoanV1
+                file: ./abis/LoanV1.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: MplReward
+                file: ./abis/MplRewards.json
+              - name: Pool
+                file: ./abis/Pool.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
+              - name: StakeLocker
+                file: ./abis/StakeLocker.json
+
+              # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
+          eventHandlers:
+              - event: PoolCreated(indexed address,indexed address,address,address,address,address,uint256,uint256,uint256,string,string)
+                handler: handlePoolCreated
+
+    - name: Pool
+      kind: ethereum/contract
+      network: mainnet
+      source:
+          abi: Pool
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mappings/pool.ts
+          entities:
+              - Market
+              - Deposit
+              - Withdraw
+              - _Loan
+              - _StakeLocker
+              - Token
+              - InterestRate
+              - _MplReward
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
+          abis:
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
+              - name: LoanV1
+                file: ./abis/LoanV1.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: MplReward
+                file: ./abis/MplRewards.json
+              - name: Pool
+                file: ./abis/Pool.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
+              - name: StakeLocker
+                file: ./abis/StakeLocker.json
+
+              # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
+          eventHandlers:
+              - event: Transfer(indexed address,indexed address,uint256)
+                handler: handleTransfer
+              - event: PoolStateChanged(uint8)
+                handler: handlePoolStateChanged
+              - event: LoanFunded(indexed address,address,uint256)
+                handler: handleLoanFunded
+              - event: Claim(indexed address,uint256,uint256,uint256,uint256,uint256)
+                handler: handleClaim
+              - event: DefaultSuffered(indexed address,uint256,uint256,uint256,uint256)
+                handler: handleDefaultSuffered
+              - event: FundsWithdrawn(indexed address,uint256,uint256)
+                handler: handleFundsWithdrawn
+
+    - name: StakeLocker
+      kind: ethereum/contract
+      network: mainnet
+      source:
+          abi: StakeLocker
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mappings/stakeLocker.ts
+          entities:
+              - _StakeLocker
+              - _Stake
+              - _Unstake
+              - Market
+              - Token
+              - _MplReward
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
+          abis:
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
+              - name: LoanV1
+                file: ./abis/LoanV1.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: MplReward
+                file: ./abis/MplRewards.json
+              - name: Pool
+                file: ./abis/Pool.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
+              - name: StakeLocker
+                file: ./abis/StakeLocker.json
+
+              # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
+          eventHandlers:
+              - event: Stake(indexed address,uint256)
+                handler: handleStake
+              - event: Unstake(indexed address,uint256)
+                handler: handleUnstake
+              - event: LossesRecognized(indexed address,uint256,uint256)
+                handler: handleLossesRecognized
+
+    - name: LoanV1
+      kind: ethereum/contract
+      network: mainnet
+      source:
+          abi: LoanV1
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mappings/loanV1.ts
+          entities:
+              - _Loan
+              - Borrow
+              - Repay
+              - Liquidate
+              - Market
+              - _StakeLocker
+              - _MplReward
+              - LendingProtocol
+              - Token
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
+          abis:
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
+              - name: LoanV1
+                file: ./abis/LoanV1.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: MplReward
+                file: ./abis/MplRewards.json
+              - name: Pool
+                file: ./abis/Pool.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
+              - name: StakeLocker
+                file: ./abis/StakeLocker.json
+
+              # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
+          eventHandlers:
+              - event: Drawdown(uint256)
+                handler: handleDrawdown
+              - event: PaymentMade(uint256,uint256,uint256,uint256,uint256,uint256,bool)
+                handler: handlePaymentMade
+              - event: Liquidation(uint256,uint256,uint256,uint256)
+                handler: handleLiquidation
+
+    - name: LoanV2
+      kind: ethereum/contract
+      network: mainnet
+      source:
+          abi: LoanV2
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mappings/LoanV2.ts
+          entities:
+              - _Loan
+              - Borrow
+              - Repay
+              - Liquidate
+              - Market
+              - _StakeLocker
+              - _MplReward
+              - Token
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
+          abis:
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
+              - name: LoanV1
+                file: ./abis/LoanV1.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: MplReward
+                file: ./abis/MplRewards.json
+              - name: Pool
+                file: ./abis/Pool.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
+              - name: StakeLocker
+                file: ./abis/StakeLocker.json
+
+                # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
+          eventHandlers:
+              - event: FundsDrawnDown(uint256,indexed address)
+                handler: handleFundsDrawnDown
+              - event: PaymentMade(uint256,uint256)
+                handler: handlePaymentMade
+              - event: Repossessed(uint256,uint256,indexed address)
+                handler: handleRepossessed
+              - event: NewTermsAccepted(bytes32,address,bytes[])
+                handler: handleNewTermsAccepted
+
+    - name: LoanV3
+      kind: ethereum/contract
+      network: mainnet
+      source:
+          abi: LoanV3
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mappings/LoanV3.ts
+          entities:
+              - _Loan
+              - Borrow
+              - Repay
+              - Liquidate
+              - Market
+              - _StakeLocker
+              - _MplReward
+              - Token
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
+          abis:
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
+              - name: LoanV1
+                file: ./abis/LoanV1.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: MplReward
+                file: ./abis/MplRewards.json
+              - name: Pool
+                file: ./abis/Pool.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
+              - name: StakeLocker
+                file: ./abis/StakeLocker.json
+
+                # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
+          eventHandlers:
+              - event: FundsDrawnDown(uint256,indexed address)
+                handler: handleFundsDrawnDown
+              - event: PaymentMade(uint256,uint256,uint256,uint256)
+                handler: handlePaymentMade
+              - event: Repossessed(uint256,uint256,indexed address)
+                handler: handleRepossessed
+              - event: NewTermsAccepted(bytes32,address,uint256,bytes[])
+                handler: handleNewTermsAccepted
+
+    - name: MplReward
+      kind: ethereum/contract
+      network: mainnet
+      source:
+          abi: MplReward
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mappings/mplRewards.ts
+          entities:
+              - Market
+              - _MplReward
+              - Token
+              - _Stake
+              - _Unstake
+              - LendingProtocol
+              - UsageMetricsHourlySnapshot
+              - UsageMetricsDailySnapshot
+          abis:
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+              - name: BalancerPool
+                file: ./abis/BalancerPool.json
+              - name: LoanV1
+                file: ./abis/LoanV1.json
+              - name: LoanV2
+                file: ./abis/LoanV2.json
+              - name: LoanV3
+                file: ./abis/LoanV3.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: MplReward
+                file: ./abis/MplRewards.json
+              - name: Pool
+                file: ./abis/Pool.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
+              - name: StakeLocker
+                file: ./abis/StakeLocker.json
+
+              # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
+          eventHandlers:
+              - event: Staked(indexed address,uint256)
+                handler: handleStaked
+              - event: Withdrawn(indexed address,uint256)
+                handler: handleWidthdrawn
+              - event: RewardAdded(uint256)
+                handler: handleRewardAdded
+              - event: RewardsDurationUpdated(uint256)
+                handler: handleRewardsDurationUpdated
+          callHandlers:
+              - function: updatePeriodFinish(uint256)
+                handler: handleUpdatePeriodFinish
+# graft:
+#     base: QmRZRW9JbWS8Pz3pSCFz4KYzdxE3hsH4o6zuzY1FEJZpAH
+#     block: 15115190

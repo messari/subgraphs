@@ -6,65 +6,13 @@ export const schema = (version: string): string => {
   versionGroupArr.pop();
   const versionGroup = versionGroupArr.join(".") + ".0";
   switch (versionGroup) {
-    case Versions.Schema100:
-      return schema100();
-    case Versions.Schema110:
-      return schema110();
     case Versions.Schema120:
       return schema120();
+    case Versions.Schema130:
+      return schema130();
     default:
-      return schema120();
+      return schema130();
   }
-};
-
-export const schema100 = (): string => {
-  return `query Data($skipAmt: Int!) {
-        liquidityPools(first: 100, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
-            id
-            name
-            fees{
-            feePercentage
-            feeType
-            }
-            inputTokens {
-            name
-            }
-            outputToken {
-            name
-            decimals
-            }
-            rewardTokens {
-            id
-            }
-            symbol
-        }
-    }`;
-};
-
-export const schema110 = (): string => {
-  return `
-    query Data($skipAmt: Int!) {
-        liquidityPools(first: 100, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
-            id
-            name
-            fees{
-              feePercentage
-              feeType
-            }
-            inputTokens{
-              decimals
-              name
-            }
-            outputToken {
-              id
-              decimals
-            }
-            rewardTokens {
-              id
-            }
-            symbol
-        }
-    }`;
 };
 
 export const schema120 = (): string => {
@@ -92,6 +40,7 @@ export const schema120 = (): string => {
       }
       rewardTokens {
         id
+        type
         token {
           id
           decimals
@@ -109,5 +58,55 @@ export const schema120 = (): string => {
       rewardTokenEmissionsAmount
       rewardTokenEmissionsUSD
         }
+    }`;
+};
+
+export const schema130 = (): string => {
+  return `
+    query Data($skipAmt: Int!) {
+      liquidityPools(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+        id
+        name
+        symbol
+        fees {
+          feePercentage
+          feeType
+        }
+        isSingleSided
+        inputTokens{
+          id
+          decimals
+          name
+          symbol
+        }
+        outputToken {
+          id
+          decimals
+          name
+          symbol
+        }
+        rewardTokens {
+          id
+          type
+          token {
+            id
+            decimals
+            name
+            symbol
+          }
+        }
+        totalValueLockedUSD
+        cumulativeSupplySideRevenueUSD
+        cumulativeProtocolSideRevenueUSD
+        cumulativeTotalRevenueUSD
+        cumulativeVolumeUSD
+        inputTokenBalances
+        inputTokenWeights
+        outputTokenSupply
+        outputTokenPriceUSD
+        stakedOutputTokenAmount
+        rewardTokenEmissionsAmount
+        rewardTokenEmissionsUSD
+      }
     }`;
 };

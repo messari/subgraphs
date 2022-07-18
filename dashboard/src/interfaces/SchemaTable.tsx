@@ -11,7 +11,6 @@ function checkValueFalsey(
   fieldDataType: string[],
   issues: { message: string; type: string; level: string; fieldName: string }[],
 ): { message: string; type: string; level: string; fieldName: string } | undefined {
-
   if (!fieldDataType || fieldDataType.length === 0) {
     return undefined;
   }
@@ -48,13 +47,7 @@ interface SchemaTableProps {
   >;
 }
 
-function SchemaTable({
-  entityData,
-  schemaName,
-  dataFields,
-  issuesProps,
-  setIssues
-}: SchemaTableProps) {
+function SchemaTable({ entityData, schemaName, dataFields, issuesProps, setIssues }: SchemaTableProps) {
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   let schema: (JSX.Element | null)[] = [];
   if (entityData) {
@@ -151,9 +144,6 @@ function SchemaTable({
             if (entityData?.rewardTokens[idx]?.token?.decimals) {
               decimals = entityData?.rewardTokens[idx]?.token?.decimals;
               tokenNames.push(entityData.rewardTokens[idx]?.token?.name || "TOKEN [" + idx + "]");
-            } else if (entityData?.rewardTokens[idx]?.decimals) {
-              decimals = entityData?.rewardTokens[idx]?.decimals;
-              tokenNames.push(entityData.rewardTokens[idx]?.name || "TOKEN [" + idx + "]");
             }
             return convertTokenDecimals(val, decimals).toString();
           });
@@ -267,6 +257,9 @@ function SchemaTable({
               return entityData.inputTokens[idx].name || "TOKEN [" + idx + "]";
             });
             dataType += " [" + tokenNames.join(",") + "]";
+          } else if (fieldName.toUpperCase() === "POSITIONS") {
+            // ignore positions
+            return null;
           }
 
           if (isPercentageField) {

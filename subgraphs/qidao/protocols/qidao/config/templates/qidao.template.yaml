@@ -1,0 +1,145 @@
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  {{ #maticVault }}
+  - kind: ethereum
+    name: {{ name }}
+    network: {{ chain }}
+    source:
+      address: "{{ address }}"
+      abi: QiStablecoin
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - InterestRate
+        - LendingProtocol
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - FinancialsDailySnapshot
+        - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
+        - Account
+        - ActiveAccount
+        - _InProgressLiquidate
+      abis:
+        - name: QiStablecoin
+          file: ./abis/QiStablecoin.json
+        - name: erc20QiStablecoin
+          file: ./abis/erc20QiStablecoin.json
+        - name: QiStablecoinDecimals
+          file: ./abis/QiStablecoinDecimals.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: DepositCollateral(uint256,uint256)
+          handler: handleDepositCollateral
+        - event: WithdrawCollateral(uint256,uint256)
+          handler: handleWithdrawCollateral
+        - event: BorrowToken(uint256,uint256)
+          handler: handleBorrowToken
+        - event: PayBackToken(uint256,uint256,uint256)
+          handler: handlePayBackToken
+        - event: BuyRiskyVault(uint256,address,address,uint256)
+          handler: handleBuyRiskyVault
+      file: ./src/mappings/QiStablecoin.ts
+  {{ /maticVault }}
+  {{ #erc20Vaults }}
+  - kind: ethereum
+    name: {{ name }}
+    network: {{ chain }}
+    source:
+      address: "{{ address }}"
+      abi: erc20QiStablecoin
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - InterestRate
+        - LendingProtocol
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - FinancialsDailySnapshot
+        - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
+        - Account
+        - ActiveAccount
+      abis:
+        - name: erc20QiStablecoin
+          file: ./abis/erc20QiStablecoin.json
+        - name: QiStablecoinDecimals
+          file: ./abis/QiStablecoinDecimals.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: BorrowToken(uint256,uint256)
+          handler: handleBorrowToken
+        - event: DepositCollateral(uint256,uint256)
+          handler: handleDepositCollateral
+        - event: LiquidateVault(uint256,address,address,uint256,uint256,uint256)
+          handler: handleLiquidateVault
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PayBackToken(uint256,uint256,uint256)
+          handler: handlePayBackToken
+        - event: WithdrawCollateral(uint256,uint256)
+          handler: handleWithdrawCollateral
+      file: ./src/mappings/erc20QiStablecoin.ts
+  {{ /erc20Vaults }}
+# Template is only used for imports
+templates:
+  - kind: ethereum
+    name: Vault
+    network: {{ chain }}
+    source:
+      abi: QiStablecoin
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      abis:
+        - name: QiStablecoin
+          file: ./abis/QiStablecoin.json
+        - name: erc20QiStablecoin
+          file: ./abis/erc20QiStablecoin.json
+        - name: QiStablecoinDecimals
+          file: ./abis/QiStablecoinDecimals.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      entities:
+        - LendingProtocol
+      file: ./src/mappings/QiStablecoin.ts

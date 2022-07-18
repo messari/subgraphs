@@ -1,8 +1,20 @@
-import { Address, BigDecimal } from '@graphprotocol/graph-ts';
-import { Factory } from '../../../../../generated/Factory/Factory';
-import { FeeSwitch, Network, PROTOCOL_SCHEMA_VERSION, RewardIntervalType } from '../../../../../src/common/constants';
-import { Configurations } from '../../../../../configurations/configurations/interface';
-import { PROTOCOL_SUBGRAPH_VERSION, PROTOCOL_METHODOLOGY_VERSION, PROTOCOL_NAME, PROTOCOL_SLUG } from '../../../src/common/constants';
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Factory } from "../../../../../generated/Factory/Factory";
+import {
+  BIGINT_ZERO,
+  FeeSwitch,
+  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  Network,
+  PROTOCOL_SCHEMA_VERSION,
+  RewardIntervalType,
+} from "../../../../../src/common/constants";
+import { Configurations } from "../../../../../configurations/configurations/interface";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
 
 export class SpookyswapFantomConfigurations implements Configurations {
   getNetwork(): string {
@@ -26,29 +38,34 @@ export class SpookyswapFantomConfigurations implements Configurations {
   getFactoryAddress(): string {
     return "0x152ee697f2e276fa89e96742e9bb9ab1f2e61be3";
   }
-  getFactoryContract(): Factory { 
-    return Factory.bind(Address.fromString("0x152ee697f2e276fa89e96742e9bb9ab1f2e61be3"));
+  getFactoryContract(): Factory {
+    return Factory.bind(
+      Address.fromString("0x152ee697f2e276fa89e96742e9bb9ab1f2e61be3")
+    );
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("2");
+    return BigDecimal.fromString("0.2");
   }
   getProtocolFeeToOn(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("2");
+    return BigDecimal.fromString("0.2");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("2");
+    return BigDecimal.fromString("0.2");
   }
   getFeeOnOff(): string {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.TIMESTAMP;
+  }
+  getRewardTokenRate(): BigInt {
+    return BIGINT_ZERO;
   }
   getReferenceToken(): string {
     return "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83";
@@ -63,7 +80,7 @@ export class SpookyswapFantomConfigurations implements Configurations {
       "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
       "0x049d68029688eabf473097a2fc38ef61633a3c7a", // fUSDT
       "0x74b23882a30290451A17c44f4F05243b6b58C76d", // WETH
-      "0x321162Cd933E2Be498Cd2267a90534A804051b11" // WBTC
+      "0x321162Cd933E2Be498Cd2267a90534A804051b11", // WBTC
     ];
   }
   getStableCoins(): string[] {
@@ -82,5 +99,11 @@ export class SpookyswapFantomConfigurations implements Configurations {
   }
   getUntrackedPairs(): string[] {
     return [];
+  }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
+  getMinimumLiquidityThreshold(): BigDecimal {
+    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
   }
 }

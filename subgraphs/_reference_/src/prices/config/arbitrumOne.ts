@@ -70,6 +70,8 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+export const USDC_DECIMALS = 6;
+
 export const WHITELIST_TOKENS = new TypedMap<string, Address>();
 WHITELIST_TOKENS.set(
   "WETH",

@@ -11,20 +11,39 @@ import {
   DistributedBorrowerComp,
   DistributedSupplierComp,
 } from "../generated/Factory/Factory";
-import { MANTISSA_DECIMALS, BIGDECIMAL_ONE, FACTORY_ADDRESS, BIGINT_ZERO, BIGDECIMAL_HUNDRED } from './common/constants';
-import { getOrCreateToken, getOrCreateUnderlyingToken, getOrCreateMarket, getOrCreateProtocol } from "./common/getters";
+import {
+  MANTISSA_DECIMALS,
+  BIGDECIMAL_ONE,
+  FACTORY_ADDRESS,
+  BIGINT_ZERO,
+  BIGDECIMAL_HUNDRED,
+  INT_ONE,
+} from "./common/constants";
+import {
+  getOrCreateToken,
+  getOrCreateUnderlyingToken,
+  getOrCreateMarket,
+  getOrCreateProtocol,
+  getOrCreateUsageMetricsDailySnapshot,
+} from "./common/getters";
 import { Market } from "../generated/schema";
 import { updateMarketEmission } from "./common/helpers";
 import { decimalsToBigDecimal } from "./common/utils";
 
 export function handleMarketListed(event: MarketListed): void {
   let protocol = getOrCreateProtocol();
+  protocol.totalPoolCount += INT_ONE;
+  protocol.save();
 
   getOrCreateToken(event.params.cToken);
   getOrCreateUnderlyingToken(event.params.cToken);
 
   let marketAddr = event.params.cToken.toHexString();
   getOrCreateMarket(marketAddr, event);
+
+  let marketMetrics = getOrCreateUsageMetricsDailySnapshot(event);
+  marketMetrics.totalPoolCount += INT_ONE;
+  marketMetrics.save();
 
   // trigger CToken template
   CToken.create(event.params.cToken);

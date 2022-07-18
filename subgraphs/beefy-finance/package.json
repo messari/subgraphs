@@ -1,0 +1,25 @@
+{
+  "name": "beefy-finance",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
+    "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.29.2",
+    "@graphprotocol/graph-ts": "0.26.0",
+    "@types/node": "^17.0.35",
+    "dotenv": "^16.0.1",
+    "ethereum-block-by-date": "^1.4.5",
+    "ethers": "^5.6.8",
+    "moment": "^2.29.3",
+    "write-yaml-file": "^4.2.0"
+  },
+  "devDependencies": {
+    "matchstick-as": "^0.5.0"
+  }
+}

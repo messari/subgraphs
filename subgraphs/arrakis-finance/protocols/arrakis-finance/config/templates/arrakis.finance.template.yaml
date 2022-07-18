@@ -1,0 +1,206 @@
+specVersion: 0.0.4
+{{#grafting}}
+features:
+  - grafting
+graft:
+  base: {{graftBase}}
+  block: {{graftBlock}}
+{{/grafting}}
+schema:
+  file: ./schema.graphql
+dataSources:
+  {{#factory}}
+  - kind: ethereum
+    name: ArrakisFactory
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: ArrakisFactoryV1
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - YieldAggregator
+        - Vault
+      abis:
+        - name: ArrakisFactoryV1
+          file: ./abis/ArrakisFactoryV1.json
+        - name: ArrakisVaultV1
+          file: ./abis/ArrakisVaultV1.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: PoolCreated(indexed address,indexed address,indexed address)
+          handler: handlePoolCreated
+      file: ./src/mappings/handlers/vault.ts
+  {{/factory}}
+  {{#gaugeRegistry}}
+  - kind: ethereum
+    name: GaugeRegistry
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: GaugeRegistry
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+      abis:
+        - name: GaugeRegistry
+          file: ./abis/GaugeRegistry.json
+        - name: LiquidityGaugeV4
+          file: ./abis/LiquidityGaugeV4.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: AddGauge(address,address)
+          handler: handleAddGauge
+      file: ./src/mappings/handlers/liquidityGauge.ts
+  {{/gaugeRegistry}}
+templates:
+  - name: ArrakisVault
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: ArrakisVaultV1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers/vault.ts
+      entities:
+        - YieldAggregator
+        - Vault
+      abis:
+        - name: ArrakisVaultV1
+          file: ./abis/ArrakisVaultV1.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Minted(address,uint256,uint256,uint256,uint128)
+          handler: handleMinted
+        - event: Burned(address,uint256,uint256,uint256,uint128)
+          handler: handleBurned
+        - event: FeesEarned(uint256,uint256)
+          handler: handleFeesEarned
+        - event: UpdateManagerParams(uint16,address,uint16,uint16,uint32)
+          handler: handleUpdateManagerParams
+  {{#hasLiquidityGauge}}
+  - name: LiquidityGauge
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: LiquidityGaugeV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers/liquidityGauge.ts
+      entities:
+        - Vault
+      abis:
+        - name: LiquidityGaugeV4
+          file: ./abis/LiquidityGaugeV4.json
+        - name: ArrakisVaultV1
+          file: ./abis/ArrakisVaultV1.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
+        - event: RewardDataUpdate(indexed address,uint256)
+          handler: handleRewardDataUpdate
+  {{/hasLiquidityGauge}}

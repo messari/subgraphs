@@ -6,22 +6,6 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
-  MarketListed,
-  NewCollateralFactor,
-  NewLiquidationIncentive,
-  NewPriceOracle,
-  ActionPaused1,
-} from "../generated/Comptroller/Comptroller";
-import {
-  Mint,
-  Redeem,
-  Borrow as BorrowEvent,
-  RepayBorrow,
-  LiquidateBorrow,
-  AccrueInterest,
-  NewReserveFactor,
-} from "../generated/templates/CToken/CToken";
-import {
   Account,
   Borrow,
   ActiveAccount,
@@ -40,6 +24,7 @@ import {
   UsageMetricsHourlySnapshot,
 } from "../generated/schema";
 import {
+  ActivityType,
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -58,6 +43,7 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "./constants";
+import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 
 enum EventType {
   Deposit,
@@ -72,92 +58,46 @@ enum EventType {
 ////////////////////////
 
 export class ProtocolData {
-  comptrollerAddr: Address;
-  name: string;
-  slug: string;
-  schemaVersion: string;
-  subgraphVersion: string;
-  methodologyVersion: string;
-  network: string;
-  liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>;
-  oracleResult: ethereum.CallResult<Address>;
   constructor(
-    comptrollerAddr: Address,
-    name: string,
-    slug: string,
-    schemaVersion: string,
-    subgraphVersion: string,
-    methodologyVersion: string,
-    network: string,
-    liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>,
-    oracleResult: ethereum.CallResult<Address>
-  ) {
-    this.comptrollerAddr = comptrollerAddr;
-    this.name = name;
-    this.slug = slug;
-    this.schemaVersion = schemaVersion;
-    this.subgraphVersion = subgraphVersion;
-    this.methodologyVersion = methodologyVersion;
-    this.network = network;
-    this.liquidationIncentiveMantissaResult =
-      liquidationIncentiveMantissaResult;
-    this.oracleResult = oracleResult;
-  }
+    public readonly comptrollerAddr: Address,
+    public readonly name: string,
+    public readonly slug: string,
+    public readonly schemaVersion: string,
+    public readonly subgraphVersion: string,
+    public readonly methodologyVersion: string,
+    public readonly network: string,
+    public readonly liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>,
+    public readonly oracleResult: ethereum.CallResult<Address>
+  ) {}
 }
 
 export class TokenData {
-  address: Address;
-  name: string;
-  symbol: string;
-  decimals: i32;
-  constructor(address: Address, name: string, symbol: string, decimals: i32) {
-    this.address = address;
-    this.name = name;
-    this.symbol = symbol;
-    this.decimals = decimals;
-  }
+  constructor(
+    public readonly address: Address,
+    public readonly name: string,
+    public readonly symbol: string,
+    public readonly decimals: i32
+  ) {}
 }
 
 export class MarketListedData {
-  protocol: LendingProtocol;
-  token: TokenData;
-  cToken: TokenData;
-  cTokenReserveFactorMantissa: BigInt;
   constructor(
-    protocol: LendingProtocol,
-    token: TokenData,
-    cToken: TokenData,
-    cTokenReserveFactorMantissa: BigInt
-  ) {
-    this.protocol = protocol;
-    this.token = token;
-    this.cToken = cToken;
-    this.cTokenReserveFactorMantissa = cTokenReserveFactorMantissa;
-  }
+    public readonly protocol: LendingProtocol,
+    public readonly token: TokenData,
+    public readonly cToken: TokenData,
+    public readonly cTokenReserveFactorMantissa: BigInt
+  ) {}
 }
 
 export class UpdateMarketData {
-  totalSupplyResult: ethereum.CallResult<BigInt>;
-  exchangeRateStoredResult: ethereum.CallResult<BigInt>;
-  supplyRateResult: ethereum.CallResult<BigInt>;
-  borrowRateResult: ethereum.CallResult<BigInt>;
-  getUnderlyingPriceResult: ethereum.CallResult<BigInt>;
-  unitPerYear: i32;
   constructor(
-    totalSupplyResult: ethereum.CallResult<BigInt>,
-    exchangeRateStoredResult: ethereum.CallResult<BigInt>,
-    supplyRateResult: ethereum.CallResult<BigInt>,
-    borrowRateResult: ethereum.CallResult<BigInt>,
-    getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
-    unitPerYear: i32
-  ) {
-    this.totalSupplyResult = totalSupplyResult;
-    this.exchangeRateStoredResult = exchangeRateStoredResult;
-    this.supplyRateResult = supplyRateResult;
-    this.borrowRateResult = borrowRateResult;
-    this.getUnderlyingPriceResult = getUnderlyingPriceResult;
-    this.unitPerYear = unitPerYear;
-  }
+    public readonly totalSupplyResult: ethereum.CallResult<BigInt>,
+    public readonly exchangeRateStoredResult: ethereum.CallResult<BigInt>,
+    public readonly supplyRateResult: ethereum.CallResult<BigInt>,
+    public readonly borrowRateResult: ethereum.CallResult<BigInt>,
+    public readonly getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
+    public readonly unitPerYear: i32
+  ) {}
 }
 
 ////////////////////////////////////
@@ -169,14 +109,16 @@ export class UpdateMarketData {
 // event.params.cToken:
 // event.params.oldCollateralFactorMantissa:
 // event.params.newCollateralFactorMantissa:
-export function _handleNewCollateralFactor(event: NewCollateralFactor): void {
-  let marketID = event.params.cToken.toHexString();
+export function _handleNewCollateralFactor(
+  marketID: string,
+  newCollateralFactorMantissa: BigInt
+): void {
   let market = Market.load(marketID);
   if (market == null) {
     log.warning("[handleNewCollateralFactor] Market not found: {}", [marketID]);
     return;
   }
-  let collateralFactor = event.params.newCollateralFactorMantissa
+  let collateralFactor = newCollateralFactorMantissa
     .toBigDecimal()
     .div(mantissaFactorBD)
     .times(BIGDECIMAL_HUNDRED);
@@ -200,9 +142,9 @@ export function _handleNewCollateralFactor(event: NewCollateralFactor): void {
 // event.params.newLiquidationIncentiveMantissa
 export function _handleNewLiquidationIncentive(
   protocol: LendingProtocol,
-  event: NewLiquidationIncentive
+  newLiquidationIncentiveMantissa: BigInt
 ): void {
-  let liquidationIncentive = event.params.newLiquidationIncentiveMantissa
+  let liquidationIncentive = newLiquidationIncentiveMantissa
     .toBigDecimal()
     .div(mantissaFactorBD)
     .minus(BIGDECIMAL_ONE)
@@ -231,9 +173,9 @@ export function _handleNewLiquidationIncentive(
 // - newPriceOracle
 export function _handleNewPriceOracle(
   protocol: LendingProtocol,
-  event: NewPriceOracle
+  newPriceOracle: Address
 ): void {
-  protocol._priceOracle = event.params.newPriceOracle.toHexString();
+  protocol._priceOracle = newPriceOracle.toHexString();
   protocol.save();
 }
 
@@ -243,18 +185,21 @@ export function _handleNewPriceOracle(
 //  - cToken: Address
 //  - action: string
 //  - pauseState: boolean
-export function _handleActionPaused(event: ActionPaused1): void {
-  let marketID = event.params.cToken.toHexString();
+export function _handleActionPaused(
+  marketID: string,
+  action: string,
+  pauseState: boolean
+): void {
   let market = Market.load(marketID);
   if (!market) {
     log.warning("[handleActionPaused] Market not found: {}", [marketID]);
     return;
   }
 
-  if (event.params.action == "Mint") {
-    market.isActive = event.params.pauseState;
-  } else if (event.params.action == "Borrow") {
-    market.canBorrowFrom = event.params.pauseState;
+  if (action == "Mint") {
+    market.isActive = pauseState;
+  } else if (action == "Borrow") {
+    market.canBorrowFrom = pauseState;
   }
 
   market.save();
@@ -265,9 +210,9 @@ export function _handleActionPaused(event: ActionPaused1): void {
 // event.params.cToken: The address of the market (token) to list
 export function _handleMarketListed(
   marketListedData: MarketListedData,
-  event: MarketListed
+  event: ethereum.Event
 ): void {
-  let cTokenAddr = event.params.cToken;
+  let cTokenAddr = marketListedData.cToken.address;
   let cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
@@ -348,9 +293,10 @@ export function _handleMarketListed(
   market.outputTokenSupply = BIGINT_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.exchangeRate = BIGDECIMAL_ZERO;
-  market._cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  market._cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  market._cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  market._borrowBalance = BIGINT_ZERO;
 
   market.save();
 
@@ -360,6 +306,7 @@ export function _handleMarketListed(
   let marketIDs = marketListedData.protocol._marketIDs;
   marketIDs.push(market.id);
   marketListedData.protocol._marketIDs = marketIDs;
+  marketListedData.protocol.totalPoolCount++;
   marketListedData.protocol.save();
 }
 
@@ -373,7 +320,13 @@ export function _handleMarketListed(
 // - minter
 // - mintAmount: The amount of underlying assets to mint
 // - mintTokens: The amount of cTokens minted
-export function _handleMint(comptrollerAddr: Address, event: Mint): void {
+export function _handleMint(
+  comptrollerAddr: Address,
+  minter: Address,
+  mintAmount: BigInt,
+  //mintTokens: BigInt, //not used
+  event: ethereum.Event
+): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[handleMint] protocol not found: {}", [
@@ -404,14 +357,14 @@ export function _handleMint(comptrollerAddr: Address, event: Mint): void {
   deposit.logIndex = event.transactionLogIndex.toI32();
   deposit.protocol = protocol.id;
   deposit.to = marketID;
-  deposit.from = event.params.minter.toHexString();
+  deposit.from = minter.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.market = marketID;
   deposit.asset = market.inputToken;
-  deposit.amount = event.params.mintAmount;
+  deposit.amount = mintAmount;
   let depositUSD = market.inputTokenPriceUSD.times(
-    event.params.mintAmount
+    mintAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
   );
@@ -432,7 +385,7 @@ export function _handleMint(comptrollerAddr: Address, event: Mint): void {
     comptrollerAddr,
     event.block.number,
     event.block.timestamp,
-    event.params.minter.toHexString(),
+    minter.toHexString(),
     EventType.Deposit
   );
 }
@@ -443,7 +396,12 @@ export function _handleMint(comptrollerAddr: Address, event: Mint): void {
 // - redeemer
 // - redeemAmount
 // - redeecTokens
-export function _handleRedeem(comptrollerAddr: Address, event: Redeem): void {
+export function _handleRedeem(
+  comptrollerAddr: Address,
+  redeemer: Address,
+  redeemAmount: BigInt,
+  event: ethereum.Event
+): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[handleMint] protocol not found: {}", [
@@ -473,15 +431,15 @@ export function _handleRedeem(comptrollerAddr: Address, event: Redeem): void {
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.transactionLogIndex.toI32();
   withdraw.protocol = protocol.id;
-  withdraw.to = event.params.redeemer.toHexString();
+  withdraw.to = redeemer.toHexString();
   withdraw.from = marketID;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
   withdraw.market = marketID;
   withdraw.asset = market.inputToken;
-  withdraw.amount = event.params.redeemAmount;
+  withdraw.amount = redeemAmount;
   withdraw.amountUSD = market.inputTokenPriceUSD.times(
-    event.params.redeemAmount
+    redeemAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
   );
@@ -489,11 +447,18 @@ export function _handleRedeem(comptrollerAddr: Address, event: Redeem): void {
 
   market.save();
 
+  updateMarketSnapshots(
+    marketID,
+    event.block.timestamp.toI32(),
+    withdraw.amountUSD,
+    EventType.Withdraw
+  );
+
   snapshotUsage(
     comptrollerAddr,
     event.block.number,
     event.block.timestamp,
-    event.params.redeemer.toHexString(),
+    redeemer.toHexString(),
     EventType.Withdraw
   );
 }
@@ -507,7 +472,9 @@ export function _handleRedeem(comptrollerAddr: Address, event: Redeem): void {
 // - totalBorrows
 export function _handleBorrow(
   comptrollerAddr: Address,
-  event: BorrowEvent
+  borrower: Address,
+  borrowAmount: BigInt,
+  event: ethereum.Event
 ): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -538,15 +505,15 @@ export function _handleBorrow(
   borrow.hash = event.transaction.hash.toHexString();
   borrow.logIndex = event.transactionLogIndex.toI32();
   borrow.protocol = protocol.id;
-  borrow.to = event.params.borrower.toHexString();
+  borrow.to = borrower.toHexString();
   borrow.from = marketID;
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
   borrow.market = marketID;
   borrow.asset = market.inputToken;
-  borrow.amount = event.params.borrowAmount;
+  borrow.amount = borrowAmount;
   let borrowUSD = market.inputTokenPriceUSD.times(
-    event.params.borrowAmount
+    borrowAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
   );
@@ -567,7 +534,7 @@ export function _handleBorrow(
     comptrollerAddr,
     event.block.number,
     event.block.timestamp,
-    event.params.borrower.toHexString(),
+    borrower.toHexString(),
     EventType.Borrow
   );
 }
@@ -582,7 +549,9 @@ export function _handleBorrow(
 // - totalBorrows
 export function _handleRepayBorrow(
   comptrollerAddr: Address,
-  event: RepayBorrow
+  payer: Address,
+  repayAmount: BigInt,
+  event: ethereum.Event
 ): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -614,24 +583,31 @@ export function _handleRepayBorrow(
   repay.logIndex = event.transactionLogIndex.toI32();
   repay.protocol = protocol.id;
   repay.to = marketID;
-  repay.from = event.params.payer.toHexString();
+  repay.from = payer.toHexString();
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
   repay.market = marketID;
   repay.asset = market.inputToken;
-  repay.amount = event.params.repayAmount;
+  repay.amount = repayAmount;
   repay.amountUSD = market.inputTokenPriceUSD.times(
-    event.params.repayAmount
+    repayAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
   );
   repay.save();
 
+  updateMarketSnapshots(
+    marketID,
+    event.block.timestamp.toI32(),
+    repay.amountUSD,
+    EventType.Repay
+  );
+
   snapshotUsage(
     comptrollerAddr,
     event.block.number,
     event.block.timestamp,
-    event.params.payer.toHexString(),
+    payer.toHexString(),
     EventType.Repay
   );
 }
@@ -646,7 +622,12 @@ export function _handleRepayBorrow(
 // - seizeTokens
 export function _handleLiquidateBorrow(
   comptrollerAddr: Address,
-  event: LiquidateBorrow
+  cTokenCollateral: Address,
+  liquidator: Address,
+  borrower: Address,
+  seizeTokens: BigInt,
+  repayAmount: BigInt,
+  event: ethereum.Event
 ): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
@@ -678,7 +659,7 @@ export function _handleLiquidateBorrow(
     return;
   }
 
-  let liquidatedCTokenMarketID = event.params.cTokenCollateral.toHexString();
+  let liquidatedCTokenMarketID = cTokenCollateral.toHexString();
   let liquidatedCTokenMarket = Market.load(liquidatedCTokenMarketID);
   if (!liquidatedCTokenMarket) {
     log.warning(
@@ -714,20 +695,18 @@ export function _handleLiquidateBorrow(
   liquidate.logIndex = event.transactionLogIndex.toI32();
   liquidate.protocol = protocol.id;
   liquidate.to = repayTokenMarketID;
-  liquidate.from = event.params.liquidator.toHexString();
+  liquidate.from = liquidator.toHexString();
+  liquidate.liquidatee = borrower.toHexString();
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
-  liquidate.market = repayTokenMarketID;
-  if (liquidatedCTokenID) {
-    // this is logically redundant since nullcheck has been done before, but removing the if check will fail 'graph build'
-    liquidate.asset = liquidatedCTokenID;
-  }
-  liquidate.amount = event.params.seizeTokens;
-  let gainUSD = event.params.seizeTokens
+  liquidate.market = liquidatedCTokenID!;
+  liquidate.asset = repayTokenMarketID;
+  liquidate.amount = seizeTokens;
+  let gainUSD = seizeTokens
     .toBigDecimal()
     .div(cTokenDecimalsBD)
     .times(liquidatedCTokenMarket.outputTokenPriceUSD);
-  let lossUSD = event.params.repayAmount
+  let lossUSD = repayAmount
     .toBigDecimal()
     .div(exponentToBigDecimal(repayToken.decimals))
     .times(repayTokenMarket.inputTokenPriceUSD);
@@ -750,7 +729,7 @@ export function _handleLiquidateBorrow(
     comptrollerAddr,
     event.block.number,
     event.block.timestamp,
-    event.params.liquidator.toHexString(),
+    liquidator.toHexString(),
     EventType.Liquidate
   );
 }
@@ -763,7 +742,10 @@ export function _handleLiquidateBorrow(
 export function _handleAccrueInterest(
   updateMarketData: UpdateMarketData,
   comptrollerAddr: Address,
-  event: AccrueInterest
+  interestAccumulated: BigInt,
+  totalBorrows: BigInt,
+  updateMarketPrices: boolean,
+  event: ethereum.Event
 ): void {
   let marketID = event.address.toHexString();
   let market = Market.load(marketID);
@@ -782,10 +764,12 @@ export function _handleAccrueInterest(
   updateMarket(
     updateMarketData,
     marketID,
-    event.params.interestAccumulated,
-    event.params.totalBorrows,
+    interestAccumulated,
+    totalBorrows,
     event.block.number,
-    event.block.timestamp
+    event.block.timestamp,
+    updateMarketPrices,
+    comptrollerAddr
   );
   updateProtocol(comptrollerAddr);
 
@@ -801,14 +785,16 @@ export function _handleAccrueInterest(
 // event.params
 // - oldReserveFactorMantissa
 // - newReserveFactorMantissa
-export function _handleNewReserveFactor(event: NewReserveFactor): void {
-  let marketID = event.address.toHexString();
+export function _handleNewReserveFactor(
+  marketID: string,
+  newReserveFactorMantissa: BigInt
+): void {
   let market = Market.load(marketID);
   if (market == null) {
     log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
     return;
   }
-  let reserveFactor = event.params.newReserveFactorMantissa
+  let reserveFactor = newReserveFactorMantissa
     .toBigDecimal()
     .div(mantissaFactorBD);
   market._reserveFactor = reserveFactor;
@@ -840,6 +826,11 @@ export function snapshotMarket(
   dailySnapshot.protocol = market.protocol;
   dailySnapshot.market = marketID;
   dailySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+  dailySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  dailySnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  dailySnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
   dailySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   dailySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   dailySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -871,6 +862,11 @@ export function snapshotMarket(
   hourlySnapshot.protocol = market.protocol;
   hourlySnapshot.market = marketID;
   hourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+  hourlySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  hourlySnapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  hourlySnapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
   hourlySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   hourlySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   hourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -931,6 +927,8 @@ export function snapshotFinancials(
   let dailyDepositUSD = BIGDECIMAL_ZERO;
   let dailyBorrowUSD = BIGDECIMAL_ZERO;
   let dailyLiquidateUSD = BIGDECIMAL_ZERO;
+  let dailyWithdrawUSD = BIGDECIMAL_ZERO;
+  let dailyRepayUSD = BIGDECIMAL_ZERO;
   let dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   let dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   let dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -963,20 +961,26 @@ export function snapshotFinancials(
     dailyLiquidateUSD = dailyLiquidateUSD.plus(
       marketDailySnapshot.dailyLiquidateUSD
     );
+    dailyWithdrawUSD = dailyWithdrawUSD.plus(
+      marketDailySnapshot.dailyWithdrawUSD
+    );
+    dailyRepayUSD = dailyRepayUSD.plus(marketDailySnapshot.dailyRepayUSD);
     dailyTotalRevenueUSD = dailyTotalRevenueUSD.plus(
-      marketDailySnapshot._dailyTotalRevenueUSD
+      marketDailySnapshot.dailyTotalRevenueUSD
     );
     dailyProtocolSideRevenueUSD = dailyProtocolSideRevenueUSD.plus(
-      marketDailySnapshot._dailyProtocolSideRevenueUSD
+      marketDailySnapshot.dailyProtocolSideRevenueUSD
     );
     dailySupplySideRevenueUSD = dailySupplySideRevenueUSD.plus(
-      marketDailySnapshot._dailySupplySideRevenueUSD
+      marketDailySnapshot.dailySupplySideRevenueUSD
     );
   }
 
   snapshot.dailyDepositUSD = dailyDepositUSD;
   snapshot.dailyBorrowUSD = dailyBorrowUSD;
   snapshot.dailyLiquidateUSD = dailyLiquidateUSD;
+  snapshot.dailyWithdrawUSD = dailyWithdrawUSD;
+  snapshot.dailyRepayUSD = dailyRepayUSD;
   snapshot.dailyTotalRevenueUSD = dailyTotalRevenueUSD;
   snapshot.dailyProtocolSideRevenueUSD = dailyProtocolSideRevenueUSD;
   snapshot.dailySupplySideRevenueUSD = dailySupplySideRevenueUSD;
@@ -1033,7 +1037,10 @@ function snapshotUsage(
     dailySnapshot.blockNumber = blockNumber;
     dailySnapshot.timestamp = blockTimestamp;
   }
-  let dailyAccountID = accountID.concat("-").concat(dailySnapshotID);
+  let dailyAccountID = ActivityType.DAILY.concat("-")
+    .concat(accountID)
+    .concat("-")
+    .concat(dailySnapshotID);
   let dailyActiveAccount = ActiveAccount.load(dailyAccountID);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyAccountID);
@@ -1062,6 +1069,7 @@ function snapshotUsage(
     default:
       break;
   }
+  dailySnapshot.totalPoolCount = protocol.totalPoolCount;
   dailySnapshot.blockNumber = blockNumber;
   dailySnapshot.timestamp = blockTimestamp;
   dailySnapshot.save();
@@ -1085,7 +1093,10 @@ function snapshotUsage(
     hourlySnapshot.blockNumber = blockNumber;
     hourlySnapshot.timestamp = blockTimestamp;
   }
-  let hourlyAccountID = accountID.concat("-").concat(hourlySnapshotID);
+  let hourlyAccountID = ActivityType.HOURLY.concat("-")
+    .concat(accountID)
+    .concat("-")
+    .concat(hourlySnapshotID);
   let hourlyActiveAccount = ActiveAccount.load(hourlyAccountID);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyAccountID);
@@ -1142,6 +1153,14 @@ function updateMarketSnapshots(
       marketHourlySnapshot.hourlyLiquidateUSD =
         marketHourlySnapshot.hourlyLiquidateUSD.plus(amountUSD);
       break;
+    case EventType.Withdraw:
+      marketHourlySnapshot.hourlyWithdrawUSD =
+        marketHourlySnapshot.hourlyWithdrawUSD.plus(amountUSD);
+      break;
+    case EventType.Repay:
+      marketHourlySnapshot.hourlyRepayUSD =
+        marketHourlySnapshot.hourlyRepayUSD.plus(amountUSD);
+      break;
     default:
       break;
   }
@@ -1161,19 +1180,30 @@ function updateMarketSnapshots(
       marketDailySnapshot.dailyLiquidateUSD =
         marketDailySnapshot.dailyLiquidateUSD.plus(amountUSD);
       break;
+    case EventType.Withdraw:
+      marketDailySnapshot.dailyWithdrawUSD =
+        marketDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
+      break;
+    case EventType.Repay:
+      marketDailySnapshot.dailyRepayUSD =
+        marketDailySnapshot.dailyRepayUSD.plus(amountUSD);
+      break;
     default:
       break;
   }
   marketDailySnapshot.save();
 }
 
+// updateMarketPrices: true when every market price is updated on AccrueInterest()
 export function updateMarket(
   updateMarketData: UpdateMarketData,
   marketID: string,
   interestAccumulatedMantissa: BigInt,
   newTotalBorrow: BigInt,
   blockNumber: BigInt,
-  blockTimestamp: BigInt
+  blockTimestamp: BigInt,
+  updateMarketPrices: boolean,
+  comptrollerAddress: Address
 ): void {
   let market = Market.load(marketID);
   if (!market) {
@@ -1189,6 +1219,11 @@ export function updateMarket(
     return;
   }
 
+  if (updateMarketPrices) {
+    updateAllMarketPrices(comptrollerAddress, blockNumber);
+  }
+
+  // update this market's price no matter what
   let underlyingTokenPriceUSD = getTokenPriceUSD(
     updateMarketData.getUnderlyingPriceResult,
     underlyingToken.decimals
@@ -1279,6 +1314,7 @@ export function updateMarket(
   market.totalValueLockedUSD = underlyingSupplyUSD;
   market.totalDepositBalanceUSD = underlyingSupplyUSD;
 
+  market._borrowBalance = newTotalBorrow;
   market.totalBorrowBalanceUSD = newTotalBorrow
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
@@ -1323,28 +1359,43 @@ export function updateMarket(
     protocolSideRevenueUSDDelta
   );
 
-  market._cumulativeTotalRevenueUSD = market._cumulativeTotalRevenueUSD.plus(
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(
     interestAccumulatedUSD
   );
-  market._cumulativeProtocolSideRevenueUSD =
-    market._cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
-  market._cumulativeSupplySideRevenueUSD =
-    market._cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  market.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
+  market.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
   market.save();
 
-  // update daily fields in snapshot
-  let snapshot = getOrCreateMarketDailySnapshot(
+  // update daily fields in marketDailySnapshot
+  let dailySnapshot = getOrCreateMarketDailySnapshot(
     market.id,
     blockTimestamp.toI32()
   );
-  snapshot._dailyTotalRevenueUSD = snapshot._dailyTotalRevenueUSD.plus(
+  dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
     interestAccumulatedUSD
   );
-  snapshot._dailyProtocolSideRevenueUSD =
-    snapshot._dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
-  snapshot._dailySupplySideRevenueUSD =
-    snapshot._dailySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
-  snapshot.save();
+  dailySnapshot.dailyProtocolSideRevenueUSD =
+    dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
+  dailySnapshot.dailySupplySideRevenueUSD =
+    dailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  dailySnapshot.save();
+
+  // update hourly fields in marketHourlySnapshot
+  let hourlySnapshot = getOrCreateMarketHourlySnapshot(
+    market.id,
+    blockTimestamp.toI32()
+  );
+  hourlySnapshot.hourlyTotalRevenueUSD =
+    hourlySnapshot.hourlyTotalRevenueUSD.plus(interestAccumulatedUSD);
+  hourlySnapshot.hourlyProtocolSideRevenueUSD =
+    hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+      protocolSideRevenueUSDDelta
+    );
+  hourlySnapshot.hourlySupplySideRevenueUSD =
+    hourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  hourlySnapshot.save();
 }
 
 export function updateProtocol(comptrollerAddr: Address): void {
@@ -1391,13 +1442,13 @@ export function updateProtocol(comptrollerAddr: Address): void {
       market.cumulativeLiquidateUSD
     );
     cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD.plus(
-      market._cumulativeTotalRevenueUSD
+      market.cumulativeTotalRevenueUSD
     );
     cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD.plus(
-      market._cumulativeProtocolSideRevenueUSD
+      market.cumulativeProtocolSideRevenueUSD
     );
     cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD.plus(
-      market._cumulativeSupplySideRevenueUSD
+      market.cumulativeSupplySideRevenueUSD
     );
   }
 
@@ -1446,6 +1497,7 @@ export function _getOrCreateProtocol(
     protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    protocol.totalPoolCount = INT_ZERO;
     protocol._marketIDs = [];
 
     // set liquidation incentive
@@ -1454,6 +1506,7 @@ export function _getOrCreateProtocol(
         "[getOrCreateProtocol] liquidationIncentiveMantissaResult reverted",
         []
       );
+      protocol._liquidationIncentive = BIGDECIMAL_ZERO;
     } else {
       protocol._liquidationIncentive =
         protocolData.liquidationIncentiveMantissaResult.value
@@ -1473,7 +1526,7 @@ export function _getOrCreateProtocol(
   return protocol;
 }
 
-function getOrCreateMarketHourlySnapshot(
+export function getOrCreateMarketHourlySnapshot(
   marketID: string,
   blockTimestamp: i32
 ): MarketHourlySnapshot {
@@ -1486,6 +1539,11 @@ function getOrCreateMarketHourlySnapshot(
     snapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
     snapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
     snapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyRepayUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
   }
 
   return snapshot;
@@ -1568,9 +1626,11 @@ export function getOrCreateMarketDailySnapshot(
     snapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
     snapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
     snapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
-    snapshot._dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot._dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot._dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   }
 
   return snapshot;
@@ -1641,4 +1701,56 @@ function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
     snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
+}
+
+export function updateAllMarketPrices(
+  comptrollerAddr: Address,
+  blockNumber: BigInt
+): void {
+  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  if (!protocol) {
+    log.warning("[updateAllMarketPrices] protocol not found: {}", [
+      comptrollerAddr.toHexString(),
+    ]);
+    return;
+  }
+  let priceOracle = PriceOracle.bind(Address.fromString(protocol._priceOracle));
+
+  for (let i = 0; i < protocol._marketIDs.length; i++) {
+    let market = Market.load(protocol._marketIDs[i]);
+    if (!market) {
+      break;
+    }
+    let underlyingToken = Token.load(market.inputToken);
+    if (!underlyingToken) {
+      break;
+    }
+
+    // update market price
+    let underlyingTokenPriceUSD = getTokenPriceUSD(
+      priceOracle.try_getUnderlyingPrice(Address.fromString(market.id)),
+      underlyingToken.decimals
+    );
+
+    underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
+    underlyingToken.lastPriceBlockNumber = blockNumber;
+    underlyingToken.save();
+
+    market.inputTokenPriceUSD = underlyingTokenPriceUSD;
+
+    // update TVL, supplyUSD, borrowUSD
+    market.totalDepositBalanceUSD = market.inputTokenBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(underlyingTokenPriceUSD);
+    market.totalBorrowBalanceUSD = market._borrowBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(underlyingTokenPriceUSD);
+    market.totalValueLockedUSD = market.inputTokenBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(underlyingTokenPriceUSD);
+    market.save();
+  }
 }

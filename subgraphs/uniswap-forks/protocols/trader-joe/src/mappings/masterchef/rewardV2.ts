@@ -1,17 +1,88 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw } from "../../../../../generated/MasterChefV2/MasterChefV2TraderJoe";
-import { _HelperStore } from "../../../../../generated/schema";
-import { UsageType } from "../../../../../src/common/constants";
-import { handleRewardV2 } from "../../common/handlers/handleRewardV2";
+import { log } from "@graphprotocol/graph-ts";
+import {
+  Deposit,
+  Withdraw,
+  EmergencyWithdraw,
+  Add,
+  Set,
+  UpdateEmissionRate,
+} from "../../../../../generated/MasterChefV2/MasterChefV2TraderJoe";
+import {
+  _HelperStore,
+  _MasterChefStakingPool,
+} from "../../../../../generated/schema";
+import { MasterChef } from "../../../../../src/common/constants";
+import {
+  updateMasterChefDeposit,
+  updateMasterChefWithdraw,
+} from "../../common/handlers/handleRewardV2";
+import {
+  createMasterChefStakingPool,
+  getOrCreateMasterChef,
+  updateMasterChefTotalAllocation,
+} from "../../common/helpers";
 
-export function handleDepositV2(event: DepositEvent): void {
-  handleRewardV2(event, event.params.pid, event.params.amount, UsageType.DEPOSIT);
+// A deposit or stake for the pool specific MasterChef.
+export function handleDeposit(event: Deposit): void {
+  updateMasterChefDeposit(event, event.params.pid, event.params.amount);
 }
 
-export function handleWithdrawV2(event: WithdrawEvent): void {
-  handleRewardV2(event, event.params.pid, event.params.amount, UsageType.WITHDRAW);
+// A withdraw or unstaking for the pool specific MasterChef.
+export function handleWithdraw(event: Withdraw): void {
+  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
 }
 
-export function handleEmergencyWithdrawV2(event: EmergencyWithdraw): void {
-  handleRewardV2(event, event.params.pid, event.params.amount, UsageType.WITHDRAW);
+// A withdraw or unstaking for the pool specific MasterChef.
+export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
+  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
+}
+
+// Handle the addition of a new pool to the MasterChef. New staking pool.
+export function handleAdd(event: Add): void {
+  let masterChefV2Pool = createMasterChefStakingPool(
+    event,
+    MasterChef.MASTERCHEFV2,
+    event.params.pid,
+    event.params.lpToken
+  );
+  updateMasterChefTotalAllocation(
+    event,
+    masterChefV2Pool.poolAllocPoint,
+    event.params.allocPoint,
+    MasterChef.MASTERCHEFV2
+  );
+  masterChefV2Pool.poolAllocPoint = event.params.allocPoint;
+  masterChefV2Pool.save();
+}
+
+// Update the allocation points of the pool.
+export function handleSet(event: Set): void {
+  let masterChefV2Pool = _MasterChefStakingPool.load(
+    MasterChef.MASTERCHEFV2 + "-" + event.params.pid.toString()
+  )!;
+  updateMasterChefTotalAllocation(
+    event,
+    masterChefV2Pool.poolAllocPoint,
+    event.params.allocPoint,
+    MasterChef.MASTERCHEFV2
+  );
+  masterChefV2Pool.poolAllocPoint = event.params.allocPoint;
+  masterChefV2Pool.save();
+}
+
+// Update the total emissions rate of rewards for the masterchef contract.
+export function handleUpdateEmissionRate(event: UpdateEmissionRate): void {
+  let masterChefV2Pool = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+  let masterChefV3Pool = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV3);
+
+  log.warning("NEW REWARD RATE: " + event.params._joePerSec.toString(), []);
+
+  masterChefV2Pool.rewardTokenRate = event.params._joePerSec;
+  masterChefV2Pool.adjustedRewardTokenRate = event.params._joePerSec;
+
+  masterChefV3Pool.rewardTokenRate = event.params._joePerSec;
+
+  masterChefV2Pool.save();
+  masterChefV3Pool.save();
 }

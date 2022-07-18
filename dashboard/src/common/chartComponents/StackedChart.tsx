@@ -15,9 +15,10 @@ export function StackedChart({ tokens, tokenWeightsArray, poolTitle }: StackedCh
   const dates: string[] = [];
 
   const tokenWeightsValues = tokenWeightsArray.map((x) => {
+    const hourly = poolTitle.toUpperCase().includes("HOURLY");
     const currentTokenValues = x.map((weight: { [x: string]: any }) => {
       if (dates.length < x.length) {
-        dates.push(toDate(weight.date));
+        dates.push(toDate(weight.date, hourly));
       }
       return Number(weight.value);
     });

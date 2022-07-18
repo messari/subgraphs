@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: RariUSDCFundManager
-    network: { { network } }
+    network: {{ network }}
     source:
       address: "{{ rariUSDCFundManager.address }}"
       abi: RariStableFundManager
-      startBlock: { { rariUSDCFundManager.startBlock } }
+      startBlock: {{ rariUSDCFundManager.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -77,11 +77,11 @@ dataSources:
           handler: handleUSDCWithdrawal
   - kind: ethereum/contract
     name: RariYieldFundManager
-    network: { { network } }
+    network: {{ network }}
     source:
-      address: " {{ rariYieldFundManager.address }}"
+      address: "{{ rariYieldFundManager.address }}"
       abi: RariYieldFundManager
-      startBlock: { { rariYieldFundManager.startBlock } }
+      startBlock: {{ rariYieldFundManager.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -149,11 +149,11 @@ dataSources:
           handler: handleYieldWithdrawal
   - kind: ethereum/contract
     name: RariDAIFundManager
-    network: { { network } }
+    network: {{ network }}
     source:
       address: "{{ rariDAIFundManager.address }}"
       abi: RariStableFundManager
-      startBlock: { { rariDAIFundManager.startBlock } }
+      startBlock: {{ rariDAIFundManager.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -221,11 +221,11 @@ dataSources:
           handler: handleDAIWithdrawal
   - kind: ethereum/contract
     name: RariEtherFundManager
-    network: { { network } }
+    network: {{ network }}
     source:
       address: "{{ rariEtherFundManager.address}}"
       abi: RariEtherFundManager
-      startBlock: { { rariEtherFundManager.startBlock } }
+      startBlock: {{ rariEtherFundManager.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

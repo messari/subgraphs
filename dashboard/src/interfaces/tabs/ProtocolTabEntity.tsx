@@ -1,13 +1,11 @@
 import { Box, CircularProgress, Grid, Typography } from "@mui/material";
-import { useState } from "react";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
-import { negativeFieldList, ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../../constants";
-import { convertTokenDecimals, toDate } from "../../utils";
-import SchemaTable from "../SchemaTable";
-import IssuesDisplay from "../IssuesDisplay";
+import { negativeFieldList } from "../../constants";
+import { convertTokenDecimals } from "../../utils";
 import { useEffect } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
+import { BigNumber } from "bignumber.js";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
@@ -62,16 +60,6 @@ function ProtocolTabEntity({
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
-        if (timeseriesInstance.dailySupplySideRevenueUSD && timeseriesInstance.totalValueLockedUSD) {
-          const value = (timeseriesInstance.dailySupplySideRevenueUSD / timeseriesInstance.totalValueLockedUSD) * 100;
-          if (!dataFields.capitalEfficiency) {
-            dataFields.capitalEfficiency = [{ value, date: Number(timeseriesInstance.timestamp) }];
-            dataFieldMetrics.capitalEfficiency = { sum: value };
-          } else {
-            dataFields.capitalEfficiency.push({ value, date: Number(timeseriesInstance.timestamp) });
-            dataFieldMetrics.capitalEfficiency.sum += value;
-          }
-        }
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
           // skip the timestamp field on each entity instance
           if (fieldName === "timestamp" || fieldName === "id") {
@@ -105,6 +93,49 @@ function ProtocolTabEntity({
                   };
                 }
                 dataFieldMetrics[fieldName].negative.count += 1;
+              }
+              if (fieldName.endsWith("TotalRevenueUSD") && !dataFieldMetrics[fieldName].revSumMismatch) {
+                // store ID of first instance where total rev != supply + protocol rev
+                const fieldSplit = fieldName.split("TotalRevenueUSD");
+                const totalRevenue = new BigNumber(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].sum);
+                const sumRevenue = new BigNumber(dataFieldMetrics[`${fieldSplit[0]}ProtocolSideRevenueUSD`].sum).plus(
+                  new BigNumber(dataFieldMetrics[`${fieldSplit[0]}SupplySideRevenueUSD`].sum),
+                );
+                if (!sumRevenue.isEqualTo(totalRevenue)) {
+                  const divergence = totalRevenue.minus(sumRevenue).div(totalRevenue).times(100).toNumber().toFixed(1);
+                  dataFieldMetrics[fieldName].revSumMismatch = {
+                    timeSeriesInstanceId: timeseriesInstance.id,
+                    totalRevenue,
+                    sumRevenue,
+                    divergence,
+                  };
+                }
+              }
+              if (fieldName.endsWith("TransactionCount") && !dataFieldMetrics[fieldName].txSumMismatch) {
+                // store ID of first instance where total tx != sum of all individual tx
+                const individualTxCountKeys = Object.keys(timeseriesInstance).filter(
+                  (field) =>
+                    (field.startsWith("daily") || field.startsWith("hourly")) &&
+                    field.endsWith("Count") &&
+                    !field.endsWith("TransactionCount"),
+                );
+                const individualTxSum = individualTxCountKeys.reduce(
+                  (prev, currentKey) => prev.plus(new BigNumber(timeseriesInstance[currentKey])),
+                  new BigNumber(0),
+                );
+
+                const totalTxKey = Object.keys(timeseriesInstance).find((field) => field.endsWith("TransactionCount"));
+                const totalTx = new BigNumber(totalTxKey || 0);
+
+                if (!individualTxSum.isEqualTo(totalTx)) {
+                  const divergence = totalTx.minus(individualTxSum).div(totalTx).times(100).toNumber().toFixed(1);
+                  dataFieldMetrics[fieldName].txSumMismatch = {
+                    timeSeriesInstanceId: timeseriesInstance.id,
+                    individualTxSum,
+                    totalTx,
+                    divergence,
+                  };
+                }
               }
               if (fieldName.includes("umulative")) {
                 if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
@@ -164,9 +195,7 @@ function ProtocolTabEntity({
               }
             }
           } catch (err) {
-            if (
-              issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0
-            ) {
+            if (issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0) {
               let message = "JAVASCRIPT ERROR";
               if (err instanceof Error) {
                 message = err.message;
@@ -202,7 +231,7 @@ function ProtocolTabEntity({
             const req =
               "!" ===
               entitiesData[entityName][entityField].split("")[
-              entitiesData[entityName][entityField].split("").length - 1
+                entitiesData[entityName][entityField].split("").length - 1
               ];
             if (req) {
               list[entityName][entityField] = "MISSING AND REQUIRED";
@@ -212,21 +241,6 @@ function ProtocolTabEntity({
           }
         }
       }
-      console.log("LIST", list);
-
-      if (dataFields.protocolControlledValueUSD) {
-        const capitalEfficiency = dataFields.capitalEfficiency;
-        delete dataFields.capitalEfficiency;
-        dataFields.capitalEfficiency = capitalEfficiency;
-      }
-
-      if (dataFields.protocolControlledValueUSD) {
-        const protocolControlledValueUSD = dataFields.protocolControlledValueUSD;
-        delete dataFields.protocolControlledValueUSD;
-        dataFields.protocolControlledValueUSD = protocolControlledValueUSD;
-      }
-
-      console.log("DATAFIELDSOBJ-PROTOCOL", dataFields);
 
       // For each entity field/key in the dataFields object, create a chart and tableChart component
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
@@ -268,6 +282,25 @@ function ProtocolTabEntity({
                   }
                 }
                 issues.push({ type: "SUM", message: "", fieldName: label, level });
+              }
+              if (dataFieldMetrics[field].revSumMismatch && dataFieldMetrics[field].revSumMismatch.divergence > 5) {
+                // if total revenue != protocol + supply revenue, add a warning
+                const fieldSplit = field.split("TotalRevenueUSD");
+                issues.push({
+                  type: "TOTAL_REV",
+                  message: JSON.stringify(dataFieldMetrics[`${fieldSplit[0]}TotalRevenueUSD`].revSumMismatch),
+                  level: "warning",
+                  fieldName: label,
+                });
+              }
+              if (dataFieldMetrics[field].txSumMismatch && dataFieldMetrics[field].txSumMismatch.divergence > 5) {
+                // if total transactions != sum of all individual transactions, add a warning
+                issues.push({
+                  type: "TOTAL_TX",
+                  message: JSON.stringify(dataFieldMetrics[field].txSumMismatch),
+                  level: "warning",
+                  fieldName: label,
+                });
               }
               if (
                 issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE")?.length === 0 &&
@@ -363,6 +396,13 @@ function ProtocolTabEntity({
       </Grid>
     );
   } else {
+    console.log(
+      currentTimeseriesLoading,
+      currentTimeseriesLoading,
+      currentEntityData,
+      currentTimeseriesError,
+      protocolTableData,
+    );
     return (
       <Grid key={entityName}>
         <Box my={3}>

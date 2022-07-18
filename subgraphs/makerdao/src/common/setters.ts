@@ -8,6 +8,7 @@ export function updateProtocolMarketList(marketAddress: string): void {
   let marketIdList = protocol.marketIDList;
   marketIdList.push(marketAddress);
   protocol.marketIDList = marketIdList;
+  protocol.totalPoolCount += 1;
   protocol.save();
 }
 
@@ -40,6 +41,9 @@ export function createMarket(
   MarketEntity.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
   MarketEntity.cumulativeDepositUSD = BIGDECIMAL_ZERO;
   MarketEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+  MarketEntity.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  MarketEntity.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  MarketEntity.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
   MarketEntity.createdTimestamp = blockTimestamp;
   MarketEntity.createdBlockNumber = blockNumber;
   MarketEntity.name = ilk.toString();

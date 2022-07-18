@@ -57,12 +57,10 @@ function PoolTab({
   const poolKeySingular = PoolName[data.protocols[0].type];
   const poolKeyPlural = PoolNames[data.protocols[0].type];
 
-  let allLoaded = true;
-  Object.keys(poolTimeseriesLoading).forEach((entity: string) => {
-    if (poolTimeseriesLoading[entity]) {
-      allLoaded = false;
-    }
-  });
+  let allLoaded = false;
+  if (!poolTimeseriesLoading && (poolTimeseriesData || poolTimeseriesError)) {
+    allLoaded = true
+  }
 
   let oneLoaded = false;
   Object.keys(poolTimeseriesLoading).forEach((entity: string) => {
@@ -72,7 +70,7 @@ function PoolTab({
   });
 
   useEffect(() => {
-    console.log("PROTOCOL ISSUES TO SET", issuesToDisplay, issues, tableIssues);
+    console.log("POOL ISSUES TO SET", issuesToDisplay, issues, tableIssues);
     let brokenDownIssuesState: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
     Object.keys(issues).forEach((iss) => {
       brokenDownIssuesState = brokenDownIssuesState.concat(issues[iss]);
@@ -85,6 +83,7 @@ function PoolTab({
   let issuesDisplayElement = null;
 
   const entityData = data[poolKeySingular];
+
   let poolDropDown = null;
   if (poolsList) {
     poolDropDown = (
@@ -109,10 +108,22 @@ function PoolTab({
   }
 
   let poolDataSection = null;
+  let poolTable = null;
   if (poolId) {
     issuesDisplayElement = (
       <IssuesDisplay issuesArrayProps={issuesToDisplay} allLoaded={allLoaded} oneLoaded={oneLoaded} />
     );
+    if (poolData) {
+      poolTable = (
+        <SchemaTable
+          entityData={entityData}
+          schemaName={poolKeySingular}
+          dataFields={poolData}
+          setIssues={(x) => setTableIssues(x)}
+          issuesProps={tableIssues}
+        />
+      );
+    }
     if (poolTimeseriesData) {
       const poolEntityElements = Object.keys(poolTimeseriesData).map((entityName: string) => {
         return (
@@ -130,26 +141,14 @@ function PoolTab({
       });
       poolDataSection = (
         <div>
-          <SchemaTable
-            entityData={entityData}
-            schemaName={poolKeySingular}
-            dataFields={poolData}
-            setIssues={(x) => setTableIssues(x)}
-            issuesProps={tableIssues}
-          />
+          {poolTable}
           {poolEntityElements}
         </div>
       );
     } else if (!poolTimeseriesData && !poolTimeseriesError) {
       poolDataSection = (
         <div>
-          <SchemaTable
-            entityData={entityData}
-            schemaName={poolKeySingular}
-            dataFields={poolData}
-            setIssues={(x) => setTableIssues(x)}
-            issuesProps={tableIssues}
-          />
+          {poolTable}
           <CircularProgress sx={{ margin: 6 }} size={50} />
         </div>
       );
@@ -167,13 +166,7 @@ function PoolTab({
     } else {
       poolDataSection = (
         <div>
-          <SchemaTable
-            entityData={entityData}
-            schemaName={poolKeySingular}
-            dataFields={poolData}
-            setIssues={(x) => setTableIssues(x)}
-            issuesProps={tableIssues}
-          />
+          {poolTable}
           <Grid>
             <Box my={3}>
               <CopyLinkToClipboard link={window.location.href}>

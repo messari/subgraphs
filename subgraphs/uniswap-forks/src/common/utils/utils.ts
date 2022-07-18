@@ -20,7 +20,7 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 // convert emitted values to tokens count
 export function convertTokenToDecimal(
   tokenAmount: BigInt,
-  exchangeDecimals: i32,
+  exchangeDecimals: i32
 ): BigDecimal {
   if (exchangeDecimals == INT_ZERO) {
     return tokenAmount.toBigDecimal();
@@ -47,7 +47,10 @@ export function toBytesArray(arr: string[]): Bytes[] {
   return byteArr;
 }
 
-export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T): T {
+export function readValue<T>(
+  callResult: ethereum.CallResult<T>,
+  defaultValue: T
+): T {
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
@@ -66,4 +69,13 @@ export function toLowerCaseList(list: string[]): string[] {
 
 export function toLowerCase(string: string): string {
   return string.toLowerCase();
+}
+
+// Round BigDecimal to whole number
+export function roundToWholeNumber(n: BigDecimal): BigDecimal {
+  return n.truncate(0);
+}
+
+export function percToDec(percentage: BigDecimal): BigDecimal {
+  return percentage.div(BIGDECIMAL_HUNDRED);
 }

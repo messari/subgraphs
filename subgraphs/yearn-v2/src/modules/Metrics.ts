@@ -1,6 +1,4 @@
-import {
-  ActiveAccount,
-} from "../../generated/schema";
+import { ActiveAccount } from "../../generated/schema";
 import {
   getOrCreateVault,
   getOrCreateAccount,
@@ -17,7 +15,7 @@ import { Address, ethereum } from "@graphprotocol/graph-ts";
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   const account = getOrCreateAccount(from.toHexString());
 
-  const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+  const protocol = getOrCreateYieldAggregator();
   const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block);
   const usageMetricsHourly = getOrCreateUsageMetricsHourlySnapshot(block);
 
@@ -61,13 +59,28 @@ export function updateVaultSnapshots(
   let vault = getOrCreateVault(vaultAddress, block);
 
   const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
-    vaultAddress,
+    vaultAddress.toHexString(),
     block
   );
   const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    vaultAddress,
+    vaultAddress.toHexString(),
     block
   );
+
+  vaultDailySnapshots.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD;
+  vaultHourlySnapshots.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD;
+
+  vaultDailySnapshots.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD;
+  vaultHourlySnapshots.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD;
+
+  vaultDailySnapshots.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD;
+  vaultHourlySnapshots.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD;
 
   vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
@@ -96,7 +109,7 @@ export function updateVaultSnapshots(
 
 export function updateFinancials(block: ethereum.Block): void {
   const financialMetrics = getOrCreateFinancialDailySnapshots(block);
-  const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+  const protocol = getOrCreateYieldAggregator();
 
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD =
