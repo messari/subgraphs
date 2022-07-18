@@ -294,13 +294,16 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
               Address.fromString(protocol.priceOracle)
             );
           }
-        } else {
+        }
+
+        // if reward token price was not found then use old method
+        if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
           rewardTokenPriceUSD = getAssetPriceInUSDC(
             tryRewardAsset.value,
             Address.fromString(protocol.priceOracle)
           );
         }
-
+        
         let rewardsPerDayUSD = rewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
