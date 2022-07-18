@@ -48,6 +48,8 @@ templates:
       abis:
         - name: AaveIncentivesController
           file: ./abis/aave-v2/AaveIncentivesController.json
+        - name: StakedAave
+          file: ./abis/aave-v2/StakedAave.json
         - name: AToken
           file: ./abis/aave-v2/AToken.json
         - name: VariableDebtToken
