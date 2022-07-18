@@ -24,14 +24,9 @@ export function updateProtocolAndPoolTvl(
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
 
-  // inputToken is ETH, price with ETH
-  const amountUSD = bigIntToBigDecimal(amount).times(
-    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
-      .lastPriceUSD!
-  );
-
   // Pool
   pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount)];
+  // inputToken is ETH, price with ETH
   pool.totalValueLockedUSD = bigIntToBigDecimal(
     pool.inputTokenBalances[0]
   ).times(
@@ -165,7 +160,7 @@ export function updateProtocolSideRevenueMetrics(
     block
   );
 
-  // TODO: Rewards are minted in stETH shares, should we price with stETH? CONFIRM.
+  // Staking rewards revenue is in ETH (rebased in stETH for user), price in ETH
   const amountUSD = bigIntToBigDecimal(amount).times(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
