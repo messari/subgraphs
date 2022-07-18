@@ -895,10 +895,51 @@
       }
     },
     "openzeppelin-governor": {
+      "ens-governance": {
+        "mainnet": {
+          "template": "ens-governance.template.yaml",
+          "danielkhoo": "danielkhoo/ens-governance",
+          "messari": "messari/ens-governance",
+          "deploy-on-merge": true
+        }
+      },
+      "euler-governance": {
+        "mainnet": {
+          "template": "euler-governance.template.yaml",
+          "danielkhoo": "danielkhoo/euler-governance",
+          "messari": "messari/euler-governance",
+          "deploy-on-merge": false
+        }
+      },
+      "fei-governance": {
+        "mainnet": {
+          "template": "fei-governance.template.yaml",
+          "danielkhoo": "danielkhoo/fei-governance",
+          "messari": "messari/fei-governance",
+          "deploy-on-merge": false
+        }
+      },
+      "hop-governance": {
+        "mainnet": {
+          "template": "hop-governance.template.yaml",
+          "danielkhoo": "danielkhoo/hop-governance",
+          "messari": "messari/hop-governance",
+          "deploy-on-merge": false
+        }
+      },
+      "silo-governance": {
+        "mainnet": {
+          "template": "silo-governance.template.yaml",
+          "danielkhoo": "danielkhoo/silo-governance",
+          "messari": "messari/silo-governance",
+          "deploy-on-merge": false
+        }
+      },
       "truefi-governance": {
         "ethereum": {
           "template": "truefi-governance.template.yaml",
           "danielkhoo": "danielkhoo/truefi-governance",
+          "messari": "messari/truefi-governance",
           "deploy-on-merge": false
         }
       }
