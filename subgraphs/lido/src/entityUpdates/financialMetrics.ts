@@ -216,25 +216,34 @@ export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
   );
 
   // Pool
-  pool.cumulativeSupplySideRevenueUSD = pool.cumulativeTotalRevenueUSD.minus(
-    pool.cumulativeProtocolSideRevenueUSD
-  );
+  pool.cumulativeSupplySideRevenueUSD =
+    pool.cumulativeTotalRevenueUSD == BIGDECIMAL_ZERO
+      ? BIGDECIMAL_ZERO
+      : pool.cumulativeTotalRevenueUSD.minus(
+          pool.cumulativeProtocolSideRevenueUSD
+        );
   pool.save();
 
   // Pool Daily
   poolMetricsDailySnapshot.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
-  poolMetricsDailySnapshot.dailySupplySideRevenueUSD = poolMetricsDailySnapshot.dailyTotalRevenueUSD.minus(
-    poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD
-  );
+  poolMetricsDailySnapshot.dailySupplySideRevenueUSD =
+    poolMetricsDailySnapshot.dailyTotalRevenueUSD == BIGDECIMAL_ZERO
+      ? BIGDECIMAL_ZERO
+      : poolMetricsDailySnapshot.dailyTotalRevenueUSD.minus(
+          poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD
+        );
   poolMetricsDailySnapshot.save();
 
   // Pool Hourly
   poolMetricsHourlySnapshot.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
-  poolMetricsHourlySnapshot.hourlySupplySideRevenueUSD = poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.minus(
-    poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD
-  );
+  poolMetricsHourlySnapshot.hourlySupplySideRevenueUSD =
+    poolMetricsHourlySnapshot.hourlyTotalRevenueUSD == BIGDECIMAL_ZERO
+      ? BIGDECIMAL_ZERO
+      : poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.minus(
+          poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD
+        );
   poolMetricsHourlySnapshot.save();
 
   // Protocol
@@ -244,9 +253,12 @@ export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
   // Financial Daily
   financialMetrics.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
-  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailyTotalRevenueUSD.minus(
-    financialMetrics.dailyProtocolSideRevenueUSD
-  );
+  financialMetrics.dailySupplySideRevenueUSD =
+    financialMetrics.dailyTotalRevenueUSD == BIGDECIMAL_ZERO
+      ? BIGDECIMAL_ZERO
+      : financialMetrics.dailyTotalRevenueUSD.minus(
+          financialMetrics.dailyProtocolSideRevenueUSD
+        );
   financialMetrics.save();
 }
 
