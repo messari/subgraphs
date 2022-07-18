@@ -580,6 +580,14 @@
         }
       }
     },
+    "maple-finance": {
+      "maple-finance": {
+        "ethereum": {
+          "template": "maple.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "stakedao": {
       "stakedao": {
         "ethereum": {
