@@ -15,7 +15,7 @@ import { Address, ethereum } from "@graphprotocol/graph-ts";
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   const account = getOrCreateAccount(from.toHexString());
 
-  const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+  const protocol = getOrCreateYieldAggregator();
   const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block);
   const usageMetricsHourly = getOrCreateUsageMetricsHourlySnapshot(block);
 
@@ -109,7 +109,7 @@ export function updateVaultSnapshots(
 
 export function updateFinancials(block: ethereum.Block): void {
   const financialMetrics = getOrCreateFinancialDailySnapshots(block);
-  const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+  const protocol = getOrCreateYieldAggregator();
 
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD =

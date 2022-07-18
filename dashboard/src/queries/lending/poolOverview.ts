@@ -6,10 +6,6 @@ export const schema = (version: string): string => {
   versionGroupArr.pop();
   const versionGroup = versionGroupArr.join(".") + ".0";
   switch (versionGroup) {
-    case Versions.Schema100:
-      return schema100();
-    case Versions.Schema110:
-      return schema110();
     case Versions.Schema120:
       return schema120();
     case Versions.Schema130:
@@ -18,79 +14,6 @@ export const schema = (version: string): string => {
     default:
       return schema201();
   }
-};
-
-export const schema100 = (): string => {
-  return `
-    query Data($skipAmt: Int!) {
-        markets(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
-            inputTokens{
-                decimals
-                name
-              }
-              outputToken {
-                id
-              }
-             
-              rewardTokens{
-                id
-              }
-              id
-             name
-             isActive
-             canUseAsCollateral
-             canBorrowFrom
-             maximumLTV
-             liquidationThreshold
-             liquidationPenalty
-             depositRate
-             stableBorrowRate
-             variableBorrowRate
-             rewardTokenEmissionsAmount
-             rewardTokenEmissionsUSD
-        }
-    }`;
-};
-
-export const schema110 = (): string => {
-  return `
-    query Data($skipAmt: Int!) {
-        markets(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
-            id
-            name
-            inputTokens{
-              id
-              decimals
-              name
-              symbol
-            }
-            outputToken {
-              id
-              decimals
-              name
-              symbol
-            }
-            rewardTokens{
-              id
-              decimals
-              name
-              symbol
-            }
-            inputTokenBalances
-            outputTokenSupply
-           isActive
-           canUseAsCollateral
-           canBorrowFrom
-           maximumLTV
-           liquidationThreshold
-           liquidationPenalty
-           depositRate
-           stableBorrowRate
-           variableBorrowRate
-           rewardTokenEmissionsAmount
-           rewardTokenEmissionsUSD
-        }
-    }`;
 };
 
 export const schema120 = (): string => {
@@ -113,6 +36,7 @@ export const schema120 = (): string => {
             }
             rewardTokens {
               id
+              type
               token {
                 id
                 decimals
@@ -169,6 +93,7 @@ export const schema130 = (): string => {
             }
             rewardTokens {
               id
+              type
               token {
                 id
                 decimals
@@ -228,6 +153,7 @@ export const schema201 = (): string => {
             }
             rewardTokens {
               id
+              type
               token {
                 id
                 decimals

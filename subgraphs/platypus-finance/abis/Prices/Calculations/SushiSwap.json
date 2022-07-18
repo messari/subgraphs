@@ -27,18 +27,14 @@
     "type": "constructor"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "tokenAddress", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "tokenAddress", "type": "address" }],
     "name": "getLpTokenPriceUsdc",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "tokenAddress", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "tokenAddress", "type": "address" }],
     "name": "getLpTokenTotalLiquidityUsdc",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -55,38 +51,28 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "tokenAddress", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "tokenAddress", "type": "address" }],
     "name": "getPriceFromRouterUsdc",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "tokenAddress", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "tokenAddress", "type": "address" }],
     "name": "getPriceUsdc",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "tokenAddress", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "tokenAddress", "type": "address" }],
     "name": "getRouterForLpToken",
-    "outputs": [
-      { "internalType": "contract PriceRouter", "name": "", "type": "address" }
-    ],
+    "outputs": [{ "internalType": "contract PriceRouter", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "tokenAddress", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "tokenAddress", "type": "address" }],
     "name": "isLpToken",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",

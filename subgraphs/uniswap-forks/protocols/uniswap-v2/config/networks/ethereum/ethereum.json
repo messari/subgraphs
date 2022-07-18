@@ -1,0 +1,11 @@
+{
+  "deployment": "UNISWAP_V2_ETHEREUM",
+  "network": "mainnet",
+  "factory": {
+    "address": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+    "startBlock": 10000834
+  },
+  "graftEnabled": true,
+  "subgraphId": "Qmb5tNSKKvtUviEvmnicuQKE596RJsV8Wnx72DE8KnyqmJ",
+  "graftStartBlock": 11014325
+}

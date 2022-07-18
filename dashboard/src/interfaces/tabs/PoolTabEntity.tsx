@@ -224,8 +224,6 @@ function PoolTabEntity({
               const token = data[poolKeySingular]?.rewardTokens[idx];
               if (token?.token?.name) {
                 dataFieldKey = " [" + token?.token?.name + "]";
-              } else if (token?.name) {
-                dataFieldKey = " [" + token?.name + "]";
               } else {
                 dataFieldKey = " [" + idx + "]";
               }
@@ -315,9 +313,7 @@ function PoolTabEntity({
                   // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
 
                   const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
-                  if (currentRewardToken?.decimals || currentRewardToken?.decimals === 0) {
-                    value = convertTokenDecimals(val, currentRewardToken?.decimals);
-                  } else if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
+                  if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
                     value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
                   } else {
                     value = convertTokenDecimals(val, 18);
@@ -325,10 +321,19 @@ function PoolTabEntity({
                 }
 
                 if (fieldName === "rewardTokenEmissionsUSD") {
-                  //Convert emissions amount in USD to APY/APR
-                  // total reward emission USD / total staked USD * 100 = reward APR
+                  //Convert emissions amount in USD to APR
+                  const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
                   let apr = 0;
-                  if (timeseriesInstance?.totalDepositBalanceUSD && data.protocols[0].type === "LENDING") {
+                  if (currentRewardToken.type === 'BORROW' && data.protocols[0].type === "LENDING" && timeseriesInstance?.totalBorrowBalanceUSD) {
+                    apr = (Number(val) / timeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
+                  } else if (currentRewardToken.type === 'BORROW' && issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length === 0) {
+                    issues.push({
+                      type: "BORROW",
+                      message: "Attempted to calculate APR of BORROW reward token. Field 'totalBorrowBalanceUSD' is not present in the timeseries instance.",
+                      level: "critical",
+                      fieldName: entityName + "-" + fieldName,
+                    });
+                  } else if (timeseriesInstance?.totalDepositBalanceUSD && data.protocols[0].type === "LENDING") {
                     apr = (Number(val) / timeseriesInstance.totalDepositBalanceUSD) * 100 * 365;
                   } else {
                     if (
@@ -463,7 +468,7 @@ function PoolTabEntity({
 
     // The rewardAPRElement logic is used to take all of the rewardAPR and display their lines on one graph
     let rewardAPRElement = null;
-    if (Object.keys(rewardChart).length > 0) {
+    if (Object.keys(rewardChart).length > 0 && !dataFieldMetrics['rewardAPR']?.invalidDataPlot) {
       const elementId = entityName + "-rewardAPR";
       const tableVals: { value: any; date: any }[] = [];
       const firstKey = Object.keys(rewardChart)[0];
@@ -477,23 +482,13 @@ function PoolTabEntity({
           ) {
             issues.push({ type: "SUM", level: "error", fieldName: entityName + "-" + reward, message: "" });
           }
-          let currentRewardToken: { [x: string]: string } = {};
-          if (data[poolKeySingular].rewardTokens[idx]?.token) {
-            currentRewardToken = data[poolKeySingular].rewardTokens[idx].token;
-          } else {
-            currentRewardToken = data[poolKeySingular].rewardTokens[idx];
-          }
+          const currentRewardToken: { [x: string]: string } = data[poolKeySingular]?.rewardTokens[idx]?.token;
           const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol + " " : "";
           tableVals[x].value.push(`${symbol}[${idx}]: ${rewardChart[reward][x].value.toFixed(3)}`);
         });
       }
       Object.keys(rewardChart).forEach((reward: any, idx: number) => {
-        let currentRewardToken: { [x: string]: string } = {};
-        if (data[poolKeySingular].rewardTokens[idx]?.token) {
-          currentRewardToken = data[poolKeySingular].rewardTokens[idx].token;
-        } else {
-          currentRewardToken = data[poolKeySingular].rewardTokens[idx];
-        }
+        const currentRewardToken: { [x: string]: string } = data[poolKeySingular].rewardTokens[idx].token;
         const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
         const val = rewardChart[reward];
         rewardChart[`${name} [${idx}]`] = val;
@@ -652,12 +647,7 @@ function PoolTabEntity({
                 (fieldName.toUpperCase().includes("REWARDTOKEN") || fieldName.toUpperCase().includes("REWARDAPR")) &&
                 data[poolKeySingular]?.rewardTokens
               ) {
-                let currentRewardToken: { [x: string]: string } = {};
-                if (data[poolKeySingular]?.rewardTokens[arrayIndex]?.token) {
-                  currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex].token;
-                } else {
-                  currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
-                }
+                const currentRewardToken: { [x: string]: string } = data[poolKeySingular].rewardTokens[arrayIndex].token;
                 const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
                 const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol : "N/A";
                 label += " - " + symbol + ": " + name;
@@ -784,7 +774,9 @@ function PoolTabEntity({
               </div>
             );
           }
-
+          if (dataFieldMetrics[fieldName]?.invalidDataPlot || dataFieldMetrics[field]?.invalidDataPlot) {
+            return null
+          }
           return (
             <div key={elementId} id={linkToElementId}>
               <Box mt={3} mb={1}>

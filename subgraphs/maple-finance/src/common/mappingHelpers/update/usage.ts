@@ -18,6 +18,11 @@ export function updateUsageMetrics(event: ethereum.Event, accountAddress: Addres
     const protocol = getOrCreateProtocol();
 
     ////
+    // Updates directly from protocol
+    ////
+    usageDailyMetric.totalPoolCount = protocol.totalPoolCount;
+
+    ////
     // Update cumulative accounts
     ////
     let account = Account.load(accountAddress.toHexString());

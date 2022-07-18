@@ -3,7 +3,7 @@ import { CircularProgress, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -81,6 +81,9 @@ const messagesByLevel = (
       if (issuesArray[x].type === "EMPTY") {
         issuesMsg = `Entity ${issuesArray[x].fieldName} has no instances. This could mean that the pool was created but no transactions were detected on it.`;
       }
+      if (issuesArray[x].type === "BORROW") {
+        issuesMsg = `Entity ${issuesArray[x].fieldName} could not calculate BORROW Reward APR. The Pool Borrow Balance is not available.`;
+      }
       issuesMsgs.push(<li key={`${x}-${issuesArray[x].fieldName}`}>{issuesMsg}</li>);
     }
   }
@@ -106,7 +109,7 @@ export const IssuesDisplay = ({ issuesArrayProps, allLoaded, oneLoaded }: Issues
       <CircularProgress sx={{ margin: 6 }} size={50} />
     </>
   );
-  if (!oneLoaded && issuesArray.length === 0) {
+  if (!oneLoaded && !allLoaded && issuesArray.length === 0) {
     return <IssuesContainer $hasCritical={false}>{waitingElement}</IssuesContainer>;
   }
 

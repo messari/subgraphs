@@ -1,4 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BIGINT_TWO, BIGINT_ZERO, SECONDS_PER_YEAR } from "./constants";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
@@ -77,4 +78,21 @@ export function rayMul(a: BigInt, b: BigInt): BigInt {
   result = result.plus(halfRAY);
   let mult = result.div(RAY);
   return mult;
+}
+
+export function rayPow(a: BigInt, p: BigInt): BigInt {
+  let z = !p.mod(BIGINT_TWO).equals(BIGINT_ZERO) ? a : RAY;
+  for (p = p.div(BIGINT_TWO); !p.equals(BIGINT_ZERO); p = p.div(BIGINT_TWO)) {
+    a = rayMul(a, a);
+    if (!p.mod(BIGINT_TWO).equals(BIGINT_ZERO)) {
+      z = rayMul(z, a);
+    }
+  }
+  return z;
+}
+
+export function rayAPRtoAPY(apr: BigInt): BigInt {
+  return rayPow(apr.div(SECONDS_PER_YEAR).plus(RAY), SECONDS_PER_YEAR).minus(
+    RAY
+  );
 }

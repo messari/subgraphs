@@ -6,41 +6,39 @@ export namespace ProtocolType {
   export const GENERIC = "GENERIC";
 }
 export namespace Versions {
-  export const Schema100 = "1.0.0";
-  export const Schema110 = "1.1.0";
   export const Schema120 = "1.2.0";
   export const Schema130 = "1.3.0";
   export const Schema201 = "2.0.1";
 
   // Array to list out the different schema versions available
-  export const SchemaVersions = [Schema100, Schema110, Schema120, Schema130, Schema201];
+  export const SchemaVersions = [Schema120, Schema130, Schema201];
 }
 
-export const latestSchemaVersion = "2.0.1";
+export const latestSchemaVersion = "1.3.0";
 export const SubgraphBaseUrl = "https://api.thegraph.com/subgraphs/name/";
 export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",
   LENDING: "market",
   YIELD: "vault",
-  GENERIC: "pool"
+  GENERIC: "pool",
 };
 export const PoolNames: Record<string, string> = {
   EXCHANGE: "liquidityPools",
   LENDING: "markets",
   YIELD: "vaults",
-  GENERIC: "pools"
+  GENERIC: "pools",
 };
 export const ProtocolTypeEntityName: Record<string, string> = {
   EXCHANGE: "dexAmmProtocol",
   LENDING: "lendingProtocol",
   YIELD: "yieldAggregator",
-  GENERIC: "protocol"
+  GENERIC: "protocol",
 };
 export const ProtocolTypeEntityNames: Record<string, string> = {
   EXCHANGE: "dexAmmProtocols",
   LENDING: "lendingProtocols",
   YIELD: "yieldAggregators",
-  GENERIC: "pools"
+  GENERIC: "protocols",
 };
 export interface Schema {
   entities: string[];
@@ -83,8 +81,8 @@ export const blockExplorers: Record<string, string> = {
   CELO: "https://explorer.celo.org/",
   FUSE: "https://explorer.fuse.io/",
   HARMONY: "https://explorer.harmony.one/",
-  CRONOS: "https://cronoscan.com/"
-}
+  CRONOS: "https://cronoscan.com/",
+};
 
 // negativeFieldList contains field names that can be negative
 export const negativeFieldList = [];

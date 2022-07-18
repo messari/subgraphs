@@ -1,6 +1,6 @@
 import { Autocomplete, Typography } from "@mui/material";
 import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ComboBoxInput } from "./ComboBoxInput";
 
 /**
@@ -24,7 +24,6 @@ interface PoolDropDownProps {
 }
 
 export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDropDownProps) => {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   // Create the array of pool selections in the drop down
   const options = markets.map((market: any) => {
@@ -49,16 +48,16 @@ export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDrop
         sx={{ maxWidth: 1000, my: 2 }}
         onChange={(event: React.SyntheticEvent) => {
           // Upon selecting a pool from the list, get the pool id and navigate to the routing for that pool
+          const href = new URL(window.location.href);
+          const p = new URLSearchParams(href.search);
           setIssues([]);
           const targEle = event?.target as HTMLLIElement;
           setTextInput(targEle.innerText);
-          searchParams.delete("view");
+          p.delete("view");
           if (targEle.innerText) {
+            p.set("poolId", targEle.innerText?.split(" / ")[0]);
             setPoolId(targEle.innerText?.split(" / ")[0]);
-            navigate(
-              `?endpoint=${searchParams.get("endpoint")}&tab=${searchParams.get("tab")}&poolId=${targEle.innerText?.split(" / ")[0]
-              }`,
-            );
+            navigate("?" + p.toString().split("%2F").join("/"));
           }
         }}
         renderInput={(params) => <ComboBoxInput label="PoolList" params={params} setTextInput={setTextInput} />}

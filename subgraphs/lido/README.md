@@ -1,6 +1,197 @@
 # Lido Subgraph
-## Calculation Methodology v1.0.0
 
+## Methodology v1.1.0
+
+## Overview of the Products of Lido
+Lido is a staking service provider, mainly known as the largest ETH2.0 staking service provider. Lido's other staking products include:
+
+- ETH on Ethereum
+- ERC20 version of MATIC (Polygon native token) on Ethereum
+- xcKSM (ERC20 version of KSM, the native token of Kusana) on Moonbeam
+- xcDOT (ERC20 version of DOT, the native token of Polkadot) on Moonriver
+- SOL (native token of Solana) on Solana
+- LUNA on Terra (terminated)
+
+## Lido Introduction and Staking ETH on Ethereum
+### Basic Mechanism
+Lido is ETH2.0 staking service provider. Instead of locking 32 ETH and having no liquidity until ETH2.0 merger, Lido allows users to deposit ETH with Lido, and the deposited ETH is then pooled and staked with node operators selected by the Lido DAO. In exchange, depositors will be given a ERC20 token stETH on a 1:1 basis for the ETHs deposited. stETH is liquid and can be traded; and when withdrawals are enabled on ETH2.0, stETH can be redeemed for ETH.
+
+### stETH and wstETH Tokens
+stETH is a rebasable token. As Lido's staked ETH generates staking rewards from ETH 2.0 (net off penalties inflicted on validators), Lido’s ETH balance on the beacon chain will increase and stETH will be updated accordingly to match the balance of ETH on beacon chain. Lido will in turn update its depositors their corresponding stETH balances once per day. 
+
+As the stETH is a rebased token, it's not accepted by some defi protocols. wstETH, a wrapped version of stETH is then created to address this issue. wstETH balance does not rebase, wstETH's price denominated in stETH changes instead.
+
+### Fees
+Lido applies a 10% fee on a user’s staking rewards. This fee is split between node operators, the DAO (treasury), and a coverage fund.
+
+Currently, the fee split is:
+- Node operators: 50%
+- Coverage fund: 50%
+- DAO (Treasury): 0%
+
+Reference link: https://mainnet.lido.fi/#/lido-dao/0xae7ab96520de3a18e5e111b5eaab095312d7fe84/ 
+
+### Incentives
+There's not direct incentives for staking ETH in Lido. However, in order to encourage the adoption of stETH, Lido incentivises for providing liquidity to stETH related pools in Curve and Balancer. E.g. LDO, its governance token, are given for liquidity providers in Curve's stETH-ETH pool. 
+
+### Useful Links
+- Protocol
+  - https://lido.fi/
+- Docs
+  - https://docs.lido.fi/
+- Smart contracts
+  - https://docs.lido.fi/contracts/lido
+  - https://docs.lido.fi/deployed-contracts
+- Tokenomics 
+  - https://blog.lido.fi/introducing-ldo/
+  - https://lido.fi/static/Lido:Ethereum-Liquid-Staking.pdf
+- Treasury
+  - https://blog.lido.fi/lido-dao-treasury-fund/
+- Fees
+  - https://docs.lido.fi/guides/node-operator-manual#the-fee
+- Governance forum
+  - https://research.lido.fi/
+  - https://mainnet.lido.fi/#/lido-dao.aragonid.eth 
+- Blog
+  - https://blog.lido.fi/
+ 
+### Usage Metrics
+
+For Lido on Ethereum, the staking services include staking of ETH and staking of MATIC (please refer to the section "Staking MATIC on Ethereum" fo r details of staking MATIC.  
+
+#### Active Users, Total Unique Users & Daily Transaction Count
+Transactions that can be considered to be relevant to Lido on Ethereum network:
+- Stake ETH into Lido
+- Wrap stETH into wstETH or unwrap
+- Stake MATIC into Lido 
+- Unstake stMATIC
+- Claim stMATIC after 3-4 days waiting period
+
+Note: In Lido, ETH is deposited to get stETH on a 1:1 basis. However, in dexes likes Curve or Balancer, stETH is typically trading at a small discount. Therefore, buying stETH sometimes is out of the intention to stake ETH with Lido, but at a discount. 
+
+### Financial Metrics
+#### Total Value Locked USD
+The Total Value Locked (TVL) on Lido in Ethereum is the sum of:
+- the value of ETH in its staking contract
+- the value of MATIC in its staking contract
+
+#### Protocol Controlled Value USD
+Lido has a treasury but not Protocol Controlled Value.
+
+#### Revenue
+Lido generates revenue from the staking rewards from:
+- ETH2.0 staking rewards
+- MATIC staking rewards
+
+#### Supply-side and Protocol-side
+As of now, 90% of the staking rewards are accrued to ETH depositors with Lido (supply-side revenue), and 10% are given to node operators, insurance fund and treasury (protocol-side revenue).
+
+The Lido DAO can vote to change the 10% fee but the ratio has not been changed since Lido's launch.
+
+Similarly, 90% of MATIC staking rewards go to MATIC depositors and the 10% goes to validators, insurance fund and the DAO.
+
+### Pool-Level Metrics
+#### Pool Total Value Locked USD
+Lido on Ethereum network has two pools:
+- ETH staking pool
+- MATIC staking pool
+
+#### Reward Tokens & Reward Token Emissions Amount
+Lido does not give incentives or reward tokens within its own protocol. 
+
+
+## Staking MATIC on Ethereum
+### Summary
+Lido partnered with Shard Labs since March 2022 for providing the staking service of the ERC20 version of MATIC on Ethereum. Polygon has a validator-delegator mechanism, where validators receive MATIC from delegators on Ethereum and stake for incentives in MATIC rewarded by Polygon Network.
+
+Lido pool MATIC from depositors and allocate MATIC to validators. Lido then share the staking incentives with depositors, validator and the DAO. Currently, the split is the same as ETH staking, where 10% is for validators (5%), insurance fund (2.5%) and the Lido DAO (2.5%), and the remaining 90% goes to MATIC depositors.
+
+### stMATIC
+
+Depositors of MATIC into Lido on Polygon get an ERC-20 stMATIC tokens, which is NOT a rebased token. Depositor will get stMATIC based on the then exchange rate between stMATIC and MATIC. A depositor's balance of stMATIC is not going to increase on a daily basis to reflect rewards. Instead, the value of his stMATIC will change relative to MATIC as staking rewards are earned.
+
+stMATIC can be redeemed any time. Default stMATIC unstaking period takes around 3-4 days (80 epochs on Polygon) to process. After that one has to take one more step to withdraw in the Claim page of Lido UI. 
+
+
+### MATIC Staking Useful Links
+- Protocol
+  - https://polygon.lido.fi/
+- Blog
+  - https://blog.lido.fi/category/polygon/
+- Documentation
+  - https://docs.polygon.lido.fi/
+- Fees
+  - https://docs.polygon.lido.fi/fees
+- Deployed contracts
+  - https://docs.polygon.lido.fi/deployed-contracts
+
+### Metrics
+Metrics of staking MATIC on Ethereum is included in the section "Lido Introduction and Staking ETH on Ethereum" - "Usage Metrics", as this staking service is on Ethereum.
+
+
+## Lido Staking xcDOT on Moonbeam
+Lido has staking services for xcDOT on Moonbeam network. It follows the same mechanism as staking ETH on Ethereum. More details are as follows:
+
+### Staking DOT
+- DOT is the native token of Polkadot. xcDOT is ERC20 compatible token on the Moonbeam network, which can be received by users in exchange for DOT. A DOT holder locks their DOT on Polkadot and gets the same amount of xcDOT on their Moonbeam account. xcDOT can be instantly exchanged for DOT.
+- stDOT is issued when a user stakes xcDOT in Lido, on a 1:1 basis. Like stETH, stDOT accrues rewards from Polkadot and is a rebase token. stDOT can be redeemed to xcDOT subject to a 30 days unbonding period.
+- wstDOT is the wrapped version of stDOT.
+- Links:
+  - Details of tokens: https://docs.polkadot.lido.fi/extras/tokenomics
+  - Protocol: https://lido.fi/polkadot
+  - Contracts: https://docs.polkadot.lido.fi/extras/deployed-contracts
+  - Docs: https://docs.polkadot.lido.fi/
+- Fees: 10% of staking rewards is split between node operators, the DAO treasury, and Polkadot developers. I.e. 90% revenue goes to supply-side and 10% protocol side. 
+
+### Metrics
+- TVL of LIDO on Moonbeam is the xcDOT staked with Lido contracts
+- Revenues are staking rewards from Polkadot, split between depositors (90%) and protocol (10%)
+- Usage data should include:
+  - stake xcDOT for stDOT
+  - unbond stDOT for xcDOT
+  - claim xcDOT after the unbonding period 
+  - wrap/unwrap stDOt
+  - transfer of DOT into Moonbeam chain to mint xcDOT and vice versa (optional)
+
+## Staking xcKSM on Moonriver
+Lido has staking services for xcKSM on Moonriver network. As Kusama is the test net for Polkadot, the mechanism of staking xcKSM on Moonriver is identical to staking xcDOT on Moonbeam. Only minor variations stated below:
+- The ERC20 compatible token for KSM is xcKSM, and when staked with Lido, depositors get stKSM. Depositers can also wrap their stKSM and receive wstKSM.
+- The unbonding period is 7 to 8 days
+- Links:
+  - Details of tokens: https://docs.kusama.lido.fi/extras/tokenomics
+  - Protocol: https://lido.fi/kusama
+  - Contracts: https://docs.kusama.lido.fi/extras/deployed-contracts
+  - Docs: https://docs.kusama.lido.fi/
+
+## Staking SOL on Solana
+Lido has staking service for SOL on Solana. It's close to staking MATIC on Ethereum. The details are as follows:
+
+### Staking SOL
+- SOL is the native token of Solana network. It can be staked directly with Lido.  
+- stSOL is issued when a user stakes SOL in Lido, at the then exchange rate between stSOL and SOL. Like stMATIC, stSOL is not a rebase token. Over time, as a user's SOL delegation accrues staking rewards, the value of his stSOL appreciates. stSOL can be redeemed to SOL subject to a 2-3 days deactivation period.
+- Links:
+  - Protocol: https://solana.lido.fi/
+  - Contracts: https://docs.solana.lido.fi/deployments
+  - Docs: https://docs.solana.lido.fi/
+  - Fees: https://docs.solana.lido.fi/fees
+- Fees: 10% of staking rewards is split between validators, the DAO treasury, and Solido developers. I.e. 90% revenue goes to supply-side and 10% protocol-side. 
+
+### Metrics
+- TVL of Lido on Solana is the SOL staked with Lido contracts
+- Revenues are staking rewards from Solana staking, split between depositors (90%) and protocol (10%)
+- Usage data should include:
+  - stake SOL for stSOL
+  - unstake stSOL for SOL
+  - withdraw SOL after the deactivation period (executed in the wallet UI)
+  
+## Other Reference Links
+- https://pro.nansen.ai/lido
+- https://tokenterminal.com/terminal/projects/lido-finance
+- https://dune.com/LidoAnalytical/Lido-Finance-Extended
+
+---
+
+# Technical Details
 
 ### stETH Supply:
 
@@ -240,33 +431,17 @@ lido LidoOracle 0x442af784a788a5bd6f42a01ebe9f287a871243fb
 
 SUM(`Treasury Revenue (ETH)`) OVER `time` + SUM(`Node Operators Revenue (ETH)`) OVER `time`
 
+---
 
+## Protocol Diagrams
 
+![Staking Pool Overview](https://blog.lido.fi/content/images/2020/11/01.png)
 
-## METRICS FOR UI
+## Useful links and references
 
-### Total Value Locked (TVL) USD
+https://docs.lido.fi/
 
-`Agg. Deposits (ETH)`
-
-### Total Revenue USD
-
-`Staking Rewards (ETH)`
-
-### Protocol-Side Revenue USD
-
-`Lido Protocol Revenue (ETH)`
-
-### Supply-Side Revenue USD
-
-`Supply-side Revenue (ETH)`
-
-### Total Unique Users
-
-`Unique Users`
-
-
-## Note: MISSING DATA (Dec 2020 - Apr 29, 2021)
+## Note: Missing Data (Dec 2020 - Apr 29, 2021)
 
 * The Lido smart contracts use an upgradeable proxy contract format to update the contracts. Initial contracts didn't have relevant public functions and events for easily calculating certain revenue metrics. The contracts were upgraded in April 2021 to make available `PostTotalShares` event and `lastCompletedReportDelta` function which allow you to conveniently calculate staking rewards (and therefore total revenue).
 * Calculating Total Revenue (and hence Supply Side Revenue) for the duration Dec 2020 - Apr 2021 is cumbersome. We (Tarun, Vincent) decided to not calculate metrics for the mentioned duration. Supporting quantitative data for our decision is provided below. For more information on the calculation methodology, see the discussion with the Lido team on their discord [here](https://discord.com/channels/761182643269795850/773584934619185154/996811044477476935).
@@ -283,152 +458,7 @@ May 2021 - July 2022 (present)
 
 The 2% difference seems acceptable given the methodology won't be straighforward to fill the gap and this methodology won't apply for calculations beyond those 4 months.
 
-## Protocol Diagrams
 
-![Staking Pool Overview](https://blog.lido.fi/content/images/2020/11/01.png)
+## Validation
 
-## Validation (in-progress)
-
-Validation was done against other data sources (tokenterminal, defillama) and documented in this sheet: [Lido Finance - Messari Subgraph - Validation Sheet](https://docs.google.com/spreadsheets/d/1fiKfv9KLoWbRK1W6ejhWiySIzbd5CDyWs5so-tvJcHo/edit#gid=0).
-
-A helper validation script was created to quickly view and compare data in the terminal: [review.sh](https://github.com/fortysevenlabs/messari-subgraphs/tree/master/subgraphs/lido/validation/review.sh).
-
-**Runing the helper script**
-The intention of the script is to print relevant revenue metrics for quick comparison. The script takes a date in `YYYY-MM-DD` format, normalizes the timestampts to tokenterminal format (`2022-07-01T00:00:00.000Z`), converts the tokenterminal format to epoch times for subgraph, makes queries (subgraph, tokenterminal) and prints the output. 
-```
-./review.sh {GRAPH_API_URL} {YYYY-MM-DD}
-./review.sh https://api.thegraph.com/subgraphs/name/fortysevenlabs/lido 2022-07-01
-```
-
-**Files** 
-
-* Structure
-
-    ```
-    validation
-      ├── lido-finance-project.json
-      ├── metrics-daily-{date}.json
-      ├── metrics-monthly-{date}.json
-      └── review.sh
-    ```
- 
-* Token Terminal Metrics (and Samples)
-
-    * **metrics-daily-{date}.json** - daily metric values, see sample below
-    ```
-    {
-        "project_id": "lido-finance",
-        "timestamp": "2022-07-04T00:00:00.000Z",
-        "active_users": null,
-        "business_type": "interest",
-        "deposits": null,
-        "gmv": null,
-        "market_cap_circulating": 232787544.26598746,
-        "market_cap_fully_diluted": 501204356.71843535,
-        "pe_circulating": 10.114905445579968,
-        "pe_fully_diluted": 21.777946466616125,
-        "price": 0.5012043567184353,
-        "project": "Lido Finance",
-        "ps_circulating": 1.0114905445579967,
-        "ps_fully_diluted": 2.1777946466616127,
-        "revenue_protocol": 56549.80000931314,
-        "revenue_supply_side": 508948.2000838183,
-        "revenue_total": 565498.0000931314,
-        "token_incentives": null,
-        "token_trading_volume": 16187416.610178523,
-        "tokenholders": 16268,
-        "treasury": 108013901.4348732,
-        "tvl": 4624675259.240275,
-        "volmc_circulating": 0.0695372970285836,
-        "volmc_fully_diluted": 0.03229703890876636
-    }
-    ```
-
-    * **metrics-monthly-{date}.json** - monthly metric values, see sample below
-    ```
-    {
-        "project_id": "lido-finance",
-        "timestamp": "2022-07-01T00:00:00.000Z",
-        "active_users": null,
-        "business_type": "interest",
-        "deposits": null,
-        "gmv": null,
-        "market_cap_circulating": 299253507.347208,
-        "market_cap_fully_diluted": 629531658.1241714,
-        "pe_circulating": 13.960412433611236,
-        "pe_fully_diluted": 29.331670090462787,
-        "price": 0.6295316581241713,
-        "project": "Lido Finance",
-        "ps_circulating": 1.3960412433611233,
-        "ps_fully_diluted": 2.933167009046278,
-        "revenue_protocol": 918432.1152130027,
-        "revenue_supply_side": 8265889.036917024,
-        "revenue_total": 9184321.152130026,
-        "token_incentives": null,
-        "token_trading_volume": 25201168.607745774,
-        "tokenholders": 16410,
-        "treasury": 128933022.49720491,
-        "tvl": 4945104157.166401,
-        "volmc_circulating": 0.0746432616201606,
-        "volmc_fully_diluted": 0.0355197736414646
-    }
-    ```
-
-    * **metrics-aggregates-{date}.json** - aggregates for each available metric, see sample below
-    ```
-    "revenue_total": {
-      "values": {
-        "latest": 591638.2247886488,
-        "max": 1283408.9217863563
-      },
-      "sums": {
-        "1d": 591638.2247886488,
-        "7d": 3801974.0384223517,
-        "30d": 18230313.019791126,
-        "90d": 83039425.02801158,
-        "180d": 157171362.6796032,
-        "365d": 280335074.4713445,
-        "all": 300694642.4476183
-      },
-      "averages": {
-        "1d": 591638.2247886488,
-        "7d": 543139.1483460503,
-        "30d": 607677.1006597042,
-        "90d": 922660.2780890175,
-        "180d": 873174.2371089066,
-        "365d": 768041.2999214916,
-        "all": null
-      },
-      "changes": {
-        "1d": 0.05691777970848855,
-        "7d": 0.17276281877458688,
-        "30d": -0.34239173121466204,
-        "90d": -0.49199632652903247,
-        "180d": -0.2259560682991053,
-        "365d": 2.44463209675667,
-        "all": null
-      },
-      "trends": {
-        "1d": 0.05691777970848855,
-        "7d": -0.06525895356191369,
-        "30d": -0.3606337929222101,
-        "90d": 0.12015721777412214,
-        "180d": 0.28707332304856736,
-        "365d": 12.769205456522135,
-        "all": null
-      },
-      "moving_averages_annualized": {
-        "1d": null,
-        "7d": null,
-        "30d": 221802141.74079204,
-        "90d": null,
-        "180d": null,
-        "365d": null,
-        "all": null
-      }
-    }
-    ```
-
-## Useful links and references
-
-https://docs.lido.fi/
+Validation was done against other data sources (tokenterminal, defillama) and documented on this sheet: [Lido Finance - Messari Subgraph - Validation Sheet](https://docs.google.com/spreadsheets/d/1fiKfv9KLoWbRK1W6ejhWiySIzbd5CDyWs5so-tvJcHo/edit#gid=0).

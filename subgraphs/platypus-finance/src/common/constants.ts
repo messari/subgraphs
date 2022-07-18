@@ -162,7 +162,7 @@ export class poolDetail {
   name: string;
   symbol: string;
   address: string;
-  ignore: bool;
+  ignore: boolean;
 
   // Initialize a Token Definition with its attributes
   constructor(name: string, symbol: string, address: string, ignore: string) {
@@ -174,6 +174,8 @@ export class poolDetail {
 
   static getAltPoolAddressArray(): Array<string> {
     return [
+      // We comment out the main pool as we already are "watching" its events
+      // As per the subgraph.yaml manifest definition
       // "0x66357dCaCe80431aee0A7507e2E361B7e2402370",
       "0xe0D166DE15665bC4B7185B2e35E847E51316E126",
       "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824",
@@ -184,6 +186,8 @@ export class poolDetail {
       "0x233Ba46B01d2FbF1A31bDBc500702E286d6de218",
       "0x91BB10D68C72d64a7cE10482b453153eEa03322C",
       "0x27912AE6Ba9a54219d8287C3540A8969FF35500B",
+      "0x853ea32391AaA14c112C645FD20BA389aB25C5e0",
+      "0x3B55E45fD6bd7d4724F5c47E0d1bCaEdd059263e",
     ];
   }
 
@@ -197,10 +201,12 @@ export class poolDetail {
       ["Alt Pool MIM", "MIM-USDC Pool", "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7", "false"],
       ["Alt Pool YUSD", "YUSD-USDC Pool", "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83", "false"],
       ["Alt Pool sAVAX", "sAVAX-AVAX Pool", "0x4658EA7e9960D6158a261104aAA160cC953bb6ba", "false"],
-      ["Alt Pool BTC.b-WBTC.e", "BTC.b-WBTC.e Pool", "0x27912AE6Ba9a54219d8287C3540A8969FF35500B", "false"],
+      ["Alt Pool BTC.b-WBTC.e", "BTC.b-WBTC.e Pool", "0x39dE4e02F76Dbd4352Ec2c926D8d64Db8aBdf5b2", "false"],
       ["Factory Pool H2O", "H2O-USDC Pool", "0x233Ba46B01d2FbF1A31bDBc500702E286d6de218", "false"],
       ["Factory Pool TSD", "TSD-USDC Pool", "0x91BB10D68C72d64a7cE10482b453153eEa03322C", "false"],
       ["Factory Pool MONEY", "MONEY-USDC Pool", "0x27912AE6Ba9a54219d8287C3540A8969FF35500B", "false"],
+      ["Factory Pool dForce USX", "USX-USDC Pool", "0x853ea32391AaA14c112C645FD20BA389aB25C5e0", "false"],
+      ["Factory Pool MAI", "MiMatic-USDC Pool", "0x3B55E45fD6bd7d4724F5c47E0d1bCaEdd059263e", "false"],
 
       // Ignore pools while calculating TVL not in above list
       ["Withdraw Pool MIM", "MIM-Ignore", "0x6c84f0580c8ffab0c716c87e66ab474e4bea97d9", "true"],
