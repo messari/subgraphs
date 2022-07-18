@@ -749,7 +749,7 @@
           "template": "spookyswap.template.yaml",
           "steegecs": "steegecs/spookyswap-fantom",
           "messari": "messari/spookyswap-fantom",
-          "deploy-on-merge": false,
+          "deploy-on-merge": true,
           "prepare:constants": true
         }
       },
