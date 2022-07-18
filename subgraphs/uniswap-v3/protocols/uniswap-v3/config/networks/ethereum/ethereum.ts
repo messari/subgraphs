@@ -97,7 +97,10 @@ export class UniswapV3MainnetConfigurations implements Configurations {
     ]);
   }
   getUntrackedPairs(): string[] {
-    return toLowerCase([]);
+    return toLowerCase([
+      "0x8fe8d9bb8eeba3ed688069c3d6b556c9ca258248",
+      "0xfd9715a9f03678975b2e224c938fae8d481b09b2",
+    ]);
   }
   getUntrackedTokens(): string[] {
     return toLowerCase([
