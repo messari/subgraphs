@@ -45,12 +45,14 @@ function PoolOverviewTab({
   const [tableIssues, setTableIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>(
     [],
   );
-  const [currentPage, setCurrentPage] = useState(1);
-  const issues: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
-
   const navigate = useNavigate();
   const href = new URL(window.location.href);
   const p = new URLSearchParams(href.search);
+
+  const skipAmtParam = p.get("skipAmt") || "0";
+  const [currentPage, setCurrentPage] = useState(skipAmtParam ? (parseInt(skipAmtParam) + 50) / 50 : 1);
+  const issues: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
+
   if (!!poolOverviewRequest.poolOverviewError && issues.filter((x) => x.fieldName === "PoolOverviewTab").length === 0) {
     issues.push({
       message: poolOverviewRequest?.poolOverviewError?.message + ". Refresh and try again.",
@@ -60,8 +62,12 @@ function PoolOverviewTab({
     });
   }
 
+  let loadingEle = null;
   if (poolOverviewRequest.poolOverviewLoading) {
-    return <CircularProgress sx={{ margin: 6 }} size={50} />;
+    loadingEle = <CircularProgress sx={{ margin: 6 }} size={50} />;
+    if (pools.length === 0 || !pools) {
+      return loadingEle;
+    }
   }
 
   let nextButton = null;
@@ -134,6 +140,7 @@ function PoolOverviewTab({
           setTableIssues(x);
         }}
       />
+      {loadingEle}
       <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
         {prevButton}
         <span>{totalPoolCount ? `Page ${currentPage} out of ${Math.ceil(totalPoolCount / 50)}` : null}</span>

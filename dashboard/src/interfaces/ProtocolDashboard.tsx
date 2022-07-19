@@ -203,6 +203,26 @@ function ProtocolDashboard() {
     { data: dataPools, error: poolOverviewError, loading: poolOverviewLoading, refetch: poolOverviewRefetch },
   ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt } });
 
+  const [
+    getPoolsOverviewData2,
+    { data: dataPools2, error: poolOverviewError2, loading: poolOverviewLoading2, refetch: poolOverviewRefetch2 },
+  ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 10 } });
+
+  const [
+    getPoolsOverviewData3,
+    { data: dataPools3, error: poolOverviewError3, loading: poolOverviewLoading3, refetch: poolOverviewRefetch3 },
+  ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 20 } });
+
+  const [
+    getPoolsOverviewData4,
+    { data: dataPools4, error: poolOverviewError4, loading: poolOverviewLoading4, refetch: poolOverviewRefetch4 },
+  ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 30 } });
+
+  const [
+    getPoolsOverviewData5,
+    { data: dataPools5, error: poolOverviewError5, loading: poolOverviewLoading5, refetch: poolOverviewRefetch5 },
+  ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 40 } });
+
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
     tabNum = "2";
@@ -285,13 +305,13 @@ function ProtocolDashboard() {
   }, [protocolTableData, getFinancialsData, tabValue]);
 
   useEffect(() => {
-    if (financialsData) {
+    if (financialsData && tabValue === "1") {
       getDailyUsageData();
     }
   }, [financialsData, getDailyUsageData]);
 
   useEffect(() => {
-    if (dailyUsageData) {
+    if (dailyUsageData && tabValue === "1") {
       getHourlyUsageData();
     }
   }, [dailyUsageData, getHourlyUsageData]);
@@ -303,19 +323,19 @@ function ProtocolDashboard() {
   }, [poolId]);
 
   useEffect(() => {
-    if (financialsError) {
+    if (financialsError && tabValue === "1") {
       financialsRefetch();
     }
   }, [financialsError]);
 
   useEffect(() => {
-    if (dailyUsageError) {
+    if (dailyUsageError && tabValue === "1") {
       dailyUsageRefetch();
     }
   }, [dailyUsageError]);
 
   useEffect(() => {
-    if (hourlyUsageError) {
+    if (hourlyUsageError && tabValue === "1") {
       hourlyUsageRefetch();
     }
   }, [hourlyUsageError]);
@@ -339,12 +359,40 @@ function ProtocolDashboard() {
   }, [poolOverviewError]);
 
   useEffect(() => {
-    if (tabValue === "2") {
+    if (tabValue === "2" && !dataPools) {
       getPoolsOverviewData();
-    } else if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
+    }
+  }, [tabValue, getPoolsOverviewData]);
+
+  useEffect(() => {
+    if (dataPools && tabValue === "2" && !dataPools2) {
+      getPoolsOverviewData2();
+    }
+  }, [tabValue, dataPools]);
+
+  useEffect(() => {
+    if (dataPools2 && tabValue === "2" && !dataPools3) {
+      getPoolsOverviewData3();
+    }
+  }, [dataPools2]);
+
+  useEffect(() => {
+    if (dataPools3 && tabValue === "2" && !dataPools4) {
+      getPoolsOverviewData4();
+    }
+  }, [dataPools3]);
+
+  useEffect(() => {
+    if (dataPools4 && tabValue === "2" && !dataPools5) {
+      getPoolsOverviewData5();
+    }
+  }, [dataPools4]);
+
+  useEffect(() => {
+    if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
       getPoolsListData();
     }
-  }, [tabValue, getPoolsOverviewData, getPoolsListData]);
+  }, [tabValue, getPoolsListData]);
 
   useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
@@ -380,6 +428,36 @@ function ProtocolDashboard() {
   let pools: { [x: string]: any }[] = [];
   if (dataPools && data) {
     pools = dataPools[PoolNames[data?.protocols[0]?.type]];
+  }
+  if (dataPools2) {
+    pools = pools.concat(dataPools2[PoolNames[data?.protocols[0]?.type]]);
+  }
+  if (dataPools3) {
+    pools = pools.concat(dataPools3[PoolNames[data?.protocols[0]?.type]]);
+  }
+  if (dataPools4) {
+    pools = pools.concat(dataPools4[PoolNames[data?.protocols[0]?.type]]);
+  }
+  if (dataPools5) {
+    pools = pools.concat(dataPools5[PoolNames[data?.protocols[0]?.type]]);
+  }
+
+  if (pools?.length > 0) {
+    let poolTemp = [...pools];
+    pools = poolTemp.sort((a, b) => {
+      return b.totalValueLockedUSD - a.totalValueLockedUSD;
+    });
+  }
+
+  let anyPoolOverviewLoading = false;
+  if (
+    poolOverviewLoading ||
+    poolOverviewLoading2 ||
+    poolOverviewLoading3 ||
+    poolOverviewLoading4 ||
+    poolOverviewLoading5
+  ) {
+    anyPoolOverviewLoading = true;
   }
 
   let toggleVersion = null;
@@ -492,7 +570,7 @@ function ProtocolDashboard() {
           protocolTableData={protocolTableData}
           subgraphToQueryURL={subgraphToQuery.url}
           skipAmt={skipAmt}
-          poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
+          poolOverviewRequest={{ poolOverviewError, poolOverviewLoading: anyPoolOverviewLoading }}
           poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
           positionsQuery={positionsQuery}
           protocolTimeseriesData={{
