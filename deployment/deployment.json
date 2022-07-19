@@ -912,7 +912,7 @@
         }
       },
       "ens-governance": {
-        "mainnet": {
+        "ethereum": {
           "template": "ens-governance.template.yaml",
           "danielkhoo": "danielkhoo/ens-governance",
           "messari": "messari/ens-governance",
@@ -920,7 +920,7 @@
         }
       },
       "euler-governance": {
-        "mainnet": {
+        "ethereum": {
           "template": "euler-governance.template.yaml",
           "danielkhoo": "danielkhoo/euler-governance",
           "messari": "messari/euler-governance",
@@ -928,7 +928,7 @@
         }
       },
       "fei-governance": {
-        "mainnet": {
+        "ethereum": {
           "template": "fei-governance.template.yaml",
           "danielkhoo": "danielkhoo/fei-governance",
           "messari": "messari/fei-governance",
@@ -936,7 +936,7 @@
         }
       },
       "hop-governance": {
-        "mainnet": {
+        "ethereum": {
           "template": "hop-governance.template.yaml",
           "danielkhoo": "danielkhoo/hop-governance",
           "messari": "messari/hop-governance",
@@ -944,7 +944,7 @@
         }
       },
       "silo-governance": {
-        "mainnet": {
+        "ethereum": {
           "template": "silo-governance.template.yaml",
           "danielkhoo": "danielkhoo/silo-governance",
           "messari": "messari/silo-governance",
@@ -952,7 +952,7 @@
         }
       },
       "truefi-governance": {
-        "mainnet": {
+        "ethereum": {
           "template": "truefi-governance.template.yaml",
           "danielkhoo": "danielkhoo/truefi-governance",
           "messari": "messari/truefi-governance",
