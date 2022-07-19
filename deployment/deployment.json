@@ -472,7 +472,7 @@
           "template": "rari-fuse.template.yaml",
           "messari": "messari/rari-fuse-ethereum",
           "dmelotik": "dmelotik/fuse-mainnet",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "scream": {
