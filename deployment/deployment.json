@@ -640,13 +640,13 @@
           "dmelotik": "dmelotik/network-harmony",
           "deploy-on-merge": true
         },
-        "mainnet": {
+        "ethereum": {
           "template": "evm.template.yaml",
           "messari": "messari/network-ethereum",
           "dmelotik": "dmelotik/network-ethereum",
           "deploy-on-merge": true
         },
-        "matic": {
+        "polygon": {
           "template": "evm.template.yaml",
           "messari": "messari/network-polygon",
           "dmelotik": "dmelotik/network-polygon",
@@ -670,7 +670,7 @@
           "dmelotik": "dmelotik/network-optimism",
           "deploy-on-merge": true
         },
-        "xdai": {
+        "gnosis": {
           "template": "evm.template.yaml",
           "messari": "messari/network-gnosis",
           "dmelotik": "dmelotik/network-xdai",

@@ -13,7 +13,7 @@ Once everything is setup properly deploying is very easy.
 npm run deploy --SUBGRAPH=network --PROTOCOL=evm --LOCATION=dmelotik
 
 # This will do the same, but only deploying the mainnet subgraph
-npm run deploy --SUBGRAPH=network --PROTOCOL=evm --NETWORK=mainnet --LOCATION=dmelotik
+npm run deploy --SUBGRAPH=network --PROTOCOL=evm --NETWORK=ethereum --LOCATION=dmelotik
 ```
 
 > Setting `deploy-on-merge` to `true` in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) will run the above commands on subgraphs that have changed to messari's hosted service.
@@ -26,7 +26,7 @@ To setup the subgraph manifest from the template:
 
 ```bash
 # Use mainnet network as an example
-npm run prepare:yaml --PROTOCOL=evm --NETWORK=mainnet --TEMPLATE=evm.template.yaml
+npm run prepare:yaml --PROTOCOL=evm --NETWORK=ethereum --TEMPLATE=evm.template.yaml
 ```
 
 To codegen and build:
