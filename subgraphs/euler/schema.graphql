@@ -983,13 +983,13 @@ type _MarketUtility @entity {
   collateralFactor: BigInt!
 
   " Euler Debt token for the market "
-  dToken: Token!
+  dToken: Token
 
   " Euler Pool token for the market "
-  eToken: Token!
+  eToken: Token
 
   " Underlying token for the market "
-  token: Token!
+  token: Token
 }
 
 type _ProtocolUtility @entity {

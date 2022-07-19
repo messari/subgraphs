@@ -353,33 +353,37 @@ export function syncWithEulerGeneralView(
      * In order to calculate eToken and dToken price, we need to pull supply off ERC-20 contracts and calculate
      * token price by using totalDepositBalanceUSD and totalBorrowBalanceUSD.
      */
-    const eTokenAddress = Address.fromString(marketUtility.eToken);
-    const eToken = getOrCreateToken(eTokenAddress);
-    const eTokenTotalSupply = getAssetTotalSupply(eTokenAddress);
-    const eTokenPrecision = new BigDecimal(BigInt.fromI32(10).pow(<u8>eToken.decimals));
-    if (eTokenTotalSupply.gt(BIGINT_ZERO)) {
-      const eTokenPriceUSD = market.totalDepositBalanceUSD.div(eTokenTotalSupply.toBigDecimal().div(eTokenPrecision));
-      eToken.lastPriceUSD = eTokenPriceUSD;
-      eToken.lastPriceBlockNumber = block.number;
-      eToken.save();
+    if (marketUtility.eToken) {
+      const eTokenAddress = Address.fromString(marketUtility.eToken!);
+      const eToken = getOrCreateToken(eTokenAddress);
+      const eTokenTotalSupply = getAssetTotalSupply(eTokenAddress);
+      const eTokenPrecision = new BigDecimal(BigInt.fromI32(10).pow(<u8>eToken.decimals));
+      if (eTokenTotalSupply.gt(BIGINT_ZERO)) {
+        const eTokenPriceUSD = market.totalDepositBalanceUSD.div(eTokenTotalSupply.toBigDecimal().div(eTokenPrecision));
+        eToken.lastPriceUSD = eTokenPriceUSD;
+        eToken.lastPriceBlockNumber = block.number;
+        eToken.save();
 
-      market.outputTokenPriceUSD = eTokenPriceUSD;
-      market.outputTokenSupply = eTokenTotalSupply;
-      market.exchangeRate = eTokenTotalSupply
-        .toBigDecimal()
-        .div(eTokenPrecision)
-        .div(eulerViewMarket.totalBalances.toBigDecimal().div(tokenPrecision));
+        market.outputTokenPriceUSD = eTokenPriceUSD;
+        market.outputTokenSupply = eTokenTotalSupply;
+        market.exchangeRate = eTokenTotalSupply
+          .toBigDecimal()
+          .div(eTokenPrecision)
+          .div(eulerViewMarket.totalBalances.toBigDecimal().div(tokenPrecision));
+      }
     }
 
-    const dTokenAddress = Address.fromString(marketUtility.dToken);
-    const dToken = getOrCreateToken(dTokenAddress);
-    const dTokenTotalSupply = getAssetTotalSupply(dTokenAddress);
-    if (dTokenTotalSupply.gt(BIGINT_ZERO)) {
-      const dTokenPrecision = new BigDecimal(BigInt.fromI32(10).pow(<u8>dToken.decimals));
-      const dTokenPriceUSD = market.totalBorrowBalanceUSD.div(dTokenTotalSupply.toBigDecimal().div(dTokenPrecision));
-      dToken.lastPriceUSD = dTokenPriceUSD;
-      dToken.lastPriceBlockNumber = block.number;
-      dToken.save();
+    if (marketUtility.dToken) {
+      const dTokenAddress = Address.fromString(marketUtility.dToken!);
+      const dToken = getOrCreateToken(dTokenAddress);
+      const dTokenTotalSupply = getAssetTotalSupply(dTokenAddress);
+      if (dTokenTotalSupply.gt(BIGINT_ZERO)) {
+        const dTokenPrecision = new BigDecimal(BigInt.fromI32(10).pow(<u8>dToken.decimals));
+        const dTokenPriceUSD = market.totalBorrowBalanceUSD.div(dTokenTotalSupply.toBigDecimal().div(dTokenPrecision));
+        dToken.lastPriceUSD = dTokenPriceUSD;
+        dToken.lastPriceBlockNumber = block.number;
+        dToken.save();
+      }
     }
 
     market.save();
