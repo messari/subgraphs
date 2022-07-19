@@ -1,6 +1,5 @@
 import { Address } from "@graphprotocol/graph-ts";
 import {
-  LateQuorumVoteExtensionSet,
   ProposalCanceled,
   ProposalCreated,
   ProposalExecuted,

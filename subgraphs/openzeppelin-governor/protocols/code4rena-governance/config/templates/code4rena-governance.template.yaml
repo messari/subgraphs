@@ -24,16 +24,18 @@ dataSources:
         - name: ArenaGovernor
           file: ./abis/code4rena-governance/ArenaGovernor.json
       eventHandlers:
-        - event: LateQuorumVoteExtensionSet(uint64,uint64)
-          handler: handleLateQuorumVoteExtensionSet
+        # Part of GovernorPreventLateQuorum 
+        # Our entities currently don't track deadline
+        # - event: LateQuorumVoteExtensionSet(uint64,uint64)
+        #   handler: handleLateQuorumVoteExtensionSet
         - event: ProposalCanceled(uint256)
           handler: handleProposalCanceled
         - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
           handler: handleProposalCreated
         - event: ProposalExecuted(uint256)
           handler: handleProposalExecuted
-        - event: ProposalExtended(indexed uint256,uint64)
-          handler: handleProposalExtended
+        # - event: ProposalExtended(indexed uint256,uint64)
+        #   handler: handleProposalExtended
         - event: ProposalQueued(uint256,uint256)
           handler: handleProposalQueued
         - event: ProposalThresholdSet(uint256,uint256)
