@@ -1,0 +1,10 @@
+image: ghcr.io/streamingfast/substreams-gitpod:develop
+tasks:
+  - command: |
+      # Authenticate with the substreams server
+      export SUBSTREAMS_API_TOKEN=$(curl https://auth.dfuse.io/v1/auth/issue -s --data-binary '{"api_key":"'$STREAMINGFAST_KEY'"}' | jq -r .token)
+ports:
+  - port: 6060
+    onOpen: ignore
+  - port: 1065
+    onOpen: ignore

@@ -1,0 +1,33 @@
+[package]
+name = "substreams-template"
+version = "0.1.0"
+description = "Substream template demo project"
+edition = "2021"
+repository = "https://github.com/streamingfast/substreams-template"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ethabi = "17.0"
+hex = "0.4.3"
+prost = { version = "0.10.1" }
+prost-types = "0.10.1"
+# Use latest from https://crates.io/crates/substreams
+substreams = "0.0.11"
+# Use latest from https://crates.io/crates/substreams-ethereum
+substreams-ethereum = "0.1.2"
+
+# Required so that ethabi > ethereum-types build correctly under wasm32-unknown-unknown
+[target.wasm32-unknown-unknown.dependencies]
+getrandom = { version = "0.2", features = ["custom"] }
+
+[build-dependencies]
+anyhow = "1"
+substreams-ethereum = "0.1.0"
+prost-build = "0.10.1"
+
+[profile.release]
+lto = true
+opt-level = 's'
+strip = "debuginfo"
