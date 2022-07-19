@@ -96,6 +96,7 @@ export const BIGINT_ZERO = BigInt.fromI32(INT_ZERO);
 export const BIGINT_ONE = BigInt.fromI32(INT_ONE);
 
 export const BIGDECIMAL_ZERO = BigDecimal.fromString("0");
+export const BIGDECIMAL_TWO = BigDecimal.fromString("2");
 
 /////////////////////
 //// Date / Time ////

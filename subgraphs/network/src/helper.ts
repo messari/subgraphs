@@ -22,6 +22,7 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   SUBGRAPH_VERSION,
+  BIGDECIMAL_TWO,
 } from "./constants";
 import { BlockData, UpdateNetworkData } from "./mapping";
 import { exponentToBigDecimal, getBlocksPerDay } from "./utils";
@@ -37,16 +38,16 @@ export function updateNetwork(networkData: UpdateNetworkData): Network {
     if (!network.cumulativeDifficulty) {
       network.cumulativeDifficulty = BIGINT_ZERO;
     }
-    network.cumulativeDifficulty = network.cumulativeDifficulty.plus(
-      networkData.newDifficulty
+    network.cumulativeDifficulty = network.cumulativeDifficulty!.plus(
+      networkData.newDifficulty!
     );
   }
   if (networkData.newGasUsed) {
     if (!network.cumulativeGasUsed) {
       network.cumulativeGasUsed = BIGINT_ZERO;
     }
-    network.cumulativeGasUsed = network.cumulativeGasUsed.plus(
-      networkData.newGasUsed
+    network.cumulativeGasUsed = network.cumulativeGasUsed!.plus(
+      networkData.newGasUsed!
     );
   }
   network.gasLimit = networkData.gasLimit;
@@ -54,29 +55,29 @@ export function updateNetwork(networkData: UpdateNetworkData): Network {
     if (!network.cumulativeBurntFees) {
       network.cumulativeBurntFees = BIGINT_ZERO;
     }
-    network.cumulativeBurntFees = network.cumulativeBurntFees.plus(
-      networkData.newBurntFees
+    network.cumulativeBurntFees = network.cumulativeBurntFees!.plus(
+      networkData.newBurntFees!
     );
   }
   if (networkData.newRewards) {
     if (!network.cumulativeRewards) {
       network.cumulativeRewards = BIGINT_ZERO;
     }
-    network.cumulativeRewards = network.cumulativeRewards.plus(
-      networkData.newRewards
+    network.cumulativeRewards = network.cumulativeRewards!.plus(
+      networkData.newRewards!
     );
   }
   if (networkData.newTransactions) {
     if (!network.cumulativeTransactions) {
       network.cumulativeTransactions = INT_ZERO;
     }
-    network.cumulativeTransactions += networkData.newTransactions.toI32();
+    network.cumulativeTransactions += networkData.newTransactions!.toI32();
   }
   if (networkData.newSize) {
     if (!network.cumulativeSize) {
       network.cumulativeSize = BIGINT_ZERO;
     }
-    network.cumulativeSize = network.cumulativeSize.plus(networkData.newSize);
+    network.cumulativeSize = network.cumulativeSize!.plus(networkData.newSize!);
   }
   network.totalSupply = networkData.totalSupply;
 
@@ -99,6 +100,9 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
   let snapshotId = (blockData.timestamp.toI64() / SECONDS_PER_DAY).toString();
   let snapshot = getOrCreateDailySnapshot(blockData.timestamp);
 
+  // grab block interval before updating timestamp
+  let blockInterval = blockData.timestamp.minus(snapshot.timestamp);
+
   // update overlapping fields for snapshot
   snapshot.blockHeight = network.blockHeight;
   snapshot.dailyBlocks++;
@@ -107,11 +111,24 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
   // update statistical analysis fields
   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
   if (blockData.author) {
-    snapshot.dailyAuthors = updateStats(
-      snapshotId,
-      DataType.AUTHORS,
-      BIGINT_ONE
-    ); // TODO: check for new daily author
+    // check for new hourly authors
+    let id =
+      IntervalType.DAILY +
+      "-" +
+      blockData.author!.toHexString() +
+      "-" +
+      snapshot.id;
+    let activeAuthor = ActiveAuthor.load(id);
+    if (!activeAuthor) {
+      activeAuthor = new ActiveAuthor(id);
+      activeAuthor.save();
+
+      snapshot.dailyUniqueAuthors = updateStats(
+        snapshotId,
+        DataType.AUTHORS,
+        BIGINT_ONE
+      ); // TODO: check for new daily author
+    }
   }
 
   snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
@@ -119,7 +136,7 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
     snapshot.dailyDifficulty = updateStats(
       snapshotId,
       DataType.DIFFICULTY,
-      blockData.difficulty
+      blockData.difficulty!
     );
   }
 
@@ -128,7 +145,7 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
     snapshot.dailyGasUsed = updateStats(
       snapshotId,
       DataType.GAS_USED,
-      blockData.gasUsed
+      blockData.gasUsed!
     );
   }
 
@@ -137,199 +154,170 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
     snapshot.dailyBurntFees = updateStats(
       snapshotId,
       DataType.BURNT_FEES,
-      blockData.burntFees
-    )
+      blockData.burntFees!
+    );
   }
 
-  snapshot.blockHeight = network.blockHeight;
-  snapshot.timestamp = blockData.timestamp;
-  snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
-  snapshot.cumulativeGasUsed = network.cumulativeGasUsed;
-  snapshot.gasLimit = snapshot.cumulativeBurntFees =
-    network.cumulativeBurntFees;
   snapshot.cumulativeRewards = network.cumulativeRewards;
-  snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
-  snapshot.cumulativeRewards = network.cumulativeRewards;
-  snapshot.totalSupply = network.totalSupply;
+  if (blockData.rewards) {
+    snapshot.dailyRewards = updateStats(
+      snapshotId,
+      DataType.REWARDS,
+      blockData.rewards!
+    );
+  }
+
   snapshot.cumulativeSize = network.cumulativeSize;
+  if (blockData.size) {
+    snapshot.dailySize = updateStats(
+      snapshotId,
+      DataType.SIZE,
+      blockData.size!
+    );
+  }
+
+  if (blockData.chunkCount) {
+    snapshot.dailyChunks = updateStats(
+      snapshotId,
+      DataType.CHUNKS,
+      blockData.chunkCount!
+    );
+  }
+
+  snapshot.totalSupply = network.totalSupply;
+  if (blockData.newSupply) {
+    snapshot.dailySupply = updateStats(
+      snapshotId,
+      DataType.SUPPLY,
+      blockData.newSupply!
+    );
+  }
+
+  snapshot.cumulativeTransactions = network.cumulativeTransactions;
+  if (blockData.transactionCount) {
+    snapshot.dailyTransactions = updateStats(
+      snapshotId,
+      DataType.TRANSACTIONS,
+      blockData.transactionCount!
+    );
+  }
+
+  snapshot.dailyBlockInterval = updateStats(
+    snapshotId,
+    DataType.BLOCK_INTERVAL,
+    blockInterval
+  );
+
   snapshot.gasPrice = blockData.gasPrice;
-
-  // check for new daily authors
-  let id =
-    IntervalType.DAILY +
-    "-" +
-    blockData.author.toHexString() +
-    "-" +
-    snapshot.id;
-  let activeAuthor = ActiveAuthor.load(id);
-  if (!activeAuthor) {
-    activeAuthor = new ActiveAuthor(id);
-    activeAuthor.save();
-    snapshot.dailyActiveAuthors++;
+  if (blockData.gasPrice) {
+    snapshot.dailyGasPrice = updateStats(
+      snapshotId,
+      DataType.GAS_PRICE,
+      blockData.gasPrice!
+    );
   }
 
-  // update daily metrics
-  snapshot.dailyBlocks++;
-  let dailyBlocksBD = BigDecimal.fromString(snapshot.dailyBlocks.toString());
-
-  snapshot.dailyDifficulty = snapshot.dailyDifficulty.plus(
-    blockData.difficulty
-  );
-  snapshot.dailyMeanDifficulty = snapshot.dailyDifficulty
-    .toBigDecimal()
-    .div(dailyBlocksBD);
-  snapshot.dailyCumulativeGasUsed = snapshot.dailyCumulativeGasUsed.plus(
-    blockData.gasUsed
-  );
-  snapshot.dailyCumulativeGasLimit = snapshot.dailyCumulativeGasLimit.plus(
-    blockData.gasLimit
-  );
-  snapshot.dailyMeanGasUsed = snapshot.dailyCumulativeGasUsed
-    .toBigDecimal()
-    .div(dailyBlocksBD);
-  snapshot.dailyMeanGasLimit = snapshot.dailyCumulativeGasLimit
-    .toBigDecimal()
-    .div(dailyBlocksBD);
-  snapshot.dailyBurntFees = snapshot.dailyBurntFees.plus(blockData.burntFees);
-  snapshot.dailyRewards = snapshot.dailyRewards.plus(blockData.rewards);
-  snapshot.dailyMeanRewards = snapshot.dailyRewards
-    .toBigDecimal()
-    .div(dailyBlocksBD);
-  snapshot.dailyMeanBlockSize = snapshot.dailyCumulativeSize
-    .toBigDecimal()
-    .div(dailyBlocksBD);
-  snapshot.dailyCumulativeSize = snapshot.dailyCumulativeSize.plus(
-    blockData.size
-  );
-  snapshot.dailyMeanBlockSize = snapshot.dailyCumulativeSize
-    .toBigDecimal()
-    .div(dailyBlocksBD);
-  snapshot.dailyChunkCount += blockData.chunkCount.toI32();
-  snapshot.dailyTransactionCount += blockData.transactionCount.toI32();
-
-  if (snapshot.dailyCumulativeGasLimit != BIGINT_ZERO) {
-    snapshot.dailyBlockUtilization = snapshot.dailyCumulativeGasUsed
-      .toBigDecimal()
-      .div(snapshot.dailyCumulativeGasLimit.toBigDecimal())
-      .times(exponentToBigDecimal(INT_TWO));
-  } else {
-    snapshot.dailyBlockUtilization = BIGDECIMAL_ZERO;
-  }
-
-  if (network.totalSupply != BIGINT_ZERO) {
-    // calculate new supply emitted this block
-    let newSupply = network.totalSupply.minus(snapshot.firstSupply);
-    snapshot.dailySupplyIncrease = newSupply;
-  }
-
-  // calculate mean block interval
-  // mean = (timestamp - firstTimestamp) / dailyBlocks
-  let timestampDiff = blockData.timestamp.minus(snapshot.firstTimestamp);
-  snapshot.dailyMeanBlockInterval = timestampDiff
-    .toBigDecimal()
-    .div(dailyBlocksBD);
-
-  snapshot.save();
+  // TODO: update variance and quartiles at the end of a snapshot (howto)
 }
 
-function updateHourlySnapshot(blockData: BlockData, network: Network): void {
-  let snapshot = getOrCreateHourlySnapshot(
-    blockData.timestamp,
-    network.totalSupply
-  );
+// function updateHourlySnapshot(blockData: BlockData, network: Network): void {
+//   let snapshot = getOrCreateHourlySnapshot(
+//     blockData.timestamp,
+//     network.totalSupply
+//   );
 
-  // update overlapping fields for snapshot
-  snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
-  snapshot.blockHeight = network.blockHeight;
-  snapshot.timestamp = blockData.timestamp;
-  snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
-  snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
-  snapshot.cumulativeRewards = network.cumulativeRewards;
-  snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
-  snapshot.cumulativeRewards = network.cumulativeRewards;
-  snapshot.totalSupply = network.totalSupply;
-  snapshot.cumulativeSize = network.cumulativeSize;
-  snapshot.gasPrice = blockData.gasPrice ? blockData.gasPrice : BIGINT_ZERO;
+//   // update overlapping fields for snapshot
+//   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
+//   snapshot.blockHeight = network.blockHeight;
+//   snapshot.timestamp = blockData.timestamp;
+//   snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
+//   snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
+//   snapshot.cumulativeRewards = network.cumulativeRewards;
+//   snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
+//   snapshot.cumulativeRewards = network.cumulativeRewards;
+//   snapshot.totalSupply = network.totalSupply;
+//   snapshot.cumulativeSize = network.cumulativeSize;
+//   snapshot.gasPrice = blockData.gasPrice ? blockData.gasPrice : BIGINT_ZERO;
 
-  // check for new hourly authors
-  let id =
-    IntervalType.HOURLY +
-    "-" +
-    blockData.author.toHexString() +
-    "-" +
-    snapshot.id;
-  let activeAuthor = ActiveAuthor.load(id);
-  if (!activeAuthor) {
-    activeAuthor = new ActiveAuthor(id);
-    activeAuthor.save();
-    snapshot.hourlyActiveAuthors++;
-  }
+//   // check for new hourly authors
+//   let id =
+//     IntervalType.HOURLY +
+//     "-" +
+//     blockData.author.toHexString() +
+//     "-" +
+//     snapshot.id;
+//   let activeAuthor = ActiveAuthor.load(id);
+//   if (!activeAuthor) {
+//     activeAuthor = new ActiveAuthor(id);
+//     activeAuthor.save();
+//     snapshot.hourlyActiveAuthors++;
+//   }
 
-  // update hourly metrics
-  snapshot.hourlyBlocks++;
-  let hourlyBlocksBD = BigDecimal.fromString(snapshot.hourlyBlocks.toString());
+//   // update hourly metrics
+//   snapshot.hourlyBlocks++;
+//   let hourlyBlocksBD = BigDecimal.fromString(snapshot.hourlyBlocks.toString());
 
-  snapshot.hourlyDifficulty = snapshot.hourlyDifficulty.plus(
-    blockData.difficulty
-  );
-  snapshot.hourlyMeanDifficulty = snapshot.hourlyDifficulty
-    .toBigDecimal()
-    .div(hourlyBlocksBD);
-  snapshot.hourlyCumulativeGasUsed = snapshot.hourlyCumulativeGasUsed.plus(
-    blockData.gasUsed
-  );
-  snapshot.hourlyCumulativeGasLimit = snapshot.hourlyCumulativeGasLimit.plus(
-    blockData.gasLimit
-  );
-  snapshot.hourlyMeanGasUsed = snapshot.hourlyCumulativeGasUsed
-    .toBigDecimal()
-    .div(hourlyBlocksBD);
-  snapshot.hourlyMeanGasLimit = snapshot.hourlyCumulativeGasLimit
-    .toBigDecimal()
-    .div(hourlyBlocksBD);
-  snapshot.hourlyBurntFees = snapshot.hourlyBurntFees.plus(blockData.burntFees);
-  snapshot.hourlyRewards = snapshot.hourlyRewards.plus(blockData.rewards);
-  snapshot.hourlyMeanRewards = snapshot.hourlyRewards
-    .toBigDecimal()
-    .div(hourlyBlocksBD);
-  snapshot.hourlyMeanBlockSize = snapshot.hourlyCumulativeSize
-    .toBigDecimal()
-    .div(hourlyBlocksBD);
-  snapshot.hourlyCumulativeSize = snapshot.hourlyCumulativeSize.plus(
-    blockData.size
-  );
-  snapshot.hourlyMeanBlockSize = snapshot.hourlyCumulativeSize
-    .toBigDecimal()
-    .div(hourlyBlocksBD);
-  snapshot.hourlyChunkCount += blockData.chunkCount.toI32();
-  snapshot.hourlyTransactionCount += blockData.transactionCount.toI32();
+//   snapshot.hourlyDifficulty = snapshot.hourlyDifficulty.plus(
+//     blockData.difficulty
+//   );
+//   snapshot.hourlyMeanDifficulty = snapshot.hourlyDifficulty
+//     .toBigDecimal()
+//     .div(hourlyBlocksBD);
+//   snapshot.hourlyCumulativeGasUsed = snapshot.hourlyCumulativeGasUsed.plus(
+//     blockData.gasUsed
+//   );
+//   snapshot.hourlyCumulativeGasLimit = snapshot.hourlyCumulativeGasLimit.plus(
+//     blockData.gasLimit
+//   );
+//   snapshot.hourlyMeanGasUsed = snapshot.hourlyCumulativeGasUsed
+//     .toBigDecimal()
+//     .div(hourlyBlocksBD);
+//   snapshot.hourlyMeanGasLimit = snapshot.hourlyCumulativeGasLimit
+//     .toBigDecimal()
+//     .div(hourlyBlocksBD);
+//   snapshot.hourlyBurntFees = snapshot.hourlyBurntFees.plus(blockData.burntFees);
+//   snapshot.hourlyRewards = snapshot.hourlyRewards.plus(blockData.rewards);
+//   snapshot.hourlyMeanRewards = snapshot.hourlyRewards
+//     .toBigDecimal()
+//     .div(hourlyBlocksBD);
+//   snapshot.hourlyMeanBlockSize = snapshot.hourlyCumulativeSize
+//     .toBigDecimal()
+//     .div(hourlyBlocksBD);
+//   snapshot.hourlyCumulativeSize = snapshot.hourlyCumulativeSize.plus(
+//     blockData.size
+//   );
+//   snapshot.hourlyMeanBlockSize = snapshot.hourlyCumulativeSize
+//     .toBigDecimal()
+//     .div(hourlyBlocksBD);
+//   snapshot.hourlyChunkCount += blockData.chunkCount.toI32();
+//   snapshot.hourlyTransactionCount += blockData.transactionCount.toI32();
 
-  if (snapshot.hourlyCumulativeGasLimit != BIGINT_ZERO) {
-    snapshot.hourlyBlockUtilization = snapshot.hourlyCumulativeGasUsed
-      .toBigDecimal()
-      .div(snapshot.hourlyCumulativeGasLimit.toBigDecimal())
-      .times(exponentToBigDecimal(INT_TWO));
-  } else {
-    snapshot.hourlyBlockUtilization = BIGDECIMAL_ZERO;
-  }
+//   if (snapshot.hourlyCumulativeGasLimit != BIGINT_ZERO) {
+//     snapshot.hourlyBlockUtilization = snapshot.hourlyCumulativeGasUsed
+//       .toBigDecimal()
+//       .div(snapshot.hourlyCumulativeGasLimit.toBigDecimal())
+//       .times(exponentToBigDecimal(INT_TWO));
+//   } else {
+//     snapshot.hourlyBlockUtilization = BIGDECIMAL_ZERO;
+//   }
 
-  if (network.totalSupply != BIGINT_ZERO) {
-    // calculate new supply emitted this block
-    let newSupply = network.totalSupply.minus(snapshot.firstSupply);
-    snapshot.hourlySupplyIncrease = newSupply;
-  }
+//   if (network.totalSupply != BIGINT_ZERO) {
+//     // calculate new supply emitted this block
+//     let newSupply = network.totalSupply.minus(snapshot.firstSupply);
+//     snapshot.hourlySupplyIncrease = newSupply;
+//   }
 
-  // calculate mean block interval
-  // mean = (timestamp - firstTimestamp) / hourlyBlocks
-  let timestampDiff = blockData.timestamp.minus(snapshot.firstTimestamp);
-  snapshot.hourlyMeanBlockInterval = timestampDiff
-    .toBigDecimal()
-    .div(hourlyBlocksBD);
+//   // calculate mean block interval
+//   // mean = (timestamp - firstTimestamp) / hourlyBlocks
+//   let timestampDiff = blockData.timestamp.minus(snapshot.firstTimestamp);
+//   snapshot.hourlyMeanBlockInterval = timestampDiff
+//     .toBigDecimal()
+//     .div(hourlyBlocksBD);
 
-  snapshot.save();
+//   snapshot.save();
 
-  snapshot.save();
-}
+//   snapshot.save();
+// }
 
 export function updateAuthors(
   authorId: Bytes,
@@ -352,7 +340,7 @@ export function updateAuthors(
     if (!author.cumulativeDifficulty) {
       author.cumulativeDifficulty = BIGINT_ZERO;
     }
-    author.cumulativeDifficulty = author.cumulativeDifficulty.plus(difficulty);
+    author.cumulativeDifficulty = author.cumulativeDifficulty!.plus(difficulty);
   }
   author.save();
 }
@@ -373,8 +361,13 @@ function updateStats(id: string, dataType: string, value: BigInt): string {
 
   // update mean / median
   stats.values = insertInOrder(value, stats.values);
-  stats.mean = stats.sum.toBigDecimal().div(stats.count.toBigDecimal());
-  // stats.median = TODO
+  stats.mean = stats.sum
+    .toBigDecimal()
+    .div(BigDecimal.fromString(stats.count.toString()));
+  stats.median = getMedian(stats.values);
+
+  stats.save();
+  return stats.id;
 }
 
 //
@@ -383,32 +376,50 @@ function updateStats(id: string, dataType: string, value: BigInt): string {
 // Runtime: O(n logn) average
 function insertInOrder(value: BigInt, array: BigInt[]): BigInt[] {
   let lowBound = 0; // left bound of the search section
-  let highBound = length - 1; // right bound of the search section
+  let highBound = array.length - 1; // right bound of the search section
   let index = Math.round(array.length / 2);
 
+  array.push(value);
+  return array.sort();
+
   // find position in array
-  while (true) {
-    let compareVal = array[index];
-    if (value.equals(compareVal)) {
-      // found same value, place after and return
-      return array.splice(index + 1, 0, value);
-    } else if (value.lt(compareVal)) {
-      // value is less than compareVal, search left side
-      if (index - lowBound <= 2) {
-        // insert 1 position before index
-        return array.splice(index - 1, 0, value);
-      }
-      highBound = index;
-      index = Math.round((lowBound + index) / 2); // new index is between lowBound-index
-    } else {
-      // value is greater than compareVal, search right side
-      if (highBound - index <= 2) {
-        // insert 1 position after index
-        return array.splice(index + 1, 0, value);
-      }
-      lowBound = index;
-      index = Math.round((index + highBound) / 2); // new index is between index-highBound
-    }
+  // while (true) {
+  //   let compareVal = array[index];
+  //   if (value.equals(compareVal)) {
+  //     // found same value, place after and return
+  //     return array.splice(index + 1, [value]);
+  //   } else if (value.lt(compareVal)) {
+  //     // value is less than compareVal, search left side
+  //     if (index - lowBound <= 2) {
+  //       // insert 1 position before index
+  //       array.
+  //       return array.splice(index - 1, [value]);
+  //     }
+  //     highBound = index;
+  //     index = Math.round((lowBound + index) / 2); // new index is between lowBound-index
+  //   } else {
+  //     // value is greater than compareVal, search right side
+  //     if (highBound - index <= 2) {
+  //       // insert 1 position after index
+  //       return array.splice(index + 1, [value]);
+  //     }
+  //     lowBound = index;
+  //     index = Math.round((index + highBound) / 2); // new index is between index-highBound
+  //   }
+  // }
+}
+
+function getMedian(list: BigInt[]): BigDecimal {
+  if (list.length % 2 == 1) {
+    // list length is odd
+    let index = (list.length + 1) / 2;
+    return list[index].toBigDecimal();
+  } else {
+    // list length is even
+    let index1 = list.length / 2;
+    let index2 = index1 + 1;
+    let sum = list[index1].toBigDecimal().plus(list[index2].toBigDecimal());
+    return sum.div(BIGDECIMAL_TWO);
   }
 }
 
@@ -513,19 +524,15 @@ export function createBlock(blockData: BlockData): void {
   block.gasUsed = blockData.gasUsed;
   block.gasPrice = blockData.gasPrice;
   block.burntFees = blockData.burntFees;
-  block.chunkCount = blockData.chunkCount ? blockData.chunkCount.toI32() : null;
-  block.transactionCount = blockData.transactionCount
-    ? blockData.transactionCount.toI32()
-    : null;
+  block.chunkCount = blockData.chunkCount;
+  block.transactionCount = blockData.transactionCount;
   block.rewards = blockData.rewards;
 
-  if (block.gasLimit && block.gasLimit != BIGINT_ZERO) {
-    block.blockUtilization = block.gasUsed
-      ? block.gasUsed
-          .toBigDecimal()
-          .div(block.gasLimit.toBigDecimal())
-          .times(exponentToBigDecimal(INT_TWO))
-      : null;
+  if (block.gasLimit && block.gasLimit != BIGINT_ZERO && block.gasUsed) {
+    block.blockUtilization = block
+      .gasUsed!.toBigDecimal()
+      .div(block.gasLimit!.toBigDecimal())
+      .times(exponentToBigDecimal(INT_TWO));
   } else {
     block.blockUtilization = BIGDECIMAL_ZERO;
   }
@@ -567,8 +574,8 @@ function getOrCreateStats(snapshot: string, dataType: string): STATS {
   if (!stats) {
     stats = new STATS(id);
     stats.count = INT_ZERO;
-    stats.mean = BIGINT_ZERO;
-    stats.median = BIGINT_ZERO;
+    stats.mean = BIGDECIMAL_ZERO;
+    stats.median = BIGDECIMAL_ZERO;
     stats.max = BIGINT_ZERO;
     stats.min = BIGINT_ZERO;
     stats.variance = BIGDECIMAL_ZERO;

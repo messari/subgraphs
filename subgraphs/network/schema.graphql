@@ -171,7 +171,7 @@ type DailySnapshot @entity {
   cumulativeUniqueAuthors: Int
 
   " Statistical analysis of unique daily active authors "
-  dailyAuthors: STATS
+  dailyUniqueAuthors: STATS
 
   " Total difficulty up until this day "
   cumulativeDifficulty: BigInt
@@ -214,6 +214,9 @@ type DailySnapshot @entity {
 
   " Statisitcal analysis of the daily supply "
   dailySupply: STATS
+
+  " Total number of transactions that have occured on this blockchain "
+  cumulativeTransactions: Int
 
   " Statistical analysis of transactions per day "
   dailyTransactions: STATS
@@ -371,10 +374,10 @@ type Block @entity(immutable: true) {
   burntFees: BigInt
 
   " Number of chunks in this block (e.g. shards on NEAR) "
-  chunkCount: Int
+  chunkCount: BigInt
 
   " Number of transactions in this block "
-  transactionCount: Int
+  transactionCount: BigInt
 
   " Rewards emitted in this block "
   rewards: BigInt
