@@ -59,7 +59,7 @@ function PoolTab({
 
   let allLoaded = false;
   if (!poolTimeseriesLoading && (poolTimeseriesData || poolTimeseriesError)) {
-    allLoaded = true
+    allLoaded = true;
   }
 
   let oneLoaded = false;

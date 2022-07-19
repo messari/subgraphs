@@ -135,13 +135,11 @@ export const Deployment = ({
   const { schemaVersion } = protocol ?? {};
 
   useEffect(() => {
-    if (!data && statusData) {
-      if (!currentDeployment) {
-        setEndpointURL("https://api.thegraph.com/subgraphs/id/" + statusData?.subgraph);
-      }
-      getSchemaData();
+    if (!data && statusData && !currentDeployment) {
+      setEndpointURL("https://api.thegraph.com/subgraphs/id/" + statusData?.subgraph);
     }
-  }, [status]);
+    getSchemaData();
+  }, [statusLoading]);
 
   useEffect(() => {
     if (error || errorIndexing) {
@@ -163,7 +161,7 @@ export const Deployment = ({
     return null;
   }
 
-  if (!statusData && !statusLoading) {
+  if (!statusData && !statusLoading && !data) {
     let errorMsg = null;
     if (errorIndexing) {
       errorMsg = (
@@ -203,7 +201,7 @@ export const Deployment = ({
   }
   const indexed = synced
     ? 100
-    : toPercent(statusData.chains[0]?.latestBlock?.number || 0, statusData.chains[0].chainHeadBlock.number);
+    : toPercent(statusData?.chains[0]?.latestBlock?.number || 0, statusData?.chains[0]?.chainHeadBlock?.number);
 
   const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
@@ -223,7 +221,7 @@ export const Deployment = ({
       onClick={navigateToSubgraph(endpointURL)}
       $styleRules={{
         schemaOutdated,
-        nonFatalErrors: nonFatalErrors.length > 0,
+        nonFatalErrors: nonFatalErrors?.length > 0,
         fatalError: !!fatalError,
         success: indexedSuccess,
         currentVersion: currentDeployment,
@@ -239,14 +237,15 @@ export const Deployment = ({
             </Typography>
           </Box>
           <CardRow className="indexed">
-            <span>Indexed:</span> <span>{indexed}%</span>
+            <span>Indexed:</span> <span>{Number(indexed) ? indexed + "%" : "N/A"}</span>
           </CardRow>
           <CardRow>
-            <span>Latest Block:</span> <span>{statusData.chains[0]?.latestBlock?.number || "N/A"}</span>
+            <span>Latest Block:</span>{" "}
+            <span>{statusData?.chains[0]?.latestBlock?.number || data?._meta?.block?.number}</span>
           </CardRow>
           <CardRow>
             <span>Current chain block:</span>
-            <span>{statusData.chains[0].chainHeadBlock.number}</span>
+            <span>{statusData?.chains[0]?.chainHeadBlock?.number || "N/A"}</span>
           </CardRow>
           <CardRow $warning={schemaOutdated}>
             <span>Schema version:</span> <span>{protocol?.schemaVersion || "N/A"}</span>
@@ -254,14 +253,17 @@ export const Deployment = ({
           <CardRow>
             <span>Subgraph version:</span> <span>{protocol?.subgraphVersion || "N/A"}</span>
           </CardRow>
-          <CardRow $warning={nonFatalErrors.length > 0}>
-            <span>Non fatal error count:</span> <span>{nonFatalErrors.length}</span>
+          <CardRow $warning={nonFatalErrors?.length > 0}>
+            <span>Non fatal error count:</span> <span>{nonFatalErrors?.length || 0}</span>
           </CardRow>
           <CardRow>
-            <span>Entity count:</span> <span>{parseInt(statusData.entityCount).toLocaleString()}</span>
+            <span>Entity count:</span>{" "}
+            <span>
+              {parseInt(statusData?.entityCount) ? parseInt(statusData?.entityCount)?.toLocaleString() : "N/A"}
+            </span>
           </CardRow>
         </CardContent>
-        {(nonFatalErrors.length > 0 || fatalError) && (
+        {(nonFatalErrors?.length > 0 || fatalError) && (
           <CardButton variant="contained" color="error" onClick={showErrorModal}>
             View Errors
           </CardButton>

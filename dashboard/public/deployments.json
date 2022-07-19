@@ -65,6 +65,9 @@
         "trader-joe": {
             "avalanche": "https://api.thegraph.com/subgraphs/name/messari/trader-joe-avalanche"
         },
+        "ubeswap": {
+            "celo": "https://api.thegraph.com/subgraphs/name/messari/ubeswap-celo"
+        },
         "uniswap-v2": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v2-ethereum"
         },
@@ -73,6 +76,9 @@
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-ethereum",
             "matic": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-polygon",
             "optimism": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-optimism"
+        },
+        "vvs-finance": {
+            "cronos": "https://graph.cronoslabs.com/subgraphs/name/messari/vvs-finance"
         }
     },
     "lending-protocols": {
@@ -174,6 +180,9 @@
         },
         "scream": {
             "fantom": "https://api.thegraph.com/subgraphs/name/messari/scream-fantom"
+        },
+        "tectonic": {
+            "cronos": "https://graph.cronoslabs.com/subgraphs/name/messari/tectonic"
         },
         "venus": {
             "bsc": "https://api.thegraph.com/subgraphs/name/messari/venus-protocol-bsc"
