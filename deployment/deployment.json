@@ -900,7 +900,7 @@
           "template": "ens-governance.template.yaml",
           "danielkhoo": "danielkhoo/ens-governance",
           "messari": "messari/ens-governance",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       },
       "euler-governance": {
@@ -932,15 +932,15 @@
           "template": "silo-governance.template.yaml",
           "danielkhoo": "danielkhoo/silo-governance",
           "messari": "messari/silo-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "truefi-governance": {
-        "ethereum": {
+        "mainnet": {
           "template": "truefi-governance.template.yaml",
           "danielkhoo": "danielkhoo/truefi-governance",
           "messari": "messari/truefi-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
