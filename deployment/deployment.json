@@ -903,6 +903,14 @@
           "deploy-on-merge": false
         }
       },
+      "code4rena-governance": {
+        "polygon": {
+          "template": "code4rena-governance.template.yaml",
+          "danielkhoo": "danielkhoo/code4rena-governance",
+          "messari": "messari/code4rena-governance",
+          "deploy-on-merge": false
+        }
+      },
       "ens-governance": {
         "mainnet": {
           "template": "ens-governance.template.yaml",
