@@ -71,7 +71,6 @@ export function handleTransfer(event: Transfer): void {
     if (isBurn) {
       handleBurnEvent(token, amount, event.params.from, event);
     } else if (isMint) {
-      log.error("isMint", []);
       handleMintEvent(token, amount, event.params.to, event);
     } else {
       // In this case, it will be transfer event.
@@ -155,7 +154,6 @@ export function handleMint(event: Mint): void {
 
   if (token != null) {
     let amount = toDecimal(event.params.amount, token.decimals);
-    log.error("handleMint", []);
     handleMintEvent(token, amount, event.params.to, event);
 
     // Update destination account balance

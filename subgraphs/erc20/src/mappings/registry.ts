@@ -21,22 +21,9 @@ import {
 import {
   REGISTRY_HASH,
   DEFAULT_DECIMALS,
-  DETAILED_TOKEN,
-  BURN_EVENT,
-  MINT_EVENT,
   BIGINT_ZERO,
   BIGDECIMAL_ZERO,
 } from "../common/constants";
-
-// If token contract emits Burn event when destroy/burn tokens
-export function hasBurnEvent(flags: u64): boolean {
-  return (flags & BURN_EVENT) != 0;
-}
-
-// If token contract emits Mint event when create/mint tokens
-export function hasMintEvent(flags: u64): boolean {
-  return (flags & MINT_EVENT) != 0;
-}
 
 export function toDecimal(value: BigInt, decimals: u32): BigDecimal {
   let precision = BigInt.fromI32(10)
@@ -59,7 +46,6 @@ export function createToken(value: JSONValue, userData: Value): void {
 
   let address = rawData[0].isNull() ? "" : rawData[0].toString();
   let symbol = rawData[1].isNull() ? "" : rawData[1].toString();
-  let flags: u16 = rawData[2].isNull() ? 0 : (rawData[2].toU64() as u16);
 
   if (address != null) {
     let contractAddress = Address.fromString(address);
@@ -92,14 +78,8 @@ export function createToken(value: JSONValue, userData: Value): void {
 
       // Start indexing token events
       StandardToken.create(contractAddress);
-
-      if (hasBurnEvent(flags)) {
-        BurnableToken.create(contractAddress);
-      }
-
-      if (hasMintEvent(flags)) {
-        MintableToken.create(contractAddress);
-      }
+      BurnableToken.create(contractAddress);
+      MintableToken.create(contractAddress);
     } else {
       log.warning("Token {} already in registry", [contractAddress.toHex()]);
     }
