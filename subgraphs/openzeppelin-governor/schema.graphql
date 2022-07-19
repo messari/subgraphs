@@ -142,9 +142,9 @@ type Vote @entity(immutable: true) {
   proposal: Proposal!
 
   "Block number vote is cast in"
-  block: BigInt
+  block: BigInt!
   "Timestamp of block vote was cast in"
-  blockTime: BigInt
+  blockTime: BigInt!
 }
 
 enum VoteChoice {
