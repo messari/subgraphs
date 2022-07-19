@@ -10,8 +10,8 @@ Once everything is setup properly deploying is very easy.
 # This example will deploy all forks of aave-v2 on all networks to the hosted service under "dmelotik" in deploymentConfigurations.json
 npm run deploy --SUBGRAPH=aave-v2-forks --PROTOCOL=aave-v2 --LOCATION=dmelotik
 
-# This will do the same, but only deploying the mainnet subgraph
-npm run deploy --SUBGRAPH=aave-v2-forks --PROTOCOL=aave-v2 --NETWORK=mainnet --LOCATION=dmelotik
+# This will do the same, but only deploying the ethereum subgraph
+npm run deploy --SUBGRAPH=aave-v2-forks --PROTOCOL=aave-v2 --NETWORK=ethereum --LOCATION=dmelotik
 ```
 
 > Setting `deploy-on-merge` to `true` in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) will run the above commands on subgraphs that have changed to messari's hosted service.
@@ -24,7 +24,7 @@ To setup the subgraph manifest from the template:
 
 ```bash
 # Use aave-v2 as an example
-npm run prepare:yaml --PROTOCOL=aave-v2 --NETWORK=mainnet --TEMPLATE=aave.v2.template.yaml
+npm run prepare:yaml --PROTOCOL=aave-v2 --NETWORK=ethereum --TEMPLATE=aave.v2.template.yaml
 ```
 
 To codegen and build:
