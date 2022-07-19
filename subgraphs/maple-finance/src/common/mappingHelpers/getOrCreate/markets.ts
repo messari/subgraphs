@@ -35,8 +35,6 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
 
         const poolContract = PoolContract.bind(marketAddress);
 
-        poolContract.try_name;
-
         const marketName = readCallResult(poolContract.try_name(), "UNDEFINED", poolContract.try_name.name);
 
         const poolFactoryAddress = readCallResult(
@@ -89,6 +87,9 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
         market.rewardTokens = new Array<string>();
         market.rates = new Array<string>();
         market.totalValueLockedUSD = ZERO_BD;
+        market.cumulativeSupplySideRevenueUSD = ZERO_BD;
+        market.cumulativeProtocolSideRevenueUSD = ZERO_BD;
+        market.cumulativeTotalRevenueUSD = ZERO_BD;
         market.totalDepositBalanceUSD = ZERO_BD;
         market.cumulativeDepositUSD = ZERO_BD;
         market.totalBorrowBalanceUSD = ZERO_BD;
@@ -120,15 +121,13 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
         market._cumulativeInterest = ZERO_BI;
         market._cumulativeInterestClaimed = ZERO_BI;
         market._cumulativePoolLosses = ZERO_BI;
+        market._recognizedPoolLosses = ZERO_BI;
         market._cumulativePoolDelegateRevenue = ZERO_BI;
         market._cumulativeTreasuryRevenue = ZERO_BI;
         market._totalDepositBalance = ZERO_BI;
         market._totalInterestBalance = ZERO_BI;
         market._totalBorrowBalance = ZERO_BI;
         market._cumulativeLiquidate = ZERO_BI;
-        market._cumulativeSupplySideRevenueUSD = ZERO_BD;
-        market._cumulativeProtocolSideRevenueUSD = ZERO_BD;
-        market._cumulativeTotalRevenueUSD = ZERO_BD;
         market._lastUpdatedBlockNumber = event.block.number;
 
         market.save();
@@ -167,6 +166,7 @@ export function getOrCreateStakeLocker(event: ethereum.Event, stakeLockerAddress
         stakeLocker.cumulativeStake = ZERO_BI;
         stakeLocker.cumulativeUnstake = ZERO_BI;
         stakeLocker.cumulativeLosses = ZERO_BI;
+        stakeLocker.recognizedLosses = ZERO_BI;
         stakeLocker.cumulativeLossesInPoolInputToken = ZERO_BI;
         stakeLocker.cumulativeInterestInPoolInputTokens = ZERO_BI;
 
@@ -265,6 +265,11 @@ export function getOrCreateLoan(
             const rate = rateFromContract.toBigDecimal().div(BigDecimal.fromString("100"));
             const interestRate = getOrCreateInterestRate(event, loan, rate, tryTermDays.value);
             loan.interestRate = interestRate.id;
+            loan.borrower = readCallResult(
+                loanV1Contract.try_borrower(),
+                ZERO_ADDRESS,
+                loanV1Contract.try_borrower.name
+            ).toHexString();
         } else {
             // V2 or V3, functions used below are common between
             const loanV2V3Contract = LoanV2Contract.bind(loanAddress);
@@ -310,6 +315,12 @@ export function getOrCreateLoan(
             const rate = parseUnits(rateFromContract, 18).times(BigDecimal.fromString("100"));
             const interestRate = getOrCreateInterestRate(event, loan, rate, termDays);
             loan.interestRate = interestRate.id;
+
+            loan.borrower = readCallResult(
+                loanV2V3Contract.try_borrower(),
+                ZERO_ADDRESS,
+                loanV2V3Contract.try_borrower.name
+            ).toHexString();
         }
 
         loan.save();
@@ -398,7 +409,6 @@ export function getOrCreateAccountMarket(
         accountMarket = new _AccountMarket(id);
 
         accountMarket.market = market.id;
-        accountMarket.unrecognizedLosses = ZERO_BI;
         accountMarket.recognizedLosses = ZERO_BI;
 
         accountMarket.creationBlockNumber = event.block.number;

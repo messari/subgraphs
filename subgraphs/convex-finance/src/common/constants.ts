@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 // The network names corresponding to the Network enum in the schema.
 // They also correspond to the ones in `dataSource.network()` after converting to lower case.
@@ -48,11 +48,21 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
+export namespace RewardIntervalType {
+  export const BLOCK = "BLOCK";
+  export const TIMESTAMP = "TIMESTAMP";
+}
+
+export namespace NULL {
+  export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
+  export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
+}
+
 export namespace Protocol {
   export const NAME = "convex";
   export const SLUG = "convex";
   export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.1.1";
+  export const SUBGRAPH_VERSION = "1.2.0";
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 
@@ -61,6 +71,10 @@ export const SECONDS_PER_YEAR = BigInt.fromI32(31556952);
 
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
+
+export const CVX_CLIFF_COUNT = BigDecimal.fromString("1000");
+export const CVX_CLIFF_SIZE = BigDecimal.fromString("100000");
+export const CVX_MAX_SUPPLY = BigDecimal.fromString("100000000");
 
 export const DEFAULT_MANAGEMENT_FEE = BigInt.fromI32(200);
 export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(2000);
@@ -83,13 +97,15 @@ export const USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 export const DENOMINATOR = BigDecimal.fromString("10000");
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
-export const ZERO_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
-);
-export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
 
 export const CONVEX_BOOSTER_ADDRESS = Address.fromString(
   "0xf403c135812408bfbe8713b5a23a04b3d48aae31"
+);
+export const CRV_TOKEN_ADDRESS = Address.fromString(
+  "0xd533a949740bb3306d119cc777fa900ba034cd52"
+);
+export const CONVEX_TOKEN_ADDRESS = Address.fromString(
+  "0x4e3FBD56CD56c3e72c1403e103b45Db9da5B9D2B"
 );
 
 export namespace CURVE_REGISTRY {
@@ -118,4 +134,102 @@ POOL_ADDRESS_V2.set(
 POOL_ADDRESS_V2.set(
   "0x3d229e1b4faab62f621ef2f6a610961f7bd7b23b",
   Address.fromString("0x98a7F18d4E56Cfe84E3D081B40001B3d5bD3eB8B")
+);
+
+export const MISSING_POOLS_MAP = new TypedMap<Address, Address>();
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x90244f43d548a4f8dfecfad91a193465b1fad6f7"),
+  Address.fromString("0x941eb6f616114e4ecaa85377945ea306002612fe")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0xf3a43307dcafa93275993862aae628fcb50dc768"),
+  Address.fromString("0xd658a338613198204dca1143ac3f01a722b5d94a")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x137469b55d1f15651ba46a89d0588e97dd0b6562"),
+  Address.fromString("0x50f3752289e1456bfa505afd37b241bca23e685d")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0xe160364fd8407ffc8b163e278300c6c5d18ff61d"),
+  Address.fromString("0xf43b15ab692fde1f9c24a9fce700adcc809d5391")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x2302aabe69e6e7a1b0aa23aac68fccb8a4d2b460"),
+  Address.fromString("0x9a22cdb1ca1cdd2371cd5bb5199564c4e89465eb")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x1054ff2ffa34c055a13dcd9e0b4c0ca5b3aeceb9"),
+  Address.fromString("0xe07bde9eb53deffa979dae36882014b758111a78")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x3a70dfa7d2262988064a2d051dd47521e43c9bdd"),
+  Address.fromString("0x3a70dfa7d2262988064a2d051dd47521e43c9bdd")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x401322b9fddba8c0a8d40fbcece1d1752c12316b"),
+  Address.fromString("0xfe4a08f22fe65759ba91db2e2cada09b4415b0d7")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x4704ab1fb693ce163f7c9d3a31b3ff4eaf797714"),
+  Address.fromString("0xf861483fa7e511fbc37487d91b6faa803af5d37c")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x6359b6d3e327c497453d4376561ee276c6933323"),
+  Address.fromString("0xfb8814d005c5f32874391e888da6eb2fe7a27902")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x54c8ecf46a81496eeb0608bd3353388b5d7a2a33"),
+  Address.fromString("0x5b692073f141c31384fae55856cfb6cbffe91e60")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x08cea8e5b4551722deb97113c139dd83c26c5398"),
+  Address.fromString("0x6df0d77f0496ce44e72d695943950d8641fca5cf")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x8682fbf0cbf312c891532ba9f1a91e44f81ad7df"),
+  Address.fromString("0x1570af3df649fc74872c5b8f280a162a3bdd4eb6")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x22cf19eb64226e0e1a79c69b345b31466fd273a7"),
+  Address.fromString("0xacce4fe9ce2a6fe9af83e7cf321a3ff7675e0ab6")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x127091ede112aed7bae281747771b3150bb047bb"),
+  Address.fromString("0xeb0265938c1190ab4e3e1f6583bc956df47c0f93")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x80caccdbd3f07bbdb558db4a9e146d099933d677"),
+  Address.fromString("0xef04f337fcb2ea220b6e8db5edbe2d774837581c")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x4647b6d835f3b393c7a955df51eefcf0db961606"),
+  Address.fromString("0x21410232b484136404911780bc32756d5d1a9fa9")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x3660bd168494d61ffdac21e403d0f6356cf90fd7"),
+  Address.fromString("0x6ec38b3228251a0c5d491faf66858e2e23d7728b")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0xf7b55c3732ad8b2c2da7c24f30a69f55c54fb717"),
+  Address.fromString("0xf7b55c3732ad8b2c2da7c24f30a69f55c54fb717")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x48ff31bbbd8ab553ebe7cbd84e1ea3dba8f54957"),
+  Address.fromString("0x48ff31bbbd8ab553ebe7cbd84e1ea3dba8f54957")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0xdf55670e27be5cde7228dd0a6849181891c9eba1"),
+  Address.fromString("0x3211c6cbef1429da3d0d58494938299c92ad5860")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0xbe4f3ad6c9458b901c81b734cb22d9eae9ad8b50"),
+  Address.fromString("0x75a6787c7ee60424358b449b539a8b774c9b4862")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x8c524635d52bd7b1bd55e062303177a7d916c046"),
+  Address.fromString("0x8c524635d52bd7b1bd55e062303177a7d916c046")
+);
+MISSING_POOLS_MAP.set(
+  Address.fromString("0x7ea4ad8c803653498bf6ac1d2debc04dce8fd2ad"),
+  Address.fromString("0xe0e970a99bc4f53804d8145bebbc7ebc9422ba7f")
 );

@@ -664,14 +664,8 @@ type Account @entity {
   " All positions that belong to this account "
   positions: [Position!]! @derivedFrom(field: "account")
 
-  " All open positions this account has "
-  openPositions: [Position!]!
-
   " Number of open positions this account has "
   openPositionCount: Int!
-
-  " All closed positions this account has "
-  closedPositions: [Position!]!
 
   " Number of closed positions this account has "
   closedPositionCount: Int!
@@ -696,7 +690,7 @@ type Account @entity {
 }
 
 type Position @entity {
-  " { Account address }-{ Market address } "
+  " { Account address }-{ Market address }-{ Count } "
   id: ID!
 
   " Account that owns this position "

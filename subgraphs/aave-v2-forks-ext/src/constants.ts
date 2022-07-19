@@ -132,17 +132,6 @@ export function wadToRay(a: BigInt): BigInt {
   return result;
 }
 
-export function bigIntToBigDecimal(
-  quantity: BigInt,
-  decimals: i32 = 18
-): BigDecimal {
-  return quantity.divDecimal(
-    BigInt.fromI32(10)
-      .pow(decimals as u8)
-      .toBigDecimal()
-  );
-}
-
 // n => 10^n
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
   let result = BIGINT_ONE;

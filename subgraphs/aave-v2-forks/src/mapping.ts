@@ -23,8 +23,8 @@ import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
-  bigIntToBigDecimal,
   BIGINT_ZERO,
+  DEFAULT_DECIMALS,
   EventType,
   exponentToBigDecimal,
   InterestRateSide,
@@ -367,7 +367,7 @@ export function _handleReserveDataUpdated(
   protocol.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDeltaUSD);
 
-  log.info("[ReserveDataUpdated] New revenue: {}", [
+  log.info("[ReserveDataUpdated] New total revenue: {}", [
     totalRevenueDeltaUSD.toString(),
   ]);
 
@@ -376,21 +376,27 @@ export function _handleReserveDataUpdated(
     market.id,
     InterestRateSide.BORROWER,
     InterestRateType.STABLE,
-    bigIntToBigDecimal(rayToWad(stableBorrowRate))
+    rayToWad(stableBorrowRate)
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
 
   let vBorrowRate = createInterestRate(
     market.id,
     InterestRateSide.BORROWER,
     InterestRateType.VARIABLE,
-    bigIntToBigDecimal(rayToWad(variableBorrowRate))
+    rayToWad(variableBorrowRate)
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
 
   let depositRate = createInterestRate(
     market.id,
     InterestRateSide.LENDER,
     InterestRateType.VARIABLE,
-    bigIntToBigDecimal(rayToWad(liquidityRate))
+    rayToWad(liquidityRate)
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
 
   market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];

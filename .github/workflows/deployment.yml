@@ -18,3 +18,14 @@ jobs:
           CHANGED_FILES: "${{ steps.files.outputs.all }}"
           ABSOLUTE_PATH: ${{ github.workspace }}
           GRAPH_DEPLOYMENT_LOCATION: messari
+
+      - uses: steegecs/Messari-Deployment-Config-Reset@main
+        with: 
+          ABSOLUTE_PATH: ${{ github.workspace }}
+
+      - uses: EndBug/add-and-commit@v9
+        with:
+          add: '.'
+          commit: --signoff
+          push: true
+

@@ -1,4 +1,4 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 
 import {
     LoanV1 as LoanV1Template,
@@ -11,11 +11,10 @@ import {
     Transfer as TransferEvent,
     Claim as ClaimEvent,
     DefaultSuffered as DefaultSufferedEvent,
-    FundsWithdrawn as FundsWithdrawnEvent,
-    LossesRecognized as LossesRecognizedEvent
+    FundsWithdrawn as FundsWithdrawnEvent
 } from "../../generated/templates/Pool/Pool";
 
-import { LoanVersion, PoolState } from "../common/constants";
+import { LoanVersion, PoolState, ZERO_BD, ZERO_BI } from "../common/constants";
 import {
     getOrCreateFinancialsDailySnapshot,
     getOrCreateMarketHourlySnapshot
@@ -37,23 +36,6 @@ import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 import { getTokenAmountInUSD } from "../common/prices/prices";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
-
-export function handleLossesRecognized(event: LossesRecognizedEvent): void {
-    const accountAddress = event.transaction.from;
-    const market = getOrCreateMarket(event, event.address);
-    const accountMarket = getOrCreateAccountMarket(event, accountAddress, market);
-
-    ////
-    // Update account market
-    ////
-    accountMarket.unrecognizedLosses = accountMarket.unrecognizedLosses.plus(event.params.lossesRecognized);
-    accountMarket.save();
-
-    ////
-    // Trigger interval update
-    ////
-    intervalUpdate(event, market);
-}
 
 export function handleTransfer(event: TransferEvent): void {
     if (Address.zero() == event.params.from) {
@@ -112,20 +94,38 @@ export function handleTransfer(event: TransferEvent): void {
         ////
         // Create withdraw
         ////
-        const withdraw = createWithdraw(event, market, event.params.value, accountMarket.unrecognizedLosses);
+        const withdraw = createWithdraw(event, market, event.params.value, accountMarket.recognizedLosses);
 
         ////
         // Update AccountMarket
         ////
         accountMarket.recognizedLosses = accountMarket.recognizedLosses.plus(withdraw._losses);
-        accountMarket.unrecognizedLosses = accountMarket.unrecognizedLosses.minus(withdraw._losses);
         accountMarket.save();
 
         ////
         // Update market
         ////
         market._cumulativeWithdraw = market._cumulativeWithdraw.plus(withdraw.amount);
+        market._recognizedPoolLosses = market._recognizedPoolLosses.plus(withdraw._losses);
         market.save();
+
+        ////
+        // Update financial snapshot
+        ////
+        const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+        financialsDailySnapshot.dailyWithdrawUSD = financialsDailySnapshot.dailyWithdrawUSD.plus(withdraw.amountUSD);
+        financialsDailySnapshot.save();
+
+        ////
+        // Update market snapshot
+        ////
+        const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
+        marketDailySnapshot.dailyWithdrawUSD = marketDailySnapshot.dailyWithdrawUSD.plus(withdraw.amountUSD);
+        marketDailySnapshot.save();
+
+        const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+        MarketHourlySnapshot.hourlyWithdrawUSD = MarketHourlySnapshot.hourlyWithdrawUSD.plus(withdraw.amountUSD);
+        MarketHourlySnapshot.save();
 
         ////
         // Trigger interval update
@@ -220,38 +220,41 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
 export function handleClaim(event: ClaimEvent): void {
     const market = getOrCreateMarket(event, event.address);
     const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
-    const poolInterest = event.params.interest;
-    const poolDelegatePotion = event.params.poolDelegatePortion;
-    const stakeLockerPortion = event.params.stakeLockerPortion;
+    const poolInterestAmount = event.params.interest;
+    const poolDelegateInterestAmount = event.params.poolDelegatePortion;
+    const stakeLockerInterestAmount = event.params.stakeLockerPortion;
+    const principalRepayAmount = event.params.principal;
+
+    const principalRepayAmountUSD = getTokenAmountInUSD(event, inputToken, principalRepayAmount);
+    const totalInterestAmountUSD = getTokenAmountInUSD(
+        event,
+        inputToken,
+        poolInterestAmount.plus(poolDelegateInterestAmount).plus(stakeLockerInterestAmount)
+    );
 
     ////
     // Update stake locker
     ////
     const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
     stakeLocker.cumulativeInterestInPoolInputTokens = stakeLocker.cumulativeInterestInPoolInputTokens.plus(
-        stakeLockerPortion
+        poolDelegateInterestAmount
     );
     stakeLocker.save();
 
     ////
     // Update market
     ////
-    market._cumulativePrincipalRepay = market._cumulativePrincipalRepay.plus(event.params.principal);
-    market._cumulativeInterest = market._cumulativeInterest.plus(poolInterest);
-    market._cumulativePoolDelegateRevenue = market._cumulativePoolDelegateRevenue.plus(poolDelegatePotion);
-    const amountUSD = getTokenAmountInUSD(
-        event,
-        inputToken,
-        poolInterest.plus(poolDelegatePotion).plus(stakeLockerPortion)
-    );
-    market._cumulativeSupplySideRevenueUSD = market._cumulativeSupplySideRevenueUSD.plus(amountUSD);
+    market._cumulativePrincipalRepay = market._cumulativePrincipalRepay.plus(principalRepayAmount);
+    market._cumulativeInterest = market._cumulativeInterest.plus(poolInterestAmount);
+    market._cumulativePoolDelegateRevenue = market._cumulativePoolDelegateRevenue.plus(poolDelegateInterestAmount);
+    market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(totalInterestAmountUSD);
     market.save();
 
     ////
     // Update protocol
     ////
     const protocol = getOrCreateProtocol();
-    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(amountUSD);
+    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(totalInterestAmountUSD);
     protocol.save();
 
     ////
@@ -259,9 +262,30 @@ export function handleClaim(event: ClaimEvent): void {
     ////
     const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
     financialsDailySnapshot.dailySupplySideRevenueUSD = financialsDailySnapshot.dailySupplySideRevenueUSD.plus(
-        amountUSD
+        totalInterestAmountUSD
     );
     financialsDailySnapshot.save();
+
+    ////
+    // Update market snapshot
+    ////
+    const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
+    marketDailySnapshot.dailySupplySideRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
+        totalInterestAmountUSD
+    );
+    marketDailySnapshot.dailyRepayUSD = marketDailySnapshot.dailyRepayUSD.plus(
+        principalRepayAmountUSD.plus(totalInterestAmountUSD)
+    );
+    marketDailySnapshot.save();
+
+    const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+    marketHourlySnapshot.hourlySupplySideRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
+        totalInterestAmountUSD
+    );
+    marketHourlySnapshot.hourlyRepayUSD = marketHourlySnapshot.hourlyRepayUSD.plus(
+        principalRepayAmountUSD.plus(totalInterestAmountUSD)
+    );
+    marketHourlySnapshot.save();
 
     ////
     // Trigger interval update
@@ -289,10 +313,10 @@ export function handleDefaultSuffered(event: DefaultSufferedEvent): void {
     ////
     // Update stake locker
     ////
-    const stakeAssetBurnedAmount = event.params.bptsBurned.minus(event.params.bptsReturned);
+    const stakeAssetBurnedAmount = event.params.bptsBurned;
     const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
     stakeLocker.cumulativeLosses = stakeLocker.cumulativeLosses.plus(stakeAssetBurnedAmount);
-    stakeLocker.cumulativeLossesInPoolInputToken = stakeLocker.cumulativeLosses.plus(
+    stakeLocker.cumulativeLossesInPoolInputToken = stakeLocker.cumulativeLossesInPoolInputToken.plus(
         liquidate._defaultSufferedByStakeLocker
     );
     stakeLocker.save();
@@ -321,6 +345,13 @@ export function handleDefaultSuffered(event: DefaultSufferedEvent): void {
     const protocol = getOrCreateProtocol();
     protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidate.amountUSD);
     protocol.save();
+
+    ////
+    // Update protocol snapshot
+    ////
+    const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+    financialsDailySnapshot.dailyLiquidateUSD = financialsDailySnapshot.dailyBorrowUSD.plus(liquidate.amountUSD);
+    financialsDailySnapshot.save();
 
     ////
     // Trigger interval update

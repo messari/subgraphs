@@ -79,11 +79,11 @@ dataSources:
           file: ./abis/trader-joe/ERC20.json
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
-          handler: handleDepositV3
+          handler: handleDeposit
         - event: Withdraw(indexed address,indexed uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
-          handler: handleEmergencyWithdrawV3
+          handler: handleEmergencyWithdraw
         - event: Add(indexed uint256,uint256,indexed address,indexed address)
           handler: handleAdd
         - event: Set(indexed uint256,uint256,indexed address,bool)
