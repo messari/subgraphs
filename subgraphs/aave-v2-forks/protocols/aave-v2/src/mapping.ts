@@ -17,6 +17,7 @@ import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
   Protocol,
+  USDC_POS_TOKEN_ADDRESS,
   USDC_TOKEN_ADDRESS,
 } from "./constants";
 import {
@@ -423,12 +424,22 @@ function getAssetPriceInUSDC(
     return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
   }
 
+  // Polygon Oracle returns price in ETH, must convert to USD with following method
+  if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
+    let priceUSDCInEth = readValue<BigInt>(
+      oracle.try_getAssetPrice(Address.fromString(USDC_POS_TOKEN_ADDRESS)),
+      BIGINT_ZERO
+    );
+
+    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+  }
+
   // Avalanche Oracle return the price offset by 8 decimals
   if (equalsIgnoreCase(dataSource.network(), Network.AVALANCHE)) {
     return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
   }
 
-  // otherwise return the output of the price oracle
+  // last resort, should not be touched
   let inputToken = getOrCreateToken(tokenAddress);
   return oracleResult
     .toBigDecimal()
