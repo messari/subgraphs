@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import {
   ActiveAuthor,
   Author,
@@ -68,6 +68,7 @@ export function updateNetwork(networkData: UpdateNetworkData): Network {
     );
   }
   if (networkData.newTransactions) {
+    log.warning("errored: {}", [networkData.newTransactions!.toString()]);
     if (!network.cumulativeTransactions) {
       network.cumulativeTransactions = INT_ZERO;
     }
@@ -332,6 +333,10 @@ export function updateAuthors(
     author.save();
 
     // update unique authors
+    if (!network.cumulativeUniqueAuthors) {
+      log.warning("error?", []);
+      network.cumulativeUniqueAuthors = INT_ZERO;
+    }
     network.cumulativeUniqueAuthors++;
     network.save();
   }

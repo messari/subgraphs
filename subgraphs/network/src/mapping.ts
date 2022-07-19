@@ -218,10 +218,10 @@ export function handleEvmBlock(block: ethereum.Block): void {
     block.gasUsed,
     block.gasLimit,
     burntFees,
-    BIGINT_ZERO,
-    BIGINT_ZERO,
+    null,
+    null,
     block.size,
-    BIGINT_ZERO
+    null
   );
   let network = updateNetwork(updateNetworkData);
 
