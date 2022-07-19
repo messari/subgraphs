@@ -942,6 +942,14 @@
           "messari": "messari/truefi-governance",
           "deploy-on-merge": true
         }
+      },
+      "unlock-governance": {
+        "ethereum": {
+          "template": "unlock-governance.template.yaml",
+          "danielkhoo": "danielkhoo/unlock-governance",
+          "messari": "messari/unlock-governance",
+          "deploy-on-merge": false
+        }
       }
     },
     "vesper-finance": {
