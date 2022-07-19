@@ -966,7 +966,7 @@
         "avalanche": {
           "template": "platypus.template.yaml",
           "messari": "messari/platypus-finance",
-          "aditya": "aditya-todi/platypus-finance-v2",
+          "aditya-todi": "aditya-todi/platypus-finance-avalanche",
           "deploy-on-merge": false
         }
       }

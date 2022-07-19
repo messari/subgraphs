@@ -2,6 +2,9 @@ specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
 features:
   - grafting
+# graft:
+#   base: {{ graftBase }}
+#   block: {{ graftBlock }}
 schema:
   file: ./schema.graphql
 dataSources:
@@ -202,13 +205,15 @@ dataSources:
           handler: handleEmergencyWithdraw
         - event: Withdraw(indexed address,indexed uint256,uint256)
           handler: handleWithdraw
+
+  {{#pools}}
   - kind: ethereum/contract
-    name: Pool
-    network: avalanche
+    name: {{ name }}
+    network: {{ network }}
     source:
-      address: "0x66357dCaCe80431aee0A7507e2E361B7e2402370"
+      address: "{{ address }}"
       abi: Pool
-      startBlock: 7409737
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -266,70 +271,9 @@ dataSources:
           handler: handleSwap
         - event: AssetAdded(indexed address,indexed address)
           handler: handleAssetAdded
+  {{/pools}}
 
 templates:
-  - kind: ethereum/contract
-    name: Pool
-    network: avalanche
-    source:
-      abi: Pool
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/pool.ts
-      entities:
-        - Protocol
-        - DexAmmProtocol
-        - LiquidityPool
-        - Token
-        - RewardToken
-        - _Asset
-        - FinancialsDailySnapshot
-        - UsageMetricsDailySnapshot
-        - UsageMetricsHourlySnapshot
-        - LiquidityPoolDailySnapshot
-        - LiquidityPoolHourlySnapshot
-      abis:
-        - name: Asset
-          file: ./abis/asset.json
-        - name: Pool
-          file: ./abis/pool.json
-        - name: SecondaryPool
-          file: ./abis/secondaryPool.json
-        - name: Router
-          file: ./abis/router.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: ERC20SymbolBytes
-          file: ./abis/ERC20SymbolBytes.json
-        - name: ERC20NameBytes
-          file: ./abis/ERC20NameBytes.json
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # ERC20
-        - name: _ERC20
-          file: ./abis/Prices/ERC20.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        # TraderJOE Contracts
-        - name: TraderJoeRouter
-          file: ./abis/Prices/TraderJoe/Router.json
-      eventHandlers:
-        - event: Deposit(indexed address,address,uint256,uint256,indexed address)
-          handler: handleDeposit
-        - event: Withdraw(indexed address,address,uint256,uint256,indexed address)
-          handler: handleWithdraw
-        - event: Swap(indexed address,address,address,uint256,uint256,indexed address)
-          handler: handleSwap
-        - event: AssetAdded(indexed address,indexed address)
-          handler: handleAssetAdded
   - kind: ethereum/contract
     name: Asset
     network: avalanche
