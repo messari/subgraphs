@@ -93,6 +93,7 @@ export const INT_FOUR = 4;
 export const INT_NINE = 9; // nano second > second conversion
 
 export const BIGINT_ZERO = BigInt.fromI32(INT_ZERO);
+export const BIGINT_ONE = BigInt.fromI32(INT_ONE);
 
 export const BIGDECIMAL_ZERO = BigDecimal.fromString("0");
 

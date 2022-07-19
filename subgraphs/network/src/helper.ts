@@ -11,6 +11,7 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  BIGINT_ONE,
   DataType,
   IntervalType,
   INT_TWO,
@@ -105,12 +106,39 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
 
   // update statistical analysis fields
   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
-  if (!blockData.author) {
+  if (blockData.author) {
     snapshot.dailyAuthors = updateStats(
       snapshotId,
       DataType.AUTHORS,
       BIGINT_ONE
     ); // TODO: check for new daily author
+  }
+
+  snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
+  if (blockData.difficulty) {
+    snapshot.dailyDifficulty = updateStats(
+      snapshotId,
+      DataType.DIFFICULTY,
+      blockData.difficulty
+    );
+  }
+
+  snapshot.cumulativeGasUsed = network.cumulativeGasUsed;
+  if (blockData.gasUsed) {
+    snapshot.dailyGasUsed = updateStats(
+      snapshotId,
+      DataType.GAS_USED,
+      blockData.gasUsed
+    );
+  }
+
+  snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
+  if (blockData.burntFees) {
+    snapshot.dailyBurntFees = updateStats(
+      snapshotId,
+      DataType.BURNT_FEES,
+      blockData.burntFees
+    )
   }
 
   snapshot.blockHeight = network.blockHeight;
