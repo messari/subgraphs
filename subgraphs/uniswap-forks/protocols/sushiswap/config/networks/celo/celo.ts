@@ -3,7 +3,7 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
@@ -81,12 +81,13 @@ export class SushiswapCeloConfigurations implements Configurations {
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
-      "0x2def4285787d58a2f811af24755a8150622f4361", // wETH
-      "0xbe6c36f49aac4ee12ca4b23765d9ea901be00683", // cUSD
+      "0x471ece3750da237f93b8e339c536989b8978a438", // CELO
+      "0x765de816845861e75a25fca122bb6898b8b1282a", // cUSD
       "0xef4229c8c3250c675f21bcefa42f58efbff6002a", // USDC
-      "0xb020d981420744f6b0fedd22bb67cd37ce18a1d5", // USDT
-      "0xe4fe50cdd716522a56204352f00aa110f731932d", // DAI
-      "0x4060573addb42883238bd6c77a02ab2b23c95f41", // wBTC
+      "0x88eec49252c8cbc039dcdb394c0c2ba2f1637ea0", // USDT
+      "0x90ca507a5d4458a4c6c6249d186b6dcb02a5bccd", // DAI
+      "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73", // cEUR
+      "0xbaab46e28388d2779e6e31fd00cf0e5ad95e327b", // wBTC
     ]);
   }
   getStableCoins(): string[] {
@@ -112,6 +113,6 @@ export class SushiswapCeloConfigurations implements Configurations {
     return [];
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+    return MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND;
   }
 }

@@ -15,7 +15,6 @@ import {
   convertTokenToDecimal,
   roundToWholeNumber,
 } from "../../../../../src/common/utils/utils";
-import { MasterChef } from "../constants";
 import { getOrCreateMasterChef } from "../helpers";
 
 // Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.

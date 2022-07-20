@@ -3,7 +3,7 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  MINIMUM_LIQUIDITY_TEN_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
@@ -87,6 +87,7 @@ export class SushiswapMoonbeamConfigurations implements Configurations {
       "0x8e70cd5b4ff3f62659049e74b6649c6603a0e594", // USDT
       "0x30d2a9f5fdf90ace8c17952cbb4ee48a55d916a7", // wETH
       "0xc234a67a4f840e61ade794be47de455361b52413", // DAI
+      "0x322e86852e492a7ee17f28a78c663da38fb33bfb", /// Frax
     ]);
   }
   getStableCoins(): string[] {
@@ -110,6 +111,6 @@ export class SushiswapMoonbeamConfigurations implements Configurations {
     return [];
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+    return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
 }

@@ -22,7 +22,7 @@ export function createMasterChefStakingPool(
   masterChefPool.multiplier = BIGINT_ONE;
   masterChefPool.poolAllocPoint = BIGINT_ZERO;
   masterChefPool.lastRewardBlock = event.block.number;
-  log.warning("MASTERCHEF POOL CREATED: " + pid.toString()!, []);
+  log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (pool) {
