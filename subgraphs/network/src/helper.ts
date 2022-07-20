@@ -376,40 +376,10 @@ function updateStats(id: string, dataType: string, value: BigInt): string {
 //
 // insert value into array and keep numerical order
 // Algo: quicksort modification
-// Runtime: O(n logn) average
+// Runtime: cannot be specified (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
 function insertInOrder(value: BigInt, array: BigInt[]): BigInt[] {
-  let lowBound = 0; // left bound of the search section
-  let highBound = array.length - 1; // right bound of the search section
-  let index = Math.round(array.length / 2);
-
   array.push(value);
   return array.sort();
-
-  // find position in array
-  // while (true) {
-  //   let compareVal = array[index];
-  //   if (value.equals(compareVal)) {
-  //     // found same value, place after and return
-  //     return array.splice(index + 1, [value]);
-  //   } else if (value.lt(compareVal)) {
-  //     // value is less than compareVal, search left side
-  //     if (index - lowBound <= 2) {
-  //       // insert 1 position before index
-  //       array.
-  //       return array.splice(index - 1, [value]);
-  //     }
-  //     highBound = index;
-  //     index = Math.round((lowBound + index) / 2); // new index is between lowBound-index
-  //   } else {
-  //     // value is greater than compareVal, search right side
-  //     if (highBound - index <= 2) {
-  //       // insert 1 position after index
-  //       return array.splice(index + 1, [value]);
-  //     }
-  //     lowBound = index;
-  //     index = Math.round((index + highBound) / 2); // new index is between index-highBound
-  //   }
-  // }
 }
 
 function getMedian(list: BigInt[]): BigDecimal {
@@ -656,18 +626,6 @@ function getOrCreateNetwork(id: string): Network {
     network.blockHeight = INT_ZERO;
     network.blocksPerDay = BIGDECIMAL_ZERO;
     network.dailyBlocks = getOrCreateStats(id, DataType.BLOCKS).id;
-
-    // network.cumulativeUniqueAuthors = INT_ZERO;
-    // network.blockHeight = INT_ZERO;
-    // network.cumulativeDifficulty = BIGINT_ZERO;
-    // network.cumulativeGasUsed = BIGINT_ZERO;
-    // network.gasLimit = BIGINT_ZERO;
-    // network.cumulativeBurntFees = BIGINT_ZERO;
-    // network.cumulativeRewards = BIGINT_ZERO;
-    // network.cumulativeTransactions = INT_ZERO;
-    // network.cumulativeSize = BIGINT_ZERO;
-    // network.totalSupply = BIGINT_ZERO;
-    // network.blocksPerDay = BIGDECIMAL_ZERO;
 
     network.save();
   }
