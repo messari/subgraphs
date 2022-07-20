@@ -365,26 +365,34 @@ function ProtocolDashboard() {
   }, [tabValue, getPoolsOverviewData]);
 
   useEffect(() => {
-    if (dataPools && tabValue === "2" && !dataPools2) {
-      getPoolsOverviewData2();
+    if (data?.protocols && dataPools) {
+      if (dataPools[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools2) {
+        getPoolsOverviewData2();
+      }
     }
-  }, [tabValue, dataPools]);
+  }, [tabValue, dataPools, poolOverviewLoading]);
 
   useEffect(() => {
-    if (dataPools2 && tabValue === "2" && !dataPools3) {
-      getPoolsOverviewData3();
+    if (data?.protocols && dataPools2) {
+      if (dataPools2[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools3) {
+        getPoolsOverviewData3();
+      }
     }
-  }, [dataPools2]);
+  }, [dataPools2, poolOverviewLoading2]);
 
   useEffect(() => {
-    if (dataPools3 && tabValue === "2" && !dataPools4) {
-      getPoolsOverviewData4();
+    if (data?.protocols && dataPools3) {
+      if (dataPools3[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools4) {
+        getPoolsOverviewData4();
+      }
     }
   }, [dataPools3]);
 
   useEffect(() => {
-    if (dataPools4 && tabValue === "2" && !dataPools5) {
-      getPoolsOverviewData5();
+    if (data?.protocols && dataPools4) {
+      if (dataPools4[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools5) {
+        getPoolsOverviewData5();
+      }
     }
   }, [dataPools4]);
 

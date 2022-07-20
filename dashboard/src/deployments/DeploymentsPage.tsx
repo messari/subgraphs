@@ -6,9 +6,10 @@ import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
 import { Typography } from "@mui/material";
 import { NewClient } from "../utils";
 import { useEffect, useState } from "react";
+import DeploymentsTable from "./DeploymentsTable";
 
 const DeploymentsLayout = styled("div")`
-  padding: ${({ theme }) => theme.spacing(4)};
+  padding: 0;
 `;
 
 function DeploymentsPage() {
@@ -68,18 +69,17 @@ function DeploymentsPage() {
         >
           Load Subgraph
         </SearchInput>
-        <Typography variant="h4" align="center" sx={{ my: 2 }}>
+        <Typography variant="h4" align="center" sx={{ my: 3 }}>
           Deployed Subgraphs
         </Typography>
         {Object.keys(ProtocolsToQuery).map((key) => (
           <>
-            {Object.keys(ProtocolsToQuery[key]).map((prot) => (
-              <SubgraphDeployments
-                clientIndexing={clientIndexing}
-                key={key + "-" + prot}
-                protocol={{ name: prot, deploymentMap: ProtocolsToQuery[key][prot] }}
-              />
-            ))}
+            <Typography variant="h4" align="center" sx={{ my: 6 }}>{key.toUpperCase()}</Typography>
+            <DeploymentsTable
+              clientIndexing={clientIndexing}
+              protocolsOnType={ProtocolsToQuery[key]}
+              protocolType={key}
+            />
           </>
         ))}
       </DeploymentsLayout>

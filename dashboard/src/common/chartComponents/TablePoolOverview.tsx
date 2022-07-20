@@ -1,5 +1,5 @@
 import { Box, Tooltip } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridColumnHeaderParams } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { blockExplorers } from "../../constants";
@@ -53,13 +53,19 @@ export const TablePoolOverview = ({
         headerName: "Base Yield %",
         width: 180,
         renderCell: (params: any) => {
-          let value = "%" + params.value.toFixed(2);
+          let value = params.value.toFixed(2) + "%";
+          let cellStyle = { ...tableCellTruncate }
+          cellStyle.width = "100%";
+          cellStyle.textAlign = "right";
           return (
             <Tooltip title={value}>
-              <span style={tableCellTruncate}>{value}</span>
+              <span style={cellStyle}>{value}</span>
             </Tooltip>
           );
         },
+        renderHeader: (params: GridColumnHeaderParams) => {
+          return <span style={{ width: "180px", textAlign: "right", marginRight: "10px", fontWeight: "500" }}>Base Yield %</span>;
+        }
       });
       baseFieldCol = true;
     }
@@ -222,9 +228,8 @@ export const TablePoolOverview = ({
             ) {
               issues.push({
                 type: "VAL",
-                message: `${
-                  pool.name || "#" + i + 1 + skipAmt
-                } does not have a valid 'totalBorrowBalanceUSD' value. Neither Reward APR (BORROWER) nor Base Yield could be properly calculated.`,
+                message: `${pool.name || "#" + i + 1 + skipAmt
+                  } does not have a valid 'totalBorrowBalanceUSD' value. Neither Reward APR (BORROWER) nor Base Yield could be properly calculated.`,
                 level: "critical",
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
               });
@@ -243,13 +248,11 @@ export const TablePoolOverview = ({
             ) {
               issues.push({
                 type: "VAL",
-                message: `${
-                  pool.name || "#" + i + 1 + skipAmt
-                } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
+                message: `${pool.name || "#" + i + 1 + skipAmt
+                  } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
                 level: "critical",
-                fieldName: `${
-                  pool.name || "#" + i + 1 + skipAmt
-                }-totalDepositBalanceUSD/totalValueLockedUSD-pool value`,
+                fieldName: `${pool.name || "#" + i + 1 + skipAmt
+                  }-totalDepositBalanceUSD/totalValueLockedUSD-pool value`,
               });
             } else if (pool.totalDepositBalanceUSD) {
               apr = (Number(val) / Number(pool.totalDepositBalanceUSD)) * 100 * 365;
@@ -328,7 +331,7 @@ export const TablePoolOverview = ({
           }
           const volumeUSD = Number(pool.cumulativeVolumeUSD);
           let value = ((feePercentage * volumeUSD) / Number(pool.totalValueLockedUSD)) * 100;
-          if (!value || !Number(pool.totalValueLockedUSD)) {
+          if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
             value = 0;
             if (issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0) {
               issues.push({
