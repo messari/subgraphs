@@ -333,10 +333,7 @@ export function updateAuthors(
     author.save();
 
     // update unique authors
-    if (!network.cumulativeUniqueAuthors) {
-      log.warning("error?", []);
-      network.cumulativeUniqueAuthors = INT_ZERO;
-    }
+    network.cumulativeUniqueAuthors = INT_ZERO;
     network.cumulativeUniqueAuthors++;
     network.save();
   }
@@ -552,6 +549,7 @@ function getOrCreateNetwork(id: string): Network {
     network.schemaVersion = SCHEMA_VERSION;
     network.subgraphVersion = SUBGRAPH_VERSION;
     network.methodologyVersion = METHODOLOGY_VERSION;
+    network.cumulativeUniqueAuthors = INT_ZERO;
     network.blockHeight = INT_ZERO;
     network.blocksPerDay = BIGDECIMAL_ZERO;
     network.dailyBlocks = getOrCreateStats(id, DataType.BLOCKS).id;

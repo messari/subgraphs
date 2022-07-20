@@ -101,7 +101,7 @@ type Network @entity {
   #### Quantitative Data ####
 
   " Number of cumulative unique authors (see type Author for explanation) "
-  cumulativeUniqueAuthors: Int
+  cumulativeUniqueAuthors: Int!
 
   " The total number of blocks in the blockchain "
   blockHeight: Int!
