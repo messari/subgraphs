@@ -18,10 +18,10 @@ Once everything is setup properly deploying is very easy.
 
 ```bash
 # This example will deploy rari-fuse on all networks to the hosted service under "dmelotik" in deploymentConfigurations.json
-npm run deploy --SUBGRAPH=compound-forks --PROTOCOL=rari-fuse --LOCATION=dmelotik
+npm run deploy --SUBGRAPH=compound-forks-ext --PROTOCOL=rari-fuse --LOCATION=dmelotik
 
 # This will do the same, but only deploying the mainnet subgraph
-npm run deploy --SUBGRAPH=compound-forks --PROTOCOL=rari-fuse --NETWORK=mainnet --LOCATION=dmelotik
+npm run deploy --SUBGRAPH=compound-forks-ext --PROTOCOL=rari-fuse --NETWORK=ethereum --LOCATION=dmelotik
 ```
 
 > Setting `deploy-on-merge` to `true` in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) will run the above commands on subgraphs that have changed to messari's hosted service.
@@ -34,7 +34,7 @@ To setup the subgraph manifest from the template:
 
 ```bash
 # Use rari fuse as an example
-npm run prepare:yaml --PROTOCOL=rari-fuse --NETWORK=mainnet --TEMPLATE=rari-fuse.template.yaml
+npm run prepare:yaml --PROTOCOL=rari-fuse --NETWORK=ethereum --TEMPLATE=rari-fuse.template.yaml
 ```
 
 To codegen and build:

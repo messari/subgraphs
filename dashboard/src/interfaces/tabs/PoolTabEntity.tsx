@@ -324,12 +324,21 @@ function PoolTabEntity({
                   //Convert emissions amount in USD to APR
                   const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
                   let apr = 0;
-                  if (currentRewardToken.type === 'BORROW' && data.protocols[0].type === "LENDING" && timeseriesInstance?.totalBorrowBalanceUSD) {
+                  if (
+                    currentRewardToken.type === "BORROW" &&
+                    data.protocols[0].type === "LENDING" &&
+                    timeseriesInstance?.totalBorrowBalanceUSD
+                  ) {
                     apr = (Number(val) / timeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
-                  } else if (currentRewardToken.type === 'BORROW' && issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length === 0) {
+                  } else if (
+                    currentRewardToken.type === "BORROW" &&
+                    issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length ===
+                      0
+                  ) {
                     issues.push({
                       type: "BORROW",
-                      message: "Attempted to calculate APR of BORROW reward token. Field 'totalBorrowBalanceUSD' is not present in the timeseries instance.",
+                      message:
+                        "Attempted to calculate APR of BORROW reward token. Field 'totalBorrowBalanceUSD' is not present in the timeseries instance.",
                       level: "critical",
                       fieldName: entityName + "-" + fieldName,
                     });
@@ -468,7 +477,7 @@ function PoolTabEntity({
 
     // The rewardAPRElement logic is used to take all of the rewardAPR and display their lines on one graph
     let rewardAPRElement = null;
-    if (Object.keys(rewardChart).length > 0 && !dataFieldMetrics['rewardAPR']?.invalidDataPlot) {
+    if (Object.keys(rewardChart).length > 0 && !dataFieldMetrics["rewardAPR"]?.invalidDataPlot) {
       const elementId = entityName + "-rewardAPR";
       const tableVals: { value: any; date: any }[] = [];
       const firstKey = Object.keys(rewardChart)[0];
@@ -647,7 +656,8 @@ function PoolTabEntity({
                 (fieldName.toUpperCase().includes("REWARDTOKEN") || fieldName.toUpperCase().includes("REWARDAPR")) &&
                 data[poolKeySingular]?.rewardTokens
               ) {
-                const currentRewardToken: { [x: string]: string } = data[poolKeySingular].rewardTokens[arrayIndex].token;
+                const currentRewardToken: { [x: string]: string } =
+                  data[poolKeySingular].rewardTokens[arrayIndex].token;
                 const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
                 const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol : "N/A";
                 label += " - " + symbol + ": " + name;
@@ -775,7 +785,7 @@ function PoolTabEntity({
             );
           }
           if (dataFieldMetrics[fieldName]?.invalidDataPlot || dataFieldMetrics[field]?.invalidDataPlot) {
-            return null
+            return null;
           }
           return (
             <div key={elementId} id={linkToElementId}>

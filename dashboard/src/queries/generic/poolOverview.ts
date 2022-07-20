@@ -15,23 +15,14 @@ export const schema = (version: string): string => {
   }
 };
 
-
 export const schema120 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-    pools(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+    pools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
       id
       name
       symbol
       inputTokens{
-        id
-        decimals
-        name
-        symbol
-      }
-      outputToken {
-        id
-        decimals
         name
         symbol
       }
@@ -39,18 +30,14 @@ export const schema120 = (): string => {
         id
         type
         token {
-          id
           decimals
           name
           symbol
         }
       }
       totalValueLockedUSD
-      inputTokenBalances
       outputTokenSupply
-      outputTokenPriceUSD
       stakedOutputTokenAmount
-      rewardTokenEmissionsAmount
       rewardTokenEmissionsUSD
         }
     }`;
@@ -59,19 +46,10 @@ export const schema120 = (): string => {
 export const schema130 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-      pools(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+      pools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
         id
         name
-        symbol
         inputTokens{
-          id
-          decimals
-          name
-          symbol
-        }
-        outputToken {
-          id
-          decimals
           name
           symbol
         }
@@ -79,21 +57,14 @@ export const schema130 = (): string => {
           id
           type
           token {
-            id
             decimals
             name
             symbol
           }
         }
         totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        inputTokenBalances
         outputTokenSupply
-        outputTokenPriceUSD
         stakedOutputTokenAmount
-        rewardTokenEmissionsAmount
         rewardTokenEmissionsUSD
       }
     }`;

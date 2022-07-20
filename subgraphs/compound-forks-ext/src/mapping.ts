@@ -434,8 +434,9 @@ export function _handleMint(
   market.save();
 
   updateMarketSnapshots(
-    marketID,
-    event.block.timestamp.toI32(),
+    market,
+    event.block.timestamp,
+    event.block.number,
     depositUSD,
     EventType.Deposit
   );
@@ -529,8 +530,9 @@ export function _handleRedeem(
   withdraw.save();
 
   updateMarketSnapshots(
-    marketID,
-    event.block.timestamp.toI32(),
+    market,
+    event.block.timestamp,
+    event.block.number,
     withdraw.amountUSD,
     EventType.Withdraw
   );
@@ -624,8 +626,9 @@ export function _handleBorrow(
   market.save();
 
   updateMarketSnapshots(
-    marketID,
-    event.block.timestamp.toI32(),
+    market,
+    event.block.timestamp,
+    event.block.number,
     borrowUSD,
     EventType.Borrow
   );
@@ -729,8 +732,9 @@ export function _handleRepayBorrow(
   repay.save();
 
   updateMarketSnapshots(
-    marketID,
-    event.block.timestamp.toI32(),
+    market,
+    event.block.timestamp,
+    event.block.number,
     repay.amountUSD,
     EventType.Repay
   );
@@ -906,8 +910,9 @@ export function _handleLiquidateBorrow(
   liquidatedCTokenMarket.save();
 
   updateMarketSnapshots(
-    liquidatedCTokenMarketID,
-    event.block.timestamp.toI32(),
+    liquidatedCTokenMarket,
+    event.block.timestamp,
+    event.block.number,
     gainUSD,
     EventType.Liquidate
   );
@@ -951,10 +956,23 @@ export function _handleAccrueInterest(
   }
 
   // creates and initializes market snapshots
-  snapshotMarket(
-    event.address.toHexString(),
-    event.block.number,
-    event.block.timestamp
+
+  //
+  // daily snapshot
+  //
+  getOrCreateMarketDailySnapshot(
+    market,
+    event.block.timestamp,
+    event.block.number
+  );
+
+  //
+  // hourly snapshot
+  //
+  getOrCreateMarketHourlySnapshot(
+    market,
+    event.block.timestamp,
+    event.block.number
   );
 
   updateMarket(
@@ -993,90 +1011,6 @@ export function _handleNewReserveFactor(
 /////////////////////////
 //// Entity Updaters ////
 /////////////////////////
-
-export function snapshotMarket(
-  marketID: string,
-  blockNumber: BigInt,
-  blockTimestamp: BigInt
-): void {
-  let market = Market.load(marketID);
-  if (!market) {
-    log.warning("[snapshotMarket] Market not found: {}", [marketID]);
-    return;
-  }
-
-  //
-  // daily snapshot
-  //
-  let dailySnapshot = getOrCreateMarketDailySnapshot(
-    marketID,
-    blockTimestamp.toI32()
-  );
-  dailySnapshot.protocol = market.protocol;
-  dailySnapshot.market = marketID;
-  dailySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
-  dailySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
-  dailySnapshot.cumulativeProtocolSideRevenueUSD =
-    market.cumulativeProtocolSideRevenueUSD;
-  dailySnapshot.cumulativeSupplySideRevenueUSD =
-    market.cumulativeSupplySideRevenueUSD;
-  dailySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
-  dailySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
-  dailySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
-  dailySnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
-  dailySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
-  dailySnapshot.inputTokenBalance = market.inputTokenBalance;
-  dailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
-  dailySnapshot.outputTokenSupply = market.outputTokenSupply;
-  dailySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
-  dailySnapshot.exchangeRate = market.exchangeRate;
-  dailySnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
-  dailySnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-  dailySnapshot.blockNumber = blockNumber;
-  dailySnapshot.timestamp = blockTimestamp;
-  dailySnapshot.rates = getSnapshotRates(
-    market.rates,
-    (blockTimestamp.toI64() / SECONDS_PER_DAY).toString()
-  );
-
-  dailySnapshot.save();
-
-  //
-  // hourly snapshot
-  //
-  let hourlySnapshot = getOrCreateMarketHourlySnapshot(
-    marketID,
-    blockTimestamp.toI32()
-  );
-  hourlySnapshot.protocol = market.protocol;
-  hourlySnapshot.market = marketID;
-  hourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
-  hourlySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
-  hourlySnapshot.cumulativeProtocolSideRevenueUSD =
-    market.cumulativeProtocolSideRevenueUSD;
-  hourlySnapshot.cumulativeSupplySideRevenueUSD =
-    market.cumulativeSupplySideRevenueUSD;
-  hourlySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
-  hourlySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
-  hourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
-  hourlySnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
-  hourlySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
-  hourlySnapshot.inputTokenBalance = market.inputTokenBalance;
-  hourlySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
-  hourlySnapshot.outputTokenSupply = market.outputTokenSupply;
-  hourlySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
-  hourlySnapshot.exchangeRate = market.exchangeRate;
-  hourlySnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
-  hourlySnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-  hourlySnapshot.blockNumber = blockNumber;
-  hourlySnapshot.timestamp = blockTimestamp;
-  hourlySnapshot.rates = getSnapshotRates(
-    market.rates,
-    (blockTimestamp.toI64() / SECONDS_PER_HOUR).toString()
-  );
-
-  hourlySnapshot.save();
-}
 
 /**
  *
@@ -1356,14 +1290,16 @@ function snapshotUsage(
 }
 
 function updateMarketSnapshots(
-  marketID: string,
-  timestamp: i32,
+  market: Market,
+  timestamp: BigInt,
+  blockNumber: BigInt,
   amountUSD: BigDecimal,
   eventType: EventType
 ): void {
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
-    marketID,
-    timestamp
+    market,
+    timestamp,
+    blockNumber
   );
   switch (eventType) {
     case EventType.Deposit:
@@ -1391,7 +1327,11 @@ function updateMarketSnapshots(
   }
   marketHourlySnapshot.save();
 
-  let marketDailySnapshot = getOrCreateMarketDailySnapshot(marketID, timestamp);
+  let marketDailySnapshot = getOrCreateMarketDailySnapshot(
+    market,
+    timestamp,
+    blockNumber
+  );
   switch (eventType) {
     case EventType.Deposit:
       marketDailySnapshot.dailyDepositUSD =
@@ -1586,8 +1526,9 @@ export function updateMarket(
 
   // update daily fields in marketDailySnapshot
   let dailySnapshot = getOrCreateMarketDailySnapshot(
-    market.id,
-    blockTimestamp.toI32()
+    market,
+    blockTimestamp,
+    blockNumber
   );
   dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
     interestAccumulatedUSD
@@ -1600,8 +1541,9 @@ export function updateMarket(
 
   // update hourly fields in marketHourlySnapshot
   let hourlySnapshot = getOrCreateMarketHourlySnapshot(
-    market.id,
-    blockTimestamp.toI32()
+    market,
+    blockTimestamp,
+    blockNumber
   );
   hourlySnapshot.hourlyTotalRevenueUSD =
     hourlySnapshot.hourlyTotalRevenueUSD.plus(interestAccumulatedUSD);
@@ -1748,29 +1690,6 @@ export function _getOrCreateProtocol(
   return protocol;
 }
 
-export function getOrCreateMarketHourlySnapshot(
-  marketID: string,
-  blockTimestamp: i32
-): MarketHourlySnapshot {
-  let snapshotID = getMarketHourlySnapshotID(marketID, blockTimestamp);
-  let snapshot = MarketHourlySnapshot.load(snapshotID);
-  if (!snapshot) {
-    snapshot = new MarketHourlySnapshot(snapshotID);
-
-    // initialize zero values to ensure no null runtime errors
-    snapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyRepayUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  }
-
-  return snapshot;
-}
-
 function createAccount(accountID: string): Account {
   let account = new Account(accountID);
   account.positionCount = 0;
@@ -1849,18 +1768,18 @@ function setInterestRate(
 }
 
 export function getOrCreateMarketDailySnapshot(
-  marketID: string,
-  blockTimestamp: i32
+  market: Market,
+  blockTimestamp: BigInt,
+  blockNumber: BigInt
 ): MarketDailySnapshot {
-  let snapshotID = getMarketDailySnapshotID(marketID, blockTimestamp);
+  let snapshotID = `${market.id}-${(
+    blockTimestamp.toI32() / SECONDS_PER_DAY
+  ).toString()}`;
   let snapshot = MarketDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketDailySnapshot(snapshotID);
 
-    let market = Market.load(marketID);
-
     // initialize zero values to ensure no null runtime errors
-    snapshot.protocol = market!.protocol;
     snapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
     snapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
     snapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
@@ -1869,7 +1788,91 @@ export function getOrCreateMarketDailySnapshot(
     snapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     snapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     snapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+
+    snapshot.protocol = market.protocol;
+    snapshot.market = market.id;
   }
+
+  snapshot.rates = getSnapshotRates(
+    market.rates,
+    (blockTimestamp.toI32() / SECONDS_PER_DAY).toString()
+  );
+  snapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+  snapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  snapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  snapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  snapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+  snapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
+  snapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+  snapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+  snapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+  snapshot.inputTokenBalance = market.inputTokenBalance;
+  snapshot.outputTokenSupply = market.outputTokenSupply;
+  snapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  snapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  snapshot.exchangeRate = market.exchangeRate;
+  snapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+  snapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+  snapshot.blockNumber = blockNumber;
+  snapshot.timestamp = blockTimestamp;
+  snapshot.save();
+
+  return snapshot;
+}
+
+export function getOrCreateMarketHourlySnapshot(
+  market: Market,
+  blockTimestamp: BigInt,
+  blockNumber: BigInt
+): MarketHourlySnapshot {
+  let snapshotID = `${market.id}-${(
+    blockTimestamp.toI32() / SECONDS_PER_HOUR
+  ).toString()}`;
+  let snapshot = MarketHourlySnapshot.load(snapshotID);
+  if (!snapshot) {
+    snapshot = new MarketHourlySnapshot(snapshotID);
+
+    // initialize zero values to ensure no null runtime errors
+    snapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyRepayUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+
+    snapshot.protocol = market.protocol;
+    snapshot.market = market.id;
+  }
+
+  snapshot.blockNumber = blockNumber;
+  snapshot.timestamp = blockTimestamp;
+  snapshot.rates = getSnapshotRates(
+    market.rates,
+    (blockTimestamp.toI32() / SECONDS_PER_HOUR).toString()
+  );
+  snapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+  snapshot.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD;
+  snapshot.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD;
+  snapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  snapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+  snapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
+  snapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+  snapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+  snapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+  snapshot.inputTokenBalance = market.inputTokenBalance;
+  snapshot.outputTokenSupply = market.outputTokenSupply;
+  snapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  snapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  snapshot.exchangeRate = market.exchangeRate;
+  snapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+  snapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+  snapshot.save();
 
   return snapshot;
 }
