@@ -89,7 +89,7 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum-amm": {
           "template": "aave.v2.template.yaml",
@@ -101,7 +101,7 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-polygon",
           "dmelotik": "dmelotik/aave-v2-polygon",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum-rwa": {
           "template": "aave.v2.template.yaml",
@@ -137,7 +137,7 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-ethereum-extended",
           "dmelotik": "dmelotik/aave-v2-mainnet-ext",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum-amm": {
           "template": "aave.v2.template.yaml",
@@ -149,7 +149,7 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-polygon-extended",
           "dmelotik": "dmelotik/aave-v2-polygon-ext",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum-rwa": {
           "template": "aave.v2.template.yaml",
@@ -204,32 +204,32 @@
         "arbitrum": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-arbitrum-extended",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "avalanche": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-avalanche-extended",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-fantom-extended",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "harmony": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-harmony-extended",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "polygon": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-polygon-extended",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "optimism": {
           "template": "aave-v3-extended.template.yaml",
           "messari": "messari/aave-v3-optimism-extended",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -472,7 +472,7 @@
           "template": "rari-fuse.template.yaml",
           "messari": "messari/rari-fuse-ethereum",
           "dmelotik": "dmelotik/fuse-mainnet",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "scream": {
@@ -900,7 +900,7 @@
           "template": "ens-governance.template.yaml",
           "danielkhoo": "danielkhoo/ens-governance",
           "messari": "messari/ens-governance",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       },
       "euler-governance": {
@@ -932,15 +932,15 @@
           "template": "silo-governance.template.yaml",
           "danielkhoo": "danielkhoo/silo-governance",
           "messari": "messari/silo-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "truefi-governance": {
-        "ethereum": {
+        "mainnet": {
           "template": "truefi-governance.template.yaml",
           "danielkhoo": "danielkhoo/truefi-governance",
           "messari": "messari/truefi-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -966,7 +966,7 @@
         "avalanche": {
           "template": "platypus.template.yaml",
           "messari": "messari/platypus-finance",
-          "aditya": "aditya-todi/platypus-finance-v2",
+          "aditya-todi": "aditya-todi/platypus-finance-avalanche",
           "deploy-on-merge": false
         }
       }
