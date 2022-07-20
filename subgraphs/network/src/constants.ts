@@ -94,6 +94,9 @@ export const INT_NINE = 9; // nano second > second conversion
 
 export const BIGINT_ZERO = BigInt.fromI32(INT_ZERO);
 export const BIGINT_ONE = BigInt.fromI32(INT_ONE);
+export const BIGINT_MAX = BigInt.fromString(
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+);
 
 export const BIGDECIMAL_ZERO = BigDecimal.fromString("0");
 export const BIGDECIMAL_TWO = BigDecimal.fromString("2");
@@ -118,4 +121,4 @@ export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const NETWORK_NAME = dataSource.network();
 export const SCHEMA_VERSION = "1.0.0";
 export const METHODOLOGY_VERSION = "1.0.0";
-export const SUBGRAPH_VERSION = "1.0.3";
+export const SUBGRAPH_VERSION = "1.1.0";

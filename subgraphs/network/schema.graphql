@@ -122,7 +122,7 @@ type Network @entity {
   cumulativeRewards: BigInt
 
   " Total number of transactions that have occured on this network "
-  cumulativeTransactions: Int
+  cumulativeTransactions: BigInt
 
   " Total size of the network in native units (e.g. Bytes in Arweave and Ethereum) "
   cumulativeSize: BigInt
@@ -168,7 +168,7 @@ type DailySnapshot @entity {
   timestamp: BigInt!
 
   " Number of cumulative unique authors (see type Author for explanation) "
-  cumulativeUniqueAuthors: Int
+  cumulativeUniqueAuthors: Int!
 
   " Statistical analysis of unique daily active authors "
   dailyUniqueAuthors: STATS
@@ -216,7 +216,7 @@ type DailySnapshot @entity {
   dailySupply: STATS
 
   " Total number of transactions that have occured on this blockchain "
-  cumulativeTransactions: Int
+  cumulativeTransactions: BigInt
 
   " Statistical analysis of transactions per day "
   dailyTransactions: STATS

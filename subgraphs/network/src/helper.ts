@@ -23,6 +23,7 @@ import {
   SECONDS_PER_HOUR,
   SUBGRAPH_VERSION,
   BIGDECIMAL_TWO,
+  BIGINT_MAX,
 } from "./constants";
 import { BlockData, UpdateNetworkData } from "./mapping";
 import { exponentToBigDecimal, getBlocksPerDay } from "./utils";
@@ -68,11 +69,12 @@ export function updateNetwork(networkData: UpdateNetworkData): Network {
     );
   }
   if (networkData.newTransactions) {
-    log.warning("errored: {}", [networkData.newTransactions!.toString()]);
     if (!network.cumulativeTransactions) {
-      network.cumulativeTransactions = INT_ZERO;
+      network.cumulativeTransactions = BIGINT_ZERO;
     }
-    network.cumulativeTransactions += networkData.newTransactions!.toI32();
+    network.cumulativeTransactions = network.cumulativeTransactions!.plus(
+      networkData.newTransactions!
+    );
   }
   if (networkData.newSize) {
     if (!network.cumulativeSize) {
@@ -218,7 +220,7 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
     );
   }
 
-  // TODO: update variance and quartiles at the end of a snapshot (howto)
+  snapshot.save();
 }
 
 // function updateHourlySnapshot(blockData: BlockData, network: Network): void {
@@ -333,7 +335,6 @@ export function updateAuthors(
     author.save();
 
     // update unique authors
-    network.cumulativeUniqueAuthors = INT_ZERO;
     network.cumulativeUniqueAuthors++;
     network.save();
   }
@@ -412,9 +413,20 @@ function insertInOrder(value: BigInt, array: BigInt[]): BigInt[] {
 }
 
 function getMedian(list: BigInt[]): BigDecimal {
+  // base case - error catching
+  if (list.length == 0) {
+    return BIGDECIMAL_ZERO;
+  }
+  if (list.length == 1) {
+    return list[0].toBigDecimal();
+  }
+  if (list.length == 2) {
+    return list[0].plus(list[1]).toBigDecimal().div(BIGDECIMAL_TWO);
+  }
+
   if (list.length % 2 == 1) {
     // list length is odd
-    let index = (list.length + 1) / 2;
+    let index = (list.length - 1) / 2;
     return list[index].toBigDecimal();
   } else {
     // list length is even
@@ -423,6 +435,102 @@ function getMedian(list: BigInt[]): BigDecimal {
     let sum = list[index1].toBigDecimal().plus(list[index2].toBigDecimal());
     return sum.div(BIGDECIMAL_TWO);
   }
+}
+
+//
+//
+// update the previous snapshots statistical data
+function updatePreviousSnapshot(snapshot: DailySnapshot): void {
+  let network = getOrCreateNetwork(NETWORK_NAME);
+
+  // update network dailyBlock stats
+  updateStats(
+    network.id,
+    DataType.BLOCKS,
+    BigInt.fromI32(snapshot.dailyBlocks)
+  );
+  updateStatisicalData(getOrCreateStats(network.id, DataType.BLOCKS));
+
+  // calculate var, q1, and q3 for prev snapshots
+  if (snapshot.dailyUniqueAuthors) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.AUTHORS));
+  }
+  if (snapshot.dailyDifficulty) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.DIFFICULTY));
+  }
+  if (snapshot.dailyGasUsed) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_USED));
+  }
+  if (snapshot.dailyGasLimit) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_LIMIT));
+  }
+  if (snapshot.dailyBurntFees) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.BURNT_FEES));
+  }
+  if (snapshot.dailyRewards) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.REWARDS));
+  }
+  if (snapshot.dailySize) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SIZE));
+  }
+  if (snapshot.dailyChunks) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.CHUNKS));
+  }
+  if (snapshot.dailySupply) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SUPPLY));
+  }
+  if (snapshot.dailyTransactions) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
+  }
+  if (snapshot.dailyGasPrice) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
+  }
+}
+
+//
+//
+// This function updates a snapshots variance, q1, and q3
+function updateStatisicalData(statsEntity: STATS): void {
+  // find variance
+  statsEntity.variance = findVariance(statsEntity.mean, statsEntity.values);
+
+  // find first and second half arrays
+  let firstHalf: BigInt[];
+  let secondHalf: BigInt[];
+  let middleIndex = Math.round(statsEntity.values.length / 2) as i32;
+
+  if (statsEntity.values.length % 2 == 1) {
+    // list length is odd
+    firstHalf = statsEntity.values.slice(0, middleIndex - 2);
+    secondHalf = statsEntity.values.slice(middleIndex);
+  } else {
+    // list length is even
+    firstHalf = statsEntity.values.slice(0, middleIndex - 1);
+    secondHalf = statsEntity.values.slice(middleIndex);
+  }
+
+  statsEntity.q1 = getMedian(firstHalf);
+  statsEntity.q3 = getMedian(secondHalf);
+  statsEntity.save();
+}
+
+//
+//
+// Finds the variance of a list of numbers with the mean already supplied
+// Variance = Sum( (x - mean)^2 ) / N
+function findVariance(mean: BigDecimal, values: BigInt[]): BigDecimal {
+  let sumOfDeviationSquared = BIGDECIMAL_ZERO;
+
+  for (let i = 0; i < values.length; i++) {
+    let value = values[i].toBigDecimal();
+    let deviation = value.minus(mean);
+    let deviationSquared = deviation.times(deviation);
+    sumOfDeviationSquared = sumOfDeviationSquared.plus(deviationSquared);
+  }
+
+  return sumOfDeviationSquared.div(
+    BigDecimal.fromString(values.length.toString())
+  );
 }
 
 /////////////////
@@ -436,35 +544,30 @@ function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
     dailySnapshot = new DailySnapshot(id);
     dailySnapshot.network = NETWORK_NAME;
     dailySnapshot.blockHeight = INT_ZERO;
+    dailySnapshot.dailyBlocks = INT_ZERO;
     dailySnapshot.timestamp = timestamp;
-
-    // dailySnapshot.dailyBlocks = INT_ZERO;
-    // dailySnapshot.cumulativeDifficulty = BIGINT_ZERO;
-    // dailySnapshot.dailyDifficulty = BIGINT_ZERO;
-    // dailySnapshot.dailyMeanDifficulty = BIGDECIMAL_ZERO;
-    // dailySnapshot.dailyCumulativeGasUsed = BIGINT_ZERO;
-    // dailySnapshot.dailyCumulativeGasLimit = BIGINT_ZERO;
-    // dailySnapshot.dailyBlockUtilization = BIGDECIMAL_ZERO;
-    // dailySnapshot.dailyMeanGasUsed = BIGDECIMAL_ZERO;
-    // dailySnapshot.dailyMeanGasLimit = BIGDECIMAL_ZERO;
-    // dailySnapshot.gasPrice = BIGINT_ZERO;
-    // dailySnapshot.cumulativeBurntFees = BIGINT_ZERO;
-    // dailySnapshot.dailyBurntFees = BIGINT_ZERO;
-    // dailySnapshot.dailyRewards = BIGINT_ZERO;
-    // dailySnapshot.cumulativeRewards = BIGINT_ZERO;
-    // dailySnapshot.dailyMeanRewards = BIGDECIMAL_ZERO;
-    // dailySnapshot.totalSupply = originalSupply;
-    // dailySnapshot.dailySupplyIncrease = BIGINT_ZERO;
-    // dailySnapshot.firstTimestamp = timestamp;
-    // dailySnapshot.dailyMeanBlockInterval = BIGDECIMAL_ZERO;
-    // dailySnapshot.cumulativeSize = BIGINT_ZERO;
-    // dailySnapshot.dailyCumulativeSize = BIGINT_ZERO;
-    // dailySnapshot.dailyMeanBlockSize = BIGDECIMAL_ZERO;
-    // dailySnapshot.dailyChunkCount = INT_ZERO;
-    // dailySnapshot.dailyTransactionCount = INT_ZERO;
-    // dailySnapshot.firstSupply = originalSupply;
+    dailySnapshot.cumulativeUniqueAuthors = INT_ZERO;
 
     dailySnapshot.save();
+
+    // update variance, q1, q3 of previous snapshot
+    // update dailyBlocks stats in network
+    // we know that the previous snapshot exists because we are handling every block
+    let previousSnapshotId = (
+      timestamp.toI64() -
+      SECONDS_PER_DAY -
+      1
+    ).toString();
+    let previousSnapshot = DailySnapshot.load(previousSnapshotId);
+    if (!previousSnapshot) {
+      log.warning(
+        "[getOrCreateDailySnapshot] previous snapshot not found at timestamp: {}",
+        [timestamp.toString()]
+      );
+    } else {
+      // snapshot exists
+      updatePreviousSnapshot(previousSnapshot);
+    }
   }
   return dailySnapshot;
 }
@@ -580,7 +683,7 @@ function getOrCreateStats(snapshot: string, dataType: string): STATS {
     stats.mean = BIGDECIMAL_ZERO;
     stats.median = BIGDECIMAL_ZERO;
     stats.max = BIGINT_ZERO;
-    stats.min = BIGINT_ZERO;
+    stats.min = BIGINT_MAX;
     stats.variance = BIGDECIMAL_ZERO;
     stats.q3 = BIGDECIMAL_ZERO;
     stats.q1 = BIGDECIMAL_ZERO;

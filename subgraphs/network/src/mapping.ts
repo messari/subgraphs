@@ -206,7 +206,7 @@ export function handleEvmBlock(block: ethereum.Block): void {
     null,
     null,
     null,
-    null // TODO: try to get supply working
+    null // TODO: try to get supply working for evm
   );
   createBlock(blockData);
 
