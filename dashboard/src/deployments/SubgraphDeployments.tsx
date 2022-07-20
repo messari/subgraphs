@@ -7,13 +7,12 @@ import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
 import LazyLoad from "react-lazyload";
 
 const Subgraph = styled(Box)`
-  margin-bottom: ${({ theme }) => theme.spacing(6)};
+  width: 100%;
 `;
 
 const DeploymentContainer = styled("div")`
   display: flex;
   flex-wrap: wrap;
-  gap: ${({ theme }) => theme.spacing(2)};
 `;
 
 interface SubgraphDeploymentsProps extends BoxProps {
@@ -41,11 +40,8 @@ export const SubgraphDeployments = ({
 
   return (
     <Subgraph {...rest}>
-      <Box display="flex" alignItems="center" gap={1} mb={2}>
-        <SubgraphLogo name={name} />
-        <Typography variant="h4">{name}</Typography>
-      </Box>
-      <LazyLoad height={260} offset={80}>
+
+      <LazyLoad height={125} offset={70}>
         <DeploymentContainer>
           {deployments.map(({ network, deployment }) => {
             return (
