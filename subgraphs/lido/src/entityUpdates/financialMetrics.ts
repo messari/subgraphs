@@ -217,7 +217,7 @@ export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
 
   // Pool
   pool.cumulativeSupplySideRevenueUSD =
-    pool.cumulativeTotalRevenueUSD == BIGDECIMAL_ZERO
+    pool.cumulativeTotalRevenueUSD <= pool.cumulativeProtocolSideRevenueUSD
       ? BIGDECIMAL_ZERO
       : pool.cumulativeTotalRevenueUSD.minus(
           pool.cumulativeProtocolSideRevenueUSD
@@ -228,7 +228,8 @@ export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
   poolMetricsDailySnapshot.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
   poolMetricsDailySnapshot.dailySupplySideRevenueUSD =
-    poolMetricsDailySnapshot.dailyTotalRevenueUSD == BIGDECIMAL_ZERO
+    poolMetricsDailySnapshot.dailyTotalRevenueUSD <=
+    poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD
       ? BIGDECIMAL_ZERO
       : poolMetricsDailySnapshot.dailyTotalRevenueUSD.minus(
           poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD
@@ -239,7 +240,8 @@ export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
   poolMetricsHourlySnapshot.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
   poolMetricsHourlySnapshot.hourlySupplySideRevenueUSD =
-    poolMetricsHourlySnapshot.hourlyTotalRevenueUSD == BIGDECIMAL_ZERO
+    poolMetricsHourlySnapshot.hourlyTotalRevenueUSD <=
+    poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD
       ? BIGDECIMAL_ZERO
       : poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.minus(
           poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD
@@ -254,7 +256,8 @@ export function updateSupplySideRevenueMetrics(block: ethereum.Block): void {
   financialMetrics.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
   financialMetrics.dailySupplySideRevenueUSD =
-    financialMetrics.dailyTotalRevenueUSD == BIGDECIMAL_ZERO
+    financialMetrics.dailyTotalRevenueUSD <=
+    financialMetrics.dailyProtocolSideRevenueUSD
       ? BIGDECIMAL_ZERO
       : financialMetrics.dailyTotalRevenueUSD.minus(
           financialMetrics.dailyProtocolSideRevenueUSD
