@@ -1,8 +1,8 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { CustomPriceType } from "../common/types";
-import { ChainlinkOracle } from "../../../generated/ExampleVault/ChainlinkOracle";
+import { ChainlinkOracle } from "../../../generated/aave-aave-eol/ChainlinkOracle";
 import { polygonOracles as oracles } from "./oracles";
-import { ERC20 } from "../../../generated/ExampleVault/ERC20";
+import { ERC20 } from "../../../generated/aave-aave-eol/ERC20";
 import { ZERO_ADDRESS } from "../common/constants";
 
 export function getChainLinkContract(
