@@ -201,3 +201,10 @@ TOKEN_PRICE_SOURCE_SKIPS.set(
     PriceSource.SUSHISWAP_ROUTER
   ]
 );
+TOKEN_PRICE_SOURCE_SKIPS.set(
+  Address.fromString("0x956F47F50A910163D8BF957Cf5846D573E7f87CA"), // FEI
+  // Skip all as bad price is being returned
+  [
+    PriceSource.YEARN,  // Yearn is returning incorrect price
+  ]
+);
