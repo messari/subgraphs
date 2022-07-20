@@ -1,5 +1,8 @@
 {
   "network": "matic",
   "startBlock": "12687216",
-  "factoryAddress": "0xd05e3E715d945B59290df0ae8eF85c1BdB684744"
+  "factoryAddress": "0xd05e3E715d945B59290df0ae8eF85c1BdB684744",
+  "graftEnabled": true,
+  "subgraphId": "Qme1XxR32Fs3Aw7J4nPoSua9n2tuMn9Hq89nhNfSyHfB4F",
+  "graftStartBlock": 14162430
 }
