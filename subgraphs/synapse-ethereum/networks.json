@@ -1,0 +1,10 @@
+{
+  "mainnet": {
+    "Bridge": {
+      "address": "0x2796317b0fF8538F253012862c06787Adfb8cEb6"
+    },
+    "MiniChef": {
+      "address": "0xd10eF2A513cEE0Db54E959eF16cAc711470B62cF"
+    }
+  }
+}
