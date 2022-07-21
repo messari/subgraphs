@@ -7,9 +7,10 @@ import { ProtocolQuery } from "../queries/protocolQuery";
 import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
 import { useEffect } from "react";
 import { styled } from "../styled";
-import { alpha, Box, Card, CircularProgress, Typography } from "@mui/material";
+import { alpha, Card, CircularProgress, TableRow, Typography } from "@mui/material";
 import { NetworkLogo } from "../common/NetworkLogo";
 import { SubgraphLogo } from "../common/SubgraphLogo";
+import { TableCell } from "@mui/material";
 
 const DeploymentBackground = styled("div")`
   background: rgba(22, 24, 29, 0.95);
@@ -141,84 +142,77 @@ export const Deployment = ({
     };
   }, [schemaVersion, fatalError, synced]);
   if (loading || statusLoading) {
-    return <div style={{ display: "inline-block", width: "100%" }}><CircularProgress sx={{ margin: 2 }} size={10} /></div>;
+    return (
+      <div style={{ display: "inline-block", width: "100%" }}>
+        <CircularProgress sx={{ margin: 2 }} size={10} />
+      </div>
+    );
   }
 
   if (!statusData && !statusLoading && !currentDeployment) {
     return null;
   }
 
-  if (!statusData && !statusLoading && !data) {
-    let errorMsg = null;
-    if (errorIndexing) {
-      errorMsg = (
-        <Box marginTop="10px" gap={2} alignItems="center">
-          <span>Indexing status could not be pulled: "{errorIndexing.message.slice(0, 100)}..."</span>
-        </Box>
-      );
-    }
-    return (
-      <StyledDeployment
-        onClick={navigateToSubgraph(endpointURL)}
-        sx={{ width: "100%" }}
-        $styleRules={{
-          schemaOutdated,
-          nonFatalErrors: false,
-          fatalError: false,
-          success: false,
-          currentVersion: currentDeployment,
-        }}
-      >
-        <DeploymentBackground>
-          <Box display="flex" gap={3} alignItems="center">
-            <NetworkLogo network={networkName} />
-            <Typography variant="h5" align="center">
-              {networkName}
-            </Typography>
-          </Box>
-          <Box marginTop="10px" gap={2} alignItems="center">
-            <span>{deployment}</span>
-          </Box>
-          {errorMsg}
-        </DeploymentBackground>
-      </StyledDeployment>
-    );
+  let statusColor = "";
+  if (fatalError) {
+    statusColor = "#B8301C";
+  } else if (schemaOutdated || nonFatalErrors?.length > 0 || !currentDeployment) {
+    statusColor = "#EFCB68";
+  } else if (indexedSuccess) {
+    statusColor = "#58BC82";
   }
+
   const indexed = synced
     ? 100
     : toPercent(statusData?.chains[0]?.latestBlock?.number || 0, statusData?.chains[0]?.chainHeadBlock?.number);
 
-  const columnStyle = {
-    width: "100%",
-    paddingLeft: "4px",
-    height: "40px",
-    margin: "0"
-  }
-
   return (
-    <StyledDeployment
-      onClick={navigateToSubgraph(endpointURL)}
-      $styleRules={{
-        schemaOutdated,
-        nonFatalErrors: nonFatalErrors?.length > 0,
-        fatalError: !!fatalError,
-        success: indexedSuccess,
-        currentVersion: currentDeployment,
-      }}
-    >
-      <DeploymentBackground>
-        <div style={{ display: "flex", width: "100%", justifyContent: "space-around", height: "40px" }}>
-          <div style={{ ...columnStyle, flex: 4, borderRight: "white 2px solid", display: "flex" }}><SubgraphLogo name={subgraphID} /><NetworkLogo network={networkName} /><span>{subgraphID}-{networkName}{!currentDeployment ? " (pending)" : null}</span></div>
-          <h5 style={{ ...columnStyle, flex: 2, borderRight: "white 2px solid" }}>{Number(indexed) ? indexed + "%" : "N/A"}</h5>
-          <h5 style={{ ...columnStyle, flex: 2, borderRight: "white 2px solid" }}>{statusData?.chains[0]?.latestBlock?.number || data?._meta?.block?.number}</h5>
-          <h5 style={{ ...columnStyle, flex: 2, borderRight: "white 2px solid" }}>{statusData?.chains[0]?.chainHeadBlock?.number || "?"}</h5>
-          <h5 style={{ ...columnStyle, flex: 1, borderRight: "white 2px solid" }}>{protocol?.schemaVersion || "N/A"}</h5>
-          <h5 style={{ ...columnStyle, flex: 1, borderRight: "white 2px solid" }}>{protocol?.subgraphVersion || "N/A"}</h5>
-          <h5 style={{ ...columnStyle, flex: 1, borderRight: "white 2px solid" }}>{nonFatalErrors?.length || 0}</h5>
-          <h5 style={{ ...columnStyle, flex: 2 }}>{parseInt(statusData?.entityCount) ? parseInt(statusData?.entityCount)?.toLocaleString() : "N/A"}</h5>
+    <TableRow sx={{ width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }} onClick={navigateToSubgraph(endpointURL)}>
+      <TableCell sx={{ padding: "6px", borderLeft: `${statusColor} solid 6px`, verticalAlign: "middle" }}>
+        <div style={{ display: "flex" }}>
+          <SubgraphLogo name={subgraphID} />
+          <NetworkLogo network={networkName} />
+          <span style={{ display: "inline-flex", alignItems: "center", paddingLeft: "6px", fontSize: "14px" }}>
+            {subgraphID}-{networkName}
+            {!currentDeployment ? " (pending)" : null}
+          </span>
         </div>
-
-      </DeploymentBackground>
-    </StyledDeployment>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {Number(indexed) ? indexed + "%" : "N/A"}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {statusData?.chains[0]?.latestBlock?.number || data?._meta?.block?.number}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {statusData?.chains[0]?.chainHeadBlock?.number || "?"}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {protocol?.schemaVersion || "N/A"}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {protocol?.subgraphVersion || "N/A"}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {nonFatalErrors?.length || 0}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right", paddingRight: "30px" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {parseInt(statusData?.entityCount) ? parseInt(statusData?.entityCount)?.toLocaleString() : "N/A"}
+        </Typography>
+      </TableCell>
+    </TableRow>
   );
 };

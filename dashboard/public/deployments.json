@@ -81,7 +81,7 @@
             "cronos": "https://graph.cronoslabs.com/subgraphs/name/messari/vvs-finance"
         }
     },
-    "lending-protocols": {
+    "lending": {
         "aave-v2": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/aave-v2-ethereum"
         },
