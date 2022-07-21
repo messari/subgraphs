@@ -4,7 +4,7 @@ import {
   LogPoolAddition,
   LogSetPool,
   Withdraw,
-} from "../../../../../generated/MasterChefV2/MasterChefV2Sushiswap";
+} from "../../../../../generated/MasterChefV2/MasterChefV2Spookyswap";
 import { _MasterChefStakingPool } from "../../../../../generated/schema";
 import {
   createMasterChefStakingPool,

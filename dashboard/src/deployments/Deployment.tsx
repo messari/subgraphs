@@ -1,4 +1,4 @@
-import { MouseEventHandler, useContext, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { latestSchemaVersion } from "../constants";
 import { useNavigate } from "react-router";
 import { ApolloClient, NormalizedCacheObject, useQuery, useLazyQuery } from "@apollo/client";
@@ -7,9 +7,10 @@ import { ProtocolQuery } from "../queries/protocolQuery";
 import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
 import { useEffect } from "react";
 import { styled } from "../styled";
-import { alpha, Box, Button, Card, CardContent, CircularProgress, Typography } from "@mui/material";
-import DeploymentsContext from "./DeploymentsContext";
+import { alpha, Card, CircularProgress, TableRow, Typography } from "@mui/material";
 import { NetworkLogo } from "../common/NetworkLogo";
+import { SubgraphLogo } from "../common/SubgraphLogo";
+import { TableCell } from "@mui/material";
 
 const DeploymentBackground = styled("div")`
   background: rgba(22, 24, 29, 0.95);
@@ -33,6 +34,8 @@ const StyledDeployment = styled(Card)<{
     statusColor = theme.palette.warning.main;
   } else if ($styleRules.success) {
     statusColor = theme.palette.success.main;
+  } else {
+    statusColor = "white";
   }
 
   const indexedStyles =
@@ -50,7 +53,8 @@ const StyledDeployment = styled(Card)<{
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    
+    width: 100%;
+    justifyContent: space-around;
     &:hover {
       box-shadow: 0 0 2px 1px ${alpha(theme.palette.primary.main, 0.6)};
     }
@@ -58,21 +62,6 @@ const StyledDeployment = styled(Card)<{
     ${indexedStyles}
   `;
 });
-
-const CardRow = styled("div")<{ $warning?: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: ${({ theme }) => theme.spacing(2)};
-  margin-top: ${({ theme }) => theme.spacing(1)};
-  ${({ $warning, theme }) => $warning && `color: ${theme.palette.warning.main}`};
-`;
-
-const CardButton = styled(Button)`
-  width: 100%;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-`;
 
 interface DeploymentProps {
   networkName: string;
@@ -91,7 +80,6 @@ export const Deployment = ({
   currentDeployment,
 }: DeploymentProps) => {
   const [endpointURL, setEndpointURL] = useState(deployment);
-  const deploymentsContext = useContext(DeploymentsContext);
   const navigate = useNavigate();
   const navigateToSubgraph = (url: string) => () => {
     let versionParam = "";
@@ -154,121 +142,77 @@ export const Deployment = ({
     };
   }, [schemaVersion, fatalError, synced]);
   if (loading || statusLoading) {
-    return <CircularProgress sx={{ margin: 6 }} size={50} />;
+    return (
+      <div style={{ display: "inline-block", width: "100%" }}>
+        <CircularProgress sx={{ margin: 2 }} size={10} />
+      </div>
+    );
   }
 
   if (!statusData && !statusLoading && !currentDeployment) {
     return null;
   }
 
-  if (!statusData && !statusLoading && !data) {
-    let errorMsg = null;
-    if (errorIndexing) {
-      errorMsg = (
-        <Box marginTop="10px" gap={2} alignItems="center">
-          <span>Indexing status could not be pulled: "{errorIndexing.message.slice(0, 100)}..."</span>
-        </Box>
-      );
-    }
-    return (
-      <StyledDeployment
-        onClick={navigateToSubgraph(endpointURL)}
-        sx={{ width: "70%" }}
-        $styleRules={{
-          schemaOutdated,
-          nonFatalErrors: false,
-          fatalError: false,
-          success: false,
-          currentVersion: currentDeployment,
-        }}
-      >
-        <DeploymentBackground>
-          <CardContent>
-            <Box display="flex" gap={3} alignItems="center">
-              <NetworkLogo network={networkName} />
-              <Typography variant="h5" align="center">
-                {networkName}
-              </Typography>
-            </Box>
-            <Box marginTop="10px" gap={2} alignItems="center">
-              <span>{deployment}</span>
-            </Box>
-            {errorMsg}
-          </CardContent>
-        </DeploymentBackground>
-      </StyledDeployment>
-    );
+  let statusColor = "";
+  if (fatalError) {
+    statusColor = "#B8301C";
+  } else if (schemaOutdated || nonFatalErrors?.length > 0 || !currentDeployment) {
+    statusColor = "#EFCB68";
+  } else if (indexedSuccess) {
+    statusColor = "#58BC82";
   }
+
   const indexed = synced
     ? 100
     : toPercent(statusData?.chains[0]?.latestBlock?.number || 0, statusData?.chains[0]?.chainHeadBlock?.number);
 
-  const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    deploymentsContext.setErrorDialogData({
-      deployment,
-      network: networkName,
-      fatalError,
-      nonFatalErrors,
-      subgraphName: subgraphID,
-    });
-    deploymentsContext.showErrorDialog(true);
-  };
   return (
-    <StyledDeployment
-      onClick={navigateToSubgraph(endpointURL)}
-      $styleRules={{
-        schemaOutdated,
-        nonFatalErrors: nonFatalErrors?.length > 0,
-        fatalError: !!fatalError,
-        success: indexedSuccess,
-        currentVersion: currentDeployment,
-      }}
-    >
-      <DeploymentBackground>
-        <CardContent>
-          <Box display="flex" gap={2} alignItems="center">
-            <NetworkLogo network={networkName} />
-            <Typography variant="h6" align="center">
-              {networkName}
-              {!currentDeployment ? " (pending)" : null}
-            </Typography>
-          </Box>
-          <CardRow className="indexed">
-            <span>Indexed:</span> <span>{Number(indexed) ? indexed + "%" : "N/A"}</span>
-          </CardRow>
-          <CardRow>
-            <span>Latest Block:</span>{" "}
-            <span>{statusData?.chains[0]?.latestBlock?.number || data?._meta?.block?.number}</span>
-          </CardRow>
-          <CardRow>
-            <span>Current chain block:</span>
-            <span>{statusData?.chains[0]?.chainHeadBlock?.number || "N/A"}</span>
-          </CardRow>
-          <CardRow $warning={schemaOutdated}>
-            <span>Schema version:</span> <span>{protocol?.schemaVersion || "N/A"}</span>
-          </CardRow>
-          <CardRow>
-            <span>Subgraph version:</span> <span>{protocol?.subgraphVersion || "N/A"}</span>
-          </CardRow>
-          <CardRow $warning={nonFatalErrors?.length > 0}>
-            <span>Non fatal error count:</span> <span>{nonFatalErrors?.length || 0}</span>
-          </CardRow>
-          <CardRow>
-            <span>Entity count:</span>{" "}
-            <span>
-              {parseInt(statusData?.entityCount) ? parseInt(statusData?.entityCount)?.toLocaleString() : "N/A"}
-            </span>
-          </CardRow>
-        </CardContent>
-        {(nonFatalErrors?.length > 0 || fatalError) && (
-          <CardButton variant="contained" color="error" onClick={showErrorModal}>
-            View Errors
-          </CardButton>
-        )}
-      </DeploymentBackground>
-    </StyledDeployment>
+    <TableRow sx={{ width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }} onClick={navigateToSubgraph(endpointURL)}>
+      <TableCell sx={{ padding: "6px", borderLeft: `${statusColor} solid 6px`, verticalAlign: "middle" }}>
+        <div style={{ display: "flex" }}>
+          <SubgraphLogo name={subgraphID} />
+          <NetworkLogo network={networkName} />
+          <span style={{ display: "inline-flex", alignItems: "center", paddingLeft: "6px", fontSize: "14px" }}>
+            {subgraphID}-{networkName}
+            {!currentDeployment ? " (pending)" : null}
+          </span>
+        </div>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {Number(indexed) ? indexed + "%" : "N/A"}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {statusData?.chains[0]?.latestBlock?.number || data?._meta?.block?.number}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {statusData?.chains[0]?.chainHeadBlock?.number || "?"}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {protocol?.schemaVersion || "N/A"}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {protocol?.subgraphVersion || "N/A"}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {nonFatalErrors?.length || 0}
+        </Typography>
+      </TableCell>
+      <TableCell sx={{ padding: "6px", textAlign: "right", paddingRight: "30px" }}>
+        <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+          {parseInt(statusData?.entityCount) ? parseInt(statusData?.entityCount)?.toLocaleString() : "N/A"}
+        </Typography>
+      </TableCell>
+    </TableRow>
   );
 };

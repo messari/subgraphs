@@ -1,14 +1,14 @@
 import { styled } from "../styled";
-import { SubgraphDeployments } from "./SubgraphDeployments";
 import { useNavigate } from "react-router";
 import { SearchInput } from "../common/utilComponents/SearchInput";
 import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
 import { Typography } from "@mui/material";
 import { NewClient } from "../utils";
 import { useEffect, useState } from "react";
+import DeploymentsTable from "./DeploymentsTable";
 
 const DeploymentsLayout = styled("div")`
-  padding: ${({ theme }) => theme.spacing(4)};
+  padding: 0;
 `;
 
 function DeploymentsPage() {
@@ -68,18 +68,27 @@ function DeploymentsPage() {
         >
           Load Subgraph
         </SearchInput>
-        <Typography variant="h4" align="center" sx={{ my: 2 }}>
+        <Typography variant="h4" align="center" sx={{ my: 3 }}>
           Deployed Subgraphs
         </Typography>
         {Object.keys(ProtocolsToQuery).map((key) => (
           <>
-            {Object.keys(ProtocolsToQuery[key]).map((prot) => (
-              <SubgraphDeployments
-                clientIndexing={clientIndexing}
-                key={key + "-" + prot}
-                protocol={{ name: prot, deploymentMap: ProtocolsToQuery[key][prot] }}
-              />
-            ))}
+            <Typography
+              key={"typography-" + key}
+              variant="h4"
+              align="left"
+              fontWeight={500}
+              fontSize={28}
+              sx={{ padding: "6px", my: 2 }}
+            >
+              {key.toUpperCase()}
+            </Typography>
+            <DeploymentsTable
+              key={"depTable-" + key}
+              clientIndexing={clientIndexing}
+              protocolsOnType={ProtocolsToQuery[key]}
+              protocolType={key}
+            />
           </>
         ))}
       </DeploymentsLayout>

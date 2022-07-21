@@ -1,5 +1,5 @@
 import { Box, Tooltip } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridColumnHeaderParams } from "@mui/x-data-grid";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { blockExplorers } from "../../constants";
@@ -53,11 +53,22 @@ export const TablePoolOverview = ({
         headerName: "Base Yield %",
         width: 180,
         renderCell: (params: any) => {
-          let value = "%" + params.value.toFixed(2);
+          const value = Number(params.value.split("//")[0]).toFixed(2) + "%";
+          const cellStyle = { ...tableCellTruncate };
+          cellStyle.width = "100%";
+          cellStyle.textAlign = "right";
+          const hoverText = params.value.split("//")[1];
           return (
-            <Tooltip title={value}>
-              <span style={tableCellTruncate}>{value}</span>
+            <Tooltip title={hoverText}>
+              <span style={cellStyle}>{value}</span>
             </Tooltip>
+          );
+        },
+        renderHeader: (params: GridColumnHeaderParams) => {
+          return (
+            <span style={{ width: "180px", textAlign: "right", marginRight: "10px", fontWeight: "500" }}>
+              Base Yield %
+            </span>
           );
         },
       });
@@ -146,15 +157,19 @@ export const TablePoolOverview = ({
         headerName: "Reward Tokens",
         width: inputTokenColWidth,
         renderCell: (params: any) => {
-          let rewardTokenStr = params.value;
+          let rewardTokenStr = params.value.split("//")[0];
           if (rewardTokenStr.length > 18) {
-            rewardTokenStr = `${params.value.slice(0, 8)}...${params.value.slice(
-              params.value.length - 7,
-              params.value.length,
+            rewardTokenStr = `${rewardTokenStr.slice(0, 8)}...${rewardTokenStr.slice(
+              rewardTokenStr.length - 7,
+              rewardTokenStr.length,
             )}`;
           }
+          let hoverStr = rewardTokenStr;
+          if (params.value.split("//").length > 1) {
+            hoverStr = params.value.split("//")[1];
+          }
           return (
-            <Tooltip title={params.value}>
+            <Tooltip title={hoverStr}>
               <span style={tableCellTruncate}>{rewardTokenStr}</span>
             </Tooltip>
           );
@@ -213,6 +228,8 @@ export const TablePoolOverview = ({
           });
         }
 
+        const rewardFactors: string[] = [];
+        let rewardFactorsStr = "N/A";
         let rewardAPRs: string[] = pool?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
           let apr = 0;
           if (protocolType === "LENDING" && pool.rewardTokens[idx]?.type === "BORROW") {
@@ -230,6 +247,9 @@ export const TablePoolOverview = ({
               });
             } else if (Number(pool.totalBorrowBalanceUSD)) {
               apr = (Number(val) / Number(pool.totalBorrowBalanceUSD)) * 100 * 365;
+              rewardFactorsStr = `(${Number(val).toFixed(2)} (Daily Reward Emissions) / ${Number(
+                pool.totalBorrowBalanceUSD,
+              ).toFixed(2)} (Borrow balance)) * 100 * 365 = ${apr.toFixed(2)}%`;
             }
           } else if (protocolType === "LENDING") {
             if (
@@ -253,8 +273,14 @@ export const TablePoolOverview = ({
               });
             } else if (pool.totalDepositBalanceUSD) {
               apr = (Number(val) / Number(pool.totalDepositBalanceUSD)) * 100 * 365;
+              rewardFactorsStr = `(${Number(val).toFixed(2)} (Daily Reward Emissions) / ${Number(
+                pool.totalDepositBalanceUSD,
+              ).toFixed(2)} (Deposit balance)) * 100 * 365 = ${apr.toFixed(2)}%`;
             } else if (Number(pool.totalValueLockedUSD)) {
               apr = (Number(val) / Number(pool.totalValueLockedUSD)) * 100 * 365;
+              rewardFactorsStr = `(${Number(val).toFixed(2)} (Daily Reward Emissions) / ${Number(
+                pool.totalValueLockedUSD,
+              ).toFixed(2)} (TVL)) * 100 * 365 = ${apr.toFixed(2)}%`;
             }
           } else {
             let outputStakedFactor = Number(pool?.stakedOutputTokenAmount) / Number(pool?.outputTokenSupply);
@@ -262,6 +288,11 @@ export const TablePoolOverview = ({
               outputStakedFactor = 1;
             }
             apr = (Number(val) / (Number(pool.totalValueLockedUSD) * outputStakedFactor)) * 100 * 365;
+            rewardFactorsStr = `(${Number(val).toFixed(2)} (Daily Reward Emissions) / (${Number(
+              pool.totalValueLockedUSD,
+            ).toFixed(2)} (TVL) * (${Number(pool?.stakedOutputTokenAmount)} (Staked Output Token) / ${Number(
+              pool?.outputTokenSupply,
+            )} (Output Token Supply)))) * 100 * 365 = ${apr.toFixed(2)}%`;
           }
           if (
             Number(apr) === 0 &&
@@ -299,6 +330,7 @@ export const TablePoolOverview = ({
               fieldName: `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             });
           }
+          rewardFactors.push("Token [" + idx + "] " + rewardFactorsStr);
           return Number(apr).toFixed(2) + "%";
         });
         if (!rewardAPRs) {
@@ -311,7 +343,8 @@ export const TablePoolOverview = ({
           }
           return str;
         });
-        returnObj.rewardTokens = rewardTokenCell.join(", ");
+
+        returnObj.rewardTokens = rewardTokenCell.join(", ") + "//" + rewardFactors.join("  ||  ");
       } else {
         returnObj.rewardTokens = "No Reward Token";
       }
@@ -326,9 +359,12 @@ export const TablePoolOverview = ({
           if (supplierFee) {
             feePercentage = Number(supplierFee.feePercentage);
           }
-          const volumeUSD = Number(pool.cumulativeVolumeUSD);
-          let value = ((feePercentage * volumeUSD) / Number(pool.totalValueLockedUSD)) * 100;
-          if (!value || !Number(pool.totalValueLockedUSD)) {
+          const volumeUSD = Number(pool?.dailySnapshots[pool?.dailySnapshots?.length - 1]?.dailyVolumeUSD) || 0;
+          let value = (feePercentage * volumeUSD * 36500) / Number(pool.totalValueLockedUSD);
+          const factorsStr = `(${feePercentage.toFixed(2)} (LP Fee) * ${volumeUSD.toFixed(
+            2,
+          )} (Volume 24h) * 365 * 100) / ${Number(pool.totalValueLockedUSD).toFixed(2)} (TVL) = ${value.toFixed(2)}%`;
+          if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
             value = 0;
             if (issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0) {
               issues.push({
@@ -350,7 +386,7 @@ export const TablePoolOverview = ({
               fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
             });
           }
-          returnObj.baseYield = value;
+          returnObj.baseYield = value + "//" + factorsStr;
         }
       }
       return returnObj;
