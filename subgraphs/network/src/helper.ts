@@ -26,7 +26,7 @@ import {
   BIGINT_MAX,
 } from "./constants";
 import { BlockData, UpdateNetworkData } from "./mapping";
-import { exponentToBigDecimal, getBlocksPerDay } from "./utils";
+import { exponentToBigDecimal } from "./utils";
 
 //////////////////
 //// Updaters ////
@@ -83,11 +83,6 @@ export function updateNetwork(networkData: UpdateNetworkData): Network {
     network.cumulativeSize = network.cumulativeSize!.plus(networkData.newSize!);
   }
   network.totalSupply = networkData.totalSupply;
-
-  network.blocksPerDay = getBlocksPerDay(
-    networkData.height,
-    networkData.timestamp
-  );
 
   network.save();
   return network;
@@ -690,7 +685,6 @@ function getOrCreateNetwork(id: string): Network {
     network.methodologyVersion = METHODOLOGY_VERSION;
     network.cumulativeUniqueAuthors = INT_ZERO;
     network.blockHeight = INT_ZERO;
-    network.blocksPerDay = BIGDECIMAL_ZERO;
     network.dailyBlocks = getOrCreateStats(id, DataType.BLOCKS).id;
 
     network.save();

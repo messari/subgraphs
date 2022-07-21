@@ -8,7 +8,13 @@ import {
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import { Chunk } from "../generated/schema";
-import { BIGINT_ZERO, INT_NINE } from "./constants";
+import {
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  INT_NINE,
+  NETWORK_NAME,
+  SubgraphNetwork,
+} from "./constants";
 import {
   createBlock,
   updateAuthors,
@@ -178,10 +184,11 @@ export function handleEvmBlock(block: ethereum.Block): void {
     block.baseFeePerGas,
     burntFees,
     null,
+    NETWORK_NAME == SubgraphNetwork.OPTIMISM ? BIGINT_ONE : null, // optimism "blocks" are actually transactions
     null,
-    null,
-    null // TODO: try to get supply working for evm
+    null
   );
+
   createBlock(blockData);
 
   // update network entity

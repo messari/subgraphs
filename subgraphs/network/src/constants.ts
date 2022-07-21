@@ -55,7 +55,7 @@ export namespace SubgraphNetwork {
   export const MOONRIVER = "moonriver";
   export const NEAR = "near-mainnet";
   export const OPTIMISM = "optimism";
-  export const OSMOSIS = "osmosis";
+  export const OSMOSIS = "osmosis-1";
   export const POLYGON = "matic";
   export const XDAI = "xdai";
 }
@@ -119,6 +119,6 @@ export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 ///////////////////////////
 
 export const NETWORK_NAME = dataSource.network();
-export const SCHEMA_VERSION = "1.0.0";
+export const SCHEMA_VERSION = "1.1.0";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const SUBGRAPH_VERSION = "1.1.0";

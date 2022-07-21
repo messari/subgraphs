@@ -44,7 +44,11 @@ To deploy follow the steps above. You may put your hosted service endpoint in [d
 
 The timeseries data is important, based off `Network` and adds numerous daily/hourly metrics.
 
-The following data is collected:
+### Schema 1.1.0 Explanation
+
+<details>
+<summary>Schema 1.0.0</summary>
+<br>
 
 - `blockHeight` is the current block height
 - `dailyBlocks` is the number of blocks mined per day
@@ -62,6 +66,8 @@ The following data is collected:
 - `dailyMeanBlockSize` = `dailySize` / `dailyBlocks`
   - The size is the amount of data in a block in bytes (in the case of ethereum)
 - Chunks are the number of shards in a single block. This is used in networks where computation is parallelized into shards
+
+</details>
 
 ## Block-specific Data
 
@@ -182,11 +188,12 @@ class Block {
 
 ## Development Notes
 
-- `juno` and `osmosis` is not yet supported on the graph (as of 6/18/2022)
+- `juno` is not yet supported on the graph (as of 7/21/2022)
 - `cronos` needs to have a startBlock of 1 to work, so I had to keep it seperate from the evm chains
   - Also, the hosted service does not support `cronos` so you have to deploy here: https://portal.cronoslabs.com/
-- TODO: explain how eth rewards can be calculated using subgraph data
+- explain how eth rewards can be calculated using subgraph data
 - `aurora` will take ~3 months to fully sync
+- `optimism` blocks are actually transactions. There is no way to get blocks.
 
 ### Deployment
 

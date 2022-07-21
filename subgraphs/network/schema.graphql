@@ -1,5 +1,5 @@
 # Subgraph Schema: Network
-# Version: 1.0.0
+# Version: 1.1.0
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum SubgraphNetwork {
@@ -129,9 +129,6 @@ type Network @entity {
 
   " Current supply of the native asset "
   totalSupply: BigInt
-
-  " Current blocks per day emission "
-  blocksPerDay: BigDecimal!
 
   " Statistical analysis of blocks/day from daily snapshots "
   dailyBlocks: STATS!
