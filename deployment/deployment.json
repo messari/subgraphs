@@ -540,6 +540,14 @@
         }
       }
     },
+    "lido": {
+      "lido": {
+        "ethereum": {
+          "template": "lido.template.yaml",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "liquity": {
       "liquity": {
         "ethereum": {
