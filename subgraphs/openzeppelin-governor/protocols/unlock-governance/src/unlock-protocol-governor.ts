@@ -19,6 +19,7 @@ import {
 } from "../../../src/handlers";
 import { UnlockProtocolGovernor } from "../../../generated/UnlockProtocolGovernor/UnlockProtocolGovernor";
 import { GovernanceFramework } from "../../../generated/schema";
+import { GovernanceFrameworkType } from "../../../src/constants";
 
 // ProposalCanceled(proposalId)
 export function handleProposalCanceled(event: ProposalCanceled): void {
@@ -105,7 +106,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     );
 
     governanceFramework.name = contract.name();
-    governanceFramework.type = "OZGovernor";
+    governanceFramework.type = GovernanceFrameworkType.OPENZEPPELIN_GOVERNOR;
     governanceFramework.version = contract.version();
 
     governanceFramework.contractAddress = contractAddress;
