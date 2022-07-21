@@ -96,7 +96,7 @@ export function updateNetwork(networkData: UpdateNetworkData): Network {
 // update snapshots
 export function updateMetrics(blockData: BlockData, network: Network): void {
   updateDailySnapshot(blockData, network);
-  // updateHourlySnapshot(blockData, network);
+  updateHourlySnapshot(blockData, network);
 }
 
 function updateDailySnapshot(blockData: BlockData, network: Network): void {
@@ -223,104 +223,129 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
   snapshot.save();
 }
 
-// function updateHourlySnapshot(blockData: BlockData, network: Network): void {
-//   let snapshot = getOrCreateHourlySnapshot(
-//     blockData.timestamp,
-//     network.totalSupply
-//   );
+function updateHourlySnapshot(blockData: BlockData, network: Network): void {
+  let snapshotId = (blockData.timestamp.toI64() / SECONDS_PER_HOUR).toString();
+  let snapshot = getOrCreateHourlySnapshot(blockData.timestamp);
 
-//   // update overlapping fields for snapshot
-//   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
-//   snapshot.blockHeight = network.blockHeight;
-//   snapshot.timestamp = blockData.timestamp;
-//   snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
-//   snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
-//   snapshot.cumulativeRewards = network.cumulativeRewards;
-//   snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
-//   snapshot.cumulativeRewards = network.cumulativeRewards;
-//   snapshot.totalSupply = network.totalSupply;
-//   snapshot.cumulativeSize = network.cumulativeSize;
-//   snapshot.gasPrice = blockData.gasPrice ? blockData.gasPrice : BIGINT_ZERO;
+  // grab block interval before updating timestamp
+  let blockInterval = blockData.timestamp.minus(snapshot.timestamp);
 
-//   // check for new hourly authors
-//   let id =
-//     IntervalType.HOURLY +
-//     "-" +
-//     blockData.author.toHexString() +
-//     "-" +
-//     snapshot.id;
-//   let activeAuthor = ActiveAuthor.load(id);
-//   if (!activeAuthor) {
-//     activeAuthor = new ActiveAuthor(id);
-//     activeAuthor.save();
-//     snapshot.hourlyActiveAuthors++;
-//   }
+  // update overlapping fields for snapshot
+  snapshot.blockHeight = network.blockHeight;
+  snapshot.hourlyBlocks++;
+  snapshot.timestamp = blockData.timestamp;
 
-//   // update hourly metrics
-//   snapshot.hourlyBlocks++;
-//   let hourlyBlocksBD = BigDecimal.fromString(snapshot.hourlyBlocks.toString());
+  // update statistical analysis fields
+  snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
+  if (blockData.author) {
+    // check for new hourly authors
+    let id =
+      IntervalType.HOURLY +
+      "-" +
+      blockData.author!.toHexString() +
+      "-" +
+      snapshot.id;
+    let activeAuthor = ActiveAuthor.load(id);
+    if (!activeAuthor) {
+      activeAuthor = new ActiveAuthor(id);
+      activeAuthor.save();
 
-//   snapshot.hourlyDifficulty = snapshot.hourlyDifficulty.plus(
-//     blockData.difficulty
-//   );
-//   snapshot.hourlyMeanDifficulty = snapshot.hourlyDifficulty
-//     .toBigDecimal()
-//     .div(hourlyBlocksBD);
-//   snapshot.hourlyCumulativeGasUsed = snapshot.hourlyCumulativeGasUsed.plus(
-//     blockData.gasUsed
-//   );
-//   snapshot.hourlyCumulativeGasLimit = snapshot.hourlyCumulativeGasLimit.plus(
-//     blockData.gasLimit
-//   );
-//   snapshot.hourlyMeanGasUsed = snapshot.hourlyCumulativeGasUsed
-//     .toBigDecimal()
-//     .div(hourlyBlocksBD);
-//   snapshot.hourlyMeanGasLimit = snapshot.hourlyCumulativeGasLimit
-//     .toBigDecimal()
-//     .div(hourlyBlocksBD);
-//   snapshot.hourlyBurntFees = snapshot.hourlyBurntFees.plus(blockData.burntFees);
-//   snapshot.hourlyRewards = snapshot.hourlyRewards.plus(blockData.rewards);
-//   snapshot.hourlyMeanRewards = snapshot.hourlyRewards
-//     .toBigDecimal()
-//     .div(hourlyBlocksBD);
-//   snapshot.hourlyMeanBlockSize = snapshot.hourlyCumulativeSize
-//     .toBigDecimal()
-//     .div(hourlyBlocksBD);
-//   snapshot.hourlyCumulativeSize = snapshot.hourlyCumulativeSize.plus(
-//     blockData.size
-//   );
-//   snapshot.hourlyMeanBlockSize = snapshot.hourlyCumulativeSize
-//     .toBigDecimal()
-//     .div(hourlyBlocksBD);
-//   snapshot.hourlyChunkCount += blockData.chunkCount.toI32();
-//   snapshot.hourlyTransactionCount += blockData.transactionCount.toI32();
+      snapshot.hourlyUniqueAuthors = updateStats(
+        snapshotId,
+        DataType.AUTHORS,
+        BIGINT_ONE
+      ); // TODO: check for new hourly author
+    }
+  }
 
-//   if (snapshot.hourlyCumulativeGasLimit != BIGINT_ZERO) {
-//     snapshot.hourlyBlockUtilization = snapshot.hourlyCumulativeGasUsed
-//       .toBigDecimal()
-//       .div(snapshot.hourlyCumulativeGasLimit.toBigDecimal())
-//       .times(exponentToBigDecimal(INT_TWO));
-//   } else {
-//     snapshot.hourlyBlockUtilization = BIGDECIMAL_ZERO;
-//   }
+  snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
+  if (blockData.difficulty) {
+    snapshot.hourlyDifficulty = updateStats(
+      snapshotId,
+      DataType.DIFFICULTY,
+      blockData.difficulty!
+    );
+  }
 
-//   if (network.totalSupply != BIGINT_ZERO) {
-//     // calculate new supply emitted this block
-//     let newSupply = network.totalSupply.minus(snapshot.firstSupply);
-//     snapshot.hourlySupplyIncrease = newSupply;
-//   }
+  snapshot.cumulativeGasUsed = network.cumulativeGasUsed;
+  if (blockData.gasUsed) {
+    snapshot.hourlyGasUsed = updateStats(
+      snapshotId,
+      DataType.GAS_USED,
+      blockData.gasUsed!
+    );
+  }
 
-//   // calculate mean block interval
-//   // mean = (timestamp - firstTimestamp) / hourlyBlocks
-//   let timestampDiff = blockData.timestamp.minus(snapshot.firstTimestamp);
-//   snapshot.hourlyMeanBlockInterval = timestampDiff
-//     .toBigDecimal()
-//     .div(hourlyBlocksBD);
+  snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
+  if (blockData.burntFees) {
+    snapshot.hourlyBurntFees = updateStats(
+      snapshotId,
+      DataType.BURNT_FEES,
+      blockData.burntFees!
+    );
+  }
 
-//   snapshot.save();
+  snapshot.cumulativeRewards = network.cumulativeRewards;
+  if (blockData.rewards) {
+    snapshot.hourlyRewards = updateStats(
+      snapshotId,
+      DataType.REWARDS,
+      blockData.rewards!
+    );
+  }
 
-//   snapshot.save();
-// }
+  snapshot.cumulativeSize = network.cumulativeSize;
+  if (blockData.size) {
+    snapshot.hourlySize = updateStats(
+      snapshotId,
+      DataType.SIZE,
+      blockData.size!
+    );
+  }
+
+  if (blockData.chunkCount) {
+    snapshot.hourlyChunks = updateStats(
+      snapshotId,
+      DataType.CHUNKS,
+      blockData.chunkCount!
+    );
+  }
+
+  snapshot.totalSupply = network.totalSupply;
+  if (blockData.newSupply) {
+    snapshot.hourlySupply = updateStats(
+      snapshotId,
+      DataType.SUPPLY,
+      blockData.newSupply!
+    );
+  }
+
+  snapshot.cumulativeTransactions = network.cumulativeTransactions;
+  if (blockData.transactionCount) {
+    snapshot.hourlyTransactions = updateStats(
+      snapshotId,
+      DataType.TRANSACTIONS,
+      blockData.transactionCount!
+    );
+  }
+
+  snapshot.hourlyBlockInterval = updateStats(
+    snapshotId,
+    DataType.BLOCK_INTERVAL,
+    blockInterval
+  );
+
+  snapshot.gasPrice = blockData.gasPrice;
+  if (blockData.gasPrice) {
+    snapshot.hourlyGasPrice = updateStats(
+      snapshotId,
+      DataType.GAS_PRICE,
+      blockData.gasPrice!
+    );
+  }
+
+  snapshot.save();
+}
 
 export function updateAuthors(
   authorId: Bytes,
@@ -409,8 +434,8 @@ function getMedian(list: BigInt[]): BigDecimal {
 
 //
 //
-// update the previous snapshots statistical data
-function updatePreviousSnapshot(snapshot: DailySnapshot): void {
+// update the previous daily snapshots statistical data
+function updatePreviousDailySnapshot(snapshot: DailySnapshot): void {
   let network = getOrCreateNetwork(NETWORK_NAME);
 
   // update network dailyBlock stats
@@ -453,6 +478,46 @@ function updatePreviousSnapshot(snapshot: DailySnapshot): void {
     updateStatisicalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
   }
   if (snapshot.dailyGasPrice) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
+  }
+}
+
+//
+//
+// update the previous hourly snapshots statistical data
+function updatePreviousHourlySnapshot(snapshot: HourlySnapshot): void {
+  // calculate var, q1, and q3 for prev snapshots
+  if (snapshot.hourlyUniqueAuthors) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.AUTHORS));
+  }
+  if (snapshot.hourlyDifficulty) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.DIFFICULTY));
+  }
+  if (snapshot.hourlyGasUsed) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_USED));
+  }
+  if (snapshot.hourlyGasLimit) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_LIMIT));
+  }
+  if (snapshot.hourlyBurntFees) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.BURNT_FEES));
+  }
+  if (snapshot.hourlyRewards) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.REWARDS));
+  }
+  if (snapshot.hourlySize) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SIZE));
+  }
+  if (snapshot.hourlyChunks) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.CHUNKS));
+  }
+  if (snapshot.hourlySupply) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.SUPPLY));
+  }
+  if (snapshot.hourlyTransactions) {
+    updateStatisicalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
+  }
+  if (snapshot.hourlyGasPrice) {
     updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
   }
 }
@@ -524,8 +589,7 @@ function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
     // update dailyBlocks stats in network
     // we know that the previous snapshot exists because we are handling every block
     let previousSnapshotId = (
-      timestamp.toI64() -
-      SECONDS_PER_DAY -
+      timestamp.toI64() / SECONDS_PER_DAY -
       1
     ).toString();
     let previousSnapshot = DailySnapshot.load(previousSnapshotId);
@@ -536,52 +600,41 @@ function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
       );
     } else {
       // snapshot exists
-      updatePreviousSnapshot(previousSnapshot);
+      updatePreviousDailySnapshot(previousSnapshot);
     }
   }
   return dailySnapshot;
 }
 
-function getOrCreateHourlySnapshot(
-  timestamp: BigInt,
-  originalSupply: BigInt
-): HourlySnapshot {
-  let id = (timestamp.toI64() / SECONDS_PER_HOUR).toString();
+function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
+  let id = (timestamp.toI64() / SECONDS_PER_DAY).toString();
   let hourlySnapshot = HourlySnapshot.load(id);
   if (!hourlySnapshot) {
     hourlySnapshot = new HourlySnapshot(id);
     hourlySnapshot.network = NETWORK_NAME;
-    hourlySnapshot.cumulativeUniqueAuthors = INT_ZERO;
-    hourlySnapshot.hourlyActiveAuthors = INT_ZERO;
     hourlySnapshot.blockHeight = INT_ZERO;
-    hourlySnapshot.timestamp = timestamp;
     hourlySnapshot.hourlyBlocks = INT_ZERO;
-    hourlySnapshot.cumulativeDifficulty = BIGINT_ZERO;
-    hourlySnapshot.hourlyDifficulty = BIGINT_ZERO;
-    hourlySnapshot.hourlyMeanDifficulty = BIGDECIMAL_ZERO;
-    hourlySnapshot.hourlyCumulativeGasUsed = BIGINT_ZERO;
-    hourlySnapshot.hourlyCumulativeGasLimit = BIGINT_ZERO;
-    hourlySnapshot.hourlyBlockUtilization = BIGDECIMAL_ZERO;
-    hourlySnapshot.hourlyMeanGasUsed = BIGDECIMAL_ZERO;
-    hourlySnapshot.hourlyMeanGasLimit = BIGDECIMAL_ZERO;
-    hourlySnapshot.gasPrice = BIGINT_ZERO;
-    hourlySnapshot.cumulativeBurntFees = BIGINT_ZERO;
-    hourlySnapshot.hourlyBurntFees = BIGINT_ZERO;
-    hourlySnapshot.hourlyRewards = BIGINT_ZERO;
-    hourlySnapshot.cumulativeRewards = BIGINT_ZERO;
-    hourlySnapshot.hourlyMeanRewards = BIGDECIMAL_ZERO;
-    hourlySnapshot.totalSupply = BIGINT_ZERO;
-    hourlySnapshot.hourlySupplyIncrease = BIGINT_ZERO;
-    hourlySnapshot.firstTimestamp = timestamp;
-    hourlySnapshot.hourlyMeanBlockInterval = BIGDECIMAL_ZERO;
-    hourlySnapshot.cumulativeSize = BIGINT_ZERO;
-    hourlySnapshot.hourlyCumulativeSize = BIGINT_ZERO;
-    hourlySnapshot.hourlyMeanBlockSize = BIGDECIMAL_ZERO;
-    hourlySnapshot.hourlyChunkCount = INT_ZERO;
-    hourlySnapshot.hourlyTransactionCount = INT_ZERO;
-    hourlySnapshot.firstSupply = originalSupply;
+    hourlySnapshot.timestamp = timestamp;
+    hourlySnapshot.cumulativeUniqueAuthors = INT_ZERO;
 
     hourlySnapshot.save();
+
+    // update variance, q1, q3 of previous snapshot
+    // we know that the previous snapshot exists because we are handling every block
+    let previousSnapshotId = (
+      timestamp.toI64() / SECONDS_PER_HOUR -
+      1
+    ).toString();
+    let previousSnapshot = HourlySnapshot.load(previousSnapshotId);
+    if (!previousSnapshot) {
+      log.warning(
+        "[getOrCreateHourlySnapshot] previous snapshot not found at timestamp: {}",
+        [timestamp.toString()]
+      );
+    } else {
+      // snapshot exists
+      updatePreviousHourlySnapshot(previousSnapshot);
+    }
   }
   return hourlySnapshot;
 }

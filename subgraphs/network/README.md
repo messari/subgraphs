@@ -10,7 +10,7 @@ Once everything is setup properly deploying is very easy.
 
 ```bash
 # This example will deploy all evm networks to the hosted service under "dmelotik" in deploymentConfigurations.json
-npm run deploy --SUBGRAPH=network --PROTOCOL=evm --LOCATION=dmelotik
+npm run deploy --SUBGRAPH=network --POTOCOL=evm --LOCATION=dmelotik
 
 # This will do the same, but only deploying the mainnet subgraph
 npm run deploy --SUBGRAPH=network --PROTOCOL=evm --NETWORK=ethereum --LOCATION=dmelotik

@@ -240,11 +240,11 @@ type HourlySnapshot @entity {
 
   #### Quantitative Data ####
 
-  " Block height at this hour (aka, blockNumber) "
+  " Block height at this day (aka, blockNumber) "
   blockHeight: Int!
 
-  " First timestamp of this entity (used to calculate averages) "
-  firstTimestamp: BigInt!
+  " Blocks created during this day (note, this is different from blocksPerDay) "
+  hourlyBlocks: Int!
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
@@ -252,84 +252,65 @@ type HourlySnapshot @entity {
   " Number of cumulative unique authors (see type Author for explanation) "
   cumulativeUniqueAuthors: Int!
 
+  " Statistical analysis of unique hourly active authors "
+  hourlyUniqueAuthors: STATS
+
   " Total difficulty up until this hour "
-  cumulativeDifficulty: BigInt!
+  cumulativeDifficulty: BigInt
+
+  " Statistical analysis of difficulty during this hour "
+  hourlyDifficulty: STATS
+
+  " Total gas used up until this hour "
+  cumulativeGasUsed: BigInt
+
+  " Statistical analysis of gas used during this hour"
+  hourlyGasUsed: STATS
+
+  " Statistical analysis of gas limit across blocks this hour"
+  hourlyGasLimit: STATS
 
   " Total amount of fees burned "
-  cumulativeBurntFees: BigInt!
+  cumulativeBurntFees: BigInt
+
+  " Statisical amount of burnt fees for this hour "
+  hourlyBurntFees: STATS
 
   " Total amount of rewards emitted "
-  cumulativeRewards: BigInt!
+  cumulativeRewards: BigInt
+
+  " Statistical analysis of rewards emitted on this hour "
+  hourlyRewards: STATS
 
   " Total size of the entire network in this hour (in native units) "
-  cumulativeSize: BigInt!
+  cumulativeSize: BigInt
+
+  " Statistical analysis of size in bytes of a block during this hour "
+  hourlySize: STATS
+
+  " Statistical analysis of chunks per block during this hour "
+  hourlyChunks: STATS
 
   " Total amount of the native asset in circulation during this hour "
-  totalSupply: BigInt!
+  totalSupply: BigInt
+
+  " Statisitcal analysis of the hourly supply "
+  hourlySupply: STATS
+
+  " Total number of transactions that have occured on this blockchain "
+  cumulativeTransactions: BigInt
+
+  " Statistical analysis of transactions per hour "
+  hourlyTransactions: STATS
+
+  " Statisical analysis of the block interval during this hour "
+  hourlyBlockInterval: STATS
 
   " gas price at the end of this hour in network native gas units "
-  gasPrice: BigInt!
+  gasPrice: BigInt
 
-  #### Hourly Metrics ####
-
-  " Number of unique hourly active authors "
-  hourlyActiveAuthors: Int!
-
-  " Blocks created during this hour "
-  hourlyBlocks: Int!
-
-  " Difficulty during this hour "
-  hourlyDifficulty: BigInt!
-
-  " Average difficulty for this hour "
-  hourlyMeanDifficulty: BigDecimal!
-
-  " Sum of all gas used during this hour "
-  hourlyCumulativeGasUsed: BigInt!
-
-  " Sum of all gas limit during this hour "
-  hourlyCumulativeGasLimit: BigInt!
-
-  " Block utilization aggregated across this hour "
-  hourlyBlockUtilization: BigDecimal!
-
-  " Mean of gas used per block during this hour "
-  hourlyMeanGasUsed: BigDecimal!
-
-  " Mean of gas limit per block during this hour "
-  hourlyMeanGasLimit: BigDecimal!
-
-  " Amount of burnt fees for this hour "
-  hourlyBurntFees: BigInt!
-
-  " New rewards emitted on this hour "
-  hourlyRewards: BigInt!
-
-  " Hourly mean block reward emitted "
-  hourlyMeanRewards: BigDecimal!
-
-  " New supply added during this hour "
-  hourlySupplyIncrease: BigInt!
-
-  " Hourly mean block interval time in seconds during this hour "
-  hourlyMeanBlockInterval: BigDecimal!
-
-  " Cumulative size of all blocks created in this hour "
-  hourlyCumulativeSize: BigInt!
-
-  " hourly mean size in bytes of a block during this hour "
-  hourlyMeanBlockSize: BigDecimal!
-
-  " Hourly chunk count "
-  hourlyChunkCount: Int!
-
-  " Number of transactions during this hour "
-  hourlyTransactionCount: Int!
-
-  #### Helpers ####
-
-  " Keep track of the first supply of this snapshot "
-  firstSupply: BigInt!
+  " Statistical analysis of the gas price during this hour "
+  hourlyGasPrice: STATS
 }
 
 ##########################
