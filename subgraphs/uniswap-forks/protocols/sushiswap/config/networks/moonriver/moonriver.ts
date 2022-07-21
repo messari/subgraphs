@@ -4,7 +4,7 @@ import {
   BIGINT_ZERO,
   FeeSwitch,
   MINIMUM_LIQUIDITY_FIVE_THOUSAND,
-  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  MINIMUM_LIQUIDITY_TEN_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
@@ -15,7 +15,6 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  MASTERCHEFV2_SUSHI_PER_BLOCK,
 } from "../../../src/common/constants";
 import {
   toLowerCase,
@@ -114,7 +113,7 @@ export class SushiswapMoonriverConfigurations implements Configurations {
     return [];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+    return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
   getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
     return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
