@@ -2,6 +2,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   FeeSwitch,
+  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
   MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
@@ -140,7 +141,10 @@ export class SushiswapMainnetConfigurations implements Configurations {
       "0xe9f84de264e91529af07fa2c746e934397810334", // Sake Token
     ];
   }
-  getMinimumLiquidityThreshold(): BigDecimal {
+  getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND;
+  }
+  getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
+    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
   }
 }
