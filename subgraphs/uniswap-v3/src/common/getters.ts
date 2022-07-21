@@ -76,9 +76,44 @@ export function getOrCreateToken(address: string): Token {
     }
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
+
+    // Fixing token fields that did not return proper values from contract
+    // Manually coded in when necessary
+    token = fixTokenFields(token);
+
     token.save();
   }
   return token as Token;
+}
+
+export function fixTokenFields(token: Token): Token {
+  // Arbitrum
+  if (
+    token.id == "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1".toLowerCase() &&
+    NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
+  ) {
+    token.name = "WETH";
+    token.symbol = "WETH";
+    token.decimals = DEFAULT_DECIMALS;
+  }
+
+  if (
+    token.id == "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8".toLowerCase() &&
+    NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
+  ) {
+    token.name = "USDC";
+    token.symbol = "USDC";
+  }
+
+  if (
+    token.id == "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9".toLowerCase() &&
+    NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE
+  ) {
+    token.name = "USDT";
+    token.symbol = "USDT";
+  }
+
+  return token;
 }
 
 export function getOrCreateLPToken(
