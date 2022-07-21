@@ -3,6 +3,7 @@ import {
   ProposalCanceled,
   ProposalCreated,
   ProposalExecuted,
+  ProposalExtended,
   ProposalQueued,
   ProposalThresholdSet,
   TimelockChange,
@@ -16,6 +17,7 @@ import {
   _handleProposalExecuted,
   _handleProposalQueued,
   _handleVoteCast,
+  _handleProposalExtended,
 } from "../../../src/handlers";
 import { ArenaGovernor } from "../../../generated/ArenaGovernor/ArenaGovernor";
 import { GovernanceFramework } from "../../../generated/schema";
@@ -49,6 +51,14 @@ export function handleProposalCreated(event: ProposalCreated): void {
 // ProposalExecuted(proposalId)
 export function handleProposalExecuted(event: ProposalExecuted): void {
   _handleProposalExecuted(event.params.proposalId.toString(), event);
+}
+
+// ProposalExtended(proposalId,extendedDeadline)
+export function handleProposalExtended(event: ProposalExtended): void {
+  _handleProposalExtended(
+    event.params.proposalId.toString(),
+    event.params.extendedDeadline
+  );
 }
 
 // ProposalQueued(proposalId, eta)

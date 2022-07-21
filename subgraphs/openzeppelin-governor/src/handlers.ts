@@ -232,6 +232,16 @@ export function _handleProposalExecuted(
   governance.save();
 }
 
+export function _handleProposalExtended(
+  proposalId: string,
+  extendedDeadline: BigInt
+): void {
+  // Update proposal endBlock
+  let proposal = getOrCreateProposal(proposalId);
+  proposal.endBlock = extendedDeadline;
+  proposal.save();
+}
+
 export function _handleProposalQueued(proposalId: BigInt, eta: BigInt): void {
   // Update proposal status + execution metadata
   let proposal = getOrCreateProposal(proposalId.toString());
