@@ -16,7 +16,10 @@ import {
 } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { getOrCreateMasterChef } from "../helpers";
+import {
+  getOrCreateMasterChef,
+  getOrCreateMasterChefStakingPool,
+} from "../../../../../src/common/masterchef/helpers";
 import {
   convertTokenToDecimal,
   roundToWholeNumber,
@@ -153,31 +156,4 @@ export function handleReward(
   masterChefV2.save();
   rewardToken.save();
   pool.save();
-}
-
-// Create a MasterChefStaking pool using the MasterChef pid for id.
-function getOrCreateMasterChefStakingPool(
-  event: ethereum.Event,
-  masterChefType: string,
-  pid: BigInt
-): _MasterChefStakingPool {
-  let masterChefPool = _MasterChefStakingPool.load(
-    masterChefType + "-" + pid.toString()
-  );
-
-  // Create entity to track masterchef pool mappings
-  if (!masterChefPool) {
-    masterChefPool = new _MasterChefStakingPool(
-      masterChefType + "-" + pid.toString()
-    );
-
-    masterChefPool.multiplier = BIGINT_ONE;
-    masterChefPool.poolAllocPoint = BIGINT_ZERO;
-    masterChefPool.lastRewardBlock = event.block.number;
-    log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
-
-    masterChefPool.save();
-  }
-
-  return masterChefPool;
 }

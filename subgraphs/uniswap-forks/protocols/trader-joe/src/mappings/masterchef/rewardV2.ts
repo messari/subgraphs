@@ -21,7 +21,7 @@ import {
   createMasterChefStakingPool,
   getOrCreateMasterChef,
   updateMasterChefTotalAllocation,
-} from "../../common/helpers";
+} from "../../../../../src/common/masterchef/helpers";
 
 // A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {

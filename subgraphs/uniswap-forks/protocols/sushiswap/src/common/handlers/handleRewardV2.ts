@@ -12,7 +12,7 @@ import {
   convertTokenToDecimal,
   roundToWholeNumber,
 } from "../../../../../src/common/utils/utils";
-import { getOrCreateMasterChef } from "../helpers";
+import { getOrCreateMasterChef } from "../../../../../src/common/masterchef/helpers";
 
 // Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
 export function updateMasterChef(

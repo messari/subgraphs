@@ -7,7 +7,7 @@ import {
 } from "../../../../../generated/schema";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { getOrCreateMasterChef } from "../helpers";
+import { getOrCreateMasterChef } from "../../../../../src/common/masterchef/helpers";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
 import {
   convertTokenToDecimal,

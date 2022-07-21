@@ -17,7 +17,7 @@ import {
   createMasterChefStakingPool,
   getOrCreateMasterChef,
   updateMasterChefTotalAllocation,
-} from "../../common/helpers";
+} from "../../../../../src/common/masterchef/helpers";
 import { updateMasterChef } from "../../common/handlers/handleRewardMini";
 import {
   BIGINT_NEG_ONE,

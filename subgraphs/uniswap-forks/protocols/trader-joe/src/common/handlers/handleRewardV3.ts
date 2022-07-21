@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefV3TraderJoe } from "../../../../../generated/MasterChefV3/MasterChefV3TraderJoe";
 import {
@@ -8,7 +8,7 @@ import {
 } from "../../../../../generated/schema";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { getOrCreateMasterChef } from "../helpers";
+import { getOrCreateMasterChef } from "../../../../../src/common/masterchef/helpers";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
 import {
   convertTokenToDecimal,

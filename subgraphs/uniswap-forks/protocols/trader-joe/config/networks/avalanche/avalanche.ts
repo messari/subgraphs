@@ -14,6 +14,7 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
+  TRADER_JOE_AVALANCHE_REWARD_TOKEN_RATE,
 } from "../../../src/common/constants";
 import {
   toLowerCase,
@@ -71,7 +72,7 @@ export class TraderJoeAvalancheConfigurations implements Configurations {
     return RewardIntervalType.TIMESTAMP;
   }
   getRewardTokenRate(): BigInt {
-    return BIGINT_ZERO;
+    return TRADER_JOE_AVALANCHE_REWARD_TOKEN_RATE;
   }
   getReferenceToken(): string {
     return toLowerCase("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7");

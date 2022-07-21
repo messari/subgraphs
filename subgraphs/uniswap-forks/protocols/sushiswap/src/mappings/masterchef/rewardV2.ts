@@ -9,7 +9,7 @@ import { _MasterChefStakingPool } from "../../../../../generated/schema";
 import {
   createMasterChefStakingPool,
   updateMasterChefTotalAllocation,
-} from "../../common/helpers";
+} from "../../../../../src/common/masterchef/helpers";
 import { updateMasterChef } from "../../common/handlers/handleRewardV2";
 import {
   BIGINT_NEG_ONE,

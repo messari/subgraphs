@@ -19,7 +19,10 @@ import {
   convertTokenToDecimal,
   roundToWholeNumber,
 } from "../../../../../src/common/utils/utils";
-import { getOrCreateMasterChef } from "../helpers";
+import {
+  getOrCreateMasterChef,
+  getOrCreateMasterChefStakingPool,
+} from "../../../../../src/common/masterchef/helpers";
 
 // Called on both deposits and withdraws into the MasterApe/MasterChef pool.
 // Tracks staked LP tokens, and estimates the emissions of LP tokens for the liquidity pool associated with the staked LP.
@@ -137,31 +140,4 @@ export function handleReward(
   masterChef.save();
   rewardToken.save();
   pool.save();
-}
-
-// Create a MasterChefStaking pool using the MasterChef pid for id.
-function getOrCreateMasterChefStakingPool(
-  event: ethereum.Event,
-  masterChefType: string,
-  pid: BigInt
-): _MasterChefStakingPool {
-  let masterChefPool = _MasterChefStakingPool.load(
-    masterChefType + "-" + pid.toString()
-  );
-
-  // Create entity to track masterchef pool mappings
-  if (!masterChefPool) {
-    masterChefPool = new _MasterChefStakingPool(
-      masterChefType + "-" + pid.toString()
-    );
-
-    masterChefPool.multiplier = BIGINT_ONE;
-    masterChefPool.poolAllocPoint = BIGINT_ZERO;
-    masterChefPool.lastRewardBlock = event.block.number;
-    log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
-
-    masterChefPool.save();
-  }
-
-  return masterChefPool;
 }
