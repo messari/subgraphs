@@ -172,6 +172,10 @@ export function _handleProposalCreated(
   proposer = getOrCreateDelegate(proposerAddr);
 
   proposal.proposer = proposer.id;
+  proposal.delegateAgainstVotes = BIGINT_ZERO;
+  proposal.delegateForVotes = BIGINT_ZERO;
+  proposal.delegateAbstainVotes = BIGINT_ZERO;
+  proposal.delegateTotalVotes = BIGINT_ZERO;
   proposal.againstVotes = BIGINT_ZERO;
   proposal.forVotes = BIGINT_ZERO;
   proposal.abstainVotes = BIGINT_ZERO;
@@ -282,15 +286,22 @@ export function _handleVoteCast(
   }
 
   // Increment respective vote choice counts
+  // NOTE: We are counting the weight instead of individual votes
   if (support === 0) {
-    proposal.againstVotes = proposal.againstVotes.plus(BIGINT_ONE);
+    proposal.delegateAgainstVotes =
+      proposal.delegateAgainstVotes.plus(BIGINT_ONE);
+    proposal.againstVotes = proposal.againstVotes.plus(weight);
   } else if (support === 1) {
-    proposal.forVotes = proposal.forVotes.plus(BIGINT_ONE);
+    proposal.delegateForVotes = proposal.delegateForVotes.plus(BIGINT_ONE);
+    proposal.forVotes = proposal.forVotes.plus(weight);
   } else if (support === 2) {
-    proposal.abstainVotes = proposal.abstainVotes.plus(BIGINT_ONE);
+    proposal.delegateAbstainVotes =
+      proposal.delegateAbstainVotes.plus(BIGINT_ONE);
+    proposal.abstainVotes = proposal.abstainVotes.plus(weight);
   }
   // Increment total
-  proposal.totalVotes = proposal.totalVotes.plus(BIGINT_ONE);
+  proposal.delegateTotalVotes = proposal.delegateTotalVotes.plus(BIGINT_ONE);
+  proposal.totalVotes = proposal.totalVotes.plus(weight);
   proposal.save();
 
   // Add 1 to participant's proposal voting count

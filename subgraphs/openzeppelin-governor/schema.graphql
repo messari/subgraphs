@@ -76,13 +76,21 @@ type Proposal @entity {
   "State of the proposal"
   state: ProposalState!
 
-  "Votes against the proposal"
+  "Unweighted Votes against the proposal"
+  delegateAgainstVotes: BigInt!
+  "Unweighted Votes for the proposal"
+  delegateForVotes: BigInt!
+  "Unweighted Votes abstaining to the proposal"
+  delegateAbstainVotes: BigInt!
+  "Total unweighted for/against/abstaining votes"
+  delegateTotalVotes: BigInt!
+  "Weighted votes against the proposal"
   againstVotes: BigInt!
-  "Votes for the proposal"
+  "Weighted votes for the proposal"
   forVotes: BigInt!
-  "Votes abstaining to the proposal"
+  "Weighted votes abstaining to the proposal"
   abstainVotes: BigInt!
-  "Total for/against/abstaining votes"
+  "Total weighted for/against/abstaining votes"
   totalVotes: BigInt!
   "Votes associated to this proposal"
   votes: [Vote!]! @derivedFrom(field: "proposal")
