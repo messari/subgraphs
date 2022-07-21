@@ -3,6 +3,7 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   FeeSwitch,
   MINIMUM_LIQUIDITY_FIVE_THOUSAND,
+  MINIMUM_LIQUIDITY_TEN_THOUSAND,
   MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
@@ -143,7 +144,7 @@ export class SushiswapMainnetConfigurations implements Configurations {
     ];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
-    return MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND;
+    return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
   getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
     return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
