@@ -129,6 +129,10 @@ Due to the design of Notional, some transactions of different user intention may
 - if before the transaction, the user's fCASH balance is zero or positive, increasing his fCASH balance to a higher positive number indicates he is lending;
 - If before the transaction his fCASH balance is negative, increasing his fCASH balance, i.e. reducing the negative amount or reducing it to zero, indicates that he is repaying a loan. 
 
+Similarly, when a user's fCASH balance decreases after a transaction, then:
+- if before the transaction, the users' fCASH balance is zero or negative, decreasing his fCASH balance indicates he is borrowing;
+- if before the transaction, the user's fCASH balance is positive, decreasing his fCASH balance indicates he is withdrawing.
+
 ### Protocol Level
 The protocol level metrics of the above items is the sum of the same metrics from all pools. In addition, protocol level metric may include stakers staking and unstaking NOTE tokens.
 
