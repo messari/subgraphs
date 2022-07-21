@@ -109,7 +109,8 @@ export function handleReward(
 
   // Calculate Reward Emission per Block to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block
-  let poolRewardTokenRate = masterChef.adjustedRewardTokenRate
+  let poolRewardTokenRate = masterChefPool.multiplier
+    .times(masterChef.adjustedRewardTokenRate)
     .times(masterChefPool.poolAllocPoint)
     .div(masterChef.totalAllocPoint);
 

@@ -126,7 +126,8 @@ export function handleReward(
   masterChefV2.lastUpdatedRewardRate = event.block.number;
 
   // Calculate Reward Emission per Block
-  let poolRewardTokenRate = masterChef.adjustedRewardTokenRate
+  let poolRewardTokenRate = masterChefPool.multiplier
+    .times(masterChef.adjustedRewardTokenRate)
     .times(masterChefPool.poolAllocPoint)
     .div(masterChef.totalAllocPoint);
 
