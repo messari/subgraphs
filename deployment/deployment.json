@@ -544,7 +544,7 @@
       "lido": {
         "ethereum": {
           "template": "lido.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
