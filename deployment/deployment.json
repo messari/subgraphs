@@ -999,7 +999,7 @@
           "template": "platypus.template.yaml",
           "messari": "messari/platypus-finance",
           "aditya-todi": "aditya-todi/platypus-finance-avalanche",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     }
