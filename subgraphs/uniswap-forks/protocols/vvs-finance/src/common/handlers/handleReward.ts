@@ -12,12 +12,8 @@ import {
   INT_ZERO,
   MasterChef,
   RECENT_BLOCK_THRESHOLD,
-  UsageType,
 } from "../../../../../src/common/constants";
-import {
-  getOrCreateRewardToken,
-  getOrCreateToken,
-} from "../../../../../src/common/getters";
+import { getOrCreateToken } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../helpers";
 import {
@@ -31,8 +27,7 @@ import {
 export function handleReward(
   event: ethereum.Event,
   pid: BigInt,
-  amount: BigInt,
-  usageType: string
+  amount: BigInt
 ): void {
   let poolContract = Craftsman.bind(event.address);
   let masterChefPool = getOrCreateMasterChefStakingPool(
@@ -64,18 +59,13 @@ export function handleReward(
   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
     return;
-  } else {
-    pool.rewardTokens = [
-      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-    ];
   }
 
+  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  pool.rewardTokens = [rewardToken.id];
+
   // Update staked amounts
-  if (usageType == UsageType.DEPOSIT) {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
-  } else {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
-  }
+  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
 
   // Return if you have calculated rewards recently - Performance Boost
   if (
@@ -122,9 +112,6 @@ export function handleReward(
     .times(masterChefPool.poolAllocPoint)
     .div(masterChef.totalAllocPoint);
 
-  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
-
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
   let rewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
   let rewardTokenPerDay = getRewardsPerDay(
@@ -149,7 +136,6 @@ export function handleReward(
   masterChefPool.save();
   masterChef.save();
   rewardToken.save();
-  nativeToken.save();
   pool.save();
 }
 
