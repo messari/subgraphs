@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   ProposalCanceled,
   ProposalCreated,
@@ -10,8 +10,8 @@ import {
   VoteCast,
   VotingDelayUpdated,
   VotingPeriodUpdated,
-} from "../../../generated/FeiDAO/FeiDAO";
-import { FeiDAO } from "../../../generated/FeiDAO/FeiDAO";
+} from "../../../generated/Governor/Governor";
+import { Governor } from "../../../generated/Governor/Governor";
 import { GovernanceFramework } from "../../../generated/schema";
 import { GovernanceFrameworkType } from "../../../src/constants";
 import {
@@ -105,7 +105,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
-    let contract = FeiDAO.bind(Address.fromString(contractAddress));
+    let contract = Governor.bind(Address.fromString(contractAddress));
 
     governanceFramework.name = contract.name();
     governanceFramework.type = GovernanceFrameworkType.OPENZEPPELIN_GOVERNOR;
@@ -118,7 +118,10 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework.votingDelay = contract.votingDelay();
     governanceFramework.votingPeriod = contract.votingPeriod();
     governanceFramework.proposalThreshold = contract.proposalThreshold();
-    governanceFramework.quorumVotes = contract.quorumVotes(); // FIXME: OZ -- Only for GovA/B
+
+    // Use start block for quorum at governanceFramework creation
+    const startBlock = new BigInt(13473019);
+    governanceFramework.quorumVotes = contract.quorum(startBlock);
   }
 
   return governanceFramework;
