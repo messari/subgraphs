@@ -1,0 +1,160 @@
+# Subgraph Schema: NFT Marketplace
+# Version: 0.0.1
+
+enum Network {
+  ARBITRUM_ONE
+  ARWEAVE_MAINNET
+  AURORA
+  AVALANCHE
+  BOBA
+  BSC # aka BNB Chain
+  CELO
+  COSMOS
+  CRONOS
+  MAINNET # Ethereum Mainnet
+  FANTOM
+  FUSE
+  HARMONY
+  JUNO
+  MOONBEAM
+  MOONRIVER
+  NEAR_MAINNET
+  OPTIMISM
+  OSMOSIS
+  MATIC # aka Polygon
+  XDAI # aka Gnosis Chain
+}
+
+enum NftStandard {
+    ERC721
+    ERC721A
+    ERC1155
+}
+
+enum SaleStrategy {
+    " Strategy that executes an order at a fixed price that can be taken either by a bid or an ask. "
+    StandardSale
+
+    " Strategy that executes an order at a fixed price that can be matched by any tokenId for the collection. "
+    AnyItemFromCollection
+
+    " Strategy that executes an order at a fixed price that can be matched by any tokenId in a set of tokenIds. "
+    AnyItemFromSet
+
+    " Strategy to launch a Dutch Auction for a token where the price decreases linearly until a specified timestamp and end price defined by the seller. "
+    DutchAuction
+
+    " Strategy to set up an order that can only be executed by a specific address. "
+    PrivateSale
+}
+
+type Marketplace @entity {
+    " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
+    id: ID!
+
+    " Name of the NFT marketplace, for example LooksRare "
+    name: String!
+
+    " The blockchain network this subgraph is indexing on. "
+    network: Network!
+
+    " Number of collections listed on the marketplace. "
+    collectionCount: Int!
+
+    " Cumulative sale volume (in ETH) "
+    cumulativeSaleVolumeETH: BigDecimal!
+
+    " Cumulative sale volume (in USD)"
+    cumulativeSaleVolumeUSD: BigDecimal!
+
+    " Revenue that goes to the marketplace protocol, aka protocol fee. "
+    marketplaceRevenue: BigDecimal!
+
+    " Revenue that goes to creator, aka royalty fee. "
+    creatorRevenue: BigDecimal!
+
+    " Sum of marketplaceRevenue and creatorRevenue. "
+    totalRevenue: BigDecimal!
+
+    " Trade count of the all collections on the marketplace. "
+    totalTradeCount: Int!
+}
+
+type Collection @entity {
+    " Contract address. "
+    id: ID!
+
+    " Collectio name, mirrored from the smart contract. "
+    name: String!
+
+    " Collection symbol, mirrored from the smart contract. "
+    symbol: String!
+
+    " Total supply of the collection, mirrored from the smart contract. "
+    totalSupply: BigInt!
+
+    " NFT Standard the collection uses. "
+    nftStandard: NftStandard!
+
+    " Royalty fee rate in percentage. E.g. 2.5% should be 2.5 "
+    royaltyFee: BigDecimal!
+
+    " Number of tokens for sale in the marketplace. "
+    listedCount: BigInt!
+
+    " Floor price (in ETH) "
+    floorPriceETH: BigDecimal!
+
+    " Floor price (in USD) "
+    floorPriceUSD: BigDecimal!
+
+    " Cumulative trade volume (in ETH) "
+    cumulativeTradeVolumeETH: BigDecimal!
+
+    " Cumulative trade volume (in USD)"
+    cumulativeTradeVolumeUSD: BigDecimal!
+
+    " Revenue that goes to the marketplace protocol, aka protocol fee. "
+    marketplaceRevenue: BigDecimal!
+
+    " Revenue that goes to creator, aka royalty fee. "
+    creatorRevenue: BigDecimal!
+
+    " Sum of marketplaceRevenue and creatorRevenue. "
+    totalRevenue: BigDecimal!
+
+    " Trade count of the collection on the marketplace. "
+    totalTradeCount: Int!
+}
+
+" Trades exist such as a combination of taker/order and bid/ask. "
+type Trade @entity {
+    id: ID!
+
+    " Block timestamp where the trade is executed. "
+    timestamp: BigInt!
+
+    " Block number where the trade is executed. "
+    blockNumber: BigInt!
+
+    " Collection involved "
+    collection: Collection!
+
+    " Token ID of the traded NFT. "
+    tokenId: BigInt!
+
+    " Price (in ETH) "
+    priceETH: BigDecimal!
+
+    " Price (in USD) "
+    priceUSD: BigDecimal!
+
+    " Stretegy that the trade is executed. "
+    strategy: SaleStrategy!
+
+    " Buyer account address "
+    buyer: String!
+
+    " Seller account address "
+    seller: String!
+}
