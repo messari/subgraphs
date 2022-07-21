@@ -57,11 +57,11 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-To be added
+Does not apply to Uniswap V3
 
 ### Protocol Controlled Value
 
-To be added
+Does not apply to Uniswap V3
 
 ## References and Useful Links
 
