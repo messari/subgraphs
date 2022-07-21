@@ -8,7 +8,6 @@ import {
 } from "../../../../../generated/schema";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
 import {
-  getOrCreateRewardToken,
   getOrCreateToken,
 } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
@@ -34,11 +33,10 @@ export function updateMasterChefDeposit(
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
-  } else {
-    pool.rewardTokens = [
-      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-    ];
   }
+
+  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  pool.rewardTokens = [rewardToken.id];
 
   // Get the amount of reward tokens emitted per block at this point in time.
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
@@ -48,9 +46,6 @@ export function updateMasterChefDeposit(
     }
     masterChefV2.lastUpdatedRewardRate = event.block.number;
   }
-
-  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block.
@@ -86,7 +81,6 @@ export function updateMasterChefDeposit(
   masterChefV2Pool.save();
   masterChefV2.save();
   rewardToken.save();
-  nativeToken.save();
   pool.save();
 }
 
@@ -106,11 +100,10 @@ export function updateMasterChefWithdraw(
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
-  } else {
-    pool.rewardTokens = [
-      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-    ];
   }
+
+  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  pool.rewardTokens = [rewardToken.id];
 
   // Get the amount of reward tokens emitted per block at this point in time.
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
@@ -120,9 +113,6 @@ export function updateMasterChefWithdraw(
     }
     masterChefV2.lastUpdatedRewardRate = event.block.number;
   }
-
-  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block.
@@ -155,7 +145,6 @@ export function updateMasterChefWithdraw(
   masterChefV2Pool.save();
   masterChefV2.save();
   rewardToken.save();
-  nativeToken.save();
   pool.save();
 }
 
