@@ -23,7 +23,6 @@ dataSources:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
-
   - kind: ethereum
     name: MasterChef
     network: fantom
@@ -35,9 +34,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities:
-        - _CircularBuffer
-        - RewardToken
+      entities: []
       abis:
         - name: MasterChefSpookyswap
           file: ./abis/spookyswap/MasterChefSpookyswap.json
@@ -110,3 +107,31 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
+  - kind: ethereum/contract
+    name: StakingRewards
+    network: celo
+    source:
+      abi: StakingRewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./protocols/ubeswap/src/mappings/stakingrewards/handleReward.ts
+      entities: []
+      abis:
+        - name: StakingRewards
+          file: ./abis/ubeswap/StakingRewards.json
+        - name: PoolManager
+          file: ./abis/ubeswap/PoolManager.json
+        - name: TokenABI
+          file: ./abis/ubeswap/ERC20.json
+        - name: UniswapV2Pair
+          file: ./abis/ubeswap/UniswapV2Pair.json
+          
+      eventHandlers:
+        - event: Staked(indexed address,uint256)
+          handler: handleStaked
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleWithdrawn
+        - event: RewardPaid(indexed address,uint256)
+          handler: handleRewardPaid

@@ -1,19 +1,7 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Deployment } from "./Deployment";
-import { Box, BoxProps, Typography } from "@mui/material";
-import { styled } from "../styled";
-import { SubgraphLogo } from "../common/SubgraphLogo";
+import { BoxProps } from "@mui/material";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
-import LazyLoad from "react-lazyload";
-
-const Subgraph = styled(Box)`
-  width: 100%;
-`;
-
-const DeploymentContainer = styled("div")`
-  display: flex;
-  flex-wrap: wrap;
-`;
 
 interface SubgraphDeploymentsProps extends BoxProps {
   protocol: {
@@ -39,34 +27,29 @@ export const SubgraphDeployments = ({
   );
 
   return (
-    <Subgraph {...rest}>
-
-      <LazyLoad height={125} offset={70}>
-        <DeploymentContainer>
-          {deployments.map(({ network, deployment }) => {
-            return (
-              <>
-                <Deployment
-                  key={network}
-                  clientIndexing={clientIndexing}
-                  subgraphID={name}
-                  networkName={network}
-                  deployment={deployment}
-                  currentDeployment={true}
-                />
-                <Deployment
-                  key={network}
-                  clientIndexing={clientIndexing}
-                  subgraphID={name}
-                  networkName={network}
-                  deployment={deployment}
-                  currentDeployment={false}
-                />
-              </>
-            );
-          })}
-        </DeploymentContainer>
-      </LazyLoad>
-    </Subgraph>
+    <>
+      {deployments.map(({ network, deployment }) => {
+        return (
+          <>
+            <Deployment
+              key={deployment + "-" + network}
+              clientIndexing={clientIndexing}
+              subgraphID={name}
+              networkName={network}
+              deployment={deployment}
+              currentDeployment={true}
+            />
+            <Deployment
+              key={"pending-" + deployment + "-" + network}
+              clientIndexing={clientIndexing}
+              subgraphID={name}
+              networkName={network}
+              deployment={deployment}
+              currentDeployment={false}
+            />
+          </>
+        );
+      })}
+    </>
   );
 };

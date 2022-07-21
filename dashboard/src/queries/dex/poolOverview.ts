@@ -38,6 +38,9 @@ export const schema120 = (): string => {
           symbol
         }
       }
+      dailySnapshots (first: 2, orderBy:timestamp, orderDirection: desc){
+        dailyVolumeUSD
+      }
       totalValueLockedUSD
       cumulativeVolumeUSD
       outputTokenSupply
@@ -69,6 +72,9 @@ export const schema130 = (): string => {
             name
             symbol
           }
+        }
+        dailySnapshots (first: 2, orderBy:timestamp, orderDirection: desc){
+          dailyVolumeUSD
         }
         totalValueLockedUSD
         cumulativeVolumeUSD

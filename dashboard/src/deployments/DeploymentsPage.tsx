@@ -1,5 +1,4 @@
 import { styled } from "../styled";
-import { SubgraphDeployments } from "./SubgraphDeployments";
 import { useNavigate } from "react-router";
 import { SearchInput } from "../common/utilComponents/SearchInput";
 import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
@@ -74,8 +73,18 @@ function DeploymentsPage() {
         </Typography>
         {Object.keys(ProtocolsToQuery).map((key) => (
           <>
-            <Typography variant="h4" align="center" sx={{ my: 6 }}>{key.toUpperCase()}</Typography>
+            <Typography
+              key={"typography-" + key}
+              variant="h4"
+              align="left"
+              fontWeight={500}
+              fontSize={28}
+              sx={{ padding: "6px", my: 2 }}
+            >
+              {key.toUpperCase()}
+            </Typography>
             <DeploymentsTable
+              key={"depTable-" + key}
               clientIndexing={clientIndexing}
               protocolsOnType={ProtocolsToQuery[key]}
               protocolType={key}

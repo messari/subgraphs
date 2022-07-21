@@ -24,6 +24,9 @@
 - Trader Joe
   - Avalanche
     - Uses the uniswap-v2 codebase as Uniswap V2 for factory and pools. Additionally, it uses a masterchefV2 contract that is templated from Sushiswap's implementation and a masterchefV3 contract that is deployed at a later start block.
+- Ubeswap
+  - Celo
+    - Uses the uniswap-v2 codebase as Uniswap V2 for factory and pools. Additionally, it uses a PoolManager contract that manages and creates staking pools. These staking pools created and monitored using templates where you can get deposit, withdraw, and rewards data. The code for the staking pools are quite different than Sushiswap, because the desired events are stored in the StakingPool contracts created by the PoolManager contract which are instantiated for each pool.
 - Uniswap V2
   - Mainnet
     - Uniswap V2 serves as a base for the deployment of the other subgraphs. The others are forks of uniswap and inherit the baseline functionality for pool creation, pool management, and events like swaps, deposits, and withdraws. The code for these functionailities are the same code used for all forks specified.

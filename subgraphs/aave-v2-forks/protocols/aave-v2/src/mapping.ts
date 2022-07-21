@@ -304,7 +304,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
             Address.fromString(protocol.priceOracle)
           );
         }
-        
+
         let rewardsPerDayUSD = rewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
@@ -421,7 +421,11 @@ function getAssetPriceInUSDC(
       BIGINT_ZERO
     );
 
-    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
   }
 
   // Polygon Oracle returns price in ETH, must convert to USD with following method
@@ -431,7 +435,11 @@ function getAssetPriceInUSDC(
       BIGINT_ZERO
     );
 
-    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
   }
 
   // Avalanche Oracle return the price offset by 8 decimals
