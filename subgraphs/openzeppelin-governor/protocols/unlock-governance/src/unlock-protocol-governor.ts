@@ -110,8 +110,8 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework.version = contract.version();
 
     governanceFramework.contractAddress = contractAddress;
-    governanceFramework.tokenAddress = contract.timelock().toHexString();
-    governanceFramework.timelockAddress = contract.token().toHexString();
+    governanceFramework.tokenAddress = contract.token().toHexString();
+    governanceFramework.timelockAddress = contract.timelock().toHexString();
 
     governanceFramework.votingDelay = contract.votingDelay();
     governanceFramework.votingPeriod = contract.votingPeriod();
