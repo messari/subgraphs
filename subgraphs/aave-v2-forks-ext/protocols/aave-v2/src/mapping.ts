@@ -445,7 +445,11 @@ function getAssetPriceInUSDC(
       BIGINT_ZERO
     );
 
-    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
   }
 
   // Polygon Oracle returns price in ETH, must convert to USD with following method
@@ -455,7 +459,11 @@ function getAssetPriceInUSDC(
       BIGINT_ZERO
     );
 
-    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
   }
 
   // Avalanche Oracle return the price offset by 8 decimals
@@ -463,7 +471,7 @@ function getAssetPriceInUSDC(
     return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
   }
 
-  // last resort, should not be used
+  // last resort, should not be touched
   let inputToken = getOrCreateToken(tokenAddress);
   return oracleResult
     .toBigDecimal()
