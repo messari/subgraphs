@@ -1,9 +1,7 @@
-import { BigInt, BigDecimal, Address, log, Bytes, ByteArray, bigInt, bigDecimal } from "@graphprotocol/graph-ts";
+import { BigInt, BigDecimal, Address } from "@graphprotocol/graph-ts";
 import {
   Swap as SwapEvent,
   PoolBalanceChanged,
-  PoolBalanceManaged,
-  InternalBalanceChanged,
   Vault,
   PoolRegistered,
   TokensRegistered,
@@ -19,7 +17,6 @@ import { BIGINT_ZERO, UsageType, VAULT_ADDRESS } from "../common/constants";
 import { updateWeight } from "../common/weight";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { getLiquidityPool, getLiquidityPoolFee, getOrCreateToken } from "../common/getters";
-import { LiquidityPool } from "../../generated/schema";
 import { SwapFeePercentageChanged } from "../../generated/Vault/LinearPool";
 import { scaleDown } from "../common/tokens";
 

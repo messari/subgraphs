@@ -13,6 +13,7 @@ import {
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
+import { getOrCreateAccount } from "./position";
 import { calculatePrice, fetchPrice, isUSDStable, TokenInfo } from "./pricing";
 import { scaleDown } from "./tokens";
 
@@ -38,8 +39,6 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
   let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
 
-  let protocol = getOrCreateDex();
-
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetricsDaily.blockNumber = event.block.number;
   usageMetricsDaily.timestamp = event.block.timestamp;
@@ -54,6 +53,8 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   } else if (usageType == UsageType.WITHDRAW) {
     usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
   } else if (usageType == UsageType.SWAP) {
+    // We call this here so that we can update the Unique traders for protocol
+    getOrCreateAccount(from, true);
     usageMetricsHourly.hourlySwapCount += INT_ONE;
   }
 
@@ -81,18 +82,12 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
     hourlyActiveAccount.save();
   }
 
-  let account = Account.load(from);
-  if (!account) {
-    account = new Account(from);
-    protocol.cumulativeUniqueUsers += INT_ONE;
-    account.save();
-  }
+  let protocol = getOrCreateDex();
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsDaily.totalPoolCount = protocol.totalPoolCount;
   usageMetricsDaily.save();
   usageMetricsHourly.save();
-  protocol.save();
 }
 
 // Update UsagePoolDailySnapshot entity

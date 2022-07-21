@@ -1,3 +1,5 @@
+import { BigInt } from "@graphprotocol/graph-ts";
+
 export function removeFromArrayAtIndex<T>(x: T[], index: i32): T[] {
   let retval = new Array<T>(x.length - 1);
   let nI = 0;

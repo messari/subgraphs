@@ -17,7 +17,7 @@ import {
   INT_ZERO,
   LiquidityPoolFeeType,
   REWARD_TOKEN,
-  ZERO_ADDRESS,
+  UsageType,
 } from "./constants";
 import { updateTokenPrice, updateVolumeAndFee } from "./metrics";
 import { valueInUSD } from "./pricing";
@@ -25,6 +25,7 @@ import { convertTokenToDecimal } from "./utils/utils";
 import { PoolBalanceChanged } from "../../generated/Vault/Vault";
 import { scaleDown } from "./tokens";
 import { updateWeight } from "./weight";
+import { getOrCreatePosition, updatePositions } from "./position";
 
 export function createLiquidityPool(
   event: ethereum.Event,
@@ -176,14 +177,6 @@ export function createSwapHandleVolume(
 
   // create Swap event
   let swap = new Swap(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
-
-  if (event.transaction.to) {
-    swap.to = event.transaction.to!.toHexString();
-  } else {
-    swap.to = ZERO_ADDRESS;
-  }
-  swap.from = event.transaction.from.toHexString();
-
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();
   swap.protocol = protocol.id;
@@ -198,6 +191,9 @@ export function createSwapHandleVolume(
   swap.amountOut = amountOut;
   swap.amountOutUSD = valueInUSD(amountOutConverted, Address.fromString(tokenOut));
   swap.pool = pool.id;
+  swap.nonce = event.transaction.nonce;
+  swap.gasLimit = event.transaction.gasLimit;
+  swap.gasPrice = event.transaction.gasPrice;
 
   // get amount that should be tracked only - div 2 because cant count both input and output as volume
   let trackedAmountUSD = swap.amountInUSD;
@@ -221,6 +217,7 @@ export function createDepositMulti(event: PoolBalanceChanged, poolAddress: strin
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD);
 
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  let withdrawBalances: BigInt[] = [];
   //recalculate pool tvl
   for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
     let token = getOrCreateToken(pool.inputTokens[i]);
@@ -233,6 +230,7 @@ export function createDepositMulti(event: PoolBalanceChanged, poolAddress: strin
         inputTokenBalances[i] = inputTokenBalances[i].plus(amounts[j]);
         let amountConverted = convertTokenToDecimal(amounts[j], token.decimals);
         amountUSD = amountUSD.plus(amountConverted.times(token.lastPriceUSD!));
+        withdrawBalances.push(amounts[j]);
       }
     }
     let totalConverted = convertTokenToDecimal(inputTokenBalances[i], token.decimals);
@@ -253,14 +251,18 @@ export function createDepositMulti(event: PoolBalanceChanged, poolAddress: strin
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = pool.inputTokens;
   deposit.outputToken = pool.outputToken;
-  deposit.inputTokenAmounts = amounts;
+  deposit.inputTokenAmounts = withdrawBalances;
   deposit.outputTokenAmount = BIGINT_ONE;
-  deposit.pool = pool.id;
   deposit.amountUSD = amountUSD;
-
+  deposit.nonce = event.transaction.nonce;
+  deposit.gasLimit = event.transaction.gasLimit;
+  deposit.gasPrice = event.transaction.gasPrice;
+  let position = getOrCreatePosition(deposit.pool, deposit.account, event);
+  deposit.position = position.id;
   deposit.save();
   pool.save();
   protocol.save();
+  updatePositions(deposit.pool, UsageType.DEPOSIT, deposit.account, event, deposit.id);
 }
 
 export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: string, amounts: BigInt[]): void {
@@ -312,8 +314,13 @@ export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: stri
   withdrawal.outputTokenAmount = BIGINT_ONE;
   withdrawal.pool = pool.id;
   withdrawal.amountUSD = amountUSD;
-
+  withdrawal.nonce = event.transaction.nonce;
+  withdrawal.gasLimit = event.transaction.gasLimit;
+  withdrawal.gasPrice = event.transaction.gasPrice;
+  let position = getOrCreatePosition(withdrawal.pool, withdrawal.account, event);
+  withdrawal.position = position.id;
   withdrawal.save();
   pool.save();
   protocol.save();
+  updatePositions(withdrawal.pool, UsageType.WITHDRAW, withdrawal.account, event, withdrawal.id);
 }

@@ -244,9 +244,11 @@ type DexAmmProtocol implements Protocol @entity {
 
   " Number of cumulative liquidity providers "
   cumulativeUniqueLPs: Int!
+  LPs: [Account!]!
 
   " Number of cumulative traders "
   cumulativeUniqueTraders: Int!
+  traders: [Account!]!
 
   " Total number of open positions "
   openPositionCount: Int!
@@ -685,14 +687,8 @@ type Account @entity {
   " All positions that belong to this account "
   positions: [Position!]! @derivedFrom(field: "account")
 
-  " All open positions this account has "
-  openPositions: [Position!]!
-
   " Number of open positions this account has "
   openPositionCount: Int!
-
-  " All closed positions this account has "
-  closedPositions: [Position!]!
 
   " Number of closed positions this account has "
   closedPositionCount: Int!
@@ -717,7 +713,7 @@ type Account @entity {
 }
 
 type Position @entity {
-  " { Account address }-{ Market address } "
+  " { Account address }-{ Market address }-{ count } "
   id: ID!
 
   " Account that owns this position "
@@ -748,7 +744,7 @@ type Position @entity {
   inputTokenBalances: [BigInt!]!
 
   " Output token balance in this position, in native amounts "
-  outputTokenBalance: BigInt
+  outputTokenBalance: BigInt!
 
   " Total reward token accumulated under this position, in native amounts "
   cumulativeRewardTokenAmounts: [BigInt!]
@@ -1018,4 +1014,11 @@ type Stat @entity {
 type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
+}
+
+type _PositionCounter @entity {
+  " { Account address }-{ Market address } "
+  id: ID!
+  " count for Next postion  "
+  nextCount: Int!
 }

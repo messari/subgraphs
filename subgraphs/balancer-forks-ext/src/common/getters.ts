@@ -31,14 +31,13 @@ import {
   DEFAULT_NETWORK,
   RewardTokenType,
 } from "./constants";
-import { fetchPrice } from "./pricing";
 import { addToArrayAtIndex } from "./utils/arrays";
 
 export function getStat(id: string): Stat {
   let stat = Stat.load(id);
 
   if (!stat) {
-    let stat = new Stat(id);
+    stat = new Stat(id);
     stat.count = BIGINT_ZERO;
     stat.meanAmount = BIGINT_ZERO;
     stat.medianAmount = BIGINT_ZERO;
@@ -53,7 +52,7 @@ export function getStat(id: string): Stat {
     stat.save();
   }
 
-  return stat!;
+  return stat;
 }
 
 export function getOrCreateDex(): DexAmmProtocol {
@@ -72,7 +71,9 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
+    protocol.LPs = [];
     protocol.cumulativeUniqueLPs = INT_ZERO;
+    protocol.traders = [];
     protocol.cumulativeUniqueTraders = INT_ZERO;
     protocol.openPositionCount = INT_ZERO;
     protocol.cumulativePositionCount = INT_ZERO;
