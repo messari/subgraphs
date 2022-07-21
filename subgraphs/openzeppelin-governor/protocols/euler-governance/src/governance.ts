@@ -4,6 +4,7 @@ import {
   ProposalCreated,
   ProposalExecuted,
   ProposalQueued,
+  ProposalThresholdSet,
   QuorumNumeratorUpdated,
   TimelockChange,
   VoteCast,
@@ -55,6 +56,13 @@ export function handleProposalExecuted(event: ProposalExecuted): void {
 // ProposalQueued(proposalId, eta)
 export function handleProposalQueued(event: ProposalQueued): void {
   _handleProposalQueued(event.params.proposalId, event.params.eta);
+}
+
+// ProposalThresholdSet(oldProposalThreshold, newProposalThreshold)
+export function handleProposalThresholdSet(event: ProposalThresholdSet): void {
+  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  governanceFramework.proposalThreshold = event.params.newProposalThreshold;
+  governanceFramework.save();
 }
 
 // QuorumNumeratorUpdated(oldQuorumNumerator, newQuorumNumerator)
