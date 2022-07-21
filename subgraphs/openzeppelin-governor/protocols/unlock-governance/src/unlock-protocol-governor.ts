@@ -19,7 +19,7 @@ import {
 } from "../../../src/handlers";
 import { UnlockProtocolGovernor } from "../../../generated/UnlockProtocolGovernor/UnlockProtocolGovernor";
 import { GovernanceFramework } from "../../../generated/schema";
-import { GovernanceFrameworkType } from "../../../src/constants";
+import { BIGINT_ZERO, GovernanceFrameworkType } from "../../../src/constants";
 
 // ProposalCanceled(proposalId)
 export function handleProposalCanceled(event: ProposalCanceled): void {
@@ -116,8 +116,9 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework.votingDelay = contract.votingDelay();
     governanceFramework.votingPeriod = contract.votingPeriod();
 
-    // Missing from this old version of Governor
-    // governanceFramework.proposalThreshold = contract.proposalThreshold();
+    // Missing from this old version of Governor, default it to Zero
+    governanceFramework.proposalThreshold = BIGINT_ZERO;
+
     const startBlock = new BigInt(13148447);
     governanceFramework.quorumVotes = contract.quorum(startBlock);
   }
