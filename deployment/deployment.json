@@ -569,7 +569,7 @@
         "cosmoshub": {
           "template": "cosmos.template.yaml",
           "messari": "messari/network-cosmos",
-          "dmelotik": "dmelotik/network-cosmos-hub",
+          "dmelotik": "dmelotik/network-cosmoshub",
           "deploy-on-merge": true
         },
         "osmosis": {
@@ -649,7 +649,7 @@
         "polygon": {
           "template": "evm.template.yaml",
           "messari": "messari/network-polygon",
-          "dmelotik": "dmelotik/network-polygon",
+          "dmelotik": "dmelotik/network-matic",
           "deploy-on-merge": true
         },
         "moonbeam": {

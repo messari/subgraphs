@@ -104,6 +104,7 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
   let snapshot = getOrCreateDailySnapshot(blockData.timestamp);
 
   // grab block interval before updating timestamp
+  // newTimestamp - oldTimestamp = interval
   let blockInterval = blockData.timestamp.minus(snapshot.timestamp);
 
   // update overlapping fields for snapshot
@@ -477,6 +478,11 @@ function updatePreviousDailySnapshot(snapshot: DailySnapshot): void {
   if (snapshot.dailyTransactions) {
     updateStatisicalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
   }
+  if (snapshot.dailyBlockInterval) {
+    updateStatisicalData(
+      getOrCreateStats(snapshot.id, DataType.BLOCK_INTERVAL)
+    );
+  }
   if (snapshot.dailyGasPrice) {
     updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
   }
@@ -517,6 +523,11 @@ function updatePreviousHourlySnapshot(snapshot: HourlySnapshot): void {
   if (snapshot.hourlyTransactions) {
     updateStatisicalData(getOrCreateStats(snapshot.id, DataType.TRANSACTIONS));
   }
+  if (snapshot.hourlyBlockInterval) {
+    updateStatisicalData(
+      getOrCreateStats(snapshot.id, DataType.BLOCK_INTERVAL)
+    );
+  }
   if (snapshot.hourlyGasPrice) {
     updateStatisicalData(getOrCreateStats(snapshot.id, DataType.GAS_PRICE));
   }
@@ -555,7 +566,6 @@ function updateStatisicalData(statsEntity: STATS): void {
 // Variance = Sum( (x - mean)^2 ) / N
 function findVariance(mean: BigDecimal, values: BigInt[]): BigDecimal {
   let sumOfDeviationSquared = BIGDECIMAL_ZERO;
-
   for (let i = 0; i < values.length; i++) {
     let value = values[i].toBigDecimal();
     let deviation = value.minus(mean);
@@ -563,9 +573,11 @@ function findVariance(mean: BigDecimal, values: BigInt[]): BigDecimal {
     sumOfDeviationSquared = sumOfDeviationSquared.plus(deviationSquared);
   }
 
-  return sumOfDeviationSquared.div(
-    BigDecimal.fromString(values.length.toString())
-  );
+  return values.length == 0
+    ? BIGDECIMAL_ZERO
+    : sumOfDeviationSquared.div(
+        BigDecimal.fromString(values.length.toString())
+      );
 }
 
 /////////////////
@@ -607,7 +619,7 @@ function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
 }
 
 function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
-  let id = (timestamp.toI64() / SECONDS_PER_DAY).toString();
+  let id = (timestamp.toI64() / SECONDS_PER_HOUR).toString();
   let hourlySnapshot = HourlySnapshot.load(id);
   if (!hourlySnapshot) {
     hourlySnapshot = new HourlySnapshot(id);
@@ -626,6 +638,7 @@ function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
       1
     ).toString();
     let previousSnapshot = HourlySnapshot.load(previousSnapshotId);
+    log.warning("previous hourly: {}", [previousSnapshotId]);
     if (!previousSnapshot) {
       log.warning(
         "[getOrCreateHourlySnapshot] previous snapshot not found at timestamp: {}",
@@ -656,7 +669,7 @@ export function createBlock(blockData: BlockData): void {
   block.transactionCount = blockData.transactionCount;
   block.rewards = blockData.rewards;
 
-  if (block.gasLimit && block.gasLimit != BIGINT_ZERO && block.gasUsed) {
+  if (block.gasLimit && block.gasLimit > BIGINT_ZERO && block.gasUsed) {
     block.blockUtilization = block
       .gasUsed!.toBigDecimal()
       .div(block.gasLimit!.toBigDecimal())

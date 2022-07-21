@@ -235,6 +235,8 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("1");
   } else if (network == SubgraphNetwork.COSMOS) {
     return BigDecimal.fromString("1");
+  } else if (network == SubgraphNetwork.OSMOSIS) {
+    return BigDecimal.fromString("5");
   } else if (network == SubgraphNetwork.JUNO) {
     return BigDecimal.fromString("6.1");
   } else if (network == SubgraphNetwork.OSMOSIS) {

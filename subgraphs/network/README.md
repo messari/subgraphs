@@ -227,6 +227,7 @@ npm run deploy --SUBGRAPH=network --PROTOCOL=evm --NETWORK=juno --LOCATION=dmelo
 - xDai: https://thegraph.com/hosted-service/subgraph/dmelotik/network-xdai
 - Arweave: https://thegraph.com/hosted-service/subgraph/dmelotik/network-arweave-mainnet
 - Cosmos: https://thegraph.com/hosted-service/subgraph/dmelotik/network-cosmoshub
+- Osmosis: https://thegraph.com/hosted-service/subgraph/dmelotik/network-osmosis
 - Juno: https://thegraph.com/hosted-service/subgraph/dmelotik/network-juno
 - Osmosis: https://thegraph.com/hosted-service/subgraph/dmelotik/network-osmosis
 - NEAR: https://thegraph.com/hosted-service/subgraph/dmelotik/network-near-mainnet
