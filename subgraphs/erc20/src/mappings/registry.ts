@@ -52,7 +52,6 @@ export function createToken(value: JSONValue, userData: Value): void {
 
     // Persist token data if it didn't exist
     let token = Token.load(contractAddress.toHex());
-
     if (token == null) {
       token = new Token(contractAddress.toHex());
       token.name = "";
@@ -64,7 +63,6 @@ export function createToken(value: JSONValue, userData: Value): void {
       token.transferCount = BIGINT_ZERO;
       token.mintCount = BIGINT_ZERO;
       token.burnCount = BIGINT_ZERO;
-
       token.totalSupply = BIGDECIMAL_ZERO;
       token.totalBurned = BIGDECIMAL_ZERO;
       token.totalMinted = BIGDECIMAL_ZERO;

@@ -46,7 +46,6 @@ export function handleTransfer(event: Transfer): void {
       let erc20 = ERC20.bind(event.address);
       let tokenName = erc20.try_name();
       let tokenSymbol = erc20.try_symbol();
-      let initialSupply = erc20.try_totalSupply();
       let tokenDecimals = erc20.try_decimals();
 
       token.name = tokenName.reverted ? "" : tokenName.value;
@@ -54,9 +53,7 @@ export function handleTransfer(event: Transfer): void {
       token.decimals = tokenDecimals.reverted
         ? DEFAULT_DECIMALS
         : tokenDecimals.value;
-      token.totalSupply = initialSupply.reverted
-        ? token.totalSupply
-        : toDecimal(initialSupply.value, token.decimals);
+      token.totalSupply = BIGDECIMAL_ZERO;
     }
 
     if (event.params.value == BIGINT_ZERO) {
@@ -67,13 +64,19 @@ export function handleTransfer(event: Transfer): void {
     let isBurn = event.params.to.toHex() == GENESIS_ADDRESS;
     let isMint = event.params.from.toHex() == GENESIS_ADDRESS;
     let isTransfer = !isBurn && !isMint;
+    let isEventProcessed = false;
 
     if (isBurn) {
-      handleBurnEvent(token, amount, event.params.from, event);
+      isEventProcessed = handleBurnEvent(
+        token,
+        amount,
+        event.params.from,
+        event
+      );
     } else if (isMint) {
-      handleMintEvent(token, amount, event.params.to, event);
+      isEventProcessed = handleMintEvent(token, amount, event.params.to, event);
     } else {
-      // In this case, it will be transfer event.
+      // In this case, it will be a normal transfer event.
       handleTransferEvent(
         token,
         amount,
@@ -84,6 +87,9 @@ export function handleTransfer(event: Transfer): void {
     }
 
     // Updates balances of accounts
+    if (isEventProcessed) {
+      return;
+    }
     if (isTransfer || isBurn) {
       let sourceAccount = getOrCreateAccount(event.params.from);
 
@@ -128,7 +134,15 @@ export function handleBurn(event: Burn): void {
   if (token != null) {
     let amount = toDecimal(event.params.value, token.decimals);
 
-    handleBurnEvent(token, amount, event.params.burner, event);
+    let isEventProcessed = handleBurnEvent(
+      token,
+      amount,
+      event.params.burner,
+      event
+    );
+    if (isEventProcessed) {
+      return;
+    }
 
     // Update source account balance
     let account = getOrCreateAccount(event.params.burner);
@@ -154,7 +168,15 @@ export function handleMint(event: Mint): void {
 
   if (token != null) {
     let amount = toDecimal(event.params.amount, token.decimals);
-    handleMintEvent(token, amount, event.params.to, event);
+    let isEventProcessed = handleMintEvent(
+      token,
+      amount,
+      event.params.to,
+      event
+    );
+    if (isEventProcessed) {
+      return;
+    }
 
     // Update destination account balance
     let account = getOrCreateAccount(event.params.to);
@@ -180,14 +202,20 @@ function handleBurnEvent(
   amount: BigDecimal,
   burner: Bytes,
   event: ethereum.Event
-): void {
+): boolean {
   // Track total supply/burned
   if (token != null) {
-    token.burnCount = token.burnCount.plus(BIGINT_ONE);
     let totalSupply = ERC20.bind(event.address).try_totalSupply();
-    token.totalSupply = totalSupply.reverted
+    let currentTotalSupply = totalSupply.reverted
       ? token.totalSupply
       : toDecimal(totalSupply.value, token.decimals);
+    //If the totalSupply from contract call equals with the totalSupply stored in token entity, it means the burn event was process before.
+    //It happens when the transfer function which transfers to GENESIS_ADDRESS emits both transfer event and burn event.
+    if (currentTotalSupply == token.totalSupply) {
+      return true;
+    }
+    token.totalSupply = token.totalSupply.minus(amount);
+    token.burnCount = token.burnCount.plus(BIGINT_ONE);
     token.totalBurned = token.totalBurned.plus(amount);
 
     let dailySnapshot = getOrCreateTokenDailySnapshot(token, event.block);
@@ -212,6 +240,7 @@ function handleBurnEvent(
     dailySnapshot.save();
     hourlySnapshot.save();
   }
+  return false;
 }
 
 function handleMintEvent(
@@ -219,14 +248,21 @@ function handleMintEvent(
   amount: BigDecimal,
   destination: Bytes,
   event: ethereum.Event
-): void {
+): boolean {
   // Track total token supply/minted
   if (token != null) {
-    token.mintCount = token.mintCount.plus(BIGINT_ONE);
     let totalSupply = ERC20.bind(event.address).try_totalSupply();
-    token.totalSupply = totalSupply.reverted
+    let currentTotalSupply = totalSupply.reverted
       ? token.totalSupply
       : toDecimal(totalSupply.value, token.decimals);
+    //If the totalSupply from contract call equals with the totalSupply stored in token entity, it means the mint event was process before.
+    //It happens when the transfer function which transfers from GENESIS_ADDRESS emits both transfer event and mint event.
+    if (currentTotalSupply == token.totalSupply) {
+      return true;
+    }
+    token.totalSupply = token.totalSupply.plus(amount);
+
+    token.mintCount = token.mintCount.plus(BIGINT_ONE);
     token.totalMinted = token.totalMinted.plus(amount);
 
     let dailySnapshot = getOrCreateTokenDailySnapshot(token, event.block);
@@ -251,6 +287,7 @@ function handleMintEvent(
     dailySnapshot.save();
     hourlySnapshot.save();
   }
+  return false;
 }
 
 function handleTransferEvent(
