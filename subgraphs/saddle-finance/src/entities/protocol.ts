@@ -14,7 +14,9 @@ import {
   LiquidityPool,
 } from "../../generated/schema";
 import {
+  BIGDECIMAL_ZERO,
   DEPLOYER_ADDRESS,
+  INT_ZERO,
   ProtocolType,
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
@@ -24,7 +26,10 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "../utils/constants";
-import { getOrCreatePoolDailySnapshot, getOrCreatePoolHourlySnapshot } from "./pool";
+import {
+  getOrCreatePoolDailySnapshot,
+  getOrCreatePoolHourlySnapshot,
+} from "./pool";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(DEPLOYER_ADDRESS);
@@ -37,7 +42,13 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = ProtocolType.EXCHANGE;
-    protocol.totalPoolCount = 0;
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeUniqueUsers = INT_ZERO;
+    protocol.totalPoolCount = INT_ZERO;
     protocol.save();
   }
   return protocol;
@@ -55,6 +66,12 @@ export function getOrCreateUsageMetricsSnapshot(
     usageMetrics.protocol = protocol.id;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
     usageMetrics.totalPoolCount = protocol.totalPoolCount;
+
+    usageMetrics.dailyActiveUsers = 0;
+    usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.dailyDepositCount = 0;
+    usageMetrics.dailyWithdrawCount = 0;
+    usageMetrics.dailySwapCount = 0;
   }
   usageMetrics.blockNumber = event.block.number;
   usageMetrics.timestamp = event.block.timestamp;
@@ -74,6 +91,12 @@ export function getOrCreateUsageMetricsHourlySnapshot(
     usageMetrics = new UsageMetricsHourlySnapshot(id);
     usageMetrics.protocol = protocol.id;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+
+    usageMetrics.hourlyActiveUsers = 0;
+    usageMetrics.hourlyTransactionCount = 0;
+    usageMetrics.hourlyDepositCount = 0;
+    usageMetrics.hourlyWithdrawCount = 0;
+    usageMetrics.hourlySwapCount = 0;
   }
   usageMetrics.blockNumber = event.block.number;
   usageMetrics.timestamp = event.block.timestamp;
@@ -130,6 +153,10 @@ export function getOrCreateFinancialsSnapshot(
   if (!financialsSnapshot) {
     financialsSnapshot = new FinancialsDailySnapshot(id);
     financialsSnapshot.protocol = protocol.id;
+    financialsSnapshot.dailyVolumeUSD = BIGDECIMAL_ZERO;
+    financialsSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialsSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialsSnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
   financialsSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialsSnapshot.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
@@ -234,9 +261,7 @@ export function addProtocolUSDRevenue(
   poolDailySnapshot.dailySupplySideRevenueUSD =
     poolDailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
   poolDailySnapshot.dailyProtocolSideRevenueUSD =
-    poolDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-      protocolSideRevenueUSD
-    );
+    poolDailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
   poolDailySnapshot.dailyTotalRevenueUSD =
     poolDailySnapshot.dailyTotalRevenueUSD.plus(
       supplySideRevenueUSD.plus(protocolSideRevenueUSD)
@@ -266,4 +291,10 @@ export function updateProtocolTVL(
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.save();
+}
+
+export function incrementProtocolTotalPoolCount(): void {
+  const protocol = getOrCreateProtocol();
+  protocol.totalPoolCount += 1;
+  protocol.save();
 }

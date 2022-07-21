@@ -608,19 +608,19 @@
       "saddle-finance": {
         "arbitrum": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "optimism": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
