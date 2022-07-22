@@ -58,6 +58,15 @@ type Marketplace @entity {
     " The blockchain network this subgraph is indexing on. "
     network: Network!
 
+    " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+    schemaVersion: String!
+
+    " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+    subgraphVersion: String!
+
+    " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
+    methodologyVersion: String!
+
     " Number of collections listed on the marketplace. "
     collectionCount: Int!
 
