@@ -388,6 +388,9 @@ type LiquidityPool @entity {
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
 
+  " inputTokens in native (contract) order "
+  _inputTokensOrdered: [String!]!
+
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 

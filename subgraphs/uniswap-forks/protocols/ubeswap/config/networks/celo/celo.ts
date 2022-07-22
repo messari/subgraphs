@@ -3,7 +3,7 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  MINIMUM_LIQUIDITY_THREE_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
@@ -25,10 +25,10 @@ export class UbeswapCeloConfigurations implements Configurations {
     return Network.CELO;
   }
   getProtocolName(): string {
-    return "ubeswap";
+    return PROTOCOL_NAME;
   }
   getProtocolSlug(): string {
-    return "ubeswap";
+    return PROTOCOL_SLUG;
   }
 
   getSchemaVersion(): string {
@@ -113,6 +113,6 @@ export class UbeswapCeloConfigurations implements Configurations {
     return [];
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+    return MINIMUM_LIQUIDITY_THREE_THOUSAND;
   }
 }

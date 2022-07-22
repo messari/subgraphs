@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -8,6 +8,7 @@ import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 // They also correspond to the ones in `dataSource.network()` after converting to lower case.
 // See below for a complete list:
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
+
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
@@ -205,8 +206,8 @@ export class poolDetail {
       ["Factory Pool H2O", "H2O-USDC Pool", "0x233Ba46B01d2FbF1A31bDBc500702E286d6de218", "false"],
       ["Factory Pool TSD", "TSD-USDC Pool", "0x91BB10D68C72d64a7cE10482b453153eEa03322C", "false"],
       ["Factory Pool MONEY", "MONEY-USDC Pool", "0x27912AE6Ba9a54219d8287C3540A8969FF35500B", "false"],
-      ["Factory Pool dForce USX", "USX-USDC Pool", "0x853ea32391AaA14c112C645FD20BA389aB25C5e0", "false"],
-      ["Factory Pool MAI", "MiMatic-USDC Pool", "0x3B55E45fD6bd7d4724F5c47E0d1bCaEdd059263e", "false"],
+      ["Factory Pool dForce USX", "USX-USDC Pool", "0x89E9EFD9614621309aDA948a761D364F0236eDEA", "false"],
+      ["Factory Pool MAI", "MiMatic-USDC Pool", "0x1abB6Bf97506C9B4AC985F558C4Ee6Eeb9C11F1D", "false"],
 
       // Ignore pools while calculating TVL not in above list
       ["Withdraw Pool MIM", "MIM-Ignore", "0x6c84f0580c8ffab0c716c87e66ab474e4bea97d9", "true"],

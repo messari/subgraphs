@@ -39,6 +39,8 @@ Setting up a new subgraph will require mimicing what is done currently.
 It is quickest to use graph init to grab ABIs and generate reference code. Note that we will only be copying code over. This folder will be deleted once we are done.
 `graph init --product hosted-service danielkhoo/truefi-governance`
 
+Note: If token contract is a proxy, grab the token abi from miniscan.xyz instead.
+
 ### 2) Duplicate existing OZ Governor subgraph
 
 - Under `./abis`, create a new folder with the 2 new ABIs

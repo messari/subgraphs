@@ -27,7 +27,6 @@ export function updateMasterChefDeposit(
   let masterChefV2Pool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV2 + "-" + pid.toString()
   )!;
-  let masterchefV2Contract = MasterChefV2Sushiswap.bind(event.address);
   let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
   // Return if pool does not exist
@@ -40,20 +39,12 @@ export function updateMasterChefDeposit(
     ];
   }
 
-  // Get the amount of reward tokens emitted per block at this point in time.
-  if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
-    let getSushiPerBlock = masterchefV2Contract.try_sushiPerBlock();
-    if (!getSushiPerBlock.reverted) {
-      masterChefV2.adjustedRewardTokenRate = getSushiPerBlock.value;
-    }
-    masterChefV2.lastUpdatedRewardRate = event.block.number;
-  }
-
   let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block.
+  // Adjusted reward token rate is calculated in the MasterChefV1 handler since rewards feed in from MasterChefV1.
   let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
     .times(masterChefV2Pool.poolAllocPoint)
     .div(masterChefV2.totalAllocPoint);
@@ -99,7 +90,6 @@ export function updateMasterChefWithdraw(
   let masterChefV2Pool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV2 + "-" + pid.toString()
   )!;
-  let masterchefV2Contract = MasterChefV2Sushiswap.bind(event.address);
   let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
   // Return if pool does not exist
@@ -112,20 +102,12 @@ export function updateMasterChefWithdraw(
     ];
   }
 
-  // Get the amount of reward tokens emitted per block at this point in time.
-  if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
-    let getSushiPerBlock = masterchefV2Contract.try_sushiPerBlock();
-    if (!getSushiPerBlock.reverted) {
-      masterChefV2.adjustedRewardTokenRate = getSushiPerBlock.value;
-    }
-    masterChefV2.lastUpdatedRewardRate = event.block.number;
-  }
-
   let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block.
+  // The adjusted reward token rate is calculated in the MasterChefV1 handler since rewards feed in from MasterChefV1.
   let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
     .times(masterChefV2Pool.poolAllocPoint)
     .div(masterChefV2.totalAllocPoint);
