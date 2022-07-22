@@ -10,4 +10,4 @@ export const PROTOCOL_NAME = "Trader Joe";
 export const PROTOCOL_SLUG = "trader-joe";
 
 export const TRADER_JOE_AVALANCHE_REWARD_TOKEN_RATE =
-  BigInt.fromI32(30000000000000000000);
+  BigInt.fromI64(30000000000000000000);
