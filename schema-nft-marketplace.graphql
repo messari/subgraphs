@@ -61,6 +61,9 @@ type Marketplace @entity {
     " Number of collections listed on the marketplace. "
     collectionCount: Int!
 
+    " Trade count of the all collections on the marketplace. "
+    tradeCount: Int!
+
     " Cumulative trade volume (in ETH) "
     cumulativeTradeVolumeETH: BigDecimal!
 
@@ -72,9 +75,6 @@ type Marketplace @entity {
 
     " Sum of marketplaceRevenueETH and creatorRevenueETH. "
     totalRevenueETH: BigDecimal!
-
-    " Trade count of the all collections on the marketplace. "
-    totalTradeCount: Int!
 
     " Cumulative unique traders "
     cumulativeUniqueTraders: Int!
@@ -99,7 +99,7 @@ type Collection @entity {
     " Royalty fee rate in percentage. E.g. 2.5% should be 2.5 "
     royaltyFee: BigDecimal!
 
-    " Number of tokens listed for sale in the marketplace. "
+    " Number of tokens listed for trade in the marketplace. "
     listedCount: BigInt!
 
     " Floor price (in ETH) "
@@ -118,7 +118,7 @@ type Collection @entity {
     totalRevenueETH: BigDecimal!
 
     " Trade count of the collection on the marketplace. "
-    totalTradeCount: Int!
+    tradeCount: Int!
 
     " Trades of the collection. "
     trades: [Trade!]! @derivedFrom(field: "collection")
@@ -173,8 +173,8 @@ type MarketplaceDailySnapshot @entity {
     " Number of collections listed on the marketplace. "
     collectionCount: Int!
 
-    " Cumulative sale volume (in ETH) "
-    cumulativeSaleVolumeETH: BigDecimal!
+    " Cumulative trade volume (in ETH) "
+    cumulativeTradeVolumeETH: BigDecimal!
 
     " Revenue that goes to the marketplace protocol, aka protocol fee. "
     marketplaceRevenueETH: BigDecimal!
@@ -186,13 +186,19 @@ type MarketplaceDailySnapshot @entity {
     totalRevenueETH: BigDecimal!
 
     " Trade count of the all collections on the marketplace. "
-    totalTradeCount: Int!
+    tradeCount: Int!
 
     " Cumulative unique traders "
     cumulativeUniqueTraders: Int!
 
     " Daily active traders "
     dailyActiveTraders: Int!
+
+    " Number of traded collections of the day "
+    dailyTradedCollectionCount: Int!
+
+    " Number of traded items of the day "
+    dailyTradedItemCount: Int!
 }
 
 type CollectionDailySnapshot @entity {
@@ -230,5 +236,8 @@ type CollectionDailySnapshot @entity {
     totalRevenueETH: BigDecimal!
 
     " Trade count of the collection on the marketplace. "
-    totalTradeCount: Int!
+    tradeCount: Int!
+
+    " Number of traded items of the day "
+    dailyTradedItemCount: Int!
 }
