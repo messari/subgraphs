@@ -81,6 +81,8 @@ export function getOrCreateProposal(
 
   if (!proposal && createIfNotFound) {
     proposal = new Proposal(id);
+    proposal.tokenHoldersAtStart = BIGINT_ZERO;
+    proposal.delegatesAtStart = BIGINT_ZERO;
     if (save) {
       proposal.save();
     }
@@ -173,14 +175,14 @@ export function _handleProposalCreated(
   proposer = getOrCreateDelegate(proposerAddr);
 
   proposal.proposer = proposer.id;
-  proposal.delegateAgainstVotes = BIGINT_ZERO;
-  proposal.delegateForVotes = BIGINT_ZERO;
-  proposal.delegateAbstainVotes = BIGINT_ZERO;
-  proposal.delegateTotalVotes = BIGINT_ZERO;
-  proposal.againstVotes = BIGINT_ZERO;
-  proposal.forVotes = BIGINT_ZERO;
-  proposal.abstainVotes = BIGINT_ZERO;
-  proposal.totalVotes = BIGINT_ZERO;
+  proposal.againstDelegateVotes = BIGINT_ZERO;
+  proposal.forDelegateVotes = BIGINT_ZERO;
+  proposal.abstainDelegateVotes = BIGINT_ZERO;
+  proposal.totalDelegateVotes = BIGINT_ZERO;
+  proposal.againstWeightedVotes = BIGINT_ZERO;
+  proposal.forWeightedVotes = BIGINT_ZERO;
+  proposal.abstainWeightedVotes = BIGINT_ZERO;
+  proposal.totalWeightedVotes = BIGINT_ZERO;
   proposal.targets = addressesToStrings(targets);
   proposal.values = values;
   proposal.signatures = signatures;
@@ -262,48 +264,42 @@ export function _handleProposalQueued(proposalId: BigInt, eta: BigInt): void {
 }
 
 export function _handleVoteCast(
-  proposalId: string,
+  proposal: Proposal,
   voterAddress: string,
   weight: BigInt,
   reason: string,
   support: i32,
   event: ethereum.Event
 ): void {
-  let voteId = voterAddress.concat("-").concat(proposalId);
+  let voteId = voterAddress.concat("-").concat(proposal.id);
   let vote = new Vote(voteId);
-  vote.proposal = proposalId;
+  vote.proposal = proposal.id;
   vote.voter = voterAddress;
   vote.weight = weight;
   vote.reason = reason;
   vote.block = event.block.number;
   vote.blockTime = event.block.timestamp;
-
   // Retrieve enum string key by value (0 = Against, 1 = For, 2 = Abstain)
   vote.choice = getVoteChoiceByValue(support);
   vote.save();
 
-  let proposal = getOrCreateProposal(proposalId);
-  if (proposal.state == ProposalState.PENDING) {
-    proposal.state = ProposalState.ACTIVE;
-  }
-
   // Increment respective vote choice counts
   // NOTE: We are counting the weight instead of individual votes
   if (support === 0) {
-    proposal.delegateAgainstVotes =
-      proposal.delegateAgainstVotes.plus(BIGINT_ONE);
-    proposal.againstVotes = proposal.againstVotes.plus(weight);
+    proposal.againstDelegateVotes =
+      proposal.againstDelegateVotes.plus(BIGINT_ONE);
+    proposal.againstWeightedVotes = proposal.againstWeightedVotes.plus(weight);
   } else if (support === 1) {
-    proposal.delegateForVotes = proposal.delegateForVotes.plus(BIGINT_ONE);
-    proposal.forVotes = proposal.forVotes.plus(weight);
+    proposal.forDelegateVotes = proposal.forDelegateVotes.plus(BIGINT_ONE);
+    proposal.forWeightedVotes = proposal.forWeightedVotes.plus(weight);
   } else if (support === 2) {
-    proposal.delegateAbstainVotes =
-      proposal.delegateAbstainVotes.plus(BIGINT_ONE);
-    proposal.abstainVotes = proposal.abstainVotes.plus(weight);
+    proposal.abstainDelegateVotes =
+      proposal.abstainDelegateVotes.plus(BIGINT_ONE);
+    proposal.abstainWeightedVotes = proposal.abstainWeightedVotes.plus(weight);
   }
   // Increment total
-  proposal.delegateTotalVotes = proposal.delegateTotalVotes.plus(BIGINT_ONE);
-  proposal.totalVotes = proposal.totalVotes.plus(weight);
+  proposal.totalDelegateVotes = proposal.totalDelegateVotes.plus(BIGINT_ONE);
+  proposal.totalWeightedVotes = proposal.totalWeightedVotes.plus(weight);
   proposal.save();
 
   // Add 1 to participant's proposal voting count
