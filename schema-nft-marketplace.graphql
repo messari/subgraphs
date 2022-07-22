@@ -75,6 +75,9 @@ type Marketplace @entity {
 
     " Trade count of the all collections on the marketplace. "
     totalTradeCount: Int!
+
+    " Cumulative unique traders "
+    cumulativeUniqueTraders: Int!
 }
 
 type Collection @entity {
@@ -184,6 +187,12 @@ type MarketplaceDailySnapshot @entity {
 
     " Trade count of the all collections on the marketplace. "
     totalTradeCount: Int!
+
+    " Cumulative unique traders "
+    cumulativeUniqueTraders: Int!
+
+    " Daily active traders "
+    dailyActiveTraders: Int!
 }
 
 type CollectionDailySnapshot @entity {
@@ -207,6 +216,9 @@ type CollectionDailySnapshot @entity {
 
     " Cumulative trade volume (in ETH) "
     cumulativeTradeVolumeETH: BigDecimal!
+
+    " Daily trade volume (in ETH) "
+    dailyTradeVolumeETH: BigDecimal!
 
     " Revenue that goes to the marketplace protocol, aka protocol fee. "
     marketplaceRevenueETH: BigDecimal!
