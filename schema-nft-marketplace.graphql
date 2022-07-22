@@ -33,19 +33,19 @@ enum NftStandard {
 
 enum SaleStrategy {
     " Strategy that executes an order at a fixed price that can be taken either by a bid or an ask. "
-    StandardSale
+    STANDARD_SALE
 
     " Strategy that executes an order at a fixed price that can be matched by any tokenId for the collection. "
-    AnyItemFromCollection
+    ANY_ITEM_FROM_COLLECTION
 
     " Strategy that executes an order at a fixed price that can be matched by any tokenId in a set of tokenIds. "
-    AnyItemFromSet
+    ANY_ITEM_FROM_SET
 
     " Strategy to launch a Dutch Auction for a token where the price decreases linearly until a specified timestamp and end price defined by the seller. "
-    DutchAuction
+    DUTCH_AUCTION
 
     " Strategy to set up an order that can only be executed by a specific address. "
-    PrivateSale
+    PRIVATE_SALE
 }
 
 type Marketplace @entity {
