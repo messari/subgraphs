@@ -3,7 +3,7 @@ import { CircularProgress, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -77,6 +77,9 @@ const messagesByLevel = (
       }
       if (issuesArray[x].type === "RATEZERO") {
         issuesMsg = `'${issuesArray[x].fieldName}' has a zero rate.`;
+      }
+      if (issuesArray[x].type === "RATEDEC") {
+        issuesMsg = `'${issuesArray[x].fieldName}' has a rate between 0% and ${issuesArray[x].message}. Check that the decimals on this value are correct.`;
       }
       if (issuesArray[x].type === "EMPTY") {
         issuesMsg = `Entity ${issuesArray[x].fieldName} has no instances. This could mean that the pool was created but no transactions were detected on it.`;

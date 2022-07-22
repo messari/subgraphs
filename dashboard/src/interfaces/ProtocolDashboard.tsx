@@ -468,6 +468,25 @@ function ProtocolDashboard() {
     anyPoolOverviewLoading = true;
   }
 
+  let anyPoolOverviewError = null;
+  if (poolOverviewError5) {
+    anyPoolOverviewError = poolOverviewError5;
+  }
+  if (poolOverviewError4) {
+    anyPoolOverviewError = poolOverviewError4;
+  }
+  if (poolOverviewError3) {
+    anyPoolOverviewError = poolOverviewError3;
+  }
+  if (poolOverviewError2) {
+    anyPoolOverviewError = poolOverviewError2;
+  }
+  if (poolOverviewError) {
+    anyPoolOverviewError = poolOverviewError;
+  }
+
+
+
   let toggleVersion = null;
 
   if (endpoints?.pending) {
@@ -578,7 +597,7 @@ function ProtocolDashboard() {
           protocolTableData={protocolTableData}
           subgraphToQueryURL={subgraphToQuery.url}
           skipAmt={skipAmt}
-          poolOverviewRequest={{ poolOverviewError, poolOverviewLoading: anyPoolOverviewLoading }}
+          poolOverviewRequest={{ poolOverviewError: anyPoolOverviewError, poolOverviewLoading: anyPoolOverviewLoading }}
           poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
           positionsQuery={positionsQuery}
           protocolTimeseriesData={{

@@ -144,7 +144,7 @@ export const Deployment = ({
   if (loading || statusLoading) {
     return (
       <div style={{ display: "inline-block", width: "100%" }}>
-        <CircularProgress sx={{ margin: 2 }} size={10} />
+        <CircularProgress sx={{ margin: "10px" }} size={"33px"} />
       </div>
     );
   }
@@ -168,15 +168,13 @@ export const Deployment = ({
 
   return (
     <TableRow sx={{ width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }} onClick={navigateToSubgraph(endpointURL)}>
-      <TableCell sx={{ padding: "6px", borderLeft: `${statusColor} solid 6px`, verticalAlign: "middle" }}>
-        <div style={{ display: "flex" }}>
-          <SubgraphLogo name={subgraphID} />
-          <NetworkLogo network={networkName} />
-          <span style={{ display: "inline-flex", alignItems: "center", paddingLeft: "6px", fontSize: "14px" }}>
-            {subgraphID}-{networkName}
-            {!currentDeployment ? " (pending)" : null}
-          </span>
-        </div>
+      <TableCell sx={{ padding: "6px", borderLeft: `${statusColor} solid 6px`, verticalAlign: "middle", display: "flex" }}>
+        <SubgraphLogo name={subgraphID} />
+        <NetworkLogo network={networkName} />
+        <span style={{ display: "inline-flex", alignItems: "center", paddingLeft: "6px", fontSize: "14px" }}>
+          {subgraphID}-{networkName}
+          {!currentDeployment ? " (pending)" : null}
+        </span>
       </TableCell>
       <TableCell sx={{ padding: "6px", textAlign: "right" }}>
         <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
@@ -185,12 +183,12 @@ export const Deployment = ({
       </TableCell>
       <TableCell sx={{ padding: "6px", textAlign: "right" }}>
         <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-          {statusData?.chains[0]?.latestBlock?.number || data?._meta?.block?.number}
+          {Number(statusData?.chains[0]?.latestBlock?.number)?.toLocaleString() || Number(data?._meta?.block?.number)?.toLocaleString()}
         </Typography>
       </TableCell>
       <TableCell sx={{ padding: "6px", textAlign: "right" }}>
         <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-          {statusData?.chains[0]?.chainHeadBlock?.number || "?"}
+          {Number(statusData?.chains[0]?.chainHeadBlock?.number)?.toLocaleString() || "?"}
         </Typography>
       </TableCell>
       <TableCell sx={{ padding: "6px", textAlign: "right" }}>
