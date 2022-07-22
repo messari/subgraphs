@@ -53,11 +53,11 @@ export const TablePoolOverview = ({
         headerName: "Base Yield %",
         width: 180,
         renderCell: (params: any) => {
-          const value = Number(params.value.split("//")[0]).toFixed(2) + "%";
+          const value = Number(params?.value?.toString()?.split("//")[0] || params?.value)?.toFixed(2) + "%";
           const cellStyle = { ...tableCellTruncate };
           cellStyle.width = "100%";
           cellStyle.textAlign = "right";
-          const hoverText = params.value.split("//")[1];
+          let hoverText = params?.value?.toString()?.split("//")[1];
           return (
             <Tooltip title={hoverText}>
               <span style={cellStyle}>{value}</span>
@@ -239,9 +239,8 @@ export const TablePoolOverview = ({
             ) {
               issues.push({
                 type: "VAL",
-                message: `${
-                  pool.name || "#" + i + 1 + skipAmt
-                } does not have a valid 'totalBorrowBalanceUSD' value. Neither Reward APR (BORROWER) nor Base Yield could be properly calculated.`,
+                message: `${pool.name || "#" + i + 1 + skipAmt
+                  } does not have a valid 'totalBorrowBalanceUSD' value. Neither Reward APR (BORROWER) nor Base Yield could be properly calculated.`,
                 level: "critical",
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
               });
@@ -263,13 +262,11 @@ export const TablePoolOverview = ({
             ) {
               issues.push({
                 type: "VAL",
-                message: `${
-                  pool.name || "#" + i + 1 + skipAmt
-                } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
+                message: `${pool.name || "#" + i + 1 + skipAmt
+                  } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
                 level: "critical",
-                fieldName: `${
-                  pool.name || "#" + i + 1 + skipAmt
-                }-totalDepositBalanceUSD/totalValueLockedUSD-pool value`,
+                fieldName: `${pool.name || "#" + i + 1 + skipAmt
+                  }-totalDepositBalanceUSD/totalValueLockedUSD-pool value`,
               });
             } else if (pool.totalDepositBalanceUSD) {
               apr = (Number(val) / Number(pool.totalDepositBalanceUSD)) * 100 * 365;
@@ -296,38 +293,38 @@ export const TablePoolOverview = ({
           }
           if (
             Number(apr) === 0 &&
-            issues.filter((x) => x.fieldName === `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPR`)
+            issues.filter((x) => x.fieldName === `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`)
               .length === 0
           ) {
             issues.push({
               type: "RATEZERO",
               message: "",
               level: "warning",
-              fieldName: `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              fieldName: `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             });
           }
           if (
             isNaN(apr) &&
-            issues.filter((x) => x.fieldName === `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPR`)
+            issues.filter((x) => x.fieldName === `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`)
               .length === 0
           ) {
             issues.push({
               type: "NAN",
               message: "",
               level: "critical",
-              fieldName: `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              fieldName: `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             });
           }
           if (
             Number(apr) < 0 &&
-            issues.filter((x) => x.fieldName === `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPR`)
+            issues.filter((x) => x.fieldName === `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`)
               .length === 0
           ) {
             issues.push({
               type: "RATENEG",
               message: "",
               level: "critical",
-              fieldName: `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              fieldName: `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             });
           }
           rewardFactors.push("Token [" + idx + "] " + rewardFactorsStr);
@@ -359,11 +356,17 @@ export const TablePoolOverview = ({
           if (supplierFee) {
             feePercentage = Number(supplierFee.feePercentage);
           }
+          if (feePercentage < 1 && feePercentage !== 0 && issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} LP Fee`).length === 0) {
+            issues.push({
+              type: "RATEDEC",
+              message: "1%",
+              level: "error",
+              fieldName: `${pool.name || "#" + i + 1 + skipAmt} LP Fee`,
+            });
+          }
           const volumeUSD = Number(pool?.dailySnapshots[pool?.dailySnapshots?.length - 1]?.dailyVolumeUSD) || 0;
-          let value = (feePercentage * volumeUSD * 36500) / Number(pool.totalValueLockedUSD);
-          const factorsStr = `(${feePercentage.toFixed(2)} (LP Fee) * ${volumeUSD.toFixed(
-            2,
-          )} (Volume 24h) * 365 * 100) / ${Number(pool.totalValueLockedUSD).toFixed(2)} (TVL) = ${value.toFixed(2)}%`;
+          let value = (feePercentage * volumeUSD * 365) / Number(pool.totalValueLockedUSD);
+          const factorsStr = `(${feePercentage.toFixed(2)} (LP Fee) * ${volumeUSD.toFixed(2)} (Volume 24h) * 365) / ${Number(pool.totalValueLockedUSD).toFixed(2)} (TVL) = ${value.toFixed(2)}%`;
           if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
             value = 0;
             if (issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0) {
