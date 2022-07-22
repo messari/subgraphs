@@ -1,0 +1,263 @@
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: TroveManager
+    network: avalanche
+    source:
+      address: "0x000000000000614c27530d24B5f039EC15A61d8d"
+      abi: TroveManager
+      startBlock: 13441808
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - _Trove
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
+        - LendingProtocol
+        - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
+        - Token
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - ActiveAccount
+        - Account
+        - FinancialsDailySnapshot
+      abis:
+        - name: TroveManager
+          file: ./abis/TroveManager.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: YetiController
+          file: ./abis/YetiController.json
+      eventHandlers:
+        - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
+          handler: handleTroveUpdated
+      file: ./src/mapping/TroveManager.ts
+  - kind: ethereum/contract
+    name: TroveManagerLiquidations
+    network: avalanche
+    source:
+      address: "0x0000000000aDCd24b833604068cBbbb2EEb3a2a3"
+      abi: TroveManagerLiquidations
+      startBlock: 13441817
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - _Trove
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
+        - LendingProtocol
+        - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
+        - Token
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - ActiveAccount
+        - Account
+        - FinancialsDailySnapshot
+      abis:
+        - name: TroveManagerLiquidations
+          file: ./abis/TroveManagerLiquidations.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: YetiController
+          file: ./abis/YetiController.json
+        - name: TroveManager
+          file: ./abis/TroveManager.json
+      eventHandlers:
+        - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
+          handler: handleTroveUpdated
+        - event: TroveLiquidated(indexed address,uint256,uint8)
+          handler: handleTroveLiquidated
+      file: ./src/mapping/TroveManager.ts
+  - kind: ethereum/contract
+    name: TroveManagerRedemptions
+    network: avalanche
+    source:
+      address: "0x00000000000d9c2f60d8e82F2d1C2bed5008DD7d"
+      abi: TroveManagerRedemptions
+      startBlock: 13441825	
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - _Trove
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
+        - LendingProtocol
+        - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
+        - Token
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - ActiveAccount
+        - Account
+        - FinancialsDailySnapshot
+      abis:
+        - name: TroveManagerRedemptions
+          file: ./abis/TroveManagerRedemptions.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: YetiController
+          file: ./abis/YetiController.json
+      eventHandlers:
+        - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
+          handler: handleTroveUpdated
+        - event: Redemption(uint256,uint256,uint256,address[],uint256[])
+          handler: handleRedemption
+      file: ./src/mapping/TroveManager.ts
+  - kind: ethereum/contract
+    name: BorrowerOperations
+    network: avalanche
+    source:
+      address: "0xBBbbbbbBBBBeC8bF32635374c0717C44B5c535eF"
+      abi: BorrowerOperations
+      startBlock: 13442304
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - FinancialsDailySnapshot
+        - LendingProtocol
+        - _Trove
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
+        - Token
+        - ActiveAccount
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - Account
+      abis:
+        - name: BorrowerOperations
+          file: ./abis/BorrowerOperations.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: YetiController
+          file: ./abis/YetiController.json
+
+      eventHandlers:
+        - event: YUSDBorrowingFeePaid(indexed address,uint256)
+          handler: handleYUSDBorrowingFeePaid
+        - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
+          handler: handleTroveUpdated
+      file: ./src/mapping/BorrowerOperations.ts
+  - kind: ethereum/contract
+    name: ActivePool
+    network: avalanche
+    source:
+      address: "0xAAAaaAaaAaDd4AA719f0CF8889298D13dC819A15"
+      abi: ActivePool
+      startBlock: 13442327
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Market
+        - LendingProtocol
+        - Token
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
+        - FinancialsDailySnapshot
+      abis:
+        - name: ActivePool
+          file: ./abis/ActivePool.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: YetiController
+          file: ./abis/YetiController.json
+      eventHandlers:
+        - event: ActivePoolYUSDDebtUpdated(uint256)
+          handler: handleActivePoolYUSDDebtUpdated
+        - event: ActivePoolBalanceUpdated(address,uint256)
+          handler: handleActivePoolAssetBalanceUpdated
+        - event: ActivePoolBalancesUpdated(address[],uint256[])
+          handler: handleActivePoolAssetsBalanceUpdated
+      file: ./src/mapping/ActivePool.ts
+  - kind: ethereum/contract
+    name: CollSurplusPool
+    network: avalanche
+    source:
+      address: "0x5555555598B91C1df1C065E8E3a50fF846653968"
+      abi: CollSurplusPool
+      startBlock: 13442348
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - _Trove
+        - Withdraw
+        - LendingProtocol
+        - Market
+        - Token
+        - ActiveAccount
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - Account
+      abis:
+        - name: CollSurplusPool
+          file: ./abis/CollSurplusPool.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: YetiController
+          file: ./abis/YetiController.json
+      eventHandlers:
+        - event: CollBalanceUpdated(indexed address)
+          handler: handleCollBalanceUpdated
+      file: ./src/mapping/CollSurplusPool.ts
+  - kind: ethereum/contract
+    name: StabilityPool
+    network: avalanche
+    source:
+      address: "0xFFffFfffFff5d3627294FeC5081CE5C5D7fA6451"
+      abi: StabilityPool
+      startBlock: 13442314
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LendingProtocol
+        - Token
+        - FinancialsDailySnapshot
+        - Market
+      abis:
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: YetiController
+          file: ./abis/YetiController.json
+      eventHandlers:
+        - event: StabilityPoolYUSDBalanceUpdated(uint256)
+          handler: handleStabilityPoolYUSDBalanceUpdated
+        - event: StabilityPoolBalancesUpdated(address[],uint256[])
+          handler: handleStabilityPoolBalancesUpdated
+      file: ./src/mapping/StabilityPool.ts

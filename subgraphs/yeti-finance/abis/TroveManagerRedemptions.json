@@ -1,0 +1,298 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_attemptedYUSDAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_actualYUSDAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "YUSDfee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "tokens",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "Redemption",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_debt",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "_tokens",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "_amounts",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum TroveManagerBase.TroveManagerOperation",
+        "name": "operation",
+        "type": "uint8"
+      }
+    ],
+    "name": "TroveUpdated",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "BETA",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DECIMAL_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "NAME",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getEntireSystemColl",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getEntireSystemDebt",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_YUSDamount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_YUSDMaxFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_firstRedemptionHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperPartialRedemptionHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerPartialRedemptionHint",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_partialRedemptionHintAICR",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxIterations",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_redeemer",
+        "type": "address"
+      }
+    ],
+    "name": "redeemCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_YUSDamount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_YUSDMaxFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_target",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_hintAICR",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_collToRedeem",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_redeemer",
+        "type": "address"
+      }
+    ],
+    "name": "redeemCollateralSingle",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_activePoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_defaultPoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_gasPoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_collSurplusPoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_yusdTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_sortedTrovesAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_controllerAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_troveManagerAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setAddresses",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "updateRedemptionsEnabled",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
