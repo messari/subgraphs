@@ -8,7 +8,6 @@ import {
   TableHead,
   TableRow,
   Typography,
-  CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
 import Placeholder from "./Placeholder";
@@ -54,65 +53,63 @@ function DeploymentsTable({ protocolsOnType, clientIndexing, protocolType }: Dep
 
   return (
     <>
-      <div>
-        <TableContainer>
-          <Table stickyHeader>
-            <TableHead sx={{ height: "30px" }}>
-              <TableRow sx={{ height: "30px", width: "100%" }}>
-                {Object.keys(columnLabels).map((x, idx) => {
-                  const style: { [x: string]: string } = {
-                    minWidth: columnLabels[x],
-                    maxWidth: columnLabels[x],
-                    padding: "6px",
-                  };
-                  let textAlign = "left";
-                  if (idx !== 0) {
-                    textAlign = "right";
-                  }
-                  if (idx === Object.keys(columnLabels).length - 1) {
-                    style.paddingRight = "30px";
-                  }
-                  return (
-                    <TableCell key={"column" + x} sx={style}>
-                      <Typography
-                        variant="h5"
-                        fontSize={14}
-                        fontWeight={500}
-                        sx={{ margin: "0", width: "100%", textAlign }}
-                      >
-                        {x}
-                      </Typography>
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            </TableHead>
-            <TableBody sx={{ width: "100%" }}>
-              {Object.keys(deploymentsLoaded).map((protocol) => {
+      <TableContainer>
+        <Table stickyHeader>
+          <TableHead sx={{ height: "30px" }}>
+            <TableRow sx={{ height: "30px", width: "100%" }}>
+              {Object.keys(columnLabels).map((x, idx) => {
+                const style: { [x: string]: string } = {
+                  minWidth: columnLabels[x],
+                  maxWidth: columnLabels[x],
+                  padding: "6px",
+                };
+                let textAlign = "left";
+                if (idx !== 0) {
+                  textAlign = "right";
+                }
+                if (idx === Object.keys(columnLabels).length - 1) {
+                  style.paddingRight = "30px";
+                }
                 return (
-                  <SubgraphDeployments
-                    clientIndexing={clientIndexing}
-                    key={"DeploymentsOnProtocol-" + protocolType + "-" + protocol}
-                    protocol={{ name: protocol, deploymentMap: protocolsOnType[protocol] }}
-                  />
+                  <TableCell key={"column" + x} sx={style}>
+                    <Typography
+                      variant="h5"
+                      fontSize={14}
+                      fontWeight={500}
+                      sx={{ margin: "0", width: "100%", textAlign }}
+                    >
+                      {x}
+                    </Typography>
+                  </TableCell>
                 );
               })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <div>
-          {Object.keys(placeholders).map((deployment) => {
-            return (
-              <LazyLoad key={"dep-" + deployment} height={25} offset={20}>
-                <Placeholder
-                  deploymentsLoaded={deploymentsLoadedState}
-                  deploymentKey={deployment}
-                  setDeploymentsLoaded={(x: any) => setDeploymentsLoaded(x)}
+            </TableRow>
+          </TableHead>
+          <TableBody sx={{ width: "100%" }}>
+            {Object.keys(deploymentsLoaded).map((protocol) => {
+              return (
+                <SubgraphDeployments
+                  clientIndexing={clientIndexing}
+                  key={"DeploymentsOnProtocol-" + protocolType + "-" + protocol}
+                  protocol={{ name: protocol, deploymentMap: protocolsOnType[protocol] }}
                 />
-              </LazyLoad>
-            );
-          })}
-        </div>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <div>
+        {Object.keys(placeholders).map((deployment) => {
+          return (
+            <LazyLoad key={"dep-" + deployment} height={53} offset={100}>
+              <Placeholder
+                deploymentsLoaded={deploymentsLoadedState}
+                deploymentKey={deployment}
+                setDeploymentsLoaded={(x: any) => setDeploymentsLoaded(x)}
+              />
+            </LazyLoad>
+          );
+        })}
       </div>
     </>
   );

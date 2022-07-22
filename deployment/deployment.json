@@ -238,7 +238,7 @@
         "ethereum": {
           "template": "arrakis.finance.template.yaml",
           "messari": "messari/arrakis-finance-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -540,6 +540,14 @@
         }
       }
     },
+    "lido": {
+      "lido": {
+        "ethereum": {
+          "template": "lido.template.yaml",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "liquity": {
       "liquity": {
         "ethereum": {
@@ -600,19 +608,19 @@
       "saddle-finance": {
         "arbitrum": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "optimism": {
           "template": "saddle.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -989,9 +997,9 @@
       "platypus-finance": {
         "avalanche": {
           "template": "platypus.template.yaml",
-          "messari": "messari/platypus-finance",
+          "messari": "messari/platypus-finance-avalanche",
           "aditya-todi": "aditya-todi/platypus-finance-avalanche",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     }

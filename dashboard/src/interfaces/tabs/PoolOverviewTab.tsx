@@ -53,11 +53,11 @@ function PoolOverviewTab({
   const [currentPage, setCurrentPage] = useState(skipAmtParam ? (parseInt(skipAmtParam) + 50) / 50 : 1);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
 
-  if (!!poolOverviewRequest.poolOverviewError && issues.filter((x) => x.fieldName === "PoolOverviewTab").length === 0) {
+  if (poolOverviewRequest.poolOverviewError && issues.filter((x) => x.fieldName === "Pool Overview Tab").length === 0) {
     issues.push({
       message: poolOverviewRequest?.poolOverviewError?.message + ". Refresh and try again.",
       type: "",
-      fieldName: "PoolOverviewTab",
+      fieldName: "Pool Overview Tab",
       level: "critical",
     });
   }

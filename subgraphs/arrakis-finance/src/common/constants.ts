@@ -7,7 +7,7 @@ import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 export const PROTOCOL_NAME = "Arrakis Finance";
 export const PROTOCOL_SLUG = "arrakis-finance";
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.1";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -199,5 +199,12 @@ TOKEN_PRICE_SOURCE_SKIPS.set(
     PriceSource.CURVE_ROUTER,
     PriceSource.UNISWAP_ROUTER,
     PriceSource.SUSHISWAP_ROUTER
+  ]
+);
+TOKEN_PRICE_SOURCE_SKIPS.set(
+  Address.fromString("0x956F47F50A910163D8BF957Cf5846D573E7f87CA"), // FEI
+  // Skip all as bad price is being returned
+  [
+    PriceSource.YEARN,  // Yearn is returning incorrect price
   ]
 );

@@ -4,7 +4,7 @@
     "graftBlock": 0,
     "pools": [
         {
-            "name": "Main USD Pool",
+            "name": "Pool",
             "address": "0x66357dCaCe80431aee0A7507e2E361B7e2402370",
             "startBlock": 7409737
         },
