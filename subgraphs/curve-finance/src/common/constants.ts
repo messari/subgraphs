@@ -1,15 +1,5 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
-////////////////////
-///// Versions /////
-////////////////////
-
-export const PROTOCOL_NAME = "Curve Finance";
-export const PROTOCOL_SLUG = "curve-finance";
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.2";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
-
 ////////////////////////
 ///// Schema Enums /////
 ////////////////////////
@@ -20,17 +10,24 @@ export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
+  export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
   export const AVALANCHE = "AVALANCHE";
+  export const BOBA = "BOBA";
   export const AURORA = "AURORA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
+  export const COSMOS = "COSMOS";
+  export const CRONOS = "CRONOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY";
+  export const JUNO = "JUNO";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
+  export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
 }
@@ -41,13 +38,6 @@ export namespace ProtocolType {
   export const YIELD = "YIELD";
   export const BRIDGE = "BRIDGE";
   export const GENERIC = "GENERIC";
-}
-
-export namespace VaultFeeType {
-  export const MANAGEMENT_FEE = "MANAGEMENT_FEE";
-  export const PERFORMANCE_FEE = "PERFORMANCE_FEE";
-  export const DEPOSIT_FEE = "DEPOSIT_FEE";
-  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
 }
 
 export namespace LiquidityPoolFeeType {
@@ -92,80 +82,48 @@ export namespace UsageType {
   export const SWAP = "SWAP";
 }
 
-//////////////////////////////
-///// Ethereum Addresses /////
-//////////////////////////////
+export namespace RewardIntervalType {
+  export const BLOCK = "BLOCK";
+  export const TIMESTAMP = "TIMESTAMP";
+}
 
-export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export namespace NULL {
+  export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
+  export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
+}
 
-export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+export namespace Protocol {
+  export const NAME = "Curve Finance";
+  export const SLUG = "curve-finance";
+  export const SCHEMA_VERSION = "1.3.0";
+  export const SUBGRAPH_VERSION = "1.0.0";
+  export const METHODOLOGY_VERSION = "1.0.0";
+}
 
-export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
-export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // created block 10042267
-export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // created block 10093341
-
-////////////////////////
-///// Type Helpers /////
-////////////////////////
-
-export const DEFAULT_DECIMALS = 18;
-
-export const USDC_DECIMALS = 6;
-export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
+export const SECONDS_PER_HOUR = 60 * 60;
+export const SECONDS_PER_DAY = 60 * 60 * 24;
+export const MAX_BPS = BigInt.fromI32(10000);
+export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
-export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
-export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
-export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
-export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
-);
-//@ts-ignore
-export const INT_NEGATIVE_ONE = -1 as i32; //@ts-ignore
-export const INT_ZERO = 0 as i32; //@ts-ignore
-export const INT_ONE = 1 as i32; //@ts-ignore
-export const INT_TWO = 2 as i32; //@ts-ignore
-export const INT_FOUR = 4 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
-export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
-export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
-export const BIGDECIMAL_ONE_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
-export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
+export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
+export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 
-/////////////////////
-///// Date/Time /////
-/////////////////////
+export const FEE_DENOMINATOR = BigDecimal.fromString('10000000000')
+export const DEFAULT_POOL_FEE = BigInt.fromString("4000000");
+export const DEFAULT_ADMIN_FEE = BigInt.fromString("5000000000");
 
-export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
-export const SECONDS_PER_HOUR = 60 * 60; // 3600
-export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
-export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
-export const SNAPSHOT_SECONDS = SECONDS_PER_DAY;
+export namespace Mainnet  {
+  export const REGISTRY_ADDRESS = Address.fromString(
+    '0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5'
+  );
 
-////////////////
-///// Misc /////
-////////////////
-
-export const ETH_SYMBOL = "ETH";
-export const ETH_NAME = "Ether";
-
-/////////////////////////////
-///// Protocol Specific /////
-/////////////////////////////
-
-export const FEE_DENOMINATOR_DECIMALS = 10;
-export const CRV_TOKEN = Address.fromString("0xd533a949740bb3306d119cc777fa900ba034cd52");
-export const CRV_POOL_START_BLOCK = 10928474;
-
-export const MISPRICE_TOKENS: string[] = [
-  "0x48759f220ed983db51fa7a8c0d2aab8f3ce4166a",
-  "0x76eb2fe28b36b3ee97f3adae0c69606eedb2a37c",
-  "0x8e595470ed749b85c6f7669de83eae304c2ec68f",
-];
+  export const FACTORY_REGISTRY_ADDRESS = Address.fromString(
+    '0xB9fC157394Af804a3578134A6585C0dc9cc990d4'
+  );
+}

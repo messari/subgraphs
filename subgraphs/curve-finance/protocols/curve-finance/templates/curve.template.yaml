@@ -1,14 +1,15 @@
-specVersion: 0.0.4
+specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
+  {{#registries}}
 
   - kind: ethereum
-    name: Pool_Registry
-    network: mainnet
+    name: {{ name }}
+    network: {{ chain }}
     source:
-      address: "0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"
-      startBlock: 12195750
+      address: "{{ address }}"
+      startBlock: {{ startBlock }}
       abi: Registry
     mapping:
       kind: ethereum/events
@@ -38,42 +39,7 @@ dataSources:
         - event: LiquidityGaugeDeployed(address,address)
           handler: handleLiquidityGaugeDeployed
       file: ./src/mappings/registryMappings.ts
-
-  - kind: ethereum
-    name: Factory_Registry
-    network: mainnet
-    source:
-      address: "0xB9fC157394Af804a3578134A6585C0dc9cc990d4"
-      startBlock: 12903979
-      abi: Registry
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - LiquidityPool
-        - Registry
-        - Factory
-      abis:
-        - name: Registry
-          file: ./abis/Registry.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-      eventHandlers:
-        # Pool Registry events
-        - event: PoolAdded(indexed address,bytes)
-          handler: handlePoolAdded
-        
-        # Factory Pool Registry Events
-        - event: BasePoolAdded(address)
-          handler: handleBasePoolAdded
-        - event: PlainPoolDeployed(address[4],uint256,uint256,address)
-          handler: handlePlainPoolDeployed
-        - event: MetaPoolDeployed(address,address,uint256,uint256,address)
-          handler: handleMetaPoolDeployed
-        - event: LiquidityGaugeDeployed(address,address)
-          handler: handleLiquidityGaugeDeployed
-      file: ./src/mappings/registryMappings.ts
+  {{/registries}}
 
 templates:
   - name: PoolTemplate

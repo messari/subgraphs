@@ -1,0 +1,15 @@
+{
+  "chain": "mainnet",
+  "registries": [
+    {
+      "name": "Pool_Registry",
+      "address": "0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5",
+      "startBlock": "12195750"
+    },
+    {
+      "name": "Factory_Registry",
+      "address": "0xB9fC157394Af804a3578134A6585C0dc9cc990d4",
+      "startBlock": "12903979"
+    }
+  ]
+}
