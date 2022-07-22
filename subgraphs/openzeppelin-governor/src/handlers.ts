@@ -154,6 +154,7 @@ export function _handleProposalCreated(
   startBlock: BigInt,
   endBlock: BigInt,
   description: string,
+  quorum: BigInt,
   event: ethereum.Event
 ): void {
   let proposal = getOrCreateProposal(proposalId);
@@ -194,6 +195,7 @@ export function _handleProposalCreated(
       ? ProposalState.ACTIVE
       : ProposalState.PENDING;
   proposal.governanceFramework = event.address.toHexString();
+  proposal.quorumVotes = quorum;
   proposal.save();
 
   // Increment gov proposal count

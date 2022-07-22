@@ -75,6 +75,8 @@ type Proposal @entity {
   proposer: Delegate!
   "State of the proposal"
   state: ProposalState!
+  "The number of votes for a proposal to succeed."
+  quorumVotes: BigInt!
 
   "Unweighted Votes against the proposal"
   delegateAgainstVotes: BigInt!

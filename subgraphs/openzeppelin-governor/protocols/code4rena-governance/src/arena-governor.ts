@@ -30,10 +30,12 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
+  let contract = ArenaGovernor.bind(event.address);
+  let quorum = contract.quorum(event.block.number);
+
   // FIXME: Prefer to use a single object arg for params
   // e.g.  { proposalId: event.params.proposalId, proposer: event.params.proposer, ...}
   // but graph wasm compilation breaks for unknown reasons
-
   _handleProposalCreated(
     event.params.proposalId.toString(),
     event.params.proposer.toHexString(),
@@ -44,6 +46,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
     event.params.startBlock,
     event.params.endBlock,
     event.params.description,
+    quorum,
     event
   );
 }
