@@ -3,6 +3,7 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
+  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
   MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
@@ -82,11 +83,10 @@ export class SushiswapFantomConfigurations implements Configurations {
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
       "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83", // wFTM
-      "0x74b23882a30290451a17c44f4f05243b6b58c76d", // wETH
       "0xad84341756bf337f5a0164515b1f6f993d194e1f", // fUSD
       "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e", // DAI
-      "0x049d68029688eAbF473097a2fC38ef61633A3C7A", // USDT
-      "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
+      "0x74b23882a30290451a17c44f4f05243b6b58c76d", // wETH
+      "0x04068da6c83afcfa0e13ba15a6696662335d5b75", // USDC
     ]);
   }
   getStableCoins(): string[] {
@@ -119,7 +119,10 @@ export class SushiswapFantomConfigurations implements Configurations {
       "0x6160240896d8039b2d901cd59dea95396c94a1c2", // Adult Entertainment Token
     ];
   }
-  getMinimumLiquidityThreshold(): BigDecimal {
+  getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND;
+  }
+  getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
+    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
   }
 }

@@ -3,7 +3,8 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
+  MINIMUM_LIQUIDITY_TEN_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
@@ -87,6 +88,7 @@ export class SushiswapXdaiConfigurations implements Configurations {
       "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // USDC
       "0x4ecaba5870353805a9f068101a40e0f32ed605c6", // USDT
       "0x44fa8e6f47987339850636f88629646662444217", // DAI
+      "0xfe7ed09c4956f7cdb54ec4ffcb9818db2d7025b8", // USDP
     ]);
   }
   getStableCoins(): string[] {
@@ -108,7 +110,10 @@ export class SushiswapXdaiConfigurations implements Configurations {
   getUntrackedTokens(): string[] {
     return [];
   }
-  getMinimumLiquidityThreshold(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+  getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
+    return MINIMUM_LIQUIDITY_TEN_THOUSAND;
+  }
+  getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
+    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
   }
 }

@@ -3,6 +3,7 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
+  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
   MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
@@ -194,7 +195,10 @@ export class UniswapV2MainnetConfigurations implements Configurations {
       // "0xbba477999ed5b067fddbb1fe1797ba026d89eb23", // SPARK
     ];
   }
-  getMinimumLiquidityThreshold(): BigDecimal {
+  getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND;
+  }
+  getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
+    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
   }
 }
