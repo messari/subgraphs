@@ -46,8 +46,70 @@ The timeseries data is important, based off `Network` and adds numerous daily/ho
 
 ### Schema 1.1.0 Explanation
 
+There is a new entity called `STATS` that contains statistical calculations for each field collected.
+
+```ts
+type STATS @entity {
+  " { id of the snapshot this belongs to } - { DataType } "
+  id: ID!
+
+  " Number of times entity has been used in a time data entity "
+  count: Int!
+
+  " The average of all the values "
+  mean: BigDecimal!
+
+  " The middle value when ordered from least to greatest "
+  median: BigDecimal!
+
+  " The maximum value in this entity "
+  max: BigInt!
+
+  " The minimum value in this data set "
+  min: BigInt!
+
+  " List of values in order from smallest to largest "
+  values: [BigInt!]!
+
+  " The sum of all the values "
+  sum: BigInt!
+
+  ##### Calculated Statisitcal Fields #####
+
+  " The standard deviation of all values within this entity "
+  variance: BigDecimal
+
+  " This is the upper quartile where 75% of the values lie "
+  q3: BigDecimal
+
+  " This is the lower quartile where 25% of the values lie "
+  q1: BigDecimal
+}
+```
+
+The fields that will exhibit this type are:
+
+- `dailyUniqueAuthors` measures the number of different authors that mined a block this day. Some of the `STATS` metrics are redunant for this field.
+- `dailyDifficulty`
+- `dailyGasUsed`
+- `dailyGasLimit`
+- `dailyBurntFees`
+- `dailyRewards`
+- `dailySize`
+- `dailyChunks`
+- `dailySupply`
+- `dailyTransactions`
+- `dailyBlockInterval` measures the block interval between blocks throughout a given day.
+
+> All of these fields also apply to `HourlySnapshot`
+
+What was removed?
+
+- The rolling `blocksPerDay` field was removed because it is essentially the same as `dailyBlocks` and this is not an intended use case.
+- A field will be null when it is not available for a given network.
+
 <details>
-<summary>Schema 1.0.0</summary>
+<summary>Deprecated: Schema 1.0.0</summary>
 <br>
 
 - `blockHeight` is the current block height

@@ -130,9 +130,6 @@ type Network @entity {
   " Current supply of the native asset "
   totalSupply: BigInt
 
-  " Current blocks per day emission "
-  blocksPerDay: BigDecimal!
-
   " Statistical analysis of blocks/day from daily snapshots "
   dailyBlocks: STATS!
 
@@ -409,13 +406,4 @@ type Chunk @entity(immutable: true) {
 
   " Gas utilization within this chunk (e.g. gasUsed / gasLimit) "
   chunkUtilization: BigDecimal
-}
-
-type _CircularBuffer @entity {
-  id: ID!
-  blocks: [Int!]!
-  windowStartIndex: Int!
-  nextIndex: Int!
-  bufferSize: Int!
-  blocksPerDay: BigDecimal!
 }
