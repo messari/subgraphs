@@ -17,6 +17,7 @@ import {
 } from "../../../src/handlers";
 import { HOPGovernor } from "../../../generated/HOPGovernor/HOPGovernor";
 import { GovernanceFramework } from "../../../generated/schema";
+import { GovernanceFrameworkType } from "../../../src/constants";
 
 export function handleProposalCanceled(event: ProposalCanceled): void {
   _handleProposalCanceled(event.params.proposalId.toString(), event);
@@ -83,7 +84,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     let contract = HOPGovernor.bind(Address.fromString(contractAddress));
 
     governanceFramework.name = contract.name();
-    governanceFramework.type = "OZGovernor";
+    governanceFramework.type = GovernanceFrameworkType.OPENZEPPELIN_GOVERNOR;
     governanceFramework.version = contract.version();
 
     governanceFramework.contractAddress = contractAddress;

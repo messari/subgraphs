@@ -17,6 +17,7 @@ import {
   AAVE_DECIMALS,
   getNetworkSpecificConstant,
   Protocol,
+  USDC_POS_TOKEN_ADDRESS,
   USDC_TOKEN_ADDRESS,
 } from "./constants";
 import {
@@ -68,6 +69,7 @@ import {
   getOrCreateToken,
 } from "../../../src/helpers";
 import {
+  BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   equalsIgnoreCase,
   exponentToBigDecimal,
@@ -79,6 +81,7 @@ import {
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/templates/LendingPool/AaveIncentivesController";
+import { StakedAave } from "../../../generated/templates/LendingPool/StakedAave";
 import { IPriceOracleGetter } from "../../../generated/templates/LendingPool/IPriceOracleGetter";
 
 function getProtocolData(): ProtocolData {
@@ -283,10 +286,29 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
         let rewardsPerDay = tryRewardInfo.value.value0.times(
           BigInt.fromI32(SECONDS_PER_DAY)
         );
-        let rewardTokenPriceUSD = getAssetPriceInUSDC(
-          tryRewardAsset.value,
-          Address.fromString(protocol.priceOracle)
-        );
+
+        // get price of reward token (if stkAAVE it is tied to the price of AAVE)
+        let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
+        if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
+          // get staked token if possible to grab price of staked token
+          let stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
+          let tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
+          if (!tryStakedToken.reverted) {
+            rewardTokenPriceUSD = getAssetPriceInUSDC(
+              tryStakedToken.value,
+              Address.fromString(protocol.priceOracle)
+            );
+          }
+        }
+
+        // if reward token price was not found then use old method
+        if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
+          rewardTokenPriceUSD = getAssetPriceInUSDC(
+            tryRewardAsset.value,
+            Address.fromString(protocol.priceOracle)
+          );
+        }
+
         let rewardsPerDayUSD = rewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
@@ -423,7 +445,25 @@ function getAssetPriceInUSDC(
       BIGINT_ZERO
     );
 
-    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
+  }
+
+  // Polygon Oracle returns price in ETH, must convert to USD with following method
+  if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
+    let priceUSDCInEth = readValue<BigInt>(
+      oracle.try_getAssetPrice(Address.fromString(USDC_POS_TOKEN_ADDRESS)),
+      BIGINT_ZERO
+    );
+
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
   }
 
   // Avalanche Oracle return the price offset by 8 decimals
@@ -431,7 +471,7 @@ function getAssetPriceInUSDC(
     return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
   }
 
-  // otherwise return the output of the price oracle
+  // last resort, should not be touched
   let inputToken = getOrCreateToken(tokenAddress);
   return oracleResult
     .toBigDecimal()

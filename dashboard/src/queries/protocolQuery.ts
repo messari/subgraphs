@@ -12,6 +12,9 @@ export const ProtocolQuery = gql`
     }
     _meta {
       deployment
+      block {
+        number
+      }
     }
   }
 `;

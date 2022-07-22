@@ -5,7 +5,9 @@ import { Network, ZERO_ADDRESS } from "../../../src/constants";
 ///// Ethereum Addresses /////
 //////////////////////////////
 
-export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; // ETH
+export const USDC_POS_TOKEN_ADDRESS =
+  "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"; // Polygon
 
 /////////////////////////////
 ///// Protocol Specific /////

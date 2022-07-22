@@ -19,7 +19,7 @@ export const schema = (version: string): string => {
 export const schema120 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        markets(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+        markets(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
             id
             name
             inputToken {
@@ -80,14 +80,6 @@ export const schema130 = (): string => {
             id
             name
             inputToken {
-              id
-              decimals
-              name
-              symbol
-            }
-            outputToken {
-              id
-              decimals
               name
               symbol
             }
@@ -95,7 +87,6 @@ export const schema130 = (): string => {
               id
               type
               token {
-                id
                 decimals
                 name
                 symbol
@@ -107,27 +98,9 @@ export const schema130 = (): string => {
               rate
               type
             }
-            isActive
-            canUseAsCollateral
-            canBorrowFrom
-            maximumLTV
-            liquidationThreshold
-            liquidationPenalty
             totalValueLockedUSD
-            cumulativeSupplySideRevenueUSD
-            cumulativeProtocolSideRevenueUSD
-            cumulativeTotalRevenueUSD
-            totalDepositBalanceUSD
-            cumulativeDepositUSD
             totalBorrowBalanceUSD
-            cumulativeBorrowUSD
-            cumulativeLiquidateUSD
-            inputTokenBalance
-            inputTokenPriceUSD
-            outputTokenSupply
-            outputTokenPriceUSD
-            exchangeRate
-            rewardTokenEmissionsAmount
+            totalDepositBalanceUSD
             rewardTokenEmissionsUSD
         }
     }`;
@@ -136,16 +109,10 @@ export const schema130 = (): string => {
 export const schema201 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        markets(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+        markets(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
             id
             name
             inputToken {
-              id
-              decimals
-              name
-              symbol
-            }
-            outputToken {
               id
               decimals
               name
@@ -156,7 +123,6 @@ export const schema201 = (): string => {
               type
               token {
                 id
-                decimals
                 name
                 symbol
               }
@@ -167,28 +133,11 @@ export const schema201 = (): string => {
               rate
               type
             }
-            isActive
-            canUseAsCollateral
-            canBorrowFrom
-            maximumLTV
-            liquidationThreshold
-            liquidationPenalty
             totalValueLockedUSD
-            cumulativeSupplySideRevenueUSD
-            cumulativeProtocolSideRevenueUSD
-            cumulativeTotalRevenueUSD
-            totalDepositBalanceUSD
-            cumulativeDepositUSD
-            totalBorrowBalanceUSD
-            cumulativeBorrowUSD
-            cumulativeLiquidateUSD
-            inputTokenBalance
-            inputTokenPriceUSD
-            outputTokenSupply
-            outputTokenPriceUSD
-            exchangeRate
-            rewardTokenEmissionsAmount
             rewardTokenEmissionsUSD
+            totalBorrowBalanceUSD
+            totalDepositBalanceUSD
+
 
             positionCount
             openPositionCount

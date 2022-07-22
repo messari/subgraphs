@@ -17,24 +17,15 @@ export const schema = (version: string): string => {
 
 export const schema120 = (): string => {
   return `
-    query Data($skipAmt: Int!) {
-        liquidityPools(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
-            id
+  query Data($skipAmt: Int!) {
+    liquidityPools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+      id
       name
-      symbol
-      fees{
+      fees {
         feePercentage
         feeType
       }
       inputTokens{
-        id
-        decimals
-        name
-        symbol
-      }
-      outputToken {
-        id
-        decimals
         name
         symbol
       }
@@ -42,46 +33,34 @@ export const schema120 = (): string => {
         id
         type
         token {
-          id
           decimals
           name
           symbol
         }
       }
+      dailySnapshots (first: 2, orderBy:timestamp, orderDirection: desc){
+        dailyVolumeUSD
+      }
       totalValueLockedUSD
       cumulativeVolumeUSD
-      inputTokenBalances
-      inputTokenWeights
       outputTokenSupply
-      outputTokenPriceUSD
       stakedOutputTokenAmount
-      rewardTokenEmissionsAmount
       rewardTokenEmissionsUSD
-        }
-    }`;
+    }
+  }`;
 };
 
 export const schema130 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-      liquidityPools(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+      liquidityPools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
         id
         name
-        symbol
         fees {
           feePercentage
           feeType
         }
-        isSingleSided
         inputTokens{
-          id
-          decimals
-          name
-          symbol
-        }
-        outputToken {
-          id
-          decimals
           name
           symbol
         }
@@ -89,23 +68,18 @@ export const schema130 = (): string => {
           id
           type
           token {
-            id
             decimals
             name
             symbol
           }
         }
+        dailySnapshots (first: 2, orderBy:timestamp, orderDirection: desc){
+          dailyVolumeUSD
+        }
         totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
         cumulativeVolumeUSD
-        inputTokenBalances
-        inputTokenWeights
         outputTokenSupply
-        outputTokenPriceUSD
         stakedOutputTokenAmount
-        rewardTokenEmissionsAmount
         rewardTokenEmissionsUSD
       }
     }`;

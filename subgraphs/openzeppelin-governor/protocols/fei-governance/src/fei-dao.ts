@@ -13,6 +13,7 @@ import {
 } from "../../../generated/FeiDAO/FeiDAO";
 import { FeiDAO } from "../../../generated/FeiDAO/FeiDAO";
 import { GovernanceFramework } from "../../../generated/schema";
+import { GovernanceFrameworkType } from "../../../src/constants";
 import {
   _handleProposalCreated,
   _handleProposalCanceled,
@@ -107,7 +108,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     let contract = FeiDAO.bind(Address.fromString(contractAddress));
 
     governanceFramework.name = contract.name();
-    governanceFramework.type = "OZGovernor";
+    governanceFramework.type = GovernanceFrameworkType.OPENZEPPELIN_GOVERNOR;
     governanceFramework.version = contract.version();
 
     governanceFramework.contractAddress = contractAddress;

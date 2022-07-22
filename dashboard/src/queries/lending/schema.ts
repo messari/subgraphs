@@ -218,6 +218,7 @@ export const schema120 = (): Schema => {
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
+        protocolControlledValueUSD
         totalDepositBalanceUSD
         cumulativeDepositUSD
         totalBorrowBalanceUSD
@@ -359,6 +360,7 @@ export const schema120 = (): Schema => {
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",
+    protocolControlledValueUSD: "BigDecimal",
     totalDepositBalanceUSD: "BigDecimal!",
     cumulativeDepositUSD: "BigDecimal!",
     totalBorrowBalanceUSD: "BigDecimal!",
@@ -601,6 +603,7 @@ export const schema130 = (): Schema => {
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
+        protocolControlledValueUSD
         totalPoolCount
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
@@ -750,6 +753,7 @@ export const schema130 = (): Schema => {
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",
+    protocolControlledValueUSD: "BigDecimal",
     totalPoolCount: "Int!",
     totalDepositBalanceUSD: "BigDecimal!",
     cumulativeDepositUSD: "BigDecimal!",
@@ -998,7 +1002,6 @@ export const schema201 = (): Schema => {
       openPositionCount
       cumulativePositionCount
       totalValueLockedUSD
-      protocolControlledValueUSD
       cumulativeSupplySideRevenueUSD
       cumulativeProtocolSideRevenueUSD
       cumulativeTotalRevenueUSD

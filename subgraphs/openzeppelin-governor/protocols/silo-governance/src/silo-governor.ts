@@ -20,6 +20,7 @@ import {
   _handleVoteCast,
 } from "../../../src/handlers";
 import { GovernanceFramework } from "../../../generated/schema";
+import { GovernanceFrameworkType } from "../../../src/constants";
 
 // ProposalCanceled(proposalId)
 export function handleProposalCanceled(event: ProposalCanceled): void {
@@ -111,7 +112,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     let contract = SiloGovernor.bind(Address.fromString(contractAddress));
 
     governanceFramework.name = contract.name();
-    governanceFramework.type = "OZGovernor";
+    governanceFramework.type = GovernanceFrameworkType.OPENZEPPELIN_GOVERNOR;
     governanceFramework.version = contract.version();
 
     governanceFramework.contractAddress = contractAddress;

@@ -23,5 +23,5 @@ interface NetworkLogoProps {
 }
 
 export const NetworkLogo = ({ network }: NetworkLogoProps) => {
-  return <Avatar sx={{ width: 24, height: 24 }} src={NetworkLogos[network] ?? ""} />;
+  return <Avatar src={NetworkLogos[network] ?? ""} />;
 };

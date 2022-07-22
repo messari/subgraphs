@@ -230,6 +230,7 @@ function closePosition(
 ): void {
   position.blockNumberClosed = event.block.number;
   position.hashClosed = event.transaction.hash.toHexString();
+  position.timestampClosed = event.block.timestamp;
   if (position.side == PositionSide.LENDER) {
     position.isCollateral = false;
   }
