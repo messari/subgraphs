@@ -1,4 +1,4 @@
-import { ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { ethereum, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefV2Sushiswap } from "../../../../../generated/MasterChefV2/MasterChefV2Sushiswap";
 import {
@@ -6,7 +6,11 @@ import {
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
+import {
+  BIGINT_ZERO,
+  INT_ZERO,
+  MasterChef,
+} from "../../../../../src/common/constants";
 import {
   getOrCreateRewardToken,
   getOrCreateToken,
@@ -45,9 +49,20 @@ export function updateMasterChefDeposit(
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block.
   // Adjusted reward token rate is calculated in the MasterChefV1 handler since rewards feed in from MasterChefV1.
-  let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
-    .times(masterChefV2Pool.poolAllocPoint)
-    .div(masterChefV2.totalAllocPoint);
+  let rewardAmountPerInterval: BigInt;
+  if (masterChefV2.totalAllocPoint != BIGINT_ZERO) {
+    rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
+      .times(masterChefV2Pool.poolAllocPoint)
+      .div(masterChefV2.totalAllocPoint);
+  } else {
+    rewardAmountPerInterval = BIGINT_ZERO;
+    log.warning(
+      "TOTAL ALLOC POINT IS ZERO. POOL ALLOC POINT IS: " +
+        masterChefV2Pool.poolAllocPoint.toString(),
+      []
+    );
+  }
+
   let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
@@ -108,12 +123,25 @@ export function updateMasterChefWithdraw(
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block.
   // The adjusted reward token rate is calculated in the MasterChefV1 handler since rewards feed in from MasterChefV1.
-  let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
-    .times(masterChefV2Pool.poolAllocPoint)
-    .div(masterChefV2.totalAllocPoint);
+  let rewardAmountPerInterval: BigInt;
+  if (masterChefV2.totalAllocPoint != BIGINT_ZERO) {
+    rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
+      .times(masterChefV2Pool.poolAllocPoint)
+      .div(masterChefV2.totalAllocPoint);
+  } else {
+    rewardAmountPerInterval = BIGINT_ZERO;
+    log.warning(
+      "TOTAL ALLOC POINT IS ZERO. POOL ALLOC POINT IS: " +
+        masterChefV2Pool.poolAllocPoint.toString(),
+      []
+    );
+  }
+
   let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
+
+  // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
   let rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
@@ -121,6 +149,7 @@ export function updateMasterChefWithdraw(
     masterChefV2.rewardTokenInterval
   );
 
+  // Update the amount of staked tokens after withdraw
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
