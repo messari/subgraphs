@@ -129,6 +129,12 @@ type Collection @entity {
     " Trade count of the collection on the marketplace. "
     tradeCount: Int!
 
+    " Buyer count. "
+    buyerCount: Int!
+
+    " Seller count. "
+    sellerCount: Int!
+
     " Trades of the collection. "
     trades: [Trade!]! @derivedFrom(field: "collection")
 }
