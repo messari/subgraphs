@@ -135,11 +135,14 @@ type Collection @entity {
 
 " Trades exist such as a combination of taker/order and bid/ask. "
 type Trade @entity {
-    " { Transaction hash }-{ Log index } "
+    " { maker txn hash }-{ taker txn hash } "
     id: ID!
 
-    " Transaction hash of the trade. "
-    transactionHash: String!
+    " Transaction hash of the maker. "
+    makerTransactionHash: String!
+
+    " Transaction hash of the taker. "
+    takerTransactionHash: String!
 
     " Event log index. "
     logIndex: Int!
