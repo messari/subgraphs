@@ -5,19 +5,18 @@ import {
   EmergencyWithdraw,
 } from "../../../../../generated/MasterChef/MasterChefSpiritSwap";
 import { _HelperStore } from "../../../../../generated/schema";
-import { UsageType } from "../../../../../src/common/constants";
+import { BIGINT_NEG_ONE } from "../../../../../src/common/constants";
 import { handleReward } from "../../common/handlers/handleReward";
 
 export function handleDeposit(event: DepositEvent): void {
-  handleReward(event, event.params.pid, event.params.amount, UsageType.DEPOSIT);
+  handleReward(event, event.params.pid, event.params.amount);
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {
   handleReward(
     event,
     event.params.pid,
-    event.params.amount,
-    UsageType.WITHDRAW
+    event.params.amount.times(BIGINT_NEG_ONE)
   );
 }
 
@@ -25,7 +24,6 @@ export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
   handleReward(
     event,
     event.params.pid,
-    event.params.amount,
-    UsageType.WITHDRAW
+    event.params.amount.times(BIGINT_NEG_ONE)
   );
 }

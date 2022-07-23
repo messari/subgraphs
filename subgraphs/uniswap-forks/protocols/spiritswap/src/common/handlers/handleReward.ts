@@ -7,7 +7,6 @@ import {
   BIGINT_ONE,
   BIGINT_ZERO,
   INT_ZERO,
-  UsageType,
   ZERO_ADDRESS,
 } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
@@ -16,8 +15,7 @@ import { getRewardsPerDay } from "../../../../../src/common/rewards";
 export function handleReward(
   event: ethereum.Event,
   pid: BigInt,
-  amount: BigInt,
-  usageType: string
+  amount: BigInt
 ): void {
   let masterChefPool = _HelperStore.load(pid.toString());
   let poolContract = MasterChefSpiritSwap.bind(event.address);
@@ -43,11 +41,7 @@ export function handleReward(
   }
 
   // Update staked amounts
-  if (usageType == UsageType.DEPOSIT) {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
-  } else {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
-  }
+  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
 
   // Return if you have calculated rewards recently
   if (event.block.number.minus(masterChefPool.valueBigInt!).lt(BIGINT_FIVE)) {
