@@ -17,12 +17,13 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
+import { getUsdPricePerToken } from "../prices";
 
 export function createDepositTransaction(
   liquidityPool: LiquidityPoolStore,
   inputTokens: string[],
   inputTokenAmounts: BigInt[],
-  outputTokenAmount: BigInt,
+  outputTokenMintedAmount: BigInt,
   amountUSD: BigDecimal,
   provider: Address,
   transaction: ethereum.Transaction,
@@ -48,7 +49,7 @@ export function createDepositTransaction(
     depositTransaction.inputTokenAmounts = inputTokenAmounts;
 
     depositTransaction.outputToken = liquidityPool.outputToken;
-    depositTransaction.outputTokenAmount = outputTokenAmount;
+    depositTransaction.outputTokenAmount = outputTokenMintedAmount;
 
     depositTransaction.amountUSD = amountUSD;
 
@@ -79,8 +80,8 @@ export function UpdateMetricsAfterDeposit(block: ethereum.Block): void {
 
 export function Deposit(
   liquidityPoolAddress: Address,
-  depositAmounts: BigInt[],
-  totalSupply: BigInt,
+  depositedCoinAmounts: BigInt[],
+  totalSupplyAfterDeposit: BigInt,
   fees: BigInt[],
   provider: Address,
   transaction: ethereum.Transaction,
@@ -90,33 +91,39 @@ export function Deposit(
 
   let inputTokens: string[] = [];
   let inputTokenAmounts: BigInt[] = [];
-  let outputTokenAmount = constants.BIGINT_ZERO;
   let inputTokenBalances = pool.inputTokenBalances;
   let depositAmountUSD = constants.BIGDECIMAL_ZERO;
+  let outputTokenMintedAmount = totalSupplyAfterDeposit.minus(pool.outputTokenSupply!);
 
-  for (let idx = 0; idx < depositAmounts.length; idx++) {
+  for (let idx = 0; idx < depositedCoinAmounts.length; idx++) {
     let inputToken = utils.getOrCreateTokenFromString(pool.inputTokens[idx]);
     let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
-    // TODO: Price USD
-    let inputTokenPrice = constants.BIGDECIMAL_ZERO;
-    
-    inputTokenBalances[inputTokenIndex] = inputTokenBalances[inputTokenIndex].plus(depositAmounts[idx]);
-    
-    inputTokenAmounts.push(depositAmounts[idx]);
+
+    let inputTokenAddress = Address.fromString(inputToken.id);
+    let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+    let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
+
+    inputTokenBalances[inputTokenIndex] = inputTokenBalances[
+      inputTokenIndex
+    ].plus(depositedCoinAmounts[idx]);
+
+    inputTokenAmounts.push(depositedCoinAmounts[idx]);
     inputTokens.push(inputToken.id);
-    
-    // TODO: Price USD
-    depositAmountUSD = depositAmountUSD.plus(constants.BIGDECIMAL_ZERO);
+
+    depositAmountUSD = depositAmountUSD
+      .div(inputTokenDecimals)
+      .times(inputTokenPrice.usdPrice)
+      .div(inputTokenPrice.decimalsBaseTen);
   }
 
-  pool.outputTokenSupply = totalSupply;
+  pool.outputTokenSupply = totalSupplyAfterDeposit;
   pool.save();
 
   createDepositTransaction(
     pool,
     inputTokens,
     inputTokenAmounts,
-    outputTokenAmount,
+    outputTokenMintedAmount,
     depositAmountUSD,
     provider,
     transaction,
@@ -129,7 +136,13 @@ export function Deposit(
   UpdateMetricsAfterDeposit(block);
 
   log.info(
-    "[AddLiquidity] LiquidityPool: {}, sharesMinted: {}, depositAmount: {}, depositAmountUSD: {}, TxnHash: {}",
-    []
+    "[AddLiquidity] LiquidityPool: {}, sharesMinted: {}, depositAmount: [{}], depositAmountUSD: {}, TxnHash: {}",
+    [
+      liquidityPoolAddress.toHexString(),
+      outputTokenMintedAmount.toString(),
+      depositedCoinAmounts.join(', '),
+      depositAmountUSD.truncate(2).toString(),
+      transaction.hash.toHexString()
+    ]
   );
 }

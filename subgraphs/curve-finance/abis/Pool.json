@@ -914,5 +914,13 @@
     "inputs": [],
     "outputs": [{ "name": "", "type": "address" }],
     "gas": 4416
+  },
+  {
+    "name": "lp_token",
+    "outputs": [{ "type": "address", "name": "" }],
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 2291
   }
 ]

@@ -19,6 +19,7 @@ import {
 import * as utils from "../common/utils";
 import { updateTokenVolume } from "./Metrics";
 import * as constants from "../common/constants";
+import { getUsdPricePerToken } from "../prices";
 
 export function createSwapTransaction(
   liquidityPool: LiquidityPoolStore,
@@ -109,9 +110,23 @@ export function Swap(
     tokenOut = underlyingCoins[bought_id.toI32()].toHexString();
   }
 
-  // TODO: Price USD
-  let amountInUSD = amountIn.divDecimal(constants.BIGDECIMAL_NEGATIVE_ONE);
-  let amountOutUSD = amountOut.divDecimal(constants.BIGDECIMAL_NEGATIVE_ONE);
+  let tokenInAddress = Address.fromString(tokenIn);
+  let tokenInDecimals = utils.getTokenDecimals(tokenInAddress);
+  let tokenInPrice = getUsdPricePerToken(tokenInAddress);
+
+  const amountInUSD = amountIn
+    .divDecimal(tokenInDecimals)
+    .times(tokenInPrice.usdPrice)
+    .div(tokenInPrice.decimalsBaseTen);
+
+  let tokenOutAddress = Address.fromString(tokenOut);
+  let tokenOutDecimals = utils.getTokenDecimals(tokenOutAddress);
+  let tokenOutPrice = getUsdPricePerToken(tokenOutAddress);
+
+  const amountOutUSD = amountOut
+    .divDecimal(tokenOutDecimals)
+    .times(tokenOutPrice.usdPrice)
+    .div(tokenOutPrice.decimalsBaseTen);
 
   createSwapTransaction(
     pool,
@@ -148,13 +163,20 @@ export function Swap(
     underlying
   );
 
-  // Balances, PoolTVL, ProtocolTVL 
+  // TODO: Update Balances, PoolTVL, ProtocolTVL
 
   utils.updateProtocolTotalValueLockedUSD();
   UpdateMetricsAfterSwap(block);
 
   log.info(
-    "[AddLiquidity] LiquidityPool: {}, sharesMinted: {}, depositAmount: {}, depositAmountUSD: {}, TxnHash: {}",
-    []
+    "[Exchange] LiquidityPool: {}, tokenIn: {}, tokenOut: {}, amountInUSD: {}, amountOutUSD: {}, TxnHash: {}",
+    [
+      liquidityPoolAddress.toHexString(),
+      tokenIn,
+      tokenOut,
+      amountInUSD.truncate(2).toString(),
+      amountOutUSD.truncate(2).toString(),
+      transaction.hash.toHexString()
+    ]
   );
 }

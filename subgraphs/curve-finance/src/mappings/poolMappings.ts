@@ -17,8 +17,10 @@ import {
   RemoveLiquidityOne1 as RemoveLiquidityOneWithSupply,
 } from "../../generated/templates/PoolTemplate/Pool";
 import { Swap } from "../modules/Swap";
+import * as utils from "../common/utils";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
+import * as constants from "../common/constants";
 
 export function handleTokenExchange(event: TokenExchange): void {
   const buyer = event.params.buyer;
@@ -123,14 +125,14 @@ export function handleAddLiquidityWithFees(event: AddLiquidityWithFees): void {
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   const provider = event.params.provider;
   const liquidityPoolAddress = event.address;
-  const tokenSupply = event.params.token_supply;
-  const tokenAmounts = event.params.token_amounts;
+  const withdrawnCoinAmounts = event.params.token_amounts;
+  const tokenSupplyAfterWithdrawal = event.params.token_supply;
 
   Withdraw(
     liquidityPoolAddress,
-    [], // TODO: inputTokenAmounts
-    tokenAmounts,
-    tokenSupply,
+    withdrawnCoinAmounts,
+    constants.BIGINT_NEGATIVE_ONE,
+    tokenSupplyAfterWithdrawal,
     provider,
     event.transaction,
     event.block
@@ -147,14 +149,14 @@ export function handleRemoveLiquidityWithFees(
   const fees = event.params.fees;
   const provider = event.params.provider;
   const liquidityPoolAddress = event.address;
-  const tokenSupply = event.params.token_supply;
-  const tokenAmounts = event.params.token_amounts;
+  const withdrawnCoinAmounts = event.params.token_amounts;
+  const tokenSupplyAfterWithdrawal = event.params.token_supply;
 
   Withdraw(
     liquidityPoolAddress,
-    [], // TODO: inputTokenAmounts
-    tokenAmounts,
-    tokenSupply,
+    withdrawnCoinAmounts,
+    constants.BIGINT_NEGATIVE_ONE,
+    tokenSupplyAfterWithdrawal,
     provider,
     event.transaction,
     event.block
@@ -170,14 +172,14 @@ export function handleRemoveLiquidityWithFees(
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
   const provider = event.params.provider;
   const liquidityPoolAddress = event.address;
-  const coinAmount = event.params.coin_amount;
-  const tokenAmount = event.params.token_amount;
+  const withdrawnCoinAmounts = event.params.coin_amount;
+  const outputTokenBurntAmount = event.params.token_amount;
 
   Withdraw(
     liquidityPoolAddress,
-    [], // TODO: inputTokenAmounts
-    [tokenAmount],
-    null,
+    [withdrawnCoinAmounts],
+    outputTokenBurntAmount,
+    constants.BIGINT_NEGATIVE_ONE,
     provider,
     event.transaction,
     event.block
@@ -193,15 +195,15 @@ export function handleRemoveLiquidityOneWithSupply(
 ): void {
   const provider = event.params.provider;
   const liquidityPoolAddress = event.address;
-  const coinAmount = event.params.coin_amount;
-  const tokenAmount = event.params.token_amount;
-  const tokenSupply = event.params.token_supply;
+  const withdrawnCoinAmounts = event.params.coin_amount;
+  const outputTokenBurntAmount = event.params.token_amount;
+  const tokenSupplyAfterWithdrawal = event.params.token_supply;
 
   Withdraw(
     liquidityPoolAddress,
-    [], // TODO: inputTokenAmounts
-    [tokenAmount],
-    tokenSupply,
+    [withdrawnCoinAmounts],
+    outputTokenBurntAmount,
+    tokenSupplyAfterWithdrawal,
     provider,
     event.transaction,
     event.block
@@ -219,14 +221,14 @@ export function handleRemoveLiquidityImbalance(
   const provider = event.params.provider;
   const invariant = event.params.invariant;
   const liquidityPoolAddress = event.address;
-  const tokenSupply = event.params.token_supply;
-  const tokenAmounts = event.params.token_amounts;
+  const withdrawnTokenAmounts = event.params.token_amounts;
+  const tokenSupplyAfterWithdrawal = event.params.token_supply;
 
   Withdraw(
     liquidityPoolAddress,
-    [], // TODO: inputTokenAmounts
-    tokenAmounts,
-    tokenSupply,
+    withdrawnTokenAmounts,
+    constants.BIGINT_NEGATIVE_ONE,
+    tokenSupplyAfterWithdrawal,
     provider,
     event.transaction,
     event.block

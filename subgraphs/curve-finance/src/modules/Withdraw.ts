@@ -16,12 +16,13 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 
 export function createWithdrawTransaction(
   pool: LiquidityPoolStore,
   inputTokenAmounts: BigInt[],
-  outputTokenAmount: BigInt,
+  outputTokenBurntAmount: BigInt,
   amountUSD: BigDecimal,
   provider: Address,
   transaction: ethereum.Transaction,
@@ -47,7 +48,7 @@ export function createWithdrawTransaction(
     withdrawTransaction.inputTokenAmounts = inputTokenAmounts;
 
     withdrawTransaction.outputToken = pool.outputToken;
-    withdrawTransaction.outputTokenAmount = outputTokenAmount;
+    withdrawTransaction.outputTokenAmount = outputTokenBurntAmount;
 
     withdrawTransaction.amountUSD = amountUSD;
 
@@ -78,53 +79,79 @@ export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
 
 export function Withdraw(
   liquidityPoolAddress: Address,
-  withdrawTokenAmounts: BigInt[],
-  outputTokenAmount: BigInt[],
-  tokenSupply: BigInt | null = null,
+  withdrawnTokenAmounts: BigInt[],
+  outputTokenBurntAmount: BigInt,
+  tokenSupplyAfterWithdrawal: BigInt,
   provider: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
   const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
 
+  if (outputTokenBurntAmount.equals(constants.BIGINT_NEGATIVE_ONE)) {
+    outputTokenBurntAmount = pool.outputTokenSupply!.minus(
+      tokenSupplyAfterWithdrawal!
+    );
+  }
+  if (tokenSupplyAfterWithdrawal.equals(constants.BIGINT_NEGATIVE_ONE)) {
+    tokenSupplyAfterWithdrawal = pool.outputTokenSupply!.minus(
+      outputTokenBurntAmount
+    );
+  }
+
   let inputTokens: string[] = [];
   let inputTokenAmounts: BigInt[] = [];
   let inputTokenBalances = pool.inputTokenBalances;
   let withdrawAmountUSD = constants.BIGDECIMAL_ZERO;
 
-  for (let idx = 0; idx < withdrawTokenAmounts.length; idx++) {
+  // TODO: Use 0.0.7
+  if (withdrawnTokenAmounts.length == 1) return;
+
+  for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
     let inputToken = utils.getOrCreateTokenFromString(pool.inputTokens[idx]);
     let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
-    // TODO: Price USD
-    let inputTokenPrice = constants.BIGDECIMAL_ZERO;
+    
+    let inputTokenAddress = Address.fromString(inputToken.id);
+    let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+    let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
 
-    inputTokenBalances[inputTokenIndex] = inputTokenBalances[inputTokenIndex].plus(withdrawTokenAmounts[idx]);
+    inputTokenBalances[inputTokenIndex] = inputTokenBalances[
+      inputTokenIndex
+    ].plus(withdrawnTokenAmounts[idx]);
 
-    inputTokenAmounts.push(withdrawTokenAmounts[idx]);
+    inputTokenAmounts.push(withdrawnTokenAmounts[idx]);
     inputTokens.push(inputToken.id);
 
-    // TODO: Price USD
-    withdrawAmountUSD = withdrawAmountUSD.plus(constants.BIGDECIMAL_ZERO);
+    withdrawAmountUSD = withdrawAmountUSD
+      .div(inputTokenDecimals)
+      .times(inputTokenPrice.usdPrice)
+      .div(inputTokenPrice.decimalsBaseTen);
   }
 
   createWithdrawTransaction(
     pool,
     inputTokenAmounts,
-    outputTokenAmount,
+    outputTokenBurntAmount,
     withdrawAmountUSD,
     provider,
     transaction,
     block
   );
 
-  pool.outputTokenSupply = tokenSupply;
+  pool.outputTokenSupply = tokenSupplyAfterWithdrawal;
   pool.save();
 
   utils.updateProtocolTotalValueLockedUSD();
   UpdateMetricsAfterWithdraw(block);
 
   log.info(
-    "[Withdraw] vault: {}, sharesBurnt: {}, withdrawalFee: {}, withdrawalFeeUSD: {}, withdrawAmount: {}, withdrawAmountUSD: {}, outputTokenPriceUSD: {}, TxnHash: {}",
-    []
+    "[RemoveLiquidity] LiquidityPool: {}, sharesBurnt: {}, depositAmount: [{}], depositAmountUSD: {}, TxnHash: {}",
+    [
+      liquidityPoolAddress.toHexString(),
+      outputTokenBurntAmount.toString(),
+      withdrawnTokenAmounts.join(', '),
+      withdrawAmountUSD.truncate(2).toString(),
+      transaction.hash.toHexString()
+    ]
   );
 }
