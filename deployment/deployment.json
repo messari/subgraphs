@@ -238,7 +238,7 @@
         "ethereum": {
           "template": "arrakis.finance.template.yaml",
           "messari": "messari/arrakis-finance-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },

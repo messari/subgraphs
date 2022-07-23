@@ -68,7 +68,7 @@ The subgraph uses the price libs which currently does not support polygon and op
 | icETH        | 0x7c07f7abe10ce8e33dc6c5ad68fe033085256a84 |
 | ETHV         | 0xc53342fd7575f572b0ff4569e31941a5b821ac76 |
 | POP          | 0xd0cd466b34a24fcb2f87676278af2005ca8a78c4 |
-| FAITH.       | 0x30b2de4a95f397545c6509402f235b1be0fa9a14 |
+| FAITH        | 0x30b2de4a95f397545c6509402f235b1be0fa9a14 |
 
 ## Links
 

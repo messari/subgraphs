@@ -111,52 +111,26 @@ export function handleReward(
     masterChef.totalAllocPoint = getTotalAlloc.value;
   }
 
-  // Address where allocation is moved to over time to reduce inflation.
-  // This is like a burn address, so that less reward tokens are minted into circulation over time
-  let getPoolInfo45 = poolContract.try_poolInfo(BigInt.fromI32(45));
-  let masterPoolAllocPID45: BigInt = BIGINT_ZERO;
-  if (!getPoolInfo45.reverted) {
-    masterPoolAllocPID45 = getPoolInfo45.value.value1;
-  }
-
   // Allocation from the MasterChefV2 Contract.
   // This portion of the allocation is fed into the MasterChevV2 contract.
   // This means the proportion of rewards at this allocation will be all rewards emitted by MasterChefV2.
   let getPoolInfo250 = poolContract.try_poolInfo(BigInt.fromI32(250));
-  let masterPoolAllocPID250: BigInt = BIGINT_ZERO;
+  let masterChefV2Alloc: BigInt;
   if (!getPoolInfo250.reverted) {
-    masterPoolAllocPID250 = getPoolInfo250.value.value1;
-    masterChefV2.totalAllocPoint = masterPoolAllocPID250;
+    masterChefV2Alloc = getPoolInfo250.value.value1;
+  } else {
+    masterChefV2Alloc = BIGINT_ZERO;
   }
 
-  // Total allocation to staking pools that are giving out rewards to users in MasterChef (V1)
-  let usedTotalAllocation = masterChef.totalAllocPoint
-    .minus(masterPoolAllocPID45)
-    .minus(masterPoolAllocPID250);
-
-  // Calculate Reward Emission per Block to a specific pool
-  // Pools are allocated based on their fraction of the total allocation times the adjusted rewards emitted per block
-  masterChef.adjustedRewardTokenRate = usedTotalAllocation
-    .div(masterChef.totalAllocPoint)
-    .times(masterChef.rewardTokenRate);
+  // Adjusted Reward Emission are just the static reward rate
+  masterChef.adjustedRewardTokenRate = masterChef.rewardTokenRate;
   masterChef.lastUpdatedRewardRate = event.block.number;
 
   // Calculate Adjusted Reward Emission per Block to the MasterChefV2 Contract
-  masterChefV2.adjustedRewardTokenRate = masterChefV2.totalAllocPoint
+  masterChefV2.adjustedRewardTokenRate = masterChefV2Alloc
     .div(masterChef.totalAllocPoint)
     .times(masterChef.rewardTokenRate);
   masterChefV2.lastUpdatedRewardRate = event.block.number;
-
-  log.warning("USED TOTAL ALLOCATION: " + usedTotalAllocation.toString(), []);
-  log.warning("TOTAL ALLOCATION: " + masterChef.totalAllocPoint.toString(), []);
-  log.warning(
-    "USED TOTAL ALLOCATION: " + masterChef.rewardTokenRate.toString(),
-    []
-  );
-  log.warning(
-    "ADJUSTED REWARD RATE: " + masterChef.adjustedRewardTokenRate.toString(),
-    []
-  );
 
   // Calculate Reward Emission per Block
   let poolRewardTokenRate = masterChef.adjustedRewardTokenRate
