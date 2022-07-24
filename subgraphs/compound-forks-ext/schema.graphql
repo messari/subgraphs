@@ -1239,6 +1239,7 @@ type ActiveAccount @entity {
 ###########################
 ##### Helper Entities #####
 ###########################
+
 # Helper entities are additional entities created to help with mapping.
 # They are usually used to store internal states that would simplify
 # the mapping logic. All helper entities should be prefixed with an
