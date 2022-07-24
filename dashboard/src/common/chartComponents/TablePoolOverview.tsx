@@ -34,7 +34,7 @@ export const TablePoolOverview = ({
   issueProps,
 }: TableChartProps) => {
   const navigate = useNavigate();
-  let issues: { message: string; type: string; level: string; fieldName: string }[] = issueProps;
+  const issues: { message: string; type: string; level: string; fieldName: string }[] = [...issueProps];
   useEffect(() => {
     if (JSON.stringify(issues) !== JSON.stringify(issueProps)) {
       setIssues(issues);
@@ -214,18 +214,22 @@ export const TablePoolOverview = ({
           return "N/A";
         });
         const tokenFieldDiff = pool.rewardTokens?.length - pool.rewardTokenEmissionsUSD?.length;
-        if (
-          tokenFieldDiff !== 0 &&
-          issues.filter(
-            (x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt}[${tokenFieldDiff}]` && x.type === "TOK",
-          ).length === 0
-        ) {
-          issues.push({
-            type: "TOK",
-            level: "error",
-            fieldName: `${pool.name || "#" + i + 1 + skipAmt}[${tokenFieldDiff}]`,
-            message: `rewardTokens [${tokenFieldDiff}]`,
-          });
+        if (issues.filter(x => x.type === "TOK" && tokenFieldDiff !== 0 && x.fieldName.includes(pool.name)).length === 0) {
+          if (pool.rewardTokens?.length > pool.rewardTokenEmissionsUSD?.length) {
+            issues.push({
+              type: "TOK",
+              level: "error",
+              fieldName: `${pool.name}-rewardTokens///${pool.rewardTokens?.length - 1}`,
+              message: `rewardTokenEmissionsUSD///(${pool.rewardTokenEmissionsUSD?.length - 1})`,
+            });
+          } else {
+            issues.push({
+              type: "TOK",
+              level: "error",
+              fieldName: `${pool.name}-rewardTokenEmissionsUSD///${pool.rewardTokenEmissionsUSD?.length - 1}`,
+              message: `rewardTokens///${pool.rewardTokens?.length - 1}`,
+            });
+          }
         }
 
         const rewardFactors: string[] = [];
@@ -266,18 +270,20 @@ export const TablePoolOverview = ({
                   } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
                 level: "critical",
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt
-                  }-totalDepositBalanceUSD/totalValueLockedUSD-pool value`,
+                  } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
               });
             } else if (pool.totalDepositBalanceUSD) {
               apr = (Number(val) / Number(pool.totalDepositBalanceUSD)) * 100 * 365;
-              rewardFactorsStr = `(${Number(val).toFixed(2)} (Daily Reward Emissions) / ${Number(
+              rewardFactorsStr = `(${Number(val).toFixed(2)}(Daily Reward Emissions) / ${Number(
                 pool.totalDepositBalanceUSD,
-              ).toFixed(2)} (Deposit balance)) * 100 * 365 = ${apr.toFixed(2)}%`;
+              ).toFixed(2)} (Deposit balance)) * 100 * 365 = ${apr.toFixed(2)
+                }% `;
             } else if (Number(pool.totalValueLockedUSD)) {
               apr = (Number(val) / Number(pool.totalValueLockedUSD)) * 100 * 365;
-              rewardFactorsStr = `(${Number(val).toFixed(2)} (Daily Reward Emissions) / ${Number(
+              rewardFactorsStr = `(${Number(val).toFixed(2)}(Daily Reward Emissions) / ${Number(
                 pool.totalValueLockedUSD,
-              ).toFixed(2)} (TVL)) * 100 * 365 = ${apr.toFixed(2)}%`;
+              ).toFixed(2)
+                } (TVL)) * 100 * 365 = ${apr.toFixed(2)}% `;
             }
           } else {
             let outputStakedFactor = Number(pool?.stakedOutputTokenAmount) / Number(pool?.outputTokenSupply);
@@ -285,11 +291,11 @@ export const TablePoolOverview = ({
               outputStakedFactor = 1;
             }
             apr = (Number(val) / (Number(pool.totalValueLockedUSD) * outputStakedFactor)) * 100 * 365;
-            rewardFactorsStr = `(${Number(val).toFixed(2)} (Daily Reward Emissions) / (${Number(
+            rewardFactorsStr = `(${Number(val).toFixed(2)}(Daily Reward Emissions) / (${Number(
               pool.totalValueLockedUSD,
             ).toFixed(2)} (TVL) * (${Number(pool?.stakedOutputTokenAmount)} (Staked Output Token) / ${Number(
               pool?.outputTokenSupply,
-            )} (Output Token Supply)))) * 100 * 365 = ${apr.toFixed(2)}%`;
+            )} (Output Token Supply)))) * 100 * 365 = ${apr.toFixed(2)}% `;
           }
           if (
             Number(apr) === 0 &&
@@ -334,9 +340,9 @@ export const TablePoolOverview = ({
           rewardAPRs = [];
         }
         const rewardTokenCell = rewardTokenSymbol.map((tok: string, idx: number) => {
-          let str = `0.00 % ${tok}`;
+          let str = `0.00 % ${tok} `;
           if (rewardAPRs[idx]) {
-            str = `${rewardAPRs[idx]} ${tok}`;
+            str = `${rewardAPRs[idx]} ${tok} `;
           }
           return str;
         });
@@ -366,7 +372,7 @@ export const TablePoolOverview = ({
           }
           const volumeUSD = Number(pool?.dailySnapshots[pool?.dailySnapshots?.length - 1]?.dailyVolumeUSD) || 0;
           let value = (feePercentage * volumeUSD * 365) / Number(pool.totalValueLockedUSD);
-          const factorsStr = `(${feePercentage.toFixed(2)} (LP Fee) * ${volumeUSD.toFixed(2)} (Volume 24h) * 365) / ${Number(pool.totalValueLockedUSD).toFixed(2)} (TVL) = ${value.toFixed(2)}%`;
+          const factorsStr = `(${feePercentage.toFixed(2)}(LP Fee) * ${volumeUSD.toFixed(2)}(Volume 24h) * 365) / ${Number(pool.totalValueLockedUSD).toFixed(2)} (TVL) = ${value.toFixed(2)}% `;
           if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
             value = 0;
             if (issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0) {
