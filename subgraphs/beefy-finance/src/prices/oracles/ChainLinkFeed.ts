@@ -7,8 +7,7 @@ import { ZERO_ADDRESS } from "../common/constants";
 import { CHAIN_LINK_USD_ADDRESS } from "../common/constants";
 
 export function getChainLinkContract(
-  asset: string,
-  network: string
+  asset: string
 ): ChainLinkContract {
   for (let i = 0; i < oracles.length; i++) {
     if (oracles[i][0] === asset) {
@@ -18,13 +17,10 @@ export function getChainLinkContract(
   return ChainLinkContract.bind(ZERO_ADDRESS);
 }
 
-export function getTokenPriceFromChainLink(
-  tokenAddr: Address,
-  network: string
-): CustomPriceType {
+export function getTokenPriceFromChainLink(tokenAddr: Address): CustomPriceType {
   const tokenContract = ERC20.bind(tokenAddr);
   const symbol = tokenContract.symbol();
-  const chainLinkContract = getChainLinkContract(symbol, network);
+  const chainLinkContract = getChainLinkContract(symbol);
 
   if (chainLinkContract._address === ZERO_ADDRESS) {
     return new CustomPriceType();
