@@ -113,29 +113,13 @@ export function updatePositions(
     position.depositCount = position.depositCount + 1;
 
     let deposit = Deposit.load(eventId)!;
-    let inputBalances = position.inputTokenBalances;
-
-    if (inputBalances.length == 0) {
-      inputBalances = deposit.inputTokenAmounts;
-    } else {
-      for (let i = 0; i < deposit.inputTokens.length; i += 1) {
-        inputBalances[i] = inputBalances[i].plus(deposit.inputTokenAmounts[i]);
-      }
-    }
-
-    position.inputTokenBalances = inputBalances;
+    position.inputTokenBalances = [];
     position.outputTokenBalance = position.outputTokenBalance.plus(deposit.outputTokenAmount!);
   } else if (eventType == UsageType.WITHDRAW) {
     account.withdrawCount = account.depositCount + 1;
     position.withdrawCount = position.withdrawCount + 1;
     let withdraw = Withdraw.load(eventId)!;
-    let inputBalances = position.inputTokenBalances;
-
-    for (let i = 0; i < withdraw.inputTokens.length; i += 1) {
-      inputBalances[i] = inputBalances[i].plus(withdraw.inputTokenAmounts[i]);
-    }
-
-    position.inputTokenBalances = inputBalances;
+    position.inputTokenBalances = [];
     position.outputTokenBalance = position.outputTokenBalance.minus(withdraw.outputTokenAmount!);
 
     if (position.outputTokenBalance.equals(BIGINT_ZERO)) {

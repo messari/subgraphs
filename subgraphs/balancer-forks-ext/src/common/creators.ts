@@ -1,5 +1,5 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
+import { BigInt, Address, crypto, ethereum, BigDecimal, log, ByteArray, Bytes } from "@graphprotocol/graph-ts";
 import { LiquidityPool, Deposit, Withdraw, Swap, LiquidityPoolFee, Account } from "../../generated/schema";
 
 import {
@@ -52,6 +52,7 @@ export function createLiquidityPool(
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = inputTokenBalances;
+  pool.outputToken = getOrCreateToken(poolAddress).id;
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
@@ -252,13 +253,15 @@ export function createDepositMulti(event: PoolBalanceChanged, poolAddress: strin
   deposit.inputTokens = pool.inputTokens;
   deposit.outputToken = pool.outputToken;
   deposit.inputTokenAmounts = withdrawBalances;
-  deposit.outputTokenAmount = BIGINT_ONE;
   deposit.amountUSD = amountUSD;
   deposit.nonce = event.transaction.nonce;
   deposit.gasLimit = event.transaction.gasLimit;
   deposit.gasPrice = event.transaction.gasPrice;
+
+  // let newPositionBalance = getAccountBalance(deposit.pool, deposit.account);
   let position = getOrCreatePosition(deposit.pool, deposit.account, event);
   deposit.position = position.id;
+  deposit.outputTokenAmount = getOutputTokenAmount(event, deposit.pool, deposit.account);
   deposit.save();
   pool.save();
   protocol.save();
@@ -311,16 +314,51 @@ export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: stri
   withdrawal.inputTokens = pool.inputTokens;
   withdrawal.outputToken = pool.outputToken;
   withdrawal.inputTokenAmounts = amounts;
-  withdrawal.outputTokenAmount = BIGINT_ONE;
   withdrawal.pool = pool.id;
   withdrawal.amountUSD = amountUSD;
   withdrawal.nonce = event.transaction.nonce;
   withdrawal.gasLimit = event.transaction.gasLimit;
   withdrawal.gasPrice = event.transaction.gasPrice;
+
+  // let newPositionBalance = getAccountBalance(withdrawal.pool, withdrawal.account);
   let position = getOrCreatePosition(withdrawal.pool, withdrawal.account, event);
+
   withdrawal.position = position.id;
+  withdrawal.outputTokenAmount = getOutputTokenAmount(event, withdrawal.pool, withdrawal.account);
   withdrawal.save();
   pool.save();
   protocol.save();
   updatePositions(withdrawal.pool, UsageType.WITHDRAW, withdrawal.account, event, withdrawal.id);
+}
+
+function getOutputTokenAmount(event: PoolBalanceChanged, outputToken: string, account: string): BigInt | null {
+  let receipt = event.receipt;
+  if (!receipt) {
+    log.debug("[getOutputTokenAmount][{}] no receipt", [event.transaction.hash.toHexString()]);
+    return BIGINT_ONE;
+  }
+  let logs = event.receipt!.logs;
+  if (!logs) {
+    log.debug("[getOutputTokenAmount][{}] no logs", [event.transaction.hash.toHexString()]);
+    return BIGINT_ONE;
+  }
+
+  for (let i = 0; i < logs.length; ++i) {
+    let curr = logs.at(i);
+    let topic_sig = curr.topics.at(0);
+    if (crypto.keccak256(ByteArray.fromUTF8("Transfer(address,address,uint256)")).equals(topic_sig)) {
+      if (curr.address.toHexString() == outputToken) {
+        let from = ethereum.decode("address", curr.topics.at(1))!.toAddress().toHexString();
+        let to = ethereum.decode("address", curr.topics.at(2))!.toAddress().toHexString();
+        if (to == account || from == account) {
+          let data_value = ethereum.decode("uint256", curr.data);
+          if (!data_value) {
+            return BIGINT_ONE;
+          }
+          return data_value!.toBigInt();
+        }
+      }
+    }
+  }
+  return BIGINT_ONE;
 }

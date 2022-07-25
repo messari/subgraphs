@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.6
 repository: https://github.com/messari/subgraphs
 {{#graftEnabled}}
 graft:
@@ -17,7 +17,7 @@ dataSources:
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mappings/handlers.ts
       entities:
@@ -78,6 +78,7 @@ dataSources:
           handler: handleTokensRegister
         - event: PoolBalanceChanged(indexed bytes32,indexed address,address[],int256[],uint256[])
           handler: handlePoolBalanceChanged
+          receipt: true 
         - event: Swap(indexed bytes32,indexed address,indexed address,uint256,uint256)
           handler: handleSwap
 {{#isBeets}}
@@ -90,7 +91,7 @@ dataSources:
       startBlock: {{masterChefV2StartBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mappings/masterchef.ts
       entities:
@@ -153,7 +154,7 @@ templates:
       abi: WeightedPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mappings/handlers.ts
       entities:

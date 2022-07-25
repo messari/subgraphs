@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.6
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
@@ -12,7 +12,7 @@ dataSources:
       startBlock: 15832990
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mappings/handlers.ts
       entities:
@@ -73,6 +73,7 @@ dataSources:
           handler: handleTokensRegister
         - event: PoolBalanceChanged(indexed bytes32,indexed address,address[],int256[],uint256[])
           handler: handlePoolBalanceChanged
+          receipt: true
         - event: Swap(indexed bytes32,indexed address,indexed address,uint256,uint256)
           handler: handleSwap
 templates:
@@ -83,7 +84,7 @@ templates:
       abi: WeightedPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mappings/handlers.ts
       entities:

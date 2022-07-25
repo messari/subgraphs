@@ -17,7 +17,6 @@ export const PROTOCOL_SLUG = "balancer-v2"
 
 
 
-
 // The network names corresponding to the Network enum in the schema.
 // They also correspond to the ones in `dataSource.network()` after converting to lower case.
 // See below for a complete list:
