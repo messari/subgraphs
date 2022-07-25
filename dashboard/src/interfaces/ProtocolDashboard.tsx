@@ -231,27 +231,34 @@ function ProtocolDashboard() {
 
   const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
 
-  const snapshotDailyVolumeQuery = gql`
-    ${getSnapshotDailyVolume(schemaVersion)}
-  `;
 
-  const [getPoolsSnapshotVolume, { data: snapshotVolume }] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+  const snapshotDailyVolumeQuery = gql`${getSnapshotDailyVolume(schemaVersion)}`;
 
-  const [getPoolsSnapshotVolume2, { data: snapshotVolume2 }] = useLazyQuery(snapshotDailyVolumeQuery, {
-    client: client,
-  });
+  const [
+    getPoolsSnapshotVolume,
+    { data: snapshotVolume },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
 
-  const [getPoolsSnapshotVolume3, { data: snapshotVolume3 }] = useLazyQuery(snapshotDailyVolumeQuery, {
-    client: client,
-  });
+  const [
+    getPoolsSnapshotVolume2,
+    { data: snapshotVolume2 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
 
-  const [getPoolsSnapshotVolume4, { data: snapshotVolume4 }] = useLazyQuery(snapshotDailyVolumeQuery, {
-    client: client,
-  });
+  const [
+    getPoolsSnapshotVolume3,
+    { data: snapshotVolume3 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
 
-  const [getPoolsSnapshotVolume5, { data: snapshotVolume5 }] = useLazyQuery(snapshotDailyVolumeQuery, {
-    client: client,
-  });
+  const [
+    getPoolsSnapshotVolume4,
+    { data: snapshotVolume4 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
+  const [
+    getPoolsSnapshotVolume5,
+    { data: snapshotVolume5 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
 
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
