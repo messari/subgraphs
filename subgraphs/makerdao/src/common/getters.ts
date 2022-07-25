@@ -14,6 +14,10 @@ import {
   _Chi,
   _Urn,
   _Proxy,
+  _PositionCounter,
+  Position,
+  Account,
+  _InternalPosition,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
@@ -31,6 +35,9 @@ import {
   PROTOCOL_SLUG,
   BIGINT_ZERO,
   BIGINT_ONE_RAY,
+  INT_ZERO,
+  INT_ONE,
+  PositionSide,
 } from "./constants";
 
 export function getOrCreateToken(
@@ -92,7 +99,15 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = protocol.id;
     usageMetrics.dailyActiveUsers = 0;
+    usageMetrics.dailyActiveDepositors = 0;
+    usageMetrics.dailyActiveBorrowers = 0;
+    usageMetrics.dailyActiveLiquidators = 0;
+    usageMetrics.dailyActiveLiquidatees = 0;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.cumulativeUniqueDepositors = protocol.cumulativeUniqueDepositors;
+    usageMetrics.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
+    usageMetrics.cumulativeUniqueLiquidators = protocol.cumulativeUniqueLiquidators;
+    usageMetrics.cumulativeUniqueLiquidatees = protocol.cumulativeUniqueLiquidatees;
     usageMetrics.totalPoolCount = protocol.totalPoolCount;
     usageMetrics.dailyTransactionCount = 0;
     usageMetrics.dailyDepositCount = 0;
@@ -256,6 +271,12 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
     protocol.cumulativeUniqueUsers = 0;
+    protocol.cumulativeUniqueBorrowers = 0;
+    protocol.cumulativeUniqueDepositors = 0;
+    protocol.cumulativeUniqueLiquidatees = 0;
+    protocol.cumulativeUniqueLiquidators = 0;
+    protocol.openPositionCount = 0;
+    protocol.cumulativePositionCount = 0;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol._cumulativeProtocolSideStabilityFeeRevenue = BIGDECIMAL_ZERO;
@@ -327,8 +348,13 @@ export function getOrCreateMarket(
     market.liquidationThreshold = BIGDECIMAL_ZERO;
     market.liquidationPenalty = BIGDECIMAL_ZERO;
     market.rates = [BIGDECIMAL_ZERO.toString()];
-    market.debtMultiplier = BIGDECIMAL_ZERO;
     market._mat = BIGINT_ONE_RAY;
+
+    market.positionCount = INT_ZERO;
+    market.openPositionCount = INT_ZERO;
+    market.closedPositionCount = INT_ZERO;
+    market.borrowingPositionCount = INT_ZERO;
+    market.lendingPositionCount = INT_ZERO;
 
     market.save();
 
@@ -391,9 +417,8 @@ export function getOrCreateLiquidate(
     liquidate = new Liquidate(LiquidateID);
     liquidate.hash = event!.transaction.hash.toHexString();
     liquidate.logIndex = event!.logIndex.toI32();
-    liquidate.protocol = market!.protocol;
-    liquidate.to = market!.id;
-    liquidate.from = liquidator!;
+    liquidate.nonce = event!.transaction.nonce;
+    liquidate.liquidator = liquidator!;
     liquidate.liquidatee = liquidatee!;
     liquidate.blockNumber = event!.block.number;
     liquidate.timestamp = event!.block.timestamp;
@@ -402,6 +427,7 @@ export function getOrCreateLiquidate(
     liquidate.amount = amount!;
     liquidate.amountUSD = amountUSD!;
     liquidate.profitUSD = profitUSD!;
+    liquidate.position = "";
     liquidate.save();
   }
   return liquidate;
@@ -418,10 +444,115 @@ export function getOrCreateChi(chiID: string): _Chi {
 
   return _chi;
 }
+export function getOrCreateAccount(accountID: string): Account {
+  let account = Account.load(accountID);
+  if (account == null) {
+    account = new Account(accountID);
+    account.depositCount = INT_ZERO;
+    account.withdrawCount = INT_ZERO;
+    account.borrowCount = INT_ZERO;
+    account.repayCount = INT_ZERO;
+    account.liquidateCount = INT_ZERO;
+    account.liquidationCount = INT_ZERO;
+    account.positionCount = INT_ZERO;
+    account.openPositionCount = INT_ZERO;
+    account.closedPositionCount = INT_ZERO;
+    account._positionIDList = [];
+    account.save();
+  }
+
+  return account;
+}
+
+export function getOrCreatePosition(
+  event: ethereum.Event,
+  side: string,
+  marketID: string,
+  accountAddress: string,
+  newPosition: bool = false,
+): Position {
+  let positionPrefix = `${accountAddress}-${marketID}-${side}`;
+  //let position = getOrCreatePosition()
+  let counterEnity = getOrCreatePositionCounter(accountAddress, marketID, side);
+  let counter = counterEnity.nextCount;
+  let positionID = `${positionPrefix}-${counter}`;
+  let position = Position.load(positionID);
+
+  if (newPosition && position != null) {
+    // increase the counter to create a new position
+    counter += 1;
+    positionID = `${positionPrefix}-${counter}`;
+    position = Position.load(positionID);
+    counterEnity.nextCount = counter;
+    counterEnity.save();
+  }
+
+  if (position == null) {
+    // new position
+    position = new Position(positionID);
+    position.market = marketID;
+    position.account = accountAddress;
+    position.hashOpened = event.transaction.hash.toHexString();
+    position.blockNumberOpened = event.block.number;
+    position.timestampOpened = event.block.timestamp;
+    position.side = side;
+    position.balance = BIGINT_ZERO;
+    position.depositCount = INT_ZERO;
+    position.withdrawCount = INT_ZERO;
+    position.borrowCount = INT_ZERO;
+    position.repayCount = INT_ZERO;
+    position.liquidationCount = INT_ZERO;
+
+    if (side == PositionSide.LENDER) {
+      //isCollateral is always enabled for maker lender position
+      position.isCollateral = true;
+    }
+
+    position.save();
+  }
+
+  return position;
+}
+
+export function getOrCreatePositionCounter(
+  accountAddress: string,
+  marketAddress: string,
+  side: string,
+): _PositionCounter {
+  let ID = `${accountAddress}-${marketAddress}-${side}`;
+  let counterEnity = _PositionCounter.load(ID);
+  if (!counterEnity) {
+    counterEnity = new _PositionCounter(ID);
+    counterEnity.nextCount = INT_ZERO;
+    counterEnity.save();
+  }
+  return counterEnity;
+}
+
+export function getOrCreateInternalPosition(
+  id: string,
+  marketAddress: string | null = null,
+  accountAddress: string | null = null,
+): _InternalPosition {
+  let internalPosition = _InternalPosition.load(id);
+  if (internalPosition == null) {
+    internalPosition = new _InternalPosition(id);
+    internalPosition.marketAddress = marketAddress!;
+    internalPosition.accountAddress = accountAddress!;
+    internalPosition.lenderPositions = [];
+    internalPosition.borrowerPositions = [];
+    internalPosition.save();
+  }
+  return internalPosition;
+}
 
 ///////////////////////////
 ///////// Helpers /////////
 ///////////////////////////
+export function getNextPositionCounter(accountAddress: string, marketAddress: string, side: string): i32 {
+  let counterEnity = getOrCreatePositionCounter(accountAddress, marketAddress, side);
+  return counterEnity.nextCount;
+}
 
 export function getMarketAddressFromIlk(ilk: Bytes): Address | null {
   let _ilk = getOrCreateIlk(ilk);
@@ -436,7 +567,7 @@ export function getMarketFromIlk(ilk: Bytes): Market | null {
   return getOrCreateMarket(marketAddress!.toHexString());
 }
 
-export function getOwnerAddressFromCdp(urn: string): string {
+export function getOwnerAddressFromUrn(urn: string): string {
   let owner = urn;
   let _urn = _Urn.load(urn);
   if (_urn) {
@@ -474,4 +605,34 @@ export function getSnapshotRates(rates: string[], timeSuffix: string): string[] 
     snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
+}
+export function getPositionIDForAccount(
+  accountAddress: string,
+  market: string,
+  side: string,
+  open: u32 = 2, // 0 - false, 1 - true, 2 - all/any
+): string[] {
+  let account = getOrCreateAccount(accountAddress);
+  let resultPositionIDs: string[] = [];
+  let positionIDs = account._positionIDList!;
+  for (let i = 0; i < positionIDs.length; i++) {
+    let positionID = positionIDs[i];
+    let position = Position.load(positionID)!;
+    if (position.market.toLowerCase() == market.toLowerCase() && position.side == side) {
+      switch (open) {
+        case 1:
+          if (position.balance.gt(BIGINT_ZERO)) {
+            resultPositionIDs.push(positionID);
+          }
+        case 0:
+          if (position.balance == BIGINT_ZERO) {
+            resultPositionIDs.push(positionID);
+          }
+        default:
+          resultPositionIDs.push(positionID);
+      }
+    }
+  }
+
+  return resultPositionIDs;
 }

@@ -91,6 +91,24 @@ export namespace ProtocolSideRevenueType {
   export const LIQUIDATION: u32 = 2;
   export const PSM: u32 = 3;
 }
+export namespace PositionSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
+export namespace EventType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const BORROW = "BORROW";
+  export const REPAY = "REPAY";
+  export const LIQUIDATOR = "LIQUIDAOTR";
+  export const LIQUIDATEE = "LIQUIDATEE";
+}
+
+export namespace ActivityType {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
 
 //////////////////////////////
 ///// Ethereum Addresses /////
