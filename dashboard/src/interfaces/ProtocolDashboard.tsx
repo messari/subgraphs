@@ -259,6 +259,20 @@ function ProtocolDashboard() {
   ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
 
 
+  const tokenQuery = gql`
+    ${poolOverviewTokensQuery(protocolSchemaData?.protocols[0]?.type?.toUpperCase())}
+  `;
+
+  const [getPoolOverviewTokens, { data: poolOverviewTokens }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens2, { data: poolOverviewTokens2 }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens3, { data: poolOverviewTokens3 }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens4, { data: poolOverviewTokens4 }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
+
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
     tabNum = "2";
@@ -402,6 +416,7 @@ function ProtocolDashboard() {
       getPoolsOverviewData();
     }
   }, [tabValue, getPoolsOverviewData]);
+
 
   useEffect(() => {
     if (data?.protocols && dataPools) {
@@ -685,6 +700,7 @@ function ProtocolDashboard() {
     }
     pools = pools.concat(poolArray);
   }
+
 
   if (pools?.length > 0) {
     let poolTemp = [...pools];
