@@ -22,19 +22,7 @@ export const schema120 = (): string => {
       id
       name
       symbol
-      inputTokens{
-        name
-        symbol
-      }
-      rewardTokens {
-        id
-        type
-        token {
-          decimals
-          name
-          symbol
-        }
-      }
+
       totalValueLockedUSD
       outputTokenSupply
       stakedOutputTokenAmount
@@ -49,19 +37,7 @@ export const schema130 = (): string => {
       pools(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
         id
         name
-        inputTokens{
-          name
-          symbol
-        }
-        rewardTokens {
-          id
-          type
-          token {
-            decimals
-            name
-            symbol
-          }
-        }
+        
         totalValueLockedUSD
         outputTokenSupply
         stakedOutputTokenAmount

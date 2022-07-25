@@ -116,8 +116,8 @@ function PoolTabEntity({
           if (supplierFee) {
             feePercentage = Number(supplierFee.feePercentage);
           }
-          const volumeUSD = Number(timeseriesInstance.dailyVolumeUSD) || Number(timeseriesInstance.hourlyVolumeUSD);
-          value = ((feePercentage * volumeUSD) / Number(timeseriesInstance.totalValueLockedUSD)) * 100;
+          const revenueUSD = Number(timeseriesInstance.dailySupplySideRevenueUSD) * 365 || Number(timeseriesInstance.hourlySupplySideRevenueUSD) * 24 * 365;
+          value = (revenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 100;
           if (!value) {
             value = 0;
           }
