@@ -77,13 +77,13 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-arc-ethereum",
           "dmelotik": "dmelotik/aave-v2-arc",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "avalanche": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-avalanche",
           "dmelotik": "dmelotik/aave-v2-avalanche",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum": {
           "template": "aave.v2.template.yaml",
@@ -95,7 +95,7 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-amm-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum-amm",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "polygon": {
           "template": "aave.v2.template.yaml",
@@ -107,7 +107,7 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-rwa-ethereum",
           "dmelotik": "dmelotik/aave-v2-rwa",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "geist-finance": {
@@ -115,55 +115,7 @@
           "template": "geist.finance.template.yaml",
           "messari": "messari/geist-finance-fantom",
           "dmelotik": "dmelotik/geist-fantom",
-          "deploy-on-merge": false
-        }
-      }
-    },
-    "aave-v2-forks-ext": {
-      "aave-v2": {
-        "ethereum-arc": {
-          "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-arc-ethereum-extended",
-          "dmelotik": "dmelotik/aave-v2-arc-ext",
-          "deploy-on-merge": false
-        },
-        "avalanche": {
-          "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-v2-avalanche-extended",
-          "dmelotik": "dmelotik/aave-v2-avalanche-ext",
-          "deploy-on-merge": false
-        },
-        "ethereum": {
-          "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-v2-ethereum-extended",
-          "dmelotik": "dmelotik/aave-v2-mainnet-ext",
           "deploy-on-merge": true
-        },
-        "ethereum-amm": {
-          "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-amm-ethereum-extended",
-          "dmelotik": "dmelotik/aave-v2-ethereum-amm-ext",
-          "deploy-on-merge": false
-        },
-        "polygon": {
-          "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-v2-polygon-extended",
-          "dmelotik": "dmelotik/aave-v2-polygon-ext",
-          "deploy-on-merge": true
-        },
-        "ethereum-rwa": {
-          "template": "aave.v2.template.yaml",
-          "messari": "messari/aave-rwa-ethereum-extended",
-          "dmelotik": "dmelotik/aave-v2-rwa-ext",
-          "deploy-on-merge": false
-        }
-      },
-      "geist-finance": {
-        "fantom": {
-          "template": "geist.finance.template.yaml",
-          "messari": "messari/geist-finance-fantom-extended",
-          "dmelotik": "dmelotik/geist-finance-ext",
-          "deploy-on-merge": false
         }
       }
     },

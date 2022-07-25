@@ -38,6 +38,8 @@ import {
   LiquidationCall,
   Repay,
   ReserveDataUpdated,
+  ReserveUsedAsCollateralDisabled,
+  ReserveUsedAsCollateralEnabled,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
 import { GToken } from "../../../generated/templates/LendingPool/GToken";
@@ -56,6 +58,8 @@ import {
   _handleReserveDeactivated,
   _handleReserveFactorChanged,
   _handleReserveInitialized,
+  _handleReserveUsedAsCollateralDisabled,
+  _handleReserveUsedAsCollateralEnabled,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
@@ -315,6 +319,26 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   );
 }
 
+export function handleReserveUsedAsCollateralEnabled(
+  event: ReserveUsedAsCollateralEnabled
+): void {
+  // This Event handler enables a reserve/market to be used as collateral
+  _handleReserveUsedAsCollateralEnabled(
+    event.params.reserve,
+    event.params.user
+  );
+}
+
+export function handleReserveUsedAsCollateralDisabled(
+  event: ReserveUsedAsCollateralDisabled
+): void {
+  // This Event handler disables a reserve/market being used as collateral
+  _handleReserveUsedAsCollateralDisabled(
+    event.params.reserve,
+    event.params.user
+  );
+}
+
 export function handleDeposit(event: Deposit): void {
   _handleDeposit(
     event,
@@ -361,9 +385,9 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidatedCollateralAmount,
     event.params.collateralAsset,
     getProtocolData(),
-    event.params.debtAsset,
     event.params.liquidator,
-    event.params.user
+    event.params.user,
+    event.params.debtAsset
   );
 }
 
