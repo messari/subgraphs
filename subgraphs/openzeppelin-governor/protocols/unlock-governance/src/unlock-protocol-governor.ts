@@ -16,10 +16,17 @@ import {
   _handleProposalExecuted,
   _handleProposalQueued,
   _handleVoteCast,
+  getOrCreateProposal,
+  getGovernance,
 } from "../../../src/handlers";
 import { UnlockProtocolGovernor } from "../../../generated/UnlockProtocolGovernor/UnlockProtocolGovernor";
-import { GovernanceFramework } from "../../../generated/schema";
-import { GovernanceFrameworkType } from "../../../src/constants";
+import { GovernanceFramework, Proposal } from "../../../generated/schema";
+import {
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  GovernanceFrameworkType,
+  ProposalState,
+} from "../../../src/constants";
 
 // ProposalCanceled(proposalId)
 export function handleProposalCanceled(event: ProposalCanceled): void {
@@ -28,10 +35,13 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
+  let quorumVotes = UnlockProtocolGovernor.bind(event.address).quorum(
+    event.block.number.minus(BIGINT_ONE)
+  );
+
   // FIXME: Prefer to use a single object arg for params
   // e.g.  { proposalId: event.params.proposalId, proposer: event.params.proposer, ...}
   // but graph wasm compilation breaks for unknown reasons
-
   _handleProposalCreated(
     event.params.proposalId.toString(),
     event.params.proposer.toHexString(),
@@ -42,6 +52,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
     event.params.startBlock,
     event.params.endBlock,
     event.params.description,
+    quorumVotes,
     event
   );
 }
@@ -70,10 +81,33 @@ export function handleTimelockChange(event: TimelockChange): void {
   governanceFramework.save();
 }
 
+function getLatestProposalValues(
+  proposalId: string,
+  contractAddress: Address
+): Proposal {
+  let proposal = getOrCreateProposal(proposalId);
+
+  // On first vote, set state and quorum values
+  if (proposal.state == ProposalState.PENDING) {
+    let contract = UnlockProtocolGovernor.bind(contractAddress);
+    proposal.state = ProposalState.ACTIVE;
+    proposal.quorumVotes = contract.quorum(proposal.startBlock);
+
+    let governance = getGovernance();
+    proposal.tokenHoldersAtStart = governance.currentTokenHolders;
+    proposal.delegatesAtStart = governance.currentDelegates;
+  }
+  return proposal;
+}
 // VoteCast(account, proposalId, support, weight, reason);
 export function handleVoteCast(event: VoteCast): void {
-  _handleVoteCast(
+  let proposal = getLatestProposalValues(
     event.params.proposalId.toString(),
+    event.address
+  );
+
+  _handleVoteCast(
+    proposal,
     event.params.voter.toHexString(),
     event.params.weight,
     event.params.reason,
@@ -110,14 +144,15 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework.version = contract.version();
 
     governanceFramework.contractAddress = contractAddress;
-    governanceFramework.tokenAddress = contract.timelock().toHexString();
-    governanceFramework.timelockAddress = contract.token().toHexString();
+    governanceFramework.tokenAddress = contract.token().toHexString();
+    governanceFramework.timelockAddress = contract.timelock().toHexString();
 
     governanceFramework.votingDelay = contract.votingDelay();
     governanceFramework.votingPeriod = contract.votingPeriod();
 
-    // Missing from this old version of Governor
-    // governanceFramework.proposalThreshold = contract.proposalThreshold();
+    // Missing from this old version of Governor, default it to Zero
+    governanceFramework.proposalThreshold = BIGINT_ZERO;
+
     const startBlock = new BigInt(13148447);
     governanceFramework.quorumVotes = contract.quorum(startBlock);
   }
