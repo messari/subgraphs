@@ -1,4 +1,4 @@
-# Abracadabra Lending Protocol Subgraph
+# Abracadabra Lending Protocol Subgraph (Extended)
 
 ## Calculation Methodology v1.0.0
 
