@@ -13,6 +13,7 @@
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-avalanche",
           "messari": "messari/abracadabra-money-avalanche",
+          "dmelotik": "dmelotik/abracadabra-avalanche",
           "deploy-on-merge": true
         },
         "bsc": {
