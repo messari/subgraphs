@@ -8,6 +8,8 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
+  Account,
+  ActorAccount,
   Borrow,
   Deposit,
   Liquidate,
@@ -31,14 +33,19 @@ import {
   InterestRateType,
   INT_FOUR,
   INT_TWO,
+  INT_ZERO,
+  PositionSide,
   rayToWad,
   RAY_OFFSET,
 } from "./constants";
 import {
+  addPosition,
+  createAccount,
   createInterestRate,
   getOrCreateLendingProtocol,
   getOrCreateToken,
   snapshotUsage,
+  subtractPosition,
   updateFinancials,
   updateMarketSnapshots,
   updateSnapshots,
@@ -103,9 +110,9 @@ export function _handleReserveInitialized(
 
   market.protocol = protocol.name;
   market.name = outputTokenEntity.name;
-  market.isActive = true;
-  market.canUseAsCollateral = true;
-  market.canBorrowFrom = true;
+  market.isActive = false;
+  market.canUseAsCollateral = false;
+  market.canBorrowFrom = false;
   market.maximumLTV = BIGDECIMAL_ZERO;
   market.liquidationThreshold = BIGDECIMAL_ZERO;
   market.liquidationPenalty = BIGDECIMAL_ZERO;
@@ -136,6 +143,11 @@ export function _handleReserveInitialized(
   market.liquidityIndex = BIGINT_ZERO;
   market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
+  market.positionCount = INT_ZERO;
+  market.openPositionCount = INT_ZERO;
+  market.closedPositionCount = INT_ZERO;
+  market.lendingPositionCount = INT_ZERO;
+  market.borrowingPositionCount = INT_ZERO;
   market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.rates = []; // calculated in event ReserveDataUpdated
@@ -244,6 +256,62 @@ export function _handleReserveFactorChanged(
     .toBigDecimal()
     .div(exponentToBigDecimal(INT_TWO));
   market.save();
+}
+
+export function _handleReserveUsedAsCollateralEnabled(
+  marketId: Address,
+  accountID: Address
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.warning("[ReserveUsedAsCollateralEnabled] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  // grab account
+  let account = Account.load(accountID.toHexString());
+  if (!account) {
+    log.warning("[ReserveUsedAsCollateralEnabled] Account not found: {}", [
+      accountID.toHexString(),
+    ]);
+    return;
+  }
+  let markets = account.enabledCollaterals;
+  markets.push(market.id);
+  account.enabledCollaterals = markets;
+  account.save();
+}
+
+export function _handleReserveUsedAsCollateralDisabled(
+  marketId: Address,
+  accountID: Address
+): void {
+  let market = Market.load(marketId.toHexString());
+  if (!market) {
+    log.warning("[ReserveUsedAsCollateralDisabled] Market not found: {}", [
+      marketId.toHexString(),
+    ]);
+    return;
+  }
+
+  // grab account
+  let account = Account.load(accountID.toHexString());
+  if (!account) {
+    log.warning("[ReserveUsedAsCollateralEnabled] Account not found: {}", [
+      accountID.toHexString(),
+    ]);
+    return;
+  }
+  let markets = account.enabledCollaterals;
+  let index = markets.indexOf(market.id);
+  if (index >= 0) {
+    // drop 1 element at given index
+    markets.splice(index, 1);
+  }
+  account.enabledCollaterals = markets;
+  account.save();
 }
 
 ////////////////////////////////
@@ -442,7 +510,7 @@ export function _handleDeposit(
   amount: BigInt,
   marketId: Address,
   protocolData: ProtocolData,
-  account: Address
+  accountID: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -458,14 +526,38 @@ export function _handleDeposit(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let deposit = new Deposit(id);
 
+  // create account
+  let account = Account.load(accountID.toHexString());
+  if (!account) {
+    account = createAccount(accountID.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.depositCount += 1;
+  account.save();
+
+  // update position
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  let positionId = addPosition(
+    protocol,
+    market,
+    account,
+    aTokenContract.try_balanceOf(accountID), // try getting balance of account
+    PositionSide.LENDER,
+    EventType.DEPOSIT,
+    event
+  );
+
+  deposit.position = positionId;
+  deposit.nonce = event.transaction.nonce;
+  deposit.account = accountID.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
-  deposit.to = market.id;
-  deposit.from = account.toHexString();
   deposit.market = marketId.toHexString();
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
-  deposit.protocol = protocol.id;
   deposit.asset = inputToken!.id;
   deposit.amount = amount;
   deposit.amountUSD = amount
@@ -489,8 +581,9 @@ export function _handleDeposit(
     protocol,
     event.block.number,
     event.block.timestamp,
-    deposit.from,
-    EventType.DEPOSIT
+    deposit.account,
+    EventType.DEPOSIT,
+    true
   );
 
   // udpate market daily / hourly snapshots / financialSnapshots
@@ -509,7 +602,7 @@ export function _handleWithdraw(
   amount: BigInt,
   marketId: Address,
   protocolData: ProtocolData,
-  account: Address
+  accountID: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -525,14 +618,43 @@ export function _handleWithdraw(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let withdraw = new Withdraw(id);
 
+  // get account
+  let account = Account.load(accountID.toHexString());
+  if (!account) {
+    account = createAccount(accountID.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.withdrawCount += 1;
+  account.save();
+
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  let positionId = subtractPosition(
+    protocol,
+    market,
+    account,
+    aTokenContract.try_balanceOf(accountID), // try getting balance of account
+    PositionSide.LENDER,
+    EventType.WITHDRAW,
+    event
+  );
+  if (positionId === null) {
+    log.warning("[handleWithdraw] Position not found for account: {}", [
+      accountID.toHexString(),
+    ]);
+    return;
+  }
+
+  withdraw.position = positionId;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
-  withdraw.to = account.toHexString();
-  withdraw.from = market.id;
+  withdraw.account = account.id;
   withdraw.market = market.id;
   withdraw.hash = event.transaction.hash.toHexString();
+  withdraw.nonce = event.transaction.nonce;
   withdraw.logIndex = event.logIndex.toI32();
-  withdraw.protocol = protocol.id;
   withdraw.asset = inputToken!.id;
   withdraw.amount = amount;
   withdraw.amountUSD = amount
@@ -546,8 +668,9 @@ export function _handleWithdraw(
     protocol,
     event.block.number,
     event.block.timestamp,
-    withdraw.to,
-    EventType.WITHDRAW
+    withdraw.account,
+    EventType.WITHDRAW,
+    true
   );
 
   // udpate market daily / hourly snapshots / financialSnapshots
@@ -566,7 +689,7 @@ export function _handleBorrow(
   amount: BigInt,
   marketId: Address,
   protocolData: ProtocolData,
-  account: Address
+  accountID: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -582,14 +705,38 @@ export function _handleBorrow(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let borrow = new Borrow(id);
 
+  // create account
+  let account = Account.load(accountID.toHexString());
+  if (!account) {
+    account = createAccount(accountID.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.borrowCount += 1;
+  account.save();
+
+  // update position
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  let positionId = addPosition(
+    protocol,
+    market,
+    account,
+    aTokenContract.try_balanceOf(accountID), // try getting balance of account
+    PositionSide.BORROWER,
+    EventType.BORROW,
+    event
+  );
+
+  borrow.position = positionId;
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
-  borrow.to = account.toHexString();
-  borrow.from = market.id;
+  borrow.account = account.id;
+  borrow.nonce = event.transaction.nonce;
   borrow.market = market.id;
   borrow.hash = event.transaction.hash.toHexString();
   borrow.logIndex = event.logIndex.toI32();
-  borrow.protocol = protocol.id;
   borrow.asset = inputToken!.id;
   borrow.amount = amount;
   borrow.amountUSD = amount
@@ -613,8 +760,9 @@ export function _handleBorrow(
     protocol,
     event.block.number,
     event.block.timestamp,
-    borrow.to,
-    EventType.BORROW
+    borrow.account,
+    EventType.BORROW,
+    true
   );
 
   // udpate market daily / hourly snapshots / financialSnapshots
@@ -633,7 +781,7 @@ export function _handleRepay(
   amount: BigInt,
   marketId: Address,
   protocolData: ProtocolData,
-  account: Address
+  accountID: Address
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -649,14 +797,43 @@ export function _handleRepay(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let repay = new Repay(id);
 
+  // get account
+  let account = Account.load(accountID.toHexString());
+  if (!account) {
+    account = createAccount(accountID.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.repayCount += 1;
+  account.save();
+
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  let positionId = subtractPosition(
+    protocol,
+    market,
+    account,
+    aTokenContract.try_balanceOf(accountID), // try getting balance of account
+    PositionSide.LENDER,
+    EventType.REPAY,
+    event
+  );
+  if (positionId === null) {
+    log.warning("[handleRepay] Position not found for account: {}", [
+      accountID.toHexString(),
+    ]);
+    return;
+  }
+
+  repay.position = positionId;
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
-  repay.to = market.id;
-  repay.from = account.toHexString();
+  repay.account = account.id;
   repay.market = market.id;
   repay.hash = event.transaction.hash.toHexString();
+  repay.nonce = event.transaction.nonce;
   repay.logIndex = event.logIndex.toI32();
-  repay.protocol = protocol.id;
   repay.asset = inputToken!.id;
   repay.amount = amount;
   repay.amountUSD = amount
@@ -670,8 +847,9 @@ export function _handleRepay(
     protocol,
     event.block.number,
     event.block.timestamp,
-    repay.from,
-    EventType.REPAY
+    repay.account,
+    EventType.REPAY,
+    true
   );
 
   // udpate market daily / hourly snapshots / financialSnapshots
@@ -690,9 +868,9 @@ export function _handleLiquidate(
   amount: BigInt,
   marketId: Address, // collateral market
   protocolData: ProtocolData,
-  debtAsset: Address,
   liquidator: Address,
-  user: Address // account liquidated
+  borrower: Address, // account liquidated
+  repayToken: Address // token repaid to cover debt
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
@@ -708,43 +886,99 @@ export function _handleLiquidate(
   let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
   let liquidate = new Liquidate(id);
 
+  // update liquidators account
+  let liquidatorAccount = Account.load(liquidator.toHexString());
+  if (!liquidatorAccount) {
+    liquidatorAccount = createAccount(liquidator.toHexString());
+    liquidatorAccount.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  liquidatorAccount.liquidateCount += 1;
+  let liquidatorActorID = "liquidator"
+    .concat("-")
+    .concat(liquidator.toHexString());
+  let liquidatorActor = ActorAccount.load(liquidatorActorID);
+  if (!liquidatorActor) {
+    liquidatorActor = new ActorAccount(liquidatorActorID);
+    liquidatorActor.save();
+
+    protocol.cumulativeUniqueLiquidators += 1;
+    protocol.save();
+  }
+
+  // get borrower account
+  let account = Account.load(borrower.toHexString());
+  if (!account) {
+    account = createAccount(borrower.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.liquidationCount += 1;
+  account.save();
+
+  let repayTokenMarket = Market.load(repayToken.toHexString());
+  if (!repayTokenMarket) {
+    log.warning("[Liquidate] Repay token market not found on protocol: {}", [
+      repayToken.toHexString(),
+    ]);
+  }
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  let positionId = subtractPosition(
+    protocol,
+    market,
+    account,
+    aTokenContract.try_balanceOf(borrower), // try getting balance of account
+    PositionSide.LENDER,
+    EventType.LIQUIDATEE,
+    event
+  );
+  if (positionId === null) {
+    log.warning("[handleLiquidate] Position not found for account: {}", [
+      borrower.toHexString(),
+    ]);
+    return;
+  }
+
+  liquidate.position = positionId;
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
-  liquidate.to = debtAsset.toHexString();
-  liquidate.from = liquidator.toHexString();
+  liquidate.liquidator = liquidator.toHexString();
+  liquidate.liquidatee = borrower.toHexString();
   liquidate.market = market.id;
   liquidate.hash = event.transaction.hash.toHexString();
+  liquidate.nonce = event.transaction.nonce;
   liquidate.logIndex = event.logIndex.toI32();
-  liquidate.protocol = protocol.id;
   liquidate.asset = inputToken!.id;
   liquidate.amount = amount;
   liquidate.amountUSD = amount
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken!.decimals))
     .times(market.inputTokenPriceUSD);
-  liquidate.liquidatee = user.toHexString();
   liquidate.profitUSD = liquidate.amountUSD.times(
     market.liquidationPenalty.div(BIGDECIMAL_HUNDRED)
   );
   liquidate.save();
-
-  // update metrics
-  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
-    liquidate.amountUSD
-  );
-  protocol.save();
-  market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(
-    liquidate.amountUSD
-  );
-  market.save();
 
   // update usage metrics
   snapshotUsage(
     protocol,
     event.block.number,
     event.block.timestamp,
-    liquidate.from,
-    EventType.LIQUIDATE
+    liquidate.liquidatee,
+    EventType.LIQUIDATEE,
+    true // only count this liquidate as new tx
+  );
+  snapshotUsage(
+    protocol,
+    event.block.number,
+    event.block.timestamp,
+    liquidate.liquidator,
+    EventType.LIQUIDATOR, // updates dailyActiveLiquidators
+    false
   );
 
   // udpate market daily / hourly snapshots / financialSnapshots
@@ -752,7 +986,7 @@ export function _handleLiquidate(
     protocol,
     market,
     liquidate.amountUSD,
-    EventType.LIQUIDATE,
+    EventType.LIQUIDATOR,
     event.block.timestamp,
     event.block.number
   );
