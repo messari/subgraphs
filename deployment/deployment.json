@@ -124,63 +124,37 @@
         "arbitrum": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-arbitrum",
-          "deploy-on-merge": false
+          "dmelotik": "dmelotik/aave-v3-arbitrum",
+          "deploy-on-merge": true
         },
         "avalanche": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-avalanche",
-          "deploy-on-merge": false
+          "dmelotik": "dmelotik/aave-v3-avalanche",
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-fantom",
-          "deploy-on-merge": false
+          "dmelotik": "dmelotik/aave-v3-fantom",
+          "deploy-on-merge": true
         },
         "harmony": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-harmony",
-          "deploy-on-merge": false
+          "dmelotik": "dmelotik/aave-v3-harmony",
+          "deploy-on-merge": true
         },
         "polygon": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-polygon",
-          "deploy-on-merge": false
+          "dmelotik": "dmelotik/aave-v3-polygon",
+          "deploy-on-merge": true
         },
         "optimism": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-optimism",
-          "deploy-on-merge": false
-        }
-      },
-      "aave-v3-extended": {
-        "arbitrum": {
-          "template": "aave-v3-extended.template.yaml",
-          "messari": "messari/aave-v3-arbitrum-extended",
-          "deploy-on-merge": true
-        },
-        "avalanche": {
-          "template": "aave-v3-extended.template.yaml",
-          "messari": "messari/aave-v3-avalanche-extended",
-          "deploy-on-merge": true
-        },
-        "fantom": {
-          "template": "aave-v3-extended.template.yaml",
-          "messari": "messari/aave-v3-fantom-extended",
-          "deploy-on-merge": true
-        },
-        "harmony": {
-          "template": "aave-v3-extended.template.yaml",
-          "messari": "messari/aave-v3-harmony-extended",
-          "deploy-on-merge": true
-        },
-        "polygon": {
-          "template": "aave-v3-extended.template.yaml",
-          "messari": "messari/aave-v3-polygon-extended",
-          "deploy-on-merge": true
-        },
-        "optimism": {
-          "template": "aave-v3-extended.template.yaml",
-          "messari": "messari/aave-v3-optimism-extended",
+          "dmelotik": "dmelotik/aave-v3-optimism",
           "deploy-on-merge": true
         }
       }

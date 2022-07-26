@@ -15,7 +15,11 @@ import {
 import { createMarket, getMarket } from "../entities/market";
 import { createReserve } from "../entities/reserve";
 import { getOrCreateToken } from "../entities/token";
-import { BIGDECIMAL_HUNDRED, BIGINT_ZERO, INT_TWO } from "../../../../src/utils/constants";
+import {
+  BIGDECIMAL_HUNDRED,
+  BIGINT_ZERO,
+  INT_TWO,
+} from "../../../../src/utils/constants";
 import { bigIntToBigDecimal } from "../../../../src/utils/numbers";
 
 export function handleReserveInitialized(event: ReserveInitialized): void {
