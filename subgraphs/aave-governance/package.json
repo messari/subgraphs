@@ -4,7 +4,7 @@
   "scripts": {
     "clean": "rm -rf generated/",
     "prepare:build": "npm run clean && graph codegen && graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ danielkhoo/aave-governance",
+    "deploy": "graph deploy --product hosted-service danielkhoo/aave-governance",
     "create-local": "graph create --node http://localhost:8020/ danielkhoo/aave-governance",
     "remove-local": "graph remove --node http://localhost:8020/ danielkhoo/aave-governance",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 danielkhoo/aave-governance"

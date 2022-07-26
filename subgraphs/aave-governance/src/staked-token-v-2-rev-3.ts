@@ -2,7 +2,7 @@ import {
   DelegateChanged,
   DelegatedPowerChanged,
   Transfer,
-} from "../generated/AaveTokenV2/AaveTokenV2";
+} from "../generated/StakedTokenV2Rev3/StakedTokenV2Rev3";
 import {
   BIGINT_ONE,
   BIGINT_ZERO,

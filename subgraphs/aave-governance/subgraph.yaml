@@ -2,6 +2,8 @@ specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
+features:
+  - ipfsOnEthereumContracts
 dataSources:
   - kind: ethereum/contract
     name: AaveGovernanceV2
@@ -42,41 +44,13 @@ dataSources:
         - event: VotingDelayChanged(uint256,indexed address)
           handler: handleVotingDelayChanged
       file: ./src/aave-governance-v-2.ts
-  - kind: ethereum/contract
-    name: AaveTokenV2
-    network: mainnet
-    source:
-      address: "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9"
-      abi: AaveTokenV2
-      startBlock: 10926829
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - Governance
-        - Proposal
-        - Vote
-        - TokenHolder
-        - Delegate
-      abis:
-        - name: AaveTokenV2
-          file: ./abis/AaveTokenV2.json
-      eventHandlers:
-        - event: DelegateChanged(indexed address,indexed address,uint8)
-          handler: handleDelegateChanged
-        - event: DelegatedPowerChanged(indexed address,uint256,uint8)
-          handler: handleDelegatedPowerChanged
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/aave-token-v-2.ts
-  # - kind: ethereum
-  #   name: StakedTokenV2Rev3
+  # - kind: ethereum/contract
+  #   name: AaveTokenV2
   #   network: mainnet
   #   source:
-  #     address: "0x4da27a545c0c5b758a6ba100e3a049001de870f5"
-  #     abi: StakedTokenV2Rev3
-  #     startBlock: 10927018
+  #     address: "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9"
+  #     abi: AaveTokenV2
+  #     startBlock: 10926829
   #   mapping:
   #     kind: ethereum/events
   #     apiVersion: 0.0.6
@@ -88,8 +62,8 @@ dataSources:
   #       - TokenHolder
   #       - Delegate
   #     abis:
-  #       - name: StakedTokenV2Rev3
-  #         file: ./abis/StakedTokenV2Rev3.json
+  #       - name: AaveTokenV2
+  #         file: ./abis/AaveTokenV2.json
   #     eventHandlers:
   #       - event: DelegateChanged(indexed address,indexed address,uint8)
   #         handler: handleDelegateChanged
@@ -97,4 +71,32 @@ dataSources:
   #         handler: handleDelegatedPowerChanged
   #       - event: Transfer(indexed address,indexed address,uint256)
   #         handler: handleTransfer
-  #     file: ./src/staked-token-v-2-rev-3.ts
+  #     file: ./src/aave-token-v-2.ts
+  - kind: ethereum
+    name: StakedTokenV2Rev3
+    network: mainnet
+    source:
+      address: "0x4da27a545c0c5b758a6ba100e3a049001de870f5"
+      abi: StakedTokenV2Rev3
+      startBlock: 10927018
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: StakedTokenV2Rev3
+          file: ./abis/StakedTokenV2Rev3.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,uint8)
+          handler: handleDelegateChanged
+        - event: DelegatedPowerChanged(indexed address,uint256,uint8)
+          handler: handleDelegatedPowerChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/staked-token-v-2-rev-3.ts

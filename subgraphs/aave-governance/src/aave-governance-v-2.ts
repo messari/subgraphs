@@ -15,8 +15,10 @@ import {
   BIGINT_ONE,
   BIGINT_ZERO,
   GOVERNANCE_NAME,
+  GOVERNANCE_STRATEGY_ADDRESS,
   ProposalState,
   SHORT_EXECUTOR_ADDRESS,
+  TOKEN_ADDRESS,
   VoteChoice,
   ZERO_ADDRESS,
 } from "./constants";
@@ -188,6 +190,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
   proposer = getOrCreateDelegate(proposerAddr);
   proposal.executor = event.params.executor.toHexString();
   proposal.proposer = proposer.id;
+  proposal.quorumVotes = BIGINT_ZERO;
   proposal.againstDelegateVotes = BIGINT_ZERO;
   proposal.forDelegateVotes = BIGINT_ZERO;
   proposal.abstainDelegateVotes = BIGINT_ZERO;
@@ -340,43 +343,31 @@ export function handleVoteEmitted(event: VoteEmitted): void {
 
 // VotingDelayChanged (newVotingDelay, initiatorChange)
 export function handleVotingDelayChanged(event: VotingDelayChanged): void {
-  let governanceFramework = getGovernanceFramework(
-    event.address.toHexString(),
-    event
-  );
+  let governanceFramework = getGovernanceFramework(event.address.toHexString());
   governanceFramework.votingDelay = event.params.newVotingDelay;
   governanceFramework.save();
 }
 
 // Helper function that imports and binds the contract
-function getGovernanceFramework(
-  contractAddress: string,
-  event: ethereum.Event
-): GovernanceFramework {
+function getGovernanceFramework(contractAddress: string): GovernanceFramework {
   let governanceFramework = GovernanceFramework.load(contractAddress);
 
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
     let contract = AaveGovernanceV2.bind(Address.fromString(contractAddress));
-    let executorContract = Executor.bind(
-      Address.fromString(SHORT_EXECUTOR_ADDRESS)
-    );
     governanceFramework.name = contract.NAME();
     governanceFramework.type = GOVERNANCE_NAME;
-    governanceFramework.contractAddress = contractAddress;
-
     governanceFramework.version = "1";
-    governanceFramework.tokenAddress = "";
-    governanceFramework.timelockAddress = "";
-    governanceFramework.votingPeriod = executorContract.VOTING_DURATION();
-    governanceFramework.proposalThreshold =
-      executorContract.getMinimumPropositionPowerNeeded(
-        Address.fromString(contractAddress),
-        event.block.number
-      );
-    governanceFramework.votingDelay = contract.getVotingDelay();
 
-    // governanceFramework.quorumVotes = contract.quorumNumerator();
+    governanceFramework.contractAddress = contractAddress;
+    governanceFramework.tokenAddress = TOKEN_ADDRESS;
+    governanceFramework.timelockAddress = SHORT_EXECUTOR_ADDRESS;
+
+    // Init as zero, as govStrat / executor contracts are not deployed yet
+    // values will be updated when proposal voting starts
+    governanceFramework.votingPeriod = BIGINT_ZERO;
+    governanceFramework.proposalThreshold = BIGINT_ZERO;
+    governanceFramework.votingDelay = contract.getVotingDelay();
   }
 
   return governanceFramework;
