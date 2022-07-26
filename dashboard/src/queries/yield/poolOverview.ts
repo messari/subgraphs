@@ -26,19 +26,7 @@ export const schema120 = (): string => {
                 feeType
                 feePercentage
               }
-              inputToken {
-                name
-                symbol
-              }
-              rewardTokens {
-                id
-                type
-                token {
-                  decimals
-                  name
-                  symbol
-                }
-              }
+
               totalValueLockedUSD
               stakedOutputTokenAmount
               outputTokenSupply
@@ -57,19 +45,7 @@ export const schema130 = (): string => {
           feeType
           feePercentage
         }
-        inputToken {
-          name
-          symbol
-        }
-        rewardTokens {
-          id
-          type
-          token {
-            decimals
-            name
-            symbol
-          }
-        }
+
         totalValueLockedUSD
         stakedOutputTokenAmount
         outputTokenSupply
