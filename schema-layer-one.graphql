@@ -1,0 +1,409 @@
+# Subgraph Schema: Network
+# Version: 1.1.0
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+
+enum SubgraphNetwork {
+  ARBITRUM_ONE
+  ARWEAVE_MAINNET
+  AURORA
+  AVALANCHE
+  BOBA
+  BSC # aka BNB Chain
+  CELO
+  CLOVER
+  COSMOS
+  CRONOS
+  MAINNET # Ethereum Mainnet
+  FANTOM
+  FUSE
+  HARMONY
+  JUNO
+  MOONBEAM
+  MOONRIVER
+  NEAR_MAINNET
+  OPTIMISM
+  OSMOSIS
+  MATIC # aka Polygon
+  XDAI # aka Gnosis Chain
+}
+
+enum DataType {
+  AUTHORS
+  DIFFICULTY
+  GAS_USED
+  GAS_LIMIT
+  BURNT_FEES
+  REWARDS
+  SIZE
+  CHUNKS
+  SUPPLY
+  TRANSACTIONS
+  BLOCKS
+  BLOCK_INTERVAL
+  GAS_PRICE
+}
+
+# Stores statistical analytics for given metrics
+type STATS @entity {
+  " { id of the snapshot this belongs to } - { DataType } "
+  id: ID!
+
+  " Number of times entity has been used in a time data entity "
+  count: Int!
+
+  " The average of all the values "
+  mean: BigDecimal!
+
+  " The middle value when ordered from least to greatest "
+  median: BigDecimal!
+
+  " The maximum value in this entity "
+  max: BigInt!
+
+  " The minimum value in this data set "
+  min: BigInt!
+
+  " List of values in order from smallest to largest "
+  values: [BigInt!]!
+
+  " The sum of all the values "
+  sum: BigInt!
+
+  ##### Calculated Statisitcal Fields #####
+
+  " The standard deviation of all values within this entity "
+  variance: BigDecimal
+
+  " This is the upper quartile where 75% of the values lie "
+  q3: BigDecimal
+
+  " This is the lower quartile where 25% of the values lie "
+  q1: BigDecimal
+}
+
+##########################
+#### Network Metadata ####
+##########################
+
+type Network @entity {
+  " Name of the network being indexed "
+  id: ID!
+
+  " The verison of the schema "
+  schemaVersion: String!
+
+  " The version of the subgraph "
+  subgraphVersion: String!
+
+  " The version of the methodology "
+  methodologyVersion: String!
+
+  #### Quantitative Data ####
+
+  " Number of cumulative unique authors (see type Author for explanation) "
+  cumulativeUniqueAuthors: Int!
+
+  " The total number of blocks in the blockchain "
+  blockHeight: Int!
+
+  " Total difficulty to reach the current block "
+  cumulativeDifficulty: BigInt
+
+  " Total gas used "
+  cumulativeGasUsed: BigInt
+
+  " Current gas limit "
+  gasLimit: BigInt
+
+  " Total burnt fees on the network in native asset "
+  cumulativeBurntFees: BigInt
+
+  " Total rewards emitted on the network in native asset "
+  cumulativeRewards: BigInt
+
+  " Total number of transactions that have occured on this network "
+  cumulativeTransactions: BigInt
+
+  " Total size of the network in native units (e.g. Bytes in Arweave and Ethereum) "
+  cumulativeSize: BigInt
+
+  " Current supply of the native asset "
+  totalSupply: BigInt
+
+  " Statistical analysis of blocks/day from daily snapshots "
+  dailyBlocks: STATS!
+
+  #### Snapshots ####
+
+  " Daily metrics for this blockchain "
+  dailySnapshots: [DailySnapshot!]! @derivedFrom(field: "network")
+
+  " Hourly metrics for this blockchain "
+  hourlySnapshots: [HourlySnapshot!]! @derivedFrom(field: "network")
+}
+
+###############################
+#### Blockchain Timeseries ####
+###############################
+
+type DailySnapshot @entity {
+  " { number of days since UNIX epoch time } "
+  id: ID!
+
+  " ID of the network this snapshot belongs to "
+  network: Network!
+
+  #### Quantitative Data ####
+
+  " Block height at this day (aka, blockNumber) "
+  blockHeight: Int!
+
+  " Blocks created during this day (note, this is different from blocksPerDay) "
+  dailyBlocks: Int!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
+  " Number of cumulative unique authors (see type Author for explanation) "
+  cumulativeUniqueAuthors: Int!
+
+  " Statistical analysis of unique daily active authors "
+  dailyUniqueAuthors: STATS
+
+  " Total difficulty up until this day "
+  cumulativeDifficulty: BigInt
+
+  " Statistical analysis of difficulty during this day "
+  dailyDifficulty: STATS
+
+  " Total gas used up until this day "
+  cumulativeGasUsed: BigInt
+
+  " Statistical analysis of gas used during this day"
+  dailyGasUsed: STATS
+
+  " Statistical analysis of gas limit across blocks this day"
+  dailyGasLimit: STATS
+
+  " Total amount of fees burned "
+  cumulativeBurntFees: BigInt
+
+  " Statisical amount of burnt fees for this day "
+  dailyBurntFees: STATS
+
+  " Total amount of rewards emitted "
+  cumulativeRewards: BigInt
+
+  " Statistical analysis of rewards emitted on this day "
+  dailyRewards: STATS
+
+  " Total size of the entire network in this day (in native units) "
+  cumulativeSize: BigInt
+
+  " Statistical analysis of size in bytes of a block during this day "
+  dailySize: STATS
+
+  " Statistical analysis of chunks per block during this day "
+  dailyChunks: STATS
+
+  " Total amount of the native asset in circulation during this day "
+  totalSupply: BigInt
+
+  " Statisitcal analysis of the daily supply "
+  dailySupply: STATS
+
+  " Total number of transactions that have occured on this blockchain "
+  cumulativeTransactions: BigInt
+
+  " Statistical analysis of transactions per day "
+  dailyTransactions: STATS
+
+  " Statisical analysis of the block interval during this day "
+  dailyBlockInterval: STATS
+
+  " gas price at the end of this hour in network native gas units "
+  gasPrice: BigInt
+
+  " Statistical analysis of the gas price during this day "
+  dailyGasPrice: STATS
+}
+
+type HourlySnapshot @entity {
+  " { number of hours since UNIX epoch time } "
+  id: ID!
+
+  " ID of the network this snapshot belongs to "
+  network: Network!
+
+  #### Quantitative Data ####
+
+  " Block height at this day (aka, blockNumber) "
+  blockHeight: Int!
+
+  " Blocks created during this day (note, this is different from blocksPerDay) "
+  hourlyBlocks: Int!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
+  " Number of cumulative unique authors (see type Author for explanation) "
+  cumulativeUniqueAuthors: Int!
+
+  " Statistical analysis of unique hourly active authors "
+  hourlyUniqueAuthors: STATS
+
+  " Total difficulty up until this hour "
+  cumulativeDifficulty: BigInt
+
+  " Statistical analysis of difficulty during this hour "
+  hourlyDifficulty: STATS
+
+  " Total gas used up until this hour "
+  cumulativeGasUsed: BigInt
+
+  " Statistical analysis of gas used during this hour"
+  hourlyGasUsed: STATS
+
+  " Statistical analysis of gas limit across blocks this hour"
+  hourlyGasLimit: STATS
+
+  " Total amount of fees burned "
+  cumulativeBurntFees: BigInt
+
+  " Statisical amount of burnt fees for this hour "
+  hourlyBurntFees: STATS
+
+  " Total amount of rewards emitted "
+  cumulativeRewards: BigInt
+
+  " Statistical analysis of rewards emitted on this hour "
+  hourlyRewards: STATS
+
+  " Total size of the entire network in this hour (in native units) "
+  cumulativeSize: BigInt
+
+  " Statistical analysis of size in bytes of a block during this hour "
+  hourlySize: STATS
+
+  " Statistical analysis of chunks per block during this hour "
+  hourlyChunks: STATS
+
+  " Total amount of the native asset in circulation during this hour "
+  totalSupply: BigInt
+
+  " Statisitcal analysis of the hourly supply "
+  hourlySupply: STATS
+
+  " Total number of transactions that have occured on this blockchain "
+  cumulativeTransactions: BigInt
+
+  " Statistical analysis of transactions per hour "
+  hourlyTransactions: STATS
+
+  " Statisical analysis of the block interval during this hour "
+  hourlyBlockInterval: STATS
+
+  " gas price at the end of this hour in network native gas units "
+  gasPrice: BigInt
+
+  " Statistical analysis of the gas price during this hour "
+  hourlyGasPrice: STATS
+}
+
+##########################
+#### Block-level Data ####
+##########################
+
+type Block @entity(immutable: true) {
+  " { block number } "
+  id: ID!
+
+  " Hash of this block "
+  hash: Bytes!
+
+  " Timestamp of the block "
+  timestamp: BigInt!
+
+  " Author of this block (the entity that successfully found this block) "
+  author: Author
+
+  " Data size of the block in Bytes "
+  size: BigInt
+
+  " Minimum gasUsed multiplier for transaction to be included (note, post London upgrade) "
+  baseFeePerGas: BigInt
+
+  " Amount of effort required to create this block "
+  difficulty: BigInt
+
+  " Total gas limit provided from all transactions this block "
+  gasLimit: BigInt
+
+  " Total gas used in this block "
+  gasUsed: BigInt
+
+  " Percentage of gas filled in this block (e.g. gasUsed / gasLimit) "
+  blockUtilization: BigDecimal
+
+  " The price of gas in this block in network native gas units "
+  gasPrice: BigInt
+
+  " Burnt fees in native asset (baseFeePerGas * gasUsed) (note, post London upgrade) "
+  burntFees: BigInt
+
+  " Number of chunks in this block (e.g. shards on NEAR) "
+  chunkCount: BigInt
+
+  " Number of transactions in this block "
+  transactionCount: BigInt
+
+  " Rewards emitted in this block "
+  rewards: BigInt
+}
+
+# This is the node that found the next block (e.g. miner or validator)
+type Author @entity {
+  " Address of the author "
+  id: Bytes!
+
+  " Number of blocks created "
+  cumulativeBlocksCreated: Int!
+
+  " Total difficulty secured on blockchain "
+  cumulativeDifficulty: BigInt
+
+  " A mapping to every block that this author has generated "
+  blocks: [Block!]! @derivedFrom(field: "author")
+}
+
+#################
+#### Helpers ####
+#################
+
+# Helper entity for calculating daily/hourly active authors
+type ActiveAuthor @entity(immutable: true) {
+  " { daily/hourly }-{ Address of the author }-{ Days/hours since Unix epoch } "
+  id: ID!
+}
+
+# Helper entitiy for NEAR protocol to keep track of chunks for metric aggregation
+# Chunks are shards within a block on NEAR protocol: https://coinmarketcap.com/alexandria/glossary/chunk-near
+type Chunk @entity(immutable: true) {
+  " { chunk hash } "
+  id: Bytes!
+
+  " The block this chunk belongs to "
+  block: Block!
+
+  " The gas used in this chunk "
+  gasUsed: BigInt
+
+  " The gas limit in this chunk "
+  gasLimit: BigInt
+
+  " The fees burnt in this chunk, also the total amount of fees "
+  burntFees: BigInt
+
+  " Gas utilization within this chunk (e.g. gasUsed / gasLimit) "
+  chunkUtilization: BigDecimal
+}

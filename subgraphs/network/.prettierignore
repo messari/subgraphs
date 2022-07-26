@@ -1,0 +1,6 @@
+build
+generated
+package.json
+
+# ignore manifest templates
+templates
