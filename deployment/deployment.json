@@ -20,12 +20,14 @@
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-bsc",
           "messari": "messari/abracadabra-money-bsc",
+          "dmelotik": "dmelotik/abracadabra-bsc",
           "deploy-on-merge": true
         },
         "fantom": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-fantom",
           "messari": "messari/abracadabra-money-fantom",
+          "dmelotik": "dmelotik/abracadabra-fantom",
           "deploy-on-merge": true
         },
         "ethereum": {
