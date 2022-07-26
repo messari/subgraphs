@@ -124,6 +124,7 @@
         "arbitrum": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-arbitrum",
+          "dmelotik": "dmelotik/aave-v3-arbitrum",
           "deploy-on-merge": true
         },
         "avalanche": {
@@ -135,16 +136,19 @@
         "fantom": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-fantom",
+          "dmelotik": "dmelotik/aave-v3-fantom",
           "deploy-on-merge": true
         },
         "harmony": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-harmony",
+          "dmelotik": "dmelotik/aave-v3-harmony",
           "deploy-on-merge": true
         },
         "polygon": {
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-polygon",
+          "dmelotik": "dmelotik/aave-v3-polygon",
           "deploy-on-merge": true
         },
         "optimism": {
