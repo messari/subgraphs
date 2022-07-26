@@ -3,18 +3,18 @@ import { ProtocolType } from "../constants";
 export const poolOverviewTokensQuery = (protocolType: string): string => {
     // The version group uses the first two digits  of the schema version and defaults to that schema.
     if (protocolType === ProtocolType.EXCHANGE) {
-        return fetchExchangeTokens();
+        return fetchTokensOnExchange();
     } else if (protocolType === ProtocolType.LENDING) {
-        return fetchLendingTokens();
+        return fetchTokensOnLending();
     } else if (protocolType === ProtocolType.YIELD) {
-        return fetchYieldTokens();
+        return fetchTokensOnYield();
     } else {
-        return fetchGenericTokens();
+        return fetchTokensOnGeneric();
     }
 };
 
 
-const fetchExchangeTokens = (): string => {
+const fetchTokensOnExchange = (): string => {
 
     return `
       query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
@@ -183,7 +183,7 @@ const fetchExchangeTokens = (): string => {
 }
 
 
-const fetchLendingTokens = (): string => {
+const fetchTokensOnLending = (): string => {
     return `
     query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
       pool1: market(id: $pool1Id) {
@@ -351,7 +351,7 @@ const fetchLendingTokens = (): string => {
 }
 
 
-const fetchYieldTokens = (): string => {
+const fetchTokensOnYield = (): string => {
     return `
     query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
       pool1: vault(id: $pool1Id) {
@@ -518,7 +518,7 @@ const fetchYieldTokens = (): string => {
   `
 }
 
-const fetchGenericTokens = (): string => {
+const fetchTokensOnGeneric = (): string => {
     return `
     query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
       pool1: pool(id: $pool1Id) {

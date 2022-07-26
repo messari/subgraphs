@@ -499,6 +499,8 @@ function ProtocolDashboard() {
     }
   }, [dataPools5])
 
+
+
   useEffect(() => {
     if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
       getPoolsListData();
@@ -542,158 +544,150 @@ function ProtocolDashboard() {
   }
   let pools: { [x: string]: any }[] = [];
   if (dataPools && data) {
-    let newPoolObject = dataPools[PoolNames[data?.protocols[0]?.type]];
+    let poolArray = dataPools[PoolNames[data?.protocols[0]?.type]];
     if (snapshotVolume) {
       if (Object.keys(snapshotVolume)?.length > 0) {
-        const copyPool = [...newPoolObject];
-        newPoolObject = [];
+        const copyPool = [...poolArray];
+        poolArray = [];
         Object.keys(snapshotVolume).forEach((x, idx) => {
           const copyElement = { ...copyPool[idx] };
           copyElement.dailyVolumeUSD = snapshotVolume[x][snapshotVolume[x].length - 1]?.dailyVolumeUSD;
-          newPoolObject.push(copyElement)
+          poolArray.push(copyElement)
         })
       }
     }
     if (poolOverviewTokens) {
-
       if (Object.keys(poolOverviewTokens)?.length > 0) {
-        const copyPool = [...newPoolObject];
-        newPoolObject = [];
+        const copyPool = [...poolArray];
+        poolArray = [];
         Object.keys(poolOverviewTokens).forEach((x, idx) => {
           if (poolOverviewTokens[x]) {
-
             const copyElement = { ...copyPool[idx] };
             copyElement[tokenKey] = poolOverviewTokens[x][tokenKey];
             copyElement["rewardTokens"] = poolOverviewTokens[x]["rewardTokens"];
-            newPoolObject.push(copyElement)
+            poolArray.push(copyElement)
           }
 
         })
       }
     }
-    pools = newPoolObject;
+    pools = poolArray;
   }
   if (dataPools2 && data) {
-    let newPoolObject = dataPools2[PoolNames[data?.protocols[0]?.type]];
+    let poolArray = dataPools2[PoolNames[data?.protocols[0]?.type]];
     if (snapshotVolume2) {
       if (Object.keys(snapshotVolume2)?.length > 0) {
-        const copyPool = [...newPoolObject];
-        newPoolObject = [];
+        const copyPool = [...poolArray];
+        poolArray = [];
         Object.keys(snapshotVolume2).forEach((x, idx) => {
           const copyElement = { ...copyPool[idx] };
           copyElement.dailyVolumeUSD = snapshotVolume2[x][snapshotVolume2[x].length - 1]?.dailyVolumeUSD;
-          newPoolObject.push(copyElement)
+          poolArray.push(copyElement);
         })
       }
     }
     if (poolOverviewTokens2) {
       if (Object.keys(poolOverviewTokens2).length > 0) {
-        const copyPool = [...newPoolObject];
-        newPoolObject = [];
+        const copyPool = [...poolArray];
+        poolArray = [];
         Object.keys(poolOverviewTokens2).forEach((x, idx) => {
           if (poolOverviewTokens2[x]) {
             const copyElement = { ...copyPool[idx] };
             copyElement[tokenKey] = poolOverviewTokens2[x][tokenKey];
             copyElement["rewardTokens"] = poolOverviewTokens2[x]["rewardTokens"];
-
-            newPoolObject.push(copyElement)
+            poolArray.push(copyElement);
           }
         })
       }
     }
-    pools = pools.concat(newPoolObject);
+    pools = pools.concat(poolArray);
   }
   if (dataPools3 && data) {
-    let newPoolObject = dataPools3[PoolNames[data?.protocols[0]?.type]];
+    let poolArray = dataPools3[PoolNames[data?.protocols[0]?.type]];
     if (snapshotVolume3) {
       if (Object.keys(snapshotVolume3)?.length > 0) {
-        const copyPool = [...newPoolObject];
-        newPoolObject = [];
+        const copyPool = [...poolArray];
+        poolArray = [];
         Object.keys(snapshotVolume3).forEach((x, idx) => {
           const copyElement = { ...copyPool[idx] };
           copyElement.dailyVolumeUSD = snapshotVolume3[x][snapshotVolume3[x].length - 1]?.dailyVolumeUSD;
-          newPoolObject.push(copyElement)
+          poolArray.push(copyElement);
         })
       }
     }
     if (poolOverviewTokens3) {
       if (Object.keys(poolOverviewTokens3).length > 0) {
-        const copyPool = [...newPoolObject];
-        newPoolObject = [];
+        const copyPool = [...poolArray];
+        poolArray = [];
         Object.keys(poolOverviewTokens3).forEach((x, idx) => {
           if (poolOverviewTokens3[x]) {
-
             const copyElement = { ...copyPool[idx] };
             copyElement[tokenKey] = poolOverviewTokens3[x][tokenKey];
             copyElement["rewardTokens"] = poolOverviewTokens3[x]["rewardTokens"];
-
-            newPoolObject.push(copyElement)
+            poolArray.push(copyElement);
           }
         })
       }
     }
-    pools = pools.concat(newPoolObject);
+    pools = pools.concat(poolArray);
   }
   if (dataPools4 && data) {
-    let newPoolObject = dataPools4[PoolNames[data?.protocols[0]?.type]];
+    let poolArray = dataPools4[PoolNames[data?.protocols[0]?.type]];
     if (snapshotVolume4) {
       if (Object.keys(snapshotVolume4)?.length > 0) {
-        const copyPool = [...newPoolObject];
-        newPoolObject = [];
+        const copyPool = [...poolArray];
+        poolArray = [];
         Object.keys(snapshotVolume4).forEach((x, idx) => {
           const copyElement = { ...copyPool[idx] };
           copyElement.dailyVolumeUSD = snapshotVolume4[x][snapshotVolume4[x].length - 1]?.dailyVolumeUSD;
-          newPoolObject.push(copyElement)
+          poolArray.push(copyElement);
         })
       }
     }
     if (poolOverviewTokens4) {
       if (Object.keys(poolOverviewTokens4).length > 0) {
-        const copyPool = [...newPoolObject];
-        newPoolObject = [];
+        const copyPool = [...poolArray];
+        poolArray = [];
         Object.keys(poolOverviewTokens4).forEach((x, idx) => {
           if (poolOverviewTokens4[x]) {
-
             const copyElement = { ...copyPool[idx] };
             copyElement[tokenKey] = poolOverviewTokens4[x][tokenKey];
             copyElement["rewardTokens"] = poolOverviewTokens4[x]["rewardTokens"];
-            newPoolObject.push(copyElement)
+            poolArray.push(copyElement);
           }
         })
       }
     }
-    pools = pools.concat(newPoolObject);
+    pools = pools.concat(poolArray);
   }
   if (dataPools5 && data) {
-    let newPoolObject = dataPools5[PoolNames[data?.protocols[0]?.type]];
+    let poolArray = dataPools5[PoolNames[data?.protocols[0]?.type]];
     if (snapshotVolume5) {
       if (Object.keys(snapshotVolume5)?.length > 0) {
-        const copyPool = [...newPoolObject];
-        newPoolObject = [];
+        const copyPool = [...poolArray];
+        poolArray = [];
         Object.keys(snapshotVolume5).forEach((x, idx) => {
           const copyElement = { ...copyPool[idx] };
           copyElement.dailyVolumeUSD = snapshotVolume5[x][snapshotVolume5[x].length - 1]?.dailyVolumeUSD;
-          newPoolObject.push(copyElement)
+          poolArray.push(copyElement);
         })
       }
     }
     if (poolOverviewTokens5) {
       if (Object.keys(poolOverviewTokens5).length > 0) {
-        const copyPool = [...newPoolObject];
-        newPoolObject = [];
+        const copyPool = [...poolArray];
+        poolArray = [];
         Object.keys(poolOverviewTokens5).forEach((x, idx) => {
           if (poolOverviewTokens5[x]) {
-
             const copyElement = { ...copyPool[idx] };
             copyElement[tokenKey] = poolOverviewTokens5[x][tokenKey];
             copyElement["rewardTokens"] = poolOverviewTokens5[x]["rewardTokens"];
-
-            newPoolObject.push(copyElement)
+            poolArray.push(copyElement);
           }
         })
       }
     }
-    pools = pools.concat(newPoolObject);
+    pools = pools.concat(poolArray);
   }
 
 
