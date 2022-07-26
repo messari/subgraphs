@@ -527,6 +527,8 @@ function ProtocolDashboard() {
     }
   }, [dataPools5]);
 
+
+
   useEffect(() => {
     if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
       getPoolsListData();
