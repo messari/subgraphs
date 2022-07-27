@@ -2,13 +2,13 @@ import {
   DelegateChanged,
   DelegatedPowerChanged,
   Transfer,
-} from "../generated/AaveTokenV2/AaveTokenV2";
+} from "../../../generated/AaveTokenV2/AaveTokenV2";
 import {
   BIGINT_ONE,
   BIGINT_ZERO,
   DelegationType,
   ZERO_ADDRESS,
-} from "./constants";
+} from "../../../src/constants";
 import {
   getGovernance,
   getOrCreateDelegate,

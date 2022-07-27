@@ -8,20 +8,18 @@ import {
   log,
   JSONValue,
   JSONValueKind,
-  ethereum,
 } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ONE,
   BIGINT_ZERO,
   GOVERNANCE_NAME,
-  GOVERNANCE_STRATEGY_ADDRESS,
   ProposalState,
   SHORT_EXECUTOR_ADDRESS,
   TOKEN_ADDRESS,
   VoteChoice,
   ZERO_ADDRESS,
-} from "./constants";
+} from "../../../src/constants";
 import {
   AaveGovernanceV2,
   ProposalCanceled,
@@ -30,9 +28,9 @@ import {
   ProposalQueued,
   VoteEmitted,
   VotingDelayChanged,
-} from "../generated/AaveGovernanceV2/AaveGovernanceV2";
-import { Executor } from "../generated/AaveGovernanceV2/Executor";
-import { GovernanceStrategy } from "../generated/AaveGovernanceV2/GovernanceStrategy";
+} from "../../../generated/AaveGovernanceV2/AaveGovernanceV2";
+import { Executor } from "../../../generated/AaveGovernanceV2/Executor";
+import { GovernanceStrategy } from "../../../generated/AaveGovernanceV2/GovernanceStrategy";
 import {
   Delegate,
   Governance,
@@ -40,7 +38,7 @@ import {
   Proposal,
   TokenHolder,
   Vote,
-} from "../generated/schema";
+} from "../../../generated/schema";
 
 export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
   return value.divDecimal(
@@ -94,6 +92,8 @@ export function getOrCreateProposal(
 
   if (!proposal && createIfNotFound) {
     proposal = new Proposal(id);
+    proposal.tokenHoldersAtStart = BIGINT_ZERO;
+    proposal.delegatesAtStart = BIGINT_ZERO;
     if (save) {
       proposal.save();
     }
@@ -158,7 +158,7 @@ export function getOrCreateTokenHolder(
 }
 
 export function handleProposalCanceled(event: ProposalCanceled): void {
-  let proposal = getOrCreateProposal(event.params.id.toHexString());
+  let proposal = getOrCreateProposal(event.params.id.toString());
   proposal.state = ProposalState.CANCELED;
   proposal.cancellationBlock = event.block.number;
   proposal.cancellationTime = event.block.timestamp;
@@ -175,7 +175,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
   let proposerAddr = event.params.creator.toHexString();
 
   let proposal = getOrCreateProposal(proposalId);
-  let proposer = getOrCreateDelegate(proposerAddr, false);
+  let proposer = getOrCreateDelegate(proposerAddr);
 
   // Checking if the proposer was a delegate already accounted for, if not we should log an error
   // since it shouldn't be possible for a delegate to propose anything without first being "created"
@@ -242,7 +242,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
 
 export function handleProposalExecuted(event: ProposalExecuted): void {
   // Update proposal status + execution metadata
-  let proposal = getOrCreateProposal(event.params.id.toHexString());
+  let proposal = getOrCreateProposal(event.params.id.toString());
   proposal.state = ProposalState.EXECUTED;
   proposal.executionBlock = event.block.number;
   proposal.executionTime = event.block.timestamp;

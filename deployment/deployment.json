@@ -902,6 +902,15 @@
         }
       }
     },
+    "aave-governance": {
+      "aave-governance": {
+        "ethereum": {
+          "template": "aave-governance.template.yaml",
+          "danielkhoo": "danielkhoo/aave-governance",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "openzeppelin-governor": {
       "angle-governance": {
         "ethereum": {

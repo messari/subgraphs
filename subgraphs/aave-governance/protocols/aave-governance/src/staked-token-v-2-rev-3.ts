@@ -2,13 +2,13 @@ import {
   DelegateChanged,
   DelegatedPowerChanged,
   Transfer,
-} from "../generated/StakedTokenV2Rev3/StakedTokenV2Rev3";
+} from "../../../generated/StakedTokenV2Rev3/StakedTokenV2Rev3";
 import {
   BIGINT_ONE,
   BIGINT_ZERO,
   DelegationType,
   ZERO_ADDRESS,
-} from "./constants";
+} from "../../../src/constants";
 import {
   getGovernance,
   getOrCreateDelegate,

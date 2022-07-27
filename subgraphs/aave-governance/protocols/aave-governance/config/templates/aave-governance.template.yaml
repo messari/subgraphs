@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
@@ -7,11 +7,11 @@ features:
 dataSources:
   - kind: ethereum/contract
     name: AaveGovernanceV2
-    network: mainnet
+    network: {{ network }}
     source:
-      address: "0xEC568fffba86c094cf06b22134B23074DFE2252c"
+      address: "{{ governorContractAddress }}"
       abi: AaveGovernanceV2
-      startBlock: 11427398
+      startBlock: {{ governorContractStartBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -46,11 +46,11 @@ dataSources:
       file: ./protocols/aave-governance/src/aave-governance-v-2.ts
   # - kind: ethereum/contract
   #   name: AaveTokenV2
-  #   network:  mainnet
+  #   network:  {{ network }}
   #   source:
-  #     address: "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9"
+  #     address: "{{ tokenContractAddress }}"
   #     abi: AaveTokenV2
-  #     startBlock: 10926829
+  #     startBlock: {{ tokenContractStartBlock }}
   #   mapping:
   #     kind: ethereum/events
   #     apiVersion: 0.0.6
@@ -74,11 +74,11 @@ dataSources:
   #     file: ./protocols/aave-governance/src/aave-token-v-2.ts
   - kind: ethereum/contract
     name: StakedTokenV2Rev3
-    network:  mainnet
+    network:  {{ network }}
     source:
-      address: "0x4da27a545c0c5b758a6ba100e3a049001de870f5"
+      address: "{{ secondTokenContractAddress }}"
       abi: StakedTokenV2Rev3
-      startBlock: 10927018
+      startBlock: {{ secondTokenContractStartBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
