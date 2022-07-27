@@ -17,6 +17,7 @@ export namespace Network {
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
   export const COSMOS = "COSMOS";
+  export const CRONOS = "CRONOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
@@ -29,7 +30,6 @@ export namespace Network {
   export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
-  export const CRONOS = "CRONOS"; // Crypto.com Cronos chain
 }
 
 export namespace ProtocolType {
@@ -69,6 +69,11 @@ export namespace InterestRateSide {
 export namespace ActivityType {
   export const DAILY = "DAILY";
   export const HOURLY = "HOURLY";
+}
+
+export namespace PositionSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
 }
 
 ////////////////////////

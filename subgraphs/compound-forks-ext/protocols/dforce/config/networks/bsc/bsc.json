@@ -1,9 +1,0 @@
-{
-  "network": "bsc",
-  "comptrollerAddr": "0x0b53E608bD058Bb54748C35148484fD627E6dc0A",
-  "startBlock": 5929646,
-  "USXAddr": "0xB5102CeE1528Ce2C760893034A4603663495fD72",
-  "USXStartBlock": 7484709,
-  "EUXAddr": "0x367c17D19fCd0f7746764455497D63c8e8b2BbA3",
-  "EUXStartBlock": 7484776
-}

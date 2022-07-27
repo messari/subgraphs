@@ -1,9 +1,0 @@
-{
-  "network": "avalanche",
-  "comptrollerAddr": "0x75b9a7b6f55754d4d0e952da4bdb55eaea7df38e",
-  "startBlock": 15972069,
-  "USXAddr": "0x0000000000000000000000000000000000000000",
-  "USXStartBlock": 2147483647,
-  "EUXAddr": "0x0000000000000000000000000000000000000000",
-  "EUXStartBlock": 2147483647
-}
