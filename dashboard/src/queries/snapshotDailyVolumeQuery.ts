@@ -1,7 +1,6 @@
 import { Versions } from "../constants";
 
 export const getSnapshotDailyVolume = (version: string): string => {
-  console.log('VERSIONI', version)
   if (version?.includes(Versions.Schema120.split(".0")[0])) {
     return `
       query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
@@ -30,7 +29,7 @@ export const getSnapshotDailyVolume = (version: string): string => {
           dailyVolumeUSD
         }
         pool7: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool7Id}) {
-            id
+          id
           dailyVolumeUSD
         }
         pool8: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool8Id}) {

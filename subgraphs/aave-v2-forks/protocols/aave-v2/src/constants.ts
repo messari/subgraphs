@@ -16,8 +16,8 @@ export const USDC_POS_TOKEN_ADDRESS =
 export namespace Protocol {
   export const NAME = "Aave v2";
   export const SLUG = "aave-v2";
-  export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.2.3";
+  export const SCHEMA_VERSION = "2.0.1";
+  export const SUBGRAPH_VERSION = "1.2.4";
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 export const AAVE_DECIMALS = 8;

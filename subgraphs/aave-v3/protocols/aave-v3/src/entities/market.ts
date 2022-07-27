@@ -11,6 +11,7 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_SECONDS_PER_DAY,
   BIGINT_ZERO,
+  INT_ZERO,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
 } from "../../../../src/utils/constants";
@@ -24,7 +25,9 @@ import {
   addProtocolSideRevenue,
   addProtocolWithdrawVolume,
   addSupplySideRevenue,
+  decrementProtocolOpenPositionCount,
   getOrCreateLendingProtocol,
+  incrementProtocolPositionCount,
   updateProtocolBorrowBalance,
   updateProtocolTVL,
 } from "./protocol";
@@ -79,6 +82,11 @@ export function createMarket(
     market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.positionCount = INT_ZERO;
+    market.openPositionCount = INT_ZERO;
+    market.closedPositionCount = INT_ZERO;
+    market.lendingPositionCount = INT_ZERO;
+    market.borrowingPositionCount = INT_ZERO;
     market.save();
     incrementProtocolTotalPoolCount(event);
   }
@@ -399,6 +407,29 @@ function updateMarketRewardTokenEmissions(
   market.rewardTokenEmissionsAmount = rewardTokenEmissions;
   market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   market.save();
+}
+
+export function openMarketBorrowerPosition(market: Market): void {
+  market.openPositionCount += 1;
+  market.positionCount += 1;
+  market.borrowingPositionCount += 1;
+  market.save();
+  incrementProtocolPositionCount();
+}
+
+export function openMarketLenderPosition(market: Market): void {
+  market.openPositionCount += 1;
+  market.positionCount += 1;
+  market.lendingPositionCount += 1;
+  market.save();
+  incrementProtocolPositionCount();
+}
+
+export function closeMarketPosition(market: Market): void {
+  market.openPositionCount -= 1;
+  market.closedPositionCount += 1;
+  market.save();
+  decrementProtocolOpenPositionCount();
 }
 
 function updateMarketTVL(event: ethereum.Event, market: Market): void {
