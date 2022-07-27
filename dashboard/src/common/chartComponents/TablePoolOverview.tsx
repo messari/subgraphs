@@ -58,7 +58,7 @@ export const TablePoolOverview = ({
           cellStyle.width = "100%";
           cellStyle.textAlign = "right";
           let hoverText = params?.value?.toString()?.split("//")[1];
-          if (params?.row?.dailyVolumeUSD === null) {
+          if (params?.row?.dailyVolumeUSD === null && params?.row?.dailySupplySideRevenueUSD === null) {
             return (
               <span style={cellStyle}><CircularProgress size={30} /></span>
             )
@@ -277,7 +277,8 @@ export const TablePoolOverview = ({
               issues.filter(
                 (x) =>
                   x.fieldName ===
-                  `${pool.name || "#" + i + 1 + skipAmt}-totalDepositBalanceUSD/totalValueLockedUSD-pool value`,
+                  `${pool.name || "#" + i + 1 + skipAmt
+                  } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
               ).length === 0
             ) {
               issues.push({
@@ -371,11 +372,14 @@ export const TablePoolOverview = ({
       }
       if (baseFieldCol) {
         returnObj.dailyVolumeUSD = null;
-        returnObj.baseYield = 0;
-        if (pool?.totalValueLockedUSD && pool?.dailyVolumeUSD) {
-          returnObj.dailyVolumeUSD = pool?.dailyVolumeUSD;
+        returnObj.dailySupplySideRevenueUSD = null;
 
-          if (Object.keys(pool?.fees)?.length > 0) {
+        returnObj.baseYield = 0;
+        if (pool?.totalValueLockedUSD && (pool?.dailyVolumeUSD || pool?.dailySupplySideRevenueUSD)) {
+          returnObj.dailyVolumeUSD = pool?.dailyVolumeUSD;
+          returnObj.dailySupplySideRevenueUSD = pool?.dailySupplySideRevenueUSD;
+
+          if (Object.keys(pool?.fees)?.length > 0 && !pool?.dailySupplySideRevenueUSD) {
             // CURRENTLY THE FEE IS BASED OFF OF THE POOL RATHER THAN THE TIME SERIES. THIS IS TEMPORARY
             const supplierFee = pool.fees.find((fee: { [x: string]: string }) => {
               return fee.feeType === "FIXED_LP_FEE" || fee.feeType === "DYNAMIC_LP_FEE";
@@ -418,9 +422,27 @@ export const TablePoolOverview = ({
               });
             }
             returnObj.baseYield = value + "//" + factorsStr;
+          } else if (pool?.dailySupplySideRevenueUSD) {
+            let value = (Number(pool?.dailySupplySideRevenueUSD) * 36500) / Number(pool.totalValueLockedUSD)
+            const factorsStr = `(${Number(pool?.dailySupplySideRevenueUSD).toFixed(2)} (Daily Supply Side Revenue) * 365 * 100) / ${Number(pool.totalValueLockedUSD).toFixed(2)} (TVL) = ${value.toFixed(2)}%`;
+            if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
+              value = 0;
+              if (issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0) {
+                issues.push({
+                  type: "NAN",
+                  message: "",
+                  level: "critical",
+                  fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
+                });
+              }
+            }
+            returnObj.baseYield = value + "//" + factorsStr;
           } else {
             if (
-              issues.filter((x) => x.message === `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`).length === 0
+              issues.filter((x) => x.message === `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`).length === 0 &&
+              issues.filter((x) => x.message === `${pool.name} Base yield could not be calculated.`).length === 0
+              &&
+              (Object.keys(pool?.fees)?.length === 0 || !pool?.fees)
             ) {
               issues.push({
                 type: "val",
@@ -428,8 +450,18 @@ export const TablePoolOverview = ({
                 level: "critical",
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
               });
+            } else if (
+              issues.filter((x) => x.message === `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`).length === 0 &&
+              issues.filter((x) => x.message === `${pool.name} Base yield could not be calculated.`).length === 0
+            ) {
+              issues.push({
+                type: "val",
+                message: `${pool.name} Base yield could not be calculated.`,
+                level: "critical",
+                fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
+              });
             }
-            returnObj.baseYield = 'N/A//COULD NOT BE CALCULATED, NO FEES ON POOL';
+            returnObj.baseYield = 'N/A//Base Yield could not be calculated, no fees or supply side revenue provided.';
 
           }
 

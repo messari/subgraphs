@@ -15,7 +15,7 @@ const subgraphLogoMap: Record<string, string> = {
   compound: "https://messari.io/asset-images/157f4fe3-6046-4b6d-bceb-a2af8ca021b5/128.png?v=2",
   liquity: "https://messari.io/asset-images/d2bc5118-39e8-4b2c-bdea-a7e0c43536f3/128.png?v=2",
   honeyswap: "https://storage.googleapis.com/subgraph-images/1656114165689honeyswap.png",
-  platypus: "https://storage.googleapis.com/subgraph-images/1656114523112platypus-v2.png",
+  "platypus-finance": "https://storage.googleapis.com/subgraph-images/1656114523112platypus-v2.png",
   "vvs-finance": "https://assets.coingecko.com/coins/images/20210/small/8glAYOTM_400x400.jpg?1636667919",
   dforce: "https://assets.coingecko.com/coins/images/9709/small/xlGxxIjI_400x400.jpg?1571006794",
   makerdao: "https://messari.io/asset-images/4758c080-821e-4a19-bbae-4df59682d229/128.png?v=2",
