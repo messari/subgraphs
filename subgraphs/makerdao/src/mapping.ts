@@ -348,7 +348,7 @@ export function handleCatFile(event: CatNoteEvent): void {
       log.warning("[handleFileDog]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
       return;
     }
-    market.liquidationPenalty = bigIntToBDUseDecimals(chop, RAY)
+    market.liquidationPenalty = bigIntToBDUseDecimals(chop, WAD)
       .minus(BIGDECIMAL_ONE)
       .times(BIGDECIMAL_ONE_HUNDRED);
     market.save();
@@ -412,7 +412,7 @@ export function handleDogFile(event: DogFileChopEvent): void {
       return;
     }
     let chop = event.params.data;
-    market.liquidationPenalty = bigIntToBDUseDecimals(chop, RAY)
+    market.liquidationPenalty = bigIntToBDUseDecimals(chop, WAD)
       .minus(BIGDECIMAL_ONE)
       .times(BIGDECIMAL_ONE_HUNDRED);
     market.save();

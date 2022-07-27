@@ -65,16 +65,19 @@ export function BigDecimalTruncateToBigInt(x: BigDecimal): BigInt {
 //change number of decimals for BigInt
 export function bigIntChangeDecimals(x: BigInt, from: i32, to: i32): BigInt {
   let xBD = x.toBigDecimal();
-  let diffDecimals = to > from ? to - from : from - to;
-  let diffMagnitude = BigInt.fromI32(10)
-    .pow(diffDecimals as u8)
-    .toBigDecimal();
-  let denominator = diffMagnitude;
-  if (to < from) {
-    denominator = BIGDECIMAL_ONE.div(diffMagnitude);
+  if (to > from) {
+    // truncate number of decimals
+    let diffMagnitude = BigInt.fromI32(10)
+      .pow((to - from) as u8)
+      .toBigDecimal();
+    xBD = xBD.div(diffMagnitude);
+  } else if (to < from) {
+    // increase number of decimals
+    let diffMagnitude = BigInt.fromI32(10)
+      .pow((from - to) as u8)
+      .toBigDecimal();
+    xBD = xBD.times(diffMagnitude);
   }
-
-  xBD = xBD.div(denominator);
 
   return BigDecimalTruncateToBigInt(xBD);
 }
