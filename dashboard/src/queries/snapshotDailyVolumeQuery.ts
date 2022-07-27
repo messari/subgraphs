@@ -1,5 +1,8 @@
-export const getSnapshotDailyVolume = (): string => {
-  return `
+import { Versions } from "../constants";
+
+export const getSnapshotDailyVolume = (version: string): string => {
+  if (version?.includes(Versions.Schema120.split(".0")[0])) {
+    return `
       query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
         pool1: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool1Id}) {
           id
@@ -43,4 +46,50 @@ export const getSnapshotDailyVolume = (): string => {
         }
       }
     `;
+  } else {
+    return `
+    query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
+      pool1: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool1Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool2: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool2Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool3: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool3Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool4: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool4Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool5: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool5Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool6: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool6Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool7: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool7Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool8: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool8Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool9: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool9Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool10: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool10Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+    }
+  `;
+  }
 }

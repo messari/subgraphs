@@ -207,26 +207,26 @@ function ProtocolDashboard() {
 
   const [
     getPoolsOverviewData2,
-    { data: dataPools2, error: poolOverviewError2, loading: poolOverviewLoading2, refetch: poolOverviewRefetch2 },
+    { data: dataPools2, error: poolOverviewError2, loading: poolOverviewLoading2 },
   ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 10 } });
 
   const [
     getPoolsOverviewData3,
-    { data: dataPools3, error: poolOverviewError3, loading: poolOverviewLoading3, refetch: poolOverviewRefetch3 },
+    { data: dataPools3, error: poolOverviewError3, loading: poolOverviewLoading3 },
   ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 20 } });
 
   const [
     getPoolsOverviewData4,
-    { data: dataPools4, error: poolOverviewError4, loading: poolOverviewLoading4, refetch: poolOverviewRefetch4 },
+    { data: dataPools4, error: poolOverviewError4, loading: poolOverviewLoading4 },
   ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 30 } });
 
   const [
     getPoolsOverviewData5,
-    { data: dataPools5, error: poolOverviewError5, loading: poolOverviewLoading5, refetch: poolOverviewRefetch5 },
+    { data: dataPools5, error: poolOverviewError5, loading: poolOverviewLoading5 },
   ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 40 } });
 
 
-  const snapshotDailyVolumeQuery = gql`${getSnapshotDailyVolume()}`;
+  const snapshotDailyVolumeQuery = gql`${getSnapshotDailyVolume(protocolSchemaData?.protocols[0]?.schemaVersion)}`;
 
   const [
     getPoolsSnapshotVolume,
@@ -551,7 +551,9 @@ function ProtocolDashboard() {
         poolArray = [];
         Object.keys(snapshotVolume).forEach((x, idx) => {
           const copyElement = { ...copyPool[idx] };
+          copyElement.dailySupplySideRevenueUSD = snapshotVolume[x][snapshotVolume[x].length - 1]?.dailySupplySideRevenueUSD;
           copyElement.dailyVolumeUSD = snapshotVolume[x][snapshotVolume[x].length - 1]?.dailyVolumeUSD;
+
           poolArray.push(copyElement)
         })
       }
@@ -581,7 +583,9 @@ function ProtocolDashboard() {
         poolArray = [];
         Object.keys(snapshotVolume2).forEach((x, idx) => {
           const copyElement = { ...copyPool[idx] };
+          copyElement.dailySupplySideRevenueUSD = snapshotVolume2[x][snapshotVolume2[x].length - 1]?.dailySupplySideRevenueUSD;
           copyElement.dailyVolumeUSD = snapshotVolume2[x][snapshotVolume2[x].length - 1]?.dailyVolumeUSD;
+
           poolArray.push(copyElement);
         })
       }
@@ -610,7 +614,9 @@ function ProtocolDashboard() {
         poolArray = [];
         Object.keys(snapshotVolume3).forEach((x, idx) => {
           const copyElement = { ...copyPool[idx] };
+          copyElement.dailySupplySideRevenueUSD = snapshotVolume3[x][snapshotVolume3[x].length - 1]?.dailySupplySideRevenueUSD;
           copyElement.dailyVolumeUSD = snapshotVolume3[x][snapshotVolume3[x].length - 1]?.dailyVolumeUSD;
+
           poolArray.push(copyElement);
         })
       }
@@ -639,7 +645,9 @@ function ProtocolDashboard() {
         poolArray = [];
         Object.keys(snapshotVolume4).forEach((x, idx) => {
           const copyElement = { ...copyPool[idx] };
+          copyElement.dailySupplySideRevenueUSD = snapshotVolume4[x][snapshotVolume4[x].length - 1]?.dailySupplySideRevenueUSD;
           copyElement.dailyVolumeUSD = snapshotVolume4[x][snapshotVolume4[x].length - 1]?.dailyVolumeUSD;
+
           poolArray.push(copyElement);
         })
       }
@@ -668,7 +676,9 @@ function ProtocolDashboard() {
         poolArray = [];
         Object.keys(snapshotVolume5).forEach((x, idx) => {
           const copyElement = { ...copyPool[idx] };
+          copyElement.dailySupplySideRevenueUSD = snapshotVolume5[x][snapshotVolume5[x].length - 1]?.dailySupplySideRevenueUSD;
           copyElement.dailyVolumeUSD = snapshotVolume5[x][snapshotVolume5[x].length - 1]?.dailyVolumeUSD;
+
           poolArray.push(copyElement);
         })
       }

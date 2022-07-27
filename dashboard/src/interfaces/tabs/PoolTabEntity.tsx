@@ -107,14 +107,6 @@ function PoolTabEntity({
       if (data.protocols[0].type === "EXCHANGE") {
         let value = 0;
         if (Object.keys(data[poolKeySingular]?.fees)?.length > 0 && timeseriesInstance.totalValueLockedUSD) {
-          // CURRENTLY THE FEE IS BASED OFF OF THE POOL RATHER THAN THE TIME SERIES. THIS IS TEMPORARY
-          const supplierFee = data[poolKeySingular].fees.find((fee: { [x: string]: string }) => {
-            return fee.feeType === "FIXED_LP_FEE" || fee.feeType === "DYNAMIC_LP_FEE";
-          });
-          let feePercentage = 0;
-          if (supplierFee) {
-            feePercentage = Number(supplierFee.feePercentage);
-          }
           const revenueUSD = Number(timeseriesInstance.dailySupplySideRevenueUSD) * 365 || Number(timeseriesInstance.hourlySupplySideRevenueUSD) * 24 * 365;
           value = (revenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 100;
           if (!value) {
