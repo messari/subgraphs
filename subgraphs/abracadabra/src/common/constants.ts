@@ -69,6 +69,14 @@ export namespace InterestRateSide {
   export const LENDER = "LENDER";
   export const BORROW = "BORROWER";
 }
+export namespace EventType {
+  export const BORROW = "BORROW";
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const REPAY = "REPAY";
+  export const LIQUIDATEE = "LIQUIDATEE";
+  export const LIQUIDATOR = "LIQUIDATOR";
+}
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
@@ -183,6 +191,6 @@ export const ARB_NETWORK = "arbitrum-one";
 export const BSC_NETWORK = "bsc";
 export const AVALANCHE_NETWORK = "avalanche";
 
-export const schemaVersion = "1.3.0";
-export const subgraphVersion = "1.0.7";
+export const schemaVersion = "2.0.1";
+export const subgraphVersion = "1.2.1";
 export const methodologyVersion = "1.0.0";

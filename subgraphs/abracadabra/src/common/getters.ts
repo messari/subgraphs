@@ -54,7 +54,7 @@ import {
   schemaVersion,
   subgraphVersion,
   methodologyVersion,
-} from "../common/constants";
+} from "./constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -124,6 +124,16 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics.totalPoolCount = 0;
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
+
+    usageMetrics.dailyActiveDepositors = 0;
+    usageMetrics.dailyActiveBorrowers = 0;
+    usageMetrics.dailyActiveLiquidators = 0;
+    usageMetrics.dailyActiveLiquidatees = 0;
+    usageMetrics.cumulativeUniqueDepositors = 0;
+    usageMetrics.cumulativeUniqueBorrowers = 0;
+    usageMetrics.cumulativeUniqueLiquidators = 0;
+    usageMetrics.cumulativeUniqueLiquidatees = 0;
+
     usageMetrics.save();
   }
   return usageMetrics;
@@ -311,6 +321,16 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
   LendingProtocolEntity.protocolControlledValueUSD = BIGDECIMAL_ZERO;
   LendingProtocolEntity.marketIDList = [];
+  LendingProtocolEntity.depositors = [];
+  LendingProtocolEntity.borrowers = [];
+  LendingProtocolEntity.liquidators = [];
+  LendingProtocolEntity.liquidatees = [];
+  LendingProtocolEntity.cumulativeUniqueDepositors = 0;
+  LendingProtocolEntity.cumulativeUniqueBorrowers = 0;
+  LendingProtocolEntity.cumulativeUniqueLiquidators = 0;
+  LendingProtocolEntity.cumulativeUniqueLiquidatees = 0;
+  LendingProtocolEntity.openPositionCount = 0;
+  LendingProtocolEntity.cumulativePositionCount = 0;
 
   LendingProtocolEntity.save();
   return LendingProtocolEntity;
