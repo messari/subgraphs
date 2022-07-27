@@ -54,7 +54,6 @@ export const ETH_SYMBOL = "ETH";
 
 export const SOHM_ADDRESS = "0x04f2694c8fcee23e8fd0dfea1d4f5bb8c352111f";
 export const GOHM_ADDRESS = "0x0ab87046fBb341D058F17CBC4c1133F25a20a52f";
-export const FMIM_ADDRESS = "0xd9444bab79720e8223b83e5d913d00c679b44b65";
 
 ///////////////////////////
 //// Protocol Specific ////
@@ -62,6 +61,6 @@ export const FMIM_ADDRESS = "0xd9444bab79720e8223b83e5d913d00c679b44b65";
 
 export const PROTOCOL_NAME = "Rari Fuse";
 export const PROTOCOL_SLUG = "rari-fuse";
-export const SUBGRAPH_VERSION = "1.0.18";
+export const SUBGRAPH_VERSION = "1.0.16";
 export const SCHEMA_VERSION = "1.3.0";
 export const METHODOLOGY_VERSION = "1.0.0";

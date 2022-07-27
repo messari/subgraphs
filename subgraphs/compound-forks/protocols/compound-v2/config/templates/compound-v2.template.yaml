@@ -2,6 +2,14 @@ specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum/contract
     name: Comptroller
@@ -37,6 +45,10 @@ dataSources:
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
+        - event: MarketEntered(address,address)
+          handler: handleMarketEntered
+        - event: MarketExited(address,address)
+          handler: handleMarketExited
         - event: NewCollateralFactor(address,uint256,uint256)
           handler: handleNewCollateralFactor
         - event: NewLiquidationIncentive(uint256,uint256)
