@@ -1,0 +1,199 @@
+###
+# Subgraph Schema: ERC721 Smart Contracts and Tokens
+# Version: 1.0.0
+
+#############################
+####### Token Metadata ######
+#############################
+
+type Token @entity {
+  " address of the token, { Contract Address }-{ Token ID }  "
+  id: ID!
+
+  " Smart contract address for the token "
+  contract: Contract!
+
+  " ID of the token from the smart contract "
+  tokenID: BigInt!
+
+  " URI of the token "
+  tokenURI: String!
+
+  " The owner's address for the token "
+  owner: Account!
+
+  " timestamp of the token's mint "
+  mintTime: BigInt!
+}
+
+#############################################
+####### ERC721 Smart Contract Metadata ######
+#############################################
+
+type Contract @entity {
+  " ERC721 Smart contract address "
+  id: ID!
+
+  " Name of the smart contract "
+  name: String!
+
+  " Symbol of the smart contract "
+  symbol: String!
+
+  " Flag for whether EIP721 metadata is supported "
+  supportsEIP721Metadata: Boolean!
+
+  " Total number of unique tokens in the smart contract "
+  tokenCount: BigInt!
+
+  " Total number of unique token owners in the smart contract "
+  ownerCount: BigInt!
+
+  " Tokens in the smart contract "
+  tokens: [Token!]! @derivedFrom(field: "contract")
+
+  " List of token transfers "
+  transfers: [TransferEvent!]! @derivedFrom(field: "contract")
+
+  " Token holder's balance "
+  holdersBalance: [AccountBalance!]! @derivedFrom(field: "contract")
+
+  ##### Snapshots #####
+
+  " Daily snapshot for this smart contract "
+  dailyContractSnapshot: [ContractDailySnapshot!]!
+    @derivedFrom(field: "contract")
+}
+
+###############################################
+####### ERC721 Smart Contract Timeseries ######
+###############################################
+
+type ContractDailySnapshot @entity {
+  " { Smart Contract Address }-{ # of days since Unix epoch time } "
+  id: ID!
+
+  " Smart contract this snapshot is associated with "
+  contract: Contract!
+
+  " Total number of unique tokens in the smart contract for the specific day"
+  tokenCount: BigInt!
+
+  " Total number of unique token owners in the smart contract for the specific day"
+  ownerCount: BigInt!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+##################################
+##### Event-Level Data #####
+##################################
+
+type TransferEvent @entity {
+  " { Contract ID }-{ Transaction hash }-{ Log index } "
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The ERC721 smart contract this event belongs to "
+  contract: Contract!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: Int!
+
+  " ID of the token transferred "
+  tokenId: BigInt!
+
+  " Account that received the tokens "
+  to: Account!
+
+  " Account that sent the tokens "
+  from: Account!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+}
+
+##################################
+######## Account MetaData ########
+##################################
+
+# An account is a unique Ethereum address
+type Account @entity {
+  " Address of the account "
+  id: ID!
+
+  " Total number of unique tokens that this account holds "
+  tokenCount: BigInt!
+
+  " Tokens that this account holds "
+  tokens: [Token!]! @derivedFrom(field: "owner")
+
+  " Token transfers to this account "
+  transferTo: [TransferEvent!]! @derivedFrom(field: "to")
+
+  " Token transfers from this account "
+  transferFrom: [TransferEvent!]! @derivedFrom(field: "from")
+
+  " Token balances that this account holds "
+  balances: [AccountBalance!]! @derivedFrom(field: "account")
+
+  " Token balances snapshot that this account holds "
+  balancesSnapshot: [AccountBalanceDailySnapshot!]!
+    @derivedFrom(field: "account")
+}
+
+type AccountBalance @entity {
+  " { Address Of the Account }-{ Address of the Contract }"
+  id: ID!
+
+  " Account address "
+  account: Account!
+
+  " Contract address "
+  contract: Contract!
+
+  " Current token amount for the smart contract "
+  tokenCount: BigInt!
+
+  " Block number in which the balance was last modified "
+  blockNumber: BigInt!
+
+  " Timestamp in which the balance was last modified "
+  timestamp: BigInt!
+}
+
+###############################
+###### Account Timeseries #####
+###############################
+
+type AccountBalanceDailySnapshot @entity {
+  " { Address Of the Account }-{ Address of the Contract }-{ # of hours since Unix epoch time } "
+  id: ID!
+
+  " Account address "
+  account: Account!
+
+  " Contract address "
+  contract: Contract!
+
+  " Current token amount for the smart contract "
+  tokenCount: BigInt!
+
+  " Block number in which the balance was last modified "
+  blockNumber: BigInt!
+
+  " Timestamp in which the balance was last modified "
+  timestamp: BigInt!
+}
