@@ -48,7 +48,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 2. ChainLink Feed Registry
-  let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);
+  let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr);
   if (!chainLinkPrice.reverted) {
     log.warning("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),

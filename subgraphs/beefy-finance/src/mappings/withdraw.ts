@@ -3,7 +3,7 @@ import { Withdraw } from "../../generated/schema";
 import {
   BeefyStrategy,
   Withdraw as WithdrawEvent,
-} from "../../generated/ExampleVault/BeefyStrategy";
+} from "../../generated/aave-aave-eol/BeefyStrategy";
 import { getTokenOrCreate } from "../utils/getters";
 import {
   BIGINT_TEN,

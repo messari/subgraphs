@@ -1,7 +1,7 @@
 import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { Token, Vault, YieldAggregator } from "../../generated/schema";
 import { createVaultFromStrategy } from "../mappings/vault";
-import { BeefyStrategy } from "../../generated/ExampleVault/BeefyStrategy";
+import { BeefyStrategy } from "../../generated/aave-aave-eol/BeefyStrategy";
 import {
   fetchTokenDecimals,
   fetchTokenName,
