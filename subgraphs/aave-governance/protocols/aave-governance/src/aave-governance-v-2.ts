@@ -309,6 +309,7 @@ export function handleVoteEmitted(event: VoteEmitted): void {
   vote.reason = null;
   vote.block = event.block.number;
   vote.blockTime = event.block.timestamp;
+  vote.txnHash = event.transaction.hash.toHexString();
   // Retrieve enum string key by value (false = Against, true = For)
   vote.choice = choice;
   vote.save();
