@@ -50,7 +50,8 @@ export function createDeposit(
   event: ethereum.Event,
   reserve: Address,
   user: Address,
-  amount: BigInt
+  amount: BigInt,
+  isTransfer: boolean = false
 ): Deposit {
   if (amount.le(BIGINT_ZERO)) {
     log.critical("Invalid deposit amount: {}", [amount.toString()]);
@@ -80,8 +81,10 @@ export function createDeposit(
   deposit.amountUSD = amountInUSD(amount, asset);
   deposit.save();
   updateUsageMetrics(event, event.transaction.from);
-  addMarketDepositVolume(event, market, deposit.amountUSD);
-  incrementProtocolDepositCount(event, account);
+  if (!isTransfer) {
+    addMarketDepositVolume(event, market, deposit.amountUSD);
+    incrementProtocolDepositCount(event, account);
+  }
   incrementAccountDepositCount(account);
   incrementPositionDepositCount(position);
   return deposit;
@@ -91,7 +94,8 @@ export function createWithdraw(
   event: ethereum.Event,
   reserve: Address,
   user: Address,
-  amount: BigInt
+  amount: BigInt,
+  isTransfer: boolean = false
 ): Withdraw {
   if (amount.le(BIGINT_ZERO)) {
     log.critical("Invalid withdraw amount: {}", [amount.toString()]);
@@ -121,8 +125,10 @@ export function createWithdraw(
   withdraw.amountUSD = amountInUSD(amount, asset);
   withdraw.save();
   updateUsageMetrics(event, user);
-  addMarketWithdrawVolume(event, market, withdraw.amountUSD);
-  incrementProtocolWithdrawCount(event);
+  if (!isTransfer) {
+    addMarketWithdrawVolume(event, market, withdraw.amountUSD);
+    incrementProtocolWithdrawCount(event);
+  }
   incrementAccountWithdrawCount(account);
   incrementPositionWithdrawCount(position);
   checkIfPositionClosed(event, account, market, position);
