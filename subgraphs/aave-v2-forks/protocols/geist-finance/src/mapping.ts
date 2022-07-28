@@ -268,7 +268,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     );
     let tryTotalAllocPoint = incentiveControllerContract.try_totalAllocPoint();
     let tryTotalRewardsPerSecond =
-      incentiveControllerContract.try_totalRewardsPerSecond();
+      incentiveControllerContract.try_rewardsPerSecond();
 
     if (
       !tryPoolInfo.reverted ||
@@ -290,7 +290,9 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       let rewardsPerSecond = tryTotalRewardsPerSecond.value
         .times(tryPoolInfo.value.value1)
         .div(tryTotalAllocPoint.value);
-      let rewardsPerDay = rewardsPerSecond.times(SECONDS_PER_DAY);
+      let rewardsPerDay = rewardsPerSecond.times(
+        BigInt.fromI32(SECONDS_PER_DAY)
+      );
 
       let rewardTokenPriceUSD = getGeistPriceUSD();
       let rewardsPerDayUSD = rewardsPerDay
