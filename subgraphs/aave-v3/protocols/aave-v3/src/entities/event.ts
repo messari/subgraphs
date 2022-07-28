@@ -232,6 +232,12 @@ export function createLiquidate(
     market,
     PositionSide.LENDER
   );
+  const borrowerPosition = getOrCreateUserPosition(
+    event,
+    userAccount,
+    getMarket(debtAsset),
+    PositionSide.BORROWER
+  );
   const liquidate = new Liquidate(
     `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
   );
@@ -259,5 +265,6 @@ export function createLiquidate(
   incrementPositionLiquidationCount(position);
   incrementAccountLiquidatorCount(liquidatorAccount);
   checkIfPositionClosed(event, userAccount, market, position);
+  checkIfPositionClosed(event, userAccount, market, borrowerPosition);
   return liquidate;
 }

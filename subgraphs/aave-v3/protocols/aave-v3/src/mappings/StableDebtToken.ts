@@ -10,11 +10,12 @@ export function handleBurn(event: Burn): void {
   updateReserveStableDebtSupply(event, event.params.newTotalSupply);
 
   const reserve = getReserve(event.address);
+  const balance = event.params.currentBalance.minus(event.params.amount);
   updateUserStableBorrowerPosition(
     event,
     event.params.from,
     getMarketById(reserve.id),
-    event.params.currentBalance
+    balance
   );
 }
 
@@ -22,10 +23,11 @@ export function handleMint(event: Mint): void {
   updateReserveStableDebtSupply(event, event.params.newTotalSupply);
 
   const reserve = getReserve(event.address);
+  const balance = event.params.currentBalance.plus(event.params.amount);
   updateUserStableBorrowerPosition(
     event,
     event.params.onBehalfOf,
     getMarketById(reserve.id),
-    event.params.currentBalance
+    balance
   );
 }
