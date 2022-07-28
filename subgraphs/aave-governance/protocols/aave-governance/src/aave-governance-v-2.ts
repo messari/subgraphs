@@ -208,8 +208,7 @@ export function handleProposalCreated(event: ProposalCreated): void {
   proposal.startBlock = event.params.startBlock;
   proposal.endBlock = event.params.endBlock;
 
-  // Get description from ipfs hash
-  // Adapted from the official Aave Governance Subgraph
+  // Get description from ipfs hash (from official Aave Governance Subgraph)
   // https://github.com/aave/governance-delegation-subgraph/blob/master/src/mapping/governance.ts#L33
   let description = "";
   let hash = Bytes.fromHexString(
@@ -225,13 +224,26 @@ export function handleProposalCreated(event: ProposalCreated): void {
       description = descriptionJSON.toString();
     }
   }
-
   proposal.description = description;
-  proposal.state =
-    event.block.number >= proposal.startBlock
-      ? ProposalState.ACTIVE
-      : ProposalState.PENDING;
   proposal.governanceFramework = event.address.toHexString();
+
+  // If start block reached, proposal starts as active
+  if (event.block.number >= proposal.startBlock) {
+    proposal.state = ProposalState.ACTIVE;
+
+    // Set snapshot for quorum, tokenholders and delegates
+    proposal.quorumVotes = getQuorumFromContract(
+      event.address,
+      Address.fromString(proposal.executor),
+      event.block.number.minus(BIGINT_ONE)
+    );
+    let governance = getGovernance();
+    proposal.tokenHoldersAtStart = governance.currentTokenHolders;
+    proposal.delegatesAtStart = governance.currentDelegates;
+  } else {
+    proposal.state = ProposalState.PENDING;
+  }
+
   proposal.save();
 
   // Increment gov proposal count
@@ -259,7 +271,6 @@ export function handleProposalQueued(event: ProposalQueued): void {
   // Update proposal status + execution metadata
   let proposal = getOrCreateProposal(event.params.id.toString());
   proposal.state = ProposalState.QUEUED;
-  // FIXME: check if block no. or block time
   proposal.executionETA = event.params.executionTime;
   proposal.save();
 
@@ -269,43 +280,24 @@ export function handleProposalQueued(event: ProposalQueued): void {
   governance.save();
 }
 
-function getLatestProposalValues(
-  proposalId: string,
-  contractAddress: Address,
-  blockNumber: BigInt
-): Proposal {
-  let proposal = getOrCreateProposal(proposalId);
+export function handleVoteEmitted(event: VoteEmitted): void {
+  let proposal = getOrCreateProposal(event.params.id.toString());
 
-  // On first vote, set state and quorum values
+  // if state is pending (i.e. the first vote), set state, quorum, delegates and tokenholders
   if (proposal.state == ProposalState.PENDING) {
     proposal.state = ProposalState.ACTIVE;
 
-    // Get govStrat contract address
-    let contract = AaveGovernanceV2.bind(contractAddress);
-    let govStratAddress = contract.getGovernanceStrategy();
-    // Get totalVotingSuppy from GovStrat contract
-    let governanceStrategyContract = GovernanceStrategy.bind(govStratAddress);
-    let totalVotingSupply = governanceStrategyContract.getTotalVotingSupplyAt(
-      blockNumber.minus(BIGINT_ONE)
+    // Set snapshot for quorum, tokenholders and delegates
+    proposal.quorumVotes = getQuorumFromContract(
+      event.address,
+      Address.fromString(proposal.executor),
+      event.block.number.minus(BIGINT_ONE)
     );
-    // Get minimum voting power from Executor contract
-    let executorAddress = Address.fromString(proposal.executor);
-    let executorContract = Executor.bind(executorAddress);
-    proposal.quorumVotes =
-      executorContract.getMinimumVotingPowerNeeded(totalVotingSupply);
-
     let governance = getGovernance();
     proposal.tokenHoldersAtStart = governance.currentTokenHolders;
     proposal.delegatesAtStart = governance.currentDelegates;
   }
-  return proposal;
-}
-export function handleVoteEmitted(event: VoteEmitted): void {
-  let proposal = getLatestProposalValues(
-    event.params.id.toString(),
-    event.address,
-    event.block.number
-  );
+
   let voterAddress = event.params.voter.toHexString();
   let choice = getVoteChoiceByValue(event.params.support);
   let weight = event.params.votingPower;
@@ -371,4 +363,21 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
   }
 
   return governanceFramework;
+}
+function getQuorumFromContract(
+  contractAddress: Address,
+  executorAddress: Address,
+  blockNumber: BigInt
+): BigInt {
+  // Get govStrat contract address
+  let contract = AaveGovernanceV2.bind(contractAddress);
+  let govStratAddress = contract.getGovernanceStrategy();
+  // Get totalVotingSuppy from GovStrat contract
+  let governanceStrategyContract = GovernanceStrategy.bind(govStratAddress);
+  let totalVotingSupply = governanceStrategyContract.getTotalVotingSupplyAt(
+    blockNumber.minus(BIGINT_ONE)
+  );
+  // Get minimum voting power from Executor contract
+  let executorContract = Executor.bind(executorAddress);
+  return executorContract.getMinimumVotingPowerNeeded(totalVotingSupply);
 }
