@@ -47,7 +47,7 @@ Stakers of SNX (or depositors of ETH and BTC) can be liquidated if their debt ar
 
 ### Other Features
 
-*Wrapper
+*Wrapper*
 
 Synthetix also allows (or historically allowed) users to deposit ETH, renBTC and LUSD as collaterals, to borrow sETH or sUSD. This feature changed the nature a few times in the past and it's not in the documentation. 
 
