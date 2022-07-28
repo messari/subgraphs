@@ -8,6 +8,7 @@ import {
 import {
   getGovernance,
   getOrCreateProposal,
+  _handleProposalCanceled,
   _handleProposalCreated,
   _handleProposalExecuted,
   _handleProposalQueued,
@@ -25,7 +26,6 @@ import {
 import { Executor } from "../../../generated/DydxGovernor/Executor";
 import { GovernanceStrategy } from "../../../generated/DydxGovernor/GovernanceStrategy";
 import { GovernanceFramework } from "../../../generated/schema";
-import { _handleProposalCanceled } from "../../../../openzeppelin-governor/src/handlers";
 
 export function handleProposalCanceled(event: ProposalCanceled): void {
   _handleProposalCanceled(event.params.id.toString(), event);
