@@ -909,6 +909,13 @@
           "danielkhoo": "danielkhoo/aave-governance",
           "deploy-on-merge": false
         }
+      },
+      "dydx-governance": {
+        "ethereum": {
+          "template": "dydx-governance.template.yaml",
+          "danielkhoo": "danielkhoo/dydx-governance",
+          "deploy-on-merge": false
+        }
       }
     },
     "openzeppelin-governor": {
