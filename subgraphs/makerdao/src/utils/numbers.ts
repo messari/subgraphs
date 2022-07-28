@@ -64,22 +64,24 @@ export function BigDecimalTruncateToBigInt(x: BigDecimal): BigInt {
 
 //change number of decimals for BigInt
 export function bigIntChangeDecimals(x: BigInt, from: i32, to: i32): BigInt {
-  let xBD = x.toBigDecimal();
-  if (to > from) {
-    // truncate number of decimals
-    let diffMagnitude = BigInt.fromI32(10)
-      .pow((to - from) as u8)
-      .toBigDecimal();
-    xBD = xBD.div(diffMagnitude);
-  } else if (to < from) {
+  let result = x;
+
+  if (to == from) {
+    return result;
+  } else if (to > from) {
     // increase number of decimals
+    let diffMagnitude = BigInt.fromI32(10).pow((to - from) as u8);
+    result = x.times(diffMagnitude);
+  } else if (to < from) {
+    // decrease number of decimals
     let diffMagnitude = BigInt.fromI32(10)
       .pow((from - to) as u8)
       .toBigDecimal();
-    xBD = xBD.times(diffMagnitude);
+    let xBD = x.divDecimal(diffMagnitude);
+    result = BigDecimalTruncateToBigInt(xBD);
   }
 
-  return BigDecimalTruncateToBigInt(xBD);
+  return result;
 }
 
 export function round(numberToRound: BigDecimal): BigDecimal {
