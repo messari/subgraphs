@@ -49,7 +49,7 @@ Stakers of SNX (or depositors of ETH and BTC) can be liquidated if their debt ar
 
 *Wrapper*
 
-Synthetix also allows (or historically allowed) users to deposit ETH, renBTC and LUSD as collaterals, to borrow sETH or sUSD. This feature changed the nature a few times in the past and it's not in the documentation. 
+Synthetix also allows (or historically allowed) users to deposit ETH, renBTC and LUSD as collaterals, to borrow sETH or sUSD. This feature changed a few times in the past and it's not in the documentation. 
 
 Depositing ETH, renBTC or LUSD into Synthetix is separated from staking SNX. It functions like a normal CDP, whereby:
   - It's in the "Loan" screen in UI, not the Staking UI
