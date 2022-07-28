@@ -7,12 +7,6 @@ export const BIGINT_FIVE = BigInt.fromI32(5);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 
 export const GOVERNANCE_NAME = "AaveGovernanceV2";
-export const GOVERNANCE_ADDRESS = "0xEC568fffba86c094cf06b22134B23074DFE2252c";
-export const GOVERNANCE_STRATEGY_ADDRESS =
-  "0xb7e383ef9B1E9189Fc0F71fb30af8aa14377429e";
-export const SHORT_EXECUTOR_ADDRESS =
-  "0xee56e2b3d491590b5b31738cc34d5232f378a8d5";
-export const TOKEN_ADDRESS = "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9";
 
 export namespace DelegationType {
   export const VOTING_POWER = 0;

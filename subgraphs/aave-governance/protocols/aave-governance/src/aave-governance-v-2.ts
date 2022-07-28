@@ -1,25 +1,18 @@
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ipfs,
-  json,
-  Bytes,
-  log,
-  JSONValue,
-  JSONValueKind,
-} from "@graphprotocol/graph-ts";
-import {
-  BIGDECIMAL_ZERO,
   BIGINT_ONE,
   BIGINT_ZERO,
   GOVERNANCE_NAME,
   ProposalState,
-  SHORT_EXECUTOR_ADDRESS,
-  TOKEN_ADDRESS,
-  VoteChoice,
-  ZERO_ADDRESS,
 } from "../../../src/constants";
+import {
+  getGovernance,
+  getOrCreateProposal,
+  _handleProposalCreated,
+  _handleProposalExecuted,
+  _handleProposalQueued,
+  _handleVoteEmitted,
+} from "../../../src/handlers";
 import {
   AaveGovernanceV2,
   ProposalCanceled,
@@ -31,253 +24,43 @@ import {
 } from "../../../generated/AaveGovernanceV2/AaveGovernanceV2";
 import { Executor } from "../../../generated/AaveGovernanceV2/Executor";
 import { GovernanceStrategy } from "../../../generated/AaveGovernanceV2/GovernanceStrategy";
-import {
-  Delegate,
-  Governance,
-  GovernanceFramework,
-  Proposal,
-  TokenHolder,
-  Vote,
-} from "../../../generated/schema";
-
-export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
-  return value.divDecimal(
-    BigInt.fromI32(10)
-      .pow(<u8>decimals)
-      .toBigDecimal()
-  );
-}
-export function addressesToStrings(addresses: Address[]): Array<string> {
-  const byteAddresses = new Array<string>();
-  for (let i = 0; i < addresses.length; i++) {
-    byteAddresses.push(addresses[i].toHexString());
-  }
-  return byteAddresses;
-}
-
-export function getVoteChoiceByValue(choiceValue: bool): string {
-  if (choiceValue === true) {
-    return VoteChoice.FOR;
-  } else {
-    return VoteChoice.AGAINST;
-  }
-}
-
-export function getGovernance(): Governance {
-  let governance = Governance.load(GOVERNANCE_NAME);
-
-  if (!governance) {
-    governance = new Governance(GOVERNANCE_NAME);
-    governance.proposals = BIGINT_ZERO;
-    governance.currentTokenHolders = BIGINT_ZERO;
-    governance.totalTokenHolders = BIGINT_ZERO;
-    governance.currentDelegates = BIGINT_ZERO;
-    governance.totalDelegates = BIGINT_ZERO;
-    governance.delegatedVotesRaw = BIGINT_ZERO;
-    governance.delegatedVotes = BIGDECIMAL_ZERO;
-    governance.proposalsQueued = BIGINT_ZERO;
-    governance.proposalsExecuted = BIGINT_ZERO;
-    governance.proposalsCanceled = BIGINT_ZERO;
-  }
-
-  return governance;
-}
-
-export function getOrCreateProposal(
-  id: string,
-  createIfNotFound: boolean = true,
-  save: boolean = false
-): Proposal {
-  let proposal = Proposal.load(id);
-
-  if (!proposal && createIfNotFound) {
-    proposal = new Proposal(id);
-    proposal.tokenHoldersAtStart = BIGINT_ZERO;
-    proposal.delegatesAtStart = BIGINT_ZERO;
-    if (save) {
-      proposal.save();
-    }
-  }
-
-  return proposal as Proposal;
-}
-
-export function getOrCreateDelegate(
-  address: string,
-  createIfNotFound: boolean = true,
-  save: boolean = true
-): Delegate {
-  let delegate = Delegate.load(address);
-
-  if (!delegate && createIfNotFound) {
-    delegate = new Delegate(address);
-    delegate.delegatedVotesRaw = BIGINT_ZERO;
-    delegate.delegatedVotes = BIGDECIMAL_ZERO;
-    delegate.tokenHoldersRepresentedAmount = 0;
-    delegate.numberVotes = 0;
-    if (save) {
-      delegate.save();
-    }
-
-    if (address != ZERO_ADDRESS) {
-      let governance = getGovernance();
-      governance.totalDelegates = governance.totalDelegates.plus(BIGINT_ONE);
-      governance.save();
-    }
-  }
-
-  return delegate as Delegate;
-}
-
-export function getOrCreateTokenHolder(
-  address: string,
-  createIfNotFound: boolean = true,
-  save: boolean = true
-): TokenHolder {
-  let tokenHolder = TokenHolder.load(address);
-
-  if (!tokenHolder && createIfNotFound) {
-    tokenHolder = new TokenHolder(address);
-    tokenHolder.tokenBalanceRaw = BIGINT_ZERO;
-    tokenHolder.tokenBalance = BIGDECIMAL_ZERO;
-    tokenHolder.totalTokensHeldRaw = BIGINT_ZERO;
-    tokenHolder.totalTokensHeld = BIGDECIMAL_ZERO;
-    if (save) {
-      tokenHolder.save();
-    }
-
-    if (address != ZERO_ADDRESS) {
-      let governance = getGovernance();
-      governance.totalTokenHolders =
-        governance.totalTokenHolders.plus(BIGINT_ONE);
-      governance.save();
-    }
-  }
-
-  return tokenHolder as TokenHolder;
-}
+import { GovernanceFramework } from "../../../generated/schema";
+import { _handleProposalCanceled } from "../../../../openzeppelin-governor/src/handlers";
 
 export function handleProposalCanceled(event: ProposalCanceled): void {
-  let proposal = getOrCreateProposal(event.params.id.toString());
-  proposal.state = ProposalState.CANCELED;
-  proposal.cancellationBlock = event.block.number;
-  proposal.cancellationTime = event.block.timestamp;
-  proposal.save();
-
-  // Update governance proposal state counts
-  const governance = getGovernance();
-  governance.proposalsCanceled = governance.proposalsCanceled.plus(BIGINT_ONE);
-  governance.save();
+  _handleProposalCanceled(event.params.id.toString(), event);
 }
 
 export function handleProposalCreated(event: ProposalCreated): void {
-  let proposalId = event.params.id.toString();
-  let proposerAddr = event.params.creator.toHexString();
+  let executor = event.params.executor;
+  let quorumVotes = getQuorumFromContract(
+    event.address,
+    executor,
+    event.block.number.minus(BIGINT_ONE)
+  );
 
-  let proposal = getOrCreateProposal(proposalId);
-  let proposer = getOrCreateDelegate(proposerAddr);
-
-  // Checking if the proposer was a delegate already accounted for, if not we should log an error
-  // since it shouldn't be possible for a delegate to propose anything without first being "created"
-  if (proposer == null) {
-    log.error(
-      "Delegate participant {} not found on ProposalCreated. tx_hash: {}",
-      [proposerAddr, event.transaction.hash.toHexString()]
-    );
-  }
-
-  // Creating it anyway since we will want to account for this event data, even though it should've never happened
-  proposer = getOrCreateDelegate(proposerAddr);
-  proposal.executor = event.params.executor.toHexString();
-  proposal.proposer = proposer.id;
-  proposal.quorumVotes = BIGINT_ZERO;
-  proposal.againstDelegateVotes = BIGINT_ZERO;
-  proposal.forDelegateVotes = BIGINT_ZERO;
-  proposal.abstainDelegateVotes = BIGINT_ZERO;
-  proposal.totalDelegateVotes = BIGINT_ZERO;
-  proposal.againstWeightedVotes = BIGINT_ZERO;
-  proposal.forWeightedVotes = BIGINT_ZERO;
-  proposal.abstainWeightedVotes = BIGINT_ZERO;
-  proposal.totalWeightedVotes = BIGINT_ZERO;
-  proposal.targets = addressesToStrings(event.params.targets);
-  proposal.values = event.params.values;
-  proposal.signatures = event.params.signatures;
-  proposal.calldatas = event.params.calldatas;
-  proposal.creationBlock = event.block.number;
-  proposal.creationTime = event.block.timestamp;
-  proposal.startBlock = event.params.startBlock;
-  proposal.endBlock = event.params.endBlock;
-
-  // Get description from ipfs hash (from official Aave Governance Subgraph)
-  // https://github.com/aave/governance-delegation-subgraph/blob/master/src/mapping/governance.ts#L33
-  let description = "";
-  let hash = Bytes.fromHexString(
-    "1220" + event.params.ipfsHash.toHexString().slice(2)
-  ).toBase58();
-  let data = ipfs.cat(hash);
-  let proposalData = json.try_fromBytes(data as Bytes);
-  let descriptionJSON: JSONValue | null = null;
-  if (proposalData.isOk && proposalData.value.kind == JSONValueKind.OBJECT) {
-    let jsonData = proposalData.value.toObject();
-    descriptionJSON = jsonData.get("description");
-    if (descriptionJSON) {
-      description = descriptionJSON.toString();
-    }
-  }
-  proposal.description = description;
-  proposal.governanceFramework = event.address.toHexString();
-
-  // If start block reached, proposal starts as active
-  if (event.block.number >= proposal.startBlock) {
-    proposal.state = ProposalState.ACTIVE;
-
-    // Set snapshot for quorum, tokenholders and delegates
-    proposal.quorumVotes = getQuorumFromContract(
-      event.address,
-      Address.fromString(proposal.executor),
-      event.block.number.minus(BIGINT_ONE)
-    );
-    let governance = getGovernance();
-    proposal.tokenHoldersAtStart = governance.currentTokenHolders;
-    proposal.delegatesAtStart = governance.currentDelegates;
-  } else {
-    proposal.state = ProposalState.PENDING;
-  }
-
-  proposal.save();
-
-  // Increment gov proposal count
-  const governance = getGovernance();
-  governance.proposals = governance.proposals.plus(BIGINT_ONE);
-  governance.save();
+  _handleProposalCreated(
+    event.params.id.toString(),
+    event.params.creator.toHexString(),
+    executor.toHexString(),
+    event.params.targets,
+    event.params.values,
+    event.params.signatures,
+    event.params.calldatas,
+    event.params.startBlock,
+    event.params.endBlock,
+    event.params.ipfsHash,
+    quorumVotes,
+    event
+  );
 }
 
 export function handleProposalExecuted(event: ProposalExecuted): void {
-  // Update proposal status + execution metadata
-  let proposal = getOrCreateProposal(event.params.id.toString());
-  proposal.state = ProposalState.EXECUTED;
-  proposal.executionBlock = event.block.number;
-  proposal.executionTime = event.block.timestamp;
-  proposal.save();
-
-  // Update governance proposal state counts
-  let governance = getGovernance();
-  governance.proposalsQueued = governance.proposalsQueued.minus(BIGINT_ONE);
-  governance.proposalsExecuted = governance.proposalsExecuted.plus(BIGINT_ONE);
-  governance.save();
+  _handleProposalExecuted(event.params.id.toString(), event);
 }
 
 export function handleProposalQueued(event: ProposalQueued): void {
-  // Update proposal status + execution metadata
-  let proposal = getOrCreateProposal(event.params.id.toString());
-  proposal.state = ProposalState.QUEUED;
-  proposal.executionETA = event.params.executionTime;
-  proposal.save();
-
-  // Update governance proposal state counts
-  let governance = getGovernance();
-  governance.proposalsQueued = governance.proposalsQueued.plus(BIGINT_ONE);
-  governance.save();
+  _handleProposalQueued(event.params.id.toString(), event.params.executionTime);
 }
 
 export function handleVoteEmitted(event: VoteEmitted): void {
@@ -286,7 +69,6 @@ export function handleVoteEmitted(event: VoteEmitted): void {
   // if state is pending (i.e. the first vote), set state, quorum, delegates and tokenholders
   if (proposal.state == ProposalState.PENDING) {
     proposal.state = ProposalState.ACTIVE;
-
     // Set snapshot for quorum, tokenholders and delegates
     proposal.quorumVotes = getQuorumFromContract(
       event.address,
@@ -298,40 +80,14 @@ export function handleVoteEmitted(event: VoteEmitted): void {
     proposal.delegatesAtStart = governance.currentDelegates;
   }
 
-  let voterAddress = event.params.voter.toHexString();
-  let choice = getVoteChoiceByValue(event.params.support);
-  let weight = event.params.votingPower;
-  let voteId = voterAddress.concat("-").concat(proposal.id);
-  let vote = new Vote(voteId);
-  vote.proposal = proposal.id;
-  vote.voter = voterAddress;
-  vote.weight = weight;
-  vote.reason = null;
-  vote.block = event.block.number;
-  vote.blockTime = event.block.timestamp;
-  vote.txnHash = event.transaction.hash.toHexString();
-  // Retrieve enum string key by value (false = Against, true = For)
-  vote.choice = choice;
-  vote.save();
-
-  // Increment respective vote choice counts
-  if (choice === VoteChoice.FOR) {
-    proposal.againstDelegateVotes =
-      proposal.againstDelegateVotes.plus(BIGINT_ONE);
-    proposal.againstWeightedVotes = proposal.againstWeightedVotes.plus(weight);
-  } else {
-    proposal.forDelegateVotes = proposal.forDelegateVotes.plus(BIGINT_ONE);
-    proposal.forWeightedVotes = proposal.forWeightedVotes.plus(weight);
-  }
-  // Increment total
-  proposal.totalDelegateVotes = proposal.totalDelegateVotes.plus(BIGINT_ONE);
-  proposal.totalWeightedVotes = proposal.totalWeightedVotes.plus(weight);
-  proposal.save();
-
-  // Add 1 to participant's proposal voting count
-  let voter = getOrCreateDelegate(voterAddress);
-  voter.numberVotes = voter.numberVotes + 1;
-  voter.save();
+  // Proposal will be updated as part of handler
+  _handleVoteEmitted(
+    proposal,
+    event.params.voter.toHexString(),
+    event.params.votingPower,
+    event.params.support,
+    event
+  );
 }
 
 // VotingDelayChanged (newVotingDelay, initiatorChange)
@@ -353,8 +109,10 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework.version = "1";
 
     governanceFramework.contractAddress = contractAddress;
-    governanceFramework.tokenAddress = TOKEN_ADDRESS;
-    governanceFramework.timelockAddress = SHORT_EXECUTOR_ADDRESS;
+    governanceFramework.tokenAddress =
+      "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9";
+    governanceFramework.timelockAddress =
+      "0xee56e2b3d491590b5b31738cc34d5232f378a8d5";
 
     // Init as zero, as govStrat / executor contracts are not deployed yet
     // values will be updated when proposal voting starts
