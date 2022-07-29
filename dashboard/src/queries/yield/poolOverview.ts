@@ -17,48 +17,19 @@ export const schema = (version: string): string => {
 
 export const schema120 = (): string => {
   return `
-          query Data($skipAmt: Int!) {
-              vaults(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
-                  id
+    query Data($skipAmt: Int!) {
+      vaults(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+              id
               name
               symbol
               fees {
                 feeType
                 feePercentage
               }
-              inputToken {
-                id
-                decimals
-                name
-                symbol
-              }
-              outputToken {
-                id
-                decimals
-                name
-                symbol
-              }
-              rewardTokens {
-                id
-                type
-                token {
-                  id
-                  decimals
-                  name
-                  symbol
-                }
-              }
-              depositLimit
+
               totalValueLockedUSD
-              cumulativeSupplySideRevenueUSD
-              cumulativeProtocolSideRevenueUSD
-              cumulativeTotalRevenueUSD
               stakedOutputTokenAmount
-              pricePerShare
-              inputTokenBalance
               outputTokenSupply
-              outputTokenPriceUSD
-              rewardTokenEmissionsAmount
               rewardTokenEmissionsUSD
               }
           }`;
@@ -66,45 +37,18 @@ export const schema120 = (): string => {
 
 export const schema130 = (): string => {
   return `
-        query Data($skipAmt: Int!) {
-        vaults(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
-            id
+    query Data($skipAmt: Int!) {
+      vaults(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+        id
         name
-        symbol
         fees {
           feeType
           feePercentage
         }
-        inputToken {
-          id
-          decimals
-          name
-          symbol
-        }
-        outputToken {
-          id
-          decimals
-          name
-          symbol
-        }
-        rewardTokens {
-          id
-          type
-          token {
-            id
-            decimals
-            name
-            symbol
-          }
-        }
-        depositLimit
+
         totalValueLockedUSD
         stakedOutputTokenAmount
-        pricePerShare
-        inputTokenBalance
         outputTokenSupply
-        outputTokenPriceUSD
-        rewardTokenEmissionsAmount
         rewardTokenEmissionsUSD
         }
     }`;

@@ -11,11 +11,11 @@ const subgraphLogoMap: Record<string, string> = {
   moonwell: "https://assets.coingecko.com/coins/images/23914/small/moonwell-logo-200px.png?1645682927",
   apeswap: "https://messari.io/asset-images/78426375-fb5a-4079-91b3-e5db4fef2826/128.png?v=2",
   benqi: "https://messari.io/asset-images/0b731b8e-0387-48ee-8d7b-8342daf727f8/128.png?v=2",
-  uniswap: "https://messari.io/asset-images/6efbfc8a-18c9-4c6f-aa78-feea100521cf/128.png?v=1",
+  uniswap: "https://assets.coingecko.com/coins/images/12504/small/uniswap-uni.png?1600306604",
   compound: "https://messari.io/asset-images/157f4fe3-6046-4b6d-bceb-a2af8ca021b5/128.png?v=2",
   liquity: "https://messari.io/asset-images/d2bc5118-39e8-4b2c-bdea-a7e0c43536f3/128.png?v=2",
   honeyswap: "https://storage.googleapis.com/subgraph-images/1656114165689honeyswap.png",
-  platypus: "https://storage.googleapis.com/subgraph-images/1656114523112platypus-v2.png",
+  "platypus-finance": "https://storage.googleapis.com/subgraph-images/1656114523112platypus-v2.png",
   "vvs-finance": "https://assets.coingecko.com/coins/images/20210/small/8glAYOTM_400x400.jpg?1636667919",
   dforce: "https://assets.coingecko.com/coins/images/9709/small/xlGxxIjI_400x400.jpg?1571006794",
   makerdao: "https://messari.io/asset-images/4758c080-821e-4a19-bbae-4df59682d229/128.png?v=2",
@@ -47,7 +47,9 @@ const subgraphLogoMap: Record<string, string> = {
   "banker-joe": "https://storage.googleapis.com/subgraph-images/1654009863071banker-joe.png",
   quickswap: "https://assets.coingecko.com/coins/images/25393/small/quickswap.jpg?1651680141",
   solarbeam: "https://assets.coingecko.com/coins/images/18260/small/solarbeamlogo.png?1636080005",
-  "maple-finance": "https://assets.coingecko.com/coins/images/14097/small/Maple_Logo_Mark_Maple_Orange.png?1653381382"
+  ubeswap: "https://assets.coingecko.com/coins/images/15317/small/ubeswap.png?1620395836",
+  tectonic: "https://assets.coingecko.com/coins/images/21982/small/TONIC_logo.png?1640575290",
+  "maple-finance": "https://assets.coingecko.com/coins/images/14097/small/Maple_Logo_Mark_Maple_Orange.png?1653381382",
 };
 
 // used for protocols with multiple versions

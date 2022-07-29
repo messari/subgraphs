@@ -52,7 +52,6 @@ import {
   setBorrowInterestRate,
   setSupplyInterestRate,
   snapshotFinancials,
-  snapshotMarket,
   TokenData,
   updateAllMarketPrices,
   UpdateMarketData,
@@ -326,10 +325,23 @@ function handleAccrueInterest(
   updateRewards(event, market);
 
   // creates and initializes market snapshots
-  snapshotMarket(
-    event.address.toHexString(),
-    event.block.number,
-    event.block.timestamp
+
+  //
+  // daily snapshot
+  //
+  getOrCreateMarketDailySnapshot(
+    market,
+    event.block.timestamp,
+    event.block.number
+  );
+
+  //
+  // hourly snapshot
+  //
+  getOrCreateMarketHourlySnapshot(
+    market,
+    event.block.timestamp,
+    event.block.number
   );
 
   updateMarket(
@@ -525,8 +537,9 @@ function updateMarket(
 
   // update daily fields in marketDailySnapshot
   let dailySnapshot = getOrCreateMarketDailySnapshot(
-    market.id,
-    blockTimestamp.toI32()
+    market,
+    blockTimestamp,
+    blockNumber
   );
   dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
     interestAccumulatedUSD
@@ -539,8 +552,9 @@ function updateMarket(
 
   // update hourly fields in marketHourlySnapshot
   let hourlySnapshot = getOrCreateMarketHourlySnapshot(
-    market.id,
-    blockTimestamp.toI32()
+    market,
+    blockTimestamp,
+    blockNumber
   );
   hourlySnapshot.hourlyTotalRevenueUSD =
     hourlySnapshot.hourlyTotalRevenueUSD.plus(interestAccumulatedUSD);

@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 
 import {
     Borrow,
@@ -13,10 +13,11 @@ import {
     _Stake,
     _Unstake
 } from "../../../../generated/schema";
+import { Pool as PoolContract } from "../../../../generated/templates/Pool/Pool";
 
-import { PROTOCOL_ID, StakeType, TransactionType, ZERO_BD } from "../../constants";
+import { PROTOCOL_ID, StakeType, TransactionType, ZERO_BD, ZERO_BI } from "../../constants";
 import { getTokenAmountInUSD } from "../../prices/prices";
-import { bigDecimalToBigInt, minBigInt } from "../../utils";
+import { bigDecimalToBigInt, minBigInt, readCallResult } from "../../utils";
 import { updateUsageMetrics } from "../update/usage";
 import { getOrCreateMarket } from "./markets";
 import { getOrCreateToken } from "./supporting";
@@ -59,20 +60,28 @@ export function createDeposit(event: ethereum.Event, market: Market, amountMPTMi
  * Create withdraw entity for withdrawing principal out of the market, this also includes recognizing unrecognized pool losses
  * @param market market withdrawing out of into
  * @param amountMPTMinted amount of LP tokens that were burned on the withdraw
- * @param unrecognizedLosses unrecognized losses getting recognized on this withdraw
+ * @param oldRecognizedLosses amount of recognized losses for the account before this withdraw
  * @returns withdraw entity
  */
 export function createWithdraw(
     event: ethereum.Event,
     market: Market,
     amountMPTBurned: BigInt,
-    unrecognizedLosses: BigInt
+    oldRecognizedLosses: BigInt
 ): Withdraw {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const withdraw = new Withdraw(id);
 
     const asset = getOrCreateToken(Address.fromString(market.inputToken));
     const accountAddress = event.transaction.from;
+
+    const poolContract = PoolContract.bind(Address.fromString(market.id));
+    const newRecognizedLosses = readCallResult(
+        poolContract.try_recognizedLossesOf(accountAddress),
+        ZERO_BI,
+        poolContract.recognizedLossesOf.name
+    );
+    const losses = newRecognizedLosses.minus(oldRecognizedLosses);
 
     const losslessAmount = bigDecimalToBigInt(amountMPTBurned.toBigDecimal().times(market._initialExchangeRate));
 
@@ -87,7 +96,7 @@ export function createWithdraw(
     withdraw.from = market._liquidityLockerAddress;
     withdraw.to = accountAddress.toHexString(); // from since its a burn
     withdraw._amountMPT = amountMPTBurned;
-    withdraw._losses = minBigInt(unrecognizedLosses, losslessAmount);
+    withdraw._losses = losses;
     withdraw.amount = losslessAmount.minus(withdraw._losses);
     withdraw.amountUSD = getTokenAmountInUSD(event, asset, withdraw.amount);
 
@@ -247,6 +256,7 @@ export function createLiquidate(
     liquidate.asset = market.inputToken;
     liquidate.from = market._stakeLocker;
     liquidate.to = market._liquidityLockerAddress;
+    liquidate.liquidatee = loan.borrower;
     liquidate._defaultSufferedByStakeLocker = defaultSufferedByStakeLocker;
     liquidate._defaultSufferedByPool = defaultsufferedByPool;
     liquidate.amount = liquidate._defaultSufferedByStakeLocker.plus(liquidate._defaultSufferedByPool);

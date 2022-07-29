@@ -7,7 +7,6 @@ import { NetworkConfigs } from "../../configurations/configure";
 // Liquidity pool is created from the Factory contract.
 // Create a pool entity and start monitoring events from the newly deployed pool contract specified in the subgraph.yaml.
 export function handlePoolCreated(event: PoolCreated): void {
-  // temp fix
   if (
     NetworkConfigs.getUntrackedPairs().includes(event.params.pool.toHexString())
   ) {

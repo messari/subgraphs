@@ -430,3 +430,35 @@ lido LidoOracle 0x442af784a788a5bd6f42a01ebe9f287a871243fb
 ### Agg. Protocol Revenue (ETH)
 
 SUM(`Treasury Revenue (ETH)`) OVER `time` + SUM(`Node Operators Revenue (ETH)`) OVER `time`
+
+---
+
+## Protocol Diagrams
+
+![Staking Pool Overview](https://blog.lido.fi/content/images/2020/11/01.png)
+
+## Useful links and references
+
+https://docs.lido.fi/
+
+## Note: Missing Data (Dec 2020 - Apr 29, 2021)
+
+* The Lido smart contracts use an upgradeable proxy contract format to update the contracts. Initial contracts didn't have relevant public functions and events for easily calculating certain revenue metrics. The contracts were upgraded in April 2021 to make available `PostTotalShares` event and `lastCompletedReportDelta` function which allow you to conveniently calculate staking rewards (and therefore total revenue).
+* Calculating Total Revenue (and hence Supply Side Revenue) for the duration Dec 2020 - Apr 2021 is cumbersome. We (Tarun, Vincent) decided to not calculate metrics for the mentioned duration. Supporting quantitative data for our decision is provided below. For more information on the calculation methodology, see the discussion with the Lido team on their discord [here](https://discord.com/channels/761182643269795850/773584934619185154/996811044477476935).
+
+### Supporting Data
+Dec 2020 - Apr 2021
+* The totalRevenue data is missing from Jan 07 2021 (revenue start data) - April 29 2021. 
+* The cumulativeProtocolRevenue (calculated by tracking the transfers from null_address to treasury OR node operators) for this period was ~700K.
+* If cumulativeProtocolRevenue was ~700K, then the cumulativeTotalRevenue would be ~7 million and the cumulativeSupplySideRevenue would be 6.4 million. (Given protocol side revenue is 10% of total revenue, supply side revenue is 90%).
+
+May 2021 - July 2022 (present)
+* As of now, the cumulativeTotalRevenue is 304 million, cumulativeProtocolSideRevenue is 30 million and cumulativeSupplySideRevenue is 274 million.
+* This would mean, in the grand scheme of things, the cumulativeTotalRevenue and cumulativeSupplySideRevenue would ~2% difference if we are unable to fill the 4 month Jan 2021 - Apr 2021 gap in that data.
+
+The 2% difference seems acceptable given the methodology won't be straighforward to fill the gap and this methodology won't apply for calculations beyond those 4 months.
+
+
+## Validation
+
+Validation was done against other data sources (tokenterminal, defillama) and documented on this sheet: [Lido Finance - Messari Subgraph - Validation Sheet](https://docs.google.com/spreadsheets/d/1fiKfv9KLoWbRK1W6ejhWiySIzbd5CDyWs5so-tvJcHo/edit#gid=0).
