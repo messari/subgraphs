@@ -15,11 +15,7 @@ import {
     getOrCreateMarket
 } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
-import {
-    getOrCreateFinancialsDailySnapshot,
-    getOrCreateMarketDailySnapshot,
-    getOrCreateMarketHourlySnapshot
-} from "../common/mappingHelpers/getOrCreate/snapshots";
+import { getOrCreateFinancialsDailySnapshot } from "../common/mappingHelpers/getOrCreate/snapshots";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { createBorrow, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
@@ -98,7 +94,7 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
         bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
     );
     const protocolRevenueUSD = getTokenAmountInUSD(event, inputToken, treasuryFeePaid);
-    market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(protocolRevenueUSD);
+    market._cumulativeProtocolSideRevenueUSD = market._cumulativeProtocolSideRevenueUSD.plus(protocolRevenueUSD);
     market.save();
 
     ////
@@ -124,21 +120,6 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     financialsDailySnapshot.save();
 
     ////
-    // Update market snapshot
-    ////
-    const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
-    marketDailySnapshot.dailyProtocolSideRevenueUSD = marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-        protocolRevenueUSD
-    );
-    marketDailySnapshot.save();
-
-    const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-    MarketHourlySnapshot.hourlyProtocolSideRevenueUSD = MarketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-        protocolRevenueUSD
-    );
-    MarketHourlySnapshot.save();
-
-    ////
     // Trigger interval update
     ////
     intervalUpdate(event, market);
@@ -151,19 +132,10 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
 
     const repay = createRepay(event, loan, principalPaid, interestPaid, ZERO_BI);
 
-    ////
     // Update loan
-    ////
     loan.principalPaid = loan.principalPaid.plus(repay._principalPaid);
     loan.interestPaid = loan.interestPaid.plus(repay._interestPaid);
     loan.save();
-
-    ////
-    // Update financial snapshot
-    ////
-    const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
-    financialsDailySnapshot.dailyRepayUSD = financialsDailySnapshot.dailyRepayUSD.plus(repay.amountUSD);
-    financialsDailySnapshot.save();
 
     ////
     // Trigger interval update

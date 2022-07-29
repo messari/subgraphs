@@ -2,8 +2,6 @@ import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   ActionPaused1,
   Comptroller,
-  MarketEntered,
-  MarketExited,
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
@@ -54,13 +52,14 @@ import {
   setBorrowInterestRate,
   setSupplyInterestRate,
   snapshotFinancials,
+  snapshotMarket,
   TokenData,
+  updateAllMarketPrices,
   UpdateMarketData,
   _getOrCreateProtocol,
   _handleActionPaused,
   _handleBorrow,
   _handleLiquidateBorrow,
-  _handleMarketEntered,
   _handleMarketListed,
   _handleMint,
   _handleNewCollateralFactor,
@@ -97,7 +96,7 @@ import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
 export function handleMint(event: Mint): void {
   let minter = event.params.minter;
   let mintAmount = event.params.mintAmount;
-  let contract = CTokenContract.bind(event.address);
+  let contract = CToken.bind(event.address);
   let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
@@ -113,7 +112,7 @@ export function handleMint(event: Mint): void {
 export function handleRedeem(event: Redeem): void {
   let redeemer = event.params.redeemer;
   let redeemAmount = event.params.redeemAmount;
-  let contract = CTokenContract.bind(event.address);
+  let contract = CToken.bind(event.address);
   let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.redeemer
   );
@@ -129,7 +128,7 @@ export function handleRedeem(event: Redeem): void {
 export function handleBorrow(event: Borrow): void {
   let borrower = event.params.borrower;
   let borrowAmount = event.params.borrowAmount;
-  let contract = CTokenContract.bind(event.address);
+  let contract = CToken.bind(event.address);
   let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
@@ -146,7 +145,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let payer = event.params.payer;
   let borrower = event.params.borrower;
   let repayAmount = event.params.repayAmount;
-  let contract = CTokenContract.bind(event.address);
+  let contract = CToken.bind(event.address);
   let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
@@ -273,22 +272,6 @@ export function handleMarketListed(event: MarketListed): void {
   );
 }
 
-export function handleMarketEntered(event: MarketEntered): void {
-  _handleMarketEntered(
-    event.params.cToken.toHexString(),
-    event.params.account.toHexString(),
-    true
-  );
-}
-
-export function handleMarketExited(event: MarketExited): void {
-  _handleMarketEntered(
-    event.params.cToken.toHexString(),
-    event.params.account.toHexString(),
-    false
-  );
-}
-
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
   let newPriceOracle = event.params.newPriceOracle;
@@ -385,23 +368,10 @@ function handleAccrueInterest(
   updateRewards(event, market);
 
   // creates and initializes market snapshots
-
-  //
-  // daily snapshot
-  //
-  getOrCreateMarketDailySnapshot(
-    market,
-    event.block.timestamp,
-    event.block.number
-  );
-
-  //
-  // hourly snapshot
-  //
-  getOrCreateMarketHourlySnapshot(
-    market,
-    event.block.timestamp,
-    event.block.number
+  snapshotMarket(
+    event.address.toHexString(),
+    event.block.number,
+    event.block.timestamp
   );
 
   updateMarket(
@@ -447,6 +417,10 @@ function updateMarket(
       market.inputToken,
     ]);
     return;
+  }
+
+  if (updateMarketPrices) {
+    updateAllMarketPrices(comptrollerAddress, blockNumber);
   }
 
   // compound v2 specific price calculation (see ./prices.ts)
@@ -537,6 +511,7 @@ function updateMarket(
   market.totalValueLockedUSD = underlyingSupplyUSD;
   market.totalDepositBalanceUSD = underlyingSupplyUSD;
 
+  market._borrowBalance = newTotalBorrow;
   market.totalBorrowBalanceUSD = newTotalBorrow
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
@@ -592,9 +567,8 @@ function updateMarket(
 
   // update daily fields in marketDailySnapshot
   let dailySnapshot = getOrCreateMarketDailySnapshot(
-    market,
-    blockTimestamp,
-    blockNumber
+    market.id,
+    blockTimestamp.toI32()
   );
   dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
     interestAccumulatedUSD
@@ -607,9 +581,8 @@ function updateMarket(
 
   // update hourly fields in marketHourlySnapshot
   let hourlySnapshot = getOrCreateMarketHourlySnapshot(
-    market,
-    blockTimestamp,
-    blockNumber
+    market.id,
+    blockTimestamp.toI32()
   );
   hourlySnapshot.hourlyTotalRevenueUSD =
     hourlySnapshot.hourlyTotalRevenueUSD.plus(interestAccumulatedUSD);

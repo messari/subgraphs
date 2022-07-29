@@ -160,7 +160,6 @@ export const schema120 = (): Schema => {
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
         cumulativeUniqueUsers
-        protocolControlledValueUSD
       }
     }`;
 
@@ -272,7 +271,6 @@ export const schema120 = (): Schema => {
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",
     cumulativeUniqueUsers: "Int!",
-    protocolControlledValueUSD: "BigDecimal",
   };
 
   return {
@@ -452,7 +450,6 @@ export const schema130 = (): Schema => {
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
         cumulativeUniqueUsers
-        protocolControlledValueUSD
         totalPoolCount
       }
     }`;
@@ -569,7 +566,6 @@ export const schema130 = (): Schema => {
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",
     cumulativeUniqueUsers: "Int!",
-    protocolControlledValueUSD: "BigDecimal",
     totalPoolCount: "Int!",
   };
 

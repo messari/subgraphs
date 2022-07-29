@@ -1,0 +1,184 @@
+type Governance @entity {
+  "Unique entity used to keep track of common aggregated data"
+  id: ID!
+
+  "Total number of token holders currently"
+  currentTokenHolders: BigInt!
+  "Total number of token holders"
+  totalTokenHolders: BigInt!
+  "Total number of delegates participating on the governance currently"
+  currentDelegates: BigInt!
+  "Total number of delegates that held delegated votes"
+  totalDelegates: BigInt!
+  "Total number of votes delegated expressed in the smallest unit of the token"
+  delegatedVotesRaw: BigInt!
+  "Total number of votes delegated expressed as a BigDecimal normalized value for the token"
+  delegatedVotes: BigDecimal!
+
+  "Total number of proposals created"
+  proposals: BigInt!
+  "Number of proposals currently queued for execution"
+  proposalsQueued: BigInt!
+  "Number of proposals currently executed"
+  proposalsExecuted: BigInt!
+  "Number of proposals currently canceled"
+  proposalsCanceled: BigInt!
+}
+
+type GovernanceFramework @entity {
+  "Governance framework contract address"
+  id: String!
+  "Name of the governance framework"
+  name: String!
+  "Type of governance framework"
+  type: GovernanceFrameworkType!
+  "Version of the governance framework"
+  version: String!
+
+  "Governance framework contract address"
+  contractAddress: String!
+  "The contract address associated with the governance token used for voting on the governance framework proposals"
+  tokenAddress: String!
+  "The contract address associated with the contract that manages the delay of administrative actions for the governance framework"
+  timelockAddress: String!
+
+  "The delay before voting on a proposal may take place in blocks"
+  votingDelay: BigInt!
+  "The duration of voting on a proposal in blocks"
+  votingPeriod: BigInt!
+  "The number of votes required in order for a voter to become a proposer"
+  proposalThreshold: BigInt!
+
+  "The number of votes for a proposal to succeed."
+  quorumVotes: BigInt
+  "Quorum fraction numerator value. (OZ: quorum = totalSupply * numerator / denominator)"
+  quorumNumerator: BigInt
+  "Quorum fraction denominator value. (OZ: quorum = totalSupply * numerator / denominator)"
+  quorumDenominator: BigInt
+}
+
+enum GovernanceFrameworkType {
+  GovernorAlpha
+  GovernorBravo
+  OZGovernor
+}
+
+type Proposal @entity {
+  "Internal proposal ID, in this implementation it seems to be a autoincremental id"
+  id: ID!
+  "Governor Alpha Proposal description in markdown format"
+  description: String
+
+  "Delegate that proposed the change"
+  proposer: Delegate!
+  "State of the proposal"
+  state: ProposalState!
+
+  "Votes against the proposal"
+  againstVotes: BigInt!
+  "Votes for the proposal"
+  forVotes: BigInt!
+  "Votes abstaining to the proposal"
+  abstainVotes: BigInt!
+  "Votes associated to this proposal"
+  votes: [Vote!]! @derivedFrom(field: "proposal")
+
+  "Block number proposal was created in"
+  creationBlock: BigInt!
+  "Timestamp of block proposal was created in"
+  creationTime: BigInt!
+  "Block number from where the voting starts"
+  startBlock: BigInt!
+  "Block number from where the voting ends"
+  endBlock: BigInt!
+  "Once the proposal is queued for execution it will have an ETA of the execution"
+  executionETA: BigInt
+  "Block number proposal was executed in"
+  executionBlock: BigInt
+  "Timestamp of block proposal was executed in"
+  executionTime: BigInt
+  "Block number proposal was canceled in"
+  cancellationBlock: BigInt
+  "Timestamp of block proposal was canceled in"
+  cancellationTime: BigInt
+
+  "Targets data for the change"
+  targets: [String!]
+  "Values data for the change"
+  values: [BigInt!]
+  "Signature data for the change"
+  signatures: [String!]
+  "Call data for the change"
+  calldatas: [Bytes!]
+}
+
+enum ProposalState {
+  PENDING
+  ACTIVE
+  CANCELED
+  DEFEATED
+  SUCCEEDED
+  QUEUED
+  EXPIRED
+  EXECUTED
+}
+
+type Vote @entity(immutable: true) {
+  "Delegate ID + Proposal ID"
+  id: ID!
+  "Whether the vote is in favour, against or abstaining to the proposal"
+  choice: VoteChoice!
+  "Voting weight expressed in the vote"
+  weight: BigInt!
+  "Reason for voting choice"
+  reason: String
+  "Delegate that emitted the vote"
+  voter: Delegate!
+  "Proposal that is being voted on"
+  proposal: Proposal!
+}
+
+enum VoteChoice {
+  FOR
+  AGAINST
+  ABSTAIN
+}
+
+type TokenHolder @entity {
+  "A TokenHolder is any address that holds any amount of tokens, the id used is the blockchain address."
+  id: String!
+  "Delegate address of the token holder which will participate in votings. Delegates don't need to hold any tokens and can even be the token holder itself."
+  delegate: Delegate
+
+  "Token balance of this address expressed in the smallest unit of the token"
+  tokenBalanceRaw: BigInt!
+  "Token balance of this address expressed as a BigDecimal normalized value"
+  tokenBalance: BigDecimal!
+  "Total amount of tokens ever held by this address expressed in the smallest unit of the token"
+  totalTokensHeldRaw: BigInt!
+  "Total amount of tokens ever held by this address expressed as a BigDecimal normalized value"
+  totalTokensHeld: BigDecimal!
+}
+
+type Delegate @entity {
+  "A Delegate is any address that has been delegated with voting tokens by a token holder, id is the blockchain address of said delegate"
+  id: String!
+
+  "Amount of votes delegated to this delegate to be used on proposal votings expressed in the smallest unit of the token"
+  delegatedVotesRaw: BigInt!
+  "Amount of votes delegated to this delegate to be used on proposal votings expressed as a BigDecimal normalized value"
+  delegatedVotes: BigDecimal!
+
+  "Total token holders that this delegate represents"
+  tokenHoldersRepresentedAmount: Int!
+  "Token holders that this delegate represents"
+  tokenHoldersRepresented: [TokenHolder!]! @derivedFrom(field: "delegate")
+
+  "Votes that a delegate has made in different proposals"
+  votes: [Vote!]! @derivedFrom(field: "voter")
+  "Number of proposals voted on"
+  numberVotes: Int!
+
+  "Proposals that the delegate has created"
+  proposals: [Proposal!]! @derivedFrom(field: "proposer")
+}

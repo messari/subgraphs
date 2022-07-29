@@ -19,18 +19,55 @@ export const schema = (version: string): string => {
 export const schema120 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        markets(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+        markets(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
             id
             name
+            inputToken {
+              id
+              decimals
+              name
+              symbol
+            }
+            outputToken {
+              id
+              decimals
+              name
+              symbol
+            }
+            rewardTokens {
+              id
+              type
+              token {
+                id
+                decimals
+                name
+                symbol
+              }
+            }
             rates {
               id
               side
               rate
               type
             }
+            isActive
+            canUseAsCollateral
+            canBorrowFrom
+            maximumLTV
+            liquidationThreshold
+            liquidationPenalty
             totalValueLockedUSD
             totalDepositBalanceUSD
+            cumulativeDepositUSD
             totalBorrowBalanceUSD
+            cumulativeBorrowUSD
+            cumulativeLiquidateUSD
+            inputTokenBalance
+            inputTokenPriceUSD
+            outputTokenSupply
+            outputTokenPriceUSD
+            exchangeRate
+            rewardTokenEmissionsAmount
             rewardTokenEmissionsUSD
         }
     }`;
@@ -39,19 +76,58 @@ export const schema120 = (): string => {
 export const schema130 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        markets(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+        markets(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
             id
             name
-
+            inputToken {
+              id
+              decimals
+              name
+              symbol
+            }
+            outputToken {
+              id
+              decimals
+              name
+              symbol
+            }
+            rewardTokens {
+              id
+              type
+              token {
+                id
+                decimals
+                name
+                symbol
+              }
+            }
             rates {
               id
               side
               rate
               type
             }
+            isActive
+            canUseAsCollateral
+            canBorrowFrom
+            maximumLTV
+            liquidationThreshold
+            liquidationPenalty
             totalValueLockedUSD
-            totalBorrowBalanceUSD
+            cumulativeSupplySideRevenueUSD
+            cumulativeProtocolSideRevenueUSD
+            cumulativeTotalRevenueUSD
             totalDepositBalanceUSD
+            cumulativeDepositUSD
+            totalBorrowBalanceUSD
+            cumulativeBorrowUSD
+            cumulativeLiquidateUSD
+            inputTokenBalance
+            inputTokenPriceUSD
+            outputTokenSupply
+            outputTokenPriceUSD
+            exchangeRate
+            rewardTokenEmissionsAmount
             rewardTokenEmissionsUSD
         }
     }`;
@@ -60,21 +136,59 @@ export const schema130 = (): string => {
 export const schema201 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        markets(first: 10, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
+        markets(first: 50, skip: $skipAmt, orderBy:totalValueLockedUSD, orderDirection: desc) {
             id
             name
-
+            inputToken {
+              id
+              decimals
+              name
+              symbol
+            }
+            outputToken {
+              id
+              decimals
+              name
+              symbol
+            }
+            rewardTokens {
+              id
+              type
+              token {
+                id
+                decimals
+                name
+                symbol
+              }
+            }
             rates {
               id
               side
               rate
               type
             }
+            isActive
+            canUseAsCollateral
+            canBorrowFrom
+            maximumLTV
+            liquidationThreshold
+            liquidationPenalty
             totalValueLockedUSD
-            rewardTokenEmissionsUSD
-            totalBorrowBalanceUSD
+            cumulativeSupplySideRevenueUSD
+            cumulativeProtocolSideRevenueUSD
+            cumulativeTotalRevenueUSD
             totalDepositBalanceUSD
-
+            cumulativeDepositUSD
+            totalBorrowBalanceUSD
+            cumulativeBorrowUSD
+            cumulativeLiquidateUSD
+            inputTokenBalance
+            inputTokenPriceUSD
+            outputTokenSupply
+            outputTokenPriceUSD
+            exchangeRate
+            rewardTokenEmissionsAmount
+            rewardTokenEmissionsUSD
 
             positionCount
             openPositionCount

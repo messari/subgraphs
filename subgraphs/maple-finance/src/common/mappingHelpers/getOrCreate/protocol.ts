@@ -46,7 +46,6 @@ export function getOrCreateProtocol(): LendingProtocol {
         protocol.cumulativeBorrowUSD = ZERO_BD;
         protocol.cumulativeLiquidateUSD = ZERO_BD;
         protocol.mintedTokenSupplies = new Array<BigInt>();
-        protocol.totalPoolCount = ZERO_I32;
 
         protocol._treasuryFee = PROTOCOL_INITIAL_TREASURY_FEE;
 

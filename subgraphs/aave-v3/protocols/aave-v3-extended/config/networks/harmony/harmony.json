@@ -1,0 +1,11 @@
+{
+  "network": "harmony",
+  "PoolAddressesProviderRegistry": {
+    "address": "0x770ef9f4fe897e59daCc474EF11238303F9552b6",
+    "startBlock": 23930102
+  },
+  "RewardsController": {
+    "address": "0x929EC64c34a17401F460460D4B9390518E5B473e",
+    "startBlock": 24097683
+  }
+}

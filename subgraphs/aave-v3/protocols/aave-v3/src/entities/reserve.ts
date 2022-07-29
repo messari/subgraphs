@@ -51,7 +51,7 @@ export function getReserveOrNull(address: Address): _Reserve | null {
 
 export function updateReserveATokenSupply(
   event: ethereum.Event,
-  newSupply: BigInt,
+  amount: BigInt,
   newLiquidityIndex: BigInt
 ): void {
   const reserve = getReserve(event.address);
@@ -66,7 +66,7 @@ export function updateReserveATokenSupply(
       amountInUSD(balanceIncrease, getTokenById(reserve.id))
     );
   }
-  reserve.scaledATokenSupply = newSupply;
+  reserve.scaledATokenSupply = reserve.scaledATokenSupply.plus(amount);
   reserve.totalATokenSupply = rayMul(
     reserve.scaledATokenSupply,
     newLiquidityIndex
@@ -92,11 +92,12 @@ export function updateReserveStableDebtSupply(
 
 export function updateReserveVariableDebtSupply(
   event: ethereum.Event,
-  newSupply: BigInt,
+  change: BigInt,
   newLiquidityIndex: BigInt
 ): void {
   const reserve = getReserve(event.address);
-  reserve.scaledVariableDebtSupply = newSupply;
+  reserve.scaledVariableDebtSupply =
+    reserve.scaledVariableDebtSupply.plus(change);
   reserve.variableDebtSupply = rayMul(
     reserve.scaledVariableDebtSupply,
     newLiquidityIndex

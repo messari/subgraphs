@@ -50,7 +50,6 @@ function ProtocolTab({
 
       return (
         <ProtocolTabEntity
-          key={entityName + '-ProtocolTabEntity'}
           entityName={entityName}
           entitiesData={entitiesData}
           currentEntityData={currentEntityData}

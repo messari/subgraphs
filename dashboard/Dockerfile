@@ -17,7 +17,5 @@ RUN yarn
 # add app
 COPY . ./
 
-ADD https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json ./public
-
 # start app
 CMD ["yarn", "start"]

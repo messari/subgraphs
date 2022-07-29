@@ -9,16 +9,14 @@ import {
   LendingType,
   ProtocolType,
   PROTOCOL_ID_KEY,
-  RiskType,
-  SECONDS_PER_DAY,
-} from "../../../../src/utils/constants";
-import {
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SLUG,
   PROTOCOL_SUBGRAPH_VERSION,
-} from "../utils/constants";
+  RiskType,
+  SECONDS_PER_DAY,
+} from "../../../../src/utils/constants";
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
   const id = dataSource.context().getString(PROTOCOL_ID_KEY);
@@ -36,10 +34,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.riskType = RiskType.ISOLATED;
 
     protocol.cumulativeUniqueUsers = INT_ZERO;
-    protocol.cumulativeUniqueDepositors = INT_ZERO;
-    protocol.cumulativeUniqueBorrowers = INT_ZERO;
-    protocol.cumulativeUniqueLiquidators = INT_ZERO;
-    protocol.cumulativeUniqueLiquidatees = INT_ZERO;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -50,8 +44,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     protocol.totalPoolCount = INT_ZERO;
-    protocol.openPositionCount = INT_ZERO;
-    protocol.cumulativePositionCount = INT_ZERO;
     protocol.save();
   }
   return protocol;
@@ -217,47 +209,4 @@ export function updateProtocolBorrowBalance(
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.save();
-}
-
-export function incrementProtocolUniqueUsers(): void {
-  const protocol = getOrCreateLendingProtocol();
-  protocol.cumulativeUniqueUsers += 1;
-  protocol.save();
-}
-
-export function incrementProtocolUniqueDepositors(): void {
-  const protocol = getOrCreateLendingProtocol();
-  protocol.cumulativeUniqueDepositors += 1;
-  protocol.save();
-}
-
-export function incrementProtocolUniqueBorrowers(): void {
-  const protocol = getOrCreateLendingProtocol();
-  protocol.cumulativeUniqueBorrowers += 1;
-  protocol.save();
-}
-
-export function incrementProtocolUniqueLiquidators(): void {
-  const protocol = getOrCreateLendingProtocol();
-  protocol.cumulativeUniqueLiquidators += 1;
-  protocol.save();
-}
-
-export function incrementProtocolUniqueLiquidatees(): void {
-  const protocol = getOrCreateLendingProtocol();
-  protocol.cumulativeUniqueLiquidatees += 1;
-  protocol.save();
-}
-
-export function incrementProtocolPositionCount(): void {
-  const protocol = getOrCreateLendingProtocol();
-  protocol.cumulativePositionCount += 1;
-  protocol.openPositionCount += 1;
-  protocol.save();
-}
-
-export function decrementProtocolOpenPositionCount(): void {
-  const protocol = getOrCreateLendingProtocol();
-  protocol.openPositionCount -= 1;
-  protocol.save();
 }

@@ -139,7 +139,6 @@ export const schema120 = (): Schema => {
         network
         type
         totalValueLockedUSD
-        protocolControlledValueUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
@@ -211,7 +210,6 @@ export const schema120 = (): Schema => {
       inputTokenBalances
       outputTokenSupply
       outputTokenPriceUSD
-      protocolControlledValueUSD
       stakedOutputTokenAmount
       rewardTokenEmissionsAmount
       rewardTokenEmissionsUSD
@@ -397,7 +395,6 @@ export const schema130 = (): Schema => {
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
         cumulativeUniqueUsers
-        protocolControlledValueUSD
         totalPoolCount
       }
     }`;
@@ -491,7 +488,6 @@ export const schema130 = (): Schema => {
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",
     cumulativeUniqueUsers: "Int!",
-    protocolControlledValueUSD: "BigDecimal",
   };
 
   return {

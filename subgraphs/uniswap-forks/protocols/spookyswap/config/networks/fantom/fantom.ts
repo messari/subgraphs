@@ -44,13 +44,13 @@ export class SpookyswapFantomConfigurations implements Configurations {
     );
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("0.20");
+    return BigDecimal.fromString("0.2");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.03");
+    return BigDecimal.fromString("0");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.17");
+    return BigDecimal.fromString("0.2");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");

@@ -1,0 +1,210 @@
+# prettier-ignore
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema-extended.graphql
+dataSources:
+  - kind: ethereum
+    name: PoolAddressesProviderRegistry
+    network: {{ network }}
+    source:
+      address: "{{ PoolAddressesProviderRegistry.address }}"
+      abi: PoolAddressesProviderRegistry
+      startBlock: {{ PoolAddressesProviderRegistry.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: PoolAddressesProviderRegistry
+          file: ./abis/PoolAddressesProviderRegistry.json
+      eventHandlers:
+        - event: AddressesProviderRegistered(indexed address,indexed uint256)
+          handler: handleAddressesProviderRegistered
+      file: ./protocols/aave-v3-extended/src/mappings/PoolAddressesProviderRegistry.ts
+  - kind: ethereum
+    name: RewardsController
+    network: {{ network }}
+    source:
+      address: "{{ RewardsController.address }}"
+      abi: RewardsController
+      startBlock: {{ RewardsController.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - RewardsController
+      abis:
+        - name: RewardsController
+          file: ./abis/RewardsController.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+      eventHandlers:
+        - event: AssetConfigUpdated(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleAssetConfigUpdated
+      file: ./protocols/aave-v3-extended/src/mappings/RewardsController.ts
+templates:
+  - kind: ethereum
+    name: PoolAddressesProvider
+    network: {{ network }}
+    source:
+      abi: PoolAddressesProvider
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: PoolAddressesProvider
+          file: ./abis/PoolAddressesProvider.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+      eventHandlers:
+        - event: PriceOracleUpdated(indexed address,indexed address)
+          handler: handlePriceOracleUpdated
+        - event: ProxyCreated(indexed bytes32,indexed address,indexed address)
+          handler: handleProxyCreated
+      file: ./protocols/aave-v3-extended/src/mappings/PoolAddressesProvider.ts
+  - kind: ethereum
+    name: Pool
+    network: {{ network }}
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+      eventHandlers:
+        - event: Borrow(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
+          handler: handleBorrow
+        - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
+          handler: handleLiquidationCall
+        - event: MintedToTreasury(indexed address,uint256)
+          handler: handleMintedToTreasury
+        - event: Repay(indexed address,indexed address,indexed address,uint256,bool)
+          handler: handleRepay
+        - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleReserveDataUpdated
+        - event: Supply(indexed address,address,indexed address,uint256,indexed uint16)
+          handler: handleSupply
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256)
+          handler: handleWithdraw
+        - event: ReserveUsedAsCollateralEnabled(indexed address,indexed address)
+          handler: handleReserveUsedAsCollateralEnabled
+        - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
+          handler: handleReserveUsedAsCollateralDisabled
+      file: ./protocols/aave-v3-extended/src/mappings/Pool.ts
+  - kind: ethereum
+    name: PoolConfigurator
+    network: {{ network }}
+    source:
+      abi: PoolConfigurator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: PoolConfigurator
+          file: ./abis/PoolConfigurator.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: AToken
+          file: ./abis/AToken.json
+      eventHandlers:
+        - event: CollateralConfigurationChanged(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralConfigurationChanged
+        - event: ReserveActive(indexed address,bool)
+          handler: handleReserveActive
+        - event: ReserveBorrowing(indexed address,bool)
+          handler: handleReserveBorrowing
+        - event: ReserveFrozen(indexed address,bool)
+          handler: handleReserveFrozen
+        - event: ReserveInitialized(indexed address,indexed address,address,address,address)
+          handler: handleReserveInitialized
+        - event: ReservePaused(indexed address,bool)
+          handler: handleReservePaused
+      file: ./protocols/aave-v3-extended/src/mappings/PoolConfigurator.ts
+  - kind: ethereum
+    name: AToken
+    network: {{ network }}
+    source:
+      abi: AToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: AToken
+          file: ./abis/AToken.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+      eventHandlers:
+        - event: Burn(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleBurn
+        - event: Mint(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleMint
+        - event: BalanceTransfer(indexed address,indexed address,uint256,uint256)
+          handler: handleBalanceTransfer
+      file: ./protocols/aave-v3-extended/src/mappings/AToken.ts
+  - kind: ethereum
+    name: StableDebtToken
+    network: {{ network }}
+    source:
+      abi: StableDebtToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableDebtToken
+          file: ./abis/StableDebtToken.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+      eventHandlers:
+        - event: Burn(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleBurn
+        - event: Mint(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleMint
+      file: ./protocols/aave-v3-extended/src/mappings/StableDebtToken.ts
+  - kind: ethereum
+    name: VariableDebtToken
+    network: {{ network }}
+    source:
+      abi: VariableDebtToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: VariableDebtToken
+          file: ./abis/VariableDebtToken.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+      eventHandlers:
+        - event: Burn(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleBurn
+        - event: Mint(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleMint
+      file: ./protocols/aave-v3-extended/src/mappings/VariableDebtToken.ts

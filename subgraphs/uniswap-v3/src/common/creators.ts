@@ -88,13 +88,7 @@ export function createLiquidityPool(
   pool.fees = createPoolFees(poolAddress, fees);
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
-  pool.name =
-    protocol.name +
-    " " +
-    LPtoken.symbol +
-    " " +
-    convertFeeToPercent(fees).toString() +
-    "%";
+  pool.name = protocol.name + " " + LPtoken.symbol;
   pool.symbol = LPtoken.symbol;
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;

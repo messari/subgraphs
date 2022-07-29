@@ -1,0 +1,10 @@
+{
+  "mainnet": {
+    "SiloGovernor": {
+      "address": "0xA89163F7B2D68A8fbA6Ca36BEEd32Bd4f3EeAf61"
+    },
+    "SiloGovernanceToken": {
+      "address": "0x6f80310ca7f2c654691d1383149fa1a57d8ab1f8"
+    }
+  }
+}

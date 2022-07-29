@@ -1,4 +1,4 @@
-// fuse handlers
+// fuse v1 handlers
 import {
   Address,
   BigDecimal,
@@ -22,8 +22,10 @@ import {
   _handleRepayBorrow,
   _handleLiquidateBorrow,
   UpdateMarketData,
+  _handleAccrueInterest,
   getOrElse,
   _handleActionPaused,
+  snapshotMarket,
   updateProtocol,
   snapshotFinancials,
   setSupplyInterestRate,
@@ -434,7 +436,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   }
 
   //
-  // replacing _handleAccrueInterest() to properly derive assetPrice
+  // replacing _handleAccrueInterst() to properly derive assetPrice
   //
 
   let marketID = event.address.toHexString();
@@ -476,23 +478,10 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
 
   // creates and initializes market snapshots
-
-  //
-  // daily snapshot
-  //
-  getOrCreateMarketDailySnapshot(
-    market,
-    event.block.timestamp,
-    event.block.number
-  );
-
-  //
-  // hourly snapshot
-  //
-  getOrCreateMarketHourlySnapshot(
-    market,
-    event.block.timestamp,
-    event.block.number
+  snapshotMarket(
+    event.address.toHexString(),
+    event.block.number,
+    event.block.timestamp
   );
 
   // handles fuse and admin fees (ie, protocol-side)
@@ -826,9 +815,8 @@ function updateMarket(
 
   // update daily fields in marketDailySnapshot
   let dailySnapshot = getOrCreateMarketDailySnapshot(
-    market,
-    blockTimestamp,
-    blockNumber
+    market.id,
+    blockTimestamp.toI32()
   );
   dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
     interestAccumulatedUSD
@@ -841,9 +829,8 @@ function updateMarket(
 
   // update hourly fields in marketHourlySnapshot
   let hourlySnapshot = getOrCreateMarketHourlySnapshot(
-    market,
-    blockTimestamp,
-    blockNumber
+    market.id,
+    blockTimestamp.toI32()
   );
   hourlySnapshot.hourlyTotalRevenueUSD =
     hourlySnapshot.hourlyTotalRevenueUSD.plus(interestAccumulatedUSD);

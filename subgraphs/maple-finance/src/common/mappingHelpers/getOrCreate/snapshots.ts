@@ -28,9 +28,6 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, market: Ma
 
         marketSnapshot.rates = market.rates;
         marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
-        marketSnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
-        marketSnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
-        marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
         marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
         marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
         marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -47,11 +44,6 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, market: Ma
         marketSnapshot.dailyDepositUSD = ZERO_BD;
         marketSnapshot.dailyBorrowUSD = ZERO_BD;
         marketSnapshot.dailyLiquidateUSD = ZERO_BD;
-        marketSnapshot.dailySupplySideRevenueUSD = ZERO_BD;
-        marketSnapshot.dailyProtocolSideRevenueUSD = ZERO_BD;
-        marketSnapshot.dailyTotalRevenueUSD = ZERO_BD;
-        marketSnapshot.dailyWithdrawUSD = ZERO_BD;
-        marketSnapshot.dailyRepayUSD = ZERO_BD;
 
         marketSnapshot.save();
     }
@@ -75,9 +67,6 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, market: M
 
         marketSnapshot.rates = market.rates;
         marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
-        marketSnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
-        marketSnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
-        marketSnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
         marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
         marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
         marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -94,11 +83,6 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, market: M
         marketSnapshot.hourlyDepositUSD = ZERO_BD;
         marketSnapshot.hourlyBorrowUSD = ZERO_BD;
         marketSnapshot.hourlyLiquidateUSD = ZERO_BD;
-        marketSnapshot.hourlySupplySideRevenueUSD = ZERO_BD;
-        marketSnapshot.hourlyProtocolSideRevenueUSD = ZERO_BD;
-        marketSnapshot.hourlyTotalRevenueUSD = ZERO_BD;
-        marketSnapshot.hourlyWithdrawUSD = ZERO_BD;
-        marketSnapshot.hourlyRepayUSD = ZERO_BD;
 
         marketSnapshot.save();
     }
@@ -139,8 +123,6 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
         financialsSnapshot.dailyDepositUSD = ZERO_BD;
         financialsSnapshot.dailyBorrowUSD = ZERO_BD;
         financialsSnapshot.dailyLiquidateUSD = ZERO_BD;
-        financialsSnapshot.dailyWithdrawUSD = ZERO_BD;
-        financialsSnapshot.dailyRepayUSD = ZERO_BD;
 
         financialsSnapshot.save();
     }
@@ -163,7 +145,6 @@ export function getOrCreateUsageDailyMetric(event: ethereum.Event): UsageMetrics
 
         usageMetric.protocol = protocol.id;
         usageMetric.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-        usageMetric.totalPoolCount = protocol.totalPoolCount;
 
         usageMetric.dailyActiveUsers = ZERO_I32;
         usageMetric.dailyTransactionCount = ZERO_I32;
@@ -172,6 +153,7 @@ export function getOrCreateUsageDailyMetric(event: ethereum.Event): UsageMetrics
         usageMetric.dailyBorrowCount = ZERO_I32;
         usageMetric.dailyRepayCount = ZERO_I32;
         usageMetric.dailyLiquidateCount = ZERO_I32;
+        usageMetric.dailyBorrowCount = ZERO_I32;
         usageMetric._dailyStakeCount = ZERO_I32;
         usageMetric._dailyUnstakeCount = ZERO_I32;
         usageMetric._dailyClaimCount = ZERO_I32;

@@ -4,7 +4,7 @@ import { ApolloClient, ApolloError, gql, HttpLink, InMemoryCache, useLazyQuery, 
 import { Chart as ChartJS, registerables } from "chart.js";
 import React, { useEffect, useMemo, useState } from "react";
 import { poolOverview, schema } from "../queries/schema";
-import { PoolNames, ProtocolType, SubgraphBaseUrl } from "../constants";
+import { PoolNames, SubgraphBaseUrl } from "../constants";
 import ErrorDisplay from "./ErrorDisplay";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router";
@@ -12,9 +12,7 @@ import { isValidHttpUrl, NewClient } from "../utils";
 import AllDataTabs from "./AllDataTabs";
 import { DashboardHeader } from "../graphs/DashboardHeader";
 import { getPendingSubgraphId } from "../queries/subgraphStatusQuery";
-import { getSnapshotDailyVolume } from "../queries/snapshotDailyVolumeQuery";
 import { styled } from "../styled";
-import { poolOverviewTokensQuery } from "../queries/poolOverviewTokensQuery";
 
 const BackBanner = styled("div")`
   display: flex;
@@ -205,81 +203,6 @@ function ProtocolDashboard() {
     { data: dataPools, error: poolOverviewError, loading: poolOverviewLoading, refetch: poolOverviewRefetch },
   ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt } });
 
-  const [
-    getPoolsOverviewData2,
-    { data: dataPools2, error: poolOverviewError2, loading: poolOverviewLoading2 },
-  ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 10 } });
-
-  const [
-    getPoolsOverviewData3,
-    { data: dataPools3, error: poolOverviewError3, loading: poolOverviewLoading3 },
-  ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 20 } });
-
-  const [
-    getPoolsOverviewData4,
-    { data: dataPools4, error: poolOverviewError4, loading: poolOverviewLoading4 },
-  ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 30 } });
-
-  const [
-    getPoolsOverviewData5,
-    { data: dataPools5, error: poolOverviewError5, loading: poolOverviewLoading5 },
-  ] = useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 40 } });
-
-
-  const snapshotDailyVolumeQuery = gql`${getSnapshotDailyVolume(protocolSchemaData?.protocols[0]?.schemaVersion)}`;
-
-  const [
-    getPoolsSnapshotVolume,
-    { data: snapshotVolume },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
-
-  const [
-    getPoolsSnapshotVolume2,
-    { data: snapshotVolume2 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
-
-  const [
-    getPoolsSnapshotVolume3,
-    { data: snapshotVolume3 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
-
-  const [
-    getPoolsSnapshotVolume4,
-    { data: snapshotVolume4 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
-
-  const [
-    getPoolsSnapshotVolume5,
-    { data: snapshotVolume5 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
-
-  const tokenQuery = gql`${poolOverviewTokensQuery(protocolSchemaData?.protocols[0]?.type?.toUpperCase())}`;
-
-  const [
-    getPoolOverviewTokens,
-    { data: poolOverviewTokens },
-  ] = useLazyQuery(tokenQuery, { client: client });
-
-  const [
-    getPoolOverviewTokens2,
-    { data: poolOverviewTokens2 },
-  ] = useLazyQuery(tokenQuery, { client: client });
-
-  const [
-    getPoolOverviewTokens3,
-    { data: poolOverviewTokens3 },
-  ] = useLazyQuery(tokenQuery, { client: client });
-
-  const [
-    getPoolOverviewTokens4,
-    { data: poolOverviewTokens4 },
-  ] = useLazyQuery(tokenQuery, { client: client });
-
-  const [
-    getPoolOverviewTokens5,
-    { data: poolOverviewTokens5 },
-  ] = useLazyQuery(tokenQuery, { client: client });
-
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
     tabNum = "2";
@@ -362,13 +285,13 @@ function ProtocolDashboard() {
   }, [protocolTableData, getFinancialsData, tabValue]);
 
   useEffect(() => {
-    if (financialsData && tabValue === "1") {
+    if (financialsData) {
       getDailyUsageData();
     }
   }, [financialsData, getDailyUsageData]);
 
   useEffect(() => {
-    if (dailyUsageData && tabValue === "1") {
+    if (dailyUsageData) {
       getHourlyUsageData();
     }
   }, [dailyUsageData, getHourlyUsageData]);
@@ -380,19 +303,19 @@ function ProtocolDashboard() {
   }, [poolId]);
 
   useEffect(() => {
-    if (financialsError && tabValue === "1") {
+    if (financialsError) {
       financialsRefetch();
     }
   }, [financialsError]);
 
   useEffect(() => {
-    if (dailyUsageError && tabValue === "1") {
+    if (dailyUsageError) {
       dailyUsageRefetch();
     }
   }, [dailyUsageError]);
 
   useEffect(() => {
-    if (hourlyUsageError && tabValue === "1") {
+    if (hourlyUsageError) {
       hourlyUsageRefetch();
     }
   }, [hourlyUsageError]);
@@ -416,96 +339,12 @@ function ProtocolDashboard() {
   }, [poolOverviewError]);
 
   useEffect(() => {
-    if (tabValue === "2" && !dataPools) {
+    if (tabValue === "2") {
       getPoolsOverviewData();
-    }
-  }, [tabValue, getPoolsOverviewData]);
-
-
-  useEffect(() => {
-    if (data?.protocols && dataPools) {
-      const variables: { [x: string]: any } = {}
-      for (let idx = 0; idx < 10; idx++) {
-        variables['pool' + (idx + 1) + 'Id'] = dataPools[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
-      }
-      getPoolOverviewTokens({ variables })
-      if (data?.protocols[0]?.type === 'EXCHANGE') {
-        getPoolsSnapshotVolume({ variables })
-      }
-      if (dataPools[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools2) {
-        getPoolsOverviewData2();
-      }
-    }
-  }, [tabValue, dataPools, poolOverviewLoading]);
-
-  useEffect(() => {
-    if (data?.protocols && dataPools2) {
-      const variables: { [x: string]: any } = {}
-      for (let idx = 0; idx < 10; idx++) {
-        variables['pool' + (idx + 1) + 'Id'] = dataPools2[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
-      }
-      getPoolOverviewTokens2({ variables })
-      if (data?.protocols[0]?.type === 'EXCHANGE') {
-        getPoolsSnapshotVolume2({ variables })
-      }
-      if (dataPools2[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools3) {
-        getPoolsOverviewData3();
-      }
-    }
-  }, [dataPools2, poolOverviewLoading2]);
-
-  useEffect(() => {
-    if (data?.protocols && dataPools3) {
-      const variables: { [x: string]: any } = {}
-      for (let idx = 0; idx < 10; idx++) {
-        variables['pool' + (idx + 1) + 'Id'] = dataPools3[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
-      }
-      getPoolOverviewTokens3({ variables })
-      if (data?.protocols[0]?.type === 'EXCHANGE') {
-        getPoolsSnapshotVolume3({ variables })
-      }
-      if (dataPools3[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools4) {
-        getPoolsOverviewData4();
-      }
-    }
-  }, [dataPools3]);
-
-  useEffect(() => {
-    if (data?.protocols && dataPools4) {
-      const variables: { [x: string]: any } = {}
-      for (let idx = 0; idx < 10; idx++) {
-        variables['pool' + (idx + 1) + 'Id'] = dataPools4[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
-      }
-      getPoolOverviewTokens4({ variables })
-      if (data?.protocols[0]?.type === 'EXCHANGE') {
-        getPoolsSnapshotVolume4({ variables })
-      }
-      if (dataPools4[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools5) {
-        getPoolsOverviewData5();
-      }
-    }
-  }, [dataPools4]);
-
-  useEffect(() => {
-    if (data?.protocols && dataPools5) {
-      const variables: { [x: string]: any } = {}
-      for (let idx = 0; idx < 10; idx++) {
-        variables['pool' + (idx + 1) + 'Id'] = dataPools5[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
-      }
-      getPoolOverviewTokens5({ variables })
-      if (data?.protocols[0]?.type === 'EXCHANGE') {
-        getPoolsSnapshotVolume5({ variables })
-      }
-    }
-  }, [dataPools5])
-
-
-
-  useEffect(() => {
-    if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
+    } else if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
       getPoolsListData();
     }
-  }, [tabValue, getPoolsListData]);
+  }, [tabValue, getPoolsOverviewData, getPoolsListData]);
 
   useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
@@ -538,205 +377,10 @@ function ProtocolDashboard() {
     errorDisplayProps = error;
   }
 
-  let tokenKey = "inputTokens";
-  if (protocolSchemaData?.protocols[0]?.type === ProtocolType.LENDING || protocolSchemaData?.protocols[0]?.type === ProtocolType.YIELD) {
-    tokenKey = "inputToken";
-  }
   let pools: { [x: string]: any }[] = [];
   if (dataPools && data) {
-    let poolArray = dataPools[PoolNames[data?.protocols[0]?.type]];
-    if (snapshotVolume) {
-      if (Object.keys(snapshotVolume)?.length > 0) {
-        const copyPool = [...poolArray];
-        poolArray = [];
-        Object.keys(snapshotVolume).forEach((x, idx) => {
-          const copyElement = { ...copyPool[idx] };
-          copyElement.dailySupplySideRevenueUSD = snapshotVolume[x][snapshotVolume[x].length - 1]?.dailySupplySideRevenueUSD;
-          copyElement.dailyVolumeUSD = snapshotVolume[x][snapshotVolume[x].length - 1]?.dailyVolumeUSD;
-
-          poolArray.push(copyElement)
-        })
-      }
-    }
-    if (poolOverviewTokens) {
-      if (Object.keys(poolOverviewTokens)?.length > 0) {
-        const copyPool = [...poolArray];
-        poolArray = [];
-        Object.keys(poolOverviewTokens).forEach((x, idx) => {
-          if (poolOverviewTokens[x]) {
-            const copyElement = { ...copyPool[idx] };
-            copyElement[tokenKey] = poolOverviewTokens[x][tokenKey];
-            copyElement["rewardTokens"] = poolOverviewTokens[x]["rewardTokens"];
-            poolArray.push(copyElement)
-          }
-
-        })
-      }
-    }
-    pools = poolArray;
+    pools = dataPools[PoolNames[data?.protocols[0]?.type]];
   }
-  if (dataPools2 && data) {
-    let poolArray = dataPools2[PoolNames[data?.protocols[0]?.type]];
-    if (snapshotVolume2) {
-      if (Object.keys(snapshotVolume2)?.length > 0) {
-        const copyPool = [...poolArray];
-        poolArray = [];
-        Object.keys(snapshotVolume2).forEach((x, idx) => {
-          const copyElement = { ...copyPool[idx] };
-          copyElement.dailySupplySideRevenueUSD = snapshotVolume2[x][snapshotVolume2[x].length - 1]?.dailySupplySideRevenueUSD;
-          copyElement.dailyVolumeUSD = snapshotVolume2[x][snapshotVolume2[x].length - 1]?.dailyVolumeUSD;
-
-          poolArray.push(copyElement);
-        })
-      }
-    }
-    if (poolOverviewTokens2) {
-      if (Object.keys(poolOverviewTokens2).length > 0) {
-        const copyPool = [...poolArray];
-        poolArray = [];
-        Object.keys(poolOverviewTokens2).forEach((x, idx) => {
-          if (poolOverviewTokens2[x]) {
-            const copyElement = { ...copyPool[idx] };
-            copyElement[tokenKey] = poolOverviewTokens2[x][tokenKey];
-            copyElement["rewardTokens"] = poolOverviewTokens2[x]["rewardTokens"];
-            poolArray.push(copyElement);
-          }
-        })
-      }
-    }
-    pools = pools.concat(poolArray);
-  }
-  if (dataPools3 && data) {
-    let poolArray = dataPools3[PoolNames[data?.protocols[0]?.type]];
-    if (snapshotVolume3) {
-      if (Object.keys(snapshotVolume3)?.length > 0) {
-        const copyPool = [...poolArray];
-        poolArray = [];
-        Object.keys(snapshotVolume3).forEach((x, idx) => {
-          const copyElement = { ...copyPool[idx] };
-          copyElement.dailySupplySideRevenueUSD = snapshotVolume3[x][snapshotVolume3[x].length - 1]?.dailySupplySideRevenueUSD;
-          copyElement.dailyVolumeUSD = snapshotVolume3[x][snapshotVolume3[x].length - 1]?.dailyVolumeUSD;
-
-          poolArray.push(copyElement);
-        })
-      }
-    }
-    if (poolOverviewTokens3) {
-      if (Object.keys(poolOverviewTokens3).length > 0) {
-        const copyPool = [...poolArray];
-        poolArray = [];
-        Object.keys(poolOverviewTokens3).forEach((x, idx) => {
-          if (poolOverviewTokens3[x]) {
-            const copyElement = { ...copyPool[idx] };
-            copyElement[tokenKey] = poolOverviewTokens3[x][tokenKey];
-            copyElement["rewardTokens"] = poolOverviewTokens3[x]["rewardTokens"];
-            poolArray.push(copyElement);
-          }
-        })
-      }
-    }
-    pools = pools.concat(poolArray);
-  }
-  if (dataPools4 && data) {
-    let poolArray = dataPools4[PoolNames[data?.protocols[0]?.type]];
-    if (snapshotVolume4) {
-      if (Object.keys(snapshotVolume4)?.length > 0) {
-        const copyPool = [...poolArray];
-        poolArray = [];
-        Object.keys(snapshotVolume4).forEach((x, idx) => {
-          const copyElement = { ...copyPool[idx] };
-          copyElement.dailySupplySideRevenueUSD = snapshotVolume4[x][snapshotVolume4[x].length - 1]?.dailySupplySideRevenueUSD;
-          copyElement.dailyVolumeUSD = snapshotVolume4[x][snapshotVolume4[x].length - 1]?.dailyVolumeUSD;
-
-          poolArray.push(copyElement);
-        })
-      }
-    }
-    if (poolOverviewTokens4) {
-      if (Object.keys(poolOverviewTokens4).length > 0) {
-        const copyPool = [...poolArray];
-        poolArray = [];
-        Object.keys(poolOverviewTokens4).forEach((x, idx) => {
-          if (poolOverviewTokens4[x]) {
-            const copyElement = { ...copyPool[idx] };
-            copyElement[tokenKey] = poolOverviewTokens4[x][tokenKey];
-            copyElement["rewardTokens"] = poolOverviewTokens4[x]["rewardTokens"];
-            poolArray.push(copyElement);
-          }
-        })
-      }
-    }
-    pools = pools.concat(poolArray);
-  }
-  if (dataPools5 && data) {
-    let poolArray = dataPools5[PoolNames[data?.protocols[0]?.type]];
-    if (snapshotVolume5) {
-      if (Object.keys(snapshotVolume5)?.length > 0) {
-        const copyPool = [...poolArray];
-        poolArray = [];
-        Object.keys(snapshotVolume5).forEach((x, idx) => {
-          const copyElement = { ...copyPool[idx] };
-          copyElement.dailySupplySideRevenueUSD = snapshotVolume5[x][snapshotVolume5[x].length - 1]?.dailySupplySideRevenueUSD;
-          copyElement.dailyVolumeUSD = snapshotVolume5[x][snapshotVolume5[x].length - 1]?.dailyVolumeUSD;
-
-          poolArray.push(copyElement);
-        })
-      }
-    }
-    if (poolOverviewTokens5) {
-      if (Object.keys(poolOverviewTokens5).length > 0) {
-        const copyPool = [...poolArray];
-        poolArray = [];
-        Object.keys(poolOverviewTokens5).forEach((x, idx) => {
-          if (poolOverviewTokens5[x]) {
-            const copyElement = { ...copyPool[idx] };
-            copyElement[tokenKey] = poolOverviewTokens5[x][tokenKey];
-            copyElement["rewardTokens"] = poolOverviewTokens5[x]["rewardTokens"];
-            poolArray.push(copyElement);
-          }
-        })
-      }
-    }
-    pools = pools.concat(poolArray);
-  }
-
-
-  if (pools?.length > 0) {
-    let poolTemp = [...pools];
-    pools = poolTemp.sort((a, b) => {
-      return b.totalValueLockedUSD - a.totalValueLockedUSD;
-    });
-  }
-
-  let anyPoolOverviewLoading = false;
-  if (
-    poolOverviewLoading ||
-    poolOverviewLoading2 ||
-    poolOverviewLoading3 ||
-    poolOverviewLoading4 ||
-    poolOverviewLoading5
-  ) {
-    anyPoolOverviewLoading = true;
-  }
-
-  let anyPoolOverviewError = null;
-  if (poolOverviewError5) {
-    anyPoolOverviewError = poolOverviewError5;
-  }
-  if (poolOverviewError4) {
-    anyPoolOverviewError = poolOverviewError4;
-  }
-  if (poolOverviewError3) {
-    anyPoolOverviewError = poolOverviewError3;
-  }
-  if (poolOverviewError2) {
-    anyPoolOverviewError = poolOverviewError2;
-  }
-  if (poolOverviewError) {
-    anyPoolOverviewError = poolOverviewError;
-  }
-
-
 
   let toggleVersion = null;
 
@@ -848,7 +492,7 @@ function ProtocolDashboard() {
           protocolTableData={protocolTableData}
           subgraphToQueryURL={subgraphToQuery.url}
           skipAmt={skipAmt}
-          poolOverviewRequest={{ poolOverviewError: anyPoolOverviewError, poolOverviewLoading: anyPoolOverviewLoading }}
+          poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
           poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
           positionsQuery={positionsQuery}
           protocolTimeseriesData={{

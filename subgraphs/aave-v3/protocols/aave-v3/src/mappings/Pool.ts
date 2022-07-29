@@ -6,13 +6,9 @@ import {
   Pool,
   Repay,
   ReserveDataUpdated,
-  ReserveUsedAsCollateralDisabled,
-  ReserveUsedAsCollateralEnabled,
   Supply,
   Withdraw,
 } from "../../../../generated/templates/Pool/Pool";
-import { BIGINT_ZERO } from "../../../../src/utils/constants";
-import { rayDiv } from "../../../../src/utils/numbers";
 import {
   createBorrow,
   createDeposit,
@@ -21,14 +17,15 @@ import {
   createWithdraw,
 } from "../entities/event";
 import { updateMarketRates } from "../entities/market";
-import { setUserLenderPositionIsCollateral } from "../entities/position";
 import { updateReserveAccruedToTreasury } from "../entities/reserve";
+import { BIGINT_ZERO } from "../../../../src/utils/constants";
+import { rayDiv } from "../../../../src/utils/numbers";
 
 export function handleBorrow(event: Borrow): void {
   createBorrow(
     event,
     event.params.reserve,
-    event.params.onBehalfOf,
+    event.params.user,
     event.params.amount
   );
 }
@@ -63,7 +60,7 @@ export function handleRepay(event: Repay): void {
   createRepay(
     event,
     event.params.reserve,
-    event.params.user,
+    event.params.repayer,
     event.params.amount
   );
 }
@@ -89,7 +86,7 @@ export function handleSupply(event: Supply): void {
   createDeposit(
     event,
     event.params.reserve,
-    event.params.onBehalfOf,
+    event.params.user,
     event.params.amount
   );
 }
@@ -98,27 +95,7 @@ export function handleWithdraw(event: Withdraw): void {
   createWithdraw(
     event,
     event.params.reserve,
-    event.params.user,
+    event.params.to,
     event.params.amount
-  );
-}
-
-export function handleReserveUsedAsCollateralEnabled(
-  event: ReserveUsedAsCollateralEnabled
-): void {
-  setUserLenderPositionIsCollateral(
-    event.params.user,
-    event.params.reserve,
-    true
-  );
-}
-
-export function handleReserveUsedAsCollateralDisabled(
-  event: ReserveUsedAsCollateralDisabled
-): void {
-  setUserLenderPositionIsCollateral(
-    event.params.user,
-    event.params.reserve,
-    false
   );
 }

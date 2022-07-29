@@ -36,7 +36,6 @@ import {
   getOrCreateProtocol,
   incrementProtocolDepositCount,
   incrementProtocolSwapCount,
-  incrementProtocolTotalPoolCount,
   incrementProtocolWithdrawCount,
   updateProtocolTVL,
 } from "./protocol";
@@ -85,8 +84,7 @@ export function createPoolFromEvent(event: NewSwapPool): boolean {
   }
   const pool = new LiquidityPool(addressString);
   pool.protocol = getOrCreateProtocol().id;
-  pool._inputTokensOrdered = getOrCreateInputTokens(event.params.pooledTokens);
-  pool.inputTokens = pool._inputTokensOrdered.sort();
+  pool.inputTokens = getOrCreateInputTokens(event.params.pooledTokens);
   const token = getOrCreateToken(lpTokenAddress, addressString);
   pool.outputToken = token.id;
   pool.outputTokenSupply = BIGINT_ZERO;
@@ -99,15 +97,7 @@ export function createPoolFromEvent(event: NewSwapPool): boolean {
   pool.fees = createOrUpdateAllFees(address, tradingFee, adminFee);
   pool._basePool = getBasePool(contract);
   setInputTokenBalancesAndWeights(pool, contract);
-
-  pool.isSingleSided = false;
-  pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.save();
-  incrementProtocolTotalPoolCount();
   return true;
 }
 
@@ -129,7 +119,6 @@ export function getOrCreatePoolDailySnapshot(
       pool.inputTokens.length
     ).map<BigDecimal>(() => BIGDECIMAL_ZERO);
 
-    poolDailySnapshot.dailyVolumeUSD = BIGDECIMAL_ZERO;
     poolDailySnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolDailySnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     poolDailySnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
@@ -176,7 +165,6 @@ export function getOrCreatePoolHourlySnapshot(
       pool.inputTokens.length
     ).map<BigDecimal>(() => BIGDECIMAL_ZERO);
 
-    poolHourlySnapshot.hourlyVolumeUSD = BIGDECIMAL_ZERO;
     poolHourlySnapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolHourlySnapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     poolHourlySnapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
@@ -447,11 +435,10 @@ function setInputTokenBalancesAndWeights(
       balances.push(balance.times(lpTokenBalance).div(totalLPTokenSupply));
     }
   }
-  balances = getBalances(
+  pool.inputTokenBalances = getBalances(
     contract,
     pool.inputTokens.length - balances.length
   ).concat(balances);
-  pool.inputTokenBalances = sortByInputTokenOrder(pool, balances);
   pool.inputTokenWeights = getBalanceWeights(
     pool.inputTokenBalances,
     pool.inputTokens
@@ -506,8 +493,7 @@ function createPoolFromAddress(address: Address): LiquidityPool {
 
   const protocol = getOrCreateProtocol();
   pool.protocol = protocol.id;
-  pool._inputTokensOrdered = getOrCreateInputTokensFromContract(contract);
-  pool.inputTokens = pool._inputTokensOrdered.sort();
+  pool.inputTokens = getOrCreateInputTokensFromContract(contract);
   const token = getOrCreateToken(lpTokenAddress, address.toHexString());
   pool.outputToken = token.id;
   pool.outputTokenSupply = BIGINT_ZERO;
@@ -522,13 +508,15 @@ function createPoolFromAddress(address: Address): LiquidityPool {
   setInputTokenBalancesAndWeights(pool, contract);
 
   pool.isSingleSided = false;
-  pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+
+  protocol.totalPoolCount += 1;
+
+  protocol.save();
   pool.save();
-  incrementProtocolTotalPoolCount();
+
   return pool;
 }
 
@@ -544,23 +532,4 @@ function getOrCreateInputTokensFromContract(contract: Swap): string[] {
     i += 1;
   } while (!call.reverted);
   return getOrCreateInputTokens(tokens);
-}
-
-function sortByInputTokenOrder<T>(
-  pool: LiquidityPool,
-  arr: Array<T>
-): Array<T> {
-  if (arr.length != pool.inputTokens.length) {
-    log.error(
-      "Failed to sort array, expected array of length {}, received length {}",
-      [pool.inputTokens.length.toString(), arr.length.toString()]
-    );
-    return arr;
-  }
-  const ordered = new Array<T>(arr.length);
-  for (let i = 0; i < arr.length; i++) {
-    const newIndex = pool.inputTokens.indexOf(pool._inputTokensOrdered[i]);
-    ordered[newIndex] = arr[i];
-  }
-  return ordered;
 }

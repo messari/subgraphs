@@ -18,7 +18,7 @@ import {
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 import { emissionsPerDay } from "../common/rewards";
 
-export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset | null {
+export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset {
   let MasterPlatypusContract = MasterPlatypusOld.bind(MasterPlatypusOld_ADDRESS);
 
   let poolInfo = MasterPlatypusContract.try_poolInfo(pid);
@@ -28,7 +28,6 @@ export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset | null {
       pid.toString(),
       event.address.toHexString(),
     ]);
-    return null;
   }
   let poolInfoMap = poolInfo.value;
   let poolPoints = poolInfoMap.value1;
@@ -39,7 +38,6 @@ export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset | null {
       event.transaction.hash.toHexString(),
       poolInfoMap.value0.toHexString(),
     ]);
-    return null;
   }
 
   // _asset!._index = pid;
@@ -110,7 +108,7 @@ export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset | null {
   return _asset!;
 }
 
-export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset | null{
+export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset {
   let MasterPlatypusContract = MasterPlatypusFactory.bind(MasterPlatypusFactory_ADDRESS);
 
   let poolInfo = MasterPlatypusContract.try_poolInfo(pid);
@@ -120,7 +118,6 @@ export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset | null{
       pid.toString(),
       event.address.toHexString(),
     ]);
-    return null;
   }
   let poolInfoMap = poolInfo.value;
   let poolPoints = poolInfoMap.value1;
@@ -130,7 +127,6 @@ export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset | null{
       event.transaction.hash.toHexString(),
       poolInfoMap.value0.toHexString(),
     ]);
-    return null;
   }
 
   // _asset!._index = pid;
@@ -201,7 +197,7 @@ export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset | null{
   return _asset!;
 }
 
-export function handlePlatypus<T>(event: T, pid: BigInt): _Asset | null {
+export function handlePlatypus<T>(event: T, pid: BigInt): _Asset {
   let MasterPlatypusContract = MasterPlatypus.bind(event.address);
 
   let poolInfo = MasterPlatypusContract.try_poolInfo(pid);
@@ -211,7 +207,6 @@ export function handlePlatypus<T>(event: T, pid: BigInt): _Asset | null {
       pid.toString(),
       event.address.toHexString(),
     ]);
-    return null;
   }
   let poolInfoMap = poolInfo.value;
   let poolPoints = poolInfoMap.value7;
@@ -222,7 +217,6 @@ export function handlePlatypus<T>(event: T, pid: BigInt): _Asset | null {
       event.transaction.hash.toHexString(),
       poolInfoMap.value0.toHexString(),
     ]);
-    return null;
   }
 
   // _asset!._index = pid;
@@ -348,7 +342,7 @@ export function getBonusRewardTPS(rewarder: Address): BigInt {
   return tps.value;
 }
 
-export function getAssetForRewards<T>(event: T): _Asset | null {
+export function getAssetForRewards<T>(event: T): _Asset {
   let pid = event.params.pid;
   if (event.address.equals(MasterPlatypusOld_ADDRESS)) {
     return handleOldPlatypus(event, pid);
@@ -360,36 +354,24 @@ export function getAssetForRewards<T>(event: T): _Asset | null {
 }
 
 export function handleDeposit(event: Deposit): void {
-  let _asset: _Asset | null;
+  let _asset: _Asset;
   _asset = getAssetForRewards<Deposit>(event);
-  if (!_asset) {
-    log.error("[{}] error handling masterchef event, potentially unexpected asset", [event.transaction.hash.toHexString()])
-    return;
-  }
   _asset.amountStaked = _asset.amountStaked.plus(event.params.amount);
   _asset.save();
   updatePoolRewards(event, Address.fromString(_asset.id));
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  let _asset: _Asset | null;
+  let _asset: _Asset;
   _asset = getAssetForRewards<Withdraw>(event);
-  if (!_asset) {
-    log.error("[{}] error handling masterchef event, potentially unexpected asset", [event.transaction.hash.toHexString()])
-    return;
-  }
   _asset.amountStaked = _asset.amountStaked.minus(event.params.amount);
   _asset.save();
   updatePoolRewards(event, Address.fromString(_asset.id));
 }
 
 export function handleDepositFor(event: DepositFor): void {
-  let _asset: _Asset | null;
+  let _asset: _Asset;
   _asset = getAssetForRewards<DepositFor>(event);
-  if (!_asset) {
-    log.error("[{}] error handling masterchef event, potentially unexpected asset", [event.transaction.hash.toHexString()])
-    return;
-  }
   _asset.amountStaked = _asset.amountStaked.plus(event.params.amount);
   _asset.save();
   updatePoolRewards(event, Address.fromString(_asset.id));

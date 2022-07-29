@@ -7,7 +7,6 @@ import {
 } from "@graphprotocol/graph-ts";
 import { Vault, VaultFee, _UnderlyingToken } from "../../../generated/schema";
 import { ArrakisVaultV1 as VaultV1Contract } from "../../../generated/templates/ArrakisVault/ArrakisVaultV1";
-import { UniswapV3Pool as PoolContract } from "../../../generated/templates/ArrakisVault/UniswapV3Pool";
 import {
   BIGINT_MAX,
   BIGINT_ZERO,
@@ -68,9 +67,6 @@ export function getOrCreateVault(
   let vault = Vault.load(vaultId);
   if (!vault) {
     let vaultContract = VaultV1Contract.bind(vaultAddress);
-    const poolAddress = vaultContract.pool();
-    let poolContract = PoolContract.bind(poolAddress);
-    const poolFeePercentage = poolContract.fee() / 10000.0;
 
     // Create relevant tokens
     getOrCreateUnderlyingToken(vaultAddress);
@@ -78,11 +74,7 @@ export function getOrCreateVault(
 
     vault = new Vault(vaultId);
     vault.protocol = "";
-    vault.name = vaultContract
-      .name()
-      .concat("-")
-      .concat(poolFeePercentage.toString())
-      .concat("%");
+    vault.name = vaultContract.name();
     vault.symbol = vaultContract.symbol();
     vault.inputToken = vaultId;
     vault.outputToken = vaultId;

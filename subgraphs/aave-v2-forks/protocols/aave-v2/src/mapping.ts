@@ -14,10 +14,8 @@ import {
   LendingPoolAddressesProvider as AddressProviderContract,
 } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
-  AAVE_DECIMALS,
   getNetworkSpecificConstant,
   Protocol,
-  USDC_POS_TOKEN_ADDRESS,
   USDC_TOKEN_ADDRESS,
 } from "./constants";
 import {
@@ -39,8 +37,6 @@ import {
   LiquidationCall,
   Repay,
   ReserveDataUpdated,
-  ReserveUsedAsCollateralDisabled,
-  ReserveUsedAsCollateralEnabled,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
 import { AToken } from "../../../generated/templates/LendingPool/AToken";
@@ -59,8 +55,6 @@ import {
   _handleReserveDeactivated,
   _handleReserveFactorChanged,
   _handleReserveInitialized,
-  _handleReserveUsedAsCollateralDisabled,
-  _handleReserveUsedAsCollateralEnabled,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
@@ -69,7 +63,6 @@ import {
   getOrCreateToken,
 } from "../../../src/helpers";
 import {
-  BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   equalsIgnoreCase,
   exponentToBigDecimal,
@@ -81,7 +74,6 @@ import {
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/templates/LendingPool/AaveIncentivesController";
-import { StakedAave } from "../../../generated/templates/LendingPool/StakedAave";
 import { IPriceOracleGetter } from "../../../generated/templates/LendingPool/IPriceOracleGetter";
 
 function getProtocolData(): ProtocolData {
@@ -286,29 +278,10 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
         let rewardsPerDay = tryRewardInfo.value.value0.times(
           BigInt.fromI32(SECONDS_PER_DAY)
         );
-
-        // get price of reward token (if stkAAVE it is tied to the price of AAVE)
-        let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
-        if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
-          // get staked token if possible to grab price of staked token
-          let stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
-          let tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
-          if (!tryStakedToken.reverted) {
-            rewardTokenPriceUSD = getAssetPriceInUSDC(
-              tryStakedToken.value,
-              Address.fromString(protocol.priceOracle)
-            );
-          }
-        }
-
-        // if reward token price was not found then use old method
-        if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
-          rewardTokenPriceUSD = getAssetPriceInUSDC(
-            tryRewardAsset.value,
-            Address.fromString(protocol.priceOracle)
-          );
-        }
-
+        let rewardTokenPriceUSD = getAssetPriceInUSDC(
+          tryRewardAsset.value,
+          Address.fromString(protocol.priceOracle)
+        );
         let rewardsPerDayUSD = rewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
@@ -337,26 +310,6 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     protocolData,
     event.params.reserve,
     assetPriceUSD
-  );
-}
-
-export function handleReserveUsedAsCollateralEnabled(
-  event: ReserveUsedAsCollateralEnabled
-): void {
-  // This Event handler enables a reserve/market to be used as collateral
-  _handleReserveUsedAsCollateralEnabled(
-    event.params.reserve,
-    event.params.user
-  );
-}
-
-export function handleReserveUsedAsCollateralDisabled(
-  event: ReserveUsedAsCollateralDisabled
-): void {
-  // This Event handler disables a reserve/market being used as collateral
-  _handleReserveUsedAsCollateralDisabled(
-    event.params.reserve,
-    event.params.user
   );
 }
 
@@ -406,9 +359,9 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidatedCollateralAmount,
     event.params.collateralAsset,
     getProtocolData(),
+    event.params.debtAsset,
     event.params.liquidator,
-    event.params.user,
-    event.params.debtAsset
+    event.params.user
   );
 }
 
@@ -445,33 +398,10 @@ function getAssetPriceInUSDC(
       BIGINT_ZERO
     );
 
-    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
-      return BIGDECIMAL_ZERO;
-    } else {
-      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
-    }
+    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
   }
 
-  // Polygon Oracle returns price in ETH, must convert to USD with following method
-  if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
-    let priceUSDCInEth = readValue<BigInt>(
-      oracle.try_getAssetPrice(Address.fromString(USDC_POS_TOKEN_ADDRESS)),
-      BIGINT_ZERO
-    );
-
-    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
-      return BIGDECIMAL_ZERO;
-    } else {
-      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
-    }
-  }
-
-  // Avalanche Oracle return the price offset by 8 decimals
-  if (equalsIgnoreCase(dataSource.network(), Network.AVALANCHE)) {
-    return oracleResult.toBigDecimal().div(exponentToBigDecimal(AAVE_DECIMALS));
-  }
-
-  // last resort, should not be touched
+  // otherwise return the output of the price oracle
   let inputToken = getOrCreateToken(tokenAddress);
   return oracleResult
     .toBigDecimal()
