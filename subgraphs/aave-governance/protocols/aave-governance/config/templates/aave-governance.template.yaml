@@ -44,34 +44,34 @@ dataSources:
         - event: VotingDelayChanged(uint256,indexed address)
           handler: handleVotingDelayChanged
       file: ./protocols/aave-governance/src/aave-governance-v-2.ts
-  # - kind: ethereum/contract
-  #   name: AaveTokenV2
-  #   network:  {{ network }}
-  #   source:
-  #     address: "{{ tokenContractAddress }}"
-  #     abi: AaveTokenV2
-  #     startBlock: {{ tokenContractStartBlock }}
-  #   mapping:
-  #     kind: ethereum/events
-  #     apiVersion: 0.0.6
-  #     language: wasm/assemblyscript
-  #     entities:
-  #       - Governance
-  #       - Proposal
-  #       - Vote
-  #       - TokenHolder
-  #       - Delegate
-  #     abis:
-  #       - name: AaveTokenV2
-  #         file: ./abis/aave-governance/AaveTokenV2.json
-  #     eventHandlers:
-  #       - event: DelegateChanged(indexed address,indexed address,uint8)
-  #         handler: handleDelegateChanged
-  #       - event: DelegatedPowerChanged(indexed address,uint256,uint8)
-  #         handler: handleDelegatedPowerChanged
-  #       - event: Transfer(indexed address,indexed address,uint256)
-  #         handler: handleTransfer
-  #     file: ./protocols/aave-governance/src/aave-token-v-2.ts
+  - kind: ethereum/contract
+    name: AaveTokenV2
+    network:  {{ network }}
+    source:
+      address: "{{ tokenContractAddress }}"
+      abi: AaveTokenV2
+      startBlock: {{ tokenContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: AaveTokenV2
+          file: ./abis/aave-governance/AaveTokenV2.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,uint8)
+          handler: handleDelegateChanged
+        - event: DelegatedPowerChanged(indexed address,uint256,uint8)
+          handler: handleDelegatedPowerChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/aave-governance/src/aave-token-v-2.ts
   - kind: ethereum/contract
     name: StakedTokenV2Rev3
     network:  {{ network }}
