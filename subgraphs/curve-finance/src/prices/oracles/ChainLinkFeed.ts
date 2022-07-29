@@ -4,7 +4,7 @@ import { CustomPriceType } from "../common/types";
 import { ChainLinkContract } from "../../../generated/templates/PoolTemplate/ChainLinkContract";
 
 export function getChainLinkContract(network: string): ChainLinkContract {
-  return ChainLinkContract.bind(constants.CHAIN_LINK_CONTRACT_ADDRESS.get(network)!);
+  return ChainLinkContract.bind(constants.CHAIN_LINK_CONTRACT_ADDRESS.get(network));
 }
 
 export function getTokenPriceFromChainLink(tokenAddr: Address, network: string): CustomPriceType {

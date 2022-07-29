@@ -24,10 +24,9 @@ export function getRewardsData_v1(gaugeAddress: Address): RewardsInfoType {
 
   let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
   let rewardCount = utils
-    .readValue<BigInt>(gaugeContract.try_reward_count(), constants.BIGINT_TEN)
-    .toI32() as u8;
+    .readValue<BigInt>(gaugeContract.try_reward_count(), constants.BIGINT_TEN);
 
-  for (let idx = 0; idx < rewardCount; idx++) {
+  for (let idx = 0; idx < rewardCount.toI32(); idx++) {
     let rewardToken = utils.readValue<Address>(
       gaugeContract.try_reward_tokens(BigInt.fromI32(idx)),
       constants.NULL.TYPE_ADDRESS

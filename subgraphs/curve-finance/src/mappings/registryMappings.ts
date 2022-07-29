@@ -77,7 +77,7 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
 
   let basePoolAddress = event.params.base_pool;
   let basePool = getOrCreateLiquidityPool(basePoolAddress, event.block);
-  let basePoolCoins = basePool.inputTokens.map((x) => Address.fromString(x));
+  let basePoolCoins = basePool.inputTokens.map<Address>((x) => Address.fromString(x));
   let poolCoins = [event.params.coin].concat(basePoolCoins);
 
   let poolAddress = utils.getPoolFromCoins(registryAddress, poolCoins);

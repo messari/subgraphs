@@ -19,7 +19,7 @@ export class RewardsInfoType {
     return this._rewardRates;
   }
 
-  isEmpty(): Boolean {
+  isEmpty(): bool {
     if (this.getRewardTokens.length === 0) return true;
 
     return false;

@@ -22,7 +22,6 @@ import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
 import { Pool as LiquidityPoolContract } from "../../generated/templates/PoolTemplate/Pool";
-import { updateProtocolRevenue } from "./Metrics";
 
 export function createWithdrawTransaction(
   pool: LiquidityPoolStore,
