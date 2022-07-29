@@ -412,6 +412,7 @@ export function getOrCreateLiquidityPool(
 
     utils.updateProtocolAfterNewLiquidityPool(liquidityPoolAddress);
 
+    liquidityPool._gaugeAddress = constants.NULL.TYPE_STRING;
     liquidityPool.save();
 
     log.warning(
