@@ -257,6 +257,12 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     return;
   }
 
+
+  //
+  // Reward rate (rewards/second) in a market comes from try_assets(to)
+  // Supply side the to address is the aToken
+  // Borrow side the to address is the variableDebtToken
+
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let tryIncentiveController = aTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
