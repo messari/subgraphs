@@ -1,8 +1,17 @@
 import {
+  log,
+  BigInt,
+  Address,
+  ethereum,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
+import {
   Token,
   Account,
+  _LpToken,
   RewardToken,
   DexAmmProtocol,
+  _LiquidityGauge,
   LiquidityPoolFee,
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
@@ -13,13 +22,6 @@ import {
 import * as utils from "./utils";
 import * as constants from "./constants";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
 
 export function getOrCreateAccount(id: string): Account {
@@ -326,6 +328,37 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
   return poolSnapshots;
 }
 
+export function getOrCreateLiquidityGauge(
+  gaugeAddress: Address
+): _LiquidityGauge {
+  let liquidityGauge = _LiquidityGauge.load(gaugeAddress.toHexString());
+
+  if (!liquidityGauge) {
+    liquidityGauge = new _LiquidityGauge(gaugeAddress.toHexString());
+
+    liquidityGauge.poolAddress = constants.NULL.TYPE_STRING;
+    liquidityGauge.save();
+  }
+
+  return liquidityGauge;
+}
+
+export function getOrCreateLpToken(
+  lpTokenAddress: Address,
+  poolAddress: Address
+): _LpToken {
+  let lpToken = _LpToken.load(lpTokenAddress.toHexString());
+
+  if (!lpToken) {
+    lpToken = new _LpToken(lpTokenAddress.toHexString());
+
+    lpToken.poolAddress = poolAddress.toHexString();
+    lpToken.save();
+  }
+
+  return lpToken;
+}
+
 export function getOrCreateLiquidityPool(
   liquidityPoolAddress: Address,
   block: ethereum.Block
@@ -344,6 +377,10 @@ export function getOrCreateLiquidityPool(
     liquidityPool.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
 
     const lpToken = utils.getLpTokenFromPool(liquidityPoolAddress);
+
+    if (lpToken.id != constants.NULL.TYPE_STRING)
+      getOrCreateLpToken(Address.fromString(lpToken.id), liquidityPoolAddress);
+
     liquidityPool.name = lpToken.name;
     liquidityPool.symbol = lpToken.symbol;
     liquidityPool.protocol = constants.Mainnet.REGISTRY_ADDRESS.toHexString();
@@ -352,7 +389,11 @@ export function getOrCreateLiquidityPool(
     liquidityPool.inputTokenBalances = utils.getPoolBalances(
       liquidityPoolAddress
     );
-    liquidityPool.inputTokenWeights = utils.getPoolTokenWeights(liquidityPool);
+    liquidityPool.inputTokenWeights = utils.getPoolTokenWeights(
+      liquidityPool.inputTokens,
+      liquidityPool.inputTokenBalances,
+      constants.BIGDECIMAL_ZERO
+    );
 
     liquidityPool.outputToken = lpToken.id;
     liquidityPool.outputTokenSupply = constants.BIGINT_ZERO;

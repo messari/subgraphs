@@ -87,7 +87,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return sushiswapPrice;
   }
 
-  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [tokenAddr.toHexString()]);
+  log.info("[Oracle] Failed to Fetch Price, tokenAddr: {}", [tokenAddr.toHexString()]);
 
   return new CustomPriceType();
 }

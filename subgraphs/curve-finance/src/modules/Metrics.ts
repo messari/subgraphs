@@ -18,8 +18,11 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
   getOrCreateLiquidityPoolDailySnapshots,
   getOrCreateLiquidityPoolHourlySnapshots,
+  getOrCreateLiquidityPoolFee,
 } from "../common/initializers";
+import { enumToPrefix } from "../common/utils";
 import * as constants from "../common/constants";
+import { updateRevenueSnapshots } from "./Revenue";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   const account = getOrCreateAccount(from.toHexString());
@@ -223,4 +226,42 @@ export function updateSnapshotsVolume(
   poolHourlySnaphot.save();
   poolDailySnaphot.save();
   protcol.save();
+}
+
+export function updateProtocolRevenue(
+  liquidityPoolAddress: Address,
+  volumeUSD: BigDecimal,
+  block: ethereum.Block
+): void {
+  const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
+
+  let lpFeeId =
+    enumToPrefix(constants.LiquidityPoolFeeType.FIXED_LP_FEE) +
+    liquidityPoolAddress.toHexString();
+  const lpFee = getOrCreateLiquidityPoolFee(
+    lpFeeId,
+    constants.LiquidityPoolFeeType.FIXED_LP_FEE
+  );
+
+  let protocolFeeId =
+    enumToPrefix(constants.LiquidityPoolFeeType.FIXED_PROTOCOL_FEE) +
+    liquidityPoolAddress.toHexString();
+  const protocolFee = getOrCreateLiquidityPoolFee(
+    protocolFeeId,
+    constants.LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
+  );
+
+  let supplySideRevenueUSD = lpFee
+    .feePercentage!.times(volumeUSD)
+    .div(constants.BIGDECIMAL_HUNDRED);
+  let protocolSideRevenueUSD = protocolFee
+    .feePercentage!.times(volumeUSD)
+    .div(constants.BIGDECIMAL_HUNDRED);
+
+  updateRevenueSnapshots(
+    pool,
+    supplySideRevenueUSD,
+    protocolSideRevenueUSD,
+    block
+  );
 }

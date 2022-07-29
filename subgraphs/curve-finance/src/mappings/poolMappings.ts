@@ -134,8 +134,10 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
     constants.BIGINT_NEGATIVE_ONE,
     tokenSupplyAfterWithdrawal,
     provider,
+    [],
     event.transaction,
-    event.block
+    event.block,
+    event
   );
 
   updateUsageMetrics(event.block, provider);
@@ -158,11 +160,11 @@ export function handleRemoveLiquidityWithFees(
     constants.BIGINT_NEGATIVE_ONE,
     tokenSupplyAfterWithdrawal,
     provider,
+    fees,
     event.transaction,
-    event.block
+    event.block,
+    event
   );
-
-  // TODO: Handle Fees
 
   updateUsageMetrics(event.block, provider);
   updatePoolSnapshots(liquidityPoolAddress, event.block);
@@ -181,8 +183,10 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
     outputTokenBurntAmount,
     constants.BIGINT_NEGATIVE_ONE,
     provider,
+    [],
     event.transaction,
-    event.block
+    event.block,
+    event
   );
 
   updateUsageMetrics(event.block, provider);
@@ -205,8 +209,10 @@ export function handleRemoveLiquidityOneWithSupply(
     outputTokenBurntAmount,
     tokenSupplyAfterWithdrawal,
     provider,
+    [],
     event.transaction,
-    event.block
+    event.block,
+    event
   );
 
   updateUsageMetrics(event.block, provider);
@@ -230,11 +236,11 @@ export function handleRemoveLiquidityImbalance(
     constants.BIGINT_NEGATIVE_ONE,
     tokenSupplyAfterWithdrawal,
     provider,
+    fees,
     event.transaction,
-    event.block
+    event.block,
+    event
   );
-
-  // TODO: Handle Fees
 
   updateUsageMetrics(event.block, provider);
   updatePoolSnapshots(liquidityPoolAddress, event.block);

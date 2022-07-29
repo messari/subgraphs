@@ -5,8 +5,10 @@ import {
 import {
   log,
   BigInt,
+  crypto,
   Address,
   ethereum,
+  ByteArray,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
@@ -18,6 +20,9 @@ import {
 import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
+import { updateRevenueSnapshots } from "./Revenue";
+import { Pool as LiquidityPoolContract } from "../../generated/templates/PoolTemplate/Pool";
+import { updateProtocolRevenue } from "./Metrics";
 
 export function createWithdrawTransaction(
   pool: LiquidityPoolStore,
@@ -28,7 +33,10 @@ export function createWithdrawTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): WithdrawTransaction {
-  let withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
+  let withdrawTransactionId = "withdraw-"
+    .concat(transaction.hash.toHexString())
+    .concat("-")
+    .concat(transaction.index.toString());
 
   let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
@@ -77,20 +85,142 @@ export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
   protocol.save();
 }
 
+function getInputToken(
+  event: ethereum.Event,
+  poolAddress: Address,
+  provider: Address
+): Address {
+  let receipt = event.receipt;
+  if (!receipt) return constants.NULL.TYPE_ADDRESS;
+
+  let logs = event.receipt!.logs;
+  if (!logs) return constants.NULL.TYPE_ADDRESS;
+
+  for (let i = 0; i < logs.length; ++i) {
+    let log = logs.at(i);
+    let topic_signature = log.topics.at(0);
+    if (
+      crypto
+        .keccak256(ByteArray.fromUTF8("Transfer(address,address,uint256)"))
+        .equals(topic_signature)
+    ) {
+      let _from = ethereum.decode("address", log.topics.at(1))!.toAddress();
+      let _to = ethereum.decode("address", log.topics.at(2))!.toAddress();
+
+      if (_from == poolAddress && _to == provider) {
+        let inputToken = log.address;
+
+        return inputToken;
+      }
+    }
+  }
+  return constants.NULL.TYPE_ADDRESS;
+}
+
+export function getWithdrawnTokenAmounts(
+  liquidityPoolAddress: Address,
+  provider: Address,
+  inputTokens: string[],
+  inputTokenAmount: BigInt,
+  event: ethereum.Event
+): BigInt[] {
+  let inputToken = getInputToken(event, liquidityPoolAddress, provider);
+
+  let withdrawnTokenAmounts = new Array<BigInt>();
+
+  for (let idx = 0; idx < inputTokens.length; idx++) {
+    if (inputTokens[idx] == inputToken.toHexString()) {
+      withdrawnTokenAmounts.push(inputTokenAmount);
+    }
+
+    withdrawnTokenAmounts.push(constants.BIGINT_ZERO);
+  }
+
+  return withdrawnTokenAmounts;
+}
+
+export function getRemoveLiquidityOneFees(
+  liquidityPoolAddress: Address,
+  withdrawnTokenAmounts: BigInt[],
+  balanceBeforeWithdraw: BigInt[],
+  admin_fee: BigInt
+): BigInt[] {
+  let fees = new Array<BigInt>();
+  let balanceAfterWithdraw = utils.getPoolBalances(liquidityPoolAddress);
+
+  for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
+    let withdrawnAmount = withdrawnTokenAmounts[idx];
+    if (withdrawnAmount.equals(constants.BIGINT_ZERO)) {
+      fees.push(constants.BIGINT_ZERO);
+      continue;
+    }
+
+    let beforeBalance = balanceBeforeWithdraw[idx];
+    let afterBalance = balanceAfterWithdraw[idx];
+
+    let fee = beforeBalance
+      .minus(afterBalance)
+      .minus(withdrawnAmount)
+      .div(admin_fee)
+      .times(constants.FEE_DENOMINATOR_BIGINT);
+
+    if (fee.ge(constants.BIGINT_ZERO)) fees.push(fee);
+    else fees.push(constants.BIGINT_ZERO);
+  }
+
+  return fees;
+}
+
+export function getRemoveLiquidityFeesUSD(
+  inputTokens: string[],
+  fees: BigInt[]
+): BigDecimal {
+  if (fees.length == 0) {
+    return constants.BIGDECIMAL_ZERO;
+  }
+
+  let totalFeesUSD = constants.BIGDECIMAL_ZERO;
+  for (let idx = 0; idx < inputTokens.length; idx++) {
+    if (fees.at(idx) == constants.BIGINT_ZERO) continue;
+
+    let inputToken = Address.fromString(inputTokens.at(idx));
+    let inputTokenPrice = getUsdPricePerToken(inputToken);
+    let inputTokenDecimals = utils.getTokenDecimals(inputToken);
+
+    let inputTokenFee = fees
+      .at(idx)
+      .divDecimal(inputTokenDecimals)
+      .times(inputTokenPrice.usdPrice)
+      .div(inputTokenPrice.decimalsBaseTen);
+
+    totalFeesUSD = totalFeesUSD.plus(inputTokenFee);
+  }
+
+  return totalFeesUSD;
+}
+
 export function Withdraw(
   liquidityPoolAddress: Address,
   withdrawnTokenAmounts: BigInt[],
   outputTokenBurntAmount: BigInt,
   tokenSupplyAfterWithdrawal: BigInt,
   provider: Address,
+  fees: BigInt[],
   transaction: ethereum.Transaction,
-  block: ethereum.Block
+  block: ethereum.Block,
+  event: ethereum.Event
 ): void {
   const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
 
+  let poolContract = LiquidityPoolContract.bind(liquidityPoolAddress);
+  let admin_fee = utils.readValue<BigInt>(
+    poolContract.try_admin_fee(),
+    constants.BIGINT_ZERO
+  );
+
   if (outputTokenBurntAmount.equals(constants.BIGINT_NEGATIVE_ONE)) {
     outputTokenBurntAmount = pool.outputTokenSupply!.minus(
-      tokenSupplyAfterWithdrawal!
+      tokenSupplyAfterWithdrawal
     );
   }
   if (tokenSupplyAfterWithdrawal.equals(constants.BIGINT_NEGATIVE_ONE)) {
@@ -99,34 +229,70 @@ export function Withdraw(
     );
   }
 
+  if (withdrawnTokenAmounts.length == 1) {
+    // Exception: Remove Liquidity One has no information about input token
+
+    withdrawnTokenAmounts = getWithdrawnTokenAmounts(
+      liquidityPoolAddress,
+      provider,
+      pool.inputTokens,
+      withdrawnTokenAmounts[0],
+      event
+    );
+
+    fees = getRemoveLiquidityOneFees(
+      liquidityPoolAddress,
+      withdrawnTokenAmounts,
+      pool.inputTokenBalances,
+      admin_fee
+    );
+  }
+
   let inputTokens: string[] = [];
   let inputTokenAmounts: BigInt[] = [];
   let inputTokenBalances = pool.inputTokenBalances;
   let withdrawAmountUSD = constants.BIGDECIMAL_ZERO;
 
-  // TODO: Use 0.0.7
-  if (withdrawnTokenAmounts.length == 1) return;
-
   for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
     let inputToken = utils.getOrCreateTokenFromString(pool.inputTokens[idx]);
     let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
-    
+
     let inputTokenAddress = Address.fromString(inputToken.id);
     let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
     let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
 
+    let liquidityAdded = withdrawnTokenAmounts[idx];
+    if (fees.length != 0) {
+      // balance after RemoveLiquidity = token_amounts[idx] - (fees[idx] * self.admin_fee / FEE_DENOMINATOR)
+      liquidityAdded = withdrawnTokenAmounts[idx].minus(
+        fees[idx].times(admin_fee).div(constants.FEE_DENOMINATOR_BIGINT)
+      );
+    }
+
     inputTokenBalances[inputTokenIndex] = inputTokenBalances[
       inputTokenIndex
-    ].plus(withdrawnTokenAmounts[idx]);
+    ].minus(withdrawnTokenAmounts[idx]);
 
     inputTokenAmounts.push(withdrawnTokenAmounts[idx]);
     inputTokens.push(inputToken.id);
 
-    withdrawAmountUSD = withdrawAmountUSD
-      .div(inputTokenDecimals)
+    withdrawAmountUSD = withdrawnTokenAmounts[idx]
+      .divDecimal(inputTokenDecimals)
       .times(inputTokenPrice.usdPrice)
       .div(inputTokenPrice.decimalsBaseTen);
   }
+
+  pool.totalValueLockedUSD = utils.getPoolTVL(
+    pool.inputTokens,
+    pool.inputTokenBalances
+  );
+  pool.inputTokenWeights = utils.getPoolTokenWeights(
+    pool.inputTokens,
+    pool.inputTokenBalances,
+    pool.totalValueLockedUSD
+  );
+  pool.outputTokenSupply = tokenSupplyAfterWithdrawal;
+  pool.save();
 
   createWithdrawTransaction(
     pool,
@@ -138,20 +304,31 @@ export function Withdraw(
     block
   );
 
-  pool.outputTokenSupply = tokenSupplyAfterWithdrawal;
-  pool.save();
+  let protocolSideRevenueUSD = getRemoveLiquidityFeesUSD(
+    pool.inputTokens,
+    fees
+  );
+
+  updateRevenueSnapshots(
+    pool,
+    constants.BIGDECIMAL_ZERO,
+    protocolSideRevenueUSD,
+    block
+  );
 
   utils.updateProtocolTotalValueLockedUSD();
   UpdateMetricsAfterWithdraw(block);
 
   log.info(
-    "[RemoveLiquidity] LiquidityPool: {}, sharesBurnt: {}, depositAmount: [{}], depositAmountUSD: {}, TxnHash: {}",
+    "[RemoveLiquidity] LiquidityPool: {}, sharesBurnt: {}, withdrawnAmounts: [{}], withdrawAmountUSD: {}, fees: [{}], feesUSD: {}, TxnHash: {}",
     [
       liquidityPoolAddress.toHexString(),
       outputTokenBurntAmount.toString(),
-      withdrawnTokenAmounts.join(', '),
-      withdrawAmountUSD.truncate(2).toString(),
-      transaction.hash.toHexString()
+      withdrawnTokenAmounts.join(", "),
+      withdrawAmountUSD.truncate(1).toString(),
+      fees.join(", "),
+      protocolSideRevenueUSD.truncate(1).toString(),
+      transaction.hash.toHexString(),
     ]
   );
 }

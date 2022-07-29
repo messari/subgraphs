@@ -2,7 +2,6 @@ specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
-
   - kind: ethereum
     name: Pool_Registry
     network: mainnet
@@ -25,7 +24,9 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
-
+        - name: Rewards
+          file: ./abis/Rewards.json
+        
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -75,8 +76,12 @@ dataSources:
           handler: handleMetaPoolDeployed
         - event: LiquidityGaugeDeployed(address,address)
           handler: handleLiquidityGaugeDeployed
+        
+        - event: CryptoPoolDeployed(address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleCryptoPoolDeployed
+        - event: LiquidityGaugeDeployed(address,address,address)
+          handler: handleLiquidityGaugeDeployedWithToken
       file: ./src/mappings/registryMappings.ts
-
   - kind: ethereum
     name: Factory_Registry
     network: mainnet
@@ -99,7 +104,9 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
-
+        - name: Rewards
+          file: ./abis/Rewards.json
+        
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -149,6 +156,91 @@ dataSources:
           handler: handleMetaPoolDeployed
         - event: LiquidityGaugeDeployed(address,address)
           handler: handleLiquidityGaugeDeployed
+        
+        - event: CryptoPoolDeployed(address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleCryptoPoolDeployed
+        - event: LiquidityGaugeDeployed(address,address,address)
+          handler: handleLiquidityGaugeDeployedWithToken
+      file: ./src/mappings/registryMappings.ts
+  - kind: ethereum
+    name: Pool_Registry_v2
+    network: mainnet
+    source:
+      address: "0xF18056Bbd320E96A48e3Fbf8bC061322531aac99"
+      startBlock: 14005321
+      abi: Registry
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - LiquidityPool
+        - Registry
+        - Factory
+      abis:
+        - name: Registry
+          file: ./abis/Registry.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: PoolInfo
+          file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        # Pool Registry events
+        - event: PoolAdded(indexed address,bytes)
+          handler: handlePoolAdded
+        
+        # Factory Pool Registry Events
+        - event: BasePoolAdded(address)
+          handler: handleBasePoolAdded
+        - event: PlainPoolDeployed(address[4],uint256,uint256,address)
+          handler: handlePlainPoolDeployed
+        - event: MetaPoolDeployed(address,address,uint256,uint256,address)
+          handler: handleMetaPoolDeployed
+        - event: LiquidityGaugeDeployed(address,address)
+          handler: handleLiquidityGaugeDeployed
+        
+        - event: CryptoPoolDeployed(address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleCryptoPoolDeployed
+        - event: LiquidityGaugeDeployed(address,address,address)
+          handler: handleLiquidityGaugeDeployedWithToken
       file: ./src/mappings/registryMappings.ts
 
   - name: 3pool
@@ -174,6 +266,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -279,6 +373,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -384,6 +480,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -489,6 +587,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -594,6 +694,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -699,6 +801,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -804,6 +908,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -909,6 +1015,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -1014,6 +1122,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -1119,6 +1229,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -1224,6 +1336,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -1329,6 +1443,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -1434,6 +1550,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -1539,6 +1657,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -1644,6 +1764,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -1749,6 +1871,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -1854,6 +1978,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -1959,6 +2085,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -2064,6 +2192,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -2169,6 +2299,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -2274,6 +2406,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -2379,6 +2513,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -2484,6 +2620,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -2589,6 +2727,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -2694,6 +2834,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -2799,6 +2941,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -2904,6 +3048,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -3009,6 +3155,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -3114,6 +3262,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -3219,6 +3369,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -3324,6 +3476,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -3429,6 +3583,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -3534,6 +3690,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -3639,6 +3797,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -3744,6 +3904,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -3849,6 +4011,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -3954,6 +4118,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -4059,6 +4225,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -4164,6 +4332,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -4269,6 +4439,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -4374,6 +4546,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -4479,6 +4653,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -4584,6 +4760,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -4689,6 +4867,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -4794,6 +4974,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -4877,6 +5059,139 @@ dataSources:
           handler: handleNewFee
       file: ./src/mappings/poolMappings.ts
 
+  - name: GaugeController
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: GaugeController
+      address: "0x2f50d538606fa9edd2b11e2446beb18c9d5846bb"
+      startBlock: 10647875
+
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      abis:
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: Rewards
+          file: ./abis/Rewards.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      entities:
+        - Account
+      eventHandlers:
+        - event: NewGauge(address,int128,uint256)
+          handler: handleNewGauge
+      file: ./src/mappings/gaugeControllerMappings.ts
+
+  - name: Minter
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Minter
+      address: "0xd061d61a4d941c39e5453435b6345dc261c2fce0"
+      startBlock: 10647887
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      abis:
+        - name: Minter
+          file: ./abis/Minter.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: PoolInfo
+          file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      entities:
+        - Account
+      eventHandlers:
+        - event: Minted(indexed address,address,uint256)
+          handler: handleMinted
+      file:  ./src/mappings/gaugeMappings.ts
+
 templates:
   - name: PoolTemplate
     kind: ethereum
@@ -4899,6 +5214,8 @@ templates:
           file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -4981,3 +5298,70 @@ templates:
         - event: NewFee(uint256,uint256,uint256)
           handler: handleNewFee
       file: ./src/mappings/poolMappings.ts
+  
+  - kind: ethereum/contract
+    name: LiquidityGauge
+    network: mainnet
+    source:
+      abi: Gauge
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - LiquidityPool
+        - Registry
+        - Factory
+      abis:
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: Registry
+          file: ./abis/Registry.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: PoolInfo
+          file: ./abis/PoolInfo.json
+        - name: Rewards
+          file: ./abis/Rewards.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: UpdateLiquidityLimit(address,uint256,uint256,uint256,uint256)
+          handler: handleUpdateLiquidityLimit
+      file: ./src/mappings/gaugeMappings.ts

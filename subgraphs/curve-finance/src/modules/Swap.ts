@@ -17,9 +17,8 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { updateTokenVolume } from "./Metrics";
-import * as constants from "../common/constants";
 import { getUsdPricePerToken } from "../prices";
+import { updateProtocolRevenue, updateTokenVolume } from "./Metrics";
 
 export function createSwapTransaction(
   liquidityPool: LiquidityPoolStore,
@@ -33,7 +32,10 @@ export function createSwapTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): SwapTransaction {
-  let transactionId = "deposit-" + transaction.hash.toHexString();
+  let transactionId = "swap-"
+    .concat(transaction.hash.toHexString())
+    .concat("-")
+    .concat(transaction.index.toString());
 
   let swapTransaction = SwapTransaction.load(transactionId);
 
@@ -143,6 +145,15 @@ export function Swap(
 
   const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
 
+  pool.totalValueLockedUSD = utils.getPoolTVL(
+    pool.inputTokens,
+    pool.inputTokenBalances
+  );
+  pool.inputTokenWeights = utils.getPoolTokenWeights(
+    pool.inputTokens,
+    pool.inputTokenBalances,
+    pool.totalValueLockedUSD
+  );
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(volumeUSD);
   pool.save();
 
@@ -163,8 +174,9 @@ export function Swap(
     underlying
   );
 
-  // TODO: Update Balances, PoolTVL, ProtocolTVL
+  // TODO: Update Balances
 
+  updateProtocolRevenue(liquidityPoolAddress, pool.cumulativeVolumeUSD, block);
   utils.updateProtocolTotalValueLockedUSD();
   UpdateMetricsAfterSwap(block);
 
@@ -176,7 +188,7 @@ export function Swap(
       tokenOut,
       amountInUSD.truncate(2).toString(),
       amountOutUSD.truncate(2).toString(),
-      transaction.hash.toHexString()
+      transaction.hash.toHexString(),
     ]
   );
 }

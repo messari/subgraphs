@@ -10,6 +10,11 @@
       "name": "Factory_Registry",
       "address": "0xB9fC157394Af804a3578134A6585C0dc9cc990d4",
       "startBlock": "12903979"
+    },
+    {
+      "name": "Pool_Registry_v2",
+      "address": "0xF18056Bbd320E96A48e3Fbf8bC061322531aac99",
+      "startBlock": "14005321"
     }
   ],
   "pools": [
@@ -237,6 +242,18 @@
       "name": "lusd",
       "address": "0xEd279fDD11cA84bEef15AF5D39BB4d4bEE23F0cA",
       "startBlock": "12242627"
+    }
+  ],
+  "gaugeController": [
+    {
+      "address": "0x2f50d538606fa9edd2b11e2446beb18c9d5846bb",
+      "startBlock": "10647875"
+    }
+  ],
+  "minter": [
+    {
+      "address": "0xd061d61a4d941c39e5453435b6345dc261c2fce0",
+      "startBlock": "10647887"
     }
   ]
 }
