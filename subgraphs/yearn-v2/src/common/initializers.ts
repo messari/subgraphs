@@ -12,6 +12,7 @@ import {
 import * as utils from "./utils";
 import * as constants from "./constants";
 import { Vault as VaultStore } from "../../generated/schema";
+import { Vault as VaultTemplate } from "../../generated/templates";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/Registry_v1/ERC20";
@@ -325,6 +326,8 @@ export function getOrCreateVault(
     vault.fees = [managementFeeId, performanceFeeId];
 
     vault.save();
+
+    VaultTemplate.create(vaultAddress);
   }
 
   return vault;
