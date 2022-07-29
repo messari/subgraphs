@@ -1,16 +1,17 @@
 {
-  "name": "erc20-eth",
-  "license": "MIT",
+  "name": "erc20",
+  "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ harsh9200/erc20-eth",
-    "create-local": "graph create --node http://localhost:8020/ harsh9200/erc20-eth",
-    "remove-local": "graph remove --node http://localhost:8020/ harsh9200/erc20-eth",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 harsh9200/erc20-eth"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ corerouter/erc20",
+    "create-local": "graph create --node http://localhost:8020/ corerouter/erc20",
+    "remove-local": "graph remove --node http://localhost:8020/ corerouter/erc20",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 corerouter/erc20"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.27.0",
-    "@graphprotocol/graph-ts": "0.24.1"
+    "@graphprotocol/graph-cli": "0.32.0",
+    "@graphprotocol/graph-ts": "0.27.0",
+    "ipfs-http-client": "^57.0.3"
   }
 }
