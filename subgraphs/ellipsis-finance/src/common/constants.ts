@@ -218,3 +218,5 @@ export const EARLY_BASEPOOLS: Address[] = [
 
 export const EPS_ADDRESS = Address.fromString("0xA7f552078dcC247C2684336020c03648500C6d9F");
 export const EPX_ADDRESS = Address.fromString("0xaf41054c1487b0e5e2b9250c0332ecbce6ce9d71");
+
+export const REGISTRY_ADDRESS_V2 = Address.fromString("0x266Bb386252347b03C7B6eB37F950f476D7c3E63");
