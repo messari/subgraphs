@@ -298,7 +298,14 @@ export function _handleVoteEmitted(
 ): void {
   let choice = getVoteChoiceByValue(support);
   let voteId = voterAddress.concat("-").concat(proposal.id);
-  let vote = new Vote(voteId);
+
+  let vote = Vote.load(voteId);
+  if (vote) {
+    // Avoid edge case for duplicate votes with zero weights
+    return;
+  }
+
+  vote = new Vote(voteId);
   vote.proposal = proposal.id;
   vote.voter = voterAddress;
   vote.weight = weight;
@@ -306,12 +313,11 @@ export function _handleVoteEmitted(
   vote.block = event.block.number;
   vote.blockTime = event.block.timestamp;
   vote.txnHash = event.transaction.hash.toHexString();
-  // Retrieve enum string key by value (false = Against, true = For)
   vote.choice = choice;
   vote.save();
 
   // Increment respective vote choice counts
-  if (choice === VoteChoice.FOR) {
+  if (choice === VoteChoice.AGAINST) {
     proposal.againstDelegateVotes =
       proposal.againstDelegateVotes.plus(BIGINT_ONE);
     proposal.againstWeightedVotes = proposal.againstWeightedVotes.plus(weight);
