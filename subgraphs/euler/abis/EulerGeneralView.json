@@ -1,0 +1,686 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "moduleGitCommit_",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "borrowSPY",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalBorrows",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalBalancesUnderlying",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint32",
+        "name": "reserveFee",
+        "type": "uint32"
+      }
+    ],
+    "name": "computeAPYs",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "borrowAPY",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "supplyAPY",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "eulerContract",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          },
+          {
+            "internalType": "address[]",
+            "name": "markets",
+            "type": "address[]"
+          }
+        ],
+        "internalType": "struct EulerGeneralView.Query",
+        "name": "q",
+        "type": "tuple"
+      }
+    ],
+    "name": "doQuery",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "blockNumber",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "underlying",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "symbol",
+                "type": "string"
+              },
+              {
+                "internalType": "uint8",
+                "name": "decimals",
+                "type": "uint8"
+              },
+              {
+                "internalType": "address",
+                "name": "eTokenAddr",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "dTokenAddr",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "pTokenAddr",
+                "type": "address"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "address",
+                    "name": "eTokenAddress",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "borrowIsolated",
+                    "type": "bool"
+                  },
+                  {
+                    "internalType": "uint32",
+                    "name": "collateralFactor",
+                    "type": "uint32"
+                  },
+                  {
+                    "internalType": "uint32",
+                    "name": "borrowFactor",
+                    "type": "uint32"
+                  },
+                  {
+                    "internalType": "uint24",
+                    "name": "twapWindow",
+                    "type": "uint24"
+                  }
+                ],
+                "internalType": "struct Storage.AssetConfig",
+                "name": "config",
+                "type": "tuple"
+              },
+              {
+                "internalType": "uint256",
+                "name": "poolSize",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "totalBalances",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "totalBorrows",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "reserveBalance",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint32",
+                "name": "reserveFee",
+                "type": "uint32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "borrowAPY",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "supplyAPY",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "twap",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "twapPeriod",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "currPrice",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint16",
+                "name": "pricingType",
+                "type": "uint16"
+              },
+              {
+                "internalType": "uint32",
+                "name": "pricingParameters",
+                "type": "uint32"
+              },
+              {
+                "internalType": "address",
+                "name": "pricingForwarded",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "underlyingBalance",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "eulerAllowance",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "eTokenBalance",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "eTokenBalanceUnderlying",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "dTokenBalance",
+                "type": "uint256"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint256",
+                    "name": "collateralValue",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "liabilityValue",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "numBorrows",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "borrowIsolated",
+                    "type": "bool"
+                  }
+                ],
+                "internalType": "struct IRiskManager.LiquidityStatus",
+                "name": "liquidityStatus",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct EulerGeneralView.ResponseMarket[]",
+            "name": "markets",
+            "type": "tuple[]"
+          },
+          {
+            "internalType": "address[]",
+            "name": "enteredMarkets",
+            "type": "address[]"
+          }
+        ],
+        "internalType": "struct EulerGeneralView.Response",
+        "name": "r",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "eulerContract",
+        "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "addrs",
+        "type": "address[]"
+      }
+    ],
+    "name": "doQueryAccountLiquidity",
+    "outputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "underlying",
+                "type": "address"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint256",
+                    "name": "collateralValue",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "liabilityValue",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "numBorrows",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "borrowIsolated",
+                    "type": "bool"
+                  }
+                ],
+                "internalType": "struct IRiskManager.LiquidityStatus",
+                "name": "status",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct IRiskManager.AssetLiquidity[]",
+            "name": "markets",
+            "type": "tuple[]"
+          }
+        ],
+        "internalType": "struct EulerGeneralView.ResponseAccountLiquidity[]",
+        "name": "r",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "eulerContract",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          },
+          {
+            "internalType": "address[]",
+            "name": "markets",
+            "type": "address[]"
+          }
+        ],
+        "internalType": "struct EulerGeneralView.Query[]",
+        "name": "qs",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "doQueryBatch",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "blockNumber",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "underlying",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "symbol",
+                "type": "string"
+              },
+              {
+                "internalType": "uint8",
+                "name": "decimals",
+                "type": "uint8"
+              },
+              {
+                "internalType": "address",
+                "name": "eTokenAddr",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "dTokenAddr",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "pTokenAddr",
+                "type": "address"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "address",
+                    "name": "eTokenAddress",
+                    "type": "address"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "borrowIsolated",
+                    "type": "bool"
+                  },
+                  {
+                    "internalType": "uint32",
+                    "name": "collateralFactor",
+                    "type": "uint32"
+                  },
+                  {
+                    "internalType": "uint32",
+                    "name": "borrowFactor",
+                    "type": "uint32"
+                  },
+                  {
+                    "internalType": "uint24",
+                    "name": "twapWindow",
+                    "type": "uint24"
+                  }
+                ],
+                "internalType": "struct Storage.AssetConfig",
+                "name": "config",
+                "type": "tuple"
+              },
+              {
+                "internalType": "uint256",
+                "name": "poolSize",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "totalBalances",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "totalBorrows",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "reserveBalance",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint32",
+                "name": "reserveFee",
+                "type": "uint32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "borrowAPY",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "supplyAPY",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "twap",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "twapPeriod",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "currPrice",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint16",
+                "name": "pricingType",
+                "type": "uint16"
+              },
+              {
+                "internalType": "uint32",
+                "name": "pricingParameters",
+                "type": "uint32"
+              },
+              {
+                "internalType": "address",
+                "name": "pricingForwarded",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "underlyingBalance",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "eulerAllowance",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "eTokenBalance",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "eTokenBalanceUnderlying",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "dTokenBalance",
+                "type": "uint256"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "uint256",
+                    "name": "collateralValue",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "liabilityValue",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "numBorrows",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "borrowIsolated",
+                    "type": "bool"
+                  }
+                ],
+                "internalType": "struct IRiskManager.LiquidityStatus",
+                "name": "liquidityStatus",
+                "type": "tuple"
+              }
+            ],
+            "internalType": "struct EulerGeneralView.ResponseMarket[]",
+            "name": "markets",
+            "type": "tuple[]"
+          },
+          {
+            "internalType": "address[]",
+            "name": "enteredMarkets",
+            "type": "address[]"
+          }
+        ],
+        "internalType": "struct EulerGeneralView.Response[]",
+        "name": "r",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "eulerContract",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "underlying",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct EulerGeneralView.QueryIRM",
+        "name": "q",
+        "type": "tuple"
+      }
+    ],
+    "name": "doQueryIRM",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "kink",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "baseAPY",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "kinkAPY",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxAPY",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "baseSupplyAPY",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "kinkSupplyAPY",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxSupplyAPY",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct EulerGeneralView.ResponseIRM",
+        "name": "r",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "moduleGitCommit",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
