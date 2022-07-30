@@ -254,7 +254,7 @@
           "template": "compound-v2.template.yaml",
           "messari": "messari/compound-ethereum",
           "dmelotik": "dmelotik/compound-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "cream-finance": {
@@ -346,13 +346,13 @@
           "template": "moonwell.template.yaml",
           "messari": "messari/moonwell-moonriver",
           "dmelotik": "dmelotik/moonwell",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "moonbeam": {
           "template": "moonwell.template.yaml",
           "messari": "messari/moonwell-moonbeam",
           "dmelotik": "dmelotik/moonwell-moonbeam",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "rari-fuse": {
@@ -366,7 +366,7 @@
           "template": "rari-fuse.template.yaml",
           "messari": "messari/rari-fuse-ethereum",
           "dmelotik": "dmelotik/fuse-mainnet",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       },
       "scream": {
