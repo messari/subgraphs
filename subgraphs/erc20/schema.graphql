@@ -18,8 +18,11 @@ type Token @entity {
   " The number of decimal places this token uses, default to 18 "
   decimals: Int!
 
-  " Number of unique token holders "
-  holderCount: BigInt!
+  " Total number of unique token holders who are currently holding more the token "
+  currentHolderCount: BigInt!
+
+  " Total number of cumulative unique token holders who held or are holding the token "
+  cumulativeHolderCount: BigInt!
 
   " Total number of token transfer events "
   transferCount: BigInt!
@@ -40,7 +43,7 @@ type Token @entity {
   totalMinted: BigDecimal!
 
   " List of token transfers "
-  transfers: [Transfer!]! @derivedFrom(field: "token")
+  transfers: [TransferEvent!]! @derivedFrom(field: "token")
 
   " Token holder's balance "
   holdersBalance: [AccountBalance!]! @derivedFrom(field: "token")
@@ -49,9 +52,6 @@ type Token @entity {
 
   " Daily snapshot for this token "
   dailyTokenSnapshot: [TokenDailySnapshot!]! @derivedFrom(field: "token")
-
-  " Hourly snapshot for this token "
-  hourlyTokenSnapshot: [TokenHourlySnapshot!]! @derivedFrom(field: "token")
 }
 
 ###############################
@@ -66,31 +66,34 @@ type TokenDailySnapshot @entity {
   token: Token!
 
   " Daily total Supply of the token "
-  dailyTotalSupply: BigInt!
+  dailyTotalSupply: BigDecimal!
 
-  " # of accounts holding this token "
-  dailyHolderCount: Int!
+  " number of accounts holding the token "
+  currentHolderCount: BigInt!
 
-  " # of unique daily active users/holders "
-  dailyActiveUsers: Int!
-
-  " # of cumulative unique users/holders "
-  cumulativeUniqueUsers: Int!
+  " number of cumulative unique holders "
+  cumulativeHolderCount: BigInt!
 
   " Total number of events occurred in a day "
   dailyEventCount: Int!
+
+  " Total number of transfers in a day "
+  dailyTransferCount: Int!
+
+  " Total number of token transfered in a day "
+  dailyTransferAmount: BigDecimal!
 
   " Total number of mints in a day "
   dailyMintCount: Int!
 
   " Total number of token minted in a day "
-  dailyMintAmount: BigInt!
+  dailyMintAmount: BigDecimal!
 
   " Total number of burns in a day "
   dailyBurnCount: Int!
 
   " Total number of token burnt in a day "
-  dailyBurnAmount: BigInt!
+  dailyBurnAmount: BigDecimal!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -107,31 +110,34 @@ type TokenHourlySnapshot @entity {
   token: Token!
 
   " Hourly total Supply of the token "
-  hourlyTotalSupply: BigInt!
+  hourlyTotalSupply: BigDecimal!
 
-  " # of accounts holding this token "
-  hourlyHolderCount: Int!
+  " number of accounts holding this token "
+  currentHolderCount: BigInt!
 
-  " # of unique hourly active users "
-  hourlyActiveUsers: Int!
-
-  " # of cumulative unique users "
-  cumulativeUniqueUsers: Int!
+  " number of cumulative unique holders "
+  cumulativeHolderCount: BigInt!
 
   " Total number of events occurred in an hour "
   hourlyEventCount: Int!
+
+  " Total number of transfers in a hour "
+  hourlyTransferCount: Int!
+
+  " Total amount of token transfered in a hour "
+  hourlyTransferAmount: BigDecimal!
 
   " Total number of mints in a hour "
   hourlyMintCount: Int!
 
   " Total amount of token minted in a hour "
-  hourlyMintAmount: BigInt!
+  hourlyMintAmount: BigDecimal!
 
   " Total number of burns in a hour "
   hourlyBurnCount: Int!
 
   " Total number of token burnt in a hour "
-  hourlyBurnAmount: BigInt!
+  hourlyBurnAmount: BigDecimal!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -161,10 +167,10 @@ interface Event {
   nonce: Int!
 
   " Address that received the tokens "
-  to: String!
+  to: Account!
 
   " Address that sent the tokens "
-  from: String!
+  from: Account!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -173,7 +179,7 @@ interface Event {
   timestamp: BigInt!
 }
 
-type Transfer implements Event @entity {
+type TransferEvent implements Event @entity {
   " { Token ID }-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -188,6 +194,9 @@ type Transfer implements Event @entity {
 
   " Nonce of the transaction that emitted this event "
   nonce: Int!
+
+  " Quantity of tokens transferred "
+  amount: BigDecimal!
 
   " Account that received the tokens "
   to: Account!
@@ -212,16 +221,17 @@ type Account @entity {
   id: ID!
 
   " Token transfers to this account "
-  transferTo: [Transfer!]! @derivedFrom(field: "to")
+  transferTo: [TransferEvent!]! @derivedFrom(field: "to")
 
   " Token transfers from this account "
-  transferFrom: [Transfer!]! @derivedFrom(field: "from")
+  transferFrom: [TransferEvent!]! @derivedFrom(field: "from")
 
   " Token balances that this account holds "
   balances: [AccountBalance!]! @derivedFrom(field: "account")
 
   " Token balances snapshot that this account holds "
-  balancesSnapshot: [AccountBalanceDailySnapshot!]! @derivedFrom(field: "account")
+  balancesSnapshot: [AccountBalanceDailySnapshot!]!
+    @derivedFrom(field: "account")
 }
 
 type AccountBalance @entity {
