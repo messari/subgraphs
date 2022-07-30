@@ -348,10 +348,13 @@ export function handleCatFile(event: CatNoteEvent): void {
       log.warning("[handleFileDog]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
       return;
     }
-    market.liquidationPenalty = bigIntToBDUseDecimals(chop, WAD)
+    let liquidationPenalty = bigIntToBDUseDecimals(chop, RAY)
       .minus(BIGDECIMAL_ONE)
       .times(BIGDECIMAL_ONE_HUNDRED);
-    market.save();
+    if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
+      market.liquidationPenalty = liquidationPenalty;
+      market.save();
+    }
 
     log.info("[handleCatFile]ilk={}, chop={}, liquidationPenalty={}", [
       ilk.toString(),
@@ -384,7 +387,7 @@ export function handleDogBark(event: BarkEvent): void {
 
   updateRevenue(event, market!.id, liquidationRevenueUSD, BIGDECIMAL_ZERO);
 
-  log.info("[property] ilk={}, urn={}, lot={}, art={}, due={}, liquidation revenue=${}", [
+  log.info("[handleDogBark] ilk={}, urn={}, lot={}, art={}, due={}, liquidation revenue=${}", [
     ilk.toString(),
     urn.toHexString(),
     lot.toString(),
@@ -412,10 +415,13 @@ export function handleDogFile(event: DogFileChopEvent): void {
       return;
     }
     let chop = event.params.data;
-    market.liquidationPenalty = bigIntToBDUseDecimals(chop, WAD)
+    let liquidationPenalty = bigIntToBDUseDecimals(chop, RAY)
       .minus(BIGDECIMAL_ONE)
       .times(BIGDECIMAL_ONE_HUNDRED);
-    market.save();
+    if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
+      market.liquidationPenalty = liquidationPenalty;
+      market.save();
+    }
 
     log.info("[handleCatFile]ilk={}, chop={}, liquidationPenalty={}", [
       ilk.toString(),

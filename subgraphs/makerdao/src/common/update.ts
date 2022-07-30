@@ -370,7 +370,7 @@ export function updateUsageMetrics(
   }
 
   if (deltaDebtUSD.gt(BIGDECIMAL_ZERO)) {
-    usageHourlySnapshot.hourlyBorrowCount + 1;
+    usageHourlySnapshot.hourlyBorrowCount += 1;
     usageDailySnapshot.dailyBorrowCount += 1;
   } else if (deltaDebtUSD.lt(BIGDECIMAL_ZERO)) {
     usageHourlySnapshot.hourlyRepayCount += 1;
