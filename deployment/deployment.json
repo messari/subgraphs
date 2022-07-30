@@ -482,6 +482,136 @@
         }
       }
     },
+    "network": {
+      "arweave": {
+        "arweave-mainnet": {
+          "template": "arweave.template.yaml",
+          "messari": "messari/network-arweave-mainnet",
+          "dmelotik": "dmelotik/network-arweave-mainnet",
+          "deploy-on-merge": false
+        }
+      },
+      "cosmos": {
+        "cosmoshub": {
+          "template": "cosmos.template.yaml",
+          "messari": "messari/network-cosmos",
+          "dmelotik": "dmelotik/network-cosmoshub",
+          "deploy-on-merge": false
+        },
+        "osmosis": {
+          "template": "cosmos.template.yaml",
+          "messari": "messari/network-osmosis",
+          "dmelotik": "dmelotik/network-osmosis",
+          "deploy-on-merge": false
+        }
+      },
+      "evm": {
+        "arbitrum": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-arbitrum",
+          "dmelotik": "dmelotik/network-arbitrum-one",
+          "deploy-on-merge": false  
+        },
+        "aurora": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-aurora",
+          "dmelotik": "dmelotik/network-aurora",
+          "deploy-on-merge": false
+        },
+        "avalanche": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-avalanche",
+          "dmelotik": "dmelotik/network-avalanche",
+          "deploy-on-merge": false
+        },
+        "boba": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-boba",
+          "dmelotik": "dmelotik/network-boba",
+          "deploy-on-merge": false
+        },
+        "bsc": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-bsc",
+          "dmelotik": "dmelotik/network-bsc",
+          "deploy-on-merge": false
+        },
+        "celo": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-celo",
+          "dmelotik": "dmelotik/network-celo",
+          "deploy-on-merge": false
+        },
+        "clover": {
+          "template": "evm.template.yaml",
+          "messari": "messari/TODO",
+          "dmelotik": "dmelotik/network-clover",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-fantom",
+          "dmelotik": "dmelotik/network-fantom",
+          "deploy-on-merge": false
+        },
+        "fuse": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-fuse",
+          "dmelotik": "dmelotik/network-fuse",
+          "deploy-on-merge": false
+        },
+        "harmony": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-harmony",
+          "dmelotik": "dmelotik/network-harmony",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-ethereum",
+          "dmelotik": "dmelotik/network-mainnet",
+          "deploy-on-merge": false
+        },
+        "polygon": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-polygon",
+          "dmelotik": "dmelotik/network-matic",
+          "deploy-on-merge": false
+        },
+        "moonbeam": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-moonbeam",
+          "dmelotik": "dmelotik/network-moonbeam",
+          "deploy-on-merge": false
+        },
+        "moonriver": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-moonriver",
+          "dmelotik": "dmelotik/network-moonriver",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-optimism",
+          "dmelotik": "dmelotik/network-optimism",
+          "deploy-on-merge": false
+        },
+        "gnosis": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-gnosis",
+          "dmelotik": "dmelotik/network-xdai",
+          "deploy-on-merge": false
+        }
+      },
+      "near": {
+        "near-mainnet": {
+          "template": "near.template.yaml",
+          "messari": "messari/network-near",
+          "dmelotik": "dmelotik/network-near-mainnet",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "gamma-strategies": {
       "gamma-strategies": {
         "arbitrum": {

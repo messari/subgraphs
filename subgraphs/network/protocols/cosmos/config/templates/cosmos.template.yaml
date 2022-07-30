@@ -1,0 +1,20 @@
+specVersion: 0.0.5
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: cosmos
+    name: CosmosHub
+    network: {{ network }}
+    source:
+      startBlock: 0
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Network
+        - Block
+        - Author
+      blockHandlers:
+        - handler: handleCosmosBlock
+      file: ./src/mapping.ts
