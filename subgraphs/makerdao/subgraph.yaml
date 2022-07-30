@@ -33,9 +33,14 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x65fae35e00000000000000000000000000000000000000000000000000000000"
           handler: handleVatRely
+        # function cage()
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x6924500900000000000000000000000000000000000000000000000000000000"
           handler: handleVatCage
+        # function slip( bytes32 ilk, address usr, int256 wad)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x7cdd3fde00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatSlip
         ### CDP Manipulation ###
         # function frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)

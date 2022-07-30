@@ -12,7 +12,7 @@ import { Jug, LogNote as JugNoteEvent } from "../generated/Jug/Jug";
 import { Pot, LogNote as PotNoteEvent } from "../generated/Pot/Pot";
 import { CdpManager, NewCdp } from "../generated/CdpManager/CdpManager";
 import { Created } from "../generated/DSProxyFactory/DSProxyFactory";
-import { Token, _Ilk, Liquidate, _LiquidateStore, _Chi, _Urn, _Proxy } from "../generated/schema";
+import { Token, _Ilk, Liquidate, _LiquidateStore, _Chi, _Urn, _Proxy, Market } from "../generated/schema";
 import {
   bigIntToBDUseDecimals,
   bigDecimalExponential,
@@ -52,9 +52,9 @@ import {
   BIGINT_ONE_RAY,
   BIGDECIMAL_ONE_RAY,
   BIGDECIMAL_ONE_WAD,
+  VAT_ADDRESS,
 } from "./common/constants";
 import {
-  updateMarketSnapshot,
   updateUsageMetrics,
   updateFinancialsSnapshot,
   updateProtocol,
@@ -62,7 +62,7 @@ import {
   updatePriceForMarket,
   updateRevenue,
   updateMarket,
-} from "./common/update";
+} from "./common/helpers";
 import {
   getOrCreateMarket,
   getOrCreateIlk,
@@ -160,10 +160,31 @@ export function handleVatCage(event: VatNoteEvent): void {
   }
 }
 
-// Deposit/Withdraw/Borrow/Repay
+// Deposit/Withdraw
+export function handleVatSlip(event: VatNoteEvent): void {
+  let ilk = event.params.arg1;
+  let usr = bytes32ToAddressHexString(event.params.arg2);
+
+  let owner = getOwnerAddressFromCdp(usr);
+  owner = getOwnerAddressFromProxy(owner);
+  let wad = bytesToSignedBigInt(event.params.arg3);
+
+  let market: Market = getMarketFromIlk(ilk)!;
+  let token = getOrCreateToken(market.inputToken);
+  let deltaCollateral = bigIntChangeDecimals(wad, WAD, token.decimals);
+  let deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
+
+  handleTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
+  updateMarket(event, market, deltaCollateral);
+  updateUsageMetrics(event, [owner, owner, owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
+  updateProtocol(deltaCollateralUSD, BIGDECIMAL_ZERO);
+  //this needs to after updateProtocol as it uses protocol to do the update
+  updateFinancialsSnapshot(event, deltaCollateralUSD, BIGDECIMAL_ZERO);
+}
+
+// Borrow/Repay
 export function handleVatFrob(event: VatNoteEvent): void {
   let ilk = event.params.arg1;
-  bytes32ToAddressHexString;
   let u = bytes32ToAddressHexString(event.params.arg2);
   let v = bytes32ToAddressHexString(event.params.arg3);
   // frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart) call
@@ -192,19 +213,12 @@ export function handleVatFrob(event: VatNoteEvent): void {
 
   let token = getOrCreateToken(market.inputToken);
   market.inputTokenPriceUSD = token.lastPriceUSD!;
-  // convert to token's native amount from WAD
-  let deltaCollateral = bigIntChangeDecimals(dink, WAD, token.decimals);
-  let deltaCollateralUSD = bigIntToBDUseDecimals(dink, WAD).times(market.inputTokenPriceUSD);
+  // change in borrowing amount
   let deltaDebtUSD = bigIntToBDUseDecimals(dart, WAD); //in DAI
-
-  market.inputTokenBalance = market.inputTokenBalance.plus(deltaCollateral);
-  market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(deltaDebtUSD);
-
-  // here we "mark-to-market" - re-price total collateral using last price
-  market.totalDepositBalanceUSD = bigIntToBDUseDecimals(market.inputTokenBalance, token.decimals).times(
-    market.inputTokenPriceUSD,
-  );
-  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+  // alternatively, use dai mapping on chain, this includes stablity fees
+  //let vatContract = Vat.bind(Address.fromString(VAT_ADDRESS));
+  //let dtab = dart.times(vatContract.ilks(ilk).getRate());
+  //deltaDebtUSD = bigIntToBDUseDecimals(dtab, RAD);
 
   log.info(
     "[handleVatFrob]block#={}, ilk={}, market={}, u={}, v={}, w={}, dink={}, dart={}," +
@@ -223,26 +237,14 @@ export function handleVatFrob(event: VatNoteEvent): void {
       market.totalBorrowBalanceUSD.toString(),
     ],
   );
-  market.save();
+  //market.save();
 
-  handleTransactions(
-    event,
-    market.id,
-    u,
-    v,
-    w,
-    market.inputToken,
-    deltaCollateral,
-    deltaCollateralUSD,
-    dart,
-    deltaDebtUSD,
-  );
-  updateMarket(market.id, deltaCollateralUSD, deltaDebtUSD);
-  updateMarketSnapshot(market, event, deltaCollateralUSD, deltaDebtUSD);
-  updateUsageMetrics(event, [u, v, w], deltaCollateralUSD, deltaDebtUSD);
-  updateProtocol(deltaCollateralUSD, deltaDebtUSD);
+  handleTransactions(event, market, v, w, BIGINT_ZERO, BIGDECIMAL_ZERO, dart, deltaDebtUSD);
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
+  updateUsageMetrics(event, [u, v, w], BIGDECIMAL_ZERO, deltaDebtUSD);
+  updateProtocol(BIGDECIMAL_ZERO, deltaDebtUSD);
   //this needs to after updateProtocol as it uses protocol to do the update
-  updateFinancialsSnapshot(event, deltaCollateralUSD, deltaDebtUSD);
+  updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, deltaDebtUSD);
 }
 
 // update total revenue (stability fee)
@@ -503,16 +505,11 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
   ]);
   liquidate.save();
 
-  let protocol = getOrCreateLendingProtocol();
-  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidate.amountUSD);
-  protocol.save();
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 
   let market = getMarketFromIlk(ilk)!;
-  market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(liquidate.amountUSD);
-  market.save();
-
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateMarketSnapshot(market, event, BIGDECIMAL_ONE, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
 
@@ -547,16 +544,10 @@ export function handleClipTakeBid(event: TakeEvent): void {
   ]);
   liquidate.save();
 
-  let protocol = getOrCreateLendingProtocol();
-  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidate.amountUSD);
-  protocol.save();
-
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   let market = getMarketFromIlk(ilk)!;
-  market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(liquidate.amountUSD);
-  market.save();
-
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateMarketSnapshot(market, event, BIGDECIMAL_ONE, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
 
