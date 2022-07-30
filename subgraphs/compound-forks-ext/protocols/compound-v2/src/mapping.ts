@@ -2,6 +2,8 @@ import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   ActionPaused1,
   Comptroller,
+  MarketEntered,
+  MarketExited,
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
@@ -53,12 +55,12 @@ import {
   setSupplyInterestRate,
   snapshotFinancials,
   TokenData,
-  updateAllMarketPrices,
   UpdateMarketData,
   _getOrCreateProtocol,
   _handleActionPaused,
   _handleBorrow,
   _handleLiquidateBorrow,
+  _handleMarketEntered,
   _handleMarketListed,
   _handleMint,
   _handleNewCollateralFactor,
@@ -95,7 +97,7 @@ import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
 export function handleMint(event: Mint): void {
   let minter = event.params.minter;
   let mintAmount = event.params.mintAmount;
-  let contract = CToken.bind(event.address);
+  let contract = CTokenContract.bind(event.address);
   let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
@@ -111,7 +113,7 @@ export function handleMint(event: Mint): void {
 export function handleRedeem(event: Redeem): void {
   let redeemer = event.params.redeemer;
   let redeemAmount = event.params.redeemAmount;
-  let contract = CToken.bind(event.address);
+  let contract = CTokenContract.bind(event.address);
   let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.redeemer
   );
@@ -127,7 +129,7 @@ export function handleRedeem(event: Redeem): void {
 export function handleBorrow(event: Borrow): void {
   let borrower = event.params.borrower;
   let borrowAmount = event.params.borrowAmount;
-  let contract = CToken.bind(event.address);
+  let contract = CTokenContract.bind(event.address);
   let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
@@ -144,7 +146,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let payer = event.params.payer;
   let borrower = event.params.borrower;
   let repayAmount = event.params.repayAmount;
-  let contract = CToken.bind(event.address);
+  let contract = CTokenContract.bind(event.address);
   let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
@@ -268,6 +270,22 @@ export function handleMarketListed(event: MarketListed): void {
       cTokenReserveFactorMantissa
     ),
     event
+  );
+}
+
+export function handleMarketEntered(event: MarketEntered): void {
+  _handleMarketEntered(
+    event.params.cToken.toHexString(),
+    event.params.account.toHexString(),
+    true
+  );
+}
+
+export function handleMarketExited(event: MarketExited): void {
+  _handleMarketEntered(
+    event.params.cToken.toHexString(),
+    event.params.account.toHexString(),
+    false
   );
 }
 
@@ -431,10 +449,6 @@ function updateMarket(
     return;
   }
 
-  if (updateMarketPrices) {
-    updateAllMarketPrices(comptrollerAddress, blockNumber);
-  }
-
   // compound v2 specific price calculation (see ./prices.ts)
   let underlyingTokenPriceUSD = getUSDPriceOfToken(market, blockNumber.toI32());
 
@@ -523,7 +537,6 @@ function updateMarket(
   market.totalValueLockedUSD = underlyingSupplyUSD;
   market.totalDepositBalanceUSD = underlyingSupplyUSD;
 
-  market._borrowBalance = newTotalBorrow;
   market.totalBorrowBalanceUSD = newTotalBorrow
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))

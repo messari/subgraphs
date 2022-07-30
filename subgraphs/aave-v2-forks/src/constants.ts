@@ -62,12 +62,18 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
+export namespace PositionSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
 export namespace EventType {
   export const DEPOSIT = 1;
   export const WITHDRAW = 2;
   export const BORROW = 3;
   export const REPAY = 4;
-  export const LIQUIDATE = 5;
+  export const LIQUIDATOR = 5;
+  export const LIQUIDATEE = 6;
 }
 
 export namespace ActivityType {

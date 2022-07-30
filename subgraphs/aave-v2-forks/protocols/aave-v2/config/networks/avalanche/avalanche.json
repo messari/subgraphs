@@ -1,5 +1,8 @@
 {
   "network": "avalanche",
   "startBlock": "4606868",
-  "factoryAddress": "0xb6A86025F0FE1862B372cb0ca18CE3EDe02A318f"
+  "factoryAddress": "0xb6A86025F0FE1862B372cb0ca18CE3EDe02A318f",
+  "graftEnabled": true,
+  "subgraphId": "QmbEQvJSV6QdaLucfAuQ3x4z5jp1wErdafKK88JYfLm5na",
+  "graftStartBlock": 17825987
 }

@@ -82,6 +82,10 @@ templates:
           handler: handleLiquidationCall
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleReserveDataUpdated
+        - event: ReserveUsedAsCollateralEnabled(indexed address,indexed address)
+          handler: handleReserveUsedAsCollateralEnabled
+        - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
+          handler: handleReserveUsedAsCollateralDisabled
       file: ./protocols/geist-finance/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator

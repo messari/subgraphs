@@ -28,8 +28,8 @@
         "honeyswap": {
             "gnosis": "https://api.thegraph.com/subgraphs/name/messari/honeyswap-gnosis"
         },
-        "platypus": {
-            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/platypus-avalanche"
+        "platypus-finance": {
+            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/platypus-finance-avalanche"
         },
         "quickswap": {
             "matic": "https://api.thegraph.com/subgraphs/name/messari/quickswap-polygon"
