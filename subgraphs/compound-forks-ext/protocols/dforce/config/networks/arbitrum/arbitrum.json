@@ -1,9 +1,0 @@
-{
-  "network": "arbitrum-one",
-  "comptrollerAddr": "0x8E7e9eA9023B81457Ae7E6D2a51b003D421E5408",
-  "startBlock": 239104,
-  "USXAddr": "0x641441c631e2F909700d2f41FD87F0aA6A6b4EDb",
-  "USXStartBlock": 239132,
-  "EUXAddr": "0xC2125882318d04D266720B598d620f28222F3ABd",
-  "EUXStartBlock": 239137
-}

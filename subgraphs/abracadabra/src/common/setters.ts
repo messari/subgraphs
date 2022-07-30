@@ -24,7 +24,7 @@ import {
   HIGH_RISK_LIQUIDATION_PENALTY,
   InterestRateSide,
   InterestRateType,
-} from "../common/constants";
+} from "./constants";
 import { bigIntToBigDecimal } from "./utils/numbers";
 
 export function updateProtocolMarketList(marketAddress: string): void {
@@ -64,6 +64,11 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     MarketEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     MarketEntity.debtMultiplier = BIGDECIMAL_ZERO;
     MarketEntity.rates = [];
+    MarketEntity.positionCount = 0;
+    MarketEntity.openPositionCount = 0;
+    MarketEntity.closedPositionCount = 0;
+    MarketEntity.lendingPositionCount = 0;
+    MarketEntity.borrowingPositionCount = 0;
     MarketEntity.name = inputToken.name + " Market";
     MarketEntity.isActive = true;
     MarketEntity.canUseAsCollateral = true;

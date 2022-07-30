@@ -1,6 +1,6 @@
 import { Address, BigDecimal, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { AnswerUpdated } from "../../../generated/templates/priceOracle/PriceOracle";
-import { BIGDECIMAL_ONE, CHAINLINK_ORACLE_DECIMALS } from "../../common/constants";
+import { BIGDECIMAL_ONE, CHAINLINK_ORACLE_DECIMALS } from "../constants";
 import { getMIMAddress, getOrCreateToken } from "../getters";
 import { bigIntToBigDecimal } from "../utils/numbers";
 

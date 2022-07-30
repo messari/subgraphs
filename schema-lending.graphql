@@ -929,7 +929,7 @@ type Position @entity {
   " Side of the position (either lender or borrower) "
   side: PositionSide!
 
-  " Whether this position is being used as a collateral (only applies to LENDER positions) "
+  " Whether this position has been enabled as a collateral (only applies to LENDER positions). For protocols (e.g. MakerDAO) that doesn't require enabling explicitly, this will always be true. "
   isCollateral: Boolean
 
   " Token balance in this position, in native amounts "

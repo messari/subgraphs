@@ -1,9 +1,0 @@
-{
-  "network": "mainnet",
-  "comptrollerAddr": "0x8B53Ab2c0Df3230EA327017C91Eb909f815Ad113",
-  "startBlock": 11927175,
-  "USXAddr": "0x0a5E677a6A24b2F1A2Bf4F3bFfC443231d2fDEc8",
-  "USXStartBlock": 12455984,
-  "EUXAddr": "0xb986F3a2d91d3704Dc974A24FB735dCc5E3C1E70",
-  "EUXStartBlock": 12456012
-}
