@@ -332,15 +332,7 @@ export function getOrCreateVault(
 
     vault.save();
 
-    const version = utils.readValue<String>(
-      vaultContract.try_apiVersion(),
-      constants.VaultVersions.v0_3_0
-    );
-
-    // skipping yearn vaults with version 0.2.x
-    if (version.split(".")[1] != "2") {
-      VaultTemplate.create(vaultAddress);
-    }
+    VaultTemplate.create(vaultAddress);
   }
 
   return vault;
