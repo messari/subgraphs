@@ -963,6 +963,11 @@ export function _handleLiquidate(
   );
   liquidate.save();
 
+  market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(
+    liquidate.amountUSD
+  );
+  market.save();
+
   // update usage metrics
   snapshotUsage(
     protocol,
