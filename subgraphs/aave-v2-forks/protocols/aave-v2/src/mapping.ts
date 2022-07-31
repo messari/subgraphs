@@ -296,7 +296,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
         let supplyRewardsPerDay = trySupplyRewards.value.value0.times(
           BigInt.fromI32(SECONDS_PER_DAY)
         );
-        let borrowRewardsPerDay = trySupplyRewards.value.value0.times(
+        let borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
           BigInt.fromI32(SECONDS_PER_DAY)
         );
 
@@ -326,7 +326,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
           .times(rewardTokenPriceUSD);
-        let borrowRewardsPerDayUSD = supplyRewardsPerDay
+        let borrowRewardsPerDayUSD = borrowRewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
           .times(rewardTokenPriceUSD);
