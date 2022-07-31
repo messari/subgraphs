@@ -108,6 +108,7 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address, transac
 
   dailyUsageSnapshot.blockNumber = event.block.number;
   dailyUsageSnapshot.timestamp = event.block.timestamp;
+  dailyUsageSnapshot.totalPoolCount = protocol.totalPoolCount;
   dailyUsageSnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   dailyUsageSnapshot.dailyTransactionCount += 1;
 
