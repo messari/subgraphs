@@ -195,6 +195,19 @@
         "badgerdao": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/badgerdao-ethereum"
         },
+        "beefy-finance": {
+            "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-arbitrum",
+            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-avalanche",
+            "bsc": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-bsc",
+            "celo": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-celo",
+            "fantom": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-fantom",
+            "fuse": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-fuse",
+            "harmony": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-harmony",
+            "matic": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-polygon",
+            "moonriver": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-moonriver",
+            "moonbeam": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-moonbeam",
+            "aurora": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-aurora"
+        },
         "belt-finance": {
             "bsc": "https://api.thegraph.com/subgraphs/name/messari/belt-finance-bsc"
         },
@@ -221,6 +234,11 @@
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-arbitrum",
             "fantom": "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-fantom",
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-ethereum"
+        }
+    },
+    "generic": {
+        "lido": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/lido-ethereum"
         }
     }
 }
