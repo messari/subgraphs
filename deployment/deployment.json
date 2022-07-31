@@ -69,7 +69,7 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-polygon",
           "dmelotik": "dmelotik/aave-v2-polygon",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "ethereum-rwa": {
           "template": "aave.v2.template.yaml",

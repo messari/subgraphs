@@ -251,6 +251,12 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     return;
   }
 
+  //
+  //
+  // Rewards / day calculation
+  // rewards per second = totalRewardsPerSecond * (allocPoint / totalAllocPoint)
+  // rewards per day = rewardsPerSecond * 60 * 60 * 24
+
   let gTokenContract = GToken.bind(Address.fromString(market.outputToken!));
   let tryIncentiveController = gTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
@@ -260,36 +266,43 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     let tryPoolInfo = incentiveControllerContract.try_poolInfo(
       Address.fromString(market.outputToken!)
     );
-    if (!tryPoolInfo.reverted) {
-      let tryEmissions = incentiveControllerContract.try_emissionSchedule(
-        tryPoolInfo.value.value1
-      ); // parameter is allocPoint
-      if (!tryEmissions.reverted) {
-        // create reward tokens
-        let depositRewardToken = getOrCreateRewardToken(
-          Address.fromString(REWARD_TOKEN_ADDRESS),
-          RewardTokenType.DEPOSIT
-        );
-        let borrowRewardToken = getOrCreateRewardToken(
-          Address.fromString(REWARD_TOKEN_ADDRESS),
-          RewardTokenType.BORROW
-        );
-        market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
+    let tryTotalAllocPoint = incentiveControllerContract.try_totalAllocPoint();
+    let tryTotalRewardsPerSecond =
+      incentiveControllerContract.try_rewardsPerSecond();
 
-        // update reward token fields
-        let rewardsPerDay = tryEmissions.value.value1.times(
-          BigInt.fromI32(SECONDS_PER_DAY)
-        );
-        let rewardTokenPriceUSD = getGeistPriceUSD();
-        let rewardsPerDayUSD = rewardsPerDay
-          .toBigDecimal()
-          .div(exponentToBigDecimal(DEFAULT_DECIMALS))
-          .times(rewardTokenPriceUSD);
+    if (
+      !tryPoolInfo.reverted ||
+      !tryTotalAllocPoint.reverted ||
+      !tryTotalRewardsPerSecond.reverted
+    ) {
+      // create reward tokens
+      let depositRewardToken = getOrCreateRewardToken(
+        Address.fromString(REWARD_TOKEN_ADDRESS),
+        RewardTokenType.DEPOSIT
+      );
+      let borrowRewardToken = getOrCreateRewardToken(
+        Address.fromString(REWARD_TOKEN_ADDRESS),
+        RewardTokenType.BORROW
+      );
+      market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
 
-        // set rewards to arrays
-        market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
-        market.rewardTokenEmissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
-      }
+      // calculate rewards per day
+      let rewardsPerSecond = tryTotalRewardsPerSecond.value
+        .times(tryPoolInfo.value.value1)
+        .div(tryTotalAllocPoint.value);
+      let rewardsPerDay = rewardsPerSecond.times(
+        BigInt.fromI32(SECONDS_PER_DAY)
+      );
+
+      let rewardTokenPriceUSD = getGeistPriceUSD();
+      let rewardsPerDayUSD = rewardsPerDay
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+        .times(rewardTokenPriceUSD);
+
+      // set rewards to arrays
+      market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
+      market.rewardTokenEmissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
     }
   }
   market.save();
@@ -415,9 +428,8 @@ function getGeistPriceUSD(): BigDecimal {
   let reserveGEIST = reserves.value.value1;
 
   let priceGEISTinFTM = reserveFTM
-    .div(reserveGEIST)
     .toBigDecimal()
-    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+    .div(reserveGEIST.toBigDecimal());
 
   // get FTM price
   let gTokenContract = GToken.bind(Address.fromString(GFTM_ADDRESS));

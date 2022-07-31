@@ -257,16 +257,26 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     return;
   }
 
+  //
+  // Reward rate (rewards/second) in a market comes from try_assets(to)
+  // Supply side the to address is the aToken
+  // Borrow side the to address is the variableDebtToken
+
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let tryIncentiveController = aTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
     let incentiveControllerContract = AaveIncentivesController.bind(
       tryIncentiveController.value
     );
-    let tryRewardInfo = incentiveControllerContract.try_assets(
+    let trySupplyRewards = incentiveControllerContract.try_assets(
       Address.fromString(market.outputToken!)
     );
-    if (!tryRewardInfo.reverted) {
+    let tryBorrowRewards = incentiveControllerContract.try_assets(
+      Address.fromString(market.vToken)
+    );
+
+    // calculate supply rewards
+    if (!trySupplyRewards.reverted || !tryBorrowRewards.reverted) {
       let tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
       if (!tryRewardAsset.reverted) {
         // create reward tokens
@@ -283,7 +293,10 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
         // now get or create reward token and update fields
         let protocol = getOrCreateLendingProtocol(protocolData);
-        let rewardsPerDay = tryRewardInfo.value.value0.times(
+        let supplyRewardsPerDay = trySupplyRewards.value.value0.times(
+          BigInt.fromI32(SECONDS_PER_DAY)
+        );
+        let borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
           BigInt.fromI32(SECONDS_PER_DAY)
         );
 
@@ -309,14 +322,24 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
           );
         }
 
-        let rewardsPerDayUSD = rewardsPerDay
+        let supplyRewardsPerDayUSD = supplyRewardsPerDay
+          .toBigDecimal()
+          .div(exponentToBigDecimal(rewardDecimals))
+          .times(rewardTokenPriceUSD);
+        let borrowRewardsPerDayUSD = borrowRewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
           .times(rewardTokenPriceUSD);
 
         // set rewards to arrays
-        market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
-        market.rewardTokenEmissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
+        market.rewardTokenEmissionsAmount = [
+          supplyRewardsPerDay,
+          borrowRewardsPerDay,
+        ];
+        market.rewardTokenEmissionsUSD = [
+          supplyRewardsPerDayUSD,
+          borrowRewardsPerDayUSD,
+        ];
       }
     }
   }
