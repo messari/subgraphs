@@ -230,3 +230,26 @@ Deprecated Pools (like an Old MIM pool) are also ignored and as named as "Withdr
 ## Interaction Diagram
 
 ![Platypus Finance](./interaction-diagram.jpg "Platypus Finance")
+
+## Add a new pool to subgraph
+The process of adding new pool to subgraph
+- Get the relevant information regarding the pool. Eg:
+```
+{
+  "name": "Main USD Pool",
+  "address": "0x66357dCaCe80431aee0A7507e2E361B7e2402370",
+  "startBlock": 7409737
+}
+```
+- Add the details to the deployment config in networks/{network}/{network}.json
+- Add the details to `constants.ts` as well as it is currently unfeasible to import json in a realiable way in assembly script. Add the details to `detailsJson` array. The last argument is wether the pool should be ignored while calculating protocol TVL, should be set to true for withdraw pools only.
+```
+["Name", "Symbol", "Address", "false"]
+```
+Eg:
+```
+["Main Pool", "Main Pool", "0x66357dCaCe80431aee0A7507e2E361B7e2402370", "false"],
+```
+- Set `graftBase` as the GraphID of the existing subgraph and set `graftBlock` as one block previous to `startBlock` of the new pool in the deployment config.
+- Deploy the subgraph
+- NOTE: The assets from the pools which are not added for indexing will be ignored in masterchef event handlers.

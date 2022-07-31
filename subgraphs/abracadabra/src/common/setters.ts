@@ -1,7 +1,7 @@
-import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { Market, Liquidate, LiquidateProxy } from "../../generated/schema";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Market, LiquidateProxy } from "../../generated/schema";
 import { Cauldron, LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
-import { getMIMAddress, getOrCreateInterestRate, getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
+import { getOrCreateInterestRate, getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
 import {
   BIGDECIMAL_ZERO,
   BIGDECIMAL_ONE,
@@ -24,7 +24,7 @@ import {
   HIGH_RISK_LIQUIDATION_PENALTY,
   InterestRateSide,
   InterestRateType,
-} from "../common/constants";
+} from "./constants";
 import { bigIntToBigDecimal } from "./utils/numbers";
 
 export function updateProtocolMarketList(marketAddress: string): void {
@@ -49,7 +49,7 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     MarketEntity.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
     MarketEntity.inputTokenBalance = BIGINT_ZERO;
     MarketEntity.outputTokenSupply = BIGINT_ZERO;
-    MarketEntity.outputTokenPriceUSD = BIGDECIMAL_ONE;
+    MarketEntity.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     MarketEntity.createdTimestamp = blockTimestamp;
     MarketEntity.createdBlockNumber = blockNumber;
     MarketEntity.maximumLTV = BIGDECIMAL_ZERO;
@@ -64,6 +64,11 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     MarketEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     MarketEntity.debtMultiplier = BIGDECIMAL_ZERO;
     MarketEntity.rates = [];
+    MarketEntity.positionCount = 0;
+    MarketEntity.openPositionCount = 0;
+    MarketEntity.closedPositionCount = 0;
+    MarketEntity.lendingPositionCount = 0;
+    MarketEntity.borrowingPositionCount = 0;
     MarketEntity.name = inputToken.name + " Market";
     MarketEntity.isActive = true;
     MarketEntity.canUseAsCollateral = true;

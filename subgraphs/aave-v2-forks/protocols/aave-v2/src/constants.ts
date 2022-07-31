@@ -5,7 +5,9 @@ import { Network, ZERO_ADDRESS } from "../../../src/constants";
 ///// Ethereum Addresses /////
 //////////////////////////////
 
-export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; // ETH
+export const USDC_POS_TOKEN_ADDRESS =
+  "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"; // Polygon
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -14,10 +16,11 @@ export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 export namespace Protocol {
   export const NAME = "Aave v2";
   export const SLUG = "aave-v2";
-  export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.2.3";
+  export const SCHEMA_VERSION = "2.0.1";
+  export const SUBGRAPH_VERSION = "1.2.5";
   export const METHODOLOGY_VERSION = "1.0.0";
 }
+export const AAVE_DECIMALS = 8;
 
 ////////////////////////////
 ///// Network Specific /////

@@ -231,6 +231,8 @@ type YieldAggregator implements Protocol @entity {
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
 
+  _vaultIds: [String!]!
+
   _poolCount: BigInt!
 }
 
@@ -412,12 +414,13 @@ type Vault @entity {
 
   " Gauge address of the pool "
   _gauge: String!
+
   " LP Token Address of the pool"
   _lpToken: String!
-  " stash version of the pool "
-  _stashVersion: BigInt!
+
   " Pool Address of the pool"
   _pool: String!
+
   " CRV Rewards Address of the pool"
   _crvRewards: String!
 
@@ -688,16 +691,33 @@ type ActiveAccount @entity {
 }
 
 # Helper entity for fetching RewardPool from rewardToken
-type RewardTokenInfo @entity {
-  " { Pool ID }-{ RewardToken } "
+type _RewardPoolInfo @entity {
+  " { Pool ID }-{ RewardPool } "
   id: ID!
 
-  " Base reward Pool Address "
-  rewardTokenPool: String!
+  " Historical Rewards of the Pool "
+  historicalRewards: BigInt!
 
   " Timestamp of last Reward "
   lastRewardTimestamp: BigInt!
+}
 
-  " Historical Extra Rewards of the pool "
-  _previousExtraHistoricalRewards: BigInt!
+type _CircularBuffer @entity {
+  " 'CIRCULAR_BUFFER' "
+  id: ID!
+
+  " Array of sorted block numbers sorted continuously "
+  blocks: [Int!]!
+
+  " The index in the blocks array which will be used with the newest block to calculate block speed (Usally set to about a day before newest block) "
+  windowStartIndex: Int!
+
+  " The next index in the blocks array that will be replaced with the newest block "
+  nextIndex: Int!
+
+  " This determines the size of the blocks array. Should be set to contain at least a days worth of blocks according to a 1 day window for measuring speed"
+  bufferSize: Int!
+
+  " The current calculated number of blocks per day based on calculated block speed "
+  blocksPerDay: BigDecimal!
 }

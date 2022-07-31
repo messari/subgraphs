@@ -1,8 +1,6 @@
 [
   {
-    "inputs": [
-      { "internalType": "address", "name": "_feeToSetter", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_feeToSetter", "type": "address" }],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "constructor"
@@ -63,9 +61,7 @@
       { "internalType": "address", "name": "tokenB", "type": "address" }
     ],
     "name": "createPair",
-    "outputs": [
-      { "internalType": "address", "name": "pair", "type": "address" }
-    ],
+    "outputs": [{ "internalType": "address", "name": "pair", "type": "address" }],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -102,9 +98,7 @@
   },
   {
     "constant": false,
-    "inputs": [
-      { "internalType": "address", "name": "_feeTo", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_feeTo", "type": "address" }],
     "name": "setFeeTo",
     "outputs": [],
     "payable": false,
@@ -113,9 +107,7 @@
   },
   {
     "constant": false,
-    "inputs": [
-      { "internalType": "address", "name": "_feeToSetter", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_feeToSetter", "type": "address" }],
     "name": "setFeeToSetter",
     "outputs": [],
     "payable": false,

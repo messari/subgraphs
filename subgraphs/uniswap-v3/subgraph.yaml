@@ -4,8 +4,8 @@ schema:
   file: ./schema.graphql
 description: ...
 graft:
-  base: "QmQ6w5oXZiMeTpVSkLy4UqBVtVKmtiEMcL9ygiPZgGddg5"
-  block: 13864521
+  base: QmYH9eXvZoLX6gox87wamg7WcdnkKqWxc5YqjLwY6KpLFu # Subgraph ID of base subgraph
+  block: 13639984 # Block number
 dataSources:
   - kind: ethereum/contract
     name: Factory

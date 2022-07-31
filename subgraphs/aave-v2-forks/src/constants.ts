@@ -62,12 +62,18 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
+export namespace PositionSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
 export namespace EventType {
   export const DEPOSIT = 1;
   export const WITHDRAW = 2;
   export const BORROW = 3;
   export const REPAY = 4;
-  export const LIQUIDATE = 5;
+  export const LIQUIDATOR = 5;
+  export const LIQUIDATEE = 6;
 }
 
 export namespace ActivityType {
@@ -124,17 +130,6 @@ export function rayToWad(a: BigInt): BigInt {
 export function wadToRay(a: BigInt): BigInt {
   const result = a.times(BigInt.fromI32(10).pow(9));
   return result;
-}
-
-export function bigIntToBigDecimal(
-  quantity: BigInt,
-  decimals: i32 = 18
-): BigDecimal {
-  return quantity.divDecimal(
-    BigInt.fromI32(10)
-      .pow(decimals as u8)
-      .toBigDecimal()
-  );
 }
 
 // n => 10^n

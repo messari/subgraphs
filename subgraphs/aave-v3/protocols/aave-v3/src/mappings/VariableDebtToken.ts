@@ -1,23 +1,46 @@
 import {
   Burn,
   Mint,
+  VariableDebtToken,
 } from "../../../../generated/templates/VariableDebtToken/VariableDebtToken";
-import { updateReserveVariableDebtSupply } from "../entities/reserve";
-import { BIGINT_ZERO } from "../../../../src/utils/constants";
-import { rayDiv } from "../../../../src/utils/numbers";
+import { rayMul } from "../../../../src/utils/numbers";
+import { getMarketById } from "../entities/market";
+import { updateUserVariableBorrowerPosition } from "../entities/position";
+import {
+  getReserve,
+  updateReserveVariableDebtSupply,
+} from "../entities/reserve";
 
 export function handleBurn(event: Burn): void {
-  let amount = event.params.value.plus(event.params.balanceIncrease);
-  amount = rayDiv(amount, event.params.index);
-  updateReserveVariableDebtSupply(
+  const contract = VariableDebtToken.bind(event.address);
+  const result = contract.getScaledUserBalanceAndSupply(event.params.from);
+  const scaledTotalSupply = result.value1;
+  updateReserveVariableDebtSupply(event, scaledTotalSupply, event.params.index);
+
+  const userBalance = rayMul(result.value0, event.params.index);
+  const reserve = getReserve(event.address);
+  updateUserVariableBorrowerPosition(
     event,
-    BIGINT_ZERO.minus(amount),
-    event.params.index
+    event.params.from,
+    getMarketById(reserve.id),
+    userBalance
   );
 }
 
 export function handleMint(event: Mint): void {
-  let amount = event.params.value.minus(event.params.balanceIncrease);
-  amount = rayDiv(amount, event.params.index);
-  updateReserveVariableDebtSupply(event, amount, event.params.index);
+  const contract = VariableDebtToken.bind(event.address);
+  const result = contract.getScaledUserBalanceAndSupply(
+    event.params.onBehalfOf
+  );
+  const scaledTotalSupply = result.value1;
+  updateReserveVariableDebtSupply(event, scaledTotalSupply, event.params.index);
+
+  const userBalance = rayMul(result.value0, event.params.index);
+  const reserve = getReserve(event.address);
+  updateUserVariableBorrowerPosition(
+    event,
+    event.params.onBehalfOf,
+    getMarketById(reserve.id),
+    userBalance
+  );
 }

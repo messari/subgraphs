@@ -1,52 +1,57 @@
+import * as utils from "../common/utils";
 import {
   NewVault,
   NewExperimentalVault,
 } from "../../generated/Registry_v1/Registry_v1";
-import { _NewVault } from "../modules/Vault";
 import { log } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
-import { getOrCreateYieldAggregator } from "../common/initializers";
+import { getOrCreateVault } from "../common/initializers";
+import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
 
 export function handleNewVault(event: NewVault): void {
   const vaultAddress = event.params.vault;
+  const tokenAddress = event.params.token;
 
-  let protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+  const vaultContract = VaultContract.bind(vaultAddress);
+  const vaultVersion = utils.readValue<String>(
+    vaultContract.try_apiVersion(),
+    constants.VaultVersions.v0_3_0
+  );
 
-  let vaultIds = protocol._vaultIds;
-  vaultIds.push(vaultAddress.toHexString());
+  // skipping yearn vaults with version less than 0.3.0
+  if (vaultVersion.split(".")[1] == "2") {
+    return;
+  }
 
-  protocol._vaultIds = vaultIds;
-  protocol.totalPoolCount += 1;
-  protocol.save();
+  const vault = getOrCreateVault(vaultAddress, event.block);
 
-  _NewVault(vaultAddress, event.block);
-
-  log.warning("[NewVault] - TxHash: {}, VaultId: {}, TokenId: {}", [
+  log.warning("[NewVault] - VaultId: {}, TokenId: {}, TxHash: {}", [
+    vault.id,
+    tokenAddress.toHexString(),
     event.transaction.hash.toHexString(),
-    event.params.vault.toHexString(),
-    event.params.token.toHexString(),
   ]);
 }
 
 export function handleNewExperimentalVault(event: NewExperimentalVault): void {
   const vaultAddress = event.params.vault;
+  const tokenAddress = event.params.token;
 
-  let protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
-  let vaultIds = protocol._vaultIds;
-
-  vaultIds.push(vaultAddress.toHexString());
-  protocol._vaultIds = vaultIds;
-  protocol.totalPoolCount += 1;
-  protocol.save();
-
-  _NewVault(vaultAddress, event.block);
-
-  log.warning(
-    "[NewExperimentalVault] - TxHash: {}, VaultId: {}, TokenId: {}",
-    [
-      event.transaction.hash.toHexString(),
-      event.params.vault.toHexString(),
-      event.params.token.toHexString(),
-    ]
+  const vaultContract = VaultContract.bind(vaultAddress);
+  const vaultVersion = utils.readValue<String>(
+    vaultContract.try_apiVersion(),
+    constants.VaultVersions.v0_3_0
   );
+
+  // skipping yearn vaults with version less than 0.3.0
+  if (vaultVersion.split(".")[1] == "2") {
+    return;
+  }
+
+  const vault = getOrCreateVault(vaultAddress, event.block);
+
+  log.warning("[NewExperimentalVault] - VaultId: {}, TokenId: {}, TxHash: {}", [
+    vault.id,
+    tokenAddress.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
 }

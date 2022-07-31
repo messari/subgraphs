@@ -3,7 +3,7 @@ const {
   runCommands,
   scripts,
 } = require("./execution.js");
-const protocolNetworkData = require("./deploymentConfigurations.json");
+const protocolNetworkData = require("./deployment.json");
 const args = require("minimist")(process.argv.slice(2));
 
 const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))[

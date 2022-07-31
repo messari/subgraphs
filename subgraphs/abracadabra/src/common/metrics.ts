@@ -1,5 +1,5 @@
-import { BigDecimal, BigInt, Address, ethereum, dataSource } from "@graphprotocol/graph-ts";
-import { Account, ActiveAccount } from "../../generated/schema";
+import { BigDecimal, BigInt, Address, ethereum, dataSource, log } from "@graphprotocol/graph-ts";
+import { ActiveAccount } from "../../generated/schema";
 import {
   SECONDS_PER_DAY,
   BIGDECIMAL_ZERO,
@@ -9,6 +9,7 @@ import {
   BIGDECIMAL_ONE,
   SECONDS_PER_HOUR,
   BIGINT_ZERO,
+  EventType,
 } from "./constants";
 import {
   getOrCreateMarketDailySnapshot,
@@ -25,6 +26,7 @@ import {
 import { bigIntToBigDecimal } from "./utils/numbers";
 import { DegenBox } from "../../generated/BentoBox/DegenBox";
 import { readValue } from "./utils/utils";
+import { getOrCreateAccount } from "../positions";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal, marketId: string): void {
@@ -32,8 +34,20 @@ export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal, mar
   // totalValueLockedUSD is handled in updateTVL()
   let financialsDailySnapshots = getOrCreateFinancials(event);
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, marketId);
+  if (!marketHourlySnapshot) {
+    log.warning("[updateFinancials] marketHourlySnapshot not found for market: {}", [marketId]);
+    return;
+  }
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, marketId);
+  if (!marketDailySnapshot) {
+    log.warning("[updateFinancials] marketDailySnapshot not found for market: {}", [marketId]);
+    return;
+  }
   let market = getMarket(marketId);
+  if (!market) {
+    log.warning("[updateFinancials] Market not found: {}", [marketId]);
+    return;
+  }
 
   let protocol = getOrCreateLendingProtocol();
 
@@ -41,44 +55,56 @@ export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal, mar
   let supplySideRevenueUSD = feesUSD.times(ABRA_USER_REVENUE_SHARE);
   let protocolSideRevenueUSD = feesUSD.times(ABRA_PROTOCOL_REVENUE_SHARE);
 
+  // add cumulative revenues to market
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+  market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  market.save();
+
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
 
   financialsDailySnapshots.dailyTotalRevenueUSD = financialsDailySnapshots.dailyTotalRevenueUSD.plus(totalRevenueUSD); // feesUSD comes from logAccrue which is accounted in MIM
-  financialsDailySnapshots.dailySupplySideRevenueUSD =
-    financialsDailySnapshots.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
-  financialsDailySnapshots.dailyProtocolSideRevenueUSD =
-    financialsDailySnapshots.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  financialsDailySnapshots.dailySupplySideRevenueUSD = financialsDailySnapshots.dailySupplySideRevenueUSD.plus(
+    supplySideRevenueUSD,
+  );
+  financialsDailySnapshots.dailyProtocolSideRevenueUSD = financialsDailySnapshots.dailyProtocolSideRevenueUSD.plus(
+    protocolSideRevenueUSD,
+  );
 
   financialsDailySnapshots.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   financialsDailySnapshots.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   financialsDailySnapshots.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
 
-  marketDailySnapshot!.dailyTotalRevenueUSD = marketDailySnapshot!.dailyTotalRevenueUSD.plus(totalRevenueUSD); // feesUSD comes from logAccrue which is accounted in MIM
-  marketDailySnapshot!.dailySupplySideRevenueUSD =
-    marketDailySnapshot!.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
-  marketDailySnapshot!.dailyProtocolSideRevenueUSD =
-    marketDailySnapshot!.dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD); // feesUSD comes from logAccrue which is accounted in MIM
+  marketDailySnapshot.dailySupplySideRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
+    supplySideRevenueUSD,
+  );
+  marketDailySnapshot.dailyProtocolSideRevenueUSD = marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+    protocolSideRevenueUSD,
+  );
 
-  marketDailySnapshot!.cumulativeTotalRevenueUSD = market!.cumulativeTotalRevenueUSD;
-  marketDailySnapshot!.cumulativeSupplySideRevenueUSD = market!.cumulativeSupplySideRevenueUSD;
-  marketDailySnapshot!.cumulativeProtocolSideRevenueUSD = market!.cumulativeProtocolSideRevenueUSD;
+  marketDailySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  marketDailySnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketDailySnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
 
-  marketHourlySnapshot!.hourlyTotalRevenueUSD = marketHourlySnapshot!.hourlyTotalRevenueUSD.plus(totalRevenueUSD); // feesUSD comes from logAccrue which is accounted in MIM
-  marketHourlySnapshot!.hourlySupplySideRevenueUSD =
-    marketHourlySnapshot!.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSD);
-  marketHourlySnapshot!.hourlyProtocolSideRevenueUSD =
-    marketHourlySnapshot!.hourlyProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+  marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlyTotalRevenueUSD.plus(totalRevenueUSD); // feesUSD comes from logAccrue which is accounted in MIM
+  marketHourlySnapshot.hourlySupplySideRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
+    supplySideRevenueUSD,
+  );
+  marketHourlySnapshot.hourlyProtocolSideRevenueUSD = marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+    protocolSideRevenueUSD,
+  );
 
-  marketHourlySnapshot!.cumulativeTotalRevenueUSD = market!.cumulativeTotalRevenueUSD;
-  marketHourlySnapshot!.cumulativeSupplySideRevenueUSD = market!.cumulativeSupplySideRevenueUSD;
-  marketHourlySnapshot!.cumulativeProtocolSideRevenueUSD = market!.cumulativeProtocolSideRevenueUSD;
+  marketHourlySnapshot.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  marketHourlySnapshot.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketHourlySnapshot.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
 
   financialsDailySnapshots.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
   financialsDailySnapshots.save();
-  marketDailySnapshot!.save();
-  marketHourlySnapshot!.save();
+  marketDailySnapshot.save();
+  marketHourlySnapshot.save();
   protocol.save();
 }
 
@@ -99,32 +125,14 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   usageDailySnapshot.timestamp = event.block.timestamp;
   usageDailySnapshot.dailyTransactionCount += 1;
 
-  let fromAccountId = from.toHexString();
-  let fromAccount = Account.load(fromAccountId);
-  let toAccountId = to.toHexString();
-  let toAccount = Account.load(toAccountId);
-
-  if (!fromAccount) {
-    fromAccount = new Account(fromAccountId);
-    fromAccount.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-
-  if (!toAccount) {
-    toAccount = new Account(fromAccountId);
-    toAccount.save();
-
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
+  getOrCreateAccount(from.toHexString(), event);
+  getOrCreateAccount(to.toHexString(), event);
 
   usageHourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageDailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the hour/day
-  let hourlyActiveAccountIdFrom = hourlyId.toString() + "-" + from.toHexString();
+  let hourlyActiveAccountIdFrom = "hourly-" + from.toHexString() + "-" + hourlyId.toString();
   let hourlyActiveAccountFrom = ActiveAccount.load(hourlyActiveAccountIdFrom);
   if (!hourlyActiveAccountFrom) {
     hourlyActiveAccountFrom = new ActiveAccount(hourlyActiveAccountIdFrom);
@@ -132,7 +140,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     usageHourlySnapshot.hourlyActiveUsers += 1;
   }
 
-  let hourlyActiveAccountIdTo = hourlyId.toString() + "-" + to.toHexString();
+  let hourlyActiveAccountIdTo = "hourly-" + to.toHexString() + "-" + hourlyId.toString();
   let hourlyActiveAccountTo = ActiveAccount.load(hourlyActiveAccountIdTo);
   if (!hourlyActiveAccountTo) {
     hourlyActiveAccountTo = new ActiveAccount(hourlyActiveAccountIdTo);
@@ -140,7 +148,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     usageHourlySnapshot.hourlyActiveUsers += 1;
   }
 
-  let dailyActiveAccountIdFrom = dailyId.toString() + "-" + from.toHexString();
+  let dailyActiveAccountIdFrom = "daily-" + from.toHexString() + "-" + dailyId.toString();
   let dailyActiveAccountFrom = ActiveAccount.load(dailyActiveAccountIdFrom);
   if (!dailyActiveAccountFrom) {
     dailyActiveAccountFrom = new ActiveAccount(dailyActiveAccountIdFrom);
@@ -148,7 +156,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     usageDailySnapshot.dailyActiveUsers += 1;
   }
 
-  let dailyActiveAccountIdTo = dailyId.toString() + "-" + from.toHexString();
+  let dailyActiveAccountIdTo = "daily-" + to.toHexString() + "-" + dailyId.toString();
   let dailyActiveAccountTo = ActiveAccount.load(dailyActiveAccountIdTo);
   if (!dailyActiveAccountTo) {
     dailyActiveAccountTo = new ActiveAccount(dailyActiveAccountIdTo);
@@ -310,13 +318,15 @@ export function updateMarketStats(
   marketDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
-  if (eventType == "DEPOSIT") {
+  if (eventType == EventType.DEPOSIT) {
     let inputTokenBalance = market.inputTokenBalance.plus(amount);
     market.inputTokenBalance = inputTokenBalance;
     market.totalValueLockedUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD!);
     market.totalDepositBalanceUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD!);
     usageHourlySnapshot.hourlyDepositCount += 1;
     usageDailySnapshot.dailyDepositCount += 1;
+    market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
+
 
     marketHourlySnapshot.cumulativeDepositUSD = marketHourlySnapshot.cumulativeDepositUSD.plus(amountUSD);
     marketDailySnapshot.cumulativeDepositUSD = marketDailySnapshot.cumulativeDepositUSD.plus(amountUSD);
@@ -325,7 +335,7 @@ export function updateMarketStats(
     marketHourlySnapshot.hourlyDepositUSD = marketHourlySnapshot.hourlyDepositUSD.plus(amountUSD);
     marketDailySnapshot.dailyDepositUSD = marketDailySnapshot.dailyDepositUSD.plus(amountUSD);
     financialsDailySnapshot.dailyDepositUSD = financialsDailySnapshot.dailyDepositUSD.plus(amountUSD);
-  } else if (eventType == "WITHDRAW") {
+  } else if (eventType == EventType.WITHDRAW) {
     let inputTokenBalance = market.inputTokenBalance.minus(amount);
     market.inputTokenBalance = inputTokenBalance;
     market.totalValueLockedUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD!);
@@ -334,12 +344,13 @@ export function updateMarketStats(
     usageHourlySnapshot.hourlyWithdrawCount += 1;
     usageDailySnapshot.dailyWithdrawCount += 1;
     financialsDailySnapshot.dailyWithdrawUSD = financialsDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
-  } else if (eventType == "BORROW") {
+  } else if (eventType == EventType.BORROW) {
     let outputTokenSupply = market.outputTokenSupply.plus(amount);
     market.outputTokenSupply = outputTokenSupply;
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, token.decimals).times(priceUSD!);
     usageHourlySnapshot.hourlyBorrowCount += 1;
     usageDailySnapshot.dailyBorrowCount += 1;
+    market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
 
     marketHourlySnapshot.cumulativeBorrowUSD = marketHourlySnapshot.cumulativeBorrowUSD.plus(amountUSD);
     marketDailySnapshot.cumulativeBorrowUSD = marketDailySnapshot.cumulativeBorrowUSD.plus(amountUSD);
@@ -348,7 +359,7 @@ export function updateMarketStats(
     marketHourlySnapshot.hourlyBorrowUSD = marketHourlySnapshot.hourlyBorrowUSD.plus(amountUSD);
     marketDailySnapshot.dailyBorrowUSD = marketDailySnapshot.dailyBorrowUSD.plus(amountUSD);
     financialsDailySnapshot.dailyBorrowUSD = financialsDailySnapshot.dailyBorrowUSD.plus(amountUSD);
-  } else if (eventType == "REPAY") {
+  } else if (eventType == EventType.REPAY) {
     let outputTokenSupply = market.outputTokenSupply.minus(amount);
     market.outputTokenSupply = outputTokenSupply;
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, token.decimals).times(priceUSD!);
@@ -358,10 +369,6 @@ export function updateMarketStats(
     financialsDailySnapshot.dailyRepayUSD = financialsDailySnapshot.dailyRepayUSD.plus(amountUSD);
   }
   market.inputTokenPriceUSD = getOrCreateToken(Address.fromString(market.inputToken)).lastPriceUSD!;
-  market.outputTokenPriceUSD =
-    asset.toLowerCase() == getMIMAddress(dataSource.network()).toLowerCase()
-      ? priceUSD!
-      : getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).lastPriceUSD!;
   market.save();
   usageHourlySnapshot.save();
   usageDailySnapshot.save();

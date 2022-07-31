@@ -21,6 +21,8 @@ dataSources:
           file: ./abis/ArrakisFactoryV1.json
         - name: ArrakisVaultV1
           file: ./abis/ArrakisVaultV1.json
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20NameBytes
@@ -48,6 +50,8 @@ templates:
       abis:
         - name: ArrakisVaultV1
           file: ./abis/ArrakisVaultV1.json
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20NameBytes

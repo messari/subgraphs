@@ -22,9 +22,20 @@ export function getOrCreateUsageMetricsSnapshot(
     usageMetrics = new UsageMetricsDailySnapshot(id);
     usageMetrics.protocol = protocol.id;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.cumulativeUniqueDepositors =
+      protocol.cumulativeUniqueDepositors;
+    usageMetrics.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
+    usageMetrics.cumulativeUniqueLiquidators =
+      protocol.cumulativeUniqueLiquidators;
+    usageMetrics.cumulativeUniqueLiquidatees =
+      protocol.cumulativeUniqueLiquidatees;
     usageMetrics.totalPoolCount = protocol.totalPoolCount;
 
     usageMetrics.dailyActiveUsers = INT_ZERO;
+    usageMetrics.dailyActiveDepositors = INT_ZERO;
+    usageMetrics.dailyActiveBorrowers = INT_ZERO;
+    usageMetrics.dailyActiveLiquidators = INT_ZERO;
+    usageMetrics.dailyActiveLiquidatees = INT_ZERO;
     usageMetrics.dailyTransactionCount = INT_ZERO;
     usageMetrics.dailyDepositCount = INT_ZERO;
     usageMetrics.dailyWithdrawCount = INT_ZERO;
@@ -72,17 +83,6 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     getOrCreateUsageMetricsHourlySnapshot(event);
 
   let accountId = from.toHexString();
-  let account = Account.load(accountId);
-  if (!account) {
-    account = new Account(accountId);
-    account.save();
-    const protocol = getOrCreateLendingProtocol();
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-    usageMetricsDailySnapshot.cumulativeUniqueUsers += 1;
-    usageMetricsHourlySnapshot.cumulativeUniqueUsers += 1;
-  }
-
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = `daily-${accountId}-${day}`;
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
@@ -103,10 +103,34 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   usageMetricsHourlySnapshot.save();
 }
 
-export function incrementProtocolDepositCount(event: ethereum.Event): void {
+function isUniqueDailyUser(
+  event: ethereum.Event,
+  account: Account,
+  action: string
+): boolean {
+  const timestamp = event.block.timestamp.toI64();
+  const day = `${timestamp / SECONDS_PER_DAY}`;
+  // Combine the id, user address, and action to generate a unique user id for the day
+  let dailyActionActiveAccountId = `daily-${action}-${account.id}-${day}`;
+  let dailyActionActiveAccount = ActiveAccount.load(dailyActionActiveAccountId);
+  if (!dailyActionActiveAccount) {
+    dailyActionActiveAccount = new ActiveAccount(dailyActionActiveAccountId);
+    dailyActionActiveAccount.save();
+    return true;
+  }
+  return false;
+}
+
+export function incrementProtocolDepositCount(
+  event: ethereum.Event,
+  account: Account
+): void {
   const usageMetricsDailySnapshot = getOrCreateUsageMetricsSnapshot(event);
   usageMetricsDailySnapshot.dailyDepositCount += 1;
   usageMetricsDailySnapshot.dailyTransactionCount += 1;
+  if (isUniqueDailyUser(event, account, "deposit")) {
+    usageMetricsDailySnapshot.dailyActiveDepositors += 1;
+  }
   usageMetricsDailySnapshot.save();
   const usageMetricsHourlySnapshot =
     getOrCreateUsageMetricsHourlySnapshot(event);
@@ -115,10 +139,16 @@ export function incrementProtocolDepositCount(event: ethereum.Event): void {
   usageMetricsHourlySnapshot.save();
 }
 
-export function incrementProtocolBorrowCount(event: ethereum.Event): void {
+export function incrementProtocolBorrowCount(
+  event: ethereum.Event,
+  account: Account
+): void {
   const usageMetricsDailySnapshot = getOrCreateUsageMetricsSnapshot(event);
   usageMetricsDailySnapshot.dailyBorrowCount += 1;
   usageMetricsDailySnapshot.dailyTransactionCount += 1;
+  if (isUniqueDailyUser(event, account, "borrow")) {
+    usageMetricsDailySnapshot.dailyActiveBorrowers += 1;
+  }
   usageMetricsDailySnapshot.save();
   const usageMetricsHourlySnapshot =
     getOrCreateUsageMetricsHourlySnapshot(event);
@@ -151,10 +181,20 @@ export function incrementProtocolRepayCount(event: ethereum.Event): void {
   usageMetricsHourlySnapshot.save();
 }
 
-export function incrementProtocolLiquidateCount(event: ethereum.Event): void {
+export function incrementProtocolLiquidateCount(
+  event: ethereum.Event,
+  account: Account,
+  liquidator: Account
+): void {
   const usageMetricsDailySnapshot = getOrCreateUsageMetricsSnapshot(event);
   usageMetricsDailySnapshot.dailyLiquidateCount += 1;
   usageMetricsDailySnapshot.dailyTransactionCount += 1;
+  if (isUniqueDailyUser(event, account, "liquidatee")) {
+    usageMetricsDailySnapshot.dailyActiveLiquidatees += 1;
+  }
+  if (isUniqueDailyUser(event, liquidator, "liquidator")) {
+    usageMetricsDailySnapshot.dailyActiveLiquidators += 1;
+  }
   usageMetricsDailySnapshot.save();
   const usageMetricsHourlySnapshot =
     getOrCreateUsageMetricsHourlySnapshot(event);

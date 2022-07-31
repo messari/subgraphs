@@ -212,7 +212,6 @@ function ProtocolTabEntity({
       }
 
       list[entityName] = {};
-      console.log("ENTITY NAME: ", entityName);
       for (let x = 0; x < Object.keys(entitiesData[entityName]).length; x++) {
         const entityField = Object.keys(entitiesData[entityName])[x];
         if (entityField === "timestamp") {

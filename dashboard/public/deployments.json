@@ -28,8 +28,8 @@
         "honeyswap": {
             "gnosis": "https://api.thegraph.com/subgraphs/name/messari/honeyswap-gnosis"
         },
-        "platypus": {
-            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/platypus-avalanche"
+        "platypus-finance": {
+            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/platypus-finance-avalanche"
         },
         "quickswap": {
             "matic": "https://api.thegraph.com/subgraphs/name/messari/quickswap-polygon"
@@ -65,6 +65,9 @@
         "trader-joe": {
             "avalanche": "https://api.thegraph.com/subgraphs/name/messari/trader-joe-avalanche"
         },
+        "ubeswap": {
+            "celo": "https://api.thegraph.com/subgraphs/name/messari/ubeswap-celo"
+        },
         "uniswap-v2": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v2-ethereum"
         },
@@ -73,9 +76,12 @@
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-ethereum",
             "matic": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-polygon",
             "optimism": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-optimism"
+        },
+        "vvs-finance": {
+            "cronos": "https://graph.cronoslabs.com/subgraphs/name/messari/vvs-finance"
         }
     },
-    "lending-protocols": {
+    "lending": {
         "aave-v2": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/aave-v2-ethereum"
         },
@@ -175,6 +181,9 @@
         "scream": {
             "fantom": "https://api.thegraph.com/subgraphs/name/messari/scream-fantom"
         },
+        "tectonic": {
+            "cronos": "https://graph.cronoslabs.com/subgraphs/name/messari/tectonic"
+        },
         "venus": {
             "bsc": "https://api.thegraph.com/subgraphs/name/messari/venus-protocol-bsc"
         }
@@ -185,6 +194,19 @@
         },
         "badgerdao": {
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/badgerdao-ethereum"
+        },
+        "beefy-finance": {
+            "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-arbitrum",
+            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-avalanche",
+            "bsc": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-bsc",
+            "celo": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-celo",
+            "fantom": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-fantom",
+            "fuse": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-fuse",
+            "harmony": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-harmony",
+            "matic": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-polygon",
+            "moonriver": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-moonriver",
+            "moonbeam": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-moonbeam",
+            "aurora": "https://api.thegraph.com/subgraphs/name/messari/beefy-finance-aurora"
         },
         "belt-finance": {
             "bsc": "https://api.thegraph.com/subgraphs/name/messari/belt-finance-bsc"
@@ -212,6 +234,11 @@
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-arbitrum",
             "fantom": "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-fantom",
             "mainnet": "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-ethereum"
+        }
+    },
+    "generic": {
+        "lido": {
+            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/lido-ethereum"
         }
     }
 }
