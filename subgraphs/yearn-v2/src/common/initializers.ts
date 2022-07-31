@@ -262,14 +262,13 @@ export function getOrCreateVault(
   vaultAddress: Address,
   block: ethereum.Block
 ): VaultStore {
-  const vaultAddressString = vaultAddress.toHexString();
-  const vaultContract = VaultContract.bind(vaultAddress);
 
-  let vault = VaultStore.load(vaultAddressString);
+  let vault = VaultStore.load(vaultAddress.toHexString());
 
   if (!vault) {
-    vault = new VaultStore(vaultAddressString);
+    vault = new VaultStore(vaultAddress.toHexString());
 
+    const vaultContract = VaultContract.bind(vaultAddress);
     vault.name = utils.readValue<string>(vaultContract.try_name(), "");
     vault.symbol = utils.readValue<string>(vaultContract.try_symbol(), "");
     vault.protocol = constants.ETHEREUM_PROTOCOL_ID;
@@ -333,7 +332,15 @@ export function getOrCreateVault(
 
     vault.save();
 
-    VaultTemplate.create(vaultAddress);
+    const version = utils.readValue<String>(
+      vaultContract.try_apiVersion(),
+      constants.VaultVersions.v0_3_0
+    );
+
+    // skipping yearn vaults with version 0.2.x
+    if (version.split(".")[1] != "2") {
+      VaultTemplate.create(vaultAddress);
+    }
   }
 
   return vault;
