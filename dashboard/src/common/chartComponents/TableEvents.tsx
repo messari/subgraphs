@@ -62,17 +62,18 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
             return convertTokenDecimals(amt, currentData.inputTokens[idx].decimals).toFixed(2);
           });
           const outputTokenDecimal = convertTokenDecimals(
-            currentData.outputTokenAmount,
-            currentData.outputToken.decimals,
-          ).toFixed(2);
-          currentData.inputTokenAmounts = inputTokensDecimal;
+            currentData?.outputTokenAmount,
+            currentData?.outputToken?.decimals,
+          )?.toFixed(2);
+
+          currentData.inputTokenAmounts = inputTokensDecimal.join(', ');
           currentData.outputTokenAmount = outputTokenDecimal;
           currentData.inputTokens = currentData.inputTokens
             .map((tok: any) => {
               return tok.id;
             })
             .join(", ");
-          currentData.outputToken = JSON.stringify(currentData.outputToken.id);
+          currentData.outputToken = JSON.stringify(currentData?.outputToken?.id);
         } else if (currentData.amount) {
           currentData.amount = convertTokenDecimals(currentData.amount, data[poolName].inputTokens[0].decimals);
         }
@@ -117,11 +118,14 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
               valueStr = params.value;
             }
             let onClick = undefined;
-            if (valueStr.length > 20) {
+            if (valueStr?.length > 20) {
               valueStr = `${params.value.slice(0, 10)}...${params.value.slice(
                 params.value.length - 15,
                 params.value.length,
               )}`;
+            }
+            if (!valueStr) {
+              valueStr = 'N/A';
             }
             const blockExplorerUrlBase = blockExplorers[protocolNetwork.toUpperCase()];
             if (k.toUpperCase() === "HASH") {
