@@ -18,7 +18,7 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "../prices";
-import { updateProtocolRevenue, updateTokenVolume } from "./Metrics";
+import { updateProtocolRevenue, updateSnapshotsVolume, updateTokenVolume } from "./Metrics";
 
 export function createSwapTransaction(
   liquidityPool: LiquidityPoolStore,
@@ -177,17 +177,20 @@ export function Swap(
   // TODO: Update Balances
 
   updateProtocolRevenue(liquidityPoolAddress, pool.cumulativeVolumeUSD, block);
-  utils.updateProtocolTotalValueLockedUSD();
+  updateSnapshotsVolume(liquidityPoolAddress, volumeUSD, block);
   UpdateMetricsAfterSwap(block);
 
+  utils.updateProtocolTotalValueLockedUSD();
+
   log.info(
-    "[Exchange] LiquidityPool: {}, tokenIn: {}, tokenOut: {}, amountInUSD: {}, amountOutUSD: {}, TxnHash: {}",
+    "[Exchange] LiquidityPool: {}, tokenIn: {}, tokenOut: {}, amountInUSD: {}, amountOutUSD: {}, isUnderlying: {}, TxnHash: {}",
     [
       liquidityPoolAddress.toHexString(),
       tokenIn,
       tokenOut,
       amountInUSD.truncate(2).toString(),
       amountOutUSD.truncate(2).toString(),
+      underlying.toString(),
       transaction.hash.toHexString(),
     ]
   );

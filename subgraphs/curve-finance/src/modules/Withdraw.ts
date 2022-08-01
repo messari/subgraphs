@@ -260,17 +260,17 @@ export function Withdraw(
     let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
     let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
 
-    let liquidityAdded = withdrawnTokenAmounts[idx];
+    let liquidityWithdrawn = withdrawnTokenAmounts[idx];
     if (fees.length != 0) {
       // balance after RemoveLiquidity = token_amounts[idx] - (fees[idx] * self.admin_fee / FEE_DENOMINATOR)
-      liquidityAdded = withdrawnTokenAmounts[idx].minus(
+      liquidityWithdrawn = withdrawnTokenAmounts[idx].minus(
         fees[idx].times(admin_fee).div(constants.FEE_DENOMINATOR_BIGINT)
       );
     }
 
     inputTokenBalances[inputTokenIndex] = inputTokenBalances[
       inputTokenIndex
-    ].minus(withdrawnTokenAmounts[idx]);
+    ].minus(liquidityWithdrawn);
 
     inputTokenAmounts.push(withdrawnTokenAmounts[idx]);
     inputTokens.push(inputToken.id);
@@ -281,6 +281,7 @@ export function Withdraw(
       .div(inputTokenPrice.decimalsBaseTen);
   }
 
+  pool.inputTokenBalances = inputTokenBalances;
   pool.totalValueLockedUSD = utils.getPoolTVL(
     pool.inputTokens,
     pool.inputTokenBalances
@@ -319,10 +320,11 @@ export function Withdraw(
   UpdateMetricsAfterWithdraw(block);
 
   log.info(
-    "[RemoveLiquidity] LiquidityPool: {}, sharesBurnt: {}, withdrawnAmounts: [{}], withdrawAmountUSD: {}, fees: [{}], feesUSD: {}, TxnHash: {}",
+    "[RemoveLiquidity] LiquidityPool: {}, sharesBurnt: {}, inputTokenBalances: [{}], withdrawnAmounts: [{}], withdrawAmountUSD: {}, fees: [{}], feesUSD: {}, TxnHash: {}",
     [
       liquidityPoolAddress.toHexString(),
       outputTokenBurntAmount.toString(),
+      inputTokenBalances.join(", "),
       withdrawnTokenAmounts.join(", "),
       withdrawAmountUSD.truncate(1).toString(),
       fees.join(", "),
