@@ -315,6 +315,7 @@ type LendingProtocol implements Protocol @entity {
   markets: [Market!]! @derivedFrom(field: "protocol")
 
   #### Add-Ons ####
+
   " oracle for the protocol "
   _priceOracle: String!
 
@@ -654,6 +655,7 @@ type Market @entity {
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
 
   ### Add-Ons ###
+
   _reserveFactor: BigDecimal!
 }
 
@@ -1244,6 +1246,7 @@ type ActiveAccount @entity {
 # They are usually used to store internal states that would simplify
 # the mapping logic. All helper entities should be prefixed with an
 # underscore to differentiate them from the common schema.
+
 type _CircularBuffer @entity {
   " 'CIRCULAR_BUFFER' "
   id: ID!
@@ -1275,6 +1278,19 @@ type _DforceMarketStatus @entity {
   redeemPaused: Boolean!
   " Is transfer paused for the market "
   transferPaused: Boolean!
+}
+
+type _FusePool @entity {
+  " {Comptroller implementation} "
+  id: ID!
+  " Fuse pool  number "
+  poolNumber: String!
+  " Price oracle for the "
+  priceOracle: String!
+  " Liquidation incentive for the pool "
+  liquidationIncentive: BigDecimal!
+  " IDs of all the markets in this fuse pool "
+  marketIDs: [String!]!
 }
 
 type _PositionCounter @entity {
