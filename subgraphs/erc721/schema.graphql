@@ -7,13 +7,13 @@
 #############################
 
 type Token @entity {
-  " address of the token, { Contract Address }-{ Token ID }  "
+  " Address of the token, { Contract Address }-{ Token ID }  "
   id: ID!
 
-  " Smart contract for the token "
-  contract: Contract!
+  " Collection for the token "
+  collection: Collection!
 
-  " ID of the token from the smart contract "
+  " ID of the token from the collection "
   tokenID: BigInt!
 
   " URI of the token "
@@ -22,65 +22,71 @@ type Token @entity {
   " The owner for the token "
   owner: Account!
 
-  " timestamp of the token's mint "
+  " Timestamp of the token's mint "
   mintTime: BigInt!
 }
 
-#############################################
-####### ERC721 Smart Contract Metadata ######
-#############################################
+#########################################
+####### ERC721 Collection Metadata ######
+#########################################
 
-type Contract @entity {
-  " ERC721 Smart contract address "
+type Collection @entity {
+  " ERC721 collection address "
   id: ID!
 
-  " Name of the smart contract "
+  " Name of the collection "
   name: String
 
-  " Symbol of the smart contract "
+  " Symbol of the collection "
   symbol: String
 
   " Flag for whether ERC721 metadata is supported "
   supportsERC721Metadata: Boolean!
 
-  " Total number of unique minted tokens in the smart contract "
+  " Total number of unique minted tokens in the collection "
   tokenCount: BigInt!
 
-  " Total number of unique token owners in the smart contract "
+  " Total number of unique token owners holding tokens in the collection "
   ownerCount: BigInt!
 
-  " Tokens in the smart contract "
-  tokens: [Token!]! @derivedFrom(field: "contract")
+  " Total number of token transfer events "
+  transferCount: BigInt!
+
+  " Tokens in the collection "
+  tokens: [Token!]! @derivedFrom(field: "collection")
 
   " List of token transfers "
-  transfers: [TransferEvent!]! @derivedFrom(field: "contract")
+  transfers: [Transfer!]! @derivedFrom(field: "collection")
 
   " Token holder's balance "
-  holdersBalance: [AccountBalance!]! @derivedFrom(field: "contract")
+  holdersBalance: [AccountBalance!]! @derivedFrom(field: "collection")
 
   ##### Snapshots #####
 
-  " Daily snapshot for this smart contract "
-  dailyContractSnapshot: [ContractDailySnapshot!]!
-    @derivedFrom(field: "contract")
+  " Daily snapshot for this collection "
+  dailyCollectionSnapshot: [CollectionDailySnapshot!]!
+    @derivedFrom(field: "collection")
 }
 
 ###############################################
-####### ERC721 Smart Contract Timeseries ######
+####### ERC721 Collection Timeseries ######
 ###############################################
 
-type ContractDailySnapshot @entity {
-  " { Smart Contract Address }-{ # of days since Unix epoch time } "
+type CollectionDailySnapshot @entity {
+  " { collection address }-{ # of days since Unix epoch time } "
   id: ID!
 
-  " Smart contract this snapshot is associated with "
-  contract: Contract!
+  " Collection this snapshot is associated with "
+  collection: Collection!
 
-  " Total number of unique tokens in the smart contract for the specific day"
+  " Total number of unique tokens in the collection for the specific day "
   tokenCount: BigInt!
 
-  " Total number of unique token owners in the smart contract for the specific day"
+  " Total number of unique token owners in the collection for the specific day "
   ownerCount: BigInt!
+
+  " Total number of transfers in a day "
+  dailyTransferCount: Int!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -89,11 +95,11 @@ type ContractDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-##################################
-##### Event-Level Data #####
-##################################
+###############################
+##### Transfer Event Data #####
+###############################
 
-type TransferEvent @entity {
+type Transfer @entity {
   " { Contract ID }-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -103,8 +109,8 @@ type TransferEvent @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
-  " The ERC721 smart contract this event belongs to "
-  contract: Contract!
+  " The ERC721 Collection this event belongs to "
+  collection: Collection!
 
   " Nonce of the transaction that emitted this event "
   nonce: Int!
@@ -141,10 +147,10 @@ type Account @entity {
   tokens: [Token!]! @derivedFrom(field: "owner")
 
   " Token transfers to this account "
-  transferTo: [TransferEvent!]! @derivedFrom(field: "to")
+  transferTo: [Transfer!]! @derivedFrom(field: "to")
 
   " Token transfers from this account "
-  transferFrom: [TransferEvent!]! @derivedFrom(field: "from")
+  transferFrom: [Transfer!]! @derivedFrom(field: "from")
 
   " Token balances that this account holds "
   balances: [AccountBalance!]! @derivedFrom(field: "account")
@@ -155,16 +161,16 @@ type Account @entity {
 }
 
 type AccountBalance @entity {
-  " { Address Of the Account }-{ Address of the Contract }"
+  " { Address Of the Account }-{ Address of the Collection }"
   id: ID!
 
   " Account address "
   account: Account!
 
-  " Contract address "
-  contract: Contract!
+  " Collection address "
+  collection: Collection!
 
-  " Current token amount for the smart contract "
+  " Current token amount for the collection "
   tokenCount: BigInt!
 
   " Block number in which the balance was last modified "
@@ -179,16 +185,16 @@ type AccountBalance @entity {
 ###############################
 
 type AccountBalanceDailySnapshot @entity {
-  " { Address Of the Account }-{ Address of the Contract }-{ # of hours since Unix epoch time } "
+  " { Address Of the Account }-{ Address of the Contract }-{ # of days since Unix epoch time } "
   id: ID!
 
   " Account address "
   account: Account!
 
-  " Contract address "
-  contract: Contract!
+  " Collection address "
+  collection: Collection!
 
-  " Current token amount for the smart contract "
+  " Current token amount for the collection "
   tokenCount: BigInt!
 
   " Block number in which the balance was last modified "
@@ -196,4 +202,13 @@ type AccountBalanceDailySnapshot @entity {
 
   " Timestamp in which the balance was last modified "
   timestamp: BigInt!
+}
+
+#####################################
+####### Non ERC721 Collections ######
+#####################################
+
+type NonERC721Collection @entity {
+  " Non ERC721 Smart contract address "
+  id: ID!
 }
