@@ -288,36 +288,42 @@
           "template": "dforce.template.yaml",
           "messari": "messari/dforce-arbitrum",
           "tnkrxyz": "tnkrxyz/dforce-arbitrum",
+          "dmelotik": "dmelotik/dforce-arbitrum",
           "deploy-on-merge": true
         },
         "avalanche": {
           "template": "dforce.template.yaml",
           "messari": "messari/dforce-avalanche",
           "tnkrxyz": "tnkrxyz/dforce-avalanche",
+          "dmelotik": "dmelotik/dforce-avalanche",
           "deploy-on-merge": true
         },
         "bsc": {
           "template": "dforce.template.yaml",
           "messari": "messari/dforce-bsc",
           "tnkrxyz": "tnkrxyz/dforce-bsc",
+          "dmelotik": "dmelotik/dforce-bsc",
           "deploy-on-merge": true
         },
         "ethereum": {
           "template": "dforce.template.yaml",
           "messari": "messari/dforce-ethereum",
           "tnkrxyz": "tnkrxyz/dforce",
+          "dmelotik": "dmelotik/dforce-ethereum",
           "deploy-on-merge": true
         },
         "optimism": {
           "template": "dforce.template.yaml",
           "messari": "messari/dforce-optimism",
           "tnkrxyz": "tnkrxyz/dforce-optimism",
+          "dmelotik": "dmelotik/dforce-optimism",
           "deploy-on-merge": true
         },
         "polygon": {
           "template": "dforce.template.yaml",
           "messari": "messari/dforce-polygon",
           "tnkrxyz": "tnkrxyz/dforce-polygon",
+          "dmelotik": "dmelotik/dforce-polygon",
           "deploy-on-merge": true
         }
       },
