@@ -39,6 +39,7 @@ import {
   RewardTokenType,
   BIGDECIMAL_ZERO,
   exponentToBigDecimal,
+  SECONDS_PER_DAY,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -524,7 +525,7 @@ function getRewardTokenEmission(
   }
   let rewardAmountPerSecond = rewardSpeedsResult.value;
   let rewardAmount = rewardAmountPerSecond.times(
-    BigInt.fromI32(SECONDS_PER_YEAR)
+    BigInt.fromI32(SECONDS_PER_DAY)
   );
   let rewardUSD = rewardAmount
     .toBigDecimal()
