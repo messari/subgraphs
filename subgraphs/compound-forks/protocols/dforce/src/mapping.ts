@@ -77,7 +77,9 @@ import {
   RedeemPaused,
   BorrowPaused,
   TransferPaused,
-  Comptroller, MarketEntered, MarketExited
+  Comptroller,
+  MarketEntered,
+  MarketExited,
 } from "../../../generated/Comptroller/Comptroller";
 import {
   Mint,
