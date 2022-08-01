@@ -1,4 +1,4 @@
-# Subgraph Schema: Lending Protocol (Extended)
+# Subgraph Schema: Lending Protocol
 # Version: 2.0.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
@@ -943,7 +943,7 @@ type Position @entity {
   " Side of the position (either lender or borrower) "
   side: PositionSide!
 
-  " Whether this position is being used as a collateral (only applies to LENDER positions) "
+  " Whether this position has been enabled as a collateral (only applies to LENDER positions). For protocols (e.g. MakerDAO) that doesn't require enabling explicitly, this will always be true. "
   isCollateral: Boolean
 
   " Token balance in this position, in native amounts "
@@ -979,7 +979,7 @@ type Position @entity {
   " Liquidation event related to this position (if exists) "
   liquidations: [Liquidate!]! @derivedFrom(field: "position")
 
-  " Snapshots for open positions "
+  " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
 
@@ -993,7 +993,7 @@ type PositionSnapshot @entity {
   " { Position ID }-{ Transaction hash }-{ Log index } "
   id: ID!
 
-" Transaction hash of the transaction that triggered this snapshot "
+  " Position daily snapshots for open positions "
   hash: String!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
@@ -1276,6 +1276,7 @@ type _DforceMarketStatus @entity {
   " Is transfer paused for the market "
   transferPaused: Boolean!
 }
+
 type _PositionCounter @entity {
   " { Account address }-{ Market address }-{ Position Side } "
   id: ID!

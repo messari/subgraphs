@@ -31,6 +31,7 @@ import {
   setBorrowInterestRate,
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
+  _handleMarketEntered,
 } from "../../../src/mapping";
 import { PoolRegistered } from "../../../generated/FusePoolDirectory/FusePoolDirectory";
 import {
@@ -51,6 +52,8 @@ import {
 import {
   ActionPaused1,
   Comptroller,
+  MarketEntered,
+  MarketExited,
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
@@ -189,6 +192,22 @@ export function handlePoolRegistered(event: PoolRegistered): void {
 
 // Note: these are pool level functions in fuse, but each pool is a Comptroller impl
 // Source: https://docs.rari.capital/fuse
+
+export function handleMarketEntered(event: MarketEntered): void {
+  _handleMarketEntered(
+    event.params.cToken.toHexString(),
+    event.params.account.toHexString(),
+    true
+  );
+}
+
+export function handleMarketExited(event: MarketExited): void {
+  _handleMarketEntered(
+    event.params.cToken.toHexString(),
+    event.params.account.toHexString(),
+    false
+  );
+}
 
 // add a new market
 export function handleMarketListed(event: MarketListed): void {
@@ -352,28 +371,70 @@ export function handleMint(event: Mint): void {
   let minter = event.params.minter;
   let mintAmount = event.params.mintAmount;
   let factoryContract = Address.fromString(FACTORY_CONTRACT);
-  _handleMint(factoryContract, minter, mintAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.minter
+  );
+  _handleMint(
+    factoryContract,
+    minter,
+    mintAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleRedeem(event: Redeem): void {
   let redeemer = event.params.redeemer;
   let redeemAmount = event.params.redeemAmount;
   let factoryContract = Address.fromString(FACTORY_CONTRACT);
-  _handleRedeem(factoryContract, redeemer, redeemAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.redeemer
+  );
+  _handleRedeem(
+    factoryContract,
+    redeemer,
+    redeemAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleBorrow(event: Borrow): void {
   let borrower = event.params.borrower;
   let borrowAmount = event.params.borrowAmount;
   let factoryContract = Address.fromString(FACTORY_CONTRACT);
-  _handleBorrow(factoryContract, borrower, borrowAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleBorrow(
+    factoryContract,
+    borrower,
+    borrowAmount,
+    borrowBalanceStoredResult,
+    event
+  );
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
+  let borrower = event.params.borrower;
   let payer = event.params.payer;
   let repayAmount = event.params.repayAmount;
   let factoryContract = Address.fromString(FACTORY_CONTRACT);
-  _handleRepayBorrow(factoryContract, payer, repayAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleRepayBorrow(
+    factoryContract,
+    borrower,
+    payer,
+    repayAmount,
+    borrowBalanceStoredResult,
+    event
+  );
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
