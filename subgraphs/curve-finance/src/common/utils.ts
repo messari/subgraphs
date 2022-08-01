@@ -10,6 +10,7 @@ import {
   getOrCreateDexAmmProtocol,
   getOrCreateLiquidityPoolFee,
 } from "./initializers";
+import { PoolFeesType } from "./types";
 import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { Token, LiquidityPool } from "../../generated/schema";
@@ -202,7 +203,7 @@ export function getPoolBalances(poolAddress: Address): BigInt[] {
   return inputTokenBalances;
 }
 
-export function getPoolFees(poolAddress: Address): string[] {
+export function getPoolFees(poolAddress: Address): PoolFeesType {
   const curvePool = PoolContract.bind(poolAddress);
 
   let totalFees = readValue<BigInt>(
@@ -222,7 +223,7 @@ export function getPoolFees(poolAddress: Address): string[] {
     constants.LiquidityPoolFeeType.FIXED_TRADING_FEE,
     totalFees
       .divDecimal(constants.FEE_DENOMINATOR)
-      .times(constants.BIGDECIMAL_ZERO)
+      .times(constants.BIGDECIMAL_HUNDRED)
   );
 
   const protocolFeeId =
@@ -234,7 +235,7 @@ export function getPoolFees(poolAddress: Address): string[] {
     totalFees
       .times(adminFees)
       .divDecimal(constants.FEE_DENOMINATOR)
-      .times(constants.BIGDECIMAL_ZERO)
+      .times(constants.BIGDECIMAL_HUNDRED)
   );
 
   const lpFeeId =
@@ -246,10 +247,10 @@ export function getPoolFees(poolAddress: Address): string[] {
     totalFees
       .minus(adminFees.times(totalFees))
       .divDecimal(constants.FEE_DENOMINATOR)
-      .times(constants.BIGDECIMAL_ZERO)
+      .times(constants.BIGDECIMAL_HUNDRED)
   );
 
-  return [tradingFee.id, protocolFee.id, lpFee.id];
+  return new PoolFeesType(tradingFee, protocolFee, lpFee);
 }
 
 export function getPoolFromLpToken(lpTokenAddress: Address): Address {
