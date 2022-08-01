@@ -907,6 +907,7 @@
         "ethereum": {
           "template": "aave-governance.template.yaml",
           "danielkhoo": "danielkhoo/aave-governance",
+          "messari": "messari/aave-governance",
           "deploy-on-merge": false
         }
       },
@@ -914,6 +915,7 @@
         "ethereum": {
           "template": "dydx-governance.template.yaml",
           "danielkhoo": "danielkhoo/dydx-governance",
+          "messari": "messari/dydx-governance",
           "deploy-on-merge": false
         }
       }
