@@ -1476,6 +1476,7 @@ export function updateMarket(
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
 
+  // TODO: remove this line before review
   if (market.id == "0xe5308dc623101508952948b141fd9eabd3337d99") {
     log.error(
       "block: {}, totalSupply: {}, cumulativeDeposits: ${}, exchangeRate: {}, inputTokenBalance: {}, tvl: ${}, inputTokenPrice: ${}",
