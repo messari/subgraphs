@@ -1,0 +1,545 @@
+[
+  {
+    "inputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "rewardType",
+        "type": "uint8"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract CToken",
+        "name": "cToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardDelta",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardBorrowIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "DistributedBorrowerReward",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "rewardType",
+        "type": "uint8"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract CToken",
+        "name": "cToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "supplier",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardDelta",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardSupplyIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "DistributedSupplierReward",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "rewardType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newRewardAddress",
+        "type": "address"
+      }
+    ],
+    "name": "RewardAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "rewardType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "oldRewardAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newRewardAddress",
+        "type": "address"
+      }
+    ],
+    "name": "RewardAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "rewardType",
+        "type": "uint8"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract CToken",
+        "name": "cToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newSpeed",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardBorrowSpeedUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "rewardType",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardGranted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "rewardType",
+        "type": "uint8"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract CToken",
+        "name": "cToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newSpeed",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardSupplySpeedUpdated",
+    "type": "event"
+  },
+  { "payable": true, "stateMutability": "payable", "type": "fallback" },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "uint8", "name": "rewardType", "type": "uint8" },
+      {
+        "internalType": "address payable",
+        "name": "recipient",
+        "type": "address"
+      },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "_grantReward",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "uint8", "name": "rewardType", "type": "uint8" },
+      {
+        "internalType": "contract CToken",
+        "name": "cToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rewardSupplySpeed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rewardBorrowSpeed",
+        "type": "uint256"
+      }
+    ],
+    "name": "_setRewardSpeed",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newRewardAddress",
+        "type": "address"
+      }
+    ],
+    "name": "addRewardAddress",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "admin",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "uint8", "name": "rewardType", "type": "uint8" },
+      { "internalType": "address payable", "name": "holder", "type": "address" }
+    ],
+    "name": "claimReward",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "uint8", "name": "rewardType", "type": "uint8" },
+      {
+        "internalType": "address payable",
+        "name": "holder",
+        "type": "address"
+      },
+      {
+        "internalType": "contract CToken[]",
+        "name": "cTokens",
+        "type": "address[]"
+      }
+    ],
+    "name": "claimReward",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "uint8", "name": "rewardType", "type": "uint8" },
+      {
+        "internalType": "address payable[]",
+        "name": "holders",
+        "type": "address[]"
+      },
+      {
+        "internalType": "contract CToken[]",
+        "name": "cTokens",
+        "type": "address[]"
+      },
+      { "internalType": "bool", "name": "borrowers", "type": "bool" },
+      { "internalType": "bool", "name": "suppliers", "type": "bool" }
+    ],
+    "name": "claimReward",
+    "outputs": [],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "comptroller",
+    "outputs": [
+      { "internalType": "contract Comptroller", "name": "", "type": "address" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getBlockTimestamp",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "uint256", "name": "rewardType", "type": "uint256" }
+    ],
+    "name": "getRewardAddress",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "initialize",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "uint8", "name": "", "type": "uint8" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "rewardAccrued",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "rewardAddresses",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "uint8", "name": "", "type": "uint8" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "rewardBorrowSpeeds",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "uint8", "name": "", "type": "uint8" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "rewardBorrowState",
+    "outputs": [
+      { "internalType": "uint224", "name": "index", "type": "uint224" },
+      { "internalType": "uint32", "name": "timestamp", "type": "uint32" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "uint8", "name": "", "type": "uint8" },
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "rewardBorrowerIndex",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "rewardInitialIndex",
+    "outputs": [{ "internalType": "uint224", "name": "", "type": "uint224" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "uint8", "name": "", "type": "uint8" },
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "rewardSupplierIndex",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "uint8", "name": "", "type": "uint8" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "rewardSupplySpeeds",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "uint8", "name": "", "type": "uint8" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "rewardSupplyState",
+    "outputs": [
+      { "internalType": "uint224", "name": "index", "type": "uint224" },
+      { "internalType": "uint32", "name": "timestamp", "type": "uint32" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address", "name": "_newAdmin", "type": "address" }
+    ],
+    "name": "setAdmin",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address", "name": "_comptroller", "type": "address" }
+    ],
+    "name": "setComptroller",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "uint8", "name": "rewardType", "type": "uint8" },
+      {
+        "internalType": "address",
+        "name": "newRewardAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setRewardAddress",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address", "name": "cToken", "type": "address" },
+      { "internalType": "address", "name": "borrower", "type": "address" },
+      {
+        "components": [
+          { "internalType": "uint256", "name": "mantissa", "type": "uint256" }
+        ],
+        "internalType": "struct ExponentialNoError.Exp",
+        "name": "marketBorrowIndex",
+        "type": "tuple"
+      }
+    ],
+    "name": "updateAndDistributeBorrowerRewardsForToken",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address", "name": "cToken", "type": "address" },
+      { "internalType": "address", "name": "supplier", "type": "address" }
+    ],
+    "name": "updateAndDistributeSupplierRewardsForToken",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

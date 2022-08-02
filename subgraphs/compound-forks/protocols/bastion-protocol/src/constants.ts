@@ -23,3 +23,9 @@ export const nativeCToken = new TokenData(
   "cETH",
   cTokenDecimals
 );
+
+// reward token mappings
+export const REWARD_TOKENS = [
+  Address.fromString("0x9f1F933C660a1DC856F0E0Fe058435879c5CCEf0"), // BSTN (index 0)
+  Address.fromString("0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"), // wNEAR (index 1)
+];

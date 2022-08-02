@@ -18,12 +18,20 @@ import {
   AccrueInterest,
   NewReserveFactor,
 } from "../../../generated/templates/CToken/CToken";
-import { LendingProtocol, Token } from "../../../generated/schema";
+import {
+  LendingProtocol,
+  Market,
+  RewardToken,
+  Token,
+} from "../../../generated/schema";
 import {
   cTokenDecimals,
   Network,
   BIGINT_ZERO,
   SECONDS_PER_YEAR,
+  SECONDS_PER_DAY,
+  RewardTokenType,
+  exponentToBigDecimal,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -51,8 +59,17 @@ import { CToken } from "../../../generated/Comptroller/CToken";
 import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
-import { comptrollerAddr, nativeCToken, nativeToken } from "./constants";
+import {
+  comptrollerAddr,
+  nativeCToken,
+  nativeToken,
+  REWARD_TOKENS,
+} from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
+import {
+  RewardSupplySpeedUpdated,
+  RewardBorrowSpeedUpdated,
+} from "../../../generated/RewardDistributor/RewardDistributor";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
@@ -246,6 +263,9 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
 export function handleAccrueInterest(event: AccrueInterest): void {
   let marketAddress = event.address;
+  // update rewards for market
+  updateRewardsPrices(marketAddress);
+
   let cTokenContract = CToken.bind(marketAddress);
   let protocol = getOrCreateProtocol();
   let oracleContract = PriceOracle.bind(
@@ -270,6 +290,60 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
 }
 
+export function handleRewardSupplySpeedUpdated(
+  event: RewardSupplySpeedUpdated
+): void {
+  let market = Market.load(event.params.cToken.toHexString());
+  if (!market) {
+    log.warning("[handleRewardSupplySpeedUpdate] Market not found", [
+      event.params.cToken.toHexString(),
+    ]);
+    return;
+  }
+
+  let rewardTokenAddress = REWARD_TOKENS[event.params.rewardType];
+  let token = Token.load(rewardTokenAddress.toHexString());
+  if (!token) {
+    log.warning("[handleSupplySpeedUpdate] Token not found", [
+      rewardTokenAddress.toHexString(),
+    ]);
+    return;
+  }
+  let rewardSpeed = event.params.newSpeed.times(
+    BigInt.fromI32(SECONDS_PER_DAY)
+  );
+  let rewardToken = getOrCreateRewardToken(token, RewardTokenType.DEPOSIT);
+
+  updateRewards(market, rewardToken, rewardSpeed);
+}
+
+export function handleRewardBorrowSpeedUpdated(
+  event: RewardBorrowSpeedUpdated
+): void {
+  let market = Market.load(event.params.cToken.toHexString());
+  if (!market) {
+    log.warning("[handleRewardBorrowSpeedUpdate] Market not found", [
+      event.params.cToken.toHexString(),
+    ]);
+    return;
+  }
+
+  let rewardTokenAddress = REWARD_TOKENS[event.params.rewardType];
+  let token = Token.load(rewardTokenAddress.toHexString());
+  if (!token) {
+    log.warning("[handleBorrowSpeedUpdate] Token not found", [
+      rewardTokenAddress.toHexString(),
+    ]);
+    return;
+  }
+  let rewardSpeed = event.params.newSpeed.times(
+    BigInt.fromI32(SECONDS_PER_DAY)
+  );
+  let rewardToken = getOrCreateRewardToken(token, RewardTokenType.BORROW);
+
+  updateRewards(market, rewardToken, rewardSpeed);
+}
+
 function getOrCreateProtocol(): LendingProtocol {
   let comptroller = Comptroller.bind(comptrollerAddr);
   let protocolData = new ProtocolData(
@@ -284,4 +358,109 @@ function getOrCreateProtocol(): LendingProtocol {
     comptroller.try_oracle()
   );
   return _getOrCreateProtocol(protocolData);
+}
+
+//
+//
+// Update the rewards arrays in a given market
+// can be done for supply / borrow side triggered by Supply/BorrowSpeedUpdate events
+function updateRewards(
+  market: Market,
+  rewardToken: RewardToken,
+  rewardsPerDay: BigInt
+): void {
+  let token = Token.load(rewardToken.token);
+  if (!token) {
+    log.warning("[updateRewards] Token not found", [rewardToken.id]);
+    return;
+  }
+  let rewardTokenPrice = token.lastPriceUSD!;
+
+  let rewardTokens = market.rewardTokens;
+  let rewardEmissions = market.rewardTokenEmissionsAmount;
+  let rewardEmissionsUSD = market.rewardTokenEmissionsUSD;
+  let isAdded = false; // tracks if reward token is added yet
+  if (rewardTokens) {
+    // try to find index of rewards
+    for (let i = 0; i < rewardTokens.length; i++) {
+      if (rewardTokens[i] === rewardToken.id) {
+        rewardEmissions![i] = rewardsPerDay;
+        rewardEmissionsUSD![i] = rewardsPerDay
+          .toBigDecimal()
+          .div(exponentToBigDecimal(token.decimals))
+          .times(rewardTokenPrice);
+        isAdded = true;
+        break;
+      }
+    }
+  } else {
+    // if no rewards yet, create new array
+    rewardTokens = [rewardToken.id];
+    rewardEmissions = [rewardsPerDay];
+    rewardEmissionsUSD = [
+      rewardsPerDay
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals))
+        .times(rewardTokenPrice),
+    ];
+    isAdded = true;
+  }
+
+  // add token to the end of the existing array
+  if (!isAdded) {
+    rewardTokens.push(rewardToken.id);
+    rewardEmissions!.push(rewardsPerDay);
+    rewardEmissionsUSD!.push(
+      rewardsPerDay
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals))
+        .times(rewardTokenPrice)
+    );
+  }
+
+  market.rewardTokens = rewardTokens;
+  market.rewardTokenEmissionsAmount = rewardEmissions;
+  market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+  market.save();
+}
+
+//
+//
+// market.rewardTokenEmissionsUSD
+// both wNEAR and BSTN prices can be updated from cTokens
+function updateRewardsPrices(marketAddress: Address): void {
+  let market = Market.load(marketAddress.toHexString());
+  if (!market) {
+    log.warning("[updateRewardsPrices] Market not found", [
+      marketAddress.toHexString(),
+    ]);
+    return;
+  }
+
+  if (market.rewardTokens) {
+    for (let i = 0; i < market.rewardTokens!.length; i++) {
+      let rewardToken = RewardToken.load(market.rewardTokens![i]);
+      let token = Token.load(rewardToken!.token);
+
+      market.rewardTokenEmissionsUSD![i] = market
+        .rewardTokenEmissionsAmount![i].toBigDecimal()
+        .div(exponentToBigDecimal(token!.decimals))
+        .times(token!.lastPriceUSD!);
+    }
+    market.save();
+  }
+}
+
+function getOrCreateRewardToken(token: Token, type: string): RewardToken {
+  let rewardTokenId = type + "-" + token.id;
+  let rewardToken = RewardToken.load(rewardTokenId);
+
+  if (!rewardToken) {
+    rewardToken = new RewardToken(rewardTokenId);
+    rewardToken.token = token.id;
+    rewardToken.type = type;
+    rewardToken.save();
+  }
+
+  return rewardToken;
 }

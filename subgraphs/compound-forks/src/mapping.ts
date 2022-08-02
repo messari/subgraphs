@@ -1486,7 +1486,7 @@ export function updateMarket(
         market.exchangeRate!.toString(),
         market.inputTokenBalance.toString(),
         market.totalValueLockedUSD.toString(),
-        market.inputTokenPriceUSD.toString()
+        market.inputTokenPriceUSD.toString(),
       ]
     );
   }
