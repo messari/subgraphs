@@ -196,9 +196,9 @@ export function findUSDPricePerToken(
 
 export function getTrackedVolumeUSD(
   pool: _LiquidityPoolAmount,
-  tokenAmount0: BigDecimal,
+  tokenUSD0: BigDecimal,
   token0: Token,
-  tokenAmount1: BigDecimal,
+  tokenUSD1: BigDecimal,
   token1: Token
 ): BigDecimal[] {
   let price0USD = token0.lastPriceUSD!;
@@ -261,13 +261,10 @@ export function getTrackedVolumeUSD(
     NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
     NetworkConfigs.getWhitelistTokens().includes(token1.id)
   ) {
-    let token0ValueUSD = tokenAmount0.times(price0USD);
-    let token1ValueUSD = tokenAmount1.times(price1USD);
-
     return [
-      token0ValueUSD,
-      token1ValueUSD,
-      token0ValueUSD.plus(token1ValueUSD).div(BIGDECIMAL_TWO),
+      tokenUSD0,
+      tokenUSD1,
+      tokenUSD0.plus(tokenUSD1).div(BIGDECIMAL_TWO),
     ];
   }
 
@@ -276,11 +273,7 @@ export function getTrackedVolumeUSD(
     NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
     !NetworkConfigs.getWhitelistTokens().includes(token1.id)
   ) {
-    return [
-      tokenAmount0.times(price0USD),
-      BIGDECIMAL_ZERO,
-      tokenAmount0.times(price0USD),
-    ];
+    return [tokenUSD0, BIGDECIMAL_ZERO, tokenUSD0];
   }
 
   // take double value of the whitelisted token amount
@@ -288,11 +281,7 @@ export function getTrackedVolumeUSD(
     !NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
     NetworkConfigs.getWhitelistTokens().includes(token1.id)
   ) {
-    return [
-      BIGDECIMAL_ZERO,
-      tokenAmount1.times(price1USD),
-      tokenAmount1.times(price1USD),
-    ];
+    return [BIGDECIMAL_ZERO, tokenUSD1, tokenUSD1];
   }
 
   // neither token is on white list, tracked amount is 0

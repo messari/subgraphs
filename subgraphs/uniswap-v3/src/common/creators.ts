@@ -1,11 +1,4 @@
-// import { log } from '@graphprotocol/graph-ts'
-import {
-  BigInt,
-  Address,
-  ethereum,
-  log,
-  dataSource,
-} from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   LiquidityPool,
   Token,
@@ -441,10 +434,10 @@ export function createSwapHandleVolumeAndFees(
   // get amount that should be tracked only - div 2 because cant count both input and output as volume
   let trackedAmountUSD = getTrackedVolumeUSD(
     poolAmounts,
-    amount0Abs,
-    token0 as Token,
-    amount1Abs,
-    token1 as Token
+    amount0USD,
+    token0,
+    amount1USD,
+    token1
   );
   updateVolumeAndFees(
     event,
