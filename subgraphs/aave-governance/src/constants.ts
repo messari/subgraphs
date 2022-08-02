@@ -6,7 +6,7 @@ export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_FIVE = BigInt.fromI32(5);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 
-export const GOVERNANCE_NAME = "AaveGovernanceV2";
+export const GOVERNANCE_TYPE = "AaveGovernanceV2";
 
 export namespace DelegationType {
   export const VOTING_POWER = 0;
@@ -16,7 +16,7 @@ export namespace DelegationType {
 export const YES_WINS = "Yes";
 export const NO_WINS = "No";
 export const ABSTAIN_WINS = "Abstain";
-export const NA = "Na";
+export const NA = "N/A";
 
 export const VOTING_CONSTANT = "Voting";
 export const PROPOSITION_CONSTANT = "Proposition";

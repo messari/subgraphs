@@ -2,7 +2,8 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   BIGINT_ONE,
   BIGINT_ZERO,
-  GOVERNANCE_NAME,
+  GOVERNANCE_TYPE,
+  NA,
   ProposalState,
 } from "../../../src/constants";
 import {
@@ -105,8 +106,8 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework = new GovernanceFramework(contractAddress);
     let contract = DydxGovernor.bind(Address.fromString(contractAddress));
     governanceFramework.name = contract.EIP712_DOMAIN_NAME();
-    governanceFramework.type = GOVERNANCE_NAME;
-    governanceFramework.version = "1";
+    governanceFramework.type = GOVERNANCE_TYPE;
+    governanceFramework.version = NA;
 
     governanceFramework.contractAddress = contractAddress;
     governanceFramework.tokenAddress =

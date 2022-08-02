@@ -14,7 +14,7 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ONE,
   BIGINT_ZERO,
-  GOVERNANCE_NAME,
+  GOVERNANCE_TYPE,
   ProposalState,
   VoteChoice,
   ZERO_ADDRESS,
@@ -51,10 +51,10 @@ export function getVoteChoiceByValue(choiceValue: boolean): string {
 }
 
 export function getGovernance(): Governance {
-  let governance = Governance.load(GOVERNANCE_NAME);
+  let governance = Governance.load(GOVERNANCE_TYPE);
 
   if (!governance) {
-    governance = new Governance(GOVERNANCE_NAME);
+    governance = new Governance(GOVERNANCE_TYPE);
     governance.proposals = BIGINT_ZERO;
     governance.currentTokenHolders = BIGINT_ZERO;
     governance.totalTokenHolders = BIGINT_ZERO;
@@ -264,16 +264,6 @@ export function _handleProposalExecuted(
   governance.proposalsQueued = governance.proposalsQueued.minus(BIGINT_ONE);
   governance.proposalsExecuted = governance.proposalsExecuted.plus(BIGINT_ONE);
   governance.save();
-}
-
-export function _handleProposalExtended(
-  proposalId: string,
-  extendedDeadline: BigInt
-): void {
-  // Update proposal endBlock
-  let proposal = getOrCreateProposal(proposalId);
-  proposal.endBlock = extendedDeadline;
-  proposal.save();
 }
 
 export function _handleProposalQueued(proposalId: string, eta: BigInt): void {
