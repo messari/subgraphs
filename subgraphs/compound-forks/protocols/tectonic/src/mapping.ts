@@ -18,8 +18,23 @@ import {
   AccrueInterest,
   NewReserveFactor,
 } from "../../../generated/templates/CToken/CToken";
-import { LendingProtocol, Token } from "../../../generated/schema";
-import { cTokenDecimals, BIGINT_ZERO } from "../../../src/constants";
+
+import {
+  LendingProtocol,
+  Token,
+  Market,
+  RewardToken,
+} from "../../../generated/schema";
+import {
+  cTokenDecimals,
+  Network,
+  BIGINT_ZERO,
+  BIGDECIMAL_ZERO,
+  SECONDS_PER_YEAR,
+  RewardTokenType,
+  exponentToBigDecimal,
+} from "../../../src/constants";
+
 import {
   ProtocolData,
   _getOrCreateProtocol,
@@ -43,19 +58,19 @@ import {
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
+import { Core } from "../../../generated/Comptroller/Core";
 import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
-import { getNetworkSpecificConstant } from "./constants";
+import {
+  comptrollerAddr,
+  nativeCToken,
+  nativeToken,
+  TONICAddress,
+  tTONICAddress,
+  CRONOS_BLOCKSPERDAY,
+} from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
-
-// Constant values
-let constant = getNetworkSpecificConstant();
-let comptrollerAddr = constant.comptrollerAddr;
-let network = constant.network;
-let unitPerYear = constant.unitPerYear;
-let nativeToken = constant.nativeToken;
-let nativeCToken = constant.nativeCToken;
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
@@ -91,16 +106,16 @@ export function handleMarketListed(event: MarketListed): void {
 
   let protocol = getOrCreateProtocol();
   let cTokenContract = CToken.bind(event.params.cToken);
+
   let cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
-  if (nativeToken && nativeCToken && cTokenAddr == nativeCToken!.address) {
-    // compilor is too silly to figure out this is not-null, hence the !
+  if (cTokenAddr == nativeCToken.address) {
     let marketListedData = new MarketListedData(
       protocol,
-      nativeToken!,
-      nativeCToken!,
+      nativeToken,
+      nativeCToken,
       cTokenReserveFactorMantissa
     );
     _handleMarketListed(marketListedData, event);
@@ -132,7 +147,6 @@ export function handleMarketListed(event: MarketListed): void {
         getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
         cTokenDecimals
       ),
-
       cTokenReserveFactorMantissa
     ),
     event
@@ -158,12 +172,6 @@ export function handleActionPaused(event: ActionPaused1): void {
   let action = event.params.action;
   let pauseState = event.params.pauseState;
   _handleActionPaused(marketID, action, pauseState);
-}
-
-export function handleNewReserveFactor(event: NewReserveFactor): void {
-  let marketID = event.address.toHexString();
-  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
-  _handleNewReserveFactor(marketID, newReserveFactorMantissa);
 }
 
 export function handleMint(event: Mint): void {
@@ -262,15 +270,25 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    unitPerYear
+    SECONDS_PER_YEAR
   );
   let interestAccumulated = event.params.interestAccumulated;
   let totalBorrows = event.params.totalBorrows;
+
+  let marketID = marketAddress.toHexString();
+  let market = Market.load(marketID);
+  if (!market) {
+    log.warning("[handleAccrueInterest] Market not found: {}", [marketID]);
+    return;
+  }
+  updateTONICRewards(event, market, protocol);
+
   _handleAccrueInterest(
     updateMarketData,
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
+    // true, TODO: a note that when updateAllMarketPrices() is turned on this should be set to true
     event
   );
 }
@@ -279,14 +297,105 @@ function getOrCreateProtocol(): LendingProtocol {
   let comptroller = Comptroller.bind(comptrollerAddr);
   let protocolData = new ProtocolData(
     comptrollerAddr,
-    "CREAM Finance",
-    "cream-finance",
+    "Tectonic",
+    "tectonic",
     "2.0.1",
     "1.1.0",
     "1.0.0",
-    network,
+    Network.CRONOS,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()
   );
+
   return _getOrCreateProtocol(protocolData);
+}
+
+function updateTONICRewards(
+  event: AccrueInterest,
+  market: Market,
+  protocol: LendingProtocol
+): void {
+  let rewardTokenBorrow: RewardToken | null = null;
+  let rewardTokenDeposit: RewardToken | null = null;
+
+  // check if market has Tonic reward tokens
+  if (market.rewardTokens == null) {
+    // get or create Tonic token
+    let TonicToken = Token.load(TONICAddress);
+    if (!TonicToken) {
+      let tokenContract = ERC20.bind(Address.fromString(TONICAddress));
+      TonicToken = new Token(TONICAddress);
+      TonicToken.name = getOrElse(tokenContract.try_name(), "unkown");
+      TonicToken.symbol = getOrElse(tokenContract.try_symbol(), "unkown");
+      TonicToken.decimals = getOrElse(tokenContract.try_decimals(), 0);
+      TonicToken.save();
+    }
+
+    let borrowID = RewardTokenType.BORROW.concat("-").concat(TONICAddress);
+    rewardTokenBorrow = RewardToken.load(borrowID);
+    if (!rewardTokenBorrow) {
+      rewardTokenBorrow = new RewardToken(borrowID);
+      rewardTokenBorrow.token = TonicToken.id; // Tonic already made from tTonic market
+      rewardTokenBorrow.type = RewardTokenType.BORROW;
+      rewardTokenBorrow.save();
+    }
+    let depositID = RewardTokenType.DEPOSIT.concat("-").concat(TONICAddress);
+    rewardTokenDeposit = RewardToken.load(depositID);
+    if (!rewardTokenDeposit) {
+      rewardTokenDeposit = new RewardToken(depositID);
+      rewardTokenDeposit.token = TonicToken.id; // Tonic already made from tTonic market
+      rewardTokenDeposit.type = RewardTokenType.DEPOSIT;
+      rewardTokenDeposit.save();
+    }
+
+    market.rewardTokens = [rewardTokenDeposit.id, rewardTokenBorrow.id];
+    market.save();
+  }
+
+  // get TONIC distribution/block
+  // let rewardDecimals = Token.load(TONICAddress)!.decimals;
+  let rewardDecimals = 18; // TONIC 18 decimals
+  let troller = Core.bind(comptrollerAddr);
+  let blocksPerDay = BigInt.fromString(
+    CRONOS_BLOCKSPERDAY.truncate(0).toString()
+  );
+
+  let TonicPriceUSD = BIGDECIMAL_ZERO;
+  let supplyTonicPerDay = BIGINT_ZERO;
+  let borrowTonicPerDay = BIGINT_ZERO;
+
+  // Tonic speeds are the same for supply/borrow side
+  let tryTonicSpeed = troller.try_tonicSpeeds(event.address);
+  supplyTonicPerDay = tryTonicSpeed.reverted
+    ? BIGINT_ZERO
+    : tryTonicSpeed.value.times(blocksPerDay);
+  borrowTonicPerDay = supplyTonicPerDay;
+
+  if (event.block.number.gt(BigInt.fromI32(1337194))) {
+    let oracleContract = PriceOracle.bind(
+      Address.fromString(protocol._priceOracle)
+    );
+    let price = oracleContract.try_getUnderlyingPrice(
+      Address.fromString(tTONICAddress)
+    );
+    if (price.reverted) {
+      log.warning("[updateTonicrewards] getUnderlyingPrice reverted", []);
+    } else {
+      TonicPriceUSD = price.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(rewardDecimals));
+    }
+  }
+
+  let borrowTonicPerDayUSD = borrowTonicPerDay
+    .toBigDecimal()
+    .div(exponentToBigDecimal(rewardDecimals))
+    .times(TonicPriceUSD);
+  let supplyTonicPerDayUSD = supplyTonicPerDay
+    .toBigDecimal()
+    .div(exponentToBigDecimal(rewardDecimals))
+    .times(TonicPriceUSD);
+  market.rewardTokenEmissionsAmount = [borrowTonicPerDay, supplyTonicPerDay]; // same order as market.rewardTokens
+  market.rewardTokenEmissionsUSD = [borrowTonicPerDayUSD, supplyTonicPerDayUSD];
+  market.save();
 }

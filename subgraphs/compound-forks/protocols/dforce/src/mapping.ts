@@ -20,6 +20,7 @@ import {
   getOrElse,
   _handleActionPaused,
   snapshotFinancials,
+  _handleMarketEntered,
 } from "../../../src/mapping";
 import {
   cTokenDecimals,
@@ -42,7 +43,6 @@ import { ERC20 } from "../../../generated/Comptroller/ERC20";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
 import { PriceOracle } from "../../../generated/Comptroller/PriceOracle";
-import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import {
   CToken as CTokenTemplate,
   Reward as RewardTemplate,
@@ -77,6 +77,9 @@ import {
   RedeemPaused,
   BorrowPaused,
   TransferPaused,
+  Comptroller,
+  MarketEntered,
+  MarketExited,
 } from "../../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -99,6 +102,22 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
   let newPriceOracle = event.params.newPriceOracle;
   _handleNewPriceOracle(protocol, newPriceOracle);
+}
+
+export function handleMarketEntered(event: MarketEntered): void {
+  _handleMarketEntered(
+    event.params.iToken.toHexString(),
+    event.params.account.toHexString(),
+    true
+  );
+}
+
+export function handleMarketExited(event: MarketExited): void {
+  _handleMarketEntered(
+    event.params.iToken.toHexString(),
+    event.params.account.toHexString(),
+    false
+  );
 }
 
 export function handleMarketAdded(event: MarketAdded): void {
@@ -290,25 +309,67 @@ export function handleNewReserveFactor(event: NewReserveRatio): void {
 export function handleMint(event: Mint): void {
   let minter = event.params.sender;
   let mintAmount = event.params.mintAmount;
-  _handleMint(comptrollerAddr, minter, mintAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.sender
+  );
+  _handleMint(
+    comptrollerAddr,
+    minter,
+    mintAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleRedeem(event: Redeem): void {
   let redeemer = event.params.recipient;
   let redeemAmount = event.params.redeemUnderlyingAmount;
-  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.recipient
+  );
+  _handleRedeem(
+    comptrollerAddr,
+    redeemer,
+    redeemAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleBorrow(event: BorrowEvent): void {
   let borrower = event.params.borrower;
   let borrowAmount = event.params.borrowAmount;
-  _handleBorrow(comptrollerAddr, borrower, borrowAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleBorrow(
+    comptrollerAddr,
+    borrower,
+    borrowAmount,
+    borrowBalanceStoredResult,
+    event
+  );
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
+  let borrower = event.params.borrower;
   let payer = event.params.payer;
   let repayAmount = event.params.repayAmount;
-  _handleRepayBorrow(comptrollerAddr, payer, repayAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleRepayBorrow(
+    comptrollerAddr,
+    borrower,
+    payer,
+    repayAmount,
+    borrowBalanceStoredResult,
+    event
+  );
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
@@ -577,8 +638,8 @@ function getOrCreateProtocol(): LendingProtocol {
     comptrollerAddr,
     "dForce v2",
     "dforce-v2",
-    "1.3.0",
-    "1.0.2",
+    "2.0.1",
+    "1.1.0",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),

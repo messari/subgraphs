@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
@@ -24,6 +24,8 @@ dataSources:
           file: ./abis/CToken.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: Core
+          file: ./abis/tectonic/Core.json
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
@@ -39,7 +41,7 @@ dataSources:
           handler: handleNewLiquidationIncentive
         - event: ActionPaused(address,string,bool)
           handler: handleActionPaused
-      file: ./protocols/scream/src/mapping.ts
+      file: ./protocols/tectonic/src/mapping.ts
 templates:
   - name: CToken
     kind: ethereum/contract
@@ -65,6 +67,8 @@ templates:
           file: ./abis/ERC20.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
+        - name: Core
+          file: ./abis/tectonic/Core.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -76,8 +80,8 @@ templates:
           handler: handleRepayBorrow
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
-        - event: AccrueInterest(uint256,uint256,uint256,uint256) # diff
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
           handler: handleAccrueInterest
         - event: NewReserveFactor(uint256,uint256)
           handler: handleNewReserveFactor
-      file: ./protocols/scream/src/mapping.ts
+      file: ./protocols/tectonic/src/mapping.ts

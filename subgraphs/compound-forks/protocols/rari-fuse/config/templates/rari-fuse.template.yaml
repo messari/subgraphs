@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 schema:
-  file: ./protocols/rari-fuse/schema.graphql
+  file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: FusePoolDirectory
@@ -51,6 +51,10 @@ templates:
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
+        - event: MarketEntered(address,address)
+          handler: handleMarketEntered
+        - event: MarketExited(address,address)
+          handler: handleMarketExited
         - event: NewCollateralFactor(address,uint256,uint256)
           handler: handleNewCollateralFactor
         - event: NewLiquidationIncentive(uint256,uint256)
