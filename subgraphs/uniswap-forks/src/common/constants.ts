@@ -117,6 +117,7 @@ export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_FIVE = BigInt.fromI32(5);
 export const RECENT_BLOCK_THRESHOLD = BigInt.fromI32(5);
 export const BIGINT_TEN = BigInt.fromI32(10);
+export const BIGINT_FIFTY = BigInt.fromI32(50);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_THREE_THOUSAND = BigInt.fromI32(25000);
@@ -139,6 +140,7 @@ export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
 export const BIGDECIMAL_TEN = new BigDecimal(BIGINT_TEN);
 export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 
+export const BIGDECIMAL_FIFTY_PERCENT = new BigDecimal(BIGINT_FIFTY);
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_DAY = 60 * 60 * 24;
