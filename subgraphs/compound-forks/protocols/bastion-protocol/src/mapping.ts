@@ -383,7 +383,7 @@ function updateRewards(
   if (rewardTokens) {
     // try to find index of rewards
     for (let i = 0; i < rewardTokens.length; i++) {
-      if (rewardTokens[i] === rewardToken.id) {
+      if (rewardTokens[i].toLowerCase() === rewardToken.id.toLowerCase()) {
         rewardEmissions![i] = rewardsPerDay;
         rewardEmissionsUSD![i] = rewardsPerDay
           .toBigDecimal()
