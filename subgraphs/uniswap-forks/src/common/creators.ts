@@ -19,8 +19,7 @@ import {
   BIGINT_ZERO,
   LiquidityPoolFeeType,
   FeeSwitch,
-  BIGDECIMAL_TWO,
-  BIGDECIMAL_ONE,
+  BIGDECIMAL_FIFTY_PERCENT,
 } from "./constants";
 import {
   getLiquidityPool,
@@ -96,10 +95,7 @@ export function createLiquidityPool(
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.inputTokenWeights = [
-    BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
-    BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
-  ];
+  pool.inputTokenWeights = [BIGDECIMAL_FIFTY_PERCENT, BIGDECIMAL_FIFTY_PERCENT];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.rewardTokens = [];
