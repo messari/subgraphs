@@ -96,7 +96,7 @@ type Collection @entity {
   " Contract address. "
   id: ID!
 
-  " Collectio name, mirrored from the smart contract. Leave null if not available. "
+  " Collection name, mirrored from the smart contract. Leave null if not available. "
   name: String
 
   " Collection symbol, mirrored from the smart contract. Leave null if not available. "
