@@ -56,7 +56,7 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ## Known Issues
 
-- Rari Vaults supports multiple input tokens, so to fit our schema we made a new pool for each input token to a pool.
+- Rari Vaults supports multiple input tokens, so to fit our schema we made a new pool for each input token to a pool. `totalPoolCount` is higher than the number of actual pools because of this.
 - Eth vault revenues are weird
 - Big spike in revenues around 10/21/2020 (may be okay since there is also a big spike in activity)
 - _Note_: `OutputTokenSupply/Price` should be the same for each vault with the same contract addresses (ie, USDC pool mStable and USDC)
