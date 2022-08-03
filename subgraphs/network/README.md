@@ -1,4 +1,4 @@
-# EVM L1 Subgraph
+# Network Subgraph
 
 This subgraph and schema will gather a standard set of L1 data metrics that matter.
 
@@ -10,7 +10,7 @@ Once everything is setup properly deploying is very easy.
 
 ```bash
 # This example will deploy all evm networks to the hosted service under "dmelotik" in deploymentConfigurations.json
-npm run deploy --SUBGRAPH=network --POTOCOL=evm --LOCATION=dmelotik
+npm run deploy --SUBGRAPH=network --PROTOCOL=evm --LOCATION=dmelotik
 
 # This will do the same, but only deploying the mainnet subgraph
 npm run deploy --SUBGRAPH=network --PROTOCOL=evm --NETWORK=ethereum --LOCATION=dmelotik
@@ -272,36 +272,6 @@ npm run deploy --SUBGRAPH=network --PROTOCOL=evm --NETWORK=juno --LOCATION=dmelo
 > Setting `deploy-on-merge` to `true` in [deploymentConfigurations.json](../../deployment/deploymentConfigurations.json) will run the above commands on subgraphs that have changed to messari's hosted service.
 
 ## Resources and Links
-
-<details>
-<summary>See hosted service testing endpoints</summary>
-<br>
-
-- Arbitrum One: https://thegraph.com/hosted-service/subgraph/dmelotik/network-arbitrum-one
-- Aurora: https://thegraph.com/hosted-service/subgraph/dmelotik/network-aurora
-- Avalanche: https://thegraph.com/hosted-service/subgraph/dmelotik/network-avalanche
-- Boba: https://thegraph.com/hosted-service/subgraph/dmelotik/network-boba
-- BSC: https://thegraph.com/hosted-service/subgraph/dmelotik/network-bsc
-- Celo: https://thegraph.com/hosted-service/subgraph/dmelotik/network-celo
-- Clover: https://thegraph.com/hosted-service/subgraph/dmelotik/network-clover
-- Cronos: https://graph.cronoslabs.com/subgraphs/name/network-cronos/first-subgraph/graphql
-- Fantom: https://thegraph.com/hosted-service/subgraph/dmelotik/network-fantom
-- Fuse: https://thegraph.com/hosted-service/subgraph/dmelotik/network-fuse
-- Harmony: https://thegraph.com/hosted-service/subgraph/dmelotik/network-harmony
-- Mainnet: https://thegraph.com/hosted-service/subgraph/dmelotik/network-mainnet
-- Matic: https://thegraph.com/hosted-service/subgraph/dmelotik/network-matic
-- Moonbeam: https://thegraph.com/hosted-service/subgraph/dmelotik/network-optimism
-- Moonriver: https://thegraph.com/hosted-service/subgraph/dmelotik/network-moonriver
-- Optimism: https://thegraph.com/hosted-service/subgraph/dmelotik/network-optimism
-- xDai: https://thegraph.com/hosted-service/subgraph/dmelotik/network-xdai
-- Arweave: https://thegraph.com/hosted-service/subgraph/dmelotik/network-arweave-mainnet
-- Cosmos: https://thegraph.com/hosted-service/subgraph/dmelotik/network-cosmoshub
-- Osmosis: https://thegraph.com/hosted-service/subgraph/dmelotik/network-osmosis
-- Juno: https://thegraph.com/hosted-service/subgraph/dmelotik/network-juno
-- Osmosis: https://thegraph.com/hosted-service/subgraph/dmelotik/network-osmosis
-- NEAR: https://thegraph.com/hosted-service/subgraph/dmelotik/network-near-mainnet
-
-</details>
 
 <details>
 <summary>Reference subgraphs</summary>

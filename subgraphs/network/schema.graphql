@@ -44,7 +44,7 @@ enum DataType {
 }
 
 # Stores statistical analytics for given metrics
-type STATS @entity {
+type Stats @entity {
   " { id of the snapshot this belongs to } - { DataType } "
   id: ID!
 
