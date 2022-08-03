@@ -102,6 +102,8 @@ dataSources:
       abis:
         - name: Pot
           file: ./abis/Pot.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
       eventHandlers:
@@ -169,6 +171,8 @@ dataSources:
       abis:
         - name: CatV1
           file: ./abis/CatV1.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
         - Token
@@ -198,6 +202,8 @@ dataSources:
       abis:
         - name: CatV2
           file: ./abis/CatV2.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
         - Token
@@ -226,6 +232,8 @@ dataSources:
       abis:
         - name: Dog
           file: ./abis/Dog.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
         - Token
@@ -298,6 +306,8 @@ templates:
       abis:
         - name: Flip
           file: ./abis/Flip.json
+        - name: DAI
+          file: ./abis/DAI.json
       eventHandlers:
         # collateral auction
         # Flip.tend(uint256,uint256,uint256)
@@ -333,6 +343,8 @@ templates:
       abis:
         - name: Clip
           file: ./abis/Clip.json
+        - name: DAI
+          file: ./abis/DAI.json
       eventHandlers:
         # collateral auction
         - event: Take(indexed uint256,uint256,uint256,uint256,uint256,uint256,indexed address)

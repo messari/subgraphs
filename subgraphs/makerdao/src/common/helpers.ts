@@ -119,22 +119,29 @@ export function updateMarket(
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
 ): void {
   let token = getOrCreateToken(market.inputToken);
-  market.inputTokenPriceUSD = token.lastPriceUSD!;
 
   if (deltaCollateral != BIGINT_ZERO) {
     market.inputTokenBalance = market.inputTokenBalance.plus(deltaCollateral);
-    // here we "mark-to-market" - re-price total collateral using last price
+  }
+
+  // here we "mark-to-market" - re-price total collateral using last price
+  if (token.lastPriceUSD) {
+    market.inputTokenPriceUSD = token.lastPriceUSD!;
     market.totalDepositBalanceUSD = bigIntToBDUseDecimals(market.inputTokenBalance, token.decimals).times(
       market.inputTokenPriceUSD,
     );
-    market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+  } else if (deltaCollateralUSD != BIGDECIMAL_ZERO) {
+    // add deltaCollateralUSD to market.totalDepositBalanceUSD
+    market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(deltaCollateralUSD);
+  }
 
-    if (deltaCollateral.gt(BIGINT_ZERO)) {
-      //let deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
-      market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(deltaCollateralUSD);
-    } else if (deltaCollateral.lt(BIGINT_ZERO)) {
-      // ignore as we don't care about cumulativeWithdraw in a market
-    }
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+
+  if (deltaCollateral.gt(BIGINT_ZERO)) {
+    //let deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
+    market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(deltaCollateralUSD);
+  } else if (deltaCollateral.lt(BIGINT_ZERO)) {
+    // ignore as we don't care about cumulativeWithdraw in a market
   }
 
   if (deltaDebtUSD != BIGDECIMAL_ZERO) {

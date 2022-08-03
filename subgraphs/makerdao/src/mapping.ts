@@ -173,9 +173,16 @@ export function handleVatSlip(event: VatNoteEvent): void {
   let token = getOrCreateToken(market.inputToken);
   let deltaCollateral = bigIntChangeDecimals(wad, WAD, token.decimals);
   let deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
+  log.info("[handleVatSlip]ilk/market: {}/{}, toke={}, deltaCollateral={}, deltaCollateralUSD={}", [
+    ilk.toString(),
+    market.id,
+    token.name,
+    deltaCollateral.toString(),
+    deltaCollateralUSD.toString(),
+  ]);
 
   handleTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
-  updateMarket(event, market, deltaCollateral);
+  updateMarket(event, market, deltaCollateral, deltaCollateralUSD);
   updateUsageMetrics(event, [owner, owner, owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
   updateProtocol(deltaCollateralUSD, BIGDECIMAL_ZERO);
   //this needs to after updateProtocol as it uses protocol to do the update
