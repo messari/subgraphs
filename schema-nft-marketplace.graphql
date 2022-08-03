@@ -1,5 +1,5 @@
 # Subgraph Schema: NFT Marketplace
-# Version: 0.0.1
+# Version: 1.0.0
 
 enum Network {
   ARBITRUM_ONE
@@ -96,7 +96,7 @@ type Collection @entity {
     " Contract address. "
     id: ID!
 
-    " Collectio name, mirrored from the smart contract. Leave null if not available. "
+    " Collection name, mirrored from the smart contract. Leave null if not available. "
     name: String
 
     " Collection symbol, mirrored from the smart contract. Leave null if not available. "
