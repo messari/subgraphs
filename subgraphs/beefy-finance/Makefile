@@ -7,7 +7,7 @@ codegen:
 	graph codegen
 
 deploy:
-	graph deploy --product hosted-service messari/beefy-finance-${network}
+	graph deploy --product hosted-service ${deployment}
 
 clean:
 	rm -rf ./generated
