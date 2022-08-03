@@ -45,6 +45,10 @@ export function _handleDelegatedPowerChanged(
     let previousBalance = delegate.delegatedVotesRaw;
     let votesDifference = newBalance.minus(previousBalance);
 
+    delegate.delegatedVotesRaw = newBalance;
+    delegate.delegatedVotes = toDecimal(newBalance);
+    delegate.save();
+
     // Update governance delegate count
     let governance = getGovernance();
     if (previousBalance == BIGINT_ZERO && newBalance > BIGINT_ZERO) {
