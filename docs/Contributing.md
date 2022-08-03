@@ -79,6 +79,6 @@ An impact-level identifier:
 Examples:
 
 - "1️⃣ Compound Forks: upgrade to 2.0.1 schema"
-- "3️⃣ Dashboard: Fix reward calculation"
-- "1️⃣ Dashboard: Support 2.0.1 schemas"
-- "2️⃣ Abracadabra: Fixing issue #420"
+- "3️⃣ Dashboard: fix reward calculation"
+- "1️⃣ Dashboard: support 2.0.1 schemas"
+- "2️⃣ Abracadabra: fixing issue #420"
