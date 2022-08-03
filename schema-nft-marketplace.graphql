@@ -55,6 +55,9 @@ type Marketplace @entity {
     " Name of the NFT marketplace, for example LooksRare "
     name: String!
 
+    " Slug of the NFT marketplace, for example looksrare "
+    slug: String!
+
     " The blockchain network this subgraph is indexing on. "
     network: Network!
 
