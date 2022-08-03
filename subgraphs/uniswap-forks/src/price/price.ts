@@ -218,7 +218,7 @@ export function getTrackedVolumeUSD(
   ) {
     return [
       tokenAmount0.times(price0USD),
-      BIGDECIMAL_ZERO,
+      tokenAmount0.times(price0USD),
       tokenAmount0.times(price0USD),
     ];
   }
@@ -229,7 +229,7 @@ export function getTrackedVolumeUSD(
     NetworkConfigs.getWhitelistTokens().includes(token1.id)
   ) {
     return [
-      BIGDECIMAL_ZERO,
+      tokenAmount1.times(price1USD),
       tokenAmount1.times(price1USD),
       tokenAmount1.times(price1USD),
     ];
