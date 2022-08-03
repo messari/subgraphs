@@ -145,6 +145,9 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetricsDaily.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsDaily.blockNumber = event.block.number;
   poolMetricsDaily.timestamp = event.block.timestamp;
+  poolMetricsDaily.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+  poolMetricsDaily.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+  poolMetricsDaily.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
 
   poolMetricsHourly.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsHourly.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
@@ -154,6 +157,9 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetricsHourly.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsHourly.blockNumber = event.block.number;
   poolMetricsHourly.timestamp = event.block.timestamp;
+  poolMetricsHourly.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+  poolMetricsHourly.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+  poolMetricsHourly.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
 
   poolMetricsDaily.save();
   poolMetricsHourly.save();
