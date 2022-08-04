@@ -286,14 +286,14 @@ export function _handleVoteCast(
 
   // Increment respective vote choice counts
   // NOTE: We are counting the weight instead of individual votes
-  if (support === 0) {
+  if (support === VoteChoice.AGAINST_VALUE) {
     proposal.againstDelegateVotes =
       proposal.againstDelegateVotes.plus(BIGINT_ONE);
     proposal.againstWeightedVotes = proposal.againstWeightedVotes.plus(weight);
-  } else if (support === 1) {
+  } else if (support === VoteChoice.FOR_VALUE) {
     proposal.forDelegateVotes = proposal.forDelegateVotes.plus(BIGINT_ONE);
     proposal.forWeightedVotes = proposal.forWeightedVotes.plus(weight);
-  } else if (support === 2) {
+  } else if (support === VoteChoice.ABSTAIN_VALUE) {
     proposal.abstainDelegateVotes =
       proposal.abstainDelegateVotes.plus(BIGINT_ONE);
     proposal.abstainWeightedVotes = proposal.abstainWeightedVotes.plus(weight);
