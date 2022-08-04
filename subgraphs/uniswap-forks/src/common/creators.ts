@@ -100,8 +100,8 @@ export function createLiquidityPool(
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.rewardTokens = [];
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
-  pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  pool.rewardTokenEmissionsAmount = [];
+  pool.rewardTokenEmissionsUSD = [];
   pool.fees = createPoolFees(poolAddress);
   pool.isSingleSided = false;
   pool.createdTimestamp = event.block.timestamp;
