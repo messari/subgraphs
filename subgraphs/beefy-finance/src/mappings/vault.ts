@@ -7,7 +7,7 @@ import {
   Deposit,
   StratHarvest,
   Withdraw,
-} from "../../generated/ExampleVault/BeefyStrategy";
+} from "../../generated/aave-aave-eol/BeefyStrategy";
 import { BeefyVault } from "../../generated/aave-aave-eol/BeefyVault";
 import {
   getBeefyFinanceOrCreate,

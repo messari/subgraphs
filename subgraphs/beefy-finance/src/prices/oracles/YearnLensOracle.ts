@@ -7,7 +7,7 @@ import { YearnLensContract } from "../../../generated/aave-aave-eol/YearnLensCon
 export function getYearnLensContract(
   network: string
 ): YearnLensContract | null {
-  const yearnLensAddress = constants.YEARN_LENS_CONTRACT_ADDRESS.get(network)!;
+  const yearnLensAddress = constants.YEARN_LENS_CONTRACT_ADDRESS.get(network);
   if (yearnLensAddress == constants.ZERO_ADDRESS) {
     return null;
   } else {

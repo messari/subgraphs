@@ -69,8 +69,13 @@ to build the yaml file for the correct chain; than you can deploy using
 
 `yarn deploy ${githubuser/subgraphname}`
 
+### Using the Makefile
+
+Simply run `make network=bsc deployment=messari/beefy-finance-bsc` for example
+
 ## Known Issues
 
+- Beefy Finance `harmony` has no vaults yet
 - On Celo, sushiswap oracle fails to fetch prices of LP tokens
 - Since the workaround to calculate deposit and withdraws amounts is not perfect (if more calls to the same vault are done in the same block there could be interferences between events) some negative amounts could occasionally come up
 - Some vaults do not emit all the needed events for a complete tracking of all the metrics, so some old data may be missing

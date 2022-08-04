@@ -3,7 +3,7 @@ import { Deposit } from "../../generated/schema";
 import {
   BeefyStrategy,
   Deposit as DepositEvent,
-} from "../../generated/ExampleVault/BeefyStrategy";
+} from "../../generated/aave-aave-eol/BeefyStrategy";
 import { getTokenOrCreate } from "../utils/getters";
 import {
   BIGINT_TEN,

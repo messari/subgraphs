@@ -189,7 +189,8 @@
       "beefy-finance": {
         "aurora": {
           "template": "beefy.finance.template.yaml",
-          "deploy-on-merge": false
+          "messari": "messari/beefy-finance-aurora",
+          "deploy-on-merge": true
         }
       }
     },
