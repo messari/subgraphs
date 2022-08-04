@@ -7,7 +7,7 @@ import {
   Staked,
   Withdrawn,
 } from "../../../../../generated/templates/StakingRewards/StakingRewards";
-import { BIGINT_NEGATIVE_ONE } from "../../../../../src/common/constants";
+import { BIGINT_NEG_ONE } from "../../../../../src/common/constants";
 import {} from "../../../../../src/common/getters";
 import {
   updateRewardEmissions,
@@ -22,7 +22,7 @@ export function handleStaked(event: Staked): void {
 
 // Load in the liquidity pool entity associated with this staking pool and decrease staked amount
 export function handleWithdrawn(event: Withdrawn): void {
-  updateStakedAmount(event, event.params.amount.times(BIGINT_NEGATIVE_ONE));
+  updateStakedAmount(event, event.params.amount.times(BIGINT_NEG_ONE));
   updateRewardEmissions(event);
 }
 
