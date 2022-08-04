@@ -1,0 +1,93 @@
+###
+# Subgraph Schema: ERC721 Token Detailed Metadata
+# Version: 1.0.0
+
+#############################################
+####### ERC721 Token Detailed Metadata ######
+#############################################
+
+type Token @entity {
+  " Address of the token, { Contract Address }-{ Token ID }  "
+  id: ID!
+
+  " Collection for the token "
+  collection: Collection!
+
+  " ID of the token from the collection "
+  tokenID: BigInt!
+
+  " URI of the token metadata"
+  tokenURI: String
+
+  " Identifies the asset to which this token represents, defined in opensea metadata standards "
+  name: String
+
+  " Describes the asset to which this token represents, defined in opensea metadata standards "
+  description: String
+
+  " A URI pointing to a resource with mime type image, defined in opensea metadata standards "
+  imageURI: String
+
+  " URL which allows users to view the item on the colletion's site, defined in opensea metadata standards "
+  externalURI: String
+
+  " Attributes for the token metadata, defined in opensea metadata standards "
+  attributes: [Trait!] @derivedFrom(field: "token")
+
+  " Block number of the metadata snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of the metadata snapshot "
+  timestamp: BigInt!
+}
+
+##############################################
+####### Opensea Token Traits Metadata ######
+##############################################
+
+type Trait @entity {
+  " { Contract ID }-{ Token ID }-{ Trait name } "
+  id: ID!
+
+  " Address of the collection  "
+  collection: String!
+
+  " ID of the token from the collection  "
+  tokenId: BigInt!
+
+  " Token metadata this attribute belongs to "
+  token: Token
+
+  " Name of the trait "
+  name: String!
+
+  " Value of the trait "
+  value: String!
+
+  " Indicates how the trait should be displayed. "
+  displayType: String
+}
+
+#####################################
+####### ERC721 Collections ######
+#####################################
+
+type Collection @entity {
+  " ERC721 collection address "
+  id: ID!
+
+  " Flag for whether ERC721 metadata is supported "
+  supportsERC721Metadata: Boolean!
+
+  " Tokens in the collection "
+  tokens: [Token!]! @derivedFrom(field: "collection")
+}
+
+#####################################
+####### Non ERC721 Collections ######
+#####################################
+
+type NonERC721Collection @entity {
+  " Non ERC721 smart contract address "
+  id: ID!
+}
