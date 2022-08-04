@@ -100,30 +100,52 @@ It is nice to have a consistent naming convention for pull requests. Oftentimes 
 
 PR names also drive the commit name once a PR is merged into `master`. In this way it is easier to tell what was changed in each commit.
 
-An impact-level identifier:
+The impact level identifiers are based on semver versioning. So you can use #`name` to help prefix and categorize your PR. Read more about semver changes [here](https://semver.org/#summary).
 
-### 1️⃣
+### #patch
 
-- Subgraphs: change impacts an entire fork directory / multiple protocols
-- Dashboard: change impacts the entire dashboard / multiple objects
+This change is generally a bug fix, and does not break anything. ie, it is backwards compatible.
 
-### 2️⃣
+### #minor
 
-- Subgraphs: change impacts a single protocol
-- Dashboard: change impacts a single object
+This is a change that adds a new feature, but still remains backwards compatible.
 
-### 3️⃣
+### #major
 
-- Subgraphs: change impacts a single network of a single protocol
-- Dashboard: change impacts is a minor enhancement / bug fix
+This change is usually a big update as it will not be backwards compatible with the previous code.
+
+### Additional identifiers
+
+In addition to the version impact level you can identify a change with words to be more descriptive. In some cases a change doesn't really fit into the semver system. For example, adding this to the docs.
+
+Some other naming identifiers:
+
+- `fix` - bug fix
+- `feat` - new feature
+- `chore` - chores (like updating README.md)
+- `docs` - adding to the docs
+- `style` - fix folder/file names or syntax formatting
+- `refactor` - update logic, but the program performs the same way
+- `perf` - add performance
+- `test` - add a test
+
+> If you find yourself wanting to name a PR with multiple of these identifiers you should probably make a PR for each one.
 
 ### How to name a PR
 
-"`impact-level` `subgraph-name`: `description`"
+"`identifier`(#`semver-change`); `subgraph-name`; `description`"
+
+> Ideally you want the `description` to be short and sweet.
 
 Examples:
 
-- "1️⃣ Compound Forks: upgrade to 2.0.1 schema"
-- "3️⃣ Dashboard: fix reward calculation"
-- "1️⃣ Dashboard: support 2.0.1 schemas"
-- "2️⃣ Abracadabra: fixing issue #420"
+- "fix(#major); compound forks; upgrade to 2.0.1 schema"
+- "feat(#minor); dashboard; add tvl to front page"
+- "chore(); README; update comp version"
+- "fix(#patch); abracadabra; fixing issue #420"
+- "docs(); contributing; add Contributing.md"
+- "refactor(#patch); aave-v2-forks; update reward logic"
+- "style(); uniswap; format code"
+- "perf(#patch); spookyswap; find value without contract call"
+
+> Notice: some of the names don't have a #`semver` name. This is because they don't actually affect the versioning on any of the subgraphs / dashboard. A good way to know which semver identifer to use is to notice which part of the version you are updating. And it looks like this (MAJOR.MINOR.PATCH)!
