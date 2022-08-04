@@ -30,10 +30,23 @@ At this point you will just need to follow the "Reviewing" process until your PR
 
 - This part is straight forward, and if you are reviewing you know what to do.
 - It is courtesy to let the developer know that you are done with the review.
+- The reviewer is generally assigned by Vincent (@this-username-is-taken)
 
 > This is an iterative process that takes time, so don't think it will always be easy.
 
 ## Rebasing
+
+### Why rebase?
+
+Whenever there are merge conflicts you should rebase *instead* of merge. The reason for this is that it keeps a clean working history. 
+
+How does this happen?
+
+The version of `master` you initally branched off is not the current version. New commits have been added, and some of them conflict with your changes. Answer: rebase.
+
+Sometimes you need to make a change based off a `feature-branch` that hasn't been merged into `master` yet. Once `feature-branch` is merged into `master` you want to rebase onto `master` to clean up the branch commit history. 
+
+### How to rebase:
 
 There are multiple ways to do this. Most of the time you will rebase onto `master`, so you should make sure your `master` branch is up to date with the upstream `master` (ie, Messari's repo).
 
@@ -47,9 +60,41 @@ This will initiate a rebase. Sometimes you will have to resolve conflicts. And t
 
 Following this method, after rebasing you can do the command `git push --force` to update your remote repo.
 
-## Naming Convention
+## Pull Requests
 
-### Pull Requests
+In general you want to keep PRs small when possible. This way it is easier to review and if a breaking change is merged it is easier to go back and not mess up a lot of history.
+
+### What should be included in a PR?
+
+To keep PRs small follow thse guidelines, and use them to make educated choices about other scenarios you might run into:
+
+- If you are formatting code outside of the scope of your PR it should be in a separate PR
+- Isolate bug fixes into individual PRs, do not combine them. If they depend on each other use your judgement if they should be together or not. You can always branch off a `feature-branch`
+- Use a single PR for each feature (ie, a new subgraph has it's own PR)
+
+### Commit Messages
+
+TODO: come up with standard
+
+### Merging
+
+For now after a PR is reviewed Vincent (@this-username-is-taken) does the final merge into `master`.
+
+### PR Comments
+
+It is nice to outline the changes / fixes you made in your PR. This way the reviewer knows what to look for and what to expect.
+
+If the change affects a subgraph you should make a link to your testing subgraph in https://okgraph.xyz/. This website is a great hub for subgraph viewing (shoutout @0xbe1).
+
+An example of good PR heading comments:
+
+![Good comments](./images/contributing/good-comments.png)
+
+> Sometimes a PR is so small or the name is self explanatory and a descriptive comment is not necessary. See [#715](https://github.com/messari/subgraphs/pull/715). Use your judgement and ask questions if you want to learn and grow as a team!
+
+## Naming Conventions
+
+### How to name your PR
 
 It is nice to have a consistent naming convention for pull requests. Oftentimes there are dozens of PRs out on `messari/subgraphs` so being able to know exactly what a PR is is important.
 
