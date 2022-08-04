@@ -374,6 +374,9 @@ export function updateTVL(event: ethereum.Event): void {
     let vault = getOrCreateVault(event, vaultAddress, tokenAddress);
     let inputToken = getOrCreateToken(vault.inputToken);
 
+
+    // How to get TVL from rari vaults on a per token basis
+
     // if...else to grab TVL for correct vault
     let tryTokenBalance: ethereum.CallResult<BigInt>;
     if (vaultAddress == YIELD_VAULT_ADDRESS) {
