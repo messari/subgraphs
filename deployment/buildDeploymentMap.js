@@ -21,11 +21,11 @@ https.get(url, res => {
         firstLevelKeys.forEach(x => {
             Object.keys(data.subgraphs[x]).forEach(y => {
                 Object.keys(data.subgraphs[x][y]).forEach(network => {
-                    if (!data.subgraphs[x][y][network]?.messari) {
+                    if (!data.subgraphs[x][y][network].messari) {
                         listedNoName['messari' + '/' + y + '-' + network] = true;
                         liveDeployments['messari' + '/' + y + '-' + network] = "";
                     } else {
-                        liveDeployments[data.subgraphs[x][y][network]?.messari] = "";
+                        liveDeployments[data.subgraphs[x][y][network].messari] = "";
                     }
                 })
             })
@@ -54,16 +54,26 @@ https.get(url, res => {
         Promise.all(depIdPromArr).then(val => {
             const formattedDeployments = {}
             val.forEach((dep, idx) => {
-                formattedDeployments[Object.keys(liveDeployments)[idx]] = {
-                    IPFS_Hash: dep?._meta?.deployment || 'N/A',
-                    issues: []
+                if (dep) {
+                    if (dep._meta) {
+                        formattedDeployments[Object.keys(liveDeployments)[idx]] = {
+                            IPFS_Hash: dep._meta.deployment || 'N/A',
+                            issues: []
+                        }
+                    }
+                }
+                if (!formattedDeployments[Object.keys(liveDeployments)[idx]]) {
+                    formattedDeployments[Object.keys(liveDeployments)[idx]] = {
+                        IPFS_Hash: 'N/A',
+                        issues: ["Could not pull either current subgraph IPFS hash given subgraph name. Query attempted on _meta entity at endpoint https://api.thegraph.com/subgraphs/name/" + Object.keys(liveDeployments)[idx]]
+                    }
                 }
                 if (listedNoName[Object.keys(liveDeployments)[idx]]) {
                     formattedDeployments[Object.keys(liveDeployments)[idx]].issues.push("deployment.json file does not have subgraph name string under the 'messari' key. Attempted to construct subgraph name from 'messari/(PROTOCOL)-(NETWORK)");
                 }
-                if (!dep?._meta?.deployment) {
-                    formattedDeployments[Object.keys(liveDeployments)[idx]].issues.push("Could not pull either current subgraph IPFS hash given subgraph name. Query attempted on _meta entity at endpoint https://api.thegraph.com/subgraphs/name/" + Object.keys(liveDeployments)[idx])
-                }
+                // if (!dep._meta.deployment) {
+                //     formattedDeployments[Object.keys(liveDeployments)[idx]].issues.push("Could not pull either current subgraph IPFS hash given subgraph name. Query attempted on _meta entity at endpoint https://api.thegraph.com/subgraphs/name/" + Object.keys(liveDeployments)[idx])
+                // }
             })
 
             const storeData = () => {
