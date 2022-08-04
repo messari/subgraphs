@@ -1,5 +1,4 @@
 // generic aave-v2 handlers
-
 import {
   Address,
   BigDecimal,
@@ -962,6 +961,11 @@ export function _handleLiquidate(
     market.liquidationPenalty.div(BIGDECIMAL_HUNDRED)
   );
   liquidate.save();
+
+  market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(
+    liquidate.amountUSD
+  );
+  market.save();
 
   // update usage metrics
   snapshotUsage(

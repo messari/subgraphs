@@ -172,6 +172,7 @@ export function Deposit(
       .div(inputTokenPrice.decimalsBaseTen);
   }
 
+  pool.inputTokenBalances = inputTokenBalances;
   pool.totalValueLockedUSD = utils.getPoolTVL(
     pool.inputTokens,
     pool.inputTokenBalances

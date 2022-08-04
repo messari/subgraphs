@@ -3,7 +3,8 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
+  MINIMUM_LIQUIDITY_TEN_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
@@ -14,7 +15,6 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  MASTERCHEFV2_SUSHI_PER_BLOCK,
 } from "../../../src/common/constants";
 import {
   toLowerCase,
@@ -85,9 +85,11 @@ export class SushiswapMoonriverConfigurations implements Configurations {
       "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c", // wETH
       "0xf50225a84382c74cbdea10b0c176f71fc3de0c4d", // wMOVR
       "0xe6a991ffa8cfe62b0bf6bf72959a3d4f11b2e0f5", // wBTC
+      "0x1a93b23281cc1cde4c4741353f3064709a16197d", // FrAX
       "0xb44a9b6905af7c801311e8f4e76932ee959c663c", // USDT
       "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d", // USDC
       "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844", // DAI
+      "0x0cae51e1032e8461f4806e26332c030e34de3adb", // MIM
     ]);
   }
   getStableCoins(): string[] {
@@ -110,7 +112,10 @@ export class SushiswapMoonriverConfigurations implements Configurations {
   getUntrackedTokens(): string[] {
     return [];
   }
-  getMinimumLiquidityThreshold(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+  getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
+    return MINIMUM_LIQUIDITY_TEN_THOUSAND;
+  }
+  getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
+    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
   }
 }

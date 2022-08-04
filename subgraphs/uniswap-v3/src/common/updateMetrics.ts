@@ -254,8 +254,8 @@ export function updateVolumeAndFees(
     ];
   } else {
     poolMetricsDaily.dailyVolumeByTokenAmount = [
-      poolMetricsDaily.dailyVolumeByTokenAmount[INT_ZERO].minus(token0Amount),
-      poolMetricsDaily.dailyVolumeByTokenAmount[INT_ONE].minus(
+      poolMetricsDaily.dailyVolumeByTokenAmount[INT_ZERO].plus(token0Amount),
+      poolMetricsDaily.dailyVolumeByTokenAmount[INT_ONE].plus(
         token1Amount.times(BIGINT_NEG_ONE)
       ),
     ];
@@ -281,8 +281,8 @@ export function updateVolumeAndFees(
     ];
   } else {
     poolMetricsHourly.hourlyVolumeByTokenAmount = [
-      poolMetricsHourly.hourlyVolumeByTokenAmount[INT_ZERO].minus(token0Amount),
-      poolMetricsHourly.hourlyVolumeByTokenAmount[INT_ONE].minus(
+      poolMetricsHourly.hourlyVolumeByTokenAmount[INT_ZERO].plus(token0Amount),
+      poolMetricsHourly.hourlyVolumeByTokenAmount[INT_ONE].plus(
         token1Amount.times(BIGINT_NEG_ONE)
       ),
     ];

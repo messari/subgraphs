@@ -18,9 +18,8 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
   getOrCreateLiquidityPoolDailySnapshots,
   getOrCreateLiquidityPoolHourlySnapshots,
-  getOrCreateLiquidityPoolFee,
 } from "../common/initializers";
-import { enumToPrefix } from "../common/utils";
+import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
 
@@ -171,25 +170,33 @@ export function updateTokenVolume(
   );
 
   let tokenIndex = pool.inputTokens.indexOf(tokenAddress);
-  if (tokenIndex == -1 && !underlying) {
-    log.warning("", []);
+  if (tokenIndex == -1 && !underlying) return;
 
-    return;
-  }
+  let dailyVolumeByTokenAmount = poolDailySnaphot.dailyVolumeByTokenAmount;
+  dailyVolumeByTokenAmount[tokenIndex] = dailyVolumeByTokenAmount[
+    tokenIndex
+  ].plus(tokenAmount);
 
-  poolDailySnaphot.dailyVolumeByTokenAmount[
+  let hourlyVolumeByTokenAmount = poolHourlySnaphot.hourlyVolumeByTokenAmount;
+  hourlyVolumeByTokenAmount[tokenIndex] = hourlyVolumeByTokenAmount[
     tokenIndex
-  ] = poolDailySnaphot.dailyVolumeByTokenAmount[tokenIndex].plus(tokenAmount);
-  poolHourlySnaphot.hourlyVolumeByTokenAmount[
-    tokenIndex
-  ] = poolHourlySnaphot.hourlyVolumeByTokenAmount[tokenIndex].plus(tokenAmount);
+  ].plus(tokenAmount);
 
-  poolDailySnaphot.dailyVolumeByTokenUSD[
-    tokenIndex
-  ] = poolDailySnaphot.dailyVolumeByTokenUSD[tokenIndex].plus(tokenAmountUSD);
-  poolHourlySnaphot.hourlyVolumeByTokenUSD[
-    tokenIndex
-  ] = poolHourlySnaphot.hourlyVolumeByTokenUSD[tokenIndex].plus(tokenAmountUSD);
+  let dailyVolumeByTokenUSD = poolDailySnaphot.dailyVolumeByTokenUSD;
+  dailyVolumeByTokenUSD[tokenIndex] = dailyVolumeByTokenUSD[tokenIndex].plus(
+    tokenAmountUSD
+  );
+
+  let hourlyVolumeByTokenUSD = poolHourlySnaphot.hourlyVolumeByTokenUSD;
+  hourlyVolumeByTokenUSD[tokenIndex] = hourlyVolumeByTokenUSD[tokenIndex].plus(
+    tokenAmountUSD
+  );
+
+  poolDailySnaphot.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
+  poolHourlySnaphot.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
+
+  poolDailySnaphot.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
+  poolHourlySnaphot.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
 
   poolHourlySnaphot.save();
   poolDailySnaphot.save();
@@ -234,29 +241,10 @@ export function updateProtocolRevenue(
   block: ethereum.Block
 ): void {
   const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
+  const poolFees = utils.getPoolFees(liquidityPoolAddress);
 
-  let lpFeeId =
-    enumToPrefix(constants.LiquidityPoolFeeType.FIXED_LP_FEE) +
-    liquidityPoolAddress.toHexString();
-  const lpFee = getOrCreateLiquidityPoolFee(
-    lpFeeId,
-    constants.LiquidityPoolFeeType.FIXED_LP_FEE
-  );
-
-  let protocolFeeId =
-    enumToPrefix(constants.LiquidityPoolFeeType.FIXED_PROTOCOL_FEE) +
-    liquidityPoolAddress.toHexString();
-  const protocolFee = getOrCreateLiquidityPoolFee(
-    protocolFeeId,
-    constants.LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
-  );
-
-  let supplySideRevenueUSD = lpFee
-    .feePercentage!.times(volumeUSD)
-    .div(constants.BIGDECIMAL_HUNDRED);
-  let protocolSideRevenueUSD = protocolFee
-    .feePercentage!.times(volumeUSD)
-    .div(constants.BIGDECIMAL_HUNDRED);
+  let supplySideRevenueUSD = poolFees.getLpFees.times(volumeUSD);
+  let protocolSideRevenueUSD = poolFees.getProtocolFees.times(volumeUSD);
 
   updateRevenueSnapshots(
     pool,

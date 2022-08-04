@@ -32,23 +32,6 @@ import {
 import { exponentToBigDecimal } from "./utils/numbers";
 import { getUsdPrice } from "../prices";
 
-// let altPoolsInit = false;
-
-// export function initAltPoolTemplates(): void {
-//   // Start watching the LiquidityPools
-//   // Note: I have no idea what happens if I create a dynamic datasource
-//   // that clashes with an exisiting datasource
-//   if (!altPoolsInit) {
-//     altPoolsInit = true;
-//     let altArray = poolDetail.getAltPoolAddressArray();
-//     for (let i = 0; i < altArray.length; i++) {
-//       let poolAddress = Address.fromString(altArray[i]);
-//       // getOrCreateLiquidityPool(poolAddress, event);
-//       PoolTemplate.create(poolAddress);
-//     }
-//   }
-// }
-
 export function getOrCreateToken(event: ethereum.Event, tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
   // fetch info if null
@@ -116,14 +99,13 @@ function getOrCreateLiquidityPoolFeeTypes(poolAddress: Address): string[] {
 function addPoolToProtocol(poolId: string, ignore: bool): void {
   let protocol = getOrCreateDexAmm();
   let _pools: string[] = protocol.pools;
-  _pools.push(poolId);
-  protocol.pools = _pools.sort();
 
-  if (!ignore) {
-    protocol.totalPoolCount = protocol.totalPoolCount + 1;
+  if (!ignore && !_pools.includes(poolId)) {
+    _pools.push(poolId);
+    protocol.pools = _pools.sort();
+    protocol.totalPoolCount = _pools.length;
+    protocol.save();
   }
-
-  protocol.save();
 }
 
 export function getTokenHelperId(poolAddress: Address, tokenAddress: Address): string {
@@ -386,7 +368,6 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.totalPoolCount = 0;
     protocol.pools = [];
     protocol.save();
-    // initAltPoolTemplates();
   }
   return protocol;
 }

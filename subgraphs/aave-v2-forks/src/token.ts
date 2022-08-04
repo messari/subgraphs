@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import { Address } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../generated/templates/LendingPool/ERC20";
 import { ERC20NameBytes } from "../generated/templates/LendingPool/ERC20NameBytes";

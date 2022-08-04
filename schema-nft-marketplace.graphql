@@ -1,5 +1,5 @@
 # Subgraph Schema: NFT Marketplace
-# Version: 0.0.1
+# Version: 1.0.0
 
 enum Network {
   ARBITRUM_ONE
@@ -27,8 +27,8 @@ enum Network {
 
 enum NftStandard {
     ERC721
-    ERC721A
     ERC1155
+    UNKNOWN
 }
 
 enum SaleStrategy {
@@ -54,6 +54,9 @@ type Marketplace @entity {
 
     " Name of the NFT marketplace, for example LooksRare "
     name: String!
+
+    " Slug of the NFT marketplace, for example looksrare "
+    slug: String!
 
     " The blockchain network this subgraph is indexing on. "
     network: Network!
@@ -93,26 +96,20 @@ type Collection @entity {
     " Contract address. "
     id: ID!
 
-    " Collectio name, mirrored from the smart contract. Leave null if not available. "
+    " Collection name, mirrored from the smart contract. Leave null if not available. "
     name: String
 
     " Collection symbol, mirrored from the smart contract. Leave null if not available. "
     symbol: String
 
     " Total supply of the collection, mirrored from the smart contract. "
-    totalSupply: BigInt!
+    totalSupply: BigInt
 
     " NFT Standard the collection uses. "
     nftStandard: NftStandard!
 
     " Royalty fee rate in percentage. E.g. 2.5% should be 2.5 "
     royaltyFee: BigDecimal!
-
-    " Number of tokens listed for trade in the marketplace. "
-    listedCount: BigInt!
-
-    " Floor price (in ETH) "
-    floorPriceETH: BigDecimal!
 
     " Cumulative trade volume (in ETH) "
     cumulativeTradeVolumeETH: BigDecimal!
@@ -141,14 +138,11 @@ type Collection @entity {
 
 " Trades exist such as a combination of taker/order and bid/ask. "
 type Trade @entity {
-    " { maker txn hash }-{ taker txn hash } "
+    " { Transaction hash }-{ Log index }-{ (optional) ID within bundle } "
     id: ID!
 
-    " Transaction hash of the maker. "
-    makerTransactionHash: String!
-
-    " Transaction hash of the taker. "
-    takerTransactionHash: String!
+    " Event transaction hash. "
+    transactionHash: String!
 
     " Event log index. "
     logIndex: Int!
@@ -159,13 +153,19 @@ type Trade @entity {
     " Block number where the trade is executed. "
     blockNumber: BigInt!
 
+    " Whether the trade is in a bundle. "
+    isBundle: Boolean!
+
     " Collection involved "
     collection: Collection!
 
     " Token ID of the traded NFT. "
     tokenId: BigInt!
 
-    " Price (in ETH) "
+    " The amount of token to transfer. It is set at 1 except for ERC1155 batch. "
+    amount: BigInt!
+
+    " Price (in ETH). If only 1 tokenId is involved, then the price is determined by the token only. If the trade is incurred by a batch purchasing (available in x2y2), then the price is the average price in the batch. "
     priceETH: BigDecimal!
 
     " Stretegy that the trade is executed. "
@@ -181,6 +181,9 @@ type Trade @entity {
 type MarketplaceDailySnapshot @entity {
     " { Contract address }-{# of days since Unix epoch time} "
     id: ID!
+
+    " The marketplace that this snapshot belongs to. "
+    marketplace: Marketplace!
 
     " Block number where the snapshot is taken. "
     blockNumber: BigInt!
@@ -223,6 +226,9 @@ type CollectionDailySnapshot @entity {
     " { Contract address }-{# of days since epoch unix time } "
     id: ID!
 
+    " The collection that this snapshot belongs to. "
+    collection: Collection!
+
     " Block number where the snapshot is taken. "
     blockNumber: BigInt!
 
@@ -232,11 +238,11 @@ type CollectionDailySnapshot @entity {
     " Royalty fee rate in percentage. E.g. 2.5% should be 2.5 "
     royaltyFee: BigDecimal!
 
-    " Number of tokens listed for sale in the marketplace. "
-    listedCount: BigInt!
+    " Minimum sale price of the day (in ETH) "
+    dailyMinSalePrice: BigDecimal!
 
-    " Floor price (in ETH) "
-    floorPriceETH: BigDecimal!
+    " Maximum sale price of the day (in ETH) "
+    dailyMaxSalePrice: BigDecimal!
 
     " Cumulative trade volume (in ETH) "
     cumulativeTradeVolumeETH: BigDecimal!

@@ -1,0 +1,1869 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newBoostMinuteDecayFactor",
+        "type": "uint256"
+      }
+    ],
+    "name": "BoostMinuteDecayFactorChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newClaimAddress",
+        "type": "address"
+      }
+    ],
+    "name": "ClaimAddressChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "CollateralAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "CollateralDeprecated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "CollateralUndeprecated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newDefaultRouter",
+        "type": "address"
+      }
+    ],
+    "name": "DefaultRouterChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "FeeBootstrapPeriodEnabledChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newFeeCurve",
+        "type": "address"
+      }
+    ],
+    "name": "FeeCurveChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newGlobalBoostMultiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "GlobalBoostMultiplierChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_canMint",
+        "type": "bool"
+      }
+    ],
+    "name": "GlobalYUSDMintOn",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "LeverUpChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newMaxCollsInTrove",
+        "type": "uint256"
+      }
+    ],
+    "name": "MaxCollsInTroveChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newMaxSystemColls",
+        "type": "uint256"
+      }
+    ],
+    "name": "MaxSystemCollsChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newOracle",
+        "type": "address"
+      }
+    ],
+    "name": "OracleChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newRecoveryRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "RecoveryRatioChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newSplit",
+        "type": "uint256"
+      }
+    ],
+    "name": "RedemptionBorrowerFeeSplitChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "RedemptionsEnabledUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newSafetyRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "SafetyRatioChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_contractAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_isWhitelisted",
+        "type": "bool"
+      }
+    ],
+    "name": "UpdateVeYetiCallers",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newFeeRecipient",
+        "type": "address"
+      }
+    ],
+    "name": "YUSDFeeRecipientChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_minter",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "_canMint",
+        "type": "bool"
+      }
+    ],
+    "name": "YUSDMinterChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_newTreasury",
+        "type": "address"
+      }
+    ],
+    "name": "YetiFinanceTreasuryChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newSplit",
+        "type": "uint256"
+      }
+    ],
+    "name": "YetiFinanceTreasurySplitChanged",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "DECIMAL_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "YUSDFeeRecipient",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "absorptionColls",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "absorptionWeights",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_safetyRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_recoveryRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_oracle",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_decimals",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_feeCurve",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isWrapped",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "_routerAddress",
+        "type": "address"
+      }
+    ],
+    "name": "addCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_minter",
+        "type": "address"
+      }
+    ],
+    "name": "addValidYUSDMinter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_contractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "addVeYetiCaller",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "bootstrapEnded",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newBoostMinuteDecayFactor",
+        "type": "uint256"
+      }
+    ],
+    "name": "changeBoostMinuteDecayFactor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_newClaimAddress",
+        "type": "address"
+      }
+    ],
+    "name": "changeClaimAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_feeCurve",
+        "type": "address"
+      }
+    ],
+    "name": "changeFeeCurve",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newGlobalBoostMultiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "changeGlobalBoostMultiplier",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_oracle",
+        "type": "address"
+      }
+    ],
+    "name": "changeOracle",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_newSafetyRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_newRecoveryRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "changeRatios",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newSplit",
+        "type": "uint256"
+      }
+    ],
+    "name": "changeRedemptionBorrowerFeeSplit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_newFeeRecipient",
+        "type": "address"
+      }
+    ],
+    "name": "changeYUSDFeeRecipient",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_newTreasury",
+        "type": "address"
+      }
+    ],
+    "name": "changeYetiFinanceTreasury",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newSplit",
+        "type": "uint256"
+      }
+    ],
+    "name": "changeYetiFinanceTreasurySplit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_depositColls",
+        "type": "address[]"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_withdrawColls",
+        "type": "address[]"
+      }
+    ],
+    "name": "checkCollateralListDouble",
+    "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_colls",
+        "type": "address[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "_deposit",
+        "type": "bool"
+      }
+    ],
+    "name": "checkCollateralListSingle",
+    "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "collateralParams",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "safetyRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "recoveryRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "oracle",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "decimals",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "feeCurve",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "defaultRouter",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isWrapped",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "deprecateAllCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "deprecateCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "endBootstrap",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeBootstrapPeriodEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAbsorptionCollParams",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getClaimAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "getDecimals",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "getDefaultRouterAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getEntireSystemColl",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getEntireSystemDebt",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "getFeeCurve",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getFeeSplitInformation",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "getIndex",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_colls",
+        "type": "address[]"
+      }
+    ],
+    "name": "getIndices",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "indices",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "getIsActive",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getMaxCollsInTrove",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "getOracle",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "getPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "getRecoveryRatio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRedemptionBorrowerFeeSplit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "getSafetyRatio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_tokensIn",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amountsIn",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_leverages",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_entireSystemCollVC",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_VCin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_VCout",
+        "type": "uint256"
+      }
+    ],
+    "name": "getTotalVariableDepositFeeAndUpdate",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "YUSDFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "boostFactor",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getValidCollateral",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "getValueRVC",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "getValueUSD",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "getValueVC",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_collaterals",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "getValuesRVC",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "RVCValue",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_collaterals",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "getValuesUSD",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "USDValue",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_collaterals",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "getValuesVC",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "VCValue",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_collaterals",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "getValuesVCAndRVC",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "VCValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "RVCValue",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_collaterals",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "getValuesVCIndividual",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_collateralVCInput",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_collateralVCSystemBalance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_totalVCBalancePre",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_totalVCBalancePost",
+        "type": "uint256"
+      }
+    ],
+    "name": "getVariableDepositFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getYUSDFeeRecipient",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getYetiFinanceTreasury",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getYetiFinanceTreasurySplit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "isLeverUpEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "isWrapped",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_collaterals",
+        "type": "address[]"
+      }
+    ],
+    "name": "isWrappedMany",
+    "outputs": [
+      {
+        "internalType": "bool[]",
+        "name": "wrapped",
+        "type": "bool[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "leverUpEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxCollsInTrove",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxSystemColls",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "redemptionBorrowerFeeSplit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_minter",
+        "type": "address"
+      }
+    ],
+    "name": "removeValidYUSDMinter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_contractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "removeVeYetiCaller",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_activePoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_defaultPoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_stabilityPoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_collSurplusPoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_borrowerOperationsAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_yusdTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_YUSDFeeRecipientAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_yetiFinanceTreasury",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_sortedTrovesAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_veYETIAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_troveManagerRedemptionsAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_claimAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_threeDayTimelock",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_twoWeekTimelock",
+        "type": "address"
+      }
+    ],
+    "name": "setAddresses",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_router",
+        "type": "address"
+      }
+    ],
+    "name": "setDefaultRouter",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "setFeeBootstrapPeriodEnabled",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "setLeverUp",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "threeDayTimelock",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "twoWeekTimelock",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "unDeprecateCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_colls",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_weights",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "updateAbsorptionColls",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_canMint",
+        "type": "bool"
+      }
+    ],
+    "name": "updateGlobalYUSDMinting",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newMax",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateMaxCollsInTrove",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newMax",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateMaxSystemColls",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "updateRedemptionsEnabled",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "validCollateral",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "yetiFinanceTreasury",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "yetiFinanceTreasurySplit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

@@ -2,7 +2,7 @@
   "network": "matic",
   "startBlock": "12687216",
   "factoryAddress": "0xd05e3E715d945B59290df0ae8eF85c1BdB684744",
-  "graftEnabled": true,
+  "graftEnabled": false,
   "subgraphId": "QmWRUVJCcB5dsa8sHmmdWWpSA62R8pjGBatjoQZf1RwNPS",
   "graftStartBlock": 15083810
 }

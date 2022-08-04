@@ -9,26 +9,34 @@ import { _MasterChefStakingPool } from "../../../../../generated/schema";
 import {
   createMasterChefStakingPool,
   updateMasterChefTotalAllocation,
-} from "../../common/helpers";
+} from "../../../../../src/common/masterchef/helpers";
+import { updateMasterChef } from "../../common/handlers/handleRewardV2";
 import {
-  updateMasterChefDeposit,
-  updateMasterChefWithdraw,
-} from "../../common/handlers/handleRewardV2";
-import { MasterChef } from "../../../../../src/common/constants";
+  BIGINT_NEG_ONE,
+  MasterChef,
+} from "../../../../../src/common/constants";
 
 // A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {
-  updateMasterChefDeposit(event, event.params.pid, event.params.amount);
+  updateMasterChef(event, event.params.pid, event.params.amount);
 }
 
 // A withdraw or unstaking for the pool specific MasterChef.
 export function handleWithdraw(event: Withdraw): void {
-  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
+  updateMasterChef(
+    event,
+    event.params.pid,
+    event.params.amount.times(BIGINT_NEG_ONE)
+  );
 }
 
 // A withdraw or unstaking for the pool specific MasterChef.
 export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
-  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
+  updateMasterChef(
+    event,
+    event.params.pid,
+    event.params.amount.times(BIGINT_NEG_ONE)
+  );
 }
 
 // Handle the addition of a new pool to the MasterChef. New staking pool.
@@ -63,7 +71,3 @@ export function handleLogSetPool(event: LogSetPool): void {
   masterChefPool.poolAllocPoint = event.params.allocPoint;
   masterChefPool.save();
 }
-
-// export function handleHarvest(event: Harvest): void {
-//  updateMasterChefHarvest(event, event.params.pid, event.params.amount)
-// }

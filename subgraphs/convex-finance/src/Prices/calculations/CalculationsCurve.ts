@@ -18,9 +18,10 @@ export function getTokenPriceFromCalculationCurve(
 ): CustomPriceType {
   const calculationCurveContract = getCalculationsCurveContract(network);
 
-  if (!calculationCurveContract) {
+  if (!calculationCurveContract) return new CustomPriceType();
+
+  if (tokenAddr.equals(constants.CRV_TRI_CRYPTO_ADDRESS))
     return new CustomPriceType();
-  }
 
   let tokenPrice: BigDecimal = utils
     .readValue<BigInt>(

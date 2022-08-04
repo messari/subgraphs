@@ -399,12 +399,11 @@ export function getOrCreateLiquidityPool(
     liquidityPool.outputTokenSupply = constants.BIGINT_ZERO;
     liquidityPool.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
 
-    // TODO: No idea right now
     liquidityPool.rewardTokens = [];
     liquidityPool.rewardTokenEmissionsAmount = [];
     liquidityPool.rewardTokenEmissionsUSD = [];
 
-    liquidityPool.fees = utils.getPoolFees(liquidityPoolAddress);
+    liquidityPool.fees = utils.getPoolFees(liquidityPoolAddress).stringIds();
     liquidityPool.isSingleSided = false;
 
     liquidityPool.createdBlockNumber = block.number;

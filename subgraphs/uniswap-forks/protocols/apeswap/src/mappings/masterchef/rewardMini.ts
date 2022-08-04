@@ -10,30 +10,38 @@ import {
   _HelperStore,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { MasterChef } from "../../../../../src/common/constants";
 import {
-  updateMasterChefDeposit,
-  updateMasterChefWithdraw,
-} from "../../common/handlers/handleRewardMini";
+  BIGINT_NEG_ONE,
+  MasterChef,
+} from "../../../../../src/common/constants";
+import { updateMasterChef } from "../../common/handlers/handleRewardMini";
 import {
   createMasterChefStakingPool,
   getOrCreateMasterChef,
   updateMasterChefTotalAllocation,
-} from "../../common/helpers";
+} from "../../../../../src/common/masterchef/helpers";
 
 // A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {
-  updateMasterChefDeposit(event, event.params.pid, event.params.amount);
+  updateMasterChef(event, event.params.pid, event.params.amount);
 }
 
 // A withdraw or unstaking for the pool specific MasterChef.
 export function handleWithdraw(event: Withdraw): void {
-  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
+  updateMasterChef(
+    event,
+    event.params.pid,
+    event.params.amount.times(BIGINT_NEG_ONE)
+  );
 }
 
 // A withdraw or unstaking for the pool specific MasterChef.
 export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
-  updateMasterChefWithdraw(event, event.params.pid, event.params.amount);
+  updateMasterChef(
+    event,
+    event.params.pid,
+    event.params.amount.times(BIGINT_NEG_ONE)
+  );
 }
 
 // Handle the addition of a new pool to the MasterChef. New staking pool.

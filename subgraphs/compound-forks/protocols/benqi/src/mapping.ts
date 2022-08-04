@@ -12,6 +12,8 @@ import {
   NewCollateralFactor,
   NewLiquidationIncentive,
   ActionPaused1,
+  MarketExited,
+  MarketEntered,
 } from "../../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -37,6 +39,7 @@ import {
   RewardTokenType,
   BIGDECIMAL_ZERO,
   exponentToBigDecimal,
+  SECONDS_PER_DAY,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -57,6 +60,7 @@ import {
   _handleAccrueInterest,
   getOrElse,
   _handleActionPaused,
+  _handleMarketEntered,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
@@ -91,6 +95,22 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
   let newPriceOracle = event.params.newPriceOracle;
   _handleNewPriceOracle(protocol, newPriceOracle);
+}
+
+export function handleMarketEntered(event: MarketEntered): void {
+  _handleMarketEntered(
+    event.params.qiToken.toHexString(),
+    event.params.account.toHexString(),
+    true
+  );
+}
+
+export function handleMarketExited(event: MarketExited): void {
+  _handleMarketEntered(
+    event.params.qiToken.toHexString(),
+    event.params.account.toHexString(),
+    false
+  );
 }
 
 export function handleMarketListed(event: MarketListed): void {
@@ -183,25 +203,67 @@ export function handleNewReserveFactor(event: NewReserveFactor): void {
 export function handleMint(event: Mint): void {
   let minter = event.params.minter;
   let mintAmount = event.params.mintAmount;
-  _handleMint(comptrollerAddr, minter, mintAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.minter
+  );
+  _handleMint(
+    comptrollerAddr,
+    minter,
+    mintAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleRedeem(event: Redeem): void {
   let redeemer = event.params.redeemer;
   let redeemAmount = event.params.redeemAmount;
-  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.redeemer
+  );
+  _handleRedeem(
+    comptrollerAddr,
+    redeemer,
+    redeemAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleBorrow(event: BorrowEvent): void {
   let borrower = event.params.borrower;
   let borrowAmount = event.params.borrowAmount;
-  _handleBorrow(comptrollerAddr, borrower, borrowAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleBorrow(
+    comptrollerAddr,
+    borrower,
+    borrowAmount,
+    borrowBalanceStoredResult,
+    event
+  );
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
+  let borrower = event.params.borrower;
   let payer = event.params.payer;
   let repayAmount = event.params.repayAmount;
-  _handleRepayBorrow(comptrollerAddr, payer, repayAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleRepayBorrow(
+    comptrollerAddr,
+    borrower,
+    payer,
+    repayAmount,
+    borrowBalanceStoredResult,
+    event
+  );
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
@@ -256,8 +318,8 @@ function getOrCreateProtocol(): LendingProtocol {
     comptrollerAddr,
     "BENQI",
     "benqi",
-    "1.3.0",
-    "1.0.6",
+    "2.0.1",
+    "1.1.0",
     "1.0.0",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),
@@ -463,7 +525,7 @@ function getRewardTokenEmission(
   }
   let rewardAmountPerSecond = rewardSpeedsResult.value;
   let rewardAmount = rewardAmountPerSecond.times(
-    BigInt.fromI32(SECONDS_PER_YEAR)
+    BigInt.fromI32(SECONDS_PER_DAY)
   );
   let rewardUSD = rewardAmount
     .toBigDecimal()
