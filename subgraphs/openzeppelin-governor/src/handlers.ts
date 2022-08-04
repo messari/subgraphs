@@ -39,7 +39,7 @@ export function addressesToStrings(addresses: Address[]): Array<string> {
 }
 
 export function getVoteChoiceByValue(choiceValue: number): string {
-  if (choiceValue === VoteChoice.ABSTAIN_VALUE) {
+  if (choiceValue === VoteChoice.AGAINST_VALUE) {
     return VoteChoice.AGAINST;
   } else if (choiceValue === VoteChoice.FOR_VALUE) {
     return VoteChoice.FOR;
