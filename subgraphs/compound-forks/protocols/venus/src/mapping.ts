@@ -51,7 +51,13 @@ import { CToken } from "../../../generated/Comptroller/CToken";
 import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
-import { comptrollerAddr, nativeCToken, nativeToken } from "./constants";
+import {
+  cakeCToken,
+  cakeToken,
+  comptrollerAddr,
+  nativeCToken,
+  nativeToken,
+} from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
@@ -92,42 +98,49 @@ export function handleMarketListed(event: MarketListed): void {
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
+
+  let cTokenData: TokenData;
+  let underlyingTokenData: TokenData;
   if (cTokenAddr == nativeCToken.address) {
-    let marketListedData = new MarketListedData(
-      protocol,
-      nativeToken,
-      nativeCToken,
-      cTokenReserveFactorMantissa
+    // find native token
+    cTokenData = nativeCToken;
+    underlyingTokenData = nativeToken;
+  } else if (cTokenAddr == cakeCToken.address) {
+    cTokenData = cakeCToken;
+    underlyingTokenData = cakeToken;
+  } else {
+    let underlyingTokenAddrResult = cTokenContract.try_underlying();
+    if (underlyingTokenAddrResult.reverted) {
+      log.warning(
+        "[handleMarketListed] could not fetch underlying token of cToken: {}",
+        [cTokenAddr.toHexString()]
+      );
+      return;
+    }
+
+    let underlyingTokenAddr = underlyingTokenAddrResult.value;
+    let underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
+
+    underlyingTokenData = new TokenData(
+      underlyingTokenAddr,
+      getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
+      getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
+      getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
     );
-    _handleMarketListed(marketListedData, event);
-    return;
+
+    cTokenData = new TokenData(
+      cTokenAddr,
+      getOrElse<string>(cTokenContract.try_name(), "unknown"),
+      getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
+      cTokenDecimals
+    );
   }
 
-  let underlyingTokenAddrResult = cTokenContract.try_underlying();
-  if (underlyingTokenAddrResult.reverted) {
-    log.warning(
-      "[handleMarketListed] could not fetch underlying token of cToken: {}",
-      [cTokenAddr.toHexString()]
-    );
-    return;
-  }
-  let underlyingTokenAddr = underlyingTokenAddrResult.value;
-  let underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
   _handleMarketListed(
     new MarketListedData(
       protocol,
-      new TokenData(
-        underlyingTokenAddr,
-        getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
-        getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
-        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
-      ),
-      new TokenData(
-        cTokenAddr,
-        getOrElse<string>(cTokenContract.try_name(), "unknown"),
-        getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals
-      ),
+      underlyingTokenData,
+      cTokenData,
       cTokenReserveFactorMantissa
     ),
     event

@@ -19,3 +19,16 @@ export const nativeCToken = new TokenData(
   "vBNB",
   cTokenDecimals
 );
+
+export const cakeToken = new TokenData(
+  Address.fromString("0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82"),
+  "PancakeSwap Token",
+  "CAKE",
+  18
+);
+export const cakeCToken = new TokenData(
+  Address.fromString("0x86ac3974e2bd0d60825230fa6f355ff11409df5c"),
+  "Venus CAKE",
+  "vCAKE",
+  cTokenDecimals
+);
