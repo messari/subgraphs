@@ -52,10 +52,17 @@ function DeploymentsPage() {
 
   const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
-  }>({})
+  }>({});
 
-  const clientDecentralizedEndpoint = useMemo(() => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"), []);
-  const { data: decentralized, error: decentralizedQueryError, loading: decentralizedQueryLoading } = useQuery(decentralizedNetworkSubgraphsQuery, {
+  const clientDecentralizedEndpoint = useMemo(
+    () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"),
+    [],
+  );
+  const {
+    data: decentralized,
+    error: decentralizedQueryError,
+    loading: decentralizedQueryLoading,
+  } = useQuery(decentralizedNetworkSubgraphsQuery, {
     client: clientDecentralizedEndpoint,
   });
 
@@ -63,10 +70,9 @@ function DeploymentsPage() {
     getData();
   }, []);
 
-
   useEffect(() => {
     if (decentralized && !Object.keys(decentralizedDeployments)?.length) {
-      const decenDepos: { [x: string]: any } = { exchanges: {}, lending: {}, vaults: {}, generic: {} }
+      const decenDepos: { [x: string]: any } = { exchanges: {}, lending: {}, vaults: {}, generic: {} };
       const subs = decentralized.graphAccount.subgraphs;
       subs.forEach((sub: any, idx: number) => {
         let name = sub.currentVersion.subgraphDeployment.originalName.toLowerCase().split(" ");
@@ -75,21 +81,36 @@ function DeploymentsPage() {
         const network = sub.currentVersion.subgraphDeployment.network.id;
         const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
         const subgraphId = sub.id;
-        const schemaVersion = sub.currentVersion.subgraphDeployment.schema.split("\n").join("").split("#").find((x: string[]) => x.includes("Version:")).split("Version:")[1].trim()
-        const protocolTypeRaw = sub.currentVersion.subgraphDeployment.schema.split("\n").join("").split("#").find((x: string[]) => x.includes("Subgraph Schema:")).split("Subgraph Schema:")[1].trim();
+        const schemaVersion = sub.currentVersion.subgraphDeployment.schema
+          .split("\n")
+          .join("")
+          .split("#")
+          .find((x: string[]) => x.includes("Version:"))
+          .split("Version:")[1]
+          .trim();
+        const protocolTypeRaw = sub.currentVersion.subgraphDeployment.schema
+          .split("\n")
+          .join("")
+          .split("#")
+          .find((x: string[]) => x.includes("Subgraph Schema:"))
+          .split("Subgraph Schema:")[1]
+          .trim();
         let protocolType = "generic";
         if (protocolTypeRaw.toUpperCase().includes("LEND")) {
           protocolType = "lending";
-        } else if (protocolTypeRaw.toUpperCase().includes("EXCHANGE") || protocolTypeRaw.toUpperCase().includes("DEX")) {
+        } else if (
+          protocolTypeRaw.toUpperCase().includes("EXCHANGE") ||
+          protocolTypeRaw.toUpperCase().includes("DEX")
+        ) {
           protocolType = "exchanges";
         } else if (protocolTypeRaw.toUpperCase().includes("VAULT") || protocolTypeRaw.toUpperCase().includes("YIELD")) {
           protocolType = "vaults";
         }
-        decenDepos[protocolType][name] = { network, schemaVersion, deploymentId, subgraphId }
-      })
+        decenDepos[protocolType][name] = { network, schemaVersion, deploymentId, subgraphId };
+      });
       setDecentralizedDeployments(decenDepos);
     }
-  }, [decentralized])
+  }, [decentralized]);
 
   const navigate = useNavigate();
   const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
@@ -97,28 +118,37 @@ function DeploymentsPage() {
 
   let decentralizedSubgraphTable = null;
   if (Object.keys(decentralizedDeployments)?.length) {
-    decentralizedSubgraphTable = Object.keys(decentralizedDeployments).map(key => (
-      <>
-        <Typography
-          key={"typography-" + key}
-          variant="h4"
-          align="left"
-          fontWeight={500}
-          fontSize={28}
-          sx={{ padding: "6px", my: 2 }}
-        >
-          {key.toUpperCase()}
-        </Typography>
-        <DeploymentsTable
-          key={"depTable-" + key}
-          clientIndexing={clientIndexing}
-          protocolsOnType={decentralizedDeployments[key]}
-          protocolType={key}
-          isDecentralizedNetworkTable={true}
-        />
-      </>
-    ))
-    decentralizedSubgraphTable.unshift(<Typography variant="h4" align="center" sx={{ my: 4 }}>Decentralized Network Subgraphs</Typography>);
+    decentralizedSubgraphTable = Object.keys(decentralizedDeployments).map((key) => {
+      if (!Object.keys(decentralizedDeployments[key]).length) {
+        return null;
+      }
+      return (
+        <>
+          <Typography
+            key={"typography-" + key}
+            variant="h4"
+            align="left"
+            fontWeight={500}
+            fontSize={28}
+            sx={{ padding: "6px", my: 2 }}
+          >
+            {key.toUpperCase()}
+          </Typography>
+          <DeploymentsTable
+            key={"depTable-" + key}
+            clientIndexing={clientIndexing}
+            protocolsOnType={decentralizedDeployments[key]}
+            protocolType={key}
+            isDecentralizedNetworkTable={true}
+          />
+        </>
+      );
+    });
+    decentralizedSubgraphTable.unshift(
+      <Typography variant="h4" align="center" sx={{ my: 4 }}>
+        Decentralized Network Subgraphs
+      </Typography>,
+    );
   }
 
   return (
@@ -167,7 +197,7 @@ function DeploymentsPage() {
                 isDecentralizedNetworkTable={false}
               />
             </>
-          )
+          );
         })}
       </DeploymentsLayout>
     </DeploymentsContextProvider>

@@ -3,7 +3,7 @@ import MomentAdapter from "@material-ui/pickers/adapter/moment";
 import { Box, Button, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
-import { toDate } from "../../../src/utils/index";
+import { toDate, toUnitsSinceEpoch } from "../../../src/utils/index";
 import { percentageFieldList } from "../../constants";
 import moment, { Moment } from "moment";
 
@@ -14,14 +14,24 @@ interface TableChartProps {
 
 export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDateString, toggleDateString] = useState(true);
   const [dates, setDates] = useState<any>([]);
 
   const isPercentageField = percentageFieldList.find((x) => {
     return datasetLabel.toUpperCase().includes(x.toUpperCase());
   });
+  const hourly = datasetLabel.toUpperCase().includes("HOURLY");
   if (dataTable) {
+    let xHeaderName = "Date";
+    if (!showDateString) {
+      if (hourly) {
+        xHeaderName = "Hours";
+      } else {
+        xHeaderName = "Days";
+      }
+    }
     const columns = [
-      { field: "date", headerName: "Date", width: 120 },
+      { field: "date", headerName: xHeaderName, width: 120 },
       {
         field: "value",
         headerName: "Value",
@@ -32,7 +42,6 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
     if (isPercentageField) {
       suffix = "%";
     }
-    const hourly = datasetLabel.toUpperCase().includes("HOURLY");
 
     const filteredData = dataTable.filter((val: any) =>
       dates.length
@@ -44,9 +53,13 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
       if (isPercentageField && Array.isArray(val.value)) {
         returnVal = val.value.map((ele: string) => ele.toLocaleString() + "%").join(", ");
       }
+      let dateColumn = toDate(val.date, hourly);
+      if (!showDateString) {
+        dateColumn = toUnitsSinceEpoch(val.date, hourly);
+      }
       return {
         id: i,
-        date: toDate(val.date, hourly),
+        date: dateColumn,
         value: returnVal,
       };
     });
@@ -101,6 +114,9 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
 
           <Button onClick={() => setShowDatePicker((prev) => !prev)}>
             {showDatePicker ? "Hide" : "Show"} Date Filter
+          </Button>
+          <Button onClick={() => toggleDateString(!showDateString)}>
+            {showDateString ? `Show ${hourly ? "hours" : "days"} since epoch` : "Show Date MM/DD/YYYY"}
           </Button>
         </Box>
         <DataGrid

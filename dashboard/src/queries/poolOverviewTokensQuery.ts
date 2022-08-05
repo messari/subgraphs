@@ -1,22 +1,20 @@
 import { ProtocolType } from "../constants";
 
 export const poolOverviewTokensQuery = (protocolType: string): string => {
-    // The version group uses the first two digits  of the schema version and defaults to that schema.
-    if (protocolType === ProtocolType.EXCHANGE) {
-        return fetchTokensOnExchange();
-    } else if (protocolType === ProtocolType.LENDING) {
-        return fetchTokensOnLending();
-    } else if (protocolType === ProtocolType.YIELD) {
-        return fetchTokensOnYield();
-    } else {
-        return fetchTokensOnGeneric();
-    }
+  // The version group uses the first two digits  of the schema version and defaults to that schema.
+  if (protocolType === ProtocolType.EXCHANGE) {
+    return fetchTokensOnExchange();
+  } else if (protocolType === ProtocolType.LENDING) {
+    return fetchTokensOnLending();
+  } else if (protocolType === ProtocolType.YIELD) {
+    return fetchTokensOnYield();
+  } else {
+    return fetchTokensOnGeneric();
+  }
 };
 
-
 const fetchTokensOnExchange = (): string => {
-
-    return `
+  return `
       query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
         pool1: liquidityPool(id: $pool1Id) {
           id
@@ -180,11 +178,10 @@ const fetchTokensOnExchange = (): string => {
           }
       }
     `;
-}
-
+};
 
 const fetchTokensOnLending = (): string => {
-    return `
+  return `
     query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
       pool1: market(id: $pool1Id) {
         id
@@ -348,11 +345,10 @@ const fetchTokensOnLending = (): string => {
         }
     }
   `;
-}
-
+};
 
 const fetchTokensOnYield = (): string => {
-    return `
+  return `
     query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
       pool1: vault(id: $pool1Id) {
         id
@@ -515,11 +511,11 @@ const fetchTokensOnYield = (): string => {
           }
         }
     }
-  `
-}
+  `;
+};
 
 const fetchTokensOnGeneric = (): string => {
-    return `
+  return `
     query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
       pool1: pool(id: $pool1Id) {
         id
@@ -682,5 +678,5 @@ const fetchTokensOnGeneric = (): string => {
           }
         }
     }
-  `
-}
+  `;
+};

@@ -266,7 +266,7 @@ function ProtocolTabEntity({
 
             try {
               if (
-                issues.filter((x) => x.message === label && x.type === "SUM")?.length === 0 &&
+                issues.filter((x) => x.fieldName === label && x.type === "SUM")?.length === 0 &&
                 dataFieldMetrics[field]?.sum === 0
               ) {
                 // Create a warning for the 0 sum of all snapshots for this field
