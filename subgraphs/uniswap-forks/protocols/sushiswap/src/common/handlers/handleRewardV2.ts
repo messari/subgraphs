@@ -72,7 +72,8 @@ export function updateMasterChef(
     masterChefV2.rewardTokenInterval
   );
 
-  // Update the amount of staked tokens after withdraw
+  // Update the amount of staked LP tokens
+  // Positive for deposits, negative for withdraws
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
