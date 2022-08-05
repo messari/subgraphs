@@ -5,7 +5,10 @@ import {
   _HelperStore,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { getOrCreateToken } from "../../../../../src/common/getters";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../../../../../src/common/masterchef/helpers";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
@@ -32,7 +35,9 @@ export function updateMasterChef(
   }
 
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
-  pool.rewardTokens = [rewardToken.id];
+  pool.rewardTokens = [
+    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+  ];
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
