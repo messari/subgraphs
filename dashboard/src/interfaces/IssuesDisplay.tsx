@@ -3,7 +3,7 @@ import { CircularProgress, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -67,11 +67,13 @@ const messagesByLevel = (
         issuesMsg = issuesArray[x].message;
       }
       if (issuesArray[x].type === "TOK") {
-        let endStr = `has elements up to index [${issuesArray[x]?.message?.split('///')[1]}]`;
-        if (issuesArray[x]?.message?.split('///')[1] === "-1") {
+        let endStr = `has elements up to index [${issuesArray[x]?.message?.split("///")[1]}]`;
+        if (issuesArray[x]?.message?.split("///")[1] === "-1") {
           endStr = `is empty`;
         }
-        issuesMsg = `${issuesArray[x].fieldName?.split("///")[0]} array has elements up to index [${issuesArray[x].fieldName?.split("///")[1]}], but ${issuesArray[x]?.message?.split('///')[0]} array ${endStr}.`;
+        issuesMsg = `${issuesArray[x].fieldName?.split("///")[0]} array has elements up to index [${
+          issuesArray[x].fieldName?.split("///")[1]
+        }], but ${issuesArray[x]?.message?.split("///")[0]} array ${endStr}.`;
       }
       if (issuesArray[x].type === "NEG") {
         const msgObj = JSON.parse(issuesArray[x].message);

@@ -1,14 +1,6 @@
 import { SubgraphDeployments } from "./SubgraphDeployments";
 import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { useState } from "react";
 import Placeholder from "./Placeholder";
 import LazyLoad from "react-lazyload";
@@ -21,7 +13,12 @@ interface DeploymentsTable {
   isDecentralizedNetworkTable: Boolean;
 }
 
-function DeploymentsTable({ protocolsOnType, clientIndexing, protocolType, isDecentralizedNetworkTable }: DeploymentsTable) {
+function DeploymentsTable({
+  protocolsOnType,
+  clientIndexing,
+  protocolType,
+  isDecentralizedNetworkTable,
+}: DeploymentsTable) {
   const initialLoaded: { [x: string]: Boolean } = {};
   if (!isDecentralizedNetworkTable) {
     Object.keys(protocolsOnType).forEach((p, idx) => {
@@ -75,12 +72,7 @@ function DeploymentsTable({ protocolsOnType, clientIndexing, protocolType, isDec
           }
           return (
             <TableCell key={"column" + x} sx={style}>
-              <Typography
-                variant="h5"
-                fontSize={14}
-                fontWeight={500}
-                sx={{ margin: "0", width: "100%", textAlign }}
-              >
+              <Typography variant="h5" fontSize={14} fontWeight={500} sx={{ margin: "0", width: "100%", textAlign }}>
                 {x}
               </Typography>
             </TableCell>
@@ -90,17 +82,19 @@ function DeploymentsTable({ protocolsOnType, clientIndexing, protocolType, isDec
     </TableHead>
   );
 
-  let loadedTableBody = (<>
-    {Object.keys(deploymentsLoaded).map((protocol) => {
-      return (
-        <SubgraphDeployments
-          clientIndexing={clientIndexing}
-          key={"DeploymentsOnProtocol-" + protocolType + "-" + protocol}
-          protocol={{ name: protocol, deploymentMap: protocolsOnType[protocol] }}
-        />
-      );
-    })}
-  </>);
+  let loadedTableBody = (
+    <>
+      {Object.keys(deploymentsLoaded).map((protocol) => {
+        return (
+          <SubgraphDeployments
+            clientIndexing={clientIndexing}
+            key={"DeploymentsOnProtocol-" + protocolType + "-" + protocol}
+            protocol={{ name: protocol, deploymentMap: protocolsOnType[protocol] }}
+          />
+        );
+      })}
+    </>
+  );
 
   let placeholderTableBody: JSX.Element | null = (
     <div>
@@ -118,11 +112,19 @@ function DeploymentsTable({ protocolsOnType, clientIndexing, protocolType, isDec
     </div>
   );
   if (isDecentralizedNetworkTable) {
-    loadedTableBody = (<>
-      {Object.keys(protocolsOnType).map(protocol => {
-        return <DecentralizedNetworkRow rowData={protocolsOnType[protocol]} subgraphName={protocol} clientIndexing={clientIndexing} />
-      })}
-    </>);
+    loadedTableBody = (
+      <>
+        {Object.keys(protocolsOnType).map((protocol) => {
+          return (
+            <DecentralizedNetworkRow
+              rowData={protocolsOnType[protocol]}
+              subgraphName={protocol}
+              clientIndexing={clientIndexing}
+            />
+          );
+        })}
+      </>
+    );
     placeholderTableBody = null;
   }
 
@@ -131,9 +133,7 @@ function DeploymentsTable({ protocolsOnType, clientIndexing, protocolType, isDec
       <TableContainer>
         <Table stickyHeader>
           {tableHead}
-          <TableBody >
-            {loadedTableBody}
-          </TableBody>
+          <TableBody>{loadedTableBody}</TableBody>
         </Table>
       </TableContainer>
       {placeholderTableBody}

@@ -66,7 +66,7 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
             currentData?.outputToken?.decimals,
           )?.toFixed(2);
 
-          currentData.inputTokenAmounts = inputTokensDecimal.join(', ');
+          currentData.inputTokenAmounts = inputTokensDecimal.join(", ");
           currentData.outputTokenAmount = outputTokenDecimal;
           currentData.inputTokens = currentData.inputTokens
             .map((tok: any) => {
@@ -125,7 +125,7 @@ export const TableEvents = ({ datasetLabel, protocolNetwork, data, eventName }: 
               )}`;
             }
             if (!valueStr) {
-              valueStr = 'N/A';
+              valueStr = "N/A";
             }
             const blockExplorerUrlBase = blockExplorers[protocolNetwork.toUpperCase()];
             if (k.toUpperCase() === "HASH") {

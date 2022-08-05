@@ -116,7 +116,7 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
             {showDatePicker ? "Hide" : "Show"} Date Filter
           </Button>
           <Button onClick={() => toggleDateString(!showDateString)}>
-            {showDateString ? `Show ${hourly ? 'hours' : 'days'} since epoch` : "Show Date MM/DD/YYYY"}
+            {showDateString ? `Show ${hourly ? "hours" : "days"} since epoch` : "Show Date MM/DD/YYYY"}
           </Button>
         </Box>
         <DataGrid

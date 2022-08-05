@@ -10,7 +10,7 @@ const subgraphLogoMap: Record<string, string> = {
   "beethoven-x": "https://storage.googleapis.com/subgraph-images/1655507943634beethoven-x.png",
   "saddle-finance": "https://messari.io/asset-images/b00ea47b-da58-403f-83b5-30c21bb28cb3/128.png?v=2",
   moonwell: "https://assets.coingecko.com/coins/images/23914/small/moonwell-logo-200px.png?1645682927",
-  "lido": "https://assets.coingecko.com/coins/images/13573/small/Lido_DAO.png?1609873644",
+  lido: "https://assets.coingecko.com/coins/images/13573/small/Lido_DAO.png?1609873644",
   apeswap: "https://messari.io/asset-images/78426375-fb5a-4079-91b3-e5db4fef2826/128.png?v=2",
   benqi: "https://messari.io/asset-images/0b731b8e-0387-48ee-8d7b-8342daf727f8/128.png?v=2",
   uniswap: "https://assets.coingecko.com/coins/images/12504/small/uniswap-uni.png?1600306604",

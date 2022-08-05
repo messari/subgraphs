@@ -107,7 +107,9 @@ function PoolTabEntity({
       if (data.protocols[0].type === "EXCHANGE") {
         let value = 0;
         if (Object.keys(data[poolKeySingular]?.fees)?.length > 0 && timeseriesInstance.totalValueLockedUSD) {
-          const revenueUSD = Number(timeseriesInstance.dailySupplySideRevenueUSD) * 365 || Number(timeseriesInstance.hourlySupplySideRevenueUSD) * 24 * 365;
+          const revenueUSD =
+            Number(timeseriesInstance.dailySupplySideRevenueUSD) * 365 ||
+            Number(timeseriesInstance.hourlySupplySideRevenueUSD) * 24 * 365;
           value = (revenueUSD / Number(timeseriesInstance.totalValueLockedUSD)) * 100;
           if (!value) {
             value = 0;
@@ -141,7 +143,10 @@ function PoolTabEntity({
             }
             dataFields[fieldName] = [];
             dataFieldMetrics[fieldName] = { sum: 0, invalidDataPlot: dataType };
-            if (capsFieldName.includes("REWARD") && issues.filter(x => x.type === "VAL" && x.fieldName.includes(fieldName)).length === 0) {
+            if (
+              capsFieldName.includes("REWARD") &&
+              issues.filter((x) => x.type === "VAL" && x.fieldName.includes(fieldName)).length === 0
+            ) {
               issues.push({
                 type: "VAL",
                 level: "critical",
@@ -332,7 +337,7 @@ function PoolTabEntity({
                   } else if (
                     currentRewardToken.type === "BORROW" &&
                     issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length ===
-                    0
+                      0
                   ) {
                     issues.push({
                       type: "BORROW",
@@ -352,7 +357,11 @@ function PoolTabEntity({
                       factors.push("snapshot.totalValueLockedUSD");
                       apr = (Number(val) / Number(timeseriesInstance.totalValueLockedUSD)) * 100 * 365;
                     } else {
-                      factors.push("snapshot.totalValueLockedUSD", "snapshot.stakedOutputTokenAmount", "snapshot.outputTokenSupply");
+                      factors.push(
+                        "snapshot.totalValueLockedUSD",
+                        "snapshot.stakedOutputTokenAmount",
+                        "snapshot.outputTokenSupply",
+                      );
                       apr =
                         (Number(val) /
                           (Number(timeseriesInstance.totalValueLockedUSD) *
@@ -371,7 +380,10 @@ function PoolTabEntity({
                     dataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
                       { value: apr, date: Number(timeseriesInstance.timestamp) },
                     ];
-                    dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"] = { sum: apr, factors: factors.join(", ") };
+                    dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"] = {
+                      sum: apr,
+                      factors: factors.join(", "),
+                    };
                   } else {
                     dataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
                       value: apr,
@@ -611,23 +623,23 @@ function PoolTabEntity({
 
     const rewardFieldCount: { [x: string]: any } = {};
     const inputTokenFieldCount: { [x: string]: any } = {};
-    Object.keys(dataFields).forEach(field => {
+    Object.keys(dataFields).forEach((field) => {
       const fieldName = field.split(" [")[0];
-      if (fieldName.includes('rewardToken')) {
+      if (fieldName.includes("rewardToken")) {
         if (!rewardFieldCount[fieldName]) {
           rewardFieldCount[fieldName] = 0;
         }
         rewardFieldCount[fieldName] += 1;
-      } else if (fieldName.toUpperCase().includes('TOKEN') && !fieldName.toUpperCase().includes("OUTPUT")) {
+      } else if (fieldName.toUpperCase().includes("TOKEN") && !fieldName.toUpperCase().includes("OUTPUT")) {
         if (!inputTokenFieldCount[fieldName]) {
           inputTokenFieldCount[fieldName] = 0;
         }
         inputTokenFieldCount[fieldName] += 1;
       }
-    })
+    });
 
-    Object.keys(rewardFieldCount).forEach(field => {
-      if (issues.filter(x => x.type === "TOK" && x.fieldName.includes(data[poolKeySingular]?.name)).length === 0) {
+    Object.keys(rewardFieldCount).forEach((field) => {
+      if (issues.filter((x) => x.type === "TOK" && x.fieldName.includes(data[poolKeySingular]?.name)).length === 0) {
         if (rewardFieldCount[field] === 1 && data[poolKeySingular][field]) {
           if (data[poolKeySingular][field].length > rewardTokensLength) {
             issues.push({
@@ -662,11 +674,10 @@ function PoolTabEntity({
           }
         }
       }
-
     });
 
-    Object.keys(inputTokenFieldCount).forEach(field => {
-      if (issues.filter(x => x.type === "TOK" && x.fieldName.includes(data[poolKeySingular]?.name)).length === 0) {
+    Object.keys(inputTokenFieldCount).forEach((field) => {
+      if (issues.filter((x) => x.type === "TOK" && x.fieldName.includes(data[poolKeySingular]?.name)).length === 0) {
         if (inputTokenFieldCount[field] > inputTokensLength) {
           issues.push({
             type: "TOK",

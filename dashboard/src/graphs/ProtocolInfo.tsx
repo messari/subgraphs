@@ -41,8 +41,8 @@ function ProtocolInfo({ protocolData, protocolId, subgraphToQueryURL, schemaVers
       link += "?version=pending";
     }
   } else if (subgraphToQueryURL.includes("https://gateway.thegraph.com")) {
-    const subId = subgraphToQueryURL.split('id/')[1];
-    link = `https://thegraph.com/explorer/subgraph?id=${subId}&view=Overview`
+    const subId = subgraphToQueryURL.split("id/")[1];
+    link = `https://thegraph.com/explorer/subgraph?id=${subId}&view=Overview`;
   } else {
     link = subgraphToQueryURL;
   }
@@ -60,7 +60,8 @@ function ProtocolInfo({ protocolData, protocolId, subgraphToQueryURL, schemaVers
           <Typography variant="h6">
             <span>{protocolSchemaData?.name} - </span>
             <Typography variant="body1" component="span">
-              {protocolSchemaData?.network}{(subgraphToQueryURL.includes("https://gateway.thegraph.com")) ? ' (DECENTRALIZED NETWORK)' : ''}
+              {protocolSchemaData?.network}
+              {subgraphToQueryURL.includes("https://gateway.thegraph.com") ? " (DECENTRALIZED NETWORK)" : ""}
             </Typography>
           </Typography>
         </Link>

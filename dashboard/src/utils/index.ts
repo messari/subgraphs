@@ -25,7 +25,7 @@ export const toUnitsSinceEpoch = (timestamp: number, hour: boolean) => {
     return (timestamp / 3600).toFixed(0);
   }
   return (timestamp / 86400).toFixed(0);
-}
+};
 
 export function isValidHttpUrl(s: string) {
   let url;
