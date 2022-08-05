@@ -249,11 +249,7 @@ type DexAmmProtocol implements Protocol @entity {
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 
-  "use to calculate the share of pool"
-  totalAllocPoint: BigInt!
-
-  "use to calculate reward token emission of beets"
-  beetsPerBlock: BigInt!
+  _poolIds: [String!]!
 }
 
 ###############################
@@ -466,8 +462,7 @@ type LiquidityPool @entity {
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
 
-  "use to calculate the share of pool"
-  allocPoint: BigInt!
+  _poolId: String!
 }
 
 #################################

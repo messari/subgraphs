@@ -12,9 +12,9 @@ dataSources:
       startBlock: 12272146
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/handlers.ts
+      file: ./src/mappings/vaultMappings.ts
       entities:
         - DexAmmProtocol
         - Token
@@ -33,6 +33,8 @@ dataSources:
           file: ./abis/ConvergentCurvePool.json
         - name: LinearPool
           file: ./abis/LinearPool.json
+        - name: FeesCollector
+          file: ./abis/FeesCollector.json
 
         ###########################################
         ############## Price Oracle ###############
@@ -68,9 +70,9 @@ dataSources:
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: PoolRegistered(indexed bytes32,indexed address,uint8)
-          handler: handlePoolRegister
+          handler: handlePoolRegistered
         - event: TokensRegistered(indexed bytes32,address[],address[])
-          handler: handleTokensRegister
+          handler: handleTokensRegistered
         - event: PoolBalanceChanged(indexed bytes32,indexed address,address[],int256[],uint256[])
           handler: handlePoolBalanceChanged
         - event: Swap(indexed bytes32,indexed address,indexed address,uint256,uint256)
@@ -83,15 +85,17 @@ templates:
       abi: WeightedPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/handlers.ts
+      file: ./src/mappings/poolMappings.ts
       entities:
         - WeightedPool
         - LiquidityPoolFee
       abis:
         - name: WeightedPool
           file: ./abis/WeightedPool.json
+        - name: FeesCollector
+          file: ./abis/FeesCollector.json
       eventHandlers:
         - event: SwapFeePercentageChanged(uint256)
-          handler: handleSwapFeePercentageChange
+          handler: handleSwapFeePercentageChanged

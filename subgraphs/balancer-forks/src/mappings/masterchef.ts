@@ -23,7 +23,7 @@ import {
 import { DEFAULT_DECIMALS } from "../prices/common/constants";
 import { convertTokenToDecimal } from "../common/utils/utils";
 import { LiquidityPool, RewardToken } from "../../generated/schema";
-import { fetchPrice } from "../common/pricing";
+import { fetchPrice } from "../modules/Pricing";
 
 export function handleUpdateEmissionRate(event: UpdateEmissionRate): void {
   log.info("[MasterChef] Log update emission rate {} {}", [
