@@ -43,6 +43,24 @@
   file: ./abis/Prices/Calculations/SushiSwap.json
 ```
 
+### Uniswap - Overriding router path
+
+The default behaviour when querying the Uniswap router for non-native token (e.g. ETH on mainnet, MATIC on polygon) prices is to derive the price via two jumps using the native token.
+
+As an example, to get the price of WBTC in USDC on ethereum mainnet, the path used would be WBTC -> WETH -> USDC, deriving the prices from the WBTC/WETH pool and the WETH/USDC pool.
+There may be cases where the price queried with this method is inaccurate due to low liquidity of the intermediate pools, in this case, it is possible to override the router path for tokens on specific networks.
+This is done by adding a new entry to '`UNISWAP_PATH_OVERRIDE` in the `./config/<network>.ts` file.
+
+For example, on polygon there is insufficient liquidity in WBTC/WMATIC at the time of writing. we have overrided the router PATH for WBTC on polygon so that the WBTC/USDC pool is used instead:
+```
+QUICKSWAP_PATH_OVERRIDE.set(
+  Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // Token to override (WBTC)
+  [
+    Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // WBTC
+    Address.fromString("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"),  // USDC
+  ]
+```
+
 ## Usage
 
 Following are some ways through which you can get the prices of tokens:
