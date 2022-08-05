@@ -28,7 +28,11 @@ const messagesByLevel = (
     for (let x = 0; x < issuesArray.length; x++) {
       let issuesMsg = (issuesArray[x].fieldName ? issuesArray[x].fieldName + ": " : "") + issuesArray[x].message;
       if (issuesArray[x].type === "SUM") {
-        issuesMsg = `All values in ${issuesArray[x].fieldName} are 0. Verify that this data is being mapped correctly.`;
+        let factors = "";
+        if (issuesArray[x].message) {
+          factors = "This field is derived from the following factors: " + issuesArray[x].message + ". ";
+        }
+        issuesMsg = `All values in ${issuesArray[x].fieldName} are 0. ${factors}Verify that this data is being mapped correctly.`;
       }
       if (issuesArray[x].type === "LIQ") {
         issuesMsg = `${issuesArray[x].fieldName} timeseries value cannot be higher than totalValueLockedUSD on the pool. Look at snapshot id ${issuesArray[x].message}`;

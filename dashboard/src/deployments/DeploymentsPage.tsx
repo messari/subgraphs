@@ -97,27 +97,31 @@ function DeploymentsPage() {
 
   let decentralizedSubgraphTable = null;
   if (Object.keys(decentralizedDeployments)?.length) {
-    decentralizedSubgraphTable = Object.keys(decentralizedDeployments).map(key => (
-      <>
-        <Typography
-          key={"typography-" + key}
-          variant="h4"
-          align="left"
-          fontWeight={500}
-          fontSize={28}
-          sx={{ padding: "6px", my: 2 }}
-        >
-          {key.toUpperCase()}
-        </Typography>
-        <DeploymentsTable
-          key={"depTable-" + key}
-          clientIndexing={clientIndexing}
-          protocolsOnType={decentralizedDeployments[key]}
-          protocolType={key}
-          isDecentralizedNetworkTable={true}
-        />
-      </>
-    ))
+    decentralizedSubgraphTable = Object.keys(decentralizedDeployments).map(key => {
+      if (!Object.keys(decentralizedDeployments[key]).length) {
+        return null
+      }
+      return (
+        <>
+          <Typography
+            key={"typography-" + key}
+            variant="h4"
+            align="left"
+            fontWeight={500}
+            fontSize={28}
+            sx={{ padding: "6px", my: 2 }}
+          >
+            {key.toUpperCase()}
+          </Typography>
+          <DeploymentsTable
+            key={"depTable-" + key}
+            clientIndexing={clientIndexing}
+            protocolsOnType={decentralizedDeployments[key]}
+            protocolType={key}
+            isDecentralizedNetworkTable={true}
+          />
+        </>)
+    })
     decentralizedSubgraphTable.unshift(<Typography variant="h4" align="center" sx={{ my: 4 }}>Decentralized Network Subgraphs</Typography>);
   }
 

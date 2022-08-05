@@ -138,14 +138,22 @@ export const DecentralizedNetworkRow = ({
         ? 100
         : toPercent(statusData?.chains[0]?.latestBlock?.number || 0, statusData?.chains[0]?.chainHeadBlock?.number);
 
+    let network = rowData.network;
+    if (network === 'mainnet') {
+        network = 'ethereum';
+    }
+    if (network === 'matic') {
+        network = 'polygon';
+    }
+
     const endpointURL = "https://gateway.thegraph.com/api/f57ab6e6638dd854bc032b4c9a10ee1e/subgraphs/id/" + rowData.subgraphId;
     return (
         <TableRow sx={{ width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }} onClick={navigateToSubgraph(endpointURL)}>
             <TableCell sx={{ padding: "6px", borderLeft: `${statusColor} solid 6px`, verticalAlign: "middle", display: "flex" }}>
                 <SubgraphLogo name={subgraphName} />
-                <NetworkLogo network={rowData.network} />
+                <NetworkLogo network={network} />
                 <span style={{ display: "inline-flex", alignItems: "center", paddingLeft: "6px", fontSize: "14px" }}>
-                    {subgraphName}-{rowData.network}
+                    {subgraphName}-{network}
                 </span>
             </TableCell>
             <TableCell sx={{ padding: "6px", textAlign: "right" }}>

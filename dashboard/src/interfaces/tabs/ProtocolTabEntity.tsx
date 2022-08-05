@@ -230,7 +230,7 @@ function ProtocolTabEntity({
             const req =
               "!" ===
               entitiesData[entityName][entityField].split("")[
-                entitiesData[entityName][entityField].split("").length - 1
+              entitiesData[entityName][entityField].split("").length - 1
               ];
             if (req) {
               list[entityName][entityField] = "MISSING AND REQUIRED";
@@ -266,7 +266,7 @@ function ProtocolTabEntity({
 
             try {
               if (
-                issues.filter((x) => x.message === label && x.type === "SUM")?.length === 0 &&
+                issues.filter((x) => x.fieldName === label && x.type === "SUM")?.length === 0 &&
                 dataFieldMetrics[field]?.sum === 0
               ) {
                 // Create a warning for the 0 sum of all snapshots for this field

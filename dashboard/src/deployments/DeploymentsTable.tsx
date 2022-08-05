@@ -47,7 +47,7 @@ function DeploymentsTable({ protocolsOnType, clientIndexing, protocolType, isDec
   }
 
   const columnLabels: { [x: string]: string } = {
-    "Name/Network": "220px",
+    "Name/Network": "285px",
     "Indexed %": "80px",
     "Current Block": "120px",
     "Chain Head": "120px",
@@ -59,7 +59,7 @@ function DeploymentsTable({ protocolsOnType, clientIndexing, protocolType, isDec
 
   const tableHead = (
     <TableHead sx={{ height: "30px" }}>
-      <TableRow sx={{ height: "30px", width: "100%" }}>
+      <TableRow sx={{ height: "30px" }}>
         {Object.keys(columnLabels).map((x, idx) => {
           const style: { [x: string]: string } = {
             minWidth: columnLabels[x],
@@ -131,7 +131,7 @@ function DeploymentsTable({ protocolsOnType, clientIndexing, protocolType, isDec
       <TableContainer>
         <Table stickyHeader>
           {tableHead}
-          <TableBody sx={{ width: "100%" }}>
+          <TableBody >
             {loadedTableBody}
           </TableBody>
         </Table>

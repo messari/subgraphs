@@ -230,7 +230,6 @@ export const TablePoolOverview = ({
         });
         const tokenFieldDiff = pool.rewardTokens?.length - pool.rewardTokenEmissionsUSD?.length;
         if (tokenFieldDiff !== 0 && issues.filter(x => x.type === "TOK" && x.fieldName.includes(pool.name)).length === 0) {
-          console.log(pool.rewardTokens?.length, pool.rewardTokenEmissionsUSD?.length, tokenFieldDiff, tokenFieldDiff !== 0)
           if (pool.rewardTokens?.length > pool.rewardTokenEmissionsUSD?.length) {
             issues.push({
               type: "TOK",

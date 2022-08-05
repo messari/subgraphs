@@ -126,11 +126,17 @@ function SchemaTable({ entityData, schemaName, dataFields, issuesProps, setIssue
           value = "[ " + decimalMapped.join(", ") + " ]";
         } else if (
           fieldName.toUpperCase() === "INPUTTOKENBALANCE" ||
-          fieldName.toUpperCase() === "PRICEPERSHARE" ||
           fieldName.toUpperCase() === "DEPOSITLIMIT"
         ) {
           value = convertTokenDecimals(value, entityData.inputToken.decimals);
           dataType += " [" + entityData.inputToken.name + "]";
+          const issueReturned = checkValueFalsey(value, schemaName, fieldName, fieldDataTypeChars, issues);
+          if (issueReturned) {
+            issues.push(issueReturned);
+          }
+        } else if (fieldName.toUpperCase() === "PRICEPERSHARE") {
+          value = convertTokenDecimals(value, entityData.outputToken.decimals);
+          dataType += " [" + entityData.outputToken.name + "]";
           const issueReturned = checkValueFalsey(value, schemaName, fieldName, fieldDataTypeChars, issues);
           if (issueReturned) {
             issues.push(issueReturned);
