@@ -376,6 +376,7 @@ export function updateTVL(event: ethereum.Event): void {
 
 
     // How to get TVL from rari vaults on a per token basis
+    // we do not want unclaimed fees to be included in the balances
 
     // if...else to grab TVL for correct vault
     let tryTokenBalance: ethereum.CallResult<BigInt>;
