@@ -51,7 +51,7 @@ SPOOKY_SWAP_ROUTER_ADDRESS.set(
   Address.fromString("0x0000000000000000000000000000000000000000")
 );
 
-export const SPOOKYSWAP_PATH_OVERRIDE = new TypedMap<Address, Address[]>();
+export const SPOOKY_SWAP_PATH_OVERRIDE = new TypedMap<Address, Address[]>();
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// YEARNLENS CONTRACT //////////////////////////
