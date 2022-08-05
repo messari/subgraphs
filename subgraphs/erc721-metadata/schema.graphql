@@ -11,7 +11,7 @@ type Token @entity {
   id: ID!
 
   " Collection for the token "
-  collection: Collection!
+  collection: ERC721Collection!
 
   " ID of the token from the collection "
   tokenID: BigInt!
@@ -49,14 +49,14 @@ type Trait @entity {
   " { Contract ID }-{ Token ID }-{ Trait name } "
   id: ID!
 
-  " Address of the collection  "
-  collection: String!
+  " The collection for the trait "
+  collection: ERC721Collection!
 
   " ID of the token from the collection  "
   tokenId: BigInt!
 
   " Token metadata this attribute belongs to "
-  token: Token
+  token: Token!
 
   " Name of the trait "
   name: String!
@@ -69,10 +69,10 @@ type Trait @entity {
 }
 
 #####################################
-####### ERC721 Collections ######
+####### ERC721 Collection ######
 #####################################
 
-type Collection @entity {
+type ERC721Collection @entity {
   " ERC721 collection address "
   id: ID!
 
