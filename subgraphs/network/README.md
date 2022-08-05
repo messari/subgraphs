@@ -44,12 +44,12 @@ To deploy follow the steps above. You may put your hosted service endpoint in [d
 
 The timeseries data is important, based off `Network` and adds numerous daily/hourly metrics.
 
-### Schema 1.1.0 Explanation
+### Schema 1.1.1 Explanation
 
 There is a new entity called `STATS` that contains statistical calculations for each field collected.
 
 ```ts
-type STATS @entity {
+type Stats @entity {
   " { id of the snapshot this belongs to } - { DataType } "
   id: ID!
 
@@ -58,9 +58,6 @@ type STATS @entity {
 
   " The average of all the values "
   mean: BigDecimal!
-
-  " The middle value when ordered from least to greatest "
-  median: BigDecimal!
 
   " The maximum value in this entity "
   max: BigInt!
@@ -86,6 +83,8 @@ type STATS @entity {
   q1: BigDecimal
 }
 ```
+
+> Upon moving to substreams we will add `median` back into `Stats`
 
 The fields that will exhibit this type are:
 
