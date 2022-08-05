@@ -7,7 +7,10 @@ import {
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
-import { getOrCreateToken } from "../../../../../src/common/getters";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../../../../../src/common/masterchef/helpers";
 import {
@@ -33,7 +36,9 @@ export function updateMasterChef(
   }
 
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
-  pool.rewardTokens = [rewardToken.id];
+  pool.rewardTokens = [
+    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+  ];
 
   // Get the amount of Banana tokens emitted for all pools per second.
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
@@ -61,7 +66,8 @@ export function updateMasterChef(
     masterChefV2.rewardTokenInterval
   );
 
-  // Update the amount of staked tokens after deposit
+  // Update the amount of staked tokens
+  // Positive for deposits, negative for withdraws
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),

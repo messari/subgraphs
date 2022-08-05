@@ -5,8 +5,15 @@ import {
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
-import { BIGINT_ZERO, INT_ZERO, MasterChef } from "../../../../../src/common/constants";
-import { getOrCreateToken } from "../../../../../src/common/getters";
+import {
+  BIGINT_ZERO,
+  INT_ZERO,
+  MasterChef,
+} from "../../../../../src/common/constants";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import {
   convertTokenToDecimal,
@@ -32,8 +39,10 @@ export function updateMasterChef(
   }
 
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
-  pool.rewardTokens = [rewardToken.id];
-  
+  pool.rewardTokens = [
+    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+  ];
+
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block.
   // Adjusted reward token rate is calculated in the MasterChefV1 handler since rewards feed in from MasterChefV1.
@@ -63,7 +72,8 @@ export function updateMasterChef(
     masterChefV2.rewardTokenInterval
   );
 
-  // Update the amount of staked tokens after withdraw
+  // Update the amount of staked LP tokens
+  // Positive for deposits, negative for withdraws
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),

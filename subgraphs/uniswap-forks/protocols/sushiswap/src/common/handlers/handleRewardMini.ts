@@ -6,7 +6,10 @@ import {
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
-import { getOrCreateToken } from "../../../../../src/common/getters";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import {
   convertTokenToDecimal,
@@ -31,7 +34,9 @@ export function updateMasterChef(
   }
 
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
-  pool.rewardTokens = [rewardToken.id];
+  pool.rewardTokens = [
+    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+  ];
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
@@ -51,6 +56,7 @@ export function updateMasterChef(
   );
 
   // Update the amount of staked tokens after deposit
+  // Positive for deposits, negative for withdraws
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
