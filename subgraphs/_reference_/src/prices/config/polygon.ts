@@ -52,6 +52,15 @@ QUICKSWAP_ROUTER_ADDRESS.set(
   Address.fromString("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff")
 );
 
+export const QUICKSWAP_PATH_OVERRIDE = new TypedMap<Address, Address[]>();
+QUICKSWAP_PATH_OVERRIDE.set(
+  Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // WBTC - WBTC/WMATIC liquidity too low， use WBTC/USDC directly
+  [
+    Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // WBTC
+    Address.fromString("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"),  // USDC
+  ]
+)
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// YEARNLENS CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
