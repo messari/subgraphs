@@ -56,7 +56,7 @@ Arrakis Finance have deployed vaults on Polygon with a time-limited rewards prog
 To be added
 
 ### TVL/Revenue Known Issues
-The subgraph uses the price libs which currently does not support polygon and optimism.  The price lib used in this subgraph does not currently support Uniswap V3, as such, USD values of TVL and revenue of vaults containing the following tokens may be inaccurate:
+The subgraph uses the price libs which currently does not support optimism.  The price lib used in this subgraph does not currently support Uniswap V3, as such, USD values of TVL and revenue of vaults containing the following tokens may be inaccurate:
 | Token Symbol | Token Address                              |
 |--------------|--------------------------------------------|
 | JPG          | 0x02e7ac540409d32c90bfb51114003a9e1ff0249c |

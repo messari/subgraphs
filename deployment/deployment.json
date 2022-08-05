@@ -133,6 +133,11 @@
           "template": "arrakis.finance.template.yaml",
           "messari": "messari/arrakis-finance-ethereum",
           "deploy-on-merge": true
+        },
+        "polygon": {
+          "template": "arrakis.finance.template.yaml",
+          "messari": "messari/arrakis-finance-polygon",
+          "deploy-on-merge": true
         }
       }
     },
