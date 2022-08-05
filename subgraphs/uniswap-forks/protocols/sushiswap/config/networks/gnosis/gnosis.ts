@@ -3,8 +3,8 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
   MINIMUM_LIQUIDITY_TEN_THOUSAND,
+  MINIMUM_LIQUIDITY_THREE_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
@@ -75,7 +75,7 @@ export class SushiswapXdaiConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1");
+    return toLowerCase("0xe91d153e0b41518a2ce8dd3d7944fa863463a97d"); // wxDAI
   }
   getRewardToken(): string {
     return toLowerCase("0x2995D1317DcD4f0aB89f4AE60F3f020A4F17C7CE");
@@ -114,6 +114,6 @@ export class SushiswapXdaiConfigurations implements Configurations {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
   getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
-    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
+    return MINIMUM_LIQUIDITY_THREE_THOUSAND;
   }
 }

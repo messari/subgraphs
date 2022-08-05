@@ -315,9 +315,9 @@ function getOrCreateMarketplace(marketplaceID: string): Marketplace {
     marketplace.name = "X2Y2";
     marketplace.slug = "x2y2";
     marketplace.network = Network.MAINNET;
-    marketplace.schemaVersion = "0.0.1";
-    marketplace.subgraphVersion = "0.0.1";
-    marketplace.methodologyVersion = "0.0.1";
+    marketplace.schemaVersion = "1.0.0";
+    marketplace.subgraphVersion = "1.0.0";
+    marketplace.methodologyVersion = "1.0.0";
     marketplace.collectionCount = 0;
     marketplace.tradeCount = 0;
     marketplace.cumulativeTradeVolumeETH = BIGDECIMAL_ZERO;
