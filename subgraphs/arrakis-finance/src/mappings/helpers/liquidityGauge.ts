@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _GaugeRewardToken, _LiquidityGauge } from "../../../generated/schema";
 import { LiquidityGaugeV4 as GaugeContract } from "../../../generated/templates/LiquidityGauge/LiquidityGaugeV4";
 import {
@@ -7,6 +7,7 @@ import {
   SECONDS_PER_DAY,
 } from "../../common/constants";
 import { getOrCreateRewardToken } from "../../common/getters";
+import { BIGINT_TEN } from "../../prices/common/constants";
 import { updateTokenPrice } from "./pricing";
 import { getOrCreateVault } from "./vaults";
 
@@ -66,13 +67,13 @@ export function updateRewardToken(
 
     // Check if reward token already exists on the vault
     // This might be the case if a new gauge replaced an old one
-    let rewardTokenIndex = rewardTokens.length
+    let rewardTokenIndex = rewardTokens.length;
     for (let i = 0; i < rewardTokens.length; i++) {
       if (Address.fromString(rewardTokens[i]) == rewardTokenAddress) {
-        rewardTokenIndex = i
+        rewardTokenIndex = i;
       }
     }
-    
+
     // Create new _GaugeRewardToken entity for future index lookup
     gaugeRewardToken = createGaugeRewardToken(
       gaugeAddress,
@@ -122,9 +123,9 @@ export function updateRewardEmission(
       BigInt.fromI32(SECONDS_PER_DAY)
     );
     let rewardToken = updateTokenPrice(rewardTokenAddress, block.number);
-    emissionsUSD[rewardTokenIndex] = rewardToken.lastPriceUSD!.times(
-      emissionsAmount[rewardTokenIndex].toBigDecimal()
-    );
+    emissionsUSD[rewardTokenIndex] = rewardToken
+      .lastPriceUSD!.times(emissionsAmount[rewardTokenIndex].toBigDecimal())
+      .div(BIGINT_TEN.pow(rewardToken.decimals as u8).toBigDecimal());
   } else {
     // Set emissions to 0 if reward period has ended
     emissionsAmount[rewardTokenIndex] = BIGINT_ZERO;
