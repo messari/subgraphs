@@ -142,7 +142,7 @@ export const DecentralizedNetworkRow = ({ rowData, subgraphName, clientIndexing 
   }
 
   const endpointURL =
-    "https://gateway.thegraph.com/api/f57ab6e6638dd854bc032b4c9a10ee1e/subgraphs/id/" + rowData.subgraphId;
+    "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + rowData.subgraphId;
   return (
     <TableRow sx={{ width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }} onClick={navigateToSubgraph(endpointURL)}>
       <TableCell
