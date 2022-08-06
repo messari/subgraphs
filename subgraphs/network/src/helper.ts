@@ -6,7 +6,7 @@ import {
   DailySnapshot,
   HourlySnapshot,
   Network,
-  STATS,
+  Stats,
 } from "../generated/schema";
 import {
   BIGDECIMAL_ZERO,
@@ -370,7 +370,7 @@ export function updateAuthors(
 }
 
 //
-// Update STATS entity and return the id
+// Update Stats entity and return the id
 // calculate the variance, q1, q3 once the daily/hourly snapshot is done
 function updateStats(id: string, dataType: string, value: BigInt): string {
   let stats = getOrCreateStats(id, dataType);
@@ -384,23 +384,15 @@ function updateStats(id: string, dataType: string, value: BigInt): string {
   stats.min = value.lt(stats.min) ? value : stats.min;
 
   // update mean / median
-  stats.values = insertInOrder(value, stats.values);
+  let values = stats.values;
+  values.push(value);
+  stats.values = values;
   stats.mean = stats.sum
     .toBigDecimal()
     .div(BigDecimal.fromString(stats.count.toString()));
-  stats.median = getMedian(stats.values);
 
   stats.save();
   return stats.id;
-}
-
-//
-// insert value into array and keep numerical order
-// Algo: quicksort modification
-// Runtime: cannot be specified (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
-function insertInOrder(value: BigInt, array: BigInt[]): BigInt[] {
-  array.push(value);
-  return array.sort();
 }
 
 function getMedian(list: BigInt[]): BigDecimal {
@@ -531,7 +523,10 @@ function updatePreviousHourlySnapshot(snapshot: HourlySnapshot): void {
 //
 //
 // This function updates a snapshots variance, q1, and q3
-function updateStatisicalData(statsEntity: STATS): void {
+function updateStatisicalData(statsEntity: Stats): void {
+  // sort values array
+  statsEntity.values = statsEntity.values.sort();
+
   // find variance
   statsEntity.variance = findVariance(statsEntity.mean, statsEntity.values);
 
@@ -692,14 +687,13 @@ function getOrCreateNetwork(id: string): Network {
   return network;
 }
 
-function getOrCreateStats(snapshot: string, dataType: string): STATS {
+function getOrCreateStats(snapshot: string, dataType: string): Stats {
   let id = snapshot.concat("-").concat(dataType);
-  let stats = STATS.load(id);
+  let stats = Stats.load(id);
   if (!stats) {
-    stats = new STATS(id);
+    stats = new Stats(id);
     stats.count = INT_ZERO;
     stats.mean = BIGDECIMAL_ZERO;
-    stats.median = BIGDECIMAL_ZERO;
     stats.max = BIGINT_ZERO;
     stats.min = BIGINT_MAX;
     stats.variance = BIGDECIMAL_ZERO;
