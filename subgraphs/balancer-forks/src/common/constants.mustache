@@ -115,11 +115,18 @@ export const BIGINT_NEGATIVE_ONE = BigInt.fromString("-1");
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
+export const BIGDECIMAL_POINT_FOUR = BigDecimal.fromString("0.4");
 
 export const FEE_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
 
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
+
+export const WEEKLY_BAL_EMISSIONS = BigDecimal.fromString("145000");
+export const DAILY_BAL_EMISSIONS = WEEKLY_BAL_EMISSIONS.div(
+  BigDecimal.fromString("7")
+);
+
 
 /////////////////////////////
 ///// Protocol Specific /////

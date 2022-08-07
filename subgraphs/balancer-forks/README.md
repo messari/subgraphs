@@ -27,8 +27,6 @@ Sum across all Pools:
 
 `Pool Swap Volume * Pool Swap Fee * ProtocolSide Fee`
 
-Note: 04/07/22 The ProtocolSideFee is currently 50% and has been changed twice. It can continue changing.
-
 ### Supply-Side Revenue USD
 
 Portion of the Total Revenue allocated to the Supply-Side
@@ -48,8 +46,7 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 `Withdraws`
 
 ### Reward Token Emissions Amount
-
-To be added
+Note: Currently, 145,000 BAL tokens, or approximately 7.5M per year, are distributed every week through the Liquidity Mining program.
 
 ### Protocol Controlled Value
 
