@@ -6,17 +6,18 @@ import {
   BigDecimal,
   Bytes,
 } from "@graphprotocol/graph-ts";
-import { PoolFeesType, PoolTokensType } from "./types";
-import { getUsdPricePerToken } from "../prices";
-import * as constants from "../common/constants";
-import { Token, LiquidityPool } from "../../generated/schema";
-import { Vault as VaultContract } from "../../generated/Vault/Vault";
-import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import {
   getOrCreateToken,
   getOrCreateDexAmmProtocol,
   getOrCreateLiquidityPoolFee,
 } from "./initializers";
+import { getUsdPricePerToken } from "../prices";
+import * as constants from "../common/constants";
+import { PoolFeesType, PoolTokensType } from "./types";
+import { Token, LiquidityPool } from "../../generated/schema";
+import { Vault as VaultContract } from "../../generated/Vault/Vault";
+import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
+import { Gauge as LiquidityGaugeContract } from "../../generated/templates/gauge/Gauge";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
 import { FeesCollector as FeesCollectorContract } from "../../generated/templates/WeightedPool/FeesCollector";
 
@@ -61,6 +62,19 @@ export function getPoolTokensInfo(poolId: Bytes): PoolTokensType {
     poolTokens.value.getTokens(),
     poolTokens.value.getBalances()
   );
+}
+
+export function getPoolFromGauge(gaugeAddress: Address): Address | null {
+  const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
+
+  let poolAddress = readValue<Address>(
+    gaugeContract.try_lp_token(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return null;
+  
+  return poolAddress;
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {

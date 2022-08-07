@@ -1,25 +1,22 @@
 {
-  "startBlock": "12272146",
   "network": "mainnet",
-
   "protocolName": "Balancer v2",
   "protocolSlug": "balancer-v2",
   "defaultNetwork": "Network.MAINNET",
 
   "vaultAddress": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
-  "protocolFeesCollectorAddress": "0xce88686553686DA562CE7Cea497CE749DA109f9F",
-  "knownAssets": {
-    "dai": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-    "usdc": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    "usdt": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-    "weth": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    "wbtc": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-    "wmatic": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
-    "bal": "0xba100000625a3754423978a60c9317c58a424e3D"
-  },
+  "vaultStartBlock": 12272146,
 
-  "isBalancer": true,
+  "gaugeControllerAddress": "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD",
+  "gaugeControllerStartBlock": 14457014,
+
+  "balancerMinterAddress" : "0x239e55f427d44c3cc793f49bfb507ebe76638a2b",
+  "balancerMinterStartBlock": 14457016,
+
+  "protocolFeesCollectorAddress": "0xce88686553686DA562CE7Cea497CE749DA109f9F",
+  "balancerAddress": "0xba100000625a3754423978a60c9317c58a424e3D",
+  
   "graftEnabled": false,
-  "subgraphId": "QmcqdR5ipUSZpoqFdZR4ecqyZ1izpDjxV93uDDsNoUR8jX",
-  "graftStartBlock": "14736560"
+  "subgraphId": "",
+  "graftStartBlock": ""
 }

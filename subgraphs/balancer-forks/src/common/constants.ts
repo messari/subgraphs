@@ -93,7 +93,7 @@ export namespace NULL {
 }
 
 export namespace Protocol {
-  export const NAME = "Balancer V2";
+  export const NAME = "Balancer v2";
   export const SLUG = "balancer-v2";
   export const NETWORK = Network.MAINNET;
   export const SCHEMA_VERSION = "1.3.0";
@@ -131,28 +131,9 @@ export const VAULT_ADDRESS = Address.fromString(
 export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
   "0xce88686553686DA562CE7Cea497CE749DA109f9F"
 );
-
-export const WETH = Address.fromString(
-  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-);
-export const WMATIC = Address.fromString(
-  "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
-);
-export const WBTC = Address.fromString(
-  "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
-);
-export const USDC = Address.fromString(
-  "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-);
-export const USDT = Address.fromString(
-  "0xdAC17F958D2ee523a2206206994597C13D831ec7"
-);
-export const BAL = Address.fromString(
+export const BALANCER_TOKEN_ADDRESS = Address.fromString(
   "0xba100000625a3754423978a60c9317c58a424e3D"
 );
-export const DAI = Address.fromString(
-  "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
+  "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD"
 );
-
-export const USD_STABLE_ASSETS = [USDC, DAI, USDT];
-export const BASE_ASSETS = [WETH, WMATIC, WBTC, BAL];

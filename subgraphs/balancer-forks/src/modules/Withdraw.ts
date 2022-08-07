@@ -156,8 +156,8 @@ export function Withdraw(
     poolContract.try_totalSupply(),
     pool.outputTokenSupply!
   );
-  let outputTokenBurntAmount = tokenSupplyAfterWithdrawal.minus(
-    pool.outputTokenSupply!
+  let outputTokenBurntAmount = pool.outputTokenSupply!.minus(
+    tokenSupplyAfterWithdrawal
   );
 
   pool.inputTokenBalances = inputTokenBalances;
