@@ -1218,8 +1218,11 @@ type Liquidate @entity {
   " The market of the collateral being used "
   market: Market!
 
-  " The user position changed by this event "
+  " The user (borrower) position changed by this event "
   position: Position!
+
+  " The user (lender) position changed by this event "
+  lenderPosition: Position!
 
   " Asset repaid (borrowed) "
   asset: Token!
