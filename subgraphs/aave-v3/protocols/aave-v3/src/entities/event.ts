@@ -232,7 +232,7 @@ export function createLiquidate(
   const collateralToken = getOrCreateToken(collateralAsset);
   const userAccount = getOrCreateAccount(liquidatee);
   const liquidatorAccount = getOrCreateAccount(liquidator);
-  const position = getOrCreateUserPosition(
+  const lenderPosition = getOrCreateUserPosition(
     event,
     userAccount,
     market,
@@ -255,7 +255,8 @@ export function createLiquidate(
   liquidate.liquidator = liquidatorAccount.id;
   liquidate.liquidatee = userAccount.id;
   liquidate.market = market.id;
-  liquidate.position = position.id;
+  liquidate.position = borrowerPosition.id;
+  liquidate.lenderPosition = lenderPosition.id;
   liquidate.asset = debtToken.id;
   liquidate.amount = amountLiquidated;
   liquidate.amountUSD = amountInUSD(amountLiquidated, collateralToken);
@@ -268,9 +269,10 @@ export function createLiquidate(
   addMarketLiquidateVolume(event, market, liquidate.amountUSD);
   incrementProtocolLiquidateCount(event, userAccount, liquidatorAccount);
   incrementAccountLiquidationCount(userAccount);
-  incrementPositionLiquidationCount(position);
+  incrementPositionLiquidationCount(borrowerPosition);
+  incrementPositionLiquidationCount(lenderPosition);
   incrementAccountLiquidatorCount(liquidatorAccount);
-  checkIfPositionClosed(event, userAccount, market, position);
+  checkIfPositionClosed(event, userAccount, market, lenderPosition);
   checkIfPositionClosed(event, userAccount, market, borrowerPosition);
   return liquidate;
 }
