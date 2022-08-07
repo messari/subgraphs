@@ -72,10 +72,6 @@ To keep PRs small follow thse guidelines, and use them to make educated choices 
 - Isolate bug fixes into individual PRs, do not combine them. If they depend on each other use your judgement if they should be together or not. You can always branch off a `feature-branch`
 - Use a single PR for each feature (ie, a new subgraph has it's own PR)
 
-### Commit Messages
-
-TODO: come up with standard
-
 ### Merging
 
 For now after a PR is reviewed Vincent (@this-username-is-taken) does the final merge into `master`.
