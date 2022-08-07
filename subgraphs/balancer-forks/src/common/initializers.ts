@@ -70,6 +70,11 @@ export function getOrCreateLiquidityPoolFee(
     fees.save();
   }
 
+  if (feePercentage.notEqual(constants.BIGDECIMAL_ZERO)) {
+    fees.feePercentage = feePercentage;
+    fees.save();
+  }
+
   return fees;
 }
 
@@ -356,7 +361,7 @@ export function getOrCreateLiquidityPool(
     pool.inputTokenBalances = inputTokensInfo.getBalances;
     pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
 
-    pool.outputToken = poolAddress.toHexString();
+    pool.outputToken = getOrCreateToken(poolAddress).id;
     pool.outputTokenSupply = constants.BIGINT_ZERO;
     pool.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
 

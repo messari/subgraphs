@@ -115,11 +115,18 @@ export const BIGINT_NEGATIVE_ONE = BigInt.fromString("-1");
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
+export const BIGDECIMAL_POINT_FOUR = BigDecimal.fromString("0.4");
 
 export const FEE_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
 
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
+
+export const WEEKLY_BAL_EMISSIONS = BigDecimal.fromString("145000");
+export const DAILY_BAL_EMISSIONS = WEEKLY_BAL_EMISSIONS.div(
+  BigDecimal.fromString("7")
+);
+
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -131,28 +138,9 @@ export const VAULT_ADDRESS = Address.fromString(
 export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
   "{{protocolFeesCollectorAddress}}"
 );
-
-export const WETH = Address.fromString(
-  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+export const BALANCER_TOKEN_ADDRESS = Address.fromString(
+  "{{balancerAddress}}"
 );
-export const WMATIC = Address.fromString(
-  "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
+export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
+  "{{gaugeControllerAddress}}"
 );
-export const WBTC = Address.fromString(
-  "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"
-);
-export const USDC = Address.fromString(
-  "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-);
-export const USDT = Address.fromString(
-  "0xdAC17F958D2ee523a2206206994597C13D831ec7"
-);
-export const BAL = Address.fromString(
-  "0xba100000625a3754423978a60c9317c58a424e3D"
-);
-export const DAI = Address.fromString(
-  "0x6B175474E89094C44Da98b954EedeAC495271d0F"
-);
-
-export const USD_STABLE_ASSETS = [USDC, DAI, USDT];
-export const BASE_ASSETS = [WETH, WMATIC, WBTC, BAL];

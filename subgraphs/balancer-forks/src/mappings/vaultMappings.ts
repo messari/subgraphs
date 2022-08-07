@@ -13,8 +13,8 @@ import {
   getOrCreateToken,
   getOrCreateLiquidityPool,
 } from "../common/initializers";
-import * as utils from "../common/utils";
 import { Swap } from "../modules/Swap";
+import * as utils from "../common/utils";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
 import * as constants from "../common/constants";
