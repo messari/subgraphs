@@ -77,7 +77,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | [Ellipsis Finance](https://ellipsis.finance/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Ellipsis Finance BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/ellipsis-finance-bsc) |
 | [Quickswap](https://quickswap.exchange/#/swap) | 🛠 | 1.3.0 / 1.0.2 / 1.0.0 | [![Quickswap Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/quickswap-polygon) |
 | [Honeyswap](https://honeyswap.org/) | 🛠 | 1.3.0 / 1.0.2 / 1.0.1 | [![Honeyswap Gnosis](./docs/images/chains/xdai.png)](https://thegraph.com/hosted-service/subgraph/messari/honeyswap-gnosis) |
-| [Platypus Finance](https://platypus.finance/) | 🛠 | 1.3.0 / 1.3.0 / 1.0.0 | [![Platypus Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/platypus-finance-avalanche) |
+| [Platypus Finance](https://platypus.finance/) | ✅ | 1.3.0 / 1.3.0 / 1.0.0 | [![Platypus Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/platypus-finance-avalanche) |
 | [Saddle Finance](https://saddle.finance/#/) | 🛠 | 1.3.0 / 1.1.0 / 1.0.0 | [![Saddle Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/saddle-finance-ethereum) [![Saddle Finance Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/saddle-finance-arbitrum) [![Saddle Finance Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/saddle-finance-fantom) [![Saddle Finance Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/saddle-finance-optimism) |
 | [Solarbeam](https://solarbeam.io/) | 🛠 | 1.3.0 / 1.0.2 / 1.0.0 | [![Solarbeam Moonriver](./docs/images/chains/moonriver.png)](https://thegraph.com/hosted-service/subgraph/messari/solarbeam-moonriver) |
 | [SpiritSwap](https://www.spiritswap.finance/) | 🛠 | 1.3.0 / 1.0.2 / 1.0.0 | [![SpiritSwap Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/spiritswap-fantom) |
@@ -109,7 +109,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | [Rari Fuse](https://app.rari.capital/fuse) | 🛠 | 2.0.1 / 1.1.0 / 1.0.0 | [![Rari Fuse Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-ethereum) [![Rari Fuse Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-arbitrum) |
 | [SCREAM](https://scream.sh/) | 🛠 | 2.0.1 / 1.1.0 / 1.0.0 | [![SCREAM Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/scream-fantom) |
 | [Tectonic](https://tectonic.finance/) | 🛠 | 2.0.1 / 1.1.0 / 1.0.0 | [![Tectonic Cronos](./docs/images/chains/cronos.png)](https://graph.cronoslabs.com/subgraphs/name/messari/tectonic/graphql) |
-| [Venus Protocol](https://venus.io/) | 🛠 | 2.0.1 / 1.1.0 / 1.0.0 | [![Venus Protocol BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/venus-protocol-bsc) |
+| [Venus Protocol](https://venus.io/) | ✅ | 2.0.1 / 1.1.0 / 1.0.0 | [![Venus Protocol BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/venus-protocol-bsc) |
 | [Yeti Finance](https://yeti.finance/) | 🔨 | | |
 | **CDPs** | | |
 | [Abracadabra](https://abracadabra.money/) | 🛠 | 2.0.1 / 1.2.1 / 1.0.0 | [![Abracadabra Money](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-ethereum) [![Abracadabra Money](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-bsc) [![Abracadabra Money](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-arbitrum) [![Abracadabra Money](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-fantom) [![Abracadabra Money](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-avalanche) |
@@ -136,7 +136,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | [Yearn v2](https://yearn.fi/) | 🛠 | 1.3.0 / 1.2.0 / 1.0.0 | [![Yearn V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-ethereum) [![Yearn V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-arbitrum) [![Yearn V2 Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-fantom) |
 | **Others** | | |
 | [Lido](https://lido.fi) | ✅ | 1.3.0 / 1.0.0 / 1.0.0 | [![Lido Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/lido-ethereum) |
-| Rocket Pool | | | |
+| Rocket Pool | 🔨 | | |
 | Tornado Cash | 🔨 | | |
 | **Governance** | | |
 | Fei Governor | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![Fei Governor](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/fei-governance) |
