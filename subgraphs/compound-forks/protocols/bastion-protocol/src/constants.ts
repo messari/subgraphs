@@ -6,8 +6,12 @@ import { TokenData } from "../../../src/mapping";
 /////     Addresses      /////
 //////////////////////////////
 
-export let comptrollerAddr = Address.fromString(
+export const comptrollerAddr = Address.fromString(
   "0x6De54724e128274520606f038591A00C5E94a1F6"
+);
+
+export const rewardDistributorAddress = Address.fromString(
+  "0x98E8d4b4F53FA2a2d1b9C651AF919Fc839eE4c1a"
 );
 
 export const nativeToken = new TokenData(

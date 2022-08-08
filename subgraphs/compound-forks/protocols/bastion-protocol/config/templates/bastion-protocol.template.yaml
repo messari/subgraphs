@@ -40,31 +40,6 @@ dataSources:
         - event: ActionPaused(address,string,bool)
           handler: handleActionPaused
       file: ./protocols/bastion-protocol/src/mapping.ts
-  - kind: ethereum/contract
-    name: RewardDistributor
-    network: {{ network }}
-    source:
-      address: "{{ rewardDistributorAddress }}"
-      abi: RewardDistributor
-      startBlock: {{ rewardDistributorStartBlock }}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - Market
-        - Token
-      abis:
-        - name: RewardDistributor
-          file: ./abis/bastion-protocol/RewardDistributor.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-      eventHandlers:
-        - event: RewardSupplySpeedUpdated(uint8,indexed address,uint256)
-          handler: handleRewardSupplySpeedUpdated
-        - event: RewardBorrowSpeedUpdated(uint8,indexed address,uint256)
-          handler: handleRewardBorrowSpeedUpdated
-      file: ./protocols/bastion-protocol/src/mapping.ts
 templates:
   - name: CToken
     kind: ethereum/contract
