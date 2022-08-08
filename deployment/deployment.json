@@ -908,7 +908,7 @@
           "template": "aave-governance.template.yaml",
           "danielkhoo": "danielkhoo/aave-governance",
           "messari": "messari/aave-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "dydx-governance": {
@@ -916,7 +916,7 @@
           "template": "dydx-governance.template.yaml",
           "danielkhoo": "danielkhoo/dydx-governance",
           "messari": "messari/dydx-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
