@@ -1,7 +1,5 @@
 {
   "network": "aurora",
   "factoryAddress": "0x6De54724e128274520606f038591A00C5E94a1F6",
-  "startBlock": "60837829",
-  "rewardDistributorAddress": "0x98e8d4b4f53fa2a2d1b9c651af919fc839ee4c1a",
-  "rewardDistributorStartBlock": "60837741"
+  "startBlock": "60837829"
 }

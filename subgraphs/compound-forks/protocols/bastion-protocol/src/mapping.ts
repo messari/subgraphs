@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -32,6 +32,8 @@ import {
   SECONDS_PER_DAY,
   RewardTokenType,
   exponentToBigDecimal,
+  INT_ZERO,
+  INT_ONE,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -63,13 +65,11 @@ import {
   comptrollerAddr,
   nativeCToken,
   nativeToken,
+  rewardDistributorAddress,
   REWARD_TOKENS,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
-import {
-  RewardSupplySpeedUpdated,
-  RewardBorrowSpeedUpdated,
-} from "../../../generated/RewardDistributor/RewardDistributor";
+import { RewardDistributor } from "../../../generated/RewardDistributor/RewardDistributor";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
@@ -263,8 +263,11 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
 export function handleAccrueInterest(event: AccrueInterest): void {
   let marketAddress = event.address;
-  // update rewards for market
-  updateRewardsPrices(marketAddress);
+  // update rewards for market after the RewardDistributor is created at block 60837741
+  if (event.block.number.toI64() > 60837741) {
+    updateRewards(marketAddress);
+  }
+  
 
   let cTokenContract = CToken.bind(marketAddress);
   let protocol = getOrCreateProtocol();
@@ -290,60 +293,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
 }
 
-export function handleRewardSupplySpeedUpdated(
-  event: RewardSupplySpeedUpdated
-): void {
-  let market = Market.load(event.params.cToken.toHexString());
-  if (!market) {
-    log.warning("[handleRewardSupplySpeedUpdate] Market not found", [
-      event.params.cToken.toHexString(),
-    ]);
-    return;
-  }
-
-  let rewardTokenAddress = REWARD_TOKENS[event.params.rewardType];
-  let token = Token.load(rewardTokenAddress.toHexString());
-  if (!token) {
-    log.warning("[handleSupplySpeedUpdate] Token not found", [
-      rewardTokenAddress.toHexString(),
-    ]);
-    return;
-  }
-  let rewardSpeed = event.params.newSpeed.times(
-    BigInt.fromI32(SECONDS_PER_DAY)
-  );
-  let rewardToken = getOrCreateRewardToken(token, RewardTokenType.DEPOSIT);
-
-  updateRewards(market, rewardToken, rewardSpeed);
-}
-
-export function handleRewardBorrowSpeedUpdated(
-  event: RewardBorrowSpeedUpdated
-): void {
-  let market = Market.load(event.params.cToken.toHexString());
-  if (!market) {
-    log.warning("[handleRewardBorrowSpeedUpdate] Market not found", [
-      event.params.cToken.toHexString(),
-    ]);
-    return;
-  }
-
-  let rewardTokenAddress = REWARD_TOKENS[event.params.rewardType];
-  let token = Token.load(rewardTokenAddress.toHexString());
-  if (!token) {
-    log.warning("[handleBorrowSpeedUpdate] Token not found", [
-      rewardTokenAddress.toHexString(),
-    ]);
-    return;
-  }
-  let rewardSpeed = event.params.newSpeed.times(
-    BigInt.fromI32(SECONDS_PER_DAY)
-  );
-  let rewardToken = getOrCreateRewardToken(token, RewardTokenType.BORROW);
-
-  updateRewards(market, rewardToken, rewardSpeed);
-}
-
 function getOrCreateProtocol(): LendingProtocol {
   let comptroller = Comptroller.bind(comptrollerAddr);
   let protocolData = new ProtocolData(
@@ -364,57 +313,148 @@ function getOrCreateProtocol(): LendingProtocol {
 //
 // Update the rewards arrays in a given market
 // can be done for supply / borrow side triggered by Supply/BorrowSpeedUpdate events
-function updateRewards(
-  market: Market,
-  rewardToken: RewardToken,
-  rewardsPerDay: BigInt
-): void {
-  let token = Token.load(rewardToken.token);
-  if (!token) {
-    log.warning("[updateRewards] Token not found", [rewardToken.id]);
+function updateRewards(marketAddress: Address): void {
+  let market = Market.load(marketAddress.toHexString());
+  if (!market) {
+    log.warning("[updateRewards] Market not found: {}", [
+      marketAddress.toHexString(),
+    ]);
     return;
   }
-  let rewardTokenPrice = token.lastPriceUSD!;
 
-  let rewardTokens = market.rewardTokens;
-  let rewardEmissions = market.rewardTokenEmissionsAmount;
-  let rewardEmissionsUSD = market.rewardTokenEmissionsUSD;
-  let isAdded = false; // tracks if reward token is added yet
-  if (rewardTokens) {
-    // try to find index of rewards
-    for (let i = 0; i < rewardTokens.length; i++) {
-      if (rewardTokens[i].toLowerCase() === rewardToken.id.toLowerCase()) {
-        rewardEmissions![i] = rewardsPerDay;
-        rewardEmissionsUSD![i] = rewardsPerDay
-          .toBigDecimal()
-          .div(exponentToBigDecimal(token.decimals))
-          .times(rewardTokenPrice);
-        isAdded = true;
-        break;
-      }
+  // setup variables and contracts
+  let rewardTokens: string[] = [];
+  let rewardEmissions: BigInt[] = [];
+  let rewardEmissionsUSD: BigDecimal[] = [];
+
+  let rewardDistributorContract = RewardDistributor.bind(
+    rewardDistributorAddress
+  );
+
+  // look for borrow-side rewards
+  // must check both types of rewards (see constants.ts for details)
+  let tryBorrowZero = rewardDistributorContract.try_rewardBorrowSpeeds(
+    INT_ZERO,
+    marketAddress
+  );
+  let tryBorrowOne = rewardDistributorContract.try_rewardBorrowSpeeds(
+    INT_ONE,
+    marketAddress
+  );
+  let borrowRewardSpeed: BigInt | null = null;
+  let borrowRewardToken: RewardToken | null = null;
+  let token: Token | null;
+
+  if (!tryBorrowZero.reverted) {
+    borrowRewardSpeed = tryBorrowZero.value;
+
+    // load BSTN token
+    token = Token.load(REWARD_TOKENS[INT_ZERO].toHexString());
+    if (!token) {
+      log.warning("[updateRewards] BSTN not found: {}", [
+        REWARD_TOKENS[INT_ZERO].toHexString(),
+      ]);
+      return;
     }
-  } else {
-    // if no rewards yet, create new array
-    rewardTokens = [rewardToken.id];
-    rewardEmissions = [rewardsPerDay];
-    rewardEmissionsUSD = [
-      rewardsPerDay
-        .toBigDecimal()
-        .div(exponentToBigDecimal(token.decimals))
-        .times(rewardTokenPrice),
-    ];
-    isAdded = true;
+
+    borrowRewardToken = getOrCreateRewardToken(token, RewardTokenType.BORROW);
   }
 
-  // add token to the end of the existing array
-  if (!isAdded) {
-    rewardTokens.push(rewardToken.id);
-    rewardEmissions!.push(rewardsPerDay);
-    rewardEmissionsUSD!.push(
-      rewardsPerDay
+  if (!tryBorrowOne.reverted) {
+    if (!borrowRewardSpeed) {
+      log.warning(
+        "[updateRewards] Multiple reward speeds found for borrow side: {}",
+        [marketAddress.toHexString()]
+      );
+      return;
+    }
+    borrowRewardSpeed = tryBorrowOne.value;
+
+    // load wNEAR token
+    token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
+    if (!token) {
+      log.warning("[updateRewards] wNEAR not found: {}", [
+        REWARD_TOKENS[INT_ONE].toHexString(),
+      ]);
+      return;
+    }
+
+    borrowRewardToken = getOrCreateRewardToken(token, RewardTokenType.BORROW);
+  }
+
+  // if a borrow side reward is successfully found, update rewards
+  if (!borrowRewardSpeed) {
+    rewardTokens.push(borrowRewardToken!.id);
+    rewardEmissions.push(borrowRewardSpeed!);
+    rewardEmissionsUSD.push(
+      borrowRewardSpeed!
         .toBigDecimal()
-        .div(exponentToBigDecimal(token.decimals))
-        .times(rewardTokenPrice)
+        .div(exponentToBigDecimal(token!.decimals))
+        .times(token!.lastPriceUSD!)
+        .times(BigDecimal.fromString(SECONDS_PER_DAY.toString()))
+    );
+  }
+
+  // look for supply-side rewards
+  // must check both types of rewards (see constants.ts for details)
+  let trySupplyZero = rewardDistributorContract.try_rewardSupplySpeeds(
+    INT_ZERO,
+    marketAddress
+  );
+  let trySupplyOne = rewardDistributorContract.try_rewardSupplySpeeds(
+    INT_ONE,
+    marketAddress
+  );
+  let supplyRewardSpeed: BigInt | null = null;
+  let supplyRewardToken: RewardToken | null = null;
+
+  if (!trySupplyZero.reverted) {
+    supplyRewardSpeed = trySupplyZero.value;
+
+    // load BSTN token
+    token = Token.load(REWARD_TOKENS[INT_ZERO].toHexString());
+    if (!token) {
+      log.warning("[updateRewards] BSTN not found: {}", [
+        REWARD_TOKENS[INT_ZERO].toHexString(),
+      ]);
+      return;
+    }
+
+    supplyRewardToken = getOrCreateRewardToken(token, RewardTokenType.DEPOSIT);
+  }
+
+  if (!trySupplyOne.reverted) {
+    if (!supplyRewardSpeed) {
+      log.warning(
+        "[updateRewards] Multiple reward speeds found for supply side: {}",
+        [marketAddress.toHexString()]
+      );
+      return;
+    }
+    supplyRewardSpeed = trySupplyOne.value;
+
+    // load wNEAR token
+    token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
+    if (!token) {
+      log.warning("[updateRewards] wNEAR not found: {}", [
+        REWARD_TOKENS[INT_ONE].toHexString(),
+      ]);
+      return;
+    }
+
+    supplyRewardToken = getOrCreateRewardToken(token, RewardTokenType.DEPOSIT);
+  }
+
+  // if a supply side reward is successfully found, update rewards
+  if (!supplyRewardSpeed) {
+    rewardTokens.push(supplyRewardToken!.id);
+    rewardEmissions.push(supplyRewardSpeed!);
+    rewardEmissionsUSD.push(
+      supplyRewardSpeed!
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token!.decimals))
+        .times(token!.lastPriceUSD!)
+        .times(BigDecimal.fromString(SECONDS_PER_DAY.toString()))
     );
   }
 
@@ -422,33 +462,6 @@ function updateRewards(
   market.rewardTokenEmissionsAmount = rewardEmissions;
   market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
   market.save();
-}
-
-//
-//
-// market.rewardTokenEmissionsUSD
-// both wNEAR and BSTN prices can be updated from cTokens
-function updateRewardsPrices(marketAddress: Address): void {
-  let market = Market.load(marketAddress.toHexString());
-  if (!market) {
-    log.warning("[updateRewardsPrices] Market not found", [
-      marketAddress.toHexString(),
-    ]);
-    return;
-  }
-
-  if (market.rewardTokens) {
-    for (let i = 0; i < market.rewardTokens!.length; i++) {
-      let rewardToken = RewardToken.load(market.rewardTokens![i]);
-      let token = Token.load(rewardToken!.token);
-
-      market.rewardTokenEmissionsUSD![i] = market
-        .rewardTokenEmissionsAmount![i].toBigDecimal()
-        .div(exponentToBigDecimal(token!.decimals))
-        .times(token!.lastPriceUSD!);
-    }
-    market.save();
-  }
 }
 
 function getOrCreateRewardToken(token: Token, type: string): RewardToken {
