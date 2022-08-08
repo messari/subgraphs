@@ -1,6 +1,14 @@
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { NftMetadata } from "../generated/OpenSeaV2/NftMetadata";
 import {
-  EXCHANGE_MARKETPLACE_NAME,
+  Collection,
+  CollectionDailySnapshot,
+  Marketplace,
+  MarketplaceDailySnapshot,
+} from "../generated/schema";
+import {
   Network,
+  EXCHANGE_MARKETPLACE_NAME,
   BIGDECIMAL_ZERO,
   EXCHANGE_MARKETPLACE_SLUG,
   EXCHANGE_MARKETPLACE_ADDRESS,
@@ -10,14 +18,8 @@ import {
   BIGINT_ZERO,
   SECONDS_PER_DAY,
   BIGDECIMAL_MAX,
+  SaleStrategy,
 } from "./constants";
-import {
-  Collection,
-  CollectionDailySnapshot,
-  Marketplace,
-  MarketplaceDailySnapshot,
-} from "../generated/schema";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export function getOrCreateMarketplace(marketplaceID: string): Marketplace {
   let marketplace = Marketplace.load(marketplaceID);
@@ -142,6 +144,14 @@ export function getOrCreateCollectionDailySnapshot(
   }
 
   return snapshot;
+}
+
+export function getSaleStrategy(saleKind: i32): string {
+  if (saleKind == 0) {
+    return SaleStrategy.STANDARD_SALE;
+  } else {
+    return SaleStrategy.DUTCH_AUCTION;
+  }
 }
 
 export function calcTradeVolumeETH(

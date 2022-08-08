@@ -1,8 +1,12 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 import { Trade, _Item } from "../generated/schema";
 import {
+  BIGDECIMAL_HUNDRED,
   EXCHANGE_MARKETPLACE_ADDRESS,
+  EXCHANGE_MARKETPLACE_FEE,
+  INVERSE_BASIS_POINT,
+  NULL_ADDRESS,
   SaleStrategy,
   SECONDS_PER_DAY,
   WYVERN_ATOMICIZER_ADDRESS,
@@ -15,7 +19,9 @@ import {
   calcTradeVolumeETH,
   min,
   max,
+  getSaleStrategy,
 } from "./helpers";
+import { logCallInputs } from "./logging";
 
 // struct Order {
 //   /* Exchange address, intended as a versioning mechanism. */
@@ -74,18 +80,62 @@ import {
 // sellSig: Sig(vs[1], rssMetadata[2], rssMetadata[3]),
 // metadata: rssMetadata[4]
 
+// addrs[0] buy.exchange,
+// addrs[1] buy.maker,
+// addrs[2] buy.taker,
+// addrs[3] buy.feeRecipient,
+// addrs[4] buy.target,
+// addrs[5] buy.staticTarget,
+// addrs[6] buy.paymentToken,
+// addrs[7] sell.exchange,
+// addrs[8] sell.maker,
+// addrs[9] sell.taker,
+// addrs[10] sell.feeRecipient,
+// addrs[11] sell.target,
+// addrs[12] sell.staticTarget,
+// addrs[13] sell.paymentToken,
+
+// uints[0] buy.makerRelayerFee,
+// uints[1] buy.takerRelayerFee,
+// uints[2] buy.makerProtocolFee,
+// uints[3] buy.takerProtocolFee,
+// uints[4] buy.basePrice,
+// uints[5] buy.extra,
+// uints[6] buy.listingTime,
+// uints[7] buy.expirationTime,
+// uints[8] buy.salt
+// uints[9] sell.makerRelayerFee,
+// uints[10] sell.takerRelayerFee,
+// uints[11] sell.makerProtocolFee,
+// uints[12] sell.takerProtocolFee,
+// uints[13] sell.basePrice,
+// uints[14] sell.extra,
+// uints[15] sell.listingTime,
+// uints[16] sell.expirationTime,
+// uints[17] sell.salt
+
+// feeMethodsSidesKindsHowToCalls[0] buy.feeMethod
+// feeMethodsSidesKindsHowToCalls[1] buy.side
+// feeMethodsSidesKindsHowToCalls[2] buy.saleKind
+// feeMethodsSidesKindsHowToCalls[3] buy.howToCall
+// feeMethodsSidesKindsHowToCalls[4] sell.feeMethod
+// feeMethodsSidesKindsHowToCalls[5] sell.side
+// feeMethodsSidesKindsHowToCalls[6] sell.saleKind
+// feeMethodsSidesKindsHowToCalls[7] sell.howToCall
+
 export function handleMatch(call: AtomicMatch_Call): void {
   // TODO: Derive contract address/token id from calldata to get collection entity
   // let collectionAddr = decodeContractAddress(calldata)
   // let tokenId = decodeTokenIds(calldata)
 
-  // saleTarget is sellOrder.target (addrs[11])
-  let saleTarget = call.inputs.addrs[11];
-  if (saleTarget.equals(WYVERN_ATOMICIZER_ADDRESS)) {
+  // sellTarget is sell.target (addrs[11])
+  let sellTarget = call.inputs.addrs[11];
+  if (sellTarget.equals(WYVERN_ATOMICIZER_ADDRESS)) {
     handleBundleSale(call);
   } else {
     handleSingleSale(call);
   }
+  // logCallInputs(call);
 }
 
 function handleSingleSale(call: AtomicMatch_Call): void {
@@ -97,7 +147,8 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   let priceETH = volumeETH;
 
   // TODO: Dutch Auction/Private Sale possible
-  let strategy = SaleStrategy.STANDARD_SALE;
+  let saleKind = call.inputs.feeMethodsSidesKindsHowToCalls[6];
+  let strategy = getSaleStrategy(saleKind);
 
   // buyer is buyOrder.maker (addrs[1])
   let buyer = call.inputs.addrs[1].toHexString();
@@ -118,6 +169,7 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   trade.strategy = strategy;
   trade.buyer = buyer;
   trade.seller = seller;
+  
   trade.save();
 
   // Prepare for updating dailyTradedItemCount
@@ -136,16 +188,29 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   }
 
   // Update Collection and daily snapshot
-  updateCollectionMetrics(call, collectionAddr, buyer, seller, newDailyTradedItem, volumeETH, priceETH);
+  updateCollectionMetrics(
+    call,
+    collectionAddr,
+    buyer,
+    seller,
+    newDailyTradedItem,
+    volumeETH,
+    priceETH
+  );
 
   // Update Marketplace and daily snapshot
-  updateMarketplaceMetrics(call, collectionAddr, buyer, seller, newDailyTradedItem, volumeETH);
+  updateMarketplaceMetrics(
+    call,
+    collectionAddr,
+    buyer,
+    seller,
+    newDailyTradedItem,
+    volumeETH
+  );
 }
 
 // TODO: Handle bundle sales
-function handleBundleSale(call: AtomicMatch_Call): void {
-
-}
+function handleBundleSale(call: AtomicMatch_Call): void {}
 
 function updateCollectionMetrics(
   call: AtomicMatch_Call,
@@ -184,7 +249,9 @@ function updateCollectionMetrics(
   collection.cumulativeTradeVolumeETH =
     collection.cumulativeTradeVolumeETH.plus(volumeETH);
 
-  // TODO: Update revenue fees here
+  // Update Collection/Marketplace revenue metrics
+  updateRevenueMetrics(call, collectionAddr);
+
   collection.save();
 
   // Update Collection daily snapshot
@@ -212,16 +279,15 @@ function updateCollectionMetrics(
     collectionSnapshot.dailyMaxSalePrice,
     priceETH
   );
-  
 
   // Update cumulative metrics
   collectionSnapshot.cumulativeTradeVolumeETH =
     collection.cumulativeTradeVolumeETH;
-  // collectionSnapshot.marketplaceRevenueETH = collection.marketplaceRevenueETH;
-  // collectionSnapshot.creatorRevenueETH = collection.creatorRevenueETH;
-  // collectionSnapshot.totalRevenueETH = collection.totalRevenueETH;
+  collectionSnapshot.marketplaceRevenueETH = collection.marketplaceRevenueETH;
+  collectionSnapshot.creatorRevenueETH = collection.creatorRevenueETH;
+  collectionSnapshot.totalRevenueETH = collection.totalRevenueETH;
   collectionSnapshot.tradeCount = collection.tradeCount;
-  
+
   collectionSnapshot.save();
 }
 
@@ -300,12 +366,95 @@ function updateMarketplaceMetrics(
   marketplaceSnapshot.collectionCount = marketplace.collectionCount;
   marketplaceSnapshot.cumulativeTradeVolumeETH =
     marketplace.cumulativeTradeVolumeETH;
-  // marketplaceSnapshot.marketplaceRevenueETH = marketplace.marketplaceRevenueETH;
-  // marketplaceSnapshot.creatorRevenueETH = marketplace.creatorRevenueETH;
-  // marketplaceSnapshot.totalRevenueETH = marketplace.totalRevenueETH;
+  marketplaceSnapshot.marketplaceRevenueETH = marketplace.marketplaceRevenueETH;
+  marketplaceSnapshot.creatorRevenueETH = marketplace.creatorRevenueETH;
+  marketplaceSnapshot.totalRevenueETH = marketplace.totalRevenueETH;
   marketplaceSnapshot.tradeCount = marketplace.tradeCount;
   marketplaceSnapshot.cumulativeUniqueTraders =
     marketplace.cumulativeUniqueTraders;
-  
+
   marketplaceSnapshot.save();
+}
+
+function updateRevenueMetrics(call: AtomicMatch_Call, collectionAddr: string) {
+  let collection = getOrCreateCollection(collectionAddr);
+  let marketplace = getOrCreateMarketplace(
+    EXCHANGE_MARKETPLACE_ADDRESS.toHexString()
+  );
+
+  let sellSideFeeRecipient = call.inputs.addrs[10];
+  if (sellSideFeeRecipient.notEqual(NULL_ADDRESS)) {
+    // Sell-side order is maker (sale)
+    let basePrice = call.inputs.uints[13];
+    let makerRelayerFee = call.inputs.uints[9];
+    let creatorRoyaltyFeePercentage = makerRelayerFee
+      .minus(EXCHANGE_MARKETPLACE_FEE)
+      .divDecimal(BIGDECIMAL_HUNDRED);
+    if (collection.royaltyFee.notEqual(creatorRoyaltyFeePercentage)) {
+      collection.royaltyFee = creatorRoyaltyFeePercentage;
+    }
+
+    let totalRevenueETH = makerRelayerFee
+      .times(basePrice)
+      .toBigDecimal()
+      .div(INVERSE_BASIS_POINT);
+    let marketplaceRevenueETH = EXCHANGE_MARKETPLACE_FEE.times(basePrice)
+      .toBigDecimal()
+      .div(INVERSE_BASIS_POINT);
+    let creatorRevenueETH = totalRevenueETH.minus(marketplaceRevenueETH);
+
+    collection.marketplaceRevenueETH = collection.marketplaceRevenueETH.plus(
+      marketplaceRevenueETH
+    );
+    collection.creatorRevenueETH =
+      collection.creatorRevenueETH.plus(creatorRevenueETH);
+    collection.totalRevenueETH =
+      collection.totalRevenueETH.plus(totalRevenueETH);
+
+    marketplace.marketplaceRevenueETH = marketplace.marketplaceRevenueETH.plus(
+      marketplaceRevenueETH
+    );
+    marketplace.creatorRevenueETH =
+      marketplace.creatorRevenueETH.plus(creatorRevenueETH);
+    marketplace.totalRevenueETH =
+      marketplace.totalRevenueETH.plus(totalRevenueETH);
+  } else {
+    // Buy-side order is maker (bid/offer)
+    let basePrice = call.inputs.uints[4];
+    let takerRelayerFee = call.inputs.uints[1];
+    let creatorRoyaltyFeePercentage = takerRelayerFee
+      .minus(EXCHANGE_MARKETPLACE_FEE)
+      .divDecimal(BIGDECIMAL_HUNDRED);
+    if (collection.royaltyFee.notEqual(creatorRoyaltyFeePercentage)) {
+      collection.royaltyFee = creatorRoyaltyFeePercentage;
+    }
+
+    let totalRevenueETH = takerRelayerFee
+      .times(basePrice)
+      .toBigDecimal()
+      .div(INVERSE_BASIS_POINT);
+    let marketplaceRevenueETH = EXCHANGE_MARKETPLACE_FEE.times(basePrice)
+      .toBigDecimal()
+      .div(INVERSE_BASIS_POINT);
+    let creatorRevenueETH = totalRevenueETH.minus(marketplaceRevenueETH);
+
+    collection.marketplaceRevenueETH = collection.marketplaceRevenueETH.plus(
+      marketplaceRevenueETH
+    );
+    collection.creatorRevenueETH =
+      collection.creatorRevenueETH.plus(creatorRevenueETH);
+    collection.totalRevenueETH =
+      collection.totalRevenueETH.plus(totalRevenueETH);
+
+    marketplace.marketplaceRevenueETH = marketplace.marketplaceRevenueETH.plus(
+      marketplaceRevenueETH
+    );
+    marketplace.creatorRevenueETH =
+      marketplace.creatorRevenueETH.plus(creatorRevenueETH);
+    marketplace.totalRevenueETH =
+      marketplace.totalRevenueETH.plus(totalRevenueETH);
+  }
+
+  collection.save();
+  marketplace.save();
 }

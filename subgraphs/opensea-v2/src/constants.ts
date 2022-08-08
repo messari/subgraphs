@@ -51,7 +51,7 @@ export const EXCHANGE_MARKETPLACE_ADDRESS = Address.fromString(
 );
 export const EXCHANGE_MARKETPLACE_NAME = "OpenSea Wyvern Exchange v2";
 export const EXCHANGE_MARKETPLACE_SLUG = "opensea-v2";
-export const EXCHANGE_MARKETPLACE_FEE = BigDecimal.fromString("250");
+export const EXCHANGE_MARKETPLACE_FEE = BigInt.fromI32(250);
 
 export const TRANSFER_FROM_SELECTOR = "0x23b872dd";
 export const ERC721_SAFE_TRANSFER_FROM_SELECTOR = "0x42842e0e";
