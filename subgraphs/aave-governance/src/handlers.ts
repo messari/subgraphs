@@ -172,6 +172,7 @@ export function _handleProposalCreated(
 
   // Creating it anyway since we will want to account for this event data, even though it should've never happened
   proposer = getOrCreateDelegate(proposerAddr);
+  proposal.txnHash = event.transaction.hash.toHexString();
   proposal.executor = executorAddr;
   proposal.proposer = proposer.id;
   proposal.quorumVotes = BIGINT_ZERO;

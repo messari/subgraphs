@@ -67,6 +67,8 @@ enum GovernanceFrameworkType {
 type Proposal @entity {
   "Internal proposal ID, in this implementation it seems to be a autoincremental id"
   id: ID!
+  "Transaction hash of the proposal creation"
+  txnHash: String!
   "Proposal description in markdown format"
   description: String!
   "Governance Framework that proposal is part of"
