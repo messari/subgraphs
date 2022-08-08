@@ -65,7 +65,8 @@ Not applicable to Venus Protocol
   - This protocol is a Yield Aggregator that uses Venus Protocol to earn yield.
   - In this [article](https://pancakebunny.medium.com/introducing-bunny-smart-vaults-b073938909d) they describe an algorithm that will lever up if it deems it is safe, explaining high borrows / deposits on certain days due to market conditions.
 - An event occured on May 19, 2021 had a liquidation incedent, which we can see on our subgraph.
-  - https://twitter.com/VenusProtocol/status/1394892979190513664?s=20&t=yvrRsx4T8RpH7zgKOvGUaQ
+  - Initial tweet: https://twitter.com/VenusProtocol/status/1394892979190513664?s=20&t=yvrRsx4T8RpH7zgKOvGUaQ
+  - Post-mortem statement: https://blog.venus.io/venus-protocol-incident-post-mortem-4468c87d245e
 
 ## Reference and Useful Links
 
