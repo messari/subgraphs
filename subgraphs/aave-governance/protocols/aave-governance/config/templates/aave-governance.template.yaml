@@ -46,7 +46,7 @@ dataSources:
       file: ./protocols/aave-governance/src/aave-governance-v-2.ts
   - kind: ethereum/contract
     name: AaveTokenV2
-    network:  {{ network }}
+    network: {{ network }}
     source:
       address: "{{ tokenContractAddress }}"
       abi: AaveTokenV2
@@ -74,7 +74,7 @@ dataSources:
       file: ./protocols/aave-governance/src/aave-token-v-2.ts
   - kind: ethereum/contract
     name: StakedTokenV2Rev3
-    network:  {{ network }}
+    network: {{ network }}
     source:
       address: "{{ secondTokenContractAddress }}"
       abi: StakedTokenV2Rev3
