@@ -178,13 +178,11 @@ export function getPoolCoins(
   return inputTokens;
 }
 
-export function getPoolBalances(poolAddress: Address): BigInt[] {
+export function getPoolBalances(poolAddress: Address, inputTokens: string[]): BigInt[] {
   const curvePool = PoolContract.bind(poolAddress);
 
-  let idx = 0;
   let inputTokenBalances: BigInt[] = [];
-
-  while (idx >= 0) {
+  for (let idx = 0; idx < inputTokens.length; idx++) {
     let balance = readValue<BigInt>(
       curvePool.try_balances(BigInt.fromI32(idx)),
       constants.BIGINT_ZERO
@@ -195,15 +193,9 @@ export function getPoolBalances(poolAddress: Address): BigInt[] {
         curvePool.try_balances1(BigInt.fromI32(idx)),
         constants.BIGINT_ZERO
       );
-
-      if (balance.equals(constants.BIGINT_ZERO)) {
-        idx = -1;
-        continue;
-      }
     }
 
     inputTokenBalances.push(balance);
-    idx += 1;
   }
 
   return inputTokenBalances;

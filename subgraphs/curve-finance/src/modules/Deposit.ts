@@ -93,7 +93,9 @@ export function getAddLiquidityFeesUSD(
     let outputToken = getOrCreateToken(poolAddress, block.number);
 
     return fees[0]
-      .divDecimal(constants.BIGINT_TEN.pow(outputToken.decimals as u8).toBigDecimal())
+      .divDecimal(
+        constants.BIGINT_TEN.pow(outputToken.decimals as u8).toBigDecimal()
+      )
       .times(outputToken.lastPriceUSD!);
   }
 
@@ -108,7 +110,9 @@ export function getAddLiquidityFeesUSD(
 
     let inputTokenFee = fees
       .at(idx)
-      .divDecimal(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
+      .divDecimal(
+        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+      )
       .times(inputToken.lastPriceUSD!);
 
     totalFeesUSD = totalFeesUSD.plus(inputTokenFee);
@@ -165,11 +169,16 @@ export function Deposit(
     inputTokens.push(inputToken.id);
 
     depositAmountUSD = depositedCoinAmounts[idx]
-      .divDecimal(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
+      .divDecimal(
+        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+      )
       .times(inputToken.lastPriceUSD!);
   }
 
-  pool.inputTokenBalances = inputTokenBalances;
+  pool.inputTokenBalances = utils.getPoolBalances(
+    liquidityPoolAddress,
+    pool.inputTokens
+  );
   pool.totalValueLockedUSD = utils.getPoolTVL(
     pool.inputTokens,
     pool.inputTokenBalances,
