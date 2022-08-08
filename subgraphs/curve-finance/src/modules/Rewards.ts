@@ -8,9 +8,9 @@ import {
 import {
   getOrCreateRewardToken,
   getOrCreateLiquidityPool,
+  getOrCreateToken,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
@@ -178,7 +178,7 @@ export function updateRewardTokenEmissions(
   block: ethereum.Block
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
-  const rewardToken = getOrCreateRewardToken(rewardTokenAddress);
+  const rewardToken = getOrCreateRewardToken(rewardTokenAddress, block);
 
   if (!pool.rewardTokens) {
     pool.rewardTokens = [];
@@ -202,15 +202,13 @@ export function updateRewardTokenEmissions(
   }
   let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
-  const rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);
-  const rewardTokenDecimals = utils.getTokenDecimals(rewardTokenAddress);
+  const token = getOrCreateToken(rewardTokenAddress, block.number);
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
     .toBigDecimal()
-    .div(rewardTokenDecimals)
-    .times(rewardTokenPrice.usdPrice)
-    .div(rewardTokenPrice.decimalsBaseTen);
+    .div(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
+    .times(token.lastPriceUSD!)
 
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
