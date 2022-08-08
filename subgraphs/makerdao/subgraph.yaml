@@ -349,3 +349,5 @@ templates:
         # collateral auction
         - event: Take(indexed uint256,uint256,uint256,uint256,uint256,uint256,indexed address)
           handler: handleClipTakeBid
+        - event: Yank(uint256)
+          handler: handleClipYankBid

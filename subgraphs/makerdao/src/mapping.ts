@@ -6,13 +6,23 @@ import { CatV1, Bite as BiteEvent, LogNote as CatNoteEvent } from "../generated/
 import { Dog, Bark as BarkEvent, File2 as DogFileChopEvent } from "../generated/Dog/Dog";
 import { Flip, Clip } from "../generated/templates";
 import { LogNote as FlipNoteEvent, Flip as FlipContract } from "../generated/templates/Flip/Flip";
-import { Take as TakeEvent, Clip as ClipContract } from "../generated/templates/Clip/Clip";
+import { Take as TakeEvent, Yank as ClipYankEvent, Clip as ClipContract } from "../generated/templates/Clip/Clip";
 import { Spot, Poke as PokeEvent, LogNote as SpotNoteEvent } from "../generated/Spot/Spot";
 import { Jug, LogNote as JugNoteEvent } from "../generated/Jug/Jug";
 import { Pot, LogNote as PotNoteEvent } from "../generated/Pot/Pot";
 import { CdpManager, NewCdp } from "../generated/CdpManager/CdpManager";
 import { Created } from "../generated/DSProxyFactory/DSProxyFactory";
-import { Token, _Ilk, Liquidate, _LiquidateStore, _Chi, _Urn, _Proxy, Market } from "../generated/schema";
+import {
+  Token,
+  _Ilk,
+  Liquidate,
+  _FlipBidsStore,
+  _ClipTakeStore,
+  _Chi,
+  _Urn,
+  _Proxy,
+  Market,
+} from "../generated/schema";
 import {
   bigIntToBDUseDecimals,
   bigDecimalExponential,
@@ -53,6 +63,8 @@ import {
   BIGDECIMAL_ONE_RAY,
   BIGDECIMAL_ONE_WAD,
   VAT_ADDRESS,
+  INT_ZERO,
+  INT_ONE,
 } from "./common/constants";
 import {
   updateUsageMetrics,
@@ -70,9 +82,9 @@ import {
   getOrCreateLendingProtocol,
   getMarketFromIlk,
   getMarketAddressFromIlk,
-  getOrCreateLiquidateStore,
   getOrCreateLiquidate,
 } from "./common/getters";
+import { createEventID } from "./utils/strings";
 
 // Authorizating Vat (CDP engine)
 export function handleVatRely(event: VatNoteEvent): void {
@@ -313,19 +325,26 @@ export function handleCatBite(event: BiteEvent): void {
   let art = event.params.art;
   let tab = event.params.tab;
 
-  let market = getMarketFromIlk(ilk);
-  let LiquidateID = event.transaction.hash
-    .toHexString()
-    .concat("-")
-    .concat(event.logIndex.toString());
-  getOrCreateLiquidate(LiquidateID, event, market, urn.toHexString());
+  let market = getMarketFromIlk(ilk)!;
+  //let LiquidateID = event.transaction.hash
+  //  .toHexString()
+  //  .concat("-")
+  //  .concat(event.logIndex.toString());
+  //getOrCreateLiquidate(LiquidateID, event, market, urn.toHexString());
 
   let liquidationRevenueUSD = bigIntToBDUseDecimals(tab, RAD).times(
-    market!.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
+    market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
   );
 
-  updateRevenue(event, market!.id, liquidationRevenueUSD, BIGDECIMAL_ZERO);
-  log.info("[handleCatBite] ilk={}, urn={}, lot={}, art={}, tab={}, liquidation revenue=${}", [
+  updateRevenue(event, market.id, liquidationRevenueUSD, BIGDECIMAL_ZERO);
+
+  let storeID = flip
+    .toHexString()
+    .concat("-")
+    .concat(id.toString());
+
+  log.info("[handleCatBite]storeID={}, ilk={}, urn={}: lot={}, art={}, tab={}, liquidation revenue=${}", [
+    storeID,
     ilk.toString(),
     urn.toHexString(),
     lot.toString(),
@@ -334,11 +353,20 @@ export function handleCatBite(event: BiteEvent): void {
     liquidationRevenueUSD.toString(),
   ]);
 
-  let storeID = ilk
-    .toHexString()
-    .concat("-")
-    .concat(id.toString());
-  getOrCreateLiquidateStore(storeID, LiquidateID);
+  let liquidatee = getOwnerAddressFromCdp(urn.toHexString());
+  liquidatee = getOwnerAddressFromProxy(liquidatee);
+  //let debt = bigIntChangeDecimals(tab, RAD, WAD);
+  let flipBidsStore = new _FlipBidsStore(storeID);
+  flipBidsStore.round = INT_ZERO;
+  flipBidsStore.liquidatee = liquidatee;
+  flipBidsStore.lot = lot;
+  flipBidsStore.tab = tab; // not including liquidation penalty
+  flipBidsStore.bid = BIGINT_ZERO;
+  flipBidsStore.bidder = ZERO_ADDRESS;
+  flipBidsStore.market = market.id;
+  flipBidsStore.ended = false;
+  flipBidsStore.save();
+
   // auction
   Flip.create(flip);
 }
@@ -383,20 +411,20 @@ export function handleDogBark(event: BarkEvent): void {
   let art = event.params.art;
   let due = event.params.due;
 
-  let market = getMarketFromIlk(ilk);
-  let LiquidateID = event.transaction.hash
+  let market = getMarketFromIlk(ilk)!;
+  let storeID = clip
     .toHexString()
     .concat("-")
-    .concat(event.logIndex.toString());
-  getOrCreateLiquidate(LiquidateID, event, market, urn.toHexString());
+    .concat(id.toString());
 
   let liquidationRevenueUSD = bigIntToBDUseDecimals(due, RAD).times(
-    market!.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
+    market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
   );
 
-  updateRevenue(event, market!.id, liquidationRevenueUSD, BIGDECIMAL_ZERO);
+  updateRevenue(event, market.id, liquidationRevenueUSD, BIGDECIMAL_ZERO);
 
-  log.info("[handleDogBark] ilk={}, urn={}, lot={}, art={}, due={}, liquidation revenue=${}", [
+  log.info("[handleDogBark]storeID={}, ilk={}, urn={}: lot={}, art={}, due={}, liquidation revenue=${}", [
+    storeID,
     ilk.toString(),
     urn.toHexString(),
     lot.toString(),
@@ -405,11 +433,14 @@ export function handleDogBark(event: BarkEvent): void {
     liquidationRevenueUSD.toString(),
   ]);
 
-  let storeID = ilk
-    .toHexString()
-    .concat("-")
-    .concat(id.toString());
-  getOrCreateLiquidateStore(storeID, LiquidateID);
+  //let debt = bigIntChangeDecimals(due, RAD, WAD);
+  let clipTakeStore = new _ClipTakeStore(storeID);
+  clipTakeStore.slice = INT_ZERO;
+  clipTakeStore.market = market.id;
+  clipTakeStore.lot = lot;
+  clipTakeStore.tab = due; //not including penalty
+  clipTakeStore.save();
+
   Clip.create(clip);
 }
 
@@ -451,71 +482,162 @@ export function handleFlipBids(event: FlipNoteEvent): void {
   let bids = flipContract.bids(id);
   let bid = bids.getBid();
   let lot = bids.getLot();
+  let tab = bids.getTab();
   let bidder = bids.getGuy().toHexString();
-  log.info("[handleFlipBids] id={}, ilk={}/{}, lot={}, bid={}", [
-    id.toString(),
-    ilk.toString(),
-    ilk.toHexString(),
-    lot.toString(),
-    bid.toString(),
-  ]);
 
-  let storeID = ilk
+  let storeID = event.address //flip contract
     .toHexString()
     .concat("-")
     .concat(id.toString());
-  let liquidateStore = getOrCreateLiquidateStore(storeID);
-  if (bid.gt(liquidateStore.bid)) {
+
+  let flipBidsStore = _FlipBidsStore.load(storeID)!;
+  // let liquidateID = liquidateStore.liquidate;
+  log.info(
+    "[handleFlipBids] storeID={}, flip.id={}, ilk={}, round #{} store status: lot={}, tab={}, bid={}, bidder={}",
+    [
+      //liquidateID,
+      storeID,
+      id.toString(),
+      ilk.toString(),
+      flipBidsStore.round.toString(),
+      flipBidsStore.lot.toString(),
+      flipBidsStore.tab.toString(),
+      flipBidsStore.bid.toString(),
+      flipBidsStore.bidder,
+    ],
+  );
+
+  log.info(
+    "[handleFlipBids] storeID={}, flip.id={}, ilk={}, round #{} call inputs: lot={}, tab={}, bid={}, bidder={}",
+    [
+      storeID,
+      id.toString(),
+      ilk.toString(),
+      flipBidsStore.round.toString(),
+      lot.toString(),
+      tab.toString(),
+      bid.toString(),
+      bidder,
+    ],
+  );
+
+  if (flipBidsStore.tab.notEqual(tab)) {
+    flipBidsStore.tab = tab; // initial tab does not include liquidation penalty
+  }
+
+  if (flipBidsStore.bid.lt(bid)) {
     // save higher bid
-    liquidateStore.bid = bid;
-    liquidateStore.bidder = bidder;
+    flipBidsStore.bid = bid;
+    flipBidsStore.bidder = bidder;
   }
-  if (liquidateStore.collateral.gt(lot)) {
+  if (flipBidsStore.lot.gt(lot)) {
     // save lower lot
-    liquidateStore.collateral = lot;
-    liquidateStore.bidder = bidder;
+    flipBidsStore.lot = lot;
+    flipBidsStore.bidder = bidder;
   }
-  log.info("[handleFlipBids] Current winning bid: lot={}, bid={}, bidder={}", [
-    liquidateStore.collateral.toString(),
-    liquidateStore.bid.toString(),
-    bidder,
-  ]);
-
-  liquidateStore.save();
-}
-
-export function handleFlipEndAuction(event: FlipNoteEvent): void {
-  let id = bytesToUnsignedBigInt(event.params.arg1); //
-  log.debug("[handleFlipEndAuction] id={}, event address={}", [id.toString(), event.address.toHexString()]);
-  let flipContract = FlipContract.bind(event.address);
-  let ilk = flipContract.ilk();
-  log.debug("[handleFlipEndAuction] id={}, ilk={}/{}", [id.toString(), ilk.toString(), ilk.toHexString()]);
-  let storeID = ilk
-    .toHexString()
-    .concat("-")
-    .concat(id.toString());
-  let liquidateStore = getOrCreateLiquidateStore(storeID);
-
-  let liquidateID = liquidateStore.liquidate;
-  let liquidate = getOrCreateLiquidate(liquidateID);
-  let token = getOrCreateToken(liquidate.asset);
-  liquidate.from = liquidateStore.bidder;
-  // convert collateral to its native amount (it is WAD)
-  liquidate.amount = bigIntChangeDecimals(liquidateStore.collateral, WAD, token.decimals);
-  liquidate.amountUSD = bigIntToBDUseDecimals(liquidate.amount, token.decimals).times(token.lastPriceUSD!);
-  liquidate.profitUSD = liquidate.amountUSD.minus(bigIntToBDUseDecimals(liquidateStore.bid, RAD));
-  log.info("[handleFlipEndAuction]liquidate {} won by {} at ${} (liquidator profit=${})", [
-    liquidateID,
-    liquidateStore.bidder,
-    liquidate.amountUSD.toString(),
-    liquidate.profitUSD.toString(),
-  ]);
-  liquidate.save();
-
-  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  flipBidsStore.round += INT_ONE;
 
   let market = getMarketFromIlk(ilk)!;
-  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  let token = getOrCreateToken(market.inputToken);
+  let value = bigIntToBDUseDecimals(flipBidsStore.lot, token.decimals).times(market.inputTokenPriceUSD);
+  log.info(
+    "[handleFlipBids]storeID={}, flip.id={}, ilk={} round #{} winning bid: lot={}, price={}, value (lot*price)={}, tab={}, bid={}, bidder={}",
+    [
+      flipBidsStore.id,
+      id.toString(),
+      ilk.toString(),
+      flipBidsStore.round.toString(),
+      flipBidsStore.lot.toString(),
+      market.inputTokenPriceUSD.toString(),
+      value.toString(),
+      flipBidsStore.tab.toString(),
+      flipBidsStore.bid.toString(),
+      bidder,
+    ],
+  );
+  flipBidsStore.save();
+}
+
+// handle flip.deal and flip.yank
+export function handleFlipEndAuction(event: FlipNoteEvent): void {
+  let id = bytesToUnsignedBigInt(event.params.arg1); //
+  //log.debug("[handleFlipEndAuction] id={}, event address={}", [id.toString(), event.address.toHexString()]);
+  //let flipContract = FlipContract.bind(event.address);
+  //let ilk = flipContract.ilk();
+  //log.debug("[handleFlipEndAuction] id={}, ilk={}/{}", [id.toString(), ilk.toString(), ilk.toHexString()]);
+  let storeID = event.address //flip contract
+    .toHexString()
+    .concat("-")
+    .concat(id.toString());
+
+  let flipBidsStore = _FlipBidsStore.load(storeID)!;
+  log.info("[handleFlipEndAuction]storeID={}, flip.id={} store status: lot={}, tab={}, bid={}, bidder={}", [
+    flipBidsStore.id, //storeID
+    id.toString(),
+    flipBidsStore.lot.toString(),
+    flipBidsStore.tab.toString(),
+    flipBidsStore.bid.toString(),
+    flipBidsStore.bidder,
+  ]);
+
+  let marketID = flipBidsStore.market;
+  let market = getOrCreateMarket(marketID);
+  let token = getOrCreateToken(market.inputToken);
+
+  let amount = flipBidsStore.lot;
+  let amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
+  let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(flipBidsStore.bid, RAD));
+
+  let liquidateID = createEventID(event);
+  let liquidate = getOrCreateLiquidate(
+    liquidateID,
+    event,
+    market,
+    flipBidsStore.liquidatee,
+    flipBidsStore.bidder,
+    amount,
+    amountUSD,
+    profitUSD,
+  );
+
+  log.info(
+    "[handleFlipEndAuction]storeID={}, flip.id={} final: liquidate.id={}, amount={}, price={}, amountUSD={}, profitUSD={}",
+    [
+      flipBidsStore.id, //storeID
+      id.toString(),
+      liquidate.id,
+      liquidate.amount.toString(),
+      token.lastPriceUSD!.toString(),
+      liquidate.amountUSD.toString(),
+      liquidate.profitUSD.toString(),
+    ],
+  );
+
+  if (
+    liquidate.amount.le(BIGINT_ZERO) ||
+    liquidate.amountUSD.le(BIGDECIMAL_ZERO) ||
+    liquidate.profitUSD.le(BIGDECIMAL_ZERO)
+  ) {
+    log.warning(
+      "[handleFlipEndAuction]storeID={}, liquidateID={}, flip.id={} problematic values: amount={}, amountUSD={}, profitUSD={}",
+      [
+        liquidateID,
+        storeID,
+        id.toString(),
+        liquidate.amount.toString(),
+        liquidate.amountUSD.toString(),
+        liquidate.profitUSD.toString(),
+      ],
+    );
+  }
+  //liquidate._finalized = true;
+  liquidate.save();
+
+  flipBidsStore.ended = true;
+  flipBidsStore.save();
+
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
@@ -523,19 +645,78 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
 // Auction used by Dog (new liquidation contract)
 export function handleClipTakeBid(event: TakeEvent): void {
   let id = event.params.id;
-  let liquidator = event.params.usr.toHexString();
+  let liquidatee = event.params.usr.toHexString();
+  let max = event.params.max;
   let lot = event.params.lot;
-  //let price = event.params.price;
+  let price = event.params.price;
+  let tab = event.params.tab;
   let owe = event.params.owe;
-  let clipContract = ClipContract.bind(event.address);
-  let ilk = clipContract.ilk();
-  let storeID = ilk
+
+  let liquidator = event.transaction.from.toHexString();
+  // translate possible proxy/urn handler address to owner address
+  liquidatee = getOwnerAddressFromCdp(liquidatee);
+  liquidatee = getOwnerAddressFromProxy(liquidatee);
+
+  let storeID = event.address //clip contract
     .toHexString()
     .concat("-")
     .concat(id.toString());
-  let liquidateStore = getOrCreateLiquidateStore(storeID);
+  //let liquidateStore = getOrCreateLiquidateStore(storeID);
+  let clipTakeStore = _ClipTakeStore.load(storeID)!;
+  clipTakeStore.slice += INT_ONE;
+  let marketID = clipTakeStore.market;
+  let market = getOrCreateMarket(marketID);
+  let token = getOrCreateToken(market.inputToken);
 
-  let liquidateID = liquidateStore.liquidate;
+  let value = bigIntToBDUseDecimals(lot, token.decimals).times(token.lastPriceUSD!);
+  log.info(
+    "[handleClipTakeBid]storeID={}, clip.id={}, slice #{} event params: max={}, lot={}, price={}, value(lot*price)={}, tab={}, owe={}, liquidatee={}, liquidator={}",
+    [
+      storeID, //storeID
+      id.toString(),
+      clipTakeStore.slice.toString(),
+      max.toString(),
+      lot.toString(),
+      price.toString(),
+      value.toString(),
+      tab.toString(),
+      owe.toString(),
+      liquidatee,
+      liquidator,
+    ],
+  );
+
+  let deltaLot = clipTakeStore.lot.minus(lot);
+  //let deltaTab = clipTakeStore.tab.minus(tab);
+  let amount = bigIntChangeDecimals(deltaLot, WAD, token.decimals);
+  let amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
+  //let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(deltaTab, WAD));
+  let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(owe, RAD));
+
+  let liquidateID = createEventID(event);
+  let liquidate = getOrCreateLiquidate(
+    liquidateID,
+    event,
+    market,
+    liquidatee,
+    liquidator,
+    amount,
+    amountUSD,
+    profitUSD,
+  );
+
+  clipTakeStore.lot = lot;
+  clipTakeStore.tab = tab;
+  clipTakeStore.save();
+
+  /*
+  if (
+    liquidateID.toLowerCase() != "0x63bc315387b2853768716e48cb5ea1b21a2a6cc583774f8a7a0646eb610325dc-192".toLowerCase()
+  ) {
+    return;
+  }
+
+
   let liquidate = getOrCreateLiquidate(liquidateID);
   let token = getOrCreateToken(liquidate.asset);
   liquidate.from = liquidator;
@@ -543,17 +724,121 @@ export function handleClipTakeBid(event: TakeEvent): void {
   liquidate.amount = bigIntChangeDecimals(lot, WAD, token.decimals);
   liquidate.amountUSD = bigIntToBDUseDecimals(liquidate.amount, token.decimals).times(token.lastPriceUSD!);
   liquidate.profitUSD = liquidate.amountUSD.minus(bigIntToBDUseDecimals(owe, RAD));
-  log.info("[handleClipTakeBid]liquidate {} won by {} at ${} (liquidator profit ${})", [
-    liquidateID,
-    liquidator,
-    liquidate.amountUSD.toString(),
-    liquidate.profitUSD.toString(),
+
+  */
+
+  log.info(
+    "[handleClipTakeBid]liquidateID={}, storeID={}, clip.id={}, slice #{} final: amount={}, amountUSD={}, profitUSD={}",
+    [
+      liquidate.id,
+      clipTakeStore.id, //storeID
+      id.toString(),
+      clipTakeStore.slice.toString(),
+      liquidate.amount.toString(),
+      liquidate.amountUSD.toString(),
+      liquidate.profitUSD.toString(),
+    ],
+  );
+
+  if (
+    liquidate.amount.le(BIGINT_ZERO) ||
+    liquidate.amountUSD.le(BIGDECIMAL_ZERO) ||
+    liquidate.profitUSD.le(BIGDECIMAL_ZERO)
+  ) {
+    log.warning(
+      "[handleClipTakeBid]liquidateID={}, storeID={}, clip.id={} slice #{} problematic values: amount={}, amountUSD={}, profitUSD={}",
+      [
+        liquidateID,
+        storeID,
+        id.toString(),
+        clipTakeStore.slice.toString(),
+        liquidate.amount.toString(),
+        liquidate.amountUSD.toString(),
+        liquidate.profitUSD.toString(),
+      ],
+    );
+  }
+
+  log.info("[handleClipTakeBid]storeID={}, clip.id={} clipTakeStatus: lot={}, tab={}, price={}", [
+    storeID, //storeID
+    id.toString(),
+    clipTakeStore.lot.toString(),
+    clipTakeStore.tab.toString(),
+    token.lastPriceUSD!.toString(),
   ]);
+
+  //liquidate._finalized = true;
+  //liquidate.save();
+
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+}
+
+// cancel auction
+export function handleClipYankBid(event: ClipYankEvent): void {
+  let id = event.params.id;
+  let clipContract = ClipContract.bind(event.address);
+  let ilk = clipContract.ilk();
+  let sales = clipContract.sales(id);
+  let lot = sales.getLot();
+  let tab = sales.getTab();
+  let liquidatee = sales.getUsr().toHexString();
+
+  let liquidator = event.transaction.from.toHexString();
+  // translate possible proxy/urn handler address to owner address
+  liquidatee = getOwnerAddressFromCdp(liquidatee);
+  liquidatee = getOwnerAddressFromProxy(liquidatee);
+
+  //let storeID = event.address //clip contract
+  //  .toHexString()
+  //  .concat("-")
+  //  .concat(id.toString());
+  //let liquidateStore = getOrCreateLiquidateStore(storeID);
+  //let clipTakeStore = _ClipTakeStore.load(storeID)!
+
+  //let liquidateID = liquidateStore.liquidate;
+  let market = getMarketFromIlk(ilk)!;
+  let token = getOrCreateToken(market.inputToken);
+
+  let liquidateID = createEventID(event);
+  // convert collateral to its native amount from WAD
+  let amount = bigIntChangeDecimals(lot, WAD, token.decimals);
+  let amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
+  let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(tab, RAD));
+  let liquidate = getOrCreateLiquidate(
+    liquidateID,
+    event,
+    market,
+    liquidatee,
+    liquidator,
+    amount,
+    amountUSD,
+    profitUSD,
+  );
+
+  log.info(
+    "[handleClipYankBid]auction for liquidation {} (id {}) cancelled, assuming the msg sender {} won at ${} (profit ${})",
+    [liquidateID, id.toString(), liquidate.from, liquidate.amountUSD.toString(), liquidate.profitUSD.toString()],
+  );
+
+  if (
+    liquidate.amount.le(BIGINT_ZERO) ||
+    liquidate.amountUSD.le(BIGDECIMAL_ZERO) ||
+    liquidate.profitUSD.le(BIGDECIMAL_ZERO)
+  ) {
+    log.warning("[handleClipTakeBid]problematic values: amount={}, amountUSD={}, profitUSD={}", [
+      liquidate.amount.toString(),
+      liquidate.amountUSD.toString(),
+      liquidate.profitUSD.toString(),
+    ]);
+  }
+  //liquidate._finalized = true;
   liquidate.save();
 
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  let market = getMarketFromIlk(ilk)!;
-  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
@@ -572,14 +857,6 @@ export function handleSpotFileMat(event: SpotNoteEvent): void {
     // 3rd arg: start = 4 + 2 * 32, end = start + 32
     let mat = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
     log.info("[handleSpotFileMat]ilk={}, market={}, mat={}", [ilk.toString(), market.id, mat.toString()]);
-
-    // TODO remove when verify mat working
-    /*
-    let spotContract = Spot.bind(event.address);
-    let mat2 = bigIntToBDUseDecimals(spotContract.ilks(ilk).value1, RAY); //27 decimals
-    let par2 = bigIntToBDUseDecimals(spotContract.par(), RAY); //27 decimals
-    log.info("[handleSpotFileMat]mat(storage)={}, par(storage)={}", [mat2.toString(), par2.toString()]);
-    */
 
     let protocol = getOrCreateLendingProtocol();
     let par = protocol._par!;
@@ -657,18 +934,14 @@ export function handleJugFileDuty(event: JugNoteEvent): void {
       return;
     }
 
-    let duty = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
-
-    // TODO: remove code accessing duty on storage once verify correctness
     let jugContract = Jug.bind(event.address);
     let base = jugContract.base();
-    let duty2 = jugContract.ilks(ilk).value0;
+    let duty = jugContract.ilks(ilk).value0;
     let rate = bigIntToBDUseDecimals(base.plus(duty), RAY).minus(BIGDECIMAL_ONE);
     let rateAnnualized = bigDecimalExponential(rate, SECONDS_PER_YEAR_BIGDECIMAL).times(BIGDECIMAL_ONE_HUNDRED);
-    log.info("[handleJugFileDuty] ilk={}, duty={}, duty2 (storage)={}, rate={}, rateAnnualized={}", [
+    log.info("[handleJugFileDuty] ilk={}, duty={}, rate={}, rateAnnualized={}", [
       ilk.toString(),
       duty.toString(),
-      duty2.toString(),
       rate.toString(),
       rateAnnualized.toString(),
     ]);
@@ -721,23 +994,14 @@ export function handlePotFileDsr(event: PotNoteEvent): void {
   let what = event.params.arg1.toString();
   if (what == "dsr") {
     let dsr = bytesToUnsignedBigInt(event.params.arg2);
-    /*
-    let potContract = Pot.bind(event.address);
-    let chiValue = potContract.chi();
-    let _chiID = event.address.toHexString();
-    let _chi = getOrCreateChi(_chiID);
-    _chi.chi = chiValue;
-    _chi.save();
-    */
 
-    // TODO: do we need to save dai saving rate?
-    // Since it is not linked to a real market, it is
+    // Since DAI saving is not linked to a real market, it is
     // assigned to the artificial "MCD POT" market
     let market = getOrCreateMarket(event.address.toHexString());
     let rate = bigIntToBDUseDecimals(dsr, RAY);
     let rateAnnualized = bigDecimalExponential(rate, SECONDS_PER_YEAR_BIGDECIMAL).times(BIGDECIMAL_ONE_HUNDRED);
 
-    let interestRateID = InterestRateSide.LENDER + "-" + InterestRateType.STABLE + "-" + event.address.toHexString();
+    let interestRateID = `${InterestRateSide.LENDER}-${InterestRateType.STABLE}-${event.address.toHexString()}`;
     let interestRate = getOrCreateInterestRate(market.id, InterestRateSide.LENDER, InterestRateType.STABLE);
     interestRate.rate = rateAnnualized;
     interestRate.save();

@@ -1052,15 +1052,44 @@ type _Ilk @entity {
   marketAddress: String!
 }
 
-# Helper entity for liquidate transaction
-type _LiquidateStore @entity {
+# Helper entity for liquidate transaction (Flip contract)
+type _FlipBidsStore @entity {
   " { address of liquiditee }-{ ilk hexstring }-{ auction id }"
   id: ID!
-  " ID of Liquidate entity"
-  liquidate: Liquidate!
-  bid: BigInt!
-  collateral: BigInt!
+  " round of bidding "
+  round: Int!
+  " ID of Market entity "
+  market: Market!
+  " Account being liquidated "
+  liquidatee: String!
+  " amount collateral "
+  lot: BigInt!
+  " amount of debt to be repaid "
+  tab: BigInt!
+  " current highest bidder "
   bidder: String!
+  " current highest bid "
+  bid: BigInt!
+  " Is the auction ended "
+  ended: Boolean!
+}
+
+# Helper entity for liquidate transaction (Clip contract)
+type _ClipTakeStore @entity {
+  " { address of liquiditee }-{ ilk hexstring }-{ auction id }"
+  id: ID!
+  " slice number "
+  slice: Int!
+  " ID of Market entity "
+  market: Market!
+  " Account being liquidated "
+  liquidatee: String!
+  " amount of collateral remaining to be auctioned "
+  lot: BigInt!
+  " amount of debt remaining to be repaid "
+  tab: BigInt!
+  " Is the auction ended "
+  ended: Boolean!
 }
 
 # Helper entity for calculating supply side revenue

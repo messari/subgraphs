@@ -1,4 +1,4 @@
-import { Address, Bytes, ethereum, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, Bytes, ethereum, BigInt, log, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   Token,
   UsageMetricsDailySnapshot,
@@ -11,7 +11,6 @@ import {
   MarketHourlySnapshot,
   UsageMetricsHourlySnapshot,
   Liquidate,
-  _LiquidateStore,
   _Chi,
   _Urn,
   _Proxy,
@@ -376,6 +375,10 @@ export function getOrCreateLiquidate(
   event: ethereum.Event | null = null,
   market: Market | null = null,
   liquidatee: string | null = null,
+  liquidator: string | null = null,
+  amount: BigInt | null = null,
+  amountUSD: BigDecimal | null = null,
+  profitUSD: BigDecimal | null = null,
 ): Liquidate {
   let liquidate = Liquidate.load(LiquidateID);
   if (liquidate == null) {
@@ -384,31 +387,18 @@ export function getOrCreateLiquidate(
     liquidate.logIndex = event!.logIndex.toI32();
     liquidate.protocol = market!.protocol;
     liquidate.to = market!.id;
-    liquidate.from = ZERO_ADDRESS; //liquidator, to be filled
+    liquidate.from = liquidator!;
     liquidate.liquidatee = liquidatee!;
     liquidate.blockNumber = event!.block.number;
     liquidate.timestamp = event!.block.timestamp;
     liquidate.market = market!.id;
     liquidate.asset = market!.inputToken;
-    liquidate.amount = BIGINT_ZERO;
-    liquidate.amountUSD = BIGDECIMAL_ZERO;
-    liquidate.profitUSD = BIGDECIMAL_ZERO;
+    liquidate.amount = amount!;
+    liquidate.amountUSD = amountUSD!;
+    liquidate.profitUSD = profitUSD!;
     liquidate.save();
   }
   return liquidate;
-}
-
-export function getOrCreateLiquidateStore(LiquidateStoreID: string, liquidateID: string = ""): _LiquidateStore {
-  let liquidateStore = _LiquidateStore.load(LiquidateStoreID);
-  if (liquidateStore == null) {
-    liquidateStore = new _LiquidateStore(LiquidateStoreID);
-    liquidateStore.liquidate = liquidateID;
-    liquidateStore.bid = BIGINT_ZERO;
-    liquidateStore.collateral = BIGINT_MAX;
-    liquidateStore.bidder = ZERO_ADDRESS;
-    liquidateStore.save();
-  }
-  return liquidateStore;
 }
 
 export function getOrCreateChi(chiID: string): _Chi {
