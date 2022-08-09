@@ -337,7 +337,7 @@ function PoolTabEntity({
                   } else if (
                     currentRewardToken.type === "BORROW" &&
                     issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length ===
-                    0
+                      0
                   ) {
                     issues.push({
                       type: "BORROW",
