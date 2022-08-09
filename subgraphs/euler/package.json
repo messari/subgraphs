@@ -14,7 +14,7 @@
     "deploy-local-fork": "graph deploy euler --node http://localhost:8020/ --ipfs http://localhost:5001 --debug-fork QmNUAu43xbQ61DCmB1Ya6RvS7BtGq3tVkpa9kAjMdsdYRh"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.28.1",
+    "@graphprotocol/graph-cli": "0.33.0",
     "@graphprotocol/graph-ts": "0.26.0",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
