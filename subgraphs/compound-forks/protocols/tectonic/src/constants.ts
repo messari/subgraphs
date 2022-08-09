@@ -290,38 +290,38 @@ export function getOrCreateCircularBuffer(): _CircularBuffer {
 function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
-  if (dataSource.network() == Network.MAINNET) {
+  if (dataSource.network().toUpperCase() == Network.MAINNET) {
     return BigDecimal.fromString("13.39");
-  } else if (dataSource.network() == Network.ARBITRUM_ONE) {
+  } else if (dataSource.network().toUpperCase() == Network.ARBITRUM_ONE) {
     return BigDecimal.fromString("15");
-  } else if (dataSource.network() == Network.AURORA) {
+  } else if (dataSource.network().toUpperCase() == Network.AURORA) {
     return BigDecimal.fromString("1.03");
-  } else if (dataSource.network() == Network.BSC) {
+  } else if (dataSource.network().toUpperCase() == Network.BSC) {
     return BigDecimal.fromString("5");
-  } else if (dataSource.network() == Network.CELO) {
+  } else if (dataSource.network().toUpperCase() == Network.CELO) {
     return BigDecimal.fromString("5");
-  } else if (dataSource.network() == Network.FANTOM) {
+  } else if (dataSource.network().toUpperCase() == Network.FANTOM) {
     return BigDecimal.fromString("1");
-  } else if (dataSource.network() == Network.FUSE) {
+  } else if (dataSource.network().toUpperCase() == Network.FUSE) {
     return BigDecimal.fromString("1");
-  } else if (dataSource.network() == Network.OPTIMISM) {
+  } else if (dataSource.network().toUpperCase() == Network.OPTIMISM) {
     return BigDecimal.fromString("12.5");
-  } else if (dataSource.network() == Network.MATIC) {
+  } else if (dataSource.network().toUpperCase() == Network.MATIC) {
     return BigDecimal.fromString("2");
-  } else if (dataSource.network() == Network.XDAI) {
+  } else if (dataSource.network().toUpperCase() == Network.XDAI) {
     return BigDecimal.fromString("5");
-  } else if (dataSource.network() == Network.MOONBEAM) {
+  } else if (dataSource.network().toUpperCase() == Network.MOONBEAM) {
     return BigDecimal.fromString("13.39");
-  } else if (dataSource.network() == Network.MOONRIVER) {
+  } else if (dataSource.network().toUpperCase() == Network.MOONRIVER) {
     return BigDecimal.fromString("13.39");
-  } else if (dataSource.network() == Network.AVALANCHE) {
+  } else if (dataSource.network().toUpperCase() == Network.AVALANCHE) {
     return BigDecimal.fromString("13.39");
-  } else if (dataSource.network() == Network.CRONOS) {
+  } else if (dataSource.network().toUpperCase() == Network.CRONOS) {
     return BigDecimal.fromString("5.5");
   }
 
   // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")
-  // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")
+  // else if (dataSource.network().toUpperCase() == "harmony") return BigDecimal.fromString("13.39")
   else {
     log.warning("getStartingBlockRate(): Network not found", []);
     return BIGDECIMAL_ZERO;
