@@ -28,6 +28,9 @@
         "honeyswap": {
             "gnosis": "https://api.thegraph.com/subgraphs/name/messari/honeyswap-gnosis"
         },
+        "mm-finance": {
+            "cronos": "https://graph.cronoslabs.com/subgraphs/name/messari/mm-finance"
+        },
         "platypus-finance": {
             "avalanche": "https://api.thegraph.com/subgraphs/name/messari/platypus-finance-avalanche"
         },

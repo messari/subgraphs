@@ -1,7 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-git stash -k -u
 npx pretty-quick --staged
-git add .
-git stash pop

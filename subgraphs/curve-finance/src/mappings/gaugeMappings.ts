@@ -3,13 +3,13 @@ import {
   updateRewardTokenInfo,
 } from "../modules/Rewards";
 import {
+  getOrCreateToken,
   getOrCreateLpToken,
   getOrCreateLiquidityPool,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import { Minted } from "../../generated/Minter/Minter";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import { UpdateLiquidityLimit } from "../../generated/templates/LiquidityGauge/Gauge";
@@ -31,14 +31,15 @@ export function handleMinted(event: Minted): void {
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
 
-  let crvTokenPrice = getUsdPricePerToken(constants.Mainnet.CRV_TOKEN_ADDRESS);
-  let crvTokenDecimals = utils.getTokenDecimals(
-    constants.Mainnet.CRV_TOKEN_ADDRESS
+  let crvToken = getOrCreateToken(
+    constants.Mainnet.CRV_TOKEN_ADDRESS,
+    event.block.number
   );
   let supplySideRevenueUSD = crvAmountMinted
-    .divDecimal(crvTokenDecimals)
-    .times(crvTokenPrice.usdPrice)
-    .div(crvTokenPrice.decimalsBaseTen);
+    .divDecimal(
+      constants.BIGINT_TEN.pow(crvToken.decimals as u8).toBigDecimal()
+    )
+    .times(crvToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
     pool,
@@ -46,6 +47,13 @@ export function handleMinted(event: Minted): void {
     constants.BIGDECIMAL_ZERO,
     event.block
   );
+
+  log.warning("[Minted] pool: {}, gauge: {}, amount: {}, Txn: {}", [
+    poolAddress.toHexString(),
+    gaugeAddress.toHexString(),
+    crvAmountMinted.toString(),
+    event.transaction.hash.toHexString(),
+  ]);
 }
 
 export function handleUpdateLiquidityLimit(event: UpdateLiquidityLimit): void {

@@ -29,6 +29,7 @@ const subgraphLogoMap: Record<string, string> = {
   tokemak: "https://messari.io/asset-images/39d6707f-c1f0-4ef9-b916-a3613dc7bd0f/128.png?v=2",
   yearn: "https://messari.io/asset-images/75af0d92-7ec7-4279-bd5b-05eafa1090bf/128.png?v=2",
   curve: "https://assets.coingecko.com/coins/images/12124/small/Curve.png?1597369484",
+  "mm-finance": "https://assets.coingecko.com/coins/images/22273/small/MMF200X200.png?1650448869",
   "ellipsis-finance": "https://assets.coingecko.com/coins/images/25444/small/ellipsis-light_%281%29.png?1651786591",
   gamma: "https://storage.googleapis.com/subgraph-images/1654636003709gamma.jpg",
   badgerdao: "https://storage.googleapis.com/subgraph-images/1651427188757badger.png",

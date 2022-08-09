@@ -175,6 +175,7 @@ export function _handleProposalCreated(
   proposer = getOrCreateDelegate(proposerAddr);
 
   proposal.proposer = proposer.id;
+  proposal.txnHash = event.transaction.hash.toHexString();
   proposal.againstDelegateVotes = BIGINT_ZERO;
   proposal.forDelegateVotes = BIGINT_ZERO;
   proposal.abstainDelegateVotes = BIGINT_ZERO;
