@@ -267,7 +267,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   if (event.block.number.toI64() > 60837741) {
     updateRewards(marketAddress);
   }
-  
 
   let cTokenContract = CToken.bind(marketAddress);
   let protocol = getOrCreateProtocol();
