@@ -8,7 +8,7 @@ export const PROTOCOL_NAME = "MakerDao";
 export const PROTOCOL_SLUG = "makerdao";
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.1.0";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
+export const PROTOCOL_METHODOLOGY_VERSION = "1.0.1";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -92,15 +92,6 @@ export namespace InterestRateSide {
 //////////////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ADDRESS_ZERO = Address.fromString(ZERO_ADDRESS);
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-
-export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
-
-export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
-export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // created block 10042267
-export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // created block 10093341
 
 ////////////////////////
 ///// Type Helpers /////
@@ -117,12 +108,15 @@ export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_THREE = BigInt.fromI32(3);
 export const BIGINT_SIX = BigInt.fromI32(6);
 export const BIGINT_TWELVE = BigInt.fromI32(12);
-
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
 export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
+//10^18
+export const BIGINT_ONE_WAD = BigInt.fromString("1000000000000000000");
+// 10^27
+export const BIGINT_ONE_RAY = BigInt.fromString("1000000000000000000000000000");
 
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
@@ -133,12 +127,13 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
 export const BIGDECIMAL_THREE = new BigDecimal(BIGINT_THREE);
-
 export const BIGDECIMAL_SIX = new BigDecimal(BIGINT_SIX);
 export const BIGDECIMAL_TWELVE = new BigDecimal(BIGINT_TWELVE);
 export const BIGDECIMAL_ONE_HUNDRED = new BigDecimal(BigInt.fromI32(100));
 export const BIGDECIMAL_ONE_THOUSAND = new BigDecimal(BigInt.fromI32(1000));
 export const BIGDECIMAL_NEG_ONE = BigDecimal.fromString("-1");
+export const BIGDECIMAL_ONE_WAD = BIGINT_ONE_WAD.toBigDecimal();
+export const BIGDECIMAL_ONE_RAY = BIGINT_ONE_RAY.toBigDecimal();
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -163,22 +158,11 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const MCD_DEPLOY_ADDRESS = "0xbaa65281c2FA2baAcb2cb550BA051525A480D3F4".toLowerCase();
-export const MCD_SPOT_ADDRESS = "0x65C79fcB50Ca1594B025960e539eD7A9a6D434A3".toLowerCase();
-export const MCD_JUG_ADDRESS = "0x19c0976f590D67707E62397C87829d896Dc0f1F1".toLowerCase();
-export const MCD_CAT_ADDRESS = "0x78F2c2AF65126834c51822F56Be0d7469D7A523E".toLowerCase();
-export const MCD_CAT_V2_ADDRESS = "0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea".toLowerCase();
-export const MCD_VAT_ADDRESS = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
-export const MCD_VOW_ADDRESS = "0xa950524441892a31ebddf91d3ceefa04bf454466".toLowerCase();
-export const MCD_POT_ADDRESS = "0x197e90f9fad81970ba7976f33cbd77088e5d7cf7".toLowerCase();
-
-export const ILK_REGISTRY_1_ADDRESS = "0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24".toLowerCase();
-export const ILK_REGISTRY_1_STARTBLOCK = BigInt.fromI32(10744721);
-export const ILK_REGISTRY_2_ADDRESS = "0x5a464C28D19848f44199D003BeF5ecc87d090F87".toLowerCase();
-export const ILK_REGISTRY_2_STARTBLOCK = BigInt.fromI32(12251871);
-
-export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase();
 export const VAT_ADDRESS = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
-export const ADDRESS_LENGTH = 20;
+export const VOW_ADDRESS = "0xa950524441892a31ebddf91d3ceefa04bf454466".toLowerCase();
+export const DAI_ADDRESS = "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase();
 
-export const COLLATERAL_FILE_SIGNATURE = "0x1a0b287e";
+// unconventional token requiring special handling
+export const ILK_SAI = "0x5341490000000000000000000000000000000000000000000000000000000000";
+// the first market, used to detect cat/dog contract
+export const ILK_ETH_A = "0x4554482d41000000000000000000000000000000000000000000000000000000";

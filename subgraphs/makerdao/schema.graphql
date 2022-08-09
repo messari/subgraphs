@@ -289,6 +289,9 @@ type LendingProtocol implements Protocol @entity {
   markets: [Market!]! @derivedFrom(field: "protocol")
 
   marketIDList: [String!]!
+
+  " ref per dai [ray, decimals=18]. The relationship between DAI and 1 unit of asset value, specified in the spot contract "
+  _par: BigInt
 }
 
 ###############################
@@ -577,6 +580,9 @@ type Market @entity {
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
 
   debtMultiplier: BigDecimal!
+
+  " Discount to asset price when calculating ltv [RAY, decimals=27], specified in the Spot contract "
+  _mat: BigInt!
 }
 
 #################################
@@ -1038,15 +1044,78 @@ type ActiveAccount @entity {
   id: ID!
 }
 
+# Helper entity for getting makertAddress from Ilk
 type _Ilk @entity {
   " Ilk name referred to in maker contracts"
   id: ID!
+  " Address of corresponding market"
   marketAddress: String!
 }
 
-# User CDP vault
-type _Proxy @entity {
-  " Address of CDP vault"
+# Helper entity for liquidate transaction (Flip contract)
+type _FlipBidsStore @entity {
+  " { address of liquiditee }-{ ilk hexstring }-{ auction id }"
   id: ID!
-  owner: String!
+  " round of bidding "
+  round: Int!
+  " ID of Market entity "
+  market: Market!
+  " Account being liquidated "
+  liquidatee: String!
+  " amount collateral "
+  lot: BigInt!
+  " amount of debt to be repaid "
+  tab: BigInt!
+  " current highest bidder "
+  bidder: String!
+  " current highest bid "
+  bid: BigInt!
+  " Is the auction ended "
+  ended: Boolean!
+}
+
+# Helper entity for liquidate transaction (Clip contract)
+type _ClipTakeStore @entity {
+  " { address of liquiditee }-{ ilk hexstring }-{ auction id }"
+  id: ID!
+  " slice number "
+  slice: Int!
+  " ID of Market entity "
+  market: Market!
+  " Account being liquidated "
+  liquidatee: String!
+  " amount of collateral remaining to be auctioned "
+  lot: BigInt!
+  " amount of debt remaining to be repaid "
+  tab: BigInt!
+  " Is the auction ended "
+  ended: Boolean!
+}
+
+# Helper entity for calculating supply side revenue
+type _Chi @entity {
+  " { address of Pot contract }"
+  id: ID!
+  " current rate: the difference of rates x dai balance = supply side revenue "
+  chi: BigInt!
+  " last timestamp when Pot.drip() was called "
+  rho: BigInt!
+}
+
+# Helper entity for translating urnhandler address to owner address
+type _Urn @entity {
+  " { urnhandler address }"
+  id: ID!
+  " cdp number "
+  cdpi: BigInt
+  " address of owner "
+  ownerAddress: String!
+}
+
+# Helper entity for translating proxy address to owner address
+type _Proxy @entity {
+  " { DSProxy address }"
+  id: ID!
+  " address of owner "
+  ownerAddress: String!
 }
