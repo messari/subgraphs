@@ -7,20 +7,22 @@
     "format": "npx prettier --write .",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --studio euler",
-    "create-local": "graph create --node http://localhost:8020/ euler",
-    "remove-local": "graph remove --node http://localhost:8020/ euler",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 euler",
-    "deploy-local-fork": "graph deploy euler --node http://localhost:8020/ --ipfs http://localhost:5001 --debug-fork QmNUAu43xbQ61DCmB1Ya6RvS7BtGq3tVkpa9kAjMdsdYRh"
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
+    "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.33.0",
-    "@graphprotocol/graph-ts": "0.26.0",
+    "@graphprotocol/graph-ts": "^0.27.0",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
     "eslint": "^8.11.0",
     "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.6.0",
     "typescript": "^4.6.2"
+  },
+  "devDependencies": {
+    "mustache": "^3.1.0"
   }
 }
