@@ -485,7 +485,7 @@
           "template": "evm.template.yaml",
           "messari": "messari/network-arbitrum",
           "dmelotik": "dmelotik/network-arbitrum-one",
-          "deploy-on-merge": true  
+          "deploy-on-merge": true
         },
         "aurora": {
           "template": "evm.template.yaml",
@@ -615,7 +615,7 @@
       "makerdao": {
         "ethereum": {
           "template": "makerdao.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
