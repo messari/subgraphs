@@ -137,8 +137,8 @@ function queryEulerGeneralView(marketIds: string[], block: ethereum.Block): Eule
 }
 
 export function handleBlockUpdates(block: ethereum.Block): void {
-  if (!block.number.mod(BigInt.fromI32(50)).equals(BIGINT_ZERO)) {
-    return; // Do this update every 50 block (every ~10min).
+  if (!block.number.mod(BigInt.fromI32(257)).equals(BIGINT_ZERO)) {
+    return; // Do this update every 257 block (every ~60min).
   }
 
   const protocolUtility = getOrCreateProtocolUtility();
