@@ -433,6 +433,14 @@
         }
       }
     },
+    "euler": {
+      "euler": {
+        "ethereum": {
+          "template": "euler.template.yaml",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "inverse-finance": {
       "inverse-finance": {
         "ethereum": {
