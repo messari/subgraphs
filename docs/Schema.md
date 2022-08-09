@@ -15,7 +15,7 @@ All subgraphs follow a set of standardized schemas. This standardization brings 
 - We have a set of common libraries that you can leverage. Some of them took weeks to implement.
 - We have great tooling you can use to validate your subgraph.
 
-***
+---
 
 ## Naming Conventions
 
@@ -30,8 +30,8 @@ All subgraphs follow a set of standardized schemas. This standardization brings 
 - Use plurals when referring to multiple items, usually stored as an array (e.g. tokens, balances).
 - Optional fields that don't apply to an entity should be left as `null` instead of initialized with 0 or empty string.
 - Certain prefixes may be used to indicate a particular type of value:
-  - *cumulative*: sum of all historical data from day 1 up to this point. E.g. `cumulativeDepositUSD` means all deposits has ever been made to this protocol/pool.
-  - *daily/hourly*: this only applies to snapshots and represents the sum of the snapshot interval (i.e. daily aggregate). E.g. `dailyActiveUsers` means all unique active users on a given day, up till now.
+  - _cumulative_: sum of all historical data from day 1 up to this point. E.g. `cumulativeDepositUSD` means all deposits has ever been made to this protocol/pool.
+  - _daily/hourly_: this only applies to snapshots and represents the sum of the snapshot interval (i.e. daily aggregate). E.g. `dailyActiveUsers` means all unique active users on a given day, up till now.
   - All other quantitative field indicates a spot balance. In other words, the value at this point in time. E.g. `totalValueLockedUSD` means the total TVL of the protocol/pool as of now.
 
 ### Quantitative Data
@@ -93,7 +93,7 @@ Generally, they are Ethereum events emitted by a function in the smart contracts
 
 In some cases, a smart contract call can emit multiple Ethereum events. In this case, the Ethereum event that's most relevant to the user action should be used to create the Event entity. For example, when minting a Uniswap v2 LP position, the mint function in Uniswap v2 emits two events: Mint and Transfer. In this case, we only need to create an Event entity (Deposit) based on the Mint event as it's more relevant to the user action deposit.
 
-The words *transaction* and *event* are used interchangeably in this repo, instead of using *transaction* to refer to an Ethereum transaction. Note that we do not index any Ethereum transactions in our subgraphs, as Ethereum transactions can contain any number of heterogeneous events (or user actions) and are difficult to generalize in a useful way. That being said, all Event entities are keyed upon its parent transaction hash (and the event log index), so it's easy to trace back to a transaction if needed.
+The words _transaction_ and _event_ are used interchangeably in this repo, instead of using _transaction_ to refer to an Ethereum transaction. Note that we do not index any Ethereum transactions in our subgraphs, as Ethereum transactions can contain any number of heterogeneous events (or user actions) and are difficult to generalize in a useful way. That being said, all Event entities are keyed upon its parent transaction hash (and the event log index), so it's easy to trace back to a transaction if needed.
 
 When indexing smart contract calls that represent a user action but do not emit any events, we still create Event entities but use an arbitrary index as the event log index. The index should always start from 0 and increment onwards. This is necessary in situation where there are multiple calls in the same transaction, we need a way to differetiate the Event entity created from each call.
 
@@ -147,15 +147,17 @@ There are broadly two kinds of yields in DeFi:
 
 ### Reward Tokens
 
-There is a `RewardToken` entity in our schemas. This represents the extra token incentive associated with a particular protocol/pool (i.e. emission token), usually during a protocol's liquidity mining program, and is not the token associated with the base yield (i.e. LP token). Similarly, fields like `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD` also refer to the rewards that come from token incentives.
+There is a `RewardToken` entity in our schemas. This represents the extra token incentive associated with a particular protocol/pool (i.e. emission token), usually during a protocol's liquidity mining program, and is not the token associated with the base yield (i.e. LP token). Similarly, fields like `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD` also refer to the rewards that come from token incentives. The before mentioned fields represent the estimated yield projected over the subsequent 24 hour period.
 
 Not all protocols have token rewards. For example, Uniswap doesn't have any token reward. For protocols that do, usually not all pools have token rewards. For example, for Sushiswap, only pools in the Onsen program have token rewards.
 
 It's also common for a single pool to have multiple reward tokens. For example, Sushiswap's MasterChef v2 allows for multiple `Rewarders`. Some Curve pools also have both CRV as a reward and also the pool token (e.g. FXS for FRAX, SNX for sUSD) as another reward. Similarly, for Lending Protocols, it's possible for a single Market to have reward tokens for both the lender (deposit) and the borrower (borrow). In that case, you should include two reward tokens for that Market, one with reward type as deposit and one with reward type as borrow.
 
-There are different ways to calculate `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD`. In particular, you can calculate a theoretical emission amount based on the underlying emission equation, or you can calculate the realized amount based on harvests. It's recommended to use the theoretical amount as it's more accurate and consistent. When calculating these in a snapshot, you should calculate them as the per-block amount of the current block normalized to the during of that snapshot (e.g. normalize the per-block amount to the daily amount for a daily snapshot). The reasoning for that is when we show this data on the front-end, it'll be converted to an APY, which will drive user decision (e.g. decide where they want to invest their money in the future), so the data should be forward-looking.
+There are different ways to calculate `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD`. In particular, you can calculate a theoretical emission amount based on the underlying emission equation, or you can calculate the realized amount based on harvests. It's recommended to use the theoretical amount as it's more accurate and consistent. When calculating these in a snapshot, you should calculate them as the per-second (timestamp) or per-block amount of the current block normalized to the during of that snapshot depending on the emissions specified emissions interval (e.g. normalize the per-second or per-block amount to the daily amount for a daily snapshot). The reasoning for that is when we show this data on the front-end, it'll be converted to an APY, which will drive user decision (e.g. decide where they want to invest their money in the future), so the data should be forward-looking.
 
 When handling reward tokens that need to be staked (e.g. in the MasterChef contract), make sure you also keep track of `stakedOutputTokenAmount`, which will be needed to calculate reward APY.
+
+The fields related to rewards tokens in the LP staking programs (e.g. `rewardTokenEmissionsAmount`, `rewardTokenEmissionsUSD`, `stakedOutputTokenAmount`, `rewardToken`) should all remain null unless the LP tokens minted from this pool have been elligeable for staking to earn rewards. If an LP token has at one time been elligeable for use in a staking program but is no longer earning rewards, these fields should still remain as non-null values.
 
 ## Usage Metrics
 
