@@ -217,7 +217,6 @@ function ProtocolDashboard() {
   const [getPoolsOverviewData5, { data: dataPools5, error: poolOverviewError5, loading: poolOverviewLoading5 }] =
     useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 40 } });
 
-
   const tokenQuery = gql`
     ${poolOverviewTokensQuery(protocolSchemaData?.protocols[0]?.type?.toUpperCase())}
   `;
@@ -232,34 +231,27 @@ function ProtocolDashboard() {
 
   const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
 
+  const snapshotDailyVolumeQuery = gql`
+    ${getSnapshotDailyVolume(schemaVersion)}
+  `;
 
-  const snapshotDailyVolumeQuery = gql`${getSnapshotDailyVolume(schemaVersion)}`;
+  const [getPoolsSnapshotVolume, { data: snapshotVolume }] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
 
-  const [
-    getPoolsSnapshotVolume,
-    { data: snapshotVolume },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+  const [getPoolsSnapshotVolume2, { data: snapshotVolume2 }] = useLazyQuery(snapshotDailyVolumeQuery, {
+    client: client,
+  });
 
-  const [
-    getPoolsSnapshotVolume2,
-    { data: snapshotVolume2 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+  const [getPoolsSnapshotVolume3, { data: snapshotVolume3 }] = useLazyQuery(snapshotDailyVolumeQuery, {
+    client: client,
+  });
 
-  const [
-    getPoolsSnapshotVolume3,
-    { data: snapshotVolume3 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+  const [getPoolsSnapshotVolume4, { data: snapshotVolume4 }] = useLazyQuery(snapshotDailyVolumeQuery, {
+    client: client,
+  });
 
-  const [
-    getPoolsSnapshotVolume4,
-    { data: snapshotVolume4 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
-
-  const [
-    getPoolsSnapshotVolume5,
-    { data: snapshotVolume5 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
-
+  const [getPoolsSnapshotVolume5, { data: snapshotVolume5 }] = useLazyQuery(snapshotDailyVolumeQuery, {
+    client: client,
+  });
 
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
@@ -316,13 +308,17 @@ function ProtocolDashboard() {
 
   useEffect(() => {
     if (
-      !endpoints?.pending &&
       pendingVersion?.indexingStatusForPendingVersion?.subgraph &&
       pendingVersion?.indexingStatusForPendingVersion?.health === "healthy"
     ) {
+      const pendingURL =
+        "https://api.thegraph.com/subgraphs/id/" + pendingVersion?.indexingStatusForPendingVersion?.subgraph;
+      if (isCurrentVersion === false) {
+        setSubgraphToQuery({ url: pendingURL, version: "pending" });
+      }
       setEndpoints({
         current: endpoints.current,
-        pending: "https://api.thegraph.com/subgraphs/id/" + pendingVersion?.indexingStatusForPendingVersion?.subgraph,
+        pending: pendingURL,
       });
     }
   }, [pendingVersion, errorSubId]);
