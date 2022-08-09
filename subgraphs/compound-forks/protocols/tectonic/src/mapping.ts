@@ -105,6 +105,12 @@ export function handleMarketExited(event: MarketExited): void {
   );
 }
 
+export function handleNewReserveFactor(event: NewReserveFactor): void {
+  let marketID = event.address.toHexString();
+  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
+  _handleNewReserveFactor(marketID, newReserveFactorMantissa);
+}
+
 export function handleMarketListed(event: MarketListed): void {
   CTokenTemplate.create(event.params.cToken);
 

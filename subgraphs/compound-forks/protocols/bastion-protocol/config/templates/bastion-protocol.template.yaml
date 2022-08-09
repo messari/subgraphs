@@ -65,6 +65,8 @@ templates:
           file: ./abis/ERC20.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
+        - name: RewardDistributor
+          file: ./abis/bastion-protocol/RewardDistributor.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
