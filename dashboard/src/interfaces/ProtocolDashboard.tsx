@@ -232,6 +232,61 @@ function ProtocolDashboard() {
 
   const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
 
+
+  const snapshotDailyVolumeQuery = gql`${getSnapshotDailyVolume()}`;
+
+  const [
+    getPoolsSnapshotVolume,
+    { data: snapshotVolume },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
+  const [
+    getPoolsSnapshotVolume2,
+    { data: snapshotVolume2 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
+  const [
+    getPoolsSnapshotVolume3,
+    { data: snapshotVolume3 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
+  const [
+    getPoolsSnapshotVolume4,
+    { data: snapshotVolume4 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
+  const [
+    getPoolsSnapshotVolume5,
+    { data: snapshotVolume5 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
+  const tokenQuery = gql`${poolOverviewTokensQuery(protocolSchemaData?.protocols[0]?.type?.toUpperCase())}`;
+
+  const [
+    getPoolOverviewTokens,
+    { data: poolOverviewTokens },
+  ] = useLazyQuery(tokenQuery, { client: client });
+
+  const [
+    getPoolOverviewTokens2,
+    { data: poolOverviewTokens2 },
+  ] = useLazyQuery(tokenQuery, { client: client });
+
+  const [
+    getPoolOverviewTokens3,
+    { data: poolOverviewTokens3 },
+  ] = useLazyQuery(tokenQuery, { client: client });
+
+  const [
+    getPoolOverviewTokens4,
+    { data: poolOverviewTokens4 },
+  ] = useLazyQuery(tokenQuery, { client: client });
+
+  const [
+    getPoolOverviewTokens5,
+    { data: poolOverviewTokens5 },
+  ] = useLazyQuery(tokenQuery, { client: client });
+
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
     tabNum = "2";
@@ -287,13 +342,16 @@ function ProtocolDashboard() {
 
   useEffect(() => {
     if (
-      !endpoints?.pending &&
       pendingVersion?.indexingStatusForPendingVersion?.subgraph &&
       pendingVersion?.indexingStatusForPendingVersion?.health === "healthy"
     ) {
+      const pendingURL = "https://api.thegraph.com/subgraphs/id/" + pendingVersion?.indexingStatusForPendingVersion?.subgraph;
+      if (isCurrentVersion === false) {
+        setSubgraphToQuery({ url: pendingURL, version: "pending" })
+      }
       setEndpoints({
         current: endpoints.current,
-        pending: "https://api.thegraph.com/subgraphs/id/" + pendingVersion?.indexingStatusForPendingVersion?.subgraph,
+        pending: pendingURL,
       });
     }
   }, [pendingVersion, errorSubId]);
