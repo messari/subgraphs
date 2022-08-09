@@ -217,27 +217,6 @@ function ProtocolDashboard() {
   const [getPoolsOverviewData5, { data: dataPools5, error: poolOverviewError5, loading: poolOverviewLoading5 }] =
     useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 40 } });
 
-  const snapshotDailyVolumeQuery = gql`
-    ${getSnapshotDailyVolume(protocolSchemaData?.protocols[0]?.schemaVersion)}
-  `;
-
-  const [getPoolsSnapshotVolume, { data: snapshotVolume }] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
-
-  const [getPoolsSnapshotVolume2, { data: snapshotVolume2 }] = useLazyQuery(snapshotDailyVolumeQuery, {
-    client: client,
-  });
-
-  const [getPoolsSnapshotVolume3, { data: snapshotVolume3 }] = useLazyQuery(snapshotDailyVolumeQuery, {
-    client: client,
-  });
-
-  const [getPoolsSnapshotVolume4, { data: snapshotVolume4 }] = useLazyQuery(snapshotDailyVolumeQuery, {
-    client: client,
-  });
-
-  const [getPoolsSnapshotVolume5, { data: snapshotVolume5 }] = useLazyQuery(snapshotDailyVolumeQuery, {
-    client: client,
-  });
 
   const tokenQuery = gql`
     ${poolOverviewTokensQuery(protocolSchemaData?.protocols[0]?.type?.toUpperCase())}
@@ -252,6 +231,35 @@ function ProtocolDashboard() {
   const [getPoolOverviewTokens4, { data: poolOverviewTokens4 }] = useLazyQuery(tokenQuery, { client: client });
 
   const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
+
+
+  const snapshotDailyVolumeQuery = gql`${getSnapshotDailyVolume(schemaVersion)}`;
+
+  const [
+    getPoolsSnapshotVolume,
+    { data: snapshotVolume },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
+  const [
+    getPoolsSnapshotVolume2,
+    { data: snapshotVolume2 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
+  const [
+    getPoolsSnapshotVolume3,
+    { data: snapshotVolume3 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
+  const [
+    getPoolsSnapshotVolume4,
+    { data: snapshotVolume4 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
+  const [
+    getPoolsSnapshotVolume5,
+    { data: snapshotVolume5 },
+  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+
 
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
@@ -394,6 +402,7 @@ function ProtocolDashboard() {
     }
   }, [tabValue, getPoolsOverviewData]);
 
+
   useEffect(() => {
     if (data?.protocols && dataPools) {
       const variables: { [x: string]: any } = {};
@@ -470,6 +479,8 @@ function ProtocolDashboard() {
       }
     }
   }, [dataPools5]);
+
+
 
   useEffect(() => {
     if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
@@ -676,6 +687,7 @@ function ProtocolDashboard() {
     }
     pools = pools.concat(poolArray);
   }
+
 
   if (pools?.length > 0) {
     let poolTemp = [...pools];
