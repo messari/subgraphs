@@ -3,7 +3,7 @@ import {
   Deposit,
   Withdraw,
   EmergencyWithdraw,
-} from "../../../../../generated/MasterChef/MasterChefSolarbeam";
+} from "../../../../../generated/MasterChef/SolarDistributorV2";
 import { _HelperStore } from "../../../../../generated/schema";
 import { BIGINT_NEG_ONE } from "../../../../../src/common/constants";
 import { handleReward } from "../../common/handlers/handleReward";
