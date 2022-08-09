@@ -118,12 +118,16 @@ export function Swap(
 
   let tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block.number);
   const amountInUSD = amountIn
-    .divDecimal(constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal())
+    .divDecimal(
+      constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
+    )
     .times(tokenInStore.lastPriceUSD!);
 
   let tokenOutStore = utils.getOrCreateTokenFromString(tokenOut, block.number);
   const amountOutUSD = amountOut
-    .divDecimal(constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal())
+    .divDecimal(
+      constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal()
+    )
     .times(tokenOutStore.lastPriceUSD!);
 
   createSwapTransaction(
@@ -176,7 +180,7 @@ export function Swap(
     underlying
   );
 
-  updateProtocolRevenue(liquidityPoolAddress, pool.cumulativeVolumeUSD, block);
+  updateProtocolRevenue(liquidityPoolAddress, volumeUSD, block);
   updateSnapshotsVolume(liquidityPoolAddress, volumeUSD, block);
   UpdateMetricsAfterSwap(block);
 

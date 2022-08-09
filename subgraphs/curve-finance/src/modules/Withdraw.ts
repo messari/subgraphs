@@ -20,7 +20,7 @@ import {
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
-import { Pool as LiquidityPoolContract, Pool } from "../../generated/templates/PoolTemplate/Pool";
+import { Pool as LiquidityPoolContract } from "../../generated/templates/PoolTemplate/Pool";
 
 export function createWithdrawTransaction(
   pool: LiquidityPoolStore,
@@ -145,7 +145,10 @@ export function getRemoveLiquidityOneFees(
   admin_fee: BigInt
 ): BigInt[] {
   let fees = new Array<BigInt>();
-  let balanceAfterWithdraw = utils.getPoolBalances(liquidityPoolAddress, inputTokens);
+  let balanceAfterWithdraw = utils.getPoolBalances(
+    liquidityPoolAddress,
+    inputTokens
+  );
 
   for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
     let withdrawnAmount = withdrawnTokenAmounts[idx];
@@ -278,11 +281,13 @@ export function Withdraw(
     inputTokenAmounts.push(withdrawnTokenAmounts[idx]);
     inputTokens.push(inputToken.id);
 
-    withdrawAmountUSD = withdrawnTokenAmounts[idx]
-      .divDecimal(
-        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-      )
-      .times(inputToken.lastPriceUSD!);
+    withdrawAmountUSD = withdrawAmountUSD.plus(
+      withdrawnTokenAmounts[idx]
+        .divDecimal(
+          constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+        )
+        .times(inputToken.lastPriceUSD!)
+    );
   }
 
   pool.inputTokenBalances = utils.getPoolBalances(

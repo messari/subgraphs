@@ -168,11 +168,13 @@ export function Deposit(
     inputTokenAmounts.push(depositedCoinAmounts[idx]);
     inputTokens.push(inputToken.id);
 
-    depositAmountUSD = depositedCoinAmounts[idx]
-      .divDecimal(
-        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-      )
-      .times(inputToken.lastPriceUSD!);
+    depositAmountUSD = depositAmountUSD.plus(
+      depositedCoinAmounts[idx]
+        .divDecimal(
+          constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+        )
+        .times(inputToken.lastPriceUSD!)
+    );
   }
 
   pool.inputTokenBalances = utils.getPoolBalances(
