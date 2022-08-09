@@ -167,7 +167,9 @@ export function updateStakedAmount(
   )!;
   let pool = getLiquidityPool(masterChefPool.poolAddress!);
 
-  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
+  pool.stakedOutputTokenAmount = !pool.stakedOutputTokenAmount
+    ? amount
+    : pool.stakedOutputTokenAmount!.plus(amount);
 
   pool.save();
 }
