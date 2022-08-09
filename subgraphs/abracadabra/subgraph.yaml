@@ -6,7 +6,7 @@ dataSources:
     name: BentoBox
     network: arbitrum-one
     source:
-      address: '0x74c764D41B77DBbb4fe771daB1939B00b146894A'
+      address: "0x74c764D41B77DBbb4fe771daB1939B00b146894A"
       abi: DegenBox
       startBlock: 229409
     mapping:
@@ -40,7 +40,7 @@ dataSources:
     name: Spell
     network: arbitrum-one
     source:
-      address: '0x3E6648C5a70A150A88bCE65F4aD4d506Fe15d2AF'
+      address: "0x3E6648C5a70A150A88bCE65F4aD4d506Fe15d2AF"
       abi: ERC20
       startBlock: 821891
     mapping:
@@ -70,7 +70,7 @@ dataSources:
     name: OffchainAggregator
     network: arbitrum-one
     source:
-      address: '0x87121f6c9a9f6e90e59591e4cf4804873f54a95b'
+      address: "0x87121f6c9a9f6e90e59591e4cf4804873f54a95b"
       abi: OffchainAggregator
       startBlock: 2370257
     mapping:
