@@ -1,4 +1,12 @@
 specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{subgraphId}}
+  block: {{graftStartBlock}}
+{{/graftEnabled}}
 schema:
   file: ./schema.graphql
 dataSources:
@@ -21,12 +29,20 @@ dataSources:
       abis:
         - name: Registry
           file: ./abis/Registry.json
-        - name: ERC20
-          file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
         - name: Rewards
           file: ./abis/Rewards.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: Minter
+          file: ./abis/Minter.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -105,12 +121,18 @@ dataSources:
           file: ./abis/Pool.json
         - name: Registry
           file: ./abis/Registry.json
-        - name: ERC20
-          file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
         - name: Rewards
           file: ./abis/Rewards.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: Minter
+          file: ./abis/Minter.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -211,14 +233,18 @@ dataSources:
       abis:
         - name: GaugeController
           file: ./abis/GaugeController.json
+        - name: Registry
+          file: ./abis/Registry.json
         - name: Pool
           file: ./abis/Pool.json
-        - name: ERC20
-          file: ./abis/ERC20.json
         - name: Gauge
           file: ./abis/Gauge.json
         - name: Rewards
           file: ./abis/Rewards.json
+        - name: Minter
+          file: ./abis/Minter.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -278,16 +304,20 @@ dataSources:
       abis:
         - name: Minter
           file: ./abis/Minter.json
+        - name: Registry
+          file: ./abis/Registry.json
         - name: Gauge
           file: ./abis/Gauge.json
-        - name: ERC20
-          file: ./abis/ERC20.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
         - name: Pool
           file: ./abis/Pool.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
         - name: Rewards
           file: ./abis/Rewards.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -350,12 +380,18 @@ templates:
           file: ./abis/Pool.json
         - name: Registry
           file: ./abis/Registry.json
-        - name: ERC20
-          file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
         - name: Rewards
           file: ./abis/Rewards.json
+        - name: Minter
+          file: ./abis/Minter.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -455,16 +491,20 @@ templates:
       abis:
         - name: Gauge
           file: ./abis/Gauge.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
         - name: Pool
           file: ./abis/Pool.json
         - name: Registry
           file: ./abis/Registry.json
-        - name: ERC20
-          file: ./abis/ERC20.json
         - name: PoolInfo
           file: ./abis/PoolInfo.json
         - name: Rewards
           file: ./abis/Rewards.json
+        - name: Minter
+          file: ./abis/Minter.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############

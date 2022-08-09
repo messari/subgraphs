@@ -115,10 +115,13 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 
-export const FEE_DENOMINATOR = BigDecimal.fromString("10000000000");
 export const FEE_DENOMINATOR_BIGINT = BIGINT_TEN.pow(10);
+export const FEE_DENOMINATOR = BigDecimal.fromString("10000000000");
+
 export const DEFAULT_POOL_FEE = BigInt.fromString("4000000");
 export const DEFAULT_ADMIN_FEE = BigInt.fromString("5000000000");
+
+export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
 
 export namespace Mainnet {
   export const REGISTRY_ADDRESS = Address.fromString(
