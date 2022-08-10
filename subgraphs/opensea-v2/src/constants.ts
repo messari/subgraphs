@@ -53,9 +53,21 @@ export const EXCHANGE_MARKETPLACE_NAME = "OpenSea Wyvern Exchange v2";
 export const EXCHANGE_MARKETPLACE_SLUG = "opensea-v2";
 export const EXCHANGE_MARKETPLACE_FEE = BigInt.fromI32(250);
 
+// Function Selectors for ERC721/1155 Transfer Methods
+// 0x23b872dd	transferFrom(address,address,uint256)
+// 0x42842e0e	safeTransferFrom(address,address,uint256)
+// 0xf242432a safeTransferFrom(address,address,uint256,uint256,bytes)
 export const TRANSFER_FROM_SELECTOR = "0x23b872dd";
 export const ERC721_SAFE_TRANSFER_FROM_SELECTOR = "0x42842e0e";
 export const ERC1155_SAFE_TRANSFER_FROM_SELECTOR = "0xf242432a";
+
+// Function Selectors for MerkleValidator Methods (0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7)
+// 0xfb16a595 matchERC721UsingCriteria(address,address,address,uint256,bytes32,bytes32[])
+// 0xc5a0236e matchERC721WithSafeTransferUsingCriteria(address,address,address,uint256,bytes32,bytes32[])
+// 0x96809f90 matchERC1155UsingCriteria(address,address,address,uint256,uint256,bytes32,bytes32[])
+export const MATCH_ERC721_TRANSFER_FROM_SELCTOR = "0xfb16a595";
+export const MATCH_ERC721_SAFE_TRANSFER_FROM_SELCTOR = "0xc5a0236e";
+export const MATCH_ERC115_SAFE_TRANSFER_FROM_SELCTOR = "0x96809f90";
 
 export const ERC721_INTERFACE_IDENTIFIER = "0x80ac58cd";
 export const ERC1155_INTERFACE_IDENTIFIER = "0xd9b67a26";
@@ -64,6 +76,7 @@ export const MANTISSA_FACTOR = BigInt.fromI32(10).pow(18).toBigDecimal();
 export const INVERSE_BASIS_POINT = BigDecimal.fromString("10000");
 
 export const BIGINT_ZERO = BigInt.zero();
+export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGDECIMAL_ZERO = BigDecimal.zero();
 export const BIGDECIMAL_HUNDRED = BigInt.fromI32(100).toBigDecimal();
 export const BIGDECIMAL_MAX = BigInt.fromI32(i32.MAX_VALUE).toBigDecimal();

@@ -158,7 +158,7 @@ export function calcTradeVolumeETH(
   paymentToken: Address,
   basePrice: BigInt
 ): BigDecimal {
-  if (paymentToken == NULL_ADDRESS || paymentToken || WETH_ADDRESS) {
+  if (paymentToken == NULL_ADDRESS || paymentToken == WETH_ADDRESS) {
     return basePrice.toBigDecimal().div(MANTISSA_FACTOR);
   } else {
     return BIGDECIMAL_ZERO;

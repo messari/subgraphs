@@ -21,7 +21,11 @@ import {
   max,
   getSaleStrategy,
 } from "./helpers";
-import { logCallInputs } from "./logging";
+import {
+  checkCallDataFunctionSelector,
+  decodeSingleNftData,
+  guardedArrayReplace,
+} from "./utils";
 
 // struct Order {
 //   /* Exchange address, intended as a versioning mechanism. */
@@ -124,10 +128,6 @@ import { logCallInputs } from "./logging";
 // feeMethodsSidesKindsHowToCalls[7] sell.howToCall
 
 export function handleMatch(call: AtomicMatch_Call): void {
-  // TODO: Derive contract address/token id from calldata to get collection entity
-  // let collectionAddr = decodeContractAddress(calldata)
-  // let tokenId = decodeTokenIds(calldata)
-
   // sellTarget is sell.target (addrs[11])
   let sellTarget = call.inputs.addrs[11];
   if (sellTarget.equals(WYVERN_ATOMICIZER_ADDRESS)) {
@@ -135,10 +135,24 @@ export function handleMatch(call: AtomicMatch_Call): void {
   } else {
     handleSingleSale(call);
   }
-  // logCallInputs(call);
 }
 
 function handleSingleSale(call: AtomicMatch_Call): void {
+  let mergedCallData = guardedArrayReplace(
+    call.inputs.calldataBuy,
+    call.inputs.calldataSell,
+    call.inputs.replacementPatternBuy
+  );
+  if (!checkCallDataFunctionSelector(mergedCallData)) {
+    return;
+  }
+
+  let decodedTransferResult = decodeSingleNftData(mergedCallData);
+
+  let collectionAddr = decodedTransferResult.token.toHexString();
+  let tokenId = decodedTransferResult.tokenId;
+  let amount = decodedTransferResult.amount;
+
   // paymentToken is buyOrder.paymentToken/SellOrder.payment token (addrs[6]/addrs[13])
   let paymentToken = call.inputs.addrs[13];
   // basePrice is buyOrder.basePrice/SellOrder.basePrice token (uints[4]/uints[13])
@@ -162,14 +176,14 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   trade.timestamp = call.block.timestamp;
   trade.blockNumber = call.block.number;
   trade.isBundle = false;
-  // trade.collection = collectionAddr
-  // trade.tokenId = tokenId
+  trade.collection = collectionAddr;
+  trade.tokenId = tokenId;
   trade.priceETH = priceETH;
-  trade.amount = BigInt.fromI32(1);
+  trade.amount = amount;
   trade.strategy = strategy;
   trade.buyer = buyer;
   trade.seller = seller;
-  
+
   trade.save();
 
   // Prepare for updating dailyTradedItemCount
@@ -249,10 +263,10 @@ function updateCollectionMetrics(
   collection.cumulativeTradeVolumeETH =
     collection.cumulativeTradeVolumeETH.plus(volumeETH);
 
+  collection.save();
+
   // Update Collection/Marketplace revenue metrics
   updateRevenueMetrics(call, collectionAddr);
-
-  collection.save();
 
   // Update Collection daily snapshot
   let collectionSnapshot = getOrCreateCollectionDailySnapshot(
@@ -376,7 +390,10 @@ function updateMarketplaceMetrics(
   marketplaceSnapshot.save();
 }
 
-function updateRevenueMetrics(call: AtomicMatch_Call, collectionAddr: string) {
+function updateRevenueMetrics(
+  call: AtomicMatch_Call,
+  collectionAddr: string
+): void {
   let collection = getOrCreateCollection(collectionAddr);
   let marketplace = getOrCreateMarketplace(
     EXCHANGE_MARKETPLACE_ADDRESS.toHexString()
