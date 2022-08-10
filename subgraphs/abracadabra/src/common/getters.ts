@@ -321,10 +321,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
   LendingProtocolEntity.protocolControlledValueUSD = BIGDECIMAL_ZERO;
   LendingProtocolEntity.marketIDList = [];
-  LendingProtocolEntity.depositors = [];
-  LendingProtocolEntity.borrowers = [];
-  LendingProtocolEntity.liquidators = [];
-  LendingProtocolEntity.liquidatees = [];
   LendingProtocolEntity.cumulativeUniqueDepositors = 0;
   LendingProtocolEntity.cumulativeUniqueBorrowers = 0;
   LendingProtocolEntity.cumulativeUniqueLiquidators = 0;

@@ -10,8 +10,8 @@ import {
   LogExchangeRate,
 } from "../generated/templates/Cauldron/Cauldron";
 import { MarketOracle } from "../generated/templates/Cauldron/MarketOracle";
-import { Deposit, Borrow, Repay, Liquidate, Withdraw } from "../generated/schema";
-import { NEG_INT_ONE, DEFAULT_DECIMALS, ABRA_ACCOUNTS, EventType, BIGDECIMAL_ONE } from "./common/constants";
+import { Deposit, Borrow, Repay, Liquidate, Withdraw, Account } from "../generated/schema";
+import { NEG_INT_ONE, DEFAULT_DECIMALS, ABRA_ACCOUNTS, EventType, BIGDECIMAL_ONE, PositionSide } from "./common/constants";
 import { bigIntToBigDecimal, divBigDecimal } from "./common/utils/numbers";
 import {
   getOrCreateToken,
@@ -35,7 +35,7 @@ import {
   updateTotalBorrows,
 } from "./common/metrics";
 import { createMarket, createLiquidateEvent } from "./common/setters";
-import { addAccountToProtocol, getOrCreateAccount, updatePositions } from "./positions";
+import { addPosition, createAccount, subtractPosition } from "./positions";
 import { updateTokenPrice } from "./common/prices/prices";
 
 export function handleLogDeploy(event: LogDeploy): void {
@@ -61,6 +61,36 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   let tokenPriceUSD = collateralToken.lastPriceUSD;
   let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD!);
 
+  // update account/position
+  let protocol = getOrCreateLendingProtocol();
+  let account = Account.load(event.params.to.toHexString());
+  if (!account) {
+    account = createAccount(event.params.to.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.depositCount += 1;
+  account.save();
+
+  let underlyingBalanceResult = CauldronContract.try_userCollateralShare(event.params.to);
+  let positionID = addPosition(
+    protocol,
+    market,
+    account,
+    underlyingBalanceResult,
+    PositionSide.LENDER,
+    EventType.DEPOSIT,
+    event,
+  );
+
+  if (!positionID) {
+    log.warning("[handleLogAddCollateral] Failed to add position for {}", [event.params.to.toHexString()]);
+    return;
+  }
+
+  depositEvent.position = positionID;
   depositEvent.hash = event.transaction.hash.toHexString();
   depositEvent.nonce = event.transaction.nonce;
   depositEvent.logIndex = event.transactionLogIndex.toI32();
@@ -84,7 +114,6 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
-  updatePositions(market.id, EventType.DEPOSIT, event.params.share, depositEvent.account, event, depositEvent.id);
 }
 
 export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
@@ -107,6 +136,35 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   let tokenPriceUSD = collateralToken.lastPriceUSD;
   let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD!);
 
+  // handle account/positon
+  let protocol = getOrCreateLendingProtocol();
+  let account = Account.load(event.params.from.toHexString());
+  if (!account) {
+    account = createAccount(event.params.from.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.withdrawCount += 1;
+  account.save();
+
+  let underlyingBalanceResult = CauldronContract.try_userCollateralShare(event.params.from);
+  let positionID = subtractPosition(
+    protocol,
+    market,
+    account,
+    underlyingBalanceResult,
+    PositionSide.LENDER,
+    EventType.WITHDRAW,
+    event
+  );
+  if (!positionID) {
+    log.warning("[handleRedeem] Failed to find position", []);
+    return;
+  }
+
+  withdrawalEvent.position = positionID;
   withdrawalEvent.hash = event.transaction.hash.toHexString();
   withdrawalEvent.nonce = event.transaction.nonce;
   withdrawalEvent.logIndex = event.transactionLogIndex.toI32();
@@ -127,15 +185,6 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
-  updatePositions(
-    market.id,
-    EventType.WITHDRAW,
-    event.params.share,
-    withdrawalEvent.account,
-    event,
-    withdrawalEvent.id,
-    liquidation,
-  );
 }
 
 export function handleLogBorrow(event: LogBorrow): void {
@@ -152,6 +201,36 @@ export function handleLogBorrow(event: LogBorrow): void {
   let mimPriceUSD = mimToken.lastPriceUSD;
   let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD!);
 
+  // handle account/positon
+  let protocol = getOrCreateLendingProtocol();
+  let account = Account.load(event.params.from.toHexString());
+  if (!account) {
+    account = createAccount(event.params.from.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  account.borrowCount += 1;
+  account.save();
+
+  let CauldronContract = Cauldron.bind(event.address);
+  let borrowBalanceResult = CauldronContract.try_userBorrowPart(event.params.from);
+  let positionID = addPosition(
+    protocol,
+    market,
+    account,
+    borrowBalanceResult,
+    PositionSide.BORROWER,
+    EventType.BORROW,
+    event
+  );
+  if (!positionID) {
+    log.warning("[handleLogBorrow] Failed to add position for {}", [event.params.from.toHexString()]);
+    return;
+  }
+
+  borrowEvent.position = positionID;
   borrowEvent.hash = event.transaction.hash.toHexString();
   borrowEvent.nonce = event.transaction.nonce;
   borrowEvent.logIndex = event.transactionLogIndex.toI32();
@@ -169,7 +248,6 @@ export function handleLogBorrow(event: LogBorrow): void {
   updateMarketStats(market.id, EventType.BORROW, getMIMAddress(dataSource.network()), event.params.amount, event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
-  updatePositions(market.id, EventType.BORROW, event.params.amount, borrowEvent.account, event, borrowEvent.id);
 }
 
 // Liquidation steps
@@ -294,6 +372,40 @@ export function handleLogRepay(event: LogRepay): void {
   let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
   let mimPriceUSD = mimToken.lastPriceUSD;
   let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD!);
+
+  let payerAccount = Account.load(payer.toHexString());
+  if (!payerAccount) {
+    payerAccount = createAccount(payer.toHexString());
+    payerAccount.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+  payerAccount.repayCount += 1;
+  payerAccount.save();
+
+  let borrowerAccount = Account.load(borrower.toHexString());
+  if (!borrowerAccount) {
+    borrowerAccount = createAccount(borrower.toHexString());
+    borrowerAccount.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+
+  let positionID = subtractPosition(
+    protocol,
+    market,
+    borrowerAccount,
+    borrowBalanceResult,
+    PositionSide.BORROWER,
+    EventType.Repay,
+    event
+  );
+  if (!positionID) {
+    log.warning("[handleRepayBorrow] Failed to find position", []);
+    return;
+  }
 
   repayEvent.hash = event.transaction.hash.toHexString();
   repayEvent.nonce = event.transaction.nonce;

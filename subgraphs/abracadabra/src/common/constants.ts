@@ -77,6 +77,12 @@ export namespace EventType {
   export const LIQUIDATEE = "LIQUIDATEE";
   export const LIQUIDATOR = "LIQUIDATOR";
 }
+
+export namespace PositionSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
