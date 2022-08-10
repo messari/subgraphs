@@ -382,7 +382,7 @@ function updateTONICRewards(
           event.block.timestamp,
           event.block.number,
           tryTonicSpeed.value.toBigDecimal(),
-          RewardIntervalType.TIMESTAMP
+          RewardIntervalType.BLOCK
         )
           .truncate(0)
           .toString()
