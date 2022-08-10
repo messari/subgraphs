@@ -60,6 +60,7 @@ export function handleTransfer(event: Transfer): void {
       return;
     }
     let amount = toDecimal(event.params.value, token.decimals);
+    let amountBigInt = event.params.value;
 
     let isBurn = event.params.to.toHex() == GENESIS_ADDRESS;
     let isMint = event.params.from.toHex() == GENESIS_ADDRESS;
@@ -96,7 +97,7 @@ export function handleTransfer(event: Transfer): void {
       let accountBalance = decreaseAccountBalance(
         sourceAccount,
         token as Token,
-        amount
+        amountBigInt
       );
       accountBalance.blockNumber = event.block.number;
       accountBalance.timestamp = event.block.timestamp;
@@ -114,7 +115,7 @@ export function handleTransfer(event: Transfer): void {
       let accountBalance = increaseAccountBalance(
         destinationAccount,
         token as Token,
-        amount
+        amountBigInt
       );
       accountBalance.blockNumber = event.block.number;
       accountBalance.timestamp = event.block.timestamp;
@@ -133,6 +134,7 @@ export function handleBurn(event: Burn): void {
 
   if (token != null) {
     let amount = toDecimal(event.params.value, token.decimals);
+    let amountBigInt = event.params.value;
 
     let isEventProcessed = handleBurnEvent(
       token,
@@ -150,7 +152,7 @@ export function handleBurn(event: Burn): void {
     let accountBalance = decreaseAccountBalance(
       account,
       token as Token,
-      amount
+      amountBigInt
     );
     accountBalance.blockNumber = event.block.number;
     accountBalance.timestamp = event.block.timestamp;
@@ -168,6 +170,8 @@ export function handleMint(event: Mint): void {
 
   if (token != null) {
     let amount = toDecimal(event.params.amount, token.decimals);
+    let amountBigInt = event.params.amount;
+
     let isEventProcessed = handleMintEvent(
       token,
       amount,
@@ -184,7 +188,7 @@ export function handleMint(event: Mint): void {
     let accountBalance = increaseAccountBalance(
       account,
       token as Token,
-      amount
+      amountBigInt
     );
     accountBalance.blockNumber = event.block.number;
     accountBalance.timestamp = event.block.timestamp;
@@ -320,7 +324,7 @@ function handleTransferEvent(
   if (token != null) {
     let FromBalanceToZeroNum = BIGINT_ZERO;
     let balance = getOrCreateAccountBalance(getOrCreateAccount(source), token);
-    if (balance.amount == amount) {
+    if (balance.amount.toBigDecimal() == amount) {
       // It means the sender's token balance will be 0 after transferal.
       FromBalanceToZeroNum = BIGINT_ONE;
     }
@@ -335,7 +339,7 @@ function handleTransferEvent(
         getOrCreateAccount(destination),
         token
       );
-      if (balance.amount == BIGDECIMAL_ZERO) {
+      if (balance.amount.toBigDecimal() == BIGDECIMAL_ZERO) {
         // It means the receiver's token balance is 0 before transferal.
         toBalanceIsZeroNum = BIGINT_ONE;
       }

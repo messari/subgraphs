@@ -1,7 +1,7 @@
 import { BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 
 // Constants
-export const REGISTRY_HASH = "QmV1Ppv576oCPTNE2jN1w6pp6YFVNVkvU45xZWyUMrpKEH"; // data/tokens.json
+export const REGISTRY_HASH = "QmZ3Q5FHm9TJJNwPTX9gX949KExn2r6BT2cqddxebDaHMK"; // data/tokens.json
 
 export const DEFAULT_DECIMALS = 18;
 export const GENESIS_ADDRESS = "0x0000000000000000000000000000000000000000";

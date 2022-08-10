@@ -245,7 +245,7 @@ type AccountBalance @entity {
   token: Token!
 
   " Current account balance "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Block number in which the balance was last modified "
   blockNumber: BigInt!
@@ -269,7 +269,7 @@ type AccountBalanceDailySnapshot @entity {
   token: Token!
 
   " Current account balance "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Block number in which the balance was last modified "
   blockNumber: BigInt!
