@@ -169,18 +169,3 @@ templates:
           handler: handleLogExchangeRate
         - event: LogAccrue(uint128)
           handler: handleLogAccrue
-  - name: priceOracle
-    kind: ethereum/contract
-    network: {{network}}
-    source:
-      abi: PriceOracle
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/common/prices/prices.ts
-      entities:
-        - Market
-      abis:
-        - name: PriceOracle
-          file: ./abis/PriceOracle.json
