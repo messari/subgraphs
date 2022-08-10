@@ -33,9 +33,14 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x65fae35e00000000000000000000000000000000000000000000000000000000"
           handler: handleVatRely
+        # function cage()
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x6924500900000000000000000000000000000000000000000000000000000000"
           handler: handleVatCage
+        # function slip( bytes32 ilk, address usr, int256 wad)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x7cdd3fde00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatSlip
         ### CDP Manipulation ###
         # function frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
@@ -97,6 +102,8 @@ dataSources:
       abis:
         - name: Pot
           file: ./abis/Pot.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
       eventHandlers:
@@ -164,6 +171,8 @@ dataSources:
       abis:
         - name: CatV1
           file: ./abis/CatV1.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
         - Token
@@ -193,6 +202,8 @@ dataSources:
       abis:
         - name: CatV2
           file: ./abis/CatV2.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
         - Token
@@ -221,6 +232,8 @@ dataSources:
       abis:
         - name: Dog
           file: ./abis/Dog.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
         - Token
@@ -293,6 +306,8 @@ templates:
       abis:
         - name: Flip
           file: ./abis/Flip.json
+        - name: DAI
+          file: ./abis/DAI.json
       eventHandlers:
         # collateral auction
         # Flip.tend(uint256,uint256,uint256)
@@ -328,7 +343,11 @@ templates:
       abis:
         - name: Clip
           file: ./abis/Clip.json
+        - name: DAI
+          file: ./abis/DAI.json
       eventHandlers:
         # collateral auction
         - event: Take(indexed uint256,uint256,uint256,uint256,uint256,uint256,indexed address)
           handler: handleClipTakeBid
+        - event: Yank(uint256)
+          handler: handleClipYankBid
