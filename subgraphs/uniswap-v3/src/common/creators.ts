@@ -16,6 +16,7 @@ import {
   getOrCreateDex,
   getOrCreateLPToken,
   getOrCreateToken,
+  getTradingFee,
 } from "./getters";
 import { NetworkConfigs } from "../../configurations/configure";
 import {
@@ -79,7 +80,7 @@ export function createLiquidityPool(
     " " +
     LPtoken.symbol +
     " " +
-    convertFeeToPercent(fees).toString() +
+    getTradingFee(pool.id).toString() +
     "%";
   pool.symbol = LPtoken.symbol;
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
