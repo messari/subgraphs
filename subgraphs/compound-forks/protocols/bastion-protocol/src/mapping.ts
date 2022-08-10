@@ -34,6 +34,8 @@ import {
   exponentToBigDecimal,
   INT_ZERO,
   INT_ONE,
+  BIGDECIMAL_ZERO,
+  mantissaFactor,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -62,6 +64,7 @@ import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import {
+  cBSTNContract,
   comptrollerAddr,
   nativeCToken,
   nativeToken,
@@ -265,7 +268,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let marketAddress = event.address;
   // update rewards for market after the RewardDistributor is created at block 60837741
   if (event.block.number.toI64() > 60837741) {
-    updateRewards(marketAddress);
+    updateRewards(marketAddress, event.block.number);
   }
 
   let cTokenContract = CToken.bind(marketAddress);
@@ -312,7 +315,7 @@ function getOrCreateProtocol(): LendingProtocol {
 //
 // Update the rewards arrays in a given market
 // can be done for supply / borrow side triggered by Supply/BorrowSpeedUpdate events
-function updateRewards(marketAddress: Address): void {
+function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   let market = Market.load(marketAddress.toHexString());
   if (!market) {
     log.warning("[updateRewards] Market not found: {}", [
@@ -350,11 +353,18 @@ function updateRewards(marketAddress: Address): void {
     // load BSTN token
     token = Token.load(REWARD_TOKENS[INT_ZERO].toHexString());
     if (!token) {
-      log.warning("[updateRewards] BSTN not found: {}", [
-        REWARD_TOKENS[INT_ZERO].toHexString(),
-      ]);
-      return;
+      let BSTNContract = ERC20.bind(REWARD_TOKENS[INT_ZERO]);
+      token = new Token(REWARD_TOKENS[INT_ZERO].toHexString());
+      token.name = getOrElse<string>(BSTNContract.try_name(), "unknown");
+      token.symbol = getOrElse<string>(BSTNContract.try_symbol(), "unknown");
+      token.decimals = getOrElse<i32>(BSTNContract.try_decimals(), 0);
     }
+    let bstnPriceUSD = getBastionPrice();
+    if (bstnPriceUSD != BIGDECIMAL_ZERO) {
+      token.lastPriceUSD = getBastionPrice();
+      token.lastPriceBlockNumber = blockNumber;
+    }
+    token.save();
 
     borrowRewardToken = getOrCreateRewardToken(token, RewardTokenType.BORROW);
   }
@@ -372,6 +382,7 @@ function updateRewards(marketAddress: Address): void {
     // load wNEAR token
     token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
     if (!token) {
+      // wNEAR is already made from the NEAR market
       log.warning("[updateRewards] wNEAR not found: {}", [
         REWARD_TOKENS[INT_ONE].toHexString(),
       ]);
@@ -413,11 +424,18 @@ function updateRewards(marketAddress: Address): void {
     // load BSTN token
     token = Token.load(REWARD_TOKENS[INT_ZERO].toHexString());
     if (!token) {
-      log.warning("[updateRewards] BSTN not found: {}", [
-        REWARD_TOKENS[INT_ZERO].toHexString(),
-      ]);
-      return;
+      let BSTNContract = ERC20.bind(REWARD_TOKENS[INT_ZERO]);
+      token = new Token(REWARD_TOKENS[INT_ZERO].toHexString());
+      token.name = getOrElse<string>(BSTNContract.try_name(), "unknown");
+      token.symbol = getOrElse<string>(BSTNContract.try_symbol(), "unknown");
+      token.decimals = getOrElse<i32>(BSTNContract.try_decimals(), 0);
     }
+    let bstnPriceUSD = getBastionPrice();
+    if (bstnPriceUSD != BIGDECIMAL_ZERO) {
+      token.lastPriceUSD = getBastionPrice();
+      token.lastPriceBlockNumber = blockNumber;
+    }
+    token.save();
 
     supplyRewardToken = getOrCreateRewardToken(token, RewardTokenType.DEPOSIT);
   }
@@ -428,13 +446,13 @@ function updateRewards(marketAddress: Address): void {
         "[updateRewards] Multiple reward speeds found for supply side: {}",
         [marketAddress.toHexString()]
       );
-      return;
     }
     supplyRewardSpeed = trySupplyOne.value;
 
     // load wNEAR token
     token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
     if (!token) {
+      // wNEAR is already made from the NEAR market
       log.warning("[updateRewards] wNEAR not found: {}", [
         REWARD_TOKENS[INT_ONE].toHexString(),
       ]);
@@ -475,4 +493,20 @@ function getOrCreateRewardToken(token: Token, type: string): RewardToken {
   }
 
   return rewardToken;
+}
+
+//
+//
+// Get the current price of BSTN for rewards calculations
+function getBastionPrice(): BigDecimal {
+  let protocol = getOrCreateProtocol();
+  let oracleContract = PriceOracle.bind(
+    Address.fromString(protocol._priceOracle)
+  );
+
+  let priceUSD = getOrElse(
+    oracleContract.try_getUnderlyingPrice(cBSTNContract),
+    BIGINT_ZERO
+  );
+  return priceUSD.toBigDecimal().div(exponentToBigDecimal(mantissaFactor));
 }

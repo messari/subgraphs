@@ -28,6 +28,10 @@ export const nativeCToken = new TokenData(
   cTokenDecimals
 );
 
+export const cBSTNContract = Address.fromString(
+  "0x08Ac1236ae3982EC9463EfE10F0F320d9F5A9A4b"
+);
+
 // reward token mappings
 export const REWARD_TOKENS = [
   Address.fromString("0x9f1F933C660a1DC856F0E0Fe058435879c5CCEf0"), // BSTN (index 0)
