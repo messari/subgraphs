@@ -647,10 +647,6 @@ type Market @entity {
 
   " All liquidations made to this market "
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
-
-  ##### Add ons #####
-
-  debtMultiplier: BigDecimal!
 }
 
 #################################
