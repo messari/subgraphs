@@ -86,7 +86,9 @@
     },
     "lending": {
         "aave-v2": {
-            "ethereum": "https://api.thegraph.com/subgraphs/name/messari/aave-v2-ethereum"
+            "ethereum": "https://api.thegraph.com/subgraphs/name/messari/aave-v2-ethereum",
+            "avalanche": "https://api.thegraph.com/subgraphs/name/messari/aave-v2-avalanche",
+            "polygon": "https://api.thegraph.com/subgraphs/name/messari/aave-v2-polygon"
         },
         "aave-arc": {
             "ethereum": "https://api.thegraph.com/subgraphs/name/messari/aave-arc-ethereum"
@@ -143,6 +145,9 @@
         },
         "ellipsis-finance": {
             "bsc": "https://api.thegraph.com/subgraphs/name/messari/ellipsis-finance-bsc"
+        },
+        "euler-finance": {
+            "ethereum": "https://api.thegraph.com/subgraphs/name/messari/euler-finance-ethereum"
         },
         "geist-finance": {
             "fantom": "https://api.thegraph.com/subgraphs/name/messari/geist-finance-fantom"
