@@ -186,15 +186,14 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
 export function updatePositions(
   marketId: string,
   eventType: string,
-  amount: BigInt,
   accountId: string,
   event: ethereum.Event,
   eventId: string,
   liquidation: boolean = false,
-): void {
+): string {
   let market = getMarket(marketId);
   if (!market) {
-    return;
+    return "";
   }
   let position = getOrCreatePosition(InterestRateSide.LENDER, marketId, accountId, event);
   if ([EventType.BORROW, EventType.REPAY].includes(eventType)) {
@@ -278,6 +277,8 @@ export function updatePositions(
   if (closePositionToggle) {
     closePosition(position, account, market, event);
   }
+
+  return position.id;
 }
 
 export function takePositionSnapshot(position: Position, event: ethereum.Event): void {
