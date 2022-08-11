@@ -213,7 +213,7 @@ export function handleLiquidation(event: LogRepay): void {
   let tokenPriceUSD = collateralToken.lastPriceUSD;
   let collateralAmount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
     Address.fromString(collateralToken.id),
-    liquidateEvent.amount!,
+    liquidateEvent.amount,
     false,
   );
   let collateralAmountUSD = bigIntToBigDecimal(collateralAmount, collateralToken.decimals).times(tokenPriceUSD!);
@@ -235,12 +235,12 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
   liquidateEvent.save();
 
-  let liqudidatedAccount = getOrCreateAccount(liquidateEvent.liquidatee!, event);
+  let liqudidatedAccount = getOrCreateAccount(liquidateEvent.liquidatee, event);
   liqudidatedAccount.liquidateCount = liqudidatedAccount.liquidateCount + 1;
   liqudidatedAccount.save();
   addAccountToProtocol(EventType.LIQUIDATEE, liqudidatedAccount, event);
 
-  let liquidatorAccount = getOrCreateAccount(liquidateEvent.liquidator!, event);
+  let liquidatorAccount = getOrCreateAccount(liquidateEvent.liquidator, event);
   liquidatorAccount.liquidationCount = liquidatorAccount.liquidationCount + 1;
   liquidatorAccount.save();
   addAccountToProtocol(EventType.LIQUIDATOR, liquidatorAccount, event);
