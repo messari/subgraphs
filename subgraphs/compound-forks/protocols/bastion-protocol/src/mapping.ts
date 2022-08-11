@@ -383,20 +383,22 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
       );
       return;
     }
-    borrowRewardSpeed = tryBorrowOne.value;
+    if (tryBorrowOne.value.gt(BIGINT_ZERO)) {
+      borrowRewardSpeed = tryBorrowOne.value;
 
-    // load wNEAR token
-    token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
-    if (!token) {
-      // wNEAR is already made from the NEAR market
-      log.warning("[updateRewards] wNEAR not found: {} {}", [
-        REWARD_TOKENS[INT_ONE].toHexString(),
-        borrowRewardSpeed.toString(),
-      ]);
-      return;
+      // load wNEAR token
+      token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
+      if (!token) {
+        // wNEAR is already made from the NEAR market
+        log.warning("[updateRewards] wNEAR not found: {} {}", [
+          REWARD_TOKENS[INT_ONE].toHexString(),
+          borrowRewardSpeed.toString(),
+        ]);
+        return;
+      }
+
+      borrowRewardToken = getOrCreateRewardToken(token, RewardTokenType.BORROW);
     }
-
-    borrowRewardToken = getOrCreateRewardToken(token, RewardTokenType.BORROW);
   }
 
   // if a borrow side reward is successfully found, update rewards
@@ -456,19 +458,25 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
         [marketAddress.toHexString()]
       );
     }
-    supplyRewardSpeed = trySupplyOne.value;
 
-    // load wNEAR token
-    token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
-    if (!token) {
-      // wNEAR is already made from the NEAR market
-      log.warning("[updateRewards] wNEAR not found: {}", [
-        REWARD_TOKENS[INT_ONE].toHexString(),
-      ]);
-      return;
+    if (trySupplyOne.value.gt(BIGINT_ZERO)) {
+      supplyRewardSpeed = trySupplyOne.value;
+
+      // load wNEAR token
+      token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
+      if (!token) {
+        // wNEAR is already made from the NEAR market
+        log.warning("[updateRewards] wNEAR not found: {}", [
+          REWARD_TOKENS[INT_ONE].toHexString(),
+        ]);
+        return;
+      }
+
+      supplyRewardToken = getOrCreateRewardToken(
+        token,
+        RewardTokenType.DEPOSIT
+      );
     }
-
-    supplyRewardToken = getOrCreateRewardToken(token, RewardTokenType.DEPOSIT);
   }
 
   // if a supply side reward is successfully found, update rewards
