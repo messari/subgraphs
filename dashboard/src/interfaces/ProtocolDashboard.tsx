@@ -231,8 +231,12 @@ function ProtocolDashboard() {
 
   const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
 
+<<<<<<< HEAD
 
   const snapshotDailyVolumeQuery = gql`${getSnapshotDailyVolume()}`;
+=======
+  const snapshotDailyVolumeQuery = gql`${getSnapshotDailyVolume(schemaVersion)}`;
+>>>>>>> 3e19346 (Indexing progress)
 
   const [
     getPoolsSnapshotVolume,

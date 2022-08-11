@@ -162,32 +162,9 @@ export const Deployment = ({
     statusColor = "#58BC82";
   }
 
-  // const subgraphDataClient = useMemo(() => NewClient("https://api.thegraph.com/explorer/graphql"), []);
-
-  // const [getSubgraphData, {
-  //   data: subgraphData
-  // }] = useLazyQuery(subgraphDataQuery, { variables: { subgraphName: data?.protocols[0]?.slug + '-' + networkName }, client: subgraphDataClient })
-
-  // useEffect(() => {
-  //   if (data) {
-  //     getSubgraphData()
-  //   }
-  // }, [data])
-
-  // console.log(subgraphData)
-
   const indexed = synced
     ? 100
-    : toPercent(
-        statusData?.chains[0]?.latestBlock?.number - statusData?.chains[0]?.earliestBlock?.number || 0,
-        statusData?.chains[0]?.chainHeadBlock?.number - statusData?.chains[0]?.earliestBlock?.number,
-      );
-
-  // // const indexingRatio = (current block - earliest timeseries block)/(chain head block - earliest timeseries block) = ratio
-  // const indexingRatio = (statusData?.chains[0]?.latestBlock?.number - statusData?.chains[0]?.earliestBlock?.number) / (statusData?.chains[0]?.chainHeadBlock?.number - statusData?.chains[0]?.earliestBlock?.number)
-  // // (current time - deployed at time + ratio(deployed at time))/ratio = x
-  // let deployedAt = 1 //HIT THE NEW ENDPOINT AND GET deployedAt time
-  // const indexingETA = (Date.now() - deployedAt + indexingRatio * deployedAt) / indexingRatio
+    : toPercent(statusData?.chains[0]?.latestBlock?.number || 0, statusData?.chains[0]?.chainHeadBlock?.number);
 
   return (
     <TableRow sx={{ width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }} onClick={navigateToSubgraph(endpointURL)}>

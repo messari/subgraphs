@@ -12,5 +12,9 @@ const DashboardTag = styled("div")`
 `;
 
 export const DashboardVersion = () => {
+<<<<<<< HEAD
   return <DashboardTag>v1.3.3</DashboardTag>;
+=======
+  return <DashboardTag>v1.3.5</DashboardTag>;
+>>>>>>> 3e19346 (Indexing progress)
 };
