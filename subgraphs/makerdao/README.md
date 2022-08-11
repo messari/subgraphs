@@ -72,6 +72,10 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ![Makerdao](../../docs/images/protocols/makerdao.png "Makerdao")
 
+## Data Notes
+
+- There is a sharp reduction in supply side revenue on 2020-03-17. It is because Maker reduced the supply side rate (DAI Savings Rate, or DSR) to effectively 0% on that date. See https://www.reddit.com/r/MakerDAO/comments/fnzdzp/dai_savings_rate_0/
+
 ## Build
 
 - Initialize subgraph (Subgraph Studio):
