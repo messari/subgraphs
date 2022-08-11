@@ -24,6 +24,7 @@ import {
 import {
   checkCallDataFunctionSelector,
   decodeSingleNftData,
+  getFunctionSelector,
   guardedArrayReplace,
 } from "./utils";
 
@@ -144,6 +145,7 @@ function handleSingleSale(call: AtomicMatch_Call): void {
     call.inputs.replacementPatternBuy
   );
   if (!checkCallDataFunctionSelector(mergedCallData)) {
+    log.warning("[checkCallDataFunctionSelector] returned false, Method ID: {}", [getFunctionSelector(mergedCallData)]);
     return;
   }
 
@@ -153,16 +155,16 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   let tokenId = decodedTransferResult.tokenId;
   let amount = decodedTransferResult.amount;
 
-  // paymentToken is buyOrder.paymentToken/SellOrder.payment token (addrs[6]/addrs[13])
-  let paymentToken = call.inputs.addrs[13];
-  // basePrice is buyOrder.basePrice/SellOrder.basePrice token (uints[4]/uints[13])
-  let basePrice = call.inputs.uints[13];
-  let volumeETH = calcTradeVolumeETH(paymentToken, basePrice);
-  let priceETH = volumeETH;
-
-  // TODO: Dutch Auction/Private Sale possible
   let saleKind = call.inputs.feeMethodsSidesKindsHowToCalls[6];
   let strategy = getSaleStrategy(saleKind);
+
+  // paymentToken is buyOrder.paymentToken or SellOrder.payment token (addrs[6] or addrs[13])
+  let paymentToken = call.inputs.addrs[13];
+  // basePrice is buyOrder.basePrice or SellOrder.basePrice token (uints[4] or uints[13])
+  let basePrice = call.inputs.uints[13];
+  // TODO: calculate final price for dutch auction sales
+  let volumeETH = calcTradeVolumeETH(paymentToken, basePrice);
+  let priceETH = volumeETH;
 
   // buyer is buyOrder.maker (addrs[1])
   let buyer = call.inputs.addrs[1].toHexString();
@@ -320,7 +322,6 @@ function updateMarketplaceMetrics(
   marketplace.cumulativeTradeVolumeETH =
     marketplace.cumulativeTradeVolumeETH.plus(volumeETH);
 
-  // TODO: Update revenue fees here
   let buyerAccountID = "MARKETPLACE_ACCOUNT-".concat(buyer);
   let buyerAccount = _Item.load(buyerAccountID);
   if (!buyerAccount) {

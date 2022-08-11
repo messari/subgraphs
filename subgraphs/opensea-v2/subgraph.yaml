@@ -17,6 +17,8 @@ dataSources:
       abis:
         - name: OpenSeaV2
           file: ./abis/OpenSeaV2.json
+        - name: ERC165
+          file: ./abis/ERC165.json
         - name: NftMetadata
           file: ./abis/NftMetadata.json
       callHandlers:

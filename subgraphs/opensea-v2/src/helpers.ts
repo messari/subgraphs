@@ -1,4 +1,5 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { ERC165 } from "../generated/OpenSeaV2/ERC165";
 import { NftMetadata } from "../generated/OpenSeaV2/NftMetadata";
 import {
   Collection,
@@ -19,6 +20,9 @@ import {
   SECONDS_PER_DAY,
   BIGDECIMAL_MAX,
   SaleStrategy,
+  ERC721_INTERFACE_IDENTIFIER,
+  ERC1155_INTERFACE_IDENTIFIER,
+  NftStandard,
 } from "./constants";
 
 export function getOrCreateMarketplace(marketplaceID: string): Marketplace {
@@ -50,7 +54,7 @@ export function getOrCreateCollection(collectionID: string): Collection {
   if (!collection) {
     collection = new Collection(collectionID);
 
-    // TODO: Set NFT standard and get NFT metadata
+    collection.nftStandard = getNftStandard(collectionID);
     let contract = NftMetadata.bind(Address.fromString(collectionID));
 
     let nameResult = contract.try_name();
@@ -144,6 +148,34 @@ export function getOrCreateCollectionDailySnapshot(
   }
 
   return snapshot;
+}
+
+function getNftStandard(collectionID: string): string {
+  let erc165 = ERC165.bind(Address.fromString(collectionID));
+
+  let isERC721Result = erc165.try_supportsInterface(
+    Bytes.fromHexString(ERC721_INTERFACE_IDENTIFIER)
+  );
+  if (isERC721Result.reverted) {
+    log.warning("[getNftStandard] isERC721 reverted", []);
+  } else {
+    if (isERC721Result.value) {
+      return NftStandard.ERC721;
+    }
+  }
+
+  let isERC1155Result = erc165.try_supportsInterface(
+    Bytes.fromHexString(ERC1155_INTERFACE_IDENTIFIER)
+  );
+  if (isERC1155Result.reverted) {
+    log.warning("[getNftStandard] isERC1155 reverted", []);
+  } else {
+    if (isERC1155Result.value) {
+      return NftStandard.ERC1155;
+    }
+  }
+
+  return NftStandard.UNKNOWN;
 }
 
 export function getSaleStrategy(saleKind: i32): string {

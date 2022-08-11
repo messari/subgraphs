@@ -1,9 +1,12 @@
-import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   BIGINT_ONE,
+  BIGINT_ZERO,
+  ETHABI_DECODE_PREFIX,
   MATCH_ERC115_SAFE_TRANSFER_FROM_SELCTOR,
   MATCH_ERC721_SAFE_TRANSFER_FROM_SELCTOR,
   MATCH_ERC721_TRANSFER_FROM_SELCTOR,
+  NULL_ADDRESS,
 } from "./constants";
 
 export class DecodedTransferResult {
@@ -31,12 +34,12 @@ export class DecodedTransferResult {
   }
 }
 
-export function getFunctionSelctor(callData: Bytes): string {
+export function getFunctionSelector(callData: Bytes): string {
   return Bytes.fromUint8Array(callData.subarray(0, 4)).toHexString();
 }
 
 export function checkCallDataFunctionSelector(callData: Bytes): boolean {
-  let functionSelector = getFunctionSelctor(callData);
+  let functionSelector = getFunctionSelector(callData);
   return (
     functionSelector == MATCH_ERC721_TRANSFER_FROM_SELCTOR ||
     functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELCTOR ||
@@ -54,7 +57,7 @@ export function guardedArrayReplace(
   if (_mask.length == 0) {
     return _array;
   }
-
+  
   // Copies original Bytes Array to avoid buffer overwrite
   let array = Bytes.fromUint8Array(_array.slice(0));
   let replacement = Bytes.fromUint8Array(_replacement.slice(0));
@@ -70,19 +73,21 @@ export function guardedArrayReplace(
 
   bigIntReplacement = bigIntReplacement.bitAnd(bigIntMask);
   bigIntArray = bigIntArray.bitOr(bigIntReplacement);
-  return changetype<Bytes>(Bytes.fromBigInt(bigIntArray).reverse());
+  // return changetype<Bytes>(Bytes.fromBigInt(bigIntArray).reverse());
+  return Bytes.fromHexString(bigIntArray.toHexString());
 }
 
 export function decode_matchERC721UsingCriteria_Method(
   callData: Bytes
 ): DecodedTransferResult {
-  let functionSelector = getFunctionSelctor(callData);
+  let functionSelector = getFunctionSelector(callData);
   let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
+  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(dataWithoutFunctionSelector);
 
   let decoded = ethereum
     .decode(
-      "address,address,address,uint256,bytes32,bytes32[]",
-      dataWithoutFunctionSelector
+      "(address,address,address,uint256,bytes32,bytes32[])",
+      dataWithoutFunctionSelectorWithPrefix
     )!
     .toTuple();
   let senderAddress = decoded[0].toAddress();
@@ -103,13 +108,14 @@ export function decode_matchERC721UsingCriteria_Method(
 export function decode_matchERC1155UsingCriteria_Method(
   callData: Bytes
 ): DecodedTransferResult {
-  let functionSelector = getFunctionSelctor(callData);
+  let functionSelector = getFunctionSelector(callData);
   let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
+  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(dataWithoutFunctionSelector);
 
   let decoded = ethereum
     .decode(
-      "address,address,address,uint256,uint256,bytes32,bytes32[]",
-      dataWithoutFunctionSelector
+      "(address,address,address,uint256,uint256,bytes32,bytes32[])",
+      dataWithoutFunctionSelectorWithPrefix
     )!
     .toTuple();
   let senderAddress = decoded[0].toAddress();
@@ -129,7 +135,7 @@ export function decode_matchERC1155UsingCriteria_Method(
 }
 
 export function decodeSingleNftData(callData: Bytes): DecodedTransferResult {
-  let functionSelector = getFunctionSelctor(callData);
+  let functionSelector = getFunctionSelector(callData);
   if (
     functionSelector == MATCH_ERC721_TRANSFER_FROM_SELCTOR ||
     functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELCTOR

@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
@@ -68,6 +68,8 @@ export const ERC1155_SAFE_TRANSFER_FROM_SELECTOR = "0xf242432a";
 export const MATCH_ERC721_TRANSFER_FROM_SELCTOR = "0xfb16a595";
 export const MATCH_ERC721_SAFE_TRANSFER_FROM_SELCTOR = "0xc5a0236e";
 export const MATCH_ERC115_SAFE_TRANSFER_FROM_SELCTOR = "0x96809f90";
+
+export const ETHABI_DECODE_PREFIX = Bytes.fromHexString("0000000000000000000000000000000000000000000000000000000000000020");
 
 export const ERC721_INTERFACE_IDENTIFIER = "0x80ac58cd";
 export const ERC1155_INTERFACE_IDENTIFIER = "0xd9b67a26";
