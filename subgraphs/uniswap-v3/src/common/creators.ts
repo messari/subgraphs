@@ -73,11 +73,6 @@ export function createLiquidityPool(
     BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
   ];
   pool.outputTokenSupply = BIGINT_ZERO;
-  pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool.rewardTokens = [NetworkConfigs.getRewardToken()];
-  pool.stakedOutputTokenAmount = BIGINT_ZERO;
-  pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
   pool.fees = createPoolFees(poolAddress, fees);
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
