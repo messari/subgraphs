@@ -306,7 +306,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Bastion Protocol",
     "bastion-protocol",
     "2.0.1",
-    "1.1.3",
+    "1.1.4",
     "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),
@@ -349,7 +349,7 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   );
   let borrowRewardSpeed: BigInt | null = null;
   let borrowRewardToken: RewardToken | null = null;
-  let token: Token | null;
+  let token: Token | null = null;
 
   if (!tryBorrowZero.reverted) {
     borrowRewardSpeed = tryBorrowZero.value;
@@ -363,21 +363,26 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
       token.symbol = getOrElse<string>(BSTNContract.try_symbol(), "unknown");
       token.decimals = getOrElse<i32>(BSTNContract.try_decimals(), 0);
     }
-    let bstnPriceUSD = getBastionPrice();
-    if (bstnPriceUSD != BIGDECIMAL_ZERO) {
-      token.lastPriceUSD = bstnPriceUSD;
-      token.lastPriceBlockNumber = blockNumber;
-    }
+    token.lastPriceUSD = getBastionPrice();
+    token.lastPriceBlockNumber = blockNumber;
     token.save();
 
     borrowRewardToken = getOrCreateRewardToken(token, RewardTokenType.BORROW);
   }
 
   if (!tryBorrowOne.reverted) {
-    if (borrowRewardSpeed) {
+    if (
+      borrowRewardSpeed &&
+      borrowRewardSpeed.gt(BIGINT_ZERO) &&
+      tryBorrowOne.value.gt(BIGINT_ZERO)
+    ) {
       log.warning(
-        "[updateRewards] Multiple reward speeds found for borrow side: {}",
-        [marketAddress.toHexString()]
+        "[updateRewards] Multiple reward speeds found for borrow side: {} {} {}",
+        [
+          marketAddress.toHexString(),
+          borrowRewardSpeed.toString(),
+          tryBorrowOne.value.toString(),
+        ]
       );
       return;
     }
@@ -387,8 +392,9 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
     token = Token.load(REWARD_TOKENS[INT_ONE].toHexString());
     if (!token) {
       // wNEAR is already made from the NEAR market
-      log.warning("[updateRewards] wNEAR not found: {}", [
+      log.warning("[updateRewards] wNEAR not found: {} {}", [
         REWARD_TOKENS[INT_ONE].toHexString(),
+        borrowRewardSpeed.toString(),
       ]);
       return;
     }
@@ -397,14 +403,15 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   }
 
   // if a borrow side reward is successfully found, update rewards
-  if (borrowRewardSpeed) {
+  if (borrowRewardSpeed && token) {
+    let priceUSD = token.lastPriceUSD ? token.lastPriceUSD : BIGDECIMAL_ZERO;
     rewardTokens.push(borrowRewardToken!.id);
-    rewardEmissions.push(borrowRewardSpeed!);
+    rewardEmissions.push(borrowRewardSpeed);
     rewardEmissionsUSD.push(
-      borrowRewardSpeed!
+      borrowRewardSpeed
         .toBigDecimal()
-        .div(exponentToBigDecimal(token!.decimals))
-        .times(token!.lastPriceUSD!)
+        .div(exponentToBigDecimal(token.decimals))
+        .times(priceUSD!)
         .times(BigDecimal.fromString(SECONDS_PER_DAY.toString()))
     );
   }
@@ -434,20 +441,21 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
       token.symbol = getOrElse<string>(BSTNContract.try_symbol(), "unknown");
       token.decimals = getOrElse<i32>(BSTNContract.try_decimals(), 0);
     }
-    let bstnPriceUSD = getBastionPrice();
-    if (bstnPriceUSD != BIGDECIMAL_ZERO) {
-      token.lastPriceUSD = bstnPriceUSD;
-      token.lastPriceBlockNumber = blockNumber;
-    }
+    token.lastPriceUSD = getBastionPrice();
+    token.lastPriceBlockNumber = blockNumber;
     token.save();
 
     supplyRewardToken = getOrCreateRewardToken(token, RewardTokenType.DEPOSIT);
   }
 
   if (!trySupplyOne.reverted) {
-    if (supplyRewardSpeed) {
+    if (
+      supplyRewardSpeed &&
+      supplyRewardSpeed.gt(BIGINT_ZERO) &&
+      trySupplyOne.value.gt(BIGINT_ZERO)
+    ) {
       log.warning(
-        "[updateRewards] Multiple reward speeds found for supply side: {}",
+        "[updateRewards] Multiple reward speeds found for supply side: {} {}",
         [marketAddress.toHexString()]
       );
     }
@@ -467,14 +475,15 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   }
 
   // if a supply side reward is successfully found, update rewards
-  if (supplyRewardSpeed) {
+  if (supplyRewardSpeed && token) {
+    let priceUSD = token.lastPriceUSD ? token.lastPriceUSD : BIGDECIMAL_ZERO;
     rewardTokens.push(supplyRewardToken!.id);
-    rewardEmissions.push(supplyRewardSpeed!);
+    rewardEmissions.push(supplyRewardSpeed);
     rewardEmissionsUSD.push(
-      supplyRewardSpeed!
+      supplyRewardSpeed
         .toBigDecimal()
-        .div(exponentToBigDecimal(token!.decimals))
-        .times(token!.lastPriceUSD!)
+        .div(exponentToBigDecimal(token.decimals))
+        .times(priceUSD!)
         .times(BigDecimal.fromString(SECONDS_PER_DAY.toString()))
     );
   }
