@@ -139,18 +139,28 @@ Although the trading activities are on Kwenta website, the fees are accrued to t
 
 ### TVL 
 TVL is the sum of collaterals in Staking and Wrapper, e.g. the sum of SNX staked and ETH, LUSD, renBTC, etc. deposited for loans.
+> TVL = （Price of SNX * SNX tokens staked in the Staking contract) + (Price of ETH * ETH tokens in the Wrapper contract) + (Price of LUSD * LUSD tokens inthe Wrapper contract) + (Price of renBTC * renBTC tokens inthe Wrapper contract) 
 
 ### Total Borrow
 Totol borrow will be the sum of all the synths, including those in the debt pool and those minted from the Wrappers.
+> Total Borrow = $\sum$ value of synths in Debt Pool + $\sum$ value of synths minted from the Wrapper  
 
 ### Revenue
 There's no liquidity provider in Synthetix, so all revenue is protocol-side (belong to stakers of SNX).
 
 #### Protocol-Side Revenue
+
 - Trading fees
 - Liquidation fees
 - (From Wrapper) issuance fee
 - (From Wrapper) interest
+
+> Protocol-side revenue = $\sum$ (Trading fees, Liquidation Fees, Issurance Fees, interest) <br>
+Whereas, <br>
+> Trading fees = $\sum$ (exchange fee rate for each synth + dynamic fee rate when applicable) * value of the transacted synth <br>
+> Liquidation fees = $\sum$ liquidation penalty * sUSD burnt in liquidation <br>
+> Issurance fees = $\sum$ issurance fee rate when applicable * sSUD minted <br>
+> Interest = $\sum$ interest rate when applicable * sSUD minted <br>
 
 #### Supply-Side Revenue
 Nil.
