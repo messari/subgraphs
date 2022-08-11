@@ -117,7 +117,7 @@ The usage of a Notional pool includes the following:
 - Liquidity providers provide/withdraw liquidity 
 - Liquidity providers claim NOTE incentives
 - Lenders deposit/withdraw
-- Borrowers deposit/release collaterals into their portfolio
+- Borrowers deposit/release collaterals into their account
 - Borrowers borrow/repay
   - Rollover a loan (this is actually repaying the current loan and borrowing a longer term loan)
 - Liquidation
@@ -149,19 +149,30 @@ The TVL of each pool is the cTOKEN in the main proxy contract. The value is the 
 - Borrowers deposit/release collaterals in cTOKENs
 - Liquidity providers provide/withdraw cTOKENs as liquidity
 
+To simplify, the formula of Notional's TVL is:
+> TVL = $\sum$ value of cToken assets (cDAI, cUSDC, cETH, cWBTC) in the proxy contract
+
 *Volume*
 
 Volume in the context of Notional is the aggregate transactions with the liquidity pool. For instance, total borrowing volume is the total selling transactions of fCASH.
+
+To simplify, the formula of Notional's Volume (combining lend, borrow, repay and withdraw) is:
+> Volumn = $\sum$ value of fCASH transacted
 
 *Revenue*
 
 Notional has two types of revenue:
 - Interests paid by borrowers to lenders. Different from Aave or Compound, Notional operates like a trading platform of zero-interest coupon (buying and selling fCASH), so the interests paid by borrowers to lenders do not accrue per block, but rather happens when each trade takes place. To simplify, we take the difference between the cTOKEN value and fCASH future value as the interest paid. For any given period, the higher of borrowing interests paid (selling fCASH) and lending interest paid (buying fCASH) is the interest revenue for that period. For more details please refer to Appendix: Consideration on Interest Revenue For Notional.
 
+**To simplify the revenue, we can presume the interest paid by borrowers to lenders is not revenue, i.e. only counting revenue generated to liquidity providiers as revenue.** 
+
 - Fees paid by borrowers and lenders for each trade. Notional charges a fee for each transaction with the liquidity pool, e.g. borrow, repay, lend, withdraw. The fee rate is 0.3% per transaction for a 1-year loan, and pro rata for shorter maturity, i.e. 0.15% for 6-month loan. 80% of the fees go to the protocol and 20% goes to the liquidity provider. 
   - Reference: https://docs.notional.finance/governance/overview-of-governance-parameters/selected-parameters#fees-and-incentives
+  
+To simplify, the formula of Notional's Revenue is:
+> Revenue = $\sum$ value of fCASH transacted * fee rate of 0.3%
 
-As such, the protocol side revenue of Notional will be the 80% transaction fees generated from the liquidation. The supply side revenue is the sum of 20% of the transaction fees to liquidity providers and the interests paid to lenders.
+As such, the protocol side revenue of Notional will be the 80% transaction fees generated from the transaction fees. The supply side revenue is the sum of 20% of the transaction fees. Interests paid to lenders are not counted as revenue, as suggested above.
 
 *Interest Rate*
 
