@@ -64,6 +64,7 @@ import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import {
+  bstnOracle,
   cBSTNContract,
   comptrollerAddr,
   nativeCToken,
@@ -364,7 +365,7 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
     }
     let bstnPriceUSD = getBastionPrice();
     if (bstnPriceUSD != BIGDECIMAL_ZERO) {
-      token.lastPriceUSD = getBastionPrice();
+      token.lastPriceUSD = bstnPriceUSD;
       token.lastPriceBlockNumber = blockNumber;
     }
     token.save();
@@ -373,7 +374,7 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   }
 
   if (!tryBorrowOne.reverted) {
-    if (!borrowRewardSpeed) {
+    if (borrowRewardSpeed) {
       log.warning(
         "[updateRewards] Multiple reward speeds found for borrow side: {}",
         [marketAddress.toHexString()]
@@ -396,7 +397,7 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   }
 
   // if a borrow side reward is successfully found, update rewards
-  if (!borrowRewardSpeed) {
+  if (borrowRewardSpeed) {
     rewardTokens.push(borrowRewardToken!.id);
     rewardEmissions.push(borrowRewardSpeed!);
     rewardEmissionsUSD.push(
@@ -435,7 +436,7 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
     }
     let bstnPriceUSD = getBastionPrice();
     if (bstnPriceUSD != BIGDECIMAL_ZERO) {
-      token.lastPriceUSD = getBastionPrice();
+      token.lastPriceUSD = bstnPriceUSD;
       token.lastPriceBlockNumber = blockNumber;
     }
     token.save();
@@ -444,7 +445,7 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   }
 
   if (!trySupplyOne.reverted) {
-    if (!supplyRewardSpeed) {
+    if (supplyRewardSpeed) {
       log.warning(
         "[updateRewards] Multiple reward speeds found for supply side: {}",
         [marketAddress.toHexString()]
@@ -466,7 +467,7 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   }
 
   // if a supply side reward is successfully found, update rewards
-  if (!supplyRewardSpeed) {
+  if (supplyRewardSpeed) {
     rewardTokens.push(supplyRewardToken!.id);
     rewardEmissions.push(supplyRewardSpeed!);
     rewardEmissionsUSD.push(
@@ -502,10 +503,7 @@ function getOrCreateRewardToken(token: Token, type: string): RewardToken {
 //
 // Get the current price of BSTN for rewards calculations
 function getBastionPrice(): BigDecimal {
-  let protocol = getOrCreateProtocol();
-  let oracleContract = PriceOracle.bind(
-    Address.fromString(protocol._priceOracle)
-  );
+  let oracleContract = PriceOracle.bind(bstnOracle);
 
   let priceUSD = getOrElse(
     oracleContract.try_getUnderlyingPrice(cBSTNContract),
