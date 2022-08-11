@@ -162,13 +162,11 @@ export const Deployment = ({
     statusColor = "#58BC82";
   }
 
-
   // const subgraphDataClient = useMemo(() => NewClient("https://api.thegraph.com/explorer/graphql"), []);
 
   // const [getSubgraphData, {
   //   data: subgraphData
   // }] = useLazyQuery(subgraphDataQuery, { variables: { subgraphName: data?.protocols[0]?.slug + '-' + networkName }, client: subgraphDataClient })
-
 
   // useEffect(() => {
   //   if (data) {
@@ -180,7 +178,10 @@ export const Deployment = ({
 
   const indexed = synced
     ? 100
-    : toPercent(statusData?.chains[0]?.latestBlock?.number - statusData?.chains[0]?.earliestBlock?.number || 0, statusData?.chains[0]?.chainHeadBlock?.number - statusData?.chains[0]?.earliestBlock?.number);
+    : toPercent(
+        statusData?.chains[0]?.latestBlock?.number - statusData?.chains[0]?.earliestBlock?.number || 0,
+        statusData?.chains[0]?.chainHeadBlock?.number - statusData?.chains[0]?.earliestBlock?.number,
+      );
 
   // // const indexingRatio = (current block - earliest timeseries block)/(chain head block - earliest timeseries block) = ratio
   // const indexingRatio = (statusData?.chains[0]?.latestBlock?.number - statusData?.chains[0]?.earliestBlock?.number) / (statusData?.chains[0]?.chainHeadBlock?.number - statusData?.chains[0]?.earliestBlock?.number)
