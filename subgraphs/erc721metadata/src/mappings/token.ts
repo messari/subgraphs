@@ -7,7 +7,7 @@ import {
   JSONValueKind,
 } from "@graphprotocol/graph-ts";
 import { ERC721 } from "../../generated/ERC721/ERC721";
-import { Token, Attribute, ERC721Collection } from "../../generated/schema";
+import { Token, Attribute, Collection } from "../../generated/schema";
 import {
   IPFS_PREFIX,
   IPFS_SLASH,
@@ -31,7 +31,7 @@ export function normalize(strValue: string): string {
 
 export function createToken(
   contract: ERC721,
-  tokenCollection: ERC721Collection,
+  tokenCollection: Collection,
   tokenId: BigInt,
   block: ethereum.Block
 ): Token {

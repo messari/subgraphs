@@ -1,13 +1,9 @@
 import { Bytes } from "@graphprotocol/graph-ts";
 
 import { Transfer, ERC721 } from "../../generated/ERC721/ERC721";
-import {
-  Token,
-  ERC721Collection,
-  NonERC721Collection,
-} from "../../generated/schema";
+import { Token, Collection, NonERC721Collection } from "../../generated/schema";
 
-import { GENESIS_ADDRESS } from "../common/constants";
+import { GENESIS_ADDRESS, BIGINT_ONE, BIGINT_ZERO } from "../common/constants";
 import { createToken, normalize, updateTokenMetadata } from "./token";
 
 export function handleTransfer(event: Transfer): void {
@@ -22,7 +18,7 @@ export function handleTransfer(event: Transfer): void {
   let tokenId = event.params.id;
   let contract = ERC721.bind(event.address);
   let collectionId = event.address.toHex();
-  let tokenCollection = ERC721Collection.load(collectionId);
+  let tokenCollection = Collection.load(collectionId);
   if (tokenCollection == null) {
     // check whether the collection has already been verified to be non-ERC721 contract to avoid to make contract calls again.
     let previousNonERC721Collection = NonERC721Collection.load(collectionId);
@@ -38,9 +34,10 @@ export function handleTransfer(event: Transfer): void {
 
     // Save info for the ERC721 collection
     let supportsERC721Metadata = supportsInterface(contract, "5b5e139f");
-    tokenCollection = new ERC721Collection(collectionId);
+    tokenCollection = new Collection(collectionId);
     tokenCollection.supportsERC721Metadata = supportsERC721Metadata;
     tokenCollection.tokenURIUpdated = false;
+    tokenCollection.tokenCount = BIGINT_ZERO;
 
     tokenCollection.save();
   }
@@ -60,6 +57,9 @@ export function handleTransfer(event: Transfer): void {
       event.block
     );
     currentToken.save();
+
+    tokenCollection.tokenCount = tokenCollection.tokenCount.plus(BIGINT_ONE);
+    tokenCollection.save();
     return;
   }
 

@@ -11,7 +11,7 @@ type Token @entity {
   id: ID!
 
   " Collection for the token "
-  collection: ERC721Collection!
+  collection: Collection!
 
   " ID of the token from the collection "
   tokenId: BigInt!
@@ -59,7 +59,7 @@ type Attribute @entity {
   id: ID!
 
   " The collection for the trait "
-  collection: ERC721Collection!
+  collection: Collection!
 
   " ID of the token from the collection  "
   tokenId: BigInt!
@@ -84,7 +84,7 @@ type Attribute @entity {
 ####### ERC721 Collection ######
 ################################
 
-type ERC721Collection @entity {
+type Collection @entity {
   " ERC721 collection address "
   id: ID!
 
@@ -93,6 +93,9 @@ type ERC721Collection @entity {
 
   " Flag for whether the tokenURI in the collection has been updated  "
   tokenURIUpdated: Boolean!
+
+  " Total number of unique tokens in the collection "
+  tokenCount: BigInt!
 
   " Tokens in the collection "
   tokens: [Token!]! @derivedFrom(field: "collection")
