@@ -84,13 +84,13 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
     false,
   );
   depositEvent.amountUSD = amountUSD;
+  depositEvent.position = updatePositions(market.id, EventType.DEPOSIT, depositEvent.account, event, depositEvent.id);
+  depositEvent.save();
 
   updateMarketStats(market.id, EventType.DEPOSIT, collateralToken.id, event.params.share, event);
   updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
-  depositEvent.position = updatePositions(market.id, EventType.DEPOSIT, depositEvent.account, event, depositEvent.id);
-  depositEvent.save();
 }
 
 export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
@@ -128,11 +128,6 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
     false,
   );
   withdrawalEvent.amountUSD = amountUSD;
-
-  updateMarketStats(market.id, EventType.WITHDRAW, collateralToken.id, event.params.share, event);
-  updateTVL(event);
-  updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
-  updateUsageMetrics(event, event.params.from, event.params.to);
   withdrawalEvent.position = updatePositions(
     market.id,
     EventType.WITHDRAW,
@@ -142,6 +137,11 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
     liquidation,
   );
   withdrawalEvent.save();
+
+  updateMarketStats(market.id, EventType.WITHDRAW, collateralToken.id, event.params.share, event);
+  updateTVL(event);
+  updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
+  updateUsageMetrics(event, event.params.from, event.params.to);
 }
 
 export function handleLogBorrow(event: LogBorrow): void {
@@ -169,14 +169,13 @@ export function handleLogBorrow(event: LogBorrow): void {
   borrowEvent.asset = mimToken.id;
   borrowEvent.amount = event.params.amount;
   borrowEvent.amountUSD = amountUSD;
+  borrowEvent.position = updatePositions(market.id, EventType.BORROW, borrowEvent.account, event, borrowEvent.id);
+  borrowEvent.save();
 
   updateTotalBorrows(event);
   updateMarketStats(market.id, EventType.BORROW, getMIMAddress(dataSource.network()), event.params.amount, event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
-  borrowEvent.position = updatePositions(market.id, EventType.BORROW, borrowEvent.account, event, borrowEvent.id);
-
-  borrowEvent.save();
 }
 
 // Liquidation steps
@@ -319,11 +318,6 @@ export function handleLogRepay(event: LogRepay): void {
   repayEvent.asset = mimToken.id;
   repayEvent.amount = event.params.amount;
   repayEvent.amountUSD = amountUSD;
-
-  updateTotalBorrows(event);
-  updateMarketStats(market.id, EventType.REPAY, getMIMAddress(dataSource.network()), event.params.part, event); // smart contract code subs event.params.part from totalBorrow
-  updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
-  updateUsageMetrics(event, event.params.from, event.params.to);
   repayEvent.position = updatePositions(
     market.id,
     EventType.REPAY,
@@ -333,6 +327,11 @@ export function handleLogRepay(event: LogRepay): void {
     liquidation,
   );
   repayEvent.save();
+
+  updateTotalBorrows(event);
+  updateMarketStats(market.id, EventType.REPAY, getMIMAddress(dataSource.network()), event.params.part, event); // smart contract code subs event.params.part from totalBorrow
+  updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
+  updateUsageMetrics(event, event.params.from, event.params.to);
 }
 
 export function handleLogExchangeRate(event: LogExchangeRate): void {
