@@ -26,6 +26,7 @@ const subgraphLogoMap: Record<string, string> = {
   "geist-finance": "https://storage.googleapis.com/subgraph-images/1651428792354geist-finance.png",
   "rari-fuse": "https://storage.googleapis.com/subgraph-images/1652677853847rari-fuse.png",
   qidao: "https://storage.googleapis.com/subgraph-images/1654484792092qidao.png",
+  "euler-finance": "https://assets.coingecko.com/coins/images/26149/small/YCvKDfl8_400x400.jpeg?1656041509",
   tokemak: "https://messari.io/asset-images/39d6707f-c1f0-4ef9-b916-a3613dc7bd0f/128.png?v=2",
   yearn: "https://messari.io/asset-images/75af0d92-7ec7-4279-bd5b-05eafa1090bf/128.png?v=2",
   curve: "https://assets.coingecko.com/coins/images/12124/small/Curve.png?1597369484",

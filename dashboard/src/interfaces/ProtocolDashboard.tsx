@@ -398,7 +398,6 @@ function ProtocolDashboard() {
     }
   }, [tabValue, getPoolsOverviewData]);
 
-
   useEffect(() => {
     if (data?.protocols && dataPools) {
       const variables: { [x: string]: any } = {};
@@ -475,8 +474,6 @@ function ProtocolDashboard() {
       }
     }
   }, [dataPools5]);
-
-
 
   useEffect(() => {
     if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
@@ -683,7 +680,6 @@ function ProtocolDashboard() {
     }
     pools = pools.concat(poolArray);
   }
-
 
   if (pools?.length > 0) {
     let poolTemp = [...pools];
