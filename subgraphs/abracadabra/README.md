@@ -62,6 +62,12 @@ Amount of MIM tokens minted for each Market
 
 ### NO Reward Token Emissions
 
+## Notes
+
+- Market price = `1` / (`exchangeRate` / `1e18`)
+- The v2 markets have an oracle with a function called `peekSpot`. Calling this with "0x0" will return the current spot price.
+  - We loop through this on every event as a backup to ensure that the market prices are up to date.
+
 ## References and Useful Links
 
 - Protocol: https://abracadabra.money/
