@@ -1082,14 +1082,10 @@ type _ClipTakeStore @entity {
   slice: Int!
   " ID of Market entity "
   market: Market!
-  " Account being liquidated "
-  liquidatee: String!
   " amount of collateral remaining to be auctioned "
   lot: BigInt!
   " amount of debt remaining to be repaid "
   tab: BigInt!
-  " Is the auction ended "
-  ended: Boolean!
 }
 
 # Helper entity for calculating supply side revenue
