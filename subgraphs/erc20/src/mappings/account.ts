@@ -1,4 +1,4 @@
-import { BigDecimal, Bytes, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { Bytes, ethereum, BigInt } from "@graphprotocol/graph-ts";
 
 import {
   Account,
@@ -7,7 +7,7 @@ import {
   Token,
 } from "../../generated/schema";
 
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, SECONDS_PER_DAY } from "../common/constants";
+import { BIGINT_ZERO, SECONDS_PER_DAY } from "../common/constants";
 
 export function isNewAccount(accountAddress: Bytes): boolean {
   let accountId = accountAddress.toHex();

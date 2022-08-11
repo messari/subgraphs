@@ -13,5 +13,8 @@
     "@graphprotocol/graph-cli": "0.32.0",
     "@graphprotocol/graph-ts": "0.27.0",
     "ipfs-http-client": "^57.0.3"
+  },
+  "devDependencies": {
+    "prettier": "^2.7.1"
   }
 }

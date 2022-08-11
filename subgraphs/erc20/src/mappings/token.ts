@@ -1,10 +1,4 @@
-import {
-  BigDecimal,
-  Bytes,
-  BigInt,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Bytes, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 
 import { ERC20, Transfer } from "../../generated/templates/StandardToken/ERC20";
 import { Burn } from "../../generated/templates/BurnableToken/Burnable";
@@ -23,12 +17,9 @@ import {
   GENESIS_ADDRESS,
   BIGINT_ZERO,
   BIGINT_ONE,
-  BIGINT_TWO,
-  BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
 } from "../common/constants";
 
-import { toDecimal } from "./registry";
 import {
   getOrCreateAccount,
   getOrCreateAccountBalance,
@@ -53,14 +44,13 @@ export function handleTransfer(event: Transfer): void {
       token.decimals = tokenDecimals.reverted
         ? DEFAULT_DECIMALS
         : tokenDecimals.value;
-      token.totalSupply = BIGDECIMAL_ZERO;
+      token.totalSupply = BIGINT_ZERO;
     }
 
     if (event.params.value == BIGINT_ZERO) {
       return;
     }
-    let amount = toDecimal(event.params.value, token.decimals);
-    let amountBigInt = event.params.value;
+    let amount = event.params.value;
 
     let isBurn = event.params.to.toHex() == GENESIS_ADDRESS;
     let isMint = event.params.from.toHex() == GENESIS_ADDRESS;
@@ -97,7 +87,7 @@ export function handleTransfer(event: Transfer): void {
       let accountBalance = decreaseAccountBalance(
         sourceAccount,
         token as Token,
-        amountBigInt
+        amount
       );
       accountBalance.blockNumber = event.block.number;
       accountBalance.timestamp = event.block.timestamp;
@@ -115,7 +105,7 @@ export function handleTransfer(event: Transfer): void {
       let accountBalance = increaseAccountBalance(
         destinationAccount,
         token as Token,
-        amountBigInt
+        amount
       );
       accountBalance.blockNumber = event.block.number;
       accountBalance.timestamp = event.block.timestamp;
@@ -133,8 +123,7 @@ export function handleBurn(event: Burn): void {
   let token = Token.load(event.address.toHex());
 
   if (token != null) {
-    let amount = toDecimal(event.params.value, token.decimals);
-    let amountBigInt = event.params.value;
+    let amount = event.params.value;
 
     let isEventProcessed = handleBurnEvent(
       token,
@@ -152,7 +141,7 @@ export function handleBurn(event: Burn): void {
     let accountBalance = decreaseAccountBalance(
       account,
       token as Token,
-      amountBigInt
+      amount
     );
     accountBalance.blockNumber = event.block.number;
     accountBalance.timestamp = event.block.timestamp;
@@ -169,8 +158,7 @@ export function handleMint(event: Mint): void {
   let token = Token.load(event.address.toHex());
 
   if (token != null) {
-    let amount = toDecimal(event.params.amount, token.decimals);
-    let amountBigInt = event.params.amount;
+    let amount = event.params.amount;
 
     let isEventProcessed = handleMintEvent(
       token,
@@ -188,7 +176,7 @@ export function handleMint(event: Mint): void {
     let accountBalance = increaseAccountBalance(
       account,
       token as Token,
-      amountBigInt
+      amount
     );
     accountBalance.blockNumber = event.block.number;
     accountBalance.timestamp = event.block.timestamp;
@@ -203,7 +191,7 @@ export function handleMint(event: Mint): void {
 
 function handleBurnEvent(
   token: Token | null,
-  amount: BigDecimal,
+  amount: BigInt,
   burner: Bytes,
   event: ethereum.Event
 ): boolean {
@@ -212,7 +200,7 @@ function handleBurnEvent(
     let totalSupply = ERC20.bind(event.address).try_totalSupply();
     let currentTotalSupply = totalSupply.reverted
       ? token.totalSupply
-      : toDecimal(totalSupply.value, token.decimals);
+      : totalSupply.value;
     //If the totalSupply from contract call equals with the totalSupply stored in token entity, it means the burn event was process before.
     //It happens when the transfer function which transfers to GENESIS_ADDRESS emits both transfer event and burn event.
     if (currentTotalSupply == token.totalSupply) {
@@ -234,9 +222,8 @@ function handleBurnEvent(
     hourlySnapshot.hourlyTotalSupply = token.totalSupply;
     hourlySnapshot.hourlyEventCount += 1;
     hourlySnapshot.hourlyBurnCount += 1;
-    hourlySnapshot.hourlyBurnAmount = hourlySnapshot.hourlyBurnAmount.plus(
-      amount
-    );
+    hourlySnapshot.hourlyBurnAmount =
+      hourlySnapshot.hourlyBurnAmount.plus(amount);
     hourlySnapshot.blockNumber = event.block.number;
     hourlySnapshot.timestamp = event.block.timestamp;
 
@@ -249,7 +236,7 @@ function handleBurnEvent(
 
 function handleMintEvent(
   token: Token | null,
-  amount: BigDecimal,
+  amount: BigInt,
   destination: Bytes,
   event: ethereum.Event
 ): boolean {
@@ -258,7 +245,7 @@ function handleMintEvent(
     let totalSupply = ERC20.bind(event.address).try_totalSupply();
     let currentTotalSupply = totalSupply.reverted
       ? token.totalSupply
-      : toDecimal(totalSupply.value, token.decimals);
+      : totalSupply.value;
     //If the totalSupply from contract call equals with the totalSupply stored in token entity, it means the mint event was process before.
     //It happens when the transfer function which transfers from GENESIS_ADDRESS emits both transfer event and mint event.
     if (currentTotalSupply == token.totalSupply) {
@@ -281,9 +268,8 @@ function handleMintEvent(
     hourlySnapshot.hourlyTotalSupply = token.totalSupply;
     hourlySnapshot.hourlyEventCount += 1;
     hourlySnapshot.hourlyMintCount += 1;
-    hourlySnapshot.hourlyMintAmount = hourlySnapshot.hourlyMintAmount.plus(
-      amount
-    );
+    hourlySnapshot.hourlyMintAmount =
+      hourlySnapshot.hourlyMintAmount.plus(amount);
     hourlySnapshot.blockNumber = event.block.number;
     hourlySnapshot.timestamp = event.block.timestamp;
 
@@ -296,7 +282,7 @@ function handleMintEvent(
 
 function handleTransferEvent(
   token: Token | null,
-  amount: BigDecimal,
+  amount: BigInt,
   source: Bytes,
   destination: Bytes,
   event: ethereum.Event
@@ -324,7 +310,7 @@ function handleTransferEvent(
   if (token != null) {
     let FromBalanceToZeroNum = BIGINT_ZERO;
     let balance = getOrCreateAccountBalance(getOrCreateAccount(source), token);
-    if (balance.amount.toBigDecimal() == amount) {
+    if (balance.amount == amount) {
       // It means the sender's token balance will be 0 after transferal.
       FromBalanceToZeroNum = BIGINT_ONE;
     }
@@ -339,7 +325,7 @@ function handleTransferEvent(
         getOrCreateAccount(destination),
         token
       );
-      if (balance.amount.toBigDecimal() == BIGDECIMAL_ZERO) {
+      if (balance.amount == BIGINT_ONE) {
         // It means the receiver's token balance is 0 before transferal.
         toBalanceIsZeroNum = BIGINT_ONE;
       }
@@ -359,14 +345,12 @@ function handleTransferEvent(
       .minus(FromBalanceToZeroNum)
       .plus(toAddressIsNewHolderNum)
       .plus(toBalanceIsZeroNum);
-    dailySnapshot.cumulativeHolderCount = dailySnapshot.cumulativeHolderCount.plus(
-      toAddressIsNewHolderNum
-    );
+    dailySnapshot.cumulativeHolderCount =
+      dailySnapshot.cumulativeHolderCount.plus(toAddressIsNewHolderNum);
     dailySnapshot.dailyEventCount += 1;
     dailySnapshot.dailyTransferCount += 1;
-    dailySnapshot.dailyTransferAmount = dailySnapshot.dailyTransferAmount.plus(
-      amount
-    );
+    dailySnapshot.dailyTransferAmount =
+      dailySnapshot.dailyTransferAmount.plus(amount);
     dailySnapshot.blockNumber = event.block.number;
     dailySnapshot.timestamp = event.block.timestamp;
 
@@ -375,14 +359,12 @@ function handleTransferEvent(
       .minus(FromBalanceToZeroNum)
       .plus(toAddressIsNewHolderNum)
       .plus(toBalanceIsZeroNum);
-    hourlySnapshot.cumulativeHolderCount = hourlySnapshot.cumulativeHolderCount.plus(
-      toAddressIsNewHolderNum
-    );
+    hourlySnapshot.cumulativeHolderCount =
+      hourlySnapshot.cumulativeHolderCount.plus(toAddressIsNewHolderNum);
     hourlySnapshot.hourlyEventCount += 1;
     hourlySnapshot.hourlyTransferCount += 1;
-    hourlySnapshot.hourlyTransferAmount = hourlySnapshot.hourlyTransferAmount.plus(
-      amount
-    );
+    hourlySnapshot.hourlyTransferAmount =
+      hourlySnapshot.hourlyTransferAmount.plus(amount);
     hourlySnapshot.blockNumber = event.block.number;
     hourlySnapshot.timestamp = event.block.timestamp;
 
@@ -413,11 +395,11 @@ function getOrCreateTokenDailySnapshot(
   newSnapshot.cumulativeHolderCount = token.cumulativeHolderCount;
   newSnapshot.dailyEventCount = 0;
   newSnapshot.dailyTransferCount = 0;
-  newSnapshot.dailyTransferAmount = BIGDECIMAL_ZERO;
+  newSnapshot.dailyTransferAmount = BIGINT_ZERO;
   newSnapshot.dailyMintCount = 0;
-  newSnapshot.dailyMintAmount = BIGDECIMAL_ZERO;
+  newSnapshot.dailyMintAmount = BIGINT_ZERO;
   newSnapshot.dailyBurnCount = 0;
-  newSnapshot.dailyBurnAmount = BIGDECIMAL_ZERO;
+  newSnapshot.dailyBurnAmount = BIGINT_ZERO;
 
   return newSnapshot;
 }
@@ -442,11 +424,11 @@ function getOrCreateTokenHourlySnapshot(
   newSnapshot.cumulativeHolderCount = token.cumulativeHolderCount;
   newSnapshot.hourlyEventCount = 0;
   newSnapshot.hourlyTransferCount = 0;
-  newSnapshot.hourlyTransferAmount = BIGDECIMAL_ZERO;
+  newSnapshot.hourlyTransferAmount = BIGINT_ZERO;
   newSnapshot.hourlyMintCount = 0;
-  newSnapshot.hourlyMintAmount = BIGDECIMAL_ZERO;
+  newSnapshot.hourlyMintAmount = BIGINT_ZERO;
   newSnapshot.hourlyBurnCount = 0;
-  newSnapshot.hourlyBurnAmount = BIGDECIMAL_ZERO;
+  newSnapshot.hourlyBurnAmount = BIGINT_ZERO;
 
   return newSnapshot;
 }
