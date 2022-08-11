@@ -1,12 +1,10 @@
 import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   BIGINT_ONE,
-  BIGINT_ZERO,
   ETHABI_DECODE_PREFIX,
   MATCH_ERC115_SAFE_TRANSFER_FROM_SELCTOR,
   MATCH_ERC721_SAFE_TRANSFER_FROM_SELCTOR,
   MATCH_ERC721_TRANSFER_FROM_SELCTOR,
-  NULL_ADDRESS,
 } from "./constants";
 
 export class DecodedTransferResult {
@@ -57,7 +55,7 @@ export function guardedArrayReplace(
   if (_mask.length == 0) {
     return _array;
   }
-  
+
   // Copies original Bytes Array to avoid buffer overwrite
   let array = Bytes.fromUint8Array(_array.slice(0));
   let replacement = Bytes.fromUint8Array(_replacement.slice(0));
@@ -82,7 +80,9 @@ export function decode_matchERC721UsingCriteria_Method(
 ): DecodedTransferResult {
   let functionSelector = getFunctionSelector(callData);
   let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
-  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(dataWithoutFunctionSelector);
+  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
+    dataWithoutFunctionSelector
+  );
 
   let decoded = ethereum
     .decode(
@@ -110,7 +110,9 @@ export function decode_matchERC1155UsingCriteria_Method(
 ): DecodedTransferResult {
   let functionSelector = getFunctionSelector(callData);
   let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
-  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(dataWithoutFunctionSelector);
+  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
+    dataWithoutFunctionSelector
+  );
 
   let decoded = ethereum
     .decode(

@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  Bytes,
+  log,
+} from "@graphprotocol/graph-ts";
 import { ERC165 } from "../generated/OpenSeaV2/ERC165";
 import { NftMetadata } from "../generated/OpenSeaV2/NftMetadata";
 import {

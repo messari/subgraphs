@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, log } from "@graphprotocol/graph-ts";
 import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 import { Trade, _Item } from "../generated/schema";
 import {
@@ -7,7 +7,6 @@ import {
   EXCHANGE_MARKETPLACE_FEE,
   INVERSE_BASIS_POINT,
   NULL_ADDRESS,
-  SaleStrategy,
   SECONDS_PER_DAY,
   WYVERN_ATOMICIZER_ADDRESS,
 } from "./constants";
@@ -145,7 +144,10 @@ function handleSingleSale(call: AtomicMatch_Call): void {
     call.inputs.replacementPatternBuy
   );
   if (!checkCallDataFunctionSelector(mergedCallData)) {
-    log.warning("[checkCallDataFunctionSelector] returned false, Method ID: {}", [getFunctionSelector(mergedCallData)]);
+    log.warning(
+      "[checkCallDataFunctionSelector] returned false, Method ID: {}",
+      [getFunctionSelector(mergedCallData)]
+    );
     return;
   }
 
