@@ -213,9 +213,6 @@ export function updatePositions(
       Address.fromString(accountId),
       InterestRateSide.LENDER,
     );
-    let deposit = new Deposit(eventId);
-    deposit.position = position.id;
-    deposit.save();
   } else if (eventType == EventType.WITHDRAW) {
     account.withdrawCount = account.depositCount + 1;
     position.withdrawCount = position.withdrawCount + 1;
@@ -231,9 +228,6 @@ export function updatePositions(
         .toString()}`;
       updateLiqudationEvent(liqudationEventId, position.id);
     }
-    let withdraw = new Withdraw(eventId);
-    withdraw.position = position.id;
-    withdraw.save();
     if (position.balance.equals(BIGINT_ZERO)) {
       closePositionToggle = true;
     }
@@ -246,9 +240,6 @@ export function updatePositions(
       Address.fromString(accountId),
       InterestRateSide.BORROW,
     );
-    let borrow = new Borrow(eventId);
-    borrow.position = position.id;
-    borrow.save();
   } else if (eventType == EventType.REPAY) {
     account.repayCount = account.repayCount + 1;
     position.repayCount = position.repayCount + 1;
@@ -262,10 +253,6 @@ export function updatePositions(
       let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionLogIndex.toString()}`;
       updateLiqudationEvent(liqudationEventId, position.id);
     }
-
-    let repay = new Repay(eventId);
-    repay.position = position.id;
-    repay.save();
     if (position.balance.equals(BIGINT_ZERO)) {
       closePositionToggle = true;
     }
