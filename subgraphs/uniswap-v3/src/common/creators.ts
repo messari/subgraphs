@@ -19,6 +19,7 @@ import {
 } from "./getters";
 import { NetworkConfigs } from "../../configurations/configure";
 import {
+  BIGDECIMAL_FIFTY,
   BIGDECIMAL_NEG_ONE,
   BIGDECIMAL_ONE,
   BIGDECIMAL_TWO,
@@ -68,10 +69,7 @@ export function createLiquidityPool(
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.inputTokenWeights = [
-    BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
-    BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
-  ];
+  pool.inputTokenWeights = [BIGDECIMAL_FIFTY, BIGDECIMAL_FIFTY];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.rewardTokens = [NetworkConfigs.getRewardToken()];
