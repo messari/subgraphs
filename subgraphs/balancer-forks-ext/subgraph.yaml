@@ -37,6 +37,9 @@ dataSources:
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # ERC 20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
