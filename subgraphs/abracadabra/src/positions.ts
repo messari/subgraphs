@@ -1,22 +1,11 @@
 import { ethereum, BigInt, log, Address } from "@graphprotocol/graph-ts";
-import {
-  Account,
-  ActiveEventAccount,
-  Borrow,
-  Deposit,
-  Liquidate,
-  Market,
-  Position,
-  PositionSnapshot,
-  Repay,
-  Withdraw,
-} from "../generated/schema";
+import { Account, ActiveEventAccount, Market, Position, PositionSnapshot } from "../generated/schema";
 import { Cauldron } from "../generated/templates/Cauldron/Cauldron";
-import { BIGINT_ONE, BIGINT_ZERO, EventType, InterestRateSide, SECONDS_PER_DAY } from "./common/constants";
+import { BIGINT_ZERO, EventType, InterestRateSide, SECONDS_PER_DAY } from "./common/constants";
 import { getMarket, getOrCreateLendingProtocol, getOrCreateUsageMetricsDailySnapshot } from "./common/getters";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "./common/utils/arrays";
 
-export function getOrCreateAccount(accountId: string, event: ethereum.Event): Account {
+export function getOrCreateAccount(accountId: string): Account {
   let account = Account.load(accountId);
   if (!account) {
     account = new Account(accountId);
@@ -51,7 +40,7 @@ export function getOrCreatePosition(
   event: ethereum.Event,
 ): Position {
   let positionIdPrefix = `${accountId}-${marketId}-${side}`;
-  let account = getOrCreateAccount(accountId, event);
+  let account = getOrCreateAccount(accountId);
 
   log.info("[getOrCreatePosition][Hash:{}][Prefix:{}]OpenCount:{}|Pos:{}|ClosedPos:{}|Pos:{}", [
     event.transaction.hash.toHexString(),
@@ -188,7 +177,6 @@ export function updatePositions(
   eventType: string,
   accountId: string,
   event: ethereum.Event,
-  eventId: string,
   liquidation: boolean = false,
 ): string {
   let market = getMarket(marketId);
@@ -202,7 +190,7 @@ export function updatePositions(
   //  position is the current open position or a newly create open position
 
   let closePositionToggle = false;
-  let account = getOrCreateAccount(accountId, event);
+  let account = getOrCreateAccount(accountId);
 
   if (eventType == EventType.DEPOSIT) {
     addAccountToProtocol(eventType, account, event);
@@ -223,10 +211,6 @@ export function updatePositions(
     );
     if (liquidation) {
       position.liquidationCount = position.liquidationCount + 1;
-      let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionLogIndex
-        .plus(BIGINT_ONE)
-        .toString()}`;
-      updateLiqudationEvent(liqudationEventId, position.id);
     }
     if (position.balance.equals(BIGINT_ZERO)) {
       closePositionToggle = true;
@@ -250,8 +234,6 @@ export function updatePositions(
     );
     if (liquidation) {
       position.liquidationCount = position.liquidationCount + 1;
-      let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionLogIndex.toString()}`;
-      updateLiqudationEvent(liqudationEventId, position.id);
     }
     if (position.balance.equals(BIGINT_ZERO)) {
       closePositionToggle = true;
@@ -304,12 +286,6 @@ export function closePosition(position: Position, account: Account, market: Mark
   position.blockNumberClosed = event.block.number;
   position.timestampClosed = event.block.timestamp;
   position.save();
-}
-
-function updateLiqudationEvent(liqudationEventId: string, positionId: string): void {
-  let liquidation = new Liquidate(liqudationEventId);
-  liquidation.position = positionId;
-  liquidation.save();
 }
 
 // grab an individual accounts balances on a market

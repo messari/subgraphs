@@ -84,7 +84,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
     false,
   );
   depositEvent.amountUSD = amountUSD;
-  depositEvent.position = updatePositions(market.id, EventType.DEPOSIT, depositEvent.account, event, depositEvent.id);
+  depositEvent.position = updatePositions(market.id, EventType.DEPOSIT, depositEvent.account, event);
   depositEvent.save();
 
   updateMarketStats(market.id, EventType.DEPOSIT, collateralToken.id, event.params.share, event);
@@ -133,7 +133,6 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
     EventType.WITHDRAW,
     withdrawalEvent.account,
     event,
-    withdrawalEvent.id,
     liquidation,
   );
   withdrawalEvent.save();
@@ -169,7 +168,7 @@ export function handleLogBorrow(event: LogBorrow): void {
   borrowEvent.asset = mimToken.id;
   borrowEvent.amount = event.params.amount;
   borrowEvent.amountUSD = amountUSD;
-  borrowEvent.position = updatePositions(market.id, EventType.BORROW, borrowEvent.account, event, borrowEvent.id);
+  borrowEvent.position = updatePositions(market.id, EventType.BORROW, borrowEvent.account, event);
   borrowEvent.save();
 
   updateTotalBorrows(event);
@@ -248,12 +247,12 @@ export function handleLiquidation(event: LogRepay): void {
   ).id;
   liquidateEvent.save();
 
-  let liqudidatedAccount = getOrCreateAccount(liquidateEvent.liquidatee, event);
+  let liqudidatedAccount = getOrCreateAccount(liquidateEvent.liquidatee);
   liqudidatedAccount.liquidateCount = liqudidatedAccount.liquidateCount + 1;
   liqudidatedAccount.save();
   addAccountToProtocol(EventType.LIQUIDATEE, liqudidatedAccount, event);
 
-  let liquidatorAccount = getOrCreateAccount(liquidateEvent.liquidator, event);
+  let liquidatorAccount = getOrCreateAccount(liquidateEvent.liquidator);
   liquidatorAccount.liquidationCount = liquidatorAccount.liquidationCount + 1;
   liquidatorAccount.save();
   addAccountToProtocol(EventType.LIQUIDATOR, liquidatorAccount, event);
@@ -318,14 +317,7 @@ export function handleLogRepay(event: LogRepay): void {
   repayEvent.asset = mimToken.id;
   repayEvent.amount = event.params.amount;
   repayEvent.amountUSD = amountUSD;
-  repayEvent.position = updatePositions(
-    market.id,
-    EventType.REPAY,
-    repayEvent.account,
-    event,
-    repayEvent.id,
-    liquidation,
-  );
+  repayEvent.position = updatePositions(market.id, EventType.REPAY, repayEvent.account, event, liquidation);
   repayEvent.save();
 
   updateTotalBorrows(event);
