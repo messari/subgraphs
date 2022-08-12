@@ -1,5 +1,5 @@
 {
-  "name": "lido",
+  "name": "rocketpool",
   "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",
@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.30.4",
-    "@graphprotocol/graph-ts": "0.27.0"
+    "@graphprotocol/graph-ts": "0.27.0",
+    "minimist": "^1.2.6",
+    "mustache": "^4.2.0"
   }
 }

@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
-import { ERC20 } from "../../generated/Lido/ERC20";
+import { ERC20 } from "../../generated/RocketPool/ERC20";
 import { getUsdPricePerToken } from "../prices";
 import {
   BIGDECIMAL_ZERO,

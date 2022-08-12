@@ -3,12 +3,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: Lido
+    name: RocketPool
     network: mainnet
     source:
-      address: "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
-      abi: Lido
-      startBlock: 11473216
+      address: '0x4D05E3d48a938db4b7a9A59A802D5b45011BDe58'
+      abi: DepositPool
+      startBlock: 13325238
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -24,14 +24,12 @@ dataSources:
         - UsageMetricsHourlySnapshot
       abis:
         ###########################################
-        ########### Lido Generic ABIs #############
+        ######## RocketPool Generic ABIs ##########
         ###########################################
-        - name: Lido
-          file: ./abis/Lido.json
-        - name: NodeOperatorsRegistry
-          file: ./abis/NodeOperatorsRegistry.json
-        - name: LidoOracle
-          file: ./abis/LidoOracle.json
+        - name: DepositPool
+          file: ./abis/depositpool.json
+        - name: RETH
+          file: ./abis/reth.json
         - name: ERC20
           file: ./abis/ERC20.json
 
@@ -71,8 +69,6 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Submitted(indexed address,uint256,address)
-          handler: handleSubmit
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/mappings/Lido.ts
+        - event: DepositReceived(indexed address,uint256,uint256)
+          handler: handleDeposit
+      file: ./src/mappings/RocketPool.ts
