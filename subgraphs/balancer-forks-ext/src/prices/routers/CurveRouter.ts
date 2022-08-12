@@ -3,8 +3,8 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { getPriceUsdc as getPriceUsdcSushi } from "./SushiSwapRouter";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/Vault/CurveRegistry";
-import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/Vault/CurvePoolRegistry";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/UniswapV2Factory/CurveRegistry";
+import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/UniswapV2Factory/CurvePoolRegistry";
 
 export function getCurvePriceUsdc(curveLpTokenAddress: Address, network: string): CustomPriceType {
   let tokensMapping = constants.WHITELIST_TOKENS_MAP.get(network);
