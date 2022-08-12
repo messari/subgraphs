@@ -67,6 +67,8 @@ Not applicable to Venus Protocol
 - An event occured on May 19, 2021 had a liquidation incedent, which we can see on our subgraph.
   - Initial tweet: https://twitter.com/VenusProtocol/status/1394892979190513664?s=20&t=yvrRsx4T8RpH7zgKOvGUaQ
   - Post-mortem statement: https://blog.venus.io/venus-protocol-incident-post-mortem-4468c87d245e
+- On launch (11/22/2020) many of the tokens had a 0 price returning from the oracle. However this only occured when `inputTokenBalances` were also 0, so no changes needed.
+- During the LUNA depeg in May of 2022 a number of market's price feeds were turned off. This includes DAI, UST, BUSD, LUNA, USDC, ETH, USDT. (See https://blog.venus.io/venus-luna-incident-update-3-resuming-the-protocol-ff059a914405)
 
 ## Reference and Useful Links
 
