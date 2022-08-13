@@ -433,6 +433,14 @@
         }
       }
     },
+    "erc721-metadata": {
+      "erc721-metadata": {
+        "ethereum": {
+          "template": "erc721.metadata.template.yaml",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "euler": {
       "euler": {
         "ethereum": {
