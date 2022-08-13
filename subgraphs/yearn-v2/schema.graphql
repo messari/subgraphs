@@ -681,20 +681,3 @@ type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
-
-type _Strategy @entity {
-  " Strategy address "
-  id: ID!
-
-  " Last reported harvest timestamp "
-  lastReport: BigInt!
-
-  " Total invested amount "
-  totalDebt: BigInt!
-
-  " Address Of the Vault "
-  vaultAddress: Bytes!
-
-  " Performance Fee of the Strategy "
-  performanceFee: BigInt!
-}
