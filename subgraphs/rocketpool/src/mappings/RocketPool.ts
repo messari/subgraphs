@@ -59,15 +59,14 @@ export function handleDeposit(event: DepositReceived): void {
   updateProtocolAndPoolTvl(event.block, value);
   updateSnapshotsTvl(event.block);
   updateProtocolSideRevenueMetrics(event.block, value);
-  if (totalShares > pool.outputTokenSupply!) {
-    updateTotalRevenueMetrics(
-      event.block,
-      // 0
-      preTotalPooledEther,
-      //new deposit
-      postTotalPooledEther,
-      totalShares
-    );
-  }
+  updateTotalRevenueMetrics(
+    event.block,
+    // 0
+    preTotalPooledEther,
+    //new deposit
+    postTotalPooledEther,
+    totalShares
+  );
+
   updateSupplySideRevenueMetrics(event.block);
 }
