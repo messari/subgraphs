@@ -13,6 +13,7 @@ import { getPriceOfOutputTokens } from "./Price";
 import { updateRevenueSnapshots } from "./Revenue";
 import { getOrCreateVault } from "../common/initializers";
 import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
+import { Strategy as StrategyContract } from "../../generated/Registry_v1/Strategy";
 
 function getSharesMinted(
   eventAdress: Address,
@@ -27,19 +28,26 @@ function getSharesMinted(
   if (!logs) return constants.BIGINT_ZERO;
 
   for (let i = 0; i < logs.length; ++i) {
-    let log = logs.at(i);
-    let topic_signature = log.topics.at(0);
+    let currentLog = logs.at(i);
+    let topic_signature = currentLog.topics.at(0);
     if (
       crypto
         .keccak256(ByteArray.fromUTF8("Transfer(address,address,uint256)"))
         .equals(topic_signature)
     ) {
-      let _from = ethereum.decode("address", log.topics.at(1))!.toAddress();
-      let _to = ethereum.decode("address", log.topics.at(2))!.toAddress();
+      let _from = ethereum
+        .decode("address", currentLog.topics.at(1))!
+        .toAddress();
+      let _to = ethereum
+        .decode("address", currentLog.topics.at(2))!
+        .toAddress();
 
-      if (_from == from && _to == to && log.address == eventAdress) {
-        let data_value = ethereum.decode("uint256", log.data);
-
+      if (
+        _from.equals(from) &&
+        _to.equals(to) &&
+        currentLog.address.equals(eventAdress)
+      ) {
+        let data_value = ethereum.decode("uint256", currentLog.data);
         if (!data_value) {
           return constants.BIGINT_ZERO;
         }
@@ -59,6 +67,12 @@ export function strategyReported(
   const vault = getOrCreateVault(vaultAddress, event.block);
   const vaultContract = VaultContract.bind(vaultAddress);
 
+  const strategyContract = StrategyContract.bind(strategyAddress);
+  const strategistAddress = utils.readValue<Address>(
+    strategyContract.try_strategist(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
   const vaultVersion = utils.readValue<String>(
     vaultContract.try_apiVersion(),
     constants.VaultVersions.v0_4_3
@@ -76,12 +90,25 @@ export function strategyReported(
     event
   );
 
-  let sharesMintedToStrategist = getSharesMinted(
-    vaultAddress,
-    vaultAddress,
-    strategyAddress,
-    event
-  );
+  let sharesMintedToStrategist = constants.BIGINT_ZERO;
+
+  if (strategistAddress.equals(constants.NULL.TYPE_ADDRESS)) {
+    sharesMintedToStrategist = getSharesMinted(
+      vaultAddress,
+      vaultAddress,
+      strategistAddress,
+      event
+    );
+  }
+
+  if (sharesMintedToStrategist.equals(constants.BIGINT_ZERO)) {
+    sharesMintedToStrategist = getSharesMinted(
+      vaultAddress,
+      vaultAddress,
+      strategyAddress,
+      event
+    );
+  }
 
   let inputToken = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputToken);
@@ -128,7 +155,7 @@ export function strategyReported(
       vaultAddress.toHexString(),
       strategyAddress.toHexString(),
       gain.toString(),
-      sharesMintedToStrategist.toHexString(),
+      sharesMintedToStrategist.toString(),
       sharesMintedToTreasury.toString(),
       event.transaction.hash.toHexString(),
     ]
