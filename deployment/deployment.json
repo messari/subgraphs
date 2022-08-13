@@ -433,6 +433,14 @@
         }
       }
     },
+    "erc721-metadata": {
+      "erc721-metadata": {
+        "ethereum": {
+          "template": "erc721.metadata.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "inverse-finance": {
       "inverse-finance": {
         "ethereum": {
@@ -485,7 +493,7 @@
           "template": "evm.template.yaml",
           "messari": "messari/network-arbitrum",
           "dmelotik": "dmelotik/network-arbitrum-one",
-          "deploy-on-merge": false  
+          "deploy-on-merge": false
         },
         "aurora": {
           "template": "evm.template.yaml",
