@@ -62,7 +62,10 @@ export function updateMasterChef(
   );
 
   // Update the amount of staked tokens after withdraw
-  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
+  // Positive for deposits, negative for withdraws
+  pool.stakedOutputTokenAmount = !pool.stakedOutputTokenAmount
+    ? amount
+    : pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];

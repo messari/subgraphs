@@ -12,7 +12,10 @@ import {
   MasterChef,
   RECENT_BLOCK_THRESHOLD,
 } from "../../../../../src/common/constants";
-import { getOrCreateToken } from "../../../../../src/common/getters";
+import {
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import {
   convertTokenToDecimal,
@@ -63,10 +66,15 @@ export function handleReward(
   }
 
   let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
-  pool.rewardTokens = [rewardToken.id];
+  pool.rewardTokens = [
+    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+  ];
 
   // Update staked amounts
-  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
+  // Positive for deposits, negative for withdraws
+  pool.stakedOutputTokenAmount = !pool.stakedOutputTokenAmount
+    ? amount
+    : pool.stakedOutputTokenAmount!.plus(amount);
 
   // Return if you have calculated rewards recently - Performance Boost
   if (

@@ -62,7 +62,6 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     MarketEntity.cumulativeDepositUSD = BIGDECIMAL_ZERO;
     MarketEntity.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     MarketEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-    MarketEntity.debtMultiplier = BIGDECIMAL_ZERO;
     MarketEntity.rates = [];
     MarketEntity.positionCount = 0;
     MarketEntity.openPositionCount = 0;
@@ -200,6 +199,10 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
         interestRate.save();
         MarketEntity.rates = [interestRate.id];
       }
+    }
+    let oracleCall = MarketContract.try_oracle();
+    if (!oracleCall.reverted) {
+      MarketEntity.priceOracle = oracleCall.value;
     }
   }
   MarketEntity.save();

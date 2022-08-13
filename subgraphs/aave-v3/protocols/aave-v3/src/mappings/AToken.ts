@@ -65,19 +65,31 @@ export function handleBalanceTransfer(event: BalanceTransfer): void {
     const contract = AToken.bind(event.address);
     const marketAddress = Address.fromString(reserve.id);
     // Handle transfer as withdraw + deposit
-    createWithdraw(event, marketAddress, event.params.from, event.params.value);
     updateUserLenderPosition(
       event,
       event.params.from,
       getMarket(marketAddress),
       contract.balanceOf(event.params.from)
     );
-    createDeposit(event, marketAddress, event.params.to, event.params.value);
+    createWithdraw(
+      event,
+      marketAddress,
+      event.params.from,
+      event.params.value,
+      true
+    );
     updateUserLenderPosition(
       event,
       event.params.to,
       getMarket(marketAddress),
       contract.balanceOf(event.params.to)
+    );
+    createDeposit(
+      event,
+      marketAddress,
+      event.params.to,
+      event.params.value,
+      true
     );
   }
 }

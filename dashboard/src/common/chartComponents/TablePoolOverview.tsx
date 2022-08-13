@@ -60,8 +60,10 @@ export const TablePoolOverview = ({
           let hoverText = params?.value?.toString()?.split("//")[1];
           if (params?.row?.dailyVolumeUSD === null && params?.row?.dailySupplySideRevenueUSD === null) {
             return (
-              <span style={cellStyle}><CircularProgress size={30} /></span>
-            )
+              <span style={cellStyle}>
+                <CircularProgress size={30} />
+              </span>
+            );
           }
           return (
             <Tooltip title={hoverText}>
@@ -132,8 +134,10 @@ export const TablePoolOverview = ({
         renderCell: (params: any) => {
           if (!params?.row?.inputTokens && !params?.row?.inputToken) {
             return (
-              <span><CircularProgress size={30} /></span>
-            )
+              <span>
+                <CircularProgress size={30} />
+              </span>
+            );
           }
           let inputTokenStr = params?.value;
           if (inputTokenStr?.length > 23) {
@@ -169,8 +173,10 @@ export const TablePoolOverview = ({
         renderCell: (params: any) => {
           if (params?.row?.rewardTokens === null || params?.row?.rewardTokens === undefined) {
             return (
-              <span><CircularProgress size={30} /></span>
-            )
+              <span>
+                <CircularProgress size={30} />
+              </span>
+            );
           }
           let rewardTokenStr = params.value.split("//")[0];
           if (rewardTokenStr.length > 18) {
@@ -229,8 +235,10 @@ export const TablePoolOverview = ({
           return "N/A";
         });
         const tokenFieldDiff = pool.rewardTokens?.length - pool.rewardTokenEmissionsUSD?.length;
-        if (tokenFieldDiff !== 0 && issues.filter(x => x.type === "TOK" && x.fieldName.includes(pool.name)).length === 0) {
-          console.log(pool.rewardTokens?.length, pool.rewardTokenEmissionsUSD?.length, tokenFieldDiff, tokenFieldDiff !== 0)
+        if (
+          tokenFieldDiff !== 0 &&
+          issues.filter((x) => x.type === "TOK" && x.fieldName.includes(pool.name)).length === 0
+        ) {
           if (pool.rewardTokens?.length > pool.rewardTokenEmissionsUSD?.length) {
             issues.push({
               type: "TOK",
@@ -259,8 +267,9 @@ export const TablePoolOverview = ({
             ) {
               issues.push({
                 type: "VAL",
-                message: `${pool.name || "#" + i + 1 + skipAmt
-                  } does not have a valid 'totalBorrowBalanceUSD' value. Reward APR (BORROWER) could not be properly calculated.`,
+                message: `${
+                  pool.name || "#" + i + 1 + skipAmt
+                } does not have a valid 'totalBorrowBalanceUSD' value. Reward APR (BORROWER) could not be properly calculated.`,
                 level: "critical",
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
               });
@@ -277,30 +286,29 @@ export const TablePoolOverview = ({
               issues.filter(
                 (x) =>
                   x.fieldName ===
-                  `${pool.name || "#" + i + 1 + skipAmt
-                  } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
+                  `${pool.name || "#" + i + 1 + skipAmt} - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
               ).length === 0
             ) {
               issues.push({
                 type: "VAL",
-                message: `${pool.name || "#" + i + 1 + skipAmt
-                  } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
+                message: `${
+                  pool.name || "#" + i + 1 + skipAmt
+                } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
                 level: "critical",
-                fieldName: `${pool.name || "#" + i + 1 + skipAmt
-                  } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
+                fieldName: `${
+                  pool.name || "#" + i + 1 + skipAmt
+                } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
               });
             } else if (pool.totalDepositBalanceUSD) {
               apr = (Number(val) / Number(pool.totalDepositBalanceUSD)) * 100 * 365;
               rewardFactorsStr = `(${Number(val).toFixed(2)}(Daily Reward Emissions) / ${Number(
                 pool.totalDepositBalanceUSD,
-              ).toFixed(2)} (Deposit balance)) * 100 * 365 = ${apr.toFixed(2)
-                }% `;
+              ).toFixed(2)} (Deposit balance)) * 100 * 365 = ${apr.toFixed(2)}% `;
             } else if (Number(pool.totalValueLockedUSD)) {
               apr = (Number(val) / Number(pool.totalValueLockedUSD)) * 100 * 365;
               rewardFactorsStr = `(${Number(val).toFixed(2)}(Daily Reward Emissions) / ${Number(
                 pool.totalValueLockedUSD,
-              ).toFixed(2)
-                } (TVL)) * 100 * 365 = ${apr.toFixed(2)}% `;
+              ).toFixed(2)} (TVL)) * 100 * 365 = ${apr.toFixed(2)}% `;
             }
           } else {
             let outputStakedFactor = Number(pool?.stakedOutputTokenAmount) / Number(pool?.outputTokenSupply);
@@ -316,38 +324,47 @@ export const TablePoolOverview = ({
           }
           if (
             Number(apr) === 0 &&
-            issues.filter((x) => x.fieldName === `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`)
-              .length === 0
+            issues.filter(
+              (x) =>
+                x.fieldName ===
+                `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+            ).length === 0
           ) {
             issues.push({
               type: "RATEZERO",
               message: "",
               level: "warning",
-              fieldName: `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              fieldName: `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             });
           }
           if (
             isNaN(apr) &&
-            issues.filter((x) => x.fieldName === `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`)
-              .length === 0
+            issues.filter(
+              (x) =>
+                x.fieldName ===
+                `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+            ).length === 0
           ) {
             issues.push({
               type: "NAN",
               message: "",
               level: "critical",
-              fieldName: `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              fieldName: `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             });
           }
           if (
             Number(apr) < 0 &&
-            issues.filter((x) => x.fieldName === `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`)
-              .length === 0
+            issues.filter(
+              (x) =>
+                x.fieldName ===
+                `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+            ).length === 0
           ) {
             issues.push({
               type: "RATENEG",
               message: "",
               level: "critical",
-              fieldName: `${pool.name || 'Pool ' + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
+              fieldName: `${pool.name || "Pool " + i + 1 + skipAmt} ${rewardTokenSymbol[idx] || "N/A"} RewardAPR`,
             });
           }
           rewardFactors.push("Token [" + idx + "] " + rewardFactorsStr);
@@ -365,7 +382,7 @@ export const TablePoolOverview = ({
         });
 
         returnObj.rewardTokens = rewardTokenCell.join(", ") + "//" + rewardFactors.join("  ||  ");
-      } else if (Object.keys(pool).includes('rewardTokens')) {
+      } else if (Object.keys(pool).includes("rewardTokens")) {
         returnObj.rewardTokens = "No Reward Token";
       } else {
         returnObj.rewardTokens = null;
@@ -388,7 +405,11 @@ export const TablePoolOverview = ({
             if (supplierFee) {
               feePercentage = Number(supplierFee.feePercentage);
             }
-            if (feePercentage < 1 && feePercentage !== 0 && issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} LP Fee`).length === 0) {
+            if (
+              feePercentage < 1 &&
+              feePercentage !== 0 &&
+              issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} LP Fee`).length === 0
+            ) {
               issues.push({
                 type: "RATEDEC",
                 message: "1%",
@@ -398,10 +419,14 @@ export const TablePoolOverview = ({
             }
             const volumeUSD = Number(pool?.dailyVolumeUSD) || 0;
             let value = (feePercentage * volumeUSD * 365) / Number(pool.totalValueLockedUSD);
-            const factorsStr = `(${feePercentage.toFixed(2)} (LP Fee) * ${volumeUSD.toFixed(2)} (Volume 24h) * 365) / ${Number(pool.totalValueLockedUSD).toFixed(2)} (TVL) = ${value.toFixed(2)}%`;
+            const factorsStr = `(${feePercentage.toFixed(2)} (LP Fee) * ${volumeUSD.toFixed(
+              2,
+            )} (Volume 24h) * 365) / ${Number(pool.totalValueLockedUSD).toFixed(2)} (TVL) = ${value.toFixed(2)}%`;
             if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
               value = 0;
-              if (issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0) {
+              if (
+                issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0
+              ) {
                 issues.push({
                   type: "NAN",
                   message: "",
@@ -423,11 +448,17 @@ export const TablePoolOverview = ({
             }
             returnObj.baseYield = value + "//" + factorsStr;
           } else if (pool?.dailySupplySideRevenueUSD) {
-            let value = (Number(pool?.dailySupplySideRevenueUSD) * 36500) / Number(pool.totalValueLockedUSD)
-            const factorsStr = `(${Number(pool?.dailySupplySideRevenueUSD).toFixed(2)} (Daily Supply Side Revenue) * 365 * 100) / ${Number(pool.totalValueLockedUSD).toFixed(2)} (TVL) = ${value.toFixed(2)}%`;
+            let value = (Number(pool?.dailySupplySideRevenueUSD) * 36500) / Number(pool.totalValueLockedUSD);
+            const factorsStr = `(${Number(pool?.dailySupplySideRevenueUSD).toFixed(
+              2,
+            )} (Daily Supply Side Revenue) * 365 * 100) / ${Number(pool.totalValueLockedUSD).toFixed(
+              2,
+            )} (TVL) = ${value.toFixed(2)}%`;
             if ((!value || !Number(pool.totalValueLockedUSD)) && value !== 0) {
               value = 0;
-              if (issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0) {
+              if (
+                issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt} Base Yield`).length === 0
+              ) {
                 issues.push({
                   type: "NAN",
                   message: "",
@@ -439,9 +470,12 @@ export const TablePoolOverview = ({
             returnObj.baseYield = value + "//" + factorsStr;
           } else {
             if (
-              issues.filter((x) => x.message === `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`).length === 0 &&
-              issues.filter((x) => x.message === `${pool.name} Base yield could not be calculated.`).length === 0
-              &&
+              issues.filter(
+                (x) =>
+                  x.message ===
+                  `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`,
+              ).length === 0 &&
+              issues.filter((x) => x.message === `${pool.name} Base yield could not be calculated.`).length === 0 &&
               (Object.keys(pool?.fees)?.length === 0 || !pool?.fees)
             ) {
               issues.push({
@@ -451,7 +485,11 @@ export const TablePoolOverview = ({
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
               });
             } else if (
-              issues.filter((x) => x.message === `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`).length === 0 &&
+              issues.filter(
+                (x) =>
+                  x.message ===
+                  `${pool.name} does not have anything in the "fees" array field. Base yield could not be calculated.`,
+              ).length === 0 &&
               issues.filter((x) => x.message === `${pool.name} Base yield could not be calculated.`).length === 0
             ) {
               issues.push({
@@ -461,10 +499,8 @@ export const TablePoolOverview = ({
                 fieldName: `${pool.name || "#" + i + 1 + skipAmt} Base Yield`,
               });
             }
-            returnObj.baseYield = 'N/A//Base Yield could not be calculated, no fees or supply side revenue provided.';
-
+            returnObj.baseYield = "N/A//Base Yield could not be calculated, no fees or supply side revenue provided.";
           }
-
         }
       }
       return returnObj;

@@ -11,14 +11,18 @@ import {
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
+  updateTokenVolume,
+  updateProtocolRevenue,
+  updateSnapshotsVolume,
+} from "./Metrics";
+import {
   getOrCreateLiquidityPool,
   getOrCreateDexAmmProtocol,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
-import { updateProtocolRevenue, updateSnapshotsVolume, updateTokenVolume } from "./Metrics";
+import * as constants from "../common/constants";
 
 export function createSwapTransaction(
   liquidityPool: LiquidityPoolStore,
@@ -112,30 +116,26 @@ export function Swap(
     tokenOut = underlyingCoins[bought_id.toI32()].toHexString();
   }
 
-  let tokenInAddress = Address.fromString(tokenIn);
-  let tokenInDecimals = utils.getTokenDecimals(tokenInAddress);
-  let tokenInPrice = getUsdPricePerToken(tokenInAddress);
-
+  let tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block.number);
   const amountInUSD = amountIn
-    .divDecimal(tokenInDecimals)
-    .times(tokenInPrice.usdPrice)
-    .div(tokenInPrice.decimalsBaseTen);
+    .divDecimal(
+      constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
+    )
+    .times(tokenInStore.lastPriceUSD!);
 
-  let tokenOutAddress = Address.fromString(tokenOut);
-  let tokenOutDecimals = utils.getTokenDecimals(tokenOutAddress);
-  let tokenOutPrice = getUsdPricePerToken(tokenOutAddress);
-
+  let tokenOutStore = utils.getOrCreateTokenFromString(tokenOut, block.number);
   const amountOutUSD = amountOut
-    .divDecimal(tokenOutDecimals)
-    .times(tokenOutPrice.usdPrice)
-    .div(tokenOutPrice.decimalsBaseTen);
+    .divDecimal(
+      constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal()
+    )
+    .times(tokenOutStore.lastPriceUSD!);
 
   createSwapTransaction(
     pool,
-    utils.getOrCreateTokenFromString(tokenIn),
+    tokenInStore,
     amountIn,
     amountInUSD,
-    utils.getOrCreateTokenFromString(tokenOut),
+    tokenOutStore,
     amountOut,
     amountOutUSD,
     buyer,
@@ -145,14 +145,20 @@ export function Swap(
 
   const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
 
+  pool.inputTokenBalances = utils.getPoolBalances(
+    liquidityPoolAddress,
+    pool.inputTokens
+  );
   pool.totalValueLockedUSD = utils.getPoolTVL(
     pool.inputTokens,
-    pool.inputTokenBalances
+    pool.inputTokenBalances,
+    block
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,
-    pool.totalValueLockedUSD
+    pool.totalValueLockedUSD,
+    block
   );
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(volumeUSD);
   pool.save();
@@ -174,9 +180,7 @@ export function Swap(
     underlying
   );
 
-  // TODO: Update Balances
-
-  updateProtocolRevenue(liquidityPoolAddress, pool.cumulativeVolumeUSD, block);
+  updateProtocolRevenue(liquidityPoolAddress, volumeUSD, block);
   updateSnapshotsVolume(liquidityPoolAddress, volumeUSD, block);
   UpdateMetricsAfterSwap(block);
 

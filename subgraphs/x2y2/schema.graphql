@@ -1,5 +1,5 @@
 # Subgraph Schema: NFT Marketplace
-# Version: 0.0.1
+# Version: 1.0.0
 
 enum Network {
   ARBITRUM_ONE

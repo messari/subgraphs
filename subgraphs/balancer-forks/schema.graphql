@@ -249,11 +249,7 @@ type DexAmmProtocol implements Protocol @entity {
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 
-  "use to calculate the share of pool"
-  totalAllocPoint: BigInt!
-
-  "use to calculate reward token emission of beets"
-  beetsPerBlock: BigInt!
+  _poolIds: [String!]!
 }
 
 ###############################
@@ -466,8 +462,7 @@ type LiquidityPool @entity {
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
 
-  "use to calculate the share of pool"
-  allocPoint: BigInt!
+  _poolId: String!
 }
 
 #################################
@@ -804,4 +799,25 @@ type Account @entity {
 type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
+}
+
+# Helper entity for calculating reward emissions
+type _CircularBuffer @entity {
+  " 'CIRCULAR_BUFFER' "
+  id: ID!
+
+  " Array of sorted block numbers sorted continuously "
+  blocks: [Int!]!
+
+  " The index in the blocks array which will be used with the newest block to calculate block speed (Usally set to about a day before newest block) "
+  windowStartIndex: Int!
+
+  " The next index in the blocks array that will be replaced with the newest block "
+  nextIndex: Int!
+
+  " This determines the size of the blocks array. Should be set to contain at least a days worth of blocks according to a 1 day window for measuring speed"
+  bufferSize: Int!
+
+  " The current calculated number of blocks per day based on calculated block speed "
+  blocksPerDay: BigDecimal!
 }

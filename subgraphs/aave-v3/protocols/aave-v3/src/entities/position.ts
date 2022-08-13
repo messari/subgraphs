@@ -6,7 +6,6 @@ import {
   PositionSnapshot,
 } from "../../../../generated/schema";
 import { BIGINT_ZERO, INT_ZERO } from "../../../../src/utils/constants";
-import { rayDiv, rayMul } from "../../../../src/utils/numbers";
 import { PositionSide } from "../utils/constants";
 import { getOrCreateAccount } from "./account";
 import {

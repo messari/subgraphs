@@ -50,7 +50,8 @@ export function createDeposit(
   event: ethereum.Event,
   reserve: Address,
   user: Address,
-  amount: BigInt
+  amount: BigInt,
+  isTransfer: boolean = false
 ): Deposit {
   if (amount.le(BIGINT_ZERO)) {
     log.critical("Invalid deposit amount: {}", [amount.toString()]);
@@ -80,8 +81,10 @@ export function createDeposit(
   deposit.amountUSD = amountInUSD(amount, asset);
   deposit.save();
   updateUsageMetrics(event, event.transaction.from);
-  addMarketDepositVolume(event, market, deposit.amountUSD);
-  incrementProtocolDepositCount(event, account);
+  if (!isTransfer) {
+    addMarketDepositVolume(event, market, deposit.amountUSD);
+    incrementProtocolDepositCount(event, account);
+  }
   incrementAccountDepositCount(account);
   incrementPositionDepositCount(position);
   return deposit;
@@ -91,7 +94,8 @@ export function createWithdraw(
   event: ethereum.Event,
   reserve: Address,
   user: Address,
-  amount: BigInt
+  amount: BigInt,
+  isTransfer: boolean = false
 ): Withdraw {
   if (amount.le(BIGINT_ZERO)) {
     log.critical("Invalid withdraw amount: {}", [amount.toString()]);
@@ -121,8 +125,10 @@ export function createWithdraw(
   withdraw.amountUSD = amountInUSD(amount, asset);
   withdraw.save();
   updateUsageMetrics(event, user);
-  addMarketWithdrawVolume(event, market, withdraw.amountUSD);
-  incrementProtocolWithdrawCount(event);
+  if (!isTransfer) {
+    addMarketWithdrawVolume(event, market, withdraw.amountUSD);
+    incrementProtocolWithdrawCount(event);
+  }
   incrementAccountWithdrawCount(account);
   incrementPositionWithdrawCount(position);
   checkIfPositionClosed(event, account, market, position);
@@ -226,11 +232,17 @@ export function createLiquidate(
   const collateralToken = getOrCreateToken(collateralAsset);
   const userAccount = getOrCreateAccount(liquidatee);
   const liquidatorAccount = getOrCreateAccount(liquidator);
-  const position = getOrCreateUserPosition(
+  const lenderPosition = getOrCreateUserPosition(
     event,
     userAccount,
     market,
     PositionSide.LENDER
+  );
+  const borrowerPosition = getOrCreateUserPosition(
+    event,
+    userAccount,
+    getMarket(debtAsset),
+    PositionSide.BORROWER
   );
   const liquidate = new Liquidate(
     `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
@@ -243,7 +255,8 @@ export function createLiquidate(
   liquidate.liquidator = liquidatorAccount.id;
   liquidate.liquidatee = userAccount.id;
   liquidate.market = market.id;
-  liquidate.position = position.id;
+  liquidate.position = borrowerPosition.id;
+  liquidate.lenderPosition = lenderPosition.id;
   liquidate.asset = debtToken.id;
   liquidate.amount = amountLiquidated;
   liquidate.amountUSD = amountInUSD(amountLiquidated, collateralToken);
@@ -256,8 +269,10 @@ export function createLiquidate(
   addMarketLiquidateVolume(event, market, liquidate.amountUSD);
   incrementProtocolLiquidateCount(event, userAccount, liquidatorAccount);
   incrementAccountLiquidationCount(userAccount);
-  incrementPositionLiquidationCount(position);
+  incrementPositionLiquidationCount(borrowerPosition);
+  incrementPositionLiquidationCount(lenderPosition);
   incrementAccountLiquidatorCount(liquidatorAccount);
-  checkIfPositionClosed(event, userAccount, market, position);
+  checkIfPositionClosed(event, userAccount, market, lenderPosition);
+  checkIfPositionClosed(event, userAccount, market, borrowerPosition);
   return liquidate;
 }

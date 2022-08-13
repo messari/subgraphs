@@ -92,4 +92,4 @@ export const getSnapshotDailyVolume = (version: string): string => {
     }
   `;
   }
-}
+};

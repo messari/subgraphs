@@ -20,6 +20,7 @@ import { SolarbeamMoonriverConfigurations } from "../../protocols/solarbeam/conf
 import { TraderJoeAvalancheConfigurations } from "../../protocols/trader-joe/config/networks/avalanche/avalanche";
 import { TrisolarisAuroraConfigurations } from "../../protocols/trisolaris/config/networks/aurora/aurora";
 import { VSSFinanceCronosConfigurations } from "../../protocols/vvs-finance/config/networks/cronos/cronos";
+import { MMFinanceCronosConfigurations } from "../../protocols/mm-finance/config/networks/cronos/cronos";
 import { HoneyswapXdaiConfigurations } from "../../protocols/honeyswap/config/networks/gnosis/gnosis";
 import { HoneyswapMaticConfigurations } from "../../protocols/honeyswap/config/networks/polygon/polygon";
 import { Configurations } from "./interface";
@@ -102,6 +103,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.HONEYSWAP_POLYGON: {
       return new HoneyswapMaticConfigurations();
+    }
+    case Deploy.MM_FINANCE_CRONOS: {
+      return new MMFinanceCronosConfigurations();
     }
     default: {
       log.critical(

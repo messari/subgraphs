@@ -33,6 +33,7 @@ import {
   SECONDS_PER_YEAR,
   RewardTokenType,
   exponentToBigDecimal,
+  DAYS_PER_YEAR,
 } from "../../../src/constants";
 
 import {
@@ -64,11 +65,13 @@ import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import {
   comptrollerAddr,
+  getOrCreateCircularBuffer,
+  getRewardsPerDay,
   nativeCToken,
   nativeToken,
+  RewardIntervalType,
   TONICAddress,
   tTONICAddress,
-  CRONOS_BLOCKSPERDAY,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 
@@ -76,6 +79,12 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
   let newPriceOracle = event.params.newPriceOracle;
   _handleNewPriceOracle(protocol, newPriceOracle);
+}
+
+export function handleNewReserveFactor(event: NewReserveFactor): void {
+  let marketID = event.address.toHexString();
+  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
+  _handleNewReserveFactor(marketID, newReserveFactorMantissa);
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
@@ -264,13 +273,16 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let oracleContract = PriceOracle.bind(
     Address.fromString(protocol._priceOracle)
   );
+  let blocksPerDay = BigInt.fromString(
+    getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString()
+  ).toI32();
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    SECONDS_PER_YEAR
+    blocksPerDay * DAYS_PER_YEAR
   );
   let interestAccumulated = event.params.interestAccumulated;
   let totalBorrows = event.params.totalBorrows;
@@ -300,7 +312,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Tectonic",
     "tectonic",
     "2.0.1",
-    "1.1.0",
+    "1.1.1",
     "1.0.0",
     Network.CRONOS,
     comptroller.try_liquidationIncentiveMantissa(),
@@ -356,9 +368,6 @@ function updateTONICRewards(
   // let rewardDecimals = Token.load(TONICAddress)!.decimals;
   let rewardDecimals = 18; // TONIC 18 decimals
   let troller = Core.bind(comptrollerAddr);
-  let blocksPerDay = BigInt.fromString(
-    CRONOS_BLOCKSPERDAY.truncate(0).toString()
-  );
 
   let TonicPriceUSD = BIGDECIMAL_ZERO;
   let supplyTonicPerDay = BIGINT_ZERO;
@@ -368,7 +377,16 @@ function updateTONICRewards(
   let tryTonicSpeed = troller.try_tonicSpeeds(event.address);
   supplyTonicPerDay = tryTonicSpeed.reverted
     ? BIGINT_ZERO
-    : tryTonicSpeed.value.times(blocksPerDay);
+    : BigInt.fromString(
+        getRewardsPerDay(
+          event.block.timestamp,
+          event.block.number,
+          tryTonicSpeed.value.toBigDecimal(),
+          RewardIntervalType.BLOCK
+        )
+          .truncate(0)
+          .toString()
+      );
   borrowTonicPerDay = supplyTonicPerDay;
 
   if (event.block.number.gt(BigInt.fromI32(1337194))) {
