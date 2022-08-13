@@ -275,7 +275,7 @@
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-ethereum",
           "dmelotik": "dmelotik/cream-finance-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "polygon": {
           "template": "cream-finance.template.yaml",
