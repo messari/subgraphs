@@ -145,8 +145,8 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   );
   if (!checkCallDataFunctionSelector(mergedCallData)) {
     log.warning(
-      "[checkCallDataFunctionSelector] returned false, Method ID: {}",
-      [getFunctionSelector(mergedCallData)]
+      "[checkCallDataFunctionSelector] returned false, Method ID: {}, transaction hash: {}, target: {}",
+      [getFunctionSelector(mergedCallData), call.transaction.hash.toHexString(), call.inputs.addrs[11].toHexString()]
     );
     return;
   }
