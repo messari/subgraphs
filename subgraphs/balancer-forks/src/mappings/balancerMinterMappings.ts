@@ -1,9 +1,11 @@
+import {
+  getOrCreateToken,
+  getOrCreateLiquidityPool,
+} from "../common/initializers";
 import * as utils from "../common/utils";
 import { log } from "@graphprotocol/graph-ts";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "../modules/Revenue";
-import { getOrCreateLiquidityPool } from "../common/initializers";
 import { Minted } from "../../generated/BalancerMinter/BalancerMinter";
 
 export function handleMinted(event: Minted): void {
@@ -22,15 +24,16 @@ export function handleMinted(event: Minted): void {
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
 
   const balancerMinted = event.params.minted;
-  const balancerPrice = getUsdPricePerToken(constants.BALANCER_TOKEN_ADDRESS);
-  const balancerDecimals = utils.getTokenDecimals(
-    constants.BALANCER_TOKEN_ADDRESS
+  const balancerToken = getOrCreateToken(
+    constants.BALANCER_TOKEN_ADDRESS,
+    event.block.number
   );
 
   const balancerMintedUSD = balancerMinted
-    .divDecimal(balancerDecimals)
-    .times(balancerPrice.usdPrice)
-    .div(balancerPrice.decimalsBaseTen);
+    .divDecimal(
+      constants.BIGINT_TEN.pow(balancerToken.decimals as u8).toBigDecimal()
+    )
+    .div(balancerToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
     pool,

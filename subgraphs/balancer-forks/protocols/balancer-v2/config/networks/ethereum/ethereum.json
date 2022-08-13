@@ -16,7 +16,7 @@
   "protocolFeesCollectorAddress": "0xce88686553686DA562CE7Cea497CE749DA109f9F",
   "balancerAddress": "0xba100000625a3754423978a60c9317c58a424e3D",
   
-  "graftEnabled": false,
-  "subgraphId": "",
-  "graftStartBlock": ""
+  "graftEnabled": true,
+  "subgraphId": "QmUt9w97f2v2kHJc1RtXwwoSy7yxhqnZWL4aZsyNcijBmD",
+  "graftStartBlock": "14710000"
 }

@@ -11,7 +11,6 @@ import {
   getOrCreateDexAmmProtocol,
   getOrCreateLiquidityPoolFee,
 } from "./initializers";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { PoolFeesType, PoolTokensType } from "./types";
 import { Token, LiquidityPool } from "../../generated/schema";
@@ -36,8 +35,11 @@ export function readValue<T>(
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
-export function getOrCreateTokenFromString(tokenAddress: string): Token {
-  return getOrCreateToken(Address.fromString(tokenAddress));
+export function getOrCreateTokenFromString(
+  tokenAddress: string,
+  blockNumber: BigInt
+): Token {
+  return getOrCreateToken(Address.fromString(tokenAddress), blockNumber);
 }
 
 export function getTokenDecimals(tokenAddr: Address): BigDecimal {
@@ -73,7 +75,7 @@ export function getPoolFromGauge(gaugeAddress: Address): Address | null {
   );
 
   if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return null;
-  
+
   return poolAddress;
 }
 
@@ -115,22 +117,21 @@ export function getPoolTokenWeights(poolAddress: Address): BigDecimal[] {
 
 export function getPoolTVL(
   inputTokens: string[],
-  inputTokenBalances: BigInt[]
+  inputTokenBalances: BigInt[],
+  block: ethereum.Block
 ): BigDecimal {
   let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
   for (let idx = 0; idx < inputTokens.length; idx++) {
     let inputTokenBalance = inputTokenBalances[idx];
 
-    let inputTokenAddress = Address.fromString(inputTokens[idx]);
-    let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-    let inputTokenDecimals = getTokenDecimals(inputTokenAddress);
+    let inputToken = getOrCreateTokenFromString(inputTokens[idx], block.number);
 
     let amountUSD = inputTokenBalance
-      .divDecimal(inputTokenDecimals)
-      .times(inputTokenPrice.usdPrice)
-      .div(inputTokenPrice.decimalsBaseTen);
-
+      .divDecimal(
+        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+      )
+      .times(inputToken.lastPriceUSD!);
     totalValueLockedUSD = totalValueLockedUSD.plus(amountUSD);
   }
 
