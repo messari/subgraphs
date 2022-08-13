@@ -57,7 +57,6 @@ export function createLiquidityPool(
   // create the tokens and tokentracker
   let token0 = getOrCreateToken(token0Address);
   let token1 = getOrCreateToken(token1Address);
-  let LPtoken = getOrCreateLPToken(poolAddress, token0, token1);
 
   updateTokenWhitelists(token0, token1, poolAddress);
 
@@ -66,23 +65,23 @@ export function createLiquidityPool(
 
   pool.protocol = protocol.id;
   pool.inputTokens = [token0.id, token1.id];
-  pool.outputToken = LPtoken.id;
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
   pool.inputTokenWeights = [BIGDECIMAL_FIFTY, BIGDECIMAL_FIFTY];
-  pool.outputTokenSupply = BIGINT_ZERO;
   pool.fees = createPoolFees(poolAddress, fees);
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
   pool.name =
     protocol.name +
     " " +
-    LPtoken.symbol +
+    token0.name +
+    "/" +
+    token1.name +
     " " +
     getTradingFee(pool.id).toString() +
     "%";
-  pool.symbol = LPtoken.symbol;
+  pool.symbol = token0.name + "/" + token1.name;
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
@@ -112,7 +111,6 @@ export function createLiquidityPool(
   pool.save();
   token0.save();
   token1.save();
-  LPtoken.save();
   poolAmounts.save();
   poolDeposits.save();
 }
@@ -196,9 +194,6 @@ export function createDeposit(
     .times(token0.lastPriceUSD!)
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
-  // Increment for NFT minted representing the position
-  pool.outputTokenSupply = pool.outputTokenSupply!.plus(BIGINT_ONE);
-
   // Add pool value back to protocol total value locked
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
     pool.totalValueLockedUSD
@@ -219,9 +214,7 @@ export function createDeposit(
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
-  deposit.outputToken = pool.outputToken;
   deposit.inputTokenAmounts = [amount0, amount1];
-  deposit.outputTokenAmount = BIGINT_ONE;
   deposit.pool = pool.id;
   deposit.amountUSD = amountUSD;
 
@@ -280,9 +273,6 @@ export function createWithdraw(
     .times(token0.lastPriceUSD!)
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
-  // Increment for NFT minted representing the position
-  pool.outputTokenSupply = pool.outputTokenSupply!.minus(BIGINT_ONE);
-
   // reset aggregates with new amounts
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
     pool.totalValueLockedUSD
@@ -303,9 +293,7 @@ export function createWithdraw(
   withdrawal.blockNumber = event.block.number;
   withdrawal.timestamp = event.block.timestamp;
   withdrawal.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
-  withdrawal.outputToken = pool.outputToken;
   withdrawal.inputTokenAmounts = [amount0, amount1];
-  withdrawal.outputTokenAmount = BIGINT_ONE;
   withdrawal.pool = pool.id;
   withdrawal.amountUSD = amountUSD;
 
