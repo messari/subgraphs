@@ -437,6 +437,7 @@
       "erc721-metadata": {
         "ethereum": {
           "template": "erc721.metadata.template.yaml",
+          "messari": "messari/erc721-metadata",
           "deploy-on-merge": true
         }
       }
