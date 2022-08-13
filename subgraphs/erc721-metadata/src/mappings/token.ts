@@ -1,5 +1,6 @@
 import {
   BigInt,
+  BigDecimal,
   ethereum,
   ipfs,
   json,
