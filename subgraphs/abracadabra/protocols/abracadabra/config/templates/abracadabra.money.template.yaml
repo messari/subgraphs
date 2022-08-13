@@ -154,6 +154,8 @@ templates:
           file: ./abis/ERC20.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
+        - name: MarketOracle
+          file: ./abis/MarketOracle.json
       eventHandlers:
         - event: LogAddCollateral(indexed address,indexed address,uint256)
           handler: handleLogAddCollateral

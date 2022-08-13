@@ -217,8 +217,22 @@ function ProtocolDashboard() {
   const [getPoolsOverviewData5, { data: dataPools5, error: poolOverviewError5, loading: poolOverviewLoading5 }] =
     useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt: skipAmt + 40 } });
 
+  const tokenQuery = gql`
+    ${poolOverviewTokensQuery(protocolSchemaData?.protocols[0]?.type?.toUpperCase())}
+  `;
+
+  const [getPoolOverviewTokens, { data: poolOverviewTokens }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens2, { data: poolOverviewTokens2 }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens3, { data: poolOverviewTokens3 }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens4, { data: poolOverviewTokens4 }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
+
   const snapshotDailyVolumeQuery = gql`
-    ${getSnapshotDailyVolume(protocolSchemaData?.protocols[0]?.schemaVersion)}
+    ${getSnapshotDailyVolume(schemaVersion)}
   `;
 
   const [getPoolsSnapshotVolume, { data: snapshotVolume }] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
@@ -238,20 +252,6 @@ function ProtocolDashboard() {
   const [getPoolsSnapshotVolume5, { data: snapshotVolume5 }] = useLazyQuery(snapshotDailyVolumeQuery, {
     client: client,
   });
-
-  const tokenQuery = gql`
-    ${poolOverviewTokensQuery(protocolSchemaData?.protocols[0]?.type?.toUpperCase())}
-  `;
-
-  const [getPoolOverviewTokens, { data: poolOverviewTokens }] = useLazyQuery(tokenQuery, { client: client });
-
-  const [getPoolOverviewTokens2, { data: poolOverviewTokens2 }] = useLazyQuery(tokenQuery, { client: client });
-
-  const [getPoolOverviewTokens3, { data: poolOverviewTokens3 }] = useLazyQuery(tokenQuery, { client: client });
-
-  const [getPoolOverviewTokens4, { data: poolOverviewTokens4 }] = useLazyQuery(tokenQuery, { client: client });
-
-  const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
 
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
@@ -308,13 +308,17 @@ function ProtocolDashboard() {
 
   useEffect(() => {
     if (
-      !endpoints?.pending &&
       pendingVersion?.indexingStatusForPendingVersion?.subgraph &&
       pendingVersion?.indexingStatusForPendingVersion?.health === "healthy"
     ) {
+      const pendingURL =
+        "https://api.thegraph.com/subgraphs/id/" + pendingVersion?.indexingStatusForPendingVersion?.subgraph;
+      if (isCurrentVersion === false) {
+        setSubgraphToQuery({ url: pendingURL, version: "pending" });
+      }
       setEndpoints({
         current: endpoints.current,
-        pending: "https://api.thegraph.com/subgraphs/id/" + pendingVersion?.indexingStatusForPendingVersion?.subgraph,
+        pending: pendingURL,
       });
     }
   }, [pendingVersion, errorSubId]);

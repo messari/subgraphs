@@ -255,5 +255,9 @@
       "address": "0xd061d61a4d941c39e5453435b6345dc261c2fce0",
       "startBlock": "10647887"
     }
-  ]
+  ],
+
+  "graftEnabled": true,
+  "subgraphId": "QmbaHE6FxXAa9z92sqAKFfDJej3GL37AnNtNhwrJt8FGf4",
+  "graftStartBlock": "10654163"
 }
