@@ -1,5 +1,5 @@
 {
-  "name": "erc721metadata",
+  "name": "erc721-metadata",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",

@@ -11,46 +11,55 @@ type Token @entity {
   id: ID!
 
   " Collection for the token "
-  collection: ERC721Collection!
+  collection: Collection!
 
   " ID of the token from the collection "
-  tokenID: BigInt!
+  tokenId: BigInt!
 
   " URI of the token metadata"
   tokenURI: String
 
-  " Identifies the asset to which this token represents, defined in opensea metadata standards "
-  name: String
-
-  " Describes the asset to which this token represents, defined in opensea metadata standards "
+  " Describes the asset to which this token represents, defined in OpenSea metadata standards "
   description: String
 
-  " A URI pointing to a resource with mime type image, defined in opensea metadata standards "
-  imageURI: String
-
-  " URL which allows users to view the item on the colletion's site, defined in opensea metadata standards "
+  " URL which allows users to view the item on the colletion's site, defined in OpenSea metadata standards "
   externalURI: String
 
-  " Attributes for the token metadata, defined in opensea metadata standards "
-  attributes: [Trait!] @derivedFrom(field: "token")
+  " A URI pointing to a resource with mime type image, defined in OpenSea metadata standards "
+  imageURI: String
 
-  " Block number of the metadata snapshot "
+  " Identifies the asset to which this token represents, defined in OpenSea metadata standards "
+  name: String
+
+  " Attributes for the token metadata, defined in OpenSea metadata standards "
+  attributes: [Attribute!] @derivedFrom(field: "token")
+
+  " Background color of the item, defined in OpenSea metadata standards "
+  backgroundColor: String
+
+  " A link to a multi-media attachment for the item, defined in OpenSea metadata standards "
+  animationURI: String
+
+  " A link to a YouTube video, defined in OpenSea metadata standards "
+  youtubeURI: String
+
+  " Block number when the subgraph gets the tokenURI and retrieves the detailed metadata information "
   blockNumber: BigInt!
 
-  " Timestamp of the metadata snapshot "
+  " Timestamp when the subgraph gets the tokenURI and retrieves the detailed metadata information "
   timestamp: BigInt!
 }
 
-##############################################
-####### Opensea Token Traits Metadata ######
-##############################################
+########################################
+####### Token Attributes Metadata ######
+########################################
 
-type Trait @entity {
-  " { Contract ID }-{ Token ID }-{ Trait name } "
+type Attribute @entity {
+  " { Contract ID }-{ Token ID }-{ Trait type } "
   id: ID!
 
   " The collection for the trait "
-  collection: ERC721Collection!
+  collection: Collection!
 
   " ID of the token from the collection  "
   tokenId: BigInt!
@@ -58,26 +67,35 @@ type Trait @entity {
   " Token metadata this attribute belongs to "
   token: Token!
 
-  " Name of the trait "
-  name: String!
+  " Name of the trait, defined in OpenSea metadata standards "
+  traitType: String!
 
-  " Value of the trait "
-  value: String!
+  " Value of the trait, defined in OpenSea metadata standards "
+  value: String
 
-  " Indicates how the trait should be displayed. "
+  " Maximum value for a numerical trait's possible values, defined in OpenSea metadata standards "
+  maxValue: String
+
+  " Indicates how the trait should be displayed, defined in OpenSea metadata standards "
   displayType: String
 }
 
-#####################################
+################################
 ####### ERC721 Collection ######
-#####################################
+################################
 
-type ERC721Collection @entity {
+type Collection @entity {
   " ERC721 collection address "
   id: ID!
 
   " Flag for whether ERC721 metadata is supported "
   supportsERC721Metadata: Boolean!
+
+  " Flag for whether the tokenURI in the collection has been updated  "
+  tokenURIUpdated: Boolean!
+
+  " Total number of unique tokens in the collection "
+  tokenCount: BigInt!
 
   " Tokens in the collection "
   tokens: [Token!]! @derivedFrom(field: "collection")

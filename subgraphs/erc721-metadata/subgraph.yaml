@@ -19,7 +19,7 @@ dataSources:
       entities:
         - Token
         - Attribute
-        - ERC721Collection
+        - Collection
         - NonERC721Collection
       abis:
         - name: ERC721
