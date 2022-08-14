@@ -1,7 +1,7 @@
 [package]
-name = "substreams-erc721"
+name = "substreams-erc20"
 version = "0.1.0"
-description = "Messari's standardized substream for erc721"
+description = "Messari's standardized substream for erc20"
 edition = "2021"
 repository = "https://github.com/messari/subgraphs/"
 

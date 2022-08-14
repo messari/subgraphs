@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: "substreams_erc721"
+  name: "substreams_uniswap_v2"
   version: v0.1.0
 
 imports:
@@ -8,28 +8,27 @@ imports:
 
 protobuf:
   files:
-    - erc721.proto
+    - uniswap_v2.proto
   importPaths:
     - ./proto
 
 binaries:
   default:
     type: wasm/rust-v1
-    file: ./target/wasm32-unknown-unknown/release/substreams_erc721.wasm
+    file: ./target/wasm32-unknown-unknown/release/substreams_uniswap_v2.wasm
 
 modules:
-  - name: block_to_transfers
+  - name: block_to_pairs
     kind: map
-    initialBlock: 12287507
+    initialBlock: 10000834
     inputs:
       - source: sf.ethereum.type.v1.Block
     output:
-      type: proto:eth.erc721.v1.Transfers
+      type: proto:eth.messari.uniswap.v1.Pairs
 
-  - name: nft_state
+  - name: store_pairs
     kind: store
-    initialBlock: 12287507
-    updatePolicy: add
-    valueType: int64
+    updatePolicy: set
+    valueType: proto:eth.messari.uniswap.v1.Pairs
     inputs:
-      - map: block_to_transfers
+      - map: block_to_pairs

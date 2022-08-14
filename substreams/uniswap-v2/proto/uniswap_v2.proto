@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package eth.messari.uniswap_v2;
+
+message Pairs {
+    repeated Pair pairs = 1;
+}
+
+message Pair {
+    string name = 1;
+    string address = 2;
+    string token0 = 3;
+    string token1 = 4;
+}
