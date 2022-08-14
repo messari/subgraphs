@@ -80,30 +80,29 @@ export function handleSwap(event: SwapEvent): void {
   updateUsageMetrics(event, event.transaction.from, UsageType.SWAP);
 }
 
-function createPool(event: PoolRegistered): string {
+export function handlePoolRegister(event: PoolRegistered): void {
   let poolAddress: Address = event.params.poolAddress;
 
   let poolContract = WeightedPool.bind(poolAddress);
   let poolIdCall = poolContract.try_getPoolId();
   if (poolIdCall.reverted) {
-    return "";
+    return;
   }
   let poolId = poolIdCall.value;
 
   let nameCall = poolContract.try_name();
   if (nameCall.reverted) {
-    return "";
+    return;
   }
   let name = nameCall.value;
 
   let symbolCall = poolContract.try_symbol();
   if (symbolCall.reverted) {
-    return "";
+    return;
   }
   let symbol = symbolCall.value;
 
   let vaultContract = Vault.bind(VAULT_ADDRESS);
-
   let tokensCall = vaultContract.try_getPoolTokens(poolId);
   let inputTokens: string[] = [];
   if (!tokensCall.reverted) {
@@ -120,13 +119,6 @@ function createPool(event: PoolRegistered): string {
   }
 
   createLiquidityPool(event, poolAddress.toHexString(), name, symbol, inputTokens, swapFee);
-  // Load pool with initial weights
-  return poolAddress.toHexString();
-}
-
-export function handlePoolRegister(event: PoolRegistered): void {
-  let poolAddress = createPool(event);
-  updateWeight(poolAddress);
 }
 
 export function handleTokensRegister(event: TokensRegistered): void {
@@ -136,7 +128,7 @@ export function handleTokensRegister(event: TokensRegistered): void {
   let tokens: string[] = new Array<string>();
   let tokensAmount: BigInt[] = new Array<BigInt>();
   for (let i = 0; i < event.params.tokens.length; i++) {
-    let token = getOrCreateToken(event.params.tokens[i].toHexString());
+    let token = getOrCreateToken(event.params.tokens[i].toHexString(), event.block.number);
     tokens.push(token.id);
     tokensAmount.push(BIGINT_ZERO);
   }

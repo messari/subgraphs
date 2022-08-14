@@ -50,7 +50,7 @@ export function handleLogSetPool(event: LogSetPool): void {
   }
   let pool = getLiquidityPool(poolAddress.value.toHexString());
 
-  let rewardToken = getOrCreateRewardToken(BEETS.toHexString());
+  let rewardToken = getOrCreateRewardToken(BEETS.toHexString(), event.block.number);
   pool.rewardTokens = [rewardToken.id];
   let protocol = getOrCreateDex();
   protocol.totalAllocPoint = protocol.totalAllocPoint.plus(event.params.allocPoint.minus(pool.allocPoint));
@@ -111,7 +111,7 @@ function createLiquidityPool(
   let inputTokenBalancesAmount: BigDecimal[] = [];
   for (let index = 0; index < inputTokens.length; index++) {
     //create token if null
-    getOrCreateToken(inputTokens[index]);
+    getOrCreateToken(inputTokens[index], event.block.number);
     inputTokenBalances.push(BIGINT_ZERO);
     inputTokenBalancesAmount.push(BIGDECIMAL_ZERO);
   }
@@ -135,7 +135,7 @@ function createLiquidityPool(
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
   pool.isSingleSided = false;
   if (REWARD_TOKEN != "") {
-    let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
+    let rewardToken = getOrCreateRewardToken(REWARD_TOKEN, event.block.number);
     pool.rewardTokens = [rewardToken.id];
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];

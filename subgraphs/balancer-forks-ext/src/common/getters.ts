@@ -30,8 +30,11 @@ import {
   PROTOCOL_SLUG,
   DEFAULT_NETWORK,
   RewardTokenType,
+  BIGDECIMAL_ONE,
 } from "./constants";
 import { addToArrayAtIndex } from "./utils/arrays";
+import { getUsdPrice } from "../prices";
+import { isUSDStable } from "./tokens";
 
 export function getStat(id: string): Stat {
   let stat = Stat.load(id);
@@ -87,11 +90,12 @@ export function getOrCreateDex(): DexAmmProtocol {
   return protocol;
 }
 
-export function getOrCreateToken(address: string): Token {
+export function getOrCreateToken(address: string, blockNumber: BigInt): Token {
   let token = Token.load(address);
+  let tokenAddr = Address.fromString(address);
   if (!token) {
     token = new Token(address);
-    let erc20Contract = ERC20.bind(Address.fromString(address));
+    let erc20Contract = ERC20.bind(tokenAddr);
     let decimals = erc20Contract.try_decimals();
     // Using try_cause some values might be missing
     let name = erc20Contract.try_name();
@@ -103,6 +107,16 @@ export function getOrCreateToken(address: string): Token {
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
+  }
+
+  if (isUSDStable(tokenAddr)) {
+    token.lastPriceBlockNumber = blockNumber;
+    token.lastPriceUSD = BIGDECIMAL_ONE;
+  }
+
+  if (blockNumber > token.lastPriceBlockNumber!) {
+    token.lastPriceBlockNumber = blockNumber;
+    token.lastPriceUSD = getUsdPrice(tokenAddr, BIGDECIMAL_ONE);
   }
   return token as Token;
 }
@@ -306,10 +320,10 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
   return financialMetrics;
 }
 
-export function getOrCreateRewardToken(address: string): RewardToken {
+export function getOrCreateRewardToken(address: string, blockNumber: BigInt): RewardToken {
   let rewardToken = RewardToken.load(address);
   if (rewardToken == null) {
-    let token = getOrCreateToken(address);
+    let token = getOrCreateToken(address, blockNumber);
     rewardToken = new RewardToken(address);
     rewardToken.token = token.id;
     rewardToken.type = RewardTokenType.DEPOSIT;

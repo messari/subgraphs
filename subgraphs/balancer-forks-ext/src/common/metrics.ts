@@ -14,7 +14,6 @@ import {
   getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
 import { getOrCreateAccount } from "./position";
-import { calculatePrice, fetchPrice, isUSDStable, TokenInfo } from "./pricing";
 import { scaleDown } from "./tokens";
 
 // Update FinancialsDailySnapshots entity
@@ -167,69 +166,4 @@ export function updateVolumeAndFee(
 
   protocol.save();
   pool.save();
-}
-
-export function updateTokenPrice(
-  pool: LiquidityPool,
-  tokenIn: Address,
-  tokenInAmount: BigInt,
-  tokenInIndex: i32,
-  tokenOut: Address,
-  tokenOutAmount: BigInt,
-  tokenOutIndex: i32,
-  blockNumber: BigInt,
-): void {
-  let hasWeights = pool.inputTokenWeights.length > 0;
-
-  let weightTokenOut: BigDecimal | null = null;
-  let weightTokenIn: BigDecimal | null = null;
-  let tokenInDecimalsAmount = scaleDown(tokenInAmount, tokenIn);
-  let tokenOutDecimalsAmount = scaleDown(tokenOutAmount, tokenOut);
-
-  if (hasWeights) {
-    weightTokenOut = pool.inputTokenWeights[tokenOutIndex];
-    weightTokenIn = pool.inputTokenWeights[tokenInIndex];
-    tokenInDecimalsAmount = scaleDown(pool.inputTokenBalances[tokenInIndex], tokenIn);
-    tokenOutDecimalsAmount = scaleDown(pool.inputTokenBalances[tokenOutIndex], tokenOut);
-  }
-
-  let tokenInfo: TokenInfo | null = calculatePrice(
-    tokenIn,
-    tokenInDecimalsAmount,
-    weightTokenIn,
-    tokenOut,
-    tokenOutDecimalsAmount,
-    weightTokenOut,
-  );
-
-  if (tokenInfo) {
-    const token = getOrCreateToken(tokenInfo.address.toHexString());
-    const index = tokenInfo.address == tokenOut ? tokenOutIndex : tokenInIndex;
-    const currentBalance = scaleDown(pool.inputTokenBalances[index], Address.fromString(pool.inputTokens[index]));
-    // We check if current balance multiplied by the price is over 10k USD, if not,
-    // it means that the pool does have too much liquidity, so we fetch the price from
-    // external source
-    if (currentBalance.times(tokenInfo.price).gt(BigDecimal.fromString("10000"))) {
-      token.lastPriceUSD = tokenInfo.price;
-      token.lastPriceBlockNumber = blockNumber;
-      token.save();
-      return;
-    }
-  }
-
-  if (getOrCreateDex().network == "MATIC" || getOrCreateDex().network == "OPTIMISM") return;
-
-  if (!isUSDStable(tokenIn)) {
-    const token = getOrCreateToken(tokenIn.toHexString());
-    token.lastPriceUSD = fetchPrice(tokenIn);
-    token.lastPriceBlockNumber = blockNumber;
-    token.save();
-  }
-
-  if (!isUSDStable(tokenOut)) {
-    const token = getOrCreateToken(tokenOut.toHexString());
-    token.lastPriceUSD = fetchPrice(tokenOut);
-    token.lastPriceBlockNumber = blockNumber;
-    token.save();
-  }
 }

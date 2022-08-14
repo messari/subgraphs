@@ -8,8 +8,6 @@ import {
   BIGDECIMAL_TEN,
   BIGDECIMAL_TEN_THOUSAND,
   BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  BIGINT_ONE,
 } from "../constants";
 import { getLiquidityPoolFee } from "../getters";
 

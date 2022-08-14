@@ -19,11 +19,9 @@ import {
   REWARD_TOKEN,
   UsageType,
 } from "./constants";
-import { updateTokenPrice, updateVolumeAndFee } from "./metrics";
-import { valueInUSD } from "./pricing";
-import { convertTokenToDecimal } from "./utils/utils";
+import { updateVolumeAndFee } from "./metrics";
 import { PoolBalanceChanged } from "../../generated/Vault/Vault";
-import { scaleDown } from "./tokens";
+import { scaleDown, tokenAmountToUSDAmount } from "./tokens";
 import { updateWeight } from "./weight";
 import { getOrCreatePosition, updatePositions } from "./position";
 
@@ -40,7 +38,7 @@ export function createLiquidityPool(
   let inputTokenBalancesAmount: BigDecimal[] = [];
   for (let index = 0; index < inputTokens.length; index++) {
     //create token if null
-    getOrCreateToken(inputTokens[index]);
+    getOrCreateToken(inputTokens[index], event.block.number);
     inputTokenBalances.push(BIGINT_ZERO);
     inputTokenBalancesAmount.push(BIGDECIMAL_ZERO);
   }
@@ -52,7 +50,7 @@ export function createLiquidityPool(
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = inputTokenBalances;
-  pool.outputToken = getOrCreateToken(poolAddress).id;
+  pool.outputToken = getOrCreateToken(poolAddress, event.block.number).id;
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
@@ -75,7 +73,7 @@ export function createLiquidityPool(
   pool.closedPositionCount = INT_ZERO;
 
   if (REWARD_TOKEN != "") {
-    let rewardToken = getOrCreateRewardToken(REWARD_TOKEN);
+    let rewardToken = getOrCreateRewardToken(REWARD_TOKEN, event.block.number);
     pool.rewardTokens = [rewardToken.id];
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
@@ -86,6 +84,7 @@ export function createLiquidityPool(
   pool.save();
   protocol.totalPoolCount += 1;
   protocol.save();
+  updateWeight(poolAddress);
 }
 
 function createPoolFees(poolAddressString: string, fee: BigInt): string[] {
@@ -123,58 +122,44 @@ export function createSwapHandleVolume(
 ): void {
   let protocol = getOrCreateDex();
   let pool = getLiquidityPool(poolAddress);
-  let _tokenIn = getOrCreateToken(tokenIn);
-  let _tokenOut = getOrCreateToken(tokenOut);
+  let _tokenIn = getOrCreateToken(tokenIn, event.block.number);
+  let _tokenOut = getOrCreateToken(tokenOut, event.block.number);
   let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event, poolAddress);
   let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event, poolAddress);
 
   // Convert tokens according to decimals
-  let amountInConverted = convertTokenToDecimal(amountIn, _tokenIn.decimals);
-  let amountOutConverted = convertTokenToDecimal(amountOut, _tokenOut.decimals);
+  let amountInConverted = scaleDown(amountIn, Address.fromString(_tokenIn.id));
+  let amountOutConverted = scaleDown(amountOut, Address.fromString(_tokenOut.id));
 
-  let tokenInIndex: i32 = 0;
-  let tokenOutIndex: i32 = 0;
+  let amountInUSD = amountInConverted.times(_tokenIn.lastPriceUSD!);
+  let amountOutUSD = amountOutConverted.times(_tokenOut.lastPriceUSD!);
 
   let inputTokenBalances: BigInt[] = pool.inputTokenBalances;
   let dailyVolumeByTokenAmount: BigInt[] = poolMetricsDaily.dailyVolumeByTokenAmount;
   let dailyVolumeByTokenUSD: BigDecimal[] = poolMetricsDaily.dailyVolumeByTokenUSD;
   let hourlyVolumeByTokenAmount: BigInt[] = poolMetricsHourly.hourlyVolumeByTokenAmount;
   let hourlyVolumeByTokenUSD: BigDecimal[] = poolMetricsHourly.hourlyVolumeByTokenUSD;
-  for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
-    if (tokenIn == pool.inputTokens[i]) {
-      inputTokenBalances[i] = pool.inputTokenBalances[i].plus(amountIn);
-      dailyVolumeByTokenAmount[i] = poolMetricsDaily.dailyVolumeByTokenAmount[i].plus(amountIn);
-      hourlyVolumeByTokenAmount[i] = poolMetricsHourly.hourlyVolumeByTokenAmount[i].plus(amountIn);
-      dailyVolumeByTokenUSD[i] = poolMetricsDaily.dailyVolumeByTokenUSD[i].plus(amountInConverted);
-      hourlyVolumeByTokenUSD[i] = poolMetricsHourly.hourlyVolumeByTokenUSD[i].plus(amountInConverted);
-      tokenInIndex = i;
-    }
 
-    if (tokenOut == pool.inputTokens[i]) {
-      inputTokenBalances[i] = pool.inputTokenBalances[i].minus(amountOut);
-      poolMetricsDaily.dailyVolumeByTokenAmount[i] = dailyVolumeByTokenAmount[i].plus(amountOut);
-      hourlyVolumeByTokenAmount[i] = hourlyVolumeByTokenAmount[i].plus(amountOut);
-      dailyVolumeByTokenUSD[i] = dailyVolumeByTokenUSD[i].plus(amountOutConverted);
-      hourlyVolumeByTokenUSD[i] = hourlyVolumeByTokenUSD[i].plus(amountOutConverted);
-      tokenOutIndex = i;
-    }
-  }
+  // Using indexOf should be faster since it uses lower level loads
+  let tokenInIndex = pool.inputTokens.indexOf(tokenIn);
+  inputTokenBalances[tokenInIndex] = pool.inputTokenBalances[tokenInIndex].plus(amountIn);
+  dailyVolumeByTokenAmount[tokenInIndex] = poolMetricsDaily.dailyVolumeByTokenAmount[tokenInIndex].plus(amountIn);
+  hourlyVolumeByTokenAmount[tokenInIndex] = poolMetricsHourly.hourlyVolumeByTokenAmount[tokenInIndex].plus(amountIn);
+  dailyVolumeByTokenUSD[tokenInIndex] = poolMetricsDaily.dailyVolumeByTokenUSD[tokenInIndex].plus(amountInUSD);
+  hourlyVolumeByTokenUSD[tokenInIndex] = poolMetricsHourly.hourlyVolumeByTokenUSD[tokenInIndex].plus(amountOutUSD);
+
+  let tokenOutIndex = pool.inputTokens.indexOf(tokenOut);
+  inputTokenBalances[tokenOutIndex] = pool.inputTokenBalances[tokenOutIndex].minus(amountOut);
+  poolMetricsDaily.dailyVolumeByTokenAmount[tokenOutIndex] = dailyVolumeByTokenAmount[tokenOutIndex].plus(amountOut);
+  hourlyVolumeByTokenAmount[tokenOutIndex] = hourlyVolumeByTokenAmount[tokenOutIndex].plus(amountOut);
+  dailyVolumeByTokenUSD[tokenOutIndex] = dailyVolumeByTokenUSD[tokenOutIndex].plus(amountOutUSD);
+  hourlyVolumeByTokenUSD[tokenOutIndex] = hourlyVolumeByTokenUSD[tokenOutIndex].plus(amountOutUSD);
+
   poolMetricsDaily.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
   poolMetricsDaily.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
   poolMetricsHourly.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
   poolMetricsHourly.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
   pool.inputTokenBalances = inputTokenBalances;
-
-  updateTokenPrice(
-    pool,
-    Address.fromString(tokenIn),
-    amountIn,
-    tokenInIndex,
-    Address.fromString(tokenOut),
-    amountOut,
-    tokenOutIndex,
-    event.block.number,
-  );
 
   // create Swap event
   let swap = new Swap(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
@@ -187,10 +172,10 @@ export function createSwapHandleVolume(
   swap.timestamp = event.block.timestamp;
   swap.tokenIn = tokenIn;
   swap.amountIn = amountIn;
-  swap.amountInUSD = valueInUSD(amountInConverted, Address.fromString(tokenIn));
+  swap.amountInUSD = amountInUSD;
   swap.tokenOut = tokenOut;
   swap.amountOut = amountOut;
-  swap.amountOutUSD = valueInUSD(amountOutConverted, Address.fromString(tokenOut));
+  swap.amountOutUSD = amountOutUSD;
   swap.pool = pool.id;
   swap.nonce = event.transaction.nonce;
   swap.gasLimit = event.transaction.gasLimit;
@@ -199,8 +184,7 @@ export function createSwapHandleVolume(
   // get amount that should be tracked only - div 2 because cant count both input and output as volume
   let trackedAmountUSD = swap.amountInUSD;
   updateVolumeAndFee(event, protocol, pool, trackedAmountUSD);
-  updateWeight(pool.id);
-
+  
   poolMetricsDaily.dailyVolumeUSD = poolMetricsDaily.dailyVolumeUSD.plus(trackedAmountUSD);
   poolMetricsHourly.hourlyVolumeUSD = poolMetricsHourly.hourlyVolumeUSD.plus(trackedAmountUSD);
   poolMetricsHourly.save();
@@ -209,36 +193,25 @@ export function createSwapHandleVolume(
 }
 
 export function createDepositMulti(event: PoolBalanceChanged, poolAddress: string, amounts: BigInt[]): void {
-  let pool = getLiquidityPool(poolAddress);
   let protocol = getOrCreateDex();
-  let amountUSD = BIGDECIMAL_ZERO;
-  let inputTokenBalances = pool.inputTokenBalances;
+  let pool = getLiquidityPool(poolAddress);
 
   // reset tvl aggregates until new amounts calculated
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD);
+  let amountUSD = BIGDECIMAL_ZERO;
+  let inputTokenBalances = pool.inputTokenBalances;
+  let eventInputAmounts = new Array<BigInt>(event.params.tokens.length);
 
-  pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  let withdrawBalances: BigInt[] = [];
-  //recalculate pool tvl
-  for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
-    let token = getOrCreateToken(pool.inputTokens[i]);
-    if (token == null) {
-      throw new Error("poolToken not found");
-    }
-    for (let j = 0; j < event.params.tokens.length; j++) {
-      let tokenAddress = event.params.tokens[j].toHexString();
-      if (tokenAddress == pool.inputTokens[i]) {
-        inputTokenBalances[i] = inputTokenBalances[i].plus(amounts[j]);
-        let amountConverted = convertTokenToDecimal(amounts[j], token.decimals);
-        amountUSD = amountUSD.plus(amountConverted.times(token.lastPriceUSD!));
-        withdrawBalances.push(amounts[j]);
-      }
-    }
-    let totalConverted = convertTokenToDecimal(inputTokenBalances[i], token.decimals);
-    pool.totalValueLockedUSD = pool.totalValueLockedUSD.plus(totalConverted.times(token.lastPriceUSD!));
+  for (let j = 0; j < event.params.tokens.length; j++) {
+    let tokenAddress = event.params.tokens[j].toHexString();
+    let token = getOrCreateToken(tokenAddress, event.block.number);
+    let tokenIndex = pool.inputTokens.indexOf(tokenAddress);
+    inputTokenBalances[tokenIndex] = inputTokenBalances[tokenIndex].plus(amounts[j]);
+    amountUSD = amountUSD.plus(tokenAmountToUSDAmount(token, amounts[j]));
+    eventInputAmounts[tokenIndex] = amounts[j];
   }
+
   pool.inputTokenBalances = inputTokenBalances;
-  // Add pool value back to protocol total value locked
+  pool.totalValueLockedUSD = pool.totalValueLockedUSD.plus(amountUSD);
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD);
 
   let deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
@@ -252,7 +225,7 @@ export function createDepositMulti(event: PoolBalanceChanged, poolAddress: strin
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = pool.inputTokens;
   deposit.outputToken = pool.outputToken;
-  deposit.inputTokenAmounts = withdrawBalances;
+  deposit.inputTokenAmounts = eventInputAmounts;
   deposit.amountUSD = amountUSD;
   deposit.nonce = event.transaction.nonce;
   deposit.gasLimit = event.transaction.gasLimit;
@@ -280,7 +253,7 @@ export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: stri
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
 
   for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
-    let token = getOrCreateToken(pool.inputTokens[i]);
+    let token = getOrCreateToken(pool.inputTokens[i], event.block.number);
     if (token == null) {
       throw new Error("poolToken not found");
     }
@@ -289,11 +262,11 @@ export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: stri
 
       if (tokenAddress == pool.inputTokens[i]) {
         inputTokenBalances[i] = inputTokenBalances[i].plus(amounts[j]);
-        let amountConverted = convertTokenToDecimal(amounts[j], token.decimals);
+        let amountConverted = scaleDown(amounts[j], Address.fromString(token.id));
         amountUSD = amountUSD.plus(amountConverted.times(token.lastPriceUSD!));
       }
     }
-    let totalConverted = convertTokenToDecimal(inputTokenBalances[i], token.decimals);
+    let totalConverted = scaleDown(inputTokenBalances[i], Address.fromString(token.id));
     pool.totalValueLockedUSD = pool.totalValueLockedUSD.plus(totalConverted.times(token.lastPriceUSD!));
   }
   pool.inputTokenBalances = inputTokenBalances;
@@ -355,7 +328,7 @@ function getOutputTokenAmount(event: PoolBalanceChanged, outputToken: string, ac
           if (!data_value) {
             return BIGINT_ONE;
           }
-          return data_value!.toBigInt();
+          return data_value.toBigInt();
         }
       }
     }
