@@ -433,6 +433,15 @@
         }
       }
     },
+    "erc721-holders": {
+      "erc721-holders": {
+        "ethereum": {
+          "template": "erc721.holders.template.yaml",
+          "messari": "messari/erc721-holders",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "erc721-metadata": {
       "erc721-metadata": {
         "ethereum": {
