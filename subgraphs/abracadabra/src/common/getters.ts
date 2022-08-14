@@ -54,6 +54,8 @@ import {
   schemaVersion,
   subgraphVersion,
   methodologyVersion,
+  USD_BTC_ETH_ABRA_ADDRESS,
+  DEFAULT_DECIMALS,
 } from "./constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -63,7 +65,12 @@ export function getOrCreateToken(tokenAddress: Address): Token {
     token = new Token(tokenAddress.toHexString());
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.name = fetchTokenName(tokenAddress);
-    token.decimals = fetchTokenDecimals(tokenAddress);
+    if (tokenAddress == Address.fromString(USD_BTC_ETH_ABRA_ADDRESS)) {
+      token.decimals = DEFAULT_DECIMALS;
+    } else {
+      token.decimals = fetchTokenDecimals(tokenAddress);
+    }
+
     token.lastPriceUSD =
       tokenAddress == Address.fromString(getMIMAddress(dataSource.network())) ? BIGDECIMAL_ONE : BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
