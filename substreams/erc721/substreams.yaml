@@ -1,0 +1,35 @@
+specVersion: v0.1.0
+package:
+  name: "substreams_example"
+  version: v0.1.0
+
+imports:
+  eth: https://github.com/streamingfast/sf-ethereum/releases/download/v0.10.2/ethereum-v0.10.4.spkg
+
+protobuf:
+  files:
+    - erc721.proto
+  importPaths:
+    - ./proto
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams_example.wasm
+
+modules:
+  - name: block_to_transfers
+    kind: map
+    initialBlock: 12287507
+    inputs:
+      - source: sf.ethereum.type.v1.Block
+    output:
+      type: proto:eth.erc721.v1.Transfers
+
+  - name: nft_state
+    kind: store
+    initialBlock: 12287507
+    updatePolicy: add
+    valueType: int64
+    inputs:
+      - map: block_to_transfers

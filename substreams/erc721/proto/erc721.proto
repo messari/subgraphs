@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package eth.erc721.v1;
+
+message Transfers {
+  repeated Transfer transfers = 1;
+}
+
+message Transfer {
+  bytes from = 1;
+  bytes to = 2;
+  uint64 token_id = 3;
+  bytes trx_hash = 4;
+  uint64 ordinal = 5;
+}

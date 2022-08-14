@@ -1,0 +1,28 @@
+[package]
+name = "substreams-example"
+version = "0.1.0"
+description = "Substream template demo project"
+edition = "2021"
+repository = "https://github.com/streamingfast/substreams-template"
+
+[lib]
+crate-type = ["cdylib"]
+
+[target.wasm32-unknown-unknown.dependencies]
+ethabi = "17.0"
+hex-literal = "0.3.4"
+prost = "0.10.1"
+substreams = { git = "https://github.com/streamingfast/substreams/", branch = "develop" }
+substreams-ethereum = { git = "https://github.com/0xbe1/substreams-ethereum", branch = "feature/fix-version-develop" }
+
+# Required so that ethabi > ethereum-types build correctly under wasm32-unknown-unknown
+getrandom = { version = "0.2", features = ["custom"] }
+
+[build-dependencies]
+anyhow = "1"
+substreams-ethereum = { git = "https://github.com/0xbe1/substreams-ethereum", branch = "feature/fix-version-develop" }
+
+[profile.release]
+lto = true
+opt-level = 's'
+strip = "debuginfo"
