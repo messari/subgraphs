@@ -308,10 +308,13 @@ type UsageMetricsDailySnapshot @entity {
 }
 
 type UsageMetricsHourlySnapshot @entity {
+  " ID is # of hours since Unix epoch time "
+  id: ID!
+
   " Protocol this snapshot is associated with "
   protocol: DexAmmProtocol!
 
-  " Number of unique daily active users "
+  " Number of unique hourly active users "
   hourlyActiveUsers: Int!
 
   " Number of cumulative unique users "
