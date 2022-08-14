@@ -812,6 +812,12 @@ type PositionSnapshot @entity {
   " Position of this snapshot "
   position: Position!
 
+  " Lower bound tick for fee elligibility for this position"
+  lowerTick: BigInt!
+
+  " Upper bound tick for fee elligibility for this position"
+  upperTick: BigInt!
+
   " Input token balances in this position, in native amounts "
   inputTokenBalances: [BigInt!]!
 
