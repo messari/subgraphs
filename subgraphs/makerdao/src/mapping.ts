@@ -584,7 +584,7 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
   let market = getOrCreateMarket(marketID);
   let token = getOrCreateToken(market.inputToken);
 
-  let amount = flipBidsStore.lot;
+  let amount = bigIntChangeDecimals(flipBidsStore.lot, WAD, token.decimals);
   let amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
   let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(flipBidsStore.bid, RAD));
 
