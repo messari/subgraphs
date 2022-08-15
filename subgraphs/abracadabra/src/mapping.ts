@@ -349,6 +349,13 @@ export function handleLogAccrue(event: LogAccrue): void {
   let mimPriceUSD = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).lastPriceUSD;
   let feesUSD = bigIntToBigDecimal(event.params.accruedAmount, DEFAULT_DECIMALS).times(mimPriceUSD!);
   updateFinancials(event, feesUSD, event.address.toHexString());
+  if (event.address == Address.fromString("0x920d9bd936da4eafb5e25c6bdc9f6cb528953f9f")) {
+    // TODO: remove
+    log.warning("Accrue WETH yVault event amount: {} mim price ${}", [
+      event.params.accruedAmount.toString(),
+      mimPriceUSD!.toString(),
+    ]);
+  }
 }
 
 // updates all input token prices using the price oracle
