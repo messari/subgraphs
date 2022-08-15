@@ -371,7 +371,7 @@ function updateAllTokenPrices(blockNumber: BigInt): void {
 
     // check if price was already updated this block
     let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
-    if (inputToken.lastPriceBlockNumber && inputToken.lastPriceBlockNumber.ge(blockNumber)) {
+    if (inputToken.lastPriceBlockNumber && inputToken.lastPriceBlockNumber!.ge(blockNumber)) {
       continue;
     }
 

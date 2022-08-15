@@ -6,7 +6,7 @@ dataSources:
     name: BentoBox
     network: mainnet
     source:
-      address: "0xF5BCE5077908a1b7370B9ae04AdC565EBd643966"
+      address: '0xF5BCE5077908a1b7370B9ae04AdC565EBd643966'
       abi: DegenBox
       startBlock: 12094175
     mapping:
@@ -38,7 +38,7 @@ dataSources:
     name: DegenBox
     network: mainnet
     source:
-      address: "0xd96f48665a1410C0cd669A88898ecA36B9Fc2cce"
+      address: '0xd96f48665a1410C0cd669A88898ecA36B9Fc2cce'
       abi: DegenBox
       startBlock: 13418156
     mapping:
@@ -70,7 +70,7 @@ dataSources:
     name: Spell
     network: mainnet
     source:
-      address: "0x090185f2135308BaD17527004364eBcC2D37e5F6"
+      address: '0x090185f2135308BaD17527004364eBcC2D37e5F6'
       abi: ERC20
       startBlock: 12454535
     mapping:
@@ -100,7 +100,7 @@ dataSources:
     name: OffchainAggregator
     network: mainnet
     source:
-      address: "0x18f0112E30769961AF90FDEe0D1c6B27E6d72D92"
+      address: '0x18f0112E30769961AF90FDEe0D1c6B27E6d72D92'
       abi: OffchainAggregator
       startBlock: 12505995
     mapping:

@@ -35,7 +35,7 @@
           "steegecs": "steegecs/abracadabra-money-ethereum",
           "messari": "messari/abracadabra-money-ethereum",
           "dmelotik": "dmelotik/abracadabra-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
