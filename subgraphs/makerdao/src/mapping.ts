@@ -12,7 +12,7 @@ import { Jug, LogNote as JugNoteEvent } from "../generated/Jug/Jug";
 import { Pot, LogNote as PotNoteEvent } from "../generated/Pot/Pot";
 import { CdpManager, NewCdp } from "../generated/CdpManager/CdpManager";
 import { Created } from "../generated/DSProxyFactory/DSProxyFactory";
-import { BuyGem, SellGem, PSM } from "../generated/PSM-USDC/PSM";
+import { BuyGem, SellGem, PSM } from "../generated/PSM-USDC-A/PSM";
 import {
   Token,
   _Ilk,
