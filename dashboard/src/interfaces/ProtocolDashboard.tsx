@@ -116,11 +116,11 @@ function ProtocolDashboard() {
     schemaVersion = protocolSchemaData.protocols[0].schemaVersion;
   }
   let protocolIdString = searchParams.get("protocolId");
-  let protocolIdToUse: string = '';
-  if (typeof (protocolIdString) === "string") {
+  let protocolIdToUse: string = "";
+  if (typeof protocolIdString === "string") {
     protocolIdToUse = protocolIdString;
   }
-  let protocolType = 'N/A';
+  let protocolType = "N/A";
   if (protocolSchemaData?.protocols?.length > 0) {
     protocolType = protocolSchemaData?.protocols[0]?.type;
     if (protocolSchemaData.protocols[0]?.id && !protocolIdToUse) {
@@ -237,59 +237,42 @@ function ProtocolDashboard() {
     ${poolOverviewTokensQuery(protocolSchemaData?.protocols[0]?.type?.toUpperCase())}
   `;
 
-  const snapshotDailyVolumeQuery = gql`${getSnapshotDailyVolume(schemaVersion)}`;
+  const snapshotDailyVolumeQuery = gql`
+    ${getSnapshotDailyVolume(schemaVersion)}
+  `;
 
-  const [
-    getPoolsSnapshotVolume,
-    { data: snapshotVolume },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+  const [getPoolsSnapshotVolume, { data: snapshotVolume }] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
 
-  const [
-    getPoolsSnapshotVolume2,
-    { data: snapshotVolume2 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+  const [getPoolsSnapshotVolume2, { data: snapshotVolume2 }] = useLazyQuery(snapshotDailyVolumeQuery, {
+    client: client,
+  });
 
-  const [
-    getPoolsSnapshotVolume3,
-    { data: snapshotVolume3 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+  const [getPoolsSnapshotVolume3, { data: snapshotVolume3 }] = useLazyQuery(snapshotDailyVolumeQuery, {
+    client: client,
+  });
 
-  const [
-    getPoolsSnapshotVolume4,
-    { data: snapshotVolume4 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+  const [getPoolsSnapshotVolume4, { data: snapshotVolume4 }] = useLazyQuery(snapshotDailyVolumeQuery, {
+    client: client,
+  });
 
-  const [
-    getPoolsSnapshotVolume5,
-    { data: snapshotVolume5 },
-  ] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
+  const [getPoolsSnapshotVolume5, { data: snapshotVolume5 }] = useLazyQuery(snapshotDailyVolumeQuery, {
+    client: client,
+  });
 
-  const [
-    getPoolOverviewTokens,
-    { data: poolOverviewTokens },
-  ] = useLazyQuery(tokenQuery, { client: client });
+  const [getPoolOverviewTokens, { data: poolOverviewTokens }] = useLazyQuery(tokenQuery, { client: client });
 
-  const [
-    getPoolOverviewTokens2,
-    { data: poolOverviewTokens2 },
-  ] = useLazyQuery(tokenQuery, { client: client });
+  const [getPoolOverviewTokens2, { data: poolOverviewTokens2 }] = useLazyQuery(tokenQuery, { client: client });
 
-  const [
-    getPoolOverviewTokens3,
-    { data: poolOverviewTokens3 },
-  ] = useLazyQuery(tokenQuery, { client: client });
+  const [getPoolOverviewTokens3, { data: poolOverviewTokens3 }] = useLazyQuery(tokenQuery, { client: client });
 
-  const [
-    getPoolOverviewTokens4,
-    { data: poolOverviewTokens4 },
-  ] = useLazyQuery(tokenQuery, { client: client });
+  const [getPoolOverviewTokens4, { data: poolOverviewTokens4 }] = useLazyQuery(tokenQuery, { client: client });
 
-  const [
-    getPoolOverviewTokens5,
-    { data: poolOverviewTokens5 },
-  ] = useLazyQuery(tokenQuery, { client: client });
+  const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
 
-  const [getFailedIndexingStatus, { data: indexingFailureData, error: indexingFailureError }] = useLazyQuery(nameQuery, { variables: { subgraphName }, client: clientIndexing });
+  const [getFailedIndexingStatus, { data: indexingFailureData, error: indexingFailureError }] = useLazyQuery(
+    nameQuery,
+    { variables: { subgraphName }, client: clientIndexing },
+  );
 
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
@@ -349,9 +332,10 @@ function ProtocolDashboard() {
       pendingVersion?.indexingStatusForPendingVersion?.subgraph &&
       pendingVersion?.indexingStatusForPendingVersion?.health === "healthy"
     ) {
-      const pendingURL = "https://api.thegraph.com/subgraphs/id/" + pendingVersion?.indexingStatusForPendingVersion?.subgraph;
+      const pendingURL =
+        "https://api.thegraph.com/subgraphs/id/" + pendingVersion?.indexingStatusForPendingVersion?.subgraph;
       if (isCurrentVersion === false) {
-        setSubgraphToQuery({ url: pendingURL, version: "pending" })
+        setSubgraphToQuery({ url: pendingURL, version: "pending" });
       }
       setEndpoints({
         current: endpoints.current,
@@ -369,8 +353,7 @@ function ProtocolDashboard() {
         getPendingSubgraph();
       }
     }
-    getFailedIndexingStatus()
-
+    getFailedIndexingStatus();
   }, [protocolSchemaData, getData, getProtocolTableData, getPendingSubgraph]);
 
   useEffect(() => {
@@ -438,7 +421,6 @@ function ProtocolDashboard() {
       getPoolsOverviewData();
     }
   }, [tabValue, getPoolsOverviewData]);
-
 
   useEffect(() => {
     if (data?.protocols && dataPools) {
@@ -516,8 +498,6 @@ function ProtocolDashboard() {
       }
     }
   }, [dataPools5]);
-
-
 
   useEffect(() => {
     if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
@@ -725,7 +705,6 @@ function ProtocolDashboard() {
     pools = pools.concat(poolArray);
   }
 
-
   if (pools?.length > 0) {
     let poolTemp = [...pools];
     pools = poolTemp.sort((a, b) => {
@@ -837,37 +816,38 @@ function ProtocolDashboard() {
   }
 
   let protocolSchemaDataProp = protocolSchemaData;
-  const brokenDownName = subgraphName.split("/")[1].split('-');
+  const brokenDownName = subgraphName.split("/")[1].split("-");
   const network = brokenDownName.pop() || "";
   if (!protocolSchemaDataProp?.protocols[0]) {
     protocolSchemaDataProp = {
-      protocols: [{
-        type: "N/A",
-        name: brokenDownName.join(" "),
-        network: network.toUpperCase(),
-        schemaVersion: "N/A",
-        subgraphVersion: "N/A"
-      }]
-    }
+      protocols: [
+        {
+          type: "N/A",
+          name: brokenDownName.join(" "),
+          network: network.toUpperCase(),
+          schemaVersion: "N/A",
+          subgraphVersion: "N/A",
+        },
+      ],
+    };
   }
 
-  const indexingStatusKey = 'indexingStatusFor' + (isCurrentVersion ? "CurrentVersion" : "PendingVersion")
+  const indexingStatusKey = "indexingStatusFor" + (isCurrentVersion ? "CurrentVersion" : "PendingVersion");
   if (!errorDisplayProps && indexingFailureData) {
     const errMsg = indexingFailureData[indexingStatusKey]?.fatalError?.message;
-    if (typeof (errMsg) === "string") {
+    if (typeof errMsg === "string") {
       errorDisplayProps = new ApolloError({
         errorMessage: `SUBGRAPH DATA UNREACHABLE - ${subgraphToQuery.url}. INDEXING ERROR - "${errMsg}".`,
       });
     }
   } else if (indexingFailureData) {
     const errMsg = indexingFailureData[indexingStatusKey]?.fatalError?.message;
-    if (typeof (errMsg) === "string") {
+    if (typeof errMsg === "string") {
       errorDisplayProps = new ApolloError({
         errorMessage: `SUBGRAPH DATA UNREACHABLE - ${subgraphToQuery.url}. INDEXING ERROR - "${errMsg}".`,
       });
     }
   }
-
 
   return (
     <div className="ProtocolDashboard">
