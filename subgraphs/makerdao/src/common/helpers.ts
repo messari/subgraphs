@@ -29,6 +29,7 @@ import {
   VAT_ADDRESS,
   WAD,
   RAD,
+  ProtocolSideRevenueType,
 } from "./constants";
 import { createEventID } from "../utils/strings";
 import { bigIntToBDUseDecimals, bigIntChangeDecimals } from "../utils/numbers";
@@ -42,6 +43,7 @@ export function updateProtocol(
   liquidateUSD: BigDecimal = BIGDECIMAL_ZERO,
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
+  protocolSideRevenueType: u32 = 0,
 ): void {
   let protocol = getOrCreateLendingProtocol();
 
@@ -86,18 +88,34 @@ export function updateProtocol(
   }
 
   // update revenue
+  let newProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+    newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
   }
 
   if (newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   }
 
-  if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO) || newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
+  if (newProtocolSideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(
       protocol.cumulativeSupplySideRevenueUSD,
     );
+    switch (protocolSideRevenueType) {
+      case ProtocolSideRevenueType.STABILITYFEE:
+        protocol._cumulativeProtocolSideStabilityFeeRevenue = protocol._cumulativeProtocolSideStabilityFeeRevenue!.plus(
+          newProtocolSideRevenueUSD,
+        );
+      case ProtocolSideRevenueType.LIQUIDATION:
+        protocol._cumulativeProtocolSideLiquidationRevenue = protocol._cumulativeProtocolSideLiquidationRevenue!.plus(
+          newProtocolSideRevenueUSD,
+        );
+      case ProtocolSideRevenueType.PSM:
+        protocol._cumulativeProtocolSidePSMRevenue = protocol._cumulativeProtocolSidePSMRevenue!.plus(
+          newProtocolSideRevenueUSD,
+        );
+    }
   }
 
   // update mintedTokenSupplies
@@ -213,6 +231,7 @@ export function snapshotMarket(
   marketHourlySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketHourlySnapshot.inputTokenBalance = market.inputTokenBalance;
   marketHourlySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  marketHourlySnapshot.rates = market.rates;
   //marketHourlySnapshot.outputTokenSupply = market.outputTokenSupply;
   //marketHourlySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
 
@@ -231,6 +250,7 @@ export function snapshotMarket(
   marketDailySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketDailySnapshot.inputTokenBalance = market.inputTokenBalance;
   marketDailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  marketDailySnapshot.rates = market.rates;
   //marketDailySnapshot.outputTokenSupply = market.outputTokenSupply;
   //marketDailySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
 
@@ -294,6 +314,7 @@ export function updateFinancialsSnapshot(
   liquidateUSD: BigDecimal = BIGDECIMAL_ZERO,
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
+  protocolSideRevenueType: u32 = 0,
 ): void {
   let protocol = getOrCreateLendingProtocol();
   let financials = getOrCreateFinancials(event);
@@ -305,6 +326,9 @@ export function updateFinancialsSnapshot(
 
   financials.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   financials.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financials._cumulativeProtocolSideStabilityFeeRevenue = protocol._cumulativeProtocolSideStabilityFeeRevenue;
+  financials._cumulativeProtocolSideLiquidationRevenue = protocol._cumulativeProtocolSideLiquidationRevenue;
+  financials._cumulativeProtocolSidePSMRevenue = protocol._cumulativeProtocolSidePSMRevenue;
   financials.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   financials.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
   financials.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
@@ -328,15 +352,35 @@ export function updateFinancialsSnapshot(
     financials.dailyLiquidateUSD = financials.dailyLiquidateUSD.plus(liquidateUSD);
   }
 
+  let newProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     financials.dailyTotalRevenueUSD = financials.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+    let newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
   }
 
   if (newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     financials.dailySupplySideRevenueUSD = financials.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   }
 
-  financials.dailyProtocolSideRevenueUSD = financials.dailyTotalRevenueUSD.minus(financials.dailySupplySideRevenueUSD);
+  if (newProtocolSideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
+    financials.dailyProtocolSideRevenueUSD = financials.dailyTotalRevenueUSD.minus(
+      financials.dailySupplySideRevenueUSD,
+    );
+    switch (protocolSideRevenueType) {
+      case ProtocolSideRevenueType.STABILITYFEE:
+        financials._dailyProtocolSideStabilityFeeRevenue = financials._dailyProtocolSideStabilityFeeRevenue!.plus(
+          newProtocolSideRevenueUSD,
+        );
+      case ProtocolSideRevenueType.LIQUIDATION:
+        financials._dailyProtocolSideLiquidationRevenue = financials._dailyProtocolSideLiquidationRevenue!.plus(
+          newProtocolSideRevenueUSD,
+        );
+      case ProtocolSideRevenueType.PSM:
+        financials._dailyProtocolSidePSMRevenue = financials._dailyProtocolSidePSMRevenue!.plus(
+          newProtocolSideRevenueUSD,
+        );
+    }
+  }
 
   financials.blockNumber = event.block.number;
   financials.timestamp = event.block.timestamp;
@@ -544,6 +588,7 @@ export function updateRevenue(
   marketID: string,
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
+  protocolSideRevenueType: u32 = 0,
 ): void {
   let market = getOrCreateMarket(marketID);
   if (market) {
@@ -559,7 +604,14 @@ export function updateRevenue(
     );
   }
 
-  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, newTotalRevenueUSD, newSupplySideRevenueUSD);
+  updateProtocol(
+    BIGDECIMAL_ZERO,
+    BIGDECIMAL_ZERO,
+    BIGDECIMAL_ZERO,
+    newTotalRevenueUSD,
+    newSupplySideRevenueUSD,
+    protocolSideRevenueType,
+  );
 
   updateFinancialsSnapshot(
     event,
@@ -568,5 +620,6 @@ export function updateRevenue(
     BIGDECIMAL_ZERO,
     newTotalRevenueUSD,
     newSupplySideRevenueUSD,
+    protocolSideRevenueType,
   );
 }

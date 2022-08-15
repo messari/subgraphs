@@ -12,6 +12,7 @@ import { Jug, LogNote as JugNoteEvent } from "../generated/Jug/Jug";
 import { Pot, LogNote as PotNoteEvent } from "../generated/Pot/Pot";
 import { CdpManager, NewCdp } from "../generated/CdpManager/CdpManager";
 import { Created } from "../generated/DSProxyFactory/DSProxyFactory";
+import { BuyGem, SellGem, PSM } from "../generated/PSM-USDC/PSM";
 import {
   Token,
   _Ilk,
@@ -65,6 +66,7 @@ import {
   VAT_ADDRESS,
   INT_ZERO,
   INT_ONE,
+  ProtocolSideRevenueType,
 } from "./common/constants";
 import {
   updateUsageMetrics,
@@ -74,6 +76,7 @@ import {
   updatePriceForMarket,
   updateRevenue,
   updateMarket,
+  snapshotMarket,
 } from "./common/helpers";
 import {
   getOrCreateMarket,
@@ -286,7 +289,7 @@ export function handleVatFold(event: VatNoteEvent): void {
       marketID,
       newTotalRevenueUSD.toString(),
     ]);
-    updateRevenue(event, marketID, newTotalRevenueUSD, BIGDECIMAL_ZERO);
+    updateRevenue(event, marketID, newTotalRevenueUSD, BIGDECIMAL_ZERO, ProtocolSideRevenueType.STABILITYFEE);
   } else {
     log.warning("[handleVatFold]Failed to find marketID for ilk {}/{}; revenue of ${} is ignored.", [
       ilk.toString(),
@@ -336,7 +339,7 @@ export function handleCatBite(event: BiteEvent): void {
     market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
   );
 
-  updateRevenue(event, market.id, liquidationRevenueUSD, BIGDECIMAL_ZERO);
+  updateRevenue(event, market.id, liquidationRevenueUSD, BIGDECIMAL_ZERO, ProtocolSideRevenueType.LIQUIDATION);
 
   let storeID = flip
     .toHexString()
@@ -421,7 +424,7 @@ export function handleDogBark(event: BarkEvent): void {
     market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
   );
 
-  updateRevenue(event, market.id, liquidationRevenueUSD, BIGDECIMAL_ZERO);
+  updateRevenue(event, market.id, liquidationRevenueUSD, BIGDECIMAL_ZERO, ProtocolSideRevenueType.LIQUIDATION);
 
   log.info("[handleDogBark]storeID={}, ilk={}, urn={}: lot={}, art={}, due={}, liquidation revenue=${}", [
     storeID,
@@ -584,7 +587,7 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
   let market = getOrCreateMarket(marketID);
   let token = getOrCreateToken(market.inputToken);
 
-  let amount = flipBidsStore.lot;
+  let amount = bigIntChangeDecimals(flipBidsStore.lot, WAD, token.decimals);
   let amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
   let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(flipBidsStore.bid, RAD));
 
@@ -953,6 +956,7 @@ export function handleJugFileDuty(event: JugNoteEvent): void {
 
     market.rates = [interestRateID];
     market.save();
+    snapshotMarket(event, market);
   }
 }
 
@@ -1068,4 +1072,16 @@ export function handleCreateProxy(event: Created): void {
   let _proxy = new _Proxy(proxy.toHexString());
   _proxy.ownerAddress = owner.toHexString();
   _proxy.save();
+}
+
+export function handleSwapFee(event: ethereum.Event): void {
+  // use generic ethereum.Event so we don't need separate handlers for BuyGem and SellGem event
+  let SwapEvent = event as BuyGem; // or SellGem, doesn't matter for our purpose
+  let contract = PSM.bind(event.address);
+  let ilk = contract.ilk();
+  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  let fee = SwapEvent.params.fee;
+  let feeUSD = bigIntToBDUseDecimals(fee, WAD);
+  log.info("[handleSwapFee]Swap fee revenue {} collected from market {}", [feeUSD.toString(), marketID]);
+  updateRevenue(event, marketID, feeUSD, BIGDECIMAL_ZERO, ProtocolSideRevenueType.PSM);
 }
