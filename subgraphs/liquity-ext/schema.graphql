@@ -859,6 +859,9 @@ type Account @entity {
   " All positions that belong to this account "
   positions: [Position!]! @derivedFrom(field: "account")
 
+  " All open positions this account has "
+  openPositions: [Position!]!
+
   " Number of open positions this account has "
   openPositionCount: Int!
 
@@ -1203,8 +1206,11 @@ type Liquidate @entity {
   " The market of the collateral being used "
   market: Market!
 
-  " The user position changed by this event "
+  " The (borrower) user position changed by this event "
   position: Position!
+
+  " The (lender) user position changed by this event "
+  lenderPosition: Position!
 
   " Asset repaid (borrowed) "
   asset: Token!
