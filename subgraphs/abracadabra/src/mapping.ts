@@ -1,4 +1,4 @@
-import { Address, Bytes, dataSource, log, BigInt } from "@graphprotocol/graph-ts";
+import { Address, Bytes, dataSource, log, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 import { DegenBox, LogDeploy } from "../generated/BentoBox/DegenBox";
 import {
   LogAddCollateral,
@@ -11,8 +11,15 @@ import {
 } from "../generated/templates/Cauldron/Cauldron";
 import { MarketOracle } from "../generated/templates/Cauldron/MarketOracle";
 import { Deposit, Borrow, Repay, Liquidate, Withdraw } from "../generated/schema";
-import { NEG_INT_ONE, DEFAULT_DECIMALS, ABRA_ACCOUNTS, EventType, BIGDECIMAL_ONE } from "./common/constants";
-import { bigIntToBigDecimal, divBigDecimal } from "./common/utils/numbers";
+import {
+  NEG_INT_ONE,
+  DEFAULT_DECIMALS,
+  ABRA_ACCOUNTS,
+  EventType,
+  BIGDECIMAL_ONE,
+  OLD_MARKETS,
+} from "./common/constants";
+import { bigIntToBigDecimal, divBigDecimal, exponentToBigDecimal } from "./common/utils/numbers";
 import {
   getOrCreateToken,
   getOrCreateLendingProtocol,
@@ -355,6 +362,12 @@ function updateAllTokenPrices(blockNumber: BigInt): void {
       continue;
     }
 
+    // check if price was already updated this block
+    let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+    if (inputToken.lastPriceBlockNumber && inputToken.lastPriceBlockNumber.ge(blockNumber)) {
+      continue;
+    }
+
     // load PriceOracle contract and get peek (real/current) exchange rate
     if (market.priceOracle === null) {
       log.warning("[updateAllTokenPrices] Market {} has no priceOracle", [market.id]);
@@ -370,14 +383,20 @@ function updateAllTokenPrices(blockNumber: BigInt): void {
     }
     let exchangeRate = exchangeRateCall.value;
 
-    // price = 1 / (exchangeRate / 1e18)
-    let priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(exchangeRate, DEFAULT_DECIMALS));
+    let priceUSD: BigDecimal;
+    if (OLD_MARKETS.includes(market.id.toLowerCase())) {
+      // price = 1 / (exchangeRate / 1e18)
+      priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(exchangeRate, DEFAULT_DECIMALS));
+    } else {
+      // calculate the price of newer markets
+      // price = (1 / exchangeRate) * 1e(Token.decimals)
+      priceUSD = BIGDECIMAL_ONE.div(exchangeRate.toBigDecimal()).times(exponentToBigDecimal(inputToken.decimals));
+    }
 
     // update fields with new price
     market.inputTokenPriceUSD = priceUSD;
     market.save();
 
-    let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
     inputToken.lastPriceUSD = priceUSD;
     inputToken.lastPriceBlockNumber = blockNumber;
     inputToken.save();
