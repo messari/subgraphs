@@ -641,7 +641,7 @@
       "makerdao": {
         "ethereum": {
           "template": "makerdao.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
