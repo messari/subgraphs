@@ -82,9 +82,17 @@ export namespace InterestRateType {
   export const VARIABLE = "VARIABLE";
   export const FIXED = "FIXED";
 }
+
 export namespace InterestRateSide {
   export const LENDER = "LENDER";
   export const BORROW = "BORROWER";
+}
+
+// They are defined as u32 for use with switch/case
+export namespace ProtocolSideRevenueType {
+  export const STABILITYFEE = 1;
+  export const LIQUIDATION = 2;
+  export const PSM = 3;
 }
 
 //////////////////////////////
