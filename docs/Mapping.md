@@ -137,6 +137,16 @@ Useful links for troubleshooting:
 
 You can avoid re-syncing your subgraph every time by "forking" it from an existing one, which should significantly speed up the iteration time. For more details: https://thegraph.com/docs/en/developer/subgraph-debug-forking/.
 
+### Historical Contract Calls
+
+Making historical contract calls can aide your debugging. You would want to perform this in order to see the response to a contract call at a previous block. On the chain's blockscanner you can make contract calls to the current state of the network, but previous calls will require this method:
+
+- You will need an archival node access to the blockchain you want to query (contact @Vincent for this)
+- You can download and use this script: https://gist.github.com/0xbe1/bb1e4b4e0c3906b4fd119f62084b6749
+- install `web3.js` using `npm`
+- run `npm call_demo.js` in the folder you downloaded the script to
+- If you are struggling here is a video demo: https://youtu.be/-XLFWeOHJgk
+
 ## Known Issues
 
 Here are some known issues with subgraph tooling that you may run into:
