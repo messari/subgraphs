@@ -76,6 +76,7 @@ import {
   updatePriceForMarket,
   updateRevenue,
   updateMarket,
+  snapshotMarket,
 } from "./common/helpers";
 import {
   getOrCreateMarket,
@@ -955,6 +956,7 @@ export function handleJugFileDuty(event: JugNoteEvent): void {
 
     market.rates = [interestRateID];
     market.save();
+    snapshotMarket(event, market);
   }
 }
 

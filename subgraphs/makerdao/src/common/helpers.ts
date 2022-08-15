@@ -231,6 +231,7 @@ export function snapshotMarket(
   marketHourlySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketHourlySnapshot.inputTokenBalance = market.inputTokenBalance;
   marketHourlySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  marketHourlySnapshot.rates = market.rates;
   //marketHourlySnapshot.outputTokenSupply = market.outputTokenSupply;
   //marketHourlySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
 
@@ -249,6 +250,7 @@ export function snapshotMarket(
   marketDailySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketDailySnapshot.inputTokenBalance = market.inputTokenBalance;
   marketDailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  marketDailySnapshot.rates = market.rates;
   //marketDailySnapshot.outputTokenSupply = market.outputTokenSupply;
   //marketDailySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
 
