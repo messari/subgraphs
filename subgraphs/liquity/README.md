@@ -70,7 +70,7 @@ To be added
 
 ### Prepare
 
-`npm run prepare:yaml --TEMPLATE=liquity.template.yaml --PROTOCOL=liquity --NETWORK=mainnet`
+`npm run prepare:yaml --TEMPLATE=liquity.template.yaml --PROTOCOL=liquity --NETWORK=ethereum`
 
 ## Smart Contract Interactions
 
