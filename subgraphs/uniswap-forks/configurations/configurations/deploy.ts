@@ -27,4 +27,5 @@ export namespace Deploy {
   export const HONEYSWAP_GNOSIS = 22;
   export const HONEYSWAP_POLYGON = 23;
   export const MM_FINANCE_CRONOS = 24;
+  export const MM_FINANCE_POLYGON = 25;
 }
