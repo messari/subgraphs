@@ -228,7 +228,6 @@ function closePosition(
   position: Position
 ): void {
   position.blockNumberClosed = event.block.number;
-  position.timestampClosed = event.block.timestamp;
   position.hashClosed = event.transaction.hash.toHexString();
   position.timestampClosed = event.block.timestamp;
   if (position.side == PositionSide.LENDER) {
