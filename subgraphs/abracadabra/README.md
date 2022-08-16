@@ -64,10 +64,15 @@ Amount of MIM tokens minted for each Market
 
 ## Notes
 
-- Market price = `1` / (`exchangeRate` / `1e18`)
-- The v2 markets have an oracle with a function called `peekSpot`. Calling this with "0x0" will return the current spot price.
+- To get price in a vault we can use the following logic.
+  - price = `1` / (`exchangeRate` / `1etoken.decimals`)
+  - Also keeping `LogExchangeRate` in order to serve prices to markets where the above methods don't work.
+- The v2/v3 markets have an oracle with a function called `peekSpot`. Calling this with "0x0" will return the current spot price.
   - We loop through this on every event as a backup to ensure that the market prices are up to date.
 - `stkcvxcrv3crypto-abra` does not have any token decimals, however the prices are based off an 18 decimal point system. To account for this we will override the ERC20 contract call and force the decimals to be 18.
+- According to the Abracadabra team, their analytics page is "out of date" (https://discord.com/channels/847767926286319646/980148053518475274/1009048171785228369)
+- Fees displayed on the analytic page is based off of outstanding loans.
+  - Fees are not realized until a position is closed and `LogAccrue` is emitted with a non 0 value.
 
 ## References and Useful Links
 

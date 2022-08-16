@@ -11,8 +11,8 @@ import {
 } from "../generated/templates/Cauldron/Cauldron";
 import { MarketOracle } from "../generated/templates/Cauldron/MarketOracle";
 import { Deposit, Borrow, Repay, Liquidate, Withdraw } from "../generated/schema";
-import { NEG_INT_ONE, DEFAULT_DECIMALS, ABRA_ACCOUNTS, EventType, BIGDECIMAL_ONE } from "./common/constants";
-import { bigIntToBigDecimal, divBigDecimal } from "./common/utils/numbers";
+import { NEG_INT_ONE, DEFAULT_DECIMALS, ABRA_ACCOUNTS, EventType, BIGINT_ZERO } from "./common/constants";
+import { bigIntToBigDecimal } from "./common/utils/numbers";
 import {
   getOrCreateToken,
   getOrCreateLendingProtocol,
@@ -34,9 +34,8 @@ import {
   updateFinancials,
   updateTotalBorrows,
 } from "./common/metrics";
-import { createMarket, createLiquidateEvent } from "./common/setters";
+import { createMarket, createLiquidateEvent, updateTokenPrice } from "./common/setters";
 import { addAccountToProtocol, getOrCreateAccount, updatePositions } from "./positions";
-import { updateTokenPrice } from "./common/prices/prices";
 
 export function handleLogDeploy(event: LogDeploy): void {
   const account = event.transaction.from.toHex().toLowerCase();
@@ -329,13 +328,8 @@ export function handleLogExchangeRate(event: LogExchangeRate): void {
     return;
   }
   let token = getOrCreateToken(Address.fromString(market.inputToken));
-  let priceUSD = divBigDecimal(BIGDECIMAL_ONE, bigIntToBigDecimal(event.params.rate, token.decimals));
-  let inputTokenBalance = market.inputTokenBalance;
-  let tvlUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
-  market.inputTokenPriceUSD = priceUSD;
-  market.totalValueLockedUSD = tvlUSD;
-  market.save();
-  updateTokenPrice(token.id, priceUSD, event);
+  updateTokenPrice(event.params.rate, token, market, event.block.number);
+  updateTVL(event);
 }
 
 export function handleLogAccrue(event: LogAccrue): void {
@@ -355,6 +349,12 @@ function updateAllTokenPrices(blockNumber: BigInt): void {
       continue;
     }
 
+    // check if price was already updated this block
+    let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+    if (inputToken.lastPriceBlockNumber && inputToken.lastPriceBlockNumber!.ge(blockNumber)) {
+      continue;
+    }
+
     // load PriceOracle contract and get peek (real/current) exchange rate
     if (market.priceOracle === null) {
       log.warning("[updateAllTokenPrices] Market {} has no priceOracle", [market.id]);
@@ -364,22 +364,12 @@ function updateAllTokenPrices(blockNumber: BigInt): void {
 
     // get exchange rate for input token
     let exchangeRateCall = marketPriceOracle.try_peekSpot(Bytes.fromHexString("0x00"));
-    if (exchangeRateCall.reverted) {
+    if (exchangeRateCall.reverted || exchangeRateCall.value == BIGINT_ZERO) {
       log.warning("[updateAllTokenPrices] Market {} priceOracle peekSpot() failed", [market.id]);
       continue;
     }
     let exchangeRate = exchangeRateCall.value;
 
-    // price = 1 / (exchangeRate / 1e18)
-    let priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(exchangeRate, DEFAULT_DECIMALS));
-
-    // update fields with new price
-    market.inputTokenPriceUSD = priceUSD;
-    market.save();
-
-    let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
-    inputToken.lastPriceUSD = priceUSD;
-    inputToken.lastPriceBlockNumber = blockNumber;
-    inputToken.save();
+    updateTokenPrice(exchangeRate, inputToken, market, blockNumber);
   }
 }

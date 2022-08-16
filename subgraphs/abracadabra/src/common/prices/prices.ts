@@ -4,7 +4,7 @@ import { BIGDECIMAL_ONE, CHAINLINK_ORACLE_DECIMALS } from "../constants";
 import { getMIMAddress, getOrCreateToken } from "../getters";
 import { bigIntToBigDecimal } from "../utils/numbers";
 
-export function updateTokenPrice(tokenAddress: string, priceUSD: BigDecimal, event: ethereum.Event): void {
+function updateTokenPrice(tokenAddress: string, priceUSD: BigDecimal, event: ethereum.Event): void {
   let token = getOrCreateToken(Address.fromString(tokenAddress));
   token.lastPriceUSD = priceUSD;
   token.lastPriceBlockNumber = event.block.number;
