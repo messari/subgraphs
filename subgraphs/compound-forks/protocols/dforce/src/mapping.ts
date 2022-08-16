@@ -419,7 +419,7 @@ export function handleUpdateInterest(event: AccrueInterest): void {
     comptrollerAddr,
     event.params.interestAccumulated,
     event.params.totalBorrows,
-    network == Network.MAINNET ? true : false,
+    network.toLowerCase() == Network.MAINNET.toLowerCase() ? true : false,
     event
   );
 }
