@@ -67,6 +67,7 @@ Amount of MIM tokens minted for each Market
 - Based on the version of the vault there are different price logic.
   - For old markets (v1/v2): price = `1` / (`exchangeRate` / `1e18`)
   - For newer markets (v3+): price = (`1` / `exchangeRate`) * 1e`token.decimals`
+  - Also keeping `LogExchangeRate` in order to serve prices to markets where the above methods don't work.
 - The v2/v3 markets have an oracle with a function called `peekSpot`. Calling this with "0x0" will return the current spot price.
   - We loop through this on every event as a backup to ensure that the market prices are up to date.
 - `stkcvxcrv3crypto-abra` does not have any token decimals, however the prices are based off an 18 decimal point system. To account for this we will override the ERC20 contract call and force the decimals to be 18.

@@ -330,20 +330,20 @@ export function handleLogRepay(event: LogRepay): void {
   );
 }
 
-// export function handleLogExchangeRate(event: LogExchangeRate): void {
-//   let market = getMarket(event.address.toHexString());
-//   if (!market) {
-//     return;
-//   }
-//   let token = getOrCreateToken(Address.fromString(market.inputToken));
-//   let priceUSD = divBigDecimal(BIGDECIMAL_ONE, bigIntToBigDecimal(event.params.rate, token.decimals));
-//   let inputTokenBalance = market.inputTokenBalance;
-//   let tvlUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
-//   market.inputTokenPriceUSD = priceUSD;
-//   market.totalValueLockedUSD = tvlUSD;
-//   market.save();
-//   updateTokenPrice(token.id, priceUSD, event);
-// }
+export function handleLogExchangeRate(event: LogExchangeRate): void {
+  let market = getMarket(event.address.toHexString());
+  if (!market) {
+    return;
+  }
+  let token = getOrCreateToken(Address.fromString(market.inputToken));
+  let priceUSD = divBigDecimal(BIGDECIMAL_ONE, bigIntToBigDecimal(event.params.rate, token.decimals));
+  let inputTokenBalance = market.inputTokenBalance;
+  let tvlUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
+  market.inputTokenPriceUSD = priceUSD;
+  market.totalValueLockedUSD = tvlUSD;
+  market.save();
+  updateTokenPrice(token.id, priceUSD, event);
+}
 
 export function handleLogAccrue(event: LogAccrue): void {
   let mimPriceUSD = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).lastPriceUSD;
