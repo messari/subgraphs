@@ -1,5 +1,5 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Market, LiquidateProxy } from "../../generated/schema";
+import { Market, LiquidateProxy, Token } from "../../generated/schema";
 import { Cauldron, LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
 import { getOrCreateInterestRate, getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
 import {
@@ -217,4 +217,19 @@ export function createLiquidateEvent(event: LogRemoveCollateral): void {
   );
   liquidation.amount = event.params.share;
   liquidation.save();
+}
+
+// Update token price using the exchange rate
+// update on the market and token
+export function updateTokenPrice(rate: BigInt, token: Token, market: Market, blockNumber: BigInt): void {
+  let priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(rate, token.decimals));
+
+  // update market
+  market.inputTokenPriceUSD = priceUSD;
+  market.save();
+
+  // update token
+  token.lastPriceUSD = priceUSD;
+  token.lastPriceBlockNumber = blockNumber;
+  token.save();
 }
