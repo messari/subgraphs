@@ -21,6 +21,7 @@ import { TraderJoeAvalancheConfigurations } from "../../protocols/trader-joe/con
 import { TrisolarisAuroraConfigurations } from "../../protocols/trisolaris/config/networks/aurora/aurora";
 import { VSSFinanceCronosConfigurations } from "../../protocols/vvs-finance/config/networks/cronos/cronos";
 import { MMFinanceCronosConfigurations } from "../../protocols/mm-finance/config/networks/cronos/cronos";
+import { MMFinanceMaticConfigurations } from "../../protocols/mm-finance/config/networks/polygon/polygon";
 import { HoneyswapXdaiConfigurations } from "../../protocols/honeyswap/config/networks/gnosis/gnosis";
 import { HoneyswapMaticConfigurations } from "../../protocols/honeyswap/config/networks/polygon/polygon";
 import { Configurations } from "./interface";
@@ -106,6 +107,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.MM_FINANCE_CRONOS: {
       return new MMFinanceCronosConfigurations();
+    }
+    case Deploy.MM_FINANCE_POLYGON: {
+      return new MMFinanceMaticConfigurations();
     }
     default: {
       log.critical(

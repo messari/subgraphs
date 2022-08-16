@@ -782,6 +782,14 @@
           "prepare:constants": false
         }
       },
+      "mm-finance": {
+        "polygon": {
+          "template": "mm.finance.template.yaml",
+          "messari": "messari/mm-finance-polygon",
+          "deploy-on-merge": true,
+          "prepare:constants": false
+        }
+      },
       "quickswap": {
         "polygon": {
           "template": "quickswap.template.yaml",
