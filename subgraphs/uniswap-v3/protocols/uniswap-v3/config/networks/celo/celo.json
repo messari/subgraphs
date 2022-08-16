@@ -1,0 +1,9 @@
+{
+  "network": "celo",
+  "factoryAddress": "0xAfE208a311B21f13EF87E33A90049fC17A7acDEc",
+  "startBlock": 13757683,
+  "deployment": "UNISWAP_V3_CELO",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}
