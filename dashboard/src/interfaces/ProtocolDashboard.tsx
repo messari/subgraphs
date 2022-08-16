@@ -11,7 +11,7 @@ import { useNavigate } from "react-router";
 import { isValidHttpUrl, NewClient } from "../utils";
 import AllDataTabs from "./AllDataTabs";
 import { DashboardHeader } from "../graphs/DashboardHeader";
-import { getPendingSubgraphId } from "../queries/subgraphStatusQuery";
+import { getPendingSubgraphId, nameQuery } from "../queries/subgraphStatusQuery";
 import { getSnapshotDailyVolume } from "../queries/snapshotDailyVolumeQuery";
 import { styled } from "../styled";
 import { poolOverviewTokensQuery } from "../queries/poolOverviewTokensQuery";
@@ -97,6 +97,9 @@ function ProtocolDashboard() {
         id
         network
       }
+      _meta {
+        deployment
+      }
     }
   `;
 
@@ -109,13 +112,26 @@ function ProtocolDashboard() {
 
   // By default, set the schema version to the user selected. If user has not selected, go to the version on the protocol entity
   let schemaVersion = subgraphToQuery.version;
-  if (!schemaVersion && protocolSchemaData?.protocols[0].schemaVersion) {
-    schemaVersion = protocolSchemaData?.protocols[0].schemaVersion;
+  if (!schemaVersion && protocolSchemaData?.protocols[0]?.schemaVersion) {
+    schemaVersion = protocolSchemaData.protocols[0].schemaVersion;
   }
-  const protocolIdString = searchParams.get("protocolId") || protocolSchemaData?.protocols[0].id;
-  const [protocolId, setprotocolId] = useState<string>(protocolIdString);
+  let protocolIdString = searchParams.get("protocolId");
+  let protocolIdToUse: string = "";
+  if (typeof protocolIdString === "string") {
+    protocolIdToUse = protocolIdString;
+  }
+  let protocolType = "N/A";
+  if (protocolSchemaData?.protocols?.length > 0) {
+    protocolType = protocolSchemaData?.protocols[0]?.type;
+    if (protocolSchemaData.protocols[0]?.id && !protocolIdToUse) {
+      protocolIdToUse = protocolSchemaData.protocols[0]?.id;
+    }
+  }
+
+  const [protocolId, setprotocolId] = useState<string>(protocolIdToUse);
 
   // The following section fetches the full data from the subgraph. It routes to query selection and then makes the request
+
   const {
     entitiesData,
     poolData,
@@ -129,7 +145,7 @@ function ProtocolDashboard() {
     poolsQuery,
     poolTimeseriesQuery,
     positionsQuery = "",
-  } = schema(protocolSchemaData?.protocols[0].type, schemaVersion);
+  } = schema(protocolType, schemaVersion);
 
   const queryMain = gql`
     ${graphQuery}
@@ -169,7 +185,7 @@ function ProtocolDashboard() {
       gql`
         ${protocolTableQuery}
       `,
-      { client, variables: { protocolId: protocolIdString } },
+      { client, variables: { protocolId: protocolIdToUse } },
     );
 
   const [
@@ -197,7 +213,7 @@ function ProtocolDashboard() {
   );
 
   const queryPoolOverview = gql`
-    ${poolOverview(protocolSchemaData?.protocols[0].type, schemaVersion)}
+    ${poolOverview(protocolType, schemaVersion)}
   `;
 
   const [
@@ -221,16 +237,6 @@ function ProtocolDashboard() {
     ${poolOverviewTokensQuery(protocolSchemaData?.protocols[0]?.type?.toUpperCase())}
   `;
 
-  const [getPoolOverviewTokens, { data: poolOverviewTokens }] = useLazyQuery(tokenQuery, { client: client });
-
-  const [getPoolOverviewTokens2, { data: poolOverviewTokens2 }] = useLazyQuery(tokenQuery, { client: client });
-
-  const [getPoolOverviewTokens3, { data: poolOverviewTokens3 }] = useLazyQuery(tokenQuery, { client: client });
-
-  const [getPoolOverviewTokens4, { data: poolOverviewTokens4 }] = useLazyQuery(tokenQuery, { client: client });
-
-  const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
-
   const snapshotDailyVolumeQuery = gql`
     ${getSnapshotDailyVolume(schemaVersion)}
   `;
@@ -252,6 +258,21 @@ function ProtocolDashboard() {
   const [getPoolsSnapshotVolume5, { data: snapshotVolume5 }] = useLazyQuery(snapshotDailyVolumeQuery, {
     client: client,
   });
+
+  const [getPoolOverviewTokens, { data: poolOverviewTokens }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens2, { data: poolOverviewTokens2 }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens3, { data: poolOverviewTokens3 }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens4, { data: poolOverviewTokens4 }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
+
+  const [getFailedIndexingStatus, { data: indexingFailureData, error: indexingFailureError }] = useLazyQuery(
+    nameQuery,
+    { variables: { subgraphName }, client: clientIndexing },
+  );
 
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
@@ -325,11 +346,14 @@ function ProtocolDashboard() {
 
   useEffect(() => {
     // If the schema query request was successful, make the full data query
-    if (protocolSchemaData) {
-      getData();
-      getProtocolTableData();
-      getPendingSubgraph();
+    if (protocolSchemaData?.protocols?.length > 0) {
+      if (protocolIdToUse || protocolSchemaData?.protocols[0]?.id) {
+        getData();
+        getProtocolTableData();
+        getPendingSubgraph();
+      }
     }
+    getFailedIndexingStatus();
   }, [protocolSchemaData, getData, getProtocolTableData, getPendingSubgraph]);
 
   useEffect(() => {
@@ -791,10 +815,44 @@ function ProtocolDashboard() {
     );
   }
 
+  let protocolSchemaDataProp = protocolSchemaData;
+  const brokenDownName = subgraphName.split("/")[1].split("-");
+  const network = brokenDownName.pop() || "";
+  if (!protocolSchemaDataProp?.protocols[0]) {
+    protocolSchemaDataProp = {
+      protocols: [
+        {
+          type: "N/A",
+          name: brokenDownName.join(" "),
+          network: network.toUpperCase(),
+          schemaVersion: "N/A",
+          subgraphVersion: "N/A",
+        },
+      ],
+    };
+  }
+
+  const indexingStatusKey = "indexingStatusFor" + (isCurrentVersion ? "CurrentVersion" : "PendingVersion");
+  if (!errorDisplayProps && indexingFailureData) {
+    const errMsg = indexingFailureData[indexingStatusKey]?.fatalError?.message;
+    if (typeof errMsg === "string") {
+      errorDisplayProps = new ApolloError({
+        errorMessage: `SUBGRAPH DATA UNREACHABLE - ${subgraphToQuery.url}. INDEXING ERROR - "${errMsg}".`,
+      });
+    }
+  } else if (indexingFailureData) {
+    const errMsg = indexingFailureData[indexingStatusKey]?.fatalError?.message;
+    if (typeof errMsg === "string") {
+      errorDisplayProps = new ApolloError({
+        errorMessage: `SUBGRAPH DATA UNREACHABLE - ${subgraphToQuery.url}. INDEXING ERROR - "${errMsg}".`,
+      });
+    }
+  }
+
   return (
     <div className="ProtocolDashboard">
       <DashboardHeader
-        protocolData={protocolSchemaData}
+        protocolData={protocolSchemaDataProp}
         protocolId={protocolId}
         subgraphToQueryURL={subgraphToQuery.url}
         schemaVersion={schemaVersion}
