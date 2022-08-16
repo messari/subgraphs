@@ -1,21 +1,11 @@
-import { ethereum, BigInt, log } from "@graphprotocol/graph-ts";
-import {
-  Account,
-  ActiveEventAccount,
-  Borrow,
-  Deposit,
-  Liquidate,
-  Market,
-  Position,
-  PositionSnapshot,
-  Repay,
-  Withdraw,
-} from "../generated/schema";
-import { BIGINT_ONE, BIGINT_ZERO, EventType, InterestRateSide, SECONDS_PER_DAY } from "./common/constants";
+import { ethereum, BigInt, log, Address } from "@graphprotocol/graph-ts";
+import { Account, ActiveEventAccount, Market, Position, PositionSnapshot } from "../generated/schema";
+import { Cauldron } from "../generated/templates/Cauldron/Cauldron";
+import { BIGINT_ZERO, EventType, InterestRateSide, SECONDS_PER_DAY } from "./common/constants";
 import { getMarket, getOrCreateLendingProtocol, getOrCreateUsageMetricsDailySnapshot } from "./common/getters";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "./common/utils/arrays";
 
-export function getOrCreateAccount(accountId: string, event: ethereum.Event): Account {
+export function getOrCreateAccount(accountId: string): Account {
   let account = Account.load(accountId);
   if (!account) {
     account = new Account(accountId);
@@ -50,7 +40,7 @@ export function getOrCreatePosition(
   event: ethereum.Event,
 ): Position {
   let positionIdPrefix = `${accountId}-${marketId}-${side}`;
-  let account = getOrCreateAccount(accountId, event);
+  let account = getOrCreateAccount(accountId);
 
   log.info("[getOrCreatePosition][Hash:{}][Prefix:{}]OpenCount:{}|Pos:{}|ClosedPos:{}|Pos:{}", [
     event.transaction.hash.toHexString(),
@@ -108,7 +98,9 @@ export function getOrCreatePosition(
   position.blockNumberOpened = event.block.number;
   position.timestampOpened = event.block.timestamp;
   position.balance = BIGINT_ZERO;
-  position.isCollateral = market!.canUseAsCollateral;
+  if (position.side == InterestRateSide.LENDER) {
+    position.isCollateral = market!.canUseAsCollateral;
+  }
   position.depositCount = 0;
   position.withdrawCount = 0;
   position.borrowCount = 0;
@@ -137,7 +129,8 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
   if (eventType == EventType.DEPOSIT) {
     if (protocol.depositors.indexOf(account.id) < 0) {
       protocol.depositors = addToArrayAtIndex(protocol.depositors, account.id, 0);
-      protocol.cumulativeUniqueDepositors = protocol.depositors.length;
+      protocol.cumulativeUniqueDepositors += 1;
+      dailySnapshot.cumulativeUniqueDepositors = protocol.cumulativeUniqueDepositors;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
@@ -146,7 +139,8 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
   } else if (eventType == EventType.BORROW) {
     if (protocol.borrowers.indexOf(account.id) < 0) {
       protocol.borrowers = addToArrayAtIndex(protocol.borrowers, account.id, 0);
-      protocol.cumulativeUniqueBorrowers = protocol.borrowers.length;
+      protocol.cumulativeUniqueBorrowers += 1;
+      dailySnapshot.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
@@ -155,7 +149,8 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
   } else if (eventType == EventType.LIQUIDATOR) {
     if (protocol.liquidators.indexOf(account.id) < 0) {
       protocol.liquidators = addToArrayAtIndex(protocol.liquidators, account.id, 0);
-      protocol.cumulativeUniqueLiquidators = protocol.liquidators.length;
+      protocol.cumulativeUniqueLiquidators += 1;
+      dailySnapshot.cumulativeUniqueLiquidators = protocol.cumulativeUniqueLiquidators;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
@@ -165,6 +160,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
     if (protocol.liquidatees.indexOf(account.id) < 0) {
       protocol.liquidatees = addToArrayAtIndex(protocol.liquidatees, account.id, 0);
       protocol.cumulativeUniqueLiquidatees += 1;
+      dailySnapshot.cumulativeUniqueLiquidatees = protocol.cumulativeUniqueLiquidatees;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
@@ -179,15 +175,13 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
 export function updatePositions(
   marketId: string,
   eventType: string,
-  amount: BigInt,
   accountId: string,
   event: ethereum.Event,
-  eventId: string,
   liquidation: boolean = false,
-): void {
+): string {
   let market = getMarket(marketId);
   if (!market) {
-    return;
+    return "";
   }
   let position = getOrCreatePosition(InterestRateSide.LENDER, marketId, accountId, event);
   if ([EventType.BORROW, EventType.REPAY].includes(eventType)) {
@@ -196,30 +190,28 @@ export function updatePositions(
   //  position is the current open position or a newly create open position
 
   let closePositionToggle = false;
-  let account = getOrCreateAccount(accountId, event);
+  let account = getOrCreateAccount(accountId);
 
   if (eventType == EventType.DEPOSIT) {
     addAccountToProtocol(eventType, account, event);
     account.depositCount = account.depositCount + 1;
     position.depositCount = position.depositCount + 1;
-    position.balance = position.balance.plus(amount);
-    let deposit = new Deposit(eventId);
-    deposit.position = position.id;
-    deposit.save();
+    position.balance = getAccountBalance(
+      Address.fromString(marketId),
+      Address.fromString(accountId),
+      InterestRateSide.LENDER,
+    );
   } else if (eventType == EventType.WITHDRAW) {
     account.withdrawCount = account.depositCount + 1;
     position.withdrawCount = position.withdrawCount + 1;
-    position.balance = position.balance.minus(amount);
+    position.balance = getAccountBalance(
+      Address.fromString(marketId),
+      Address.fromString(accountId),
+      InterestRateSide.LENDER,
+    );
     if (liquidation) {
       position.liquidationCount = position.liquidationCount + 1;
-      let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionLogIndex
-        .plus(BIGINT_ONE)
-        .toString()}`;
-      updateLiqudationEvent(liqudationEventId, position.id);
     }
-    let withdraw = new Withdraw(eventId);
-    withdraw.position = position.id;
-    withdraw.save();
     if (position.balance.equals(BIGINT_ZERO)) {
       closePositionToggle = true;
     }
@@ -227,23 +219,22 @@ export function updatePositions(
     addAccountToProtocol(eventType, account, event);
     account.borrowCount = account.borrowCount + 1;
     position.borrowCount = position.borrowCount + 1;
-    position.balance = position.balance.plus(amount);
-    let borrow = new Borrow(eventId);
-    borrow.position = position.id;
-    borrow.save();
+    position.balance = getAccountBalance(
+      Address.fromString(marketId),
+      Address.fromString(accountId),
+      InterestRateSide.BORROW,
+    );
   } else if (eventType == EventType.REPAY) {
     account.repayCount = account.repayCount + 1;
     position.repayCount = position.repayCount + 1;
-    position.balance = position.balance.minus(amount);
+    position.balance = getAccountBalance(
+      Address.fromString(marketId),
+      Address.fromString(accountId),
+      InterestRateSide.BORROW,
+    );
     if (liquidation) {
       position.liquidationCount = position.liquidationCount + 1;
-      let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionLogIndex.toString()}`;
-      updateLiqudationEvent(liqudationEventId, position.id);
     }
-
-    let repay = new Repay(eventId);
-    repay.position = position.id;
-    repay.save();
     if (position.balance.equals(BIGINT_ZERO)) {
       closePositionToggle = true;
     }
@@ -255,6 +246,8 @@ export function updatePositions(
   if (closePositionToggle) {
     closePosition(position, account, market, event);
   }
+
+  return position.id;
 }
 
 export function takePositionSnapshot(position: Position, event: ethereum.Event): void {
@@ -295,8 +288,18 @@ export function closePosition(position: Position, account: Account, market: Mark
   position.save();
 }
 
-function updateLiqudationEvent(liqudationEventId: string, positionId: string): void {
-  let liquidation = new Liquidate(liqudationEventId);
-  liquidation.position = positionId;
-  liquidation.save();
+// grab an individual accounts balances on a market
+function getAccountBalance(marketAddress: Address, accountAddress: Address, positionSide: string): BigInt {
+  let cauldronContract = Cauldron.bind(marketAddress);
+
+  let tryBalance: ethereum.CallResult<BigInt>;
+  if (positionSide == InterestRateSide.BORROW) {
+    // grab an accounts MIM borrow from a given collateral mkt
+    tryBalance = cauldronContract.try_userBorrowPart(accountAddress);
+  } else {
+    // grab an accounts inputTokenBalance
+    tryBalance = cauldronContract.try_userCollateralShare(accountAddress);
+  }
+
+  return tryBalance.reverted ? BIGINT_ZERO : tryBalance.value;
 }

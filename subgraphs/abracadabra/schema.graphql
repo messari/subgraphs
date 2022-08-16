@@ -1,4 +1,4 @@
-# Subgraph Schema: Lending Protocol (Extended)
+# Subgraph Schema: Lending Protocol
 # Version: 2.0.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
@@ -298,20 +298,6 @@ type LendingProtocol implements Protocol @entity {
   " Total number of positions (open and closed) "
   cumulativePositionCount: Int!
 
-  ##### Account / Position Data #####
-
-  " Any account that has made a deposit before "
-  depositors: [Account!]!
-
-  " Any account that has made a borrow before "
-  borrowers: [Account!]!
-
-  " Any account that has made a liquidation before "
-  liquidators: [Account!]!
-
-  " Any account that has been liquidated before "
-  liquidatees: [Account!]!
-
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -328,7 +314,23 @@ type LendingProtocol implements Protocol @entity {
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
 
+  ##### Add ons #####
+
   marketIDList: [String!]!
+
+  ##### Account / Position Data #####
+
+  " Any account that has made a deposit before "
+  depositors: [Account!]!
+
+  " Any account that has made a borrow before "
+  borrowers: [Account!]!
+
+  " Any account that has made a liquidation before "
+  liquidators: [Account!]!
+
+  " Any account that has been liquidated before "
+  liquidatees: [Account!]!
 }
 
 ###############################
@@ -958,7 +960,7 @@ type Position @entity {
   " Side of the position (either lender or borrower) "
   side: PositionSide!
 
-  " Whether this position is being used as a collateral (only applies to LENDER positions) "
+  " Whether this position has been enabled as a collateral (only applies to LENDER positions). For protocols (e.g. MakerDAO) that doesn't require enabling explicitly, this will always be true. "
   isCollateral: Boolean
 
   " Token balance in this position, in native amounts "
@@ -1068,7 +1070,7 @@ type Deposit @entity {
   market: Market!
 
   " The user position changed by this event "
-  position: Position
+  position: Position!
 
   " Token deposited "
   asset: Token!
@@ -1106,7 +1108,7 @@ type Withdraw @entity {
   market: Market!
 
   " The user position changed by this event "
-  position: Position
+  position: Position!
 
   " Token withdrawn "
   asset: Token!
@@ -1149,7 +1151,7 @@ type Borrow @entity {
   market: Market!
 
   " The user position changed by this event "
-  position: Position
+  position: Position!
 
   " Token borrowed "
   asset: Token!
@@ -1188,7 +1190,7 @@ type Repay @entity {
   market: Market!
 
   " The user position changed by this event "
-  position: Position
+  position: Position!
 
   " Token repaid/burned "
   asset: Token!
@@ -1205,43 +1207,43 @@ type Liquidate @entity {
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String
+  hash: String!
 
   " Nonce of the transaction that emitted this event "
-  nonce: BigInt
+  nonce: BigInt!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int
+  logIndex: Int!
 
   " Block number of this event "
-  blockNumber: BigInt
+  blockNumber: BigInt!
 
   " Timestamp of this event "
-  timestamp: BigInt
+  timestamp: BigInt!
 
   " Account that carried out the liquidation "
-  liquidator: Account
+  liquidator: Account!
 
   " Account that got liquidated "
-  liquidatee: Account
+  liquidatee: Account!
 
   " The market of the collateral being used "
-  market: Market
+  market: Market!
 
   " The user position changed by this event "
-  position: Position
+  position: Position!
 
   " Asset repaid (borrowed) "
-  asset: Token
+  asset: Token!
 
   " Amount of collateral liquidated in native units "
-  amount: BigInt
+  amount: BigInt!
 
   " Amount of collateral liquidated in USD "
-  amountUSD: BigDecimal
+  amountUSD: BigDecimal!
 
   " Amount of profit from liquidation in USD "
-  profitUSD: BigDecimal
+  profitUSD: BigDecimal!
 }
 
 # Helper entity for calculating daily/hourly active users
