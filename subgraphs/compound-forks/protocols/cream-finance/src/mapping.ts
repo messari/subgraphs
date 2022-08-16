@@ -85,7 +85,10 @@ export function handleMarketListed(event: MarketListed): void {
   let cTokenAddr = event.params.cToken;
   // cream finance emits a MarketListed event that lists an invalid CToken
   // hardcode to skip it otherwise it messes up ETH token
-  if (cTokenAddr == Address.fromString("0xbdf447b39d152d6a234b4c02772b8ab5d1783f72")) {
+  if (
+    cTokenAddr ==
+    Address.fromString("0xbdf447b39d152d6a234b4c02772b8ab5d1783f72")
+  ) {
     return;
   }
   let cToken = Token.load(cTokenAddr.toHexString());

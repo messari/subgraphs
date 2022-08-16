@@ -392,6 +392,19 @@ export function _handleMint(
   account.save();
 
   //
+  // track unique depositors
+  //
+  let depositorActorID = "depositor".concat("-").concat(account.id);
+  let depositorActor = _ActorAccount.load(depositorActorID);
+  if (!depositorActor) {
+    depositorActor = new _ActorAccount(depositorActorID);
+    depositorActor.save();
+
+    protocol.cumulativeUniqueDepositors += 1;
+    protocol.save();
+  }
+
+  //
   // update position
   //
   let positionID = addPosition(
@@ -589,6 +602,22 @@ export function _handleBorrow(
   account.borrowCount += 1;
   account.save();
 
+  //
+  // track unique borrowers
+  //
+  let borrowerActorID = "borrower".concat("-").concat(account.id);
+  let borrowerActor = _ActorAccount.load(borrowerActorID);
+  if (!borrowerActor) {
+    borrowerActor = new _ActorAccount(borrowerActorID);
+    borrowerActor.save();
+
+    protocol.cumulativeUniqueBorrowers += 1;
+    protocol.save();
+  }
+
+  //
+  // update position
+  //
   let positionID = addPosition(
     protocol,
     market,
@@ -1985,27 +2014,7 @@ function addPosition(
     //
     protocol.cumulativePositionCount += 1;
     protocol.openPositionCount += 1;
-    if (eventType == EventType.Deposit) {
-      let depositorActorID = "depositor".concat("-").concat(account.id);
-      let depositorActor = _ActorAccount.load(depositorActorID);
-      if (!depositorActor) {
-        depositorActor = new _ActorAccount(depositorActorID);
-        depositorActor.save();
-
-        protocol.cumulativeUniqueDepositors += 1;
-        protocol.save();
-      }
-    } else if (eventType == EventType.Borrow) {
-      let borrowerActorID = "borrower".concat("-").concat(account.id);
-      let borrowerActor = _ActorAccount.load(borrowerActorID);
-      if (!borrowerActor) {
-        borrowerActor = new _ActorAccount(borrowerActorID);
-        borrowerActor.save();
-
-        protocol.cumulativeUniqueBorrowers += 1;
-        protocol.save();
-      }
-    }
+    protocol.save();
   }
 
   //

@@ -255,7 +255,7 @@
           "template": "compound-v2.template.yaml",
           "messari": "messari/compound-ethereum",
           "dmelotik": "dmelotik/compound-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "cream-finance": {
