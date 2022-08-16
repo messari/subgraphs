@@ -7,10 +7,10 @@ import {
     Withdraw,
 } from "../../../../generated/schema";
 import { BIGDECIMAL_ONE, BIGINT_ZERO } from "../../../../src/utils/constants";
-import { PositionSide } from "../utils/constants";
-import { getOrCreateAccount } from "./account";
+import { fetchPriceSimpleOracle, PositionSide } from "../utils/constants";
+import { getOrCreateAccount, incrementAccountDepositCount, incrementAccountWithdrawCount } from "./account";
 import { Vault as VaultContract } from "../../../../generated/FairLaunch/Vault";
-
+import { bigIntToBigDecimal } from "../../../../src/utils/numbers";
 // import {
 //     getOrCreateAccount,
 //     incrementAccountBorrowCount,
@@ -27,7 +27,7 @@ import {
     getMarket,
     updateInputTokenBalance,
 } from "./market";
-import { checkIfPositionClosed, getOrCreateUserPosition, updateUserLenderPosition } from "./position";
+import { checkIfPositionClosed, getOrCreateUserPosition, incrementPositionDepositCount, incrementPositionWithdrawCount, updateUserLenderPosition } from "./position";
 // import {
 //     checkIfPositionClosed,
 //     getOrCreateUserPosition,
@@ -39,6 +39,7 @@ import { checkIfPositionClosed, getOrCreateUserPosition, updateUserLenderPositio
 // } from "./position";
 // import { amountInUSD } from "./price";
 import { getOrCreateToken } from "./token";
+import { incrementProtocolDepositCount, incrementProtocolWithdrawCount } from "./usage";
 // import {
 //     incrementProtocolBorrowCount,
 //     incrementProtocolDepositCount,
@@ -71,6 +72,7 @@ export function createDeposit(
     const deposit = new Deposit(
         `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
     );
+    const amountInUSD = bigIntToBigDecimal(fetchPriceSimpleOracle(inputToken).times(amount));
     deposit.hash = event.transaction.hash.toHexString();
     deposit.nonce = event.transaction.nonce;
     deposit.logIndex = event.logIndex.toI32();
@@ -81,15 +83,15 @@ export function createDeposit(
     deposit.position = position.id;
     deposit.asset = asset.id;
     deposit.amount = amount;
-    deposit.amountUSD = BIGDECIMAL_ONE;
+    deposit.amountUSD = amountInUSD;
     deposit.save();
     // updateUsageMetrics(event, event.transaction.from);
     market = updateInputTokenBalance(market, vaultInstance);
     addMarketDepositVolume(event, market, deposit.amountUSD);
     updateUserLenderPosition(event, user, market, position.balance.plus(deposit.amount))
-    // incrementProtocolDepositCount(event, account);
-    // incrementAccountDepositCount(account);
-    // incrementPositionDepositCount(position);
+    incrementProtocolDepositCount(event, account);
+    incrementAccountDepositCount(account);
+    incrementPositionDepositCount(position);
     return deposit;
 }
 
@@ -101,11 +103,11 @@ export function createWithdraw(
     amount: BigInt,
     vaultInstance: VaultContract
 ): Withdraw {
-    log.info('enter withdraw creation function', [])
+    log.info('enter withdraw creation function ' + amount.toString(), [])
 
     let market = createMarket(event, poolAddress, inputToken);
     const account = getOrCreateAccount(user);
-    const position = getOrCreateUserPosition(
+    let position = getOrCreateUserPosition(
         event,
         account,
         market,
@@ -115,6 +117,7 @@ export function createWithdraw(
     const withdraw = new Withdraw(
         `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
     );
+    const amountInUSD = bigIntToBigDecimal(fetchPriceSimpleOracle(inputToken).times(amount));
     withdraw.hash = event.transaction.hash.toHexString();
     withdraw.nonce = event.transaction.nonce;
     withdraw.logIndex = event.logIndex.toI32();
@@ -125,16 +128,16 @@ export function createWithdraw(
     withdraw.position = position.id;
     withdraw.asset = asset.id;
     withdraw.amount = amount;
-    withdraw.amountUSD = BIGDECIMAL_ONE;
+    withdraw.amountUSD = amountInUSD;
     withdraw.save();
     // updateUsageMetrics(event, user);
     market = updateInputTokenBalance(market, vaultInstance);
     addMarketWithdrawVolume(event, market, withdraw.amountUSD);
-    updateUserLenderPosition(event, user, market, position.balance.minus(withdraw.amount))
+    position = updateUserLenderPosition(event, user, market, position.balance.minus(withdraw.amount))
 
-    // incrementProtocolWithdrawCount(event);
-    // incrementAccountWithdrawCount(account);
-    // incrementPositionWithdrawCount(position);
+    incrementProtocolWithdrawCount(event);
+    incrementAccountWithdrawCount(account);
+    incrementPositionWithdrawCount(position);
     checkIfPositionClosed(event, account, market, position);
     return withdraw;
 }

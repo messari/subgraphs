@@ -17,15 +17,34 @@ import {
     openMarketLenderPosition,
 } from "./market";
 
-export function getUserPosition(
+export function getUserPositionIncrementId(
     account: Account,
     market: Market,
     positionSide: string
-): Position | null {
+): string {
     // NEEDS LOGIC TO ADD A NUMBER TO POSITIONS, IF ACCOUNT REOPENING A CLOSED POSITION, NEED TO INCREMENT NUMBER
     const positionId = `${account.id}-${market.id}-${positionSide}`;
-    const position = Position.load(positionId);
-    return position
+    let counter = 1;
+    let position = Position.load(positionId + '-' + counter.toString());
+    if (position === null) {
+        return positionId + '-' + counter.toString();
+    }
+    let lastPosition = position;
+    while (position !== null) {
+        lastPosition = position;
+        counter = counter + 1;
+        position = Position.load(positionId + '-' + counter.toString());
+    }
+    const blockNumberClosed = lastPosition.blockNumberClosed;
+    if (blockNumberClosed) {
+        if (blockNumberClosed.gt(BIGINT_ZERO)) {
+            return positionId + '-' + counter.toString();
+        }
+    }
+
+    return lastPosition.id
+
+
     // const openPositions = account.positions;
     // if (!openPositions) {
     //     return null;
@@ -44,7 +63,8 @@ export function getOrCreateUserPosition(
     market: Market,
     positionSide: string
 ): Position {
-    let position = getUserPosition(account, market, positionSide);
+    const positionId = getUserPositionIncrementId(account, market, positionSide);
+    let position = Position.load(positionId);
     if (position != null) {
         return position;
     }
@@ -53,7 +73,6 @@ export function getOrCreateUserPosition(
     } else {
         openMarketBorrowerPosition(market);
     }
-    const positionId = `${account.id}-${market.id}-${positionSide}`;
     position = new Position(positionId);
     position.account = account.id;
     position.market = market.id;
@@ -106,7 +125,7 @@ export function updateUserLenderPosition(
     user: Address,
     market: Market,
     newTotalBalance: BigInt
-): void {
+): Position {
     const account = getOrCreateAccount(user);
     const position = getOrCreateUserPosition(
         event,
@@ -120,6 +139,7 @@ export function updateUserLenderPosition(
     }
     position.save();
     getOrCreatePositionSnapshot(event, position);
+    return position;
 }
 
 // export function updateUserVariableBorrowerPosition(

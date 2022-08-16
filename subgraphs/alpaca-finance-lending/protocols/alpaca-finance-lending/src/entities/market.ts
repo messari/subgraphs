@@ -35,6 +35,7 @@ import {
     updateProtocolTVL,
 } from "./protocol";
 import { bigIntToBigDecimal } from "../../../../src/utils/numbers";
+import { incrementProtocolTotalPoolCount } from "./usage";
 
 export function getMarket(address: Address): Market | null {
     const id = address.toHexString();
@@ -90,7 +91,7 @@ export function createMarket(
         market.lendingPositionCount = INT_ZERO;
         market.borrowingPositionCount = INT_ZERO;
         market.save();
-        // incrementProtocolTotalPoolCount(event);
+        incrementProtocolTotalPoolCount(event);
     }
     return market;
 }

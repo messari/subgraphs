@@ -4,9 +4,9 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_NAME = "Aave V3";
-export const PROTOCOL_SLUG = "aave-v3";
-export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_NAME = "Alpaca Finance Lending";
+export const PROTOCOL_SLUG = "alpaca-finance-lending";
+export const PROTOCOL_SCHEMA_VERSION = "2.0.1";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.0.1";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
@@ -93,18 +93,12 @@ export namespace UsageType {
 }
 
 //////////////////////////////
-///// Ethereum Addresses /////
+///// BSC Addresses /////
 //////////////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
-
-export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
-
-export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
-export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // created block 10042267
-export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // created block 10093341
+export const SIMPLE_ORACLE_ADDRESS = "0x166f56F2EDa9817cAB77118AE4FCAA0002A17eC7";
+export const USDC_ADDRESS = "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d";
 
 ////////////////////////
 ///// Type Helpers /////
@@ -112,8 +106,8 @@ export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // c
 
 export const DEFAULT_DECIMALS = 18;
 
-export const USDC_DECIMALS = 6;
-export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
+export const USDC_DECIMALS = 18;
+export const USDC_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
@@ -159,8 +153,8 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 ///// Misc /////
 ////////////////
 
-export const ETH_SYMBOL = "ETH";
-export const ETH_NAME = "Ether";
+export const BSC_SYMBOL = "BSC";
+export const BSC_NAME = "BSC";
 
 /////////////////////////////
 ///// Protocol Specific /////
