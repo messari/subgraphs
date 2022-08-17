@@ -259,8 +259,11 @@ export function _handleReserveFactorChanged(
 
 export function _handleReserveUsedAsCollateralEnabled(
   marketId: Address,
-  accountID: Address
+  accountID: Address,
+  protocolData: ProtocolData
 ): void {
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
   let market = Market.load(marketId.toHexString());
   if (!market) {
     log.warning("[ReserveUsedAsCollateralEnabled] Market not found: {}", [
@@ -272,10 +275,11 @@ export function _handleReserveUsedAsCollateralEnabled(
   // grab account
   let account = Account.load(accountID.toHexString());
   if (!account) {
-    log.warning("[ReserveUsedAsCollateralEnabled] Account not found: {}", [
-      accountID.toHexString(),
-    ]);
-    return;
+    account = createAccount(accountID.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
   }
   let markets = account.enabledCollaterals;
   markets.push(market.id);

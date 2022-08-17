@@ -7,35 +7,35 @@
           "steegecs": "steegecs/abracadabra-money-arbitrum",
           "messari": "messari/abracadabra-money-arbitrum",
           "dmelotik": "dmelotik/abracadabra-arbitrum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "avalanche": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-avalanche",
           "messari": "messari/abracadabra-money-avalanche",
           "dmelotik": "dmelotik/abracadabra-avalanche",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "bsc": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-bsc",
           "messari": "messari/abracadabra-money-bsc",
           "dmelotik": "dmelotik/abracadabra-bsc",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "fantom": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-fantom",
           "messari": "messari/abracadabra-money-fantom",
           "dmelotik": "dmelotik/abracadabra-fantom",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "ethereum": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-ethereum",
           "messari": "messari/abracadabra-money-ethereum",
           "dmelotik": "dmelotik/abracadabra-ethereum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -45,37 +45,37 @@
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-arc-ethereum",
           "dmelotik": "dmelotik/aave-v2-arc",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "avalanche": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-avalanche",
           "dmelotik": "dmelotik/aave-v2-avalanche",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum-amm": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-amm-ethereum",
           "dmelotik": "dmelotik/aave-v2-ethereum-amm",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "polygon": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-v2-polygon",
           "dmelotik": "dmelotik/aave-v2-polygon",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum-rwa": {
           "template": "aave.v2.template.yaml",
           "messari": "messari/aave-rwa-ethereum",
           "dmelotik": "dmelotik/aave-v2-rwa",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "geist-finance": {
@@ -83,7 +83,7 @@
           "template": "geist.finance.template.yaml",
           "messari": "messari/geist-finance-fantom",
           "dmelotik": "dmelotik/geist-fantom",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -275,7 +275,7 @@
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-ethereum",
           "dmelotik": "dmelotik/cream-finance-ethereum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "polygon": {
           "template": "cream-finance.template.yaml",
@@ -389,7 +389,7 @@
           "template": "venus.template.yaml",
           "messari": "messari/venus-protocol-bsc",
           "dmelotik": "dmelotik/venus",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -438,7 +438,7 @@
         "ethereum": {
           "template": "erc721.holders.template.yaml",
           "messari": "messari/erc721-holders",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -447,7 +447,7 @@
         "ethereum": {
           "template": "erc721.metadata.template.yaml",
           "messari": "messari/erc721-metadata",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -641,7 +641,7 @@
       "makerdao": {
         "ethereum": {
           "template": "makerdao.template.yaml",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -786,7 +786,7 @@
         "polygon": {
           "template": "mm.finance.template.yaml",
           "messari": "messari/mm-finance-polygon",
-          "deploy-on-merge": true,
+          "deploy-on-merge": false,
           "prepare:constants": false
         }
       },
