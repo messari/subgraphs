@@ -1074,14 +1074,22 @@ export function handleCreateProxy(event: Created): void {
   _proxy.save();
 }
 
-export function handleSwapFee(event: ethereum.Event): void {
-  // use generic ethereum.Event so we don't need separate handlers for BuyGem and SellGem event
-  let SwapEvent = event as BuyGem; // or SellGem, doesn't matter for our purpose
+export function handleBuyGem(event: BuyGem): void {
+  let fee = event.params.fee;
+  let feeUSD = bigIntToBDUseDecimals(fee, WAD);
+  _handleSwapFee(event, feeUSD);
+}
+
+export function handleSellGem(event: SellGem): void {
+  let fee = event.params.fee;
+  let feeUSD = bigIntToBDUseDecimals(fee, WAD);
+  _handleSwapFee(event, feeUSD);
+}
+
+function _handleSwapFee(event: ethereum.Event, feeUSD: BigDecimal): void {
   let contract = PSM.bind(event.address);
   let ilk = contract.ilk();
   let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
-  let fee = SwapEvent.params.fee;
-  let feeUSD = bigIntToBDUseDecimals(fee, WAD);
   log.info("[handleSwapFee]Swap fee revenue {} collected from market {}", [feeUSD.toString(), marketID]);
   updateRevenue(event, marketID, feeUSD, BIGDECIMAL_ZERO, ProtocolSideRevenueType.PSM);
 }

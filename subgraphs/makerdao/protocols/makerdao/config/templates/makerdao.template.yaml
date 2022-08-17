@@ -1,6 +1,11 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+features:
+  - grafting
+graft:
+  base: QmVQ7nvuPpm9kes668e31DogbGoPjwgSb9Yo2RnBkf5ytv
+  block: 11550320
 dataSources:
   # Vault
   - name: Vat
