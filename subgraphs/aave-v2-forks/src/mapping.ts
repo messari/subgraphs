@@ -298,6 +298,8 @@ export function _handleReserveUsedAsCollateralDisabled(
   // grab account
   let account = Account.load(accountID.toHexString());
   if (!account) {
+    createAccount(accountID.toHexString());
+    
     log.warning("[ReserveUsedAsCollateralEnabled] Account not found: {}", [
       accountID.toHexString(),
     ]);
