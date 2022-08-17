@@ -6,6 +6,7 @@ import {
   ADMIN_FEE,
   BIGDECIMAL_ONE_HUNDRED,
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   FEE_DENOMINATOR_DECIMALS,
   LiquidityPoolFeeType,
   POOL_FEE,
@@ -15,25 +16,35 @@ import { getPlatform } from "../services/platform";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { StableSwap } from "../../generated/Factory/StableSwap";
 
+
+function initBalancesList(pool: LiquidityPool): BigInt[] {
+  let inputTokensBalances: BigInt[] = [];
+  for (let i = 0; i < pool.inputTokens.length; i++) {
+    inputTokensBalances.push(BIGINT_ZERO)
+  }
+  return inputTokensBalances;
+}
+
 export function setPoolBalances(pool: LiquidityPool): void {
   let poolContract = StableSwap.bind(Address.fromString(pool.id));
-  let inputTokens = pool.inputTokens;
-  let inputTokensBalances: BigInt[] = [];
+  let inputTokensBalances = initBalancesList(pool);
   let balanceCall = poolContract.try_balances(BigInt.fromI32(0));
   if (balanceCall.reverted) {
-    for (let i = 0; i < inputTokens.length; ++i) {
-      let token = inputTokens[i];
-
+    for (let i = 0; i < pool.inputTokens.length; ++i) {
+      let token = pool.inputTokens[i];
       let balanceCall = ERC20.bind(Address.fromString(token)).try_balanceOf(Address.fromString(pool.id));
       if (!balanceCall.reverted) {
         inputTokensBalances.push(balanceCall.value);
       }
     }
   } else {
-    for (let i = 0; i < inputTokens.length; ++i) {
+    let coins = pool.coins;
+    for (let i = 0; i < coins.length; ++i) {
+      let coin = coins[i];
+      let inputTokenIndex = pool.inputTokens.indexOf(coin);
       balanceCall = poolContract.try_balances(BigInt.fromI32(i));
       if (!balanceCall.reverted) {
-        inputTokensBalances.push(balanceCall.value);
+        inputTokensBalances[inputTokenIndex] = balanceCall.value;
       }
     }
     pool.inputTokenBalances = inputTokensBalances;
@@ -128,10 +139,10 @@ export function setPoolTokenWeights(liquidityPool: LiquidityPool, timestamp: Big
 
 export function setPoolTVL(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
+  const priceUSD = getPoolAssetPrice(pool, timestamp);
   for (let j = 0; j < pool.inputTokens.length; j++) {
     let balance = pool.inputTokenBalances[j];
     let token = getOrCreateToken(Address.fromString(pool.inputTokens[j]));
-    const priceUSD = getPoolAssetPrice(pool, timestamp);
     totalValueLockedUSD = totalValueLockedUSD.plus(bigIntToBigDecimal(balance, token.decimals).times(priceUSD));
   }
   pool.totalValueLockedUSD = totalValueLockedUSD;

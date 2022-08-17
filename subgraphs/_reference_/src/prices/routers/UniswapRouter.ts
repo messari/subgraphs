@@ -38,31 +38,38 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
   let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
   let wethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("WETH")!;
 
-  // Convert ETH address to WETH
-  if (token0Address == ethAddress) {
-    token0Address = wethAddress;
-  }
-  if (token1Address == ethAddress) {
-    token1Address = wethAddress;
-  }
-
+  // Construct swap path
   let path: Address[] = [];
   let numberOfJumps: BigInt;
-  let inputTokenIsWeth: bool = token0Address == wethAddress || token1Address == wethAddress;
-
-  if (inputTokenIsWeth) {
-    // Path = [token0, weth] or [weth, token1]
-    numberOfJumps = BigInt.fromI32(1);
-
-    path.push(token0Address);
-    path.push(token1Address);
+  let pathOverride = constants.UNISWAP_PATH_OVERRIDES.get(network)!.get(token0Address)
+  if (pathOverride) {
+    path = pathOverride
+    numberOfJumps = BigInt.fromI32(path.length - 1)
   } else {
-    // Path = [token0, weth, token1]
-    numberOfJumps = BigInt.fromI32(2);
+    // Convert ETH address to WETH
+    if (token0Address == ethAddress) {
+      token0Address = wethAddress;
+    }
+    if (token1Address == ethAddress) {
+      token1Address = wethAddress;
+    }
 
-    path.push(token0Address);
-    path.push(wethAddress);
-    path.push(token1Address);
+    let inputTokenIsWeth: bool = token0Address == wethAddress || token1Address == wethAddress;
+
+    if (inputTokenIsWeth) {
+      // Path = [token0, weth] or [weth, token1]
+      numberOfJumps = BigInt.fromI32(1);
+
+      path.push(token0Address);
+      path.push(token1Address);
+    } else {
+      // Path = [token0, weth, token1]
+      numberOfJumps = BigInt.fromI32(2);
+
+      path.push(token0Address);
+      path.push(wethAddress);
+      path.push(token1Address);
+    }
   }
 
   let token0Decimals = utils.getTokenDecimals(token0Address);

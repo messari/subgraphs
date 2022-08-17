@@ -71,7 +71,9 @@ export function handleReward(
   ];
 
   // Update staked amounts
-  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
+  pool.stakedOutputTokenAmount = !pool.stakedOutputTokenAmount
+    ? amount
+    : pool.stakedOutputTokenAmount!.plus(amount);
 
   // Return if you have calculated rewards recently - Performance Boost
   if (

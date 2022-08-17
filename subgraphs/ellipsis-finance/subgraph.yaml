@@ -49,6 +49,50 @@ dataSources:
       file: ./src/mappings/factory.ts
 
   - kind: ethereum
+    name: Registry
+    network: bsc
+    source:
+      address: "0x266Bb386252347b03C7B6eB37F950f476D7c3E63"
+      abi: Registry
+      startBlock: 17209000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Registry
+          file: ./abis/Registry.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: BasePool2
+          file: ./abis/BasePool2.json
+        - name: BasePool3
+          file: ./abis/BasePool3.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: PancakeFactory
+          file: ./abis/PancakeFactory.json
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: LpStaking
+          file: ./abis/staking/LpStaking.json
+        - name: LpStakingV2
+          file: ./abis/staking/LpStakingV2.json
+      eventHandlers:
+        - event: PoolAdded(indexed address)
+          handler: handlePoolAdded
+      file: ./src/mappings/registry.ts
+
+  - kind: ethereum
     name: LpStaking
     network: bsc
     source:

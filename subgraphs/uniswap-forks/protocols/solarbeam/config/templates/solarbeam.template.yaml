@@ -34,7 +34,7 @@ dataSources:
     network: {{network}}
     source:
       address: "{{MasterChefAddress}}"
-      abi: MasterChefSolarbeam
+      abi: SolarDistributorV2
       startBlock: {{MasterChefStartBlock}}
     mapping:
       kind: ethereum/events
@@ -42,8 +42,8 @@ dataSources:
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: MasterChefSolarbeam
-          file: ./abis/solarbeam/MasterChefSolarbeam.json
+        - name: SolarDistributorV2
+          file: ./abis/solarbeam/SolarDistributorV2.json
         - name: TokenABI
           file: ./abis/solarbeam/ERC20.json
       eventHandlers:

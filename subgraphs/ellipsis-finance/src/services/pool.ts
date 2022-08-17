@@ -35,6 +35,9 @@ export function createNewPool(
   platform.save();
   const pool = new LiquidityPool(poolAddress.toHexString());
   const stableSwap = StableSwap.bind(poolAddress);
+  const tokens = coins.length > 0 ? coins : getPoolCoins(pool);
+  const sortedTokens = tokens.sort();
+  log.error('createNewPool tokens {}, sorted tokens {}', [tokens.toString(),sortedTokens.toString()]);
   pool.name = name;
   pool.platform = platform.id;
   pool.outputToken = getOrCreateToken(lpToken).id;
@@ -44,8 +47,8 @@ export function createNewPool(
   pool.createdTimestamp = timestamp;
   pool.basePool = basePool.toHexString();
   pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool, timestamp);
-  pool.inputTokens = coins.length > 0 ? coins.sort() : getPoolCoins(pool).sort();
-  pool.coins = coins.length > 0 ? coins.sort() : getPoolCoins(pool).sort();
+  pool.coins = tokens;
+  pool.inputTokens = sortedTokens;
   pool.underlyingTokens = getUnderlyingTokens(pool);
   pool.poolType = poolType;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
@@ -55,7 +58,7 @@ export function createNewPool(
   setPoolOutputTokenSupply(pool);
   pool.save();
   setProtocolTVL();
-  setLpTokenPool(lpToken,poolAddress)
+  setLpTokenPool(lpToken,poolAddress);
   return pool;
 }
 

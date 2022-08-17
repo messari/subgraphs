@@ -1,4 +1,4 @@
-import { Address, dataSource, log } from "@graphprotocol/graph-ts";
+import { Address, Bytes, dataSource, log, BigInt } from "@graphprotocol/graph-ts";
 import { DegenBox, LogDeploy } from "../generated/BentoBox/DegenBox";
 import {
   LogAddCollateral,
@@ -6,12 +6,20 @@ import {
   LogRemoveCollateral,
   LogRepay,
   Cauldron,
-  LogExchangeRate,
   LogAccrue,
+  LogExchangeRate,
 } from "../generated/templates/Cauldron/Cauldron";
+import { MarketOracle } from "../generated/templates/Cauldron/MarketOracle";
 import { Deposit, Borrow, Repay, Liquidate, Withdraw } from "../generated/schema";
-import { NEG_INT_ONE, DEFAULT_DECIMALS, BIGDECIMAL_ONE, ABRA_ACCOUNTS, EventType } from "./common/constants";
-import { bigIntToBigDecimal, divBigDecimal } from "./common/utils/numbers";
+import {
+  NEG_INT_ONE,
+  DEFAULT_DECIMALS,
+  ABRA_ACCOUNTS,
+  EventType,
+  BIGINT_ZERO,
+  InterestRateSide,
+} from "./common/constants";
+import { bigIntToBigDecimal } from "./common/utils/numbers";
 import {
   getOrCreateToken,
   getOrCreateLendingProtocol,
@@ -25,7 +33,6 @@ import {
   getOrCreateFinancials,
 } from "./common/getters";
 import { Cauldron as CauldronDataSource } from "../generated/templates";
-import { updateTokenPrice } from "./common/prices/prices";
 import {
   updateUsageMetrics,
   updateTVL,
@@ -34,8 +41,8 @@ import {
   updateFinancials,
   updateTotalBorrows,
 } from "./common/metrics";
-import { createMarket, createLiquidateEvent } from "./common/setters";
-import { addAccountToProtocol, getOrCreateAccount, updatePositions } from "./positions";
+import { createMarket, createLiquidateEvent, updateTokenPrice } from "./common/setters";
+import { addAccountToProtocol, getOrCreateAccount, getOrCreatePosition, updatePositions } from "./positions";
 
 export function handleLogDeploy(event: LogDeploy): void {
   const account = event.transaction.from.toHex().toLowerCase();
@@ -51,6 +58,10 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   if (!market) {
     return;
   }
+
+  // update market prices
+  updateAllTokenPrices(event.block.number);
+
   let CauldronContract = Cauldron.bind(event.address);
   let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
   let tokenPriceUSD = collateralToken.lastPriceUSD;
@@ -73,13 +84,13 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
     false,
   );
   depositEvent.amountUSD = amountUSD;
+  depositEvent.position = updatePositions(market.id, EventType.DEPOSIT, depositEvent.account, event);
   depositEvent.save();
 
   updateMarketStats(market.id, EventType.DEPOSIT, collateralToken.id, event.params.share, event);
   updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
-  updatePositions(market.id, EventType.DEPOSIT, event.params.share, depositEvent.account, event, depositEvent.id);
 }
 
 export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
@@ -93,6 +104,10 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   if (!market) {
     return;
   }
+
+  // update market prices
+  updateAllTokenPrices(event.block.number);
+
   let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
   let CauldronContract = Cauldron.bind(event.address);
   let tokenPriceUSD = collateralToken.lastPriceUSD;
@@ -113,20 +128,19 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
     false,
   );
   withdrawalEvent.amountUSD = amountUSD;
+  withdrawalEvent.position = updatePositions(
+    market.id,
+    EventType.WITHDRAW,
+    withdrawalEvent.account,
+    event,
+    liquidation,
+  );
   withdrawalEvent.save();
+
   updateMarketStats(market.id, EventType.WITHDRAW, collateralToken.id, event.params.share, event);
   updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
-  updatePositions(
-    market.id,
-    EventType.WITHDRAW,
-    event.params.share,
-    withdrawalEvent.account,
-    event,
-    withdrawalEvent.id,
-    liquidation,
-  );
 }
 
 export function handleLogBorrow(event: LogBorrow): void {
@@ -135,6 +149,10 @@ export function handleLogBorrow(event: LogBorrow): void {
   if (!market) {
     return;
   }
+
+  // update market prices
+  updateAllTokenPrices(event.block.number);
+
   let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
   let mimPriceUSD = mimToken.lastPriceUSD;
   let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD!);
@@ -150,13 +168,13 @@ export function handleLogBorrow(event: LogBorrow): void {
   borrowEvent.asset = mimToken.id;
   borrowEvent.amount = event.params.amount;
   borrowEvent.amountUSD = amountUSD;
+  borrowEvent.position = updatePositions(market.id, EventType.BORROW, borrowEvent.account, event);
   borrowEvent.save();
 
   updateTotalBorrows(event);
   updateMarketStats(market.id, EventType.BORROW, getMIMAddress(dataSource.network()), event.params.amount, event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
-  updatePositions(market.id, EventType.BORROW, event.params.amount, borrowEvent.account, event, borrowEvent.id);
 }
 
 // Liquidation steps
@@ -190,6 +208,10 @@ export function handleLiquidation(event: LogRepay): void {
   if (!marketHourlySnapshot || !marketDailySnapshot) {
     return;
   }
+
+  // update market prices
+  updateAllTokenPrices(event.block.number);
+
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
   let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
@@ -197,7 +219,7 @@ export function handleLiquidation(event: LogRepay): void {
   let tokenPriceUSD = collateralToken.lastPriceUSD;
   let collateralAmount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
     Address.fromString(collateralToken.id),
-    liquidateEvent.amount!,
+    liquidateEvent.amount,
     false,
   );
   let collateralAmountUSD = bigIntToBigDecimal(collateralAmount, collateralToken.decimals).times(tokenPriceUSD!);
@@ -217,14 +239,20 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.amount = collateralAmount;
   liquidateEvent.amountUSD = collateralAmountUSD;
   liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
+  liquidateEvent.position = getOrCreatePosition(
+    InterestRateSide.BORROW,
+    market.id,
+    event.params.to.toHexString(),
+    event,
+  ).id;
   liquidateEvent.save();
 
-  let liqudidatedAccount = getOrCreateAccount(liquidateEvent.liquidatee!, event);
+  let liqudidatedAccount = getOrCreateAccount(liquidateEvent.liquidatee);
   liqudidatedAccount.liquidateCount = liqudidatedAccount.liquidateCount + 1;
   liqudidatedAccount.save();
   addAccountToProtocol(EventType.LIQUIDATEE, liqudidatedAccount, event);
 
-  let liquidatorAccount = getOrCreateAccount(liquidateEvent.liquidator!, event);
+  let liquidatorAccount = getOrCreateAccount(liquidateEvent.liquidator);
   liquidatorAccount.liquidationCount = liquidatorAccount.liquidationCount + 1;
   liquidatorAccount.save();
   addAccountToProtocol(EventType.LIQUIDATOR, liquidatorAccount, event);
@@ -265,6 +293,10 @@ export function handleLogRepay(event: LogRepay): void {
     handleLiquidation(event);
     liquidation = true;
   }
+
+  // update market prices
+  updateAllTokenPrices(event.block.number);
+
   let repayEvent = new Repay(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
   if (!market) {
@@ -285,21 +317,13 @@ export function handleLogRepay(event: LogRepay): void {
   repayEvent.asset = mimToken.id;
   repayEvent.amount = event.params.amount;
   repayEvent.amountUSD = amountUSD;
+  repayEvent.position = updatePositions(market.id, EventType.REPAY, repayEvent.account, event, liquidation);
   repayEvent.save();
 
   updateTotalBorrows(event);
   updateMarketStats(market.id, EventType.REPAY, getMIMAddress(dataSource.network()), event.params.part, event); // smart contract code subs event.params.part from totalBorrow
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
-  updatePositions(
-    market.id,
-    EventType.REPAY,
-    event.params.amount,
-    repayEvent.account,
-    event,
-    repayEvent.id,
-    liquidation,
-  );
 }
 
 export function handleLogExchangeRate(event: LogExchangeRate): void {
@@ -308,17 +332,48 @@ export function handleLogExchangeRate(event: LogExchangeRate): void {
     return;
   }
   let token = getOrCreateToken(Address.fromString(market.inputToken));
-  let priceUSD = divBigDecimal(BIGDECIMAL_ONE, bigIntToBigDecimal(event.params.rate, token.decimals));
-  let inputTokenBalance = market.inputTokenBalance;
-  let tvlUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
-  market.inputTokenPriceUSD = priceUSD;
-  market.totalValueLockedUSD = tvlUSD;
-  market.save();
-  updateTokenPrice(token.id, priceUSD, event);
+  updateTokenPrice(event.params.rate, token, market, event.block.number);
+  updateTVL(event);
 }
 
 export function handleLogAccrue(event: LogAccrue): void {
   let mimPriceUSD = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).lastPriceUSD;
   let feesUSD = bigIntToBigDecimal(event.params.accruedAmount, DEFAULT_DECIMALS).times(mimPriceUSD!);
   updateFinancials(event, feesUSD, event.address.toHexString());
+}
+
+// updates all input token prices using the price oracle
+// this is a secondary option since not every market's price oracle "peekSpot()" will work
+function updateAllTokenPrices(blockNumber: BigInt): void {
+  let protocol = getOrCreateLendingProtocol();
+  for (let i = 0; i < protocol.marketIDList.length; i++) {
+    let market = getMarket(protocol.marketIDList[i]);
+    if (!market) {
+      log.warning("[updateAllTokenPrices] Market not found: {}", [protocol.marketIDList[i]]);
+      continue;
+    }
+
+    // check if price was already updated this block
+    let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+    if (inputToken.lastPriceBlockNumber && inputToken.lastPriceBlockNumber!.ge(blockNumber)) {
+      continue;
+    }
+
+    // load PriceOracle contract and get peek (real/current) exchange rate
+    if (market.priceOracle === null) {
+      log.warning("[updateAllTokenPrices] Market {} has no priceOracle", [market.id]);
+      continue;
+    }
+    let marketPriceOracle = MarketOracle.bind(Address.fromBytes(market.priceOracle!));
+
+    // get exchange rate for input token
+    let exchangeRateCall = marketPriceOracle.try_peekSpot(Bytes.fromHexString("0x00"));
+    if (exchangeRateCall.reverted || exchangeRateCall.value == BIGINT_ZERO) {
+      log.warning("[updateAllTokenPrices] Market {} priceOracle peekSpot() failed", [market.id]);
+      continue;
+    }
+    let exchangeRate = exchangeRateCall.value;
+
+    updateTokenPrice(exchangeRate, inputToken, market, blockNumber);
+  }
 }
