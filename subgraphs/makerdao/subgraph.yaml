@@ -316,9 +316,9 @@ dataSources:
         - FinancialsDailySnapshot
       eventHandlers:
         - event: SellGem(indexed address,uint256,uint256)
-          handler: handleSwapFee
+          handler: handleSellGem
         - event: BuyGem(indexed address,uint256,uint256)
-          handler: handleSwapFee
+          handler: handleBuyGem
 
   - name: PSM-PAX-A
     kind: ethereum/contract
@@ -340,9 +340,9 @@ dataSources:
         - FinancialsDailySnapshot
       eventHandlers:
         - event: SellGem(indexed address,uint256,uint256)
-          handler: handleSwapFee
+          handler: handleSellGem
         - event: BuyGem(indexed address,uint256,uint256)
-          handler: handleSwapFee
+          handler: handleBuyGem
 
   - name: PSM-GUSD-A
     kind: ethereum/contract
@@ -364,9 +364,9 @@ dataSources:
         - FinancialsDailySnapshot
       eventHandlers:
         - event: SellGem(indexed address,uint256,uint256)
-          handler: handleSwapFee
+          handler: handleSellGem
         - event: BuyGem(indexed address,uint256,uint256)
-          handler: handleSwapFee
+          handler: handleBuyGem
 
 templates:
   - name: Flip
