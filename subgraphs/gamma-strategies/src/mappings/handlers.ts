@@ -31,7 +31,7 @@ export function handleHypeAdded(event: HypeAdded): void {
   }
 
   getOrCreateYieldAggregator(event.address);
-  getOrCreateVault(event.params.hype, event.block);
+  getOrCreateVault(event);
 
   HypervisorTemplate.create(event.params.hype);
 }
@@ -41,9 +41,9 @@ export function handleDeposit(event: Deposit): void {
   createDeposit(event);
 
   // Update vault token supply
-  let vault = getOrCreateVault(event.address, event.block);
-  vault.inputTokenBalance += event.params.shares;
-  vault.outputTokenSupply += event.params.shares;
+  let vault = getOrCreateVault(event);
+  vault.inputTokenBalance = vault.inputTokenBalance.plus(event.params.shares);
+  vault.outputTokenSupply = vault.outputTokenSupply!.plus(event.params.shares);
   vault.save();
 
   updateUsageMetrics(event.params.to, UsageType.DEPOSIT, event);
@@ -56,9 +56,9 @@ export function handleWithdraw(event: Withdraw): void {
   createWithdraw(event);
 
   // Update vault token supply
-  let vault = getOrCreateVault(event.address, event.block);
-  vault.inputTokenBalance -= event.params.shares;
-  vault.outputTokenSupply -= event.params.shares;
+  let vault = getOrCreateVault(event);
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(event.params.shares);
+  vault.outputTokenSupply = vault.outputTokenSupply!.minus(event.params.shares);
   vault.save();
 
   updateUsageMetrics(event.params.to, UsageType.WITHDRAW, event);

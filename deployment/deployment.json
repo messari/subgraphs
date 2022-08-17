@@ -618,22 +618,22 @@
         "arbitrum": {
           "template": "gamma.strategies.template.yaml",
           "messari": "messari/gamma-arbitrum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum": {
           "template": "gamma.strategies.template.yaml",
           "messari": "messari/gamma-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "polygon": {
           "template": "gamma.strategies.template.yaml",
           "messari": "messari/gamma-polygon",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "optimism": {
           "template": "gamma.strategies.template.yaml",
           "messari": "messari/gamma-optimism",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
