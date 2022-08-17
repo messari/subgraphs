@@ -6,6 +6,7 @@ import {
   EXCHANGE_MARKETPLACE_ADDRESS,
   EXCHANGE_MARKETPLACE_FEE,
   INVERSE_BASIS_POINT,
+  MANTISSA_FACTOR,
   NULL_ADDRESS,
   SECONDS_PER_DAY,
   WYVERN_ATOMICIZER_ADDRESS,
@@ -28,9 +29,9 @@ import {
 } from "./utils";
 
 /**
-* Order struct as found in the Project Wyvern official source
-* https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/ExchangeCore.sol#L92
-*/
+ * Order struct as found in the Project Wyvern official source
+ * https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/ExchangeCore.sol#L92
+ */
 // struct Order {
 //   /* Exchange address, intended as a versioning mechanism. */
 //   address exchange;
@@ -82,66 +83,66 @@ import {
 // }
 
 /**
-* atomicMatch method signature as found in the Project Wyvern official source
-* https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/ExchangeCore.sol#L665
-*
-* atomicMatch(Order memory buy, Sig memory buySig, Order memory sell, Sig memory sellSig, bytes32 metadata)
-* 
-* atomicMatch parameters matched with labels of call inputs
-* https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/Exchange.sol#L333
-*
-* - buy: Order(addrs[0] exchange, addrs[1] maker, addrs[2] taker, uints[0] makerRelayerFee, uints[1] takerRelayerFee, uints[2] makerProtocolFee, uints[3] takerProtocolFee, addrs[3] feeRecipient, FeeMethod(feeMethodsSidesKindsHowToCalls[0]) feeMethod, SaleKindInterface.Side(feeMethodsSidesKindsHowToCalls[1]) side, SaleKindInterface.SaleKind(feeMethodsSidesKindsHowToCalls[2]) sideKind, addrs[4] target, AuthenticatedProxy.HowToCall(feeMethodsSidesKindsHowToCalls[3]) howToCall, calldataBuy calldata, replacementPatternBuy replacementPattern, addrs[5] staticTarget, staticExtradataBuy staticExtradata, ERC20(addrs[6]) paymentToken, uints[4] basePrice, uints[5] extra, uints[6] listingTime, uints[7] expirationTime, uints[8] salt),
-* - buySig: Sig(vs[0], rssMetadata[0], rssMetadata[1]),
-* - sell: Order(addrs[7] exchange, addrs[8] maker, addrs[9] taker, uints[9] makerRelayerFee, uints[10] takerRelayerFee, uints[11] makerProtocolFee, uints[12] takerProtocolFee, addrs[10] feeRecipient, FeeMethod(feeMethodsSidesKindsHowToCalls[4]) feeMethod, SaleKindInterface.Side(feeMethodsSidesKindsHowToCalls[5]) side, SaleKindInterface.SaleKind(feeMethodsSidesKindsHowToCalls[6]) sideKind, addrs[11] target, AuthenticatedProxy.HowToCall(feeMethodsSidesKindsHowToCalls[7]) howToCall, calldataSell calldata, replacementPatternSell replacementPattern, addrs[12] staticTarget, staticExtradataSell staticExtradata, ERC20(addrs[13]) paymentToken, uints[13] basePrice, uints[14] extra, uints[15] listingTime, uints[16] expirationTime, uints[17] salt),
-* - sellSig: Sig(vs[1], rssMetadata[2], rssMetadata[3]),
-* - metadata: rssMetadata[4]
-* 
-* Lookup table for addrs[14]
-* - addrs[0] buy.exchange
-* - addrs[1] buy.maker
-* - addrs[2] buy.taker
-* - addrs[3] buy.feeRecipient
-* - addrs[4] buy.target
-* - addrs[5] buy.staticTarget
-* - addrs[6] buy.paymentToken
-* - addrs[7] sell.exchange
-* - addrs[8] sell.maker
-* - addrs[9] sell.taker
-* - addrs[10] sell.feeRecipient
-* - addrs[11] sell.target
-* - addrs[12] sell.staticTarget
-* - addrs[13] sell.paymentToken
-* 
-* Lookup table for uints[18]
-* - uints[0] buy.makerRelayerFee
-* - uints[1] buy.takerRelayerFee
-* - uints[2] buy.makerProtocolFee
-* - uints[3] buy.takerProtocolFee
-* - uints[4] buy.basePrice
-* - uints[5] buy.extra
-* - uints[6] buy.listingTime
-* - uints[7] buy.expirationTime
-* - uints[8] buy.salt
-* - uints[9] sell.makerRelayerFee
-* - uints[10] sell.takerRelayerFee
-* - uints[11] sell.makerProtocolFee
-* - uints[12] sell.takerProtocolFee
-* - uints[13] sell.basePrice
-* - uints[14] sell.extra
-* - uints[15] sell.listingTime
-* - uints[16] sell.expirationTime
-* - uints[17] sell.salt
-* 
-* Lookup table for feeMethodsSidesKindsHowToCalls[8]
-* - feeMethodsSidesKindsHowToCalls[0] buy.feeMethod
-* - feeMethodsSidesKindsHowToCalls[1] buy.side
-* - feeMethodsSidesKindsHowToCalls[2] buy.saleKind
-* - feeMethodsSidesKindsHowToCalls[3] buy.howToCall
-* - feeMethodsSidesKindsHowToCalls[4] sell.feeMethod
-* - feeMethodsSidesKindsHowToCalls[5] sell.side
-* - feeMethodsSidesKindsHowToCalls[6] sell.saleKind
-* - feeMethodsSidesKindsHowToCalls[7] sell.howToCall
-*/
+ * atomicMatch method signature as found in the Project Wyvern official source
+ * https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/ExchangeCore.sol#L665
+ *
+ * atomicMatch(Order memory buy, Sig memory buySig, Order memory sell, Sig memory sellSig, bytes32 metadata)
+ *
+ * atomicMatch parameters matched with labels of call inputs
+ * https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/Exchange.sol#L333
+ *
+ * - buy: Order(addrs[0] exchange, addrs[1] maker, addrs[2] taker, uints[0] makerRelayerFee, uints[1] takerRelayerFee, uints[2] makerProtocolFee, uints[3] takerProtocolFee, addrs[3] feeRecipient, FeeMethod(feeMethodsSidesKindsHowToCalls[0]) feeMethod, SaleKindInterface.Side(feeMethodsSidesKindsHowToCalls[1]) side, SaleKindInterface.SaleKind(feeMethodsSidesKindsHowToCalls[2]) sideKind, addrs[4] target, AuthenticatedProxy.HowToCall(feeMethodsSidesKindsHowToCalls[3]) howToCall, calldataBuy calldata, replacementPatternBuy replacementPattern, addrs[5] staticTarget, staticExtradataBuy staticExtradata, ERC20(addrs[6]) paymentToken, uints[4] basePrice, uints[5] extra, uints[6] listingTime, uints[7] expirationTime, uints[8] salt),
+ * - buySig: Sig(vs[0], rssMetadata[0], rssMetadata[1]),
+ * - sell: Order(addrs[7] exchange, addrs[8] maker, addrs[9] taker, uints[9] makerRelayerFee, uints[10] takerRelayerFee, uints[11] makerProtocolFee, uints[12] takerProtocolFee, addrs[10] feeRecipient, FeeMethod(feeMethodsSidesKindsHowToCalls[4]) feeMethod, SaleKindInterface.Side(feeMethodsSidesKindsHowToCalls[5]) side, SaleKindInterface.SaleKind(feeMethodsSidesKindsHowToCalls[6]) sideKind, addrs[11] target, AuthenticatedProxy.HowToCall(feeMethodsSidesKindsHowToCalls[7]) howToCall, calldataSell calldata, replacementPatternSell replacementPattern, addrs[12] staticTarget, staticExtradataSell staticExtradata, ERC20(addrs[13]) paymentToken, uints[13] basePrice, uints[14] extra, uints[15] listingTime, uints[16] expirationTime, uints[17] salt),
+ * - sellSig: Sig(vs[1], rssMetadata[2], rssMetadata[3]),
+ * - metadata: rssMetadata[4]
+ *
+ * Lookup table for addrs[14]
+ * - addrs[0] buy.exchange
+ * - addrs[1] buy.maker
+ * - addrs[2] buy.taker
+ * - addrs[3] buy.feeRecipient
+ * - addrs[4] buy.target
+ * - addrs[5] buy.staticTarget
+ * - addrs[6] buy.paymentToken
+ * - addrs[7] sell.exchange
+ * - addrs[8] sell.maker
+ * - addrs[9] sell.taker
+ * - addrs[10] sell.feeRecipient
+ * - addrs[11] sell.target
+ * - addrs[12] sell.staticTarget
+ * - addrs[13] sell.paymentToken
+ *
+ * Lookup table for uints[18]
+ * - uints[0] buy.makerRelayerFee
+ * - uints[1] buy.takerRelayerFee
+ * - uints[2] buy.makerProtocolFee
+ * - uints[3] buy.takerProtocolFee
+ * - uints[4] buy.basePrice
+ * - uints[5] buy.extra
+ * - uints[6] buy.listingTime
+ * - uints[7] buy.expirationTime
+ * - uints[8] buy.salt
+ * - uints[9] sell.makerRelayerFee
+ * - uints[10] sell.takerRelayerFee
+ * - uints[11] sell.makerProtocolFee
+ * - uints[12] sell.takerProtocolFee
+ * - uints[13] sell.basePrice
+ * - uints[14] sell.extra
+ * - uints[15] sell.listingTime
+ * - uints[16] sell.expirationTime
+ * - uints[17] sell.salt
+ *
+ * Lookup table for feeMethodsSidesKindsHowToCalls[8]
+ * - feeMethodsSidesKindsHowToCalls[0] buy.feeMethod
+ * - feeMethodsSidesKindsHowToCalls[1] buy.side
+ * - feeMethodsSidesKindsHowToCalls[2] buy.saleKind
+ * - feeMethodsSidesKindsHowToCalls[3] buy.howToCall
+ * - feeMethodsSidesKindsHowToCalls[4] sell.feeMethod
+ * - feeMethodsSidesKindsHowToCalls[5] sell.side
+ * - feeMethodsSidesKindsHowToCalls[6] sell.saleKind
+ * - feeMethodsSidesKindsHowToCalls[7] sell.howToCall
+ */
 
 export function handleMatch(call: AtomicMatch_Call): void {
   // sellTarget is sell.target (addrs[11])
@@ -162,7 +163,11 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   if (!checkCallDataFunctionSelector(mergedCallData)) {
     log.warning(
       "[checkCallDataFunctionSelector] returned false, Method ID: {}, transaction hash: {}, target: {}",
-      [getFunctionSelector(mergedCallData), call.transaction.hash.toHexString(), call.inputs.addrs[11].toHexString()]
+      [
+        getFunctionSelector(mergedCallData),
+        call.transaction.hash.toHexString(),
+        call.inputs.addrs[11].toHexString(),
+      ]
     );
     return;
   }
@@ -190,7 +195,12 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   let seller = call.inputs.addrs[8].toHexString();
 
   // No event log index since this is a contract call
-  let tradeID = call.transaction.hash.toHexString();
+  let tradeID = call.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(decodedTransferResult.method)
+    .concat("-")
+    .concat(tokenId.toString());
   let trade = new Trade(tradeID);
   trade.transactionHash = call.transaction.hash.toHexString();
   trade.timestamp = call.block.timestamp;
@@ -314,7 +324,7 @@ function updateCollectionMetrics(
     priceETH
   );
 
-  // Update cumulative metrics
+  // Update snapshot metrics
   collectionSnapshot.cumulativeTradeVolumeETH =
     collection.cumulativeTradeVolumeETH;
   collectionSnapshot.marketplaceRevenueETH = collection.marketplaceRevenueETH;
@@ -395,7 +405,7 @@ function updateMarketplaceMetrics(
     marketplaceSnapshot.dailyTradedItemCount += 1;
   }
 
-  // Update cumulative metrics
+  // Update snapshot metrics
   marketplaceSnapshot.collectionCount = marketplace.collectionCount;
   marketplaceSnapshot.cumulativeTradeVolumeETH =
     marketplace.cumulativeTradeVolumeETH;
@@ -433,10 +443,12 @@ function updateRevenueMetrics(
     let totalRevenueETH = makerRelayerFee
       .times(basePrice)
       .toBigDecimal()
-      .div(INVERSE_BASIS_POINT);
+      .div(INVERSE_BASIS_POINT)
+      .div(MANTISSA_FACTOR);
     let marketplaceRevenueETH = EXCHANGE_MARKETPLACE_FEE.times(basePrice)
       .toBigDecimal()
-      .div(INVERSE_BASIS_POINT);
+      .div(INVERSE_BASIS_POINT)
+      .div(MANTISSA_FACTOR);
     let creatorRevenueETH = totalRevenueETH.minus(marketplaceRevenueETH);
 
     collection.marketplaceRevenueETH = collection.marketplaceRevenueETH.plus(
@@ -468,10 +480,12 @@ function updateRevenueMetrics(
     let totalRevenueETH = takerRelayerFee
       .times(basePrice)
       .toBigDecimal()
-      .div(INVERSE_BASIS_POINT);
+      .div(INVERSE_BASIS_POINT)
+      .div(MANTISSA_FACTOR);
     let marketplaceRevenueETH = EXCHANGE_MARKETPLACE_FEE.times(basePrice)
       .toBigDecimal()
-      .div(INVERSE_BASIS_POINT);
+      .div(INVERSE_BASIS_POINT)
+      .div(MANTISSA_FACTOR);
     let creatorRevenueETH = totalRevenueETH.minus(marketplaceRevenueETH);
 
     collection.marketplaceRevenueETH = collection.marketplaceRevenueETH.plus(

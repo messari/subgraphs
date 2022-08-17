@@ -163,7 +163,9 @@ function getNftStandard(collectionID: string): string {
     Bytes.fromHexString(ERC721_INTERFACE_IDENTIFIER)
   );
   if (isERC721Result.reverted) {
-    log.warning("[getNftStandard] isERC721 reverted, collection ID: {}", [collectionID]);
+    log.warning("[getNftStandard] isERC721 reverted, collection ID: {}", [
+      collectionID,
+    ]);
   } else {
     if (isERC721Result.value) {
       return NftStandard.ERC721;
@@ -174,7 +176,9 @@ function getNftStandard(collectionID: string): string {
     Bytes.fromHexString(ERC1155_INTERFACE_IDENTIFIER)
   );
   if (isERC1155Result.reverted) {
-    log.warning("[getNftStandard] isERC1155 reverted, collection ID: {}", [collectionID]);
+    log.warning("[getNftStandard] isERC1155 reverted, collection ID: {}", [
+      collectionID,
+    ]);
   } else {
     if (isERC1155Result.value) {
       return NftStandard.ERC1155;

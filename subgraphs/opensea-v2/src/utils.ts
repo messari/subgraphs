@@ -14,7 +14,7 @@ export class DecodedTransferResult {
     public readonly to: Address,
     public readonly token: Address,
     public readonly tokenId: BigInt,
-    public readonly amount: BigInt,
+    public readonly amount: BigInt
   ) {}
 }
 
