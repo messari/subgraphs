@@ -19,7 +19,11 @@ import {
   NewReserveFactor,
 } from "../../../generated/templates/CToken/CToken";
 import { LendingProtocol, Token } from "../../../generated/schema";
-import { cTokenDecimals, BIGINT_ZERO } from "../../../src/constants";
+import {
+  cTokenDecimals,
+  BIGINT_ZERO,
+  exponentToBigDecimal,
+} from "../../../src/constants";
 import {
   ProtocolData,
   _getOrCreateProtocol,
@@ -48,6 +52,7 @@ import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import { getNetworkSpecificConstant } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
+import { ethereum } from "@graphprotocol/graph-ts";
 
 // Constant values
 let constant = getNetworkSpecificConstant();
@@ -85,7 +90,10 @@ export function handleMarketListed(event: MarketListed): void {
   let cTokenAddr = event.params.cToken;
   // cream finance emits a MarketListed event that lists an invalid CToken
   // hardcode to skip it otherwise it messes up ETH token
-  if (cTokenAddr == Address.fromString("0xbdf447b39d152d6a234b4c02772b8ab5d1783f72")) {
+  if (
+    cTokenAddr ==
+    Address.fromString("0xbdf447b39d152d6a234b4c02772b8ab5d1783f72")
+  ) {
     return;
   }
   let cToken = Token.load(cTokenAddr.toHexString());
@@ -261,12 +269,49 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let oracleContract = PriceOracle.bind(
     Address.fromString(protocol._priceOracle)
   );
+
+  // cream finance uses an oracle that returns price in eth rather than usd.
+  // however, our common logic expects the oracle returned price to be in usd.
+  // to work around, for cream finance specifically, we get eth price first,
+  // multiple the oracle price by eth price, then pass it down to common logic.
+  //
+  // to compute eth price, we derive it from usdt price in eth.
+  // let's say if we know 1 usdt = 0.001 eth, then we know 1 eth = 1000 usd.
+  // to get usdt price, we simply do 10^(36-6)/getUnderlyingPrice(crUSDT), in which 6 = decimals(USDT)
+  //
+  // you may ask, why USDT, not USDC or DAI?
+  // this is bc crUSDT was deployed the earliest on mainnet compared to crUSDC and crDAI.
+  let usdtPriceResult = oracleContract.try_getUnderlyingPrice(
+    Address.fromString("0x797AAB1ce7c01eB727ab980762bA88e7133d2157")
+  );
+  if (usdtPriceResult.reverted) {
+    log.warning("[handleAccrueInterest] failed to get usdt price in eth", []);
+    return;
+  }
+  let ethPriceUSD = exponentToBigDecimal(36 - 6).div(
+    usdtPriceResult.value.toBigDecimal()
+  );
+  let ctokenPriceETHResult =
+    oracleContract.try_getUnderlyingPrice(marketAddress);
+  // if reverted, pass down the reverted call result anyway
+  // otherwise, pass down the value multiplied by eth price
+  let priceResult = ctokenPriceETHResult.reverted
+    ? ctokenPriceETHResult
+    : ethereum.CallResult.fromValue<BigInt>(
+        BigInt.fromString(
+          ctokenPriceETHResult.value
+            .toBigDecimal()
+            .times(ethPriceUSD)
+            .toString()
+            .split(".")[0]
+        )
+      );
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
-    oracleContract.try_getUnderlyingPrice(marketAddress),
+    priceResult,
     unitPerYear
   );
   let interestAccumulated = event.params.interestAccumulated;
@@ -287,7 +332,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "CREAM Finance",
     "cream-finance",
     "2.0.1",
-    "1.1.0",
+    "1.1.1",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),

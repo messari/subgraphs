@@ -1873,6 +1873,7 @@ export function getOrCreateMarketHourlySnapshot(
   return snapshot;
 }
 
+// Return price in USD
 function getTokenPriceUSD(
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
   underlyingDecimals: i32
