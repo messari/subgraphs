@@ -162,6 +162,7 @@ export function Deposit(
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
   pool.outputTokenSupply = totalSupplyAfterDeposit;
+  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
   pool.save();
 
   createDepositTransaction(
