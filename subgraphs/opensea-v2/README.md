@@ -24,56 +24,58 @@ which only contains hashes of the orders an not the underlying `Order` struct.
 In order to pull more relevant information for the schema, call handlers have to be used to peek into what the `Order` struct contains.
 
 ### Order Struct
+Order struct as found in the Project Wyvern official source
+https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/ExchangeCore.sol#L92
 ```js
-// struct Order {
-//   /* Exchange address, intended as a versioning mechanism. */
-//   address exchange;
-//   /* Order maker address. */
-//   address maker;
-//   /* Order taker address, if specified. */
-//   address taker;
-//   /* Maker relayer fee of the order, unused for taker order. */
-//   uint makerRelayerFee;
-//   /* Taker relayer fee of the order, or maximum taker fee for a taker order. */
-//   uint takerRelayerFee;
-//   /* Maker protocol fee of the order, unused for taker order. */
-//   uint makerProtocolFee;
-//   /* Taker protocol fee of the order, or maximum taker fee for a taker order. */
-//   uint takerProtocolFee;
-//   /* Order fee recipient or zero address for taker order. */
-//   address feeRecipient;
-//   /* Fee method (protocol token or split fee). */
-//   FeeMethod feeMethod;
-//   /* Side (buy/sell). */
-//   SaleKindInterface.Side side;
-//   /* Kind of sale. */
-//   SaleKindInterface.SaleKind saleKind;
-//   /* Target. */
-//   address target;
-//   /* HowToCall. */
-//   AuthenticatedProxy.HowToCall howToCall;
-//   /* Calldata. */
-//   bytes calldata;
-//   /* Calldata replacement pattern, or an empty byte array for no replacement. */
-//   bytes replacementPattern;
-//   /* Static call target, zero-address for no static call. */
-//   address staticTarget;
-//   /* Static call extra data. */
-//   bytes staticExtradata;
-//   /* Token used to pay for the order, or the zero-address as a sentinel value for Ether. */
-//   address paymentToken;
-//   /* Base price of the order (in paymentTokens). */
-//   uint basePrice;
-//   /* Auction extra parameter - minimum bid increment for English auctions, starting/ending price difference. */
-//   uint extra;
-//   /* Listing timestamp. */
-//   uint listingTime;
-//   /* Expiration timestamp - 0 for no expiry. */
-//   uint expirationTime;
-//   /* Order salt, used to prevent duplicate hashes. */
-//   uint salt;
-//   /* NOTE: uint nonce is an additional component of the order but is read from storage */
-// }
+struct Order {
+  /* Exchange address, intended as a versioning mechanism. */
+  address exchange;
+  /* Order maker address. */
+  address maker;
+  /* Order taker address, if specified. */
+  address taker;
+  /* Maker relayer fee of the order, unused for taker order. */
+  uint makerRelayerFee;
+  /* Taker relayer fee of the order, or maximum taker fee for a taker order. */
+  uint takerRelayerFee;
+  /* Maker protocol fee of the order, unused for taker order. */
+  uint makerProtocolFee;
+  /* Taker protocol fee of the order, or maximum taker fee for a taker order. */
+  uint takerProtocolFee;
+  /* Order fee recipient or zero address for taker order. */
+  address feeRecipient;
+  /* Fee method (protocol token or split fee). */
+  FeeMethod feeMethod;
+  /* Side (buy/sell). */
+  SaleKindInterface.Side side;
+  /* Kind of sale. */
+  SaleKindInterface.SaleKind saleKind;
+  /* Target. */
+  address target;
+  /* HowToCall. */
+  AuthenticatedProxy.HowToCall howToCall;
+  /* Calldata. */
+  bytes calldata;
+  /* Calldata replacement pattern, or an empty byte array for no replacement. */
+  bytes replacementPattern;
+  /* Static call target, zero-address for no static call. */
+  address staticTarget;
+  /* Static call extra data. */
+  bytes staticExtradata;
+  /* Token used to pay for the order, or the zero-address as a sentinel value for Ether. */
+  address paymentToken;
+  /* Base price of the order (in paymentTokens). */
+  uint basePrice;
+  /* Auction extra parameter - minimum bid increment for English auctions, starting/ending price difference. */
+  uint extra;
+  /* Listing timestamp. */
+  uint listingTime;
+  /* Expiration timestamp - 0 for no expiry. */
+  uint expirationTime;
+  /* Order salt, used to prevent duplicate hashes. */
+  uint salt;
+  /* NOTE: uint nonce is an additional component of the order but is read from storage */
+}
 ```
 
 ### Order Flow
@@ -84,7 +86,16 @@ There are 2 main styles of order flows (i.e. how a trade is made):
 In either case, when a taker (buyer/seller) accepts a price, an order is matched and a trade is facillitated. 
 
 ### Order Matching
+> Buy-side and sell-side orders each provide calldata (bytes) - for a sell-side order, the state transition for sale, for a buy-side order, the state transition to be bought.
+>
+> Along with the calldata, orders provide `replacementPattern`: a bytemask indicating which bytes of the calldata can be changed (e.g. NFT destination address).
+>
+> When a buy-side and sell-side order are matched, the desired calldatas are unified, masked with the bytemasks, and checked for agreement.
+>
+> This alone is enough to implement common simple state transitions, such as "transfer my CryptoKitty to any address" or "buy any of this kind of nonfungible token".
+
 When an order (trade) is matched, OpenSea calls the method `atomicMatch_` (can be inspected on Etherscan). Using the inputs from `atomicMatch_`:
+https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/Exchange.sol#L317
 ```js
 atomicMatch_(
   address[14] addrs,
@@ -101,6 +112,7 @@ atomicMatch_(
 )
 ```
 it constructs `Order` structs for `buy` side and `sell` side to make a call to `atomicMatch`. 
+https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/ExchangeCore.sol#L665
 ```js
 function atomicMatch(Order memory buy, Sig memory buySig, Order memory sell, Sig memory sellSig, bytes32 metadata)
 ```

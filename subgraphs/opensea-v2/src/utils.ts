@@ -8,34 +8,26 @@ import {
 } from "./constants";
 
 export class DecodedTransferResult {
-  method: string;
-  from: Address;
-  to: Address;
-  token: Address;
-  tokenId: BigInt;
-  amount: BigInt;
-
   constructor(
-    _method: string,
-    _from: Address,
-    _to: Address,
-    _token: Address,
-    _tokenId: BigInt,
-    _amount: BigInt
-  ) {
-    this.method = _method;
-    this.from = _from;
-    this.to = _to;
-    this.token = _token;
-    this.tokenId = _tokenId;
-    this.amount = _amount;
-  }
+    public readonly method: string,
+    public readonly from: Address,
+    public readonly to: Address,
+    public readonly token: Address,
+    public readonly tokenId: BigInt,
+    public readonly amount: BigInt,
+  ) {}
 }
 
+/**
+ * Get first 4 bytes of the calldata (function selector/method ID)
+ */
 export function getFunctionSelector(callData: Bytes): string {
   return Bytes.fromUint8Array(callData.subarray(0, 4)).toHexString();
 }
 
+/**
+ * Relevant function selectors/method IDs can be found via https://www.4byte.directory
+ */
 export function checkCallDataFunctionSelector(callData: Bytes): boolean {
   let functionSelector = getFunctionSelector(callData);
   return (
@@ -45,6 +37,11 @@ export function checkCallDataFunctionSelector(callData: Bytes): boolean {
   );
 }
 
+/**
+ * Replace bytes in an array with bytes in another array, guarded by a bitmask
+ * Used to merge calldataBuy and calldataSell using replacementPattern as a bitmask to recreate calldata sent to sell.target
+ * https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/common/ArrayUtils.sol#L28
+ */
 export function guardedArrayReplace(
   _array: Bytes,
   _replacement: Bytes,
@@ -71,10 +68,16 @@ export function guardedArrayReplace(
 
   bigIntReplacement = bigIntReplacement.bitAnd(bigIntMask);
   bigIntArray = bigIntArray.bitOr(bigIntReplacement);
-  // return changetype<Bytes>(Bytes.fromBigInt(bigIntArray).reverse());
   return Bytes.fromHexString(bigIntArray.toHexString());
 }
 
+/**
+ * Decode Ethereum calldata of matchERC721UsingCriteria/matchERC721WithSafeTransferUsingCriteria calls using function signature
+ * 0xfb16a595 matchERC721UsingCriteria(address,address,address,uint256,bytes32,bytes32[])
+ * 0xc5a0236e matchERC721WithSafeTransferUsingCriteria(address,address,address,uint256,bytes32,bytes32[])
+ * https://www.4byte.directory/signatures/?bytes4_signature=0xfb16a595
+ * https://www.4byte.directory/signatures/?bytes4_signature=0xc5a0236e
+ */
 export function decode_matchERC721UsingCriteria_Method(
   callData: Bytes
 ): DecodedTransferResult {
@@ -105,6 +108,11 @@ export function decode_matchERC721UsingCriteria_Method(
   );
 }
 
+/**
+ * Decode Ethereum calldata of matchERC1155UsingCriteria call using function signature
+ * 0x96809f90 matchERC1155UsingCriteria(address,address,address,uint256,uint256,bytes32,bytes32[])
+ * matchERC1155UsingCriteria(address,address,address,uint256,uint256,bytes32,bytes32[])
+ */
 export function decode_matchERC1155UsingCriteria_Method(
   callData: Bytes
 ): DecodedTransferResult {
