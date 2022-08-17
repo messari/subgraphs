@@ -1,0 +1,9 @@
+{
+    "network": "optimism",
+    "factory": [
+        {
+            "address": "0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746",
+            "startBlock": 10078686
+        }
+    ]
+}
