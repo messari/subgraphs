@@ -22,7 +22,10 @@ export function handleRewardAdded(event: RewardAdded): void {
   const crvRewardPoolAddress = event.address;
 
   let crvRewardTokenAddress = constants.CRV_TOKEN_ADDRESS;
-  let crvRewardTokenPrice = getUsdPricePerToken(crvRewardTokenAddress);
+  let crvRewardTokenPrice = getUsdPricePerToken(
+    crvRewardTokenAddress,
+    event.block
+  );
   let crvRewardTokenDecimals = utils.getTokenDecimals(crvRewardTokenAddress);
 
   const vault = getOrCreateVault(poolId, event.block);
@@ -40,7 +43,10 @@ export function handleRewardAdded(event: RewardAdded): void {
   let rewardsEarned = afterHistoricalRewards.minus(beforeHistoricalRewards);
 
   let cvxRewardTokenAddress = constants.CONVEX_TOKEN_ADDRESS;
-  let cvxRewardTokenPrice = getUsdPricePerToken(cvxRewardTokenAddress);
+  let cvxRewardTokenPrice = getUsdPricePerToken(
+    cvxRewardTokenAddress,
+    event.block
+  );
   let cvxRewardTokenDecimals = utils.getTokenDecimals(cvxRewardTokenAddress);
 
   let cvxRewardsEarned = utils.getConvexTokenMintAmount(rewardsEarned);
