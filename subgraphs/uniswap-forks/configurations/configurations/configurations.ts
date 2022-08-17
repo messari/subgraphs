@@ -24,6 +24,7 @@ import { MMFinanceCronosConfigurations } from "../../protocols/mm-finance/config
 import { MMFinanceMaticConfigurations } from "../../protocols/mm-finance/config/networks/polygon/polygon";
 import { HoneyswapXdaiConfigurations } from "../../protocols/honeyswap/config/networks/gnosis/gnosis";
 import { HoneyswapMaticConfigurations } from "../../protocols/honeyswap/config/networks/polygon/polygon";
+import { BiswapBscConfigurations } from "../../protocols/biswap/config/networks/bsc/bsc";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -110,6 +111,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.MM_FINANCE_POLYGON: {
       return new MMFinanceMaticConfigurations();
+    }
+    case Deploy.BISWAP_BSC: {
+      return new BiswapBscConfigurations();
     }
     default: {
       log.critical(

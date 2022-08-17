@@ -790,6 +790,15 @@
           "prepare:constants": false
         }
       },
+      "biswap": {
+        "bsc": {
+          "template": "biswap.bsc.template.yaml",
+          "messari": "messari/biswap-bsc",
+          "aditya-todi": "aditya-todi/biswap-v2",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
       "quickswap": {
         "polygon": {
           "template": "quickswap.template.yaml",

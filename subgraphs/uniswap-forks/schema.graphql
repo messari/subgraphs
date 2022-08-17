@@ -918,3 +918,23 @@ type _CircularBuffer @entity {
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
 }
+
+type _MasterChefRewardsAlloc @entity {
+  " MasterChef Type "
+  id: ID!
+
+  " Staking allocation of total reward emissions "
+  stakingPercent: BigInt!
+
+  " Total percentage of reward emissions "
+  percentDec: BigInt!
+
+  " Last block dev withdraw "
+  lastBlockDevWithdraw: BigInt!
+
+  " Cumulative protocol side reward emissions in amount USD "
+  cumulativeProtocolSideAmountUSD: BigDecimal!
+
+  " Cumulative protocol side reward emissions in reward token amount"
+  cumulativeProtocolSideTokenAmount: BigDecimal!
+}

@@ -5,6 +5,10 @@
 - Apeswap
   - BSC, Matic
     - The two chains use the code from uniswap V2. Additionally, there is a Masterchef and MasterchefV2 contract. BSC only uses the Masterchef contract, while MasterchefV2 is used on the Matic chain. The masterchef contracts are slightly different for Apeswap vs. Sushiswap in the naming of certain functions. It looks like Apeswap forked from Pancakeswap. This is why they each have a separate folder for Masterchef.
+- Biswap
+  - BSC
+    - Uses the uniswap-v2 codebase as Uniswap V2 for factory and pools. Additionally, it uses a masterchef contract that is templated from Sushiswap's implementation.
+    - Rewards are distributed into staking, devs, referrals and safu fund. The adjusted reward rate is the staking emissions and the rest are added to protocol side revenue.
 - Quickswap
   - Matic
     - Uses the same codebase as Uniswap-V2 for the factory and pools stored in the uniswap-forks/src folder

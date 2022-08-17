@@ -1,0 +1,89 @@
+specVersion: 0.0.1
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: Factory
+    network: {{network}}
+    source:
+      address: "{{factoryAddress}}"
+      abi: Factory
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/biswap/BiswapFactory.json
+        - name: TokenABI
+          file: ./abis/biswap/BiswapERC20.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+      file: ./src/mappings/factory.ts
+  - kind: ethereum
+    name: MasterChef
+    network: {{network}}
+    source:
+      address: "{{masterChefAddress}}"
+      abi: MasterChefBiswap
+      startBlock: {{masterChefStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - _CircularBuffer
+        - RewardToken
+      abis:
+        - name: MasterChefBiswap
+          file: ./abis/biswap/MasterChef.json
+        - name: TokenABI
+          file: ./abis/biswap/BiswapERC20.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed uint256,uint256)
+          handler: handleWithdraw
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
+          handler: handleEmergencyWithdraw
+      file: ./protocols/biswap/src/mappings/masterchef/reward.ts
+templates:
+  - kind: ethereum/contract
+    name: Pair
+    network: {{network}}
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities: []
+      abis:
+        - name: Pair
+          file: ./abis/biswap/BiswapPair.json
+        - name: Factory
+          file: ./abis/biswap/BiswapFactory.json
+        - name: TokenABI
+          file: ./abis/biswap/BiswapERC20.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint112,uint112)
+          handler: handleSync
+          
