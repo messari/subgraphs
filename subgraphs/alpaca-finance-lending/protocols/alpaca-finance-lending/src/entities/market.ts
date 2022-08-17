@@ -19,6 +19,7 @@ import { Vault as VaultContract } from "../../../../generated/FairLaunch/Vault";
 
 import { getOrCreateToken, getRewardTokenById, getTokenById } from "./token";
 import { Vault } from "../../../../generated/FairLaunch/Vault";
+import { VaultConfig } from "../../../../generated/FairLaunch/VaultConfig";
 
 import {
     addProtocolBorrowVolume,
@@ -36,6 +37,8 @@ import {
 } from "./protocol";
 import { bigIntToBigDecimal } from "../../../../src/utils/numbers";
 import { incrementProtocolTotalPoolCount } from "./usage";
+import { fetchPriceSimpleOracle } from "../utils/constants";
+import { IERC20Detailed } from "../../../../generated/FairLaunch/IERC20Detailed";
 
 export function getMarket(address: Address): Market | null {
     const id = address.toHexString();
@@ -317,9 +320,37 @@ export function updateOutputTokenSupply(
         market.outputTokenSupply = supply;
     }
     market = updateMarketTVL(event, market);
+    market = updateMarketInterestRate(market);
     market.save();
     getOrCreateMarketSnapshot(event, market);
     getOrCreateMarketHourlySnapshot(event, market);
+}
+
+export function updateMarketInterestRate(market: Market): Market {
+    // IERC bind the input token and get its balanceOf property for the output token address
+    const poolAddress = market.id;
+    const inputTokenAddress = market.inputToken;
+    const inputTokenInstance = IERC20Detailed.bind(Address.fromString(inputTokenAddress));
+    const balance = inputTokenInstance.try_balanceOf(Address.fromString(poolAddress));
+    if (balance.reverted) {
+        return market;
+    }
+    // Vault bind the output token and read its vaultDebtVal
+    const vault = Vault.bind(Address.fromString(poolAddress));
+    const vaultDebtVal = vault.try_vaultDebtVal();
+    const configAddress = vault.try_config();
+    if (vaultDebtVal.reverted || configAddress.reverted) {
+        return market;
+    }
+    const config = VaultConfig.bind(configAddress.value);
+    // Get getInterestRate(vaultDebtVal, balance) on the pool's config address
+    const interestRate = config.try_getInterestRate(vaultDebtVal.value, balance.value);
+    if (interestRate.reverted) {
+        return market;
+    }
+    log.info('VAULT ' + poolAddress + ' CONFIG RETURNED INTEREST RATE? ' + interestRate.value.toString(), [])
+    // market.rates
+    return market;
 }
 
 export function addMarketSupplySideRevenue(
@@ -451,17 +482,20 @@ export function closeMarketPosition(market: Market): void {
 
 function updateMarketTVL(event: ethereum.Event, market: Market): Market {
     const token = getTokenById(market.inputToken);
-    // const price = getAssetPrice(Address.fromString(market.inputToken));
-    const price = BIGDECIMAL_ONE;
-    const totalValueLocked = bigIntToBigDecimal(
-        market.inputTokenBalance,
-        token.decimals
-    ).times(price);
-    updateProtocolTVL(event, totalValueLocked.minus(market.totalValueLockedUSD));
-    market.inputTokenPriceUSD = price;
-    market.outputTokenPriceUSD = price;
-    market.totalValueLockedUSD = totalValueLocked;
-    market.totalDepositBalanceUSD = totalValueLocked;
+    const price = (fetchPriceSimpleOracle(Address.fromString(token.id)));
+    const totalValueLocked = market.inputTokenBalance.times(price);
+    const totalValueLockedDec = bigIntToBigDecimal(totalValueLocked.div(BigInt.fromString("10").pow(<u8>token.decimals)), token.decimals);
+    const priceDec = bigIntToBigDecimal(price, token.decimals)
+    updateProtocolTVL(event, totalValueLockedDec.minus(market.totalValueLockedUSD));
+    market.inputTokenPriceUSD = priceDec;
+    market.totalValueLockedUSD = totalValueLockedDec;
+    market.totalDepositBalanceUSD = totalValueLockedDec;
     // updateMarketRewardTokenEmissions(event, market);
+    if (market.outputToken !== null) {
+        const outputToken = getTokenById(market.outputToken!);
+        const outputTokenSupplyBigDec = bigIntToBigDecimal(market.outputTokenSupply, outputToken.decimals)
+        market.outputTokenPriceUSD = totalValueLockedDec.div(outputTokenSupplyBigDec);
+
+    }
     return market;
 }

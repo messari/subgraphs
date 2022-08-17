@@ -57,7 +57,7 @@ export function createDeposit(
     amount: BigInt,
     vaultInstance: VaultContract
 ): Deposit {
-    if (amount.le(BIGINT_ZERO)) {
+    if (amount.lt(BIGINT_ZERO)) {
         log.critical("Invalid deposit amount: {}", [amount.toString()]);
     }
     let market = createMarket(event, poolAddress, inputToken);
@@ -72,7 +72,7 @@ export function createDeposit(
     const deposit = new Deposit(
         `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
     );
-    const amountInUSD = bigIntToBigDecimal(fetchPriceSimpleOracle(inputToken).times(amount));
+    const amountInUSD = bigIntToBigDecimal(fetchPriceSimpleOracle(inputToken).times(amount).div(BigInt.fromString("10").pow(<u8>asset.decimals)));
     deposit.hash = event.transaction.hash.toHexString();
     deposit.nonce = event.transaction.nonce;
     deposit.logIndex = event.logIndex.toI32();
@@ -103,8 +103,11 @@ export function createWithdraw(
     amount: BigInt,
     vaultInstance: VaultContract
 ): Withdraw {
-    log.info('enter withdraw creation function ' + amount.toString(), [])
 
+    log.info('enter withdraw creation functions ' + amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
+    if (amount.lt(BIGINT_ZERO)) {
+        log.critical("Invalid withdraw amount: {}", [amount.toString()]);
+    }
     let market = createMarket(event, poolAddress, inputToken);
     const account = getOrCreateAccount(user);
     let position = getOrCreateUserPosition(
@@ -117,7 +120,7 @@ export function createWithdraw(
     const withdraw = new Withdraw(
         `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
     );
-    const amountInUSD = bigIntToBigDecimal(fetchPriceSimpleOracle(inputToken).times(amount));
+    const amountInUSD = bigIntToBigDecimal(fetchPriceSimpleOracle(inputToken).times(amount).div(BigInt.fromString("10").pow(<u8>asset.decimals)));
     withdraw.hash = event.transaction.hash.toHexString();
     withdraw.nonce = event.transaction.nonce;
     withdraw.logIndex = event.logIndex.toI32();

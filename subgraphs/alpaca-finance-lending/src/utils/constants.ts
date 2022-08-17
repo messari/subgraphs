@@ -98,7 +98,7 @@ export namespace UsageType {
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const SIMPLE_ORACLE_ADDRESS = "0x166f56F2EDa9817cAB77118AE4FCAA0002A17eC7";
-export const USDC_ADDRESS = "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d";
+export const BUSD_ADDRESS = "0xe9e7cea3dedca5984780bafc599bd69add087d56";
 
 ////////////////////////
 ///// Type Helpers /////
