@@ -1,12 +1,12 @@
 {
-  "name": "notion-ethereum",
+  "name": "notional-ethereum",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ fortysevenlabs/notion-ethereum",
-    "create-local": "graph create --node http://localhost:8020/ fortysevenlabs/notion-ethereum",
-    "remove-local": "graph remove --node http://localhost:8020/ fortysevenlabs/notion-ethereum",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ fortysevenlabs/notional-ethereum",
+    "create-local": "graph create --node http://localhost:8020/ fortysevenlabs/notional-ethereum",
+    "remove-local": "graph remove --node http://localhost:8020/ fortysevenlabs/notional-ethereum",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 fortysevenlabs/notion-ethereum"
   },
   "dependencies": {
