@@ -1,17 +1,20 @@
 {
-  "name": "erc20",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
+    "format": "npx prettier --write .",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ corerouter/erc20",
-    "create-local": "graph create --node http://localhost:8020/ corerouter/erc20",
-    "remove-local": "graph remove --node http://localhost:8020/ corerouter/erc20",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 corerouter/erc20"
+    "prepare:constants": "mustache protocols/erc20/config/networks/${npm_config_network}/${npm_config_year}.json configurations/configure.template.ts > configurations/configure.ts",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
+    "deploy": "npm run prepare:constants && npm run deploy:subgraph"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.32.0",
     "@graphprotocol/graph-ts": "0.27.0",
     "ipfs-http-client": "^57.0.3"
+  },
+  "devDependencies": {
+    "mustache": "^4.2.0",
+    "prettier": "^2.7.1"
   }
 }

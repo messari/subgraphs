@@ -154,7 +154,12 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | NEAR | 🛠 | 1.1.1 / 1.1.2 / 1.0.0 | [![Network Near](./docs/images/chains/near.png)](https://thegraph.com/hosted-service/subgraph/messari/network-near) |
 | Arweave | 🛠 | 1.1.1 / 1.1.2 / 1.0.0 | [![Network Arweave](./docs/images/chains/arweave.png)](https://thegraph.com/hosted-service/subgraph/messari/network-arweave-mainnet) |
 | **ERC20 Subgraphs** | | |
-| ERC20 | 🔨 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-ethereum) |
+| ERC20 Tokens (2017) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-holders-2017) |
+| ERC20 Tokens (2018) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-holders-2018) |
+| ERC20 Tokens (2019) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-holders-2019) |
+| ERC20 Tokens (2020) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-holders-2020) |
+| ERC20 Tokens (2021) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-holders-2021) |
+| ERC20 Tokens (2022) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-holders-2022) |
 | **NFT Subgraphs** | | |
 | OpenSea (Wyvern v1) | |
 | OpenSea (Wyvern v2) | 🔨 |

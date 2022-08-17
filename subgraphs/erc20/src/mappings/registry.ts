@@ -1,15 +1,6 @@
-import {
-  Address,
-  JSONValue,
-  Value,
-  log,
-  ipfs,
-  BigInt,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
+import { Address, JSONValue, Value, log, ipfs } from "@graphprotocol/graph-ts";
 
 import { Token } from "../../generated/schema";
-import { ERC20 } from "../../generated/TokenRegistry/ERC20";
 import { Unknown as UnknownEvent } from "../../generated/TokenRegistry/TokenRegistry";
 
 import {
@@ -22,16 +13,7 @@ import {
   REGISTRY_HASH,
   DEFAULT_DECIMALS,
   BIGINT_ZERO,
-  BIGDECIMAL_ZERO,
 } from "../common/constants";
-
-export function toDecimal(value: BigInt, decimals: u32): BigDecimal {
-  let precision = BigInt.fromI32(10)
-    .pow(<u8>decimals)
-    .toBigDecimal();
-
-  return value.divDecimal(precision);
-}
 
 export function initTokenList(event: UnknownEvent): void {
   log.debug("Initializing token registry, block={}", [
@@ -63,9 +45,9 @@ export function createToken(value: JSONValue, userData: Value): void {
       token.transferCount = BIGINT_ZERO;
       token.mintCount = BIGINT_ZERO;
       token.burnCount = BIGINT_ZERO;
-      token.totalSupply = BIGDECIMAL_ZERO;
-      token.totalBurned = BIGDECIMAL_ZERO;
-      token.totalMinted = BIGDECIMAL_ZERO;
+      token.totalSupply = BIGINT_ZERO;
+      token.totalBurned = BIGINT_ZERO;
+      token.totalMinted = BIGINT_ZERO;
 
       log.debug("Adding token to registry, symbol: {}, address: {}", [
         token.symbol,

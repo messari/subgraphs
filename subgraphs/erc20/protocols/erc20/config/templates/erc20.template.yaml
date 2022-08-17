@@ -12,7 +12,7 @@ dataSources:
     source:
       address: "0x7f751820be4b1e44464268c425af6095995e045a"
       abi: TokenRegistry
-      startBlock: 999
+      startBlock: 75570
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -26,7 +26,7 @@ dataSources:
           file: ./abis/ERC20.json
       eventHandlers:
         - event: Unknown(indexed bytes,indexed bytes)
-          topic0: '0xa9e319c3b10db96c5cee4bc3ebffa9c5581f222f14a4deb0df7ec2088ccd0974'
+          topic0: "0xa9e319c3b10db96c5cee4bc3ebffa9c5581f222f14a4deb0df7ec2088ccd0974"
           handler: initTokenList
       file: ./src/mappings/registry.ts
 templates:
@@ -64,6 +64,8 @@ templates:
       abis:
         - name: Burnable
           file: ./abis/Burnable.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Burn(indexed address,uint256)
           handler: handleBurn
@@ -82,6 +84,8 @@ templates:
       abis:
         - name: Mintable
           file: ./abis/Mintable.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256)
           handler: handleMint
