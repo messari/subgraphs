@@ -369,7 +369,8 @@ export function handleReserveUsedAsCollateralEnabled(
   // This Event handler enables a reserve/market to be used as collateral
   _handleReserveUsedAsCollateralEnabled(
     event.params.reserve,
-    event.params.user
+    event.params.user,
+    getProtocolData()
   );
 }
 
