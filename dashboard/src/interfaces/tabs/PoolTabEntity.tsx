@@ -136,13 +136,14 @@ function PoolTabEntity({
           if (!value && value !== 0 && !Array.isArray(currentInstanceField)) {
             let dataType = "undefined";
             if (value === null) {
+              value = 0;
               dataType = "null";
             }
             if (isNaN(value)) {
               dataType = "NaN";
             }
             dataFields[fieldName] = [];
-            dataFieldMetrics[fieldName] = { sum: 0, invalidDataPlot: dataType };
+            dataFieldMetrics[fieldName] = { sum: 0 };
             if (
               capsFieldName.includes("REWARD") &&
               issues.filter((x) => x.type === "VAL" && x.fieldName.includes(fieldName)).length === 0
@@ -156,7 +157,7 @@ function PoolTabEntity({
             }
             if (capsFieldName === "REWARDTOKENEMISSIONSUSD") {
               dataFields.rewardAPR = [];
-              dataFieldMetrics.rewardAPR = { sum: 0, invalidDataPlot: dataType };
+              dataFieldMetrics.rewardAPR = { sum: 0 };
             }
             continue;
           }
@@ -404,15 +405,14 @@ function PoolTabEntity({
                 dataFields[dataFieldKey] = returnedData.currentEntityField;
                 dataFieldMetrics[dataFieldKey] = returnedData.currentEntityFieldMetrics;
               } else {
-                let dataType = "undefined";
                 if (value === null) {
-                  dataType = "null";
+                  value = 0;
                 }
                 if (isNaN(value)) {
-                  dataType = "NaN";
+                  value = 0;
                 }
                 dataFields[dataFieldKey] = [];
-                dataFieldMetrics[dataFieldKey] = { sum: 0, invalidDataPlot: dataType };
+                dataFieldMetrics[dataFieldKey] = { sum: 0 };
               }
             });
           }
@@ -695,7 +695,7 @@ function PoolTabEntity({
         }
       }
     });
-
+    const fieldsList = Object.keys(dataFields);
     return (
       <Grid key={entityName}>
         <Box my={3}>
@@ -839,9 +839,14 @@ function PoolTabEntity({
               </div>
             );
           }
-          if (dataFieldMetrics[fieldName]?.invalidDataPlot || dataFieldMetrics[field]?.invalidDataPlot) {
+          if (dataFields[fieldName]?.length === 0) {
             return null;
           }
+          if (fieldName.toUpperCase() === field.toUpperCase() && fieldsList.filter(x => x.includes(fieldName))?.length > 1) {
+            console.log(fieldName, field)
+            return null;
+          }
+          console.log(field, dataFields[field])
           return (
             <div key={elementId} id={linkToElementId}>
               <Box mt={3} mb={1}>
