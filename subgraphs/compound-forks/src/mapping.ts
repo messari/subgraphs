@@ -1772,9 +1772,7 @@ export function getOrCreateMarketDailySnapshot(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): MarketDailySnapshot {
-  let snapshotID = `${market.id}-${(
-    blockTimestamp.toI32() / SECONDS_PER_DAY
-  ).toString()}`;
+  let snapshotID = getMarketDailySnapshotID(market.id, blockTimestamp.toI32());
   let snapshot = MarketDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketDailySnapshot(snapshotID);
@@ -1827,9 +1825,7 @@ export function getOrCreateMarketHourlySnapshot(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): MarketHourlySnapshot {
-  let snapshotID = `${market.id}-${(
-    blockTimestamp.toI32() / SECONDS_PER_HOUR
-  ).toString()}`;
+  let snapshotID = getMarketHourlySnapshotID(market.id, blockTimestamp.toI32());
   let snapshot = MarketHourlySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketHourlySnapshot(snapshotID);
