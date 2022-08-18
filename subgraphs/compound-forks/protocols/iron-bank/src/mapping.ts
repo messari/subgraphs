@@ -63,6 +63,7 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 
 export function handleMarketEntered(event: MarketEntered): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     true
@@ -71,6 +72,7 @@ export function handleMarketEntered(event: MarketEntered): void {
 
 export function handleMarketExited(event: MarketExited): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     false
@@ -269,7 +271,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Iron Bank",
     "iron-bank",
     "2.0.1",
-    "1.1.0",
+    "1.1.1",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),

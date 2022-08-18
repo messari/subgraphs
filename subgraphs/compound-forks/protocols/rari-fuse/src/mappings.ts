@@ -195,6 +195,7 @@ export function handlePoolRegistered(event: PoolRegistered): void {
 
 export function handleMarketEntered(event: MarketEntered): void {
   _handleMarketEntered(
+    Address.fromString(FACTORY_CONTRACT),
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     true
@@ -203,6 +204,7 @@ export function handleMarketEntered(event: MarketEntered): void {
 
 export function handleMarketExited(event: MarketExited): void {
   _handleMarketEntered(
+    Address.fromString(FACTORY_CONTRACT),
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     false

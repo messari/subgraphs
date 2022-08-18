@@ -191,10 +191,19 @@ export function _handleActionPaused(
 }
 
 export function _handleMarketEntered(
+  comptrollerAddr: Address,
   marketID: string,
   borrowerID: string,
   entered: boolean // true = entered, false = exited
 ): void {
+  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  if (!protocol) {
+    log.warning("[handleMint] protocol not found: {}", [
+      comptrollerAddr.toHexString(),
+    ]);
+    return;
+  }
+
   let market = Market.load(marketID);
   if (!market) {
     log.warning("[_handleMarketEntered] market {} not found", [marketID]);
@@ -204,6 +213,9 @@ export function _handleMarketEntered(
   let account = Account.load(borrowerID);
   if (!account) {
     account = createAccount(borrowerID);
+
+    protocol.cumulativeUniqueUsers++;
+    protocol.save();
   }
 
   let enabledCollaterals = account._enabledCollaterals;
@@ -385,11 +397,24 @@ export function _handleMint(
     account = createAccount(minter.toHexString());
     account.save();
 
-    protocol.cumulativeUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers++;
     protocol.save();
   }
   account.depositCount += 1;
   account.save();
+
+  //
+  // track unique depositors
+  //
+  let depositorActorID = "depositor".concat("-").concat(account.id);
+  let depositorActor = _ActorAccount.load(depositorActorID);
+  if (!depositorActor) {
+    depositorActor = new _ActorAccount(depositorActorID);
+    depositorActor.save();
+
+    protocol.cumulativeUniqueDepositors += 1;
+    protocol.save();
+  }
 
   //
   // update position
@@ -487,7 +512,7 @@ export function _handleRedeem(
     account = createAccount(redeemer.toHexString());
     account.save();
 
-    protocol.cumulativeUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers++;
     protocol.save();
   }
   account.withdrawCount += 1;
@@ -583,12 +608,28 @@ export function _handleBorrow(
     account = createAccount(borrower.toHexString());
     account.save();
 
-    protocol.cumulativeUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers++;
     protocol.save();
   }
   account.borrowCount += 1;
   account.save();
 
+  //
+  // track unique borrowers
+  //
+  let borrowerActorID = "borrower".concat("-").concat(account.id);
+  let borrowerActor = _ActorAccount.load(borrowerActorID);
+  if (!borrowerActor) {
+    borrowerActor = new _ActorAccount(borrowerActorID);
+    borrowerActor.save();
+
+    protocol.cumulativeUniqueBorrowers += 1;
+    protocol.save();
+  }
+
+  //
+  // update position
+  //
   let positionID = addPosition(
     protocol,
     market,
@@ -680,7 +721,7 @@ export function _handleRepayBorrow(
     payerAccount = createAccount(payer.toHexString());
     payerAccount.save();
 
-    protocol.cumulativeUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers++;
     protocol.save();
   }
   payerAccount.repayCount += 1;
@@ -691,7 +732,7 @@ export function _handleRepayBorrow(
     borrowerAccount = createAccount(borrower.toHexString());
     borrowerAccount.save();
 
-    protocol.cumulativeUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers++;
     protocol.save();
   }
 
@@ -825,7 +866,7 @@ export function _handleLiquidateBorrow(
     liquidatorAccount = createAccount(liquidatorAccountID);
     liquidatorAccount.save();
 
-    protocol.cumulativeUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers++;
     protocol.save();
   }
   let liquidatorActorID = "liquidator".concat("-").concat(liquidatorAccountID);
@@ -844,7 +885,7 @@ export function _handleLiquidateBorrow(
     liquidateeAccount = createAccount(liquidateeAccountID);
     liquidateeAccount.save();
 
-    protocol.cumulativeUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers++;
     protocol.save();
   }
   let liquidateeActorID = "liquidatee".concat("-").concat(liquidateeAccountID);
@@ -1985,27 +2026,7 @@ function addPosition(
     //
     protocol.cumulativePositionCount += 1;
     protocol.openPositionCount += 1;
-    if (eventType == EventType.Deposit) {
-      let depositorActorID = "depositor".concat("-").concat(account.id);
-      let depositorActor = _ActorAccount.load(depositorActorID);
-      if (!depositorActor) {
-        depositorActor = new _ActorAccount(depositorActorID);
-        depositorActor.save();
-
-        protocol.cumulativeUniqueDepositors += 1;
-        protocol.save();
-      }
-    } else if (eventType == EventType.Borrow) {
-      let borrowerActorID = "borrower".concat("-").concat(account.id);
-      let borrowerActor = _ActorAccount.load(borrowerActorID);
-      if (!borrowerActor) {
-        borrowerActor = new _ActorAccount(borrowerActorID);
-        borrowerActor.save();
-
-        protocol.cumulativeUniqueBorrowers += 1;
-        protocol.save();
-      }
-    }
+    protocol.save();
   }
 
   //

@@ -65,6 +65,7 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 
 export function handleMarketEntered(event: MarketEntered): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     true
@@ -73,6 +74,7 @@ export function handleMarketEntered(event: MarketEntered): void {
 
 export function handleMarketExited(event: MarketExited): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     false
@@ -85,7 +87,10 @@ export function handleMarketListed(event: MarketListed): void {
   let cTokenAddr = event.params.cToken;
   // cream finance emits a MarketListed event that lists an invalid CToken
   // hardcode to skip it otherwise it messes up ETH token
-  if (cTokenAddr == Address.fromString("0xbdf447b39d152d6a234b4c02772b8ab5d1783f72")) {
+  if (
+    cTokenAddr ==
+    Address.fromString("0xbdf447b39d152d6a234b4c02772b8ab5d1783f72")
+  ) {
     return;
   }
   let cToken = Token.load(cTokenAddr.toHexString());
@@ -287,7 +292,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "CREAM Finance",
     "cream-finance",
     "2.0.1",
-    "1.1.0",
+    "1.1.1",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),

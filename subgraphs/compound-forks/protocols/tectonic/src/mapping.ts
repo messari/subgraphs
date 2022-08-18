@@ -89,6 +89,7 @@ export function handleNewReserveFactor(event: NewReserveFactor): void {
 
 export function handleMarketEntered(event: MarketEntered): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     true
@@ -97,6 +98,7 @@ export function handleMarketEntered(event: MarketEntered): void {
 
 export function handleMarketExited(event: MarketExited): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     false
@@ -312,7 +314,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Tectonic",
     "tectonic",
     "2.0.1",
-    "1.1.1",
+    "1.1.2",
     "1.0.0",
     Network.CRONOS,
     comptroller.try_liquidationIncentiveMantissa(),
