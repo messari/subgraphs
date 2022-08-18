@@ -691,12 +691,17 @@
     },
     "uniswap-v3": {
       "uniswap-v3": {
-        "ethereum": {
+        "arbitrum": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
           "prepare:constants": false
         },
-        "arbitrum": {
+        "celo": {
+          "template": "uniswap.v3.template.yaml",
+          "deploy-on-merge": true,
+          "prepare:constants": true
+        },
+        "ethereum": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
           "prepare:constants": false
