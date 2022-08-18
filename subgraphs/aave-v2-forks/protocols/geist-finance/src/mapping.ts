@@ -36,10 +36,12 @@ import {
   Borrow,
   Deposit,
   LiquidationCall,
+  Paused,
   Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
+  Unpaused,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
 import { GToken } from "../../../generated/templates/LendingPool/GToken";
@@ -51,6 +53,7 @@ import {
   _handleCollateralConfigurationChanged,
   _handleDeposit,
   _handleLiquidate,
+  _handlePaused,
   _handlePriceOracleUpdated,
   _handleRepay,
   _handleReserveActivated,
@@ -60,6 +63,7 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
@@ -351,6 +355,14 @@ export function handleReserveUsedAsCollateralDisabled(
     event.params.reserve,
     event.params.user
   );
+}
+
+export function handlePaused(event: Paused): void {
+  _handlePaused(getProtocolData());
+}
+
+export function handleUnpaused(event: Unpaused): void {
+  _handleUnpaused(getProtocolData());
 }
 
 export function handleDeposit(event: Deposit): void {

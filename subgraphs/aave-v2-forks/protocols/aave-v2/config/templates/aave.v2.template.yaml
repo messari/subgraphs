@@ -91,6 +91,10 @@ templates:
           handler: handleReserveUsedAsCollateralEnabled
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
+        - event: Paused()
+          handler: handlePaused
+        - event: Unpaused()
+          handler: handleUnpaused
       file: ./protocols/aave-v2/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator
