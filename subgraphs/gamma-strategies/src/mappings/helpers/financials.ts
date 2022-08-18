@@ -32,7 +32,7 @@ export function updateTvl(event: ethereum.Event): void {
   }
 
   // Track existing TVL for cumulative calculations
-  let vault = getOrCreateVault(event);
+  let vault = getOrCreateVault(event.address, event);
   let oldTvl = vault.totalValueLockedUSD;
 
   let newTvl = getDualTokenUSD(
@@ -107,7 +107,7 @@ export function updateRevenue(event: Rebalance): void {
   let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
   let VaultDailySnapshot = getOrCreateVaultDailySnapshot(event);
   let VaultHourlySnapshot = getOrCreateVaultHourlySnapshot(event);
-  let vault = getOrCreateVault(event);
+  let vault = getOrCreateVault(event.address, event);
 
   // Update cumulative revenue
   protocol.cumulativeSupplySideRevenueUSD =
@@ -171,5 +171,8 @@ export function updateRevenue(event: Rebalance): void {
   financialsDailySnapshot.timestamp = event.block.timestamp;
 
   protocol.save();
+  vault.save();
   financialsDailySnapshot.save();
+  VaultDailySnapshot.save();
+  VaultHourlySnapshot.save();
 }
