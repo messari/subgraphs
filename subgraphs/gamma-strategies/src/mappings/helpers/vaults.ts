@@ -23,7 +23,7 @@ import { incrementTotalPoolCount } from "./usageMetrics";
 
 // Update daily and hourly snapshots from vault entity
 export function updateVaultSnapshots(event: ethereum.Event): void {
-  let vault = getOrCreateVault(event);
+  let vault = getOrCreateVault(event.address, event);
 
   let dailySnapshot = getOrCreateVaultDailySnapshot(event);
   let hourlySnapshot = getOrCreateVaultHourlySnapshot(event);
@@ -56,15 +56,18 @@ export function updateVaultSnapshots(event: ethereum.Event): void {
   hourlySnapshot.save();
 }
 
-export function getOrCreateVault(event: ethereum.Event): Vault {
-  let vaultId = event.address.toHex();
+export function getOrCreateVault(
+  vaultAddress: Address,
+  event: ethereum.Event
+): Vault {
+  let vaultId = vaultAddress.toHex();
   let vault = Vault.load(vaultId);
   if (!vault) {
-    let hypeContract = HypervisorContract.bind(event.address);
+    let hypeContract = HypervisorContract.bind(vaultAddress);
 
     // Create relevant tokens
-    getOrCreateUnderlyingToken(event.address);
-    getOrCreateToken(event.address);
+    getOrCreateUnderlyingToken(vaultAddress);
+    getOrCreateToken(vaultAddress);
 
     vault = new Vault(vaultId);
     vault.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
