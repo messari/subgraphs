@@ -30,6 +30,8 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
   - [Dune Analytics](https://dune.xyz/)
   - [TokenTerminal](https://www.tokenterminal.com/terminal)
 
+> For other contributing guidelines, please refer to [Contributing.md](./docs/Contributing.md)
+
 ## Resources
 
 ### Introductory
