@@ -422,7 +422,6 @@ function ProtocolDashboard() {
     }
   }, [tabValue, getPoolsOverviewData]);
 
-
   useEffect(() => {
     if (data?.protocols && dataPools) {
       const variables: { [x: string]: any } = {};
@@ -499,8 +498,6 @@ function ProtocolDashboard() {
       }
     }
   }, [dataPools5]);
-
-
 
   useEffect(() => {
     if (tabValue === "3" || tabValue === "4" || tabValue === "5") {
@@ -708,7 +705,6 @@ function ProtocolDashboard() {
     pools = pools.concat(poolArray);
   }
 
-
   if (pools?.length > 0) {
     let poolTemp = [...pools];
     pools = poolTemp.sort((a, b) => {
@@ -820,14 +816,14 @@ function ProtocolDashboard() {
   }
 
   let protocolSchemaDataProp = protocolSchemaData;
-  const brokenDownName = subgraphName.split("/")[1].split("-");
-  const network = brokenDownName.pop() || "";
+  const brokenDownName = subgraphName.split("/")[1]?.split("-");
+  const network = brokenDownName?.pop() || "";
   if (!protocolSchemaDataProp?.protocols[0]) {
     protocolSchemaDataProp = {
       protocols: [
         {
           type: "N/A",
-          name: brokenDownName.join(" "),
+          name: brokenDownName ? brokenDownName?.join(" ") : "",
           network: network.toUpperCase(),
           schemaVersion: "N/A",
           subgraphVersion: "N/A",

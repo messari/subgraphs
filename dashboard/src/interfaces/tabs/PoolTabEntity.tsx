@@ -338,7 +338,7 @@ function PoolTabEntity({
                   } else if (
                     currentRewardToken.type === "BORROW" &&
                     issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length ===
-                    0
+                      0
                   ) {
                     issues.push({
                       type: "BORROW",
@@ -842,11 +842,14 @@ function PoolTabEntity({
           if (dataFields[fieldName]?.length === 0) {
             return null;
           }
-          if (fieldName.toUpperCase() === field.toUpperCase() && fieldsList.filter(x => x.includes(fieldName))?.length > 1) {
-            console.log(fieldName, field)
+          if (
+            fieldName.toUpperCase() === field.toUpperCase() &&
+            fieldsList.filter((x) => x.includes(fieldName))?.length > 1
+          ) {
+            console.log(fieldName, field);
             return null;
           }
-          console.log(field, dataFields[field])
+          console.log(field, dataFields[field]);
           return (
             <div key={elementId} id={linkToElementId}>
               <Box mt={3} mb={1}>
