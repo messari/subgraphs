@@ -25,6 +25,8 @@ export function getUsdPricePerToken(
   if (tokenAddr.toHex() == constants.ZERO_ADDRESS_STRING)
     return new CustomPriceType();
 
+  // Exception: Wrong prices of crvTriCrypto
+  // Ref: https://github.com/messari/subgraphs/pull/824
   if (
     tokenAddr.equals(constants.CRV_TRI_CRYPTO_ADDRESS) &&
     block.number.lt(BigInt.fromI32(12936339))
