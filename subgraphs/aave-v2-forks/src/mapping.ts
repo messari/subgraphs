@@ -111,7 +111,7 @@ export function _handleReserveInitialized(
   market.name = outputTokenEntity.name;
   market.isActive = true; // initialized to true on creation
   market.canUseAsCollateral = true; // only stopped when protocol is paused
-  market.canBorrowFrom = false; // set manually (generally after a market is initialized)
+  market.canBorrowFrom = true; // this field changes occasinally, but all markets are set to true after creation
   market.maximumLTV = BIGDECIMAL_ZERO;
   market.liquidationThreshold = BIGDECIMAL_ZERO;
   market.liquidationPenalty = BIGDECIMAL_ZERO;
