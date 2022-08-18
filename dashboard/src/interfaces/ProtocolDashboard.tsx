@@ -269,6 +269,11 @@ function ProtocolDashboard() {
 
   const [getPoolOverviewTokens5, { data: poolOverviewTokens5 }] = useLazyQuery(tokenQuery, { client: client });
 
+  const [getFailedIndexingStatus, { data: indexingFailureData, error: indexingFailureError }] = useLazyQuery(
+    nameQuery,
+    { variables: { subgraphName }, client: clientIndexing },
+  );
+
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOLOVERVIEW") {
     tabNum = "2";
