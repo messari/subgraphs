@@ -20,6 +20,7 @@ import {
 } from "../../generated/schema";
 import * as utils from "./utils";
 import * as constants from "./constants";
+import { getUsdPricePerToken } from "../prices";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
@@ -39,12 +40,12 @@ export function getOrCreateAccount(id: string): Account {
   return account;
 }
 
-export function getOrCreateRewardToken(address: Address): RewardToken {
+export function getOrCreateRewardToken(address: Address, blockNumber: BigInt): RewardToken {
   let rewardToken = RewardToken.load(address.toHexString());
 
   if (!rewardToken) {
     rewardToken = new RewardToken(address.toHexString());
-    const token = getOrCreateToken(address);
+    const token = getOrCreateToken(address, blockNumber);
     rewardToken.token = token.id;
     rewardToken.type = constants.RewardTokenType.DEPOSIT;
 
@@ -107,7 +108,7 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
   return protocol;
 }
 
-export function getOrCreateToken(address: Address): Token {
+export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
   let token = Token.load(address.toHexString());
 
   if (!token) {
@@ -120,6 +121,23 @@ export function getOrCreateToken(address: Address): Token {
     token.decimals = utils
       .readValue<BigInt>(contract.try_decimals(), constants.BIGINT_ZERO)
       .toI32();
+
+    let tokenPrice = getUsdPricePerToken(address);
+    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceBlockNumber = blockNumber;
+    token.save();
+  }
+
+  if (
+    !token.lastPriceUSD ||
+    !token.lastPriceBlockNumber ||
+    blockNumber
+      .minus(token.lastPriceBlockNumber!)
+      .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
+  ) {
+    let tokenPrice = getUsdPricePerToken(address);
+    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceBlockNumber = blockNumber;
 
     token.save();
   }
@@ -361,7 +379,7 @@ export function getOrCreateLiquidityPool(
     pool.inputTokenBalances = inputTokensInfo.getBalances;
     pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
 
-    pool.outputToken = getOrCreateToken(poolAddress).id;
+    pool.outputToken = getOrCreateToken(poolAddress, block.number).id;
     pool.outputTokenSupply = constants.BIGINT_ZERO;
     pool.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
 

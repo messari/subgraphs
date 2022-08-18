@@ -1,22 +1,19 @@
 {
-  "startBlock": "222832",
   "network": "arbitrum-one",
-  "vault": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
-  "feeCollector": "0xce88686553686da562ce7cea497ce749da109f9f",
-  "knownAssets": {
-    "dai": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
-    "usdc": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
-    "usdt": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
-    "weth": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
-    "wbtc": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
-    "wmatic": "0x0000000000000000000000000000000000000000",
-    "bal": "0x040d1EdC9569d4Bab2D15287Dc5A4F10F56a56B8"
-  },
   "protocolName": "Balancer v2",
   "protocolSlug": "balancer-v2",
-  "defaultNetwork": "ARBITRUM_ONE",
-  "isBalancer": true,
+  "defaultNetwork": "Network.ARBITRUM_ONE",
+
+  "vaultAddress": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
+  "vaultStartBlock": 222832,
+
+  "gaugeControllerAddress": "0xb08E16cFc07C684dAA2f93C70323BAdb2A6CBFd2",
+  "gaugeControllerStartBlock": 9756975,
+
+  "protocolFeesCollectorAddress": "0xce88686553686DA562CE7Cea497CE749DA109f9F",
+  "balancerAddress": "0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8",
+
   "graftEnabled": false,
-  "subgraphId": "QmVw2ruPhJZkzWT5QUA9bskyaF3vfzwTohfUpkNdiEzeeb",
-  "graftStartBlock": "1539300"
+  "subgraphId": "",
+  "graftStartBlock": ""
 }

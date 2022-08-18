@@ -1,9 +1,9 @@
 import {
   getOrCreateRewardToken,
   getOrCreateLiquidityPool,
+  getOrCreateToken,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
@@ -62,6 +62,8 @@ export function updateBalancerRewards(
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
+
+  if (gaugeRelativeWeight.equals(constants.BIGDECIMAL_ZERO)) return;
 
   let gaugeWorkingSupply = utils
     .readValue<BigInt>(
@@ -132,7 +134,7 @@ export function updateRewardTokenEmissions(
   block: ethereum.Block
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
-  const rewardToken = getOrCreateRewardToken(rewardTokenAddress);
+  const rewardToken = getOrCreateRewardToken(rewardTokenAddress, block.number);
 
   if (!pool.rewardTokens) {
     pool.rewardTokens = [];
@@ -156,15 +158,14 @@ export function updateRewardTokenEmissions(
   }
   let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
-  const rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);
-  const rewardTokenDecimals = utils.getTokenDecimals(rewardTokenAddress);
+  const rewardTokenPrice = getOrCreateToken(rewardTokenAddress, block.number);
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
-    .toBigDecimal()
-    .div(rewardTokenDecimals)
-    .times(rewardTokenPrice.usdPrice)
-    .div(rewardTokenPrice.decimalsBaseTen);
+    .divDecimal(
+      constants.BIGINT_TEN.pow(rewardTokenPrice.decimals as u8).toBigDecimal()
+    )
+    .times(rewardTokenPrice.lastPriceUSD!);
 
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;

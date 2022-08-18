@@ -127,6 +127,7 @@ export const DAILY_BAL_EMISSIONS = WEEKLY_BAL_EMISSIONS.div(
   BigDecimal.fromString("7")
 );
 
+export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
 
 /////////////////////////////
 ///// Protocol Specific /////
