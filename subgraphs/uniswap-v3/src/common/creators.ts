@@ -14,7 +14,6 @@ import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
   getOrCreateDex,
-  getOrCreateLPToken,
   getOrCreateToken,
   getTradingFee,
 } from "./getters";
@@ -22,11 +21,8 @@ import { NetworkConfigs } from "../../configurations/configure";
 import {
   BIGDECIMAL_FIFTY,
   BIGDECIMAL_NEG_ONE,
-  BIGDECIMAL_ONE,
-  BIGDECIMAL_TWO,
   BIGDECIMAL_ZERO,
   BIGINT_NEG_ONE,
-  BIGINT_ONE,
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
@@ -152,6 +148,7 @@ function incrementDepositHelper(poolAddress: string): void {
 // Also, updated token balances and total value locked.
 export function createDeposit(
   event: ethereum.Event,
+  owner: Address,
   amount0: BigInt,
   amount1: BigInt
 ): void {
@@ -210,7 +207,7 @@ export function createDeposit(
   deposit.logIndex = event.logIndex.toI32();
   deposit.protocol = protocol.id;
   deposit.to = pool.id;
-  deposit.from = event.transaction.from.toHexString();
+  deposit.from = owner.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
@@ -231,6 +228,7 @@ export function createDeposit(
 // Also, updated token balances and total value locked.
 export function createWithdraw(
   event: ethereum.Event,
+  owner: Address,
   amount0: BigInt,
   amount1: BigInt
 ): void {
@@ -288,7 +286,7 @@ export function createWithdraw(
   withdrawal.hash = event.transaction.hash.toHexString();
   withdrawal.logIndex = event.logIndex.toI32();
   withdrawal.protocol = protocol.id;
-  withdrawal.to = event.transaction.from.toHexString();
+  withdrawal.to = owner.toHexString();
   withdrawal.from = pool.id;
   withdrawal.blockNumber = event.block.number;
   withdrawal.timestamp = event.block.timestamp;
@@ -309,8 +307,8 @@ export function createSwapHandleVolumeAndFees(
   event: ethereum.Event,
   amount0: BigInt,
   amount1: BigInt,
-  to: Address,
-  from: Address,
+  recipient: Address,
+  sender: Address,
   sqrtPriceX96: BigInt
 ): void {
   let poolAddress = event.address.toHexString();
@@ -398,8 +396,8 @@ export function createSwapHandleVolumeAndFees(
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();
   swap.protocol = protocol.id;
-  swap.to = to.toHexString();
-  swap.from = from.toHexString();
+  swap.to = recipient.toHexString();
+  swap.from = sender.toHexString();
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;
   swap.tokenIn = amount0 > BIGINT_ZERO ? token0.id : token1.id;
