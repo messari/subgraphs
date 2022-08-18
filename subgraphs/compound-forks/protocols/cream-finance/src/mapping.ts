@@ -281,6 +281,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
+    false, // do not update all prices
     event
   );
 }
@@ -292,7 +293,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "CREAM Finance",
     "cream-finance",
     "2.0.1",
-    "1.1.1",
+    "1.1.2",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
