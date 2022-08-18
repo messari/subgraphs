@@ -15,12 +15,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return new CustomPriceType();
   }
 
-  if (constants.USD_PEGGED_TOKENS.includes(tokenAddr.toHexString()))
-    return CustomPriceType.initialize(
-      BigDecimal.fromString("1000000"),
-      constants.DEFAULT_USDC_DECIMALS
-    );
-
   let network = dataSource.network();
 
   // 1. Yearn Lens Oracle

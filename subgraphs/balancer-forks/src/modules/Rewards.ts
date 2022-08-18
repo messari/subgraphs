@@ -63,6 +63,8 @@ export function updateBalancerRewards(
     )
     .toBigDecimal();
 
+  if (gaugeRelativeWeight.equals(constants.BIGDECIMAL_ZERO)) return;
+
   let gaugeWorkingSupply = utils
     .readValue<BigInt>(
       gaugeContract.try_working_supply(),

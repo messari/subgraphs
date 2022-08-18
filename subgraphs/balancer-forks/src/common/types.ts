@@ -1,5 +1,4 @@
 import * as constants from "./constants";
-import { getOrCreateToken } from "./initializers";
 import { LiquidityPoolFee } from "../../generated/schema";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 

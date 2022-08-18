@@ -9,6 +9,31 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "gauge",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "streamer",
+        "type": "address"
+      }
+    ],
+    "name": "RewardsOnlyGaugeCreated",
+    "type": "event"
+  },
+  {
     "name": "NewTypeWeight",
     "inputs": [
       { "name": "type_id", "type": "int128", "indexed": false },
