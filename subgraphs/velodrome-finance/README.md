@@ -32,7 +32,7 @@ The user actions of Velodrome include:
 - Stake (lock) VELO into veVELO NFT and unstake
 - Stakers vote weekly to decide emission allocation into pools
 - Stakers claim rewards (trading fees, VELO rebase rewards)
-- Stakers claim bribes (a future feature, not bribes are airdropped weekly)
+- Stakers claim bribes (a future feature, as of now bribes are airdropped weekly)
 - Add a bribe (probably not a smart contract feature yet)
  
 
