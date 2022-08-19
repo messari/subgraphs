@@ -87,17 +87,15 @@ export function updateProtocol(
     protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidateUSD);
   }
 
-  // update revenue
-  let newProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
-    newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
   }
 
   if (newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   }
 
+  let newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
   if (newProtocolSideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(
       protocol.cumulativeSupplySideRevenueUSD,
@@ -107,14 +105,17 @@ export function updateProtocol(
         protocol._cumulativeProtocolSideStabilityFeeRevenue = protocol._cumulativeProtocolSideStabilityFeeRevenue!.plus(
           newProtocolSideRevenueUSD,
         );
+        break;
       case ProtocolSideRevenueType.LIQUIDATION:
         protocol._cumulativeProtocolSideLiquidationRevenue = protocol._cumulativeProtocolSideLiquidationRevenue!.plus(
           newProtocolSideRevenueUSD,
         );
+        break;
       case ProtocolSideRevenueType.PSM:
         protocol._cumulativeProtocolSidePSMRevenue = protocol._cumulativeProtocolSidePSMRevenue!.plus(
           newProtocolSideRevenueUSD,
         );
+        break;
     }
   }
 
@@ -352,16 +353,15 @@ export function updateFinancialsSnapshot(
     financials.dailyLiquidateUSD = financials.dailyLiquidateUSD.plus(liquidateUSD);
   }
 
-  let newProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     financials.dailyTotalRevenueUSD = financials.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
-    newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
   }
 
   if (newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     financials.dailySupplySideRevenueUSD = financials.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   }
 
+  let newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
   if (newProtocolSideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     financials.dailyProtocolSideRevenueUSD = financials.dailyTotalRevenueUSD.minus(
       financials.dailySupplySideRevenueUSD,
@@ -371,14 +371,17 @@ export function updateFinancialsSnapshot(
         financials._dailyProtocolSideStabilityFeeRevenue = financials._dailyProtocolSideStabilityFeeRevenue!.plus(
           newProtocolSideRevenueUSD,
         );
+        break;
       case ProtocolSideRevenueType.LIQUIDATION:
         financials._dailyProtocolSideLiquidationRevenue = financials._dailyProtocolSideLiquidationRevenue!.plus(
           newProtocolSideRevenueUSD,
         );
+        break;
       case ProtocolSideRevenueType.PSM:
         financials._dailyProtocolSidePSMRevenue = financials._dailyProtocolSidePSMRevenue!.plus(
           newProtocolSideRevenueUSD,
         );
+        break;
     }
   }
 
