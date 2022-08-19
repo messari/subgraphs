@@ -150,6 +150,7 @@ export function _handleReserveInitialized(
   market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.rates = []; // calculated in event ReserveDataUpdated
+  market.prePauseState = [true, true, true];
 
   market.save();
 }
@@ -197,6 +198,11 @@ export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
   }
 
   market.canBorrowFrom = true;
+  market.prePauseState = [
+    market.prePauseState[0],
+    market.prePauseState[1],
+    true,
+  ];
   market.save();
 }
 
@@ -210,6 +216,11 @@ export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
   }
 
   market.canBorrowFrom = false;
+  market.prePauseState = [
+    market.prePauseState[0],
+    market.prePauseState[1],
+    false,
+  ];
   market.save();
 }
 
@@ -223,6 +234,11 @@ export function _handleReserveActivated(marketId: Address): void {
   }
 
   market.isActive = true;
+  market.prePauseState = [
+    true,
+    market.prePauseState[1],
+    market.prePauseState[2],
+  ];
   market.save();
 }
 
@@ -236,6 +252,11 @@ export function _handleReserveDeactivated(marketId: Address): void {
   }
 
   market.isActive = false;
+  market.prePauseState = [
+    false,
+    market.prePauseState[1],
+    market.prePauseState[2],
+  ];
   market.save();
 }
 
@@ -350,11 +371,10 @@ export function _handleUnpaused(protocolData: ProtocolData): void {
       continue;
     }
 
-    market.isActive = market.prePauseState![0];
-    market.canUseAsCollateral = market.prePauseState![1];
-    market.canBorrowFrom = market.prePauseState![2];
+    market.isActive = market.prePauseState[0];
+    market.canUseAsCollateral = market.prePauseState[1];
+    market.canBorrowFrom = market.prePauseState[2];
 
-    market.prePauseState = null;
     market.save();
   }
 }
