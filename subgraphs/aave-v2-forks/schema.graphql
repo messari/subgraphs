@@ -671,6 +671,9 @@ type Market @entity {
 
   " An aggregate metric of the average borrow rate across all borrows "
   liquidityIndex: BigInt!
+
+  " The state of the protocol prior to being paused (isActive / canUseAsCollateral / canBorrowFrom) "
+  prePauseState: [Boolean!]
 }
 
 #################################
