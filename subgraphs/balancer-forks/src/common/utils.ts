@@ -12,6 +12,7 @@ import {
   getOrCreateDexAmmProtocol,
   getOrCreateLiquidityPoolFee,
 } from "./initializers";
+import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { PoolFeesType, PoolTokensType } from "./types";
 import { Token, LiquidityPool } from "../../generated/schema";
@@ -20,6 +21,12 @@ import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/gauge/Gauge";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
 import { FeesCollector as FeesCollectorContract } from "../../generated/templates/WeightedPool/FeesCollector";
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_TEN,
+  INT_ONE,
+  INT_ZERO,
+} from "../common/constants";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -261,4 +268,30 @@ export function updateProtocolAfterNewLiquidityPool(
   protocol.totalPoolCount += 1;
 
   protocol.save();
+}
+
+// convert decimals
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let bd = BIGDECIMAL_ONE;
+  for (let i = INT_ZERO; i < (decimals as i32); i = i + INT_ONE) {
+    bd = bd.times(BIGDECIMAL_TEN);
+  }
+  return bd;
+}
+
+// convert emitted values to tokens count
+export function convertTokenToDecimal(
+  tokenAmount: BigInt,
+  exchangeDecimals: i32
+): BigDecimal {
+  if (exchangeDecimals == INT_ZERO) {
+    return tokenAmount.toBigDecimal();
+  }
+
+  return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals));
+}
+
+// Round BigDecimal to whole number
+export function roundToWholeNumber(n: BigDecimal): BigDecimal {
+  return n.truncate(0);
 }

@@ -11,7 +11,10 @@
   "gaugeControllerStartBlock": 27098624,
 
   "protocolFeesCollectorAddress": "0xce88686553686DA562CE7Cea497CE749DA109f9F",
-  "balancerAddress": "0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3",
+  "protocolTokenAddress": "0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3",
+
+  "rewardTokenInterval": "NONE",
+  "rewardTokenRate": 0,
 
   "graftEnabled": false,
   "subgraphId": "",

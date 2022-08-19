@@ -1,27 +1,25 @@
 {
-  "startBlock": "16896080",
   "network": "fantom",
-  "vault": "0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce",
-  "knownAssets": {
-    "dai": "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E",
-    "usdc": "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75",
-    "fusdt": "0x049d68029688eAbF473097a2fC38ef61633A3C7A",
-    "mim": "0x82f0B8B456c1A451378467398982d4834b6829c1",
-    "weth": "0x74b23882a30290451A17c44f4F05243b6b58C76d",
-    "wbtc": "0x321162Cd933E2Be498Cd2267a90534A804051b11",
-    "wftm": "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83",
-    "beets": "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e",
-    "fbeets": "0xfcef8a994209d6916EB2C86cDD2AFD60Aa6F54b1",
-    "ohmybeets": "0xD34C004771F7b88D8d405327db3d06EB5086Ef26"
-  },
-  "masterChefV2": "0x8166994d9ebBe5829EC86Bd81258149B87faCfd3",
-  "masterChefV2StartBlock": "18508300",
   "protocolName": "Beethoven X",
   "protocolSlug": "beethoven-x",
-  "defaultNetwork": "FANTOM",
-  "isBeets": true,
-  "rewardToken": "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e",
+  "defaultNetwork": "Network.FANTOM",
+
+  "vaultAddress": "0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce",
+  "vaultStartBlock": 16896079,
+
+  "usesMasterChefV2": false,
+  "masterChefV2": "0x8166994d9ebBe5829EC86Bd81258149B87faCfd3",
+  "masterChefV2StartBlock": 18508347,
+
+  "protocolFeesCollectorAddress": "0xc6920d3a369e7c8bd1a22dbe385e11d1f7af948f",
+
+  "protocolTokenAddress": "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e",
+  "rewardTokenInterval": "TIMESTAMP",
+  "rewardTokenRate": 0,
+
+  "gaugeControllerAddress": "0x0000000000000000000000000000000000000000",
+
   "graftEnabled": false,
-  "subgraphId": "QmcqFpUohNUbwHzsXKhwwuK4jjwKr4DJ2hcGTmJz575Wy4",
-  "graftStartBlock": "25274593"
+  "subgraphId": "Qme6b5E86jgs3NpiZXj2iL5gnYhAswCgwQdsV8HJx9BW1J",
+  "graftStartBlock": 27921709
 }

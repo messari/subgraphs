@@ -1,26 +1,22 @@
 {
-  "startBlock": "7003430",
   "network": "optimism",
-  "vault": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
-  "knownAssets": {
-    "dai": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
-    "usdc": "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
-    "usdt": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
-    "frax": "0x2e3d870790dc77a83dd1d18184acc7439a53f475",
-    "mai": "0xdfa46478f9e5ea86d57387849598dbfb2e964b02",
-    "weth": "0x4200000000000000000000000000000000000006",
-    "wbtc": "0x68f180fcCe6836688e9084f035309E29Bf0A2095",
-    "op": "0x4200000000000000000000000000000000000042",
-    "beets": "0x97513e975a7fA9072c72C92d8000B0dB90b163c5",
-    "snx": "0x8700daec35af8ff88c16bdf0418774cb3d7599b4",
-    "link": "0x350a791bfc2c21f9ed5d10980dad2e2638ffa7f6"
-  },
   "protocolName": "Beethoven X",
   "protocolSlug": "beethoven-x",
-  "defaultNetwork": "OPTIMISM",
-  "isBeetsOp": true,
-  "rewardToken": "",
+  "defaultNetwork": "Network.OPTIMISM",
+
+  "vaultAddress": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
+  "vaultStartBlock": 154627,
+
+  "gaugeControllerAddress": "0x2E96068b3D5B5BAE3D7515da4A1D2E52d08A2647",
+  "gaugeControllerStartBlock": 9052485,
+
+  "protocolFeesCollectorAddress": "0xce88686553686DA562CE7Cea497CE749DA109f9F",
+
+  "protocolTokenAddress": "0x97513e975a7fA9072c72C92d8000B0dB90b163c5",
+  "rewardTokenInterval": "TIMESTAMP",
+  "rewardTokenRate": 0,
+
   "graftEnabled": false,
-  "subgraphId": "QmPsosmUKLybJ2S56rogroeazsNAP2T9rHhHZ8vWpJw26k",
-  "graftStartBlock": "13000000"
+  "subgraphId": "",
+  "graftStartBlock": ""
 }

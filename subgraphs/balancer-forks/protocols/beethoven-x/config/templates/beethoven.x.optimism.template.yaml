@@ -1,15 +1,22 @@
 specVersion: 0.0.5
 repository: https://github.com/messari/subgraphs
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{subgraphId}}
+  block: {{graftStartBlock}}
+{{/graftEnabled}}
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Vault
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
+      address: "{{vaultAddress}}"
       abi: Vault
-      startBlock: 12272146
+      startBlock: {{vaultStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -18,17 +25,13 @@ dataSources:
         - DexAmmProtocol
       abis:
         - name: Vault
-          file: ./abis/balancer-v2/Vault.json
+          file: ./abis/beethoven-x/Vault.json
         - name: WeightedPool
-          file: ./abis/balancer-v2/WeightedPool.json
-        - name: Gauge
-          file: ./abis/balancer-v2/Gauge.json
-        - name: GaugeController
-          file: ./abis/balancer-v2/GaugeController.json
+          file: ./abis/beethoven-x/WeightedPool.json
         - name: FeesCollector
-          file: ./abis/balancer-v2/ProtocolFeesCollector.json
+          file: ./abis/beethoven-x/ProtocolFeesCollector.json
         - name: ERC20
-          file: ./abis/balancer-v2/ERC20.json
+          file: ./abis/beethoven-x/ERC20.json
 
         ###########################################
         ############## Price Oracle ###############
@@ -76,11 +79,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: GaugeController
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD"
+      address: "{{gaugeControllerAddress}}"
       abi: GaugeController
-      startBlock: 14457014
+      startBlock: {{gaugeControllerStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -89,50 +92,8 @@ dataSources:
         - DexAmmProtocol
       abis:
         - name: GaugeController
-          file: ./abis/balancer-v2/GaugeController.json
-        - name: Gauge
-          file: ./abis/balancer-v2/Gauge.json
-        - name: Vault
-          file: ./abis/balancer-v2/Vault.json
-        - name: WeightedPool
-          file: ./abis/balancer-v2/WeightedPool.json
-        - name: FeesCollector
-          file: ./abis/balancer-v2/ProtocolFeesCollector.json
-        - name: ERC20
-          file: ./abis/balancer-v2/ERC20.json
-
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
+          file: ./abis/beethoven-x/GaugeController.json
+        
       eventHandlers:
         - event: NewGauge(address,int128,uint256)
           handler: handleNewGauge
@@ -143,7 +104,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: WeightedPool
-    network: mainnet
+    network: {{network}}
     source:
       abi: WeightedPool
     mapping:
@@ -155,58 +116,17 @@ templates:
         - LiquidityPoolFee
       abis:
         - name: WeightedPool
-          file: ./abis/balancer-v2/WeightedPool.json
-        - name: Vault
-          file: ./abis/balancer-v2/Vault.json
+          file: ./abis/beethoven-x/WeightedPool.json
         - name: FeesCollector
-          file: ./abis/balancer-v2/ProtocolFeesCollector.json
-        - name: Gauge
-          file: ./abis/balancer-v2/Gauge.json
-        - name: GaugeController
-          file: ./abis/balancer-v2/GaugeController.json
-        - name: ERC20
-          file: ./abis/balancer-v2/ERC20.json
-        
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
+          file: ./abis/beethoven-x/ProtocolFeesCollector.json
       eventHandlers:
         - event: SwapFeePercentageChanged(uint256)
-          handler: handleSwapFeePercentageChanged
+          handler: handleSwapFeePercentageChange
       file: ./src/mappings/poolMappings.ts
 
   - kind: ethereum/contract
     name: Gauge
-    network: mainnet
+    network: {{network}}
     source:
       abi: Gauge
     mapping:
@@ -218,17 +138,11 @@ templates:
         - LiquidityPoolFee
       abis:
         - name: Gauge
-          file: ./abis/balancer-v2/Gauge.json
+          file: ./abis/beethoven-x/Gauge.json
         - name: GaugeController
-          file: ./abis/balancer-v2/GaugeController.json
-        - name: Vault
-          file: ./abis/balancer-v2/Vault.json
-        - name: WeightedPool
-          file: ./abis/balancer-v2/WeightedPool.json
-        - name: FeesCollector
-          file: ./abis/balancer-v2/ProtocolFeesCollector.json
+          file: ./abis/beethoven-x/GaugeController.json
         - name: ERC20
-          file: ./abis/balancer-v2/ERC20.json
+          file: ./abis/beethoven-x/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -262,6 +176,7 @@ templates:
           file: ./abis/Prices/SushiSwap/Pair.json
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
+
       eventHandlers:
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit
