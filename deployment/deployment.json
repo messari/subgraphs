@@ -694,7 +694,7 @@
         "arbitrum": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "celo": {
           "template": "uniswap.v3.template.yaml",
@@ -704,17 +704,17 @@
         "ethereum": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "optimism": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "polygon": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     },

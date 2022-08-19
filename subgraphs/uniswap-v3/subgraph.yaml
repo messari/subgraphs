@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: celo
+    network: matic
     source:
       address: "0xd9dc0d8f754c027DF7eCB4BD381301cEC76CD32F"
       abi: Factory
-      startBlock: 13757683
+      startBlock: 22757546
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -40,7 +40,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: celo
+    network: matic
     source:
       abi: Pool
     mapping:

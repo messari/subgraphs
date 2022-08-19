@@ -140,7 +140,7 @@ export function findUSDPricePerToken(
       let poolAmounts = getLiquidityPoolAmounts(poolAddress);
       let pool = getLiquidityPool(poolAddress);
 
-      if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
+      if (pool.totalValueLockedUSD!.gt(BIGDECIMAL_ZERO)) {
         if (pool.inputTokens[0] == token.id) {
           // whitelist token is token1
           let token1 = getOrCreateToken(pool.inputTokens[1]);
