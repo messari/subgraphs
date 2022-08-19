@@ -100,16 +100,16 @@ export class SushiswapMaticConfigurations implements Configurations {
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
-      "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174", // USDC
-      "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063", // DAI
-      "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", // USDT
+      "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", // USDC
+      "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063", // DAI
+      "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", // USDT
     ]);
   }
   getStableOraclePools(): string[] {
     return toLowerCaseList([
-      "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", // wETH/USDC
-      "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", // wETH/USDT
-      "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063", // wETH/DAI
+      "0x34965ba0ac2451a34a0471f04cca3f990b8dea27", // wETH/USDC
+      "0xc2755915a85c6f6c1c0f3a86ac8c058f11caa9c9", // wETH/USDT
+      "0x6ff62bfb8c12109e8000935a6de54dad83a4f39f", // wETH/DAI
     ]);
   }
   getUntrackedPairs(): string[] {
@@ -119,9 +119,9 @@ export class SushiswapMaticConfigurations implements Configurations {
     return [];
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
-    return MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND;
+    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
   }
   getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
-    return MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND;
+    return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
 }

@@ -75,7 +75,7 @@ export class SushiswapBscConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x2170Ed0880ac9A755fd29B2688956BD959F933F8");
+    return toLowerCase("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c");
   }
   getRewardToken(): string {
     return toLowerCase("0x947950BcC74888a40Ffa2593C5798F11Fc9124C4");
