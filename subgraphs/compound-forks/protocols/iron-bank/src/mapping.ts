@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -87,6 +87,20 @@ export function handleMarketListed(event: MarketListed): void {
   if (cToken != null) {
     return;
   }
+
+  // handle edge case
+  // iron bank (ethereum) has 2 cySUSD tokens: 0x4e3a36a633f63aee0ab57b5054ec78867cb3c0b8 (deployed earlier) and 0xa7c4054AFD3DbBbF5bFe80f41862b89ea05c9806 (in use)
+  // the former totalBorrows is unreasonably huge for some reason
+  // according to iron bank dashboard https://app.ib.xyz/markets/Ethereum we should use the newer one instead, which has reasonable totalBorrows number
+  // since the bad version only exists for 20+ blocks, it is fine to skip it
+  if (
+    dataSource.network() == "mainnet" &&
+    cTokenAddr ==
+      Address.fromString("0x4e3a36a633f63aee0ab57b5054ec78867cb3c0b8")
+  ) {
+    return;
+  }
+
   // this is a new cToken, a new underlying token, and a new market
 
   let protocol = getOrCreateProtocol();
@@ -272,7 +286,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Iron Bank",
     "iron-bank",
     "2.0.1",
-    "1.1.2",
+    "1.1.3",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
