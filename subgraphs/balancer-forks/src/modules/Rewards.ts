@@ -16,6 +16,7 @@ export function getRewardsData(gaugeAddress: Address): RewardsInfoType {
   let rewardTokens: Address[] = [];
 
   let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
+
   let rewardCount = utils.readValue<BigInt>(
     gaugeContract.try_reward_count(),
     constants.BIGINT_TEN
@@ -49,13 +50,11 @@ export function updateControllerRewards(
   gaugeAddress: Address,
   block: ethereum.Block
 ): void {
-  const pool = getOrCreateLiquidityPool(poolAddress, block);
-
-  let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
   let gaugeControllerContract = GaugeControllereContract.bind(
     constants.GAUGE_CONTROLLER_ADDRESS
   );
 
+  // Returns BIGINT_ZERO if the weight is zero or the GaugeControllerContract is the childChainLiquidityGaugeFactory version.
   let gaugeRelativeWeight = utils
     .readValue<BigInt>(
       gaugeControllerContract.try_gauge_relative_weight(gaugeAddress),
@@ -63,7 +62,34 @@ export function updateControllerRewards(
     )
     .toBigDecimal();
 
-  if (gaugeRelativeWeight.equals(constants.BIGDECIMAL_ZERO)) return;
+  // This essentially checks if the gauge is a GaugeController gauge instead of a childChainLiquidityGaugeFactory contract.
+  if (gaugeRelativeWeight.equals(constants.BIGDECIMAL_ZERO)) {
+    return;
+  }
+
+  // Daily BAL emissions is currently known as a static value, but it may be changed in the future.
+  // FOLLOW UP: How to keep track of the daily emission rate?
+  let protocolTokenRewardEmissionsPerDay =
+    constants.DAILY_BAL_EMISSIONS.times(gaugeRelativeWeight);
+
+  updateRewardTokenEmissions(
+    constants.BALANCER_TOKEN_ADDRESS,
+    poolAddress,
+    BigInt.fromString(
+      protocolTokenRewardEmissionsPerDay.truncate(0).toString()
+    ),
+    block
+  );
+}
+
+export function updateRewardTokenInfo(
+  poolAddress: Address,
+  gaugeAddress: Address,
+  block: ethereum.Block
+): void {
+  // Update the staked output token amount for the pool ///////////
+  const pool = getOrCreateLiquidityPool(poolAddress, block);
+  let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
   let gaugeWorkingSupply = utils
     .readValue<BigInt>(
@@ -72,9 +98,7 @@ export function updateControllerRewards(
     )
     .toBigDecimal();
 
-  let balRewardEmissionsPerDay =
-    constants.DAILY_BAL_EMISSIONS.times(gaugeRelativeWeight);
-
+  // https://dev.balancer.fi/resources/vebal-and-gauges/estimating-gauge-incentive-aprs/apr-calculation
   pool.stakedOutputTokenAmount = BigInt.fromString(
     constants.BIGINT_ONE.divDecimal(
       constants.BIGDECIMAL_POINT_FOUR.div(
@@ -85,20 +109,9 @@ export function updateControllerRewards(
       .toString()
   );
   pool.save();
+  //////////////////////////////////////////////////////////////////
 
-  updateRewardTokenEmissions(
-    constants.PROTOCOL_TOKEN_ADDRESS,
-    poolAddress,
-    BigInt.fromString(balRewardEmissionsPerDay.truncate(0).toString()),
-    block
-  );
-}
-
-export function updateFactoryRewards(
-  poolAddress: Address,
-  gaugeAddress: Address,
-  block: ethereum.Block
-): void {
+  // Get data for all reward tokens for this gauge
   let rewardsInfo = getRewardsData(gaugeAddress);
 
   let rewardTokens = rewardsInfo.getRewardTokens;
