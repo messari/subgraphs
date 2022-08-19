@@ -355,7 +355,7 @@ export function updateFinancialsSnapshot(
   let newProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     financials.dailyTotalRevenueUSD = financials.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
-    let newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
+    newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
   }
 
   if (newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
