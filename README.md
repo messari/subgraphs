@@ -111,7 +111,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Notional Finance | 🔨 | | |
 | [Rari Fuse](https://app.rari.capital/fuse) | 🛠 | 2.0.1 / 1.1.2 / 1.0.0 | [![Rari Fuse Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-ethereum) [![Rari Fuse Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-fuse-arbitrum) |
 | [SCREAM](https://scream.sh/) | 🛠 | 2.0.1 / 1.1.1 / 1.0.0 | [![SCREAM Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/scream-fantom) |
-| [Tectonic](https://tectonic.finance/) | 🛠 | 2.0.1 / 1.1.3 / 1.0.0 | [![Tectonic Cronos](./docs/images/chains/cronos.png)](https://graph.cronoslabs.com/subgraphs/name/messari/tectonic/graphql) |
+| [Tectonic](https://tectonic.finance/) | ✅ | 2.0.1 / 1.1.3 / 1.0.0 | [![Tectonic Cronos](./docs/images/chains/cronos.png)](https://graph.cronoslabs.com/subgraphs/name/messari/tectonic/graphql) |
 | [Venus Protocol](https://venus.io/) | ✅ | 2.0.1 / 1.1.2 / 1.0.0 | [![Venus Protocol BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/venus-protocol-bsc) |
 | [Yeti Finance](https://yeti.finance/) | 🔨 | | |
 | **CDPs** | | |
