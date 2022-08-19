@@ -1040,6 +1040,10 @@ export function _handleLiquidate(
   );
   liquidate.save();
 
+  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
+    liquidate.amountUSD
+  );
+  protocol.save();
   market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(
     liquidate.amountUSD
   );
