@@ -319,6 +319,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
+    false, // do not update all prices
     event
   );
 }
@@ -330,7 +331,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Moonwell",
     "moonwell",
     "2.0.1",
-    "1.1.1",
+    "1.1.2",
     "1.0.0",
     Network.MOONRIVER,
     comptroller.try_liquidationIncentiveMantissa(),

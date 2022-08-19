@@ -4,8 +4,8 @@ schema:
 features:
   - grafting
 graft:
-  base: QmVQ7nvuPpm9kes668e31DogbGoPjwgSb9Yo2RnBkf5ytv
-  block: 11550320
+  base: QmQmcQJCdU7WPtSqjkvaeMJGjenkuQu3B4y1coAvGJQxrc
+  block: 15367830
 dataSources:
   # Vault
   - name: Vat
@@ -311,6 +311,8 @@ dataSources:
       abis:
         - name: PSM
           file: ./abis/PSM.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - LendingProtocol
         - FinancialsDailySnapshot
@@ -335,6 +337,8 @@ dataSources:
       abis:
         - name: PSM
           file: ./abis/PSM.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - LendingProtocol
         - FinancialsDailySnapshot
@@ -359,6 +363,8 @@ dataSources:
       abis:
         - name: PSM
           file: ./abis/PSM.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - LendingProtocol
         - FinancialsDailySnapshot

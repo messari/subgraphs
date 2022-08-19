@@ -1,16 +1,48 @@
 import {
+  updateFinancials,
+  updatePoolSnapshots,
+  updateUsageMetrics,
+} from "../modules/Metrics";
+import {
   updateBalancerRewards,
   updateRewardTokenInfo,
 } from "../modules/Rewards";
 import * as utils from "../common/utils";
 import {
+  Deposit,
+  Withdraw,
   UpdateLiquidityLimit,
-  RewardDistributorUpdated,
 } from "../../generated/templates/Gauge/Gauge";
 
-export function handleRewardDistributorUpdated(
-  event: RewardDistributorUpdated
-): void {}
+export function handleDeposit(event: Deposit): void {
+  const gaugeAddress = event.address;
+  const provider = event.params.provider;
+  const poolAddress = utils.getPoolFromGauge(gaugeAddress);
+
+  if (!poolAddress) return;
+
+  updateBalancerRewards(poolAddress, gaugeAddress, event.block);
+  updateRewardTokenInfo(poolAddress, gaugeAddress, event.block);
+
+  updateUsageMetrics(event.block, provider);
+  updatePoolSnapshots(poolAddress, event.block);
+  updateFinancials(event.block);
+}
+
+export function handleWithdraw(event: Withdraw): void {
+  const gaugeAddress = event.address;
+  const provider = event.params.provider;
+  const poolAddress = utils.getPoolFromGauge(gaugeAddress);
+
+  if (!poolAddress) return;
+
+  updateBalancerRewards(poolAddress, gaugeAddress, event.block);
+  updateRewardTokenInfo(poolAddress, gaugeAddress, event.block);
+
+  updateUsageMetrics(event.block, provider);
+  updatePoolSnapshots(poolAddress, event.block);
+  updateFinancials(event.block);
+}
 
 export function handleUpdateLiquidityLimit(event: UpdateLiquidityLimit): void {
   const gaugeAddress = event.address;

@@ -95,7 +95,7 @@ export namespace NULL {
 export namespace Protocol {
   export const NAME = "Balancer v2";
   export const SLUG = "balancer-v2";
-  export const NETWORK = Network.MAINNET;
+  export const NETWORK = Network.ARBITRUM_ONE;
   export const SCHEMA_VERSION = "1.3.0";
   export const SUBGRAPH_VERSION = "1.1.0";
   export const METHODOLOGY_VERSION = "1.0.0";
@@ -127,6 +127,7 @@ export const DAILY_BAL_EMISSIONS = WEEKLY_BAL_EMISSIONS.div(
   BigDecimal.fromString("7")
 );
 
+export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -139,8 +140,8 @@ export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
   "0xce88686553686DA562CE7Cea497CE749DA109f9F"
 );
 export const BALANCER_TOKEN_ADDRESS = Address.fromString(
-  "0xba100000625a3754423978a60c9317c58a424e3D"
+  "0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD"
+  "0xb08E16cFc07C684dAA2f93C70323BAdb2A6CBFd2"
 );

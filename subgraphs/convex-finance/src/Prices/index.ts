@@ -1,8 +1,10 @@
 import {
   log,
   Address,
+  ethereum,
   BigDecimal,
   dataSource,
+  BigInt,
 } from "@graphprotocol/graph-ts";
 import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
@@ -15,11 +17,21 @@ import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
 
-export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
+export function getUsdPricePerToken(
+  tokenAddr: Address,
+  block: ethereum.Block
+): CustomPriceType {
   // Check if tokenAddr is a NULL Address
-  if (tokenAddr.toHex() == constants.ZERO_ADDRESS_STRING) {
+  if (tokenAddr.toHex() == constants.ZERO_ADDRESS_STRING)
     return new CustomPriceType();
-  }
+
+  // Exception: Wrong prices of crvTriCrypto
+  // Ref: https://github.com/messari/subgraphs/pull/824
+  if (
+    tokenAddr.equals(constants.CRV_TRI_CRYPTO_ADDRESS) &&
+    block.number.lt(BigInt.fromI32(12936339))
+  )
+    return new CustomPriceType();
 
   let network = dataSource.network();
 
@@ -28,7 +40,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!forexPrice.reverted) {
     log.debug("[forexPrice] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      forexPrice.usdPrice.div(forexPrice.decimalsBaseTen).toString()
+      forexPrice.usdPrice.div(forexPrice.decimalsBaseTen).toString(),
     ]);
     return forexPrice;
   }
@@ -38,7 +50,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!yearnLensPrice.reverted) {
     log.debug("[YearnLensOracle] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      yearnLensPrice.usdPrice.div(yearnLensPrice.decimalsBaseTen).toString()
+      yearnLensPrice.usdPrice.div(yearnLensPrice.decimalsBaseTen).toString(),
     ]);
     return yearnLensPrice;
   }
@@ -48,7 +60,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!chainLinkPrice.reverted) {
     log.debug("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      chainLinkPrice.usdPrice.div(chainLinkPrice.decimalsBaseTen).toString()
+      chainLinkPrice.usdPrice.div(chainLinkPrice.decimalsBaseTen).toString(),
     ]);
     return chainLinkPrice;
   }
@@ -63,7 +75,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       tokenAddr.toHexString(),
       calculationsCurvePrice.usdPrice
         .div(calculationsCurvePrice.decimalsBaseTen)
-        .toString()
+        .toString(),
     ]);
     return calculationsCurvePrice;
   }
@@ -78,7 +90,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       tokenAddr.toHexString(),
       calculationsSushiSwapPrice.usdPrice
         .div(calculationsSushiSwapPrice.decimalsBaseTen)
-        .toString()
+        .toString(),
     ]);
     return calculationsSushiSwapPrice;
   }
@@ -88,7 +100,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!curvePrice.reverted) {
     log.debug("[CurveRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      curvePrice.usdPrice.div(curvePrice.decimalsBaseTen).toString()
+      curvePrice.usdPrice.div(curvePrice.decimalsBaseTen).toString(),
     ]);
     return curvePrice;
   }
@@ -98,7 +110,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!uniswapPrice.reverted) {
     log.debug("[UniswapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      uniswapPrice.usdPrice.div(uniswapPrice.decimalsBaseTen).toString()
+      uniswapPrice.usdPrice.div(uniswapPrice.decimalsBaseTen).toString(),
     ]);
     return uniswapPrice;
   }
@@ -108,7 +120,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!sushiswapPrice.reverted) {
     log.debug("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      sushiswapPrice.usdPrice.div(sushiswapPrice.decimalsBaseTen).toString()
+      sushiswapPrice.usdPrice.div(sushiswapPrice.decimalsBaseTen).toString(),
     ]);
     return sushiswapPrice;
   }
@@ -122,9 +134,10 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 
 export function getUsdPrice(
   tokenAddr: Address,
-  amount: BigDecimal
+  amount: BigDecimal,
+  block: ethereum.Block
 ): BigDecimal {
-  let tokenPrice = getUsdPricePerToken(tokenAddr);
+  let tokenPrice = getUsdPricePerToken(tokenAddr, block);
 
   if (!tokenPrice.reverted) {
     return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);

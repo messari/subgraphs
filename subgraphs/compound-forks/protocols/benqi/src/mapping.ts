@@ -310,6 +310,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
+    false, // do not update all market prices
     event
   );
 }
@@ -321,7 +322,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "BENQI",
     "benqi",
     "2.0.1",
-    "1.1.1",
+    "1.1.2",
     "1.0.0",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),

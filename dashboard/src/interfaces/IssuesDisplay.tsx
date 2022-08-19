@@ -32,7 +32,7 @@ const messagesByLevel = (
         if (issuesArray[x].message) {
           factors = "This field is derived from the following factors: " + issuesArray[x].message + ". ";
         }
-        issuesMsg = `All values in ${issuesArray[x].fieldName} are 0. ${factors}Verify that this data is being mapped correctly.`;
+        issuesMsg = `All values in ${issuesArray[x].fieldName} are 0 (or null). ${factors}Verify that this data is being mapped correctly.`;
       }
       if (issuesArray[x].type === "LIQ") {
         issuesMsg = `${issuesArray[x].fieldName} timeseries value cannot be higher than totalValueLockedUSD on the pool. Look at snapshot id ${issuesArray[x].message}`;

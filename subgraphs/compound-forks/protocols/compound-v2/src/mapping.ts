@@ -55,6 +55,7 @@ import {
   setSupplyInterestRate,
   snapshotFinancials,
   TokenData,
+  updateAllMarketPrices,
   UpdateMarketData,
   _getOrCreateProtocol,
   _handleActionPaused,
@@ -451,6 +452,10 @@ function updateMarket(
     return;
   }
 
+  if (updateMarketPrices) {
+    updateAllMarketPrices(comptrollerAddress, blockNumber);
+  }
+
   // compound v2 specific price calculation (see ./prices.ts)
   let underlyingTokenPriceUSD = getUSDPriceOfToken(market, blockNumber.toI32());
 
@@ -539,6 +544,7 @@ function updateMarket(
   market.totalValueLockedUSD = underlyingSupplyUSD;
   market.totalDepositBalanceUSD = underlyingSupplyUSD;
 
+  market._borrowBalance = newTotalBorrow;
   market.totalBorrowBalanceUSD = newTotalBorrow
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))

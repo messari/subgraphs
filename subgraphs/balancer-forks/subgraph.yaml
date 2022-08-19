@@ -1,15 +1,15 @@
-specVersion: 0.0.4
+specVersion: 0.0.5
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Vault
-    network: mainnet
+    network: arbitrum-one
     source:
       address: "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
       abi: Vault
-      startBlock: 12272146
+      startBlock: 222832
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -76,11 +76,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: GaugeController
-    network: mainnet
+    network: arbitrum-one
     source:
-      address: "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD"
+      address: "0xb08E16cFc07C684dAA2f93C70323BAdb2A6CBFd2"
       abi: GaugeController
-      startBlock: 14457014
+      startBlock: 9756975
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -136,75 +136,14 @@ dataSources:
       eventHandlers:
         - event: NewGauge(address,int128,uint256)
           handler: handleNewGauge
+        - event: RewardsOnlyGaugeCreated(indexed address,indexed address,address)
+          handler: handleRewardsOnlyGaugeCreated
       file: ./src/mappings/GaugeControllerMappings.ts
-  - kind: ethereum/contract
-    name: BalancerMinter
-    network: mainnet
-    source:
-      address: "0x239e55f427d44c3cc793f49bfb507ebe76638a2b"
-      abi: BalancerMinter
-      startBlock: 14457016
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - DexAmmProtocol
-      abis:
-        - name: BalancerMinter
-          file: ./abis/BalancerMinter.json
-        - name: Vault
-          file: ./abis/Vault.json
-        - name: WeightedPool
-          file: ./abis/WeightedPool.json
-        - name: Gauge
-          file: ./abis/Gauge.json
-        - name: GaugeController
-          file: ./abis/GaugeController.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Minted(indexed address,address,uint256)
-          handler: handleMinted
-      file: ./src/mappings/balancerMinterMappings.ts
 
 templates:
   - kind: ethereum/contract
     name: WeightedPool
-    network: mainnet
+    network: arbitrum-one
     source:
       abi: WeightedPool
     mapping:
@@ -267,7 +206,7 @@ templates:
 
   - kind: ethereum/contract
     name: Gauge
-    network: mainnet
+    network: arbitrum-one
     source:
       abi: Gauge
     mapping:
@@ -324,8 +263,10 @@ templates:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: RewardDistributorUpdated(indexed address,address)
-          handler: handleRewardDistributorUpdated
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
         - event: UpdateLiquidityLimit(indexed address,uint256,uint256,uint256,uint256)
           handler: handleUpdateLiquidityLimit
       file: ./src/mappings/gaugeMappings.ts

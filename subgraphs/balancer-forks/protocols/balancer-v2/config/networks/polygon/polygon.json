@@ -1,19 +1,19 @@
 {
-  "startBlock": "15832990",
   "network": "matic",
-  "vault": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
-  "feeCollector": "0xce88686553686da562ce7cea497ce749da109f9f",
-  "knownAssets": {
-    "dai": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
-    "usdc": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
-    "usdt": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-    "weth": "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
-    "wbtc": "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
-    "wmatic": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-    "bal": "0x9a71012b13ca4d3d0cdc72a177df3ef03b0e76a3"
-  },
   "protocolName": "Balancer v2",
   "protocolSlug": "balancer-v2",
-  "defaultNetwork": "MATIC",
-  "isBalancer": true
+  "defaultNetwork": "Network.MATIC",
+
+  "vaultAddress": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
+  "vaultStartBlock": 15832990,
+
+  "gaugeControllerAddress": "0x3b8cA519122CdD8efb272b0D3085453404B25bD0",
+  "gaugeControllerStartBlock": 27098624,
+
+  "protocolFeesCollectorAddress": "0xce88686553686DA562CE7Cea497CE749DA109f9F",
+  "balancerAddress": "0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3",
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
 }

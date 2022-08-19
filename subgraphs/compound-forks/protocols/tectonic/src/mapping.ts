@@ -302,7 +302,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
-    // true, TODO: a note that when updateAllMarketPrices() is turned on this should be set to true
+    true,
     event
   );
 }
@@ -314,7 +314,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Tectonic",
     "tectonic",
     "2.0.1",
-    "1.1.2",
+    "1.1.3",
     "1.0.0",
     Network.CRONOS,
     comptroller.try_liquidationIncentiveMantissa(),
