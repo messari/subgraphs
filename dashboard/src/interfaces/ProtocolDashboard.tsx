@@ -840,13 +840,10 @@ function ProtocolDashboard() {
         errorMessage: `SUBGRAPH DATA UNREACHABLE - ${subgraphToQuery.url}. INDEXING ERROR - "${errMsg}".`,
       });
     }
-  } else if (indexingFailureData) {
-    const errMsg = indexingFailureData[indexingStatusKey]?.fatalError?.message;
-    if (typeof errMsg === "string") {
-      errorDisplayProps = new ApolloError({
-        errorMessage: `SUBGRAPH DATA UNREACHABLE - ${subgraphToQuery.url}. INDEXING ERROR - "${errMsg}".`,
-      });
-    }
+  }
+
+  if (data) {
+    errorDisplayProps = null;
   }
 
   return (
