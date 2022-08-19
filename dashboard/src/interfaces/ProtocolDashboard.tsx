@@ -816,14 +816,14 @@ function ProtocolDashboard() {
   }
 
   let protocolSchemaDataProp = protocolSchemaData;
-  const brokenDownName = subgraphName.split("/")[1].split("-");
-  const network = brokenDownName.pop() || "";
+  const brokenDownName = subgraphName.split("/")[1]?.split("-");
+  const network = brokenDownName?.pop() || "";
   if (!protocolSchemaDataProp?.protocols[0]) {
     protocolSchemaDataProp = {
       protocols: [
         {
           type: "N/A",
-          name: brokenDownName.join(" "),
+          name: brokenDownName ? brokenDownName?.join(" ") : "",
           network: network.toUpperCase(),
           schemaVersion: "N/A",
           subgraphVersion: "N/A",
@@ -840,13 +840,10 @@ function ProtocolDashboard() {
         errorMessage: `SUBGRAPH DATA UNREACHABLE - ${subgraphToQuery.url}. INDEXING ERROR - "${errMsg}".`,
       });
     }
-  } else if (indexingFailureData) {
-    const errMsg = indexingFailureData[indexingStatusKey]?.fatalError?.message;
-    if (typeof errMsg === "string") {
-      errorDisplayProps = new ApolloError({
-        errorMessage: `SUBGRAPH DATA UNREACHABLE - ${subgraphToQuery.url}. INDEXING ERROR - "${errMsg}".`,
-      });
-    }
+  }
+
+  if (data) {
+    errorDisplayProps = null;
   }
 
   return (
