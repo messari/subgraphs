@@ -1006,10 +1006,10 @@ function updateRewards(
           .toBigDecimal()
           .div(exponentToBigDecimal(token.decimals));
         let rewardsPerDay = supplyRewardsBD.times(blocksPerDay);
-        rewardEmissions[1] = BigInt.fromString(
+        distributorRewards[1] = BigInt.fromString(
           rewardsPerDay.truncate(0).toString()
         );
-        rewardEmissionsUSD[1] = rewardsPerDay.times(rewardTokenPriceUSD);
+        distributorRewardsUSD[1] = rewardsPerDay.times(rewardTokenPriceUSD);
 
         // create supply reward token
         let rewardTokenId = RewardTokenType.DEPOSIT + "-" + token.id;
@@ -1020,7 +1020,7 @@ function updateRewards(
           rewardToken.type = RewardTokenType.DEPOSIT;
           rewardToken.save();
         }
-        rewardTokens[1] = rewardToken.id;
+        distributorTokens[1] = rewardToken.id;
       }
     }
 
