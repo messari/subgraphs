@@ -20,10 +20,10 @@ import {
   USDC_POS_TOKEN_ADDRESS,
   USDC_TOKEN_ADDRESS,
 } from "./constants";
-// import {
-//   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
-//   LendingPool as LendingPoolTemplate,
-// } from "../../../generated/templates";
+import {
+  // LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
+  LendingPool as LendingPoolTemplate,
+} from "../../../generated/templates";
 import {
   BorrowingDisabledOnReserve,
   BorrowingEnabledOnReserve,
@@ -109,10 +109,10 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
   _handlePriceOracleUpdated(event.params.newAddress, getProtocolData());
 }
 
-// export function handleLendingPoolUpdated(event: LendingPoolUpdated): void {
-//   let context = initiateContext(event.address);
-//   startIndexingLendingPool(event.params.newAddress, context);
-// }
+export function handleLendingPoolUpdated(event: LendingPoolUpdated): void {
+  let context = initiateContext(event.address);
+  startIndexingLendingPool(event.params.newAddress, context);
+}
 
 // export function handleLendingPoolConfiguratorUpdated(
 //   event: LendingPoolConfiguratorUpdated
@@ -136,15 +136,15 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
 //   }
 // }
 
-// export function startIndexingLendingPool(
-//   poolAddress: Address,
-//   context: DataSourceContext
-// ): void {
-//   // Create a template for an implementation of a Lending Pool/Market
-//   // This indexes for events which users act upon a lending pool within the lendingPool.ts mapping script
-//   log.info("START INDEXING LENDING POOL", []);
-//   LendingPoolTemplate.createWithContext(poolAddress, context);
-// }
+export function startIndexingLendingPool(
+  poolAddress: Address,
+  context: DataSourceContext
+): void {
+  // Create a template for an implementation of a Lending Pool/Market
+  // This indexes for events which users act upon a lending pool within the lendingPool.ts mapping script
+  log.info("START INDEXING LENDING POOL", []);
+  LendingPoolTemplate.createWithContext(poolAddress, context);
+}
 
 // export function startIndexingLendingPoolConfigurator(
 //   configurator: Address,
@@ -156,35 +156,35 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
 //   LendingPoolConfiguratorTemplate.createWithContext(configurator, context);
 // }
 
-// function initiateContext(addrProvider: Address): DataSourceContext {
-//   // Add Lending Pool address, price oracle contract address,
-//   // and protocol id to the context for general accessibility
-//   let contract = AddressProviderContract.bind(addrProvider);
-//   log.info("AddrProvContract: " + addrProvider.toHexString(), []);
-//   // Get the lending pool
-//   let trylendingPool = contract.try_getLendingPool();
-//   let lendingPool = "";
-//   if (!trylendingPool.reverted) {
-//     lendingPool = trylendingPool.value.toHexString();
-//     log.info("initiateContext LP:" + lendingPool, []);
-//   }
+function initiateContext(addrProvider: Address): DataSourceContext {
+  // Add Lending Pool address, price oracle contract address,
+  // and protocol id to the context for general accessibility
+  let contract = AddressProviderContract.bind(addrProvider);
+  log.info("AddrProvContract: " + addrProvider.toHexString(), []);
+  // Get the lending pool
+  let trylendingPool = contract.try_getLendingPool();
+  let lendingPool = "";
+  if (!trylendingPool.reverted) {
+    lendingPool = trylendingPool.value.toHexString();
+    log.info("initiateContext LP:" + lendingPool, []);
+  }
 
-//   // Initialize the protocol entity
-//   let lendingProtocol = getOrCreateLendingProtocol(getProtocolData());
+  // Initialize the protocol entity
+  let lendingProtocol = getOrCreateLendingProtocol(getProtocolData());
 
-//   let priceOracle = readValue<Address>(
-//     contract.try_getPriceOracle(),
-//     Address.fromString(ZERO_ADDRESS)
-//   );
+  let priceOracle = readValue<Address>(
+    contract.try_getPriceOracle(),
+    Address.fromString(ZERO_ADDRESS)
+  );
 
-//   lendingProtocol.priceOracle = priceOracle.toHexString();
-//   lendingProtocol.save();
+  lendingProtocol.priceOracle = priceOracle.toHexString();
+  lendingProtocol.save();
 
-//   let context = new DataSourceContext();
-//   context.setString("lendingPool", lendingPool);
+  let context = new DataSourceContext();
+  context.setString("lendingPool", lendingPool);
 
-//   return context;
-// }
+  return context;
+}
 
 //////////////////////////////////////
 ///// Lending Pool Configuration /////
