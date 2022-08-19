@@ -44,7 +44,7 @@ export function getRewardsData(gaugeAddress: Address): RewardsInfoType {
   return new RewardsInfoType(rewardTokens, rewardRates);
 }
 
-export function updateBalancerRewards(
+export function updateControllerRewards(
   poolAddress: Address,
   gaugeAddress: Address,
   block: ethereum.Block
@@ -87,14 +87,14 @@ export function updateBalancerRewards(
   pool.save();
 
   updateRewardTokenEmissions(
-    constants.BALANCER_TOKEN_ADDRESS,
+    constants.PROTOCOL_TOKEN_ADDRESS,
     poolAddress,
     BigInt.fromString(balRewardEmissionsPerDay.truncate(0).toString()),
     block
   );
 }
 
-export function updateRewardTokenInfo(
+export function updateFactoryRewards(
   poolAddress: Address,
   gaugeAddress: Address,
   block: ethereum.Block

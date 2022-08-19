@@ -4,8 +4,8 @@ import {
   updateUsageMetrics,
 } from "../modules/Metrics";
 import {
-  updateBalancerRewards,
-  updateRewardTokenInfo,
+  updateControllerRewards,
+  updateFactoryRewards,
 } from "../modules/Rewards";
 import * as utils from "../common/utils";
 import {
@@ -21,8 +21,8 @@ export function handleDeposit(event: Deposit): void {
 
   if (!poolAddress) return;
 
-  updateBalancerRewards(poolAddress, gaugeAddress, event.block);
-  updateRewardTokenInfo(poolAddress, gaugeAddress, event.block);
+  updateControllerRewards(poolAddress, gaugeAddress, event.block);
+  updateFactoryRewards(poolAddress, gaugeAddress, event.block);
 
   updateUsageMetrics(event.block, provider);
   updatePoolSnapshots(poolAddress, event.block);
@@ -36,8 +36,8 @@ export function handleWithdraw(event: Withdraw): void {
 
   if (!poolAddress) return;
 
-  updateBalancerRewards(poolAddress, gaugeAddress, event.block);
-  updateRewardTokenInfo(poolAddress, gaugeAddress, event.block);
+  updateControllerRewards(poolAddress, gaugeAddress, event.block);
+  updateFactoryRewards(poolAddress, gaugeAddress, event.block);
 
   updateUsageMetrics(event.block, provider);
   updatePoolSnapshots(poolAddress, event.block);
@@ -50,6 +50,6 @@ export function handleUpdateLiquidityLimit(event: UpdateLiquidityLimit): void {
 
   if (!poolAddress) return;
 
-  updateBalancerRewards(poolAddress, gaugeAddress, event.block);
-  updateRewardTokenInfo(poolAddress, gaugeAddress, event.block);
+  updateControllerRewards(poolAddress, gaugeAddress, event.block);
+  updateFactoryRewards(poolAddress, gaugeAddress, event.block);
 }

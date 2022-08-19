@@ -173,10 +173,12 @@ interface Protocol {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -236,10 +238,12 @@ type DexAmmProtocol implements Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -799,6 +803,45 @@ type Account @entity {
 type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
+}
+
+#Added Entities
+
+type _MasterChef @entity {
+  " MasterChef Type - pid referenced in the MasterChef Contract "
+  id: ID!
+
+  " Total allocation point of all staking pools "
+  totalAllocPoint: BigInt!
+
+  " Amount of reward tokens emitted per block or timestamp "
+  rewardTokenRate: BigInt!
+
+  " Indicates whether rewards are indicated by block or timestamp  "
+  rewardTokenInterval: String!
+
+  " Reward token rate given after you adjust for allocations either burned or not applicable "
+  adjustedRewardTokenRate: BigInt!
+
+  " Last time the adjusted reward token rate was updated "
+  lastUpdatedRewardRate: BigInt!
+}
+
+type _MasterChefStakingPool @entity {
+  " MasterChef Type - pid referenced in the MasterChef Contract "
+  id: ID!
+
+  " Address of the liquidity pool per the MasterChef PID "
+  poolAddress: String
+
+  " Allocation point of this MasterChef Staking pool "
+  poolAllocPoint: BigInt!
+
+  " Reward Multiplier for a given staking pool "
+  multiplier: BigInt!
+
+  " Last block where rewards were given out "
+  lastRewardBlock: BigInt!
 }
 
 # Helper entity for calculating reward emissions

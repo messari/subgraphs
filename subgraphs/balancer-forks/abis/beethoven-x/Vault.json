@@ -6,11 +6,7 @@
         "name": "authorizer",
         "type": "address"
       },
-      {
-        "internalType": "contract IWETH",
-        "name": "weth",
-        "type": "address"
-      },
+      { "internalType": "contract IWETH", "name": "weth", "type": "address" },
       {
         "internalType": "uint256",
         "name": "pauseWindowDuration",
@@ -347,11 +343,7 @@
     "inputs": [],
     "name": "WETH",
     "outputs": [
-      {
-        "internalType": "contract IWETH",
-        "name": "",
-        "type": "address"
-      }
+      { "internalType": "contract IWETH", "name": "", "type": "address" }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -365,11 +357,7 @@
       },
       {
         "components": [
-          {
-            "internalType": "bytes32",
-            "name": "poolId",
-            "type": "bytes32"
-          },
+          { "internalType": "bytes32", "name": "poolId", "type": "bytes32" },
           {
             "internalType": "uint256",
             "name": "assetInIndex",
@@ -380,16 +368,8 @@
             "name": "assetOutIndex",
             "type": "uint256"
           },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "userData",
-            "type": "bytes"
-          }
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          { "internalType": "bytes", "name": "userData", "type": "bytes" }
         ],
         "internalType": "struct IVault.BatchSwapStep[]",
         "name": "swaps",
@@ -402,11 +382,7 @@
       },
       {
         "components": [
-          {
-            "internalType": "address",
-            "name": "sender",
-            "type": "address"
-          },
+          { "internalType": "address", "name": "sender", "type": "address" },
           {
             "internalType": "bool",
             "name": "fromInternalBalance",
@@ -427,35 +403,19 @@
         "name": "funds",
         "type": "tuple"
       },
-      {
-        "internalType": "int256[]",
-        "name": "limits",
-        "type": "int256[]"
-      },
-      {
-        "internalType": "uint256",
-        "name": "deadline",
-        "type": "uint256"
-      }
+      { "internalType": "int256[]", "name": "limits", "type": "int256[]" },
+      { "internalType": "uint256", "name": "deadline", "type": "uint256" }
     ],
     "name": "batchSwap",
     "outputs": [
-      {
-        "internalType": "int256[]",
-        "name": "assetDeltas",
-        "type": "int256[]"
-      }
+      { "internalType": "int256[]", "name": "assetDeltas", "type": "int256[]" }
     ],
     "stateMutability": "payable",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "poolId",
-        "type": "bytes32"
-      },
+      { "internalType": "bytes32", "name": "poolId", "type": "bytes32" },
       {
         "internalType": "contract IERC20[]",
         "name": "tokens",
@@ -469,16 +429,8 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "poolId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      },
+      { "internalType": "bytes32", "name": "poolId", "type": "bytes32" },
+      { "internalType": "address", "name": "sender", "type": "address" },
       {
         "internalType": "address payable",
         "name": "recipient",
@@ -496,11 +448,7 @@
             "name": "minAmountsOut",
             "type": "uint256[]"
           },
-          {
-            "internalType": "bytes",
-            "name": "userData",
-            "type": "bytes"
-          },
+          { "internalType": "bytes", "name": "userData", "type": "bytes" },
           {
             "internalType": "bool",
             "name": "toInternalBalance",
@@ -529,16 +477,8 @@
         "name": "tokens",
         "type": "address[]"
       },
-      {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "bytes",
-        "name": "userData",
-        "type": "bytes"
-      }
+      { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" },
+      { "internalType": "bytes", "name": "userData", "type": "bytes" }
     ],
     "name": "flashLoan",
     "outputs": [],
@@ -547,20 +487,10 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes4",
-        "name": "selector",
-        "type": "bytes4"
-      }
+      { "internalType": "bytes4", "name": "selector", "type": "bytes4" }
     ],
     "name": "getActionId",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -568,11 +498,7 @@
     "inputs": [],
     "name": "getAuthorizer",
     "outputs": [
-      {
-        "internalType": "contract IAuthorizer",
-        "name": "",
-        "type": "address"
-      }
+      { "internalType": "contract IAuthorizer", "name": "", "type": "address" }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -580,23 +506,13 @@
   {
     "inputs": [],
     "name": "getDomainSeparator",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
+      { "internalType": "address", "name": "user", "type": "address" },
       {
         "internalType": "contract IERC20[]",
         "name": "tokens",
@@ -605,31 +521,17 @@
     ],
     "name": "getInternalBalance",
     "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "balances",
-        "type": "uint256[]"
-      }
+      { "internalType": "uint256[]", "name": "balances", "type": "uint256[]" }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      }
+      { "internalType": "address", "name": "user", "type": "address" }
     ],
     "name": "getNextNonce",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -637,11 +539,7 @@
     "inputs": [],
     "name": "getPausedState",
     "outputs": [
-      {
-        "internalType": "bool",
-        "name": "paused",
-        "type": "bool"
-      },
+      { "internalType": "bool", "name": "paused", "type": "bool" },
       {
         "internalType": "uint256",
         "name": "pauseWindowEndTime",
@@ -658,19 +556,11 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "poolId",
-        "type": "bytes32"
-      }
+      { "internalType": "bytes32", "name": "poolId", "type": "bytes32" }
     ],
     "name": "getPool",
     "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
+      { "internalType": "address", "name": "", "type": "address" },
       {
         "internalType": "enum IVault.PoolSpecialization",
         "name": "",
@@ -682,50 +572,26 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "poolId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "contract IERC20",
-        "name": "token",
-        "type": "address"
-      }
+      { "internalType": "bytes32", "name": "poolId", "type": "bytes32" },
+      { "internalType": "contract IERC20", "name": "token", "type": "address" }
     ],
     "name": "getPoolTokenInfo",
     "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "cash",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "managed",
-        "type": "uint256"
-      },
+      { "internalType": "uint256", "name": "cash", "type": "uint256" },
+      { "internalType": "uint256", "name": "managed", "type": "uint256" },
       {
         "internalType": "uint256",
         "name": "lastChangeBlock",
         "type": "uint256"
       },
-      {
-        "internalType": "address",
-        "name": "assetManager",
-        "type": "address"
-      }
+      { "internalType": "address", "name": "assetManager", "type": "address" }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "poolId",
-        "type": "bytes32"
-      }
+      { "internalType": "bytes32", "name": "poolId", "type": "bytes32" }
     ],
     "name": "getPoolTokens",
     "outputs": [
@@ -734,11 +600,7 @@
         "name": "tokens",
         "type": "address[]"
       },
-      {
-        "internalType": "uint256[]",
-        "name": "balances",
-        "type": "uint256[]"
-      },
+      { "internalType": "uint256[]", "name": "balances", "type": "uint256[]" },
       {
         "internalType": "uint256",
         "name": "lastChangeBlock",
@@ -763,45 +625,19 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "user",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "relayer",
-        "type": "address"
-      }
+      { "internalType": "address", "name": "user", "type": "address" },
+      { "internalType": "address", "name": "relayer", "type": "address" }
     ],
     "name": "hasApprovedRelayer",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "poolId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "recipient",
-        "type": "address"
-      },
+      { "internalType": "bytes32", "name": "poolId", "type": "bytes32" },
+      { "internalType": "address", "name": "sender", "type": "address" },
+      { "internalType": "address", "name": "recipient", "type": "address" },
       {
         "components": [
           {
@@ -814,11 +650,7 @@
             "name": "maxAmountsIn",
             "type": "uint256[]"
           },
-          {
-            "internalType": "bytes",
-            "name": "userData",
-            "type": "bytes"
-          },
+          { "internalType": "bytes", "name": "userData", "type": "bytes" },
           {
             "internalType": "bool",
             "name": "fromInternalBalance",
@@ -844,21 +676,13 @@
             "name": "kind",
             "type": "uint8"
           },
-          {
-            "internalType": "bytes32",
-            "name": "poolId",
-            "type": "bytes32"
-          },
+          { "internalType": "bytes32", "name": "poolId", "type": "bytes32" },
           {
             "internalType": "contract IERC20",
             "name": "token",
             "type": "address"
           },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          }
+          { "internalType": "uint256", "name": "amount", "type": "uint256" }
         ],
         "internalType": "struct IVault.PoolBalanceOp[]",
         "name": "ops",
@@ -884,16 +708,8 @@
             "name": "asset",
             "type": "address"
           },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "sender",
-            "type": "address"
-          },
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          { "internalType": "address", "name": "sender", "type": "address" },
           {
             "internalType": "address payable",
             "name": "recipient",
@@ -919,11 +735,7 @@
       },
       {
         "components": [
-          {
-            "internalType": "bytes32",
-            "name": "poolId",
-            "type": "bytes32"
-          },
+          { "internalType": "bytes32", "name": "poolId", "type": "bytes32" },
           {
             "internalType": "uint256",
             "name": "assetInIndex",
@@ -934,16 +746,8 @@
             "name": "assetOutIndex",
             "type": "uint256"
           },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "userData",
-            "type": "bytes"
-          }
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          { "internalType": "bytes", "name": "userData", "type": "bytes" }
         ],
         "internalType": "struct IVault.BatchSwapStep[]",
         "name": "swaps",
@@ -956,11 +760,7 @@
       },
       {
         "components": [
-          {
-            "internalType": "address",
-            "name": "sender",
-            "type": "address"
-          },
+          { "internalType": "address", "name": "sender", "type": "address" },
           {
             "internalType": "bool",
             "name": "fromInternalBalance",
@@ -983,14 +783,8 @@
       }
     ],
     "name": "queryBatchSwap",
-    "outputs": [
-      {
-        "internalType": "int256[]",
-        "name": "",
-        "type": "int256[]"
-      }
-    ],
-    "stateMutability": "view",
+    "outputs": [{ "internalType": "int256[]", "name": "", "type": "int256[]" }],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1002,23 +796,13 @@
       }
     ],
     "name": "registerPool",
-    "outputs": [
-      {
-        "internalType": "bytes32",
-        "name": "",
-        "type": "bytes32"
-      }
-    ],
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "poolId",
-        "type": "bytes32"
-      },
+      { "internalType": "bytes32", "name": "poolId", "type": "bytes32" },
       {
         "internalType": "contract IERC20[]",
         "name": "tokens",
@@ -1049,13 +833,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "bool",
-        "name": "paused",
-        "type": "bool"
-      }
-    ],
+    "inputs": [{ "internalType": "bool", "name": "paused", "type": "bool" }],
     "name": "setPaused",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -1063,21 +841,9 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "relayer",
-        "type": "address"
-      },
-      {
-        "internalType": "bool",
-        "name": "approved",
-        "type": "bool"
-      }
+      { "internalType": "address", "name": "sender", "type": "address" },
+      { "internalType": "address", "name": "relayer", "type": "address" },
+      { "internalType": "bool", "name": "approved", "type": "bool" }
     ],
     "name": "setRelayerApproval",
     "outputs": [],
@@ -1088,11 +854,7 @@
     "inputs": [
       {
         "components": [
-          {
-            "internalType": "bytes32",
-            "name": "poolId",
-            "type": "bytes32"
-          },
+          { "internalType": "bytes32", "name": "poolId", "type": "bytes32" },
           {
             "internalType": "enum IVault.SwapKind",
             "name": "kind",
@@ -1108,16 +870,8 @@
             "name": "assetOut",
             "type": "address"
           },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes",
-            "name": "userData",
-            "type": "bytes"
-          }
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          { "internalType": "bytes", "name": "userData", "type": "bytes" }
         ],
         "internalType": "struct IVault.SingleSwap",
         "name": "singleSwap",
@@ -1125,11 +879,7 @@
       },
       {
         "components": [
-          {
-            "internalType": "address",
-            "name": "sender",
-            "type": "address"
-          },
+          { "internalType": "address", "name": "sender", "type": "address" },
           {
             "internalType": "bool",
             "name": "fromInternalBalance",
@@ -1150,16 +900,8 @@
         "name": "funds",
         "type": "tuple"
       },
-      {
-        "internalType": "uint256",
-        "name": "limit",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "deadline",
-        "type": "uint256"
-      }
+      { "internalType": "uint256", "name": "limit", "type": "uint256" },
+      { "internalType": "uint256", "name": "deadline", "type": "uint256" }
     ],
     "name": "swap",
     "outputs": [
@@ -1172,8 +914,5 @@
     "stateMutability": "payable",
     "type": "function"
   },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
-  }
+  { "stateMutability": "payable", "type": "receive" }
 ]

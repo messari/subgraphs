@@ -151,37 +151,37 @@
           "messari": "messari/balancer-v2-arbitrum",
           "sevenshi": "sevenshi/balancer-v2-arbitrum",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "polygon": {
           "template": "balancer.v2.template.yaml",
           "messari": "messari/balancer-v2-polygon",
           "sevenshi": "sevenshi/balancer-v2-matic",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "ethereum": {
           "template": "balancer.v2.template.yaml",
           "messari": "messari/balancer-v2-ethereum",
           "sevenshi": "sevenshi/balancer-v2-ethereum",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "beethoven-x": {
         "optimism": {
-          "template": "balancer.v2.template.yaml",
+          "template": "beethoven.x.optimism.template.yaml",
           "messari": "messari/beethoven-x-optimism",
           "sevenshi": "sevenshi/beets-optimism",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "fantom": {
-          "template": "balancer.v2.template.yaml",
+          "template": "beethoven.x.fantom.template.yaml",
           "messari": "messari/beethoven-x-fantom",
           "sevenshi": "sevenshi/beets-fantom",
-          "deploy-on-merge": false,
-          "prepare:constants": false
+          "deploy-on-merge": true,
+          "prepare:constants": true
         }
       }
     },

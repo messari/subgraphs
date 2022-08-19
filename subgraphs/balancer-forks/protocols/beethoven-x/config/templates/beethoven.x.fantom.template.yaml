@@ -1,25 +1,27 @@
 specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
-{{#graftEnabled}}
-graft:
-  base: {{subgraphId}} # Subgraph ID of base subgraph
-  block: {{graftStartBlock}} # Block number
-{{/graftEnabled}}
 schema:
   file: ./schema.graphql
+features:
+  - grafting
+{{#graftEnabled}}
+graft:
+  base: {{subgraphId}}
+  block: {{graftStartBlock}}
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum/contract
     name: Vault
     network: {{network}}
     source:
-      address: "{{vault}}"
+      address: "{{vaultAddress}}"
       abi: Vault
-      startBlock: {{startBlock}}
+      startBlock: {{vaultStartBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/handlers.ts
+      file: ./src/mappings/vaultMappings.ts
       entities:
         - DexAmmProtocol
         - Token
@@ -29,15 +31,13 @@ dataSources:
         - Account
       abis:
         - name: Vault
-          file: ./abis/Vault.json
-        - name: ERC20
-          file: ./abis/ERC20.json
+          file: ./abis/beethoven-x/Vault.json
         - name: WeightedPool
-          file: ./abis/WeightedPool.json
-        - name: ConvergentCurvePool
-          file: ./abis/ConvergentCurvePool.json
-        - name: LinearPool
-          file: ./abis/LinearPool.json
+          file: ./abis/beethoven-x/WeightedPool.json
+        - name: FeesCollector
+          file: ./abis/beethoven-x/ProtocolFeesCollector.json
+        - name: ERC20
+          file: ./abis/beethoven-x/ERC20.json
 
         ###########################################
         ############## Price Oracle ###############
@@ -73,14 +73,14 @@ dataSources:
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: PoolRegistered(indexed bytes32,indexed address,uint8)
-          handler: handlePoolRegister
+          handler: handlePoolRegistered
         - event: TokensRegistered(indexed bytes32,address[],address[])
-          handler: handleTokensRegister
+          handler: handleTokensRegistered
         - event: PoolBalanceChanged(indexed bytes32,indexed address,address[],int256[],uint256[])
           handler: handlePoolBalanceChanged
         - event: Swap(indexed bytes32,indexed address,indexed address,uint256,uint256)
           handler: handleSwap
-{{#isBeets}}
+
   - kind: ethereum/contract
     name: MasterChefV2
     network: {{ network }}
@@ -90,9 +90,9 @@ dataSources:
       startBlock: {{masterChefV2StartBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/masterchef.ts
+      file: ./src/mappings/masterChefV2Mappings.ts
       entities:
         - MasterChefV2
         - Pool
@@ -100,9 +100,10 @@ dataSources:
         - Rewarder
       abis:
         - name: MasterChefV2
-          file: ./abis/masterchef/MasterChefV2.json
+          file: ./abis/beethoven-x/masterchef/MasterChefV2.json
         - name: ERC20
-          file: ./abis/ERC20.json
+          file: ./abis/beethoven-x/ERC20.json
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -135,16 +136,21 @@ dataSources:
           file: ./abis/Prices/SushiSwap/Pair.json
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
+        
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
           handler: handleDeposit
         - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleWithdraw
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleEmergencyWithdraw
         - event: LogSetPool(indexed uint256,uint256,indexed address,bool)
           handler: handleLogSetPool
-        - event: LogUpdatePool(indexed uint256,uint256,uint256,uint256)
-          handler: handleLogUpdatePool
-{{/isBeets}}
+        - event: LogPoolAddition(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleLogPoolAddition
+        - event: UpdateEmissionRate(indexed address,uint256)
+          handler: handleUpdateEmissionRate
+
 templates:
   - kind: ethereum/contract
     name: WeightedPool
@@ -153,15 +159,51 @@ templates:
       abi: WeightedPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/handlers.ts
+      file: ./src/mappings/poolMappings.ts
       entities:
         - WeightedPool
         - LiquidityPoolFee
       abis:
         - name: WeightedPool
-          file: ./abis/WeightedPool.json
+          file: ./abis/beethoven-x/WeightedPool.json
+        - name: FeesCollector
+          file: ./abis/beethoven-x/ProtocolFeesCollector.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+          
       eventHandlers:
         - event: SwapFeePercentageChanged(uint256)
           handler: handleSwapFeePercentageChange

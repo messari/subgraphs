@@ -25,17 +25,17 @@ dataSources:
         - DexAmmProtocol
       abis:
         - name: Vault
-          file: ./abis/Vault.json
+          file: ./abis/balancer-v2/Vault.json
         - name: WeightedPool
-          file: ./abis/WeightedPool.json
+          file: ./abis/balancer-v2/WeightedPool.json
         - name: Gauge
-          file: ./abis/Gauge.json
+          file: ./abis/balancer-v2/Gauge.json
         - name: GaugeController
-          file: ./abis/GaugeController.json
+          file: ./abis/balancer-v2/GaugeController.json
         - name: FeesCollector
-          file: ./abis/FeesCollector.json
+          file: ./abis/balancer-v2/ProtocolFeesCollector.json
         - name: ERC20
-          file: ./abis/ERC20.json
+          file: ./abis/balancer-v2/ERC20.json
 
         ###########################################
         ############## Price Oracle ###############
@@ -96,17 +96,17 @@ dataSources:
         - DexAmmProtocol
       abis:
         - name: GaugeController
-          file: ./abis/GaugeController.json
+          file: ./abis/balancer-v2/GaugeController.json
         - name: Gauge
-          file: ./abis/Gauge.json
+          file: ./abis/balancer-v2/Gauge.json
         - name: Vault
-          file: ./abis/Vault.json
+          file: ./abis/balancer-v2/Vault.json
         - name: WeightedPool
-          file: ./abis/WeightedPool.json
+          file: ./abis/balancer-v2/WeightedPool.json
         - name: FeesCollector
-          file: ./abis/FeesCollector.json
+          file: ./abis/balancer-v2/ProtocolFeesCollector.json
         - name: ERC20
-          file: ./abis/ERC20.json
+          file: ./abis/balancer-v2/ERC20.json
 
         ###########################################
         ############## Price Oracle ###############
@@ -162,17 +162,17 @@ templates:
         - LiquidityPoolFee
       abis:
         - name: WeightedPool
-          file: ./abis/WeightedPool.json
+          file: ./abis/balancer-v2/WeightedPool.json
         - name: Vault
-          file: ./abis/Vault.json
+          file: ./abis/balancer-v2/Vault.json
         - name: FeesCollector
-          file: ./abis/FeesCollector.json
+          file: ./abis/balancer-v2/ProtocolFeesCollector.json
         - name: Gauge
-          file: ./abis/Gauge.json
+          file: ./abis/balancer-v2/Gauge.json
         - name: GaugeController
-          file: ./abis/GaugeController.json
+          file: ./abis/balancer-v2/GaugeController.json
         - name: ERC20
-          file: ./abis/ERC20.json
+          file: ./abis/balancer-v2/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -225,17 +225,17 @@ templates:
         - LiquidityPoolFee
       abis:
         - name: Gauge
-          file: ./abis/Gauge.json
+          file: ./abis/balancer-v2/Gauge.json
         - name: GaugeController
-          file: ./abis/GaugeController.json
+          file: ./abis/balancer-v2/GaugeController.json
         - name: Vault
-          file: ./abis/Vault.json
+          file: ./abis/balancer-v2/Vault.json
         - name: WeightedPool
-          file: ./abis/WeightedPool.json
+          file: ./abis/balancer-v2/WeightedPool.json
         - name: FeesCollector
-          file: ./abis/FeesCollector.json
+          file: ./abis/balancer-v2/ProtocolFeesCollector.json
         - name: ERC20
-          file: ./abis/ERC20.json
+          file: ./abis/balancer-v2/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
