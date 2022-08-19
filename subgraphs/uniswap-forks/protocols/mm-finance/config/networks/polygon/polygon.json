@@ -1,0 +1,13 @@
+{
+  "deployment": "MM_FINANCE_POLYGON",
+  "network": "matic",
+  "factory": {
+    "address": "0x7cfb780010e9c861e03bcbc7ac12e013137d47a5",
+    "startBlock": 31337344
+  },
+  "masterMeerkatAddress": "0xa2b417088d63400d211a4d5eb3c4c5363f834764",
+  "masterMeerkatStartBlock": 31425244,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

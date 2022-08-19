@@ -67,8 +67,8 @@ function ProtocolInfo({ protocolData, protocolId, subgraphToQueryURL, schemaVers
         </Link>
         <Typography variant="caption">{protocolSchemaData?.id}</Typography>
         <ChipContainer>
-          <Chip label={protocolSchemaData?.type} />
-          <Chip label={`Schema: ${schemaVersion}`} />
+          <Chip label={`Type: ${protocolSchemaData?.type}`} />
+          <Chip label={`Schema: ${schemaVersion || "N/A"}`} />
           <Chip label={`Subgraph: ${protocolSchemaData?.subgraphVersion}`} />
           {protocolSchemaData?.methodologyVersion && (
             <Chip label={`Methodology: ${protocolSchemaData?.methodologyVersion}`} />

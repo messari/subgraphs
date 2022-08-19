@@ -136,10 +136,10 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics.dailyActiveBorrowers = 0;
     usageMetrics.dailyActiveLiquidators = 0;
     usageMetrics.dailyActiveLiquidatees = 0;
-    usageMetrics.cumulativeUniqueDepositors = 0;
-    usageMetrics.cumulativeUniqueBorrowers = 0;
-    usageMetrics.cumulativeUniqueLiquidators = 0;
-    usageMetrics.cumulativeUniqueLiquidatees = 0;
+    usageMetrics.cumulativeUniqueDepositors = protocol.cumulativeUniqueDepositors;
+    usageMetrics.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
+    usageMetrics.cumulativeUniqueLiquidators = protocol.cumulativeUniqueLiquidators;
+    usageMetrics.cumulativeUniqueLiquidatees = protocol.cumulativeUniqueLiquidatees;
 
     usageMetrics.save();
   }

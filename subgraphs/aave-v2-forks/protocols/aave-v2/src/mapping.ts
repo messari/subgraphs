@@ -37,10 +37,12 @@ import {
   Borrow,
   Deposit,
   LiquidationCall,
+  Paused,
   Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
+  Unpaused,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
 import { AToken } from "../../../generated/templates/LendingPool/AToken";
@@ -52,6 +54,7 @@ import {
   _handleCollateralConfigurationChanged,
   _handleDeposit,
   _handleLiquidate,
+  _handlePaused,
   _handlePriceOracleUpdated,
   _handleRepay,
   _handleReserveActivated,
@@ -61,6 +64,7 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
@@ -369,7 +373,8 @@ export function handleReserveUsedAsCollateralEnabled(
   // This Event handler enables a reserve/market to be used as collateral
   _handleReserveUsedAsCollateralEnabled(
     event.params.reserve,
-    event.params.user
+    event.params.user,
+    getProtocolData()
   );
 }
 
@@ -381,6 +386,14 @@ export function handleReserveUsedAsCollateralDisabled(
     event.params.reserve,
     event.params.user
   );
+}
+
+export function handlePaused(event: Paused): void {
+  _handlePaused(getProtocolData());
+}
+
+export function handleUnpaused(event: Unpaused): void {
+  _handleUnpaused(getProtocolData());
 }
 
 export function handleDeposit(event: Deposit): void {

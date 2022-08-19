@@ -1,6 +1,6 @@
 # MakerDAO Lending Protocol Subgraph
 
-## Calculation Methodology v1.0.1
+## Calculation Methodology v1.1.0
 
 ### Total Value Locked (TVL) USD
 
@@ -30,13 +30,15 @@ Sum across all Markets:
 
 Sum across all Markets:
 
-`(Change in market debt multiplier rate value in fold LogNote events from the Vat address * market total borrow usd) + (Liquidations per market * liquidation penalty per market)`
+`Protocol-Side revenue + Supply-Side revenue`
 
 ### Protocol-Side Revenue USD
 
 Sum across all Markets:
 
-`(Change in market debt multiplier rate value in fold LogNote events from the Vat address * market total borrow usd) + (Liquidations per market * liquidation penalty per market)`
+`(stability fee * market total borrow usd) + (Liquidations per market * liquidation penalty per market) + (Swap/trade per PSM * swap fee rate)`
+
+- PSM = Peg Stability Module, PSM-USDC-A, PSM-PAX-A, PSM-GUSD-A
 
 ### Supply-Side Revenue USD
 
@@ -44,7 +46,7 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Markets
 
-`Change in dai savings rate * total dai in the pot contract`
+`dai savings rate * total dai in the pot contract`
 
 Note makerdao depositors do not earn interests on their deposit (collateral), so the supply side revenue here is different than the supply-side revenue in a typical lending protocol. Makerdao users have to use the DAI they borrow to join the Pot contract to earn revenue, so this is more like staking rewards.
 

@@ -638,7 +638,6 @@ export function addPosition(
         depositorActor.save();
 
         protocol.cumulativeUniqueDepositors += 1;
-        protocol.save();
       }
     } else if (eventType == EventType.BORROW) {
       let borrowerActorID = "borrower".concat("-").concat(account.id);
@@ -648,9 +647,9 @@ export function addPosition(
         borrowerActor.save();
 
         protocol.cumulativeUniqueBorrowers += 1;
-        protocol.save();
       }
     }
+    protocol.save();
   }
 
   //

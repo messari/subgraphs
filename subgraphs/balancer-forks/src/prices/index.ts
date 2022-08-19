@@ -38,21 +38,31 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 3. CalculationsCurve
-  let calculationsCurvePrice = getTokenPriceFromCalculationCurve(tokenAddr, network);
+  let calculationsCurvePrice = getTokenPriceFromCalculationCurve(
+    tokenAddr,
+    network
+  );
   if (!calculationsCurvePrice.reverted) {
     log.info("[CalculationsCurve] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsCurvePrice.usdPrice.div(calculationsCurvePrice.decimalsBaseTen).toString(),
+      calculationsCurvePrice.usdPrice
+        .div(calculationsCurvePrice.decimalsBaseTen)
+        .toString(),
     ]);
     return calculationsCurvePrice;
   }
 
   // 4. CalculationsSushiSwap
-  let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(tokenAddr, network);
+  let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(
+    tokenAddr,
+    network
+  );
   if (!calculationsSushiSwapPrice.reverted) {
     log.info("[CalculationsSushiSwap] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsSushiSwapPrice.usdPrice.div(calculationsSushiSwapPrice.decimalsBaseTen).toString(),
+      calculationsSushiSwapPrice.usdPrice
+        .div(calculationsSushiSwapPrice.decimalsBaseTen)
+        .toString(),
     ]);
     return calculationsSushiSwapPrice;
   }
@@ -87,12 +97,17 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return sushiswapPrice;
   }
 
-  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [tokenAddr.toHexString()]);
+  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
+    tokenAddr.toHexString(),
+  ]);
 
   return new CustomPriceType();
 }
 
-export function getUsdPrice(tokenAddr: Address, amount: BigDecimal): BigDecimal {
+export function getUsdPrice(
+  tokenAddr: Address,
+  amount: BigDecimal
+): BigDecimal {
   let tokenPrice = getUsdPricePerToken(tokenAddr);
 
   if (!tokenPrice.reverted) {

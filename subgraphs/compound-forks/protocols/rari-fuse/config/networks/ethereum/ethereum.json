@@ -1,5 +1,8 @@
 {
   "network": "mainnet",
   "fusePoolDirectoryAddress": "0x835482FE0532f169024d5E9410199369aAD5C77E",
-  "startBlock": 12060007
+  "startBlock": 12060007,
+  "graftEnabled": false,
+  "subgraphId": "QmWqNBqSuMYDZ7VK2YfjfwBT7w74CLJAfqN6gRh92zL7CT",
+  "graftStartBlock": 13380833
 }

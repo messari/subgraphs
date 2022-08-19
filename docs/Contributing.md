@@ -145,3 +145,55 @@ Examples:
 - "perf(#patch); spookyswap; find value without contract call"
 
 > Notice: some of the names don't have a #`semver` name. This is because they don't actually affect the versioning on any of the subgraphs / dashboard. A good way to know which semver identifer to use is to notice which part of the version you are updating. And it looks like this (MAJOR.MINOR.PATCH)!
+
+## Syncing with upstream/master
+
+### When to do?
+
+When you want to make a new branch on your forked subgraphs repo you should always start from the latest upstream/master branch. However, this process requires the github ui or a number of commands. The following walks through how to setup a custom git command.
+
+### Previous workflow
+
+- Go to github.com and open your forked `subgraphs` repo
+- Sync-up with upstream master
+- Go to your local `subgraphs` repo and switch to `master`
+- Pull the latest changes from remote
+
+### How to make the custom git command
+
+Start by setting the upstream branch on your local repo to `messari/subgraphs`
+
+```bash
+git remote add upstream https://github.com/messari/subgraphs.git
+```
+
+Then navigate to a folder where you can keep this bash script executable (or create a new foler). A good location is `~/bin`
+
+Once you are here create a file named `git-sync` and put the following text in it:
+
+```bash
+#!/usr/bin bash
+
+git fetch upstream          # get the latest changes from the remote repository
+git checkout master         # switch to the local (forked) master branch
+git rebase upstream/master  # rebase the remote upstream/master onto forked/master
+git push                    # sync remote forked/master
+echo "upstream/master and forked/master are in sync"
+```
+
+Now use `chmod` to build the executable:
+
+```bash
+chmod +x git-sync
+```
+
+Next, you need to add this folder's location to PATH in your environment variables (if it is not already), then run `which git-sync` PATH has visibility on this new executable.
+
+```bash
+export PATH=$PWD:$PATH
+which git-sync
+```
+
+> You should see the absolute path of `git-sync` if it worked properly
+
+Restarting your terminal and navigating to your local `subgraphs` project should be enough to make this work. Just call `git sync` from any branch and it should sync up your local and remote project with `messari/subgraphs`

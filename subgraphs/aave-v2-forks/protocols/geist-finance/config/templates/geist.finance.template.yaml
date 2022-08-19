@@ -86,6 +86,10 @@ templates:
           handler: handleReserveUsedAsCollateralEnabled
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
+        - event: Paused()
+          handler: handlePaused
+        - event: Unpaused()
+          handler: handleUnpaused
       file: ./protocols/geist-finance/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator

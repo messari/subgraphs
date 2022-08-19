@@ -275,7 +275,7 @@
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-ethereum",
           "dmelotik": "dmelotik/cream-finance-ethereum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "polygon": {
           "template": "cream-finance.template.yaml",
@@ -389,7 +389,7 @@
           "template": "venus.template.yaml",
           "messari": "messari/venus-protocol-bsc",
           "dmelotik": "dmelotik/venus",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -438,7 +438,7 @@
         "ethereum": {
           "template": "erc721.holders.template.yaml",
           "messari": "messari/erc721-holders",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -447,7 +447,7 @@
         "ethereum": {
           "template": "erc721.metadata.template.yaml",
           "messari": "messari/erc721-metadata",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
@@ -691,12 +691,17 @@
     },
     "uniswap-v3": {
       "uniswap-v3": {
-        "ethereum": {
+        "arbitrum": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
           "prepare:constants": true
         },
-        "arbitrum": {
+        "celo": {
+          "template": "uniswap.v3.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": false
+        },
+        "ethereum": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
           "prepare:constants": true
@@ -778,6 +783,14 @@
         "polygon": {
           "template": "apeswap.matic.template.yaml",
           "steegecs": "steegecs/apeswap-matic",
+          "deploy-on-merge": false,
+          "prepare:constants": false
+        }
+      },
+      "mm-finance": {
+        "polygon": {
+          "template": "mm.finance.template.yaml",
+          "messari": "messari/mm-finance-polygon",
           "deploy-on-merge": false,
           "prepare:constants": false
         }

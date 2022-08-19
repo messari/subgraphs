@@ -45,7 +45,7 @@ export function handleTokensRegistered(event: TokensRegistered): void {
   let inputTokens: string[] = [];
   let inputTokenLength = tokens.length;
   for (let idx = 0; idx < inputTokenLength; idx++) {
-    inputTokens.push(getOrCreateToken(tokens.at(idx)).id);
+    inputTokens.push(getOrCreateToken(tokens.at(idx), event.block.number).id);
   }
 
   pool.inputTokens = inputTokens;

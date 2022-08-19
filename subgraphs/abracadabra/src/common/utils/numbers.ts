@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_ZERO } from "../constants";
+import { BIGDECIMAL_ZERO, BIGINT_ONE } from "../constants";
 
 export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDecimal {
   return quantity.divDecimal(
@@ -7,6 +7,16 @@ export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDec
       .pow(decimals as u8)
       .toBigDecimal(),
   );
+}
+
+// n => 10^n
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let result = BIGINT_ONE;
+  let ten = BigInt.fromI32(10);
+  for (let i = 0; i < decimals; i++) {
+    result = result.times(ten);
+  }
+  return result.toBigDecimal();
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {

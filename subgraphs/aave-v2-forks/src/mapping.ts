@@ -109,9 +109,9 @@ export function _handleReserveInitialized(
 
   market.protocol = protocol.name;
   market.name = outputTokenEntity.name;
-  market.isActive = false;
-  market.canUseAsCollateral = false;
-  market.canBorrowFrom = false;
+  market.isActive = true; // initialized to true on creation
+  market.canUseAsCollateral = true; // only stopped when protocol is paused
+  market.canBorrowFrom = true; // this field changes occasinally, but all markets are set to true after creation
   market.maximumLTV = BIGDECIMAL_ZERO;
   market.liquidationThreshold = BIGDECIMAL_ZERO;
   market.liquidationPenalty = BIGDECIMAL_ZERO;
@@ -259,8 +259,11 @@ export function _handleReserveFactorChanged(
 
 export function _handleReserveUsedAsCollateralEnabled(
   marketId: Address,
-  accountID: Address
+  accountID: Address,
+  protocolData: ProtocolData
 ): void {
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
   let market = Market.load(marketId.toHexString());
   if (!market) {
     log.warning("[ReserveUsedAsCollateralEnabled] Market not found: {}", [
@@ -272,10 +275,11 @@ export function _handleReserveUsedAsCollateralEnabled(
   // grab account
   let account = Account.load(accountID.toHexString());
   if (!account) {
-    log.warning("[ReserveUsedAsCollateralEnabled] Account not found: {}", [
-      accountID.toHexString(),
-    ]);
-    return;
+    account = createAccount(accountID.toHexString());
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
   }
   let markets = account.enabledCollaterals;
   markets.push(market.id);
@@ -311,6 +315,48 @@ export function _handleReserveUsedAsCollateralDisabled(
   }
   account.enabledCollaterals = markets;
   account.save();
+}
+
+export function _handlePaused(protocolData: ProtocolData): void {
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
+  for (let i = 0; i < protocol.marketIDs.length; i++) {
+    let market = Market.load(protocol.marketIDs[i]);
+    if (!market) {
+      log.warning("[Paused] Market not found: {}", [protocol.marketIDs[i]]);
+      continue;
+    }
+
+    market.prePauseState = [
+      market.isActive,
+      market.canUseAsCollateral,
+      market.canBorrowFrom,
+    ];
+
+    market.isActive = false;
+    market.canUseAsCollateral = false;
+    market.canBorrowFrom = false;
+    market.save();
+  }
+}
+
+export function _handleUnpaused(protocolData: ProtocolData): void {
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
+  for (let i = 0; i < protocol.marketIDs.length; i++) {
+    let market = Market.load(protocol.marketIDs[i]);
+    if (!market) {
+      log.warning("[Paused] Market not found: {}", [protocol.marketIDs[i]]);
+      continue;
+    }
+
+    market.isActive = market.prePauseState![0];
+    market.canUseAsCollateral = market.prePauseState![1];
+    market.canBorrowFrom = market.prePauseState![2];
+
+    market.prePauseState = null;
+    market.save();
+  }
 }
 
 ////////////////////////////////

@@ -168,7 +168,7 @@ type Trade @entity {
   " Price (in ETH). If only 1 tokenId is involved, then the price is determined by the token only. If the trade is incurred by a batch purchasing (available in x2y2), then the price is the average price in the batch. "
   priceETH: BigDecimal!
 
-  " Stretegy that the trade is executed. "
+  " Strategy that the trade is executed. "
   strategy: SaleStrategy!
 
   " Buyer account address "

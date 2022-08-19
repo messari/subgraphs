@@ -7,7 +7,7 @@ dataSources:
     name: Factory
     network: matic
     source:
-      address: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
+      address: "0xd9dc0d8f754c027DF7eCB4BD381301cEC76CD32F"
       abi: Factory
       startBlock: 22757546
     mapping:

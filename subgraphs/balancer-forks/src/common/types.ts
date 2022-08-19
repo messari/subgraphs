@@ -1,5 +1,4 @@
 import * as constants from "./constants";
-import { getOrCreateToken } from "./initializers";
 import { LiquidityPoolFee } from "../../generated/schema";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
@@ -81,7 +80,7 @@ export class PoolTokensType {
     let inputTokens: string[] = [];
 
     for (let idx = 0; idx < this._tokens.length; idx++) {
-      inputTokens.push(getOrCreateToken(this._tokens.at(idx)).id);
+      inputTokens.push(this._tokens.at(idx).toHexString());
     }
 
     return inputTokens;
