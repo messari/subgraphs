@@ -75,7 +75,7 @@ export class SushiswapBscConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x2170Ed0880ac9A755fd29B2688956BD959F933F8");
+    return toLowerCase("0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"); // wBNB
   }
   getRewardToken(): string {
     return toLowerCase("0x947950BcC74888a40Ffa2593C5798F11Fc9124C4");
@@ -100,9 +100,8 @@ export class SushiswapBscConfigurations implements Configurations {
   }
   getStableOraclePools(): string[] {
     return toLowerCaseList([
-      "0xc7632b7b2d768bbb30a404e13e1de48d1439ec21", // wETH/USDC
-      "0x2905817b020fd35d9d09672946362b62766f0d69", // wETH/USDT
-      "0xe6cf29055e747e95c058f64423d984546540ede5", // wETH/DAI
+      "0x2905817b020fd35d9d09672946362b62766f0d69", // wBNB/USDT
+      "0xdc558d64c29721d74c4456cfb4363a6e6660a9bb", // wBNB/bUSD
     ]);
   }
   getUntrackedPairs(): string[] {
