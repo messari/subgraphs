@@ -9,9 +9,9 @@ import {
   _PositionCounter,
 } from "../../generated/schema";
 
-import { BIGINT_ONE, BIGINT_ZERO, SECONDS_PER_DAY, UsageType } from "./constants";
+import {  BIGINT_ZERO,  UsageType } from "./constants";
 import { getLiquidityPool, getOrCreateDex } from "./getters";
-import { addToArrayAtIndex, removeFromArrayAtIndex } from "./utils/arrays";
+import { addToArrayAtIndex} from "./utils/arrays";
 
 export function getOrCreateAccount(accountId: string, isTrader: boolean = false): Account {
   let account = Account.load(accountId);

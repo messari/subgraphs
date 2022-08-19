@@ -119,7 +119,7 @@ export function createSwapHandleVolume(
   amountIn: BigInt,
   tokenOut: string,
   amountOut: BigInt,
-): void {
+): Swap {
   let protocol = getOrCreateDex();
   let pool = getLiquidityPool(poolAddress);
   let _tokenIn = getOrCreateToken(tokenIn, event.block.number);
@@ -184,15 +184,16 @@ export function createSwapHandleVolume(
   // get amount that should be tracked only - div 2 because cant count both input and output as volume
   let trackedAmountUSD = swap.amountInUSD;
   updateVolumeAndFee(event, protocol, pool, trackedAmountUSD);
-  
+
   poolMetricsDaily.dailyVolumeUSD = poolMetricsDaily.dailyVolumeUSD.plus(trackedAmountUSD);
   poolMetricsHourly.hourlyVolumeUSD = poolMetricsHourly.hourlyVolumeUSD.plus(trackedAmountUSD);
   poolMetricsHourly.save();
   poolMetricsDaily.save();
   swap.save();
+  return swap;
 }
 
-export function createDepositMulti(event: PoolBalanceChanged, poolAddress: string, amounts: BigInt[]): void {
+export function createDepositMulti(event: PoolBalanceChanged, poolAddress: string, amounts: BigInt[]): Deposit {
   let protocol = getOrCreateDex();
   let pool = getLiquidityPool(poolAddress);
 
@@ -239,9 +240,10 @@ export function createDepositMulti(event: PoolBalanceChanged, poolAddress: strin
   pool.save();
   protocol.save();
   updatePositions(deposit.pool, UsageType.DEPOSIT, deposit.account, event, deposit.id);
+  return deposit;
 }
 
-export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: string, amounts: BigInt[]): void {
+export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: string, amounts: BigInt[]): Withdraw {
   let pool = getLiquidityPool(poolAddress);
   let protocol = getOrCreateDex();
   let amountUSD = BIGDECIMAL_ZERO;
@@ -302,6 +304,7 @@ export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: stri
   pool.save();
   protocol.save();
   updatePositions(withdrawal.pool, UsageType.WITHDRAW, withdrawal.account, event, withdrawal.id);
+  return withdrawal;
 }
 
 function getOutputTokenAmount(event: PoolBalanceChanged, outputToken: string, account: string): BigInt | null {

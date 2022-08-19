@@ -65,3 +65,8 @@ export function toLowerCase(list: string[]): string[] {
   }
   return list;
 }
+
+//convert BigDecimal to BigInt by truncating the decimal places
+export function BigDecimalTruncateToBigInt(x: BigDecimal): BigInt {
+  return BigInt.fromString(x.truncate(0).toString());
+}

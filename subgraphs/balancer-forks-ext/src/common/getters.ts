@@ -12,7 +12,6 @@ import {
   LiquidityPoolDailySnapshot,
   UsageMetricsHourlySnapshot,
   RewardToken,
-  Stat,
 } from "../../generated/schema";
 import {
   INT_ZERO,
@@ -35,28 +34,7 @@ import {
 import { addToArrayAtIndex } from "./utils/arrays";
 import { getUsdPrice } from "../prices";
 import { isUSDStable } from "./tokens";
-
-export function getStat(id: string): Stat {
-  let stat = Stat.load(id);
-
-  if (!stat) {
-    stat = new Stat(id);
-    stat.count = BIGINT_ZERO;
-    stat.meanAmount = BIGINT_ZERO;
-    stat.medianAmount = BIGINT_ZERO;
-    stat.maxAmount = BIGINT_ZERO;
-    stat.minAmount = BIGINT_ZERO;
-    stat.varAmount = BIGDECIMAL_ZERO;
-    stat.meanUSD = BIGDECIMAL_ZERO;
-    stat.medianUSD = BIGDECIMAL_ZERO;
-    stat.maxUSD = BIGDECIMAL_ZERO;
-    stat.minUSD = BIGDECIMAL_ZERO;
-    stat.varUSD = BIGDECIMAL_ZERO;
-    stat.save();
-  }
-
-  return stat;
-}
+import { getStat } from "./stats";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());
@@ -148,9 +126,9 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
     usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.totalPoolCount = 0;
 
-    usageMetrics.swapStats = getStat(`${usageMetrics.protocol}-swap-${id}`).id;
-    usageMetrics.depositStats = getStat(`${usageMetrics.protocol}-deposit-${id}`).id;
-    usageMetrics.withdrawStats = getStat(`${usageMetrics.protocol}-withdraw-${id}`).id;
+    usageMetrics.swapStats = getStat(`protocol-swap-${id}`).id;
+    usageMetrics.depositStats = getStat(`protocol-deposit-${id}`).id;
+    usageMetrics.withdrawStats = getStat(`protocol-withdraw-${id}`).id;
 
     usageMetrics.save();
   }

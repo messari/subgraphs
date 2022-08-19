@@ -1,12 +1,11 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { BigDecimal, ethereum, BigInt, Address } from "@graphprotocol/graph-ts";
-import { Account, ActiveAccount, DexAmmProtocol, LiquidityPool } from "../../generated/schema";
-import { SECONDS_PER_DAY, INT_ZERO, INT_ONE, BIGDECIMAL_ONE, UsageType, SECONDS_PER_HOUR, INT_TWO } from "./constants";
+import { BigDecimal, ethereum, Address } from "@graphprotocol/graph-ts";
+import { ActiveAccount, DexAmmProtocol, LiquidityPool, LiquidityPoolDailySnapshot } from "../../generated/schema";
+import { SECONDS_PER_DAY, INT_ZERO, INT_ONE, UsageType, SECONDS_PER_HOUR, INT_TWO } from "./constants";
 import {
   getOrCreateDex,
   getLiquidityPool,
   getLiquidityPoolFee,
-  getOrCreateToken,
   getOrCreateLiquidityPoolDailySnapshot,
   getOrCreateLiquidityPoolHourlySnapshot,
   getOrCreateFinancialsDailySnapshot,
@@ -14,7 +13,6 @@ import {
   getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
 import { getOrCreateAccount } from "./position";
-import { scaleDown } from "./tokens";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
@@ -90,7 +88,7 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
 }
 
 // Update UsagePoolDailySnapshot entity
-export function updatePoolMetrics(event: ethereum.Event, poolAddress: string): void {
+export function updatePoolMetrics(event: ethereum.Event, poolAddress: string): LiquidityPoolDailySnapshot {
   // get or create pool metrics
   let pool = getLiquidityPool(poolAddress);
   let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event, poolAddress);
@@ -123,6 +121,8 @@ export function updatePoolMetrics(event: ethereum.Event, poolAddress: string): v
 
   poolMetricsDaily.save();
   poolMetricsHourly.save();
+
+  return poolMetricsDaily;
 }
 
 // Update the volume for all relavant entities

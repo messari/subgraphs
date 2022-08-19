@@ -985,12 +985,6 @@ type Stat @entity {
   " Average in USD "
   meanUSD: BigDecimal!
 
-  " Median in native token amount"
-  medianAmount: BigInt!
-
-  " Median in USD "
-  medianUSD: BigDecimal!
-
   " Maximum in native token amount "
   maxAmount: BigInt!
 
@@ -1008,6 +1002,11 @@ type Stat @entity {
 
   " Variance for USD "
   varUSD: BigDecimal!
+
+  S_amt: BigDecimal
+  S_usd: BigDecimal
+  values_amt: [BigDecimal!]!
+  values_usd: [BigDecimal!]!
 }
 
 # Helper entity for calculating daily/hourly active users

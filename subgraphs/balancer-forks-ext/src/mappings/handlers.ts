@@ -19,6 +19,7 @@ import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { getLiquidityPool, getLiquidityPoolFee, getOrCreateToken } from "../common/getters";
 import { SwapFeePercentageChanged } from "../../generated/Vault/LinearPool";
 import { scaleDown } from "../common/tokens";
+import { getStat, updateStat } from "../common/stats";
 
 /************************************
  ****** DEPOSITS & WITHDRAWALS ******
@@ -44,10 +45,12 @@ function handlePoolJoined(event: PoolBalanceChanged): void {
   //get the contract address
   let poolAddress: string = poolId.substring(0, 42);
 
-  createDepositMulti(event, poolAddress, amounts);
+  let deposit = createDepositMulti(event, poolAddress, amounts);
   updateUsageMetrics(event, event.params.liquidityProvider, UsageType.DEPOSIT);
   updateFinancials(event);
-  updatePoolMetrics(event, poolAddress);
+  let poolDaily = updatePoolMetrics(event, poolAddress);
+  let depositStat = getStat(poolDaily.depositStats);
+  updateStat(depositStat, deposit.outputTokenAmount!, deposit.amountUSD);
 }
 
 function handlePoolExited(event: PoolBalanceChanged): void {
@@ -57,10 +60,13 @@ function handlePoolExited(event: PoolBalanceChanged): void {
   //get the contract address
   let poolAddress: string = poolId.substring(0, 42);
 
-  createWithdrawMulti(event, poolAddress, amounts);
+  let withdraw = createWithdrawMulti(event, poolAddress, amounts);
   updateUsageMetrics(event, event.params.liquidityProvider, UsageType.WITHDRAW);
   updateFinancials(event);
-  updatePoolMetrics(event, poolAddress);
+  let poolDaily = updatePoolMetrics(event, poolAddress);
+  let withdrawStat = getStat(poolDaily.withdrawStats);
+
+  updateStat(withdrawStat, withdraw.outputTokenAmount!, withdraw.amountUSD);
 }
 
 /************************************
@@ -74,10 +80,20 @@ export function handleSwap(event: SwapEvent): void {
   //get the contract address
   let poolAddress: string = poolId.substring(0, 42);
 
-  createSwapHandleVolume(event, poolAddress, tokenIn, event.params.amountIn, tokenOut, event.params.amountOut);
+  let swap = createSwapHandleVolume(
+    event,
+    poolAddress,
+    tokenIn,
+    event.params.amountIn,
+    tokenOut,
+    event.params.amountOut,
+  );
   updateFinancials(event);
-  updatePoolMetrics(event, poolAddress);
   updateUsageMetrics(event, event.transaction.from, UsageType.SWAP);
+
+  let poolDaily = updatePoolMetrics(event, poolAddress);
+  let swapStat = getStat(poolDaily.swapStats);
+  updateStat(swapStat, swap.amountIn, swap.amountInUSD);
 }
 
 export function handlePoolRegister(event: PoolRegistered): void {
