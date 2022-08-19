@@ -177,7 +177,7 @@ Once you are here create a file named `git-sync` and put the following text in i
 git fetch upstream          # get the latest changes from the remote repository
 git checkout master         # switch to the local (forked) master branch
 git rebase upstream/master  # rebase the remote upstream/master onto forked/master
-git push                    # sync remote forked/master
+git push --force            # sync remote forked/master
 echo "upstream/master and forked/master are in sync"
 ```
 
