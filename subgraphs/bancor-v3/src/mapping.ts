@@ -61,6 +61,7 @@ import {
   DaiAddr,
   EthAddr,
   exponentToBigDecimal,
+  exponentToBigInt,
   hundredBD,
   LiquidityPoolFeeType,
   Network,
@@ -662,7 +663,7 @@ function getOrCreateProtocol(): DexAmmProtocol {
     protocol.name = "Bancor V3";
     protocol.slug = "bancor-v3";
     protocol.schemaVersion = "1.3.0";
-    protocol.subgraphVersion = "1.0.0";
+    protocol.subgraphVersion = "1.0.1";
     protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.EXCHANGE;
@@ -910,25 +911,46 @@ function _handleTotalLiquidityUpdated(
   protocol.save();
 }
 
-function getDaiAmount(sourceTokenID: string, sourceAmount: BigInt): BigDecimal {
+function getDaiAmount(
+  sourceTokenID: string,
+  sourceAmountMantissa: BigInt
+): BigDecimal {
   if (sourceTokenID == DaiAddr) {
-    return sourceAmount.toBigDecimal().div(exponentToBigDecimal(18));
+    return sourceAmountMantissa.toBigDecimal().div(exponentToBigDecimal(18));
   }
+  let sourceToken = Token.load(sourceTokenID);
+  if (!sourceToken) {
+    log.warning("[getDaiAmount] token {} not found", [sourceTokenID]);
+    return zeroBD;
+  }
+  let sourceAmount = sourceAmountMantissa
+    .toBigDecimal()
+    .div(exponentToBigDecimal(sourceToken.decimals));
+  let priceUSD = getTokenPriceUSD(sourceTokenID, sourceToken.decimals);
+  return sourceAmount.times(priceUSD);
+}
+
+// get usd price of a certain token
+// by calling tradeOutputBySourceAmount method in BancorNetworkInfo
+// potential optimization: store price at Token.lastPriceUSD
+function getTokenPriceUSD(token: string, decimals: i32): BigDecimal {
   let info = BancorNetworkInfo.bind(Address.fromString(BancorNetworkInfoAddr));
-  let targetAmountResult = info.try_tradeOutputBySourceAmount(
-    Address.fromString(sourceTokenID),
+  let daiAmountMantissaResult = info.try_tradeOutputBySourceAmount(
+    Address.fromString(token),
     Address.fromString(DaiAddr),
-    sourceAmount
+    exponentToBigInt(decimals)
   );
-  if (targetAmountResult.reverted) {
+  if (daiAmountMantissaResult.reverted) {
     log.warning(
-      "[getDaiAmount] try_tradeOutputBySourceAmount({}, {}, {}) reverted",
-      [sourceTokenID, DaiAddr, sourceAmount.toString()]
+      "[getTokenPriceUSD] try_tradeOutputBySourceAmount({}, {}, {}) reverted",
+      [token, DaiAddr, exponentToBigInt(decimals).toString()]
     );
     return zeroBD;
   }
-  // dai.decimals = 18
-  return targetAmountResult.value.toBigDecimal().div(exponentToBigDecimal(18));
+  // 18 = dai decimals
+  return daiAmountMantissaResult.value
+    .toBigDecimal()
+    .div(exponentToBigDecimal(18));
 }
 
 function getReserveTokenAmount(
