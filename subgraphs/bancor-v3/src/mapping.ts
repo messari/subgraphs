@@ -663,7 +663,7 @@ function getOrCreateProtocol(): DexAmmProtocol {
     protocol.name = "Bancor V3";
     protocol.slug = "bancor-v3";
     protocol.schemaVersion = "1.3.0";
-    protocol.subgraphVersion = "1.0.1";
+    protocol.subgraphVersion = "1.0.2";
     protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.EXCHANGE;
@@ -1227,12 +1227,12 @@ function updateLiquidityPoolSnapshotRevenue(
     blockTimestamp,
     blockNumber
   );
-  hourlySnapshot.dailyTotalRevenueUSD =
-    dailySnapshot.dailyTotalRevenueUSD.plus(revenue);
-  hourlySnapshot.dailyProtocolSideRevenueUSD =
-    dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenue);
-  hourlySnapshot.dailySupplySideRevenueUSD =
-    dailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+  hourlySnapshot.hourlyTotalRevenueUSD =
+    hourlySnapshot.hourlyTotalRevenueUSD.plus(revenue);
+  hourlySnapshot.hourlyProtocolSideRevenueUSD =
+    hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(protocolSideRevenue);
+  hourlySnapshot.hourlySupplySideRevenueUSD =
+    hourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenue);
   hourlySnapshot.save();
 }
 
@@ -1478,9 +1478,9 @@ function getOrCreateLiquidityPoolHourlySnapshot(
     snapshot.cumulativeTotalRevenueUSD = zeroBD;
     snapshot.cumulativeProtocolSideRevenueUSD = zeroBD;
     snapshot.cumulativeSupplySideRevenueUSD = zeroBD;
-    snapshot.dailyTotalRevenueUSD = zeroBD;
-    snapshot.dailyProtocolSideRevenueUSD = zeroBD;
-    snapshot.dailySupplySideRevenueUSD = zeroBD;
+    snapshot.hourlyTotalRevenueUSD = zeroBD;
+    snapshot.hourlyProtocolSideRevenueUSD = zeroBD;
+    snapshot.hourlySupplySideRevenueUSD = zeroBD;
     snapshot.cumulativeVolumeUSD = zeroBD;
     snapshot.inputTokenBalances = [zeroBI];
     snapshot.inputTokenWeights = [zeroBD];
