@@ -14,8 +14,8 @@
   "protocolFeesCollectorAddress": "0xc6920d3a369e7c8bd1a22dbe385e11d1f7af948f",
 
   "protocolTokenAddress": "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e",
-  "rewardTokenInterval": "TIMESTAMP",
-  "rewardTokenRate": 0,
+  "protocolTokenStartingInflationPerIntervalUnit": 0,
+  "inflationInterval": "TIMESTAMP",
 
   "gaugeControllerAddress": "0x0000000000000000000000000000000000000000",
 

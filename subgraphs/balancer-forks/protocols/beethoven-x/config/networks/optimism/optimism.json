@@ -13,8 +13,8 @@
   "protocolFeesCollectorAddress": "0xce88686553686DA562CE7Cea497CE749DA109f9F",
 
   "protocolTokenAddress": "0x97513e975a7fA9072c72C92d8000B0dB90b163c5",
-  "rewardTokenInterval": "TIMESTAMP",
-  "rewardTokenRate": 0,
+  "protocolTokenStartingInflationPerIntervalUnit": 0,
+  "inflationInterval": "TIMESTAMP",
 
   "graftEnabled": false,
   "subgraphId": "",

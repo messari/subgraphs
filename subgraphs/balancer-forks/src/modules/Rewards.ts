@@ -10,6 +10,7 @@ import { getRewardsPerDay } from "../common/rewards";
 import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/gauge/Gauge";
 import { GaugeController as GaugeControllereContract } from "../../generated/GaugeController/GaugeController";
+import { RewardTokenType } from "../common/constants";
 
 export function getRewardsData(gaugeAddress: Address): RewardsInfoType {
   let rewardRates: BigInt[] = [];
@@ -67,13 +68,18 @@ export function updateControllerRewards(
     return;
   }
 
+  let protocolToken = getOrCreateRewardToken(
+    constants.PROTOCOL_TOKEN_ADDRESS,
+    constants.RewardTokenType.DEPOSIT,
+    block
+  );
   // Daily BAL emissions is currently known as a static value, but it may be changed in the future.
   // FOLLOW UP: How to keep track of the daily emission rate?
   let protocolTokenRewardEmissionsPerDay =
-    constants.DAILY_BAL_EMISSIONS.times(gaugeRelativeWeight);
+    protocolToken._inflationPerDay!.times(gaugeRelativeWeight);
 
   updateRewardTokenEmissions(
-    constants.BALANCER_TOKEN_ADDRESS,
+    constants.PROTOCOL_TOKEN_ADDRESS,
     poolAddress,
     BigInt.fromString(
       protocolTokenRewardEmissionsPerDay.truncate(0).toString()
@@ -82,7 +88,7 @@ export function updateControllerRewards(
   );
 }
 
-export function updateRewardTokenInfo(
+export function updateFactoryRewards(
   poolAddress: Address,
   gaugeAddress: Address,
   block: ethereum.Block
@@ -147,7 +153,11 @@ export function updateRewardTokenEmissions(
   block: ethereum.Block
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
-  const rewardToken = getOrCreateRewardToken(rewardTokenAddress, block.number);
+  const rewardToken = getOrCreateRewardToken(
+    rewardTokenAddress,
+    RewardTokenType.DEPOSIT,
+    block
+  );
 
   if (!pool.rewardTokens) {
     pool.rewardTokens = [];

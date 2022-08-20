@@ -130,15 +130,11 @@ export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 export const BIGDECIMAL_POINT_FOUR = BigDecimal.fromString("0.4");
 
-export const FEE_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
+export const DEFAULT_DECIMALS_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
+export const FEE_DENOMINATOR = DEFAULT_DECIMALS_DENOMINATOR;
 
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
-
-export const WEEKLY_BAL_EMISSIONS = BigDecimal.fromString("145000");
-export const DAILY_BAL_EMISSIONS = WEEKLY_BAL_EMISSIONS.div(
-  BigDecimal.fromString("7")
-);
 
 export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
 
@@ -159,5 +155,5 @@ export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
   "{{gaugeControllerAddress}}"
 );
 
-export const REWARD_TOKEN_INTERVAL = "{{rewardTokenInterval}}";
-export const REWARD_TOKEN_RATE = BigInt.fromI32({{rewardTokenRate}});
+export const INFLATION_INTERVAL = "{{inflationInterval}}";
+export const STARTING_INFLATION_RATE = BigDecimal.fromString(({{protocolTokenStartingInflationPerIntervalUnit}}).toString()).times(DEFAULT_DECIMALS_DENOMINATOR);

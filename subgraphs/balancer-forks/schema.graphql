@@ -72,6 +72,12 @@ type RewardToken @entity {
 
   " The type of the reward token "
   type: RewardTokenType!
+
+  " The rate of inflation of this reward token "
+  _inflationRate: BigDecimal
+
+  " The amount of inflation per day of this reward token "
+  _inflationPerDay: BigDecimal
 }
 
 # Note that trading fee is the fee paid *by* the users, whereas LP fee and
