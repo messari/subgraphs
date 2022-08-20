@@ -10,7 +10,7 @@ import { getRewardsPerDay } from "../common/rewards";
 import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/gauge/Gauge";
 import { GaugeController as GaugeControllereContract } from "../../generated/GaugeController/GaugeController";
-import { RewardTokenType } from "../common/constants";
+import { readValue } from "../common/utils";
 
 export function getRewardsData(gaugeAddress: Address): RewardsInfoType {
   let rewardRates: BigInt[] = [];
@@ -194,4 +194,17 @@ export function updateRewardTokenEmissions(
   pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
 
   pool.save();
+}
+
+export function getPoolFromGauge(gaugeAddress: Address): Address | null {
+  const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
+
+  let poolAddress = readValue<Address>(
+    gaugeContract.try_lp_token(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return null;
+
+  return poolAddress;
 }
