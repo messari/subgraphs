@@ -118,6 +118,7 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_NEGATIVE_ONE = BigInt.fromI32(-1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
@@ -162,12 +163,8 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
-
 // steth / Reth address
 export const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
 
 // deposits address
-export const DEPOSITPOOL =
-  "0x4D05E3d48a938db4b7a9A59A802D5b45011BDe58";
-
-  
+export const DEPOSITPOOL = "0x4D05E3d48a938db4b7a9A59A802D5b45011BDe58";
