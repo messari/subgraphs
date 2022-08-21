@@ -551,12 +551,12 @@ export function updateRevenue(
 //    - FinancialsDailySnapshot.cumulativeProtocolSideRevenueUSD
 //    - FinancialsDailySnapshot.dailyTotalRevenueUSD
 //    - FinancialsDailySnapshot.cumulativeTotalRevenueUSD
-export function updateStablizerFees(fees: BigDecimal, event: ethereum.Event): void {
+export function updateStablizerFees(feesUSD: BigDecimal, event: ethereum.Event): void {
   let protocol = getOrCreateProtocol();
   let cumulativePRev = protocol.cumulativeProtocolSideRevenueUSD;
   let cumulativeTRev = protocol.cumulativeTotalRevenueUSD;
-  cumulativePRev = cumulativePRev.plus(fees);
-  cumulativeTRev = cumulativeTRev.plus(fees);
+  cumulativePRev = cumulativePRev.plus(feesUSD);
+  cumulativeTRev = cumulativeTRev.plus(feesUSD);
 
   protocol.cumulativeProtocolSideRevenueUSD = cumulativePRev;
   protocol.cumulativeTotalRevenueUSD = cumulativeTRev;
@@ -565,8 +565,8 @@ export function updateStablizerFees(fees: BigDecimal, event: ethereum.Event): vo
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   financialMetrics.cumulativeProtocolSideRevenueUSD = cumulativePRev;
   financialMetrics.cumulativeTotalRevenueUSD = cumulativeTRev;
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(fees);
-  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(fees);
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(feesUSD);
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(feesUSD);
   financialMetrics.save();
 }
 

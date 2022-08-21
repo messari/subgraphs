@@ -92,6 +92,23 @@ export function getOrCreateUnderlyingToken(cToken: Address): Token {
   return token;
 }
 
+export function getOrCreateRewardToken(): Token {
+  let tokenId: string = cToken.toHexString();
+  let token = Token.load(tokenId);
+
+  if (token == null) {
+    token = new Token(tokenId);
+
+    let contract = CErc20.bind(cToken);
+    token.name = contract.name();
+    token.symbol = contract.symbol();
+    token.decimals = contract.decimals();
+
+    token.save();
+  }
+  return token;
+}
+
 export function getUnderlyingTokenPrice(cToken: Address): BigDecimal {
   let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
   let oracleAddress = factoryContract.oracle() as Address;
