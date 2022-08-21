@@ -10,6 +10,7 @@ import {
   LiquidityPool as LiquidityPoolStore,
 } from "../../generated/schema";
 import {
+  getOrCreateToken,
   getOrCreateLiquidityPool,
   getOrCreateDexAmmProtocol,
   getOrCreateUsageMetricsDailySnapshot,
@@ -82,7 +83,8 @@ export function UpdateMetricsAfterDeposit(block: ethereum.Block): void {
 }
 
 export function getAddLiquidityFeesUSD(
-  inputTokens: string[],
+  poolAddress: Address,
+  inputTokens: Address[],
   fees: BigInt[],
   block: ethereum.Block
 ): BigDecimal {
@@ -90,11 +92,9 @@ export function getAddLiquidityFeesUSD(
 
   for (let idx = 0; idx < inputTokens.length; idx++) {
     if (fees.at(idx) == constants.BIGINT_ZERO) continue;
+    if (inputTokens.at(idx).equals(poolAddress)) continue;
 
-    let inputToken = utils.getOrCreateTokenFromString(
-      inputTokens.at(idx),
-      block.number
-    );
+    let inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
 
     let inputTokenFee = fees
       .at(idx)
@@ -111,6 +111,7 @@ export function getAddLiquidityFeesUSD(
 
 export function Deposit(
   poolAddress: Address,
+  inputTokens: Address[],
   depositedCoinAmounts: BigInt[],
   fees: BigInt[],
   provider: Address,
@@ -124,10 +125,9 @@ export function Deposit(
   let depositAmountUSD = constants.BIGDECIMAL_ZERO;
 
   for (let idx = 0; idx < depositedCoinAmounts.length; idx++) {
-    let inputToken = utils.getOrCreateTokenFromString(
-      pool.inputTokens[idx],
-      block.number
-    );
+    if (inputTokens.at(idx).equals(poolAddress)) continue;
+
+    let inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
 
     let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
     inputTokenBalances[inputTokenIndex] = inputTokenBalances[
@@ -176,7 +176,8 @@ export function Deposit(
   );
 
   let protocolSideRevenueUSD = getAddLiquidityFeesUSD(
-    pool.inputTokens,
+    poolAddress,
+    inputTokens,
     fees,
     block
   );

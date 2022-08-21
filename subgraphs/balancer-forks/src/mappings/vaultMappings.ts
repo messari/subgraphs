@@ -78,6 +78,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   if (total.gt(constants.BIGINT_ZERO)) {
     Deposit(
       poolAddress,
+      inputTokens,
       deltas,
       fees,
       provider,
@@ -87,6 +88,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   } else {
     Withdraw(
       poolAddress,
+      inputTokens,
       deltas,
       fees,
       provider,
@@ -103,7 +105,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
 export function handleSwap(event: SwapEvent): void {
   const poolId = event.params.poolId;
   const poolAddress = Address.fromString(poolId.toHexString().substring(0, 42));
-
+  
   const tokenIn = event.params.tokenIn;
   const amountIn = event.params.amountIn;
 

@@ -119,10 +119,15 @@ export function Swap(
     )
     .times(tokenOutStore.lastPriceUSD!);
 
-  inputTokenBalances[tokenInIndex] =
-    inputTokenBalances[tokenInIndex].plus(amountIn);
-  inputTokenBalances[tokenOutIndex] =
-    inputTokenBalances[tokenOutIndex].minus(amountOut);
+  if (tokenInIndex != -1) {
+    inputTokenBalances[tokenInIndex] =
+      inputTokenBalances[tokenInIndex].plus(amountIn);
+  }
+
+  if (tokenOutIndex != -1) {
+    inputTokenBalances[tokenOutIndex] =
+      inputTokenBalances[tokenOutIndex].minus(amountOut);
+  }
 
   const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
 
