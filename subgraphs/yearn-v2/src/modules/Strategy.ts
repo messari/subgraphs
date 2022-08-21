@@ -130,11 +130,18 @@ export function strategyReported(
     .divDecimal(outputTokenDecimals)
     .times(outputTokenPriceUSD);
 
-  let supplySideRevenueUSD = totalGainUSD.plus(strategistRewardUSD);
-
-  let protocolSideRevenueUSD = sharesMintedToTreasury
+  let protocolFees = sharesMintedToTreasury
     .divDecimal(outputTokenDecimals)
     .times(outputTokenPriceUSD);
+
+  let supplySideRevenueUSD = totalGainUSD
+    .minus(strategistRewardUSD)
+    .minus(protocolFees);
+
+  if (supplySideRevenueUSD.lt(constants.BIGDECIMAL_ZERO))
+    supplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+
+  let protocolSideRevenueUSD = protocolFees.plus(strategistRewardUSD);
 
   vault.outputTokenSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
