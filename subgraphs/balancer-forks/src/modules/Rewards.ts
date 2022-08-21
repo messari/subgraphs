@@ -73,8 +73,8 @@ export function updateControllerRewards(
     constants.RewardTokenType.DEPOSIT,
     block
   );
-  // Daily BAL emissions is currently known as a static value, but it may be changed in the future.
-  // FOLLOW UP: How to keep track of the daily emission rate?
+
+  // Get the rewards per day for this gauge
   let protocolTokenRewardEmissionsPerDay =
     protocolToken._inflationPerDay!.times(gaugeRelativeWeight);
 
