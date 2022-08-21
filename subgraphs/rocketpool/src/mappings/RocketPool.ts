@@ -1,10 +1,12 @@
-import { Address, bigInt, log } from "@graphprotocol/graph-ts";
-
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { bigIntToBigDecimal } from "../utils/numbers";
 import {
   EtherDeposited,
   EtherWithdrawn,
-} from "../../generated/rocket-pool/RocketVault";
-import { RETH } from "../../generated/RocketPool/RETH";
+} from "../../generated/RocketVault/RocketVault";
+import { BalancesUpdated } from "../../generated/RocketNetworkBalances/rocketNetworkBalances";
+import { DepositReceived } from "../../generated/rocketNodeDeposit/rocketNodeDeposit";
+import { RETH } from "../../generated/rocketVault/RETH";
 import { getOrCreateToken } from "../entities/token";
 import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
 import {
@@ -20,8 +22,11 @@ import {
   BIGINT_ZERO,
   RETH_ADDRESS,
   BIGINT_NEGATIVE_ONE,
+  BIGDECIMAL_HALF,
+  BIGINT_TEN_TO_EIGHTEENTH,
 } from "../utils/constants";
 import { getOrCreatePool } from "../entities/pool";
+import { getOrCreateProtocol } from "../entities/protocol";
 
 export function handleEtherDeposit(event: EtherDeposited): void {
   updateProtocolAndPoolTvl(event.block, event.params.amount);
@@ -33,6 +38,33 @@ export function handleEtherWithdrawn(event: EtherWithdrawn): void {
     event.block,
     BIGINT_NEGATIVE_ONE.times(event.params.amount)
   );
+  updateSnapshotsTvl(event.block);
+}
+
+export function handleBalanceUpdate(event: BalancesUpdated): void {
+  const protocol = getOrCreateProtocol();
+  const rewardEth = event.params.totalEth.minus(event.params.stakingEth);
+  const amt = BIGDECIMAL_HALF.times(
+    bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
+  ).plus(
+    BIGDECIMAL_HALF.times(
+      bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
+    ).div(new BigDecimal(BIGINT_TEN_TO_EIGHTEENTH))
+  );
+
+  updateTotalRevenueMetrics(
+    event.block,
+    protocol.cumulativeTotalRevenueUSD,
+    rewardEth,
+    event.params.rethSupply
+  );
+  updateProtocolSideRevenueMetrics(event.block, amt);
+  updateSupplySideRevenueMetrics(event.block);
+}
+
+export function handleNodeDeposit(event: DepositReceived): void {
+  updateUsageMetrics(event.block, event.params.from);
+  updateProtocolAndPoolTvl(event.block, event.params.amount);
   updateSnapshotsTvl(event.block);
 }
 

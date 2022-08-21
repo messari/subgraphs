@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateProtocol } from "../entities/protocol";
 import { getOrCreatePool } from "../entities/pool";
@@ -77,7 +77,7 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
 
 export function updateTotalRevenueMetrics(
   block: ethereum.Block,
-  preTotalPooledEther: BigInt,
+  preTotalPooledEther: BigDecimal,
   postTotalPooledEther: BigInt,
   totalShares: BigInt
 ): void {
@@ -94,9 +94,8 @@ export function updateTotalRevenueMetrics(
   );
 
   // Staking Rewards
-  const stakingRewards = bigIntToBigDecimal(
-    postTotalPooledEther.minus(preTotalPooledEther)
-  );
+  const stakingRewards =
+    bigIntToBigDecimal(postTotalPooledEther).minus(preTotalPooledEther);
   const stakingRewardsUSD = stakingRewards.times(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
@@ -143,7 +142,7 @@ export function updateTotalRevenueMetrics(
 
 export function updateProtocolSideRevenueMetrics(
   block: ethereum.Block,
-  amount: BigInt
+  amount: BigDecimal
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
@@ -158,7 +157,7 @@ export function updateProtocolSideRevenueMetrics(
   );
 
   // Staking rewards revenue is in ETH (rebased in stETH for user), price in ETH
-  const amountUSD = bigIntToBigDecimal(amount).times(
+  const amountUSD = amount.times(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
   );
