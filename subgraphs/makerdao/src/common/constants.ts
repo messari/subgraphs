@@ -90,9 +90,9 @@ export namespace InterestRateSide {
 
 // They are defined as u32 for use with switch/case
 export namespace ProtocolSideRevenueType {
-  export const STABILITYFEE = 1;
-  export const LIQUIDATION = 2;
-  export const PSM = 3;
+  export const STABILITYFEE: u32 = 1;
+  export const LIQUIDATION: u32 = 2;
+  export const PSM: u32 = 3;
 }
 
 //////////////////////////////
