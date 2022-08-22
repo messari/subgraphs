@@ -111,7 +111,9 @@ Notional has a governance token NOTE, which is used for governance purpose and i
 ## Usage Metrics
 
 ### Pool Level
-Pools of Notional can be classified by assets (DAI, USDC, ETH, BTC). Theoretically, each asset can be further classified according to maturity, but it's difficult as the collaterals and nTOKENs do not have corresponding maturity.
+*Amended on 22 Aug 2022* The pool of Notional can be classified by assets (DAI, USDC, ETH, BTC) and maturity date. E.g. DAI loans maturing on 25 Sept 2022, DAI loans maturing on 24 Dec 2022, ETH loans maturing on 24 Dec 2022, etc. This goes in line with the concept of "Markets" by Notional. (Ref: https://info.notional.finance/).
+
+~~Pools of Notional can be classified by assets (DAI, USDC, ETH, BTC) and . Theoretically, each asset can be further classified according to maturity, but it's difficult as the collaterals and nTOKENs do not have corresponding maturity.~~ (We might need separate classifications for collaterals and nTokens).
 
 The usage of a Notional pool includes the following:
 - Liquidity providers provide/withdraw liquidity 
@@ -138,19 +140,36 @@ The protocol level metrics of the above items is the sum of the same metrics fro
 
 ## Financial Metrics
 
-### Pool Level
-Pools of Notional can be classified by assets (DAI, USDC, ETH, BTC). 
+### Pool Level (*Amended on 22 Aug 2022*)
+
+The pool of Notional can be classified by assets (DAI, USDC, ETH, BTC) and maturity date. E.g. DAI loans maturing on 25 Sept 2022, DAI loans maturing on 24 Dec 2022, ETH loans maturing on 24 Dec 2022, etc. This goes in line with the concept of "Markets" by Notional. (Ref: https://info.notional.finance/).
 
 *TVL* 
 
-The TVL of each pool is the cTOKEN in the main proxy contract. The value is the net result of:
+The TVL of each pool is the value of cTOKEN in each pool. The value is the net result of:
 - Lenders deposit/withdraw cTOKENs
 - Borrower borrow/repay cTOKENs
-- Borrowers deposit/release collaterals in cTOKENs
-- Liquidity providers provide/withdraw cTOKENs as liquidity
+- ~~Borrowers deposit/release collaterals in cTOKENs~~ (To be discussed: collaterals do not go to any pool, so there should be another class for collaterals)
+- Liquidity providers provide/withdraw cTOKENs as liquidity (the split of the same cTokens allocated to each pool of different maturity dates is determined by governance parameters. Logically this part should be included as TVL. However, in the first implementation of the subgraph, we will first ignore this for TVL calculation.) 
 
 To simplify, the formula of Notional's TVL is:
-> TVL = $\sum$ value of cToken assets (cDAI, cUSDC, cETH, cWBTC) in the proxy contract
+> TVL = $\sum$ value of cToken assets (cDAI, cUSDC, cETH, cWBTC) in the pool
+
+*Total Deposit Balance*
+
+This is the net result of all deposit/withdrawals. This should equal to TVL, similar to most lending protocols. However, this is the balance of liquidity in the pool, and not a measure of the actual deposit volume.
+
+When a pool matures, the deposits by users in that pool will be automatically convert back to cTokens at users' account level. The users decide if they wish to rollover into another lending. So the total deposit of an expired pool will be zero.
+
+*Cumulative Deposit*
+This is the sum of all deposits. When a pool matures, this record stays with the pool. 
+
+*Total Borrowing*
+
+This is the net result of all borrowing/repayments. (Pending: is it possible to easily differentiate a deposit and repayment?)
+
+*Cumulative Borrowing*
+This is the sum of all borrowings. When a pool matures, this record stays with the pool. 
 
 *Volume*
 
@@ -164,7 +183,7 @@ To simplify, the formula of Notional's Volume (combining lend, borrow, repay and
 Notional has two types of revenue:
 - Interests paid by borrowers to lenders. Different from Aave or Compound, Notional operates like a trading platform of zero-interest coupon (buying and selling fCASH), so the interests paid by borrowers to lenders do not accrue per block, but rather happens when each trade takes place. To simplify, we take the difference between the cTOKEN value and fCASH future value as the interest paid. For any given period, the higher of borrowing interests paid (selling fCASH) and lending interest paid (buying fCASH) is the interest revenue for that period. For more details please refer to Appendix: Consideration on Interest Revenue For Notional.
 
-**To simplify the revenue, we can presume the interest paid by borrowers to lenders is not revenue, i.e. only counting revenue generated to liquidity providiers as revenue.** 
+**To simplify the revenue, we can presume the interest paid by borrowers to lenders is not revenue, i.e. only counting revenue generated to liquidity providers as revenue.** 
 
 - Fees paid by borrowers and lenders for each trade. Notional charges a fee for each transaction with the liquidity pool, e.g. borrow, repay, lend, withdraw. The fee rate is 0.3% per transaction for a 1-year loan, and pro rata for shorter maturity, i.e. 0.15% for 6-month loan. 80% of the fees go to the protocol and 20% goes to the liquidity provider. 
   - Reference: https://docs.notional.finance/governance/overview-of-governance-parameters/selected-parameters#fees-and-incentives
