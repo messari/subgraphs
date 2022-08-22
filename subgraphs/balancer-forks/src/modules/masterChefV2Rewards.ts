@@ -10,6 +10,7 @@ import {
   INT_ZERO,
   MasterChef,
   PROTOCOL_TOKEN_ADDRESS,
+  RewardTokenType,
 } from "../../src/common/constants";
 import {
   convertTokenToDecimal,
@@ -38,7 +39,11 @@ export function updateMasterChef(
     event.block.number
   );
   pool.rewardTokens = [
-    getOrCreateRewardToken(PROTOCOL_TOKEN_ADDRESS, event.block.number).id,
+    getOrCreateRewardToken(
+      PROTOCOL_TOKEN_ADDRESS,
+      RewardTokenType.DEPOSIT,
+      event.block
+    ).id,
   ];
 
   // Calculate Reward Emission per second to a specific pool

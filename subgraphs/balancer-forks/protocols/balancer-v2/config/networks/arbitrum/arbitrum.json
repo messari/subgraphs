@@ -12,9 +12,10 @@
 
   "protocolFeesCollectorAddress": "0xce88686553686DA562CE7Cea497CE749DA109f9F",
   "protocolTokenAddress": "0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8",
+  "protocolTokenStartingInflationPerIntervalUnit": 0,
+  "inflationInterval": "NONE",
 
-  "rewardTokenInterval": "NONE",
-  "rewardTokenRate": 0,
+  "usesBalancerTokenAdmin": false,
 
   "graftEnabled": false,
   "subgraphId": "",

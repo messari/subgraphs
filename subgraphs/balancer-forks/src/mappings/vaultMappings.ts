@@ -45,6 +45,9 @@ export function handleTokensRegistered(event: TokensRegistered): void {
   let inputTokens: string[] = [];
   let inputTokenLength = tokens.length;
   for (let idx = 0; idx < inputTokenLength; idx++) {
+    // Exception: StablePoolFactory added poolAddress in event params token
+    if (tokens.at(idx).equals(poolAddress)) continue;
+
     inputTokens.push(getOrCreateToken(tokens.at(idx), event.block.number).id);
   }
 

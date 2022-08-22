@@ -80,7 +80,6 @@ dataSources:
           handler: handleSwap
       file: ./src/mappings/vaultMappings.ts
 
-
   - kind: ethereum/contract
     name: GaugeController
     network: {{network}}
@@ -146,7 +145,28 @@ dataSources:
         - event: RewardsOnlyGaugeCreated(indexed address,indexed address,address)
           handler: handleRewardsOnlyGaugeCreated
       file: ./src/mappings/GaugeControllerMappings.ts
-
+{{#usesBalancerTokenAdmin}} 
+  - kind: ethereum/contract
+    name: BalancerTokenAdmin
+    network: {{network}}
+    source:
+      address: "{{balancerTokenAdmin}}"
+      abi: BalancerTokenAdmin
+      startBlock: {{balancerTokenAdminStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - DexAmmProtocol
+      abis:
+        - name: BalancerTokenAdmin
+          file: ./abis/balancer-v2/BalancerTokenAdmin.json
+      eventHandlers:
+        - event: MiningParametersUpdated(uint256,uint256)
+          handler: handleMiningParametersUpdated
+      file: ./src/mappings/balancerTokenAdminMappings.ts
+{{/usesBalancerTokenAdmin}} 
 templates:
   - kind: ethereum/contract
     name: WeightedPool

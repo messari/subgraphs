@@ -24,6 +24,7 @@ import { getUsdPricePerToken } from "../prices";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
+import { getRewardsPerDay } from "./rewards";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -40,14 +41,30 @@ export function getOrCreateAccount(id: string): Account {
   return account;
 }
 
-export function getOrCreateRewardToken(address: Address, blockNumber: BigInt): RewardToken {
-  let rewardToken = RewardToken.load(address.toHexString());
+export function getOrCreateRewardToken(
+  address: Address,
+  RewardTokenType: string,
+  block: ethereum.Block
+): RewardToken {
+  let rewardToken = RewardToken.load(
+    RewardTokenType + "-" + address.toHexString()
+  );
 
   if (!rewardToken) {
     rewardToken = new RewardToken(address.toHexString());
-    const token = getOrCreateToken(address, blockNumber);
+    const token = getOrCreateToken(address, block.number);
     rewardToken.token = token.id;
-    rewardToken.type = constants.RewardTokenType.DEPOSIT;
+    rewardToken.type = RewardTokenType;
+
+    if (address == constants.PROTOCOL_TOKEN_ADDRESS) {
+      rewardToken._inflationRate = constants.STARTING_INFLATION_RATE;
+      rewardToken._inflationPerDay = getRewardsPerDay(
+        block.timestamp,
+        block.number,
+        constants.STARTING_INFLATION_RATE,
+        constants.INFLATION_INTERVAL
+      );
+    }
 
     rewardToken.save();
   }

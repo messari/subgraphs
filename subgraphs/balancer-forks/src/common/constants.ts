@@ -93,9 +93,9 @@ export namespace NULL {
 }
 
 export namespace Protocol {
-  export const NAME = "Balancer v2";
-  export const SLUG = "balancer-v2";
-  export const NETWORK = Network.MAINNET;
+  export const NAME = "Beethoven X";
+  export const SLUG = "beethoven-x";
+  export const NETWORK = Network.FANTOM;
   export const SCHEMA_VERSION = "1.3.0";
   export const SUBGRAPH_VERSION = "1.1.0";
   export const METHODOLOGY_VERSION = "1.0.0";
@@ -130,15 +130,13 @@ export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 export const BIGDECIMAL_POINT_FOUR = BigDecimal.fromString("0.4");
 
-export const FEE_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
+export const DEFAULT_DECIMALS_DENOMINATOR = BigDecimal.fromString(
+  "1000000000000000000"
+);
+export const FEE_DENOMINATOR = DEFAULT_DECIMALS_DENOMINATOR;
 
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
-
-export const WEEKLY_BAL_EMISSIONS = BigDecimal.fromString("145000");
-export const DAILY_BAL_EMISSIONS = WEEKLY_BAL_EMISSIONS.div(
-  BigDecimal.fromString("7")
-);
 
 export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
 
@@ -147,17 +145,19 @@ export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
 /////////////////////////////////////
 
 export const VAULT_ADDRESS = Address.fromString(
-  "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
+  "0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce"
 );
 export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
-  "0xce88686553686DA562CE7Cea497CE749DA109f9F"
+  "0xc6920d3a369e7c8bd1a22dbe385e11d1f7af948f"
 );
 export const PROTOCOL_TOKEN_ADDRESS = Address.fromString(
-  "0xba100000625a3754423978a60c9317c58a424e3D"
+  "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD"
+  "0x0000000000000000000000000000000000000000"
 );
 
-export const REWARD_TOKEN_INTERVAL = "NONE";
-export const REWARD_TOKEN_RATE = BigInt.fromI32(0);
+export const INFLATION_INTERVAL = "TIMESTAMP";
+export const STARTING_INFLATION_RATE = BigDecimal.fromString(
+  (0).toString()
+).times(DEFAULT_DECIMALS_DENOMINATOR);

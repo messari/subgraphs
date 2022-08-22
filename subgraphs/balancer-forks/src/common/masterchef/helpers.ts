@@ -1,4 +1,10 @@
-import { ethereum, BigInt, Address, log } from "@graphprotocol/graph-ts";
+import {
+  ethereum,
+  BigInt,
+  Address,
+  log,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
 import {
   LiquidityPool,
   _MasterChef,
@@ -8,8 +14,8 @@ import {
   BIGINT_ONE,
   BIGINT_ZERO,
   PROTOCOL_TOKEN_ADDRESS,
-  REWARD_TOKEN_INTERVAL,
-  REWARD_TOKEN_RATE,
+  INFLATION_INTERVAL,
+  STARTING_INFLATION_RATE,
 } from "../constants";
 import { getOrCreateToken } from "../initializers";
 
@@ -52,10 +58,14 @@ export function getOrCreateMasterChef(
   if (!masterChef) {
     masterChef = new _MasterChef(masterChefType);
     masterChef.totalAllocPoint = BIGINT_ZERO;
-    masterChef.rewardTokenInterval = REWARD_TOKEN_INTERVAL;
-    masterChef.rewardTokenRate = REWARD_TOKEN_RATE;
+    masterChef.rewardTokenInterval = INFLATION_INTERVAL;
+    masterChef.rewardTokenRate = BigInt.fromString(
+      STARTING_INFLATION_RATE.toString()
+    );
     log.warning("MasterChef Type: " + masterChefType, []);
-    masterChef.adjustedRewardTokenRate = REWARD_TOKEN_RATE;
+    masterChef.adjustedRewardTokenRate = BigInt.fromString(
+      STARTING_INFLATION_RATE.toString()
+    );
     masterChef.lastUpdatedRewardRate = BIGINT_ZERO;
     masterChef.save();
   }

@@ -4,6 +4,7 @@ import {
   updateUsageMetrics,
 } from "../modules/Metrics";
 import {
+  getPoolFromGauge,
   updateControllerRewards,
   updateFactoryRewards,
 } from "../modules/Rewards";
@@ -17,7 +18,7 @@ import {
 export function handleDeposit(event: Deposit): void {
   const gaugeAddress = event.address;
   const provider = event.params.provider;
-  const poolAddress = utils.getPoolFromGauge(gaugeAddress);
+  const poolAddress = getPoolFromGauge(gaugeAddress);
 
   if (!poolAddress) return;
 
@@ -32,7 +33,7 @@ export function handleDeposit(event: Deposit): void {
 export function handleWithdraw(event: Withdraw): void {
   const gaugeAddress = event.address;
   const provider = event.params.provider;
-  const poolAddress = utils.getPoolFromGauge(gaugeAddress);
+  const poolAddress = getPoolFromGauge(gaugeAddress);
 
   if (!poolAddress) return;
 
@@ -46,7 +47,7 @@ export function handleWithdraw(event: Withdraw): void {
 
 export function handleUpdateLiquidityLimit(event: UpdateLiquidityLimit): void {
   const gaugeAddress = event.address;
-  const poolAddress = utils.getPoolFromGauge(gaugeAddress);
+  const poolAddress = getPoolFromGauge(gaugeAddress);
 
   if (!poolAddress) return;
 
