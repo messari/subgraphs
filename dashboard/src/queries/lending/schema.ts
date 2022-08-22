@@ -837,7 +837,7 @@ export const schema201 = (): Schema => {
       event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { ";
     let fields = eventsFields.join(", ");
     if (event === "liquidates") {
-      fields += ", profitUSD, liquidatee{id}, liquidator{id}, position{id}";
+      fields += ", profitUSD, liquidatee{id}, liquidator{id}";
     } else {
       fields += ", account{id}, position{id}";
     }
@@ -944,9 +944,6 @@ export const schema201 = (): Schema => {
         borrowCount
         repayCount
         liquidationCount
-        liquidations {
-          hash
-        }
         repays {
           hash
         }
