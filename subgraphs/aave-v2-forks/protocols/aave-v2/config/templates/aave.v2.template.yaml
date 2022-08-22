@@ -14,9 +14,9 @@ dataSources:
     name: LendingPoolAddressesProvider
     network: {{ network }}
     source:
-      address: "{{ factoryAddress }}"
+      address: "{{ factory.address }}"
       abi: LendingPoolAddressesProvider
-      startBlock: {{ startBlock }}
+      startBlock: {{ factory.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -27,22 +27,16 @@ dataSources:
         - name: LendingPoolAddressesProvider
           file: ./abis/LendingPoolAddressesProvider.json
       eventHandlers:
-        # - event: ProxyCreated(bytes32,indexed address)
-        #   handler: handleProxyCreated
         - event: PriceOracleUpdated(indexed address)
           handler: handlePriceOracleUpdated
-        - event: LendingPoolUpdated(indexed address)
-          handler: handleLendingPoolUpdated
-        # - event: LendingPoolConfiguratorUpdated(indexed address)
-        #   handler: handleLendingPoolConfiguratorUpdated
       file: ./protocols/aave-v2/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator
     network: {{ network }}
     source:
-      address: "{{ configAddress }}"
+      address: "{{ lendingPoolConfigurator.address }}"
       abi: LendingPoolConfigurator
-      startBlock: {{ configStartBlock }}
+      startBlock: {{ lendingPoolConfigurator.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -78,12 +72,13 @@ dataSources:
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
       file: ./protocols/aave-v2/src/mapping.ts
-templates:
   - kind: ethereum/contract
     name: LendingPool
     network: {{ network }}
     source:
+      address: "{{ lendingPool.address }}"
       abi: LendingPool
+      startBlock: {{ lendingPool.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
