@@ -159,8 +159,8 @@ templates:
           handler: handleLogBorrow
         - event: LogRepay(indexed address,indexed address,uint256,uint256)
           handler: handleLogRepay
-        # - event: LogExchangeRate(uint256)
-        #   handler: handleLogExchangeRate
+        - event: LogExchangeRate(uint256)
+          handler: handleLogExchangeRate
         - event: LogAccrue(uint128)
           handler: handleLogAccrue
   - name: priceOracle

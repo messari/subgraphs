@@ -136,6 +136,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveDepositors += 1;
     }
+    dailySnapshot.save();
   } else if (eventType == EventType.BORROW) {
     if (protocol.borrowers.indexOf(account.id) < 0) {
       protocol.borrowers = addToArrayAtIndex(protocol.borrowers, account.id, 0);
@@ -146,6 +147,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveBorrowers += 1;
     }
+    dailySnapshot.save();
   } else if (eventType == EventType.LIQUIDATOR) {
     if (protocol.liquidators.indexOf(account.id) < 0) {
       protocol.liquidators = addToArrayAtIndex(protocol.liquidators, account.id, 0);
@@ -157,6 +159,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveLiquidators += 1;
     }
+    dailySnapshot.save();
   } else if (eventType == EventType.LIQUIDATEE) {
     if (protocol.liquidatees.indexOf(account.id) < 0) {
       protocol.liquidatees = addToArrayAtIndex(protocol.liquidatees, account.id, 0);
@@ -168,10 +171,10 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
       log.warning("REACHED: {}", [activeEventId])
       dailySnapshot.dailyActiveLiquidatees += 1;
     }
+    dailySnapshot.save();
   }
   activeEvent!.save();
   protocol.save();
-  dailySnapshot.save();
 }
 
 export function updatePositions(
