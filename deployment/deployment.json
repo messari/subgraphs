@@ -7,35 +7,35 @@
           "steegecs": "steegecs/abracadabra-money-arbitrum",
           "messari": "messari/abracadabra-money-arbitrum",
           "dmelotik": "dmelotik/abracadabra-arbitrum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "avalanche": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-avalanche",
           "messari": "messari/abracadabra-money-avalanche",
           "dmelotik": "dmelotik/abracadabra-avalanche",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "bsc": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-bsc",
           "messari": "messari/abracadabra-money-bsc",
           "dmelotik": "dmelotik/abracadabra-bsc",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "fantom": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-fantom",
           "messari": "messari/abracadabra-money-fantom",
           "dmelotik": "dmelotik/abracadabra-fantom",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum": {
           "template": "abracadabra.money.template.yaml",
           "steegecs": "steegecs/abracadabra-money-ethereum",
           "messari": "messari/abracadabra-money-ethereum",
           "dmelotik": "dmelotik/abracadabra-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
