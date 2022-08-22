@@ -15,6 +15,7 @@
 
   "protocolTokenAddress": "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e",
   "protocolTokenStartingInflationPerIntervalUnit": 0,
+
   "inflationInterval": "TIMESTAMP",
 
   "gaugeControllerAddress": "0x0000000000000000000000000000000000000000",
