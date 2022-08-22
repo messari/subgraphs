@@ -57,6 +57,14 @@ Be careful with loading the same entity in two different places at the same time
 
 Sometimes it might feel like an entity is not being saved. If it is not caused by what was mentioned above, double check if something else might be updating the same field on that entity. It might actually be saved, but be overwritten by a different handler triggered by a different event on a different block.
 
+### Array Sorting When Querying
+
+When you query via GraphQL some entity which contains an array of non-native entities (not bigints, strings, etc ...), the items inside that array will be returned sorted in ascending order. But if you query from the mapping you'll get the array sorted in the same way it was when saved.
+
+Some fields in some of our entities are arrays that contain information complementary to that of other fields. For example, in DEXes, pools have 2 or more input tokens. Each pool has a certain amount of each of those input tokens. The way we save this information is by having an array `inputTokens` containing the token addresses, and an array `inputTokenAmounts` containing the amount the pool has of each token. Each value in `inputTokens` maps to one in `inputTokenAmounts`, sharing their index in the array. In other words, the amount of `inputTokens[N]` in the pool will be `inputTokenAmounts[N]`, for any given `N`.
+
+Since the GraphQL API will sort `inputTokens` in ascending order, its values might not map with the values in `inputTokenAmounts` (even though they did match when saved). Fields that behave in this way need to be sorted from the subgraph, ensuring the order is always the same, so positions don't get messed up. Using the same example, before saving `inputTokens` we should already sort them in ascending order and then map to `inputTokenAmounts`.
+
 ## Testing
 
 ### Matchstick
@@ -72,7 +80,7 @@ Couple more tutorial videos:
 https://www.youtube.com/watch?v=T-orbT4gRiA
 https://www.youtube.com/watch?v=EFTHDIxOjVY
 
-Keep in mind that the test.ts file no longer needs to wrap all test() method calls into a runTests() function like older documentation specifies. Ensure that you have installed Rust, PostgreSQL, and Docker. If you are experiencing issues building the Dockerfile that is provided by matchstick documentation, confirm that all of the directories in the Dockerfile script are valid. In particular, step 15 attempts to copy the parent directory which is outiside of the build context. For some users, this throws an error and prevents execution. In this case, changing the step 15 to "COPY ./. ." can resolve this and facilitate a successful build. 
+Keep in mind that the test.ts file no longer needs to wrap all test() method calls into a runTests() function like older documentation specifies. Ensure that you have installed Rust, PostgreSQL, and Docker. If you are experiencing issues building the Dockerfile that is provided by matchstick documentation, confirm that all of the directories in the Dockerfile script are valid. In particular, step 15 attempts to copy the parent directory which is outiside of the build context. For some users, this throws an error and prevents execution. In this case, changing the step 15 to "COPY ./. ." can resolve this and facilitate a successful build.
 
 ## Debugging
 
@@ -105,7 +113,7 @@ If you're having issues with the subgraph sync failing and no error messages sho
 1. Check your graph health here https://graphiql-online.com/. Where it says "Enter the GraphQL endpoint" copy paste this endpoint https://api.thegraph.com/index-node/graphql
 2. After running this, copy the sample query in section 5 of the graph docs here https://thegraph.com/docs/en/developer/quick-start/#5-check-your-logs into the window
 3. Replace the part where it says subgraphs: ["Qm..."]  with your deployment id (you will see this in the studio)
-4. Run the query, you will see if your subgraph had any indexing errors! 
+4. Run the query, you will see if your subgraph had any indexing errors!
 
 ### Running Locally
 
@@ -119,7 +127,7 @@ A [video tutorial](https://youtu.be/nH_pZWgQb7g) on how to run the graph-node lo
 
 ### Postgres troubleshooting
 
-For those new to Postgres, the local node can be confusing when it comes to database authentication and general configuration. Here are a few things to check if the Postgres aspect of setting up the local node is giving you issues. 
+For those new to Postgres, the local node can be confusing when it comes to database authentication and general configuration. Here are a few things to check if the Postgres aspect of setting up the local node is giving you issues.
 > *Note*: the graph-node will not run properly on Windows. You must use WSL/WSL2  
 > *Note*: depending on your OS, the commands may vary
 
@@ -127,12 +135,12 @@ For those new to Postgres, the local node can be confusing when it comes to data
 
 2. If the start command in the docs does not work, try this `sudo service postgresql start`. You can also replace `start` with `stop` and `restart`.
 
-3. The default port for the Postgres server is 5432. After running the start command, check if the server is up and listening by running command `sudo netstat -nlp | grep 5432`. Or you can run `sudo lsof -i -P -n | grep LISTEN` and check numerous processes/servers running on your machine. 
+3. The default port for the Postgres server is 5432. After running the start command, check if the server is up and listening by running command `sudo netstat -nlp | grep 5432`. Or you can run `sudo lsof -i -P -n | grep LISTEN` and check numerous processes/servers running on your machine.
 
 4. Unless you have set some other default, the database system initialized from initdb is owned by the username on your system (along with the databases created within this system such as "graph-node"). However, this username from the system has not yet been made as a Postgres role that has read, write etc permissions in the Postgres system. If you try to connect to a database with this role/username, authentication will fail. You must add the user as a Postgres superuser role (there are queries you can run to just give this role permissions for one database rather than as a superuser, but for simplicity sake I wont get into that here).
 
 5. Start the Postgres cli with command `sudo -i -u postgres` followed by command `psql`. If inside the shell you run `\l`, you will see a list of databases, which "graph-node" will have an owner of the same name as your system user name. At this point, back out and run query `\du` to check if the owner of 'graph-node' database is in this list of roles. If not, run query `CREATE ROLE `*`myUser `*` WITH SUPERUSER CREATEDB CREATEROLE LOGIN ENCRYPTED PASSWORD `*`'password'`*`;`. This creates a superuser role with the proper name and will allow you to connect to the database with this user/password combo. Missing this step can cause authentication issues when attempting to build the node.
- 
+
 Useful links for troubleshooting:
 
 - More detailed graph-node [docs](https://github.com/graphprotocol/graph-node/blob/master/docs/getting-started.md)
@@ -164,8 +172,8 @@ Here are some known issues with subgraph tooling that you may run into:
 - Using a `derivedFrom` field in the graph code gives no compile time issues but fails when the graph syncs with error `unexpected null	wasm` ([Github Issue](https://github.com/graphprotocol/graph-ts/issues/219))
 - Event data can be different from contract call data as event data are calculated amid execution of a block whereas contract call data are calculated at the end of a block.
 - Note that **call-handlers** are not available on some EVM sidechains (e.g. Avalanche, Harmony, Polygon, etc). So you won't be able to use **call-handlers** in your subgraphs when indexing on these chains.
-- As of [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) there is a new enviornment variable called `GRAPH_MAX_GAS_PER_HANDLER`. This sets a maximum gas limit on handlers. This does not refer to on-chain gas limits, but a measure of the computation exerted per handler. You will get a subgraph error if this limit is exceeded. 
-    >A place you may find this is using the built-in `.pow()` with large numbers.
+- As of [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) there is a new enviornment variable called `GRAPH_MAX_GAS_PER_HANDLER`. This sets a maximum gas limit on handlers. This does not refer to on-chain gas limits, but a measure of the computation exerted per handler. You will get a subgraph error if this limit is exceeded.
+  >A place you may find this is using the built-in `.pow()` with large numbers.
 - Different graph-cli versions handle missing required fields defined in schema differently. Deploying a subgraph with missing required field with [`graph-cli v0.30.1`](https://github.com/graphprotocol/graph-node/releases/tag/v0.30.1) will fail with error `missing value for non-nullable field`, while it will succeed with [`graph-cli v0.26.0`](https://github.com/graphprotocol/graph-node/releases/tag/v0.26.0) as it automatically sets default values for those missing fields.
 
 ### AssemblyScript Issues
