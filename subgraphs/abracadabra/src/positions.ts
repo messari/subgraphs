@@ -121,7 +121,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
   let protocol = getOrCreateLendingProtocol();
   let dailyId: string = (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
 
-  let activeEventId = `hourly-${account.id}-${dailyId}-${eventType}`;
+  let activeEventId = `daily-${account.id}-${dailyId}-${eventType}`;
   let activeEvent = ActiveEventAccount.load(activeEventId);
 
   let dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
@@ -153,6 +153,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
       dailySnapshot.cumulativeUniqueLiquidators = protocol.cumulativeUniqueLiquidators;
     }
     if (!activeEvent) {
+      log.warning("REACHED: {}", [activeEventId])
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveLiquidators += 1;
     }
@@ -164,6 +165,7 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
+      log.warning("REACHED: {}", [activeEventId])
       dailySnapshot.dailyActiveLiquidatees += 1;
     }
   }
