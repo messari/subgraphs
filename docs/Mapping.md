@@ -49,6 +49,14 @@ Nested calls (e.g. calls from a multi-sig wallet) still invokes call-handlers an
 
 If no event occurred throughout the duration of a snapshot, you can skip that snapshot.
 
+### Saving Entities
+
+It is safe to load and save an entity multiple times during the execution of some event or call handler. Changes won't be persisted to the DB until it ends, but they'll be cached in memory and loading a previously saved entity should contain those changes.
+
+Be careful with loading the same entity in two different places at the same time. If both are saved at different places with different changes, it might happen that the second save overwrites the first. If you need to access the same entity in two different places try to load it just once and pass it down instead.
+
+Sometimes it might feel like an entity is not being saved. If it is not caused by what was mentioned above, double check if something else might be updating the same field on that entity. It might actually be saved, but be overwritten by a different handler triggered by a different event on a different block.
+
 ## Testing
 
 ### Matchstick
