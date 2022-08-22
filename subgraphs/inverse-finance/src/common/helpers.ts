@@ -499,31 +499,28 @@ export function updateRevenue(
 
   let marketID = event.address.toHexString();
   let market = getOrCreateMarket(marketID, event);
-  market.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  market.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  market.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  let newSupplySideRevenueUSD = newTotalRevenueUSD.minus(newProtocolRevenueUSD);
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+  market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
+  market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
   market.save();
 
   let marketDaily = getOrCreateMarketDailySnapshot(event);
-  marketDaily.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  marketDaily.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  marketDaily.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  marketDaily.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  marketDaily.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketDaily.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
   marketDaily.dailyTotalRevenueUSD = marketDaily.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
   marketDaily.dailyProtocolSideRevenueUSD = marketDaily.dailyProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
-  marketDaily.dailySupplySideRevenueUSD = marketDaily.dailyTotalRevenueUSD.minus(
-    marketDaily.dailyProtocolSideRevenueUSD,
-  );
+  marketDaily.dailySupplySideRevenueUSD = marketDaily.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   marketDaily.save();
 
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
-  marketHourly.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  marketHourly.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  marketHourly.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  marketHourly.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  marketHourly.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketHourly.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
   marketHourly.hourlyTotalRevenueUSD = marketHourly.hourlyTotalRevenueUSD.plus(newTotalRevenueUSD);
   marketHourly.hourlyProtocolSideRevenueUSD = marketHourly.hourlyProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
-  marketHourly.hourlySupplySideRevenueUSD = marketHourly.hourlyTotalRevenueUSD.minus(
-    marketHourly.hourlyProtocolSideRevenueUSD,
-  );
+  marketHourly.hourlySupplySideRevenueUSD = marketHourly.hourlySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   marketHourly.save();
 
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
