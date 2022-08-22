@@ -799,8 +799,13 @@ export function updateInterestRates(event: ethereum.Event): void {
   let marketId = event.address.toHexString();
   log.info("Updating rates for Market {} at tx hash {} ...", [marketId, event.transaction.hash.toHexString()]);
 
-  let borrowerInterestRate = getOrCreateInterestRate(marketId, InterestRateSide.BORROWER, InterestRateType.VARIABLE);
-  let lenderInterestRate = getOrCreateInterestRate(marketId, InterestRateSide.LENDER, InterestRateType.VARIABLE);
+  let borrowerInterestRate = getOrCreateInterestRate(
+    null,
+    InterestRateSide.BORROWER,
+    InterestRateType.VARIABLE,
+    marketId,
+  );
+  let lenderInterestRate = getOrCreateInterestRate(null, InterestRateSide.LENDER, InterestRateType.VARIABLE, marketId);
   if (borrowerInterestRate == null) {
     log.error("Borrower InterestRate for market {} does not exist.", [marketId]);
   }
@@ -838,4 +843,17 @@ export function updateInterestRates(event: ethereum.Event): void {
 
   borrowerInterestRate.save();
   lenderInterestRate.save();
+
+  let rates = [borrowerInterestRate.id, lenderInterestRate.id];
+  let market = getOrCreateMarket(marketId, event);
+  market.rates = rates;
+  market.save();
+
+  let dailySnapshot = getOrCreateMarketDailySnapshot(event);
+  dailySnapshot.rates = rates;
+  dailySnapshot.save();
+
+  let hourlySnapshot = getOrCreateMarketHourlySnapshot(event);
+  hourlySnapshot.rates = rates;
+  hourlySnapshot.save();
 }
