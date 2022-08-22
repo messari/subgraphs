@@ -45,7 +45,7 @@ import {
   getUnderlyingTokenPrice,
   getOrCreateToken,
 } from "./getters";
-import { decimalsToBigDecimal, BigDecimalTruncateToBigInt } from "./utils";
+import { decimalsToBigDecimal, BigDecimalTruncateToBigInt, bigIntToBDUseDecimals } from "./utils";
 
 // Create Account entity for participating account
 // return 1 if account is new, 0 if account already exists
@@ -637,6 +637,8 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
   if (market != null) {
     let tokenContract = CErc20.bind(event.address);
 
+    let inputToken = getOrCreateUnderlyingToken(event.address);
+    let outputToken = getOrCreateToken(Address.fromString(market.outputToken!));
     // To get the price of the underlying (input) token
     let inputTokenPriceUSD = getUnderlyingTokenPrice(event.address);
     let decimals = getOrCreateUnderlyingToken(event.address).decimals;
@@ -661,18 +663,24 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
     }
 
     let tryExchangeRate = tokenContract.try_exchangeRateCurrent();
-    if (tryExchangeRate.reverted) {
-      log.warning("Failed to get exchangeRate for market {} at tx hash {}; Not updating Market.exchangeRate", [
+    let exchangeRate: BigInt | null = null;
+    if (!tryExchangeRate.reverted) {
+      exchangeRate = tryExchangeRate.value;
+    } else {
+      log.warning("Failed to get current exchangeRate for market {} at tx hash {}, use exhangeRateStored instead", [
         marketId,
         event.transaction.hash.toHexString(),
       ]);
-    } else {
-      market.exchangeRate = tryExchangeRate.value.toBigDecimal().div(decimalsToBigDecimal(MANTISSA_DECIMALS));
+      exchangeRate = tokenContract.exchangeRateCurrent();
     }
+    market.exchangeRate = bigIntToBDUseDecimals(
+      exchangeRate,
+      MANTISSA_DECIMALS + inputToken.decimals - outputToken.decimals,
+    );
 
     // derive outputToken (cToken) price from exchange rate and inputTokenPriceUSD
     if (market.exchangeRate) {
-      market.outputTokenPriceUSD = inputTokenPriceUSD.div(market.exchangeRate!);
+      market.outputTokenPriceUSD = inputTokenPriceUSD.times(market.exchangeRate!);
     }
 
     //
