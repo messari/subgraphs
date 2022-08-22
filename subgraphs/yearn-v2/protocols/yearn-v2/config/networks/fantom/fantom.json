@@ -7,6 +7,10 @@
   "registry_v2-isEnabled": false,
   "callHandlersEnabled": true,
 
+  "protocolId": "0x727fe1759430df13655ddb0731dE0D0FDE929b04",
+  "yearnTreasuryVault": "0x89716ad7edc3be3b35695789c475f3e7a3deb12a",
+  "defaultNetwork": "Network.FANTOM",
+
   "manualVaults": [
     {
       "name": "ftmYvWFTMVault",

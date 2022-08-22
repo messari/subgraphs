@@ -229,6 +229,7 @@ dataSources:
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v2
           receipt: true
+        
       callHandlers:
         - function: deposit()
           handler: handleDeposit

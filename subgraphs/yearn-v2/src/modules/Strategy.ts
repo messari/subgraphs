@@ -51,7 +51,7 @@ function getSharesMinted(
         if (!data_value) {
           return constants.BIGINT_ZERO;
         }
-        return data_value!.toBigInt();
+        return data_value.toBigInt();
       }
     }
   }
@@ -142,6 +142,13 @@ export function strategyReported(
     supplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
 
   let protocolSideRevenueUSD = protocolFees.plus(strategistRewardUSD);
+
+  // Incident: 2021-05-20
+  // Reference: https://github.com/yearn/yearn-security/blob/master/disclosures/2021-05-20.md#References
+  if (constants.BLACKLISTED_TRANSACTION.includes(event.transaction.hash)) {
+    supplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    protocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+  }
 
   vault.outputTokenSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
