@@ -961,6 +961,7 @@ export function _handleLiquidate(
     protocol.save();
   }
   liquidatorAccount.liquidateCount += 1;
+  liquidatorAccount.save();
   let liquidatorActorID = "liquidator"
     .concat("-")
     .concat(liquidator.toHexString());
@@ -984,6 +985,17 @@ export function _handleLiquidate(
   }
   account.liquidationCount += 1;
   account.save();
+  let liquidateeActorID = "liquidatee"
+    .concat("-")
+    .concat(borrower.toHexString());
+  let liquidateeActor = ActorAccount.load(liquidateeActorID);
+  if (!liquidateeActor) {
+    liquidateeActor = new ActorAccount(liquidateeActorID);
+    liquidateeActor.save();
+
+    protocol.cumulativeUniqueLiquidatees += 1;
+    protocol.save();
+  }
 
   let repayTokenMarket = Market.load(repayToken.toHexString());
   if (!repayTokenMarket) {
@@ -1028,6 +1040,10 @@ export function _handleLiquidate(
   );
   liquidate.save();
 
+  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
+    liquidate.amountUSD
+  );
+  protocol.save();
   market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(
     liquidate.amountUSD
   );
