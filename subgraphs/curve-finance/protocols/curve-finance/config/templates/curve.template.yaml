@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.5
 repository: https://github.com/messari/subgraphs
 {{#graftEnabled}}
 features:
@@ -200,8 +200,10 @@ dataSources:
         
         - event: RemoveLiquidityOne(indexed address,uint256,uint256)
           handler: handleRemoveLiquidityOne
+          receipt: true
         - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
           handler: handleRemoveLiquidityOneWithSupply
+          receipt: true
         
         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleRemoveLiquidityImbalance
@@ -459,8 +461,10 @@ templates:
         
         - event: RemoveLiquidityOne(indexed address,uint256,uint256)
           handler: handleRemoveLiquidityOne
+          receipt: true
         - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
           handler: handleRemoveLiquidityOneWithSupply
+          receipt: true
         
         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleRemoveLiquidityImbalance

@@ -86,7 +86,8 @@ export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
 function getInputToken(
   event: ethereum.Event,
   poolAddress: Address,
-  provider: Address
+  provider: Address,
+  amount: BigInt
 ): Address {
   let receipt = event.receipt;
   if (!receipt) return constants.NULL.TYPE_ADDRESS;
@@ -106,9 +107,13 @@ function getInputToken(
       let _to = ethereum.decode("address", log.topics.at(2))!.toAddress();
 
       if (_from == poolAddress && _to == provider) {
-        let inputToken = log.address;
+        let data = ethereum.decode("uint256", log.data);
 
-        return inputToken;
+        if (data && data.toBigInt().equals(amount)) {
+          let inputToken = log.address;
+
+          return inputToken;
+        }
       }
     }
   }
@@ -122,13 +127,20 @@ export function getWithdrawnTokenAmounts(
   inputTokenAmount: BigInt,
   event: ethereum.Event
 ): BigInt[] {
-  let inputToken = getInputToken(event, liquidityPoolAddress, provider);
+  let inputToken = getInputToken(
+    event,
+    liquidityPoolAddress,
+    provider,
+    inputTokenAmount
+  );
 
   let withdrawnTokenAmounts = new Array<BigInt>();
 
   for (let idx = 0; idx < inputTokens.length; idx++) {
     if (inputTokens[idx] == inputToken.toHexString()) {
       withdrawnTokenAmounts.push(inputTokenAmount);
+
+      continue;
     }
 
     withdrawnTokenAmounts.push(constants.BIGINT_ZERO);
@@ -160,14 +172,22 @@ export function getRemoveLiquidityOneFees(
     let beforeBalance = balanceBeforeWithdraw[idx];
     let afterBalance = balanceAfterWithdraw[idx];
 
+    if (admin_fee.equals(constants.BIGINT_ZERO)) {
+      fees.push(constants.BIGINT_ZERO);
+      continue;
+    }
+
     let fee = beforeBalance
       .minus(afterBalance)
       .minus(withdrawnAmount)
       .div(admin_fee)
       .times(constants.FEE_DENOMINATOR_BIGINT);
 
-    if (fee.ge(constants.BIGINT_ZERO)) fees.push(fee);
-    else fees.push(constants.BIGINT_ZERO);
+    if (fee.ge(constants.BIGINT_ZERO)) {
+      fees.push(fee);
+    } else {
+      fees.push(constants.BIGINT_ZERO);
+    }
   }
 
   return fees;
