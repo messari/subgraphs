@@ -1,5 +1,13 @@
 # Introduction of Notional Finance
 
+*Note on 23 Aug 2022: due to the complexity of the protocol, there will be one or more interim versions of subgraph to test some of the parameters first and then a final to include all the implementations. This version of the methodology is based on the current and not the final version of the subgraph. Pending issues are addressed in the relevant sections of the article. Currently, the pending issues are:*
+
+- *treatment liquidity represented by nTokens (LP liquidity)*
+- *treatment of cToken collaterals not in any lending pool*
+- *separation of deposit/repayment, and separation of borrowing/withdrawal, by looking into the trade (optional)*
+- *compute interest rate and interest rate revenue (optional)*
+
+
 ## Overview of Notional Finance
 Notional Finance is a protocol for decentralised fixed term, fixed rate lending. For now it only operates on Ethereum. 
 
@@ -113,7 +121,7 @@ Notional has a governance token NOTE, which is used for governance purpose and i
 ### Pool Level
 *Amended on 22 Aug 2022* The pool of Notional can be classified by assets (DAI, USDC, ETH, BTC) and maturity date. E.g. DAI loans maturing on 25 Sept 2022, DAI loans maturing on 24 Dec 2022, ETH loans maturing on 24 Dec 2022, etc. This goes in line with the concept of "Markets" by Notional. (Ref: https://info.notional.finance/).
 
-~~Pools of Notional can be classified by assets (DAI, USDC, ETH, BTC) and . Theoretically, each asset can be further classified according to maturity, but it's difficult as the collaterals and nTOKENs do not have corresponding maturity.~~ (We might need separate classifications for collaterals and nTokens).
+~~Pools of Notional can be classified by assets (DAI, USDC, ETH, BTC) and . Theoretically, each asset can be further classified according to maturity, but it's difficult as the collaterals and nTOKENs do not have corresponding maturity.~~ (Pending issue: we might need separate classifications for collaterals and nTokens).
 
 The usage of a Notional pool includes the following:
 - Liquidity providers provide/withdraw liquidity 
@@ -149,27 +157,37 @@ The pool of Notional can be classified by assets (DAI, USDC, ETH, BTC) and matur
 The TVL of each pool is the value of cTOKEN in each pool. The value is the net result of:
 - Lenders deposit/withdraw cTOKENs
 - Borrower borrow/repay cTOKENs
-- ~~Borrowers deposit/release collaterals in cTOKENs~~ (To be discussed: collaterals do not go to any pool, so there should be another class for collaterals)
-- Liquidity providers provide/withdraw cTOKENs as liquidity (the split of the same cTokens allocated to each pool of different maturity dates is determined by governance parameters. Logically this part should be included as TVL. However, in the first implementation of the subgraph, we will first ignore this for TVL calculation.) 
+- ~~Borrowers deposit/release collaterals in cTOKENs~~ (Pending issue: collaterals do not go to any pool, so there should be another class for collaterals)
+- ~~Liquidity providers provide/withdraw cTOKENs as liquidity~~ (Pending issue: the split of the same cTokens allocated to each pool of different maturity dates is determined by governance parameters. Logically this part should be included as TVL. However, in the first implementation of the subgraph, we will first ignore this for TVL calculation.) 
 
 To simplify, the formula of Notional's TVL is:
 > TVL = $\sum$ value of cToken assets (cDAI, cUSDC, cETH, cWBTC) in the pool
 
 *Total Deposit Balance*
 
-This is the net result of all deposit/withdrawals. This should equal to TVL, similar to most lending protocols. However, this is the balance of liquidity in the pool, and not a measure of the actual deposit volume.
+This is the net result of all deposit/withdrawals. This should equal to TVL less the cTokens from liquidity providers. However, this is the balance of liquidity in the pool, and not a measure of the actual deposit volume. (Pending issue: there's no direct way to differentiate a deposit and a repayment in Notional, as they are both selling cTokens for fCASHs in the pool.) 
 
-When a pool matures, the deposits by users in that pool will be automatically convert back to cTokens at users' account level. The users decide if they wish to rollover into another lending. So the total deposit of an expired pool will be zero.
+> Total Deposit Balance = $\sum$ deposits of cTokens by users - $\sum$ withdrawal of cToken by users
+
+When a pool matures, the deposits by users in that pool will be automatically convert back to cTokens at users' account level. The users decide if they wish to rollover into another lending. So the total deposit of a matured pool will be zero.
 
 *Cumulative Deposit*
-This is the sum of all deposits. When a pool matures, this record stays with the pool. 
+This is the sum of all deposits. When a pool matures, this record stays with the pool. This is meant to be a reflection of the business volume of the pool.
 
-*Total Borrowing*
+> Cumulative Deposit Balance = $\sum$ deposits of cTokens by users
 
-This is the net result of all borrowing/repayments. (Pending: is it possible to easily differentiate a deposit and repayment?)
+*Total Borrowing Balance*
 
-*Cumulative Borrowing*
-This is the sum of all borrowings. When a pool matures, this record stays with the pool. 
+This is the net result of all borrowing/repayments. This should equal to the total deposit balance, after adjusting for cToken changes in the pool. (Pending issue: there's no direct way to differentiate a borrowing and a withdrawal in Notional, as they are both selling fCASHs for cTokens in the pool.) 
+
+> Total Borrowing Balance = $\sum$ borrowings of cTokens by users - $\sum$ repayments of cToken by users
+
+When a pool matures, the borrowings by users in that pool should have been all-repaid (before maturity date), or settled to the next pool by other users (on or shortly after maturity date), or liquidated (any time, depending on collateral ratio only). So the pool should have a zero or close-to-zero balance.
+
+*Cumulative Borrowing Balance*
+This is the sum of all borrowings. When a pool matures, this record stays with the pool. This is meant to be a reflection of the business volume of the pool.
+
+> Cumulative Borrowing Balance = $\sum$ borrowings of cTokens by users
 
 *Volume*
 
@@ -183,7 +201,7 @@ To simplify, the formula of Notional's Volume (combining lend, borrow, repay and
 Notional has two types of revenue:
 - Interests paid by borrowers to lenders. Different from Aave or Compound, Notional operates like a trading platform of zero-interest coupon (buying and selling fCASH), so the interests paid by borrowers to lenders do not accrue per block, but rather happens when each trade takes place. To simplify, we take the difference between the cTOKEN value and fCASH future value as the interest paid. For any given period, the higher of borrowing interests paid (selling fCASH) and lending interest paid (buying fCASH) is the interest revenue for that period. For more details please refer to Appendix: Consideration on Interest Revenue For Notional.
 
-**To simplify the revenue, we can presume the interest paid by borrowers to lenders is not revenue, i.e. only counting revenue generated to liquidity providers as revenue.** 
+**(Pending issue: To simplify the revenue, we can presume the interest paid by borrowers to lenders is not revenue, i.e. only counting revenue generated to liquidity providers as revenue. To calculate this part of the revenue, we need to first compute the exchange rate/interest rate; and then differentiate deposit/repayments and borrowing/withdrawals. Interest revenue are derived based on the above.)** 
 
 - Fees paid by borrowers and lenders for each trade. Notional charges a fee for each transaction with the liquidity pool, e.g. borrow, repay, lend, withdraw. The fee rate is 0.3% per transaction for a 1-year loan, and pro rata for shorter maturity, i.e. 0.15% for 6-month loan. 80% of the fees go to the protocol and 20% goes to the liquidity provider. 
   - Reference: https://docs.notional.finance/governance/overview-of-governance-parameters/selected-parameters#fees-and-incentives
