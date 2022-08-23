@@ -4,13 +4,13 @@ import {
   getOrCreateToken,
 } from "../common/initializers";
 import * as utils from "../common/utils";
+import { readValue } from "../common/utils";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
 import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/gauge/Gauge";
 import { GaugeController as GaugeControllereContract } from "../../generated/GaugeController/GaugeController";
-import { readValue } from "../common/utils";
 
 export function getRewardsData(gaugeAddress: Address): RewardsInfoType {
   let rewardRates: BigInt[] = [];
@@ -61,7 +61,11 @@ export function updateControllerRewards(
       gaugeControllerContract.try_gauge_relative_weight(gaugeAddress),
       constants.BIGINT_ZERO
     )
-    .toBigDecimal();
+    .divDecimal(
+      constants.BIGINT_TEN.pow(
+        constants.DEFAULT_DECIMALS.toI32() as u8
+      ).toBigDecimal()
+    );
 
   // This essentially checks if the gauge is a GaugeController gauge instead of a childChainLiquidityGaugeFactory contract.
   if (gaugeRelativeWeight.equals(constants.BIGDECIMAL_ZERO)) {
@@ -155,7 +159,7 @@ export function updateRewardTokenEmissions(
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   const rewardToken = getOrCreateRewardToken(
     rewardTokenAddress,
-    RewardTokenType.DEPOSIT,
+    constants.RewardTokenType.DEPOSIT,
     block
   );
 

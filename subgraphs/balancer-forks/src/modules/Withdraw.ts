@@ -123,7 +123,7 @@ export function Withdraw(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  // deltas in a remove liquidity call is negative
+  // deltas in a remove liquidity event are negative
   withdrawnTokenAmounts = withdrawnTokenAmounts.map<BigInt>((x) =>
     x.times(constants.BIGINT_NEGATIVE_ONE)
   );
@@ -135,10 +135,7 @@ export function Withdraw(
   for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
     if (inputTokens.at(idx).equals(poolAddress)) continue;
 
-    let inputToken = getOrCreateToken(
-      inputTokens.at(idx),
-      block.number
-    );
+    let inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
     let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
 
     inputTokenBalances[inputTokenIndex] = inputTokenBalances[

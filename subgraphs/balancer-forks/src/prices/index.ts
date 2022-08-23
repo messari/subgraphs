@@ -5,8 +5,8 @@ import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
 import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
 import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
 import { log, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
-import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
+import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {

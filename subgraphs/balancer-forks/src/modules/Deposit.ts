@@ -160,7 +160,12 @@ export function Deposit(
     pool.inputTokenBalances,
     block
   );
-  pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
+  let inputTokenWeights =
+    utils.getPoolTokenWeightsForDynamicWeightPools(poolAddress);
+
+  if (inputTokenWeights.length > 0) {
+    pool.inputTokenWeights = inputTokenWeights;
+  }
   pool.outputTokenSupply = totalSupplyAfterDeposit;
   pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
   pool.save();

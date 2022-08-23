@@ -105,7 +105,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
 export function handleSwap(event: SwapEvent): void {
   const poolId = event.params.poolId;
   const poolAddress = Address.fromString(poolId.toHexString().substring(0, 42));
-  
+
   const tokenIn = event.params.tokenIn;
   const amountIn = event.params.amountIn;
 

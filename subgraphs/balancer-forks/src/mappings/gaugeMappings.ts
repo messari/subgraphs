@@ -8,7 +8,6 @@ import {
   updateControllerRewards,
   updateFactoryRewards,
 } from "../modules/Rewards";
-import * as utils from "../common/utils";
 import {
   Deposit,
   Withdraw,

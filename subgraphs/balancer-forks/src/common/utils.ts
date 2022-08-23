@@ -18,12 +18,6 @@ import { Vault as VaultContract } from "../../generated/Vault/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
 import { FeesCollector as FeesCollectorContract } from "../../generated/templates/WeightedPool/FeesCollector";
-import {
-  BIGDECIMAL_ONE,
-  BIGDECIMAL_TEN,
-  INT_ONE,
-  INT_ZERO,
-} from "../common/constants";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -122,7 +116,29 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   );
 }
 
-export function getPoolTokenWeights(poolAddress: Address): BigDecimal[] {
+export function getPoolTokenWeightsForDynamicWeightPools(
+  poolAddress: Address
+): BigDecimal[] {
+  const poolContract = WeightedPoolContract.bind(poolAddress);
+
+  let scales = readValue<BigInt[]>(poolContract.try_getScalingFactors(), []);
+  let totalScale = scales
+    .reduce<BigInt>((sum, current) => sum.plus(current), constants.BIGINT_ZERO)
+    .toBigDecimal();
+
+  let inputTokenWeights: BigDecimal[] = [];
+  for (let idx = 0; idx < scales.length; idx++) {
+    inputTokenWeights.push(
+      scales.at(idx).divDecimal(totalScale).times(constants.BIGDECIMAL_HUNDRED)
+    );
+  }
+
+  return inputTokenWeights;
+}
+
+export function getPoolTokenWeightsForNormalizedPools(
+  poolAddress: Address
+): BigDecimal[] {
   const poolContract = WeightedPoolContract.bind(poolAddress);
 
   let weights = readValue<BigInt[]>(
@@ -143,6 +159,15 @@ export function getPoolTokenWeights(poolAddress: Address): BigDecimal[] {
         .times(constants.BIGDECIMAL_HUNDRED)
     );
   }
+
+  return inputTokenWeights;
+}
+
+export function getPoolTokenWeights(poolAddress: Address): BigDecimal[] {
+  let inputTokenWeights = getPoolTokenWeightsForNormalizedPools(poolAddress);
+  if (inputTokenWeights.length > 0) return inputTokenWeights;
+
+  inputTokenWeights = getPoolTokenWeightsForDynamicWeightPools(poolAddress);
 
   return inputTokenWeights;
 }
@@ -256,9 +281,13 @@ export function updateProtocolAfterNewLiquidityPool(
 
 // convert decimals
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
-  let bd = BIGDECIMAL_ONE;
-  for (let i = INT_ZERO; i < (decimals as i32); i = i + INT_ONE) {
-    bd = bd.times(BIGDECIMAL_TEN);
+  let bd = constants.BIGDECIMAL_ONE;
+  for (
+    let i = constants.INT_ZERO;
+    i < (decimals as i32);
+    i = i + constants.INT_ONE
+  ) {
+    bd = bd.times(constants.BIGDECIMAL_TEN);
   }
   return bd;
 }
@@ -268,7 +297,7 @@ export function convertTokenToDecimal(
   tokenAmount: BigInt,
   exchangeDecimals: i32
 ): BigDecimal {
-  if (exchangeDecimals == INT_ZERO) {
+  if (exchangeDecimals == constants.INT_ZERO) {
     return tokenAmount.toBigDecimal();
   }
 
