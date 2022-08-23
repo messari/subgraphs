@@ -925,12 +925,23 @@ export function _handleLiquidateBorrow(
   // Not much to do other than associating with the borrower position
   // Because compound liquidate() emits both RepayBorrow and Liquidate
   // All logic should be handled on RepayBorrow already
-  liquidate.position = borrower
+  let counterID = borrower
     .toHexString()
     .concat("-")
     .concat(repayTokenMarketID)
     .concat("-")
     .concat(PositionSide.BORROWER);
+  let positionCounter = _PositionCounter.load(counterID);
+  if (!positionCounter) {
+    log.warning("[_handleLiquidateBorrow] position counter {} not found", [
+      counterID,
+    ]);
+    return;
+  }
+  // TODO: need to find out which nextCount to use
+  liquidate.position = counterID
+    .concat("-")
+    .concat((positionCounter.nextCount--).toString());
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.market = liquidatedCTokenID!;
