@@ -1,0 +1,6 @@
+# auto generated files
+node_modules
+generated
+build
+subgraph.yaml
+./configurations/configure.ts
