@@ -122,32 +122,37 @@ export function handleCollateralConfigurationChanged(
     event.params.asset,
     event.params.liquidationBonus,
     event.params.liquidationThreshold,
-    event.params.ltv
+    event.params.ltv,
+    getProtocolData()
   );
 }
 
 export function handleBorrowingEnabledOnReserve(
   event: BorrowingEnabledOnReserve
 ): void {
-  _handleBorrowingEnabledOnReserve(event.params.asset);
+  _handleBorrowingEnabledOnReserve(event.params.asset, getProtocolData());
 }
 
 export function handleBorrowingDisabledOnReserve(
   event: BorrowingDisabledOnReserve
 ): void {
-  _handleBorrowingDisabledOnReserve(event.params.asset);
+  _handleBorrowingDisabledOnReserve(event.params.asset, getProtocolData());
 }
 
 export function handleReserveActivated(event: ReserveActivated): void {
-  _handleReserveActivated(event.params.asset);
+  _handleReserveActivated(event.params.asset, getProtocolData());
 }
 
 export function handleReserveDeactivated(event: ReserveDeactivated): void {
-  _handleReserveDeactivated(event.params.asset);
+  _handleReserveDeactivated(event.params.asset, getProtocolData());
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
-  _handleReserveFactorChanged(event.params.asset, event.params.factor);
+  _handleReserveFactorChanged(
+    event.params.asset,
+    event.params.factor,
+    getProtocolData()
+  );
 }
 
 /////////////////////////////////
@@ -181,7 +186,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       Address.fromString(market.outputToken!)
     );
     let tryBorrowRewards = incentiveControllerContract.try_assets(
-      Address.fromString(market.vToken)
+      Address.fromString(market.vToken!)
     );
 
     // calculate supply rewards
@@ -289,7 +294,8 @@ export function handleReserveUsedAsCollateralDisabled(
   // This Event handler disables a reserve/market being used as collateral
   _handleReserveUsedAsCollateralDisabled(
     event.params.reserve,
-    event.params.user
+    event.params.user,
+    getProtocolData()
   );
 }
 
