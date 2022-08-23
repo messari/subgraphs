@@ -9,5 +9,6 @@ export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_NAME = "Trader Joe";
 export const PROTOCOL_SLUG = "trader-joe";
 
-export const TRADER_JOE_AVALANCHE_REWARD_TOKEN_RATE =
-  BigInt.fromI64(30000000000000000000);
+export const TRADER_JOE_AVALANCHE_REWARD_TOKEN_RATE = BigInt.fromString(
+  "30000000000000000000"
+);
