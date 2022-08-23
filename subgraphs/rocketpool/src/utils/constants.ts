@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 ////////////////////
 ///// Versions /////
@@ -171,3 +171,9 @@ export const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
 
 // deposits address
 export const DEPOSITPOOL = "0x4D05E3d48a938db4b7a9A59A802D5b45011BDe58";
+
+export const STORAGE = "0x1d8f8f00cfa6758d7bE78336684788Fb0ee0Fa46";
+
+export const NETWORKENCODE = Bytes.fromHexString(
+  "0x034cd2ba322813e095f0f5279fe7959f6a89e44e2f0f497703d997c9bc1ba0e0"
+);

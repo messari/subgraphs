@@ -4,7 +4,7 @@ import { CustomPriceType } from "../common/types";
 import {
   UniswapPair as UniswapPairContract,
   UniswapPair__getReservesResult,
-} from "../../../generated/RocketVault/UniswapPair";
+} from "../../../generated/rocketVault/UniswapPair";
 
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/rocketVault/UniswapRouter";

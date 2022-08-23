@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Address, log } from "@graphprotocol/graph-ts";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import {
   EtherDeposited,
@@ -6,6 +6,8 @@ import {
 } from "../../generated/RocketVault/RocketVault";
 import { BalancesUpdated } from "../../generated/RocketNetworkBalances/rocketNetworkBalances";
 import { DepositReceived } from "../../generated/rocketNodeDeposit/rocketNodeDeposit";
+import { rocketNetworkFees } from "../../generated/rocketVault/rocketNetworkFees";
+import { RocketStorage } from "../../generated/rocketVault/RocketStorage";
 import { RETH } from "../../generated/rocketVault/RETH";
 import { getOrCreateToken } from "../entities/token";
 import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
@@ -24,6 +26,8 @@ import {
   BIGINT_NEGATIVE_ONE,
   BIGDECIMAL_HALF,
   BIGINT_TEN_TO_EIGHTEENTH,
+  NETWORKENCODE,
+  STORAGE,
 } from "../utils/constants";
 import { getOrCreatePool } from "../entities/pool";
 import { getOrCreateProtocol } from "../entities/protocol";
@@ -44,22 +48,42 @@ export function handleEtherWithdrawn(event: EtherWithdrawn): void {
 export function handleBalanceUpdate(event: BalancesUpdated): void {
   const protocol = getOrCreateProtocol();
   const rewardEth = event.params.totalEth.minus(event.params.stakingEth);
-  const amt = BIGDECIMAL_HALF.times(
-    bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
-  ).plus(
-    BIGDECIMAL_HALF.times(
-      bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
-    ).div(new BigDecimal(BIGINT_TEN_TO_EIGHTEENTH))
-  );
+  let fee = BIGINT_ZERO;
 
-  updateTotalRevenueMetrics(
-    event.block,
-    protocol.cumulativeTotalRevenueUSD,
-    rewardEth,
-    event.params.rethSupply
-  );
-  updateProtocolSideRevenueMetrics(event.block, amt);
-  updateSupplySideRevenueMetrics(event.block);
+  const storage = RocketStorage.bind(Address.fromString(STORAGE));
+  let fees_address = storage.try_getAddress(NETWORKENCODE);
+  if (fees_address.reverted) {
+    log.info("fees address call reverted", []);
+  } else {
+    const fees_contract = rocketNetworkFees.bind(
+      Address.fromBytes(fees_address.value)
+    );
+    let fees_call = fees_contract.try_getNodeFee();
+    if (fees_call.reverted) {
+      log.info("fees address call reverted", []);
+    } else {
+      fee = fees_call.value;
+    }
+
+    const amt = BIGDECIMAL_HALF.times(
+      bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
+    ).plus(
+      BIGDECIMAL_HALF.times(
+        bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
+      ).times(
+        bigIntToBigDecimal(fee).div(new BigDecimal(BIGINT_TEN_TO_EIGHTEENTH))
+      )
+    );
+
+    updateTotalRevenueMetrics(
+      event.block,
+      protocol.cumulativeTotalRevenueUSD,
+      rewardEth,
+      event.params.rethSupply
+    );
+    updateProtocolSideRevenueMetrics(event.block, amt);
+    updateSupplySideRevenueMetrics(event.block);
+  }
 }
 
 export function handleNodeDeposit(event: DepositReceived): void {
