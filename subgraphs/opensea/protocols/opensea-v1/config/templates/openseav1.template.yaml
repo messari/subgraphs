@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: OpenSeaV1
-    network: {{network}}
+    network: {{ network }}
     source:
       address: "{{address}}"
       abi: OpenSeaV1
-      startBlock: {{startBlock}}
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
