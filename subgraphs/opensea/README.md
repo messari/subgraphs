@@ -1,18 +1,18 @@
-# OpenSea v2 Marketplace Subgraph (Wyvern Exchange)
+# OpenSea Marketplace Subgraph (Wyvern Exchange)
 
-Deployment: [messari/opensea-v2-ethereum](https://thegraph.com/hosted-service/subgraph/messari/opensea-v2-ethereum)
-
-Subgraph Status: [Okgraph](https://okgraph.xyz/?q=messari%2Fopensea-v2-ethereum)
+| Name                        | Subgraph Deployment                                                                                     | Status                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| OpenSea: Wyvern Exchange V1 | [messari/opensea-v1-ethereum](https://thegraph.com/hosted-service/subgraph/messari/opensea-v1-ethereum) | [Okgraph](https://okgraph.xyz/?q=messari%2Fopensea-v1-ethereum) |
+| OpenSea: Wyvern Exchange V2 | [messari/opensea-v2-ethereum](https://thegraph.com/hosted-service/subgraph/messari/opensea-v2-ethereum) | [Okgraph](https://okgraph.xyz/?q=messari%2Fopensea-v2-ethereum) |
 
 ## Relevant Info
 
-Exchange Contract Address: `WyvernExchangeWithBulkCancellations` ([0x7f268357A8c2552623316e2562D90e642bB538E5](https://etherscan.io/address/0x7f268357a8c2552623316e2562d90e642bb538e5))
-
-Start Block: `14120913`
-
-Atomicizer Contract Address: `WyvernAtomicizer` ([0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5](https://etherscan.io/address/0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5))
-
-Merkle Validator Contract Address: `MerkleValidator` ([0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7](https://etherscan.io/address/0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7))
+| Contract                                     | Contract Address                                                                                                      | Start Block |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `WyvernExchange` (v2.2)                      | [0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b](https://etherscan.io/address/0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b) | `5774644`   |
+| `WyvernExchangeWithBulkCancellations` (v2.3) | [0x7f268357A8c2552623316e2562D90e642bB538E5](https://etherscan.io/address/0x7f268357a8c2552623316e2562d90e642bb538e5) | `14120913`  |
+| `WyvernAtomicizer`                           | [0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5](https://etherscan.io/address/0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5) | `5220302`   |
+| `MerkleValidator`                            | [0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7](https://etherscan.io/address/0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7) | `14128524`  |
 
 ## Methodology
 
