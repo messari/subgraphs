@@ -1,4 +1,5 @@
 import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 import {
   BIGINT_ONE,
   ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
@@ -41,6 +42,19 @@ export function checkCallDataFunctionSelector(callData: Bytes): boolean {
     functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
     functionSelector == MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR
   );
+}
+
+export function atomicizeCallData(callDatas: Bytes, callDataLengths: BigInt[]): Bytes[] {
+  let atomicizedCallData: Bytes[] = [];
+  let index = 0;
+  for (let i = 0; i < callDataLengths.length; i++ ) {
+    let length = callDataLengths[i].toI32();
+    let callData = Bytes.fromUint8Array(callDatas.subarray(index, index + length));
+    atomicizedCallData.push(callData);
+    index += length;
+  }
+
+  return atomicizedCallData;
 }
 
 /**
@@ -205,6 +219,36 @@ export function decode_matchERC1155UsingCriteria_Method(
   );
 }
 
+export function decode_atomicize_Method(call: AtomicMatch_Call, callData: Bytes): DecodedTransferResult[] {
+  let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
+  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
+    dataWithoutFunctionSelector
+  );
+  let decoded = ethereum
+    .decode(
+      "(address[],uint256[],uint256[],bytes)",
+      dataWithoutFunctionSelectorWithPrefix
+    )!
+    .toTuple();
+  let targets = decoded[0].toAddressArray();
+  let callDataLengths = decoded[2].toBigIntArray();
+  let callDatas = decoded[3].toBytes();
+  
+  let decodedTransferResults: DecodedTransferResult[] = [];
+  let atomicizedCallData = atomicizeCallData(callDatas, callDataLengths);
+  for (let i = 0; i < targets.length; i++) {
+    // Skip unrecognized method calls
+    if (checkCallDataFunctionSelector(atomicizedCallData[i])) {
+      let singleNftTransferResult = decodeSingleNftData(targets[i], atomicizedCallData[i]);
+      decodedTransferResults.push(singleNftTransferResult);
+    } else {
+      log.warning("[checkCallDataFunctionSelector] returned false in atomicize, Method ID: {}, transaction hash: {}, target: {}", [getFunctionSelector(atomicizedCallData[i]), call.transaction.hash.toHexString(), targets[i].toHexString()]);
+    }
+  }
+
+  return decodedTransferResults;
+}
+
 export function decodeSingleNftData(
   target: Address,
   callData: Bytes
@@ -225,4 +269,8 @@ export function decodeSingleNftData(
   } else {
     return decode_matchERC1155UsingCriteria_Method(callData);
   }
+}
+
+export function decodeBundleNftData(call: AtomicMatch_Call, callData: Bytes): DecodedTransferResult[] {
+  return decode_atomicize_Method(call, callData);
 }

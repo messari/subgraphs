@@ -155,6 +155,7 @@ export function handleMatch(call: AtomicMatch_Call): void {
 }
 
 function handleSingleSale(call: AtomicMatch_Call): void {
+  let sellTarget = call.inputs.addrs[11];
   let mergedCallData = guardedArrayReplace(
     call.inputs.calldataBuy,
     call.inputs.calldataSell,
@@ -166,12 +167,12 @@ function handleSingleSale(call: AtomicMatch_Call): void {
       [
         getFunctionSelector(mergedCallData),
         call.transaction.hash.toHexString(),
-        call.inputs.addrs[11].toHexString(),
+        sellTarget.toHexString(),
       ]
     );
     return;
   }
-  let sellTarget = call.inputs.addrs[11];
+
   let decodedTransferResult = decodeSingleNftData(sellTarget, mergedCallData);
 
   let collectionAddr = decodedTransferResult.token.toHexString();
