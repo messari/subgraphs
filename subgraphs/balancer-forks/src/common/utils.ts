@@ -70,34 +70,12 @@ export function getOutputTokenPriceUSD(
   block: ethereum.Block
 ): BigDecimal {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
-  const poolContract = WeightedPoolContract.bind(poolAddress);
 
   let outputToken = getOrCreateToken(poolAddress, block.number);
-  let virtualPrice = readValue<BigInt>(
-    poolContract.try_getRate(),
-    constants.BIGINT_ZERO
+
+  let outputTokenPriceUSD = pool.totalValueLockedUSD.div(
+    pool.outputTokenSupply!.toBigDecimal()
   );
-
-  let assetPriceUSD = constants.BIGDECIMAL_ZERO;
-  for (let idx = 0; idx < pool.inputTokens.length; ++idx) {
-    let token = getOrCreateTokenFromString(
-      pool.inputTokens.at(idx),
-      block.number
-    );
-
-    if (token.lastPriceUSD!.notEqual(constants.BIGDECIMAL_ZERO)) {
-      assetPriceUSD = token.lastPriceUSD!;
-      break;
-    }
-  }
-
-  let outputTokenPriceUSD = virtualPrice
-    .divDecimal(
-      constants.BIGINT_TEN.pow(
-        constants.DEFAULT_DECIMALS.toI32() as u8
-      ).toBigDecimal()
-    )
-    .times(assetPriceUSD);
 
   outputToken.lastPriceUSD = outputTokenPriceUSD;
   outputToken.save();

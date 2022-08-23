@@ -90,13 +90,7 @@ export function updateControllerRewards(
     ),
     block
   );
-}
 
-export function updateFactoryRewards(
-  poolAddress: Address,
-  gaugeAddress: Address,
-  block: ethereum.Block
-): void {
   // Update the staked output token amount for the pool ///////////
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
@@ -120,7 +114,13 @@ export function updateFactoryRewards(
   );
   pool.save();
   //////////////////////////////////////////////////////////////////
+}
 
+export function updateFactoryRewards(
+  poolAddress: Address,
+  gaugeAddress: Address,
+  block: ethereum.Block
+): void {
   // Get data for all reward tokens for this gauge
   let rewardsInfo = getRewardsData(gaugeAddress);
 
