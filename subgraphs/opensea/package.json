@@ -1,0 +1,20 @@
+{
+  "name": "opensea-v2-wyvern",
+  "license": "UNLICENSED",
+  "scripts": {
+    "format": "npx prettier --write .",
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ mrbrianhobo/opensea-v2-wyvern"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.31.0",
+    "@graphprotocol/graph-ts": "0.27.0"
+  },
+  "devDependencies": {
+    "mustache": "^4.2.0",
+    "prettier": "^2.7.1"
+  }
+}

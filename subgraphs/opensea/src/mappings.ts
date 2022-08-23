@@ -1,9 +1,9 @@
 import { BigDecimal, log } from "@graphprotocol/graph-ts";
 import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 import { Trade, _Item } from "../generated/schema";
+import { NetworkConfigs } from "../configurations/configure";
 import {
   BIGDECIMAL_HUNDRED,
-  EXCHANGE_MARKETPLACE_ADDRESS,
   EXCHANGE_MARKETPLACE_FEE,
   INVERSE_BASIS_POINT,
   MANTISSA_FACTOR,
@@ -344,7 +344,7 @@ function updateMarketplaceMetrics(
   volumeETH: BigDecimal
 ): void {
   let marketplace = getOrCreateMarketplace(
-    EXCHANGE_MARKETPLACE_ADDRESS.toHexString()
+    NetworkConfigs.getMarketplaceAddress()
   );
   marketplace.tradeCount += 1;
   marketplace.cumulativeTradeVolumeETH =
@@ -425,7 +425,7 @@ function updateRevenueMetrics(
 ): void {
   let collection = getOrCreateCollection(collectionAddr);
   let marketplace = getOrCreateMarketplace(
-    EXCHANGE_MARKETPLACE_ADDRESS.toHexString()
+    NetworkConfigs.getMarketplaceAddress()
   );
 
   let sellSideFeeRecipient = call.inputs.addrs[10];

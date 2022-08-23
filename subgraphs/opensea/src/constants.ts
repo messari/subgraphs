@@ -1,5 +1,7 @@
 import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
+export const PROTOCOL_SCHEMA_VERSION = "1.0.0";
+
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
@@ -38,6 +40,7 @@ export namespace SaleStrategy {
   export const PRIVATE_SALE = "PRIVATE_SALE";
 }
 
+// Represents native ETH when used in the paymentToken field
 export const NULL_ADDRESS = Address.zero();
 export const WETH_ADDRESS = Address.fromString(
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
@@ -46,11 +49,7 @@ export const WETH_ADDRESS = Address.fromString(
 export const WYVERN_ATOMICIZER_ADDRESS = Address.fromString(
   "0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5"
 );
-export const EXCHANGE_MARKETPLACE_ADDRESS = Address.fromString(
-  "0x7f268357A8c2552623316e2562D90e642bB538E5"
-);
-export const EXCHANGE_MARKETPLACE_NAME = "OpenSea Wyvern Exchange v2";
-export const EXCHANGE_MARKETPLACE_SLUG = "opensea-v2";
+
 export const EXCHANGE_MARKETPLACE_FEE = BigInt.fromI32(250);
 
 // Function Selectors for ERC721/1155 Transfer Methods
