@@ -314,7 +314,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Tectonic",
     "tectonic",
     "2.0.1",
-    "1.1.3",
+    "1.1.4",
     "1.0.0",
     Network.CRONOS,
     comptroller.try_liquidationIncentiveMantissa(),

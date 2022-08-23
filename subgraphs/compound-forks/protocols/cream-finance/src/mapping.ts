@@ -293,7 +293,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "CREAM Finance",
     "cream-finance",
     "2.0.1",
-    "1.1.2",
+    "1.1.3",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
