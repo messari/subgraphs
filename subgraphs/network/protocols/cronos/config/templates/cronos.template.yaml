@@ -1,0 +1,26 @@
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Placeholder
+    network: {{ network }}
+    source:
+      address: "0x0000000000000000000000000000000000000000"
+      abi: Placeholder
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Network
+        - Block
+        - Author
+      abis:
+        - name: Placeholder
+          file: ./abis/Placeholder.json
+      blockHandlers:
+        - handler: handleEvmBlock
+      file: ./src/mapping.ts

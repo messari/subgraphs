@@ -1,0 +1,59 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: euler
+    network: mainnet
+    source:
+      address: "0x27182842E098f60e3D576794A5bFFb0777E025d3"
+      abi: Euler
+      startBlock: 13711760
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - AssetStatus
+        - Borrow
+        - Deposit
+        - GovSetAssetConfig
+        - Liquidation
+        - MarketActivated
+        - Repay
+        - Withdraw
+      abis:
+        - name: Euler
+          file: ./abis/Euler.json
+        - name: EulerGeneralView
+          file: ./abis/EulerGeneralView.json
+        - name: Exec
+          file: ./abis/Exec.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
+      blockHandlers:
+        - handler: handleBlockUpdates
+      eventHandlers:
+        - event: AssetStatus(indexed address,uint256,uint256,uint96,uint256,uint256,int96,uint256)
+          handler: handleAssetStatus
+        - event: Borrow(indexed address,indexed address,uint256)
+          handler: handleBorrow
+        - event: Deposit(indexed address,indexed address,uint256)
+          handler: handleDeposit
+        - event: GovSetAssetConfig(indexed address,(address,bool,uint32,uint32,uint24))
+          handler: handleGovSetAssetConfig
+        - event: Liquidation(indexed address,indexed address,indexed address,address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleLiquidation
+        - event: MarketActivated(indexed address,indexed address,indexed address)
+          handler: handleMarketActivated
+        - event: Repay(indexed address,indexed address,uint256)
+          handler: handleRepay
+        - event: Withdraw(indexed address,indexed address,uint256)
+          handler: handleWithdraw
+      file: ./src/mappings/handlers.ts
