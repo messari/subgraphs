@@ -17,11 +17,11 @@ async function executionFlow() {
   // deployments holds the errors for every protocol
   let deployments = {};
 
-  Object.keys(data).forEach((protocolType) => {
-    Object.keys(data[protocolType]).forEach((protocol) => {
-      Object.keys(data[protocolType][protocol]).forEach((deployment) => {
+  Object.entries(data).forEach(([protocolType, protocolsOnType]) => {
+    Object.values(protocolsOnType).forEach((protocolObj) => {
+      Object.values(protocolObj).forEach((deploymentString) => {
         const nameStr =
-          data[protocolType][protocol][deployment].split("name/")[1];
+          deploymentString.split("name/")[1];
 
         deployments[nameStr.split("/")[1]] = {
           indexingError: null,
@@ -58,7 +58,7 @@ async function executionFlow() {
             outputTokenSupply: [],
             outputTokenPriceUSD: [],
           },
-          url: data[protocolType][protocol][deployment],
+          url: deploymentString,
           protocolType: protocolType,
         };
       });
