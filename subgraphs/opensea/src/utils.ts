@@ -1,10 +1,13 @@
 import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   BIGINT_ONE,
+  ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
+  ERC721_SAFE_TRANSFER_FROM_SELECTOR,
   ETHABI_DECODE_PREFIX,
-  MATCH_ERC115_SAFE_TRANSFER_FROM_SELCTOR,
-  MATCH_ERC721_SAFE_TRANSFER_FROM_SELCTOR,
-  MATCH_ERC721_TRANSFER_FROM_SELCTOR,
+  MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
+  MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR,
+  MATCH_ERC721_TRANSFER_FROM_SELECTOR,
+  TRANSFER_FROM_SELECTOR,
 } from "./constants";
 
 export class DecodedTransferResult {
@@ -31,9 +34,12 @@ export function getFunctionSelector(callData: Bytes): string {
 export function checkCallDataFunctionSelector(callData: Bytes): boolean {
   let functionSelector = getFunctionSelector(callData);
   return (
-    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELCTOR ||
-    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELCTOR ||
-    functionSelector == MATCH_ERC115_SAFE_TRANSFER_FROM_SELCTOR
+    functionSelector == TRANSFER_FROM_SELECTOR ||
+    functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
+    functionSelector == ERC1155_SAFE_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR
   );
 }
 
@@ -69,6 +75,61 @@ export function guardedArrayReplace(
   bigIntReplacement = bigIntReplacement.bitAnd(bigIntMask);
   bigIntArray = bigIntArray.bitOr(bigIntReplacement);
   return Bytes.fromHexString(bigIntArray.toHexString());
+}
+
+export function decode_ERC721Transfer_Method(
+  target: Address,
+  callData: Bytes
+): DecodedTransferResult {
+  let functionSelector = getFunctionSelector(callData);
+  let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
+
+  let decoded = ethereum
+    .decode("(address,address,uint256)", dataWithoutFunctionSelector)!
+    .toTuple();
+  let senderAddress = decoded[0].toAddress();
+  let recieverAddress = decoded[1].toAddress();
+  let tokenId = decoded[2].toBigInt();
+
+  return new DecodedTransferResult(
+    functionSelector,
+    senderAddress,
+    recieverAddress,
+    target,
+    tokenId,
+    BIGINT_ONE
+  );
+}
+
+export function decode_ERC1155Transfer_Method(
+  target: Address,
+  callData: Bytes
+): DecodedTransferResult {
+  let functionSelector = getFunctionSelector(callData);
+  let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
+  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
+    dataWithoutFunctionSelector
+  );
+
+  let decoded = ethereum
+    .decode(
+      "(address,address,uint256,uint256,bytes)",
+      dataWithoutFunctionSelectorWithPrefix
+    )!
+    .toTuple();
+  let senderAddress = decoded[0].toAddress();
+  let recieverAddress = decoded[1].toAddress();
+  let tokenId = decoded[2].toBigInt();
+  let amount = decoded[3].toBigInt();
+
+  return new DecodedTransferResult(
+    functionSelector,
+    senderAddress,
+    recieverAddress,
+    target,
+    tokenId,
+    amount
+  );
 }
 
 /**
@@ -144,13 +205,23 @@ export function decode_matchERC1155UsingCriteria_Method(
   );
 }
 
-export function decodeSingleNftData(callData: Bytes): DecodedTransferResult {
+export function decodeSingleNftData(
+  target: Address,
+  callData: Bytes
+): DecodedTransferResult {
   let functionSelector = getFunctionSelector(callData);
   if (
-    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELCTOR ||
-    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELCTOR
+    functionSelector == TRANSFER_FROM_SELECTOR ||
+    functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR
+  ) {
+    return decode_ERC721Transfer_Method(target, callData);
+  } else if (
+    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR
   ) {
     return decode_matchERC721UsingCriteria_Method(callData);
+  } else if (functionSelector == ERC1155_SAFE_TRANSFER_FROM_SELECTOR) {
+    return decode_ERC1155Transfer_Method(target, callData);
   } else {
     return decode_matchERC1155UsingCriteria_Method(callData);
   }

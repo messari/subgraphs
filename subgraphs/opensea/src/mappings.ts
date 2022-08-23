@@ -171,8 +171,8 @@ function handleSingleSale(call: AtomicMatch_Call): void {
     );
     return;
   }
-
-  let decodedTransferResult = decodeSingleNftData(mergedCallData);
+  let sellTarget = call.inputs.addrs[11];
+  let decodedTransferResult = decodeSingleNftData(sellTarget, mergedCallData);
 
   let collectionAddr = decodedTransferResult.token.toHexString();
   let tokenId = decodedTransferResult.tokenId;
@@ -193,6 +193,20 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   let buyer = call.inputs.addrs[1].toHexString();
   // seller is sellOrder.maker (addrs[8])
   let seller = call.inputs.addrs[8].toHexString();
+
+  if (buyer != decodedTransferResult.to.toHexString()) {
+    log.warning("buyer/receiver do not match, buyer: {}, reciever: {}", [
+      buyer,
+      decodedTransferResult.to.toHexString(),
+    ]);
+  }
+
+  if (seller != decodedTransferResult.from.toHexString()) {
+    log.warning("seller/sender do not match, seller: {}, sender: {}", [
+      seller,
+      decodedTransferResult.from.toHexString(),
+    ]);
+  }
 
   // No event log index since this is a contract call
   let tradeID = call.transaction.hash
