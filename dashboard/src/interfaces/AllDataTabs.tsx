@@ -9,6 +9,7 @@ import PoolOverviewTab from "./tabs/PoolOverviewTab";
 import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
 import { ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 import PositionTab from "./tabs/PositionTab";
+import DefiLlamaComparsionTab from "./tabs/DefiLlamaComparisonTab";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -185,6 +186,14 @@ function AllDataTabs({
             />
           </TabPanel>
         )}
+        <TabPanel value="6">
+          {/* DEFI LLAMA COMPARISON TAB */}
+          <DefiLlamaComparsionTab
+            data={data}
+            protocolNetwork={network}
+            protocolTimeseriesData={protocolTimeseriesData}
+          />
+        </TabPanel>
       </TabContext>
     </>
   );

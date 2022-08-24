@@ -263,7 +263,9 @@ export const TablePoolOverview = ({
           if (protocolType === "LENDING" && pool.rewardTokens[idx]?.type === "BORROW") {
             if (
               !Number(pool.totalBorrowBalanceUSD) &&
-              issues.filter((x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt}-pool value`).length === 0
+              issues.filter(
+                (x) => x.fieldName === `${pool.name || "#" + i + 1 + skipAmt}-totalBorrowBalanceUSD-pool value`,
+              ).length === 0
             ) {
               issues.push({
                 type: "VAL",

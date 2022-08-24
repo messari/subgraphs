@@ -283,6 +283,8 @@ function ProtocolDashboard() {
     tabNum = "4";
   } else if (tabString.toUpperCase() === "POSITIONS") {
     tabNum = "5";
+  } else if (tabString.toUpperCase() === "DEFILLAMA") {
+    tabNum = "6";
   }
 
   const [tabValue, setTabValue] = useState(tabNum);
@@ -320,6 +322,8 @@ function ProtocolDashboard() {
     } else if (newValue === "5") {
       poolParam = `&poolId=${poolIdFromParam || poolId}`;
       tabName = "positions";
+    } else if (newValue === "6") {
+      tabName = "defiLlama";
     }
     navigate(
       `?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}${deploymentVersionParam}`,
@@ -357,7 +361,7 @@ function ProtocolDashboard() {
   }, [protocolSchemaData, getData, getProtocolTableData, getPendingSubgraph]);
 
   useEffect(() => {
-    if (protocolTableData && tabValue === "1") {
+    if (protocolTableData && (tabValue === "1" || tabValue === "6")) {
       getFinancialsData();
     }
   }, [protocolTableData, getFinancialsData, tabValue]);

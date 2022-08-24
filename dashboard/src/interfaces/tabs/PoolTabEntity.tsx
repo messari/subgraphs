@@ -883,6 +883,9 @@ function PoolTabEntity({
           if (fieldName.toUpperCase().includes("REWARD") && !(data[poolKeySingular]?.rewardTokens?.length > 0)) {
             return null;
           }
+          if (fieldName.toUpperCase().includes("OUTPUT") && !data[poolKeySingular]?.outputToken) {
+            return null;
+          }
           return (
             <div key={elementId} id={linkToElementId}>
               <Box mt={3} mb={1}>
