@@ -44,6 +44,10 @@ export function checkCallDataFunctionSelector(callData: Bytes): boolean {
   );
 }
 
+/**
+ * Split up/atomicize a set of calldata bytes into individual ERC721/1155 transfer calldata bytes
+ * Creates a list of calldatas which can be decoded in decodeSingleNftData
+ */
 export function atomicizeCallData(
   callDatas: Bytes,
   callDataLengths: BigInt[]
@@ -96,6 +100,13 @@ export function guardedArrayReplace(
   return Bytes.fromHexString(bigIntArray.toHexString());
 }
 
+/**
+ * Decode Ethereum calldata of transferFrom/safeTransferFrom calls using function signature
+ * 0x23b872dd transferFrom(address,address,uint256)
+ * 0x42842e0e safeTransferFrom(address,address,uint256)
+ * https://www.4byte.directory/signatures/?bytes4_signature=0x23b872dd
+ * https://www.4byte.directory/signatures/?bytes4_signature=0x42842e0e
+ */
 export function decode_ERC721Transfer_Method(
   target: Address,
   callData: Bytes
@@ -120,6 +131,12 @@ export function decode_ERC721Transfer_Method(
   );
 }
 
+/**
+ * Decode Ethereum calldata of safeTransferFrom call using function signature
+ * 0xf242432a safeTransferFrom(address,address,uint256,uint256,bytes)
+ * https://www.4byte.directory/signatures/?bytes4_signature=0xf242432a
+ * NOTE: needs ETHABI_DECODE_PREFIX to decode (contains arbitrary bytes)
+ */
 export function decode_ERC1155Transfer_Method(
   target: Address,
   callData: Bytes
@@ -157,6 +174,7 @@ export function decode_ERC1155Transfer_Method(
  * 0xc5a0236e matchERC721WithSafeTransferUsingCriteria(address,address,address,uint256,bytes32,bytes32[])
  * https://www.4byte.directory/signatures/?bytes4_signature=0xfb16a595
  * https://www.4byte.directory/signatures/?bytes4_signature=0xc5a0236e
+ * NOTE: needs ETHABI_DECODE_PREFIX to decode (contains arbitrary bytes/bytes array)
  */
 export function decode_matchERC721UsingCriteria_Method(
   callData: Bytes
@@ -191,7 +209,8 @@ export function decode_matchERC721UsingCriteria_Method(
 /**
  * Decode Ethereum calldata of matchERC1155UsingCriteria call using function signature
  * 0x96809f90 matchERC1155UsingCriteria(address,address,address,uint256,uint256,bytes32,bytes32[])
- * matchERC1155UsingCriteria(address,address,address,uint256,uint256,bytes32,bytes32[])
+ * https://www.4byte.directory/signatures/?bytes4_signature=0x96809f90
+ * NOTE: needs ETHABI_DECODE_PREFIX to decode (contains arbitrary bytes/bytes array)
  */
 export function decode_matchERC1155UsingCriteria_Method(
   callData: Bytes
@@ -224,6 +243,12 @@ export function decode_matchERC1155UsingCriteria_Method(
   );
 }
 
+/**
+ * Decode Ethereum calldata of atomicize call using function signature
+ * 0x68f0bcaa atomicize(address[],uint256[],uint256[],bytes)
+ * https://www.4byte.directory/signatures/?bytes4_signature=0x68f0bcaa
+ * NOTE: needs ETHABI_DECODE_PREFIX to decode (contains arbitrary bytes/arrays)
+ */
 export function decode_atomicize_Method(
   call: AtomicMatch_Call,
   callData: Bytes
