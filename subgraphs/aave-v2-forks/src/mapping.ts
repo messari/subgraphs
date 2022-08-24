@@ -921,14 +921,15 @@ export function _handleLiquidate(
     log.warning("[Liquidate] Repay token market not found on protocol: {}", [
       repayToken.toHexString(),
     ]);
+    return;
   }
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let positionId = subtractPosition(
     protocol,
-    market,
-    account,
+    repayTokenMarket,
+    account, // the borrower
     aTokenContract.try_balanceOf(borrower), // try getting balance of account
-    PositionSide.LENDER,
+    PositionSide.BORROWER,
     EventType.LIQUIDATEE,
     event
   );
