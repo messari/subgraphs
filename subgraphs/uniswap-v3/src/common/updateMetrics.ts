@@ -26,6 +26,7 @@ import {
   INT_TWO,
   BIGINT_ZERO,
   BIGINT_NEG_ONE,
+  MOST_RECENT_TRANSACTION,
 } from "./constants";
 import {
   getOrCreateDex,
@@ -418,11 +419,11 @@ export function updateProtocolFees(event: ethereum.Event): void {
 }
 
 function isNewTransaction(hash: Bytes): bool {
-  let recentTransaction = _HelperStore.load("MOST_RECENT_TRANSACTION");
+  let recentTransaction = _HelperStore.load(MOST_RECENT_TRANSACTION);
   let hashString = hash.toHexString();
 
   if (recentTransaction === null) {
-    recentTransaction = new _HelperStore("MOST_RECENT_TRANSACTION");
+    recentTransaction = new _HelperStore(MOST_RECENT_TRANSACTION);
     recentTransaction.valueString = hashString;
     recentTransaction.save();
     return true;
