@@ -429,14 +429,6 @@ export function _handleReserveDataUpdated(
   ]);
 
   // update rates
-  let sBorrowRate = createInterestRate(
-    market.id,
-    InterestRateSide.BORROWER,
-    InterestRateType.STABLE,
-    rayToWad(stableBorrowRate)
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
-  );
 
   let vBorrowRate = createInterestRate(
     market.id,
@@ -455,8 +447,22 @@ export function _handleReserveDataUpdated(
       .toBigDecimal()
       .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
-
-  market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
+  
+  if (market.sToken) {
+    // geist does not have stable borrow rates
+    let sBorrowRate = createInterestRate(
+      market.id,
+      InterestRateSide.BORROWER,
+      InterestRateType.STABLE,
+      rayToWad(stableBorrowRate)
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
+    );
+    market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
+  } else {
+    market.rates = [depositRate.id, vBorrowRate.id]
+  }
+  
   market.save();
 
   // update protocol TVL / BorrowUSD / SupplyUSD
