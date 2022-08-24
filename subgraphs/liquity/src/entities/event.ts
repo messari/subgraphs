@@ -15,10 +15,16 @@ import {
 import {
   ACTIVE_POOL,
   BIGINT_ZERO,
-  PositionSide,
   STABILITY_POOL,
   ZERO_ADDRESS,
 } from "../utils/constants";
+import {
+  getOrCreateLiquityProtocol,
+  incrementProtocolLiquidateCount,
+  incrementProtocolRepayCount,
+  incrementProtocolWithdrawCount,
+  updateUsageMetrics,
+} from "./protocol";
 import {
   addMarketBorrowVolume,
   addMarketDepositVolume,
@@ -29,31 +35,6 @@ import {
 } from "./market";
 import { getETHToken, getLUSDToken } from "./token";
 import { prefixID } from "../utils/strings";
-import {
-  getOrCreateAccount,
-  incrementAccountBorrowCount,
-  incrementAccountDepositCount,
-  incrementAccountLiquidationCount,
-  incrementAccountLiquidatorCount,
-  incrementAccountRepayCount,
-  incrementAccountWithdrawCount,
-} from "./account";
-import {
-  getOrCreateUserPosition,
-  incrementPositionBorrowCount,
-  incrementPositionDepositCount,
-  incrementPositionLiquidationCount,
-  incrementPositionRepayCount,
-  incrementPositionWithdrawCount,
-} from "./position";
-import {
-  incrementProtocolBorrowCount,
-  incrementProtocolDepositCount,
-  incrementProtocolLiquidateCount,
-  incrementProtocolRepayCount,
-  incrementProtocolWithdrawCount,
-  updateActiveAccounts,
-} from "./usage";
 
 export function createDeposit(
   event: ethereum.Event,
@@ -64,14 +45,6 @@ export function createDeposit(
   if (amountETH.le(BIGINT_ZERO)) {
     log.critical("Invalid deposit amount: {}", [amountETH.toString()]);
   }
-  const market = getOrCreateMarket();
-  const account = getOrCreateAccount(sender);
-  const position = getOrCreateUserPosition(
-    event,
-    account,
-    market,
-    PositionSide.LENDER
-  );
   const deposit = new Deposit(
     prefixID(
       "deposit",
@@ -79,41 +52,30 @@ export function createDeposit(
     )
   );
   deposit.hash = event.transaction.hash.toHexString();
-  deposit.nonce = event.transaction.nonce;
   deposit.logIndex = event.logIndex.toI32();
+  deposit.protocol = getOrCreateLiquityProtocol().id;
+  deposit.to = ACTIVE_POOL;
+  deposit.from = sender.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
-  deposit.account = account.id;
-  deposit.market = market.id;
-  deposit.position = position.id;
+  deposit.market = getOrCreateMarket().id;
   deposit.asset = getETHToken().id;
   deposit.amount = amountETH;
   deposit.amountUSD = amountUSD;
   deposit.save();
+  updateUsageMetrics(event, sender);
   addMarketDepositVolume(event, amountUSD);
-  incrementAccountDepositCount(account);
-  incrementPositionDepositCount(position);
-  incrementProtocolDepositCount(event, account);
 }
 
 export function createWithdraw(
   event: ethereum.Event,
   amountETH: BigInt,
   amountUSD: BigDecimal,
-  user: Address,
   recipient: Address
 ): void {
   if (amountETH.le(BIGINT_ZERO)) {
     log.critical("Invalid withdraw amount: {}", [amountETH.toString()]);
   }
-  const market = getOrCreateMarket();
-  const account = getOrCreateAccount(recipient);
-  const position = getOrCreateUserPosition(
-    event,
-    getOrCreateAccount(user),
-    market,
-    PositionSide.LENDER
-  );
   const withdraw = new Withdraw(
     prefixID(
       "withdraw",
@@ -121,21 +83,20 @@ export function createWithdraw(
     )
   );
   withdraw.hash = event.transaction.hash.toHexString();
-  withdraw.nonce = event.transaction.nonce;
   withdraw.logIndex = event.logIndex.toI32();
+  withdraw.protocol = getOrCreateLiquityProtocol().id;
+  withdraw.to = recipient.toHexString();
+  withdraw.from = ACTIVE_POOL;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
-  withdraw.account = account.id;
-  withdraw.market = market.id;
-  withdraw.position = position.id;
+  withdraw.market = getOrCreateMarket().id;
   withdraw.asset = getETHToken().id;
   withdraw.amount = amountETH;
   withdraw.amountUSD = amountUSD;
   withdraw.save();
+  updateUsageMetrics(event, recipient);
   addMarketWithdrawVolume(event, amountUSD);
-  incrementAccountWithdrawCount(account);
-  incrementPositionWithdrawCount(position);
-  incrementProtocolWithdrawCount(event, account);
+  incrementProtocolWithdrawCount(event);
 }
 
 export function createBorrow(
@@ -147,14 +108,6 @@ export function createBorrow(
   if (amountLUSD.le(BIGINT_ZERO)) {
     log.critical("Invalid borrow amount: {}", [amountLUSD.toString()]);
   }
-  const market = getOrCreateMarket();
-  const account = getOrCreateAccount(recipient);
-  const position = getOrCreateUserPosition(
-    event,
-    account,
-    market,
-    PositionSide.BORROWER
-  );
   const borrow = new Borrow(
     prefixID(
       "borrow",
@@ -162,41 +115,30 @@ export function createBorrow(
     )
   );
   borrow.hash = event.transaction.hash.toHexString();
-  borrow.nonce = event.transaction.nonce;
   borrow.logIndex = event.logIndex.toI32();
+  borrow.protocol = getOrCreateLiquityProtocol().id;
+  borrow.to = recipient.toHexString();
+  borrow.from = ZERO_ADDRESS; // LUSD is minted
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
-  borrow.account = account.id;
-  borrow.market = market.id;
-  borrow.position = position.id;
+  borrow.market = getOrCreateMarket().id;
   borrow.asset = getLUSDToken().id;
   borrow.amount = amountLUSD;
   borrow.amountUSD = amountUSD;
   borrow.save();
+  updateUsageMetrics(event, recipient);
   addMarketBorrowVolume(event, amountUSD);
-  incrementAccountBorrowCount(account);
-  incrementPositionBorrowCount(position);
-  incrementProtocolBorrowCount(event, account);
 }
 
 export function createRepay(
   event: ethereum.Event,
   amountLUSD: BigInt,
   amountUSD: BigDecimal,
-  user: Address,
-  repayer: Address
+  sender: Address
 ): void {
   if (amountLUSD.le(BIGINT_ZERO)) {
     log.critical("Invalid repay amount: {}", [amountLUSD.toString()]);
   }
-  const market = getOrCreateMarket();
-  const account = getOrCreateAccount(repayer);
-  const position = getOrCreateUserPosition(
-    event,
-    getOrCreateAccount(user),
-    market,
-    PositionSide.BORROWER
-  );
   const repay = new Repay(
     prefixID(
       "repay",
@@ -204,21 +146,20 @@ export function createRepay(
     )
   );
   repay.hash = event.transaction.hash.toHexString();
-  repay.nonce = event.transaction.nonce;
   repay.logIndex = event.logIndex.toI32();
+  repay.protocol = getOrCreateLiquityProtocol().id;
+  repay.to = ZERO_ADDRESS; // LUSD is burned
+  repay.from = sender.toHexString();
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
-  repay.account = account.id;
-  repay.market = market.id;
-  repay.position = position.id;
+  repay.market = getOrCreateMarket().id;
   repay.asset = getLUSDToken().id;
   repay.amount = amountLUSD;
   repay.amountUSD = amountUSD;
   repay.save();
+  updateUsageMetrics(event, sender);
   addMarketRepayVolume(event, amountUSD);
-  incrementAccountRepayCount(account);
-  incrementPositionRepayCount(position);
-  incrementProtocolRepayCount(event, account);
+  incrementProtocolRepayCount(event);
 }
 
 export function createLiquidate(
@@ -226,24 +167,8 @@ export function createLiquidate(
   amountLiquidated: BigInt,
   amountLiquidatedUSD: BigDecimal,
   profitUSD: BigDecimal,
-  user: Address,
   liquidator: Address
 ): void {
-  const market = getOrCreateMarket();
-  const account = getOrCreateAccount(user);
-  const liquidatorAccount = getOrCreateAccount(liquidator);
-  const lenderPosition = getOrCreateUserPosition(
-    event,
-    account,
-    market,
-    PositionSide.LENDER
-  );
-  const borrowerPosition = getOrCreateUserPosition(
-    event,
-    account,
-    market,
-    PositionSide.BORROWER
-  );
   const liquidate = new Liquidate(
     prefixID(
       "liquidate",
@@ -251,25 +176,23 @@ export function createLiquidate(
     )
   );
   liquidate.hash = event.transaction.hash.toHexString();
-  liquidate.nonce = event.transaction.nonce;
   liquidate.logIndex = event.logIndex.toI32();
+  liquidate.protocol = getOrCreateLiquityProtocol().id;
+  // Liquidated funds may be spread across multiple addresses:
+  // https://github.com/liquity/dev#liquidation-logic
+  // but there is no data for this, so this is set to stability pool address
+  liquidate.to = STABILITY_POOL;
+  liquidate.from = liquidator.toHexString();
   liquidate.liquidatee = liquidator.toHexString();
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
-  liquidate.liquidator = liquidatorAccount.id;
-  liquidate.liquidatee = account.id;
-  liquidate.market = market.id;
-  liquidate.position = borrowerPosition.id;
-  liquidate.lenderPosition = lenderPosition.id;
+  liquidate.market = getOrCreateMarket().id;
   liquidate.asset = getLUSDToken().id;
   liquidate.amount = amountLiquidated;
   liquidate.amountUSD = amountLiquidatedUSD;
   liquidate.profitUSD = profitUSD;
   liquidate.save();
+  updateUsageMetrics(event, liquidator);
   addMarketLiquidateVolume(event, amountLiquidatedUSD);
-  incrementAccountLiquidationCount(account);
-  incrementPositionLiquidationCount(borrowerPosition);
-  incrementPositionLiquidationCount(lenderPosition);
-  incrementAccountLiquidatorCount(liquidatorAccount);
-  incrementProtocolLiquidateCount(event, account, liquidatorAccount);
+  incrementProtocolLiquidateCount(event);
 }

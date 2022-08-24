@@ -807,9 +807,6 @@ type _MasterChef @entity {
   " MasterChef Type - pid referenced in the MasterChef Contract "
   id: ID!
 
-  " Address of the masterchef contract "
-  address: String!
-
   " Total allocation point of all staking pools "
   totalAllocPoint: BigInt!
 
@@ -841,60 +838,6 @@ type _MasterChefStakingPool @entity {
 
   " Last block where rewards were given out "
   lastRewardBlock: BigInt!
-
-  " Optional address of a bonus rewarder, to give additional tokens on top of mastechefs' "
-  rewarder: _MasterChefRewarder
-}
-
-type _MasterChefRewarder @entity {
-  " Address of the rewarder contract associated to some staking pool "
-  id: ID!
-
-  " Staking pool to which this rewarder is associated "
-  pool: _MasterChefStakingPool!
-
-  " Address of the token given by this rewarder "
-  rewardToken: String!
-
-  " Number of tokens rewarded per second per LP staked in pool by this rewarder "
-  tokenPerSec: BigInt!
-
-  " Timestamp from the last time tokenPerSec was calculated "
-  rateCalculatedAt: BigInt!
-
-  " A field to keep track if there are any funds to give away in the rewarder "
-  hasFunds: Boolean
-
-  " When it was last checked that there were funds in the rewarder "
-  hasFundsAt: BigInt!
-
-  " If true it means the rewardRate can be retrieved directly from the contract, without crazy math "
-  canRetrieveRate: Boolean!
-
-  " Utility field to calculate the rewarder reward rate "
-  _rewardRateCalculationInProgress: Boolean!
-
-  _probes: [_RewarderProbe!]
-}
-
-type _RewarderProbe @entity {
-  " {rewarder}-{probeNum} "
-  id: ID!
-
-  " The address being probed "
-  user: String!
-
-  " The value from the last probe "
-  pending: BigInt!
-
-  " Block at which the probe was made "
-  blockNum: BigInt!
-
-  " Block timestamp at whihc the probe was taken "
-  timestamp: BigInt!
-
-  " Total LP staked in pool at the time of the probe"
-  lpStaked: BigInt!
 }
 
 type _MasterChefAddressToPid @entity {

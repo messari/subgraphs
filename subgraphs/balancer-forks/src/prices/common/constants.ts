@@ -46,6 +46,22 @@ export const WHITELIST_TOKENS_LIST: string[] = [
   "CRV",
 ];
 
+export const USD_PEGGED_TOKENS: string[] = [
+  "0x5f98805a4e8be255a32880fdec7f6728c6568ba0",
+  "0x8f4063446f5011bc1c9f79a819efe87776f23704",
+  "0xb0f75e97a114a4eb4a425edc48990e6760726709",
+  "0xc8c79fcd0e859e7ec81118e91ce8e4379a481ee6",
+  "0xd997f35c9b1281b82c8928039d14cddab5e13c20",
+  "0x2bbf681cc4eb09218bee85ea2a5d3d13fa40fc0c",
+  "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2",
+  "0x804cdb9116a10bb78768d3252355a1b18067bf8f",
+  "0x9210f1204b5a24742eba12f710636d76240df3d0",
+  "0x4fd63966879300cafafbb35d157dc5229278ed23",
+  "0x652d486b80c461c397b0d95612a404da936f3db3",
+  "0xa3823e50f20982656557a4a6a9c06ba5467ae908",
+  "0xe6bcc79f328eec93d4ec8f7ed35534d9ab549faa"
+];
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////

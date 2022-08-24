@@ -2,7 +2,6 @@ generated/
 build/
 Reference/
 .vscode/
-subgraph.yaml
 
 **/.DS_Store
 

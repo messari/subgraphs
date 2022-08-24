@@ -46,8 +46,6 @@ dataSources:
           file: ./abis/trader-joe/MasterChefV2TraderJoe.json
         - name: TokenABI
           file: ./abis/trader-joe/ERC20.json
-        - name: Rewarder
-          file: ./abis/trader-joe/Rewarder.json
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
           handler: handleDeposit
@@ -79,8 +77,6 @@ dataSources:
           file: ./abis/trader-joe/MasterChefV3TraderJoe.json
         - name: TokenABI
           file: ./abis/trader-joe/ERC20.json
-        - name: Rewarder
-          file: ./abis/trader-joe/Rewarder.json
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
           handler: handleDeposit
@@ -107,11 +103,11 @@ templates:
       entities: []
       abis:
         - name: Pair
-          file: ./abis/trader-joe/Pair.json
+          file: ./abis/spiritswap/Pair.json
         - name: Factory
-          file: ./abis/trader-joe/Factory.json
+          file: ./abis/spiritswap/Factory.json
         - name: TokenABI
-          file: ./abis/trader-joe/ERC20.json
+          file: ./abis/spiritswap/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint

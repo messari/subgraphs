@@ -40,6 +40,6 @@ See details: https://blog.chain.link/using-chainlink-oracles-to-securely-utilize
 
 ## Yearn
 
-Yearn prices can be resolved using its Lens contracts, as described here: https://docs.yearn.finance/vaults/yearn-lens
+Yearn prices can be resolved using its Lens contracts, as described here: https://docs.yearn.finance/vaults/yearn-lens/yearn-lens
 
 One thing to note is that you won't be able to retrieve any prices before the Lens contract was deployed.

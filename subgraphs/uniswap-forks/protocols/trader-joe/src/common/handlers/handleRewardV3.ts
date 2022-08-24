@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefV3TraderJoe } from "../../../../../generated/MasterChefV3/MasterChefV3TraderJoe";
 import {
@@ -12,23 +12,17 @@ import {
 } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
 import { getOrCreateMasterChef } from "../../../../../src/common/masterchef/helpers";
-import {
-  BIGINT_ZERO,
-  INT_ZERO,
-  MasterChef,
-} from "../../../../../src/common/constants";
+import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
 import {
   convertTokenToDecimal,
   roundToWholeNumber,
 } from "../../../../../src/common/utils/utils";
-import { getPoolRewardsWithBonus } from "./handleRewarder";
 
 // Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
 export function updateMasterChef(
   event: ethereum.Event,
   pid: BigInt,
-  amount: BigInt,
-  user: Address // account depositing/withdrawing
+  amount: BigInt
 ): void {
   let masterChefV3Pool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV3 + "-" + pid.toString()
@@ -88,20 +82,6 @@ export function updateMasterChef(
   ];
 
   masterChefV3Pool.lastRewardBlock = event.block.number;
-
-  let rewards = getPoolRewardsWithBonus(
-    event,
-    masterChefV3,
-    masterChefV3Pool,
-    pool,
-    user,
-    amount.gt(BIGINT_ZERO)
-  );
-  if (rewards) {
-    pool.rewardTokens = rewards.tokens;
-    pool.rewardTokenEmissionsAmount = rewards.amounts;
-    pool.rewardTokenEmissionsUSD = rewards.amountsUSD;
-  }
 
   masterChefV3Pool.save();
   masterChefV3.save();

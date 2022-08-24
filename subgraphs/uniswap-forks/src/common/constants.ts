@@ -120,10 +120,9 @@ export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_FIFTY = BigInt.fromI32(50);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_THREE_THOUSAND = BigInt.fromI32(3000);
 export const BIGINT_FIVE_THOUSAND = BigInt.fromI32(5000);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
-export const BIGINT_TWENTY_FIVE_THOUSAND = BigInt.fromI32(25000);
+export const BIGINT_THREE_THOUSAND = BigInt.fromI32(25000);
 export const BIGINT_ONE_HUNDRED_THOUSAND = BigInt.fromI32(100000);
 export const BIGINT_TWO_HUNDRED_FIFTY_THOUSAND = BigInt.fromI32(250000);
 export const BIGINT_FOUR_HUNDRED_THOUSAND = BigInt.fromI32(400000);
@@ -164,9 +163,6 @@ export const MINIMUM_LIQUIDITY_FIVE_THOUSAND = new BigDecimal(
 );
 export const MINIMUM_LIQUIDITY_TEN_THOUSAND = new BigDecimal(
   BIGINT_TEN_THOUSAND
-);
-export const MINIMUM_LIQUIDITY_TWENTY_FIVE_THOUSAND = new BigDecimal(
-  BIGINT_TWENTY_FIVE_THOUSAND
 );
 export const MINIMUM_LIQUIDITY_ONE_THOUSAND = new BigDecimal(BIGINT_THOUSAND);
 export const MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND = new BigDecimal(

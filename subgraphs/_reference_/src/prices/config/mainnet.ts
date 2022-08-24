@@ -1,4 +1,4 @@
-import { Address, BigInt, TypedMap } from "@graphprotocol/graph-ts";
+import { Address, TypedMap } from "@graphprotocol/graph-ts";
 
 export const NETWORK_STRING = "mainnet";
 
@@ -72,7 +72,7 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_DECIMALS = BigInt.fromI32(6);
+export const USDC_DECIMALS = 6;
 
 export const WHITELIST_TOKENS = new TypedMap<string, Address>();
 WHITELIST_TOKENS.set(

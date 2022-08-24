@@ -1,20 +1,21 @@
 {
-  "name": "liquity-extended-subgraph",
+  "name": "liquity-subgraph",
   "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
+
     "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
     "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
+
     "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.32.0",
-    "@graphprotocol/graph-ts": "0.27.0"
+    "@graphprotocol/graph-cli": "0.29.0",
+    "@graphprotocol/graph-ts": "0.26.0"
   },
   "devDependencies": {
-    "mustache": "^4.2.0",
     "prettier": "^2.6.2"
   }
 }

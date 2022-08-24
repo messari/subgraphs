@@ -6,8 +6,8 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export const PROTOCOL_NAME = "Liquity";
 export const PROTOCOL_SLUG = "liquity";
-export const PROTOCOL_SCHEMA_VERSION = "2.0.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.2.0";
+export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.4";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.1";
 
 ////////////////////////
@@ -89,11 +89,6 @@ export namespace InterestRateType {
 }
 
 export namespace InterestRateSide {
-  export const LENDER = "LENDER";
-  export const BORROWER = "BORROWER";
-}
-
-export namespace PositionSide {
   export const LENDER = "LENDER";
   export const BORROWER = "BORROWER";
 }

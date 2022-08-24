@@ -664,10 +664,10 @@ type Market @entity {
   totalVariableValueLocked: BigInt!
 
   " The variable debt token address correlated to the reserve asset "
-  vToken: Token
+  vToken: Token!
 
   " The stable debt token address correlated to the reserve asset "
-  sToken: Token
+  sToken: Token!
 
   " An aggregate metric of the average borrow rate across all borrows "
   liquidityIndex: BigInt!

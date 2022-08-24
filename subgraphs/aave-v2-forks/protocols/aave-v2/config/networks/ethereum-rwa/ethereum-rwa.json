@@ -1,15 +1,5 @@
 {
   "network": "mainnet",
-  "factory": {
-    "startBlock": "13770760",
-    "address": "0xB953a066377176092879a151C07798B3946EEa4b"
-  },
-  "lendingPoolConfigurator": {
-    "startBlock": "13770781",
-    "address": "0x88CDc0eADB647156c81778d51dE17BC9f969956C"
-  },
-  "lendingPool": {
-    "startBlock": "13770777",
-    "address": "0xA1a8c33C9a9a9DE231b13a2271a7C09c11C849F1"
-  }
+  "startBlock": "13770760",
+  "factoryAddress": "0xB953a066377176092879a151C07798B3946EEa4b"
 }
