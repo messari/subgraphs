@@ -1,5 +1,11 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  Bytes,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import {

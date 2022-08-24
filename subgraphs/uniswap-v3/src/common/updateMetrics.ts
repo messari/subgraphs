@@ -1,5 +1,11 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { BigDecimal, ethereum, BigInt, Address } from "@graphprotocol/graph-ts";
+import {
+  BigDecimal,
+  ethereum,
+  BigInt,
+  Address,
+  Bytes,
+} from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import {
   Account,
@@ -66,18 +72,25 @@ export function updateUsageMetrics(
 
   let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
   let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
+  let newTransaction = isNewTransaction(event.transaction.hash);
 
   let protocol = getOrCreateDex();
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetricsDaily.blockNumber = event.block.number;
   usageMetricsDaily.timestamp = event.block.timestamp;
-  usageMetricsDaily.dailyTransactionCount += INT_ONE;
+  usageMetricsDaily.dailyTransactionCount =
+    newTransaction == true
+      ? usageMetricsDaily.dailyTransactionCount + INT_ONE
+      : usageMetricsDaily.dailyTransactionCount;
   usageMetricsDaily.totalPoolCount = protocol.totalPoolCount;
 
   usageMetricsHourly.blockNumber = event.block.number;
   usageMetricsHourly.timestamp = event.block.timestamp;
-  usageMetricsHourly.hourlyTransactionCount += INT_ONE;
+  usageMetricsHourly.hourlyTransactionCount =
+    newTransaction == true
+      ? usageMetricsHourly.hourlyTransactionCount + INT_ONE
+      : usageMetricsHourly.hourlyTransactionCount;
 
   if (usageType == UsageType.DEPOSIT) {
     usageMetricsDaily.dailyDepositCount += INT_ONE;
@@ -402,4 +415,22 @@ export function updateProtocolFees(event: ethereum.Event): void {
 
   tradingFee.save();
   protocolFee.save();
+}
+
+function isNewTransaction(hash: Bytes): bool {
+  let recentTransaction = _HelperStore.load("MOST_RECENT_TRANSACTION");
+  let hashString = hash.toHexString();
+
+  if (recentTransaction === null) {
+    recentTransaction = new _HelperStore("MOST_RECENT_TRANSACTION");
+    recentTransaction.valueString = hashString;
+    recentTransaction.save();
+    return true;
+  } else if (recentTransaction.valueString !== hashString) {
+    recentTransaction.valueString = hashString;
+    recentTransaction.save();
+    return true;
+  } else {
+    return false;
+  }
 }

@@ -75,7 +75,7 @@ export function createLiquidityPool(
     "/" +
     token1.name +
     " " +
-    getTradingFee(pool.id).toString() +
+    convertFeeToPercent(fees).toString() +
     "%";
   pool.symbol = token0.name + "/" + token1.name;
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;

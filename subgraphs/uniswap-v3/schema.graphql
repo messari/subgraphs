@@ -828,6 +828,9 @@ type _HelperStore @entity {
 
   " # of deposits, # of unique users "
   valueInt: Int
+
+  " most recent transaction hash "
+  valueString: String
 }
 
 " This is used to keep tract of the derived price of tokens in ethereum and the whitelisted pools to which it belongs"
