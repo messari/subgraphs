@@ -15,18 +15,34 @@ import {
 } from "../generated/schema";
 import { NetworkConfigs } from "../configurations/configure";
 import {
+  NftStandard,
+  SaleStrategy,
   BIGDECIMAL_ZERO,
+  BIGDECIMAL_MAX,
+  BIGINT_ZERO,
   NULL_ADDRESS,
   WETH_ADDRESS,
   MANTISSA_FACTOR,
-  BIGINT_ZERO,
   SECONDS_PER_DAY,
-  BIGDECIMAL_MAX,
-  SaleStrategy,
   ERC721_INTERFACE_IDENTIFIER,
   ERC1155_INTERFACE_IDENTIFIER,
-  NftStandard,
+  TRANSFER_FROM_SELECTOR,
+  ERC721_SAFE_TRANSFER_FROM_SELECTOR,
+  ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
+  MATCH_ERC721_TRANSFER_FROM_SELECTOR,
+  MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR,
+  MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
 } from "./constants";
+import {
+  DecodedTransferResult,
+  decode_atomicize_Method,
+  decode_ERC1155Transfer_Method,
+  decode_ERC721Transfer_Method,
+  decode_matchERC1155UsingCriteria_Method,
+  decode_matchERC721UsingCriteria_Method,
+  getFunctionSelector,
+} from "./utils";
+import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 
 export function getOrCreateMarketplace(marketplaceID: string): Marketplace {
   let marketplace = Marketplace.load(marketplaceID);
@@ -193,7 +209,7 @@ export function getSaleStrategy(saleKind: i32): string {
   }
 }
 
-export function calcTradeVolumeETH(
+export function calcTradePriceETH(
   paymentToken: Address,
   basePrice: BigInt
 ): BigDecimal {
@@ -204,10 +220,47 @@ export function calcTradeVolumeETH(
   }
 }
 
-export function min(a: BigDecimal, b: BigDecimal): BigDecimal {
-  return a.lt(b) ? a : b;
+/**
+ * Validate function selectors that can be decoded
+ * Relevant function selectors/method IDs can be found via https://www.4byte.directory
+ */
+export function validateCallDataFunctionSelector(callData: Bytes): boolean {
+  let functionSelector = getFunctionSelector(callData);
+  return (
+    functionSelector == TRANSFER_FROM_SELECTOR ||
+    functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
+    functionSelector == ERC1155_SAFE_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR
+  );
 }
 
-export function max(a: BigDecimal, b: BigDecimal): BigDecimal {
-  return a.lt(b) ? b : a;
+export function decodeSingleNftData(
+  target: Address,
+  callData: Bytes
+): DecodedTransferResult {
+  let functionSelector = getFunctionSelector(callData);
+  if (
+    functionSelector == TRANSFER_FROM_SELECTOR ||
+    functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR
+  ) {
+    return decode_ERC721Transfer_Method(target, callData);
+  } else if (
+    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR
+  ) {
+    return decode_matchERC721UsingCriteria_Method(callData);
+  } else if (functionSelector == ERC1155_SAFE_TRANSFER_FROM_SELECTOR) {
+    return decode_ERC1155Transfer_Method(target, callData);
+  } else {
+    return decode_matchERC1155UsingCriteria_Method(callData);
+  }
+}
+
+export function decodeBundleNftData(
+  call: AtomicMatch_Call,
+  callData: Bytes
+): DecodedTransferResult[] {
+  return decode_atomicize_Method(call, callData);
 }

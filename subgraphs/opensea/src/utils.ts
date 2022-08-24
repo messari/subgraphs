@@ -1,15 +1,20 @@
-import { Address, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  Bytes,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 import {
   BIGINT_ONE,
-  ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
-  ERC721_SAFE_TRANSFER_FROM_SELECTOR,
   ETHABI_DECODE_PREFIX,
-  MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
-  MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR,
-  MATCH_ERC721_TRANSFER_FROM_SELECTOR,
-  TRANSFER_FROM_SELECTOR,
 } from "./constants";
+import {
+  decodeSingleNftData,
+  validateCallDataFunctionSelector,
+} from "./helpers";
 
 export class DecodedTransferResult {
   constructor(
@@ -27,21 +32,6 @@ export class DecodedTransferResult {
  */
 export function getFunctionSelector(callData: Bytes): string {
   return Bytes.fromUint8Array(callData.subarray(0, 4)).toHexString();
-}
-
-/**
- * Relevant function selectors/method IDs can be found via https://www.4byte.directory
- */
-export function checkCallDataFunctionSelector(callData: Bytes): boolean {
-  let functionSelector = getFunctionSelector(callData);
-  return (
-    functionSelector == TRANSFER_FROM_SELECTOR ||
-    functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
-    functionSelector == ERC1155_SAFE_TRANSFER_FROM_SELECTOR ||
-    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELECTOR ||
-    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
-    functionSelector == MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR
-  );
 }
 
 /**
@@ -271,7 +261,7 @@ export function decode_atomicize_Method(
   let atomicizedCallData = atomicizeCallData(callDatas, callDataLengths);
   for (let i = 0; i < targets.length; i++) {
     // Skip unrecognized method calls
-    if (checkCallDataFunctionSelector(atomicizedCallData[i])) {
+    if (validateCallDataFunctionSelector(atomicizedCallData[i])) {
       let singleNftTransferResult = decodeSingleNftData(
         targets[i],
         atomicizedCallData[i]
@@ -292,31 +282,10 @@ export function decode_atomicize_Method(
   return decodedTransferResults;
 }
 
-export function decodeSingleNftData(
-  target: Address,
-  callData: Bytes
-): DecodedTransferResult {
-  let functionSelector = getFunctionSelector(callData);
-  if (
-    functionSelector == TRANSFER_FROM_SELECTOR ||
-    functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR
-  ) {
-    return decode_ERC721Transfer_Method(target, callData);
-  } else if (
-    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELECTOR ||
-    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR
-  ) {
-    return decode_matchERC721UsingCriteria_Method(callData);
-  } else if (functionSelector == ERC1155_SAFE_TRANSFER_FROM_SELECTOR) {
-    return decode_ERC1155Transfer_Method(target, callData);
-  } else {
-    return decode_matchERC1155UsingCriteria_Method(callData);
-  }
+export function min(a: BigDecimal, b: BigDecimal): BigDecimal {
+  return a.lt(b) ? a : b;
 }
 
-export function decodeBundleNftData(
-  call: AtomicMatch_Call,
-  callData: Bytes
-): DecodedTransferResult[] {
-  return decode_atomicize_Method(call, callData);
+export function max(a: BigDecimal, b: BigDecimal): BigDecimal {
+  return a.lt(b) ? b : a;
 }

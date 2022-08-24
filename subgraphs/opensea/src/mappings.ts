@@ -14,22 +14,17 @@ import {
   WYVERN_ATOMICIZER_ADDRESS,
 } from "./constants";
 import {
+  calcTradePriceETH,
+  decodeSingleNftData,
+  decodeBundleNftData,
   getOrCreateCollection,
   getOrCreateCollectionDailySnapshot,
   getOrCreateMarketplace,
   getOrCreateMarketplaceDailySnapshot,
-  calcTradeVolumeETH,
-  min,
-  max,
   getSaleStrategy,
+  validateCallDataFunctionSelector,
 } from "./helpers";
-import {
-  checkCallDataFunctionSelector,
-  decodeBundleNftData,
-  decodeSingleNftData,
-  getFunctionSelector,
-  guardedArrayReplace,
-} from "./utils";
+import { getFunctionSelector, guardedArrayReplace, min, max } from "./utils";
 
 /**
  * Order struct as found in the Project Wyvern official source
@@ -177,7 +172,7 @@ function handleSingleSale(call: AtomicMatch_Call): void {
     call.inputs.replacementPatternBuy
   );
 
-  if (!checkCallDataFunctionSelector(mergedCallData)) {
+  if (!validateCallDataFunctionSelector(mergedCallData)) {
     log.warning(
       "[checkCallDataFunctionSelector] returned false, Method ID: {}, transaction hash: {}, target: {}",
       [
@@ -196,7 +191,7 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   let saleKind = call.inputs.feeMethodsSidesKindsHowToCalls[6];
   let strategy = getSaleStrategy(saleKind);
   // TODO: calculate final price for dutch auction sales
-  let volumeETH = calcTradeVolumeETH(paymentToken, basePrice);
+  let volumeETH = calcTradePriceETH(paymentToken, basePrice);
   let priceETH = volumeETH;
 
   collectionAddrs.push(collectionAddr);
@@ -287,7 +282,7 @@ function handleBundleSale(call: AtomicMatch_Call): void {
   let paymentToken = call.inputs.addrs[13];
   // basePrice is buyOrder.basePrice or SellOrder.basePrice token (uints[4] or uints[13])
   let basePrice = call.inputs.uints[13];
-  let bundleVolumeETH = calcTradeVolumeETH(paymentToken, basePrice);
+  let bundleVolumeETH = calcTradePriceETH(paymentToken, basePrice);
 
   let mergedCallData = guardedArrayReplace(
     call.inputs.calldataBuy,
