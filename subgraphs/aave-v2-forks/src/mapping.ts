@@ -331,18 +331,21 @@ export function _handleReserveDataUpdated(
   market.outputTokenPriceUSD = assetPriceUSD;
 
   // get current borrow balance
-  let stableDebtContract = StableDebtToken.bind(
-    Address.fromString(market.sToken!)
-  );
+  let trySBorrowBalance: ethereum.CallResult<BigInt> | null = null;
+  if (market.sToken) {
+    let stableDebtContract = StableDebtToken.bind(
+      Address.fromString(market.sToken!)
+    );
+    trySBorrowBalance = stableDebtContract.try_totalSupply();
+  }
   let variableDebtContract = VariableDebtToken.bind(
     Address.fromString(market.vToken!)
   );
-  let trySBorrowBalance = stableDebtContract.try_totalSupply();
   let tryVBorrowBalance = variableDebtContract.try_totalSupply();
   let sBorrowBalance = BIGINT_ZERO;
   let vBorrowBalance = BIGINT_ZERO;
 
-  if (!trySBorrowBalance.reverted) {
+  if (trySBorrowBalance != null && !trySBorrowBalance.reverted) {
     sBorrowBalance = trySBorrowBalance.value;
   }
   if (!tryVBorrowBalance.reverted) {
@@ -350,7 +353,7 @@ export function _handleReserveDataUpdated(
   }
 
   // broken if both revert
-  if (trySBorrowBalance.reverted && tryVBorrowBalance.reverted) {
+  if ((trySBorrowBalance != null && trySBorrowBalance.reverted) && tryVBorrowBalance.reverted) {
     log.warning("[ReserveDataUpdated] No borrow balance found", []);
     return;
   }
