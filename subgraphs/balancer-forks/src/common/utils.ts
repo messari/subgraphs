@@ -71,6 +71,9 @@ export function getOutputTokenPriceUSD(
 ): BigDecimal {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
+  if (pool.outputTokenSupply!.equals(constants.BIGINT_ZERO))
+    return constants.BIGDECIMAL_ZERO;
+
   let outputToken = getOrCreateToken(poolAddress, block.number);
 
   let outputTokenPriceUSD = pool.totalValueLockedUSD.div(
