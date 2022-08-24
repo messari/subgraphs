@@ -1,7 +1,17 @@
 {
   "network": "mainnet",
-  "startBlock": "11362562",
-  "factoryAddress": "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5",
+  "factory": {
+    "startBlock": "11362562",
+    "address": "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"
+  },
+  "lendingPoolConfigurator": {
+    "startBlock": "11362582",
+    "address": "0x311Bb771e4F8952E6Da169b425E7e92d6Ac45756"
+  },
+  "lendingPool": {
+    "startBlock": "11362579",
+    "address": "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9"
+  },
   "graftEnabled": false,
   "subgraphId": "QmfHRGh3tC4yb2bBRn5A6ctytG32Jwfi9eNo76EFjiWyrf",
   "graftStartBlock": 15217959
