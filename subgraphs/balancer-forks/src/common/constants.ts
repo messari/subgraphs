@@ -154,6 +154,9 @@ export const PROTOCOL_TOKEN_ADDRESS = Address.fromString(
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
   "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD"
 );
+export const AAVE_BOOSTED_POOL_ADDRESS = Address.fromString(
+  "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2"
+);
 
 export const INFLATION_INTERVAL = "TIMESTAMP";
 export const STARTING_INFLATION_RATE = BigDecimal.fromString((0.23974867724).toString()).times(DEFAULT_DECIMALS_DENOMINATOR);

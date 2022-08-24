@@ -286,6 +286,7 @@ export function getOrCreateLiquidityPoolDailySnapshots(
 
     poolSnapshots.rewardTokenEmissionsAmount = null;
     poolSnapshots.rewardTokenEmissionsUSD = null;
+    poolSnapshots.stakedOutputTokenAmount = null;
 
     poolSnapshots.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -342,6 +343,7 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
 
     poolSnapshots.rewardTokenEmissionsAmount = null;
     poolSnapshots.rewardTokenEmissionsUSD = null;
+    poolSnapshots.stakedOutputTokenAmount = null;
 
     poolSnapshots.hourlySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;

@@ -173,6 +173,31 @@ export function getPoolTVL(
   return totalValueLockedUSD;
 }
 
+export function getOutputTokenSupply(
+  poolAddress: Address,
+  oldSupply: BigInt
+): BigInt {
+  let poolContract = WeightedPoolContract.bind(poolAddress);
+
+  let totalSupply = readValue<BigInt>(
+    poolContract.try_totalSupply(),
+    oldSupply
+  );
+
+  if (poolAddress.equals(constants.AAVE_BOOSTED_POOL_ADDRESS)) {
+    // Exception: Aave Boosted Pool
+    // since this pool pre-mints all BPT, `totalSupply` * remains constant,
+    // whereas`getVirtualSupply` increases as users join the pool and decreases as they exit it
+
+    totalSupply = readValue<BigInt>(
+      poolContract.try_getVirtualSupply(),
+      oldSupply
+    );
+  }
+
+  return totalSupply;
+}
+
 export function getPoolFees(poolAddress: Address): PoolFeesType {
   const poolContract = WeightedPoolContract.bind(poolAddress);
 

@@ -90,30 +90,24 @@ export function updateControllerRewards(
     ),
     block
   );
+}
 
+export function updateStakedOutputTokenAmount(
+  poolAddress: Address,
+  gaugeAddress: Address,
+  block: ethereum.Block
+): void {
   // Update the staked output token amount for the pool ///////////
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
-  let gaugeWorkingSupply = utils
-    .readValue<BigInt>(
-      gaugeContract.try_working_supply(),
-      constants.BIGINT_ZERO
-    )
-    .toBigDecimal();
-
-  // https://dev.balancer.fi/resources/vebal-and-gauges/estimating-gauge-incentive-aprs/apr-calculation
-  pool.stakedOutputTokenAmount = BigInt.fromString(
-    constants.BIGINT_ONE.divDecimal(
-      constants.BIGDECIMAL_POINT_FOUR.div(
-        gaugeWorkingSupply.plus(constants.BIGDECIMAL_POINT_FOUR)
-      )
-    )
-      .truncate(0)
-      .toString()
+  let gaugeWorkingSupply = utils.readValue<BigInt>(
+    gaugeContract.try_working_supply(),
+    constants.BIGINT_ZERO
   );
+
+  pool.stakedOutputTokenAmount = gaugeWorkingSupply;
   pool.save();
-  //////////////////////////////////////////////////////////////////
 }
 
 export function updateFactoryRewards(

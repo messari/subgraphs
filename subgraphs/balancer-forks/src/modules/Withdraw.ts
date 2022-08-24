@@ -153,9 +153,8 @@ export function Withdraw(
     );
   }
 
-  let poolContract = WeightedPoolContract.bind(poolAddress);
-  let tokenSupplyAfterWithdrawal = utils.readValue<BigInt>(
-    poolContract.try_totalSupply(),
+  let tokenSupplyAfterWithdrawal = utils.getOutputTokenSupply(
+    poolAddress,
     pool.outputTokenSupply!
   );
   let outputTokenBurntAmount = pool.outputTokenSupply!.minus(

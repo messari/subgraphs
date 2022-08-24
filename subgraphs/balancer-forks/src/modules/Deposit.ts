@@ -145,9 +145,8 @@ export function Deposit(
     );
   }
 
-  let poolContract = WeightedPoolContract.bind(poolAddress);
-  let totalSupplyAfterDeposit = utils.readValue<BigInt>(
-    poolContract.try_totalSupply(),
+  let totalSupplyAfterDeposit = utils.getOutputTokenSupply(
+    poolAddress,
     pool.outputTokenSupply!
   );
   let outputTokenMintedAmount = totalSupplyAfterDeposit.minus(
