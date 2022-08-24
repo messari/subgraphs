@@ -112,5 +112,6 @@ export const BLACKLISTED_TRANSACTION: Bytes[] = [
   Bytes.fromHexString('0x4f7e0254eee6a2e2847cd4562fc2178d978b2ebfe424c8b5a6b93a3662f41525'),
   Bytes.fromHexString('0x4fc4e03751af80bf1bd548346ef6cdcb0ee99219379ffb7e9088585a4ef73c7e'),
   Bytes.fromHexString('0x09d08d6a2caeb6f4f1c90ac68adea93f758dc57d173acfa6621d92f3dc3277d0'),
-  Bytes.fromHexString('0x151be1c35cbf00fd29e0e370cf5a0469d96656df16b74f19a597b3e87d8f724d')
+  Bytes.fromHexString('0x151be1c35cbf00fd29e0e370cf5a0469d96656df16b74f19a597b3e87d8f724d'),
+  Bytes.fromHexString('0x66847f4dc80a6b4c32666972a9a68416d802d78b54619503fd0aec358fedb185')
 ] 
