@@ -34,6 +34,7 @@ import {
   PositionSide,
   rayToWad,
   RAY_OFFSET,
+  ZERO_ADDRESS,
 } from "./constants";
 import {
   addPosition,
@@ -85,13 +86,12 @@ export function _handleReserveInitialized(
   event: ethereum.Event,
   underlyingToken: Address,
   outputToken: Address,
-  stableDebtToken: Address,
   variableDebtToken: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  stableDebtToken: Address = Address.fromString(ZERO_ADDRESS)
 ): void {
   // create tokens
   let outputTokenEntity = getOrCreateToken(outputToken);
-  let stableDebtTokenEntity = getOrCreateToken(stableDebtToken);
   let variableDebtTokenEntity = getOrCreateToken(variableDebtToken);
 
   // update and initialize specofic market variables
@@ -101,8 +101,10 @@ export function _handleReserveInitialized(
   market.outputToken = outputTokenEntity.id;
   market.createdBlockNumber = event.block.number;
   market.createdTimestamp = event.block.timestamp;
-  market.sToken = stableDebtTokenEntity.id;
   market.vToken = variableDebtTokenEntity.id;
+  if (stableDebtToken != Address.fromString(ZERO_ADDRESS)) {
+    market.sToken = getOrCreateToken(stableDebtToken).id;
+  }
 
   market.save();
 }

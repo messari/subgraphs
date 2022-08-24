@@ -51,7 +51,9 @@ import {
 } from "../../../src/mapping";
 import { getOrCreateRewardToken } from "../../../src/helpers";
 import {
+  BIGDECIMAL_THREE,
   BIGDECIMAL_ZERO,
+  BIGINT_THREE,
   DEFAULT_DECIMALS,
   exponentToBigDecimal,
   RewardTokenType,
@@ -93,9 +95,9 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     event,
     event.params.asset,
     event.params.aToken,
-    event.params.stableDebtToken,
     event.params.variableDebtToken,
     getProtocolData()
+    // No stable debt token in geist
   );
 }
 
@@ -160,6 +162,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // Rewards / day calculation
   // rewards per second = totalRewardsPerSecond * (allocPoint / totalAllocPoint)
   // rewards per day = rewardsPerSecond * 60 * 60 * 24
+  // Borrow rewards are 3x the rewards per day for deposits
 
   let gTokenContract = GToken.bind(Address.fromString(market.outputToken!));
   let tryIncentiveController = gTokenContract.try_getIncentivesController();
@@ -205,8 +208,14 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
         .times(rewardTokenPriceUSD);
 
       // set rewards to arrays
-      market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
-      market.rewardTokenEmissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
+      market.rewardTokenEmissionsAmount = [
+        rewardsPerDay,
+        rewardsPerDay.times(BIGINT_THREE),
+      ];
+      market.rewardTokenEmissionsUSD = [
+        rewardsPerDayUSD,
+        rewardsPerDayUSD.times(BIGDECIMAL_THREE),
+      ];
     }
   }
   market.save();
