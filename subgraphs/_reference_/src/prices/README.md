@@ -179,3 +179,14 @@ Prices
 | ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |
 | [QuickSwap](https://etherscan.io/address/0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff) |    `Router`    | `4931900`  |    ✅     |   🛠   |
 | [SushiSwap](https://etherscan.io/address/0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506) |    `Router`    | `11333235` |    ✅     |   🛠   |
+
+### Optimism
+
+🔨 = In progress.  
+🛠 = Feature complete. Additional testing required.
+`MultiCall` = If the method uses more than two `JSON RPC Call`.
+
+| Method                                                                                          |   Type   | StartBlock | MultiCall | Status |
+| ----------------------------------------------------------------------------------------------- | :------: | :--------: | :-------: | :----: |
+| [Uniswap](https://optimistic.etherscan.io/address/0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45)   | `Router` | `1179452`  |    ✅     |   🛠    |
+| [SushiSwap](https://optimistic.etherscan.io/address/0xbE811A0D44E2553d25d11CB8DC0d3F0D0E6430E6) | `Router` | `7464245`  |    ✅     |   🛠    |
