@@ -41,10 +41,10 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
   // Construct swap path
   let path: Address[] = [];
   let numberOfJumps: BigInt;
-  let pathOverride = constants.UNISWAP_PATH_OVERRIDES.get(network)!.get(token0Address);
+  let pathOverride = constants.UNISWAP_PATH_OVERRIDES.get(network)!.get(token0Address)
   if (pathOverride) {
-    path = pathOverride;
-    numberOfJumps = BigInt.fromI32(path.length - 1);
+    path = pathOverride
+    numberOfJumps = BigInt.fromI32(path.length - 1)
   } else {
     // Convert ETH address to WETH
     if (token0Address == ethAddress) {
@@ -99,7 +99,7 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
       .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
       .toBigDecimal();
 
-    return CustomPriceType.initialize(amountOutBigDecimal, constants.USDC_DECIMALS_MAP.get(network)!.toI32());
+    return CustomPriceType.initialize(amountOutBigDecimal, constants.USDC_DECIMALS_MAP.get(network)!.toI32() as u8);
   }
 
   return new CustomPriceType();

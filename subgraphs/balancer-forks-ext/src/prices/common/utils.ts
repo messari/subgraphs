@@ -1,5 +1,4 @@
-import * as constants from "./constants";
-import { _ERC20 } from "../../../generated/Vault/_ERC20";
+import { ERC20 } from "../../../generated/Vault/ERC20";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T): T {
@@ -7,9 +6,13 @@ export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T
 }
 
 export function getTokenDecimals(tokenAddr: Address): BigInt {
-  const token = _ERC20.bind(tokenAddr);
+  const token = ERC20.bind(tokenAddr);
 
-  let decimals = readValue<BigInt>(token.try_decimals(), constants.DEFAULT_DECIMALS);
+  let decimalsCall = token.try_decimals();
 
-  return decimals;
+  if (decimalsCall.reverted) {
+    return BigInt.fromI32(18);
+  }
+
+  return decimalsCall.value;
 }
