@@ -569,8 +569,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     trollerAddr,
     blocksPerDayBD,
     PROTOCOL_NETWORK.toLowerCase() == Network.ARBITRUM_ONE.toLowerCase()
-      ? true
-      : false // update all prices if network is arbitrum
   );
   updateProtocol(Address.fromString(FACTORY_CONTRACT));
 
