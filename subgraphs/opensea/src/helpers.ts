@@ -16,7 +16,6 @@ import {
 import { NetworkConfigs } from "../configurations/configure";
 import {
   NftStandard,
-  SaleStrategy,
   BIGDECIMAL_ZERO,
   BIGDECIMAL_MAX,
   BIGINT_ZERO,
@@ -26,21 +25,14 @@ import {
   SECONDS_PER_DAY,
   ERC721_INTERFACE_IDENTIFIER,
   ERC1155_INTERFACE_IDENTIFIER,
-  TRANSFER_FROM_SELECTOR,
-  ERC721_SAFE_TRANSFER_FROM_SELECTOR,
-  ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
-  MATCH_ERC721_TRANSFER_FROM_SELECTOR,
-  MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR,
-  MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
 } from "./constants";
 import {
   DecodedTransferResult,
+  calculateMatchPrice,
   decode_atomicize_Method,
-  decode_ERC1155Transfer_Method,
-  decode_ERC721Transfer_Method,
-  decode_matchERC1155UsingCriteria_Method,
-  decode_matchERC721UsingCriteria_Method,
+  decode_nftTransfer_Method,
   getFunctionSelector,
+  validateCallDataFunctionSelector,
 } from "./utils";
 import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 
@@ -201,66 +193,65 @@ function getNftStandard(collectionID: string): string {
   return NftStandard.UNKNOWN;
 }
 
-export function getSaleStrategy(saleKind: i32): string {
-  if (saleKind == 0) {
-    return SaleStrategy.STANDARD_SALE;
-  } else {
-    return SaleStrategy.DUTCH_AUCTION;
-  }
-}
-
+/**
+ * Calculates trade/order price in BigDecimal
+ * NOTE: currently ignores non-ETH/WETH trades
+ */
 export function calcTradePriceETH(
-  paymentToken: Address,
-  basePrice: BigInt
+  call: AtomicMatch_Call,
+  paymentToken: Address
 ): BigDecimal {
   if (paymentToken == NULL_ADDRESS || paymentToken == WETH_ADDRESS) {
-    return basePrice.toBigDecimal().div(MANTISSA_FACTOR);
+    let price = calculateMatchPrice(call);
+    return price.toBigDecimal().div(MANTISSA_FACTOR);
   } else {
     return BIGDECIMAL_ZERO;
   }
 }
 
-/**
- * Validate function selectors that can be decoded
- * Relevant function selectors/method IDs can be found via https://www.4byte.directory
- */
-export function validateCallDataFunctionSelector(callData: Bytes): boolean {
-  let functionSelector = getFunctionSelector(callData);
-  return (
-    functionSelector == TRANSFER_FROM_SELECTOR ||
-    functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
-    functionSelector == ERC1155_SAFE_TRANSFER_FROM_SELECTOR ||
-    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELECTOR ||
-    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
-    functionSelector == MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR
-  );
-}
-
 export function decodeSingleNftData(
-  target: Address,
+  call: AtomicMatch_Call,
   callData: Bytes
-): DecodedTransferResult {
-  let functionSelector = getFunctionSelector(callData);
-  if (
-    functionSelector == TRANSFER_FROM_SELECTOR ||
-    functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR
-  ) {
-    return decode_ERC721Transfer_Method(target, callData);
-  } else if (
-    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELECTOR ||
-    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR
-  ) {
-    return decode_matchERC721UsingCriteria_Method(callData);
-  } else if (functionSelector == ERC1155_SAFE_TRANSFER_FROM_SELECTOR) {
-    return decode_ERC1155Transfer_Method(target, callData);
+): DecodedTransferResult | null {
+  let sellTarget = call.inputs.addrs[11];
+  if (!validateCallDataFunctionSelector(callData)) {
+    log.warning(
+      "[checkCallDataFunctionSelector] returned false, Method ID: {}, transaction hash: {}, target: {}",
+      [
+        getFunctionSelector(callData),
+        call.transaction.hash.toHexString(),
+        sellTarget.toHexString(),
+      ]
+    );
+    return null;
   } else {
-    return decode_matchERC1155UsingCriteria_Method(callData);
+    return decode_nftTransfer_Method(sellTarget, callData);
   }
 }
 
 export function decodeBundleNftData(
   call: AtomicMatch_Call,
-  callData: Bytes
+  callDatas: Bytes
 ): DecodedTransferResult[] {
-  return decode_atomicize_Method(call, callData);
+  let decodedTransferResults: DecodedTransferResult[] = [];
+  let decodedAtomicizeResult = decode_atomicize_Method(callDatas);
+  for (let i = 0; i < decodedAtomicizeResult.targets.length; i++) {
+    let target = decodedAtomicizeResult.targets[i];
+    let calldata = decodedAtomicizeResult.callDatas[i];
+    // Skip unrecognized method calls
+    if (!validateCallDataFunctionSelector(calldata)) {
+      log.warning(
+        "[checkCallDataFunctionSelector] returned false in atomicize, Method ID: {}, transaction hash: {}, target: {}",
+        [
+          getFunctionSelector(calldata),
+          call.transaction.hash.toHexString(),
+          target.toHexString(),
+        ]
+      );
+    } else {
+      let singleNftTransferResult = decode_nftTransfer_Method(target, calldata);
+      decodedTransferResults.push(singleNftTransferResult);
+    }
+  }
+  return decodedTransferResults;
 }

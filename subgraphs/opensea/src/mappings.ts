@@ -21,10 +21,8 @@ import {
   getOrCreateCollectionDailySnapshot,
   getOrCreateMarketplace,
   getOrCreateMarketplaceDailySnapshot,
-  getSaleStrategy,
-  validateCallDataFunctionSelector,
 } from "./helpers";
-import { getFunctionSelector, guardedArrayReplace, min, max } from "./utils";
+import { getSaleStrategy, guardedArrayReplace, min, max } from "./utils";
 
 /**
  * Order struct as found in the Project Wyvern official source
@@ -165,33 +163,23 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   // basePrice is buyOrder.basePrice or SellOrder.basePrice token (uints[4] or uints[13])
   let basePrice = call.inputs.uints[13];
 
-  let sellTarget = call.inputs.addrs[11];
   let mergedCallData = guardedArrayReplace(
     call.inputs.calldataBuy,
     call.inputs.calldataSell,
     call.inputs.replacementPatternBuy
   );
 
-  if (!validateCallDataFunctionSelector(mergedCallData)) {
-    log.warning(
-      "[checkCallDataFunctionSelector] returned false, Method ID: {}, transaction hash: {}, target: {}",
-      [
-        getFunctionSelector(mergedCallData),
-        call.transaction.hash.toHexString(),
-        sellTarget.toHexString(),
-      ]
-    );
+  let decodedTransferResult = decodeSingleNftData(call, mergedCallData);
+  if (!decodedTransferResult) {
     return;
   }
 
-  let decodedTransferResult = decodeSingleNftData(sellTarget, mergedCallData);
   let collectionAddr = decodedTransferResult.token.toHexString();
   let tokenId = decodedTransferResult.tokenId;
   let amount = decodedTransferResult.amount;
   let saleKind = call.inputs.feeMethodsSidesKindsHowToCalls[6];
   let strategy = getSaleStrategy(saleKind);
-  // TODO: calculate final price for dutch auction sales
-  let volumeETH = calcTradePriceETH(paymentToken, basePrice);
+  let volumeETH = calcTradePriceETH(call, paymentToken);
   let priceETH = volumeETH;
 
   collectionAddrs.push(collectionAddr);
@@ -282,7 +270,7 @@ function handleBundleSale(call: AtomicMatch_Call): void {
   let paymentToken = call.inputs.addrs[13];
   // basePrice is buyOrder.basePrice or SellOrder.basePrice token (uints[4] or uints[13])
   let basePrice = call.inputs.uints[13];
-  let bundleVolumeETH = calcTradePriceETH(paymentToken, basePrice);
+  let bundleVolumeETH = calcTradePriceETH(call, paymentToken);
 
   let mergedCallData = guardedArrayReplace(
     call.inputs.calldataBuy,

@@ -4,17 +4,22 @@ import {
   BigInt,
   Bytes,
   ethereum,
-  log,
 } from "@graphprotocol/graph-ts";
 import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 import {
   BIGINT_ONE,
+  BIGINT_ZERO,
+  ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
+  ERC721_SAFE_TRANSFER_FROM_SELECTOR,
   ETHABI_DECODE_PREFIX,
+  MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR,
+  MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR,
+  MATCH_ERC721_TRANSFER_FROM_SELECTOR,
+  NULL_ADDRESS,
+  SaleStrategy,
+  Side,
+  TRANSFER_FROM_SELECTOR,
 } from "./constants";
-import {
-  decodeSingleNftData,
-  validateCallDataFunctionSelector,
-} from "./helpers";
 
 export class DecodedTransferResult {
   constructor(
@@ -27,11 +32,60 @@ export class DecodedTransferResult {
   ) {}
 }
 
+export class DecodedAtomicizeResult {
+  constructor(
+    public readonly targets: Address[],
+    public readonly callDatas: Bytes[]
+  ) {}
+}
+
 /**
  * Get first 4 bytes of the calldata (function selector/method ID)
  */
 export function getFunctionSelector(callData: Bytes): string {
   return Bytes.fromUint8Array(callData.subarray(0, 4)).toHexString();
+}
+
+/**
+ * Get order side from side parameter
+ * enum Side { Buy, Sell }
+ * https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/SaleKindInterface.sol#L22
+ */
+export function getOrderSide(side: i32): string {
+  if (side == 0) {
+    return Side.BUY;
+  } else {
+    return Side.SELL;
+  }
+}
+
+/**
+ * Get sale strategy from saleKind parameter
+ * enum SaleKind { FixedPrice, DutchAuction }
+ * https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/SaleKindInterface.sol#L29
+ */
+export function getSaleStrategy(saleKind: i32): string {
+  if (saleKind == 0) {
+    return SaleStrategy.STANDARD_SALE;
+  } else {
+    return SaleStrategy.DUTCH_AUCTION;
+  }
+}
+
+/**
+ * Validate function selectors that can be decoded
+ * Relevant function selectors/method IDs can be found via https://www.4byte.directory
+ */
+export function validateCallDataFunctionSelector(callData: Bytes): boolean {
+  let functionSelector = getFunctionSelector(callData);
+  return (
+    functionSelector == TRANSFER_FROM_SELECTOR ||
+    functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
+    functionSelector == ERC1155_SAFE_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR
+  );
 }
 
 /**
@@ -54,6 +108,86 @@ export function atomicizeCallData(
   }
 
   return atomicizedCallData;
+}
+
+/**
+ * Calculate the price two orders would match at, if in fact they would match (otherwise fail)
+ * Returns sellPrice for sell-side order maker (sale) and buyPrice for buy-side order maker (bid/offer)
+ * https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/ExchangeCore.sol#L460
+ */
+export function calculateMatchPrice(call: AtomicMatch_Call): BigInt {
+  let sellSideFeeRecipient = call.inputs.addrs[10];
+
+  let sellSide = call.inputs.feeMethodsSidesKindsHowToCalls[5];
+  let sellSaleKind = call.inputs.feeMethodsSidesKindsHowToCalls[6];
+  let sellBasePrice = call.inputs.uints[13];
+  let sellExtra = call.inputs.uints[14];
+  let sellListingTime = call.inputs.uints[15];
+  let sellExpirationTime = call.inputs.uints[16];
+
+  // Calculate sell price
+  let sellPrice = calculateFinalPrice(
+    sellSide,
+    sellSaleKind,
+    sellBasePrice,
+    sellExtra,
+    sellListingTime,
+    sellExpirationTime,
+    call.block.timestamp
+  );
+
+  let buySide = call.inputs.feeMethodsSidesKindsHowToCalls[1];
+  let buySaleKind = call.inputs.feeMethodsSidesKindsHowToCalls[2];
+  let buyBasePrice = call.inputs.uints[4];
+  let buyExtra = call.inputs.uints[5];
+  let buyListingTime = call.inputs.uints[6];
+  let buyExpirationTime = call.inputs.uints[7];
+
+  // Calculate buy price
+  let buyPrice = calculateFinalPrice(
+    buySide,
+    buySaleKind,
+    buyBasePrice,
+    buyExtra,
+    buyListingTime,
+    buyExpirationTime,
+    call.block.timestamp
+  );
+
+  // Maker/taker priority
+  return sellSideFeeRecipient.notEqual(NULL_ADDRESS) ? sellPrice : buyPrice;
+}
+
+/**
+ * Calculate the settlement price of an order using Order paramters
+ * Returns basePrice if FixedPrice sale or calculate auction settle price if DutchAuction sale
+ * https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/SaleKindInterface.sol#L70
+ * NOTE: "now" keyword is simply an alias for block.timestamp
+ * https://docs.soliditylang.org/en/v0.4.26/units-and-global-variables.html?highlight=now#block-and-transaction-properties
+ */
+export function calculateFinalPrice(
+  side: i32,
+  saleKind: i32,
+  basePrice: BigInt,
+  extra: BigInt,
+  listingTime: BigInt,
+  expirationTime: BigInt,
+  now: BigInt
+): BigInt {
+  if (getSaleStrategy(saleKind) == SaleStrategy.STANDARD_SALE) {
+    return basePrice;
+  } else if (getSaleStrategy(saleKind) == SaleStrategy.DUTCH_AUCTION) {
+    let diff = extra
+      .times(now.minus(listingTime))
+      .div(expirationTime.minus(listingTime));
+    if (getOrderSide(side) == Side.SELL) {
+      return basePrice.minus(diff);
+    } else {
+      return basePrice.plus(diff);
+    }
+  } else {
+    return BIGINT_ZERO;
+  }
 }
 
 /**
@@ -240,9 +374,8 @@ export function decode_matchERC1155UsingCriteria_Method(
  * NOTE: needs ETHABI_DECODE_PREFIX to decode (contains arbitrary bytes/arrays)
  */
 export function decode_atomicize_Method(
-  call: AtomicMatch_Call,
   callData: Bytes
-): DecodedTransferResult[] {
+): DecodedAtomicizeResult {
   let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
   let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
     dataWithoutFunctionSelector
@@ -257,29 +390,31 @@ export function decode_atomicize_Method(
   let callDataLengths = decoded[2].toBigIntArray();
   let callDatas = decoded[3].toBytes();
 
-  let decodedTransferResults: DecodedTransferResult[] = [];
-  let atomicizedCallData = atomicizeCallData(callDatas, callDataLengths);
-  for (let i = 0; i < targets.length; i++) {
-    // Skip unrecognized method calls
-    if (validateCallDataFunctionSelector(atomicizedCallData[i])) {
-      let singleNftTransferResult = decodeSingleNftData(
-        targets[i],
-        atomicizedCallData[i]
-      );
-      decodedTransferResults.push(singleNftTransferResult);
-    } else {
-      log.warning(
-        "[checkCallDataFunctionSelector] returned false in atomicize, Method ID: {}, transaction hash: {}, target: {}",
-        [
-          getFunctionSelector(atomicizedCallData[i]),
-          call.transaction.hash.toHexString(),
-          targets[i].toHexString(),
-        ]
-      );
-    }
-  }
+  let atomicizedCallDatas = atomicizeCallData(callDatas, callDataLengths);
 
-  return decodedTransferResults;
+  return new DecodedAtomicizeResult(targets, atomicizedCallDatas);
+}
+
+export function decode_nftTransfer_Method(
+  target: Address,
+  callData: Bytes
+): DecodedTransferResult {
+  let functionSelector = getFunctionSelector(callData);
+  if (
+    functionSelector == TRANSFER_FROM_SELECTOR ||
+    functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR
+  ) {
+    return decode_ERC721Transfer_Method(target, callData);
+  } else if (
+    functionSelector == MATCH_ERC721_TRANSFER_FROM_SELECTOR ||
+    functionSelector == MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR
+  ) {
+    return decode_matchERC721UsingCriteria_Method(callData);
+  } else if (functionSelector == ERC1155_SAFE_TRANSFER_FROM_SELECTOR) {
+    return decode_ERC1155Transfer_Method(target, callData);
+  } else {
+    return decode_matchERC1155UsingCriteria_Method(callData);
+  }
 }
 
 export function min(a: BigDecimal, b: BigDecimal): BigDecimal {

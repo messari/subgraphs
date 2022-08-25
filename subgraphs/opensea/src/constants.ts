@@ -40,6 +40,11 @@ export namespace SaleStrategy {
   export const PRIVATE_SALE = "PRIVATE_SALE";
 }
 
+export namespace Side {
+  export const BUY = "BUY_SIDE";
+  export const SELL = "SELL_SIDE";
+}
+
 // Represents native ETH when used in the paymentToken field
 export const NULL_ADDRESS = Address.zero();
 export const WETH_ADDRESS = Address.fromString(
