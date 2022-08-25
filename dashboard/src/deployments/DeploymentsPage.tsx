@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
 import { useQuery } from "@apollo/client";
 import { decentralizedNetworkSubgraphsQuery } from "../queries/decentralizedNetworkSubgraphsQuery";
+import DefiLlamaComparsionTab from "../interfaces/tabs/DefiLlamaComparisonTab";
 
 const DeploymentsLayout = styled("div")`
   padding: 0;
@@ -119,9 +120,17 @@ function DeploymentsPage() {
   let decentralizedSubgraphTable = null;
   if (Object.keys(decentralizedDeployments)?.length) {
     decentralizedSubgraphTable = Object.keys(decentralizedDeployments).map((key) => {
-      if (!Object.keys(decentralizedDeployments[key]).length) {
+      const finalDeposList: any = {};
+      Object.keys(decentralizedDeployments[key]).forEach((x) => {
+        if (Object.keys(ProtocolsToQuery[key]).find((pro) => pro.includes(x))) {
+          finalDeposList[x] = decentralizedDeployments[key][x];
+        }
+      });
+
+      if (!Object.keys(finalDeposList).length) {
         return null;
       }
+
       return (
         <>
           <Typography
@@ -137,7 +146,7 @@ function DeploymentsPage() {
           <DeploymentsTable
             key={"depTable-" + key}
             clientIndexing={clientIndexing}
-            protocolsOnType={decentralizedDeployments[key]}
+            protocolsOnType={finalDeposList}
             protocolType={key}
             isDecentralizedNetworkTable={true}
           />
@@ -164,6 +173,7 @@ function DeploymentsPage() {
         >
           Load Subgraph
         </SearchInput>
+        <DefiLlamaComparsionTab deploymentJSON={ProtocolsToQuery} />
         {decentralizedSubgraphTable}
         <Typography variant="h4" align="center" sx={{ my: 4 }}>
           Hosted Service Subgraphs

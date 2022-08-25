@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TableEvents } from "../../common/chartComponents/TableEvents";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
 import IssuesDisplay from "../IssuesDisplay";
@@ -7,23 +7,100 @@ import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipb
 import { Chart } from "../../common/chartComponents/Chart";
 import { ComparisonTable } from "../../common/chartComponents/ComparisonTable";
 import { toDate } from "../../utils";
+import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery } from "@apollo/client";
+import { DeploymentsDropDown } from "../../common/utilComponents/DeploymentsDropDown";
+import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 
 interface DefiLlamaComparsionTabProps {
-  data: any;
-  protocolNetwork: string;
-  protocolTimeseriesData: any;
+  deploymentJSON: { [x: string]: any };
 }
 
 // This component is for each individual subgraph
-function DefiLlamaComparsionTab({ data, protocolNetwork, protocolTimeseriesData }: DefiLlamaComparsionTabProps) {
+function DefiLlamaComparsionTab({ deploymentJSON }: DefiLlamaComparsionTabProps) {
+  ChartJS.register(...registerables);
+  ChartJS.register(PointElement);
   const [issuesState, setIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>([]);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = issuesState;
 
+  const [deploymentURL, setDeploymentURL] = useState<string>("");
+  const [defiLlamaSlug, setDefiLlamaSlug] = useState<string>("");
+
   const [defiLlamaData, setDefiLlamaData] = useState<{ [x: string]: any }>({});
+  const [defiLlamaProtocols, setDefiLlamaProtocols] = useState<any[]>([]);
   const [isMonthly, setIsMonthly] = useState(false);
+  const client = useMemo(() => {
+    return new ApolloClient({
+      link: new HttpLink({
+        uri: deploymentURL,
+      }),
+      cache: new InMemoryCache(),
+    });
+  }, [deploymentURL]);
+
+  const deploymentNameToUrlMapping: any = {};
+
+  Object.values(deploymentJSON).forEach((protocolsOnType: { [x: string]: any }) => {
+    Object.entries(protocolsOnType).forEach(([protocolName, deploymentOnNetwork]) => {
+      protocolName = protocolName.toLowerCase();
+      deploymentNameToUrlMapping[protocolName] = {
+        slug: "",
+        defiLlamaNetworks: [],
+        subgraphNetworks: deploymentOnNetwork,
+      };
+    });
+  });
+
+  if (defiLlamaProtocols.length > 0) {
+    defiLlamaProtocols.forEach((protocol) => {
+      const currentName = protocol.name.toLowerCase().split(" ").join("-");
+      if (deploymentNameToUrlMapping[currentName]?.slug === "") {
+        deploymentNameToUrlMapping[currentName].slug = protocol.slug;
+        deploymentNameToUrlMapping[currentName].defiLlamaNetworks = Object.keys(protocol.chainTvls).map((x) =>
+          x.toLowerCase(),
+        );
+      }
+    });
+  }
+
+  const fetchDefiLlamaProtocols = () => {
+    fetch("https://api.llama.fi/protocols", {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (json) {
+        setDefiLlamaProtocols(json);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    fetchDefiLlamaProtocols();
+  }, []);
+
+  const [
+    getFinancialsData,
+    { data: financialsData, loading: financialsLoading, error: financialsError, refetch: financialsRefetch },
+  ] = useLazyQuery(
+    gql`
+      {
+        financialsDailySnapshots {
+          totalValueLockedUSD
+          timestamp
+        }
+      }
+    `,
+    { client },
+  );
 
   const defiLlama = () => {
-    fetch("https://api.llama.fi/protocol/" + data.protocols[0].slug, {
+    fetch("https://api.llama.fi/protocol/" + defiLlamaSlug?.split(" (")[0].split(" ").join("-"), {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -41,18 +118,28 @@ function DefiLlamaComparsionTab({ data, protocolNetwork, protocolTimeseriesData 
   };
 
   useEffect(() => {
-    defiLlama();
-  }, []);
+    if (defiLlamaSlug.length > 0) {
+      setDefiLlamaData({});
+      defiLlama();
+    }
+    if (deploymentURL.length > 0) {
+      getFinancialsData();
+    }
+  }, [defiLlamaSlug, deploymentURL]);
 
   useEffect(() => {
     setIssues(issues);
   }, [issuesState]);
 
   let chart = null;
-  if (Object.keys(defiLlamaData).length > 0 && protocolTimeseriesData?.financialsDailySnapshots) {
+  if (
+    Object.keys(defiLlamaData).length > 0 &&
+    financialsData?.financialsDailySnapshots &&
+    defiLlamaData.name.toLowerCase() === defiLlamaSlug?.split(" (")[0].toLowerCase()
+  ) {
     const dataset: string =
       Object.keys(defiLlamaData.chainTvls).find((chain) => {
-        let networkName = protocolNetwork.toUpperCase();
+        let networkName = defiLlamaSlug?.split(" (")[1]?.split(")")[0]?.toUpperCase();
         if (networkName === "MAINNET") {
           networkName = "ETHEREUM";
         }
@@ -63,7 +150,7 @@ function DefiLlamaComparsionTab({ data, protocolNetwork, protocolTimeseriesData 
       }) || "";
     let compChart = {
       defiLlama: defiLlamaData.chainTvls[dataset].tvl.map((x: any) => ({ value: x.totalLiquidityUSD, date: x.date })),
-      subgraph: protocolTimeseriesData.financialsDailySnapshots
+      subgraph: financialsData.financialsDailySnapshots
         .map((x: any) => ({ value: parseFloat(x.totalValueLockedUSD), date: parseInt(x.timestamp) }))
         .reverse(),
     };
@@ -92,7 +179,7 @@ function DefiLlamaComparsionTab({ data, protocolNetwork, protocolTimeseriesData 
     } else if (compChart.defiLlama.length < compChart.subgraph.length) {
       compChart.subgraph = compChart.subgraph.slice(compChart.subgraph.length - compChart.defiLlama.length);
     }
-    const elementId = "Chart (" + (isMonthly ? "Monthly" : "Daily") + ")";
+    const elementId = `${isMonthly ? "Monthly" : "Daily"} Chart - ${defiLlamaSlug}`;
     chart = (
       <div key={elementId} id={elementId}>
         <Box mt={3} mb={1}>
@@ -102,7 +189,7 @@ function DefiLlamaComparsionTab({ data, protocolNetwork, protocolTimeseriesData 
         </Box>
         <Grid container justifyContent="space-between">
           <Grid key={elementId} item xs={7.5}>
-            <Chart datasetLabel="Chart" dataChart={compChart} />
+            <Chart datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} />
           </Grid>
           <Grid key={elementId + "2"} item xs={4}>
             <ComparisonTable
@@ -120,6 +207,12 @@ function DefiLlamaComparsionTab({ data, protocolNetwork, protocolTimeseriesData 
   return (
     <>
       <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
+      <DeploymentsDropDown
+        setDeploymentURL={(x) => setDeploymentURL(x)}
+        setDefiLlamaSlug={(x) => setDefiLlamaSlug(x)}
+        deploymentURL={deploymentURL}
+        deploymentJSON={deploymentNameToUrlMapping}
+      />
       {chart}
     </>
   );

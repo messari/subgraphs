@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { ApolloClient, ApolloError, gql, HttpLink, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
 
-import { Chart as ChartJS, registerables } from "chart.js";
+import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 import React, { useEffect, useMemo, useState } from "react";
 import { poolOverview, schema } from "../queries/schema";
 import { PoolNames, ProtocolType, SubgraphBaseUrl } from "../constants";
@@ -283,8 +283,6 @@ function ProtocolDashboard() {
     tabNum = "4";
   } else if (tabString.toUpperCase() === "POSITIONS") {
     tabNum = "5";
-  } else if (tabString.toUpperCase() === "DEFILLAMA") {
-    tabNum = "6";
   }
 
   const [tabValue, setTabValue] = useState(tabNum);
@@ -322,8 +320,6 @@ function ProtocolDashboard() {
     } else if (newValue === "5") {
       poolParam = `&poolId=${poolIdFromParam || poolId}`;
       tabName = "positions";
-    } else if (newValue === "6") {
-      tabName = "defiLlama";
     }
     navigate(
       `?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}${deploymentVersionParam}`,
@@ -361,7 +357,7 @@ function ProtocolDashboard() {
   }, [protocolSchemaData, getData, getProtocolTableData, getPendingSubgraph]);
 
   useEffect(() => {
-    if (protocolTableData && (tabValue === "1" || tabValue === "6")) {
+    if (protocolTableData && tabValue === "1") {
       getFinancialsData();
     }
   }, [protocolTableData, getFinancialsData, tabValue]);

@@ -186,14 +186,6 @@ function AllDataTabs({
             />
           </TabPanel>
         )}
-        <TabPanel value="6">
-          {/* DEFI LLAMA COMPARISON TAB */}
-          <DefiLlamaComparsionTab
-            data={data}
-            protocolNetwork={network}
-            protocolTimeseriesData={protocolTimeseriesData}
-          />
-        </TabPanel>
       </TabContext>
     </>
   );
