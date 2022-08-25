@@ -52,7 +52,7 @@ export function handleTokensRegistered(event: TokensRegistered): void {
   }
 
   pool.inputTokens = inputTokens;
-  pool.inputTokenBalances = new Array<BigInt>(inputTokenLength).fill(
+  pool.inputTokenBalances = new Array<BigInt>(inputTokens.length).fill(
     constants.BIGINT_ZERO
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
@@ -78,6 +78,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   if (total.gt(constants.BIGINT_ZERO)) {
     Deposit(
       poolAddress,
+      inputTokens,
       deltas,
       fees,
       provider,
@@ -87,6 +88,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   } else {
     Withdraw(
       poolAddress,
+      inputTokens,
       deltas,
       fees,
       provider,
