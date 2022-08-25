@@ -104,7 +104,7 @@ export function Swap(
   let tokenInStore = getOrCreateToken(tokenIn, block.number);
   let tokenInIndex = pool.inputTokens.indexOf(tokenIn.toHexString());
 
-  const amountInUSD = amountIn
+  let amountInUSD = amountIn
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
     )
@@ -113,16 +113,25 @@ export function Swap(
   let tokenOutStore = getOrCreateToken(tokenOut, block.number);
   let tokenOutIndex = pool.inputTokens.indexOf(tokenOut.toHexString());
 
-  const amountOutUSD = amountOut
+  let amountOutUSD = amountOut
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal()
     )
     .times(tokenOutStore.lastPriceUSD!);
 
-  inputTokenBalances[tokenInIndex] =
-    inputTokenBalances[tokenInIndex].plus(amountIn);
-  inputTokenBalances[tokenOutIndex] =
-    inputTokenBalances[tokenOutIndex].minus(amountOut);
+  if (tokenInIndex != -1) {
+    inputTokenBalances[tokenInIndex] =
+      inputTokenBalances[tokenInIndex].plus(amountIn);
+  } else {
+    amountInUSD = constants.BIGDECIMAL_ZERO;
+  }
+
+  if (tokenOutIndex != -1) {
+    inputTokenBalances[tokenOutIndex] =
+      inputTokenBalances[tokenOutIndex].minus(amountOut);
+  } else {
+    amountOutUSD = constants.BIGDECIMAL_ZERO;
+  }
 
   const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
 
@@ -155,6 +164,7 @@ export function Swap(
     amountInUSD,
     block
   );
+
   updateTokenVolumeAndBalance(
     poolAddress,
     tokenOut.toHexString(),
