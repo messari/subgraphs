@@ -43,8 +43,7 @@ export function createDepositTransaction(
     depositTransaction.pool = liquidityPool.id;
     depositTransaction.protocol = getOrCreateDexAmmProtocol().id;
 
-    depositTransaction.to = liquidityPool.id;
-    depositTransaction.from = provider.toHexString();
+    depositTransaction.account = provider.toHexString();
 
     depositTransaction.hash = transaction.hash.toHexString();
     depositTransaction.logIndex = transaction.index.toI32();
@@ -73,7 +72,6 @@ export function UpdateMetricsAfterDeposit(block: ethereum.Block): void {
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
   const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
 
-  metricsDailySnapshot.dailyDepositCount += 1;
   metricsHourlySnapshot.hourlyDepositCount += 1;
 
   metricsDailySnapshot.save();

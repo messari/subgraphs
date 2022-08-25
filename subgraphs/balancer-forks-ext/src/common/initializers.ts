@@ -115,8 +115,12 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
     protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    protocol.cumulativeUniqueUsers = 0;
-    protocol.totalPoolCount = 0;
+    protocol.cumulativeUniqueUsers = constants.INT_ZERO;
+    protocol.cumulativeUniqueLPs = constants.INT_ZERO;
+    protocol.cumulativeUniqueTraders = constants.INT_ZERO;
+    protocol.openPositionCount = constants.INT_ZERO;
+    protocol.cumulativePositionCount = constants.INT_ZERO;
+    protocol.totalPoolCount = constants.INT_ZERO;
     protocol._poolIds = [];
 
     protocol.save();
@@ -208,9 +212,6 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
-    usageMetrics.dailyDepositCount = 0;
-    usageMetrics.dailyWithdrawCount = 0;
-    usageMetrics.dailySwapCount = 0;
 
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;
@@ -408,6 +409,10 @@ export function getOrCreateLiquidityPool(
 
     pool.fees = utils.getPoolFees(poolAddress).stringIds();
     pool.isSingleSided = false;
+
+    pool.positionCount = constants.INT_ZERO;
+    pool.openPositionCount = constants.INT_ZERO;
+    pool.closedPositionCount = constants.INT_ZERO;
 
     pool.createdBlockNumber = block.number;
     pool.createdTimestamp = block.timestamp;

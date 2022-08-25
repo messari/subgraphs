@@ -43,8 +43,7 @@ export function createWithdrawTransaction(
     withdrawTransaction.pool = pool.id;
     withdrawTransaction.protocol = constants.VAULT_ADDRESS.toHexString();
 
-    withdrawTransaction.to = transaction.to!.toHexString();
-    withdrawTransaction.from = provider.toHexString();
+    withdrawTransaction.account = provider.toHexString();
 
     withdrawTransaction.hash = transaction.hash.toHexString();
     withdrawTransaction.logIndex = transaction.index.toI32();
@@ -73,7 +72,6 @@ export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
   const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
 
-  metricsDailySnapshot.dailyWithdrawCount += 1;
   metricsHourlySnapshot.hourlyWithdrawCount += 1;
 
   metricsDailySnapshot.save();

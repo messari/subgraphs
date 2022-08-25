@@ -49,8 +49,7 @@ export function createSwapTransaction(
     swapTransaction.pool = liquidityPool.id;
     swapTransaction.protocol = getOrCreateDexAmmProtocol().id;
 
-    swapTransaction.to = liquidityPool.id;
-    swapTransaction.from = transaction.from.toHexString();
+    swapTransaction.account = transaction.from.toHexString();
 
     swapTransaction.hash = transaction.hash.toHexString();
     swapTransaction.logIndex = transaction.index.toI32();
@@ -79,7 +78,6 @@ export function UpdateMetricsAfterSwap(block: ethereum.Block): void {
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
   const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
 
-  metricsDailySnapshot.dailySwapCount += 1;
   metricsHourlySnapshot.hourlySwapCount += 1;
 
   metricsDailySnapshot.save();

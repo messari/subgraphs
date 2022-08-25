@@ -1,8 +1,8 @@
 {
-  "name": "balancer-v2-subgraph",
+  "name": "balancer-v2-subgraph-ext",
   "license": "MIT",
   "scripts": {
-    "format": "npx prettier --write ../balancer-forks",
+    "format": "npx prettier --write ../balancer-forks-ext",
     "codegen": "graph codegen",
     "build": "graph build",
     "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
