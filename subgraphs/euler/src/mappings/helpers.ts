@@ -366,10 +366,10 @@ export function syncWithEulerGeneralView(
 
         market.outputTokenPriceUSD = eTokenPriceUSD;
         market.outputTokenSupply = eTokenTotalSupply;
-        market.exchangeRate = eTokenTotalSupply
+        market.exchangeRate = eulerViewMarket.totalBalances
           .toBigDecimal()
-          .div(eTokenPrecision)
-          .div(eulerViewMarket.totalBalances.toBigDecimal().div(tokenPrecision));
+          .div(tokenPrecision)
+          .div(eTokenTotalSupply.toBigDecimal().div(eTokenPrecision));
       }
     }
 

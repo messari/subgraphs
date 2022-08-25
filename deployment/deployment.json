@@ -455,7 +455,7 @@
       "euler": {
         "ethereum": {
           "template": "euler.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
