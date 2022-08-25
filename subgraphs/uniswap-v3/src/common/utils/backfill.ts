@@ -6,6 +6,7 @@ import {
   _LiquidityPoolAmount,
 } from "../../../generated/schema";
 import {
+  BIGDECIMAL_FIFTY,
   BIGDECIMAL_ONE,
   BIGDECIMAL_TWO,
   BIGDECIMAL_ZERO,
@@ -53,37 +54,28 @@ export function populateEmptyPools(event: ethereum.Event): void {
     let poolAmounts = new _LiquidityPoolAmount(poolAddress);
 
     pool.protocol = protocol.id;
+    pool.name =
+      protocol.name +
+      " " +
+      token0.name +
+      "/" +
+      token1.name +
+      " " +
+      getTradingFee(pool.id).toString() +
+      "%";
+    pool.symbol = token0.name + "/" + token1.name;
     pool.inputTokens = [token0.id, token1.id];
-    pool.outputToken = LPtoken.id;
-    pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
-    pool.inputTokenWeights = [
-      BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
-      BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
-    ];
-    pool.outputTokenSupply = BIGINT_ZERO;
-    pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    pool.rewardTokens = [NetworkConfigs.getRewardToken()];
-    pool.stakedOutputTokenAmount = BIGINT_ZERO;
-    pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-    pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     pool.fees = createPoolFees(poolAddress, poolContract.fee());
     pool.isSingleSided = false;
     pool.createdTimestamp = event.block.timestamp;
     pool.createdBlockNumber = event.block.number;
-    pool.symbol = LPtoken.symbol;
-    pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
     pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-
-    pool.name =
-      protocol.name +
-      " " +
-      LPtoken.symbol +
-      " " +
-      getTradingFee(pool.id).toString() +
-      "%";
+    pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+    pool.inputTokenWeights = [BIGDECIMAL_FIFTY, BIGDECIMAL_FIFTY];
 
     poolAmounts.inputTokens = [token0.id, token1.id];
     poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];

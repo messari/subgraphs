@@ -1,4 +1,4 @@
-import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   LiquidityPool,
   Token,
@@ -15,7 +15,6 @@ import {
   getLiquidityPoolAmounts,
   getOrCreateDex,
   getOrCreateToken,
-  getTradingFee,
 } from "./getters";
 import { NetworkConfigs } from "../../configurations/configure";
 import {
@@ -60,15 +59,6 @@ export function createLiquidityPool(
   let poolAmounts = new _LiquidityPoolAmount(poolAddress);
 
   pool.protocol = protocol.id;
-  pool.inputTokens = [token0.id, token1.id];
-  pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-  pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.inputTokenWeights = [BIGDECIMAL_FIFTY, BIGDECIMAL_FIFTY];
-  pool.fees = createPoolFees(poolAddress, fees);
-  pool.isSingleSided = false;
-  pool.createdTimestamp = event.block.timestamp;
-  pool.createdBlockNumber = event.block.number;
   pool.name =
     protocol.name +
     " " +
@@ -76,12 +66,21 @@ export function createLiquidityPool(
     "/" +
     token1.name +
     " " +
-    getTradingFee(pool.id).toString() +
+    convertFeeToPercent(fees).toString() +
     "%";
   pool.symbol = token0.name + "/" + token1.name;
-  pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.inputTokens = [token0.id, token1.id];
+  pool.fees = createPoolFees(poolAddress, fees);
+  pool.isSingleSided = false;
+  pool.createdTimestamp = event.block.timestamp;
+  pool.createdBlockNumber = event.block.number;
+  pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+  pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+  pool.inputTokenWeights = [BIGDECIMAL_FIFTY, BIGDECIMAL_FIFTY];
 
   poolAmounts.inputTokens = [token0.id, token1.id];
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
@@ -178,14 +177,17 @@ export function createDeposit(
   );
 
   // Update pool balances adjusted for decimals and not adjusted
-  pool.inputTokenBalances = [
+  let poolInputTokenBalances: BigInt[] = [
     pool.inputTokenBalances[0].plus(amount0),
     pool.inputTokenBalances[1].plus(amount1),
   ];
-  poolAmounts.inputTokenBalances = [
+  pool.inputTokenBalances = poolInputTokenBalances;
+
+  let poolAmountsInputTokenBalances: BigDecimal[] = [
     poolAmounts.inputTokenBalances[0].plus(amount0Converted),
     poolAmounts.inputTokenBalances[1].plus(amount1Converted),
   ];
+  poolAmounts.inputTokenBalances = poolAmountsInputTokenBalances;
 
   // Get the total value locked in USD
   pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
@@ -258,14 +260,17 @@ export function createWithdraw(
   );
 
   // Update pool balances adjusted for decimals and not adjusted
-  pool.inputTokenBalances = [
+  let poolInputTokenBalances: BigInt[] = [
     pool.inputTokenBalances[0].minus(amount0),
     pool.inputTokenBalances[1].minus(amount1),
   ];
-  poolAmounts.inputTokenBalances = [
+  pool.inputTokenBalances = poolInputTokenBalances;
+
+  let poolAmountsInputTokenBalances: BigDecimal[] = [
     poolAmounts.inputTokenBalances[0].minus(amount0Converted),
     poolAmounts.inputTokenBalances[1].minus(amount1Converted),
   ];
+  poolAmounts.inputTokenBalances = poolAmountsInputTokenBalances;
 
   // Get the total value locked in USD
   pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
@@ -344,14 +349,17 @@ export function createSwapHandleVolumeAndFees(
   let amount1USD = amount1Abs.times(token1.lastPriceUSD!);
 
   // Update the pool with the new active liquidity, price, and tick.
-  pool.inputTokenBalances = [
+  let poolInputTokenBalances: BigInt[] = [
     pool.inputTokenBalances[0].plus(amount0),
     pool.inputTokenBalances[1].plus(amount1),
   ];
-  poolAmounts.inputTokenBalances = [
+  pool.inputTokenBalances = poolInputTokenBalances;
+
+  let poolAmountsInputTokenBalances: BigDecimal[] = [
     poolAmounts.inputTokenBalances[0].plus(amount0Converted),
     poolAmounts.inputTokenBalances[1].plus(amount1Converted),
   ];
+  poolAmounts.inputTokenBalances = poolAmountsInputTokenBalances;
 
   // update USD pricing
   let nativeToken = updateNativeTokenPriceInUSD();
