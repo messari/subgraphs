@@ -12,6 +12,7 @@ import { getOrCreateTrove } from "../entities/trove";
 import { getCurrentETHPrice } from "../entities/token";
 import { addProtocolSideRevenue } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
+import { updateUserPositionBalances } from "../entities/position";
 
 /**
  * Emitted when LUSD is borrowed from trove and a dynamic fee (0.5-5%) is charged (added to debt)
@@ -49,7 +50,13 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     const withdrawAmountUSD = bigIntToBigDecimal(withdrawAmountETH).times(
       getCurrentETHPrice()
     );
-    createWithdraw(event, withdrawAmountETH, withdrawAmountUSD, borrower);
+    createWithdraw(
+      event,
+      withdrawAmountETH,
+      withdrawAmountUSD,
+      borrower,
+      borrower
+    );
   }
 
   if (newDebt > trove.debt) {
@@ -59,10 +66,12 @@ export function handleTroveUpdated(event: TroveUpdated): void {
   } else if (newDebt < trove.debt) {
     const repayAmountLUSD = trove.debt.minus(newDebt);
     const repayAmountUSD = bigIntToBigDecimal(repayAmountLUSD);
-    createRepay(event, repayAmountLUSD, repayAmountUSD, borrower);
+    createRepay(event, repayAmountLUSD, repayAmountUSD, borrower, borrower);
   }
 
   trove.collateral = newCollateral;
   trove.debt = newDebt;
   trove.save();
+
+  updateUserPositionBalances(event, trove);
 }

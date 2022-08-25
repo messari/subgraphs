@@ -10,7 +10,6 @@ import {
   LiquidityPool as LiquidityPoolStore,
 } from "../../generated/schema";
 import {
-  getOrCreateToken,
   getOrCreateLiquidityPool,
   getOrCreateDexAmmProtocol,
   getOrCreateUsageMetricsDailySnapshot,
@@ -83,8 +82,7 @@ export function UpdateMetricsAfterDeposit(block: ethereum.Block): void {
 }
 
 export function getAddLiquidityFeesUSD(
-  poolAddress: Address,
-  inputTokens: Address[],
+  inputTokens: string[],
   fees: BigInt[],
   block: ethereum.Block
 ): BigDecimal {
@@ -92,9 +90,11 @@ export function getAddLiquidityFeesUSD(
 
   for (let idx = 0; idx < inputTokens.length; idx++) {
     if (fees.at(idx) == constants.BIGINT_ZERO) continue;
-    if (inputTokens.at(idx).equals(poolAddress)) continue;
 
-    let inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
+    let inputToken = utils.getOrCreateTokenFromString(
+      inputTokens.at(idx),
+      block.number
+    );
 
     let inputTokenFee = fees
       .at(idx)
@@ -111,7 +111,6 @@ export function getAddLiquidityFeesUSD(
 
 export function Deposit(
   poolAddress: Address,
-  inputTokens: Address[],
   depositedCoinAmounts: BigInt[],
   fees: BigInt[],
   provider: Address,
@@ -125,9 +124,10 @@ export function Deposit(
   let depositAmountUSD = constants.BIGDECIMAL_ZERO;
 
   for (let idx = 0; idx < depositedCoinAmounts.length; idx++) {
-    if (inputTokens.at(idx).equals(poolAddress)) continue;
-
-    let inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
+    let inputToken = utils.getOrCreateTokenFromString(
+      pool.inputTokens[idx],
+      block.number
+    );
 
     let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
     inputTokenBalances[inputTokenIndex] = inputTokenBalances[
@@ -145,8 +145,9 @@ export function Deposit(
     );
   }
 
-  let totalSupplyAfterDeposit = utils.getOutputTokenSupply(
-    poolAddress,
+  let poolContract = WeightedPoolContract.bind(poolAddress);
+  let totalSupplyAfterDeposit = utils.readValue<BigInt>(
+    poolContract.try_totalSupply(),
     pool.outputTokenSupply!
   );
   let outputTokenMintedAmount = totalSupplyAfterDeposit.minus(
@@ -159,12 +160,7 @@ export function Deposit(
     pool.inputTokenBalances,
     block
   );
-  let inputTokenWeights =
-    utils.getPoolTokenWeightsForDynamicWeightPools(poolAddress);
-
-  if (inputTokenWeights.length > 0) {
-    pool.inputTokenWeights = inputTokenWeights;
-  }
+  pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
   pool.outputTokenSupply = totalSupplyAfterDeposit;
   pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
   pool.save();
@@ -180,8 +176,7 @@ export function Deposit(
   );
 
   let protocolSideRevenueUSD = getAddLiquidityFeesUSD(
-    poolAddress,
-    inputTokens,
+    pool.inputTokens,
     fees,
     block
   );

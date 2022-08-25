@@ -7,8 +7,8 @@ import {
   getPoolFromGauge,
   updateControllerRewards,
   updateFactoryRewards,
-  updateStakedOutputTokenAmount,
 } from "../modules/Rewards";
+import * as utils from "../common/utils";
 import {
   Deposit,
   Withdraw,
@@ -22,7 +22,6 @@ export function handleDeposit(event: Deposit): void {
 
   if (!poolAddress) return;
 
-  updateStakedOutputTokenAmount(poolAddress, gaugeAddress, event.block);
   updateControllerRewards(poolAddress, gaugeAddress, event.block);
   updateFactoryRewards(poolAddress, gaugeAddress, event.block);
 
@@ -38,7 +37,6 @@ export function handleWithdraw(event: Withdraw): void {
 
   if (!poolAddress) return;
 
-  updateStakedOutputTokenAmount(poolAddress, gaugeAddress, event.block);
   updateControllerRewards(poolAddress, gaugeAddress, event.block);
   updateFactoryRewards(poolAddress, gaugeAddress, event.block);
 
@@ -53,7 +51,6 @@ export function handleUpdateLiquidityLimit(event: UpdateLiquidityLimit): void {
 
   if (!poolAddress) return;
 
-  updateStakedOutputTokenAmount(poolAddress, gaugeAddress, event.block);
   updateControllerRewards(poolAddress, gaugeAddress, event.block);
   updateFactoryRewards(poolAddress, gaugeAddress, event.block);
 }

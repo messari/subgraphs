@@ -1,20 +1,21 @@
+// import { log } from "@graphprotocol/graph-ts";
 import { log } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   Withdraw,
-  LogSetPool,
-  LogPoolAddition,
   EmergencyWithdraw,
+  LogPoolAddition,
+  LogSetPool,
   UpdateEmissionRate,
 } from "../../generated/MasterChefV2/MasterChefV2";
+import { _MasterChefStakingPool } from "../../generated/schema";
+import { BIGINT_NEG_ONE, MasterChef } from "../../src/common/constants";
+import { updateMasterChef } from "../modules/masterChefV2Rewards";
 import {
-  getOrCreateMasterChef,
   createMasterChefStakingPool,
+  getOrCreateMasterChef,
   updateMasterChefTotalAllocation,
 } from "../../src/common/masterchef/helpers";
-import { _MasterChefStakingPool } from "../../generated/schema";
-import { updateMasterChef } from "../modules/masterChefV2Rewards";
-import { BIGINT_NEG_ONE, MasterChef } from "../../src/common/constants";
 
 // A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {

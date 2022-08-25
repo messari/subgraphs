@@ -4,13 +4,13 @@ import {
   getOrCreateToken,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { readValue } from "../common/utils";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
 import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { Gauge as LiquidityGaugeContract } from "../../generated/templates/gauge/Gauge";
 import { GaugeController as GaugeControllereContract } from "../../generated/GaugeController/GaugeController";
+import { readValue } from "../common/utils";
 
 export function getRewardsData(gaugeAddress: Address): RewardsInfoType {
   let rewardRates: BigInt[] = [];
@@ -61,11 +61,7 @@ export function updateControllerRewards(
       gaugeControllerContract.try_gauge_relative_weight(gaugeAddress),
       constants.BIGINT_ZERO
     )
-    .divDecimal(
-      constants.BIGINT_TEN.pow(
-        constants.DEFAULT_DECIMALS.toI32() as u8
-      ).toBigDecimal()
-    );
+    .toBigDecimal();
 
   // This essentially checks if the gauge is a GaugeController gauge instead of a childChainLiquidityGaugeFactory contract.
   if (gaugeRelativeWeight.equals(constants.BIGDECIMAL_ZERO)) {
@@ -92,7 +88,7 @@ export function updateControllerRewards(
   );
 }
 
-export function updateStakedOutputTokenAmount(
+export function updateFactoryRewards(
   poolAddress: Address,
   gaugeAddress: Address,
   block: ethereum.Block
@@ -101,20 +97,26 @@ export function updateStakedOutputTokenAmount(
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
-  let gaugeWorkingSupply = utils.readValue<BigInt>(
-    gaugeContract.try_working_supply(),
-    constants.BIGINT_ZERO
+  let gaugeWorkingSupply = utils
+    .readValue<BigInt>(
+      gaugeContract.try_working_supply(),
+      constants.BIGINT_ZERO
+    )
+    .toBigDecimal();
+
+  // https://dev.balancer.fi/resources/vebal-and-gauges/estimating-gauge-incentive-aprs/apr-calculation
+  pool.stakedOutputTokenAmount = BigInt.fromString(
+    constants.BIGINT_ONE.divDecimal(
+      constants.BIGDECIMAL_POINT_FOUR.div(
+        gaugeWorkingSupply.plus(constants.BIGDECIMAL_POINT_FOUR)
+      )
+    )
+      .truncate(0)
+      .toString()
   );
-
-  pool.stakedOutputTokenAmount = gaugeWorkingSupply;
   pool.save();
-}
+  //////////////////////////////////////////////////////////////////
 
-export function updateFactoryRewards(
-  poolAddress: Address,
-  gaugeAddress: Address,
-  block: ethereum.Block
-): void {
   // Get data for all reward tokens for this gauge
   let rewardsInfo = getRewardsData(gaugeAddress);
 
@@ -153,7 +155,7 @@ export function updateRewardTokenEmissions(
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   const rewardToken = getOrCreateRewardToken(
     rewardTokenAddress,
-    constants.RewardTokenType.DEPOSIT,
+    RewardTokenType.DEPOSIT,
     block
   );
 

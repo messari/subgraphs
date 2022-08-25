@@ -6,9 +6,9 @@ dataSources:
     name: LendingPoolAddressesProvider
     network: {{ network }}
     source:
-      address: "{{ factoryAddress }}"
+      address: "{{ factory.address }}"
       abi: LendingPoolAddressesProvider
-      startBlock: {{ startBlock }}
+      startBlock: {{ factory.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -20,21 +20,16 @@ dataSources:
         - name: LendingPoolAddressesProvider
           file: ./abis/LendingPoolAddressesProvider.json
       eventHandlers:
-        - event: ProxyCreated(bytes32,indexed address)
-          handler: handleProxyCreated
         - event: PriceOracleUpdated(indexed address)
           handler: handlePriceOracleUpdated
-        - event: LendingPoolUpdated(indexed address)
-          handler: handleLendingPoolUpdated
-        - event: LendingPoolConfiguratorUpdated(indexed address)
-          handler: handleLendingPoolConfiguratorUpdated
       file: ./protocols/geist-finance/src/mapping.ts
-templates:
   - kind: ethereum/contract
     name: LendingPool
     network: {{ network }}
     source:
+      address: "{{ lendingPool.address }}"
       abi: LendingPool
+      startBlock: {{ lendingPool.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -95,7 +90,9 @@ templates:
     name: LendingPoolConfigurator
     network: {{ network }}
     source:
+      address: "{{ lendingPoolConfigurator.address }}"
       abi: LendingPoolConfigurator
+      startBlock: {{ lendingPoolConfigurator.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

@@ -20,11 +20,11 @@ import {
 } from "../../generated/schema";
 import * as utils from "./utils";
 import * as constants from "./constants";
-import { getRewardsPerDay } from "./rewards";
 import { getUsdPricePerToken } from "../prices";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
+import { getRewardsPerDay } from "./rewards";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -286,7 +286,6 @@ export function getOrCreateLiquidityPoolDailySnapshots(
 
     poolSnapshots.rewardTokenEmissionsAmount = null;
     poolSnapshots.rewardTokenEmissionsUSD = null;
-    poolSnapshots.stakedOutputTokenAmount = null;
 
     poolSnapshots.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -343,7 +342,6 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
 
     poolSnapshots.rewardTokenEmissionsAmount = null;
     poolSnapshots.rewardTokenEmissionsUSD = null;
-    poolSnapshots.stakedOutputTokenAmount = null;
 
     poolSnapshots.hourlySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;

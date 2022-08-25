@@ -18,6 +18,12 @@ import { Vault as VaultContract } from "../../generated/Vault/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
 import { FeesCollector as FeesCollectorContract } from "../../generated/templates/WeightedPool/FeesCollector";
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_TEN,
+  INT_ONE,
+  INT_ZERO,
+} from "../common/constants";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -70,15 +76,34 @@ export function getOutputTokenPriceUSD(
   block: ethereum.Block
 ): BigDecimal {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
-
-  if (pool.outputTokenSupply!.equals(constants.BIGINT_ZERO))
-    return constants.BIGDECIMAL_ZERO;
+  const poolContract = WeightedPoolContract.bind(poolAddress);
 
   let outputToken = getOrCreateToken(poolAddress, block.number);
-
-  let outputTokenPriceUSD = pool.totalValueLockedUSD.div(
-    pool.outputTokenSupply!.toBigDecimal()
+  let virtualPrice = readValue<BigInt>(
+    poolContract.try_getRate(),
+    constants.BIGINT_ZERO
   );
+
+  let assetPriceUSD = constants.BIGDECIMAL_ZERO;
+  for (let idx = 0; idx < pool.inputTokens.length; ++idx) {
+    let token = getOrCreateTokenFromString(
+      pool.inputTokens.at(idx),
+      block.number
+    );
+
+    if (token.lastPriceUSD!.notEqual(constants.BIGDECIMAL_ZERO)) {
+      assetPriceUSD = token.lastPriceUSD!;
+      break;
+    }
+  }
+
+  let outputTokenPriceUSD = virtualPrice
+    .divDecimal(
+      constants.BIGINT_TEN.pow(
+        constants.DEFAULT_DECIMALS.toI32() as u8
+      ).toBigDecimal()
+    )
+    .times(assetPriceUSD);
 
   outputToken.lastPriceUSD = outputTokenPriceUSD;
   outputToken.save();
@@ -97,29 +122,7 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   );
 }
 
-export function getPoolTokenWeightsForDynamicWeightPools(
-  poolAddress: Address
-): BigDecimal[] {
-  const poolContract = WeightedPoolContract.bind(poolAddress);
-
-  let scales = readValue<BigInt[]>(poolContract.try_getScalingFactors(), []);
-  let totalScale = scales
-    .reduce<BigInt>((sum, current) => sum.plus(current), constants.BIGINT_ZERO)
-    .toBigDecimal();
-
-  let inputTokenWeights: BigDecimal[] = [];
-  for (let idx = 0; idx < scales.length; idx++) {
-    inputTokenWeights.push(
-      scales.at(idx).divDecimal(totalScale).times(constants.BIGDECIMAL_HUNDRED)
-    );
-  }
-
-  return inputTokenWeights;
-}
-
-export function getPoolTokenWeightsForNormalizedPools(
-  poolAddress: Address
-): BigDecimal[] {
+export function getPoolTokenWeights(poolAddress: Address): BigDecimal[] {
   const poolContract = WeightedPoolContract.bind(poolAddress);
 
   let weights = readValue<BigInt[]>(
@@ -140,15 +143,6 @@ export function getPoolTokenWeightsForNormalizedPools(
         .times(constants.BIGDECIMAL_HUNDRED)
     );
   }
-
-  return inputTokenWeights;
-}
-
-export function getPoolTokenWeights(poolAddress: Address): BigDecimal[] {
-  let inputTokenWeights = getPoolTokenWeightsForNormalizedPools(poolAddress);
-  if (inputTokenWeights.length > 0) return inputTokenWeights;
-
-  inputTokenWeights = getPoolTokenWeightsForDynamicWeightPools(poolAddress);
 
   return inputTokenWeights;
 }
@@ -174,31 +168,6 @@ export function getPoolTVL(
   }
 
   return totalValueLockedUSD;
-}
-
-export function getOutputTokenSupply(
-  poolAddress: Address,
-  oldSupply: BigInt
-): BigInt {
-  let poolContract = WeightedPoolContract.bind(poolAddress);
-
-  let totalSupply = readValue<BigInt>(
-    poolContract.try_totalSupply(),
-    oldSupply
-  );
-
-  if (poolAddress.equals(constants.AAVE_BOOSTED_POOL_ADDRESS)) {
-    // Exception: Aave Boosted Pool
-    // since this pool pre-mints all BPT, `totalSupply` * remains constant,
-    // whereas`getVirtualSupply` increases as users join the pool and decreases as they exit it
-
-    totalSupply = readValue<BigInt>(
-      poolContract.try_getVirtualSupply(),
-      oldSupply
-    );
-  }
-
-  return totalSupply;
 }
 
 export function getPoolFees(poolAddress: Address): PoolFeesType {
@@ -287,13 +256,9 @@ export function updateProtocolAfterNewLiquidityPool(
 
 // convert decimals
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
-  let bd = constants.BIGDECIMAL_ONE;
-  for (
-    let i = constants.INT_ZERO;
-    i < (decimals as i32);
-    i = i + constants.INT_ONE
-  ) {
-    bd = bd.times(constants.BIGDECIMAL_TEN);
+  let bd = BIGDECIMAL_ONE;
+  for (let i = INT_ZERO; i < (decimals as i32); i = i + INT_ONE) {
+    bd = bd.times(BIGDECIMAL_TEN);
   }
   return bd;
 }
@@ -303,7 +268,7 @@ export function convertTokenToDecimal(
   tokenAmount: BigInt,
   exchangeDecimals: i32
 ): BigDecimal {
-  if (exchangeDecimals == constants.INT_ZERO) {
+  if (exchangeDecimals == INT_ZERO) {
     return tokenAmount.toBigDecimal();
   }
 

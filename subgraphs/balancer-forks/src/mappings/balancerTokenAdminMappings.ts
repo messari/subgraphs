@@ -1,8 +1,8 @@
-import * as constants from "../common/constants";
-import { getRewardsPerDay } from "../common/rewards";
 import { BigDecimal } from "@graphprotocol/graph-ts";
-import { getOrCreateRewardToken } from "../common/initializers";
 import { MiningParametersUpdated } from "../../generated/BalancerTokenAdmin/BalancerTokenAdmin";
+import * as constants from "../common/constants";
+import { getOrCreateRewardToken } from "../common/initializers";
+import { getRewardsPerDay } from "../common/rewards";
 
 export function handleMiningParametersUpdated(
   event: MiningParametersUpdated
