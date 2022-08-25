@@ -353,7 +353,11 @@ export function _handleReserveDataUpdated(
   }
 
   // broken if both revert
-  if ((trySBorrowBalance != null && trySBorrowBalance.reverted) && tryVBorrowBalance.reverted) {
+  if (
+    trySBorrowBalance != null &&
+    trySBorrowBalance.reverted &&
+    tryVBorrowBalance.reverted
+  ) {
     log.warning("[ReserveDataUpdated] No borrow balance found", []);
     return;
   }
@@ -447,7 +451,7 @@ export function _handleReserveDataUpdated(
       .toBigDecimal()
       .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
-  
+
   if (market.sToken) {
     // geist does not have stable borrow rates
     let sBorrowRate = createInterestRate(
@@ -460,9 +464,9 @@ export function _handleReserveDataUpdated(
     );
     market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
   } else {
-    market.rates = [depositRate.id, vBorrowRate.id]
+    market.rates = [depositRate.id, vBorrowRate.id];
   }
-  
+
   market.save();
 
   // update protocol TVL / BorrowUSD / SupplyUSD
