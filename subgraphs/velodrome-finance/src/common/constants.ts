@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////
 ///// Versions /////
@@ -104,6 +104,11 @@ export namespace UsageType {
   export const SWAP = "SWAP";
 }
 
+export namespace TransferType {
+  export const MINT = "MINT";
+  export const BURN = "BURN";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
@@ -166,13 +171,10 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 export const ETH_SYMBOL = "ETH"
 export const ETH_NAME = "Ether"
 
+export const USDC_ADDRESS = "0x7f5c764cbc14f9669b88837ca1490cca17c31607"
+
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
 
 export const FACTORY_ADDRESS = "0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746";
-export const TRADING_FEE = BigDecimal.fromString("3");
-export const PROTOCOL_FEE_TO_ON = BigDecimal.fromString("0.5");
-export const LP_FEE_TO_ON = BigDecimal.fromString("2.5");
-export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0.0");
-export const LP_FEE_TO_OFF = BigDecimal.fromString("3");

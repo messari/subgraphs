@@ -28,8 +28,40 @@ dataSources:
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,bool,address,uint256)
           handler: handlePairCreated
-      file: ./src/mappings/handlers.ts
+      file: ./src/mappings/pairFactory.ts
   {{/factory}}
+  {{#voter}}
+  - kind: ethereum
+    name: Voter
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: Voter
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - YieldAggregator
+      abis:
+        - name: Voter
+          file: ./abis/Voter.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: GaugeCreated(indexed address,address,address,indexed address,indexed address)
+          handler: handleGaugeCreated
+        - event: GaugeKilled(indexed address)
+          handler: handleGaugeKilled
+        - event: GaugeRevived(indexed address)
+          handler: handleGaugeRevived
+      file: ./src/mappings/rewards.ts
+  {{/voter}}
 templates:
   - name: Pair
     kind: ethereum/contract
@@ -40,10 +72,10 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/handlers.ts
+      file: ./src/mappings/pair.ts
       entities:
         - YieldAggregator
-        - Vault
+        - Pool
       abis:
         - name: Pair
           file: ./abis/Pair.json
@@ -53,41 +85,6 @@ templates:
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # ERC20
-        - name: _ERC20
-          file: ./abis/Prices/ERC20.json
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: Fees(indexed address,uint256,uint256)
           handler: handleFees
@@ -95,3 +92,5 @@ templates:
           handler: handleMint
         - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer

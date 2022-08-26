@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_ONE, BIGINT_TWO, BIGINT_ZERO } from "../constants";
+import { BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_TWO, BIGINT_ZERO, INT_ZERO } from "../constants";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
@@ -20,6 +20,18 @@ export function exponentToBigDecimal(exp: i32): BigDecimal {
     bd = bd.times(ten);
   }
   return bd;
+}
+
+// convert emitted values to tokens count
+export function applyDecimals(
+  tokenAmount: BigInt,
+  decimals: i32
+): BigDecimal {
+  if (decimals == INT_ZERO) {
+    return tokenAmount.toBigDecimal();
+  }
+
+  return tokenAmount.toBigDecimal().div(exponentToBigDecimal(decimals));
 }
 
 // a fast approximation of (1 + rate)^exponent
@@ -99,4 +111,12 @@ export function round(numberToRound: BigDecimal): BigDecimal {
   let roundedNumber: number =
     Math.ceil((parsedNumber + Number.EPSILON) * 100) / 100;
   return BigDecimal.fromString(roundedNumber.toString());
+}
+
+export function safeDiv(numerator: BigDecimal, denominator: BigDecimal): BigDecimal {
+  let result = BIGDECIMAL_ZERO
+  if (denominator != BIGDECIMAL_ZERO) {
+    result = numerator.div(denominator)
+  }
+  return result
 }
