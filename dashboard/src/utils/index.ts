@@ -91,7 +91,6 @@ export const toPercent = (cur: number, total: number): number => parseFloat(((cu
 
 export const formatIntToFixed2 = (val: number): string => {
   let returnStr = parseFloat(val.toFixed(2)).toLocaleString();
-  console.log("ret", returnStr);
   if (returnStr.split(".")[1]?.length === 1) {
     returnStr += "0";
   } else if (!returnStr.split(".")[1]?.length) {

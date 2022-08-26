@@ -69,6 +69,7 @@ Below the table, timeseries data is divided into their own sections. On the Pool
 - TVL on pool is less than 1000 or above 1000000000000
 - Difference between elements in input tokens array vs fields recording timeseries values related to tokens
 - Field on pool level has detected a negative value at some point (not applied to array values in timeseries)
+- inputTokenWeights do not add up to 1.00 (with .01 tolerance)
 
 ### Events Tab
 
