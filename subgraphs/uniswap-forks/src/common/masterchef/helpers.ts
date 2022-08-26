@@ -44,6 +44,7 @@ export function getOrCreateMasterChef(
 
   if (!masterChef) {
     masterChef = new _MasterChef(masterChefType);
+    masterChef.address = event.address.toHexString();
     masterChef.totalAllocPoint = BIGINT_ZERO;
     masterChef.rewardTokenInterval = NetworkConfigs.getRewardIntervalType();
     masterChef.rewardTokenRate = NetworkConfigs.getRewardTokenRate();

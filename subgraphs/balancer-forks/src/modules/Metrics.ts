@@ -94,6 +94,9 @@ export function updatePoolSnapshots(
   poolDailySnapshots.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolHourlySnapshots.outputTokenPriceUSD = pool.outputTokenPriceUSD;
 
+  poolDailySnapshots.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
+  poolHourlySnapshots.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
+
   poolDailySnapshots.rewardTokenEmissionsAmount =
     pool.rewardTokenEmissionsAmount;
   poolHourlySnapshots.rewardTokenEmissionsAmount =
@@ -153,7 +156,7 @@ export function updateTokenVolumeAndBalance(
   tokenAddress: string,
   tokenAmount: BigInt,
   tokenAmountUSD: BigDecimal,
-  block: ethereum.Block,
+  block: ethereum.Block
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
@@ -170,24 +173,20 @@ export function updateTokenVolumeAndBalance(
   if (tokenIndex == -1) return;
 
   let dailyVolumeByTokenAmount = poolDailySnaphot.dailyVolumeByTokenAmount;
-  dailyVolumeByTokenAmount[tokenIndex] = dailyVolumeByTokenAmount[
-    tokenIndex
-  ].plus(tokenAmount);
+  dailyVolumeByTokenAmount[tokenIndex] =
+    dailyVolumeByTokenAmount[tokenIndex].plus(tokenAmount);
 
   let hourlyVolumeByTokenAmount = poolHourlySnaphot.hourlyVolumeByTokenAmount;
-  hourlyVolumeByTokenAmount[tokenIndex] = hourlyVolumeByTokenAmount[
-    tokenIndex
-  ].plus(tokenAmount);
+  hourlyVolumeByTokenAmount[tokenIndex] =
+    hourlyVolumeByTokenAmount[tokenIndex].plus(tokenAmount);
 
   let dailyVolumeByTokenUSD = poolDailySnaphot.dailyVolumeByTokenUSD;
-  dailyVolumeByTokenUSD[tokenIndex] = dailyVolumeByTokenUSD[tokenIndex].plus(
-    tokenAmountUSD
-  );
+  dailyVolumeByTokenUSD[tokenIndex] =
+    dailyVolumeByTokenUSD[tokenIndex].plus(tokenAmountUSD);
 
   let hourlyVolumeByTokenUSD = poolHourlySnaphot.hourlyVolumeByTokenUSD;
-  hourlyVolumeByTokenUSD[tokenIndex] = hourlyVolumeByTokenUSD[tokenIndex].plus(
-    tokenAmountUSD
-  );
+  hourlyVolumeByTokenUSD[tokenIndex] =
+    hourlyVolumeByTokenUSD[tokenIndex].plus(tokenAmountUSD);
 
   poolDailySnaphot.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
   poolHourlySnaphot.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
@@ -215,15 +214,12 @@ export function updateSnapshotsVolume(
     block
   );
 
-  financialsDailySnapshot.dailyVolumeUSD = financialsDailySnapshot.dailyVolumeUSD.plus(
-    volumeUSD
-  );
-  poolDailySnaphot.dailyVolumeUSD = poolDailySnaphot.dailyVolumeUSD.plus(
-    volumeUSD
-  );
-  poolHourlySnaphot.hourlyVolumeUSD = poolHourlySnaphot.hourlyVolumeUSD.plus(
-    volumeUSD
-  );
+  financialsDailySnapshot.dailyVolumeUSD =
+    financialsDailySnapshot.dailyVolumeUSD.plus(volumeUSD);
+  poolDailySnaphot.dailyVolumeUSD =
+    poolDailySnaphot.dailyVolumeUSD.plus(volumeUSD);
+  poolHourlySnaphot.hourlyVolumeUSD =
+    poolHourlySnaphot.hourlyVolumeUSD.plus(volumeUSD);
   protcol.cumulativeVolumeUSD = protcol.cumulativeVolumeUSD.plus(volumeUSD);
 
   financialsDailySnapshot.save();
@@ -240,7 +236,9 @@ export function updateProtocolRevenue(
   const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
   const poolFees = utils.getPoolFees(liquidityPoolAddress);
 
-  let supplySideRevenueUSD = poolFees.getTradingFees.times(volumeUSD);
+  let supplySideRevenueUSD = poolFees.getTradingFees
+    .times(volumeUSD)
+    .times(constants.BIGDECIMAL_ONE.minus(poolFees.getProtocolFees));
 
   updateRevenueSnapshots(
     pool,

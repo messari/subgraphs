@@ -29,6 +29,7 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
       event,
       trove.collateralSurplusChange,
       collateralSurplusUSD,
+      borrower,
       borrower
     );
   } else {

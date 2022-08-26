@@ -271,7 +271,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Scream",
     "scream",
     "2.0.1",
-    "1.1.2",
+    "1.1.3",
     "1.0.0",
     Network.FANTOM,
     comptroller.try_liquidationIncentiveMantissa(),

@@ -24,7 +24,8 @@ import {
   addProtocolSideRevenue,
   addSupplySideRevenue,
 } from "../entities/protocol";
-import { log } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
+import { updateUserPositionBalances } from "../entities/position";
 
 enum TroveManagerOperation {
   applyPendingRewards,
@@ -64,6 +65,8 @@ export function handleTroveUpdated(event: TroveUpdated): void {
   trove.collateral = event.params._coll;
   trove.debt = event.params._debt;
   trove.save();
+
+  updateUserPositionBalances(event, trove);
 }
 
 /**
@@ -113,6 +116,8 @@ export function handleTroveLiquidated(event: TroveLiquidated): void {
   trove.collateral = newCollateral;
   trove.debt = newDebt;
   trove.save();
+
+  updateUserPositionBalances(event, trove);
 }
 
 // Treat applyPendingRewards as deposit + borrow
@@ -138,7 +143,13 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
 
   const repayAmountLUSD = trove.debt.minus(newDebt);
   const repayAmountUSD = bigIntToBigDecimal(repayAmountLUSD);
-  createRepay(event, repayAmountLUSD, repayAmountUSD, event.transaction.from);
+  createRepay(
+    event,
+    repayAmountLUSD,
+    repayAmountUSD,
+    Address.fromString(trove.id),
+    event.transaction.from,
+  );
 
   let withdrawAmountETH = trove.collateral.minus(newCollateral);
   // If trove was closed, then extra collateral is sent to CollSurplusPool to be withdrawn by trove owner
@@ -153,6 +164,7 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
     event,
     withdrawAmountETH,
     withdrawAmountUSD,
+    Address.fromString(trove.id),
     event.transaction.from
   );
 }
@@ -170,6 +182,7 @@ function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
     amountLiquidatedETH,
     amountLiquidatedUSD,
     profitUSD,
+    Address.fromString(trove.id),
     event.transaction.from
   );
   const liquidatedDebtUSD = bigIntToBigDecimal(trove.debt);

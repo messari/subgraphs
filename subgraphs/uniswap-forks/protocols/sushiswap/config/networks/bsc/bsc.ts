@@ -100,8 +100,9 @@ export class SushiswapBscConfigurations implements Configurations {
   }
   getStableOraclePools(): string[] {
     return toLowerCaseList([
-      "0x2905817b020fd35d9d09672946362b62766f0d69", // wBNB/USDT
-      "0xdc558d64c29721d74c4456cfb4363a6e6660a9bb", // wBNB/bUSD
+      "0xc7632b7b2d768bbb30a404e13e1de48d1439ec21", // USDC/wBNB
+      "0xe6cf29055e747e95c058f64423d984546540ede5", // DAI/wBNB
+      "0x2905817b020fd35d9d09672946362b62766f0d69", // USDT/wBNB
     ]);
   }
   getUntrackedPairs(): string[] {

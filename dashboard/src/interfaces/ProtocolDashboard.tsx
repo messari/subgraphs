@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { ApolloClient, ApolloError, gql, HttpLink, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
 
-import { Chart as ChartJS, registerables } from "chart.js";
+import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 import React, { useEffect, useMemo, useState } from "react";
 import { poolOverview, schema } from "../queries/schema";
 import { PoolNames, ProtocolType, SubgraphBaseUrl } from "../constants";

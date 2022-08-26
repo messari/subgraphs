@@ -97,6 +97,10 @@ const messagesByLevel = (
       if (issuesArray[x].type === "BORROW") {
         issuesMsg = `Entity ${issuesArray[x].fieldName} could not calculate BORROW Reward APR. The Pool Borrow Balance is not available.`;
       }
+      if (issuesArray[x].type === "QRY") {
+        const params = issuesArray[x].message.split("//").join(", ");
+        issuesMsg = `Error fetching subgraph data - Could not load protocol from query parameters ${params}`;
+      }
       issuesMsgs.push(<li key={`${x}-${issuesArray[x].fieldName}`}>{issuesMsg}</li>);
     }
   }

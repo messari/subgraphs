@@ -215,6 +215,7 @@ export const schema120 = (): Schema => {
       network
       name
       type
+      slug
       schemaVersion
       subgraphVersion
     }
@@ -530,6 +531,7 @@ export const schema130 = (): Schema => {
       network
       name
       type
+      slug
       schemaVersion
       subgraphVersion
     }

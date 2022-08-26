@@ -129,7 +129,7 @@ export const CTUSD_ADDRESS = "0x12392f67bdf24fae0af363c24ac620a2f67dad86";
 
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const SUBGRAPH_VERSION = "1.7.2";
+export const SUBGRAPH_VERSION = "1.7.3";
 export const SCHEMA_VERSION = "2.0.1";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const USDC_DECIMALS = 6;

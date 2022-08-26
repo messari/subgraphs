@@ -45,7 +45,7 @@ import {
   getUnderlyingTokenPrice,
   getOrCreateToken,
 } from "./getters";
-import { decimalsToBigDecimal, BigDecimalTruncateToBigInt } from "./utils";
+import { decimalsToBigDecimal, BigDecimalTruncateToBigInt, bigIntToBDUseDecimals } from "./utils";
 
 // Create Account entity for participating account
 // return 1 if account is new, 0 if account already exists
@@ -499,31 +499,28 @@ export function updateRevenue(
 
   let marketID = event.address.toHexString();
   let market = getOrCreateMarket(marketID, event);
-  market.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  market.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  market.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  let newSupplySideRevenueUSD = newTotalRevenueUSD.minus(newProtocolRevenueUSD);
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+  market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
+  market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
   market.save();
 
   let marketDaily = getOrCreateMarketDailySnapshot(event);
-  marketDaily.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  marketDaily.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  marketDaily.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  marketDaily.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  marketDaily.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketDaily.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
   marketDaily.dailyTotalRevenueUSD = marketDaily.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
   marketDaily.dailyProtocolSideRevenueUSD = marketDaily.dailyProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
-  marketDaily.dailySupplySideRevenueUSD = marketDaily.dailyTotalRevenueUSD.minus(
-    marketDaily.dailyProtocolSideRevenueUSD,
-  );
+  marketDaily.dailySupplySideRevenueUSD = marketDaily.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   marketDaily.save();
 
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
-  marketHourly.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  marketHourly.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  marketHourly.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  marketHourly.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
+  marketHourly.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketHourly.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
   marketHourly.hourlyTotalRevenueUSD = marketHourly.hourlyTotalRevenueUSD.plus(newTotalRevenueUSD);
   marketHourly.hourlyProtocolSideRevenueUSD = marketHourly.hourlyProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
-  marketHourly.hourlySupplySideRevenueUSD = marketHourly.hourlyTotalRevenueUSD.minus(
-    marketHourly.hourlyProtocolSideRevenueUSD,
-  );
+  marketHourly.hourlySupplySideRevenueUSD = marketHourly.hourlySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   marketHourly.save();
 
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
@@ -551,12 +548,12 @@ export function updateRevenue(
 //    - FinancialsDailySnapshot.cumulativeProtocolSideRevenueUSD
 //    - FinancialsDailySnapshot.dailyTotalRevenueUSD
 //    - FinancialsDailySnapshot.cumulativeTotalRevenueUSD
-export function updateStablizerFees(fees: BigDecimal, event: ethereum.Event): void {
+export function updateStablizerFees(feesUSD: BigDecimal, event: ethereum.Event): void {
   let protocol = getOrCreateProtocol();
   let cumulativePRev = protocol.cumulativeProtocolSideRevenueUSD;
   let cumulativeTRev = protocol.cumulativeTotalRevenueUSD;
-  cumulativePRev = cumulativePRev.plus(fees);
-  cumulativeTRev = cumulativeTRev.plus(fees);
+  cumulativePRev = cumulativePRev.plus(feesUSD);
+  cumulativeTRev = cumulativeTRev.plus(feesUSD);
 
   protocol.cumulativeProtocolSideRevenueUSD = cumulativePRev;
   protocol.cumulativeTotalRevenueUSD = cumulativeTRev;
@@ -565,8 +562,8 @@ export function updateStablizerFees(fees: BigDecimal, event: ethereum.Event): vo
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   financialMetrics.cumulativeProtocolSideRevenueUSD = cumulativePRev;
   financialMetrics.cumulativeTotalRevenueUSD = cumulativeTRev;
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(fees);
-  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(fees);
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(feesUSD);
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(feesUSD);
   financialMetrics.save();
 }
 
@@ -640,6 +637,8 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
   if (market != null) {
     let tokenContract = CErc20.bind(event.address);
 
+    let inputToken = getOrCreateUnderlyingToken(event.address);
+    let outputToken = getOrCreateToken(Address.fromString(market.outputToken!));
     // To get the price of the underlying (input) token
     let inputTokenPriceUSD = getUnderlyingTokenPrice(event.address);
     let decimals = getOrCreateUnderlyingToken(event.address).decimals;
@@ -664,18 +663,24 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
     }
 
     let tryExchangeRate = tokenContract.try_exchangeRateCurrent();
-    if (tryExchangeRate.reverted) {
-      log.warning("Failed to get exchangeRate for market {} at tx hash {}; Not updating Market.exchangeRate", [
+    let exchangeRate: BigInt | null = null;
+    if (!tryExchangeRate.reverted) {
+      exchangeRate = tryExchangeRate.value;
+    } else {
+      log.warning("Failed to get current exchangeRate for market {} at tx hash {}, use exhangeRateStored instead", [
         marketId,
         event.transaction.hash.toHexString(),
       ]);
-    } else {
-      market.exchangeRate = tryExchangeRate.value.toBigDecimal().div(decimalsToBigDecimal(MANTISSA_DECIMALS));
+      exchangeRate = tokenContract.exchangeRateCurrent();
     }
+    market.exchangeRate = bigIntToBDUseDecimals(
+      exchangeRate,
+      MANTISSA_DECIMALS + inputToken.decimals - outputToken.decimals,
+    );
 
     // derive outputToken (cToken) price from exchange rate and inputTokenPriceUSD
     if (market.exchangeRate) {
-      market.outputTokenPriceUSD = inputTokenPriceUSD.div(market.exchangeRate!);
+      market.outputTokenPriceUSD = inputTokenPriceUSD.times(market.exchangeRate!);
     }
 
     //
@@ -794,8 +799,13 @@ export function updateInterestRates(event: ethereum.Event): void {
   let marketId = event.address.toHexString();
   log.info("Updating rates for Market {} at tx hash {} ...", [marketId, event.transaction.hash.toHexString()]);
 
-  let borrowerInterestRate = getOrCreateInterestRate(marketId, InterestRateSide.BORROWER, InterestRateType.VARIABLE);
-  let lenderInterestRate = getOrCreateInterestRate(marketId, InterestRateSide.LENDER, InterestRateType.VARIABLE);
+  let borrowerInterestRate = getOrCreateInterestRate(
+    null,
+    InterestRateSide.BORROWER,
+    InterestRateType.VARIABLE,
+    marketId,
+  );
+  let lenderInterestRate = getOrCreateInterestRate(null, InterestRateSide.LENDER, InterestRateType.VARIABLE, marketId);
   if (borrowerInterestRate == null) {
     log.error("Borrower InterestRate for market {} does not exist.", [marketId]);
   }
@@ -833,4 +843,17 @@ export function updateInterestRates(event: ethereum.Event): void {
 
   borrowerInterestRate.save();
   lenderInterestRate.save();
+
+  let rates = [borrowerInterestRate.id, lenderInterestRate.id];
+  let market = getOrCreateMarket(marketId, event);
+  market.rates = rates;
+  market.save();
+
+  let dailySnapshot = getOrCreateMarketDailySnapshot(event);
+  dailySnapshot.rates = rates;
+  dailySnapshot.save();
+
+  let hourlySnapshot = getOrCreateMarketHourlySnapshot(event);
+  hourlySnapshot.rates = rates;
+  hourlySnapshot.save();
 }

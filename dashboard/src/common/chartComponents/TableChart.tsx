@@ -55,7 +55,7 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
       }
       let dateColumn = toDate(val.date, hourly);
       if (!showDateString) {
-        dateColumn = toUnitsSinceEpoch(val.date, hourly);
+        dateColumn = toUnitsSinceEpoch(dateColumn, hourly);
       }
       return {
         id: i,
