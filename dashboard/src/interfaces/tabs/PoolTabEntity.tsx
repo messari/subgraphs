@@ -484,25 +484,27 @@ function PoolTabEntity({
       }
     });
 
-    tokenWeightData.inputTokenWeights[0].forEach((val: any, idx: number) => {
-      // Looping through all instances of inputToken 0
-      let totalWeightAtIdx = val?.value;
-      for (let i = 1; i < tokenWeightData.inputTokenWeights?.length; i++) {
-        totalWeightAtIdx += tokenWeightData.inputTokenWeights[i][idx]?.value;
-      }
-      if (totalWeightAtIdx > 50) {
-        // If weights are greater than 50, its assumed that the value is denominated out of 100 rather than 1
-        totalWeightAtIdx = totalWeightAtIdx / 100;
-      }
-      if (
-        Math.abs(1 - totalWeightAtIdx) > .01 &&
-        issues.filter((x) => x.fieldName === entityName + "-inputTokenWeights").length === 0
-      ) {
-        const fieldName = entityName + "-inputTokenWeights";
-        const date = toDate(val.date);
-        issues.push({ type: "VAL", level: "error", fieldName, message: entityName + "-inputTokenWeights on " + date + " add up to " + totalWeightAtIdx + '%, which is more than 1% off of 100%. The inputTokenWeights across all tokens should add up to 100% at any given point.' });
-      }
-    })
+    if (Object.keys(tokenWeightData)?.length > 0) {
+      tokenWeightData.inputTokenWeights[0].forEach((val: any, idx: number) => {
+        // Looping through all instances of inputToken 0
+        let totalWeightAtIdx = val?.value;
+        for (let i = 1; i < tokenWeightData.inputTokenWeights?.length; i++) {
+          totalWeightAtIdx += tokenWeightData.inputTokenWeights[i][idx]?.value;
+        }
+        if (totalWeightAtIdx > 50) {
+          // If weights are greater than 50, its assumed that the value is denominated out of 100 rather than 1
+          totalWeightAtIdx = totalWeightAtIdx / 100;
+        }
+        if (
+          Math.abs(1 - totalWeightAtIdx) > .01 &&
+          issues.filter((x) => x.fieldName === entityName + "-inputTokenWeights").length === 0
+        ) {
+          const fieldName = entityName + "-inputTokenWeights";
+          const date = toDate(val.date);
+          issues.push({ type: "VAL", level: "error", fieldName, message: entityName + "-inputTokenWeights on " + date + " add up to " + totalWeightAtIdx + '%, which is more than 1% off of 100%. The inputTokenWeights across all tokens should add up to 100% at any given point.' });
+        }
+      })
+    }
 
     // The rewardAPRElement logic is used to take all of the rewardAPR and display their lines on one graph
     let rewardAPRElement = null;
