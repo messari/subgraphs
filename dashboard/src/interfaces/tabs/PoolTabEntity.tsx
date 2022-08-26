@@ -2,10 +2,11 @@ import { Box, Grid, Typography } from "@mui/material";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
-import { convertTokenDecimals } from "../../utils";
+import { convertTokenDecimals, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
 import { useEffect } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
+import moment from "moment";
 
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
@@ -338,7 +339,7 @@ function PoolTabEntity({
                   } else if (
                     currentRewardToken?.type === "BORROW" &&
                     issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length ===
-                      0
+                    0
                   ) {
                     issues.push({
                       type: "BORROW",
@@ -483,6 +484,28 @@ function PoolTabEntity({
       }
     });
 
+    if (Object.keys(tokenWeightData)?.length > 0) {
+      tokenWeightData.inputTokenWeights[0].forEach((val: any, idx: number) => {
+        // Looping through all instances of inputToken 0
+        let totalWeightAtIdx = val?.value;
+        for (let i = 1; i < tokenWeightData.inputTokenWeights?.length; i++) {
+          totalWeightAtIdx += tokenWeightData.inputTokenWeights[i][idx]?.value;
+        }
+        if (totalWeightAtIdx > 50) {
+          // If weights are greater than 50, its assumed that the value is denominated out of 100 rather than 1
+          totalWeightAtIdx = totalWeightAtIdx / 100;
+        }
+        if (
+          Math.abs(1 - totalWeightAtIdx) > .01 &&
+          issues.filter((x) => x.fieldName === entityName + "-inputTokenWeights").length === 0
+        ) {
+          const fieldName = entityName + "-inputTokenWeights";
+          const date = toDate(val.date);
+          issues.push({ type: "VAL", level: "error", fieldName, message: entityName + "-inputTokenWeights on " + date + " add up to " + totalWeightAtIdx + '%, which is more than 1% off of 100%. The inputTokenWeights across all tokens should add up to 100% at any given point.' });
+        }
+      })
+    }
+
     // The rewardAPRElement logic is used to take all of the rewardAPR and display their lines on one graph
     let rewardAPRElement = null;
     if (Object.keys(rewardChart).length > 0 && !dataFieldMetrics["rewardAPR"]?.invalidDataPlot) {
@@ -493,7 +516,7 @@ function PoolTabEntity({
       for (let x = 0; x < amountOfInstances; x++) {
         let date: number | null = null;
         Object.keys(rewardChart).forEach((z) => {
-          if (rewardChart[z][x].date && !date) {
+          if (rewardChart[z][x]?.date && !date && x < rewardChart[z].length) {
             date = rewardChart[z][x].date;
           }
         });
@@ -513,14 +536,14 @@ function PoolTabEntity({
             const currentRewardToken: { [x: string]: string } = data[poolKeySingular]?.rewardTokens[idx]?.token;
             const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol + " " : "";
             let elementVal = rewardChart[reward][x];
-            if (rewardChart[reward][x].value || rewardChart[reward][x].value === 0) {
+            if (rewardChart[reward][x]?.value || rewardChart[reward][x]?.value === 0) {
               elementVal = rewardChart[reward][x].value;
             }
             if (!elementVal) {
               elementVal = 0;
             }
             elementVal = elementVal?.toFixed(2);
-            tableVals[x].value.push(`${symbol}[${idx}]: ${elementVal}`);
+            tableVals[x]?.value.push(`${symbol}[${idx}]: ${elementVal}`);
           }
         });
       }

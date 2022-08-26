@@ -1,11 +1,7 @@
-import { LocalizationProvider, PickersDay, StaticDatePicker } from "@mui/lab";
-import MomentAdapter from "@material-ui/pickers/adapter/moment";
 import { Box, Button, TextField } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridAlignment } from "@mui/x-data-grid";
 import { useState } from "react";
-import { toDate, toUnitsSinceEpoch } from "../../../src/utils/index";
-import { percentageFieldList } from "../../constants";
-import moment, { Moment } from "moment";
+import { formatIntToFixed2, toDate } from "../../../src/utils/index";
 
 interface ComparisonTableProps {
   datasetLabel: string;
@@ -17,22 +13,40 @@ interface ComparisonTableProps {
 export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonthly }: ComparisonTableProps) => {
   if (dataTable) {
     const columns = [
-      { field: "date", headerName: "Date", flex: 1 },
-      { field: "subgraphData", headerName: "Subgraph", flex: 1 },
+      {
+        field: "date",
+        headerName: "Date",
+        minWidth: 100,
+        headerAlign: "right" as GridAlignment,
+        align: "right" as GridAlignment,
+      },
+      {
+        field: "subgraphData",
+        headerName: "Subgraph",
+        minWidth: 160,
+        headerAlign: "right" as GridAlignment,
+        align: "right" as GridAlignment,
+      },
       {
         field: "defiLlamaData",
         headerName: "DefiLlama",
-        flex: 1,
+        minWidth: 160,
+        headerAlign: "right" as GridAlignment,
+        align: "right" as GridAlignment,
       },
       {
         field: "differenceVal",
         headerName: "Diff. (value)",
-        flex: 1,
+        minWidth: 160,
+        headerAlign: "right" as GridAlignment,
+        align: "right" as GridAlignment,
       },
       {
         field: "differencePercentage",
         headerName: "Diff. (%)",
-        flex: 1,
+        minWidth: 120,
+        headerAlign: "right" as GridAlignment,
+        align: "right" as GridAlignment,
       },
     ];
 
@@ -42,14 +56,14 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
         if (isMonthly) {
           date = date.split("-").slice(0, 2).join("-");
         }
+        const diff = Math.abs(val.value - dataTable.defiLlama[i].value);
         return {
           id: i,
           date: date,
-          subgraphData: "$" + parseFloat(val.value.toFixed(2)).toLocaleString(),
-          defiLlamaData: "$" + parseFloat(dataTable.defiLlama[i].value.toFixed(2)).toLocaleString(),
-          differenceVal:
-            "$" + parseFloat(Math.abs(val.value - dataTable.defiLlama[i].value).toFixed(2)).toLocaleString(),
-          differencePercentage: (val.value / dataTable.defiLlama[i].value).toFixed(4) + "%",
+          subgraphData: "$" + formatIntToFixed2(val.value),
+          defiLlamaData: "$" + formatIntToFixed2(dataTable.defiLlama[i].value),
+          differenceVal: "$" + formatIntToFixed2(diff),
+          differencePercentage: ((diff / dataTable.defiLlama[i].value) * 100).toFixed(2) + "%",
         };
       })
       .reverse();
