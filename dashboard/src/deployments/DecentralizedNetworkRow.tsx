@@ -96,12 +96,6 @@ export const DecentralizedNetworkRow = ({ rowData, subgraphName, clientIndexing 
 
   const schemaVersion = rowData?.schemaVersion;
 
-  useEffect(() => {
-    if (errorIndexing) {
-      console.log(rowData, "DEPLOYMENT ERR", errorIndexing, status, statusData, subgraphName);
-    }
-  }, [errorIndexing]);
-
   const { schemaOutdated, indexedSuccess } = useMemo(() => {
     return {
       schemaOutdated: schemaVersion && schemaVersion !== latestSchemaVersion,
