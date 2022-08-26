@@ -996,7 +996,7 @@
           "template": "angle-governance.template.yaml",
           "danielkhoo": "danielkhoo/angle-governance",
           "messari": "messari/angle-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "code4rena-governance": {
@@ -1012,7 +1012,7 @@
           "template": "ens-governance.template.yaml",
           "danielkhoo": "danielkhoo/ens-governance",
           "messari": "messari/ens-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "euler-governance": {
@@ -1020,7 +1020,7 @@
           "template": "euler-governance.template.yaml",
           "danielkhoo": "danielkhoo/euler-governance",
           "messari": "messari/euler-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "fei-governance": {
@@ -1028,7 +1028,7 @@
           "template": "fei-governance.template.yaml",
           "danielkhoo": "danielkhoo/fei-governance",
           "messari": "messari/fei-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "hop-governance": {
@@ -1044,15 +1044,15 @@
           "template": "silo-governance.template.yaml",
           "danielkhoo": "danielkhoo/silo-governance",
           "messari": "messari/silo-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
-      "falsefi-governance": {
+      "truefi-governance": {
         "ethereum": {
-          "template": "falsefi-governance.template.yaml",
-          "danielkhoo": "danielkhoo/falsefi-governance",
-          "messari": "messari/falsefi-governance",
-          "deploy-on-merge": false
+          "template": "truefi-governance.template.yaml",
+          "danielkhoo": "danielkhoo/truefi-governance",
+          "messari": "messari/truefi-governance",
+          "deploy-on-merge": true
         }
       },
       "unlock-governance": {
@@ -1060,7 +1060,7 @@
           "template": "unlock-governance.template.yaml",
           "danielkhoo": "danielkhoo/unlock-governance",
           "messari": "messari/unlock-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
