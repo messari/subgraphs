@@ -493,7 +493,7 @@ function PoolTabEntity({
       for (let x = 0; x < amountOfInstances; x++) {
         let date: number | null = null;
         Object.keys(rewardChart).forEach((z) => {
-          if (rewardChart[z][x].date && !date) {
+          if (rewardChart[z][x]?.date && !date && x < rewardChart[z].length) {
             date = rewardChart[z][x].date;
           }
         });
@@ -513,14 +513,14 @@ function PoolTabEntity({
             const currentRewardToken: { [x: string]: string } = data[poolKeySingular]?.rewardTokens[idx]?.token;
             const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol + " " : "";
             let elementVal = rewardChart[reward][x];
-            if (rewardChart[reward][x].value || rewardChart[reward][x].value === 0) {
+            if (rewardChart[reward][x]?.value || rewardChart[reward][x]?.value === 0) {
               elementVal = rewardChart[reward][x].value;
             }
             if (!elementVal) {
               elementVal = 0;
             }
             elementVal = elementVal?.toFixed(2);
-            tableVals[x].value.push(`${symbol}[${idx}]: ${elementVal}`);
+            tableVals[x]?.value.push(`${symbol}[${idx}]: ${elementVal}`);
           }
         });
       }
