@@ -132,7 +132,7 @@
             "avalanche": "https://api.thegraph.com/subgraphs/name/messari/benqi-avalanche"
         },
         "compound-v2": {
-            "ethereum": "https://api.thegraph.com/subgraphs/name/messari/compound-ethereum"
+            "ethereum": "https://api.thegraph.com/subgraphs/name/messari/compound-v2-ethereum"
         },
         "cream-finance": {
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/cream-finance-arbitrum",
