@@ -25,21 +25,7 @@ import { getUsdPricePerToken } from "../prices";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
-
-export function getOrCreateAccount(id: string): Account {
-  let account = Account.load(id);
-
-  if (!account) {
-    account = new Account(id);
-    account.save();
-
-    const protocol = getOrCreateDexAmmProtocol();
-    protocol.cumulativeUniqueUsers += 1;
-    protocol.save();
-  }
-
-  return account;
-}
+import { getStat } from "../modules/Stat";
 
 export function getOrCreateRewardToken(
   address: Address,
@@ -219,6 +205,10 @@ export function getOrCreateUsageMetricsDailySnapshot(
     const protocol = getOrCreateDexAmmProtocol();
     usageMetrics.totalPoolCount = protocol.totalPoolCount;
 
+    usageMetrics.swapStats = getStat(`protocol-swap-${id}`).id;
+    usageMetrics.depositStats = getStat(`protocol-deposit-${id}`).id;
+    usageMetrics.withdrawStats = getStat(`protocol-withdraw-${id}`).id;
+
     usageMetrics.save();
   }
 
@@ -257,9 +247,8 @@ export function getOrCreateLiquidityPoolDailySnapshots(
   poolId: string,
   block: ethereum.Block
 ): LiquidityPoolDailySnapshot {
-  let id: string = poolId
-    .concat("-")
-    .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString());
+  let day = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
+  let id: string = poolId.concat("-").concat(day);
   let poolSnapshots = LiquidityPoolDailySnapshot.load(id);
 
   if (!poolSnapshots) {
@@ -303,6 +292,10 @@ export function getOrCreateLiquidityPoolDailySnapshots(
 
     poolSnapshots.blockNumber = block.number;
     poolSnapshots.timestamp = block.timestamp;
+
+    poolSnapshots.swapStats = getStat(`pool-${poolId}-swap-${day}`).id;
+    poolSnapshots.depositStats = getStat(`pool-${poolId}-deposit-${day}`).id;
+    poolSnapshots.withdrawStats = getStat(`pool-${poolId}-withdraw-${day}`).id;
 
     poolSnapshots.save();
   }

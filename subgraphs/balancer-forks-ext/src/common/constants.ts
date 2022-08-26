@@ -129,6 +129,8 @@ export const BIGDECIMAL_TEN = new BigDecimal(BIGINT_TEN);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 export const BIGDECIMAL_POINT_FOUR = BigDecimal.fromString("0.4");
+export const BIGINT_MAX = BigInt.fromString("115792089237316195423570985008687907853269984665640564039457584007913129639935");
+export const BIGDECIMAL_BIGINT_MAX = new BigDecimal(BIGINT_MAX);
 
 export const DEFAULT_DECIMALS_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
 export const FEE_DENOMINATOR = DEFAULT_DECIMALS_DENOMINATOR;

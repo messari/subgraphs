@@ -10,7 +10,6 @@ import {
   LiquidityPool as LiquidityPoolStore,
 } from "../../generated/schema";
 import {
-  getOrCreateAccount,
   getOrCreateLiquidityPool,
   getOrCreateDexAmmProtocol,
   getOrCreateFinancialDailySnapshots,
@@ -22,6 +21,8 @@ import {
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
+import { getOrCreateAccount } from "./Position";
+import { getStat, updateStat } from "./Stat";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   const account = getOrCreateAccount(from.toHexString());
@@ -200,6 +201,7 @@ export function updateTokenVolumeAndBalance(
 
 export function updateSnapshotsVolume(
   poolAddress: Address,
+  volumeToken: BigInt,
   volumeUSD: BigDecimal,
   block: ethereum.Block
 ): void {
@@ -225,6 +227,8 @@ export function updateSnapshotsVolume(
   financialsDailySnapshot.save();
   poolHourlySnaphot.save();
   poolDailySnaphot.save();
+
+  updateStat(getStat(poolDailySnaphot.swapStats), volumeToken, volumeUSD);
   protcol.save();
 }
 
