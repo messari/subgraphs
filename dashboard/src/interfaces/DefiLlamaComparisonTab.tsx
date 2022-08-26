@@ -1,27 +1,29 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { TableEvents } from "../../common/chartComponents/TableEvents";
-import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
-import IssuesDisplay from "../IssuesDisplay";
-import { Box, CircularProgress, Grid, Typography } from "@mui/material";
-import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
-import { Chart } from "../../common/chartComponents/Chart";
-import { ComparisonTable } from "../../common/chartComponents/ComparisonTable";
-import { toDate } from "../../utils";
+import IssuesDisplay from "./IssuesDisplay";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
+import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
+import { Chart } from "../common/chartComponents/Chart";
+import { ComparisonTable } from "../common/chartComponents/ComparisonTable";
+import { toDate } from "../utils";
 import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery } from "@apollo/client";
-import { DeploymentsDropDown } from "../../common/utilComponents/DeploymentsDropDown";
+import { DeploymentsDropDown } from "../common/utilComponents/DeploymentsDropDown";
 import { Chart as ChartJS, registerables, PointElement } from "chart.js";
+import { useNavigate } from "react-router";
 
 interface DefiLlamaComparsionTabProps {
   deploymentJSON: { [x: string]: any };
+  getData: any;
 }
 
 // This component is for each individual subgraph
-function DefiLlamaComparsionTab({ deploymentJSON }: DefiLlamaComparsionTabProps) {
+function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsionTabProps) {
+  const navigate = useNavigate();
+
   ChartJS.register(...registerables);
   ChartJS.register(PointElement);
   const [issuesState, setIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>([]);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = issuesState;
-
+  const [defiLlamaRequestLoading, setDefiLlamaRequestLoading] = useState(false);
   const [deploymentURL, setDeploymentURL] = useState<string>("");
   const [defiLlamaSlug, setDefiLlamaSlug] = useState<string>("");
 
@@ -37,12 +39,24 @@ function DefiLlamaComparsionTab({ deploymentJSON }: DefiLlamaComparsionTabProps)
     });
   }, [deploymentURL]);
 
+  useEffect(() => {
+    if (!deploymentJSON || Object.keys(deploymentJSON).length === 0) {
+      getData();
+    }
+  }, []);
+
   const deploymentNameToUrlMapping: any = {};
 
   Object.values(deploymentJSON).forEach((protocolsOnType: { [x: string]: any }) => {
     Object.entries(protocolsOnType).forEach(([protocolName, deploymentOnNetwork]) => {
       protocolName = protocolName.toLowerCase();
+      const protocolNameVersionRemoved = protocolName.split("-v")[0];
       deploymentNameToUrlMapping[protocolName] = {
+        slug: "",
+        defiLlamaNetworks: [],
+        subgraphNetworks: deploymentOnNetwork,
+      };
+      deploymentNameToUrlMapping[protocolNameVersionRemoved] = {
         slug: "",
         defiLlamaNetworks: [],
         subgraphNetworks: deploymentOnNetwork,
@@ -63,6 +77,7 @@ function DefiLlamaComparsionTab({ deploymentJSON }: DefiLlamaComparsionTabProps)
   }
 
   const fetchDefiLlamaProtocols = () => {
+    setDefiLlamaRequestLoading(true);
     fetch("https://api.llama.fi/protocols", {
       headers: {
         "Content-Type": "application/json",
@@ -73,6 +88,7 @@ function DefiLlamaComparsionTab({ deploymentJSON }: DefiLlamaComparsionTabProps)
         return res.json();
       })
       .then(function (json) {
+        setDefiLlamaRequestLoading(false);
         setDefiLlamaProtocols(json);
       })
       .catch((err) => {
@@ -90,7 +106,7 @@ function DefiLlamaComparsionTab({ deploymentJSON }: DefiLlamaComparsionTabProps)
   ] = useLazyQuery(
     gql`
       {
-        financialsDailySnapshots {
+        financialsDailySnapshots(first: 1000) {
           totalValueLockedUSD
           timestamp
         }
@@ -150,9 +166,10 @@ function DefiLlamaComparsionTab({ deploymentJSON }: DefiLlamaComparsionTabProps)
       }) || "";
     let compChart = {
       defiLlama: defiLlamaData.chainTvls[dataset].tvl.map((x: any) => ({ value: x.totalLiquidityUSD, date: x.date })),
-      subgraph: financialsData.financialsDailySnapshots
-        .map((x: any) => ({ value: parseFloat(x.totalValueLockedUSD), date: parseInt(x.timestamp) }))
-        .reverse(),
+      subgraph: financialsData.financialsDailySnapshots.map((x: any) => ({
+        value: parseFloat(x.totalValueLockedUSD),
+        date: parseInt(x.timestamp),
+      })),
     };
     if (isMonthly) {
       // key number of months from epoch value first val of month
@@ -203,16 +220,38 @@ function DefiLlamaComparsionTab({ deploymentJSON }: DefiLlamaComparsionTabProps)
       </div>
     );
   }
+  if (financialsError && !(issues.filter((x) => x.fieldName === deploymentURL).length > 0)) {
+    setIssues([
+      {
+        message: `Error fetching subgraph data - ${defiLlamaSlug}; ${financialsError.message}`,
+        type: "VAL",
+        level: "critical",
+        fieldName: deploymentURL,
+      },
+    ]);
+  }
+  useEffect(() => {
+    setIssues([]);
+  }, [deploymentURL]);
+
+  if (financialsLoading || defiLlamaRequestLoading) {
+    chart = <CircularProgress sx={{ my: 5 }} size={40} />;
+  }
 
   return (
     <>
-      <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
+      <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => navigate("/")}>
+        Back To Deployments List
+      </Button>
       <DeploymentsDropDown
         setDeploymentURL={(x) => setDeploymentURL(x)}
         setDefiLlamaSlug={(x) => setDefiLlamaSlug(x)}
+        setIssues={(x: any) => setIssues(x)}
+        issuesProps={issues}
         deploymentURL={deploymentURL}
         deploymentJSON={deploymentNameToUrlMapping}
       />
+      <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
       {chart}
     </>
   );

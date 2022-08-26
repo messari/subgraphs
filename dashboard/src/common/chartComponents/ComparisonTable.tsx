@@ -26,12 +26,12 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
       },
       {
         field: "differenceVal",
-        headerName: "Difference (value)",
+        headerName: "Diff. (value)",
         flex: 1,
       },
       {
         field: "differencePercentage",
-        headerName: "Difference (%)",
+        headerName: "Diff. (%)",
         flex: 1,
       },
     ];
@@ -47,8 +47,9 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
           date: date,
           subgraphData: "$" + parseFloat(val.value.toFixed(2)).toLocaleString(),
           defiLlamaData: "$" + parseFloat(dataTable.defiLlama[i].value.toFixed(2)).toLocaleString(),
-          differenceVal: "$" + parseFloat((val.value - dataTable.defiLlama[i].value).toFixed(2)).toLocaleString(),
-          differencePercentage: ((val.value / dataTable.defiLlama[i].value) * 100).toFixed(2) + "%",
+          differenceVal:
+            "$" + parseFloat(Math.abs(val.value - dataTable.defiLlama[i].value).toFixed(2)).toLocaleString(),
+          differencePercentage: (val.value / dataTable.defiLlama[i].value).toFixed(4) + "%",
         };
       })
       .reverse();

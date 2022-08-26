@@ -2,55 +2,24 @@ import { styled } from "../styled";
 import { useNavigate } from "react-router";
 import { SearchInput } from "../common/utilComponents/SearchInput";
 import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { NewClient } from "../utils";
 import { useEffect, useMemo, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
 import { useQuery } from "@apollo/client";
 import { decentralizedNetworkSubgraphsQuery } from "../queries/decentralizedNetworkSubgraphsQuery";
-import DefiLlamaComparsionTab from "../interfaces/tabs/DefiLlamaComparisonTab";
+import DefiLlamaComparsionTab from "../interfaces/DefiLlamaComparisonTab";
 
 const DeploymentsLayout = styled("div")`
   padding: 0;
 `;
 
-function DeploymentsPage() {
-  const [ProtocolsToQuery, setProtocolsToQuery] = useState<{
-    [type: string]: { [proto: string]: { [network: string]: string } };
-  }>({});
-  const getData = () => {
-    fetch("/deployments.json", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-      .then(function (res) {
-        return res.json();
-      })
-      .then(function (json) {
-        setProtocolsToQuery(json);
-      })
-      .catch((err) => {
-        console.log(err);
-        fetch("/deployments.json", {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        })
-          .then(function (res) {
-            return res.json();
-          })
-          .then(function (json) {
-            setProtocolsToQuery(json);
-          })
-          .catch((err) => {
-            window.location.reload();
-          });
-      });
-  };
+interface DeploymentsPageProps {
+  ProtocolsToQuery: { [x: string]: any };
+  getData: any;
+}
 
+function DeploymentsPage({ ProtocolsToQuery, getData }: DeploymentsPageProps) {
   const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
@@ -173,7 +142,11 @@ function DeploymentsPage() {
         >
           Load Subgraph
         </SearchInput>
-        <DefiLlamaComparsionTab deploymentJSON={ProtocolsToQuery} />
+        <div style={{ width: "100%", textAlign: "right", marginTop: "20px" }}>
+          <Button variant="contained" color="primary" onClick={() => navigate("/comparison")}>
+            Defi Llama Comparison
+          </Button>
+        </div>
         {decentralizedSubgraphTable}
         <Typography variant="h4" align="center" sx={{ my: 4 }}>
           Hosted Service Subgraphs
