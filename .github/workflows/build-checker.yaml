@@ -1,7 +1,7 @@
 on: 
   push:
-    branches:
-      master
+    branches-ignore:
+        - master
 
 jobs:
   Deployment: 
@@ -12,20 +12,10 @@ jobs:
         continue-on-error: true
 
       - uses: actions/checkout@v2
-      - uses: steegecs/Action-Subgraph-Deployment@main
+      - uses: steegecs/Subgraph-Build-Checker@main
         with: 
           HOSTED_SERVICE_ACCESS_TOKEN: ${{ secrets.HOSTED_SERVICE_ACCESS_TOKEN }}
           CHANGED_FILES: "${{ steps.files.outputs.all }}"
           ABSOLUTE_PATH: ${{ github.workspace }}
           GRAPH_DEPLOYMENT_LOCATION: messari
-
-      # - uses: steegecs/Messari-Deployment-Config-Reset@main
-      #   with: 
-      #     ABSOLUTE_PATH: ${{ github.workspace }}
-
-      # - uses: EndBug/add-and-commit@v9
-      #   with:
-      #     add: '.'
-      #     commit: --signoff
-      #     push: true
-
+          

@@ -7,8 +7,10 @@ const fs = require("fs");
  * @param {string} template - Template location that will be used to create subgraph.yaml
  * @param {string} location - Location in the subgraph will be deployed to {e.g. messari/uniswap-v2-ethereum}
  */
-function scripts(protocol, network, template, location, constants) {
+function scripts(protocol, network, template, location, constants, type) {
   let scripts = [];
+  let removeGenerated = "rm -rf generated";
+  let removeBuild = "rm -rf build";
   let removeResults = "rm -rf results.txt";
   let removeConfig = "rm -rf configurations/configure.ts";
   let removeSubgraphYaml = "rm -rf subgraph.yaml";
@@ -25,8 +27,11 @@ function scripts(protocol, network, template, location, constants) {
     " --NETWORK=" +
     network;
   let codegen = "graph codegen";
+  let build = "graph build";
   let deployment = "npm run deploy:subgraph --LOCATION=" + location;
 
+  scripts.push(removeGenerated);
+  scripts.push(removeBuild);
   scripts.push(removeResults);
   scripts.push(removeConfig);
   scripts.push(removeSubgraphYaml);
@@ -35,7 +40,12 @@ function scripts(protocol, network, template, location, constants) {
     scripts.push(prepareConstants);
   }
   scripts.push(codegen);
-  scripts.push(deployment);
+
+  if (type == "build") {
+    scripts.push(build);
+  } else {
+    scripts.push(deployment);
+  }
 
   return scripts;
 }
@@ -98,8 +108,17 @@ async function runCommands(allScripts, results, args, callback) {
               );
             } else {
               logs = logs + "Exec error: " + error;
-              results +=
-                "Deployment Failed: " + allDeployments[deploymentIndex] + "\n";
+
+              if (args.type == "build") {
+                results +=
+                  "Build Failed: " + allDeployments[deploymentIndex] + "\n";
+              } else {
+                results +=
+                  "Deployment Failed: " +
+                  allDeployments[deploymentIndex] +
+                  "\n";
+              }
+
               console.log(error);
               deploymentIndex++;
               scriptIndex = 0;
@@ -109,8 +128,15 @@ async function runCommands(allScripts, results, args, callback) {
             scriptIndex ==
             allScripts.get(allDeployments[deploymentIndex]).length
           ) {
-            results +=
-              "Deployment Successful: " + allDeployments[deploymentIndex] + "\n";
+            if ((args.type = "build")) {
+              results +=
+                "Build Successful: " + allDeployments[deploymentIndex] + "\n";
+            } else {
+              results +=
+                "Deployment Successful: " +
+                allDeployments[deploymentIndex] +
+                "\n";
+            }
             deploymentIndex++;
             scriptIndex = 0;
             httpCounter = 1;

@@ -778,13 +778,13 @@
           "template": "apeswap.bsc.template.yaml",
           "steegecs": "steegecs/apeswap-bsc",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "polygon": {
           "template": "apeswap.matic.template.yaml",
           "steegecs": "steegecs/apeswap-matic",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "mm-finance": {
@@ -792,7 +792,7 @@
           "template": "mm.finance.template.yaml",
           "messari": "messari/mm-finance-polygon",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "quickswap": {
@@ -801,7 +801,7 @@
           "steegecs": "steegecs/quickswap-matic",
           "messari": "messari/quickswap-polygon",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "solarbeam": {
@@ -810,7 +810,7 @@
           "steegecs": "steegecs/solarbeam-moonriver",
           "messari": "messari/solarbeam-moonriver",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "spiritswap": {
@@ -819,7 +819,7 @@
           "steegecs": "steegecs/spiritswap-fantom",
           "messari": "messari/spiritswap-fantom",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "spookyswap": {
@@ -828,24 +828,24 @@
           "steegecs": "steegecs/spookyswap-fantom",
           "messari": "messari/spookyswap-fantom",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "sushiswap": {
         "arbitrum": {
           "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "avalanche": {
           "template": "uniswap.v2.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "bsc": {
           "template": "uniswap.v2.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "celo": {
           "template": "sushiswap.alt.template.yaml",
@@ -855,44 +855,44 @@
         "fantom": {
           "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "fuse": {
           "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "ethereum": {
           "template": "sushiswap.mainnet.template.yaml",
           "steegecs": "steegecs/sushiswap-mainnet",
           "messari": "messari/sushiswap-ethereum",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "polygon": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-matic",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "moonbeam": {
           "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "moonriver": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-moonriver",
           "messari": "messari/sushiswap-moonriver",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "gnosis": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-xdai",
           "messari": "messari/sushiswap-gnosis",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "trader-joe": {
@@ -901,7 +901,7 @@
           "steegecs": "steegecs/trader-joe-avalanche",
           "messari": "messari/trader-joe-avalanche",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "trisolaris": {
@@ -910,7 +910,7 @@
           "steegecs": "steegecs/trisolaris-aurora",
           "messari": "messari/trisolaris-aurora",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "ubeswap": {
@@ -920,7 +920,7 @@
           "messari": "messari/ubeswap-celo",
           "sevenshi": "sevenshi/ubeswap_celo",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "uniswap-v2": {
@@ -928,7 +928,7 @@
           "template": "uniswap.v2.template.yaml",
           "steegecs": "steegecs/uniswap-v2",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "vvs-finance": {
@@ -937,7 +937,7 @@
           "steegecs": "steegecs/trisolaris-aurora",
           "messari": "messari/trisolaris-aurora",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "honeyswap": {
@@ -946,13 +946,13 @@
           "mrbrianhobo": "mrbrianhobo/honeyswap-xdai",
           "messari": "messari/honeyswap-gnosis",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "polygon": {
           "template": "honeyswap.matic.template.yaml",
           "mrbrianhobo": "mrbrianhobo/honeyswap-polygon",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     },
