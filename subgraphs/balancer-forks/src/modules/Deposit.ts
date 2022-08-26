@@ -18,8 +18,6 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { updateRevenueSnapshots } from "./Revenue";
-import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
 
 export function createDepositTransaction(
   liquidityPool: LiquidityPoolStore,
@@ -80,33 +78,6 @@ export function UpdateMetricsAfterDeposit(block: ethereum.Block): void {
   metricsHourlySnapshot.save();
 
   protocol.save();
-}
-
-export function getAddLiquidityFeesUSD(
-  poolAddress: Address,
-  inputTokens: Address[],
-  fees: BigInt[],
-  block: ethereum.Block
-): BigDecimal {
-  let totalFeesUSD = constants.BIGDECIMAL_ZERO;
-
-  for (let idx = 0; idx < inputTokens.length; idx++) {
-    if (fees.at(idx) == constants.BIGINT_ZERO) continue;
-    if (inputTokens.at(idx).equals(poolAddress)) continue;
-
-    let inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
-
-    let inputTokenFee = fees
-      .at(idx)
-      .divDecimal(
-        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-      )
-      .times(inputToken.lastPriceUSD!);
-
-    totalFeesUSD = totalFeesUSD.plus(inputTokenFee);
-  }
-
-  return totalFeesUSD;
 }
 
 export function Deposit(
@@ -179,25 +150,11 @@ export function Deposit(
     block
   );
 
-  let protocolSideRevenueUSD = getAddLiquidityFeesUSD(
-    poolAddress,
-    inputTokens,
-    fees,
-    block
-  );
-
-  updateRevenueSnapshots(
-    pool,
-    constants.BIGDECIMAL_ZERO,
-    protocolSideRevenueUSD,
-    block
-  );
-
   utils.updateProtocolTotalValueLockedUSD();
   UpdateMetricsAfterDeposit(block);
 
   log.info(
-    "[AddLiquidity] LiquidityPool: {}, sharesMinted: {}, depositAmount: [{}], inputTokenBalances: [{}], depositAmountUSD: {}, fees: {}, feesUSD: {}, TxnHash: {}",
+    "[AddLiquidity] LiquidityPool: {}, sharesMinted: {}, depositAmount: [{}], inputTokenBalances: [{}], depositAmountUSD: {}, fees: {}, TxnHash: {}",
     [
       poolAddress.toHexString(),
       outputTokenMintedAmount.toString(),
@@ -205,7 +162,6 @@ export function Deposit(
       inputTokenBalances.join(", "),
       depositAmountUSD.truncate(1).toString(),
       fees.join(", "),
-      protocolSideRevenueUSD.truncate(1).toString(),
       transaction.hash.toHexString(),
     ]
   );
