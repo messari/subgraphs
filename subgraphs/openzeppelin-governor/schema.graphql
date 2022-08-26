@@ -113,12 +113,22 @@ type Proposal @entity {
   startBlock: BigInt!
   "Block number from where the voting ends"
   endBlock: BigInt!
+  "Transaction hash of the proposal being queued"
+  queueTxnHash: String
+  "Block number proposal was queued in"
+  queueBlock: BigInt
+  "Timestamp of block proposal was queued in"
+  queueTime: BigInt
   "Once the proposal is queued for execution it will have an ETA of the execution"
   executionETA: BigInt
+  "Transaction hash of the proposal execution"
+  executionTxnHash: String
   "Block number proposal was executed in"
   executionBlock: BigInt
   "Timestamp of block proposal was executed in"
   executionTime: BigInt
+  "Transaction hash of the proposal cancellation"
+  cancellationTxnHash: String
   "Block number proposal was canceled in"
   cancellationBlock: BigInt
   "Timestamp of block proposal was canceled in"

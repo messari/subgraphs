@@ -20,7 +20,8 @@ export const toDate = (timestamp: number, hour: boolean = false) => {
   return moment.utc(timestamp * 1000).format(formatString);
 };
 
-export const toUnitsSinceEpoch = (timestamp: number, hour: boolean) => {
+export const toUnitsSinceEpoch = (dateStr: string, hour: boolean) => {
+  const timestamp = moment.utc(dateStr).unix();
   if (hour) {
     return (timestamp / 3600).toFixed(0);
   }

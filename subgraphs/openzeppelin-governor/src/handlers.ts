@@ -213,6 +213,7 @@ export function _handleProposalCanceled(
 ): void {
   let proposal = getOrCreateProposal(proposalId);
   proposal.state = ProposalState.CANCELED;
+  proposal.cancellationTxnHash = event.transaction.hash.toHexString();
   proposal.cancellationBlock = event.block.number;
   proposal.cancellationTime = event.block.timestamp;
   proposal.save();
@@ -230,6 +231,7 @@ export function _handleProposalExecuted(
   // Update proposal status + execution metadata
   let proposal = getOrCreateProposal(proposalId);
   proposal.state = ProposalState.EXECUTED;
+  proposal.executionTxnHash = event.transaction.hash.toHexString();
   proposal.executionBlock = event.block.number;
   proposal.executionTime = event.block.timestamp;
   proposal.save();
@@ -251,10 +253,17 @@ export function _handleProposalExtended(
   proposal.save();
 }
 
-export function _handleProposalQueued(proposalId: BigInt, eta: BigInt): void {
+export function _handleProposalQueued(
+  proposalId: BigInt,
+  eta: BigInt,
+  event: ethereum.Event
+): void {
   // Update proposal status + execution metadata
   let proposal = getOrCreateProposal(proposalId.toString());
   proposal.state = ProposalState.QUEUED;
+  proposal.queueTxnHash = event.transaction.hash.toHexString();
+  proposal.queueBlock = event.block.number;
+  proposal.queueTime = event.block.timestamp;
   proposal.executionETA = eta;
   proposal.save();
 

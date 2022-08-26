@@ -1,21 +1,13 @@
-import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { LiquidityPool, _MasterChefStakingPool } from "../../generated/schema";
 import {
-  getOrCreateRewardToken,
   getOrCreateToken,
+  getOrCreateRewardToken,
 } from "../../src/common/initializers";
+import * as utils from "../common/utils";
+import * as constants from "../common/constants";
 import { getRewardsPerDay } from "../../src/common/rewards";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { getOrCreateMasterChef } from "../../src/common/masterchef/helpers";
-import {
-  INT_ZERO,
-  MasterChef,
-  PROTOCOL_TOKEN_ADDRESS,
-  RewardTokenType,
-} from "../../src/common/constants";
-import {
-  convertTokenToDecimal,
-  roundToWholeNumber,
-} from "../../src/common/utils";
+import { LiquidityPool, _MasterChefStakingPool } from "../../generated/schema";
 
 // Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
 export function updateMasterChef(
@@ -24,9 +16,12 @@ export function updateMasterChef(
   amount: BigInt
 ): void {
   let masterChefV2Pool = _MasterChefStakingPool.load(
-    MasterChef.MASTERCHEFV2 + "-" + pid.toString()
+    constants.MasterChef.MASTERCHEFV2 + "-" + pid.toString()
   )!;
-  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+  let masterChefV2 = getOrCreateMasterChef(
+    event,
+    constants.MasterChef.MASTERCHEFV2
+  );
 
   // Return if pool does not exist
   let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
@@ -35,13 +30,13 @@ export function updateMasterChef(
   }
 
   let rewardToken = getOrCreateToken(
-    PROTOCOL_TOKEN_ADDRESS,
+    constants.PROTOCOL_TOKEN_ADDRESS,
     event.block.number
   );
   pool.rewardTokens = [
     getOrCreateRewardToken(
-      PROTOCOL_TOKEN_ADDRESS,
-      RewardTokenType.DEPOSIT,
+      constants.PROTOCOL_TOKEN_ADDRESS,
+      constants.RewardTokenType.DEPOSIT,
       event.block
     ).id,
   ];
@@ -69,13 +64,15 @@ export function updateMasterChef(
     ? amount
     : pool.stakedOutputTokenAmount!.plus(amount);
   pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
+    BigInt.fromString(utils.roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
   pool.rewardTokenEmissionsUSD = [
-    convertTokenToDecimal(
-      pool.rewardTokenEmissionsAmount![INT_ZERO],
-      rewardToken.decimals
-    ).times(rewardToken.lastPriceUSD!),
+    utils
+      .convertTokenToDecimal(
+        pool.rewardTokenEmissionsAmount![constants.INT_ZERO],
+        rewardToken.decimals
+      )
+      .times(rewardToken.lastPriceUSD!),
   ];
 
   masterChefV2Pool.lastRewardBlock = event.block.number;

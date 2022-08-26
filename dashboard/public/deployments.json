@@ -25,11 +25,15 @@
             "polygon": "https://api.thegraph.com/subgraphs/name/messari/curve-finance-polygon",
             "optimism": "https://api.thegraph.com/subgraphs/name/messari/curve-finance-optimism"
         },
+        "ellipsis-finance": {
+            "bsc": "https://api.thegraph.com/subgraphs/name/messari/ellipsis-finance-bsc"
+        },
         "honeyswap": {
             "gnosis": "https://api.thegraph.com/subgraphs/name/messari/honeyswap-gnosis"
         },
         "mm-finance": {
-            "cronos": "https://graph.cronoslabs.com/subgraphs/name/messari/mm-finance"
+            "cronos": "https://graph.cronoslabs.com/subgraphs/name/messari/mm-finance",
+            "polygon": "https://api.thegraph.com/subgraphs/name/messari/mm-finance-polygon"
         },
         "platypus-finance": {
             "avalanche": "https://api.thegraph.com/subgraphs/name/messari/platypus-finance-avalanche"
@@ -78,7 +82,8 @@
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-arbitrum",
             "ethereum": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-ethereum",
             "polygon": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-polygon",
-            "optimism": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-optimism"
+            "optimism": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-optimism",
+            "celo": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-celo"
         },
         "vvs-finance": {
             "cronos": "https://graph.cronoslabs.com/subgraphs/name/messari/vvs-finance"
@@ -127,7 +132,7 @@
             "avalanche": "https://api.thegraph.com/subgraphs/name/messari/benqi-avalanche"
         },
         "compound-v2": {
-            "ethereum": "https://api.thegraph.com/subgraphs/name/messari/compound-ethereum"
+            "ethereum": "https://api.thegraph.com/subgraphs/name/messari/compound-v2-ethereum"
         },
         "cream-finance": {
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/cream-finance-arbitrum",
@@ -142,9 +147,6 @@
             "ethereum": "https://api.thegraph.com/subgraphs/name/messari/dforce-ethereum",
             "optimism": "https://api.thegraph.com/subgraphs/name/messari/dforce-optimism",
             "polygon": "https://api.thegraph.com/subgraphs/name/messari/dforce-polygon"
-        },
-        "ellipsis-finance": {
-            "bsc": "https://api.thegraph.com/subgraphs/name/messari/ellipsis-finance-bsc"
         },
         "euler-finance": {
             "ethereum": "https://api.thegraph.com/subgraphs/name/messari/euler-finance-ethereum"

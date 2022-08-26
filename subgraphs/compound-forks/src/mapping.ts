@@ -925,12 +925,15 @@ export function _handleLiquidateBorrow(
   // Not much to do other than associating with the borrower position
   // Because compound liquidate() emits both RepayBorrow and Liquidate
   // All logic should be handled on RepayBorrow already
-  liquidate.position = borrower
-    .toHexString()
-    .concat("-")
-    .concat(repayTokenMarketID)
-    .concat("-")
-    .concat(PositionSide.BORROWER);
+  let positionId = whichPosition(borrower, repayTokenMarketID);
+  if (!positionId) {
+    log.warning(
+      "[_liquidateBorrow] cannot find associated position for liquidation {}",
+      [liquidateID]
+    );
+    return;
+  }
+  liquidate.position = positionId!;
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.market = liquidatedCTokenID!;
@@ -2266,4 +2269,47 @@ export function updateAllMarketPrices(
       .times(underlyingTokenPriceUSD);
     market.save();
   }
+}
+
+//
+//
+// This function finds the position modified by a liquidateBorrow()
+function whichPosition(account: Address, market: string): string | null {
+  // check if position has been created
+  let counterID = account
+    .toHexString()
+    .concat("-")
+    .concat(market)
+    .concat("-")
+    .concat(PositionSide.BORROWER);
+  let positionCounter = _PositionCounter.load(counterID);
+  if (!positionCounter) {
+    log.warning("[whichPosition] position counter {} not found", [counterID]);
+    return null;
+  }
+
+  // first check if the position was not closed
+  // ie, nextPosition is not associated with a new position yet
+  let positionID = counterID
+    .concat("-")
+    .concat(positionCounter.nextCount.toString());
+  let position = Position.load(positionID);
+  if (!position) {
+    // next check if the previous position exists
+    // ie, the position associated was closed
+    positionID = counterID
+      .concat("-")
+      .concat((positionCounter.nextCount--).toString());
+    position = Position.load(positionID);
+    if (!position) {
+      log.warning("[whichPosition] position not found for liquidate", []);
+      return null;
+    }
+  }
+
+  // update position liquidation count
+  position.liquidationCount += 1;
+  position.save();
+
+  return position.id;
 }

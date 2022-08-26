@@ -1,23 +1,11 @@
 import {
-  ethereum,
-  BigInt,
-  Address,
-  log,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
-import {
   LiquidityPool,
   _MasterChef,
   _MasterChefStakingPool,
 } from "../../../generated/schema";
-import {
-  BIGINT_ONE,
-  BIGINT_ZERO,
-  PROTOCOL_TOKEN_ADDRESS,
-  INFLATION_INTERVAL,
-  STARTING_INFLATION_RATE,
-} from "../constants";
+import * as constants from "../constants";
 import { getOrCreateToken } from "../initializers";
+import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 
 export function createMasterChefStakingPool(
   event: ethereum.Event,
@@ -30,15 +18,15 @@ export function createMasterChefStakingPool(
   );
 
   masterChefPool.poolAddress = poolAddress.toHexString();
-  masterChefPool.multiplier = BIGINT_ONE;
-  masterChefPool.poolAllocPoint = BIGINT_ZERO;
+  masterChefPool.multiplier = constants.BIGINT_ONE;
+  masterChefPool.poolAllocPoint = constants.BIGINT_ZERO;
   masterChefPool.lastRewardBlock = event.block.number;
   log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (pool) {
     pool.rewardTokens = [
-      getOrCreateToken(PROTOCOL_TOKEN_ADDRESS, event.block.number).id,
+      getOrCreateToken(constants.PROTOCOL_TOKEN_ADDRESS, event.block.number).id,
     ];
     pool.save();
   }
@@ -57,16 +45,16 @@ export function getOrCreateMasterChef(
 
   if (!masterChef) {
     masterChef = new _MasterChef(masterChefType);
-    masterChef.totalAllocPoint = BIGINT_ZERO;
-    masterChef.rewardTokenInterval = INFLATION_INTERVAL;
+    masterChef.totalAllocPoint = constants.BIGINT_ZERO;
+    masterChef.rewardTokenInterval = constants.INFLATION_INTERVAL;
     masterChef.rewardTokenRate = BigInt.fromString(
-      STARTING_INFLATION_RATE.toString()
+      constants.STARTING_INFLATION_RATE.toString()
     );
     log.warning("MasterChef Type: " + masterChefType, []);
     masterChef.adjustedRewardTokenRate = BigInt.fromString(
-      STARTING_INFLATION_RATE.toString()
+      constants.STARTING_INFLATION_RATE.toString()
     );
-    masterChef.lastUpdatedRewardRate = BIGINT_ZERO;
+    masterChef.lastUpdatedRewardRate = constants.BIGINT_ZERO;
     masterChef.save();
   }
   return masterChef;
@@ -88,8 +76,8 @@ export function getOrCreateMasterChefStakingPool(
       masterChefType + "-" + pid.toString()
     );
 
-    masterChefPool.multiplier = BIGINT_ONE;
-    masterChefPool.poolAllocPoint = BIGINT_ZERO;
+    masterChefPool.multiplier = constants.BIGINT_ONE;
+    masterChefPool.poolAllocPoint = constants.BIGINT_ZERO;
     masterChefPool.lastRewardBlock = event.block.number;
     log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 

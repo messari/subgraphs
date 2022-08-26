@@ -57,7 +57,7 @@ export function handleProposalExecuted(event: ProposalExecuted): void {
 }
 
 export function handleProposalQueued(event: ProposalQueued): void {
-  _handleProposalQueued(event.params.proposalId, event.params.eta);
+  _handleProposalQueued(event.params.proposalId, event.params.eta, event);
 }
 
 export function handleQuorumNumeratorUpdated(

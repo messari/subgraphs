@@ -1,28 +1,11 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  dataSource,
-  DataSourceContext,
-  log,
-} from "@graphprotocol/graph-ts";
-import {
-  LendingPoolConfiguratorUpdated,
-  LendingPoolUpdated,
-  PriceOracleUpdated,
-  ProxyCreated,
-  LendingPoolAddressesProvider as AddressProviderContract,
-} from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
   GEIST_FTM_LP_ADDRESS,
   GFTM_ADDRESS,
   Protocol,
   REWARD_TOKEN_ADDRESS,
 } from "./constants";
-import {
-  LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
-  LendingPool as LendingPoolTemplate,
-} from "../../../generated/templates";
 import {
   BorrowingDisabledOnReserve,
   BorrowingEnabledOnReserve,
@@ -66,18 +49,13 @@ import {
   _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
-import {
-  getOrCreateLendingProtocol,
-  getOrCreateRewardToken,
-} from "../../../src/helpers";
+import { getOrCreateRewardToken } from "../../../src/helpers";
 import {
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
   exponentToBigDecimal,
-  readValue,
   RewardTokenType,
   SECONDS_PER_DAY,
-  ZERO_ADDRESS,
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { ChefIncentivesController } from "../../../generated/templates/LendingPool/ChefIncentivesController";
@@ -103,92 +81,9 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
   _handlePriceOracleUpdated(event.params.newAddress, getProtocolData());
 }
 
-export function handleLendingPoolUpdated(event: LendingPoolUpdated): void {
-  let context = initiateContext(event.address);
-  startIndexingLendingPool(event.params.newAddress, context);
-}
-
-export function handleLendingPoolConfiguratorUpdated(
-  event: LendingPoolConfiguratorUpdated
-): void {
-  let context = initiateContext(event.address);
-  startIndexingLendingPoolConfigurator(event.params.newAddress, context);
-}
-
-export function handleProxyCreated(event: ProxyCreated): void {
-  // Event handler for lending pool or configurator contract creation
-  let pool = event.params.id.toString();
-  let address = event.params.newAddress;
-  let context = initiateContext(event.address);
-
-  log.info("[ProxyCreated]: {}", [pool]);
-
-  if (pool == "LENDING_POOL") {
-    startIndexingLendingPool(address, context);
-  } else if (pool == "LENDING_POOL_CONFIGURATOR") {
-    startIndexingLendingPoolConfigurator(address, context);
-  }
-}
-
-export function startIndexingLendingPool(
-  poolAddress: Address,
-  context: DataSourceContext
-): void {
-  // Create a template for an implementation of a Lending Pool/Market
-  // This indexes for events which users act upon a lending pool within the lendingPool.ts mapping script
-  log.info("START INDEXING LENDING POOL", []);
-  LendingPoolTemplate.createWithContext(poolAddress, context);
-}
-
-export function startIndexingLendingPoolConfigurator(
-  configurator: Address,
-  context: DataSourceContext
-): void {
-  // Create a template for an implementation of a Lending Pool Configurator
-  // This indexes for events within the lendingPoolConfigurator.ts mapping script
-  log.info("START INDEXING LENDING POOL CONFIG", []);
-  LendingPoolConfiguratorTemplate.createWithContext(configurator, context);
-}
-
-function initiateContext(addrProvider: Address): DataSourceContext {
-  // Add Lending Pool address, price oracle contract address,
-  // and protocol id to the context for general accessibility
-  let contract = AddressProviderContract.bind(addrProvider);
-  log.info("AddrProvContract: " + addrProvider.toHexString(), []);
-  // Get the lending pool
-  let trylendingPool = contract.try_getLendingPool();
-  let lendingPool = "";
-  if (!trylendingPool.reverted) {
-    lendingPool = trylendingPool.value.toHexString();
-    log.info("initiateContext LP:" + lendingPool, []);
-  }
-
-  // Initialize the protocol entity
-  let lendingProtocol = getOrCreateLendingProtocol(getProtocolData());
-
-  let priceOracle = readValue<Address>(
-    contract.try_getPriceOracle(),
-    Address.fromString(ZERO_ADDRESS)
-  );
-
-  lendingProtocol.priceOracle = priceOracle.toHexString();
-  lendingProtocol.save();
-
-  let context = new DataSourceContext();
-  context.setString("lendingPool", lendingPool);
-
-  return context;
-}
-
 //////////////////////////////////////
 ///// Lending Pool Configuration /////
 //////////////////////////////////////
-
-export function getLendingPoolFromCtx(): string {
-  // Get the lending pool with context
-  let context = dataSource.context();
-  return context.getString("lendingPool");
-}
 
 export function handleReserveInitialized(event: ReserveInitialized): void {
   // This function handles market entity from reserve creation event
@@ -211,32 +106,37 @@ export function handleCollateralConfigurationChanged(
     event.params.asset,
     event.params.liquidationBonus,
     event.params.liquidationThreshold,
-    event.params.ltv
+    event.params.ltv,
+    getProtocolData()
   );
 }
 
 export function handleBorrowingEnabledOnReserve(
   event: BorrowingEnabledOnReserve
 ): void {
-  _handleBorrowingEnabledOnReserve(event.params.asset);
+  _handleBorrowingEnabledOnReserve(event.params.asset, getProtocolData());
 }
 
 export function handleBorrowingDisabledOnReserve(
   event: BorrowingDisabledOnReserve
 ): void {
-  _handleBorrowingDisabledOnReserve(event.params.asset);
+  _handleBorrowingDisabledOnReserve(event.params.asset, getProtocolData());
 }
 
 export function handleReserveActivated(event: ReserveActivated): void {
-  _handleReserveActivated(event.params.asset);
+  _handleReserveActivated(event.params.asset, getProtocolData());
 }
 
 export function handleReserveDeactivated(event: ReserveDeactivated): void {
-  _handleReserveDeactivated(event.params.asset);
+  _handleReserveDeactivated(event.params.asset, getProtocolData());
 }
 
 export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
-  _handleReserveFactorChanged(event.params.asset, event.params.factor);
+  _handleReserveFactorChanged(
+    event.params.asset,
+    event.params.factor,
+    getProtocolData()
+  );
 }
 
 /////////////////////////////////
@@ -353,7 +253,8 @@ export function handleReserveUsedAsCollateralDisabled(
   // This Event handler disables a reserve/market being used as collateral
   _handleReserveUsedAsCollateralDisabled(
     event.params.reserve,
-    event.params.user
+    event.params.user,
+    getProtocolData()
   );
 }
 

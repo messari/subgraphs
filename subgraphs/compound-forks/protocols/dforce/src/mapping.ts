@@ -419,7 +419,7 @@ export function handleUpdateInterest(event: AccrueInterest): void {
     comptrollerAddr,
     event.params.interestAccumulated,
     event.params.totalBorrows,
-    network.toLowerCase() == Network.MAINNET.toLowerCase() ? true : false,
+    network.toLowerCase() == Network.MAINNET.toLowerCase(),
     event
   );
 }
@@ -649,7 +649,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "dForce v2",
     "dforce-v2",
     "2.0.1",
-    "1.1.2",
+    "1.1.3",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
