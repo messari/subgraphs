@@ -5,16 +5,18 @@ import {
   dataSource,
   log,
 } from "@graphprotocol/graph-ts";
-import { Token, _PoolAddressesProvider } from "../../../../generated/schema";
-import { AaveOracle } from "../../../../generated/templates/Pool/AaveOracle";
+import { Token, _PoolAddressesProvider } from "../../../../../generated/schema";
+import { AaveOracle } from "../../../../../generated/templates/Pool/AaveOracle";
 import {
   BIGDECIMAL_ZERO,
+  BIGINT_TEN,
   BIGINT_ZERO,
   POOL_ADDRESSES_PROVIDER_ID_KEY,
   ZERO_ADDRESS,
-} from "../../../../src/utils/constants";
-import { bigIntToBigDecimal } from "../../../../src/utils/numbers";
-import { getTokenById } from "./token";
+} from "../../../../../src/utils/constants";
+import { bigIntToBigDecimal } from "../../../../../src/utils/numbers";
+import { getTokenById } from "../token";
+import { getTokenUSDPrice } from "./univ3";
 
 export function setPriceOracleAddress(
   poolAddressesProviderAddress: Address,
@@ -33,7 +35,9 @@ export function setPriceOracleAddress(
   poolAddressesProvider.save();
 }
 
-export function getAssetPrice(asset: Address): BigDecimal {
+export function getAssetPrice(asset: Token): BigDecimal {
+  const assetAddr = Address.fromString(asset.id);
+
   const poolAddressesProviderId = dataSource
     .context()
     .get(POOL_ADDRESSES_PROVIDER_ID_KEY);
@@ -53,15 +57,18 @@ export function getAssetPrice(asset: Address): BigDecimal {
   );
   const decimals = poolAddressesProvider.priceOracleDecimals;
   const priceOracle = AaveOracle.bind(priceOracleAddress);
-  const price = priceOracle.try_getAssetPrice(asset);
-  if (price.reverted) {
-    log.error(
-      "Failed to fetch asset price, contract call reverted. Price oracle: {}, asset: {}",
-      [priceOracleAddress.toHexString(), asset.toHexString()]
-    );
-    return BIGDECIMAL_ZERO;
+  const price = priceOracle.try_getAssetPrice(assetAddr);
+  if (!price.reverted) {
+    return bigIntToBigDecimal(price.value, decimals);
   }
-  return bigIntToBigDecimal(price.value, decimals);
+
+  log.warning(
+    "Failed to fetch asset price, contract call reverted. Price oracle: {}, asset: {}\n Falling back to uniswap v3",
+    [priceOracleAddress.toHexString(), assetAddr.toHexString()]
+  );
+
+  let assetDecimals = BIGINT_TEN.pow(asset.decimals as u8).toBigDecimal();
+  return getTokenUSDPrice(assetAddr, assetDecimals);
 }
 
 export function amountInUSD(amount: BigInt, token: Token): BigDecimal {
@@ -71,7 +78,6 @@ export function amountInUSD(amount: BigInt, token: Token): BigDecimal {
   if (token.underlyingAsset) {
     return amountInUSD(amount, getTokenById(token.underlyingAsset!));
   }
-  return bigIntToBigDecimal(amount, token.decimals).times(
-    getAssetPrice(Address.fromString(token.id))
-  );
+
+  return bigIntToBigDecimal(amount, token.decimals).times(getAssetPrice(token));
 }

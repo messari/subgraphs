@@ -123,7 +123,7 @@
           "template": "aave-v3.template.yaml",
           "messari": "messari/aave-v3-optimism",
           "dmelotik": "dmelotik/aave-v3-optimism",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },

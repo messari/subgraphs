@@ -434,7 +434,7 @@ export function closeMarketPosition(market: Market): void {
 
 function updateMarketTVL(event: ethereum.Event, market: Market): void {
   const token = getTokenById(market.inputToken);
-  const price = getAssetPrice(Address.fromString(market.inputToken));
+  const price = getAssetPrice(token);
   const totalValueLocked = bigIntToBigDecimal(
     market.inputTokenBalance,
     token.decimals
