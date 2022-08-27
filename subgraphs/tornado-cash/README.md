@@ -19,14 +19,15 @@ Currently, it is fixed at 0.3% . Some pools remain without fees, either because 
 
 Due to the OFAC sanction recently, most the web services of Tornado Cash are affected. The following are the sites and their backups:
 
-- Protocol site: https://app.tornado.cash/
-  - https://ipfs.io/ipfs/bafybeicu2anhh7cxbeeakzqjfy3pisok2nakyiemm3jxd66ng35ib6y5ri/  
-- Docs: https://docs.tornado.cash/
-  - Introduction (cached): https://webcache.googleusercontent.com/search?q=cache:bQAucJ24f78J:https://docs.tornado.cash/&cd=3&hl=zh-CN&ct=clnk&gl=sg
-  - Relayer (cached): https://webcache.googleusercontent.com/search?q=cache:hmXYtuLQfXQJ:https://docs.tornado.cash/general/how-to-become-a-relayer
-  - How to use with TOR (cached): https://webcache.googleusercontent.com/search?q=cache:wH5XFMOVI0QJ:https://docs.tornado.cash/general/how-to-use-tornado-cash-with-tor
-  - Anonymity mining (cached): https://webcache.googleusercontent.com/search?q=cache:pRxbB6rJk6YJ:https://docs.tornado.cash/tornado-cash-classic/anonymity-mining
-- Smart Contracts (cached):https://webcache.googleusercontent.com/search?q=cache:FTw69XNSzv0J:https://docs.tornado.cash/general/tornado-cash-smart-contracts 
+- Protocol site: https://tornadocash.eth.link/
+  - https://ipfs.io/ipfs/bafybeicu2anhh7cxbeeakzqjfy3pisok2nakyiemm3jxd66ng35ib6y5ri/
+- Token: https://etherscan.io/address/0x77777feddddffc19ff86db637967013e6c6a116c (Mainnet)
+  - https://bscscan.com/address/0x1ba8d3c4c219b124d351f603060663bd1bcd9bbf (Bsc)
+- Docs (forked): https://github.com/Garf1eld99/docs/blob/en/SUMMARY.md
+  - Introduction: https://github.com/Garf1eld99/docs/blob/en/README.md
+  - Relayer: https://github.com/Garf1eld99/docs/blob/en/general/how-to-become-a-relayer.md
+  - Anonymity mining: https://github.com/Garf1eld99/docs/blob/en/tornado-cash-classic/anonymity-mining.md
+- Smart Contracts: https://github.com/Garf1eld99/docs/blob/en/general/tornado-cash-smart-contracts.md
 
 ## Tornado Cash accepted tokens on different chains
 - Ethereum Blockchain : ETH (Ethereum), DAI (Dai), cDAI (Compound Dai), USDC (USD Coin), USDT (Tether) & WBTC (Wrapped Bitcoin)

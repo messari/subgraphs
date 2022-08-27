@@ -1,0 +1,655 @@
+[
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_rewardSwap", "type": "bytes32" },
+      { "internalType": "bytes32", "name": "_governance", "type": "bytes32" },
+      { "internalType": "bytes32", "name": "_tornadoTrees", "type": "bytes32" },
+      {
+        "internalType": "bytes32[3]",
+        "name": "_verifiers",
+        "type": "bytes32[3]"
+      },
+      { "internalType": "bytes32", "name": "_accountRoot", "type": "bytes32" },
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "instance", "type": "bytes32" },
+          { "internalType": "uint256", "name": "value", "type": "uint256" }
+        ],
+        "internalType": "struct Miner.Rate[]",
+        "name": "_rates",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "commitment",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "nullifier",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "encryptedAccount",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "NewAccount",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "instance",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "RateChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "reward",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "withdraw",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "treeUpdate",
+        "type": "address"
+      }
+    ],
+    "name": "VerifiersUpdated",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "ACCOUNT_ROOT_HISTORY_SIZE",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "accountCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "accountNullifiers",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "accountRoots",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes[]", "name": "_rewardArgs", "type": "bytes[]" }
+    ],
+    "name": "batchReward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32[]", "name": "domains", "type": "bytes32[]" }
+    ],
+    "name": "bulkResolve",
+    "outputs": [
+      { "internalType": "address[]", "name": "result", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getLastAccountRoot",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "governance",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "_root", "type": "bytes32" },
+      { "internalType": "uint256", "name": "_index", "type": "uint256" }
+    ],
+    "name": "isKnownAccountRoot",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "rates",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "node", "type": "bytes32" }
+    ],
+    "name": "resolve",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes", "name": "_proof", "type": "bytes" },
+      {
+        "components": [
+          { "internalType": "uint256", "name": "rate", "type": "uint256" },
+          { "internalType": "uint256", "name": "fee", "type": "uint256" },
+          { "internalType": "address", "name": "instance", "type": "address" },
+          {
+            "internalType": "bytes32",
+            "name": "rewardNullifier",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "extDataHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "depositRoot",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "withdrawalRoot",
+            "type": "bytes32"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "relayer",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "encryptedAccount",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct Miner.RewardExtData",
+            "name": "extData",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "inputRoot",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "inputNullifierHash",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "outputRoot",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "outputPathIndices",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "outputCommitment",
+                "type": "bytes32"
+              }
+            ],
+            "internalType": "struct Miner.AccountUpdate",
+            "name": "account",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Miner.RewardArgs",
+        "name": "_args",
+        "type": "tuple"
+      },
+      { "internalType": "bytes", "name": "_treeUpdateProof", "type": "bytes" },
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "oldRoot", "type": "bytes32" },
+          { "internalType": "bytes32", "name": "newRoot", "type": "bytes32" },
+          { "internalType": "bytes32", "name": "leaf", "type": "bytes32" },
+          {
+            "internalType": "uint256",
+            "name": "pathIndices",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Miner.TreeUpdateArgs",
+        "name": "_treeUpdateArgs",
+        "type": "tuple"
+      }
+    ],
+    "name": "reward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes", "name": "_proof", "type": "bytes" },
+      {
+        "components": [
+          { "internalType": "uint256", "name": "rate", "type": "uint256" },
+          { "internalType": "uint256", "name": "fee", "type": "uint256" },
+          { "internalType": "address", "name": "instance", "type": "address" },
+          {
+            "internalType": "bytes32",
+            "name": "rewardNullifier",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "extDataHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "depositRoot",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "withdrawalRoot",
+            "type": "bytes32"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "relayer",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "encryptedAccount",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct Miner.RewardExtData",
+            "name": "extData",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "inputRoot",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "inputNullifierHash",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "outputRoot",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "outputPathIndices",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "outputCommitment",
+                "type": "bytes32"
+              }
+            ],
+            "internalType": "struct Miner.AccountUpdate",
+            "name": "account",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Miner.RewardArgs",
+        "name": "_args",
+        "type": "tuple"
+      }
+    ],
+    "name": "reward",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "rewardNullifiers",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "rewardSwap",
+    "outputs": [
+      { "internalType": "contract IRewardSwap", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "rewardVerifier",
+    "outputs": [
+      { "internalType": "contract IVerifier", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_newWeight", "type": "uint256" }
+    ],
+    "name": "setPoolWeight",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "instance", "type": "bytes32" },
+          { "internalType": "uint256", "name": "value", "type": "uint256" }
+        ],
+        "internalType": "struct Miner.Rate[]",
+        "name": "_rates",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "setRates",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract TornadoTrees",
+        "name": "_tornadoTrees",
+        "type": "address"
+      }
+    ],
+    "name": "setTornadoTreesContract",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IVerifier[3]",
+        "name": "_verifiers",
+        "type": "address[3]"
+      }
+    ],
+    "name": "setVerifiers",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tornadoTrees",
+    "outputs": [
+      { "internalType": "contract TornadoTrees", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "treeUpdateVerifier",
+    "outputs": [
+      { "internalType": "contract IVerifier", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes", "name": "_proof", "type": "bytes" },
+      {
+        "components": [
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          {
+            "internalType": "bytes32",
+            "name": "extDataHash",
+            "type": "bytes32"
+          },
+          {
+            "components": [
+              { "internalType": "uint256", "name": "fee", "type": "uint256" },
+              {
+                "internalType": "address",
+                "name": "recipient",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "relayer",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "encryptedAccount",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct Miner.WithdrawExtData",
+            "name": "extData",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "inputRoot",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "inputNullifierHash",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "outputRoot",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "outputPathIndices",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "outputCommitment",
+                "type": "bytes32"
+              }
+            ],
+            "internalType": "struct Miner.AccountUpdate",
+            "name": "account",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Miner.WithdrawArgs",
+        "name": "_args",
+        "type": "tuple"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes", "name": "_proof", "type": "bytes" },
+      {
+        "components": [
+          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          {
+            "internalType": "bytes32",
+            "name": "extDataHash",
+            "type": "bytes32"
+          },
+          {
+            "components": [
+              { "internalType": "uint256", "name": "fee", "type": "uint256" },
+              {
+                "internalType": "address",
+                "name": "recipient",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "relayer",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "encryptedAccount",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct Miner.WithdrawExtData",
+            "name": "extData",
+            "type": "tuple"
+          },
+          {
+            "components": [
+              {
+                "internalType": "bytes32",
+                "name": "inputRoot",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "inputNullifierHash",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "outputRoot",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "outputPathIndices",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "outputCommitment",
+                "type": "bytes32"
+              }
+            ],
+            "internalType": "struct Miner.AccountUpdate",
+            "name": "account",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct Miner.WithdrawArgs",
+        "name": "_args",
+        "type": "tuple"
+      },
+      { "internalType": "bytes", "name": "_treeUpdateProof", "type": "bytes" },
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "oldRoot", "type": "bytes32" },
+          { "internalType": "bytes32", "name": "newRoot", "type": "bytes32" },
+          { "internalType": "bytes32", "name": "leaf", "type": "bytes32" },
+          {
+            "internalType": "uint256",
+            "name": "pathIndices",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Miner.TreeUpdateArgs",
+        "name": "_treeUpdateArgs",
+        "type": "tuple"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawVerifier",
+    "outputs": [
+      { "internalType": "contract IVerifier", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
