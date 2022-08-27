@@ -118,7 +118,7 @@ export const FEE_DENOMINATOR = BigDecimal.fromString("10000000000");
 export const DEFAULT_POOL_FEE = BigInt.fromString("4000000");
 export const DEFAULT_ADMIN_FEE = BigInt.fromString("5000000000");
 
-export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
+export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(7500);
 
 export namespace Mainnet {
   export const REGISTRY_ADDRESS = Address.fromString(
@@ -145,6 +145,10 @@ export namespace Mainnet {
     "0xd533a949740bb3306d119cc777fa900ba034cd52"
   );
 }
+
+export const ETH_ADDRESS = Address.fromString(
+  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+);
 
 export const MISSING_LP_TOKENS = new Map<string, string>();
 

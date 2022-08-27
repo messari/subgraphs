@@ -4,20 +4,17 @@ import {
   updatePoolSnapshots,
 } from "../modules/Metrics";
 import {
-  NewFee,
   AddLiquidity,
   TokenExchange,
   RemoveLiquidity,
   RemoveLiquidityOne,
   TokenExchangeUnderlying,
   RemoveLiquidityImbalance,
-  NewFee1 as NewFeeWithFeeMultiplier,
   AddLiquidity2 as AddLiquidityWithFees,
   RemoveLiquidity2 as RemoveLiquidityWithFees,
   RemoveLiquidityOne1 as RemoveLiquidityOneWithSupply,
 } from "../../generated/templates/PoolTemplate/Pool";
 import { Swap } from "../modules/Swap";
-import * as utils from "../common/utils";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
 import * as constants from "../common/constants";
@@ -77,7 +74,6 @@ export function handleTokenExchangeUnderlying(
 
 export function handleAddLiquidity(event: AddLiquidity): void {
   const liquidityPoolAddress = event.address;
-  const fees = event.params.fee;
 
   const provider = event.params.provider;
   const tokenAmounts = event.params.token_amounts;
@@ -87,7 +83,6 @@ export function handleAddLiquidity(event: AddLiquidity): void {
     liquidityPoolAddress,
     tokenAmounts,
     totalSupply,
-    [fees],
     provider,
     event.transaction,
     event.block
@@ -100,8 +95,6 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 
 export function handleAddLiquidityWithFees(event: AddLiquidityWithFees): void {
   const liquidityPoolAddress = event.address;
-  const fees = event.params.fees;
-  const invariant = event.params.invariant;
 
   const provider = event.params.provider;
   const tokenAmounts = event.params.token_amounts;
@@ -111,7 +104,6 @@ export function handleAddLiquidityWithFees(event: AddLiquidityWithFees): void {
     liquidityPoolAddress,
     tokenAmounts,
     totalSupply,
-    fees,
     provider,
     event.transaction,
     event.block
@@ -134,7 +126,6 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
     constants.BIGINT_NEGATIVE_ONE,
     tokenSupplyAfterWithdrawal,
     provider,
-    [],
     event.transaction,
     event.block,
     event
@@ -160,7 +151,6 @@ export function handleRemoveLiquidityWithFees(
     constants.BIGINT_NEGATIVE_ONE,
     tokenSupplyAfterWithdrawal,
     provider,
-    fees,
     event.transaction,
     event.block,
     event
@@ -181,9 +171,8 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
     liquidityPoolAddress,
     [withdrawnCoinAmounts],
     outputTokenBurntAmount,
-    constants.BIGINT_NEGATIVE_ONE,
+    null,
     provider,
-    [],
     event.transaction,
     event.block,
     event
@@ -209,7 +198,6 @@ export function handleRemoveLiquidityOneWithSupply(
     outputTokenBurntAmount,
     tokenSupplyAfterWithdrawal,
     provider,
-    [],
     event.transaction,
     event.block,
     event
@@ -223,9 +211,7 @@ export function handleRemoveLiquidityOneWithSupply(
 export function handleRemoveLiquidityImbalance(
   event: RemoveLiquidityImbalance
 ): void {
-  const fees = event.params.fees;
   const provider = event.params.provider;
-  const invariant = event.params.invariant;
   const liquidityPoolAddress = event.address;
   const withdrawnTokenAmounts = event.params.token_amounts;
   const tokenSupplyAfterWithdrawal = event.params.token_supply;
@@ -236,7 +222,6 @@ export function handleRemoveLiquidityImbalance(
     constants.BIGINT_NEGATIVE_ONE,
     tokenSupplyAfterWithdrawal,
     provider,
-    fees,
     event.transaction,
     event.block,
     event
@@ -246,9 +231,3 @@ export function handleRemoveLiquidityImbalance(
   updatePoolSnapshots(liquidityPoolAddress, event.block);
   updateFinancials(event.block);
 }
-
-export function handleNewFee(event: NewFee): void {}
-
-export function handleNewFeeWithFeeMultiplier(
-  event: NewFeeWithFeeMultiplier
-): void {}

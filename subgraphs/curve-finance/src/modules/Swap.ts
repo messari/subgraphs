@@ -149,11 +149,6 @@ export function Swap(
     liquidityPoolAddress,
     pool.inputTokens
   );
-  pool.totalValueLockedUSD = utils.getPoolTVL(
-    pool.inputTokens,
-    pool.inputTokenBalances,
-    block
-  );
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,

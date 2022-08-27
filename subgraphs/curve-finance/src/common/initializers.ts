@@ -4,6 +4,7 @@ import {
   Address,
   ethereum,
   BigDecimal,
+  DataSourceContext,
 } from "@graphprotocol/graph-ts";
 import {
   Token,
@@ -23,6 +24,7 @@ import * as utils from "./utils";
 import * as constants from "./constants";
 import { getUsdPricePerToken } from "../prices";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
+import { LiquidityGauge as LiquidityGaugeTemplate } from "../../generated/templates";
 import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
 import { Versions } from "../versions";
 
@@ -71,6 +73,12 @@ export function getOrCreateLiquidityPoolFee(
     fees = new LiquidityPoolFee(feeId);
 
     fees.feeType = feeType;
+    fees.feePercentage = feePercentage;
+
+    fees.save();
+  }
+
+  if (feePercentage.notEqual(constants.BIGDECIMAL_ZERO)) {
     fees.feePercentage = feePercentage;
 
     fees.save();
@@ -127,6 +135,12 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       .readValue<BigInt>(contract.try_decimals(), constants.DEFAULT_DECIMALS)
       .toI32();
 
+    if (address.equals(constants.ETH_ADDRESS)) {
+      token.name = "ETH";
+      token.symbol = "ETH";
+      token.decimals = constants.DEFAULT_DECIMALS.toI32();
+    }
+
     let tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = blockNumber;
@@ -140,7 +154,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       .minus(token.lastPriceBlockNumber!)
       .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
   ) {
-    let tokenPrice = getUsdPricePerToken(address);
+    let tokenPrice = getUsdPricePerToken (address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = blockNumber;
 
@@ -275,6 +289,7 @@ export function getOrCreateLiquidityPoolDailySnapshots(
 
     poolSnapshots.rewardTokenEmissionsAmount = null;
     poolSnapshots.rewardTokenEmissionsUSD = null;
+    poolSnapshots.stakedOutputTokenAmount = null;
 
     poolSnapshots.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -331,6 +346,7 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
 
     poolSnapshots.rewardTokenEmissionsAmount = null;
     poolSnapshots.rewardTokenEmissionsUSD = null;
+    poolSnapshots.stakedOutputTokenAmount = null;
 
     poolSnapshots.hourlySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -354,7 +370,8 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
 }
 
 export function getOrCreateLiquidityGauge(
-  gaugeAddress: Address
+  gaugeAddress: Address,
+  poolAddress: Address | null = null
 ): _LiquidityGauge {
   let liquidityGauge = _LiquidityGauge.load(gaugeAddress.toHexString());
 
@@ -363,6 +380,13 @@ export function getOrCreateLiquidityGauge(
 
     liquidityGauge.poolAddress = constants.NULL.TYPE_STRING;
     liquidityGauge.save();
+
+    if (poolAddress) {
+      const context = new DataSourceContext();
+      context.setString("poolAddress", poolAddress.toHexString());
+
+      LiquidityGaugeTemplate.createWithContext(gaugeAddress, context);
+    }
   }
 
   return liquidityGauge;
@@ -370,14 +394,17 @@ export function getOrCreateLiquidityGauge(
 
 export function getOrCreateLpToken(
   lpTokenAddress: Address,
-  poolAddress: Address
+  poolAddress: Address | null = null
 ): _LpToken {
   let lpToken = _LpToken.load(lpTokenAddress.toHexString());
 
   if (!lpToken) {
     lpToken = new _LpToken(lpTokenAddress.toHexString());
+    lpToken.poolAddress = constants.NULL.TYPE_STRING;
 
-    lpToken.poolAddress = poolAddress.toHexString();
+    if (poolAddress) {
+      lpToken.poolAddress = poolAddress.toHexString();
+    }
     lpToken.save();
   }
 

@@ -7,8 +7,10 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   getOrCreateToken,
+  getOrCreateLiquidityPool,
   getOrCreateDexAmmProtocol,
   getOrCreateLiquidityPoolFee,
+  getOrCreateLpToken,
 } from "./initializers";
 import { PoolFeesType } from "./types";
 import * as constants from "../common/constants";
@@ -144,6 +146,28 @@ export function getPoolFromCoins(
   return constants.NULL.TYPE_ADDRESS;
 }
 
+export function getOutputTokenPriceUSD(
+  poolAddress: Address,
+  block: ethereum.Block
+): BigDecimal {
+  const pool = getOrCreateLiquidityPool(poolAddress, block);
+
+  if (pool.outputTokenSupply!.equals(constants.BIGINT_ZERO))
+    return constants.BIGDECIMAL_ZERO;
+
+  let lpToken = getLpTokenFromPool(poolAddress, block);
+
+  let outputTokenSupply = pool.outputTokenSupply!.divDecimal(
+    constants.BIGINT_TEN.pow(lpToken.decimals as u8).toBigDecimal()
+  );
+  let outputTokenPriceUSD = pool.totalValueLockedUSD.div(outputTokenSupply);
+
+  lpToken.lastPriceUSD = outputTokenPriceUSD;
+  lpToken.save();
+
+  return outputTokenPriceUSD;
+}
+
 export function getPoolCoins(
   poolAddress: Address,
   block: ethereum.Block
@@ -178,7 +202,10 @@ export function getPoolCoins(
   return inputTokens;
 }
 
-export function getPoolBalances(poolAddress: Address, inputTokens: string[]): BigInt[] {
+export function getPoolBalances(
+  poolAddress: Address,
+  inputTokens: string[]
+): BigInt[] {
   const curvePool = PoolContract.bind(poolAddress);
 
   let inputTokenBalances: BigInt[] = [];
@@ -207,11 +234,11 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
   let totalFees = readValue<BigInt>(
     curvePool.try_fee(),
     constants.DEFAULT_POOL_FEE
-  );
+  ).divDecimal(constants.FEE_DENOMINATOR);
   let adminFees = readValue<BigInt>(
     curvePool.try_admin_fee(),
     constants.DEFAULT_ADMIN_FEE
-  );
+  ).divDecimal(constants.FEE_DENOMINATOR);
 
   const tradingFeeId =
     enumToPrefix(constants.LiquidityPoolFeeType.FIXED_TRADING_FEE) +
@@ -219,9 +246,7 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
   let tradingFee = getOrCreateLiquidityPoolFee(
     tradingFeeId,
     constants.LiquidityPoolFeeType.FIXED_TRADING_FEE,
-    totalFees
-      .divDecimal(constants.FEE_DENOMINATOR)
-      .times(constants.BIGDECIMAL_HUNDRED)
+    totalFees.times(constants.BIGDECIMAL_HUNDRED)
   );
 
   const protocolFeeId =
@@ -230,10 +255,7 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
   let protocolFee = getOrCreateLiquidityPoolFee(
     protocolFeeId,
     constants.LiquidityPoolFeeType.FIXED_PROTOCOL_FEE,
-    totalFees
-      .times(adminFees)
-      .divDecimal(constants.FEE_DENOMINATOR)
-      .times(constants.BIGDECIMAL_HUNDRED)
+    totalFees.times(adminFees).times(constants.BIGDECIMAL_HUNDRED)
   );
 
   const lpFeeId =
@@ -243,8 +265,7 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
     lpFeeId,
     constants.LiquidityPoolFeeType.FIXED_LP_FEE,
     totalFees
-      .minus(adminFees.times(totalFees))
-      .divDecimal(constants.FEE_DENOMINATOR)
+      .minus(totalFees.times(adminFees))
       .times(constants.BIGDECIMAL_HUNDRED)
   );
 
@@ -260,6 +281,12 @@ export function getPoolFromLpToken(lpTokenAddress: Address): Address {
     registryContract.try_get_pool_from_lp_token(lpTokenAddress),
     constants.NULL.TYPE_ADDRESS
   );
+
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) {
+    let lpTokenStore = getOrCreateLpToken(lpTokenAddress);
+
+    poolAddress = Address.fromString(lpTokenStore.poolAddress);
+  }
 
   return poolAddress;
 }
@@ -336,7 +363,9 @@ export function getPoolTokenWeights(
     let inputToken = getOrCreateTokenFromString(inputTokens[idx], block.number);
 
     let balanceUSD = balance
-      .divDecimal(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
+      .divDecimal(
+        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+      )
       .times(inputToken.lastPriceUSD!);
     let weight = balanceUSD.div(totalValueLockedUSD);
 
@@ -359,7 +388,9 @@ export function getPoolTVL(
     let inputToken = getOrCreateTokenFromString(inputTokens[idx], block.number);
 
     let amountUSD = inputTokenBalance
-      .divDecimal(constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal())
+      .divDecimal(
+        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+      )
       .times(inputToken.lastPriceUSD!);
 
     totalValueLockedUSD = totalValueLockedUSD.plus(amountUSD);

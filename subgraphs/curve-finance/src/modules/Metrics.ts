@@ -99,6 +99,11 @@ export function updatePoolSnapshots(
   poolHourlySnapshots.rewardTokenEmissionsAmount =
     pool.rewardTokenEmissionsAmount;
 
+  poolDailySnapshots.stakedOutputTokenAmount =
+    pool.stakedOutputTokenAmount;
+  poolHourlySnapshots.stakedOutputTokenAmount =
+    pool.stakedOutputTokenAmount;
+
   poolDailySnapshots.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
   poolHourlySnapshots.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
 

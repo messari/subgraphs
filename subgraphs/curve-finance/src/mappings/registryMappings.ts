@@ -15,8 +15,6 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { Address, log } from "@graphprotocol/graph-ts";
 import { PoolTemplate } from "../../generated/templates";
-import { updateCrvRewardsInfo, updateRewardTokenInfo } from "../modules/Rewards";
-import { LiquidityGauge as LiquidityGaugeTemplate } from "../../generated/templates";
 
 export function handlePoolAdded(event: PoolAdded): void {
   let registryAddress = event.address;
@@ -77,7 +75,9 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
 
   let basePoolAddress = event.params.base_pool;
   let basePool = getOrCreateLiquidityPool(basePoolAddress, event.block);
-  let basePoolCoins = basePool.inputTokens.map<Address>((x) => Address.fromString(x));
+  let basePoolCoins = basePool.inputTokens.map<Address>((x) =>
+    Address.fromString(x)
+  );
   let poolCoins = [event.params.coin].concat(basePoolCoins);
 
   let poolAddress = utils.getPoolFromCoins(registryAddress, poolCoins);
@@ -111,13 +111,10 @@ export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
 
   PoolTemplate.create(poolAddress);
 
-  log.warning(
-    "[CryptoPoolDeployed] PoolAddress: {}, TxnHash: {}",
-    [
-      poolAddress.toHexString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
+  log.warning("[CryptoPoolDeployed] PoolAddress: {}, TxnHash: {}", [
+    poolAddress.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
 }
 
 export function handleLiquidityGaugeDeployed(
@@ -127,18 +124,13 @@ export function handleLiquidityGaugeDeployed(
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
 
   const gaugeAddress = event.params.gauge;
-  const gauge = getOrCreateLiquidityGauge(gaugeAddress);
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
 
   pool._gaugeAddress = gauge.id;
   gauge.poolAddress = pool.id;
 
   gauge.save();
   pool.save();
-
-  LiquidityGaugeTemplate.create(gaugeAddress);
-
-  updateCrvRewardsInfo(poolAddress, gaugeAddress, event.block);
-  updateRewardTokenInfo(poolAddress, gaugeAddress, event.block);
 
   log.warning(
     "[LiquidityGaugeDeployed] GaugeAddress: {}, PoolAddress: {}, TxnHash: {}",
@@ -158,7 +150,7 @@ export function handleLiquidityGaugeDeployedWithToken(
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
 
   const gaugeAddress = event.params.gauge;
-  const gauge = getOrCreateLiquidityGauge(gaugeAddress);
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
 
   pool.outputToken = lpToken.toHexString();
   pool._gaugeAddress = gauge.id;
@@ -166,11 +158,6 @@ export function handleLiquidityGaugeDeployedWithToken(
 
   gauge.save();
   pool.save();
-
-  LiquidityGaugeTemplate.create(gaugeAddress);
-
-  updateCrvRewardsInfo(poolAddress, gaugeAddress, event.block);
-  updateRewardTokenInfo(poolAddress, gaugeAddress, event.block);
 
   log.warning(
     "[LiquidityGaugeDeployedWithToken] GaugeAddress: {}, PoolAddress: {}, lpToken:{}, TxnHash: {}",
