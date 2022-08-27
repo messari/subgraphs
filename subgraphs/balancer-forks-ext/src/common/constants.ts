@@ -95,7 +95,7 @@ export namespace NULL {
 export namespace Protocol {
   export const NAME = "Balancer v2";
   export const SLUG = "balancer-v2";
-  export const NETWORK = Network.MATIC;
+  export const NETWORK = Network.ARBITRUM_ONE;
   export const SCHEMA_VERSION = "1.3.0";
   export const SUBGRAPH_VERSION = "1.1.0";
   export const METHODOLOGY_VERSION = "1.0.0";
@@ -151,10 +151,10 @@ export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
   "0xce88686553686DA562CE7Cea497CE749DA109f9F"
 );
 export const PROTOCOL_TOKEN_ADDRESS = Address.fromString(
-  "0x9a71012B13CA4d3D0Cdc72A177DF3ef03b0E76A3"
+  "0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "0x3b8cA519122CdD8efb272b0D3085453404B25bD0"
+  "0xb08E16cFc07C684dAA2f93C70323BAdb2A6CBFd2"
 );
 export const AAVE_BOOSTED_POOL_ADDRESS = Address.fromString(
   "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2"
