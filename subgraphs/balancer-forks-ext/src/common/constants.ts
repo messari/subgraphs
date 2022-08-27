@@ -93,9 +93,9 @@ export namespace NULL {
 }
 
 export namespace Protocol {
-  export const NAME = "Balancer v2";
-  export const SLUG = "balancer-v2";
-  export const NETWORK = Network.ARBITRUM_ONE;
+  export const NAME = "Beethoven X";
+  export const SLUG = "beethoven-x";
+  export const NETWORK = Network.OPTIMISM;
   export const SCHEMA_VERSION = "1.3.0";
   export const SUBGRAPH_VERSION = "1.1.0";
   export const METHODOLOGY_VERSION = "1.0.0";
@@ -151,14 +151,14 @@ export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
   "0xce88686553686DA562CE7Cea497CE749DA109f9F"
 );
 export const PROTOCOL_TOKEN_ADDRESS = Address.fromString(
-  "0x040d1edc9569d4bab2d15287dc5a4f10f56a56b8"
+  "0x97513e975a7fA9072c72C92d8000B0dB90b163c5"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "0xb08E16cFc07C684dAA2f93C70323BAdb2A6CBFd2"
+  "0x2E96068b3D5B5BAE3D7515da4A1D2E52d08A2647"
 );
 export const AAVE_BOOSTED_POOL_ADDRESS = Address.fromString(
   "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2"
 );
 
-export const INFLATION_INTERVAL = "NONE";
+export const INFLATION_INTERVAL = "TIMESTAMP";
 export const STARTING_INFLATION_RATE = BigDecimal.fromString((0).toString()).times(DEFAULT_DECIMALS_DENOMINATOR);
