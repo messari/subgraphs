@@ -80,7 +80,7 @@ export function updateRevenueSnapshots(
   );
 
   vault.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD.plus(
-    supplySideRevenueUSD
+    totalRevenueUSD
   );
   vaultDailySnapshot.cumulativeTotalRevenueUSD =
     vault.cumulativeTotalRevenueUSD;
