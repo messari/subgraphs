@@ -8,6 +8,7 @@ import {
   PoolHourlySnapshot,
 } from "../../generated/schema";
 import {
+  RPL_ADDRESS,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   ETH_ADDRESS,
@@ -19,7 +20,8 @@ import { getOrCreateToken } from "../entities/token";
 
 export function updateProtocolAndPoolTvl(
   block: ethereum.Block,
-  amount: BigInt
+  amount: BigInt,
+  rewards_amount: BigInt
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
@@ -33,6 +35,17 @@ export function updateProtocolAndPoolTvl(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
   );
+  pool.rewardTokens = [
+    getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number).name,
+  ];
+  pool.rewardTokenEmissionsAmount = [rewards_amount];
+  pool.rewardTokenEmissionsUSD = [
+    bigIntToBigDecimal(rewards_amount).times(
+      getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number)
+        .lastPriceUSD!
+    ),
+  ];
+
   pool.save();
 
   // Pool Daily and Hourly
@@ -63,22 +76,32 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
   // Pool Daily
   poolMetricsDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsDailySnapshot.inputTokenBalances = pool.inputTokenBalances;
+  poolMetricsDailySnapshot.rewardTokenEmissionsAmount =
+    pool.rewardTokenEmissionsAmount;
+  poolMetricsDailySnapshot.rewardTokenEmissionsUSD =
+    pool.rewardTokenEmissionsUSD;
+
   poolMetricsDailySnapshot.save();
 
   // Pool Hourly
   poolMetricsHourlySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsHourlySnapshot.inputTokenBalances = pool.inputTokenBalances;
+  poolMetricsHourlySnapshot.rewardTokenEmissionsAmount =
+    pool.rewardTokenEmissionsAmount;
+  poolMetricsHourlySnapshot.rewardTokenEmissionsUSD =
+    pool.rewardTokenEmissionsUSD;
+
   poolMetricsHourlySnapshot.save();
 
   // Financials Daily
   financialMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+
   financialMetrics.save();
 }
 
 export function updateTotalRevenueMetrics(
   block: ethereum.Block,
-  preTotalPooledEther: BigDecimal,
-  postTotalPooledEther: BigInt,
+  newRewardEth: BigDecimal,
   totalShares: BigInt
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
@@ -94,12 +117,13 @@ export function updateTotalRevenueMetrics(
   );
 
   // Staking Rewards
-  const stakingRewards =
-    bigIntToBigDecimal(postTotalPooledEther).minus(preTotalPooledEther);
-  const stakingRewardsUSD = stakingRewards.times(
+
+  const total_usd = newRewardEth.times(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
   );
+
+  const stakingRewardsUSD = total_usd.minus(pool.cumulativeTotalRevenueUSD);
 
   // Pool
   pool.cumulativeTotalRevenueUSD =
@@ -142,7 +166,7 @@ export function updateTotalRevenueMetrics(
 
 export function updateProtocolSideRevenueMetrics(
   block: ethereum.Block,
-  amount: BigDecimal
+  newAmount: BigDecimal
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
@@ -157,28 +181,31 @@ export function updateProtocolSideRevenueMetrics(
   );
 
   // Staking rewards revenue is in ETH (rebased in stETH for user), price in ETH
-  const amountUSD = amount.times(
+
+  const newAmountUSD = newAmount.times(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
   );
 
+  const amount = newAmountUSD.minus(pool.cumulativeProtocolSideRevenueUSD);
+
   // Pool
   pool.cumulativeProtocolSideRevenueUSD =
-    pool.cumulativeProtocolSideRevenueUSD.plus(amountUSD);
+    pool.cumulativeProtocolSideRevenueUSD.plus(amount);
   pool.save();
 
   // Pool Daily
   poolMetricsDailySnapshot.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
   poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD =
-    poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD.plus(amountUSD);
+    poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD.plus(amount);
   poolMetricsDailySnapshot.save();
 
   // Pool Hourly
   poolMetricsHourlySnapshot.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
   poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD =
-    poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(amountUSD);
+    poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(amount);
   poolMetricsHourlySnapshot.save();
 
   // Protocol
@@ -190,7 +217,7 @@ export function updateProtocolSideRevenueMetrics(
   financialMetrics.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
   financialMetrics.dailyProtocolSideRevenueUSD =
-    financialMetrics.dailyProtocolSideRevenueUSD.plus(amountUSD);
+    financialMetrics.dailyProtocolSideRevenueUSD.plus(amount);
   financialMetrics.save();
 }
 

@@ -169,6 +169,8 @@ export const ETH_NAME = "Ether";
 // steth / Reth address
 export const RETH_ADDRESS = "0xae78736Cd615f374D3085123A210448E74Fc6393";
 
+export const RPL_ADDRESS = "0xD33526068D116cE69F19A9ee46F0bd304F21A51f";
+
 // deposits address
 export const DEPOSITPOOL = "0x4D05E3d48a938db4b7a9A59A802D5b45011BDe58";
 

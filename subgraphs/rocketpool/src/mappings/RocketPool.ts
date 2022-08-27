@@ -9,7 +9,9 @@ import { DepositReceived } from "../../generated/rocketNodeDeposit/rocketNodeDep
 import { rocketNetworkFees } from "../../generated/rocketVault/rocketNetworkFees";
 import { RocketStorage } from "../../generated/rocketVault/RocketStorage";
 import { RETH } from "../../generated/rocketVault/RETH";
+import { ERC20 } from "../../generated/rocketVault/ERC20";
 import { getOrCreateToken } from "../entities/token";
+
 import { updateUsageMetrics } from "../entityUpdates/usageMetrics";
 import {
   updateProtocolAndPoolTvl,
@@ -22,6 +24,7 @@ import {
   ZERO_ADDRESS,
   ETH_ADDRESS,
   BIGINT_ZERO,
+  RPL_ADDRESS,
   RETH_ADDRESS,
   BIGINT_NEGATIVE_ONE,
   BIGDECIMAL_HALF,
@@ -33,14 +36,35 @@ import { getOrCreatePool } from "../entities/pool";
 import { getOrCreateProtocol } from "../entities/protocol";
 
 export function handleEtherDeposit(event: EtherDeposited): void {
-  updateProtocolAndPoolTvl(event.block, event.params.amount);
+  let rpl_amt = BIGINT_ZERO;
+  const rpl_amount = ERC20.bind(
+    Address.fromString(RPL_ADDRESS)
+  ).try_totalSupply();
+  if (rpl_amount.reverted) {
+    log.info("RPL Amount call reverted", []);
+  } else {
+    rpl_amt = rpl_amount.value;
+  }
+
+  updateProtocolAndPoolTvl(event.block, event.params.amount, rpl_amt);
   updateSnapshotsTvl(event.block);
 }
 
 export function handleEtherWithdrawn(event: EtherWithdrawn): void {
+  let rpl_amt = BIGINT_ZERO;
+  const rpl_amount = ERC20.bind(
+    Address.fromString(RPL_ADDRESS)
+  ).try_totalSupply();
+  if (rpl_amount.reverted) {
+    log.info("RPL Amount call reverted", []);
+  } else {
+    rpl_amt = rpl_amount.value;
+  }
+
   updateProtocolAndPoolTvl(
     event.block,
-    BIGINT_NEGATIVE_ONE.times(event.params.amount)
+    BIGINT_NEGATIVE_ONE.times(event.params.amount),
+    rpl_amt
   );
   updateSnapshotsTvl(event.block);
 }
@@ -48,6 +72,13 @@ export function handleEtherWithdrawn(event: EtherWithdrawn): void {
 export function handleBalanceUpdate(event: BalancesUpdated): void {
   const protocol = getOrCreateProtocol();
   const rewardEth = event.params.totalEth.minus(event.params.stakingEth);
+
+  // total reward Eth
+
+  // staking eth - (minipool count * 16) = supply side eth
+
+  // protocol side reward eth = ((minipool count * 16) / staking eth) * reward eth
+
   let fee = BIGINT_ZERO;
 
   const storage = RocketStorage.bind(Address.fromString(STORAGE));
@@ -65,30 +96,42 @@ export function handleBalanceUpdate(event: BalancesUpdated): void {
       fee = fees_call.value;
     }
 
-    const amt = BIGDECIMAL_HALF.times(
-      bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
-    ).plus(
-      BIGDECIMAL_HALF.times(
-        bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
-      ).times(
-        bigIntToBigDecimal(fee).div(new BigDecimal(BIGINT_TEN_TO_EIGHTEENTH))
-      )
-    );
+    // const amt = BIGDECIMAL_HALF.times(
+    //   bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
+    // ).plus(
+    //   BIGDECIMAL_HALF.times(
+    //     bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
+    //   ).times(
+    //     bigIntToBigDecimal(fee).div(new BigDecimal(BIGINT_TEN_TO_EIGHTEENTH))
+    //   )
+    // );
 
     updateTotalRevenueMetrics(
       event.block,
-      protocol.cumulativeTotalRevenueUSD,
-      rewardEth,
+      bigIntToBigDecimal(rewardEth),
       event.params.rethSupply
     );
-    updateProtocolSideRevenueMetrics(event.block, amt);
+    updateProtocolSideRevenueMetrics(
+      event.block,
+      bigIntToBigDecimal(rewardEth)
+    );
     updateSupplySideRevenueMetrics(event.block);
   }
 }
 
 export function handleNodeDeposit(event: DepositReceived): void {
+  let rpl_amt = BIGINT_ZERO;
+  const rpl_amount = ERC20.bind(
+    Address.fromString(RPL_ADDRESS)
+  ).try_totalSupply();
+  if (rpl_amount.reverted) {
+    log.info("RPL Amount call reverted", []);
+  } else {
+    rpl_amt = rpl_amount.value;
+  }
+
   updateUsageMetrics(event.block, event.params.from);
-  updateProtocolAndPoolTvl(event.block, event.params.amount);
+  updateProtocolAndPoolTvl(event.block, event.params.amount, rpl_amt);
   updateSnapshotsTvl(event.block);
 }
 
