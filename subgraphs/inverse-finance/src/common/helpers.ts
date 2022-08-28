@@ -349,15 +349,16 @@ export function updateLiquidate(event: LiquidateBorrow): void {
 
   let pricePerUnderlyingToken = getUnderlyingTokenPricePerAmount(event.address);
   let pricePerCollateralToken = getUnderlyingTokenPrice(event.params.cTokenCollateral);
-  let cToken = getOrCreateToken(event.address);
   let cTokenCollateral = getOrCreateToken(event.params.cTokenCollateral);
 
   // get exchangeRate for collateral token
   let collateralMarketId = event.params.cTokenCollateral.toHexString();
   let collateralMarket = getOrCreateMarket(collateralMarketId, event);
   let exchangeRate = collateralMarket.exchangeRate;
-  let liquidateAmount = bigIntToBDUseDecimals(event.params.seizeTokens, cToken.decimals).times(exchangeRate!);
-  let liquidateAmountUSD = liquidateAmount.times(pricePerCollateralToken);
+  let liquidateAmount = event.params.seizeTokens;
+  let liquidateAmountUSD = bigIntToBDUseDecimals(liquidateAmount, cTokenCollateral.decimals)
+    .times(exchangeRate!)
+    .times(pricePerCollateralToken);
 
   if (liquidate == null) {
     liquidate = new Liquidate(liquidateId);
@@ -372,9 +373,7 @@ export function updateLiquidate(event: LiquidateBorrow): void {
     liquidate.timestamp = event.block.timestamp;
     liquidate.market = event.address.toHexString();
     liquidate.asset = event.params.cTokenCollateral.toHexString();
-    liquidate.amount = BigDecimalTruncateToBigInt(
-      liquidateAmount.times(decimalsToBigDecimal(cTokenCollateral.decimals)),
-    );
+    liquidate.amount = liquidateAmount;
     liquidate.amountUSD = liquidateAmountUSD;
     let repayAmountUSD = event.params.repayAmount.toBigDecimal().times(pricePerUnderlyingToken);
 
