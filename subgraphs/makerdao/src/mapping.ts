@@ -1018,6 +1018,7 @@ export function handlePotFileDsr(event: PotNoteEvent): void {
 
     market.rates = [interestRateID];
     market.save();
+    snapshotMarket(event, market);
 
     log.info("[handlePotFileDsr] dsr={}, rate={}, rateAnnualized={}", [
       dsr.toString(),

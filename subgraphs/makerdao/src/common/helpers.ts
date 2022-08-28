@@ -17,6 +17,7 @@ import {
   getOrCreateLendingProtocol,
   getOrCreateUsageMetricsHourlySnapshot,
   getOrCreateUsageMetricsDailySnapshot,
+  getSnapshotRates,
 } from "./getters";
 import {
   BIGDECIMAL_ZERO,
@@ -219,6 +220,11 @@ export function snapshotMarket(
     log.error("[snapshotMarket]Failed to get marketsnapshot for {}", [marketID]);
     return;
   }
+  let hours = (event.block.timestamp.toI32()/SECONDS_PER_HOUR).toString()
+  let hourlySnapshotRates = getSnapshotRates(market.rates, hours)
+
+  let days = (event.block.timestamp.toI32()/SECONDS_PER_DAY).toString()
+  let dailySnapshotRates = getSnapshotRates(market.rates, days)
 
   marketHourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketHourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -232,7 +238,7 @@ export function snapshotMarket(
   marketHourlySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketHourlySnapshot.inputTokenBalance = market.inputTokenBalance;
   marketHourlySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
-  marketHourlySnapshot.rates = market.rates;
+  marketHourlySnapshot.rates = hourlySnapshotRates;
   //marketHourlySnapshot.outputTokenSupply = market.outputTokenSupply;
   //marketHourlySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
 
@@ -251,7 +257,7 @@ export function snapshotMarket(
   marketDailySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketDailySnapshot.inputTokenBalance = market.inputTokenBalance;
   marketDailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
-  marketDailySnapshot.rates = market.rates;
+  marketDailySnapshot.rates = dailySnapshotRates;
   //marketDailySnapshot.outputTokenSupply = market.outputTokenSupply;
   //marketDailySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
 
