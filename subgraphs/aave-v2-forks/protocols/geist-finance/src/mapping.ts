@@ -183,15 +183,15 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       !tryTotalRewardsPerSecond.reverted
     ) {
       // create reward tokens
-      let depositRewardToken = getOrCreateRewardToken(
-        Address.fromString(REWARD_TOKEN_ADDRESS),
-        RewardTokenType.DEPOSIT
-      );
       let borrowRewardToken = getOrCreateRewardToken(
         Address.fromString(REWARD_TOKEN_ADDRESS),
         RewardTokenType.BORROW
       );
-      market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
+      let depositRewardToken = getOrCreateRewardToken(
+        Address.fromString(REWARD_TOKEN_ADDRESS),
+        RewardTokenType.DEPOSIT
+      );
+      market.rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
 
       // calculate rewards per day
       let rewardsPerSecond = tryTotalRewardsPerSecond.value
@@ -209,12 +209,12 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
       // set rewards to arrays
       market.rewardTokenEmissionsAmount = [
-        rewardsPerDay,
         rewardsPerDay.times(BIGINT_THREE),
+        rewardsPerDay,
       ];
       market.rewardTokenEmissionsUSD = [
-        rewardsPerDayUSD,
         rewardsPerDayUSD.times(BIGDECIMAL_THREE),
+        rewardsPerDayUSD,
       ];
     }
   }
