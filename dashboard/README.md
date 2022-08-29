@@ -33,10 +33,10 @@ Below the table, timeseries data is divided into their own sections. On the Prot
 - Any field has a cumulative timeseries value of 0. Varying severity levels depending on field.
 - No snapshots for a protocol
 - Cumulative field lowers from any given snapshot to the next
-- TVL on protocol is less than 1000 or above 1000000000000
+- TVL on protocol is less than 1,000 or above 1,000,000,000,000
 - Total revenue is not equal to protocol side + supply side (with tolerance)
 - Individual transactions do not add up to total transaction number
-- Protocol level current values are falsey
+- Protocol level current values are falsy
 - Mismatch between minted token properties and mintedTokenSupplies field
 
 ### Pool Overview Tab
@@ -47,7 +47,7 @@ This tab is to get a quick summary on all pools on the protocol. It displays fie
 
 - No pools on protocol entity
 - All timeseries values for reward APRs/rates are 0
-- TVL on pool is less than 1000 or above 1000000000000
+- TVL on pool is less than 1,000 or above 1,000,000,000,000
 - Difference between amount of elements in reward token array on pool vs amount of elements in rewardTokenEmissions fields
 
 ### Pool Tab
@@ -63,10 +63,10 @@ Below the table, timeseries data is divided into their own sections. On the Pool
 - Any field has a cumulative timeseries value of 0. Varying severity levels depending on field.
 - No snapshots on a pool
 - Daily/Hourly liquidate values above the total TVL on a pool
-- Reward token is of type BORROW but totalBorrowBalanceUSD field falsey or type LENDING but totalDepositBalanceUSD falsey
-- Pool current APR value or base yield are falsey
+- Reward token is of type BORROW but totalBorrowBalanceUSD field falsy or type LENDING but totalDepositBalanceUSD falsy
+- Pool current APR value or base yield are falsy
 - Pool does not contain fees data or fee percentage misrepresented as by a certain amount of decimals points
-- TVL on pool is less than 1000 or above 1000000000000
+- TVL on pool is less than 1,000 or above 1,000,000,000,000
 - Difference between elements in input tokens array vs fields recording timeseries values related to tokens
 - Field on pool level has detected a negative value at some point (not applied to array values in timeseries)
 - inputTokenWeights do not add up to 1.00 (with .01 tolerance)
