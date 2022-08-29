@@ -43,10 +43,7 @@ if (
   );
 } else if (!args.subgraph || !args.location) {
   console.log("Please provide at least --SUBGRAPH and --LOCATION");
-} else if (
-  args.type &&
-  !["build", "deploy"].includes(args.type.toLowerCase())
-) {
+} else if (!["build", "deploy", ""].includes(args.type.toLowerCase())) {
   console.log("Please provide --TYPE=build or --TYPE=deploy");
 } else if (args.subgraph && args.protocol && args.network && args.location) {
   if (args.subgraph in protocolNetworkMap == false) {

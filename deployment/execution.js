@@ -42,11 +42,9 @@ function scripts(protocol, network, template, location, constants, type) {
   scripts.push(codegen);
 
   // Null value for type assumes you want to deploy
-  if (type == null) {
+  if (["deploy", ""].includes(type.toLowerCase())) {
     scripts.push(deployment);
-  } else if (type == "deploy") {
-    scripts.push(deployment);
-  } else if (type == "build") {
+  } else if (type.toLowerCase() == "build") {
     scripts.push(build);
   } else {
     console.log("Error: invalid type - Neither build nor deploy");
@@ -133,7 +131,7 @@ async function runCommands(allScripts, results, args, callback) {
             scriptIndex ==
             allScripts.get(allDeployments[deploymentIndex]).length
           ) {
-            if ((args.type = "build")) {
+            if (args.type == "build") {
               results +=
                 "Build Successful: " + allDeployments[deploymentIndex] + "\n";
             } else {
