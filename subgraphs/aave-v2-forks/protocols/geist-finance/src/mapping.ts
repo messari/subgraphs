@@ -1,6 +1,8 @@
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
+  CRV_ADDRESS,
+  CRV_FTM_LP_ADDRESS,
   GEIST_FTM_LP_ADDRESS,
   GFTM_ADDRESS,
   Protocol,
@@ -221,17 +223,30 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   market.save();
 
   // update gToken price
-  let tryPrice = gTokenContract.try_getAssetPrice();
-  if (tryPrice.reverted) {
-    log.warning(
-      "[handleReserveDataUpdated] Token price not found in Market: {}",
-      [market.id]
-    );
-    return;
+  let assetPriceUSD: BigDecimal;
+
+  // CRV prices are not returned from gCRV for the first 3 days
+  // ie blocks 24879410 - 25266668
+  if (
+    market.id.toLowerCase() === CRV_ADDRESS.toLowerCase() &&
+    event.block.number.toI64() <= 25266668
+  ) {
+    assetPriceUSD = getCRVPriceUSD();
+  } else {
+    let tryPrice = gTokenContract.try_getAssetPrice();
+    if (tryPrice.reverted) {
+      log.warning(
+        "[handleReserveDataUpdated] Token price not found in Market: {}",
+        [market.id]
+      );
+      return;
+    }
+
+    // get asset price normally
+    assetPriceUSD = tryPrice.value
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS));
   }
-  let assetPriceUSD = tryPrice.value
-    .toBigDecimal()
-    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
 
   _handleReserveDataUpdated(
     event,
@@ -363,4 +378,34 @@ function getGeistPriceUSD(): BigDecimal {
         .toBigDecimal()
         .div(exponentToBigDecimal(DEFAULT_DECIMALS))
         .times(priceGEISTinFTM);
+}
+
+//
+//
+// GEIST price is generated from CRV-FTM LP on SpookySwap
+function getCRVPriceUSD(): BigDecimal {
+  let crvFtmLP = SpookySwapOracle.bind(Address.fromString(CRV_FTM_LP_ADDRESS));
+
+  let reserves = crvFtmLP.try_getReserves();
+
+  if (reserves.reverted) {
+    log.error("[getCRVPriceUSD] Unable to get price for asset", [
+      REWARD_TOKEN_ADDRESS,
+    ]);
+    return BIGDECIMAL_ZERO;
+  }
+  let reserveCRV = reserves.value.value0;
+  let reserveFTM = reserves.value.value1;
+
+  let priceCRVinFTM = reserveFTM.toBigDecimal().div(reserveCRV.toBigDecimal());
+
+  // get FTM price
+  let gTokenContract = GToken.bind(Address.fromString(GFTM_ADDRESS));
+  let tryPrice = gTokenContract.try_getAssetPrice();
+  return tryPrice.reverted
+    ? BIGDECIMAL_ZERO
+    : tryPrice.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+        .times(priceCRVinFTM);
 }
