@@ -4,8 +4,8 @@ schema:
 features:
   - grafting
 graft:
-  base: Qmb1SREc6WkV3zd2ZUxnJS5annr9DYnnKKt4Pa7zF6PGrR
-  block: 15382090
+  base: QmXH7PVEVxKxGhnoJsafP3Mm5eBzRMuTxXJ5dCUuhr5qwF
+  block: 15430532
 dataSources:
   # Vault
   - name: Vat

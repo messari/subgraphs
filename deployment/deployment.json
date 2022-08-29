@@ -253,7 +253,7 @@
       "compound-v2": {
         "ethereum": {
           "template": "compound-v2.template.yaml",
-          "messari": "messari/compound-ethereum",
+          "messari": "messari/compound-v2-ethereum",
           "dmelotik": "dmelotik/compound-ethereum",
           "deploy-on-merge": true
         }
