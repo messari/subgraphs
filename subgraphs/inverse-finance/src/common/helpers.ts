@@ -15,6 +15,7 @@ import {
   EMISSION_START_BLOCK,
   BLOCKS_PER_DAY,
   BIGINT_ONE,
+  SECONDS_PER_HOUR,
 } from "./constants";
 import { CErc20, Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow } from "../../generated/templates/CToken/CErc20";
 import { JumpRateModelV2 } from "../../generated/templates/CToken/JumpRateModelV2";
@@ -44,6 +45,7 @@ import {
   getOrCreateMarket,
   getUnderlyingTokenPrice,
   getOrCreateToken,
+  getSnapshotRates,
 } from "./getters";
 import { decimalsToBigDecimal, BigDecimalTruncateToBigInt, bigIntToBDUseDecimals } from "./utils";
 
@@ -346,14 +348,15 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   let liquidate = Liquidate.load(liquidateId);
 
   let pricePerUnderlyingToken = getUnderlyingTokenPricePerAmount(event.address);
-  let pricePerCollateralToken = getUnderlyingTokenPricePerAmount(event.params.cTokenCollateral);
+  let pricePerCollateralToken = getUnderlyingTokenPrice(event.params.cTokenCollateral);
+  let cTokenCollateral = getOrCreateToken(event.params.cTokenCollateral);
+
   // get exchangeRate for collateral token
   let collateralMarketId = event.params.cTokenCollateral.toHexString();
   let collateralMarket = getOrCreateMarket(collateralMarketId, event);
   let exchangeRate = collateralMarket.exchangeRate;
   let liquidateAmount = event.params.seizeTokens;
-  let liquidateAmountUSD = liquidateAmount
-    .toBigDecimal()
+  let liquidateAmountUSD = bigIntToBDUseDecimals(liquidateAmount, cTokenCollateral.decimals)
     .times(exchangeRate!)
     .times(pricePerCollateralToken);
 
@@ -573,9 +576,10 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   let market = getOrCreateMarket(marketId, event);
 
   let marketDaily = getOrCreateMarketDailySnapshot(event);
-
+  let days = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  let dailySnapshotRates = getSnapshotRates(market.rates, days.toString());
   // use market entity to update MarketMetrics
-  marketDaily.rates = market.rates;
+  marketDaily.rates = dailySnapshotRates;
   marketDaily.totalValueLockedUSD = market.totalValueLockedUSD;
   marketDaily.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketDaily.cumulativeDepositUSD = market.cumulativeDepositUSD;
@@ -600,8 +604,10 @@ export function updateMarketMetrics(event: ethereum.Event): void {
 
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
 
+  let hours = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  let hourlySnapshotRates = getSnapshotRates(market.rates, hours.toString());
   // use market entity to update MarketMetrics
-  marketHourly.rates = market.rates;
+  marketHourly.rates = hourlySnapshotRates;
   marketHourly.totalValueLockedUSD = market.totalValueLockedUSD;
   marketHourly.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketHourly.cumulativeDepositUSD = market.cumulativeDepositUSD;
@@ -850,10 +856,14 @@ export function updateInterestRates(event: ethereum.Event): void {
   market.save();
 
   let dailySnapshot = getOrCreateMarketDailySnapshot(event);
-  dailySnapshot.rates = rates;
+  let days = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  let dailySnapshotRates = getSnapshotRates(rates, days.toString());
+  dailySnapshot.rates = dailySnapshotRates;
   dailySnapshot.save();
 
   let hourlySnapshot = getOrCreateMarketHourlySnapshot(event);
-  hourlySnapshot.rates = rates;
+  let hours = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  let hourlySnapshotRates = getSnapshotRates(rates, hours.toString());
+  hourlySnapshot.rates = hourlySnapshotRates;
   hourlySnapshot.save();
 }
