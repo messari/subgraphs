@@ -55,6 +55,7 @@ When a transaction occurs in the `lendingPool` the following events are emitted 
 
 - Avalanche oracles return prices offset by 8 decimals for some reason.
 - Liquidity index (used to calculate revenue) is initialized to 1e27, not 0
+- Geist CRV market does not return asset price for the first 3 days
 
 ### Problems
 
