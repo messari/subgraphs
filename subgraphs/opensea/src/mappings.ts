@@ -153,10 +153,6 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   let dailyTradedItems = 0;
   let collectionAddrs: string[] = [];
 
-  // buyer is buyOrder.maker (addrs[1])
-  let buyer = call.inputs.addrs[1].toHexString();
-  // seller is sellOrder.maker (addrs[8])
-  let seller = call.inputs.addrs[8].toHexString();
   // paymentToken is buyOrder.paymentToken or SellOrder.payment token (addrs[6] or addrs[13])
   let paymentToken = call.inputs.addrs[13];
 
@@ -171,6 +167,8 @@ function handleSingleSale(call: AtomicMatch_Call): void {
     return;
   }
 
+  let buyer = decodedTransferResult.to.toHexString();
+  let seller = decodedTransferResult.from.toHexString();
   let collectionAddr = decodedTransferResult.token.toHexString();
   let tokenId = decodedTransferResult.tokenId;
   let amount = decodedTransferResult.amount;
@@ -180,23 +178,28 @@ function handleSingleSale(call: AtomicMatch_Call): void {
 
   collectionAddrs.push(collectionAddr);
 
-  if (buyer != decodedTransferResult.to.toHexString()) {
-    log.warning(
-      "buyer/receiver do not match, buyer: {}, reciever: {}, tx: {}",
+  if (buyer != call.inputs.addrs[1].toHexString()) {
+    log.debug(
+      "buyMaker/receiver do not match, isBundle: {}, buyMaker: {}, reciever: {}, tx: {}",
       [
+        false.toString(),
+        call.inputs.addrs[1].toHexString(),
         buyer,
-        decodedTransferResult.to.toHexString(),
         call.transaction.hash.toHexString(),
       ]
     );
   }
 
-  if (seller != decodedTransferResult.from.toHexString()) {
-    log.warning("seller/sender do not match, seller: {}, sender: {}, tx: {}", [
-      seller,
-      decodedTransferResult.from.toHexString(),
-      call.transaction.hash.toHexString(),
-    ]);
+  if (seller != call.inputs.addrs[8].toHexString()) {
+    log.debug(
+      "sellMaker/sender do not match, isBundle: {}, sellMaker: {}, sender: {}, tx: {}",
+      [
+        false.toString(),
+        call.inputs.addrs[8].toHexString(),
+        seller,
+        call.transaction.hash.toHexString(),
+      ]
+    );
   }
 
   // No event log index since this is a contract call
@@ -291,15 +294,16 @@ function handleBundleSale(call: AtomicMatch_Call): void {
     collectionAddrs.push(collectionAddr);
 
     if (strategy == SaleStrategy.DUTCH_AUCTION) {
-      log.warning("dutch auction sale in a bundle sale, transaction: {}", [
+      log.debug("dutch auction sale in a bundle sale, transaction: {}", [
         call.transaction.hash.toHexString(),
       ]);
     }
 
     if (buyer != decodedTransferResults[i].to.toHexString()) {
       log.warning(
-        "buyer/receiver do not match, buyer: {}, reciever: {}, tx: {}",
+        "buyMaker/receiver do not match, isBundle: {}, buyMaker: {}, reciever: {}, tx: {}",
         [
+          true.toString(),
           buyer,
           decodedTransferResults[i].to.toHexString(),
           call.transaction.hash.toHexString(),
@@ -309,8 +313,9 @@ function handleBundleSale(call: AtomicMatch_Call): void {
 
     if (seller != decodedTransferResults[i].from.toHexString()) {
       log.warning(
-        "seller/sender do not match, seller: {}, sender: {}, tx: {}",
+        "sellMaker/sender do not match, isBundle: {}, sellMaker: {}, sender: {}, tx: {}",
         [
+          true.toString(),
           seller,
           decodedTransferResults[i].from.toHexString(),
           call.transaction.hash.toHexString(),

@@ -18,7 +18,7 @@
 
 ### Event Handlers vs Call Handlers
 
-For the OpenSea `WyvernExchangeWithBulkCancellations` contract, the events emitted do not provide enough information to index with Messari's standardized schema. The event that indicates a trade has been made is `OrdersMatched` but it only surfaces a few fields:
+For the OpenSea `WyvernExchange` contracts, the events emitted do not provide enough information to index with Messari's standardized schema. The event that indicates a trade has been made is `OrdersMatched` but it only surfaces a few fields:
 
 ```js
 event OrdersMatched(bytes32 buyHash, bytes32 sellHash, address indexed maker, address indexed taker, uint price, bytes32 indexed metadata)
@@ -192,13 +192,13 @@ The subgraph call handler flow can be broken down into several steps:
 
    If `sell.target` is `WyvernAtomicizer`, the trade is a bundle sale (`calldata` "atomicized" or broken down into separate calls to their respective contracts).
 
-   For single sales, `sell.target` is `MerkleValidator`.
+   For single sales, `sell.target` is `MerkleValidator` or the actual ERC721/ERC1155 contracts.
 
-   Note that `MerkleValidator` deployed at block `14128524` after `WyvernExchangeWithBulkCancellations` at block `14120913`, meaning prior to block `14128524`, `WyvernExchangeWithBulkCancellations` interacts directly with ERC721/ERC1155 contracts with their respective `transferFrom` and `safeTransferFrom` calls.
+   Note that `MerkleValidator` deployed at block `14128524` after `WyvernExchangeWithBulkCancellations` at block `14120913`, meaning prior to block `14128524`, `WyvernExchangeWithBulkCancellations` interacts directly with ERC721/ERC1155 contracts with their respective `transferFrom` and `safeTransferFrom` calls. `WyvernExchange` interacts directly with ERC721/ERC1155 contracts.
 
 2. If single sale, merge `buy.calldata` and `sell.calldata` together with `guardedArrayReplace` and decode into relevant fields with function signature.
 
-   Note that `guardedArrayReplace`, as described in the `WyvernExchangeWithBulkCancellations` contract, replaces bytes in an array with bytes in another array, guarded by a bitmask. If an order is matched, the merged `calldata` can be found via:
+   Note that `guardedArrayReplace`, as described in the `WyvernExchange` contracts, replaces bytes in an array with bytes in another array, guarded by a bitmask. If an order is matched, the merged `calldata` can be found via:
 
    ```js
    guardedArrayReplace(calldataBuy, calldataSell, replacementPatternBuy);
@@ -245,7 +245,19 @@ The subgraph call handler flow can be broken down into several steps:
   - `0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2` for WETH
   - Subgraph does not track other currencies currently
 - `buy.basePrice`/`sell.basePrice` denotes base trade price
+  - Note that dutch auction sales use `calculateMatchPrice` to determine trade price
 - `buy.maker` denotes the NFT buyer (sale taker/bid maker)
+  Known Exceptions:
+
+  - [Genie swaps](https://www.genie.xyz/)
+    - `buy.maker`: Genie: GenieSwap ([`0x0a267cf51ef038fc00e71801f5a524aec06e4f07`](https://etherscan.io/address/0x0a267cf51ef038fc00e71801f5a524aec06e4f07))
+    - NFT receiver: NFT buyer
+  - [Gem swaps](https://www.gem.xyz/)
+    - `buy.maker`: Gem: GemSwap / Gem: GemSwap 2 ([`0xf24629fbb477e10f2cf331c2b7452d8596b5c7a5`](https://etherscan.io/address/0xf24629fbb477e10f2cf331c2b7452d8596b5c7a5)/[`0x83c8f28c26bf6aaca652df1dbbe0e1b56f8baba2`](https://etherscan.io/address/0x83c8f28c26bf6aaca652df1dbbe0e1b56f8baba2))
+    - NFT receiver: NFT buyer
+  - [Nifty Gateway](https://www.niftygateway.com/)
+    - `buy.maker`: [`0x8279648470eb92cbcd00ceb8ca30c2adfac20740`](https://etherscan.io/address/0x8279648470eb92cbcd00ceb8ca30c2adfac20740)
+    - NFT receiver: [Nifty Gateway: Omnibus](https://help.niftygateway.com/hc/en-us/articles/4409003713299-An-Explanation-of-Nifty-Gateway-s-Custody-Option) ([`0xe052113bd7d7700d623414a0a4585bcae754e9d5`](https://etherscan.io/address/0xe052113bd7d7700d623414a0a4585bcae754e9d5))
 - `sell.maker` denotes the NFT seller (sale maker/bid taker)
 
 4. Update `Collection`/`Marketplace` entities.
