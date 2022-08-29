@@ -41,10 +41,15 @@ function scripts(protocol, network, template, location, constants, type) {
   }
   scripts.push(codegen);
 
-  if (type == "build") {
+  // Null value for type assumes you want to deploy
+  if (type == null) {
+    scripts.push(deployment);
+  } else if (type == "deploy") {
+    scripts.push(deployment);
+  } else if (type == "build") {
     scripts.push(build);
   } else {
-    scripts.push(deployment);
+    console.log("Error: invalid type - Neither build nor deploy");
   }
 
   return scripts;
