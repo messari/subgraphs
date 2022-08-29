@@ -62,13 +62,13 @@
       "name": "TornadoCash50000cDAI",
       "address": "0x03893a7c7463AE47D46bc7f091665f1893656003",
       "abi": "TornadoCashERC20",
-      "startBlock": 12067606
+      "startBlock": 12069037
     },
     {
       "name": "TornadoCash500000cDAI",
       "address": "0x2717c5e28cf931547B621a5dddb772Ab6A35B701",
       "abi": "TornadoCashERC20",
-      "startBlock": 12066053
+      "startBlock": 12067606
     },
     {
       "name": "TornadoCash5000000cDAI",

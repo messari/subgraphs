@@ -1,10 +1,4 @@
-import {
-  Address,
-  ethereum,
-  BigInt,
-  dataSource,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, dataSource } from "@graphprotocol/graph-ts";
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -155,15 +149,18 @@ export function getOrCreatePool(
 ): Pool {
   let pool = Pool.load(poolAddress);
 
+  let token: Token;
   if (!pool) {
     pool = new Pool(poolAddress);
+
+    let network = dataSource.network().toUpperCase();
 
     let contractTCERC20 = TornadoCashERC20.bind(
       Address.fromString(poolAddress)
     );
     let token_call = contractTCERC20.try_token();
     if (!token_call.reverted) {
-      let token = getOrCreateToken(token_call.value, event.block.number);
+      token = getOrCreateToken(token_call.value, event.block.number);
 
       let denomination_call = contractTCERC20.try_denomination();
       if (!denomination_call.reverted) {
@@ -180,7 +177,6 @@ export function getOrCreatePool(
       }
       pool.inputTokens = [token.id];
     } else {
-      let network = dataSource.network().toUpperCase();
       let tokenAddr: string;
       let denomination_call: ethereum.CallResult<BigInt>;
 
@@ -198,7 +194,7 @@ export function getOrCreatePool(
         denomination_call = contractTCETH.try_denomination();
       }
 
-      let token = getOrCreateToken(
+      token = getOrCreateToken(
         Address.fromString(tokenAddr),
         event.block.number
       );
@@ -217,8 +213,6 @@ export function getOrCreatePool(
       }
       pool.inputTokens = [token.id];
     }
-
-    let network = dataSource.network().toUpperCase();
 
     pool.rewardTokens = [
       getOrCreateRewardToken(TORN_ADDRESS.get(network)!, event.block.number).id,
