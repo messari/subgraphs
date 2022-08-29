@@ -222,7 +222,10 @@ export function createLiquidateEvent(event: LogRemoveCollateral): void {
 // Update token price using the exchange rate
 // update on the market and token
 export function updateTokenPrice(rate: BigInt, token: Token, market: Market, blockNumber: BigInt): void {
-  let priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(rate, token.decimals));
+  let priceUSD = BIGDECIMAL_ZERO;
+  if (rate != BIGINT_ZERO) {
+    priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(rate, token.decimals));
+  }
 
   // update market
   market.inputTokenPriceUSD = priceUSD;
