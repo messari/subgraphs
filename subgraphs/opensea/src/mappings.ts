@@ -7,7 +7,6 @@ import {
   BIGDECIMAL_ZERO,
   EXCHANGE_MARKETPLACE_FEE,
   INVERSE_BASIS_POINT,
-  MANTISSA_FACTOR,
   NULL_ADDRESS,
   SaleStrategy,
   SECONDS_PER_DAY,
@@ -160,8 +159,6 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   let seller = call.inputs.addrs[8].toHexString();
   // paymentToken is buyOrder.paymentToken or SellOrder.payment token (addrs[6] or addrs[13])
   let paymentToken = call.inputs.addrs[13];
-  // basePrice is buyOrder.basePrice or SellOrder.basePrice token (uints[4] or uints[13])
-  let basePrice = call.inputs.uints[13];
 
   let mergedCallData = guardedArrayReplace(
     call.inputs.calldataBuy,
@@ -179,22 +176,26 @@ function handleSingleSale(call: AtomicMatch_Call): void {
   let amount = decodedTransferResult.amount;
   let saleKind = call.inputs.feeMethodsSidesKindsHowToCalls[6];
   let strategy = getSaleStrategy(saleKind);
-  let volumeETH = calcTradePriceETH(call, paymentToken);
-  let priceETH = volumeETH;
+  let priceETH = calcTradePriceETH(call, paymentToken);
 
   collectionAddrs.push(collectionAddr);
 
   if (buyer != decodedTransferResult.to.toHexString()) {
-    log.warning("buyer/receiver do not match, buyer: {}, reciever: {}", [
-      buyer,
-      decodedTransferResult.to.toHexString(),
-    ]);
+    log.warning(
+      "buyer/receiver do not match, buyer: {}, reciever: {}, tx: {}",
+      [
+        buyer,
+        decodedTransferResult.to.toHexString(),
+        call.transaction.hash.toHexString(),
+      ]
+    );
   }
 
   if (seller != decodedTransferResult.from.toHexString()) {
-    log.warning("seller/sender do not match, seller: {}, sender: {}", [
+    log.warning("seller/sender do not match, seller: {}, sender: {}, tx: {}", [
       seller,
       decodedTransferResult.from.toHexString(),
+      call.transaction.hash.toHexString(),
     ]);
   }
 
@@ -241,7 +242,6 @@ function handleSingleSale(call: AtomicMatch_Call): void {
     collectionAddr,
     buyer,
     seller,
-    volumeETH,
     priceETH,
     newDailyTradedItem,
     trade.isBundle
@@ -253,7 +253,7 @@ function handleSingleSale(call: AtomicMatch_Call): void {
     collectionAddrs,
     buyer,
     seller,
-    volumeETH,
+    priceETH,
     dailyTradedItems
   );
 }
@@ -268,9 +268,8 @@ function handleBundleSale(call: AtomicMatch_Call): void {
   let seller = call.inputs.addrs[8].toHexString();
   // paymentToken is buyOrder.paymentToken or SellOrder.payment token (addrs[6] or addrs[13])
   let paymentToken = call.inputs.addrs[13];
-  // basePrice is buyOrder.basePrice or SellOrder.basePrice token (uints[4] or uints[13])
-  let basePrice = call.inputs.uints[13];
-  let bundleVolumeETH = calcTradePriceETH(call, paymentToken);
+
+  let bundlePriceETH = calcTradePriceETH(call, paymentToken);
 
   let mergedCallData = guardedArrayReplace(
     call.inputs.calldataBuy,
@@ -286,9 +285,8 @@ function handleBundleSale(call: AtomicMatch_Call): void {
     let amount = decodedTransferResults[i].amount;
     let saleKind = call.inputs.feeMethodsSidesKindsHowToCalls[6];
     let strategy = getSaleStrategy(saleKind);
-    // Average volume price of token in bundle
-    let tradeVolumeETH = bundleVolumeETH.div(tradeSize);
-    let priceETH = tradeVolumeETH;
+    // Average price of token in bundle
+    let avgTradePriceETH = bundlePriceETH.div(tradeSize);
 
     collectionAddrs.push(collectionAddr);
 
@@ -299,17 +297,25 @@ function handleBundleSale(call: AtomicMatch_Call): void {
     }
 
     if (buyer != decodedTransferResults[i].to.toHexString()) {
-      log.warning("buyer/receiver do not match, buyer: {}, reciever: {}", [
-        buyer,
-        decodedTransferResults[i].to.toHexString(),
-      ]);
+      log.warning(
+        "buyer/receiver do not match, buyer: {}, reciever: {}, tx: {}",
+        [
+          buyer,
+          decodedTransferResults[i].to.toHexString(),
+          call.transaction.hash.toHexString(),
+        ]
+      );
     }
 
     if (seller != decodedTransferResults[i].from.toHexString()) {
-      log.warning("seller/sender do not match, seller: {}, sender: {}", [
-        seller,
-        decodedTransferResults[i].from.toHexString(),
-      ]);
+      log.warning(
+        "seller/sender do not match, seller: {}, sender: {}, tx: {}",
+        [
+          seller,
+          decodedTransferResults[i].from.toHexString(),
+          call.transaction.hash.toHexString(),
+        ]
+      );
     }
 
     // No event log index since this is a contract call
@@ -326,7 +332,7 @@ function handleBundleSale(call: AtomicMatch_Call): void {
     trade.isBundle = true;
     trade.collection = collectionAddr;
     trade.tokenId = tokenId;
-    trade.priceETH = priceETH;
+    trade.priceETH = avgTradePriceETH;
     trade.amount = amount;
     trade.strategy = strategy;
     trade.buyer = buyer;
@@ -349,17 +355,13 @@ function handleBundleSale(call: AtomicMatch_Call): void {
       dailyTradedItems += 1;
     }
 
-    // // Update Collection/Marketplace revenue metrics
-    // updateRevenueMetrics(call, collectionAddr);
-
     // Update Collection and daily snapshot
     updateCollectionMetrics(
       call,
       collectionAddr,
       buyer,
       seller,
-      tradeVolumeETH,
-      priceETH,
+      avgTradePriceETH,
       newDailyTradedItem,
       trade.isBundle
     );
@@ -371,7 +373,7 @@ function handleBundleSale(call: AtomicMatch_Call): void {
     collectionAddrs,
     buyer,
     seller,
-    bundleVolumeETH,
+    bundlePriceETH,
     dailyTradedItems
   );
 }
@@ -381,7 +383,6 @@ function updateCollectionMetrics(
   collectionAddr: string,
   buyer: string,
   seller: string,
-  volumeETH: BigDecimal,
   priceETH: BigDecimal,
   newDailyTradedItem: bool,
   isBundle: bool
@@ -412,9 +413,12 @@ function updateCollectionMetrics(
   }
 
   collection.cumulativeTradeVolumeETH =
-    collection.cumulativeTradeVolumeETH.plus(volumeETH);
+    collection.cumulativeTradeVolumeETH.plus(priceETH);
 
   collection.save();
+
+  // Update Collection revenue metrics
+  updateCollectionRevenueMetrics(call, collectionAddr, priceETH, isBundle);
 
   // Update Collection daily snapshot
   let collectionSnapshot = getOrCreateCollectionDailySnapshot(
@@ -432,7 +436,7 @@ function updateCollectionMetrics(
   }
 
   collectionSnapshot.dailyTradeVolumeETH =
-    collectionSnapshot.dailyTradeVolumeETH.plus(volumeETH);
+    collectionSnapshot.dailyTradeVolumeETH.plus(priceETH);
 
   if (!isBundle) {
     collectionSnapshot.dailyMinSalePrice = min(
@@ -461,7 +465,7 @@ function updateMarketplaceMetrics(
   collectionAddrs: string[],
   buyer: string,
   seller: string,
-  volumeETH: BigDecimal,
+  priceETH: BigDecimal,
   dailyTradedItems: i32
 ): void {
   let marketplace = getOrCreateMarketplace(
@@ -469,7 +473,7 @@ function updateMarketplaceMetrics(
   );
   marketplace.tradeCount += 1;
   marketplace.cumulativeTradeVolumeETH =
-    marketplace.cumulativeTradeVolumeETH.plus(volumeETH);
+    marketplace.cumulativeTradeVolumeETH.plus(priceETH);
 
   let buyerAccountID = "MARKETPLACE_ACCOUNT-".concat(buyer);
   let buyerAccount = _Item.load(buyerAccountID);
@@ -486,6 +490,9 @@ function updateMarketplaceMetrics(
     marketplace.cumulativeUniqueTraders += 1;
   }
   marketplace.save();
+
+  // Update Marketplace revenue metrics
+  updateMarketplaceRevenueMetrics(call, priceETH);
 
   // Update Marketplace daily snapshot
   let marketplaceSnapshot = getOrCreateMarketplaceDailySnapshot(
@@ -541,19 +548,17 @@ function updateMarketplaceMetrics(
   marketplaceSnapshot.save();
 }
 
-function updateRevenueMetrics(
+function updateCollectionRevenueMetrics(
   call: AtomicMatch_Call,
-  collectionAddr: string
+  collectionAddr: string,
+  priceETH: BigDecimal,
+  isBundle: bool
 ): void {
   let collection = getOrCreateCollection(collectionAddr);
-  let marketplace = getOrCreateMarketplace(
-    NetworkConfigs.getMarketplaceAddress()
-  );
 
   let sellSideFeeRecipient = call.inputs.addrs[10];
   if (sellSideFeeRecipient.notEqual(NULL_ADDRESS)) {
     // Sell-side order is maker (sale)
-    let basePrice = call.inputs.uints[13];
     let makerRelayerFee = call.inputs.uints[9];
     let creatorRoyaltyFeePercentage = EXCHANGE_MARKETPLACE_FEE.le(
       makerRelayerFee
@@ -563,42 +568,35 @@ function updateRevenueMetrics(
           .divDecimal(BIGDECIMAL_HUNDRED)
       : BIGDECIMAL_ZERO;
 
-    // TODO: do not update if bundle sale
-    if (collection.royaltyFee.notEqual(creatorRoyaltyFeePercentage)) {
+    // Do not update if bundle sale
+    if (
+      collection.royaltyFee.notEqual(creatorRoyaltyFeePercentage) &&
+      !isBundle
+    ) {
       collection.royaltyFee = creatorRoyaltyFeePercentage;
     }
 
     let totalRevenueETH = makerRelayerFee
-      .times(basePrice)
       .toBigDecimal()
-      .div(INVERSE_BASIS_POINT)
-      .div(MANTISSA_FACTOR);
+      .times(priceETH)
+      .div(INVERSE_BASIS_POINT);
     let marketplaceRevenueETH = EXCHANGE_MARKETPLACE_FEE.le(makerRelayerFee)
-      ? EXCHANGE_MARKETPLACE_FEE.times(basePrice)
-          .toBigDecimal()
+      ? EXCHANGE_MARKETPLACE_FEE.toBigDecimal()
+          .times(priceETH)
           .div(INVERSE_BASIS_POINT)
-          .div(MANTISSA_FACTOR)
       : BIGDECIMAL_ZERO;
     let creatorRevenueETH = totalRevenueETH.minus(marketplaceRevenueETH);
 
+    // Update Collection revenue
+    collection.totalRevenueETH =
+      collection.totalRevenueETH.plus(totalRevenueETH);
     collection.marketplaceRevenueETH = collection.marketplaceRevenueETH.plus(
       marketplaceRevenueETH
     );
     collection.creatorRevenueETH =
       collection.creatorRevenueETH.plus(creatorRevenueETH);
-    collection.totalRevenueETH =
-      collection.totalRevenueETH.plus(totalRevenueETH);
-
-    marketplace.marketplaceRevenueETH = marketplace.marketplaceRevenueETH.plus(
-      marketplaceRevenueETH
-    );
-    marketplace.creatorRevenueETH =
-      marketplace.creatorRevenueETH.plus(creatorRevenueETH);
-    marketplace.totalRevenueETH =
-      marketplace.totalRevenueETH.plus(totalRevenueETH);
   } else {
     // Buy-side order is maker (bid/offer)
-    let basePrice = call.inputs.uints[4];
     let takerRelayerFee = call.inputs.uints[1];
     let creatorRoyaltyFeePercentage = EXCHANGE_MARKETPLACE_FEE.le(
       takerRelayerFee
@@ -608,41 +606,94 @@ function updateRevenueMetrics(
           .divDecimal(BIGDECIMAL_HUNDRED)
       : BIGDECIMAL_ZERO;
 
-    // TODO: do not update if bundle sale
-    if (collection.royaltyFee.notEqual(creatorRoyaltyFeePercentage)) {
+    // Do not update if bundle sale
+    if (
+      collection.royaltyFee.notEqual(creatorRoyaltyFeePercentage) &&
+      !isBundle
+    ) {
       collection.royaltyFee = creatorRoyaltyFeePercentage;
     }
 
     let totalRevenueETH = takerRelayerFee
-      .times(basePrice)
       .toBigDecimal()
-      .div(INVERSE_BASIS_POINT)
-      .div(MANTISSA_FACTOR);
+      .times(priceETH)
+      .div(INVERSE_BASIS_POINT);
     let marketplaceRevenueETH = EXCHANGE_MARKETPLACE_FEE.le(takerRelayerFee)
-      ? EXCHANGE_MARKETPLACE_FEE.times(basePrice)
-          .toBigDecimal()
+      ? EXCHANGE_MARKETPLACE_FEE.toBigDecimal()
+          .times(priceETH)
           .div(INVERSE_BASIS_POINT)
-          .div(MANTISSA_FACTOR)
       : BIGDECIMAL_ZERO;
     let creatorRevenueETH = totalRevenueETH.minus(marketplaceRevenueETH);
 
+    // Update Collection revenue
+    collection.totalRevenueETH =
+      collection.totalRevenueETH.plus(totalRevenueETH);
     collection.marketplaceRevenueETH = collection.marketplaceRevenueETH.plus(
       marketplaceRevenueETH
     );
     collection.creatorRevenueETH =
       collection.creatorRevenueETH.plus(creatorRevenueETH);
-    collection.totalRevenueETH =
-      collection.totalRevenueETH.plus(totalRevenueETH);
+  }
 
+  collection.save();
+}
+
+function updateMarketplaceRevenueMetrics(
+  call: AtomicMatch_Call,
+  priceETH: BigDecimal
+): void {
+  let marketplace = getOrCreateMarketplace(
+    NetworkConfigs.getMarketplaceAddress()
+  );
+
+  let sellSideFeeRecipient = call.inputs.addrs[10];
+  if (sellSideFeeRecipient.notEqual(NULL_ADDRESS)) {
+    // Sell-side order is maker (sale)
+    let makerRelayerFee = call.inputs.uints[9];
+
+    let totalRevenueETH = makerRelayerFee
+      .toBigDecimal()
+      .times(priceETH)
+      .div(INVERSE_BASIS_POINT);
+    let marketplaceRevenueETH = EXCHANGE_MARKETPLACE_FEE.le(makerRelayerFee)
+      ? EXCHANGE_MARKETPLACE_FEE.toBigDecimal()
+          .times(priceETH)
+          .div(INVERSE_BASIS_POINT)
+      : BIGDECIMAL_ZERO;
+    let creatorRevenueETH = totalRevenueETH.minus(marketplaceRevenueETH);
+
+    // Update Marketplace revenue
+    marketplace.totalRevenueETH =
+      marketplace.totalRevenueETH.plus(totalRevenueETH);
     marketplace.marketplaceRevenueETH = marketplace.marketplaceRevenueETH.plus(
       marketplaceRevenueETH
     );
     marketplace.creatorRevenueETH =
       marketplace.creatorRevenueETH.plus(creatorRevenueETH);
+  } else {
+    // Buy-side order is maker (bid/offer)
+    let takerRelayerFee = call.inputs.uints[1];
+
+    let totalRevenueETH = takerRelayerFee
+      .toBigDecimal()
+      .times(priceETH)
+      .div(INVERSE_BASIS_POINT);
+    let marketplaceRevenueETH = EXCHANGE_MARKETPLACE_FEE.le(takerRelayerFee)
+      ? EXCHANGE_MARKETPLACE_FEE.toBigDecimal()
+          .times(priceETH)
+          .div(INVERSE_BASIS_POINT)
+      : BIGDECIMAL_ZERO;
+    let creatorRevenueETH = totalRevenueETH.minus(marketplaceRevenueETH);
+
+    // Update Marketplace revenue
     marketplace.totalRevenueETH =
       marketplace.totalRevenueETH.plus(totalRevenueETH);
+    marketplace.marketplaceRevenueETH = marketplace.marketplaceRevenueETH.plus(
+      marketplaceRevenueETH
+    );
+    marketplace.creatorRevenueETH =
+      marketplace.creatorRevenueETH.plus(creatorRevenueETH);
   }
 
-  collection.save();
   marketplace.save();
 }
