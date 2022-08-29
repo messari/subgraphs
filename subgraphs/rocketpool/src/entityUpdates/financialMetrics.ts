@@ -35,9 +35,13 @@ export function updateProtocolAndPoolTvl(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
   );
-  pool.rewardTokens = [
-    getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number).name,
-  ];
+
+  let rewardTokens: string[] = [];
+  rewardTokens.push(
+    getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number).name
+  );
+  pool.rewardTokens = rewardTokens;
+
   pool.rewardTokenEmissionsAmount = [rewards_amount];
   pool.rewardTokenEmissionsUSD = [
     bigIntToBigDecimal(rewards_amount).times(
