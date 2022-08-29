@@ -73,6 +73,7 @@ Amount of MIM tokens minted for each Market
 - According to the Abracadabra team, their analytics page is "out of date" (https://discord.com/channels/847767926286319646/980148053518475274/1009048171785228369)
 - Fees displayed on the analytic page is based off of outstanding loans.
   - Fees are not realized until a position is closed and `LogAccrue` is emitted with a non 0 value.
+- On the JoeBar market in Avalanche there is a pricing mishap at the beginning of the market's life. To fix it we need to offset the rate by 6 instead of 18.
 
 ## References and Useful Links
 
