@@ -155,7 +155,6 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
       dailySnapshot.cumulativeUniqueLiquidators = protocol.cumulativeUniqueLiquidators;
     }
     if (!activeEvent) {
-      log.warning("REACHED: {}", [activeEventId])
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveLiquidators += 1;
     }
@@ -168,7 +167,6 @@ export function addAccountToProtocol(eventType: string, account: Account, event:
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
-      log.warning("REACHED: {}", [activeEventId])
       dailySnapshot.dailyActiveLiquidatees += 1;
     }
     dailySnapshot.save();
