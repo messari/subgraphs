@@ -303,6 +303,9 @@ type Pool @entity {
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   stakedOutputTokenAmount: BigInt
 
+  " Per-block anonymity points (AP) emission as of the current block"
+  _apEmissionsAmount: [BigInt!]
+
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
 

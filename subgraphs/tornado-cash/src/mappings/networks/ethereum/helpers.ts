@@ -1,4 +1,4 @@
-import { Address, dataSource } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 
 import {
   getOrCreateProtocol,
@@ -88,28 +88,7 @@ export function createRateChanged(
 ): void {
   let pool = getOrCreatePool(poolAddress, event);
 
-  let network = dataSource.network().toUpperCase();
-  let rewardToken = getOrCreateToken(
-    TORN_ADDRESS.get(network)!,
-    event.block.number
-  );
-
-  let rewardsPerDay = getRewardsPerDay(
-    event.block.timestamp,
-    event.block.number,
-    bigIntToBigDecimal(event.params.value, rewardToken.decimals),
-    RewardIntervalType.BLOCK
-  );
-
-  pool.rewardTokenEmissionsAmount = [
-    bigDecimalToBigInt(rewardsPerDay, rewardToken.decimals),
-  ];
-  pool.rewardTokenEmissionsUSD = [
-    bigIntToBigDecimal(
-      pool.rewardTokenEmissionsAmount![0],
-      rewardToken.decimals
-    ).times(rewardToken.lastPriceUSD!),
-  ];
+  pool._apEmissionsAmount = [event.params.value];
   pool.save();
 }
 
@@ -126,6 +105,17 @@ export function createRewardSwap(event: Swap): void {
   for (let i = 0; i < pools.length; i++) {
     let pool = getOrCreatePool(pools[i], event);
 
+    let rewardsPerBlock = event.params.TORN.div(event.params.pTORN).times(
+      pool._apEmissionsAmount![0]
+    );
+    let rewardsPerDay = getRewardsPerDay(
+      event.block.timestamp,
+      event.block.number,
+      new BigDecimal(rewardsPerBlock),
+      RewardIntervalType.BLOCK
+    );
+
+    pool.rewardTokenEmissionsAmount = [bigDecimalToBigInt(rewardsPerDay)];
     pool.rewardTokenEmissionsUSD = [
       bigIntToBigDecimal(
         pool.rewardTokenEmissionsAmount![0],

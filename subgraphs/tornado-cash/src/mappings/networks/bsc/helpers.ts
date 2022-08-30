@@ -1,8 +1,8 @@
-import { Address, dataSource } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 
 import { getOrCreatePool, getOrCreateToken } from "../../../common/getters";
 import { bigIntToBigDecimal } from "../../../common/utils/numbers";
-import { BIGDECIMAL_ZERO, TORN_ADDRESS } from "../../../common/constants";
+import { BIGDECIMAL_ZERO } from "../../../common/constants";
 import { updateRevenue } from "../../../common/metrics";
 
 import {
@@ -49,16 +49,7 @@ export function createWithdrawal(poolAddress: string, event: Withdrawal): void {
   ).times(inputToken.lastPriceUSD!);
 
   if (relayerFeeUsd != BIGDECIMAL_ZERO) {
-    let network = dataSource.network().toUpperCase();
-    let protocolFeeToken = getOrCreateToken(
-      TORN_ADDRESS.get(network)!,
-      event.block.number
-    );
-
-    let protocolFeeUsd = bigIntToBigDecimal(
-      pool._fee,
-      protocolFeeToken.decimals
-    ).times(protocolFeeToken.lastPriceUSD!);
+    let protocolFeeUsd = BIGDECIMAL_ZERO;
 
     updateRevenue(event, poolAddress, relayerFeeUsd, protocolFeeUsd);
   }

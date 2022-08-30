@@ -217,6 +217,7 @@ export function getOrCreatePool(
     pool.rewardTokens = [
       getOrCreateRewardToken(TORN_ADDRESS.get(network)!, event.block.number).id,
     ];
+    pool._apEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
 

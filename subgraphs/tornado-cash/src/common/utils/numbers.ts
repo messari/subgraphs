@@ -12,20 +12,9 @@ export function bigIntToBigDecimal(
   );
 }
 
-export function bigDecimalToBigInt(
-  quantity: BigDecimal,
-  decimals: i32 = 18
-): BigInt {
-  return BigInt.fromString(
-    quantity
-      .times(
-        BigInt.fromI32(10)
-          .pow(decimals as u8)
-          .toBigDecimal()
-      )
-      .truncate(0)
-      .toString()
-  );
+export function bigDecimalToBigInt(input: BigDecimal): BigInt {
+  const str = input.truncate(0).toString();
+  return BigInt.fromString(str);
 }
 
 // returns 10^exp
