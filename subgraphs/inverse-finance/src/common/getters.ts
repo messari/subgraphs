@@ -363,7 +363,7 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics.dailyBorrowCount = INT_ZERO;
     usageMetrics.dailyRepayCount = INT_ZERO;
     usageMetrics.dailyLiquidateCount = INT_ZERO;
-    usageMetrics.totalPoolCount = INT_ZERO;
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.save();
