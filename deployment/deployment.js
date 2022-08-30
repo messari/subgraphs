@@ -19,7 +19,8 @@ if (
   args.network === undefined ||
   args.location === undefined ||
   args.printlogs === undefined ||
-  args.merge === undefined
+  args.merge === undefined ||
+  args.type === undefined
 ) {
   console.log(
     "Usage: node deployment.js --subgraph=" +
@@ -33,13 +34,17 @@ if (
       " --printlogs=" +
       args.printlogs +
       " --merge=" +
-      args.merge
+      args.merge +
+      " --type=" +
+      args.type
   );
   console.log(
     "Please check subgraph:deploy script in package.json. Make sure it matches example script in the deployments folder. "
   );
 } else if (!args.subgraph || !args.location) {
   console.log("Please provide at least --SUBGRAPH and --LOCATION");
+} else if (!["build", "deploy", ""].includes(args.type.toLowerCase())) {
+  console.log("Please provide --TYPE=build or --TYPE=deploy");
 } else if (args.subgraph && args.protocol && args.network && args.location) {
   if (args.subgraph in protocolNetworkMap == false) {
     console.log(
@@ -92,7 +97,14 @@ if (
     } else {
       allScripts.set(
         location,
-        scripts(protocol, network, template, location, prepareConstants)
+        scripts(
+          protocol,
+          network,
+          template,
+          location,
+          prepareConstants,
+          args.type
+        )
       );
     }
     runCommands(allScripts, results, args, function (results) {});
@@ -140,13 +152,21 @@ if (
             "deploy-on-merge"
           ]
         ) &&
-        ["true", "t"].includes(args.merge.toLowerCase())
+        ["true", "t"].includes(args.merge.toLowerCase()) &&
+        args.deploy != "build"
       ) {
         results += "Ignored in Deployment Configurations: " + location + "\n";
       } else {
         allScripts.set(
           location,
-          scripts(protocol, network, template, location, prepareConstants)
+          scripts(
+            protocol,
+            network,
+            template,
+            location,
+            prepareConstants,
+            args.type
+          )
         );
       }
     }
@@ -198,7 +218,14 @@ if (
         } else {
           allScripts.set(
             location,
-            scripts(protocol, network, template, location, prepareConstants)
+            scripts(
+              protocol,
+              network,
+              template,
+              location,
+              prepareConstants,
+              args.type
+            )
           );
         }
       }
