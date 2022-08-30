@@ -9,5 +9,8 @@
   "SpellStartBlock": "821891",
   "OffchainAggregatorEnabled": true,
   "OffchainAggregatorAddress": "0x87121f6c9a9f6e90e59591e4cf4804873f54a95b",
-  "OffchainAggregatorStartBlock": "2370257"
+  "OffchainAggregatorStartBlock": "2370257",
+  "graftEnabled": true,
+  "subgraphId": "QmRA311PK6ZPevsPDMxohJkeQ5M4vNaq8mfVT8tTug2h7h",
+  "graftStartBlock": 21896462
 }

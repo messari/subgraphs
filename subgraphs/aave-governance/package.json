@@ -9,7 +9,7 @@
     "remove-local": "graph remove --node http://localhost:8020/ danielkhoo/aave-governance",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 danielkhoo/aave-governance",
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
-    "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
+    "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge} --type=${npm_config_type}"
   },
   "dependencies": {
     "@graphprotocol/graph-ts": "0.27.0"
