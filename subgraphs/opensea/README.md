@@ -286,6 +286,7 @@ The subgraph call handler flow can be broken down into several steps:
 - `buy.basePrice`/`sell.basePrice` denotes base trade price
   - Note that Dutch Auction sales use `calculateMatchPrice` to determine trade price
 - `buy.maker` denotes the NFT buyer (sale taker/bid maker)
+
   Known Exceptions:
 
   - [Genie swaps](https://www.genie.xyz/)
