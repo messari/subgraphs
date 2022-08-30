@@ -228,7 +228,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // CRV prices are not returned from gCRV for the first 3 days
   // ie blocks 24879410 - 25266668
   if (
-    market.id.toLowerCase() === CRV_ADDRESS.toLowerCase() &&
+    market.id.toLowerCase() == CRV_ADDRESS.toLowerCase() &&
     event.block.number.toI64() <= 25266668
   ) {
     assetPriceUSD = getCRVPriceUSD();
@@ -357,7 +357,7 @@ function getGeistPriceUSD(): BigDecimal {
   let reserves = geistFtmLP.try_getReserves();
 
   if (reserves.reverted) {
-    log.error("[getGeistPriceUSD] Unable to get price for asset", [
+    log.error("[getGeistPriceUSD] Unable to get price for asset {}", [
       REWARD_TOKEN_ADDRESS,
     ]);
     return BIGDECIMAL_ZERO;
@@ -389,8 +389,8 @@ function getCRVPriceUSD(): BigDecimal {
   let reserves = crvFtmLP.try_getReserves();
 
   if (reserves.reverted) {
-    log.error("[getCRVPriceUSD] Unable to get price for asset", [
-      REWARD_TOKEN_ADDRESS,
+    log.error("[getCRVPriceUSD] Unable to get price for asset {}", [
+      CRV_ADDRESS,
     ]);
     return BIGDECIMAL_ZERO;
   }
@@ -402,6 +402,17 @@ function getCRVPriceUSD(): BigDecimal {
   // get FTM price
   let gTokenContract = GToken.bind(Address.fromString(GFTM_ADDRESS));
   let tryPrice = gTokenContract.try_getAssetPrice();
+
+  log.warning("crv price: ${}", [
+    tryPrice.reverted
+      ? BIGDECIMAL_ZERO.toString()
+      : tryPrice.value
+          .toBigDecimal()
+          .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+          .times(priceCRVinFTM)
+          .toString(),
+  ]);
+
   return tryPrice.reverted
     ? BIGDECIMAL_ZERO
     : tryPrice.value
