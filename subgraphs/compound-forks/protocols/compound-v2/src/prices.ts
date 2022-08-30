@@ -8,6 +8,7 @@ import {
   CUSDT_ADDRESS,
   CTUSD_ADDRESS,
   USDC_DECIMALS,
+  ETH_SYMBOL,
 } from "./constants";
 import { Token, LendingProtocol, Market } from "../../../generated/schema";
 import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
@@ -37,7 +38,7 @@ export function getUSDPriceOfToken(
   // get usd price of token
   if (blockNumber > 10678764) {
     // after block 10678764 ETH price was calculated in USD instead of USDC
-    let ethPriceUSD = getUSDPriceETH();
+    let ethPriceUSD = getUSDPriceETH(blockNumber);
 
     if (cTokenAddress == CETH_ADDRESS) {
       tokenPrice = ethPriceUSD.truncate(getTokenDecimals);
@@ -167,18 +168,27 @@ function getUSDCPriceETH(blockNumber: i32): BigDecimal {
   return usdcPrice;
 }
 
-function getUSDPriceETH(): BigDecimal {
+function getUSDPriceETH(blockNumber: i32): BigDecimal {
   let protocol = LendingProtocol.load(COMPTROLLER_ADDRESS)!;
-  let mantissaFactorBD = exponentToBigDecimal(18);
   let oracle2Address = Address.fromString(protocol._priceOracle);
   let priceOracle2 = PriceOracle2.bind(oracle2Address);
-  let tryPrice = priceOracle2.try_getUnderlyingPrice(
-    Address.fromString(CETH_ADDRESS)
-  );
 
-  let ethPriceInUSD = tryPrice.reverted
-    ? BIGDECIMAL_ZERO
-    : tryPrice.value.toBigDecimal().div(mantissaFactorBD);
+  if (blockNumber < 15441888) {
+    let mantissaFactorBD = exponentToBigDecimal(18);
+    let tryPrice = priceOracle2.try_getUnderlyingPrice(
+      Address.fromString(CETH_ADDRESS)
+    );
 
-  return ethPriceInUSD;
+    return tryPrice.reverted
+      ? BIGDECIMAL_ZERO
+      : tryPrice.value.toBigDecimal().div(mantissaFactorBD);
+  } else {
+    // calculation of ETH price was changed in Proposal 117: https://compound.finance/governance/proposals/117
+    // etherscan transaction where it came into effect: https://etherscan.io/tx/0x58ad039bedcf34caf010bc9513435b16856c9ec1a0b7e46cad3422264120ddf4
+    let mantissaFactorBD = exponentToBigDecimal(6); // price() offsets by 6 decimals
+    let tryPrice = priceOracle2.try_price(ETH_SYMBOL);
+    return tryPrice.reverted
+      ? BIGDECIMAL_ZERO
+      : tryPrice.value.toBigDecimal().div(mantissaFactorBD);
+  }
 }
