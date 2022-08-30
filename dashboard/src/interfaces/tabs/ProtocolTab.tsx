@@ -111,6 +111,7 @@ function ProtocolTab({
       <IssuesDisplay issuesArrayProps={issuesToDisplay} oneLoaded={oneLoaded} allLoaded={allLoaded} />
       <SchemaTable
         entityData={protocolTableData[protocolEntityNameSingular]}
+        protocolType={protocolType}
         dataFields={protocolFields}
         schemaName={protocolEntityNameSingular}
         issuesProps={tableIssuesInit}

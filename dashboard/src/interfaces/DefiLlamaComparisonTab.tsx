@@ -153,19 +153,48 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
     financialsData?.financialsDailySnapshots &&
     defiLlamaData.name.toLowerCase() === defiLlamaSlug?.split(" (")[0].toLowerCase()
   ) {
-    const dataset: string =
-      Object.keys(defiLlamaData.chainTvls).find((chain) => {
-        let networkName = defiLlamaSlug?.split(" (")[1]?.split(")")[0]?.toUpperCase();
-        if (networkName === "MAINNET") {
-          networkName = "ETHEREUM";
-        }
-        if (networkName === "MATIC") {
-          networkName = "POLYGON";
-        }
-        return chain.toUpperCase() === networkName;
-      }) || "";
+
+    let stakedDataset = "";
+    let borrowedDataset = "";
+    let dataset: string = "";
+
+    Object.keys(defiLlamaData.chainTvls).forEach((chain) => {
+      let networkName = defiLlamaSlug?.split(" (")[1]?.split(")")[0]?.toUpperCase();
+      if (networkName === "MAINNET") {
+        networkName = "ETHEREUM";
+      }
+      if (networkName === "MATIC") {
+        networkName = "POLYGON";
+      }
+      if (chain.toUpperCase() === networkName) {
+        dataset = chain;
+      }
+      if (chain.toUpperCase() === networkName + '-STAKING') {
+        stakedDataset = chain;
+      }
+      if (chain.toUpperCase() === networkName + '-BORROWED') {
+        borrowedDataset = chain;
+      }
+    });
+
     let compChart = {
-      defiLlama: defiLlamaData.chainTvls[dataset].tvl.map((x: any) => ({ value: x.totalLiquidityUSD, date: x.date })),
+      defiLlama: defiLlamaData.chainTvls[dataset].tvl.map((x: any, idx: number) => {
+        let value = x.totalLiquidityUSD;
+        const date = toDate(x.date);
+        if (defiLlamaData.chainTvls[stakedDataset]) {
+          const stakedDatapoint = defiLlamaData.chainTvls[stakedDataset]?.tvl?.find((x: any) => toDate(x.date) === date);
+          if (stakedDatapoint) {
+            value += stakedDatapoint.totalLiquidityUSD;
+          }
+        }
+        if (defiLlamaData.chainTvls[borrowedDataset]) {
+          const borrowedDatapoint = defiLlamaData.chainTvls[borrowedDataset]?.tvl?.find((x: any) => toDate(x.date) === date);
+          if (borrowedDatapoint) {
+            value += borrowedDatapoint.totalLiquidityUSD;
+          }
+        }
+        return { value: value, date: x.date };
+      }),
       subgraph: financialsData.financialsDailySnapshots.map((x: any) => ({
         value: parseFloat(x.totalValueLockedUSD),
         date: parseInt(x.timestamp),
@@ -191,11 +220,50 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
         subgraph: Object.values(tempChartData.subgraph).map((val: any) => ({ date: val.date, value: val.value })),
       };
     }
-    if (compChart.defiLlama.length > compChart.subgraph.length) {
-      compChart.defiLlama = compChart.defiLlama.slice(compChart.defiLlama.length - compChart.subgraph.length);
-    } else if (compChart.defiLlama.length < compChart.subgraph.length) {
-      compChart.subgraph = compChart.subgraph.slice(compChart.subgraph.length - compChart.defiLlama.length);
+
+    while (toDate(compChart.defiLlama[0].date) !== toDate(compChart.subgraph[0].date)) {
+      if (compChart.defiLlama[0].date < compChart.subgraph[0].date) {
+        const startIndex = compChart.defiLlama.findIndex((x: any) => x.date >= compChart.subgraph[0].date);
+        compChart.defiLlama = [...compChart.defiLlama.slice(startIndex)];
+      } else {
+        const startIndex = compChart.subgraph.findIndex((x: any) => x.date >= compChart.defiLlama[0].date);
+        compChart.subgraph = [...compChart.subgraph.slice(startIndex)];
+      }
     }
+    // compChart.subgraph
+    //   .forEach((val: any, i: any) => {
+    //     let date = toDate(val.date);
+    //     if (isMonthly) {
+    //       date = date.split("-").slice(0, 2).join("-");
+    //     }
+    //     let llamaVal = compChart.defiLlama.find((point: any) => {
+    //       if (isMonthly) {
+    //         return toDate(point?.date)?.split("-")?.slice(0, 2)?.join("-");
+    //       }
+    //       return toDate(point?.date) === date;
+    //     })?.value;
+    //     if (!llamaVal) {
+    //       llamaVal = 0;
+    //     }
+
+    // loop off of defiLlama points, as this is to cut out subgraph points if necessary 
+    // Get the subgraph point at that index 
+    // if point doesnt exist return, end of array
+    // if more than 86400 seconds separation between llama date and subgraph date, find the next subgraph date that equals to the defi llama toDate() string.
+    // s(p)lice the subgraph data points
+
+    // const diff = Math.abs(val.value - llamaVal);
+    // return {
+    //   id: i,
+    //   date: date,
+    //   subgraphData: "$" + formatIntToFixed2(val.value),
+    //   defiLlamaData: "$" + formatIntToFixed2(llamaVal),
+    //   differenceVal: "$" + formatIntToFixed2(diff),
+    //   differencePercentage: ((diff / llamaVal) * 100).toFixed(2) + "%",
+    // };
+    // })
+    // .reverse();
+
     const elementId = `${isMonthly ? "Monthly" : "Daily"} Chart - ${defiLlamaSlug}`;
     chart = (
       <div key={elementId} id={elementId}>
