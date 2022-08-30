@@ -15,6 +15,27 @@ interface DefiLlamaComparsionTabProps {
   getData: any;
 }
 
+const lineupChartDatapoints = (compChart: any, stitchLeftIndex: number): any => {
+  while (toDate(compChart.defiLlama[stitchLeftIndex].date) !== toDate(compChart.subgraph[stitchLeftIndex].date)) {
+    if (compChart.defiLlama[stitchLeftIndex].date < compChart.subgraph[stitchLeftIndex].date) {
+      const startIndex = compChart.defiLlama.findIndex((x: any) => x.date >= compChart.subgraph[stitchLeftIndex].date);
+      let newArray = [...compChart.defiLlama.slice(startIndex)];
+      if (stitchLeftIndex > 0) {
+        newArray = [...compChart.defiLlama.slice(0, stitchLeftIndex), ...compChart.defiLlama.slice(startIndex, compChart.defiLlama.length)];
+      }
+      compChart.defiLlama = newArray;
+    } else {
+      const startIndex = compChart.subgraph.findIndex((x: any) => x.date >= compChart.defiLlama[stitchLeftIndex].date);
+      let newArray = [...compChart.subgraph.slice(startIndex)];
+      if (stitchLeftIndex > 0) {
+        newArray = [...compChart.subgraph.slice(0, stitchLeftIndex), ...compChart.subgraph.slice(startIndex, compChart.subgraph.length)];
+      }
+      compChart.subgraph = newArray;
+    }
+  }
+  return compChart;
+}
+
 // This component is for each individual subgraph
 function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsionTabProps) {
   const navigate = useNavigate();
@@ -221,48 +242,23 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
       };
     }
 
-    while (toDate(compChart.defiLlama[0].date) !== toDate(compChart.subgraph[0].date)) {
-      if (compChart.defiLlama[0].date < compChart.subgraph[0].date) {
-        const startIndex = compChart.defiLlama.findIndex((x: any) => x.date >= compChart.subgraph[0].date);
-        compChart.defiLlama = [...compChart.defiLlama.slice(startIndex)];
-      } else {
-        const startIndex = compChart.subgraph.findIndex((x: any) => x.date >= compChart.defiLlama[0].date);
-        compChart.subgraph = [...compChart.subgraph.slice(startIndex)];
-      }
-    }
-    // compChart.subgraph
-    //   .forEach((val: any, i: any) => {
-    //     let date = toDate(val.date);
-    //     if (isMonthly) {
-    //       date = date.split("-").slice(0, 2).join("-");
-    //     }
-    //     let llamaVal = compChart.defiLlama.find((point: any) => {
-    //       if (isMonthly) {
-    //         return toDate(point?.date)?.split("-")?.slice(0, 2)?.join("-");
-    //       }
-    //       return toDate(point?.date) === date;
-    //     })?.value;
-    //     if (!llamaVal) {
-    //       llamaVal = 0;
-    //     }
+    compChart = lineupChartDatapoints({ ...compChart }, 0);
+    compChart.defiLlama
+      .forEach((val: any, i: any) => {
+        const subgraphPoint = compChart.subgraph[i];
+        if (!subgraphPoint) {
+          return;
+        }
 
-    // loop off of defiLlama points, as this is to cut out subgraph points if necessary 
-    // Get the subgraph point at that index 
-    // if point doesnt exist return, end of array
-    // if more than 86400 seconds separation between llama date and subgraph date, find the next subgraph date that equals to the defi llama toDate() string.
-    // s(p)lice the subgraph data points
+        const subgraphTimestamp = subgraphPoint?.date || 0;
+        const llamaDate = toDate(val.date);
 
-    // const diff = Math.abs(val.value - llamaVal);
-    // return {
-    //   id: i,
-    //   date: date,
-    //   subgraphData: "$" + formatIntToFixed2(val.value),
-    //   defiLlamaData: "$" + formatIntToFixed2(llamaVal),
-    //   differenceVal: "$" + formatIntToFixed2(diff),
-    //   differencePercentage: ((diff / llamaVal) * 100).toFixed(2) + "%",
-    // };
-    // })
-    // .reverse();
+        if (Math.abs(subgraphTimestamp - val.date) > 86400) {
+          const dateIndex = compChart.subgraph.findIndex((x: any) => toDate(x.date) === llamaDate || x.date > val.date);
+          compChart.subgraph = [...compChart.subgraph.slice(0, i), ...compChart.subgraph.slice(dateIndex, compChart.subgraph.length)];
+          compChart = lineupChartDatapoints({ ...compChart }, i);
+        }
+      });
 
     const elementId = `${isMonthly ? "Monthly" : "Daily"} Chart - ${defiLlamaSlug}`;
     chart = (
