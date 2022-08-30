@@ -42,7 +42,9 @@ export function createWithdrawTransaction(
     withdrawTransaction.pool = pool.id;
     withdrawTransaction.protocol = constants.Mainnet.REGISTRY_ADDRESS.toHexString();
 
-    withdrawTransaction.to = transaction.to!.toHexString();
+    withdrawTransaction.to = constants.NULL.TYPE_STRING;
+    if (transaction.to) withdrawTransaction.to = transaction.to!.toHexString();
+
     withdrawTransaction.from = provider.toHexString();
 
     withdrawTransaction.hash = transaction.hash.toHexString();
