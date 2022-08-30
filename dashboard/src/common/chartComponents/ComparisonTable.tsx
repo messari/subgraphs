@@ -49,21 +49,29 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
         align: "right" as GridAlignment,
       },
     ];
-
     const tableData = dataTable.subgraph
       .map((val: any, i: any) => {
         let date = toDate(val.date);
         if (isMonthly) {
           date = date.split("-").slice(0, 2).join("-");
         }
-        const diff = Math.abs(val.value - dataTable.defiLlama[i].value);
+        let llamaVal = dataTable.defiLlama.find((point: any) => {
+          if (isMonthly) {
+            return toDate(point?.date)?.split("-")?.slice(0, 2)?.join("-");
+          }
+          return toDate(point?.date) === date;
+        })?.value;
+        if (!llamaVal) {
+          llamaVal = 0;
+        }
+        const diff = Math.abs(val.value - llamaVal);
         return {
           id: i,
           date: date,
           subgraphData: "$" + formatIntToFixed2(val.value),
-          defiLlamaData: "$" + formatIntToFixed2(dataTable.defiLlama[i].value),
+          defiLlamaData: "$" + formatIntToFixed2(llamaVal),
           differenceVal: "$" + formatIntToFixed2(diff),
-          differencePercentage: ((diff / dataTable.defiLlama[i].value) * 100).toFixed(2) + "%",
+          differencePercentage: ((diff / llamaVal) * 100).toFixed(2) + "%",
         };
       })
       .reverse();
