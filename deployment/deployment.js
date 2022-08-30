@@ -41,11 +41,13 @@ if (
   console.log(
     "Please check subgraph:deploy script in package.json. Make sure it matches example script in the deployments folder. "
   );
-} else if (!args.subgraph || !args.location) {
-  console.log("Please provide at least --SUBGRAPH and --LOCATION");
+} else if (!args.subgraph || !(args.location || args.type)) {
+  console.log(
+    "Please provide at least --SUBGRAPH and either --LOCATION or --TYPE"
+  );
 } else if (!["build", "deploy", ""].includes(args.type.toLowerCase())) {
   console.log("Please provide --TYPE=build or --TYPE=deploy");
-} else if (args.subgraph && args.protocol && args.network && args.location) {
+} else if (args.subgraph && args.protocol && args.network) {
   if (args.subgraph in protocolNetworkMap == false) {
     console.log(
       "Error: please specify a a valid subgraph directory or add to configurations (e.g. uniswap-forks, compound-forks, qidao, etc"
@@ -109,7 +111,7 @@ if (
     }
     runCommands(allScripts, results, args, function (results) {});
   }
-} else if (args.subgraph && args.protocol && args.location) {
+} else if (args.subgraph && args.protocol) {
   if (args.subgraph in protocolNetworkMap == false) {
     console.log(
       "Error: please specify a a valid subgraph directory or add to configurations  (e.g. uniswap-forks, compound-forks, qidao, etc"
@@ -173,7 +175,7 @@ if (
 
     runCommands(allScripts, results, args, function (results) {});
   }
-} else if (args.subgraph && args.location) {
+} else if (args.subgraph) {
   if (args.subgraph in protocolNetworkMap == false) {
     console.log(
       "Error: please specify a a valid subgraph directory or add to configurations  (e.g. uniswap-forks, compound-forks, qidao, etc"
@@ -234,5 +236,5 @@ if (
     runCommands(allScripts, results, args, function (results) {});
   }
 } else {
-  console.log("UNKOWN - Please post issue on github.");
+  console.log("UNKNOWN - Please post issue on github.");
 }
