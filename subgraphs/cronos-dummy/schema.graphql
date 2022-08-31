@@ -1,0 +1,18 @@
+# Subgraph Schema: Network Head
+# Version: 1.0.0
+# See the README.md for more details
+
+# Keeps track of the current block in a network
+type Network @entity {
+  " Network name "
+  id: ID!
+
+  " the head of the network "
+  currentBlock: BigInt
+
+  " Subgraph version "
+  subgraphVersion: String!
+
+  " Schema version "
+  schemaVersion: String!
+}
