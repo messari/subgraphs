@@ -434,7 +434,6 @@ export function _handleReserveDataUpdated(
   ]);
 
   // update rates
-
   let vBorrowRate = createInterestRate(
     market.id,
     InterestRateSide.BORROWER,
