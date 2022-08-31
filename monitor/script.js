@@ -2,6 +2,7 @@ import axios from "axios";
 import { getDiscordMessages, sendDiscordMessage } from "./DiscordMessages.js";
 import 'dotenv/config'
 import { protocolLevel, alertProtocolErrors } from "./protocolLevel.js";
+import { lendingPoolLevel } from "./lendingPoolLevel.js";
 
 // Hour in milliseconds
 const hourMs = 3600000;
@@ -181,11 +182,13 @@ async function executionFlow() {
   });
 
   deployments = await protocolLevel(deployments);
-  // deployments = await lendingPoolLevel(deployments);
+  deployments = await lendingPoolLevel(deployments);
 
   const discordMessages = await getDiscordMessages();
   alertFailedIndexing(discordMessages, deployments);
   alertProtocolErrors(discordMessages, deployments);
+  alertLendingPoolErrors(discordMessages, deployments);
+
 }
 
 async function alertFailedIndexing(discordMessages, deployments) {
@@ -217,4 +220,102 @@ ${indexErrs.join(",\n")}
   if (indexErrs.length > 0) {
     const sendIndexingErrorDiscord = await sendDiscordMessage(newIndexingErrorDiscordMessage);
   }
+}
+
+export const alertLendingPoolErrors = async (discordMessages, deployments) => {
+  Object.entries(deployments).forEach(([protocol, deployment]) => {
+
+    if (deployment.protocolType.toUpperCase() !== "LENDING") {
+      return;
+    }
+
+    // Change to get one singular exact deployment
+    const poolErrorMessage = discordMessages.find(x => x.content.includes("**POOL ERRORS") && x.content.includes(protocol.toUpperCase()));
+
+    const alertedErrors = {
+      totalValueLockedUSD: [],
+      cumulativeSupplySideRevenueUSD: [],
+      cumulativeProtocolSideRevenueUSD: [],
+      cumulativeTotalRevenueUSD: [],
+      cumulativeDepositUSD: [],
+      cumulativeBorrowUSD: [],
+      cumulativeLiquidateUSD: [],
+      totalBorrowBalanceUSD: [],
+      totalDepositBalanceUSD: [],
+      outputTokenSupply: [],
+      outputTokenPriceUSD: [],
+    };
+
+    // Get all of pool level message for that specific deployment, one single string
+    // Split message by each issue present
+    // if greater than 3 pools present, save length to alerted messages [field]
+    // if 3 or less pools present, save array of pool ids to alerted messages[field]
+
+    // for the new issues detected, if greater than three pools on the issue:
+    // -if alerted messages[field] is a number (length) then do nothing
+    // else add issue to error message
+    // if less than 3 pools on issue
+    // if alerted messages is a list of 3 or less pools, map through the new pools on the issue, each one that is not included() on alerted messages, write into new message    
+    // else send new message
+
+    console.log(poolErrorMessage, poolErrorMessage?.split("Issue: "));
+
+    // poolErrorMsgs.forEach(msgObj => {
+    //     const splitMsg = msgObj.split("LIST:");
+    //     const type = splitMsg[0].split('\n')[0].trim();
+    //     alertedErrors[type] = [...alertedErrors[type], ...splitMsg[1]].join('');
+    // })
+
+    const errorsToAlert = {
+      totalValueLockedUSD: [],
+      cumulativeSupplySideRevenueUSD: [],
+      cumulativeProtocolSideRevenueUSD: [],
+      cumulativeTotalRevenueUSD: [],
+      cumulativeDepositUSD: [],
+      cumulativeBorrowUSD: [],
+      cumulativeLiquidateUSD: [],
+      totalBorrowBalanceUSD: [],
+      totalDepositBalanceUSD: [],
+      outputTokenSupply: [],
+      outputTokenPriceUSD: [],
+    };
+
+    Object.entries(deployment.poolErrors).forEach(([issueSet, issueArr]) => {
+      if (issueArr.length > 0) {
+        issueArr.forEach(iss => {
+          if (!alertedErrors[issueSet].includes(protocol)) {
+            if ((protocol.includes('pending') && iss.includes('pending')) || (!protocol.includes('pending') && !iss.includes('pending'))) {
+              errorsToAlert[issueSet].push(`${iss}`);
+            }
+          }
+        })
+      }
+    });
+
+    const protocolErrs = [];
+
+    // Create start and end to error message, each error type to be displayed within it
+    // Loop through types in errors to alert and create a list of error types with list of applic pools
+    // Outside of these loops, create one single txt file per protocol 
+    const newPoolErrorDiscordMessage = [`**POOL ERRORS: ${protocol}**\n`];
+
+    Object.entries(errorsToAlert).forEach(([type, val]) => {
+      if (val?.length > 0 && protocolErrs.join(" - ").length < 1400) {
+        let list = val.join(",\n");
+        if (val.length > 3) {
+          list = val.slice(0, 3).join(",\n") + ",\n";
+        }
+        newPoolErrorDiscordMessage.push(`
+Issue: ${type + (val.length > 3 ? ('-' + val.length + " pools with this error") : "")}
+
+Pools
+${list}
+`);
+      }
+    })
+    // const nowDate = new Date().getMonth().toString() + '-' + new Date().getDate().toString() + '-' + new Date().getFullYear().toString()
+    // const jsonPath = path.join(process.cwd(), 'poolHold', 'Deployment_Pool_Errors_' + protocol + '_' + nowDate + '.txt');
+    // fs.writeFileSync(jsonPath, (newPoolErrorDiscordMessage.join("")))
+    sendDiscordMessage(newPoolErrorDiscordMessage.join(""));
+  })
 }

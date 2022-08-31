@@ -18,6 +18,23 @@ export async function getDiscordMessages() {
     return previousWeekMessages;
 }
 
+export async function clearChannel() {
+    const msgs = await getDiscordMessages()
+    const baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages/bulk-delete";
+    const headers = {
+        "Authorization": "Bot " + process.env.BOT_TOKEN,
+        "Content-Type": "application/json",
+    }
+
+    const postJSON = JSON.stringify({ "messages": msgs.map(x => x.id) });
+
+    try {
+        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+    } catch (err) {
+        console.log('ERROR', err)
+    }
+}
+
 export async function sendDiscordMessage(message) {
 
     const baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages";
@@ -31,6 +48,6 @@ export async function sendDiscordMessage(message) {
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
     } catch (err) {
-        console.log('ERROR', err, message)
+        // console.log('ERROR', err, message)
     }
 }

@@ -414,7 +414,7 @@ export const alertProtocolErrors = async (discordMessages, deployments) => {
     const protocolErrs = [];
     Object.entries(errorsToAlert).forEach(([type, val]) => {
         if (val?.length > 0 && protocolErrs.join(" - ").length < 1400) {
-            const newprotocolErrorDiscordMessage = `
+            const newProtocolErrorDiscordMessage = `
 **PROTOCOL ERRORS:**
 
 ${protocolErrorMessages[type]}
@@ -425,7 +425,7 @@ LIST:
 
 ${val.join(",\n")}
 `;
-            (sendDiscordMessage(newprotocolErrorDiscordMessage));
+            sendDiscordMessage(newProtocolErrorDiscordMessage);
         }
     })
 }

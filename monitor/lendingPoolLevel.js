@@ -11,8 +11,15 @@ export const lendingPoolLevel = async (deployments) => {
         }
     });
 
+    console.log(endpointsList)
     const baseQuery = `
     query MyQuery {
+        protocols {
+            id
+            name
+            type
+            schemaVersion
+        }
       markets(first: 10) {
         id
         name
@@ -55,127 +62,135 @@ export const lendingPoolLevel = async (deployments) => {
                 return {
                     markets: marketData?.data?.data?.markets || [],
                     url: marketData.config.url,
-                    deployment: marketData.config.url.split("messari/")[1],
+                    deployment: Object.keys(deployments).find((key) => deployments[key].url === marketData.config.url) || marketData.config.url.split("messari/")[1],
                 };
             }))
         )
         .catch((err) => console.log(err));
 
-    marketLevelData.forEach((protocol) => {
+    marketLevelData.forEach((protocol, idx) => {
+        console.log('marketLevelData', protocol.deployment, idx)
         if (!protocol?.markets) return;
         const data = protocol.markets;
         if (!data?.length) return;
         const url = protocol.url;
         // const dataFields = Object.keys(data)
 
-        const idx = Math.floor(Math.random() * data.length);
-
-        const instance = data[idx];
-        const deploymentName = Object.keys(deployments).find(
-            (depoName) => deployments[depoName].url === protocol.url
-        );
+        const deploymentName = protocol.deployment;
         const deployment = { ...deployments[deploymentName] };
 
         const issuesArrays = { ...deployment.poolErrors };
 
-        const buildIssue = (value) => protocol.deployment + "-" + instance.id + "-" + instance.name + "//" + value;
+        data.forEach((instance) => {
+            const buildIssue = (value) => instance.id;
+            let currentIssueField = "totalValueLockedUSD";
+            if (
+                !(
+                    parseFloat(instance[currentIssueField]) > 1000 &&
+                    parseFloat(instance[currentIssueField]) < 100000000000
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField]).toFixed(2)));
+            }
 
-        if (
-            !(
-                parseFloat(instance.totalValueLockedUSD) > 1000 &&
-                parseFloat(instance.totalValueLockedUSD) < 100000000000
-            )
-        ) {
-            issuesArrays.totalValueLockedUSD.push(buildIssue(parseFloat(instance.totalValueLockedUSD).toFixed(2)));
-        }
+            currentIssueField = "cumulativeSupplySideRevenueUSD";
+            if (
+                !(
+                    parseFloat(instance[currentIssueField]) >= 100 &&
+                    parseFloat(instance[currentIssueField]) <= 10000000000
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField]).toFixed(2)));
+            }
 
-        if (
-            !(
-                parseFloat(instance.cumulativeSupplySideRevenueUSD) >= 100 &&
-                parseFloat(instance.cumulativeSupplySideRevenueUSD) <= 10000000000
-            )
-        ) {
-            issuesArrays.cumulativeSupplySideRevenueUSD.push(buildIssue(parseFloat(instance.cumulativeSupplySideRevenueUSD).toFixed(2)));
-        }
+            currentIssueField = "cumulativeProtocolSideRevenueUSD";
+            if (
+                !(
+                    parseFloat(instance[currentIssueField]) >= 100 &&
+                    parseFloat(instance[currentIssueField]) <= 10000000000
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField]).toFixed(2)));
+            }
 
-        if (
-            !(
-                parseFloat(instance.cumulativeProtocolSideRevenueUSD) >= 100 &&
-                parseFloat(instance.cumulativeProtocolSideRevenueUSD) <= 10000000000
-            )
-        ) {
-            issuesArrays.cumulativeProtocolSideRevenueUSD.push(buildIssue(parseFloat(instance.cumulativeProtocolSideRevenueUSD).toFixed(2)));
-        }
+            currentIssueField = "cumulativeTotalRevenueUSD";
+            if (
+                (
+                    parseFloat(instance.cumulativeProtocolSideRevenueUSD) +
+                    parseFloat(instance.cumulativeSupplySideRevenueUSD)
+                ).toFixed(2) !== parseFloat(instance[currentIssueField]).toFixed(2) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                const value = ((parseFloat(instance.cumulativeProtocolSideRevenueUSD) +
+                    parseFloat(instance.cumulativeSupplySideRevenueUSD)) +
+                    "||" +
+                    parseFloat(data[currentIssueField]).toFixed(2) +
+                    "=" +
+                    parseFloat(data.cumulativeProtocolSideRevenueUSD).toFixed(2) +
+                    "+" +
+                    parseFloat(data.cumulativeProtocolSideRevenueUSD).toFixed(2))
+                issuesArrays[currentIssueField].push(buildIssue(value));
+            }
 
-        if (
-            (
-                parseFloat(instance.cumulativeProtocolSideRevenueUSD) +
-                parseFloat(instance.cumulativeSupplySideRevenueUSD)
-            ).toFixed(2) !== parseFloat(instance.cumulativeTotalRevenueUSD).toFixed(2)
-        ) {
-            const value = ((parseFloat(instance.cumulativeProtocolSideRevenueUSD) +
-                parseFloat(instance.cumulativeSupplySideRevenueUSD)) +
-                "||" +
-                parseFloat(data.cumulativeTotalRevenueUSD).toFixed(2) +
-                "=" +
-                parseFloat(data.cumulativeProtocolSideRevenueUSD).toFixed(2) +
-                "+" +
-                parseFloat(data.cumulativeProtocolSideRevenueUSD).toFixed(2))
-            issuesArrays.cumulativeTotalRevenueUSD.push(buildIssue(value));
-        }
+            currentIssueField = "cumulativeDepositUSD";
+            if (!(parseFloat(instance[currentIssueField]) > 100) && !issuesArrays[currentIssueField]?.includes(instance.id)) {
+                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField])));
+            }
 
-        if (!(parseFloat(instance.cumulativeDepositUSD) > 100)) {
-            issuesArrays.cumulativeDepositUSD.push(buildIssue(parseFloat(instance.cumulativeDepositUSD)));
-        }
+            if (
+                !(
+                    parseFloat(instance.cumulativeDepositUSD) >=
+                    parseFloat(instance.cumulativeBorrowUSD)
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays.cumulativeBorrowUSD.push(buildIssue(instance.cumulativeBorrowUSD + " > " + instance.cumulativeDepositUSD));
+            }
 
-        if (
-            !(
-                parseFloat(instance.cumulativeDepositUSD) >=
-                parseFloat(instance.cumulativeBorrowUSD)
-            )
-        ) {
-            issuesArrays.cumulativeBorrowUSD.push(buildIssue(instance.cumulativeBorrowUSD + " > " + instance.cumulativeDepositUSD));
-        }
+            currentIssueField = "cumulativeLiquidateUSD";
+            if (
+                !(
+                    parseFloat(instance[currentIssueField]) <=
+                    parseFloat(instance.cumulativeBorrowUSD)
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField]) + " > " + parseFloat(instance.cumulativeBorrowUSD)));
+            }
 
-        if (
-            !(
-                parseFloat(instance.cumulativeLiquidateUSD) <=
-                parseFloat(instance.cumulativeBorrowUSD)
-            )
-        ) {
-            issuesArrays.cumulativeLiquidateUSD.push(buildIssue(parseFloat(instance.cumulativeLiquidateUSD) + " > " + parseFloat(instance.cumulativeBorrowUSD)));
-        }
+            currentIssueField = "totalBorrowBalanceUSD";
+            if (
+                !(
+                    parseFloat(instance[currentIssueField]) <=
+                    parseFloat(instance.cumulativeBorrowUSD)
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays[currentIssueField].push(buildIssue(instance[currentIssueField] + " < " + instance.cumulativeBorrowUSD));
+            }
 
-        if (
-            !(
-                parseFloat(instance.totalBorrowBalanceUSD) <=
-                parseFloat(instance.cumulativeBorrowUSD)
-            )
-        ) {
-            issuesArrays.totalBorrowBalanceUSD.push(buildIssue(instance.totalBorrowBalanceUSD + " < " + instance.cumulativeBorrowUSD));
-        }
+            currentIssueField = "totalDepositBalanceUSD";
+            if (
+                !(
+                    parseFloat(instance[currentIssueField]) >=
+                    parseFloat(instance.totalBorrowBalanceUSD)
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays[currentIssueField].push(buildIssue(instance[currentIssueField] + " < " + instance.totalBorrowBalanceUSD));
+            }
 
-        if (
-            !(
-                parseFloat(instance.totalDepositBalanceUSD) >=
-                parseFloat(instance.totalBorrowBalanceUSD)
-            )
-        ) {
-            issuesArrays.totalDepositBalanceUSD.push(buildIssue(instance.totalDepositBalanceUSD + " < " + instance.totalBorrowBalanceUSD));
-        }
+            currentIssueField = "outputTokenSupply";
+            if (!(parseFloat(instance[currentIssueField]) >= 0) && !issuesArrays[currentIssueField]?.includes(instance.id)) {
+                issuesArrays[currentIssueField].push(buildIssue(instance[currentIssueField]));
+            }
 
-        if (!(parseFloat(instance.outputTokenSupply) >= 0)) {
-            issuesArrays.outputTokenSupply.push(buildIssue(instance.outputTokenSupply));
-        }
+            currentIssueField = "outputTokenPriceUSD";
+            if (
+                !(
+                    parseFloat(instance[currentIssueField]) >= 0 &&
+                    parseFloat(instance[currentIssueField]) <= 100000
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays[currentIssueField].push(buildIssue(instance[currentIssueField]));
+            }
 
-        if (
-            !(
-                parseFloat(instance.outputTokenPriceUSD) >= 0 &&
-                parseFloat(instance.outputTokenPriceUSD) <= 100000
-            )
-        ) {
-            issuesArrays.outputTokenPriceUSD.push(buildIssue(instance.outputTokenPriceUSD));
-        }
+        })
 
         deployments[deploymentName].poolErrors = issuesArrays;
     });
