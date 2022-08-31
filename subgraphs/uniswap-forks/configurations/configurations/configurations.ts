@@ -12,6 +12,7 @@ import { SushiswapMaticConfigurations } from "../../protocols/sushiswap/config/n
 import { SushiswapMoonbeamConfigurations } from "../../protocols/sushiswap/config/networks/moonbeam/moonbeam";
 import { SushiswapMoonriverConfigurations } from "../../protocols/sushiswap/config/networks/moonriver/moonriver";
 import { SushiswapXdaiConfigurations } from "../../protocols/sushiswap/config/networks/gnosis/gnosis";
+import { SushiswapHarmonyConfigurations } from "../../protocols/sushiswap/config/networks/harmony/harmony";
 import { SpookyswapFantomConfigurations } from "../../protocols/spookyswap/config/networks/fantom/fantom";
 import { UbeswapCeloConfigurations } from "../../protocols/ubeswap/config/networks/celo/celo";
 import { SpiritSwapFantomConfigurations } from "../../protocols/spiritswap/config/networks/fantom/fantom";
@@ -71,6 +72,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.SUSHISWAP_GNOSIS: {
       return new SushiswapXdaiConfigurations();
+    }
+    case Deploy.SUSHISWAP_HARMONY: {
+      return new SushiswapHarmonyConfigurations();
     }
     case Deploy.UNISWAP_V2_ETHEREUM: {
       return new UniswapV2MainnetConfigurations();

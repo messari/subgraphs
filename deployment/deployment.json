@@ -850,7 +850,7 @@
         "celo": {
           "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "fantom": {
           "template": "sushiswap.alt.template.yaml",
@@ -866,6 +866,11 @@
           "template": "sushiswap.mainnet.template.yaml",
           "steegecs": "steegecs/sushiswap-mainnet",
           "messari": "messari/sushiswap-ethereum",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "harmony": {
+          "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
           "prepare:constants": true
         },
