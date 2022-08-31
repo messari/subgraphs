@@ -154,6 +154,7 @@ export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
+export const ONE_ETH_IN_WEI = BigInt.fromString("1000000000000000000");
 
 ////////////////
 ///// Misc /////
@@ -178,4 +179,8 @@ export const STORAGE = "0x1d8f8f00cfa6758d7bE78336684788Fb0ee0Fa46";
 
 export const NETWORKENCODE = Bytes.fromHexString(
   "0x034cd2ba322813e095f0f5279fe7959f6a89e44e2f0f497703d997c9bc1ba0e0"
+);
+
+export const PRICEENCODE = Bytes.fromHexString(
+  "0xf0de2459ea3014c17544dae653d0a2712abaa43f062fbd0b6da8e03cf5a97356"
 );
