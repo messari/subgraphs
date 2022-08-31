@@ -1946,7 +1946,10 @@ function getMarketHourlySnapshotID(marketID: string, timestamp: i32): string {
   return marketID.concat("-").concat((timestamp / SECONDS_PER_HOUR).toString());
 }
 
-function getMarketDailySnapshotID(marketID: string, timestamp: i32): string {
+export function getMarketDailySnapshotID(
+  marketID: string,
+  timestamp: i32
+): string {
   return marketID.concat("-").concat((timestamp / SECONDS_PER_DAY).toString());
 }
 
