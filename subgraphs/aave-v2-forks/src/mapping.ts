@@ -415,20 +415,6 @@ export function _handleReserveDataUpdated(
     protocolSideRevenueDeltaUSD
   );
 
-  // TODO: remove
-  if (totalRevenueDeltaUSD > BigDecimal.fromString("100000")) {
-    log.warning(
-      "new liq index: {} liq index diff: {} asset price: ${} blocknum: {} totalrev: ${} market: {}",
-      [
-        market.liquidityIndex.toString(),
-        liquidityIndexDiff.toString(),
-        assetPriceUSD.toString(),
-        event.block.number.toString(),
-        totalRevenueDeltaUSD.toString(),
-        market.name!,
-      ]
-    );
-  }
   market.cumulativeTotalRevenueUSD =
     market.cumulativeTotalRevenueUSD.plus(totalRevenueDeltaUSD);
   market.cumulativeProtocolSideRevenueUSD =
