@@ -157,9 +157,9 @@ export function updateControllerRewards(
     );
 
   // Get the rewards per day for this gauge
-  let protocolTokenRewardEmissionsPerDay = inflationRate.times(
-    gaugeRelativeWeight
-  );
+  let protocolTokenRewardEmissionsPerDay = inflationRate
+    .times(gaugeRelativeWeight)
+    .times(constants.BIG_DECIMAL_SECONDS_PER_DAY);
 
   updateRewardTokenEmissions(
     constants.Mainnet.CRV_TOKEN_ADDRESS,
