@@ -68,6 +68,12 @@ CTokens have 2 different ABIs. They switch at block `8983575`, and the only diff
 
 To handle this `CToken` will contain all of the transaction events and new `accrueInterest` event. Then there is `CTokenOld` that handles the old `AccrueInterest` event.
 
+### Notes
+
+- Compound changed how ETH price is calculated at block `10678764` from value in USDC to USD
+- At block [`15441888`](https://etherscan.io/tx/0x58ad039bedcf34caf010bc9513435b16856c9ec1a0b7e46cad3422264120ddf4) compound executed [proposal 117](https://compound.finance/governance/proposals/117) which broke ETH pricing.
+  - It took ~1 week in order for the price to return to normalcy.
+
 ## Reference and Useful Links
 
 Protocol: https://compound.finance/
