@@ -34,6 +34,7 @@ import {
   PositionSide,
   rayToWad,
   RAY_OFFSET,
+  ZERO_ADDRESS,
 } from "./constants";
 import {
   addPosition,
@@ -85,13 +86,12 @@ export function _handleReserveInitialized(
   event: ethereum.Event,
   underlyingToken: Address,
   outputToken: Address,
-  stableDebtToken: Address,
   variableDebtToken: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  stableDebtToken: Address = Address.fromString(ZERO_ADDRESS)
 ): void {
   // create tokens
   let outputTokenEntity = getOrCreateToken(outputToken);
-  let stableDebtTokenEntity = getOrCreateToken(stableDebtToken);
   let variableDebtTokenEntity = getOrCreateToken(variableDebtToken);
 
   // update and initialize specofic market variables
@@ -101,8 +101,10 @@ export function _handleReserveInitialized(
   market.outputToken = outputTokenEntity.id;
   market.createdBlockNumber = event.block.number;
   market.createdTimestamp = event.block.timestamp;
-  market.sToken = stableDebtTokenEntity.id;
   market.vToken = variableDebtTokenEntity.id;
+  if (stableDebtToken != Address.fromString(ZERO_ADDRESS)) {
+    market.sToken = getOrCreateToken(stableDebtToken).id;
+  }
 
   market.save();
 }
@@ -329,18 +331,21 @@ export function _handleReserveDataUpdated(
   market.outputTokenPriceUSD = assetPriceUSD;
 
   // get current borrow balance
-  let stableDebtContract = StableDebtToken.bind(
-    Address.fromString(market.sToken!)
-  );
+  let trySBorrowBalance: ethereum.CallResult<BigInt> | null = null;
+  if (market.sToken) {
+    let stableDebtContract = StableDebtToken.bind(
+      Address.fromString(market.sToken!)
+    );
+    trySBorrowBalance = stableDebtContract.try_totalSupply();
+  }
   let variableDebtContract = VariableDebtToken.bind(
     Address.fromString(market.vToken!)
   );
-  let trySBorrowBalance = stableDebtContract.try_totalSupply();
   let tryVBorrowBalance = variableDebtContract.try_totalSupply();
   let sBorrowBalance = BIGINT_ZERO;
   let vBorrowBalance = BIGINT_ZERO;
 
-  if (!trySBorrowBalance.reverted) {
+  if (trySBorrowBalance != null && !trySBorrowBalance.reverted) {
     sBorrowBalance = trySBorrowBalance.value;
   }
   if (!tryVBorrowBalance.reverted) {
@@ -348,7 +353,11 @@ export function _handleReserveDataUpdated(
   }
 
   // broken if both revert
-  if (trySBorrowBalance.reverted && tryVBorrowBalance.reverted) {
+  if (
+    trySBorrowBalance != null &&
+    trySBorrowBalance.reverted &&
+    tryVBorrowBalance.reverted
+  ) {
     log.warning("[ReserveDataUpdated] No borrow balance found", []);
     return;
   }
@@ -392,6 +401,7 @@ export function _handleReserveDataUpdated(
     .minus(market.liquidityIndex)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
+  log.warning("prev liquidity index: {}", [market.liquidityIndex.toString()]);
   market.liquidityIndex = liquidityIndex; // must update to current liquidity index
   let newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
@@ -424,15 +434,6 @@ export function _handleReserveDataUpdated(
   ]);
 
   // update rates
-  let sBorrowRate = createInterestRate(
-    market.id,
-    InterestRateSide.BORROWER,
-    InterestRateType.STABLE,
-    rayToWad(stableBorrowRate)
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
-  );
-
   let vBorrowRate = createInterestRate(
     market.id,
     InterestRateSide.BORROWER,
@@ -451,7 +452,21 @@ export function _handleReserveDataUpdated(
       .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
 
-  market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
+  if (market.sToken) {
+    // geist does not have stable borrow rates
+    let sBorrowRate = createInterestRate(
+      market.id,
+      InterestRateSide.BORROWER,
+      InterestRateType.STABLE,
+      rayToWad(stableBorrowRate)
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
+    );
+    market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
+  } else {
+    market.rates = [depositRate.id, vBorrowRate.id];
+  }
+
   market.save();
 
   // update protocol TVL / BorrowUSD / SupplyUSD

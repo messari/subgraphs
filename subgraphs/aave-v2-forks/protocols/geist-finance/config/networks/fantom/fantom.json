@@ -11,5 +11,8 @@
   "lendingPool": {
     "startBlock": "18424497",
     "address": "0x9FAD24f572045c7869117160A571B2e50b10d068"
-  }
+  },
+  "graftEnabled": true,
+  "subgraphId": "QmPqAh6gnNdcvC7aHwtbK8rzHyZkjhJuyQEpDKuQFqyigx",
+  "graftStartBlock": 25818254
 }

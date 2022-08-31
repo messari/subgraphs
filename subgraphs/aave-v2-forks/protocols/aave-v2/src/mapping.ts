@@ -109,9 +109,9 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     event,
     event.params.asset,
     event.params.aToken,
-    event.params.stableDebtToken,
     event.params.variableDebtToken,
-    getProtocolData()
+    getProtocolData(),
+    event.params.stableDebtToken
   );
 }
 

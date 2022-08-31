@@ -1,6 +1,8 @@
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
+  CRV_ADDRESS,
+  CRV_FTM_LP_ADDRESS,
   GEIST_FTM_LP_ADDRESS,
   GFTM_ADDRESS,
   Protocol,
@@ -51,7 +53,9 @@ import {
 } from "../../../src/mapping";
 import { getOrCreateRewardToken } from "../../../src/helpers";
 import {
+  BIGDECIMAL_THREE,
   BIGDECIMAL_ZERO,
+  BIGINT_THREE,
   DEFAULT_DECIMALS,
   exponentToBigDecimal,
   RewardTokenType,
@@ -93,9 +97,9 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     event,
     event.params.asset,
     event.params.aToken,
-    event.params.stableDebtToken,
     event.params.variableDebtToken,
     getProtocolData()
+    // No stable debt token in geist
   );
 }
 
@@ -160,6 +164,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // Rewards / day calculation
   // rewards per second = totalRewardsPerSecond * (allocPoint / totalAllocPoint)
   // rewards per day = rewardsPerSecond * 60 * 60 * 24
+  // Borrow rewards are 3x the rewards per day for deposits
 
   let gTokenContract = GToken.bind(Address.fromString(market.outputToken!));
   let tryIncentiveController = gTokenContract.try_getIncentivesController();
@@ -180,15 +185,15 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       !tryTotalRewardsPerSecond.reverted
     ) {
       // create reward tokens
-      let depositRewardToken = getOrCreateRewardToken(
-        Address.fromString(REWARD_TOKEN_ADDRESS),
-        RewardTokenType.DEPOSIT
-      );
       let borrowRewardToken = getOrCreateRewardToken(
         Address.fromString(REWARD_TOKEN_ADDRESS),
         RewardTokenType.BORROW
       );
-      market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
+      let depositRewardToken = getOrCreateRewardToken(
+        Address.fromString(REWARD_TOKEN_ADDRESS),
+        RewardTokenType.DEPOSIT
+      );
+      market.rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
 
       // calculate rewards per day
       let rewardsPerSecond = tryTotalRewardsPerSecond.value
@@ -205,24 +210,43 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
         .times(rewardTokenPriceUSD);
 
       // set rewards to arrays
-      market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
-      market.rewardTokenEmissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
+      market.rewardTokenEmissionsAmount = [
+        rewardsPerDay.times(BIGINT_THREE),
+        rewardsPerDay,
+      ];
+      market.rewardTokenEmissionsUSD = [
+        rewardsPerDayUSD.times(BIGDECIMAL_THREE),
+        rewardsPerDayUSD,
+      ];
     }
   }
   market.save();
 
   // update gToken price
-  let tryPrice = gTokenContract.try_getAssetPrice();
-  if (tryPrice.reverted) {
-    log.warning(
-      "[handleReserveDataUpdated] Token price not found in Market: {}",
-      [market.id]
-    );
-    return;
+  let assetPriceUSD: BigDecimal;
+
+  // CRV prices are not returned from gCRV for the first 3 days
+  // ie blocks 24879410 - 25266668
+  if (
+    market.id.toLowerCase() == CRV_ADDRESS.toLowerCase() &&
+    event.block.number.toI64() <= 25266668
+  ) {
+    assetPriceUSD = getCRVPriceUSD();
+  } else {
+    let tryPrice = gTokenContract.try_getAssetPrice();
+    if (tryPrice.reverted) {
+      log.warning(
+        "[handleReserveDataUpdated] Token price not found in Market: {}",
+        [market.id]
+      );
+      return;
+    }
+
+    // get asset price normally
+    assetPriceUSD = tryPrice.value
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS));
   }
-  let assetPriceUSD = tryPrice.value
-    .toBigDecimal()
-    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
 
   _handleReserveDataUpdated(
     event,
@@ -333,7 +357,7 @@ function getGeistPriceUSD(): BigDecimal {
   let reserves = geistFtmLP.try_getReserves();
 
   if (reserves.reverted) {
-    log.error("[getGeistPriceUSD] Unable to get price for asset", [
+    log.error("[getGeistPriceUSD] Unable to get price for asset {}", [
       REWARD_TOKEN_ADDRESS,
     ]);
     return BIGDECIMAL_ZERO;
@@ -354,4 +378,45 @@ function getGeistPriceUSD(): BigDecimal {
         .toBigDecimal()
         .div(exponentToBigDecimal(DEFAULT_DECIMALS))
         .times(priceGEISTinFTM);
+}
+
+//
+//
+// GEIST price is generated from CRV-FTM LP on SpookySwap
+function getCRVPriceUSD(): BigDecimal {
+  let crvFtmLP = SpookySwapOracle.bind(Address.fromString(CRV_FTM_LP_ADDRESS));
+
+  let reserves = crvFtmLP.try_getReserves();
+
+  if (reserves.reverted) {
+    log.error("[getCRVPriceUSD] Unable to get price for asset {}", [
+      CRV_ADDRESS,
+    ]);
+    return BIGDECIMAL_ZERO;
+  }
+  let reserveCRV = reserves.value.value0;
+  let reserveFTM = reserves.value.value1;
+
+  let priceCRVinFTM = reserveFTM.toBigDecimal().div(reserveCRV.toBigDecimal());
+
+  // get FTM price
+  let gTokenContract = GToken.bind(Address.fromString(GFTM_ADDRESS));
+  let tryPrice = gTokenContract.try_getAssetPrice();
+
+  log.warning("crv price: ${}", [
+    tryPrice.reverted
+      ? BIGDECIMAL_ZERO.toString()
+      : tryPrice.value
+          .toBigDecimal()
+          .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+          .times(priceCRVinFTM)
+          .toString(),
+  ]);
+
+  return tryPrice.reverted
+    ? BIGDECIMAL_ZERO
+    : tryPrice.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+        .times(priceCRVinFTM);
 }
