@@ -17,9 +17,9 @@ import {
   Token,
   Withdraw,
 } from "../generated/schema";
-import { AToken } from "../generated/templates/LendingPool/AToken";
-import { StableDebtToken } from "../generated/templates/LendingPool/StableDebtToken";
-import { VariableDebtToken } from "../generated/templates/LendingPool/VariableDebtToken";
+import { AToken } from "../generated/LendingPool/AToken";
+import { StableDebtToken } from "../generated/LendingPool/StableDebtToken";
+import { VariableDebtToken } from "../generated/LendingPool/VariableDebtToken";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,

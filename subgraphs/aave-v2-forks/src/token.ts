@@ -1,7 +1,7 @@
 import { Address } from "@graphprotocol/graph-ts";
-import { ERC20 } from "../generated/templates/LendingPool/ERC20";
-import { ERC20NameBytes } from "../generated/templates/LendingPool/ERC20NameBytes";
-import { ERC20SymbolBytes } from "../generated/templates/LendingPool/ERC20SymbolBytes";
+import { ERC20 } from "../generated/LendingPool/ERC20";
+import { ERC20NameBytes } from "../generated/LendingPool/ERC20NameBytes";
+import { ERC20SymbolBytes } from "../generated/LendingPool/ERC20SymbolBytes";
 
 export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";

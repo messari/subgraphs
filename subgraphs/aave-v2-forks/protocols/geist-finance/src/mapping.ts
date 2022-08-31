@@ -16,7 +16,7 @@ import {
   ReserveDeactivated,
   ReserveFactorChanged,
   ReserveInitialized,
-} from "../../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
+} from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
   Deposit,
@@ -28,8 +28,8 @@ import {
   ReserveUsedAsCollateralEnabled,
   Unpaused,
   Withdraw,
-} from "../../../generated/templates/LendingPool/LendingPool";
-import { GToken } from "../../../generated/templates/LendingPool/GToken";
+} from "../../../generated/LendingPool/LendingPool";
+import { GToken } from "../../../generated/LendingPool/GToken";
 import {
   ProtocolData,
   _handleBorrow,
@@ -62,8 +62,8 @@ import {
   SECONDS_PER_DAY,
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
-import { ChefIncentivesController } from "../../../generated/templates/LendingPool/ChefIncentivesController";
-import { SpookySwapOracle } from "../../../generated/templates/LendingPool/SpookySwapOracle";
+import { ChefIncentivesController } from "../../../generated/LendingPool/ChefIncentivesController";
+import { SpookySwapOracle } from "../../../generated/LendingPool/SpookySwapOracle";
 
 function getProtocolData(): ProtocolData {
   return new ProtocolData(
