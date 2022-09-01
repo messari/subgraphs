@@ -16,6 +16,7 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
+import { toLowerCaseList } from "../../../../../src/common/utils/utils";
 
 export class VSSFinanceCronosConfigurations implements Configurations {
   getNetwork(): string {
@@ -37,11 +38,13 @@ export class VSSFinanceCronosConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0x3b44b2a187a7b3824131f8db5a74194d0a42fc15";
+    return "0x3b44b2a187a7b3824131f8db5a74194d0a42fc15".toLowerCase();
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0x3b44b2a187a7b3824131f8db5a74194d0a42fc15")
+      Address.fromString(
+        "0x3b44b2a187a7b3824131f8db5a74194d0a42fc15".toLowerCase()
+      )
     );
   }
   getTradeFee(): BigDecimal {
@@ -69,39 +72,39 @@ export class VSSFinanceCronosConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return "0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23";
+    return "0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23".toLowerCase();
   }
   getRewardToken(): string {
-    return "0x2D03bECE6747ADC00E1a131BBA1469C15fD11e03";
+    return "0x2D03bECE6747ADC00E1a131BBA1469C15fD11e03".toLowerCase();
   }
   getWhitelistTokens(): string[] {
-    return [
+    return toLowerCaseList([
       "0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23", // WCRO
       "0xf2001b145b43032aaf5ee2884e456ccd805f677d", // DAI
       "0xc21223249ca28397b4b6541dffaecc539bff0c59", // USDC
       "0x66e428c3f67a68878562e79a0234c1f83c208770", // USDT
       "0xe44fd7fcb2b1581822d0c862b68222998a0c299a", // wETH
-    ];
+    ]);
   }
   getStableCoins(): string[] {
-    return [
+    return toLowerCaseList([
       "0xf2001b145b43032aaf5ee2884e456ccd805f677d", // DAI
       "0xc21223249ca28397b4b6541dffaecc539bff0c59", // USDC
       "0x66e428c3f67a68878562e79a0234c1f83c208770", // USDT
-    ];
+    ]);
   }
   getStableOraclePools(): string[] {
-    return [
+    return toLowerCaseList([
       "0xe61Db569E231B3f5530168Aa2C9D50246525b6d6", // USDC/wCRO
       "0x3Eb9FF92e19b73235A393000C176c8bb150F1B20", // DAI/wCRO
       "0x3d2180DB9E1B909f35C398BC39EF36108C0FC8c3", // USDT/wCRO
-    ];
+    ]);
   }
   getUntrackedPairs(): string[] {
-    return [];
+    return toLowerCaseList([]);
   }
   getUntrackedTokens(): string[] {
-    return [];
+    return toLowerCaseList([]);
   }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;
