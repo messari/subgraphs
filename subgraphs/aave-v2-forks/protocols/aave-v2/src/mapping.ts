@@ -21,7 +21,7 @@ import {
   ReserveDeactivated,
   ReserveFactorChanged,
   ReserveInitialized,
-} from "../../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
+} from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
   Deposit,
@@ -33,8 +33,8 @@ import {
   ReserveUsedAsCollateralEnabled,
   Unpaused,
   Withdraw,
-} from "../../../generated/templates/LendingPool/LendingPool";
-import { AToken } from "../../../generated/templates/LendingPool/AToken";
+} from "../../../generated/LendingPool/LendingPool";
+import { AToken } from "../../../generated/LendingPool/AToken";
 import {
   ProtocolData,
   _handleBorrow,
@@ -72,9 +72,9 @@ import {
   SECONDS_PER_DAY,
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
-import { AaveIncentivesController } from "../../../generated/templates/LendingPool/AaveIncentivesController";
-import { StakedAave } from "../../../generated/templates/LendingPool/StakedAave";
-import { IPriceOracleGetter } from "../../../generated/templates/LendingPool/IPriceOracleGetter";
+import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
+import { StakedAave } from "../../../generated/LendingPool/StakedAave";
+import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
 
 function getProtocolData(): ProtocolData {
   let letants = getNetworkSpecificConstant();

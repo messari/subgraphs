@@ -48,7 +48,7 @@ import {
 } from "../generated/schema";
 import { ProtocolData } from "./mapping";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
-import { IPriceOracleGetter } from "../generated/templates/LendingPool/IPriceOracleGetter";
+import { IPriceOracleGetter } from "../generated/LendingPool/IPriceOracleGetter";
 
 ////////////////////////
 ///// Initializers /////
