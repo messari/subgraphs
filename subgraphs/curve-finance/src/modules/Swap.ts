@@ -116,14 +116,14 @@ export function Swap(
     tokenOut = underlyingCoins[bought_id.toI32()].toHexString();
   }
 
-  let tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block.number);
+  let tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);
   const amountInUSD = amountIn
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
     )
     .times(tokenInStore.lastPriceUSD!);
 
-  let tokenOutStore = utils.getOrCreateTokenFromString(tokenOut, block.number);
+  let tokenOutStore = utils.getOrCreateTokenFromString(tokenOut, block);
   const amountOutUSD = amountOut
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal()

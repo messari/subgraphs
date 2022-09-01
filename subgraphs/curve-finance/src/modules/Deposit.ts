@@ -100,7 +100,7 @@ export function Deposit(
   for (let idx = 0; idx < depositedCoinAmounts.length; idx++) {
     let inputToken = utils.getOrCreateTokenFromString(
       pool.inputTokens[idx],
-      block.number
+      block
     );
 
     inputTokenAmounts.push(depositedCoinAmounts[idx]);
@@ -120,9 +120,8 @@ export function Deposit(
     pool.inputTokens
   );
   pool.totalValueLockedUSD = utils.getPoolTVL(
-    pool.inputTokens,
-    pool.inputTokenBalances,
-    block
+    utils.getOrCreateTokenFromString(pool.outputToken!, block),
+    pool.outputTokenSupply!
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,

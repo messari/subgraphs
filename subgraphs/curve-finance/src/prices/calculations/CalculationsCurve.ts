@@ -15,6 +15,9 @@ export function getTokenPriceFromCalculationCurve(tokenAddr: Address, network: s
     return new CustomPriceType();
   }
 
+  if (constants.CURVE_CALCULATIONS_BLACKLIST.includes(tokenAddr))
+    return new CustomPriceType();
+
   let tokenPrice: BigDecimal = utils
     .readValue<BigInt>(calculationCurveContract.try_getCurvePriceUsdc(tokenAddr), constants.BIGINT_ZERO)
     .toBigDecimal();

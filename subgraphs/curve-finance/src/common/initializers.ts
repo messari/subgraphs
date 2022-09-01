@@ -52,7 +52,7 @@ export function getOrCreateRewardToken(
   if (!rewardToken) {
     rewardToken = new RewardToken(address.toHexString());
 
-    let token = getOrCreateToken(address, block.number);
+    let token = getOrCreateToken(address, block);
     rewardToken.token = token.id;
     rewardToken.type = constants.RewardTokenType.DEPOSIT;
 
@@ -121,7 +121,7 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
   return protocol;
 }
 
-export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
+export function getOrCreateToken(address: Address, block: ethereum.Block): Token {
   let token = Token.load(address.toHexString());
 
   if (!token) {
@@ -141,22 +141,22 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
       token.decimals = constants.DEFAULT_DECIMALS.toI32();
     }
 
-    let tokenPrice = getUsdPricePerToken(address);
+    let tokenPrice = getUsdPricePerToken(address, block);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
-    token.lastPriceBlockNumber = blockNumber;
+    token.lastPriceBlockNumber = block.number;
     token.save();
   }
 
   if (
     !token.lastPriceUSD ||
     !token.lastPriceBlockNumber ||
-    blockNumber
+    block.number
       .minus(token.lastPriceBlockNumber!)
       .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
   ) {
-    let tokenPrice = getUsdPricePerToken (address);
+    let tokenPrice = getUsdPricePerToken(address, block);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
-    token.lastPriceBlockNumber = blockNumber;
+    token.lastPriceBlockNumber = block.number;
 
     token.save();
   }

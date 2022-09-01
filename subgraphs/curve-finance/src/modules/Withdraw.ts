@@ -196,7 +196,7 @@ export function Withdraw(
   for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
     let inputToken = utils.getOrCreateTokenFromString(
       pool.inputTokens[idx],
-      block.number
+      block
     );
 
     inputTokenAmounts.push(withdrawnTokenAmounts[idx]);
@@ -216,9 +216,8 @@ export function Withdraw(
     pool.inputTokens
   );
   pool.totalValueLockedUSD = utils.getPoolTVL(
-    pool.inputTokens,
-    pool.inputTokenBalances,
-    block
+    utils.getOrCreateTokenFromString(pool.outputToken!, block),
+    pool.outputTokenSupply!
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,

@@ -65,7 +65,7 @@ export function getLpTokenFromPool(
   if (constants.MISSING_LP_TOKENS.has(poolAddress.toHexString())) {
     return getOrCreateTokenFromString(
       constants.MISSING_LP_TOKENS.get(poolAddress.toHexString()),
-      block.number
+      block
     );
   }
 
@@ -77,7 +77,7 @@ export function getLpTokenFromPool(
   let poolInfoCall = poolInfoContract.try_get_pool_info(poolAddress);
   if (!poolInfoCall.reverted) {
     if (poolInfoCall.value.getLp_token().notEqual(constants.NULL.TYPE_ADDRESS))
-      return getOrCreateToken(poolInfoCall.value.getLp_token(), block.number);
+      return getOrCreateToken(poolInfoCall.value.getLp_token(), block);
   }
 
   // Method 2: Pool Main Registry --> get_lp_token(poolAddress)
@@ -89,7 +89,7 @@ export function getLpTokenFromPool(
     constants.NULL.TYPE_ADDRESS
   );
   if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS))
-    return getOrCreateToken(lpToken, block.number);
+    return getOrCreateToken(lpToken, block);
 
   // Method 3: Pool v2 Registry --> get_lp_token(poolAddress)
   const registryContractV2 = RegistryContract.bind(
@@ -100,7 +100,7 @@ export function getLpTokenFromPool(
     constants.NULL.TYPE_ADDRESS
   );
   if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS))
-    return getOrCreateToken(lpToken, block.number);
+    return getOrCreateToken(lpToken, block);
 
   // Method 4: Pool Contract --> lp_token()
   const poolContract = LiquidityPoolContract.bind(poolAddress);
@@ -109,7 +109,7 @@ export function getLpTokenFromPool(
     constants.NULL.TYPE_ADDRESS
   );
   if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS))
-    return getOrCreateToken(lpToken, block.number);
+    return getOrCreateToken(lpToken, block);
 
   // Method 5: Pool Contract --> token()
   lpToken = readValue<Address>(
@@ -117,9 +117,9 @@ export function getLpTokenFromPool(
     constants.NULL.TYPE_ADDRESS
   );
   if (lpToken.notEqual(constants.NULL.TYPE_ADDRESS))
-    return getOrCreateToken(lpToken, block.number);
+    return getOrCreateToken(lpToken, block);
 
-  return getOrCreateToken(poolAddress, block.number);
+  return getOrCreateToken(poolAddress, block);
 }
 
 export function getPoolFromCoins(
@@ -162,9 +162,6 @@ export function getOutputTokenPriceUSD(
   );
   let outputTokenPriceUSD = pool.totalValueLockedUSD.div(outputTokenSupply);
 
-  lpToken.lastPriceUSD = outputTokenPriceUSD;
-  lpToken.save();
-
   return outputTokenPriceUSD;
 }
 
@@ -195,7 +192,7 @@ export function getPoolCoins(
       }
     }
 
-    inputTokens.push(getOrCreateToken(inputToken, block.number).id);
+    inputTokens.push(getOrCreateToken(inputToken, block).id);
     idx += 1;
   }
 
@@ -293,9 +290,9 @@ export function getPoolFromLpToken(lpTokenAddress: Address): Address {
 
 export function getOrCreateTokenFromString(
   tokenAddress: string,
-  blockNumber: BigInt
+  block: ethereum.Block
 ): Token {
-  return getOrCreateToken(Address.fromString(tokenAddress), blockNumber);
+  return getOrCreateToken(Address.fromString(tokenAddress), block);
 }
 
 export function getPoolUnderlyingCoins(poolAddress: Address): Address[] {
@@ -360,7 +357,7 @@ export function getPoolTokenWeights(
     }
 
     let balance = inputTokenBalances[idx];
-    let inputToken = getOrCreateTokenFromString(inputTokens[idx], block.number);
+    let inputToken = getOrCreateTokenFromString(inputTokens[idx], block);
 
     let balanceUSD = balance
       .divDecimal(
@@ -376,25 +373,14 @@ export function getPoolTokenWeights(
 }
 
 export function getPoolTVL(
-  inputTokens: string[],
-  inputTokenBalances: BigInt[],
-  block: ethereum.Block
+  outputToken: Token,
+  outputTokenBalance: BigInt
 ): BigDecimal {
-  let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-
-  for (let idx = 0; idx < inputTokens.length; idx++) {
-    let inputTokenBalance = inputTokenBalances[idx];
-
-    let inputToken = getOrCreateTokenFromString(inputTokens[idx], block.number);
-
-    let amountUSD = inputTokenBalance
-      .divDecimal(
-        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-      )
-      .times(inputToken.lastPriceUSD!);
-
-    totalValueLockedUSD = totalValueLockedUSD.plus(amountUSD);
-  }
+  let totalValueLockedUSD = outputTokenBalance
+    .divDecimal(
+      constants.BIGINT_TEN.pow(outputToken.decimals as u8).toBigDecimal()
+    )
+    .times(outputToken.lastPriceUSD!);
 
   return totalValueLockedUSD;
 }

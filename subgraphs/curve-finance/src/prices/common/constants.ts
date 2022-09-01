@@ -44,6 +44,15 @@ export const WHITELIST_TOKENS_LIST: string[] = [
   "CRV",
 ];
 
+export const CRV_TRI_CRYPTO_ADDRESS = Address.fromString(
+  '0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf'
+);
+
+export const CURVE_CALCULATIONS_BLACKLIST: Address[] = [
+  Address.fromString('0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf'), // crvTriCrypto
+  Address.fromString('0xc4ad29ba4b3c580e6d59105fff484999997675ff') // crv3Crypto
+]
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////

@@ -4,18 +4,26 @@ import { getCurvePriceUsdc } from "./routers/CurveRouter";
 import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
 import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
 import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
-import { log, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
+import { log, Address, BigDecimal, dataSource, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
+export function getUsdPricePerToken(tokenAddr: Address, block: ethereum.Block): CustomPriceType {
   // Check if tokenAddr is a NULL Address
   if (tokenAddr.toHex() == constants.ZERO_ADDRESS_STRING) {
     return new CustomPriceType();
   }
-
+  
   let network = dataSource.network();
+
+  // Exception: Wrong prices of crvTriCrypto
+  // Ref: https://github.com/messari/subgraphs/pull/824
+  if (
+    tokenAddr.equals(constants.CRV_TRI_CRYPTO_ADDRESS) &&
+    block.number.lt(BigInt.fromI32(12936339))
+  )
+    return new CustomPriceType();
 
   // 1. Yearn Lens Oracle
   let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
@@ -92,8 +100,12 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   return new CustomPriceType();
 }
 
-export function getUsdPrice(tokenAddr: Address, amount: BigDecimal): BigDecimal {
-  let tokenPrice = getUsdPricePerToken(tokenAddr);
+export function getUsdPrice(
+  tokenAddr: Address, 
+  amount: BigDecimal, 
+  block: ethereum.Block
+): BigDecimal {
+  let tokenPrice = getUsdPricePerToken(tokenAddr, block);
 
   if (!tokenPrice.reverted) {
     return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);
