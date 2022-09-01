@@ -121,6 +121,7 @@ export function handleMarketListed(event: MarketListed): void {
 
 export function handleMarketEntered(event: MarketEntered): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     true
@@ -129,6 +130,7 @@ export function handleMarketEntered(event: MarketEntered): void {
 
 export function handleMarketExited(event: MarketExited): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.cToken.toHexString(),
     event.params.account.toHexString(),
     false
@@ -268,6 +270,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
+    true, // update all market prices on call
     event
   );
 }
@@ -279,7 +282,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Aurigami",
     "aurigami",
     "2.0.1",
-    "1.1.0",
+    "1.1.3",
     "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),

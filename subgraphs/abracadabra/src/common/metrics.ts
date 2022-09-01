@@ -119,8 +119,8 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   usageDailySnapshot.timestamp = event.block.timestamp;
   usageDailySnapshot.dailyTransactionCount += 1;
 
-  getOrCreateAccount(from.toHexString(), event);
-  getOrCreateAccount(to.toHexString(), event);
+  getOrCreateAccount(from.toHexString());
+  getOrCreateAccount(to.toHexString());
 
   usageHourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageDailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;

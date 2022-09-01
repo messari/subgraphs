@@ -1,4 +1,4 @@
-import { BigDecimal, Bytes, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { Bytes, ethereum, BigInt } from "@graphprotocol/graph-ts";
 
 import {
   Account,
@@ -7,9 +7,9 @@ import {
   Token,
 } from "../../generated/schema";
 
-import { BIGDECIMAL_ZERO, SECONDS_PER_DAY } from "../common/constants";
+import { BIGINT_ZERO, SECONDS_PER_DAY } from "../common/constants";
 
-export function isNewAccount(accountAddress: Bytes): bool {
+export function isNewAccount(accountAddress: Bytes): boolean {
   let accountId = accountAddress.toHex();
   let existingAccount = Account.load(accountId);
 
@@ -47,7 +47,7 @@ export function getOrCreateAccountBalance(
   let newBalance = new AccountBalance(balanceId);
   newBalance.account = account.id;
   newBalance.token = token.id;
-  newBalance.amount = BIGDECIMAL_ZERO;
+  newBalance.amount = BIGINT_ZERO;
 
   return newBalance;
 }
@@ -55,7 +55,7 @@ export function getOrCreateAccountBalance(
 export function increaseAccountBalance(
   account: Account,
   token: Token,
-  amount: BigDecimal
+  amount: BigInt
 ): AccountBalance {
   let balance = getOrCreateAccountBalance(account, token);
   balance.amount = balance.amount.plus(amount);
@@ -66,12 +66,12 @@ export function increaseAccountBalance(
 export function decreaseAccountBalance(
   account: Account,
   token: Token,
-  amount: BigDecimal
+  amount: BigInt
 ): AccountBalance {
   let balance = getOrCreateAccountBalance(account, token);
   balance.amount = balance.amount.minus(amount);
-  if (balance.amount < BIGDECIMAL_ZERO) {
-    balance.amount = BIGDECIMAL_ZERO;
+  if (balance.amount < BIGINT_ZERO) {
+    balance.amount = BIGINT_ZERO;
   }
 
   return balance;

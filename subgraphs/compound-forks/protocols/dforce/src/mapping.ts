@@ -1,4 +1,10 @@
-import { Address, BigInt, log, BigDecimal } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  log,
+  BigDecimal,
+  dataSource,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   ProtocolData,
@@ -29,6 +35,7 @@ import {
   exponentToBigDecimal,
   BIGDECIMAL_ZERO,
   SECONDS_PER_DAY,
+  Network,
 } from "../../../src/constants";
 import {
   LendingProtocol,
@@ -106,6 +113,7 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 
 export function handleMarketEntered(event: MarketEntered): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.iToken.toHexString(),
     event.params.account.toHexString(),
     true
@@ -114,6 +122,7 @@ export function handleMarketEntered(event: MarketEntered): void {
 
 export function handleMarketExited(event: MarketExited): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.iToken.toHexString(),
     event.params.account.toHexString(),
     false
@@ -410,6 +419,7 @@ export function handleUpdateInterest(event: AccrueInterest): void {
     comptrollerAddr,
     event.params.interestAccumulated,
     event.params.totalBorrows,
+    network.toLowerCase() == Network.MAINNET.toLowerCase(),
     event
   );
 }
@@ -639,7 +649,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "dForce v2",
     "dforce-v2",
     "2.0.1",
-    "1.1.0",
+    "1.1.3",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),

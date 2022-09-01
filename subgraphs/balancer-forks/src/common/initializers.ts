@@ -20,6 +20,8 @@ import {
 } from "../../generated/schema";
 import * as utils from "./utils";
 import * as constants from "./constants";
+import { getRewardsPerDay } from "./rewards";
+import { getUsdPricePerToken } from "../prices";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
@@ -39,14 +41,30 @@ export function getOrCreateAccount(id: string): Account {
   return account;
 }
 
-export function getOrCreateRewardToken(address: Address): RewardToken {
-  let rewardToken = RewardToken.load(address.toHexString());
+export function getOrCreateRewardToken(
+  address: Address,
+  RewardTokenType: string,
+  block: ethereum.Block
+): RewardToken {
+  let rewardToken = RewardToken.load(
+    RewardTokenType + "-" + address.toHexString()
+  );
 
   if (!rewardToken) {
     rewardToken = new RewardToken(address.toHexString());
-    const token = getOrCreateToken(address);
+    const token = getOrCreateToken(address, block.number);
     rewardToken.token = token.id;
-    rewardToken.type = constants.RewardTokenType.DEPOSIT;
+    rewardToken.type = RewardTokenType;
+
+    if (address == constants.PROTOCOL_TOKEN_ADDRESS) {
+      rewardToken._inflationRate = constants.STARTING_INFLATION_RATE;
+      rewardToken._inflationPerDay = getRewardsPerDay(
+        block.timestamp,
+        block.number,
+        constants.STARTING_INFLATION_RATE,
+        constants.INFLATION_INTERVAL
+      );
+    }
 
     rewardToken.save();
   }
@@ -107,7 +125,7 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
   return protocol;
 }
 
-export function getOrCreateToken(address: Address): Token {
+export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
   let token = Token.load(address.toHexString());
 
   if (!token) {
@@ -120,6 +138,23 @@ export function getOrCreateToken(address: Address): Token {
     token.decimals = utils
       .readValue<BigInt>(contract.try_decimals(), constants.BIGINT_ZERO)
       .toI32();
+
+    let tokenPrice = getUsdPricePerToken(address);
+    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceBlockNumber = blockNumber;
+    token.save();
+  }
+
+  if (
+    !token.lastPriceUSD ||
+    !token.lastPriceBlockNumber ||
+    blockNumber
+      .minus(token.lastPriceBlockNumber!)
+      .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
+  ) {
+    let tokenPrice = getUsdPricePerToken(address);
+    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceBlockNumber = blockNumber;
 
     token.save();
   }
@@ -251,6 +286,7 @@ export function getOrCreateLiquidityPoolDailySnapshots(
 
     poolSnapshots.rewardTokenEmissionsAmount = null;
     poolSnapshots.rewardTokenEmissionsUSD = null;
+    poolSnapshots.stakedOutputTokenAmount = null;
 
     poolSnapshots.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -307,6 +343,7 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
 
     poolSnapshots.rewardTokenEmissionsAmount = null;
     poolSnapshots.rewardTokenEmissionsUSD = null;
+    poolSnapshots.stakedOutputTokenAmount = null;
 
     poolSnapshots.hourlySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -361,7 +398,7 @@ export function getOrCreateLiquidityPool(
     pool.inputTokenBalances = inputTokensInfo.getBalances;
     pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
 
-    pool.outputToken = getOrCreateToken(poolAddress).id;
+    pool.outputToken = getOrCreateToken(poolAddress, block.number).id;
     pool.outputTokenSupply = constants.BIGINT_ZERO;
     pool.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
 

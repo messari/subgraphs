@@ -2,10 +2,11 @@ import { Box, Grid, Typography } from "@mui/material";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
-import { convertTokenDecimals } from "../../utils";
+import { convertTokenDecimals, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
 import { useEffect } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
+import moment from "moment";
 
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
@@ -16,6 +17,9 @@ function addDataPoint(
   id: string,
 ): { [x: string]: any } {
   dataFields[fieldName].push({ value: value, date: Number(timestamp) });
+  if (dataFieldMetrics[fieldName].sum === null) {
+    dataFieldMetrics[fieldName].sum = 0;
+  }
   dataFieldMetrics[fieldName].sum += value;
 
   if (fieldName.includes("umulative")) {
@@ -134,30 +138,28 @@ function PoolTabEntity({
         let value: any = currentInstanceField;
         try {
           if (!value && value !== 0 && !Array.isArray(currentInstanceField)) {
-            let dataType = "undefined";
-            if (value === null) {
-              dataType = "null";
-            }
-            if (isNaN(value)) {
-              dataType = "NaN";
-            }
-            dataFields[fieldName] = [];
-            dataFieldMetrics[fieldName] = { sum: 0, invalidDataPlot: dataType };
-            if (
-              capsFieldName.includes("REWARD") &&
-              issues.filter((x) => x.type === "VAL" && x.fieldName.includes(fieldName)).length === 0
-            ) {
-              issues.push({
-                type: "VAL",
-                level: "critical",
-                fieldName: fieldName,
-                message: `${timeseriesInstance.__typename}-${fieldName} should be an array, but has a ${dataType} value in its timeseries data (first instance in ${timeseriesInstance.__typename} ${timeseriesInstance.id})`,
-              });
+            value = 0;
+            if (!dataFields[fieldName]) {
+              dataFields[fieldName] = [];
+              dataFieldMetrics[fieldName] = { sum: null };
             }
             if (capsFieldName === "REWARDTOKENEMISSIONSUSD") {
-              dataFields.rewardAPR = [];
-              dataFieldMetrics.rewardAPR = { sum: 0, invalidDataPlot: dataType };
+              if (!dataFields.rewardAPR) {
+                dataFields.rewardAPR = [];
+                dataFieldMetrics.rewardAPR = { sum: 0 };
+              }
+              dataFields.rewardAPR.push(value);
             }
+            const returnedData = addDataPoint(
+              dataFields,
+              dataFieldMetrics,
+              fieldName,
+              Number(value),
+              timeseriesInstance.timestamp,
+              timeseriesInstance.id,
+            );
+            dataFields[fieldName] = returnedData.currentEntityField;
+            dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
             continue;
           }
           if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField) {
@@ -328,16 +330,16 @@ function PoolTabEntity({
                   const factors = ["rewardTokenEmissionsUSD"];
                   let apr = 0;
                   if (
-                    currentRewardToken.type === "BORROW" &&
-                    data.protocols[0].type === "LENDING" &&
+                    currentRewardToken?.type === "BORROW" &&
+                    data.protocols[0]?.type === "LENDING" &&
                     timeseriesInstance?.totalBorrowBalanceUSD
                   ) {
                     apr = (Number(val) / timeseriesInstance.totalBorrowBalanceUSD) * 100 * 365;
                     factors.push("snapshot.totalBorrowBalanceUSD");
                   } else if (
-                    currentRewardToken.type === "BORROW" &&
+                    currentRewardToken?.type === "BORROW" &&
                     issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "BORROW").length ===
-                      0
+                    0
                   ) {
                     issues.push({
                       type: "BORROW",
@@ -392,28 +394,19 @@ function PoolTabEntity({
                     dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"].sum += apr;
                   }
                 }
-
-                const returnedData = addDataPoint(
-                  dataFields,
-                  dataFieldMetrics,
-                  dataFieldKey,
-                  Number(value),
-                  timeseriesInstance.timestamp,
-                  timeseriesInstance.id,
-                );
-                dataFields[dataFieldKey] = returnedData.currentEntityField;
-                dataFieldMetrics[dataFieldKey] = returnedData.currentEntityFieldMetrics;
               } else {
-                let dataType = "undefined";
-                if (value === null) {
-                  dataType = "null";
-                }
-                if (isNaN(value)) {
-                  dataType = "NaN";
-                }
-                dataFields[dataFieldKey] = [];
-                dataFieldMetrics[dataFieldKey] = { sum: 0, invalidDataPlot: dataType };
+                value = 0;
               }
+              const returnedData = addDataPoint(
+                dataFields,
+                dataFieldMetrics,
+                dataFieldKey,
+                Number(value),
+                timeseriesInstance.timestamp,
+                timeseriesInstance.id,
+              );
+              dataFields[dataFieldKey] = returnedData.currentEntityField;
+              dataFieldMetrics[dataFieldKey] = returnedData.currentEntityFieldMetrics;
             });
           }
         } catch (err) {
@@ -462,6 +455,8 @@ function PoolTabEntity({
       }
     }
 
+    const fieldsList = Object.keys(dataFields);
+
     const ratesChart: { [x: string]: any } = {};
     const rewardChart: { [x: string]: any } = {};
     const tokenWeightData: { [name: string]: any[] } = {};
@@ -489,6 +484,28 @@ function PoolTabEntity({
       }
     });
 
+    if (Object.keys(tokenWeightData)?.length > 0) {
+      tokenWeightData.inputTokenWeights[0].forEach((val: any, idx: number) => {
+        // Looping through all instances of inputToken 0
+        let totalWeightAtIdx = val?.value;
+        for (let i = 1; i < tokenWeightData.inputTokenWeights?.length; i++) {
+          totalWeightAtIdx += tokenWeightData.inputTokenWeights[i][idx]?.value;
+        }
+        if (totalWeightAtIdx > 50) {
+          // If weights are greater than 50, its assumed that the value is denominated out of 100 rather than 1
+          totalWeightAtIdx = totalWeightAtIdx / 100;
+        }
+        if (
+          Math.abs(1 - totalWeightAtIdx) > .01 &&
+          issues.filter((x) => x.fieldName === entityName + "-inputTokenWeights").length === 0
+        ) {
+          const fieldName = entityName + "-inputTokenWeights";
+          const date = toDate(val.date);
+          issues.push({ type: "VAL", level: "error", fieldName, message: entityName + "-inputTokenWeights on " + date + " add up to " + totalWeightAtIdx + '%, which is more than 1% off of 100%. The inputTokenWeights across all tokens should add up to 100% at any given point.' });
+        }
+      })
+    }
+
     // The rewardAPRElement logic is used to take all of the rewardAPR and display their lines on one graph
     let rewardAPRElement = null;
     if (Object.keys(rewardChart).length > 0 && !dataFieldMetrics["rewardAPR"]?.invalidDataPlot) {
@@ -497,47 +514,70 @@ function PoolTabEntity({
       const firstKey = Object.keys(rewardChart)[0];
       const amountOfInstances = rewardChart[Object.keys(rewardChart)[0]].length;
       for (let x = 0; x < amountOfInstances; x++) {
-        tableVals.push({ value: [], date: rewardChart[firstKey][x].date });
-        Object.keys(rewardChart).forEach((reward: any, idx: number) => {
-          if (
-            dataFieldMetrics[reward].sum === 0 &&
-            issues.filter((x) => x.fieldName === entityName + "-" + reward).length === 0
-          ) {
-            const fieldName = entityName + "-" + reward;
-            issues.push({ type: "SUM", level: "error", fieldName, message: dataFieldMetrics[reward]?.factors });
+        let date: number | null = null;
+        Object.keys(rewardChart).forEach((z) => {
+          if (rewardChart[z][x]?.date && !date && x < rewardChart[z].length) {
+            date = rewardChart[z][x].date;
           }
-          const currentRewardToken: { [x: string]: string } = data[poolKeySingular]?.rewardTokens[idx]?.token;
-          const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol + " " : "";
-          tableVals[x].value.push(`${symbol}[${idx}]: ${rewardChart[reward][x].value.toFixed(3)}`);
+        });
+        if (!date) {
+          continue;
+        }
+        tableVals.push({ value: [], date });
+        Object.keys(rewardChart).forEach((reward: any, idx: number) => {
+          if (!(fieldsList.filter((x) => x.includes(reward))?.length > 1)) {
+            if (
+              dataFieldMetrics[reward].sum === 0 &&
+              issues.filter((x) => x.fieldName === entityName + "-" + reward).length === 0
+            ) {
+              const fieldName = entityName + "-" + reward;
+              issues.push({ type: "SUM", level: "error", fieldName, message: dataFieldMetrics[reward]?.factors });
+            }
+            const currentRewardToken: { [x: string]: string } = data[poolKeySingular]?.rewardTokens[idx]?.token;
+            const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol + " " : "";
+            let elementVal = rewardChart[reward][x];
+            if (rewardChart[reward][x]?.value || rewardChart[reward][x]?.value === 0) {
+              elementVal = rewardChart[reward][x].value;
+            }
+            if (!elementVal) {
+              elementVal = 0;
+            }
+            elementVal = elementVal?.toFixed(2);
+            tableVals[x]?.value.push(`${symbol}[${idx}]: ${elementVal}`);
+          }
         });
       }
       Object.keys(rewardChart).forEach((reward: any, idx: number) => {
-        const currentRewardToken: { [x: string]: string } = data[poolKeySingular].rewardTokens[idx].token;
+        const currentRewardToken: { [x: string]: string } = data[poolKeySingular].rewardTokens[idx]?.token;
         const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
         const val = rewardChart[reward];
         rewardChart[`${name} [${idx}]`] = val;
         delete rewardChart[reward];
       });
-      const table = (
-        <Grid key={elementId + "Table"} item xs={4}>
-          <TableChart datasetLabel="rewardAPR" dataTable={tableVals} />
-        </Grid>
-      );
-      rewardAPRElement = (
-        <div id={elementId}>
-          <Box mt={3} mb={1}>
-            <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-              <Typography variant="h6">{elementId}</Typography>
-            </CopyLinkToClipboard>
-          </Box>
-          <Grid container justifyContent="space-between">
-            <Grid key={elementId + "Chart"} item xs={7.5}>
-              <Chart datasetLabel="rewardAPR" dataChart={rewardChart} />
-            </Grid>
-            {table}
+      if (tableVals.length === 0) {
+        rewardAPRElement = null;
+      } else {
+        const table = (
+          <Grid key={elementId + "Table"} item xs={4}>
+            <TableChart datasetLabel="rewardAPR" dataTable={tableVals} />
           </Grid>
-        </div>
-      );
+        );
+        rewardAPRElement = (
+          <div id={elementId}>
+            <Box mt={3} mb={1}>
+              <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
+                <Typography variant="h6">{elementId}</Typography>
+              </CopyLinkToClipboard>
+            </Box>
+            <Grid container justifyContent="space-between">
+              <Grid key={elementId + "Chart"} item xs={7.5}>
+                <Chart datasetLabel="rewardAPR" dataChart={rewardChart} />
+              </Grid>
+              {table}
+            </Grid>
+          </div>
+        );
+      }
     }
 
     // The ratesElement logic is used to take all of the rates and display their lines on one graph
@@ -629,7 +669,16 @@ function PoolTabEntity({
         if (!rewardFieldCount[fieldName]) {
           rewardFieldCount[fieldName] = 0;
         }
-        rewardFieldCount[fieldName] += 1;
+
+        if (
+          dataFields[field]?.length > 0 &&
+          !(
+            fieldName.toUpperCase() === field.toUpperCase() &&
+            fieldsList.filter((x) => x.includes(fieldName))?.length > 1
+          )
+        ) {
+          rewardFieldCount[fieldName] += 1;
+        }
       } else if (fieldName.toUpperCase().includes("TOKEN") && !fieldName.toUpperCase().includes("OUTPUT")) {
         if (!inputTokenFieldCount[fieldName]) {
           inputTokenFieldCount[fieldName] = 0;
@@ -658,12 +707,14 @@ function PoolTabEntity({
           }
         } else {
           if (rewardFieldCount[field] > rewardTokensLength) {
-            issues.push({
-              type: "TOK",
-              level: "error",
-              fieldName: `${data[poolKeySingular]?.name}-${field}///${rewardFieldCount[field] - 1}`,
-              message: `rewardTokens///${rewardTokensLength - 1}`,
-            });
+            if (!(rewardFieldCount[field] === 1 && dataFieldMetrics[field].sum === 0)) {
+              issues.push({
+                type: "TOK",
+                level: "error",
+                fieldName: `${data[poolKeySingular]?.name}-${field}///${rewardFieldCount[field] - 1}`,
+                message: `rewardTokens///${rewardTokensLength - 1}`,
+              });
+            }
           } else if (rewardFieldCount[field] < rewardTokensLength) {
             issues.push({
               type: "TOK",
@@ -682,7 +733,7 @@ function PoolTabEntity({
           issues.push({
             type: "TOK",
             level: "error",
-            fieldName: `${data[poolKeySingular]?.name}-${field}///${inputTokenFieldCount[field]}`,
+            fieldName: `${data[poolKeySingular]?.name}-${field}///${inputTokenFieldCount[field] - 1}`,
             message: `inputTokens///${inputTokensLength - 1}`,
           });
         } else if (inputTokenFieldCount[field] < inputTokensLength) {
@@ -690,12 +741,11 @@ function PoolTabEntity({
             type: "TOK",
             level: "error",
             fieldName: `${data[poolKeySingular]?.name}-inputTokens///${inputTokensLength - 1}`,
-            message: `${field}///${inputTokenFieldCount[field]}`,
+            message: `${field}///${inputTokenFieldCount[field] - 1}`,
           });
         }
       }
     });
-
     return (
       <Grid key={entityName}>
         <Box my={3}>
@@ -705,7 +755,6 @@ function PoolTabEntity({
         </Box>
         {Object.keys(dataFields).map((field: string) => {
           const fieldName = field.split(" [")[0];
-          // const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
           let label = entityName + "-" + field;
           // Label changes, element id is constant
           const elementId = label;
@@ -778,7 +827,12 @@ function PoolTabEntity({
                 </div>
               );
             }
-            if (dataFieldMetrics[field].sum === 0 && issues.filter((x) => x.fieldName === label).length === 0) {
+
+            if (
+              dataFieldMetrics[field].sum === 0 &&
+              issues.filter((x) => x.fieldName === label).length === 0 &&
+              !(fieldsList.filter((x) => x.includes(field))?.length > 1)
+            ) {
               // This array holds field names for fields that trigger a critical level issue rather than just an error level if all values are 0
               const criticalZeroFields = ["totalValueLockedUSD", "deposit"];
               let level = null;
@@ -839,7 +893,20 @@ function PoolTabEntity({
               </div>
             );
           }
-          if (dataFieldMetrics[fieldName]?.invalidDataPlot || dataFieldMetrics[field]?.invalidDataPlot) {
+          if (dataFields[fieldName]?.length === 0) {
+            return null;
+          }
+          if (
+            fieldName.toUpperCase() === field.toUpperCase() &&
+            fieldsList.filter((x) => x.includes(fieldName))?.length > 1
+          ) {
+            return null;
+          }
+
+          if (fieldName.toUpperCase().includes("REWARD") && !(data[poolKeySingular]?.rewardTokens?.length > 0)) {
+            return null;
+          }
+          if (fieldName.toUpperCase().includes("OUTPUT") && !data[poolKeySingular]?.outputToken) {
             return null;
           }
           return (

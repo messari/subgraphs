@@ -1,9 +1,10 @@
 import {
   getOrCreateRewardToken,
   getOrCreateLiquidityPool,
+  getOrCreateToken,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
+import { readValue } from "../common/utils";
 import * as constants from "../common/constants";
 import { RewardsInfoType } from "../common/types";
 import { getRewardsPerDay } from "../common/rewards";
@@ -16,6 +17,7 @@ export function getRewardsData(gaugeAddress: Address): RewardsInfoType {
   let rewardTokens: Address[] = [];
 
   let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
+
   let rewardCount = utils.readValue<BigInt>(
     gaugeContract.try_reward_count(),
     constants.BIGINT_TEN
@@ -44,59 +46,76 @@ export function getRewardsData(gaugeAddress: Address): RewardsInfoType {
   return new RewardsInfoType(rewardTokens, rewardRates);
 }
 
-export function updateBalancerRewards(
+export function updateControllerRewards(
   poolAddress: Address,
   gaugeAddress: Address,
   block: ethereum.Block
 ): void {
-  const pool = getOrCreateLiquidityPool(poolAddress, block);
-
-  let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
   let gaugeControllerContract = GaugeControllereContract.bind(
     constants.GAUGE_CONTROLLER_ADDRESS
   );
 
+  // Returns BIGINT_ZERO if the weight is zero or the GaugeControllerContract is the childChainLiquidityGaugeFactory version.
   let gaugeRelativeWeight = utils
     .readValue<BigInt>(
       gaugeControllerContract.try_gauge_relative_weight(gaugeAddress),
       constants.BIGINT_ZERO
     )
-    .toBigDecimal();
+    .divDecimal(
+      constants.BIGINT_TEN.pow(
+        constants.DEFAULT_DECIMALS.toI32() as u8
+      ).toBigDecimal()
+    );
 
-  let gaugeWorkingSupply = utils
-    .readValue<BigInt>(
-      gaugeContract.try_working_supply(),
-      constants.BIGINT_ZERO
-    )
-    .toBigDecimal();
+  // This essentially checks if the gauge is a GaugeController gauge instead of a childChainLiquidityGaugeFactory contract.
+  if (gaugeRelativeWeight.equals(constants.BIGDECIMAL_ZERO)) {
+    return;
+  }
 
-  let balRewardEmissionsPerDay =
-    constants.DAILY_BAL_EMISSIONS.times(gaugeRelativeWeight);
-
-  pool.stakedOutputTokenAmount = BigInt.fromString(
-    constants.BIGINT_ONE.divDecimal(
-      constants.BIGDECIMAL_POINT_FOUR.div(
-        gaugeWorkingSupply.plus(constants.BIGDECIMAL_POINT_FOUR)
-      )
-    )
-      .truncate(0)
-      .toString()
+  let protocolToken = getOrCreateRewardToken(
+    constants.PROTOCOL_TOKEN_ADDRESS,
+    constants.RewardTokenType.DEPOSIT,
+    block
   );
-  pool.save();
+
+  // Get the rewards per day for this gauge
+  let protocolTokenRewardEmissionsPerDay =
+    protocolToken._inflationPerDay!.times(gaugeRelativeWeight);
 
   updateRewardTokenEmissions(
-    constants.BALANCER_TOKEN_ADDRESS,
+    constants.PROTOCOL_TOKEN_ADDRESS,
     poolAddress,
-    BigInt.fromString(balRewardEmissionsPerDay.truncate(0).toString()),
+    BigInt.fromString(
+      protocolTokenRewardEmissionsPerDay.truncate(0).toString()
+    ),
     block
   );
 }
 
-export function updateRewardTokenInfo(
+export function updateStakedOutputTokenAmount(
   poolAddress: Address,
   gaugeAddress: Address,
   block: ethereum.Block
 ): void {
+  // Update the staked output token amount for the pool ///////////
+  const pool = getOrCreateLiquidityPool(poolAddress, block);
+  let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
+
+  let gaugeWorkingSupply = utils.readValue<BigInt>(
+    gaugeContract.try_working_supply(),
+    constants.BIGINT_ZERO
+  );
+
+  pool.stakedOutputTokenAmount = gaugeWorkingSupply;
+  pool.save();
+}
+
+export function updateFactoryRewards(
+  poolAddress: Address,
+  gaugeAddress: Address,
+  block: ethereum.Block
+): void {
+  // Get data for all reward tokens for this gauge
   let rewardsInfo = getRewardsData(gaugeAddress);
 
   let rewardTokens = rewardsInfo.getRewardTokens;
@@ -132,7 +151,11 @@ export function updateRewardTokenEmissions(
   block: ethereum.Block
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
-  const rewardToken = getOrCreateRewardToken(rewardTokenAddress);
+  const rewardToken = getOrCreateRewardToken(
+    rewardTokenAddress,
+    constants.RewardTokenType.DEPOSIT,
+    block
+  );
 
   if (!pool.rewardTokens) {
     pool.rewardTokens = [];
@@ -156,18 +179,30 @@ export function updateRewardTokenEmissions(
   }
   let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
-  const rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);
-  const rewardTokenDecimals = utils.getTokenDecimals(rewardTokenAddress);
+  const rewardTokenPrice = getOrCreateToken(rewardTokenAddress, block.number);
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
-    .toBigDecimal()
-    .div(rewardTokenDecimals)
-    .times(rewardTokenPrice.usdPrice)
-    .div(rewardTokenPrice.decimalsBaseTen);
+    .divDecimal(
+      constants.BIGINT_TEN.pow(rewardTokenPrice.decimals as u8).toBigDecimal()
+    )
+    .times(rewardTokenPrice.lastPriceUSD!);
 
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
 
   pool.save();
+}
+
+export function getPoolFromGauge(gaugeAddress: Address): Address | null {
+  const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
+
+  let poolAddress = readValue<Address>(
+    gaugeContract.try_lp_token(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return null;
+
+  return poolAddress;
 }

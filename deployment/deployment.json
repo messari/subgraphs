@@ -14,7 +14,7 @@
           "steegecs": "steegecs/abracadabra-money-avalanche",
           "messari": "messari/abracadabra-money-avalanche",
           "dmelotik": "dmelotik/abracadabra-avalanche",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "bsc": {
           "template": "abracadabra.money.template.yaml",
@@ -151,37 +151,37 @@
           "messari": "messari/balancer-v2-arbitrum",
           "sevenshi": "sevenshi/balancer-v2-arbitrum",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "polygon": {
           "template": "balancer.v2.template.yaml",
           "messari": "messari/balancer-v2-polygon",
           "sevenshi": "sevenshi/balancer-v2-matic",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "ethereum": {
           "template": "balancer.v2.template.yaml",
           "messari": "messari/balancer-v2-ethereum",
           "sevenshi": "sevenshi/balancer-v2-ethereum",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "beethoven-x": {
         "optimism": {
-          "template": "balancer.v2.template.yaml",
+          "template": "beethoven.x.optimism.template.yaml",
           "messari": "messari/beethoven-x-optimism",
           "sevenshi": "sevenshi/beets-optimism",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "fantom": {
-          "template": "balancer.v2.template.yaml",
+          "template": "beethoven.x.fantom.template.yaml",
           "messari": "messari/beethoven-x-fantom",
           "sevenshi": "sevenshi/beets-fantom",
-          "deploy-on-merge": false,
-          "prepare:constants": false
+          "deploy-on-merge": true,
+          "prepare:constants": true
         }
       }
     },
@@ -225,7 +225,7 @@
           "template": "banker-joe.template.yaml",
           "messari": "messari/banker-joe-avalanche",
           "dmelotik": "dmelotik/banker-joe-avalanche",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "tectonic": {
@@ -253,7 +253,7 @@
       "compound-v2": {
         "ethereum": {
           "template": "compound-v2.template.yaml",
-          "messari": "messari/compound-ethereum",
+          "messari": "messari/compound-v2-ethereum",
           "dmelotik": "dmelotik/compound-ethereum",
           "deploy-on-merge": false
         }
@@ -275,7 +275,7 @@
           "template": "cream-finance.template.yaml",
           "messari": "messari/cream-finance-ethereum",
           "dmelotik": "dmelotik/cream-finance-ethereum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "polygon": {
           "template": "cream-finance.template.yaml",
@@ -389,7 +389,15 @@
           "template": "venus.template.yaml",
           "messari": "messari/venus-protocol-bsc",
           "dmelotik": "dmelotik/venus",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "cronos-dummy": {
+      "cronos-dummy": {
+        "cronos": {
+          "template": "cronos.dummy.template.yaml",
+          "deploy-on-merge": false
         }
       }
     },
@@ -433,17 +441,26 @@
         }
       }
     },
+    "erc721-holders": {
+      "erc721-holders": {
+        "ethereum": {
+          "template": "erc721.holders.template.yaml",
+          "messari": "messari/erc721-holders",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "erc721-metadata": {
       "erc721-metadata": {
         "ethereum": {
           "template": "erc721.metadata.template.yaml",
           "messari": "messari/erc721-metadata",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       }
     },
-    "euler": {
-      "euler": {
+    "euler-finance": {
+      "euler-finance": {
         "ethereum": {
           "template": "euler.template.yaml",
           "deploy-on-merge": false
@@ -454,7 +471,7 @@
       "inverse-finance": {
         "ethereum": {
           "template": "inverse.finance.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -470,7 +487,7 @@
       "liquity": {
         "ethereum": {
           "template": "liquity.template.yaml",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
@@ -682,25 +699,30 @@
     },
     "uniswap-v3": {
       "uniswap-v3": {
-        "ethereum": {
+        "arbitrum": {
+          "template": "uniswap.v3.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "celo": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
           "prepare:constants": false
         },
-        "arbitrum": {
+        "ethereum": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "optimism": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "polygon": {
           "template": "uniswap.v3.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     },
@@ -764,13 +786,21 @@
           "template": "apeswap.bsc.template.yaml",
           "steegecs": "steegecs/apeswap-bsc",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "polygon": {
           "template": "apeswap.matic.template.yaml",
           "steegecs": "steegecs/apeswap-matic",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
+        }
+      },
+      "mm-finance": {
+        "polygon": {
+          "template": "mm.finance.template.yaml",
+          "messari": "messari/mm-finance-polygon",
+          "deploy-on-merge": false,
+          "prepare:constants": true
         }
       },
       "quickswap": {
@@ -779,7 +809,7 @@
           "steegecs": "steegecs/quickswap-matic",
           "messari": "messari/quickswap-polygon",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "solarbeam": {
@@ -788,7 +818,7 @@
           "steegecs": "steegecs/solarbeam-moonriver",
           "messari": "messari/solarbeam-moonriver",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "spiritswap": {
@@ -797,7 +827,7 @@
           "steegecs": "steegecs/spiritswap-fantom",
           "messari": "messari/spiritswap-fantom",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "spookyswap": {
@@ -806,71 +836,76 @@
           "steegecs": "steegecs/spookyswap-fantom",
           "messari": "messari/spookyswap-fantom",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "sushiswap": {
         "arbitrum": {
           "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "avalanche": {
           "template": "uniswap.v2.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "bsc": {
           "template": "uniswap.v2.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "celo": {
           "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "fantom": {
           "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "fuse": {
           "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "ethereum": {
           "template": "sushiswap.mainnet.template.yaml",
           "steegecs": "steegecs/sushiswap-mainnet",
           "messari": "messari/sushiswap-ethereum",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
+        },
+        "harmony": {
+          "template": "sushiswap.alt.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
         },
         "polygon": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-matic",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "moonbeam": {
           "template": "sushiswap.alt.template.yaml",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "moonriver": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-moonriver",
           "messari": "messari/sushiswap-moonriver",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "gnosis": {
           "template": "sushiswap.alt.template.yaml",
           "steegecs": "steegecs/sushiswap-xdai",
           "messari": "messari/sushiswap-gnosis",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "trader-joe": {
@@ -879,7 +914,7 @@
           "steegecs": "steegecs/trader-joe-avalanche",
           "messari": "messari/trader-joe-avalanche",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "trisolaris": {
@@ -888,7 +923,7 @@
           "steegecs": "steegecs/trisolaris-aurora",
           "messari": "messari/trisolaris-aurora",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "ubeswap": {
@@ -898,7 +933,7 @@
           "messari": "messari/ubeswap-celo",
           "sevenshi": "sevenshi/ubeswap_celo",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "uniswap-v2": {
@@ -906,7 +941,7 @@
           "template": "uniswap.v2.template.yaml",
           "steegecs": "steegecs/uniswap-v2",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "vvs-finance": {
@@ -915,7 +950,7 @@
           "steegecs": "steegecs/trisolaris-aurora",
           "messari": "messari/trisolaris-aurora",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       },
       "honeyswap": {
@@ -924,13 +959,13 @@
           "mrbrianhobo": "mrbrianhobo/honeyswap-xdai",
           "messari": "messari/honeyswap-gnosis",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "polygon": {
           "template": "honeyswap.matic.template.yaml",
           "mrbrianhobo": "mrbrianhobo/honeyswap-polygon",
           "deploy-on-merge": false,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     },
@@ -974,7 +1009,7 @@
           "template": "angle-governance.template.yaml",
           "danielkhoo": "danielkhoo/angle-governance",
           "messari": "messari/angle-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "code4rena-governance": {
@@ -990,7 +1025,7 @@
           "template": "ens-governance.template.yaml",
           "danielkhoo": "danielkhoo/ens-governance",
           "messari": "messari/ens-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "euler-governance": {
@@ -998,7 +1033,7 @@
           "template": "euler-governance.template.yaml",
           "danielkhoo": "danielkhoo/euler-governance",
           "messari": "messari/euler-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "fei-governance": {
@@ -1006,7 +1041,7 @@
           "template": "fei-governance.template.yaml",
           "danielkhoo": "danielkhoo/fei-governance",
           "messari": "messari/fei-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
       "hop-governance": {
@@ -1022,15 +1057,15 @@
           "template": "silo-governance.template.yaml",
           "danielkhoo": "danielkhoo/silo-governance",
           "messari": "messari/silo-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       },
-      "falsefi-governance": {
+      "truefi-governance": {
         "ethereum": {
-          "template": "falsefi-governance.template.yaml",
-          "danielkhoo": "danielkhoo/falsefi-governance",
-          "messari": "messari/falsefi-governance",
-          "deploy-on-merge": false
+          "template": "truefi-governance.template.yaml",
+          "danielkhoo": "danielkhoo/truefi-governance",
+          "messari": "messari/truefi-governance",
+          "deploy-on-merge": true
         }
       },
       "unlock-governance": {
@@ -1038,7 +1073,7 @@
           "template": "unlock-governance.template.yaml",
           "danielkhoo": "danielkhoo/unlock-governance",
           "messari": "messari/unlock-governance",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },

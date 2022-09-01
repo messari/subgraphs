@@ -102,12 +102,12 @@ export const BLOCKS_PER_YEAR = BLOCKS_PER_DAY.times(DAYS_PER_YEAR);
 export const MANTISSA_DECIMALS = 18;
 
 //////////////
-export const FACTORY_ADDRESS = "0x4dCf7407AE5C07f8681e1659f626E114A7667339";
+export const FACTORY_ADDRESS = "0x4dcf7407ae5c07f8681e1659f626e114a7667339";
 // INV contract address
-export const INV_ADDRESS = "0x41D5D79431A913C4aE7d69a668ecdfE5fF9DFB68";
+export const INV_ADDRESS = "0x41d5d79431a913c4ae7d69a668ecdfe5ff9dfb68";
 // xINV contract address
-export const XINV_ADDRESS = "0x65b35d6Eb7006e0e607BC54EB2dFD459923476fE";
-export const DOLA_ADDRESS = "0x865377367054516e17014CcdED1e7d814EDC9ce4";
+export const XINV_ADDRESS = "0x65b35d6eb7006e0e607bc54eb2dfd459923476fe";
+export const DOLA_ADDRESS = "0x865377367054516e17014ccded1e7d814edc9ce4";
 
 //Creation of the factory contract
 export const EMISSION_START_BLOCK = BigInt.fromString("11915867");

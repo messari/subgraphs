@@ -221,6 +221,9 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
 
     financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
     financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+    financialMetrics._cumulativeProtocolSideStabilityFeeRevenue = protocol._cumulativeProtocolSideStabilityFeeRevenue;
+    financialMetrics._cumulativeProtocolSideLiquidationRevenue = protocol._cumulativeProtocolSideLiquidationRevenue;
+    financialMetrics._cumulativeProtocolSidePSMRevenue = protocol._cumulativeProtocolSidePSMRevenue;
     financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
     financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
     financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
@@ -228,6 +231,9 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
 
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics._dailyProtocolSideStabilityFeeRevenue = BIGDECIMAL_ZERO;
+    financialMetrics._dailyProtocolSideLiquidationRevenue = BIGDECIMAL_ZERO;
+    financialMetrics._dailyProtocolSidePSMRevenue = BIGDECIMAL_ZERO;
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
@@ -261,6 +267,9 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.cumulativeUniqueUsers = 0;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol._cumulativeProtocolSideStabilityFeeRevenue = BIGDECIMAL_ZERO;
+    protocol._cumulativeProtocolSideLiquidationRevenue = BIGDECIMAL_ZERO;
+    protocol._cumulativeProtocolSidePSMRevenue = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeDepositUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
@@ -446,4 +455,26 @@ export function getOwnerAddressFromProxy(proxy: string): string {
     owner = _proxy.ownerAddress;
   }
   return owner;
+}
+
+// this is needed to prevent snapshot rates from being pointers to the current rate
+export function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
+  let snapshotRates: string[] = [];
+  for (let i = 0; i < rates.length; i++) {
+    let rate = InterestRate.load(rates[i]);
+    if (!rate) {
+      log.warning("[getSnapshotRates] rate {} not found, should not happen", [rates[i]]);
+      continue;
+    }
+
+    // create new snapshot rate
+    let snapshotRateId = rates[i].concat("-").concat(timeSuffix);
+    let snapshotRate = new InterestRate(snapshotRateId);
+    snapshotRate.side = rate.side;
+    snapshotRate.type = rate.type;
+    snapshotRate.rate = rate.rate;
+    snapshotRate.save();
+    snapshotRates.push(snapshotRateId);
+  }
+  return snapshotRates;
 }

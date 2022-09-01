@@ -1,0 +1,21 @@
+{
+  "name": "monitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "npx prettier --write ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "prettier": "^2.7.1"
+  }
+}

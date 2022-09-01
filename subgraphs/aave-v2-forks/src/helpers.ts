@@ -25,6 +25,8 @@ import {
   SECONDS_PER_HOUR,
   SECONDS_PER_DAY,
   PositionSide,
+  BIGDECIMAL_ONE,
+  BIGINT_ONE,
 } from "./constants";
 import {
   Account,
@@ -46,7 +48,7 @@ import {
 } from "../generated/schema";
 import { ProtocolData } from "./mapping";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
-import { IPriceOracleGetter } from "../generated/templates/LendingPool/IPriceOracleGetter";
+import { IPriceOracleGetter } from "../generated/LendingPool/IPriceOracleGetter";
 
 ////////////////////////
 ///// Initializers /////
@@ -638,7 +640,6 @@ export function addPosition(
         depositorActor.save();
 
         protocol.cumulativeUniqueDepositors += 1;
-        protocol.save();
       }
     } else if (eventType == EventType.BORROW) {
       let borrowerActorID = "borrower".concat("-").concat(account.id);
@@ -648,9 +649,9 @@ export function addPosition(
         borrowerActor.save();
 
         protocol.cumulativeUniqueBorrowers += 1;
-        protocol.save();
       }
     }
+    protocol.save();
   }
 
   //
@@ -926,4 +927,77 @@ function snapshotPosition(position: Position, event: ethereum.Event): void {
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
   snapshot.save();
+}
+
+export function getOrCreateMarket(
+  marketId: Address,
+  protocolData: ProtocolData
+): Market {
+  let market = Market.load(marketId.toHexString());
+
+  if (!market) {
+    log.info("[getOrCreateMarket] Creating new market {}", [
+      marketId.toHexString(),
+    ]);
+
+    // get protocol
+    let protocol = getOrCreateLendingProtocol(protocolData);
+    protocol.totalPoolCount++;
+    let markets = protocol.marketIDs;
+    markets.push(marketId.toHexString());
+    protocol.marketIDs = markets;
+    protocol.save();
+
+    // create inputToken
+    let inputToken = getOrCreateToken(marketId);
+
+    // Create a new Market
+    market = new Market(marketId.toHexString());
+
+    market.protocol = protocol.name;
+    market.isActive = true; // initialized to true on creation
+    market.canUseAsCollateral = true; // only stopped when protocol is paused
+    market.canBorrowFrom = true; // this field changes occasinally, but all markets are set to true after creation
+    market.maximumLTV = BIGDECIMAL_ZERO;
+    market.liquidationThreshold = BIGDECIMAL_ZERO;
+    market.liquidationPenalty = BIGDECIMAL_ZERO;
+    market.inputToken = inputToken.id;
+    market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    market.inputTokenBalance = BIGINT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.outputTokenSupply = BIGINT_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.exchangeRate = BIGDECIMAL_ONE; // this is constant
+    market.reserveFactor = BIGDECIMAL_ZERO;
+    market.totalStableValueLocked = BIGINT_ZERO;
+    market.totalVariableValueLocked = BIGINT_ZERO;
+    market.rewardTokens = []; // updated once used
+    market.rewardTokenEmissionsAmount = [];
+    market.rewardTokenEmissionsUSD = [];
+    market.liquidityIndex = BIGINT_ONE; // this is init to 1e27
+    // these are set in reserveInitialized()
+    market.createdTimestamp = BIGINT_ZERO;
+    market.createdBlockNumber = BIGINT_ZERO;
+    market.positionCount = INT_ZERO;
+    market.openPositionCount = INT_ZERO;
+    market.closedPositionCount = INT_ZERO;
+    market.lendingPositionCount = INT_ZERO;
+    market.borrowingPositionCount = INT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.rates = []; // calculated in event ReserveDataUpdated
+    market.prePauseState = [true, true, true];
+
+    market.save();
+  }
+
+  return market;
 }

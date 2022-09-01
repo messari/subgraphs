@@ -116,8 +116,10 @@ function PoolTab({
     if (poolData) {
       poolTable = (
         <SchemaTable
+          key="SchemaTable"
           entityData={entityData}
           schemaName={poolKeySingular}
+          protocolType={data.protocols[0].type}
           dataFields={poolData}
           setIssues={(x) => setTableIssues(x)}
           issuesProps={tableIssues}
@@ -128,6 +130,7 @@ function PoolTab({
       const poolEntityElements = Object.keys(poolTimeseriesData).map((entityName: string) => {
         return (
           <PoolTabEntity
+            key={"poolTabEntity-" + entityName}
             data={data}
             currentEntityData={poolTimeseriesData[entityName]}
             entityName={entityName}

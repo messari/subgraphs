@@ -3,7 +3,7 @@ repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 {{#graftEnabled}}
-description: mm-finance is a Uniswap fork in cronos chain
+description: ...
 graft:
   base: {{subgraphId}} # Subgraph ID of base subgraph
   block: {{graftStartBlock}} # Block number
@@ -11,7 +11,7 @@ graft:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: cronos
+    network: {{network}}
     source:
       address: "{{factory.address}}"
       abi: Factory
@@ -40,7 +40,7 @@ dataSources:
           ##handler: handleFeeTo
   - kind: ethereum
     name: MasterMeerkat
-    network: cronos
+    network: {{network}}
     source:
       address: "{{masterMeerkatAddress}}"
       abi: MasterMeerkat
@@ -66,7 +66,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: cronos
+    network: {{network}}
     source:
       abi: Pair
     mapping:

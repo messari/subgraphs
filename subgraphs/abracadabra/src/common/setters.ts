@@ -1,5 +1,5 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Market, LiquidateProxy } from "../../generated/schema";
+import { Market, LiquidateProxy, Token } from "../../generated/schema";
 import { Cauldron, LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
 import { getOrCreateInterestRate, getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
 import {
@@ -24,6 +24,7 @@ import {
   HIGH_RISK_LIQUIDATION_PENALTY,
   InterestRateSide,
   InterestRateType,
+  AVAX_JOE_BAR_MARKET_ADDRESS,
 } from "./constants";
 import { bigIntToBigDecimal } from "./utils/numbers";
 
@@ -217,4 +218,33 @@ export function createLiquidateEvent(event: LogRemoveCollateral): void {
   );
   liquidation.amount = event.params.share;
   liquidation.save();
+}
+
+// Update token price using the exchange rate
+// update on the market and token
+export function updateTokenPrice(rate: BigInt, token: Token, market: Market, blockNumber: BigInt): void {
+  let priceUSD = BIGDECIMAL_ZERO;
+  if (rate != BIGINT_ZERO) {
+    priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(rate, token.decimals));
+  }
+
+  // fix avax JoeBar price discrepency
+  // the exchange rate is way too low
+  // it seems like it should be offset by 6 (instead of 18) until 6431888
+  // this only affects one deposit
+  if (
+    market.id.toLowerCase() == AVAX_JOE_BAR_MARKET_ADDRESS.toLowerCase() &&
+    blockNumber.lt(BigInt.fromI32(6431889))
+  ) {
+    priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(rate, 6));
+  }
+
+  // update market
+  market.inputTokenPriceUSD = priceUSD;
+  market.save();
+
+  // update token
+  token.lastPriceUSD = priceUSD;
+  token.lastPriceBlockNumber = blockNumber;
+  token.save();
 }
