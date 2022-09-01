@@ -1,4 +1,5 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import { Notional } from "../../generated/Notional/Notional";
 import {
   Market,
   MarketDailySnapshot,
@@ -8,11 +9,13 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ZERO,
+  PROTOCOL_ID,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   ZERO_ADDRESS,
 } from "../common/constants";
-import { getTokenFromCurrency } from "../common/helpers";
+import { getTokenFromCurrency } from "../common/util";
+import { bigIntToBigDecimal } from "../common/numbers";
 import { getOrCreateInterestRate } from "./InterestRate";
 import { getOrCreateLendingProtocol } from "./protocol";
 
@@ -28,14 +31,15 @@ export function getOrCreateMarket(
   event: ethereum.Event,
   marketId: string
 ): Market {
-  // TODO: update this to smart contract and use market.name everywhere else?
-  // TODO: create the marketId here to avoid inconsistency
+  // TODO: take currency, maturity and create the marketId here to avoid inconsistency?
   let market = Market.load(marketId);
 
   if (market == null) {
     let protocol = getOrCreateLendingProtocol();
     protocol.totalPoolCount += 1;
     protocol.save();
+
+    let currencyId = marketId.split("-")[0];
 
     // market metadata
     market = new Market(marketId);
@@ -48,23 +52,32 @@ export function getOrCreateMarket(
     market.canBorrowFrom = true;
     market.maximumLTV = BIGDECIMAL_ZERO;
     market.liquidationThreshold = BIGDECIMAL_ZERO;
-    // TODO: based on currencyID, set the LiquidationPenalty
-    // SHOULD THIS BE FETCHED FROM CONTRACT?
-    // Pulling from LIQUIDATION_DISCOUNT_PERCENT_CURRENCY Constants
-    market.liquidationPenalty = BIGDECIMAL_ZERO;
+
+    // TODO: verify liquidation penalty
+    let notional = Notional.bind(Address.fromString(PROTOCOL_ID));
+    let currencyAndRatesCallResult = notional.try_getCurrencyAndRates(
+      parseInt(currencyId)
+    );
+    if (currencyAndRatesCallResult.reverted) {
+      log.info("Notional call 'getCurrencyAndRates' reverted", []);
+      market.liquidationPenalty = BIGDECIMAL_ZERO;
+    } else {
+      market.liquidationPenalty = bigIntToBigDecimal(
+        currencyAndRatesCallResult.value.getEthRate().liquidationDiscount
+      );
+    }
 
     // market tokens
-    let currencyId = market.id.split("-")[0];
     market.inputToken = getTokenFromCurrency(event, currencyId).id;
-    // TODO: ERC-1155 fCash
+    // TODO: How do we represent ERC-1155 fCash
     // ERC1155Action - 0xBf12d7e41a25f449293AB8cd1364Fe74A175bFa5
     // Notional ERC1155 Token - https://etherscan.io/token/0x1344a36a1b56144c3bc62e7757377d288fde0369#inventory
     market.outputToken = "";
     market.rewardTokens = [];
     market.inputTokenBalance = BIGINT_ZERO;
     market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
-    market.outputTokenSupply = BIGINT_ZERO;
-    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.outputTokenSupply = BIGINT_ZERO; // Not fixed supply.
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO; // There is no price.
     market.rates = [];
     market.exchangeRate = BIGDECIMAL_ZERO;
 
@@ -104,6 +117,20 @@ export function getOrCreateMarket(
     // market.liquidates
 
     market.save();
+
+    // TODO: update market status
+    // let activeMarketsCallResult = notional.try_getActiveMarkets(
+    //   parseInt(currencyId)
+    // );
+    // if (activeMarketsCallResult.reverted) {
+    //   log.info("Notional call 'getActiveMarkets' reverted", []);
+    // } else {
+    //   // update subgraph market to inacitve
+    //   let activeMarkets = activeMarketsCallResult.value;
+    //   let allSubgraphMarkets = TBD
+    //   loop through allSubgraphMarkets
+    //    market subgraphMarket as inactive if its not in activeMarkets
+    // }
   }
 
   return market;
@@ -126,11 +153,7 @@ export function getOrCreateMarketDailySnapshot(
     marketMetrics.market = marketId;
     marketMetrics.blockNumber = event.block.number;
     marketMetrics.timestamp = event.block.timestamp;
-    marketMetrics.rates = [];
-    // marketMetrics.rates = [
-    //   prefixID(marketId, InterestRateSide.LENDER, InterestRateType.VARIABLE),
-    //   prefixID(marketId, InterestRateSide.BORROWER, InterestRateType.VARIABLE),
-    // ];
+    marketMetrics.rates = market.rates;
     marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
     marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
     marketMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
@@ -183,11 +206,7 @@ export function getOrCreateMarketHourlySnapshot(
     marketMetrics.market = marketId;
     marketMetrics.blockNumber = event.block.number;
     marketMetrics.timestamp = event.block.timestamp;
-    marketMetrics.rates = [];
-    // marketMetrics.rates = [
-    //   prefixID(marketId, InterestRateSide.LENDER, InterestRateType.VARIABLE),
-    //   prefixID(marketId, InterestRateSide.BORROWER, InterestRateType.VARIABLE),
-    // ];
+    marketMetrics.rates = market.rates;
     marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
     marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
     marketMetrics.hourlyDepositUSD = BIGDECIMAL_ZERO;

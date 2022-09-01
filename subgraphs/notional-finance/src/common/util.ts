@@ -24,9 +24,7 @@ export function getTokenFromCurrency(
   } else if (currencyId == "4") {
     tokenAddress = cWBTC_ADDRESS;
   } else {
-    log.error(" ------> We didnt capture this currency: {}", [
-      currencyId.toString(),
-    ]);
+    log.error(" ------> New currency found: {}", [currencyId.toString()]);
   }
 
   let token = getOrCreateToken(

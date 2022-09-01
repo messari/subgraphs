@@ -23,7 +23,6 @@ export function updateUsageMetrics(
   to: Address,
   transactionType: string
 ): void {
-  // Number of days since Unix epoch
   let hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
@@ -117,7 +116,6 @@ export function addAccountToProtocol(
   let activeEventId = `hourly-${account.id}-${dailyId}-${transactionType}`;
   let activeEvent = ActiveEventAccount.load(activeEventId);
   let dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
-  // TODO: Missing withdraw, repay, why?
   if (transactionType == TransactionType.DEPOSIT) {
     if (protocol.depositors.indexOf(account.id) < 0) {
       protocol.depositors = addToArrayAtIndex(
@@ -158,6 +156,7 @@ export function addAccountToProtocol(
       dailySnapshot.dailyActiveLiquidators += 1;
     }
     account.liquidateCount += 1;
+    // TODO: Combine with above. TransactionType.LIQUIDATE, get and update metrics for liquidator and liquidatee?
   } else if (transactionType == TransactionType.LIQUIDATEE) {
     if (protocol.liquidatees.indexOf(account.id) < 0) {
       protocol.liquidatees = addToArrayAtIndex(

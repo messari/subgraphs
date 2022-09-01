@@ -74,7 +74,6 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
-// export namespace EventType {
 export namespace TransactionType {
   export const BORROW = "BORROW";
   export const DEPOSIT = "DEPOSIT";
@@ -200,10 +199,3 @@ export const WEEK = DAY * 6;
 export const MONTH = DAY * 30;
 export const QUARTER = DAY * 90;
 export const YEAR = QUARTER * 4;
-
-// TODO: fix this namespace
-// liquidity discounts (liquidator) -> liquidation penalty (liquidatee)
-export const LIQUIDATION_DISCOUNT_PERCENT_ETH = 6;
-export const LIQUIDATION_DISCOUNT_PERCENT_DAI = 4;
-export const LIQUIDATION_DISCOUNT_PERCENT_USDC = 4;
-export const LIQUIDATION_DISCOUNT_PERCENT_WBTC = 7;

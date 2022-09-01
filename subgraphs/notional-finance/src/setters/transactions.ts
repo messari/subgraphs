@@ -29,21 +29,14 @@ import {
   InterestRateSide,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
-import {
-  addAccountToProtocol,
-  updateUsageMetrics,
-} from "../setters/usageMetrics";
-import { getOrCreateLendingProtocol } from "./protocol";
-import { getOrCreateToken } from "./token";
-import { getOrCreateAccount } from "./account";
-import { getOrCreateMarket } from "./market";
+import { addAccountToProtocol, updateUsageMetrics } from "./usageMetrics";
+import { getOrCreateLendingProtocol } from "../getters/protocol";
+import { getOrCreateToken } from "../getters/token";
+import { getOrCreateAccount } from "../getters/account";
+import { getOrCreateMarket } from "../getters/market";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
-import {
-  updateFinancials,
-  updateMarket,
-  updateTVL,
-} from "../setters/financialMetrics";
-import { getTokenFromCurrency } from "../common/helpers";
+import { updateFinancials, updateMarket, updateTVL } from "./financialMetrics";
+import { getTokenFromCurrency } from "../common/util";
 
 export function getOrCreatePosition(
   event: ethereum.Event,
@@ -228,7 +221,7 @@ export function updatePosition(
     position.withdrawCount = position.withdrawCount + 1;
     position.balance = position.balance.minus(amount);
 
-    // TODO: Liquidation: why is this here?
+    // TODO: Liquidation: TBD if we need this
     // if (liquidation) {
     //   position.liquidationCount = position.liquidationCount + 1;
     //   let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionlogIndex
@@ -261,7 +254,7 @@ export function updatePosition(
     position.repayCount = position.repayCount + 1;
     position.balance = position.balance.minus(amount);
 
-    // TODO: Liquidation: why is this here?
+    // TODO: Liquidation: TBD if we need this
     // if (liquidation) {
     //   position.liquidationCount = position.liquidationCount + 1;
     //   let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionlogIndex.toString()}`;
@@ -312,7 +305,7 @@ export function createDeposit(
   deposit.timestamp = event.block.timestamp;
   deposit.account = account.id;
   deposit.market = market.id;
-  // TODO: updated in updatePosition
+  // updated in updatePosition
   // deposit.position = position.id;
   deposit.asset = market.inputToken;
   deposit.amount = fCashAmount;
@@ -366,6 +359,7 @@ export function createWithdraw(
   withdraw.timestamp = event.block.timestamp;
   withdraw.account = account.id;
   withdraw.market = market.id;
+  // updated in updatePosition
   // withdraw.position = position.id;
   withdraw.asset = market.inputToken;
   withdraw.amount = fCashAmount;
@@ -420,6 +414,7 @@ export function createBorrow(
   borrow.timestamp = event.block.timestamp;
   borrow.account = account.id;
   borrow.market = market.id;
+  // updated in updatePosition
   // borrow.position = position.id;
   borrow.asset = market.inputToken;
   borrow.amount = fCashAmount;
@@ -442,9 +437,6 @@ export function createBorrow(
   );
   updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
-  // updateAccount
-  // updateProtocol
-  // updateFinancial
   updateTVL(event);
 
   return borrow;
@@ -476,6 +468,7 @@ export function createRepay(
   repay.timestamp = event.block.timestamp;
   repay.account = account.id;
   repay.market = market.id;
+  // updated in updatePosition
   // repay.position = position.id;
   repay.asset = market.inputToken;
   repay.amount = fCashAmount;
@@ -499,9 +492,6 @@ export function createRepay(
   updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
   updateTVL(event);
-  // updateAccount
-  // updateProtocol
-  // updateFinancial
 
   return repay;
 }
@@ -528,7 +518,7 @@ export function createLiquidate(
   liquidate.liquidator = liquidatorAccount.id;
   liquidate.liquidatee = liquidateeAccount.id;
   liquidate.market = market.id;
-  // TODO: need to fix position
+  // TODO: The liquidation events don't provide maturity so we are unable to associate a market with the liquidation event.
   liquidate.position = getOrCreatePosition(
     event,
     liquidateeAccount,
@@ -552,9 +542,11 @@ export function createLiquidate(
     event.transaction.to!,
     TransactionType.LIQUIDATEE
   );
-  // addAccountToProtocol(TransactionType.LIQUIDATEE, liquidateeAccount, event);
-  // addAccountToProtocol(TransactionType.LIQUIDATOR, liquidatorAccount, event);
-  // TODO
+  // TODO: Should this be elsewhere?
+  addAccountToProtocol(TransactionType.LIQUIDATEE, liquidateeAccount, event);
+  addAccountToProtocol(TransactionType.LIQUIDATOR, liquidatorAccount, event);
+
+  // TODO: cannot update these metrics without market id
   // updateFinancials(event, amountUSD, market.id);
   // updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
   // updateTVL(event);

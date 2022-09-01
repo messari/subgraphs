@@ -141,6 +141,7 @@ export function updateTVL(event: ethereum.Event): void {
   let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
   let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
 
+  // TODO: can tokenAddresses be a constant namespace? see getTokenFromCurrency as well
   let tokenAddress = [cETH_ADDRESS, cDAI_ADDRESS, cUSDC_ADDRESS, cWBTC_ADDRESS];
 
   for (let i = 0; i < tokenAddress.length; i++) {
@@ -149,6 +150,7 @@ export function updateTVL(event: ethereum.Event): void {
       event.block.number
     );
     let erc20 = ERC20.bind(Address.fromString(assetToken.id));
+    // TODO: This doesn't work for cWBTC_ADDRESS (there are two tokens cWBTC, cWBTC: 2)
     let assetTokenBalance = erc20.balanceOf(Address.fromString(PROTOCOL_ID));
 
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(
@@ -188,7 +190,6 @@ export function updateMarket(
     event.block.number
   );
   let priceUSD = token.lastPriceUSD!;
-  // let amountUSD = bigIntToBigDecimal(amount, token.decimals).times(priceUSD!);
 
   // last updated block number and timestamp
   marketHourlySnapshot.blockNumber = event.block.number;
@@ -348,52 +349,3 @@ export function updateMarket(
   marketHourlySnapshot.save();
   marketDailySnapshot.save();
 }
-
-// TODO: delete, not required, addressed in updateMarket()
-// Update MarketDailySnapshot entity
-// export function updateMarketMetrics(
-//   event: ethereum.Event,
-//   market: Market
-// ): void {
-//   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
-//   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
-//   // if (!marketHourlySnapshot || !marketDailySnapshot) {
-//   //   return;
-//   // }
-//   let protocol = getOrCreateLendingProtocol();
-
-//   marketHourlySnapshot.protocol = protocol.id;
-//   marketHourlySnapshot.market = market.id;
-//   marketHourlySnapshot.rates = market.rates;
-//   marketHourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
-//   marketHourlySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
-//   marketHourlySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
-//   marketHourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
-//   marketHourlySnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
-//   marketHourlySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
-//   marketHourlySnapshot.inputTokenBalance = market.inputTokenBalance;
-//   marketHourlySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
-//   marketHourlySnapshot.outputTokenSupply = market.outputTokenSupply;
-//   marketHourlySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
-//   marketHourlySnapshot.blockNumber = event.block.number;
-//   marketHourlySnapshot.timestamp = event.block.timestamp;
-
-//   marketDailySnapshot.protocol = protocol.id;
-//   marketDailySnapshot.market = market.id;
-//   marketDailySnapshot.rates = market.rates;
-//   marketDailySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
-//   marketDailySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
-//   marketDailySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
-//   marketDailySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
-//   marketDailySnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
-//   marketDailySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
-//   marketDailySnapshot.inputTokenBalance = market.inputTokenBalance;
-//   marketDailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
-//   marketDailySnapshot.outputTokenSupply = market.outputTokenSupply;
-//   marketDailySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
-//   marketDailySnapshot.blockNumber = event.block.number;
-//   marketDailySnapshot.timestamp = event.block.timestamp;
-
-//   marketHourlySnapshot.save();
-//   marketDailySnapshot.save();
-// }

@@ -16,23 +16,17 @@ export function getOrCreateAsset(
     entity.currency = currencyId;
     entity.maturity = maturity;
     entity.notional = BigInt.fromI32(0);
-    // we are only storing fCash asset type
-    // entity.assetType
-    // TODO: is this accurate below?
-    // for fCash asset only
     entity.settlementDate = maturity;
   }
 
   return entity as Asset;
 }
 
-export function updateAssetsAndAccountPortfolio(
+export function updateAccountAssets(
   account: Account,
   portfolio: ethereum.Tuple[],
   event: ethereum.Event
 ): void {
-  // let newAssetIds = new Array<string>();
-
   for (let i: i32 = 0; i < portfolio.length; i++) {
     let genericAsset = portfolio[i];
     // This casting is required to get around type errors in AssemblyScript
@@ -52,16 +46,10 @@ export function updateAssetsAndAccountPortfolio(
       log.debug("Updated asset entity {}", [asset.id]);
       asset.save();
     }
-
-    // newAssetIds.push(asset.id);
   }
-
-  // account.portfolio = newAssetIds;
-  // account.save();
 }
 
-// TODO: update account as well?
-export function updateAssetOnEmptyPortfolio(
+export function updateAccountAssetOnEmptyPortfolio(
   accountId: string,
   currencyId: string,
   maturity: BigInt,
