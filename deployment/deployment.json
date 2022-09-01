@@ -393,6 +393,14 @@
         }
       }
     },
+    "cronos-dummy": {
+      "cronos-dummy": {
+        "cronos": {
+          "template": "cronos.dummy.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
     "curve-finance": {
       "curve-finance": {
         "arbitrum": {
