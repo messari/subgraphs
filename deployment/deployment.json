@@ -118,7 +118,7 @@
             "version": ""
           },
           "files": {
-            "template": "curve.template.yaml"        
+            "template": "curve.template.yaml"
           },
           "options": {
             "prepare:yaml": true,
@@ -372,7 +372,7 @@
       "networks": {
         "fantom": {
           "hosted-service": {
-            "subgraph-slug": "spookyswap-fantom",            
+            "subgraph-slug": "spookyswap-fantom",
             "version": ""
           },
           "files": {
@@ -474,7 +474,7 @@
         },
         "ethereum": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-ethereum",            
+            "subgraph-slug": "sushiswap-ethereum",
             "version": ""
           },
           "files": {
@@ -488,7 +488,7 @@
         },
         "polygon": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-polygon",            
+            "subgraph-slug": "sushiswap-polygon",
             "version": ""
           },
           "files": {
@@ -516,7 +516,7 @@
         },
         "moonriver": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-moonriver",           
+            "subgraph-slug": "sushiswap-moonriver",
             "version": ""
           },
           "files": {
@@ -530,7 +530,7 @@
         },
         "gnosis": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-gnosis",          
+            "subgraph-slug": "sushiswap-gnosis",
             "version": ""
           },
           "files": {
@@ -548,7 +548,7 @@
       "networks": {
         "ethereum": {
           "hosted-service": {
-            "subgraph-slug": "uniswap-v2-ethreum",
+            "subgraph-slug": "uniswap-v3-ethreum",
             "version": ""
           },
           "files": {
@@ -608,7 +608,7 @@
       "networks": {
         "avalanche": {
           "hosted-service": {
-            "subgraph-slug": "trader-joe-avalanche",            
+            "subgraph-slug": "trader-joe-avalanche",
             "version": ""
           },
           "files": {
@@ -626,7 +626,7 @@
       "networks": {
         "aurora": {
           "hosted-service": {
-            "subgraph-slug": "trisolaris-aurora",            
+            "subgraph-slug": "trisolaris-aurora",
             "version": ""
           },
           "files": {
@@ -644,7 +644,7 @@
       "networks": {
         "celo": {
           "hosted-service": {
-            "subgraph-slug": "ubeswap-celo",            
+            "subgraph-slug": "ubeswap-celo",
             "version": ""
           },
           "files": {
@@ -662,11 +662,11 @@
       "networks": {
         "ethereum": {
           "hosted-service": {
-            "subgraph-slug": "uniswap-v2-ethereum",            
+            "subgraph-slug": "uniswap-v2-ethereum",
             "version": "1.1.7"
           },
           "decentralized-network": {
-            "subgraph-slug": "uniswap-v2-ethereum",            
+            "subgraph-slug": "uniswap-v2-ethereum",
             "version": "1.1.7"
           },
           "files": {
@@ -681,10 +681,10 @@
       }
     },
     "vvs-finance": {
-      "networks": { 
+      "networks": {
         "cronos": {
           "hosted-service": {
-            "subgraph-slug": "vvs-finance",            
+            "subgraph-slug": "vvs-finance",
             "version": ""
           },
           "files": {
@@ -702,7 +702,7 @@
       "networks": {
         "gnosis": {
           "hosted-service": {
-            "subgraph-slug": "honeyswap-gnosis",            
+            "subgraph-slug": "honeyswap-gnosis",
             "version": ""
           },
           "files": {
@@ -716,7 +716,7 @@
         },
         "polygon": {
           "hosted-service": {
-            "subgraph-slug": "honeyswap-polygon",            
+            "subgraph-slug": "honeyswap-polygon",
             "version": ""
           },
           "files": {
@@ -1846,7 +1846,7 @@
     },
     "code4rena-governance": {
       "type": "openzeppelin-governor",
-      "networks":{
+      "networks": {
         "polygon": {
           "hosted-service": {
             "subgraph-slug": "code4rena-governance",

@@ -18,7 +18,6 @@ async function executeDeployment(deployment, callback) {
       exec(
         deployment.scripts.get(allDeployments[deploymentIndex])[scriptIndex++],
         function (error, stdout, stderr) {
-
           logs = logs + "stdout: " + stdout;
           logs = logs + "stderr: " + stderr;
           if (stderr.includes("HTTP error")) {
@@ -43,8 +42,15 @@ async function executeDeployment(deployment, callback) {
               );
             } else {
               logs = logs + "Exec error: " + error;
-              results +=
-                "Deployment Failed: " + allDeployments[deploymentIndex] + "\n";
+              if (["build", "check"].includes(deployment.type.toLowerCase())) {
+                results +=
+                  "Build Failed: " + allDeployments[deploymentIndex] + "\n";
+              } else {
+                results +=
+                  "Deployment Failed: " +
+                  allDeployments[deploymentIndex] +
+                  "\n";
+              }
               console.log(error);
               deploymentIndex++;
               scriptIndex = 0;
@@ -54,8 +60,15 @@ async function executeDeployment(deployment, callback) {
             scriptIndex ==
             deployment.scripts.get(allDeployments[deploymentIndex]).length
           ) {
-            results +=
-              "Deployment Successful: " + allDeployments[deploymentIndex] + "\n";
+            if (["build", "check"].includes(deployment.type.toLowerCase())) {
+              results +=
+                "Build Successful: " + allDeployments[deploymentIndex] + "\n";
+            } else {
+              results +=
+                "Deployment Successful: " +
+                allDeployments[deploymentIndex] +
+                "\n";
+            }
             deploymentIndex++;
             scriptIndex = 0;
             httpCounter = 1;
