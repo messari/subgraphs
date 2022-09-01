@@ -15,7 +15,7 @@ import {
   MasterChef,
   ZERO_ADDRESS,
 } from "../../../../../src/common/constants";
-import { updateMasterChef } from "../../common/handlers/handleRewardV2";
+import { updateMasterChef } from "../../common/handlers/handleRewardV3";
 import { setPoolRewarder } from "../../common/handlers/handleRewarder";
 import {
   createMasterChefStakingPool,
