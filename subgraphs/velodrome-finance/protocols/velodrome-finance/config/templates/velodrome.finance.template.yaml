@@ -60,6 +60,8 @@ dataSources:
           handler: handleGaugeKilled
         - event: GaugeRevived(indexed address)
           handler: handleGaugeRevived
+        - event: DistributeReward(indexed address,indexed address,uint256)
+          handler: handleDistributeReward
       file: ./src/mappings/rewards.ts
   {{/voter}}
 templates:
