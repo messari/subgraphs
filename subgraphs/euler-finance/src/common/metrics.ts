@@ -10,7 +10,7 @@ import {
 } from "./getters";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount,  UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
-import { BIGINT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./constants";
+import { ActivityType, BIGINT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./constants";
 
 // updates a given FinancialDailySnapshot Entity
 export function updateFinancials(block: ethereum.Block): void {
@@ -85,6 +85,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   let accountId = from.toHexString();
   let account = Account.load(accountId);
   let protocol = getOrCreateLendingProtocol();
+  dailyMetrics.totalPoolCount = protocol.totalPoolCount;
   if (!account) {
     account = new Account(accountId);
     account.save();
@@ -96,7 +97,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   dailyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = from.toHexString() + "-" + id.toString();
+  let dailyActiveAccountId = ActivityType.DAILY + "-" + from.toHexString() + "-" + id.toString();
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -105,7 +106,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   }
 
   // create active account for hourlyMetrics
-  let hourlyActiveAccountId = dailyActiveAccountId + "-" + hour.toString();
+  let hourlyActiveAccountId = ActivityType.HOURLY + "-" + from.toHexString() + "-" + hour.toString();
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -132,6 +133,9 @@ export function updateMarketDailyMetrics(block: ethereum.Block, marketId: string
   // update other vars
   marketMetrics.rates = market.rates;
   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketMetrics.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketMetrics.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -161,6 +165,9 @@ export function updateMarketHourlyMetrics(block: ethereum.Block, marketId: strin
   // update other vars
   marketMetrics.rates = market.rates;
   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketMetrics.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketMetrics.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;

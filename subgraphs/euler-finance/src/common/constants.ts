@@ -94,6 +94,11 @@ export namespace TransactionType {
   export const REPAY = "REPAY";
 }
 
+export namespace ActivityType {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////

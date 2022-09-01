@@ -46,7 +46,7 @@ export function handleAssetStatus(event: AssetStatus): void {
 }
 
 export function handleBorrow(event: Borrow): void {
-  createBorrow(event)
+  createBorrow(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.BORROW);
   updateFinancials(event.block);
