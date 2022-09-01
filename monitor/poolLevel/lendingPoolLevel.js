@@ -1,17 +1,16 @@
 import axios from "axios";
 
-export const dexPoolLevel = async (deployments) => {
+export const lendingPoolLevel = async (deployments) => {
     const endpointsList = [];
     Object.keys(deployments).forEach((depo) => {
         if (
             !deployments[depo].indexingError &&
-            deployments[depo].protocolType.toUpperCase() === "EXCHANGES"
+            deployments[depo].protocolType.toUpperCase() === "LENDING"
         ) {
             endpointsList.push(deployments[depo].url);
         }
     });
 
-    console.log(endpointsList)
     const baseQuery = `
     query MyQuery {
         protocols {
@@ -20,14 +19,18 @@ export const dexPoolLevel = async (deployments) => {
             type
             schemaVersion
         }
-      liquidityPools (first: 10) {
+      markets(first: 1000) {
         id
         name
         totalValueLockedUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
-        cumulativeVolumeUSD
+        cumulativeDepositUSD
+        cumulativeBorrowUSD
+        cumulativeLiquidateUSD
+        totalBorrowBalanceUSD
+        totalDepositBalanceUSD
         outputTokenSupply
         outputTokenPriceUSD
       }
@@ -50,23 +53,24 @@ export const dexPoolLevel = async (deployments) => {
         );
     });
 
-    let poolLevelData = [];
+    let marketLevelData = [];
     await Promise.all(promiseArr)
         .then(
             (response) =>
-            (poolLevelData = response.map((poolData) => {
+            (marketLevelData = response.map((marketData) => {
                 return {
-                    liquidityPools: poolData?.data?.data?.liquidityPools || [],
-                    url: poolData.config.url,
-                    deployment: Object.keys(deployments).find((key) => deployments[key].url === poolData.config.url) || poolData.config.url.split("messari/")[1],
+                    markets: marketData?.data?.data?.markets || [],
+                    url: marketData.config.url,
+                    deployment: Object.keys(deployments).find((key) => deployments[key].url === marketData.config.url) || marketData.config.url.split("messari/")[1],
                 };
             }))
         )
         .catch((err) => console.log(err));
 
-    poolLevelData.forEach((protocol, idx) => {
-        if (!protocol?.liquidityPools) return;
-        const data = protocol.liquidityPools;
+    marketLevelData.forEach((protocol, idx) => {
+        console.log('marketLevelData', protocol.deployment, idx)
+        if (!protocol?.markets) return;
+        const data = protocol.markets;
         if (!data?.length) return;
         const url = protocol.url;
         // const dataFields = Object.keys(data)
@@ -126,10 +130,48 @@ export const dexPoolLevel = async (deployments) => {
                 issuesArrays[currentIssueField].push(buildIssue(value));
             }
 
-            currentIssueField = "cumulativeVolumeUSD";
-
-            if (!(parseFloat(instance[currentIssueField]) > 100 && parseFloat(instance[currentIssueField]) < 10000000000)) {
+            currentIssueField = "cumulativeDepositUSD";
+            if (!(parseFloat(instance[currentIssueField]) > 100) && !issuesArrays[currentIssueField]?.includes(instance.id)) {
                 issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField])));
+            }
+
+            if (
+                !(
+                    parseFloat(instance.cumulativeDepositUSD) >=
+                    parseFloat(instance.cumulativeBorrowUSD)
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays.cumulativeBorrowUSD.push(buildIssue(instance.cumulativeBorrowUSD + " > " + instance.cumulativeDepositUSD));
+            }
+
+            currentIssueField = "cumulativeLiquidateUSD";
+            if (
+                !(
+                    parseFloat(instance[currentIssueField]) <=
+                    parseFloat(instance.cumulativeBorrowUSD)
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField]) + " > " + parseFloat(instance.cumulativeBorrowUSD)));
+            }
+
+            currentIssueField = "totalBorrowBalanceUSD";
+            if (
+                !(
+                    parseFloat(instance[currentIssueField]) <=
+                    parseFloat(instance.cumulativeBorrowUSD)
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays[currentIssueField].push(buildIssue(instance[currentIssueField] + " < " + instance.cumulativeBorrowUSD));
+            }
+
+            currentIssueField = "totalDepositBalanceUSD";
+            if (
+                !(
+                    parseFloat(instance[currentIssueField]) >=
+                    parseFloat(instance.totalBorrowBalanceUSD)
+                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
+            ) {
+                issuesArrays[currentIssueField].push(buildIssue(instance[currentIssueField] + " < " + instance.totalBorrowBalanceUSD));
             }
 
             currentIssueField = "outputTokenSupply";

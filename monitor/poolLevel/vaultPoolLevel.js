@@ -11,7 +11,6 @@ export const vaultPoolLevel = async (deployments) => {
         }
     });
 
-    console.log(endpointsList)
     const baseQuery = `
     query MyQuery {
         protocols {
@@ -49,24 +48,24 @@ export const vaultPoolLevel = async (deployments) => {
         );
     });
 
-    let marketLevelData = [];
+    let vaultLevelData = [];
     await Promise.all(promiseArr)
         .then(
             (response) =>
-            (marketLevelData = response.map((marketData) => {
+            (vaultLevelData = response.map((vaultData) => {
                 return {
-                    markets: marketData?.data?.data?.markets || [],
-                    url: marketData.config.url,
-                    deployment: Object.keys(deployments).find((key) => deployments[key].url === marketData.config.url) || marketData.config.url.split("messari/")[1],
+                    vaults: vaultData?.data?.data?.vaults || [],
+                    url: vaultData.config.url,
+                    deployment: Object.keys(deployments).find((key) => deployments[key].url === vaultData.config.url) || vaultData.config.url.split("messari/")[1],
                 };
             }))
         )
         .catch((err) => console.log(err));
 
-    marketLevelData.forEach((protocol, idx) => {
+    vaultLevelData.forEach((protocol, idx) => {
         console.log('vaultLevelData', protocol.deployment, idx)
-        if (!protocol?.markets) return;
-        const data = protocol.markets;
+        if (!protocol?.vaults) return;
+        const data = protocol.vaults;
         if (!data?.length) return;
         const url = protocol.url;
         // const dataFields = Object.keys(data)

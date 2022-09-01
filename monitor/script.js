@@ -3,21 +3,18 @@ import { getDiscordMessages, sendDiscordMessage } from "./DiscordMessages.js";
 import 'dotenv/config'
 import { protocolLevel, alertProtocolErrors } from "./protocolLevel.js";
 import { errorsObj } from "./errorSchemas.js";
-import { lendingPoolLevel } from "./lendingPoolLevel.js";
-import { vaultPoolLevel } from "./vaultPoolLevel.js";
-import { dexPoolLevel } from "./dexPoolLevel.js";
+import { lendingPoolLevel } from "./poolLevel/lendingPoolLevel.js";
+import { vaultPoolLevel } from "./poolLevel/vaultPoolLevel.js";
+import { dexPoolLevel } from "./poolLevel/dexPoolLevel.js";
 
-// Hour in milliseconds
-const hourMs = 3600000;
+const sleep = m => new Promise(r => setTimeout(r, m));
 
 executionFlow();
-setInterval(executionFlow, hourMs);
 
 async function executionFlow() {
   const { data } = await axios.get(
     "https://subgraphs.messari.io/deployments.json"
   );
-
   // deployments holds the errors for every protocol
   let deployments = {};
 
@@ -174,16 +171,20 @@ async function executionFlow() {
       delete deployments[realNameString];
     }
   });
-
   deployments = await protocolLevel(deployments);
-  const discordMessages = await getDiscordMessages();
+  const discordMessages = await getDiscordMessages([]);
   await alertFailedIndexing(discordMessages, deployments);
   await alertProtocolErrors(discordMessages, deployments);
-
   deployments = await deploymentsOnPoolLevel(deployments);
+  await sleep(5000);
+
   await alertPoolLevelErrors(discordMessages, deployments, "lending");
+  await sleep(5000);
   await alertPoolLevelErrors(discordMessages, deployments, "vaults");
+  await sleep(5000);
   await alertPoolLevelErrors(discordMessages, deployments, "exchanges");
+  await sleep(5000);
+  executionFlow();
 }
 
 async function deploymentsOnPoolLevel(deployments) {
@@ -195,11 +196,10 @@ async function deploymentsOnPoolLevel(deployments) {
 
 async function alertFailedIndexing(discordMessages, deployments) {
   // Get the indexing error message objects from the last week 
-  const indexingErrorMessageObjs = discordMessages.filter(x => x.content.includes("**INDEXING ERRORS:**"))
-
+  const indexingErrorMessageObjs = discordMessages.filter(x => x.content.includes("**INDEXING ERRORS:**"));
   const indexingErrorDeposListStr = indexingErrorMessageObjs.map(msgObj => {
     return msgObj.content.split("LIST:")[1];
-  })
+  });
 
   // For testing, loop through deployments and take the deployments which have an indexing error and construct a message
   const indexErrs = [];
@@ -231,43 +231,17 @@ export const alertPoolLevelErrors = async (discordMessages, deployments, protoco
       return;
     }
 
-    const alertedErrors = JSON.parse(JSON.stringify({ ...errorsObj[protocolType] }));
-    const errorsToAlert = JSON.parse(JSON.stringify({ ...errorsObj[protocolType] }));
-
     const poolErrorMessage = discordMessages.find(x => {
-      return x.content.includes("**POOL ERRORS") && x.content.includes(protocol.split('-').join(' '))
+      return x.content.includes("**POOL ERRORS") && x.content.includes(protocol.split('-').join(' '));
     });
 
-    const issuesMessage = poolErrorMessage?.content?.split("Issue: ");
-    if (issuesMessage) {
-      issuesMessage.forEach(iss => {
-        if (iss.includes("POOL ERRORS")) {
-          return;
-        }
-        const trimmed = iss.split('\n').map(x => x.trim()).join(' ');
-        let issueField = trimmed.split('Pools')[0].trim();
-        if (issueField.includes('-')) {
-          issueField = issueField?.split('-')[0].trim();
-          alertedErrors[issueField] = true;
-        }
-      })
+    if (poolErrorMessage) {
+      return;
     }
-
-    Object.entries(deployment.poolErrors).forEach(([issueSet, issueArr]) => {
-      if (Array.isArray(alertedErrors[issueSet])) {
-        issueArr.forEach(iss => {
-          if (!alertedErrors[issueSet].includes(iss)) {
-            errorsToAlert[issueSet].push(`${iss}`);
-          }
-        });
-      } else {
-        errorsToAlert[issueSet] = issueArr;
-      }
-    });
 
     const protocolErrs = [];
     const newPoolErrorDiscordMessage = [`**POOL ERRORS: ${protocol.split('-').join(' ')}**\n`];
-    Object.entries(errorsToAlert).forEach(([type, val]) => {
+    Object.entries(deployment.poolErrors).forEach(([type, val]) => {
       if (val?.length > 0 && protocolErrs.join(" - ").length < 1400) {
         let list = val.join(",\n");
         if (val.length > 3) {
