@@ -22,7 +22,7 @@ dataSources:
         - name: Notional
           file: ./abis/Notional.json
         - name: ERC20
-          file: ./abis/ERC20.json          
+          file: ./abis/ERC20.json
           
         ###########################################
         ############## Price Oracle ###############
@@ -60,12 +60,17 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
+        # Useless events, don't emit annualizedAnchorRates
+        # - event: MarketsInitialized(uint16)
+        #   handler: handleMarketsInitialized
+        # - event: UpdateInitializationParameters(uint16)
+        #   handler: handleUpdateInitializationParameters
         - event: LendBorrowTrade(indexed address,indexed uint16,uint40,int256,int256)
           handler: handleLendBorrowTrade
-        - event: LiquidateLocalCurrency(indexed address,indexed address,uint16,int256)
-          handler: handleLiquidateLocalCurrency
-        - event: LiquidateCollateralCurrency(indexed address,indexed address,uint16,uint16,int256,int256,int256)
-          handler: handleLiquidateCollateralCurrency
-        - event: LiquidatefCashEvent(indexed address,indexed address,uint16,uint16,int256,uint256[],int256[])
-          handler: handleLiquidatefCash
+        # - event: LiquidateLocalCurrency(indexed address,indexed address,uint16,int256)
+        #   handler: handleLiquidateLocalCurrency
+        # - event: LiquidateCollateralCurrency(indexed address,indexed address,uint16,uint16,int256,int256,int256)
+        #   handler: handleLiquidateCollateralCurrency
+        # - event: LiquidatefCashEvent(indexed address,indexed address,uint16,uint16,int256,uint256[],int256[])
+        #   handler: handleLiquidatefCash
       file: ./src/mappings/notional.ts

@@ -18,14 +18,14 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   let network = dataSource.network();
 
   // 1. Yearn Lens Oracle
-  let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
-  if (!yearnLensPrice.reverted) {
-    log.warning("[YearnLensOracle] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      yearnLensPrice.usdPrice.div(yearnLensPrice.decimalsBaseTen).toString(),
-    ]);
-    return yearnLensPrice;
-  }
+  // let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
+  // if (!yearnLensPrice.reverted) {
+  //   log.warning("[YearnLensOracle] tokenAddress: {}, Price: {}", [
+  //     tokenAddr.toHexString(),
+  //     yearnLensPrice.usdPrice.div(yearnLensPrice.decimalsBaseTen).toString(),
+  //   ]);
+  //   return yearnLensPrice;
+  // }
 
   // 2. ChainLink Feed Registry
   let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);

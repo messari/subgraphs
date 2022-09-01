@@ -525,6 +525,7 @@ type Market @entity {
   " Name of market "
   name: String
 
+  # TODO 
   " Is this market active or is it frozen "
   isActive: Boolean!
 
@@ -534,18 +535,22 @@ type Market @entity {
   " Can you borrow from this market "
   canBorrowFrom: Boolean!
 
+  # TODO: Should be an array, needs to be calculated per currency
   " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
   maximumLTV: BigDecimal!
 
+  # TODO: maximumLTV == liquidationThreshold
   " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
   liquidationThreshold: BigDecimal!
 
+  # TODO
   " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
   liquidationPenalty: BigDecimal!
 
   " Token that need to be deposited to take a position in protocol "
   inputToken: Token!
 
+  # TODO: How can an ERC-1155 br used?
   " Token that is minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist "
   outputToken: Token
 
@@ -598,6 +603,7 @@ type Market @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  # TODO: pending
   " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
   exchangeRate: BigDecimal
 
@@ -749,6 +755,7 @@ type MarketDailySnapshot @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  # TODO: pending
   " Amount of input token per full share of output token. Only applies when the output token exists "
   exchangeRate: BigDecimal
 
@@ -845,6 +852,7 @@ type MarketHourlySnapshot @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  # TODO: pending
   " Amount of input token per full share of output token. Only applies when the output token exists "
   exchangeRate: BigDecimal
 
@@ -916,9 +924,6 @@ type Account @entity {
 
   " All liquidation events where this account got liquidated "
   liquidations: [Liquidate!]! @derivedFrom(field: "liquidatee")
-
-#   " Portfolio "
-#   portfolio: [Asset!]!
 }
 
 type Position @entity {
@@ -1235,6 +1240,7 @@ type Liquidate @entity {
   " Amount of collateral liquidated in USD "
   amountUSD: BigDecimal!
 
+  # TODO: pending
   " Amount of profit from liquidation in USD "
   profitUSD: BigDecimal!
 }
@@ -1258,17 +1264,13 @@ type Asset @entity {
   "Reference to currency that this balance represents"
   currency: String!
 
-  "Timestamp when fCash matures, if liquidity token this will still refer to fCash maturity date"
+  "Timestamp when fCash matures"
   maturity: BigInt!
 
   "Date when assets will be settled, quarterly for liquidity tokens and at maturity for fCash"
   settlementDate: BigInt!
 
-#   We only maintain fCash
-#   "Asset type"
-#   assetType: AssetType!
-
-  "Notional amount"
+  "Native token amount (Notional fCash)"
   notional: BigInt!
 
   lastUpdateBlockHash: Bytes!

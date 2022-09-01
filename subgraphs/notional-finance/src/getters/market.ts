@@ -12,6 +12,8 @@ import {
   SECONDS_PER_HOUR,
   ZERO_ADDRESS,
 } from "../common/constants";
+import { getTokenFromCurrency } from "../common/helpers";
+import { getOrCreateInterestRate } from "./InterestRate";
 import { getOrCreateLendingProtocol } from "./protocol";
 
 // TODO: create all tokens necessary
@@ -26,6 +28,8 @@ export function getOrCreateMarket(
   event: ethereum.Event,
   marketId: string
 ): Market {
+  // TODO: update this to smart contract and use market.name everywhere else?
+  // TODO: create the marketId here to avoid inconsistency
   let market = Market.load(marketId);
 
   if (market == null) {
@@ -33,50 +37,54 @@ export function getOrCreateMarket(
     protocol.totalPoolCount += 1;
     protocol.save();
 
-    //
+    // market metadata
     market = new Market(marketId);
     market.protocol = protocol.id;
-    market.name = "";
+    market.name = marketId;
 
-    //
+    // market properties
     market.isActive = true;
-    market.canUseAsCollateral = false;
+    market.canUseAsCollateral = true; // positive fCash balances can be used collateral
     market.canBorrowFrom = true;
     market.maximumLTV = BIGDECIMAL_ZERO;
     market.liquidationThreshold = BIGDECIMAL_ZERO;
+    // TODO: based on currencyID, set the LiquidationPenalty
+    // SHOULD THIS BE FETCHED FROM CONTRACT?
+    // Pulling from LIQUIDATION_DISCOUNT_PERCENT_CURRENCY Constants
     market.liquidationPenalty = BIGDECIMAL_ZERO;
 
     // market tokens
-    market.inputToken = "";
+    let currencyId = market.id.split("-")[0];
+    market.inputToken = getTokenFromCurrency(event, currencyId).id;
+    // TODO: ERC-1155 fCash
+    // ERC1155Action - 0xBf12d7e41a25f449293AB8cd1364Fe74A175bFa5
+    // Notional ERC1155 Token - https://etherscan.io/token/0x1344a36a1b56144c3bc62e7757377d288fde0369#inventory
     market.outputToken = "";
     market.rewardTokens = [];
-
+    market.inputTokenBalance = BIGINT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.outputTokenSupply = BIGINT_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.rates = [];
-    // notional finance is fixed interest rate
-    //market.stableBorrowRate
+    market.exchangeRate = BIGDECIMAL_ZERO;
 
+    // revenue
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
     market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
     market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
     market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-    market.inputTokenBalance = BIGINT_ZERO;
-    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
-    market.outputTokenSupply = BIGINT_ZERO;
-    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    market.exchangeRate = BIGDECIMAL_ZERO;
     market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-    market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+    market.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+    market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
 
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
 
-    // TODO: needs to be verified
-    // account/position data
+    // positions
     // market.positions - derived
     market.positionCount = INT_ZERO;
     market.openPositionCount = INT_ZERO;
@@ -102,10 +110,10 @@ export function getOrCreateMarket(
 }
 
 export function getOrCreateMarketDailySnapshot(
-  event: ethereum.Event
+  event: ethereum.Event,
+  marketId: string
 ): MarketDailySnapshot {
   let dailyId = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let marketId = event.address.toHexString();
   let id = "daily-" + marketId + "-" + dailyId.toString();
 
   let protocol = getOrCreateLendingProtocol();
@@ -158,11 +166,11 @@ export function getOrCreateMarketDailySnapshot(
 }
 
 export function getOrCreateMarketHourlySnapshot(
-  event: ethereum.Event
+  event: ethereum.Event,
+  marketId: string
 ): MarketHourlySnapshot {
   // Hours since Unix epoch time
   let hourlyId = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
-  let marketId = event.address.toHexString();
   let id = "hourly-" + marketId + "-" + hourlyId.toString();
 
   let protocol = getOrCreateLendingProtocol();

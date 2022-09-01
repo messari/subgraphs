@@ -1,4 +1,4 @@
-import { ethereum } from "@graphprotocol/graph-ts";
+import { ethereum, log } from "@graphprotocol/graph-ts";
 import { Account } from "../../generated/schema";
 import { getOrCreateLendingProtocol } from "./protocol";
 
@@ -7,6 +7,7 @@ export function getOrCreateAccount(
   event: ethereum.Event
 ): Account {
   let account = Account.load(accountId);
+
   if (!account) {
     account = new Account(accountId);
     account.positionCount = 0;
@@ -30,5 +31,6 @@ export function getOrCreateAccount(
     protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
+
   return account;
 }

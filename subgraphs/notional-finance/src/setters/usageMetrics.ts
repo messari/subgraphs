@@ -16,7 +16,6 @@ import {
 } from "../getters/usageMetrics";
 import { getOrCreateAccount } from "../getters/account";
 import { addToArrayAtIndex } from "../common/arrays";
-import { getOrCreatePosition } from "../getters/transactions";
 
 export function updateUsageMetrics(
   event: ethereum.Event,
@@ -106,7 +105,6 @@ export function updateUsageMetrics(
   usageDailySnapshot.save();
 }
 
-// Fails when enab
 export function addAccountToProtocol(
   transactionType: string,
   account: Account,

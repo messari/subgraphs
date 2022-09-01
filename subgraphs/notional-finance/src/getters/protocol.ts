@@ -37,7 +37,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.totalPoolCount = constants.INT_ZERO;
     protocol.openPositionCount = constants.INT_ZERO;
     protocol.cumulativePositionCount = constants.INT_ZERO;
-    // TODO: typed array?
     protocol.depositors = [];
     protocol.borrowers = [];
     protocol.liquidatees = [];

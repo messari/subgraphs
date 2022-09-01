@@ -104,10 +104,14 @@ export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 export const UNPROVIDED_NAME: string = "NOT_PROVIDED";
 
+// TODO: fix this namespace
+// export namespace TokenAddress {
 export const cETH_ADDRESS = "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5";
 export const cDAI_ADDRESS = "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643";
 export const cUSDC_ADDRESS = "0x39AA39c021dfbaE8faC545936693aC917d5E7563";
-export const cWBTC_ADDRESS = "0xC11b1268C1A384e55C48c2391d8d480264A3A7F4";
+// export const cWBTC_ADDRESS = "0xC11b1268C1A384e55C48c2391d8d480264A3A7F4";
+export const cWBTC_ADDRESS = "0xccf4429db6322d5c611ee964527d42e5d685dd6a";
+// }
 
 ////////////////////////
 ///// Type Helpers /////
@@ -168,13 +172,10 @@ export const PROTOCOL_NETWORK = Network.MAINNET;
 // lending
 export const PROTOCOL_TYPE = ProtocolType.LENDING;
 export const PROTOCOL_LENDING_TYPE = LendingType.POOLED;
+// TODO: verify
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_INTEREST_RATE_TYPE = InterestRateType.FIXED;
 export const PROTOCOL_INTEREST_RATE_SIDE = InterestRateSide.BORROWER;
-
-// treasury
-// export const PROTOCOL_INITIAL_TREASURY_FEE = BigDecimal.fromString("0.005");
-// export const PROTOCOL_GLOBAL_PARAMS_TREASURY_FEE_KEY = "TREASURY_FEE";
 
 // contracts/addresses
 export const PROTOCOL_ID = "0x1344A36A1B56144C3Bc62E7757377D288fDE0369";
@@ -186,3 +187,23 @@ export namespace PoolId {
   export const USDC_POOL = 3;
   export const WBTC_POOL = 4;
 }
+
+// revenue
+export const NOTIONAL_TRADE_FEES = BigDecimal.fromString("0.003");
+export const NOTIONAL_USER_REVENUE_SHARE = BigDecimal.fromString("0.80");
+export const NOTIONAL_PROTOCOL_REVENUE_SHARE = BigDecimal.fromString("0.20");
+
+export const RATE_PRECISION = 1000000000;
+export const BASIS_POINTS = 100000;
+export const DAY = 86400;
+export const WEEK = DAY * 6;
+export const MONTH = DAY * 30;
+export const QUARTER = DAY * 90;
+export const YEAR = QUARTER * 4;
+
+// TODO: fix this namespace
+// liquidity discounts (liquidator) -> liquidation penalty (liquidatee)
+export const LIQUIDATION_DISCOUNT_PERCENT_ETH = 6;
+export const LIQUIDATION_DISCOUNT_PERCENT_DAI = 4;
+export const LIQUIDATION_DISCOUNT_PERCENT_USDC = 4;
+export const LIQUIDATION_DISCOUNT_PERCENT_WBTC = 7;
