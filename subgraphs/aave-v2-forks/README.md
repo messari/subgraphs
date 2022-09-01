@@ -54,6 +54,10 @@ When a transaction occurs in the `lendingPool` the following events are emitted 
 ### Notes
 
 - Avalanche oracles return prices offset by 8 decimals for some reason.
+- Liquidity index (used to calculate revenue) is initialized to 1e27, not 0
+- Geist CRV market does not return asset price for the first 3 days. So we need to use spooky swap LP pair
+- "Platform Fees" on Geist's own dashboard include transfers to the staking contracts as well. This is why it is inflated compared to our TVL
+  - Our Geist subgraph TVL only takes into account interest from borrows
 
 ### Problems
 

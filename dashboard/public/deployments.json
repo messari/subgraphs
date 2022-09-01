@@ -60,6 +60,7 @@
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-arbitrum",
             "avalanche": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-avalanche",
             "bsc": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-bsc",
+            "harmony": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-harmony",
             "celo": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-celo",
             "fantom": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-fantom",
             "fuse": "https://api.thegraph.com/subgraphs/name/messari/sushiswap-fuse",

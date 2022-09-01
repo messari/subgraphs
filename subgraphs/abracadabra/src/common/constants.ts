@@ -91,6 +91,7 @@ export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // c
 export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // created block 10042267
 export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // created block 10093341
 export const USD_BTC_ETH_ABRA_ADDRESS = "0x5958a8db7dfe0cc49382209069b00f54e17929c2";
+export const AVAX_JOE_BAR_MARKET_ADDRESS = "0x3b63f81ad1fc724e44330b4cf5b5b6e355ad964b";
 
 ////////////////////////
 ///// Type Helpers /////
@@ -193,5 +194,5 @@ export const BSC_NETWORK = "bsc";
 export const AVALANCHE_NETWORK = "avalanche";
 
 export const schemaVersion = "2.0.1";
-export const subgraphVersion = "1.2.7";
+export const subgraphVersion = "1.2.8";
 export const methodologyVersion = "1.0.0";

@@ -18,8 +18,6 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { updateRevenueSnapshots } from "./Revenue";
-import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
 
 export function createWithdrawTransaction(
   pool: LiquidityPoolStore,
@@ -80,36 +78,6 @@ export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
   metricsHourlySnapshot.save();
 
   protocol.save();
-}
-
-export function getRemoveLiquidityFeesUSD(
-  poolAddress: Address,
-  inputTokens: Address[],
-  fees: BigInt[],
-  block: ethereum.Block
-): BigDecimal {
-  if (fees.length == 0) {
-    return constants.BIGDECIMAL_ZERO;
-  }
-
-  let totalFeesUSD = constants.BIGDECIMAL_ZERO;
-  for (let idx = 0; idx < inputTokens.length; idx++) {
-    if (fees.at(idx) == constants.BIGINT_ZERO) continue;
-    if (inputTokens.at(idx).equals(poolAddress)) continue;
-
-    let inputToken = getOrCreateToken(inputTokens.at(idx), block.number);
-
-    let inputTokenFee = fees
-      .at(idx)
-      .divDecimal(
-        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-      )
-      .times(inputToken.lastPriceUSD!);
-
-    totalFeesUSD = totalFeesUSD.plus(inputTokenFee);
-  }
-
-  return totalFeesUSD;
 }
 
 export function Withdraw(
@@ -182,25 +150,11 @@ export function Withdraw(
     block
   );
 
-  let protocolSideRevenueUSD = getRemoveLiquidityFeesUSD(
-    poolAddress,
-    inputTokens,
-    fees,
-    block
-  );
-
-  updateRevenueSnapshots(
-    pool,
-    constants.BIGDECIMAL_ZERO,
-    protocolSideRevenueUSD,
-    block
-  );
-
   utils.updateProtocolTotalValueLockedUSD();
   UpdateMetricsAfterWithdraw(block);
 
   log.info(
-    "[RemoveLiquidity] LiquidityPool: {}, sharesBurnt: {}, inputTokenBalances: [{}], withdrawnAmounts: [{}], withdrawAmountUSD: {}, fees: [{}], feesUSD: {}, TxnHash: {}",
+    "[RemoveLiquidity] LiquidityPool: {}, sharesBurnt: {}, inputTokenBalances: [{}], withdrawnAmounts: [{}], withdrawAmountUSD: {}, fees: [{}], TxnHash: {}",
     [
       poolAddress.toHexString(),
       outputTokenBurntAmount.toString(),
@@ -208,7 +162,6 @@ export function Withdraw(
       withdrawnTokenAmounts.join(", "),
       withdrawAmountUSD.truncate(1).toString(),
       fees.join(", "),
-      protocolSideRevenueUSD.truncate(1).toString(),
       transaction.hash.toHexString(),
     ]
   );
