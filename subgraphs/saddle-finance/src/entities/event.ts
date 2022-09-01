@@ -43,7 +43,7 @@ export function createDeposit(
   deposit.amountUSD = getTokenAmountsSumUSD(
     event,
     deposit.inputTokenAmounts,
-    pool.inputTokens
+    pool._inputTokensOrdered
   );
   deposit.save();
   handlePoolDeposit(event, pool, deposit);
@@ -77,7 +77,7 @@ export function createWithdraw(
   withdraw.amountUSD = getTokenAmountsSumUSD(
     event,
     withdraw.inputTokenAmounts,
-    pool.inputTokens
+    pool._inputTokensOrdered
   );
   withdraw.save();
   handlePoolWithdraw(event, pool, withdraw);

@@ -24,6 +24,26 @@
       "name": "sUSDv2",
       "address": "0x824dcD7b044D60df2e89B1bB888e66D8BCf41491",
       "startBlock": 13806669
+    },
+    {
+      "name": "USDCfraxBP",
+      "address": "0x13Cc34Aa8037f722405285AD2C82FE570bfa2bdc",
+      "startBlock": 15035844
+    },
+    {
+      "name": "FRAXBPsUSD",
+      "address": "0x69baa0d7c2e864b74173922ca069ac79d3be1556",
+      "startBlock": 15035847
+    },
+    {
+      "name": "FRAXBPalUSD",
+      "address": "0xfb516cf3710fc6901f2266aaeb8834cf5e4e9558",
+      "startBlock": 15072390
+    },
+    {
+      "name": "USDCUSX",
+      "address": "0x2bff1b48cc01284416e681b099a0cddca0231d72",
+      "startBlock": 15103092
     }
   ],
   "deployers": [
