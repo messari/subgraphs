@@ -45,38 +45,45 @@ function DeploymentsPage({ ProtocolsToQuery, getData }: DeploymentsPageProps) {
       const decenDepos: { [x: string]: any } = { exchanges: {}, lending: {}, vaults: {}, generic: {} };
       const subs = decentralized.graphAccount.subgraphs;
       subs.forEach((sub: any, idx: number) => {
-        let name = sub.currentVersion.subgraphDeployment.originalName.toLowerCase().split(" ");
-        name.pop();
-        name = name.join("-");
-        const network = sub.currentVersion.subgraphDeployment.network.id;
-        const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
-        const subgraphId = sub.id;
-        const schemaVersion = sub.currentVersion.subgraphDeployment.schema
-          .split("\n")
-          .join("")
-          .split("#")
-          .find((x: string[]) => x.includes("Version:"))
-          .split("Version:")[1]
-          .trim();
-        const protocolTypeRaw = sub.currentVersion.subgraphDeployment.schema
-          .split("\n")
-          .join("")
-          .split("#")
-          .find((x: string[]) => x.includes("Subgraph Schema:"))
-          .split("Subgraph Schema:")[1]
-          .trim();
-        let protocolType = "generic";
-        if (protocolTypeRaw.toUpperCase().includes("LEND")) {
-          protocolType = "lending";
-        } else if (
-          protocolTypeRaw.toUpperCase().includes("EXCHANGE") ||
-          protocolTypeRaw.toUpperCase().includes("DEX")
-        ) {
-          protocolType = "exchanges";
-        } else if (protocolTypeRaw.toUpperCase().includes("VAULT") || protocolTypeRaw.toUpperCase().includes("YIELD")) {
-          protocolType = "vaults";
+        try {
+          let name = sub.currentVersion?.subgraphDeployment?.originalName?.toLowerCase()?.split(" ");
+          if (!name) {
+            name = sub?.displayName?.toLowerCase()?.split(" ");
+          }
+          name.pop();
+          name = name.join("-");
+          const network = sub.currentVersion.subgraphDeployment.network.id;
+          const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
+          const subgraphId = sub.id;
+          const schemaVersion = sub.currentVersion.subgraphDeployment.schema
+            .split("\n")
+            .join("")
+            .split("#")
+            .find((x: string[]) => x.includes("Version:"))
+            .split("Version:")[1]
+            .trim();
+          const protocolTypeRaw = sub.currentVersion.subgraphDeployment.schema
+            .split("\n")
+            .join("")
+            .split("#")
+            .find((x: string[]) => x.includes("Subgraph Schema:"))
+            .split("Subgraph Schema:")[1]
+            .trim();
+          let protocolType = "generic";
+          if (protocolTypeRaw.toUpperCase().includes("LEND")) {
+            protocolType = "lending";
+          } else if (
+            protocolTypeRaw.toUpperCase().includes("EXCHANGE") ||
+            protocolTypeRaw.toUpperCase().includes("DEX")
+          ) {
+            protocolType = "exchanges";
+          } else if (protocolTypeRaw.toUpperCase().includes("VAULT") || protocolTypeRaw.toUpperCase().includes("YIELD")) {
+            protocolType = "vaults";
+          }
+          decenDepos[protocolType][name] = { network, schemaVersion, deploymentId, subgraphId };
+        } catch (err) {
+          return;
         }
-        decenDepos[protocolType][name] = { network, schemaVersion, deploymentId, subgraphId };
       });
       setDecentralizedDeployments(decenDepos);
     }
@@ -152,14 +159,6 @@ function DeploymentsPage({ ProtocolsToQuery, getData }: DeploymentsPageProps) {
           Hosted Service Subgraphs
         </Typography>
         {Object.keys(ProtocolsToQuery).map((key) => {
-          // map through Obj.keys of decentralizedDeployments[key], split them by space and lowercase. Then map through obj.keys of ProtocolsToQuery[key] and see if a similar key is found in both
-          // if (decentralizedDeployments[key]) {
-          //   Object.keys(decentralizedDeployments[key]).forEach(depo => {
-          //     const keyArr = depo.split("-")
-          //     const protocol = Object.keys(ProtocolsToQuery[key]).find(x => x.includes(keyArr[0]))
-          //   })
-          // }
-          // const allProtocolsOnKey = { ...ProtocolsToQuery[key], ...decentralizedDeployments[key] }
           return (
             <>
               <Typography
