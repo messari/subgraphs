@@ -1,11 +1,11 @@
 import axios from "axios";
 
-export const lendingPoolLevel = async (deployments) => {
+export const vaultPoolLevel = async (deployments) => {
     const endpointsList = [];
     Object.keys(deployments).forEach((depo) => {
         if (
             !deployments[depo].indexingError &&
-            deployments[depo].protocolType.toUpperCase() === "LENDING"
+            deployments[depo].protocolType.toUpperCase() === "VAULTS"
         ) {
             endpointsList.push(deployments[depo].url);
         }
@@ -20,18 +20,13 @@ export const lendingPoolLevel = async (deployments) => {
             type
             schemaVersion
         }
-      markets(first: 1000) {
+      vaults(first: 1000) {
         id
         name
         totalValueLockedUSD
         cumulativeSupplySideRevenueUSD
         cumulativeProtocolSideRevenueUSD
         cumulativeTotalRevenueUSD
-        cumulativeDepositUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
-        totalBorrowBalanceUSD
-        totalDepositBalanceUSD
         outputTokenSupply
         outputTokenPriceUSD
       }
@@ -69,7 +64,7 @@ export const lendingPoolLevel = async (deployments) => {
         .catch((err) => console.log(err));
 
     marketLevelData.forEach((protocol, idx) => {
-        console.log('marketLevelData', protocol.deployment, idx)
+        console.log('vaultLevelData', protocol.deployment, idx)
         if (!protocol?.markets) return;
         const data = protocol.markets;
         if (!data?.length) return;
@@ -131,49 +126,6 @@ export const lendingPoolLevel = async (deployments) => {
                 issuesArrays[currentIssueField].push(buildIssue(value));
             }
 
-            currentIssueField = "cumulativeDepositUSD";
-            if (!(parseFloat(instance[currentIssueField]) > 100) && !issuesArrays[currentIssueField]?.includes(instance.id)) {
-                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField])));
-            }
-
-            if (
-                !(
-                    parseFloat(instance.cumulativeDepositUSD) >=
-                    parseFloat(instance.cumulativeBorrowUSD)
-                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
-            ) {
-                issuesArrays.cumulativeBorrowUSD.push(buildIssue(instance.cumulativeBorrowUSD + " > " + instance.cumulativeDepositUSD));
-            }
-
-            currentIssueField = "cumulativeLiquidateUSD";
-            if (
-                !(
-                    parseFloat(instance[currentIssueField]) <=
-                    parseFloat(instance.cumulativeBorrowUSD)
-                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
-            ) {
-                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField]) + " > " + parseFloat(instance.cumulativeBorrowUSD)));
-            }
-
-            currentIssueField = "totalBorrowBalanceUSD";
-            if (
-                !(
-                    parseFloat(instance[currentIssueField]) <=
-                    parseFloat(instance.cumulativeBorrowUSD)
-                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
-            ) {
-                issuesArrays[currentIssueField].push(buildIssue(instance[currentIssueField] + " < " + instance.cumulativeBorrowUSD));
-            }
-
-            currentIssueField = "totalDepositBalanceUSD";
-            if (
-                !(
-                    parseFloat(instance[currentIssueField]) >=
-                    parseFloat(instance.totalBorrowBalanceUSD)
-                ) && !issuesArrays[currentIssueField]?.includes(instance.id)
-            ) {
-                issuesArrays[currentIssueField].push(buildIssue(instance[currentIssueField] + " < " + instance.totalBorrowBalanceUSD));
-            }
 
             currentIssueField = "outputTokenSupply";
             if (!(parseFloat(instance[currentIssueField]) >= 0) && !issuesArrays[currentIssueField]?.includes(instance.id)) {

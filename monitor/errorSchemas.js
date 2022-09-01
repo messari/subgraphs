@@ -17,3 +17,37 @@ export const protocolErrorMessages = {
     totalBorrowBal: "Protocol level totalBorrowBalanceUSD has an unexpected value. The protocols listed below have a lower totalDepositBalanceUSD than totalBorrowBalanceUSD.",
     cumulativeLiquidate: "Protocol level cumulativeLiquidateUSD has an unexpected value. The protocols listed below have a lower cumulativeBorrowUSD than cumulativeLiquidateUSD.",
 }
+
+export const errorsObj = {
+    lending: {
+        totalValueLockedUSD: [],
+        cumulativeSupplySideRevenueUSD: [],
+        cumulativeProtocolSideRevenueUSD: [],
+        cumulativeTotalRevenueUSD: [],
+        cumulativeDepositUSD: [],
+        cumulativeBorrowUSD: [],
+        cumulativeLiquidateUSD: [],
+        totalBorrowBalanceUSD: [],
+        totalDepositBalanceUSD: [],
+        outputTokenSupply: [],
+        outputTokenPriceUSD: [],
+    },
+    exchanges: {
+        totalValueLockedUSD: [],
+        cumulativeSupplySideRevenueUSD: [],
+        cumulativeProtocolSideRevenueUSD: [],
+        cumulativeTotalRevenueUSD: [],
+        cumulativeDepositUSD: [],
+        cumulativeVolumeUSD: [],
+        outputTokenSupply: [],
+        outputTokenPriceUSD: [],
+    },
+    vaults: {
+        totalValueLockedUSD: [],
+        cumulativeSupplySideRevenueUSD: [],
+        cumulativeProtocolSideRevenueUSD: [],
+        cumulativeTotalRevenueUSD: [],
+        outputTokenSupply: [],
+        outputTokenPriceUSD: [],
+    }
+}
