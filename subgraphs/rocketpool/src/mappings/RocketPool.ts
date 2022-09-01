@@ -21,7 +21,11 @@ import {
 import {
   MinipoolEnqueued,
   MinipoolRemoved,
+  MinipoolDequeued,
 } from "../../generated/rocketMinipoolQueue/rocketMinipoolQueue";
+
+import { BalancesUpdated } from "../../generated/rocketNetworkBalances/rocketNetworkBalances";
+
 import { rocketNetworkPrices } from "../../generated/rocketNodeStaking/rocketNetworkPrices";
 import { ERC20 } from "../../generated/rocketVault/ERC20";
 import { getOrCreateToken } from "../entities/token";
@@ -45,6 +49,7 @@ import {
   BIGINT_TEN_TO_EIGHTEENTH,
   NETWORKENCODE,
   PRICEENCODE,
+  NODEDEPOSIT_ENCODE,
   STORAGE,
   ONE_ETH_IN_WEI,
   BIGDECIMAL_ONE,
@@ -52,50 +57,74 @@ import {
 import { getOrCreatePool } from "../entities/pool";
 import { getOrCreateProtocol } from "../entities/protocol";
 
-export function handleEtherDeposit(event: EtherDeposited): void {
-  let rpl_amt = BIGINT_ZERO;
-  const rpl_amount = ERC20.bind(
-    Address.fromString(RPL_ADDRESS)
-  ).try_totalSupply();
-  if (rpl_amount.reverted) {
-    log.info("RPL Amount call reverted", []);
-  } else {
-    rpl_amt = rpl_amount.value;
-  }
-
-  updateProtocolAndPoolTvl(event.block, event.params.amount, rpl_amt);
-  updateSnapshotsTvl(event.block);
-}
-
-export function handleEtherWithdrawn(event: EtherWithdrawn): void {
-  let rpl_amt = BIGINT_ZERO;
-  const rpl_amount = ERC20.bind(
-    Address.fromString(RPL_ADDRESS)
-  ).try_totalSupply();
-  if (rpl_amount.reverted) {
-    log.info("RPL Amount call reverted", []);
-  } else {
-    rpl_amt = rpl_amount.value;
-  }
-
-  updateProtocolAndPoolTvl(
-    event.block,
-    BIGINT_NEGATIVE_ONE.times(event.params.amount),
-    rpl_amt
-  );
-  updateSnapshotsTvl(event.block);
-}
-
 /** Queries Storage Address for current address of encode. encode is the string of the name of the rocketpool contract, which has been keccack256(abi.unpack(string)) in solidity. */
 function getStorageAddress(encode: Bytes): Address {
   const storage = RocketStorage.bind(Address.fromString(STORAGE));
   let address = storage.try_getAddress(encode);
   if (address.reverted) {
-    log.info("fees address call reverted", []);
+    log.info("getStorageAddress call reverted", []);
     return Address.fromString("0x0000000000000000000000000000000000000000");
   } else {
     return Address.fromBytes(address.value);
   }
+}
+
+/** handleEtherDeposit tracks ether deposited into rocketpool, which represents the TVL of the ETH staked in the pool. */
+export function handleEtherDeposit(event: EtherDeposited): void {
+  updateUsageMetrics(event.block, event.transaction.from);
+  updateProtocolAndPoolTvl(event.block, event.params.amount, "staking");
+  updateSnapshotsTvl(event.block, "staking");
+}
+
+/** handleEtherWithdrawn tracks ether withdrawn into rocketpool, which represents the TVL of the ETH staked in the pool. */
+
+export function handleEtherWithdrawn(event: EtherWithdrawn): void {
+  updateUsageMetrics(event.block, event.transaction.from);
+  updateProtocolAndPoolTvl(
+    event.block,
+    BIGINT_NEGATIVE_ONE.times(event.params.amount),
+    "staking"
+  );
+  updateSnapshotsTvl(event.block, "staking");
+}
+
+/** handleMinipoolEnqeued represents the 16 Eth enqued by a Node Manager to be deployed by the protocol. This is represented in the TVL of the network.*/
+export function handleMinipoolEnqueued(event: MinipoolEnqueued): void {
+  updateUsageMetrics(event.block, event.transaction.from);
+  updateProtocolAndPoolTvl(
+    event.block,
+    event.transaction.value,
+    event.params.minipool.toString()
+  );
+  updateSnapshotsTvl(event.block, event.params.minipool.toString());
+}
+
+/** handleMinipoolDeqeued represents the Eth being dequeued by a Node Manager. It has either received 16 staked eth from stakers,
+ * in which case the TVL is unchanged, or has been removed prematurely by the Node Manager.
+ * In this scenario, the value is subtracted from the TVL of the network.*/
+export function handleMinipoolDequeued(event: MinipoolDequeued): void {
+  const deposit_address = getStorageAddress(NODEDEPOSIT_ENCODE);
+
+  if (event.transaction.to != deposit_address) {
+    updateUsageMetrics(event.block, event.transaction.from);
+    updateProtocolAndPoolTvl(
+      event.block,
+      BIGINT_NEGATIVE_ONE.times(event.transaction.value),
+      event.params.minipool.toString()
+    );
+    updateSnapshotsTvl(event.block, event.params.minipool.toString());
+  }
+}
+
+/** handleMinipoolRemoved represents a Minipool being dissolved by a Node Manager. The value of the transaction is subtracted from the TVL of the network.*/
+export function handleMinipoolRemoved(event: MinipoolRemoved): void {
+  updateUsageMetrics(event.block, event.transaction.from);
+  updateProtocolAndPoolTvl(
+    event.block,
+    BIGINT_NEGATIVE_ONE.times(event.transaction.value),
+    event.params.minipool.toString()
+  );
+  updateSnapshotsTvl(event.block, event.params.minipool.toString());
 }
 
 // Handle RPL staked, withdrawn, slashed -> Effective proxy for amount of ETH deposited by node managers
@@ -120,9 +149,19 @@ export function handleRPLStaked(event: RPLStaked): void {
   }
 
   updateUsageMetrics(event.block, event.params.from);
-  updateProtocolSideRevenueMetrics(event.block, bigIntToBigDecimal(eth_amt));
-  updateTotalRevenueMetrics(event.block, bigIntToBigDecimal(eth_amt), rpl_amt);
-  updateSupplySideRevenueMetrics(event.block);
+  updateProtocolSideRevenueMetrics(
+    event.block,
+    bigIntToBigDecimal(eth_amt),
+    event.params.from.toString()
+  );
+  updateTotalRevenueMetrics(
+    event.block,
+    bigIntToBigDecimal(eth_amt),
+    rpl_amt,
+    event.params.from.toString()
+  );
+  updateProtocolAndPoolTvl(event.block, eth_amt, event.params.from.toString());
+  updateSnapshotsTvl(event.block, event.params.from.toString());
 }
 
 export function handleRPLWithdrawn(event: RPLWithdrawn): void {
@@ -144,9 +183,23 @@ export function handleRPLWithdrawn(event: RPLWithdrawn): void {
   }
 
   updateUsageMetrics(event.block, event.params.to);
-  updateProtocolSideRevenueMetrics(event.block, bigIntToBigDecimal(eth_amt));
-  updateTotalRevenueMetrics(event.block, bigIntToBigDecimal(eth_amt), rpl_amt);
-  updateSupplySideRevenueMetrics(event.block);
+  updateProtocolSideRevenueMetrics(
+    event.block,
+    bigIntToBigDecimal(eth_amt),
+    event.params.to.toString()
+  );
+  updateTotalRevenueMetrics(
+    event.block,
+    bigIntToBigDecimal(eth_amt),
+    rpl_amt,
+    event.params.to.toString()
+  );
+  updateProtocolAndPoolTvl(
+    event.block,
+    eth_amt.times(BIGINT_NEGATIVE_ONE),
+    event.params.to.toString()
+  );
+  updateSnapshotsTvl(event.block, event.params.to.toString());
 }
 
 export function handleRPLSlashed(event: RPLSlashed): void {
@@ -168,9 +221,17 @@ export function handleRPLSlashed(event: RPLSlashed): void {
   }
 
   updateUsageMetrics(event.block, event.params.node);
-  updateProtocolSideRevenueMetrics(event.block, bigIntToBigDecimal(eth_amt));
-  updateTotalRevenueMetrics(event.block, bigIntToBigDecimal(eth_amt), rpl_amt);
-  updateSupplySideRevenueMetrics(event.block);
+  updateProtocolSideRevenueMetrics(
+    event.block,
+    bigIntToBigDecimal(eth_amt),
+    event.params.node.toString()
+  );
+  updateTotalRevenueMetrics(
+    event.block,
+    bigIntToBigDecimal(eth_amt),
+    rpl_amt,
+    event.params.node.toString()
+  );
 }
 /**
  * Save a new RPL stake transaction.
@@ -191,172 +252,11 @@ function RPLamountinEth(event: ethereum.Event, amount: BigInt): BigInt {
   return ethAmount;
 }
 
+function handleBalanceUpdate(event: BalancesUpdated): void {
+  const BeaconChainRewardEth = event.params.totalEth
+    .minus(event.params.stakingEth)
+    .div(ONE_ETH_IN_WEI);
+}
+
 // RPL rewards event -> can be used to find amount of rewards distributed
 //https://github.com/Data-Nexus/rocket-pool-mainnet/blob/master/src/mappings/rocketRewardsPoolMapping.ts
-
-export function handleMinipoolEnqueued(event: MinipoolEnqueued): void {
-  updateProtocolSideRevenueMetrics(event.block, BigDecimal.fromString("16.0"));
-
-  let rpl_amt = BIGINT_ZERO;
-  const rpl_amount = ERC20.bind(
-    Address.fromString(RPL_ADDRESS)
-  ).try_totalSupply();
-  if (rpl_amount.reverted) {
-    log.info("RPL Amount call reverted", []);
-  } else {
-    rpl_amt = rpl_amount.value;
-  }
-
-  updateTotalRevenueMetrics(
-    event.block,
-    BigDecimal.fromString("16.0"),
-    rpl_amt
-  );
-  updateSupplySideRevenueMetrics(event.block);
-}
-
-export function handleMinipoolRemoved(event: MinipoolRemoved): void {
-  updateProtocolSideRevenueMetrics(event.block, BigDecimal.fromString("-16.0"));
-
-  let rpl_amt = BIGINT_ZERO;
-  const rpl_amount = ERC20.bind(
-    Address.fromString(RPL_ADDRESS)
-  ).try_totalSupply();
-  if (rpl_amount.reverted) {
-    log.info("RPL Amount call reverted", []);
-  } else {
-    rpl_amt = rpl_amount.value;
-  }
-
-  updateTotalRevenueMetrics(
-    event.block,
-    BigDecimal.fromString("-16.0"),
-    rpl_amt
-  );
-  updateSupplySideRevenueMetrics(event.block);
-}
-
-// export function handleBalanceUpdate(event: BalancesUpdated): void {
-//   const protocol = getOrCreateProtocol();
-//   const rewardEth = event.params.totalEth.minus(event.params.stakingEth);
-
-//   // total reward Eth
-
-//   // staking eth - (minipool count * 16) = supply side eth
-
-//   // protocol side reward eth = ((minipool count * 16) / staking eth) * reward eth
-
-//   let fee = BIGINT_ZERO;
-
-//   const storage = RocketStorage.bind(Address.fromString(STORAGE));
-//   let fees_address = storage.try_getAddress(NETWORKENCODE);
-//   if (fees_address.reverted) {
-//     log.info("fees address call reverted", []);
-//   } else {
-//     const fees_contract = rocketNetworkFees.bind(
-//       Address.fromBytes(fees_address.value)
-//     );
-//     let fees_call = fees_contract.try_getNodeFee();
-//     if (fees_call.reverted) {
-//       log.info("fees address call reverted", []);
-//     } else {
-//       fee = fees_call.value;
-//     }
-
-//     // const amt = BIGDECIMAL_HALF.times(
-//     //   bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
-//     // ).plus(
-//     //   BIGDECIMAL_HALF.times(
-//     //     bigIntToBigDecimal(rewardEth).minus(protocol.cumulativeTotalRevenueUSD)
-//     //   ).times(
-//     //     bigIntToBigDecimal(fee).div(new BigDecimal(BIGINT_TEN_TO_EIGHTEENTH))
-//     //   )
-//     // );
-
-//     updateTotalRevenueMetrics(
-//       event.block,
-//       bigIntToBigDecimal(rewardEth),
-//       event.params.rethSupply
-//     );
-//     updateProtocolSideRevenueMetrics(
-//       event.block,
-//       bigIntToBigDecimal(rewardEth)
-//     );
-//     updateSupplySideRevenueMetrics(event.block);
-
-//   }
-// }
-
-// export function handleNodeDeposit(event: DepositReceived): void {
-//   let rpl_amt = BIGINT_ZERO;
-//   const rpl_amount = ERC20.bind(
-//     Address.fromString(RPL_ADDRESS)
-//   ).try_totalSupply();
-//   if (rpl_amount.reverted) {
-//     log.info("RPL Amount call reverted", []);
-//   } else {
-//     rpl_amt = rpl_amount.value;
-//   }
-
-//   updateUsageMetrics(event.block, event.params.from);
-//   updateProtocolAndPoolTvl(event.block, event.params.amount, rpl_amt);
-//   updateSnapshotsTvl(event.block);
-// }
-
-// // export function handleDeposit(event: DepositReceived): void {
-// //   // update Token lastPrice and lastBlock
-// //   getOrCreateToken(Address.fromString(ETH_ADDRESS), event.block.number);
-// //   getOrCreateToken(Address.fromString(RETH_ADDRESS), event.block.number);
-
-// //   // get pre and post pooled ether
-// //   let preTotalPooledEther = BIGINT_ZERO;
-// //   let postTotalPooledEther = BIGINT_ZERO;
-
-// //   // get total shares
-// //   let totalShares = BIGINT_ZERO;
-// //   let rEth = RETH.bind(Address.fromString(RETH_ADDRESS));
-// //   // total shares == total supply? I think yes that coresponds to RETH
-// //   let getTotalSharesCallResult = rEth.try_totalSupply();
-
-// //   if (getTotalSharesCallResult.reverted) {
-// //     log.info("rEth call reverted", []);
-// //   } else {
-// //     totalShares = getTotalSharesCallResult.value;
-// //   }
-
-// //   // get node operators
-// //   let sender = event.params.from;
-// //   let value = event.params.amount;
-
-// //   postTotalPooledEther = value;
-
-// //   const pool = getOrCreatePool(event.block.number, event.block.timestamp);
-
-// //   // update metrics
-
-// //   // require total shares, new minted tokens which can be gotten from deposit()
-// //   // totalshares = reth token.total_supply() ??
-
-// //   updateUsageMetrics(event.block, sender);
-
-// //   // staker tvl = sum of eth staked in staking pool
-// //   // protocol - 16 for each minipool
-// //   // remove on unstake
-// //   updateProtocolAndPoolTvl(event.block, value);
-// //   updateSnapshotsTvl(event.block);
-
-// // // eth assigned in assigndeposits is all going to minipools (depositassigned amount)
-
-// //   updateProtocolSideRevenueMetrics(event.block, value);
-// //   updateTotalRevenueMetrics(
-// //     event.block,
-// //     // 0
-// //     preTotalPooledEther,
-// //     //new deposit
-// //     postTotalPooledEther,
-// //     totalShares
-// //   );
-
-// //   // supply side revenue = total tvl ()
-// //   updateSupplySideRevenueMetrics(event.block);
-// // }

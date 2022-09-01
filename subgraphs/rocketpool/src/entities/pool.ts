@@ -2,22 +2,28 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Pool } from "../../generated/schema";
 import { getOrCreateProtocol } from "./protocol";
 import { getOrCreateToken } from "./token";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, ETH_ADDRESS } from "../utils/constants";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  ETH_ADDRESS,
+  RPL_ADDRESS,
+} from "../utils/constants";
 
 // No POOL ADDRESS passed as argument because Pool == Protocol
 export function getOrCreatePool(
   blockNumber: BigInt,
-  blockTimestamp: BigInt
+  blockTimestamp: BigInt,
+  poolAddress: string
 ): Pool {
   let protocol = getOrCreateProtocol();
-  let pool = Pool.load(protocol.id);
+  let pool = Pool.load(poolAddress);
 
   if (!pool) {
-    pool = new Pool(protocol.id);
+    pool = new Pool(poolAddress);
 
     // Metadata
-    pool.name = "Rocket Pool ETH";
-    pool.symbol = "rETH";
+    pool.name = poolAddress;
+    pool.symbol = "MINIPOOL";
     pool.protocol = protocol.id;
     pool.createdTimestamp = blockTimestamp;
     pool.createdBlockNumber = blockNumber;
@@ -30,7 +36,9 @@ export function getOrCreatePool(
       Address.fromString(protocol.id),
       blockNumber
     ).id;
-    pool.rewardTokens = [];
+    pool.rewardTokens = [
+      getOrCreateToken(Address.fromString(RPL_ADDRESS), blockNumber).id,
+    ];
 
     // Quantitative Revenue Data
     pool.totalValueLockedUSD = BIGDECIMAL_ZERO;

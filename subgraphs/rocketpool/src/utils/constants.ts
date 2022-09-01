@@ -184,3 +184,7 @@ export const NETWORKENCODE = Bytes.fromHexString(
 export const PRICEENCODE = Bytes.fromHexString(
   "0xf0de2459ea3014c17544dae653d0a2712abaa43f062fbd0b6da8e03cf5a97356"
 );
+
+export const NODEDEPOSIT_ENCODE = Bytes.fromHexString(
+  "0xc5f0e8e643416573963c05884a77dfc5eba3461eb8d39b60a0a58aedca955fa5"
+);
