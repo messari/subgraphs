@@ -463,6 +463,8 @@
       "euler-finance": {
         "ethereum": {
           "template": "euler.template.yaml",
+          "messari": "messari/euler-finance-ethereum",
+          "dmelotik": "dmelotik/euler-finance-ethereum",
           "deploy-on-merge": false
         }
       }
