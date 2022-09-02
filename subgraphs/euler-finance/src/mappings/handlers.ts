@@ -46,48 +46,48 @@ export function handleAssetStatus(event: AssetStatus): void {
 }
 
 export function handleBorrow(event: Borrow): void {
-  createBorrow(event);
+  let borrowUSD = createBorrow(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.BORROW);
-  updateFinancials(event.block);
-  updateMarketDailyMetrics(event.block, marketId);
-  updateMarketHourlyMetrics(event.block, marketId);
+  updateFinancials(event.block, borrowUSD, TransactionType.BORROW);
+  updateMarketDailyMetrics(event.block, marketId, borrowUSD, TransactionType.BORROW);
+  updateMarketHourlyMetrics(event.block, marketId, borrowUSD, TransactionType.BORROW);
 }
 
 export function handleDeposit(event: Deposit): void {
-  createDeposit(event);
+  let depositUSD = createDeposit(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.DEPOSIT);
-  updateFinancials(event.block);
-  updateMarketDailyMetrics(event.block, marketId);
-  updateMarketHourlyMetrics(event.block, marketId);
+  updateFinancials(event.block, depositUSD, TransactionType.DEPOSIT);
+  updateMarketDailyMetrics(event.block, marketId, depositUSD, TransactionType.DEPOSIT);
+  updateMarketHourlyMetrics(event.block, marketId, depositUSD, TransactionType.DEPOSIT);
 }
 
 export function handleRepay(event: Repay): void {
-  createRepay(event);
+  let repayUSD = createRepay(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.REPAY);
-  updateFinancials(event.block);
-  updateMarketDailyMetrics(event.block, marketId);
-  updateMarketHourlyMetrics(event.block, marketId);
+  updateFinancials(event.block, repayUSD, TransactionType.REPAY);
+  updateMarketDailyMetrics(event.block, marketId, repayUSD, TransactionType.REPAY);
+  updateMarketHourlyMetrics(event.block, marketId, repayUSD, TransactionType.REPAY);
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  createWithdraw(event);
+  let withdrawUSD = createWithdraw(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.WITHDRAW);
-  updateFinancials(event.block);
-  updateMarketDailyMetrics(event.block, marketId);
-  updateMarketHourlyMetrics(event.block, marketId);
+  updateFinancials(event.block, withdrawUSD, TransactionType.WITHDRAW);
+  updateMarketDailyMetrics(event.block, marketId, withdrawUSD, TransactionType.WITHDRAW);
+  updateMarketHourlyMetrics(event.block, marketId, withdrawUSD, TransactionType.WITHDRAW);
 }
 
 export function handleLiquidation(event: Liquidation): void {
-  createLiquidation(event);
+  let liquidateUSD = createLiquidation(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
-  updateFinancials(event.block);
-  updateMarketDailyMetrics(event.block, marketId);
-  updateMarketHourlyMetrics(event.block, marketId);
+  updateFinancials(event.block, liquidateUSD, TransactionType.LIQUIDATE);
+  updateMarketDailyMetrics(event.block, marketId, liquidateUSD, TransactionType.LIQUIDATE);
+  updateMarketHourlyMetrics(event.block, marketId, liquidateUSD, TransactionType.LIQUIDATE);
 }
 
 export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {

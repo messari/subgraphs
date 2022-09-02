@@ -80,9 +80,8 @@ export function updateAsset(event: AssetStatus): void {
   market.save();
 }
 
-export function createBorrow(event: Borrow): void {
+export function createBorrow(event: Borrow): BigDecimal {
   const borrow = getOrCreateBorrow(event);
-  const token = getOrCreateToken(event.params.underlying);
   const marketId = event.params.underlying.toHexString();
   const tokenId = event.params.underlying.toHexString();
   const accountAddress = event.params.account;
@@ -105,9 +104,11 @@ export function createBorrow(event: Borrow): void {
     protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(borrow.amountUSD);
     protocol.save();
   }
+
+  return borrow.amountUSD;
 }
 
-export function createDeposit(event: Deposit): void {
+export function createDeposit(event: Deposit): BigDecimal {
   const deposit = getOrCreateDeposit(event);
   const marketId = event.params.underlying.toHexString();
   const tokenId = event.params.underlying.toHexString();
@@ -128,9 +129,11 @@ export function createDeposit(event: Deposit): void {
   const protocol = getOrCreateLendingProtocol();
   protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(deposit.amountUSD);
   protocol.save();
+
+  return deposit.amountUSD;
 }
 
-export function createRepay(event: Repay): void {
+export function createRepay(event: Repay): BigDecimal {
   const repay = getOrCreateRepay(event);
   const marketId = event.params.underlying.toHexString();
   const market = getOrCreateMarket(marketId);
@@ -147,9 +150,11 @@ export function createRepay(event: Repay): void {
 
   repay.save();
   market.save();
+
+  return repay.amountUSD;
 }
 
-export function createWithdraw(event: Withdraw): void {
+export function createWithdraw(event: Withdraw): BigDecimal {
   const withdraw = getOrCreateWithdraw(event);
   const marketId = event.params.underlying.toHexString();
   const market = getOrCreateMarket(marketId);
@@ -166,9 +171,11 @@ export function createWithdraw(event: Withdraw): void {
 
   withdraw.save();
   market.save();
+
+  return withdraw.amountUSD;
 }
 
-export function createLiquidation(event: Liquidation): void {
+export function createLiquidation(event: Liquidation): BigDecimal {
   const liquidation = getOrCreateLiquidate(event);
   const collateralTokenId = event.params.underlying.toHexString();
   const seizedTokenId = event.params.collateral.toHexString();
@@ -179,7 +186,7 @@ export function createLiquidation(event: Liquidation): void {
   liquidation.market = collateralTokenId;
   liquidation.asset = seizedTokenId;
   liquidation.from = event.params.liquidator.toHexString();
-  liquidation.to = market.outputToken; // eToken transfered to liquidator
+  liquidation.to = market.outputToken!; // eToken transfered to liquidator
   liquidation.liquidatee = event.params.violator.toHexString();
   liquidation.amount = event.params.repay; // Amount is denominated in underlying (not in dToken)
 
@@ -206,6 +213,8 @@ export function createLiquidation(event: Liquidation): void {
     protocol.save();
   }
   liquidation.save();
+
+  return liquidation.amountUSD;
 }
 
 function updateMarketLendingFactors(marketUtility: _MarketUtility, usdcMarketUtility: _MarketUtility): void {
@@ -416,7 +425,13 @@ export function syncWithEulerGeneralView(
     market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD
       .plus(totalRevenueSinceLastUpdate);
 
-    updateSnapshotRevenues(market.id, block, supplySideRevenueSinceLastUpdate, protocolSideRevenueSinceLastUpdate, totalRevenueSinceLastUpdate);
+    updateSnapshotRevenues(
+      market.id, 
+      block, 
+      supplySideRevenueSinceLastUpdate, 
+      protocolSideRevenueSinceLastUpdate, 
+      totalRevenueSinceLastUpdate
+    );
 
     protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
     protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);
