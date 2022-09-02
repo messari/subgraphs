@@ -364,7 +364,9 @@ export function getPoolTokenWeights(
         constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
       )
       .times(inputToken.lastPriceUSD!);
-    let weight = balanceUSD.div(totalValueLockedUSD);
+    let weight = balanceUSD
+      .div(totalValueLockedUSD)
+      .times(constants.BIGDECIMAL_HUNDRED);
 
     inputTokenWeights.push(weight);
   }
