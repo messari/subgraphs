@@ -38,7 +38,7 @@ export function createWithdrawTransaction(
     withdrawTransaction = new WithdrawTransaction(withdrawTransactionId);
 
     withdrawTransaction.vault = vaultAddress.toHexString();
-    withdrawTransaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    withdrawTransaction.protocol = constants.PROTOCOL_ID;
 
     withdrawTransaction.to = to.toHexString();
     withdrawTransaction.from = transaction.from.toHexString();

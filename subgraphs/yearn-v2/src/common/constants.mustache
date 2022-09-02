@@ -57,7 +57,7 @@ export namespace Protocol {
   export const NAME = "Yearn v2";
   export const SLUG = "yearn-v2";
   export const SCHEMA_VERSION = "1.3.0";
-  export const NETWORK = Network.MAINNET;
+  export const NETWORK = {{defaultNetwork}};
   export const SUBGRAPH_VERSION = "1.2.1";
   export const METHODOLOGY_VERSION = "1.0.0";
 }
@@ -92,9 +92,9 @@ export const DEGRADATION_COEFFICIENT = BIGINT_TEN.pow(18);
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const LOCKED_PROFIT_DEGRADATION = BigInt.fromString("46000000000000");
 
-export const PROTOCOL_ID = "0xe15461b18ee31b7379019dc523231c57d1cbc18c";
+export const PROTOCOL_ID = "{{protocolId}}";
 export const YEARN_TREASURY_VAULT = Address.fromString(
-  "0x93a62da5a14c80f265dabc077fcee437b1a0efde"
+  "{{yearnTreasuryVault}}"
 );
 
 export const MAX_UINT256 = BigInt.fromI32(
