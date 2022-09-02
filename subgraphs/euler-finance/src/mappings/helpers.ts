@@ -186,7 +186,8 @@ export function createLiquidation(event: Liquidation): BigDecimal {
   liquidation.market = collateralTokenId;
   liquidation.asset = seizedTokenId;
   liquidation.from = event.params.liquidator.toHexString();
-  liquidation.to = event.params.violator.toHexString();
+  liquidation.to = market.outputToken!; // eToken transfered to liquidator
+  liquidation.liquidatee = event.params.violator.toHexString();
   liquidation.amount = event.params.repay; // Amount is denominated in underlying (not in dToken)
 
   const collateralMarketUtility = getOrCreateMarketUtility(collateralTokenId);
@@ -427,6 +428,11 @@ export function syncWithEulerGeneralView(
       .plus(supplySideRevenueSinceLastUpdate);
     market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD
       .plus(protocolSideRevenueSinceLastUpdate);
+    market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD
+      .plus(totalRevenueSinceLastUpdate);
+
+    updateSnapshotRevenues(market.id, block, supplySideRevenueSinceLastUpdate, protocolSideRevenueSinceLastUpdate, totalRevenueSinceLastUpdate);
+
     protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
     protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);
     protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(market.totalDepositBalanceUSD);
