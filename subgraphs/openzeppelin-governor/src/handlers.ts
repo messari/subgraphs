@@ -21,7 +21,10 @@ import {
   Proposal,
   TokenHolder,
   Vote,
+  TokenDailySnapshot,
 } from "../generated/schema";
+
+export const SECONDS_PER_DAY = 60 * 60 * 24;
 
 export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
   return value.divDecimal(
@@ -56,6 +59,7 @@ export function getGovernance(): Governance {
   let governance = Governance.load(GOVERNANCE_NAME);
   if (!governance) {
     governance = new Governance(GOVERNANCE_NAME);
+    governance.tokenTotalSupply = BIGINT_ZERO;
     governance.proposals = BIGINT_ZERO;
     governance.currentTokenHolders = BIGINT_ZERO;
     governance.totalTokenHolders = BIGINT_ZERO;
@@ -121,6 +125,23 @@ export function getOrCreateTokenHolder(address: string): TokenHolder {
   }
 
   return tokenHolder as TokenHolder;
+}
+
+export function getOrCreateTokenDailySnapshot(
+  block: ethereum.Block
+): TokenDailySnapshot {
+  let snapshotId = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  let previousSnapshot = TokenDailySnapshot.load(snapshotId);
+
+  if (previousSnapshot != null) {
+    return previousSnapshot as TokenDailySnapshot;
+  }
+  let snapshot = new TokenDailySnapshot(snapshotId);
+  snapshot.totalSupply = BIGINT_ZERO;
+  snapshot.tokenHolders = BIGINT_ZERO;
+  snapshot.totalDelegates = BIGINT_ZERO;
+  snapshot.blockNumber = block.number;
+  return snapshot;
 }
 
 export function _handleProposalCreated(

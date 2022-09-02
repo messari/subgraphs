@@ -1,8 +1,9 @@
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 import {
   getGovernance,
   getOrCreateDelegate,
+  getOrCreateTokenDailySnapshot,
   getOrCreateTokenHolder,
   toDecimal,
 } from "./handlers";
@@ -54,14 +55,20 @@ export function _handleDelegateVotesChanged(
   governance.save();
 }
 
-export function _handleTransfer(from: string, to: string, value: BigInt): void {
+export function _handleTransfer(
+  from: string,
+  to: string,
+  value: BigInt,
+  event: ethereum.Event
+): void {
   let fromHolder = getOrCreateTokenHolder(from);
   let toHolder = getOrCreateTokenHolder(to);
   let governance = getGovernance();
 
-  // Deduct from from holder balance + decrement gov token holders
-  // if holder now owns 0 or increment gov token holders if new holder
-  if (from != ZERO_ADDRESS) {
+  let isBurn = to == ZERO_ADDRESS;
+  let isMint = from == ZERO_ADDRESS;
+
+  if (!isMint) {
     let fromHolderPreviousBalance = fromHolder.tokenBalanceRaw;
     fromHolder.tokenBalanceRaw = fromHolder.tokenBalanceRaw.minus(value);
     fromHolder.tokenBalance = toDecimal(fromHolder.tokenBalanceRaw);
@@ -100,4 +107,22 @@ export function _handleTransfer(from: string, to: string, value: BigInt): void {
     governance.save();
   }
   toHolder.save();
+
+  // Adjust token total supply if it changes
+  if (isMint) {
+    governance.tokenTotalSupply = governance.tokenTotalSupply.plus(value);
+    governance.save();
+  } else if (isBurn) {
+    governance.tokenTotalSupply = governance.tokenTotalSupply.minus(value);
+    governance.save();
+  }
+
+  // Take snapshot
+  let dailySnapshot = getOrCreateTokenDailySnapshot(event.block);
+  dailySnapshot.totalSupply = governance.tokenTotalSupply;
+  dailySnapshot.tokenHolders = governance.currentTokenHolders;
+  dailySnapshot.totalDelegates = governance.totalDelegates;
+  dailySnapshot.blockNumber = event.block.number;
+  dailySnapshot.timestamp = event.block.timestamp;
+  dailySnapshot.save();
 }
