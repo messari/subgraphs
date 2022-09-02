@@ -74,21 +74,13 @@ export function _handleTransfer(from: string, to: string, value: BigInt): void {
     }
 
     if (
-      fromHolder.tokenBalanceRaw == BIGINT_ZERO &&
-      fromHolderPreviousBalance > BIGINT_ZERO
+      fromHolderPreviousBalance > BIGINT_ZERO &&
+      fromHolder.tokenBalanceRaw == BIGINT_ZERO
     ) {
       governance.currentTokenHolders =
         governance.currentTokenHolders.minus(BIGINT_ONE);
       governance.save();
-    } else if (
-      fromHolder.tokenBalanceRaw > BIGINT_ZERO &&
-      fromHolderPreviousBalance == BIGINT_ZERO
-    ) {
-      governance.currentTokenHolders =
-        governance.currentTokenHolders.plus(BIGINT_ONE);
-      governance.save();
     }
-
     fromHolder.save();
   }
 
@@ -100,15 +92,8 @@ export function _handleTransfer(from: string, to: string, value: BigInt): void {
   toHolder.totalTokensHeld = toDecimal(toHolder.totalTokensHeldRaw);
 
   if (
-    toHolder.tokenBalanceRaw == BIGINT_ZERO &&
-    toHolderPreviousBalance > BIGINT_ZERO
-  ) {
-    governance.currentTokenHolders =
-      governance.currentTokenHolders.minus(BIGINT_ONE);
-    governance.save();
-  } else if (
-    toHolder.tokenBalanceRaw > BIGINT_ZERO &&
-    toHolderPreviousBalance == BIGINT_ZERO
+    toHolderPreviousBalance == BIGINT_ZERO &&
+    toHolder.tokenBalanceRaw > BIGINT_ZERO
   ) {
     governance.currentTokenHolders =
       governance.currentTokenHolders.plus(BIGINT_ONE);
