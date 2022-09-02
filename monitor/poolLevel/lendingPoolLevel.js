@@ -135,13 +135,14 @@ export const lendingPoolLevel = async (deployments) => {
                 issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField])));
             }
 
+            currentIssueField = "cumulativeBorrowUSD";
             if (
                 !(
                     parseFloat(instance.cumulativeDepositUSD) >=
                     parseFloat(instance.cumulativeBorrowUSD)
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
-                issuesArrays.cumulativeBorrowUSD.push(buildIssue(instance.cumulativeBorrowUSD + " > " + instance.cumulativeDepositUSD));
+                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField])));
             }
 
             currentIssueField = "cumulativeLiquidateUSD";
@@ -158,20 +159,19 @@ export const lendingPoolLevel = async (deployments) => {
             if (
                 !(
                     parseFloat(instance[currentIssueField]) <=
-                    parseFloat(instance.cumulativeBorrowUSD)
+                    parseFloat(instance.totalDepositBalanceUSD)
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
-                issuesArrays[currentIssueField].push(buildIssue(instance[currentIssueField] + " < " + instance.cumulativeBorrowUSD));
+                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField])));
             }
 
             currentIssueField = "totalDepositBalanceUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) >=
-                    parseFloat(instance.totalBorrowBalanceUSD)
+                    parseFloat(instance[currentIssueField]) > 1000 && parseFloat(instance[currentIssueField]) < 100000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
-                issuesArrays[currentIssueField].push(buildIssue(instance[currentIssueField] + " < " + instance.totalBorrowBalanceUSD));
+                issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField])));
             }
 
             currentIssueField = "outputTokenSupply";
