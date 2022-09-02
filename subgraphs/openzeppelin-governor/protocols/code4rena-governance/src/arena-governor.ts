@@ -18,7 +18,7 @@ import {
   _handleProposalQueued,
   _handleVoteCast,
   _handleProposalExtended,
-  getOrCreateProposal,
+  getProposal,
   getGovernance,
 } from "../../../src/handlers";
 import { ArenaGovernor } from "../../../generated/ArenaGovernor/ArenaGovernor";
@@ -93,7 +93,7 @@ function getLatestProposalValues(
   proposalId: string,
   contractAddress: Address
 ): Proposal {
-  let proposal = getOrCreateProposal(proposalId);
+  let proposal = getProposal(proposalId);
 
   // On first vote, set state and quorum values
   if (proposal.state == ProposalState.PENDING) {
