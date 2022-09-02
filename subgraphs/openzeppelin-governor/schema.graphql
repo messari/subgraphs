@@ -239,3 +239,22 @@ type TokenDailySnapshot @entity {
   "Timestamp of snapshot"
   timestamp: BigInt!
 }
+
+type VoteDailySnapshot @entity {
+  "Number of days from Unix epoch time"
+  id: ID!
+  "Proposal this snapshot is associated with"
+  proposal: Proposal!
+  "Weighted votes against the proposal at snapshot"
+  forWeightedVotes: BigInt!
+  "Weighted votes abstaining to the proposal at snapshot"
+  againstWeightedVotes: BigInt!
+  "Weighted votes for the proposal at snapshot"
+  abstainWeightedVotes: BigInt!
+  "Total weighted for/against/abstaining votes at snapshot"
+  totalWeightedVotes: BigInt!
+  "Block number of last block in snapshot"
+  blockNumber: BigInt!
+  "Timestamp of snapshot"
+  timestamp: BigInt!
+}

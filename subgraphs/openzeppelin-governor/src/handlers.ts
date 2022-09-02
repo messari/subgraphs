@@ -22,6 +22,7 @@ import {
   TokenHolder,
   Vote,
   TokenDailySnapshot,
+  VoteDailySnapshot,
 } from "../generated/schema";
 
 export const SECONDS_PER_DAY = 60 * 60 * 24;
@@ -137,10 +138,21 @@ export function getOrCreateTokenDailySnapshot(
     return previousSnapshot as TokenDailySnapshot;
   }
   let snapshot = new TokenDailySnapshot(snapshotId);
-  snapshot.totalSupply = BIGINT_ZERO;
-  snapshot.tokenHolders = BIGINT_ZERO;
-  snapshot.totalDelegates = BIGINT_ZERO;
-  snapshot.blockNumber = block.number;
+  return snapshot;
+}
+
+export function getOrCreateVoteDailySnapshot(
+  proposal: Proposal,
+  block: ethereum.Block
+): VoteDailySnapshot {
+  let snapshotId =
+    proposal.id + "-" + (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  let previousSnapshot = VoteDailySnapshot.load(snapshotId);
+
+  if (previousSnapshot != null) {
+    return previousSnapshot as VoteDailySnapshot;
+  }
+  let snapshot = new VoteDailySnapshot(snapshotId);
   return snapshot;
 }
 
@@ -315,4 +327,14 @@ export function _handleVoteCast(
   let voter = getOrCreateDelegate(voterAddress);
   voter.numberVotes = voter.numberVotes + 1;
   voter.save();
+
+  // Take snapshot
+  let dailySnapshot = getOrCreateVoteDailySnapshot(proposal, event.block);
+  dailySnapshot.proposal = proposal.id;
+  dailySnapshot.forWeightedVotes = proposal.forWeightedVotes;
+  dailySnapshot.againstWeightedVotes = proposal.againstWeightedVotes;
+  dailySnapshot.abstainWeightedVotes = proposal.abstainWeightedVotes;
+  dailySnapshot.blockNumber = event.block.number;
+  dailySnapshot.timestamp = event.block.timestamp;
+  dailySnapshot.save();
 }
