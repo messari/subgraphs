@@ -334,6 +334,7 @@ export function _handleVoteCast(
   dailySnapshot.forWeightedVotes = proposal.forWeightedVotes;
   dailySnapshot.againstWeightedVotes = proposal.againstWeightedVotes;
   dailySnapshot.abstainWeightedVotes = proposal.abstainWeightedVotes;
+  dailySnapshot.totalWeightedVotes = proposal.totalWeightedVotes;
   dailySnapshot.blockNumber = event.block.number;
   dailySnapshot.timestamp = event.block.timestamp;
   dailySnapshot.save();
