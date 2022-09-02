@@ -3,7 +3,7 @@ type Governance @entity {
   id: ID!
 
   "Total Supply of token"
-  tokenTotalSupply: BigInt!
+  totalTokenSupply: BigInt!
   "Total number of token holders currently"
   currentTokenHolders: BigInt!
   "Total number of token holders"

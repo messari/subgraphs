@@ -110,16 +110,16 @@ export function _handleTransfer(
 
   // Adjust token total supply if it changes
   if (isMint) {
-    governance.tokenTotalSupply = governance.tokenTotalSupply.plus(value);
+    governance.totalTokenSupply = governance.totalTokenSupply.plus(value);
     governance.save();
   } else if (isBurn) {
-    governance.tokenTotalSupply = governance.tokenTotalSupply.minus(value);
+    governance.totalTokenSupply = governance.totalTokenSupply.minus(value);
     governance.save();
   }
 
   // Take snapshot
   let dailySnapshot = getOrCreateTokenDailySnapshot(event.block);
-  dailySnapshot.totalSupply = governance.tokenTotalSupply;
+  dailySnapshot.totalSupply = governance.totalTokenSupply;
   dailySnapshot.tokenHolders = governance.currentTokenHolders;
   dailySnapshot.totalDelegates = governance.totalDelegates;
   dailySnapshot.blockNumber = event.block.number;

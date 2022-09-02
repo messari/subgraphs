@@ -60,7 +60,7 @@ export function getGovernance(): Governance {
   let governance = Governance.load(GOVERNANCE_NAME);
   if (!governance) {
     governance = new Governance(GOVERNANCE_NAME);
-    governance.tokenTotalSupply = BIGINT_ZERO;
+    governance.totalTokenSupply = BIGINT_ZERO;
     governance.proposals = BIGINT_ZERO;
     governance.currentTokenHolders = BIGINT_ZERO;
     governance.totalTokenHolders = BIGINT_ZERO;
