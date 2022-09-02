@@ -430,6 +430,7 @@ export function syncWithEulerGeneralView(
       .plus(protocolSideRevenueSinceLastUpdate);
     market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD
       .plus(totalRevenueSinceLastUpdate);
+    market.save();
 
     updateSnapshotRevenues(market.id, block, supplySideRevenueSinceLastUpdate, protocolSideRevenueSinceLastUpdate, totalRevenueSinceLastUpdate);
 
