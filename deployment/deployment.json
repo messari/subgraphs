@@ -776,7 +776,7 @@
           "template": "rari-vaults.template.yaml",
           "messari": "messari/rari-vaults-ethereum",
           "dmelotik": "dmelotik/rari-vaults",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         }
       }
     },
