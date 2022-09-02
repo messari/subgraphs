@@ -1,6 +1,6 @@
-import { BigInt, Address, TypedMap } from "@graphprotocol/graph-ts";
+import { Address, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
-export const NETWORK_STRING = "matic";
+export const NETWORK_STRING = "optimism";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
@@ -24,7 +24,7 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
-  "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"  // WMATIC
+  "0x0000000000000000000000000000000000000000"
 );
 
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
@@ -34,32 +34,24 @@ SUSHISWAP_ROUTER_ADDRESS.set(
 );
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506")
+  Address.fromString("0x0000000000000000000000000000000000000000")
 );
 
 ///////////////////////////////////////////////////////////////////////////
-////////////////////////// QUICKSWAP CONTRACT ///////////////////////////
+///////////////////////////// UNISWAP CONTRACT ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-// NOTE: QUICKSWAP is a Uniswap V2 Fork
 
-export const QUICKSWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
-QUICKSWAP_ROUTER_ADDRESS.set(
+export const UNISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
+UNISWAP_ROUTER_ADDRESS.set(
   "routerV1",
   Address.fromString("0x0000000000000000000000000000000000000000")
 );
-QUICKSWAP_ROUTER_ADDRESS.set(
+UNISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff")
+  Address.fromString("0x0000000000000000000000000000000000000000")
 );
 
-export const QUICKSWAP_PATH_OVERRIDE = new TypedMap<Address, Address[]>();
-QUICKSWAP_PATH_OVERRIDE.set(
-  Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // WBTC - WBTC/WMATIC liquidity too low， use WBTC/USDC directly
-  [
-    Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // WBTC
-    Address.fromString("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"),  // USDC
-  ]
-)
+export const UNISWAP_PATH_OVERRIDE = new TypedMap<Address, Address[]>();
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// YEARNLENS CONTRACT //////////////////////////
@@ -72,7 +64,6 @@ export const YEARN_LENS_CONTRACT_ADDRESS =
 ///////////////////////////// CHAINLINK CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-// No Chainlink feed registry on polygon
 export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
@@ -82,7 +73,7 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
 ///////////////////////////////////////////////////////////////////////////
 
 export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
+  "0xD81eb3728a631871a7eBBaD631b5f424909f0c77"
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -90,45 +81,41 @@ export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
 ///////////////////////////////////////////////////////////////////////////
 
 export const ONE_INCH_ORACLE_CONTRACT_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
+  "0x11DEE30E710B8d4a8630392781Cc3c0046365d4c"
 );
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_DECIMALS = BigInt.fromI32(6);
+export const USDC_DECIMALS = BigInt.fromI32(8);
 
 export const WHITELIST_TOKENS = new TypedMap<string, Address>();
 WHITELIST_TOKENS.set(
   "WETH",
-  Address.fromString("0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270")  // WMATIC
+  Address.fromString("0x4200000000000000000000000000000000000006")
 );
 WHITELIST_TOKENS.set(
   "USDT",
-  Address.fromString("0xc2132D05D31c914a87C6611C10748AEb04B58e8F")
+  Address.fromString("0x94b008aa00579c1307b0ef2c499ad98a8ce58e58")
 );
 WHITELIST_TOKENS.set(
   "DAI",
-  Address.fromString("0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063")
+  Address.fromString("0xda10009cbd5d07dd0cecc66161fc93d7c9000da1")
 );
 WHITELIST_TOKENS.set(
   "USDC",
-  Address.fromString("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174")
+  Address.fromString("0x7f5c764cbc14f9669b88837ca1490cca17c31607")
 );
 WHITELIST_TOKENS.set(
   "ETH",
-  Address.fromString("0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0") // MATIC
+  Address.fromString("0x4200000000000000000000000000000000000042")
 );
 WHITELIST_TOKENS.set(
   "WBTC",
-  Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6")
-);
-WHITELIST_TOKENS.set(
-  "EURS",
-  Address.fromString("0xE111178A87A3BFf0c8d18DECBa5798827539Ae99")
+  Address.fromString("0x68f180fcce6836688e9084f035309e29bf0a2095")
 );
 WHITELIST_TOKENS.set(
   "LINK",
-  Address.fromString("0xb0897686c545045aFc77CF20eC7A532E3120E0F1")
+  Address.fromString("0x350a791bfc2c21f9ed5d10980dad2e2638ffa7f6")
 );
