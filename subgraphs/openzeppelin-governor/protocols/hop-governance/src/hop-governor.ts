@@ -14,7 +14,7 @@ import {
   _handleProposalExecuted,
   _handleProposalQueued,
   _handleVoteCast,
-  getOrCreateProposal,
+  getProposal,
   getGovernance,
 } from "../../../src/handlers";
 import { HOPGovernor } from "../../../generated/HOPGovernor/HOPGovernor";
@@ -78,7 +78,7 @@ function getLatestProposalValues(
   proposalId: string,
   contractAddress: Address
 ): Proposal {
-  let proposal = getOrCreateProposal(proposalId);
+  let proposal = getProposal(proposalId);
 
   // On first vote, set state and quorum values
   if (proposal.state == ProposalState.PENDING) {
