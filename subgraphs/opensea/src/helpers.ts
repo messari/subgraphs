@@ -7,6 +7,7 @@ import {
 } from "@graphprotocol/graph-ts";
 import { ERC165 } from "../generated/OpenSeaV2/ERC165";
 import { NftMetadata } from "../generated/OpenSeaV2/NftMetadata";
+import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 import {
   Collection,
   CollectionDailySnapshot,
@@ -34,7 +35,6 @@ import {
   getFunctionSelector,
   validateCallDataFunctionSelector,
 } from "./utils";
-import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 
 export function getOrCreateMarketplace(marketplaceID: string): Marketplace {
   let marketplace = Marketplace.load(marketplaceID);
