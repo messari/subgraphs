@@ -1,6 +1,10 @@
 specVersion: 0.0.4
 features:
   - ipfsOnEthereumContracts
+  - grafting
+graft:
+  base: Qmcqm6Q5mzkv6sdmPMA169GaD1pffWfaPo6c8hyffF4Jrz
+  block: 12715763
 description: ERC721 Metadata
 schema:
   file: ./schema.graphql
@@ -18,7 +22,7 @@ dataSources:
       entities:
         - Token
         - Attribute
-        - ERC721Collection
+        - Collection
         - NonERC721Collection
       abis:
         - name: ERC721

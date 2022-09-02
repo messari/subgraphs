@@ -166,10 +166,13 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | ERC20 Tokens (2020) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-holders-2020) |
 | ERC20 Tokens (2021) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-holders-2021) |
 | ERC20 Tokens (2022) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC20 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc20-holders-2022) |
-| **NFT Subgraphs** | | |
-| OpenSea (Wyvern v1) | |
-| OpenSea (Wyvern v2) | 🔨 |
-| OpenSea (Seaport) | |
+| **ERC721 Subgraphs** | | |
+| ERC721 Holders | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC721 Holders](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc721-holders) |
+| ERC721 Metadata | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![ERC721 Metadata](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/erc721-metadata) |
+| **NFT Marketplace Subgraphs** | | |
+| OpenSea v1 (Wyvern Exchange) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![OpenSea v1](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/opensea-v1-ethereum) |
+| OpenSea v2 (Wyvern Exchange) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![OpenSea v2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/opensea-v2-ethereum) |
+| OpenSea (Seaport) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![OpenSea Seaport](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/opensea-seaport-ethereum) |
 | LooksRare | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![LooksRare](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/looksrare-ethereum) |
 | X2Y2 | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![X2Y2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/x2y2-ethereum) |
 

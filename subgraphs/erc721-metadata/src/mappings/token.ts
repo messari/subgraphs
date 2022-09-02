@@ -6,6 +6,7 @@ import {
   json,
   JSONValue,
   JSONValueKind,
+  log,
 } from "@graphprotocol/graph-ts";
 import { ERC721 } from "../../generated/ERC721/ERC721";
 import { Token, Attribute, Collection } from "../../generated/schema";
@@ -80,7 +81,7 @@ export function updateTokenMetadata(contract: ERC721, token: Token): Token {
     return token;
   }
   let dataJson = json.try_fromBytes(data);
-  if (dataJson.isError) {
+  if (dataJson.isError || !dataJson.isOk) {
     return token;
   }
 
@@ -96,6 +97,10 @@ export function updateTokenMetadata(contract: ERC721, token: Token): Token {
 
   let attributes = valueToArray(dataObject.get("attributes"));
   for (let i = 0; i < attributes.length; i++) {
+    if (attributes[i].kind != JSONValueKind.OBJECT) {
+      log.warning("non-standard attributes field, token id: {}", [token.id]);
+      continue;
+    }
     let item = attributes[i].toObject();
     let trait = valueToString(item.get("trait_type"));
     if (trait == null) {
