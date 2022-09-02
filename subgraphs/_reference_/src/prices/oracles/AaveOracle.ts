@@ -29,6 +29,6 @@ export function getTokenPriceFromAaveOracle(
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS
+    constants.USDC_DECIMALS_MAP.get(network)!.toI32() as u8
   );
 }

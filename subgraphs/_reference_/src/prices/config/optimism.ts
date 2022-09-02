@@ -88,7 +88,7 @@ export const ONE_INCH_ORACLE_CONTRACT_ADDRESS = Address.fromString(
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_DECIMALS = BigInt.fromI32(6);
+export const USDC_DECIMALS = BigInt.fromI32(8);
 
 export const WHITELIST_TOKENS = new TypedMap<string, Address>();
 WHITELIST_TOKENS.set(
