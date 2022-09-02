@@ -27,14 +27,16 @@ import {
   getOrCreateAsset,
   updateAccountAssetOnEmptyPortfolio,
   updateAccountAssets,
-} from "../getters/accountPortfolio";
+} from "../getters/accountAssets";
 import { getTokenFromCurrency } from "../common/util";
 
 export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   let currencyId = event.params.currencyId;
   let maturity = event.params.maturity;
-  // TODO: why is nonce empty?
-  // event.transaction.nonce
+  // TODO: why is nonce null? reading nonce value results in subgraph error
+  // log.error(" -- Before Nonce", []);
+  // let nonce = event.transaction.nonce;
+  // log.error(" -- After Nonce", [nonce.toString()]);
 
   let marketId = currencyId.toString() + "-" + maturity.toString();
   let market = getOrCreateMarket(event, marketId);
