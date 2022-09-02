@@ -290,7 +290,7 @@
           "messari": "messari/dforce-arbitrum",
           "tnkrxyz": "tnkrxyz/dforce-arbitrum",
           "dmelotik": "dmelotik/dforce-arbitrum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "avalanche": {
           "template": "dforce.template.yaml",
