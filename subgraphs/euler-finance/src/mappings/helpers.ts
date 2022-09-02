@@ -251,7 +251,7 @@ export function updateLendingFactors(event: GovSetAssetConfig): void {
     // When USDC asset config is updated, max LTV and liquidation threshold for all currencies need
     // to be updated as well.
     const usdcMarketUtility = marketUtility;
-    const protocolUtility = getOrCreateProtocolUtility();
+    const protocolUtility = getOrCreateProtocolUtility(event.block.number.toI32());
     for (let i = 0; i < protocolUtility.markets.length; i += 1) {
       const marketId = protocolUtility.markets[i];
       const otherMarketUtility =
@@ -290,11 +290,17 @@ export function createMarket(event: MarketActivated): void {
   marketUtility.dToken = dToken.id;
   marketUtility.save();
 
-  const protocolUtility = getOrCreateProtocolUtility();
+  const protocolUtility = getOrCreateProtocolUtility(event.block.number.toI32());
   protocolUtility.markets = protocolUtility.markets.concat([market.id]);
   protocolUtility.save();
 }
 
+// general market / protocol updater
+// udpates:
+//    rates
+//    balances
+//    prices
+//    revenues
 export function syncWithEulerGeneralView(
   eulerViewQueryResponse: EulerGeneralView__doQueryResultRStruct,
   block: ethereum.Block,
@@ -424,6 +430,7 @@ export function syncWithEulerGeneralView(
       .plus(protocolSideRevenueSinceLastUpdate);
     market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD
       .plus(totalRevenueSinceLastUpdate);
+    market.save();
 
     updateSnapshotRevenues(
       market.id, 
@@ -443,8 +450,8 @@ export function syncWithEulerGeneralView(
     marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
     marketUtility.save();
     
-    updateMarketDailyMetrics(block, market.id);
-    updateMarketHourlyMetrics(block, market.id);
+    updateMarketDailyMetrics(block, market.id, BIGDECIMAL_ZERO);
+    updateMarketHourlyMetrics(block, market.id, BIGDECIMAL_ZERO);
   }
   protocol.save();
 }

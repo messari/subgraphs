@@ -1076,6 +1076,9 @@ type _ProtocolUtility @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
+  " last update block number "
+  lastBlockNumber: Int!
+
   " Active markets on the protocol. "
   markets: [Market!]!
 }

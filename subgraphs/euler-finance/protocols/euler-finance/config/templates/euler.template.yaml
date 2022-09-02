@@ -37,8 +37,6 @@ dataSources:
           file: ./abis/ERC20NameBytes.json
         - name: UniswapV3Pool
           file: ./abis/UniswapV3Pool.json
-      blockHandlers:
-        - handler: handleBlockUpdates
       eventHandlers:
         - event: AssetStatus(indexed address,uint256,uint256,uint96,uint256,uint256,int96,uint256)
           handler: handleAssetStatus

@@ -15,8 +15,8 @@ import { ActivityType, SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from
 // updates a given FinancialDailySnapshot Entity
 export function updateFinancials(
     block: ethereum.Block,
-    amountUSD: BigDecimal | null = null,
-    eventType: string | null = null
+    amountUSD: BigDecimal,
+    eventType: string
   ): void {
   // number of days since unix epoch
   let financialMetrics = getOrCreateFinancials(block.timestamp, block.number);
@@ -41,18 +41,16 @@ export function updateFinancials(
   financialMetrics.timestamp = block.timestamp;
 
   // add to daily amounts
-  if (!eventType && !amountUSD) {
-    if (eventType == TransactionType.DEPOSIT) {
-      financialMetrics.dailyDepositUSD = financialMetrics.dailyDepositUSD.plus(amountUSD!);
-    } else if (eventType == TransactionType.BORROW) {
-      financialMetrics.dailyBorrowUSD = financialMetrics.dailyBorrowUSD.plus(amountUSD!);
-    } else if (eventType == TransactionType.REPAY) {
-      financialMetrics.dailyRepayUSD = financialMetrics.dailyRepayUSD.plus(amountUSD!);
-    } else if (eventType == TransactionType.WITHDRAW) {
-      financialMetrics.dailyWithdrawUSD = financialMetrics.dailyWithdrawUSD.plus(amountUSD!);
-    } else if (eventType == TransactionType.LIQUIDATE) {
-      financialMetrics.dailyLiquidateUSD = financialMetrics.dailyLiquidateUSD.plus(amountUSD!);
-    }
+  if (eventType == TransactionType.DEPOSIT) {
+    financialMetrics.dailyDepositUSD = financialMetrics.dailyDepositUSD.plus(amountUSD);
+  } else if (eventType == TransactionType.BORROW) {
+    financialMetrics.dailyBorrowUSD = financialMetrics.dailyBorrowUSD.plus(amountUSD);
+  } else if (eventType == TransactionType.REPAY) {
+    financialMetrics.dailyRepayUSD = financialMetrics.dailyRepayUSD.plus(amountUSD);
+  } else if (eventType == TransactionType.WITHDRAW) {
+    financialMetrics.dailyWithdrawUSD = financialMetrics.dailyWithdrawUSD.plus(amountUSD);
+  } else if (eventType == TransactionType.LIQUIDATE) {
+    financialMetrics.dailyLiquidateUSD = financialMetrics.dailyLiquidateUSD.plus(amountUSD);
   }
 
   financialMetrics.save();
@@ -119,7 +117,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
 export function updateMarketDailyMetrics(
   block: ethereum.Block, 
   marketId: string,
-  amountUSD: BigDecimal | null = null,
+  amountUSD: BigDecimal,
   eventType: string | null = null
 ): void {
   let marketMetrics = getOrCreateMarketDailySnapshot(block, marketId);
@@ -149,18 +147,18 @@ export function updateMarketDailyMetrics(
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   // Note: daily tracking of deposit/borrow/liquidate in respective functions in helpers.ts
 
-  // add to daily amounts
-  if (!eventType && !amountUSD) {
+  // add to daily amounts  
+  if (eventType != null) {
     if (eventType == TransactionType.DEPOSIT) {
-      marketMetrics.dailyDepositUSD = marketMetrics.dailyDepositUSD.plus(amountUSD!);
+      marketMetrics.dailyDepositUSD = marketMetrics.dailyDepositUSD.plus(amountUSD);
     } else if (eventType == TransactionType.BORROW) {
-      marketMetrics.dailyBorrowUSD = marketMetrics.dailyBorrowUSD.plus(amountUSD!);
+      marketMetrics.dailyBorrowUSD = marketMetrics.dailyBorrowUSD.plus(amountUSD);
     } else if (eventType == TransactionType.REPAY) {
-      marketMetrics.dailyRepayUSD = marketMetrics.dailyRepayUSD.plus(amountUSD!);
+      marketMetrics.dailyRepayUSD = marketMetrics.dailyRepayUSD.plus(amountUSD);
     } else if (eventType == TransactionType.WITHDRAW) {
-      marketMetrics.dailyWithdrawUSD = marketMetrics.dailyWithdrawUSD.plus(amountUSD!);
+      marketMetrics.dailyWithdrawUSD = marketMetrics.dailyWithdrawUSD.plus(amountUSD);
     } else if (eventType == TransactionType.LIQUIDATE) {
-      marketMetrics.dailyLiquidateUSD = marketMetrics.dailyLiquidateUSD.plus(amountUSD!);
+      marketMetrics.dailyLiquidateUSD = marketMetrics.dailyLiquidateUSD.plus(amountUSD);
     }
   }
 
@@ -171,7 +169,7 @@ export function updateMarketDailyMetrics(
 export function updateMarketHourlyMetrics(
   block: ethereum.Block, 
   marketId: string,
-  amountUSD: BigDecimal | null = null,
+  amountUSD: BigDecimal,
   eventType: string | null = null
 ): void {
   let marketMetrics = getOrCreateMarketHourlySnapshot(block, marketId);
@@ -202,17 +200,17 @@ export function updateMarketHourlyMetrics(
   // Note: hourly tracking of deposit/borrow/liquidate in respective functions in helpers.ts
 
   // add to hourly amounts
-  if (!eventType && !amountUSD) {
+  if (!eventType) {
     if (eventType == TransactionType.DEPOSIT) {
-      marketMetrics.hourlyDepositUSD = marketMetrics.hourlyDepositUSD.plus(amountUSD!);
+      marketMetrics.hourlyDepositUSD = marketMetrics.hourlyDepositUSD.plus(amountUSD);
     } else if (eventType == TransactionType.BORROW) {
-      marketMetrics.hourlyBorrowUSD = marketMetrics.hourlyBorrowUSD.plus(amountUSD!);
+      marketMetrics.hourlyBorrowUSD = marketMetrics.hourlyBorrowUSD.plus(amountUSD);
     } else if (eventType == TransactionType.REPAY) {
-      marketMetrics.hourlyRepayUSD = marketMetrics.hourlyRepayUSD.plus(amountUSD!);
+      marketMetrics.hourlyRepayUSD = marketMetrics.hourlyRepayUSD.plus(amountUSD);
     } else if (eventType == TransactionType.WITHDRAW) {
-      marketMetrics.hourlyWithdrawUSD = marketMetrics.hourlyWithdrawUSD.plus(amountUSD!);
+      marketMetrics.hourlyWithdrawUSD = marketMetrics.hourlyWithdrawUSD.plus(amountUSD);
     } else if (eventType == TransactionType.LIQUIDATE) {
-      marketMetrics.hourlyLiquidateUSD = marketMetrics.hourlyLiquidateUSD.plus(amountUSD!);
+      marketMetrics.hourlyLiquidateUSD = marketMetrics.hourlyLiquidateUSD.plus(amountUSD);
     }
   }
 

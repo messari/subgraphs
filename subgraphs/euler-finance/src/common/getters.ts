@@ -1,4 +1,3 @@
-// import { log } from "@graphprotocol/graph-ts"
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Token,
@@ -38,7 +37,6 @@ import {
   RiskType,
   INT_ZERO,
 } from "../common/constants";
-
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -437,11 +435,12 @@ export function getOrCreateMarketUtility(id: string): _MarketUtility {
   return entity as _MarketUtility;
 }
 
-export function getOrCreateProtocolUtility(): _ProtocolUtility {
+export function getOrCreateProtocolUtility(blockNumber: i32): _ProtocolUtility {
   let protocol = _ProtocolUtility.load(EULER_ADDRESS);
 
   if (!protocol) {
     protocol = new _ProtocolUtility(EULER_ADDRESS);
+    protocol.lastBlockNumber = blockNumber;
     protocol.markets = [];
     protocol.save();
   }
