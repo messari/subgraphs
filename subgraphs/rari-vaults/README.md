@@ -63,6 +63,8 @@ Count of Unique Addresses which have interacted with the protocol via any transa
   - However, `pricePerShare` is a function of each individual vaults `inputTokenBalance` and the overall Pool's `outputTokenSupply`
 - `DEFAULT_DECIMALS` is used in places where the `BigInt` value is offset by a factor of 1e18 on the contract-level
 - _Note_: `pricePerShare` is very small for some vaults b/c the `outputTokenSupply` is aggregated and there is little of the `inputToken`
+- Vault `totalValueLockedUSD` includes "unclaimed fees", since this is the only way to get individual token balances in a multi-token vault.
+  - _Note_: if anyone can figure out how to do it without this please make a PR!
 
 ## Reference and Useful Links
 

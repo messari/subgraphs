@@ -374,9 +374,10 @@ export function updateTVL(event: ethereum.Event): void {
     let vault = getOrCreateVault(event, vaultAddress, tokenAddress);
     let inputToken = getOrCreateToken(vault.inputToken);
 
-
-    // How to get TVL from rari vaults on a per token basis
-    // we do not want unclaimed fees to be included in the balances
+    // Get TVL from rari vaults on a per token basis
+    // Rari vaults can have multiple inputTokens and can store multiple tokens
+    // And the only way to get individual token balances is to use getRawFundBalance()
+    // This function returns the amount with "unclaimed fees"
 
     // if...else to grab TVL for correct vault
     let tryTokenBalance: ethereum.CallResult<BigInt>;
