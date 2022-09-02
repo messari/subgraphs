@@ -73,7 +73,7 @@ export function updateAsset(event: AssetStatus): void {
 
   market.totalDepositBalanceUSD = amountToUsd(event.params.totalBalances, marketUtility.twap, marketUtility.twapPrice);
   market.totalBorrowBalanceUSD = amountToUsd(event.params.totalBorrows, marketUtility.twap, marketUtility.twapPrice);
-  market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD);
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
   marketUtility.save();
   token.save();
@@ -348,7 +348,7 @@ export function syncWithEulerGeneralView(
       .toBigDecimal()
       .div(tokenPrecision)
       .times(currPriceUsd);
-    market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD);
+    market.totalValueLockedUSD = market.totalDepositBalanceUSD;
     market.name = token.name;
     market.inputTokenBalance = eulerViewMarket.totalBalances;
     market.inputTokenPriceUSD = currPriceUsd;
