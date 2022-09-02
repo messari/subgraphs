@@ -631,7 +631,7 @@
         "ethereum": {
           "template": "gamma.strategies.template.yaml",
           "messari": "messari/gamma-ethereum",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "polygon": {
           "template": "gamma.strategies.template.yaml",
