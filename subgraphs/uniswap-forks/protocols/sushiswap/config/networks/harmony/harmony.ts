@@ -75,7 +75,7 @@ export class SushiswapHarmonyConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x6983d1e6def3690c4d616b13597a09e6193ea013"); // wETH
+    return toLowerCase("0xcf664087a5bb0237a0bad6742852ec6c8d69a27a"); // wONE
   }
   getRewardToken(): string {
     return toLowerCase("0xbec775cb42abfa4288de81f387a9b1a3c4bc552a");
