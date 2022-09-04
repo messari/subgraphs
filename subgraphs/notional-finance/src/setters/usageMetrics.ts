@@ -38,8 +38,9 @@ export function updateUsageMetrics(
   usageDailySnapshot.timestamp = event.block.timestamp;
   usageDailySnapshot.dailyTransactionCount += 1;
 
-  let fromAccount = getOrCreateAccount(from.toHexString(), event);
-  let toAccount = getOrCreateAccount(to.toHexString(), event);
+  // unused
+  // let fromAccount = getOrCreateAccount(from.toHexString(), event);
+  // let toAccount = getOrCreateAccount(to.toHexString(), event);
 
   usageHourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageDailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
@@ -104,6 +105,7 @@ export function updateUsageMetrics(
   usageDailySnapshot.save();
 }
 
+// TODO: something wrong with addToArrayAtIndex resulting in all cumulativeUniqueMetrics being incorrect
 export function addAccountToProtocol(
   transactionType: string,
   account: Account,
@@ -123,25 +125,23 @@ export function addAccountToProtocol(
         account.id,
         0
       );
+      dailySnapshot.cumulativeUniqueDepositors = protocol.depositors.length;
       protocol.cumulativeUniqueDepositors = protocol.depositors.length;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveDepositors += 1;
     }
-    // TODO: this is done in updatePositions
-    // account.depositCount += 1;
   } else if (transactionType == TransactionType.BORROW) {
     if (protocol.borrowers.indexOf(account.id) < 0) {
       protocol.borrowers = addToArrayAtIndex(protocol.borrowers, account.id, 0);
+      dailySnapshot.cumulativeUniqueBorrowers = protocol.borrowers.length;
       protocol.cumulativeUniqueBorrowers = protocol.borrowers.length;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
       dailySnapshot.dailyActiveBorrowers += 1;
     }
-    // TODO: this is done in updatePositions
-    // account.borrowCount += 1;
   } else if (transactionType == TransactionType.LIQUIDATOR) {
     if (protocol.liquidators.indexOf(account.id) < 0) {
       protocol.liquidators = addToArrayAtIndex(
@@ -149,6 +149,7 @@ export function addAccountToProtocol(
         account.id,
         0
       );
+      dailySnapshot.cumulativeUniqueLiquidators = protocol.liquidators.length;
       protocol.cumulativeUniqueLiquidators = protocol.liquidators.length;
     }
     if (!activeEvent) {
@@ -156,7 +157,6 @@ export function addAccountToProtocol(
       dailySnapshot.dailyActiveLiquidators += 1;
     }
     account.liquidateCount += 1;
-    // TODO: Combine with above. TransactionType.LIQUIDATE, get and update metrics for liquidator and liquidatee?
   } else if (transactionType == TransactionType.LIQUIDATEE) {
     if (protocol.liquidatees.indexOf(account.id) < 0) {
       protocol.liquidatees = addToArrayAtIndex(
@@ -164,7 +164,8 @@ export function addAccountToProtocol(
         account.id,
         0
       );
-      protocol.cumulativeUniqueLiquidatees += 1;
+      dailySnapshot.cumulativeUniqueLiquidatees = protocol.liquidatees.length;
+      protocol.cumulativeUniqueLiquidatees = protocol.liquidatees.length;
     }
     if (!activeEvent) {
       activeEvent = new ActiveEventAccount(activeEventId);
@@ -172,6 +173,7 @@ export function addAccountToProtocol(
     }
     account.liquidationCount += 1;
   }
+
   activeEvent!.save();
   account.save();
   protocol.save();

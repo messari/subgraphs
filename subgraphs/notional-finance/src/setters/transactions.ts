@@ -35,7 +35,11 @@ import { getOrCreateToken } from "../getters/token";
 import { getOrCreateAccount } from "../getters/account";
 import { getOrCreateMarket } from "../getters/market";
 import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
-import { updateFinancials, updateMarket, updateTVL } from "./financialMetrics";
+import {
+  updateFinancials,
+  updateMarket,
+  updateTVLAndBalances,
+} from "./financialMetrics";
 import { getTokenFromCurrency } from "../common/util";
 
 export function getOrCreatePosition(
@@ -51,7 +55,7 @@ export function getOrCreatePosition(
   for (let curr = 0; curr < account.openPositionCount; curr += 1) {
     let op = account.openPositions.at(curr);
     if (op.startsWith(positionIdPrefix)) {
-      log.error(" ----- Found position with prefix... {}", [
+      log.info(" ----- Found position with prefix... {}", [
         Position.load(op)!.id,
       ]);
       return Position.load(op)!;
@@ -186,9 +190,10 @@ export function updatePosition(
 ): void {
   let closePositionToggle = false;
 
-  let account = getOrCreateAccount(accountId, event);
   let market = getOrCreateMarket(event, marketId);
+  let account = getOrCreateAccount(accountId, event);
 
+  // interest rate side
   let side: string;
   if (
     [TransactionType.DEPOSIT, TransactionType.WITHDRAW].includes(
@@ -221,13 +226,13 @@ export function updatePosition(
     position.withdrawCount = position.withdrawCount + 1;
     position.balance = position.balance.minus(amount);
 
-    // TODO: Liquidation: TBD if we need this
+    // TODO: Does liquidation using REPAY action or is it a separate action? Can we identify if a withdraw action is a liquidation event?
     // if (liquidation) {
     //   position.liquidationCount = position.liquidationCount + 1;
-    //   let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionlogIndex
-    //     .plus(BIGINT_ONE)
-    //     .toString()}`;
-    //   // updateLiqudationEvent(liqudationEventId, position.id);
+    //   let liqudationEventId = event.transaction.hash.toHexString() + "-" event.transactionlogIndex
+    //   let liquidate = new Liquidate(eventId);
+    //   liquidate.position = position.id;
+    //   liquidate.save();
     // }
 
     let withdraw = new Withdraw(eventId);
@@ -254,11 +259,13 @@ export function updatePosition(
     position.repayCount = position.repayCount + 1;
     position.balance = position.balance.minus(amount);
 
-    // TODO: Liquidation: TBD if we need this
+    // TODO: Does liquidation using REPAY action or is it a separate action? Can we identify if a repay action is a liquidation event?
     // if (liquidation) {
     //   position.liquidationCount = position.liquidationCount + 1;
-    //   let liqudationEventId = `liquidate-${event.transaction.hash.toHexString()}-${event.transactionlogIndex.toString()}`;
-    //   updateLiqudationEvent(liqudationEventId, position.id);
+    //   let liqudationEventId = event.transaction.hash.toHexString() + "-" event.transactionlogIndex
+    //   let liquidate = new Liquidate(eventId);
+    //   liquidate.position = position.id;
+    //   liquidate.save();
     // }
 
     let repay = new Repay(eventId);
@@ -305,8 +312,7 @@ export function createDeposit(
   deposit.timestamp = event.block.timestamp;
   deposit.account = account.id;
   deposit.market = market.id;
-  // updated in updatePosition
-  // deposit.position = position.id;
+  // deposit.position updated in updatePosition
   deposit.asset = market.inputToken;
   deposit.amount = fCashAmount;
   deposit.amountUSD = amountUSD;
@@ -329,7 +335,7 @@ export function createDeposit(
   );
   updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
-  updateTVL(event);
+  updateTVLAndBalances(event);
 
   return deposit;
 }
@@ -359,8 +365,7 @@ export function createWithdraw(
   withdraw.timestamp = event.block.timestamp;
   withdraw.account = account.id;
   withdraw.market = market.id;
-  // updated in updatePosition
-  // withdraw.position = position.id;
+  // withdraw.position updated in updatePosition
   withdraw.asset = market.inputToken;
   withdraw.amount = fCashAmount;
   withdraw.amountUSD = amountUSD;
@@ -383,7 +388,7 @@ export function createWithdraw(
   );
   updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
-  updateTVL(event);
+  updateTVLAndBalances(event);
 
   return withdraw;
 }
@@ -414,8 +419,7 @@ export function createBorrow(
   borrow.timestamp = event.block.timestamp;
   borrow.account = account.id;
   borrow.market = market.id;
-  // updated in updatePosition
-  // borrow.position = position.id;
+  // borrow.position updated in updatePosition
   borrow.asset = market.inputToken;
   borrow.amount = fCashAmount;
   borrow.amountUSD = amountUSD;
@@ -437,7 +441,7 @@ export function createBorrow(
   );
   updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
-  updateTVL(event);
+  updateTVLAndBalances(event);
 
   return borrow;
 }
@@ -468,8 +472,7 @@ export function createRepay(
   repay.timestamp = event.block.timestamp;
   repay.account = account.id;
   repay.market = market.id;
-  // updated in updatePosition
-  // repay.position = position.id;
+  // repay.position updated in updatePosition
   repay.asset = market.inputToken;
   repay.amount = fCashAmount;
   repay.amountUSD = amountUSD;
@@ -491,14 +494,15 @@ export function createRepay(
   );
   updateFinancials(event, amountUSD, market.id);
   updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
-  updateTVL(event);
+  updateTVLAndBalances(event);
 
   return repay;
 }
 
 export function createLiquidate(
   event: ethereum.Event,
-  market: Market,
+  // market: Market,
+  currencyId: string,
   liquidator: Address,
   liquidatee: Address,
   cTokenAmount: BigInt
@@ -517,17 +521,12 @@ export function createLiquidate(
   liquidate.timestamp = event.block.timestamp;
   liquidate.liquidator = liquidatorAccount.id;
   liquidate.liquidatee = liquidateeAccount.id;
-  liquidate.market = market.id;
-  // TODO: The liquidation events don't provide maturity so we are unable to associate a market with the liquidation event.
-  liquidate.position = getOrCreatePosition(
-    event,
-    liquidateeAccount,
-    market,
-    InterestRateSide.BORROWER
-  ).id;
-  liquidate.asset = market.inputToken;
 
-  let currencyId = market.id.split("-")[0];
+  // liquidate.market = market.id;
+  // let currencyId = market.id.split("-")[0];
+  // TODO: verify if a TX is observed in liquidation and deposit/repay
+  // updateLiquidation
+
   let token = getTokenFromCurrency(event, currencyId);
 
   liquidate.amount = bigIntToBigDecimal(cTokenAmount, token.decimals);
@@ -542,14 +541,14 @@ export function createLiquidate(
     event.transaction.to!,
     TransactionType.LIQUIDATEE
   );
-  // TODO: Should this be elsewhere?
+
+  // Could be combined into single call but this is easier to read
   addAccountToProtocol(TransactionType.LIQUIDATEE, liquidateeAccount, event);
   addAccountToProtocol(TransactionType.LIQUIDATOR, liquidatorAccount, event);
 
   // TODO: cannot update these metrics without market id
   // updateFinancials(event, amountUSD, market.id);
   // updateMarket(market.id, transactionType, cTokenAmount, amountUSD, event);
-  // updateTVL(event);
 
   return liquidate;
 }

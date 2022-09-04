@@ -24,7 +24,7 @@ export function getTokenFromCurrency(
   } else if (currencyId == "4") {
     tokenAddress = cWBTC_ADDRESS;
   } else {
-    log.error(" -- New currency found: {}", [currencyId.toString()]);
+    log.info(" -- New currency found: {}", [currencyId.toString()]);
   }
 
   let token = getOrCreateToken(
@@ -32,7 +32,7 @@ export function getTokenFromCurrency(
     event.block.number
   );
 
-  return token!;
+  return token;
 }
 
 export function getTimeRef(timestamp: i32): i32 {

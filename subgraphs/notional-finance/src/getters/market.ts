@@ -4,6 +4,7 @@ import {
   Market,
   MarketDailySnapshot,
   MarketHourlySnapshot,
+  MarketsStatus,
 } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
@@ -18,6 +19,7 @@ import { getTokenFromCurrency } from "../common/util";
 import { bigIntToBigDecimal } from "../common/numbers";
 import { getOrCreateInterestRate } from "./InterestRate";
 import { getOrCreateLendingProtocol } from "./protocol";
+import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
 
 // TODO: create all tokens necessary
 // - cTokens (cETH, cDAI, cUSDC, cWBTC)
@@ -31,7 +33,6 @@ export function getOrCreateMarket(
   event: ethereum.Event,
   marketId: string
 ): Market {
-  // TODO: take currency, maturity and create the marketId here to avoid inconsistency?
   let market = Market.load(marketId);
 
   if (market == null) {
@@ -56,10 +57,10 @@ export function getOrCreateMarket(
     // TODO: verify liquidation penalty
     let notional = Notional.bind(Address.fromString(PROTOCOL_ID));
     let currencyAndRatesCallResult = notional.try_getCurrencyAndRates(
-      parseInt(currencyId)
+      parseInt(currencyId) as i32
     );
     if (currencyAndRatesCallResult.reverted) {
-      log.info("Notional call 'getCurrencyAndRates' reverted", []);
+      log.error("[handleLendBorrowTrade:market] getCurrencyRates reverted", []);
       market.liquidationPenalty = BIGDECIMAL_ZERO;
     } else {
       market.liquidationPenalty = bigIntToBigDecimal(
@@ -117,20 +118,6 @@ export function getOrCreateMarket(
     // market.liquidates
 
     market.save();
-
-    // TODO: update market status
-    // let activeMarketsCallResult = notional.try_getActiveMarkets(
-    //   parseInt(currencyId)
-    // );
-    // if (activeMarketsCallResult.reverted) {
-    //   log.info("Notional call 'getActiveMarkets' reverted", []);
-    // } else {
-    //   // update subgraph market to inacitve
-    //   let activeMarkets = activeMarketsCallResult.value;
-    //   let allSubgraphMarkets = TBD
-    //   loop through allSubgraphMarkets
-    //    market subgraphMarket as inactive if its not in activeMarkets
-    // }
   }
 
   return market;
@@ -239,4 +226,22 @@ export function getOrCreateMarketHourlySnapshot(
   }
 
   return marketMetrics;
+}
+
+export function getMarketsWithStatus(event: ethereum.Event): MarketsStatus {
+  let id = "0";
+  let marketsStatus = MarketsStatus.load(id);
+
+  if (marketsStatus == null) {
+    marketsStatus = new MarketsStatus(id);
+
+    marketsStatus.lastUpdateBlockNumber = event.block.number;
+    marketsStatus.lastUpdateTimestamp = event.block.timestamp;
+    marketsStatus.lastUpdateTransactionHash = event.transaction.hash;
+    marketsStatus.activeMarkets = [];
+    marketsStatus.maturedMarkets = [];
+    marketsStatus.save();
+  }
+
+  return marketsStatus as MarketsStatus;
 }

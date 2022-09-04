@@ -21,6 +21,7 @@ import {
 import { bigIntToBigDecimal } from "../common/numbers";
 import { getOrCreateFinancialsDailySnapshot } from "../getters/financialMetrics";
 import {
+  getMarketsWithStatus,
   getOrCreateMarket,
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
@@ -37,8 +38,8 @@ export function updateFinancials(
   let financialsDailySnapshots = getOrCreateFinancialsDailySnapshot(event);
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, marketId);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, marketId);
-  let market = getOrCreateMarket(event, marketId);
   let protocol = getOrCreateLendingProtocol();
+  let market = getOrCreateMarket(event, marketId);
 
   // fees and revenue amounts
   let feesUSD = amountUSD.times(NOTIONAL_TRADE_FEES);
@@ -136,14 +137,23 @@ export function updateFinancials(
   protocol.save();
 }
 
-export function updateTVL(event: ethereum.Event): void {
+// TODO: instead of calculating TVL this,
+// - create a new function updateTVLDepositBorrow
+// - iterate over active markets
+// - sum TVL (markets) = protocol and financialsDailySnapshot TVL
+// - sum Deposit Balances (markets) = protocol and financialsDailySnapshot TVL
+// - sum Borrow Balances (markets) = protocol and financialsDailySnapshot TVL
+// This is dependent on having activeMarkets
+
+// TODO: new name
+export function updateTVLAndBalances(event: ethereum.Event): void {
   let protocol = getOrCreateLendingProtocol();
   let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
-  let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
 
+  // TVL
   // TODO: can tokenAddresses be a constant namespace? see getTokenFromCurrency as well
+  let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
   let tokenAddress = [cETH_ADDRESS, cDAI_ADDRESS, cUSDC_ADDRESS, cWBTC_ADDRESS];
-
   for (let i = 0; i < tokenAddress.length; i++) {
     let assetToken = getOrCreateToken(
       Address.fromString(tokenAddress[i]),
@@ -158,12 +168,31 @@ export function updateTVL(event: ethereum.Event): void {
     );
   }
 
+  let protocolTotalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  let protocolTotalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  let activeMarkets = getMarketsWithStatus(event).activeMarkets;
+  for (let i = 0; i < activeMarkets.length; i++) {
+    // event doesn't matter
+    let market = getOrCreateMarket(event, activeMarkets[i]);
+    protocolTotalDepositBalanceUSD = protocolTotalDepositBalanceUSD.plus(
+      market.totalDepositBalanceUSD
+    );
+    protocolTotalBorrowBalanceUSD = protocolTotalBorrowBalanceUSD.plus(
+      market.totalBorrowBalanceUSD
+    );
+  }
+
   financialsDailySnapshot.totalValueLockedUSD = protocolTotalValueLockedUSD;
-  financialsDailySnapshot.totalDepositBalanceUSD = protocolTotalValueLockedUSD;
+  protocol.totalValueLockedUSD = protocolTotalValueLockedUSD;
+
+  financialsDailySnapshot.totalDepositBalanceUSD = protocolTotalDepositBalanceUSD;
+  protocol.totalDepositBalanceUSD = protocolTotalDepositBalanceUSD;
+
+  financialsDailySnapshot.totalBorrowBalanceUSD = protocolTotalBorrowBalanceUSD;
+  protocol.totalBorrowBalanceUSD = protocolTotalBorrowBalanceUSD;
+
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
-  protocol.totalValueLockedUSD = protocolTotalValueLockedUSD;
-  protocol.totalDepositBalanceUSD = protocolTotalValueLockedUSD;
 
   financialsDailySnapshot.save();
   protocol.save();
@@ -206,13 +235,13 @@ export function updateMarket(
     market.totalValueLockedUSD = bigIntToBigDecimal(
       inputTokenBalance,
       token.decimals
-    ).times(priceUSD!);
+    ).times(priceUSD);
 
     // update total deposit amount
     market.totalDepositBalanceUSD = bigIntToBigDecimal(
       inputTokenBalance,
       token.decimals
-    ).times(priceUSD!);
+    ).times(priceUSD);
 
     // update deposit amounts
     market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
@@ -244,13 +273,13 @@ export function updateMarket(
     market.totalValueLockedUSD = bigIntToBigDecimal(
       inputTokenBalance,
       token.decimals
-    ).times(priceUSD!);
+    ).times(priceUSD);
 
     // update total deposit amount
     market.totalDepositBalanceUSD = bigIntToBigDecimal(
       inputTokenBalance,
       token.decimals
-    ).times(priceUSD!);
+    ).times(priceUSD);
 
     // update withdraw amounts
     marketDailySnapshot.dailyWithdrawUSD = marketDailySnapshot.dailyWithdrawUSD.plus(
@@ -261,12 +290,14 @@ export function updateMarket(
     );
   } else if (transactionType == TransactionType.BORROW) {
     // update total borrow amount
+    // TODO: This should also be inputToken
+    // TODO: if we take the output token we need to be able to get supply, price
     let outputTokenSupply = market.outputTokenSupply.plus(amount);
     market.outputTokenSupply = outputTokenSupply;
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(
       outputTokenSupply,
       token.decimals
-    ).times(priceUSD!);
+    ).times(priceUSD);
 
     // update borrow amounts
     market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
@@ -296,7 +327,7 @@ export function updateMarket(
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(
       outputTokenSupply,
       token.decimals
-    ).times(priceUSD!);
+    ).times(priceUSD);
 
     // update repay amounts
     marketDailySnapshot.dailyRepayUSD = marketDailySnapshot.dailyRepayUSD.plus(

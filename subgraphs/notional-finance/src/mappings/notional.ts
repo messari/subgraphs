@@ -11,11 +11,12 @@ import {
   LiquidateCollateralCurrency,
   LiquidatefCashEvent,
   LiquidateLocalCurrency,
+  Notional__getActiveMarketsResultValue0Struct,
 } from "../../generated/Notional/Notional";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, PROTOCOL_ID } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
 import { getOrCreateAccount } from "../getters/account";
-import { getOrCreateMarket } from "../getters/market";
+import { getOrCreateMarket, getMarketsWithStatus } from "../getters/market";
 import {
   createBorrow,
   createDeposit,
@@ -29,51 +30,116 @@ import {
   updateAccountAssets,
 } from "../getters/accountAssets";
 import { getTokenFromCurrency } from "../common/util";
+import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/arrays";
 
 export function handleLendBorrowTrade(event: LendBorrowTrade): void {
-  let currencyId = event.params.currencyId;
-  let maturity = event.params.maturity;
   // TODO: why is nonce null? reading nonce value results in subgraph error
   // log.error(" -- Before Nonce", []);
   // let nonce = event.transaction.nonce;
   // log.error(" -- After Nonce", [nonce.toString()]);
 
+  let currencyId = event.params.currencyId;
+  let maturity = event.params.maturity;
   let marketId = currencyId.toString() + "-" + maturity.toString();
+
   let market = getOrCreateMarket(event, marketId);
   let account = getOrCreateAccount(event.params.account.toHexString(), event);
   let token = getTokenFromCurrency(event, currencyId.toString());
 
-  // TODO: verify this is accurate?
+  // update market
   market.inputTokenPriceUSD = token.lastPriceUSD!;
-
+  //
   // TODO: market.rates cannot be fetched without settlement date
-  // let settlement = event.params.settlementDate;
   // let interestRate = getOrCreateInterestRate(market.id);
+  // let settlement = event.params.settlementDate;    // not available
   // Get 'impliedRate' from 'getMarket(currencyId, maturity, settlementDate);
   // interestRate.rate = impliedRate;
   // market.rates = [interestRate];
-
+  //
   // TODO: market exchange rate, talking to notional on how to find this
   // market.exchangeRate
-
+  //
   market.save();
 
-  // LendBorrow amount in USD
-  let cTokenAmount = event.params.netAssetCash;
-  let fCashAmount = event.params.netfCash;
-  let amountUSD = bigIntToBigDecimal(cTokenAmount, token.decimals).times(
-    token.lastPriceUSD!
-  );
+  // marketstatus entity
+  // TODO: we could make this protocol entity
+  // TODO: do this getOrCreateMarket?
+  let markets = getMarketsWithStatus(event);
+  if (markets.activeMarkets.indexOf(market.id) < 0) {
+    markets.activeMarkets = addToArrayAtIndex(
+      markets.activeMarkets,
+      market.id,
+      0
+    );
+    markets.save();
+  }
 
-  // fCash before
+  // getActiveMarkets
+  let currencyIds = [1, 2, 3, 4];
+  let notional = Notional.bind(Address.fromString(PROTOCOL_ID));
+  let activeMarkets: string[] = [];
+  for (let i = 0; i < currencyIds.length; i++) {
+    let call = notional.try_getActiveMarkets(currencyIds[i]);
+    if (call.reverted) {
+      log.error(
+        "[handleLendBorrowTrade] getActiveMarkets for currencyId {} reverted",
+        [currencyId.toString()]
+      );
+    } else {
+      for (let j = 0; j < call.value.length; j++) {
+        let currencyMarket =
+          currencyIds[i].toString() + "-" + call.value[j].maturity.toString();
+        activeMarkets = activeMarkets.concat([currencyMarket]);
+      }
+    }
+  }
+
+  for (let k = 0; k < markets.activeMarkets.length; k++) {
+    if (!activeMarkets.includes(markets.activeMarkets[k])) {
+      // TODO: unnecessary to pass event, can we send a empty ethereum.Event instance?
+      let m = getOrCreateMarket(event, markets.activeMarkets[k]);
+
+      // status
+      m.isActive = false;
+      m.canBorrowFrom = false;
+
+      // balances
+      m.totalValueLockedUSD = BIGDECIMAL_ZERO;
+      m.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+      m.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+
+      // positions
+      // TODO: position counts should be 0; do we need to manually close positions as markets mature?
+      // positionCount
+      // openPositionCount
+      // closedPositionCount
+      // lendingPositionCount
+      // borrowingPositionCount
+
+      m.save();
+
+      let maturedMarketIndex = markets.activeMarkets.indexOf(m.id);
+      markets.activeMarkets = removeFromArrayAtIndex(
+        markets.activeMarkets,
+        maturedMarketIndex
+      );
+      markets.maturedMarkets = addToArrayAtIndex(
+        markets.maturedMarkets,
+        m.id,
+        0
+      );
+      markets.save();
+    }
+  }
+
+  // account fCash before; we use asset entity to track fCash values before and after TX
   let fCashBeforeTransaction = getOrCreateAsset(
     account.id,
     currencyId.toString(),
     event.params.maturity
   ).notional;
 
-  // update and get asset
-  let notional = Notional.bind(Address.fromString(PROTOCOL_ID));
+  // update fCash asset values
   let accountPortfolioCallResult = notional.try_getAccountPortfolio(
     event.transaction.from
   );
@@ -97,14 +163,21 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
     }
   }
 
-  // fCash after
+  // account fCash after; we use asset entity to track fCash values before and after TX
   let fCashAfterTransaction = getOrCreateAsset(
     account.id,
     currencyId.toString(),
     event.params.maturity
   ).notional;
 
-  // use absolute amounts
+  // LendBorrow amounts (assetCash, fCash, USD)
+  let cTokenAmount = event.params.netAssetCash;
+  let fCashAmount = event.params.netfCash;
+  let amountUSD = bigIntToBigDecimal(cTokenAmount, token.decimals).times(
+    token.lastPriceUSD!
+  );
+
+  // we need absolute amounts for metrics; fCash is signed
   let absAmountUSD: BigDecimal = amountUSD;
   let absAmount: BigInt = cTokenAmount;
   let absfCashAmount: BigInt = fCashAmount;
@@ -114,21 +187,24 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
     absfCashAmount = fCashAmount.neg();
   }
 
+  // identify transaction type
+  // transactions of different user intention may call the same action type in notional smart contract design
+  // TODO: is there a way to identify if a transaction type is also liquidation event?
   if (
     fCashBeforeTransaction <= BIGINT_ZERO &&
     fCashAfterTransaction < fCashBeforeTransaction
   ) {
     createBorrow(event, market, absfCashAmount, absAmount, absAmountUSD);
   } else if (
-    // This means they withdrew their deposit and borrowed at the same time. Is this possible?
+    // This means they withdrew their deposit and borrowed at the same time.
     // No such events found but worth logging them.
-    // TODO: How should this be treated? Currently, I'm treating this as borrow.
+    // TODO: Methodology Question: A) Is this possible? B) How should this be treated? Currently, I'm treating this as borrow.
     fCashBeforeTransaction > BIGINT_ZERO &&
     fCashAfterTransaction < BIGINT_ZERO &&
     fCashAfterTransaction < fCashBeforeTransaction
   ) {
     createBorrow(event, market, absfCashAmount, absAmount, absAmountUSD);
-    log.error(
+    log.info(
       " -- Withdraw and Borrow at the same time, account: {}, hash: {}, fCashAmount: {}",
       [account.id, event.transaction.hash.toHexString(), fCashAmount.toString()]
     );
@@ -139,15 +215,15 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   ) {
     createWithdraw(event, market, absfCashAmount, absAmount, absAmountUSD);
   } else if (
-    // This means they withdrew their deposit and borrowed at the same time. Is this possible?
+    // This means they withdrew their deposit and borrowed at the same time.
     // No such events found but worth logging them.
-    // TODO: How should this be treated? Currently, I'm treating this as Repay.
+    // TODO: Methodology Question: A) Is this possible? B) How should this be treated? Currently, I'm treating this as borrow.
     fCashBeforeTransaction < BIGINT_ZERO &&
     fCashAfterTransaction > BIGINT_ZERO &&
     fCashAfterTransaction > fCashBeforeTransaction
   ) {
     createRepay(event, market, absfCashAmount, absAmount, absAmountUSD);
-    log.error(
+    log.info(
       " -- Repay and Deposit at the same time, account: {}, hash: {}, fCashAmount: {}",
       [account.id, event.transaction.hash.toHexString(), fCashAmount.toString()]
     );
@@ -171,43 +247,45 @@ export function handleLiquidateLocalCurrency(
   let currencyId = event.params.localCurrencyId as i32;
   let liquidatee = event.params.liquidated;
   let liquidator = event.params.liquidator;
-  let market = getOrCreateMarket(event, currencyId.toString());
   let amount = event.params.netLocalFromLiquidator;
   // TODO: not possible to calculate
   // let profit
 
-  createLiquidate(event, market, liquidator, liquidatee, amount);
+  // TODO: Blocker. cannot associate liquidation event with a market without maturity info.
+  // let market = getOrCreateMarket(event, marketId); // marketId = currencyId.toString() + "-" + maturity.toString();
+
+  // createliquidate(event, market, liquidator, liquidatee, amount);
+  createLiquidate(event, currencyId.toString(), liquidator, liquidatee, amount);
 }
 
 export function handleLiquidateCollateralCurrency(
   event: LiquidateCollateralCurrency
 ): void {
-  event.params._event;
   let currencyId = event.params.localCurrencyId as i32;
   let liquidatee = event.params.liquidated;
   let liquidator = event.params.liquidator;
-  let market = getOrCreateMarket(event, currencyId.toString());
   let amount = event.params.netLocalFromLiquidator;
   // TODO: not possible to calculate
   // let profit
 
-  createLiquidate(event, market, liquidator, liquidatee, amount);
+  // TODO: Blocker. cannot associate liquidation event with a market without maturity info.
+  // let market = getOrCreateMarket(event, marketId); // marketId = currencyId.toString() + "-" + maturity.toString();
+
+  // createliquidate(event, market, liquidator, liquidatee, amount);
+  createLiquidate(event, currencyId.toString(), liquidator, liquidatee, amount);
 }
 
 export function handleLiquidatefCash(event: LiquidatefCashEvent): void {
-  // TODO: remove
-  // if (event.params.localCurrencyId == event.params.fCashCurrency) {
-  //   liq.type = LocalFcash;
-  // } else {
-  //   liq.type = CrossCurrencyFcash;
-  // }
   let currencyId = event.params.localCurrencyId as i32;
   let liquidatee = event.params.liquidated;
   let liquidator = event.params.liquidator;
-  let market = getOrCreateMarket(event, currencyId.toString());
   let amount = event.params.netLocalFromLiquidator;
   // TODO: not possible to calculate
   // let profit
 
-  createLiquidate(event, market, liquidator, liquidatee, amount);
+  // TODO: Blocker. cannot associate liquidation event with a market without maturity info.
+  // let market = getOrCreateMarket(event, marketId); // marketId = currencyId.toString() + "-" + maturity.toString();
+
+  // createliquidate(event, market, liquidator, liquidatee, amount);
+  createLiquidate(event, currencyId.toString(), liquidator, liquidatee, amount);
 }

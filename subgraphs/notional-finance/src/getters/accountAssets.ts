@@ -1,5 +1,4 @@
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { Notional } from "../../generated/Notional/Notional";
 import { Account, Asset } from "../../generated/schema";
 import { BIGINT_ZERO, PROTOCOL_ID } from "../common/constants";
 
@@ -9,17 +8,17 @@ export function getOrCreateAsset(
   maturity: BigInt
 ): Asset {
   let id = accountId + "-" + currencyId + "-" + maturity.toString();
-  let entity = Asset.load(id);
+  let asset = Asset.load(id);
 
-  if (entity == null) {
-    entity = new Asset(id);
-    entity.currency = currencyId;
-    entity.maturity = maturity;
-    entity.notional = BigInt.fromI32(0);
-    entity.settlementDate = maturity;
+  if (asset == null) {
+    asset = new Asset(id);
+    asset.currency = currencyId;
+    asset.maturity = maturity;
+    asset.notional = BigInt.fromI32(0);
+    asset.settlementDate = maturity;
   }
 
-  return entity as Asset;
+  return asset;
 }
 
 export function updateAccountAssets(
@@ -38,9 +37,8 @@ export function updateAccountAssets(
 
     if (asset.notional.notEqual(notional)) {
       asset.notional = notional;
-      asset.lastUpdateBlockNumber = event.block.number.toI32();
-      asset.lastUpdateTimestamp = event.block.timestamp.toI32();
-      asset.lastUpdateBlockHash = event.block.hash;
+      asset.lastUpdateBlockNumber = event.block.number;
+      asset.lastUpdateTimestamp = event.block.timestamp;
       asset.lastUpdateTransactionHash = event.transaction.hash;
 
       log.debug("Updated asset entity {}", [asset.id]);
@@ -58,9 +56,8 @@ export function updateAccountAssetOnEmptyPortfolio(
   let asset = getOrCreateAsset(accountId, currencyId, maturity);
 
   asset.notional = BIGINT_ZERO;
-  asset.lastUpdateBlockNumber = event.block.number.toI32();
-  asset.lastUpdateTimestamp = event.block.timestamp.toI32();
-  asset.lastUpdateBlockHash = event.block.hash;
+  asset.lastUpdateBlockNumber = event.block.number;
+  asset.lastUpdateTimestamp = event.block.timestamp;
   asset.lastUpdateTransactionHash = event.transaction.hash;
 
   log.debug("Updated asset entity when empty portfolio was returned {}", [

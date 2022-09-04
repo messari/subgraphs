@@ -19,16 +19,20 @@ export function getOrCreateUsageMetricsHourlySnapshot(
     let protocol = getOrCreateLendingProtocol();
     usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
     usageMetrics.protocol = getOrCreateLendingProtocol().id;
+
     usageMetrics.hourlyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+
     usageMetrics.hourlyTransactionCount = 0;
     usageMetrics.hourlyDepositCount = 0;
     usageMetrics.hourlyBorrowCount = 0;
     usageMetrics.hourlyWithdrawCount = 0;
     usageMetrics.hourlyRepayCount = 0;
     usageMetrics.hourlyLiquidateCount = 0;
+
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
+
     usageMetrics.save();
   }
   return usageMetrics;
@@ -47,8 +51,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
     let protocol = getOrCreateLendingProtocol();
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = getOrCreateLendingProtocol().id;
-    usageMetrics.dailyActiveUsers = 0;
-    usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+
     usageMetrics.dailyTransactionCount = 0;
     usageMetrics.dailyDepositCount = 0;
     usageMetrics.dailyBorrowCount = 0;
@@ -56,17 +59,24 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics.dailyRepayCount = 0;
     usageMetrics.dailyLiquidateCount = 0;
     usageMetrics.totalPoolCount = 0;
-    usageMetrics.blockNumber = event.block.number;
-    usageMetrics.timestamp = event.block.timestamp;
 
+    usageMetrics.dailyActiveUsers = 0;
     usageMetrics.dailyActiveDepositors = 0;
     usageMetrics.dailyActiveBorrowers = 0;
     usageMetrics.dailyActiveLiquidators = 0;
     usageMetrics.dailyActiveLiquidatees = 0;
-    usageMetrics.cumulativeUniqueDepositors = 0;
-    usageMetrics.cumulativeUniqueBorrowers = 0;
-    usageMetrics.cumulativeUniqueLiquidators = 0;
-    usageMetrics.cumulativeUniqueLiquidatees = 0;
+
+    usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.cumulativeUniqueDepositors =
+      protocol.cumulativeUniqueDepositors;
+    usageMetrics.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
+    usageMetrics.cumulativeUniqueLiquidators =
+      protocol.cumulativeUniqueLiquidators;
+    usageMetrics.cumulativeUniqueLiquidatees =
+      protocol.cumulativeUniqueLiquidatees;
+
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
 
     usageMetrics.save();
   }

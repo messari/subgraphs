@@ -1227,14 +1227,17 @@ type Liquidate @entity {
   " Account that got liquidated "
   liquidatee: Account!
 
+  # TODO: cannot associate with a market
   " The market of the collateral being used "
-  market: Market!
+  market: Market
 
+  # TODO: cannot create a position without a market
   " The user position changed by this event "
   position: Position
 
+  # TODO: should this support all possible assets or just cTokens?
   " Asset repaid (borrowed) "
-  asset: Token!
+  asset: Token
 
   " Amount of collateral liquidated in native units "
   amount: BigDecimal!
@@ -1275,8 +1278,22 @@ type Asset @entity {
   "Native token amount (Notional fCash)"
   notional: BigInt!
 
-  lastUpdateBlockHash: Bytes!
-  lastUpdateBlockNumber: Int!
-  lastUpdateTimestamp: Int!
+  lastUpdateBlockNumber: BigInt!
+  lastUpdateTimestamp: BigInt!
+  lastUpdateTransactionHash: Bytes!
+}
+
+type MarketsStatus @entity {
+  "always set to 0"
+  id: ID!
+
+  "List of active markets"
+  activeMarkets: [String!]!
+
+  "List of inactive (matured) markets"
+  maturedMarkets: [String!]!
+
+  lastUpdateBlockNumber: BigInt!
+  lastUpdateTimestamp: BigInt!
   lastUpdateTransactionHash: Bytes!
 }
