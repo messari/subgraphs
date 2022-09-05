@@ -80,7 +80,7 @@ export const dexPoolLevel = async (deployments) => {
             let currentIssueField = "totalValueLockedUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) > 1000 &&
+                    parseFloat(instance[currentIssueField]) > 0 &&
                     parseFloat(instance[currentIssueField]) < 100000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
@@ -90,7 +90,7 @@ export const dexPoolLevel = async (deployments) => {
             currentIssueField = "cumulativeSupplySideRevenueUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) >= 100 &&
+                    parseFloat(instance[currentIssueField]) >= 0 &&
                     parseFloat(instance[currentIssueField]) <= 10000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
@@ -100,7 +100,7 @@ export const dexPoolLevel = async (deployments) => {
             currentIssueField = "cumulativeProtocolSideRevenueUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) >= 100 &&
+                    parseFloat(instance[currentIssueField]) >= 0 &&
                     parseFloat(instance[currentIssueField]) <= 10000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
@@ -127,7 +127,7 @@ export const dexPoolLevel = async (deployments) => {
 
             currentIssueField = "cumulativeVolumeUSD";
 
-            if (!(parseFloat(instance[currentIssueField]) > 100 && parseFloat(instance[currentIssueField]) < 10000000000)) {
+            if (!(parseFloat(instance[currentIssueField]) > 0 && parseFloat(instance[currentIssueField]) < 10000000000)) {
                 issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField])));
             }
 

@@ -68,7 +68,6 @@ export const lendingPoolLevel = async (deployments) => {
         .catch((err) => console.log(err));
 
     marketLevelData.forEach((protocol, idx) => {
-        console.log('marketLevelData', protocol.deployment, idx)
         if (!protocol?.markets) return;
         const data = protocol.markets;
         if (!data?.length) return;
@@ -85,7 +84,7 @@ export const lendingPoolLevel = async (deployments) => {
             let currentIssueField = "totalValueLockedUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) > 1000 &&
+                    parseFloat(instance[currentIssueField]) > 0 &&
                     parseFloat(instance[currentIssueField]) < 100000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
@@ -95,7 +94,7 @@ export const lendingPoolLevel = async (deployments) => {
             currentIssueField = "cumulativeSupplySideRevenueUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) >= 100 &&
+                    parseFloat(instance[currentIssueField]) >= 0 &&
                     parseFloat(instance[currentIssueField]) <= 10000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
@@ -105,7 +104,7 @@ export const lendingPoolLevel = async (deployments) => {
             currentIssueField = "cumulativeProtocolSideRevenueUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) >= 100 &&
+                    parseFloat(instance[currentIssueField]) >= 0 &&
                     parseFloat(instance[currentIssueField]) <= 10000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
@@ -168,7 +167,7 @@ export const lendingPoolLevel = async (deployments) => {
             currentIssueField = "totalDepositBalanceUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) > 1000 && parseFloat(instance[currentIssueField]) < 100000000000
+                    parseFloat(instance[currentIssueField]) > 0 && parseFloat(instance[currentIssueField]) < 100000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
                 issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField])));

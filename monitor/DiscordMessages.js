@@ -28,7 +28,7 @@ export async function fetchMessages(before) {
 
     try {
         const data = await axios.get(baseURL, { "headers": { ...headers } });
-        const timeAgo = new Date(Date.now() - ((86400000 * 2)));
+        const timeAgo = new Date(Date.now() - ((86400000 * 7)));
         const previousWeekMessages = data.data.filter(obj => {
             return moment(new Date(obj.timestamp)).isSameOrAfter(timeAgo);
         });

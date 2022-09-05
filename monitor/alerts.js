@@ -124,7 +124,8 @@ export const alertProtocolErrors = async (discordMessages, deployments) => {
                 issueArr.forEach(iss => {
                     if (iss.includes(depo) && !alertedErrors[issueSet].includes(depo)) {
                         if ((depo.includes('pending') && iss.includes('pending')) || (!depo.includes('pending') && !iss.includes('pending'))) {
-                            errorsToAlert[issueSet].push(`Name: ${iss.split("//")[0]}, Value(s): ${iss.split("//")[1]}`);
+                            const hyperlink = `[ ${iss.split("//")[0]} ] (https://subgraphs.messari.io/subgraph?endpoint=${val.url}&tab=protocol)`
+                            errorsToAlert[issueSet].push(`${iss.split("//")[0]} https://subgraphs.messari.io/subgraph?endpoint=${val.url}&tab=protocol, Value(s): ${iss.split("//")[1]}`);
                         }
                     }
                 })

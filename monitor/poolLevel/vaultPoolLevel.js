@@ -63,7 +63,6 @@ export const vaultPoolLevel = async (deployments) => {
         .catch((err) => console.log(err));
 
     vaultLevelData.forEach((protocol, idx) => {
-        console.log('vaultLevelData', protocol.deployment, idx)
         if (!protocol?.vaults) return;
         const data = protocol.vaults;
         if (!data?.length) return;
@@ -80,7 +79,7 @@ export const vaultPoolLevel = async (deployments) => {
             let currentIssueField = "totalValueLockedUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) > 1000 &&
+                    parseFloat(instance[currentIssueField]) > 0 &&
                     parseFloat(instance[currentIssueField]) < 100000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
@@ -90,7 +89,7 @@ export const vaultPoolLevel = async (deployments) => {
             currentIssueField = "cumulativeSupplySideRevenueUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) >= 100 &&
+                    parseFloat(instance[currentIssueField]) >= 0 &&
                     parseFloat(instance[currentIssueField]) <= 10000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
@@ -100,7 +99,7 @@ export const vaultPoolLevel = async (deployments) => {
             currentIssueField = "cumulativeProtocolSideRevenueUSD";
             if (
                 !(
-                    parseFloat(instance[currentIssueField]) >= 100 &&
+                    parseFloat(instance[currentIssueField]) >= 0 &&
                     parseFloat(instance[currentIssueField]) <= 10000000000
                 ) && !issuesArrays[currentIssueField]?.includes(instance.id)
             ) {
