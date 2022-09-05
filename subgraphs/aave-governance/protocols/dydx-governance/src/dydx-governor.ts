@@ -143,5 +143,15 @@ function getQuorumFromContract(
   );
   // Get minimum voting power from Executor contract
   let executorContract = Executor.bind(executorAddress);
-  return executorContract.getMinimumVotingPowerNeeded(totalVotingSupply);
+  let quorumVotes =
+    executorContract.getMinimumVotingPowerNeeded(totalVotingSupply);
+
+  // Update quorum at the contract level as well
+  let governanceFramework = getGovernanceFramework(
+    contractAddress.toHexString()
+  );
+  governanceFramework.quorumVotes = quorumVotes;
+  governanceFramework.save();
+
+  return quorumVotes;
 }
