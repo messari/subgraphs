@@ -92,6 +92,23 @@ export function getOrCreateUnderlyingToken(cToken: Address): Token {
   return token;
 }
 
+export function getOrCreateRewardToken(): Token {
+  let tokenId: string = cToken.toHexString();
+  let token = Token.load(tokenId);
+
+  if (token == null) {
+    token = new Token(tokenId);
+
+    let contract = CErc20.bind(cToken);
+    token.name = contract.name();
+    token.symbol = contract.symbol();
+    token.decimals = contract.decimals();
+
+    token.save();
+  }
+  return token;
+}
+
 export function getUnderlyingTokenPrice(cToken: Address): BigDecimal {
   let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
   let oracleAddress = factoryContract.oracle() as Address;
@@ -123,7 +140,7 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol.name = "Inverse Finance";
     protocol.slug = "inverse-finance";
     protocol.schemaVersion = "1.3.0";
-    protocol.subgraphVersion = "1.2.2";
+    protocol.subgraphVersion = "1.2.4";
     protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.ETHEREUM;
     protocol.type = ProtocolType.LENDING;
@@ -346,7 +363,7 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
     usageMetrics.dailyBorrowCount = INT_ZERO;
     usageMetrics.dailyRepayCount = INT_ZERO;
     usageMetrics.dailyLiquidateCount = INT_ZERO;
-    usageMetrics.totalPoolCount = INT_ZERO;
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.save();
@@ -432,4 +449,27 @@ export function getOrCreateInterestRate(
     interestRate.type = type;
   }
   return interestRate;
+}
+
+// create seperate InterestRate Entities for each market snapshot
+// this is needed to prevent snapshot rates from being pointers to the current rate
+export function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
+  let snapshotRates: string[] = [];
+  for (let i = 0; i < rates.length; i++) {
+    let rate = InterestRate.load(rates[i]);
+    if (!rate) {
+      log.warning("[getSnapshotRates] rate {} not found, should not happen", [rates[i]]);
+      continue;
+    }
+
+    // create new snapshot rate
+    let snapshotRateId = rates[i].concat("-").concat(timeSuffix);
+    let snapshotRate = new InterestRate(snapshotRateId);
+    snapshotRate.side = rate.side;
+    snapshotRate.type = rate.type;
+    snapshotRate.rate = rate.rate;
+    snapshotRate.save();
+    snapshotRates.push(snapshotRateId);
+  }
+  return snapshotRates;
 }

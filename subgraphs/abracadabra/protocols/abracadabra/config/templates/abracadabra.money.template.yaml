@@ -1,6 +1,14 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum
     name: BentoBox
@@ -154,6 +162,8 @@ templates:
           file: ./abis/ERC20.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
+        - name: MarketOracle
+          file: ./abis/MarketOracle.json
       eventHandlers:
         - event: LogAddCollateral(indexed address,indexed address,uint256)
           handler: handleLogAddCollateral

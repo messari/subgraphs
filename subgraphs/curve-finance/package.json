@@ -6,7 +6,7 @@
     "build": "graph build",
     "prepare:yaml": "mustache protocols/curve-finance/networks/mainnet/mainnet.json protocols/curve-finance/templates/curve.template.yaml > subgraph.yaml",
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
-    "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
+    "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge} --type=${npm_config_type}"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.32.0",

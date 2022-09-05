@@ -32,7 +32,7 @@ const messagesByLevel = (
         if (issuesArray[x].message) {
           factors = "This field is derived from the following factors: " + issuesArray[x].message + ". ";
         }
-        issuesMsg = `All values in ${issuesArray[x].fieldName} are 0. ${factors}Verify that this data is being mapped correctly.`;
+        issuesMsg = `All values in ${issuesArray[x].fieldName} are 0 (or null). ${factors}Verify that this data is being mapped correctly.`;
       }
       if (issuesArray[x].type === "LIQ") {
         issuesMsg = `${issuesArray[x].fieldName} timeseries value cannot be higher than totalValueLockedUSD on the pool. Look at snapshot id ${issuesArray[x].message}`;
@@ -96,6 +96,10 @@ const messagesByLevel = (
       }
       if (issuesArray[x].type === "BORROW") {
         issuesMsg = `Entity ${issuesArray[x].fieldName} could not calculate BORROW Reward APR. The Pool Borrow Balance is not available.`;
+      }
+      if (issuesArray[x].type === "QRY") {
+        const params = issuesArray[x].message.split("//").join(", ");
+        issuesMsg = `Error fetching subgraph data - Could not load protocol from query parameters ${params}`;
       }
       issuesMsgs.push(<li key={`${x}-${issuesArray[x].fieldName}`}>{issuesMsg}</li>);
     }

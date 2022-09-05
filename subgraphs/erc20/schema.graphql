@@ -34,13 +34,13 @@ type Token @entity {
   burnCount: BigInt!
 
   " Total token supply "
-  totalSupply: BigDecimal!
+  totalSupply: BigInt!
 
   " Total token burned "
-  totalBurned: BigDecimal!
+  totalBurned: BigInt!
 
   " Total token minted "
-  totalMinted: BigDecimal!
+  totalMinted: BigInt!
 
   " List of token transfers "
   transfers: [TransferEvent!]! @derivedFrom(field: "token")
@@ -66,7 +66,7 @@ type TokenDailySnapshot @entity {
   token: Token!
 
   " Daily total Supply of the token "
-  dailyTotalSupply: BigDecimal!
+  dailyTotalSupply: BigInt!
 
   " number of accounts holding the token "
   currentHolderCount: BigInt!
@@ -81,19 +81,19 @@ type TokenDailySnapshot @entity {
   dailyTransferCount: Int!
 
   " Total number of token transfered in a day "
-  dailyTransferAmount: BigDecimal!
+  dailyTransferAmount: BigInt!
 
   " Total number of mints in a day "
   dailyMintCount: Int!
 
   " Total number of token minted in a day "
-  dailyMintAmount: BigDecimal!
+  dailyMintAmount: BigInt!
 
   " Total number of burns in a day "
   dailyBurnCount: Int!
 
   " Total number of token burnt in a day "
-  dailyBurnAmount: BigDecimal!
+  dailyBurnAmount: BigInt!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -110,7 +110,7 @@ type TokenHourlySnapshot @entity {
   token: Token!
 
   " Hourly total Supply of the token "
-  hourlyTotalSupply: BigDecimal!
+  hourlyTotalSupply: BigInt!
 
   " number of accounts holding this token "
   currentHolderCount: BigInt!
@@ -125,19 +125,19 @@ type TokenHourlySnapshot @entity {
   hourlyTransferCount: Int!
 
   " Total amount of token transfered in a hour "
-  hourlyTransferAmount: BigDecimal!
+  hourlyTransferAmount: BigInt!
 
   " Total number of mints in a hour "
   hourlyMintCount: Int!
 
   " Total amount of token minted in a hour "
-  hourlyMintAmount: BigDecimal!
+  hourlyMintAmount: BigInt!
 
   " Total number of burns in a hour "
   hourlyBurnCount: Int!
 
   " Total number of token burnt in a hour "
-  hourlyBurnAmount: BigDecimal!
+  hourlyBurnAmount: BigInt!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -196,7 +196,7 @@ type TransferEvent implements Event @entity {
   nonce: Int!
 
   " Quantity of tokens transferred "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Account that received the tokens "
   to: Account!
@@ -245,7 +245,7 @@ type AccountBalance @entity {
   token: Token!
 
   " Current account balance "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Block number in which the balance was last modified "
   blockNumber: BigInt!
@@ -269,7 +269,7 @@ type AccountBalanceDailySnapshot @entity {
   token: Token!
 
   " Current account balance "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Block number in which the balance was last modified "
   blockNumber: BigInt!

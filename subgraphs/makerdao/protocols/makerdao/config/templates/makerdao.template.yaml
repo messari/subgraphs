@@ -1,6 +1,11 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+features:
+  - grafting
+graft:
+  base: QmXH7PVEVxKxGhnoJsafP3Mm5eBzRMuTxXJ5dCUuhr5qwF
+  block: 15430532
 dataSources:
   # Vault
   - name: Vat
@@ -33,9 +38,14 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x65fae35e00000000000000000000000000000000000000000000000000000000"
           handler: handleVatRely
+        # function cage()
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x6924500900000000000000000000000000000000000000000000000000000000"
           handler: handleVatCage
+        # function slip( bytes32 ilk, address usr, int256 wad)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x7cdd3fde00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatSlip
         ### CDP Manipulation ###
         # function frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
@@ -97,6 +107,8 @@ dataSources:
       abis:
         - name: Pot
           file: ./abis/Pot.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
       eventHandlers:
@@ -164,6 +176,8 @@ dataSources:
       abis:
         - name: CatV1
           file: ./abis/CatV1.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
         - Token
@@ -193,6 +207,8 @@ dataSources:
       abis:
         - name: CatV2
           file: ./abis/CatV2.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
         - Token
@@ -221,6 +237,8 @@ dataSources:
       abis:
         - name: Dog
           file: ./abis/Dog.json
+        - name: DAI
+          file: ./abis/DAI.json
       entities:
         - Market
         - Token
@@ -277,6 +295,85 @@ dataSources:
         - event: Created(indexed address,indexed address,address,address)
           handler: handleCreateProxy
 
+# Peg Stability Module
+  - name: PSM-USDC-A
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: PSM
+      address: "0x89B78CfA322F6C5dE0aBcEecab66Aee45393cC5A"
+      startBlock: 11478006
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mapping.ts
+      abis:
+        - name: PSM
+          file: ./abis/PSM.json
+        - name: DAI
+          file: ./abis/DAI.json
+      entities:
+        - LendingProtocol
+        - FinancialsDailySnapshot
+      eventHandlers:
+        - event: SellGem(indexed address,uint256,uint256)
+          handler: handleSellGem
+        - event: BuyGem(indexed address,uint256,uint256)
+          handler: handleBuyGem
+
+  - name: PSM-PAX-A
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: PSM
+      address: "0x961Ae24a1Ceba861D1FDf723794f6024Dc5485Cf"
+      startBlock: 13057085
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mapping.ts
+      abis:
+        - name: PSM
+          file: ./abis/PSM.json
+        - name: DAI
+          file: ./abis/DAI.json
+      entities:
+        - LendingProtocol
+        - FinancialsDailySnapshot
+      eventHandlers:
+        - event: SellGem(indexed address,uint256,uint256)
+          handler: handleSellGem
+        - event: BuyGem(indexed address,uint256,uint256)
+          handler: handleBuyGem
+
+  - name: PSM-GUSD-A
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: PSM
+      address: "0x204659B2Fd2aD5723975c362Ce2230Fba11d3900"
+      startBlock: 13684200
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mapping.ts
+      abis:
+        - name: PSM
+          file: ./abis/PSM.json
+        - name: DAI
+          file: ./abis/DAI.json
+      entities:
+        - LendingProtocol
+        - FinancialsDailySnapshot
+      eventHandlers:
+        - event: SellGem(indexed address,uint256,uint256)
+          handler: handleSellGem
+        - event: BuyGem(indexed address,uint256,uint256)
+          handler: handleBuyGem
+
 templates:
   - name: Flip
     kind: ethereum/contract
@@ -293,6 +390,8 @@ templates:
       abis:
         - name: Flip
           file: ./abis/Flip.json
+        - name: DAI
+          file: ./abis/DAI.json
       eventHandlers:
         # collateral auction
         # Flip.tend(uint256,uint256,uint256)
@@ -328,7 +427,11 @@ templates:
       abis:
         - name: Clip
           file: ./abis/Clip.json
+        - name: DAI
+          file: ./abis/DAI.json
       eventHandlers:
         # collateral auction
         - event: Take(indexed uint256,uint256,uint256,uint256,uint256,uint256,indexed address)
           handler: handleClipTakeBid
+        - event: Yank(uint256)
+          handler: handleClipYankBid

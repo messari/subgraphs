@@ -284,6 +284,8 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("13.39");
   } else if (NetworkConfigs.getNetwork() == Network.CRONOS) {
     return BigDecimal.fromString("5.5");
+  } else if (NetworkConfigs.getNetwork() == Network.HARMONY) {
+    return BigDecimal.fromString("0.5");
   }
 
   // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")

@@ -256,6 +256,7 @@ export const schema120 = (): Schema => {
       id
       name
       type
+      slug
       schemaVersion
       subgraphVersion
       methodologyVersion
@@ -644,6 +645,7 @@ export const schema130 = (): Schema => {
     protocols {
       id
       name
+      slug
       type
       schemaVersion
       subgraphVersion
@@ -837,7 +839,7 @@ export const schema201 = (): Schema => {
       event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { ";
     let fields = eventsFields.join(", ");
     if (event === "liquidates") {
-      fields += ", profitUSD, liquidatee{id}, liquidator{id}, position{id}";
+      fields += ", profitUSD, liquidatee{id}, liquidator{id}";
     } else {
       fields += ", account{id}, position{id}";
     }
@@ -944,9 +946,6 @@ export const schema201 = (): Schema => {
         borrowCount
         repayCount
         liquidationCount
-        liquidations {
-          hash
-        }
         repays {
           hash
         }
@@ -973,6 +972,7 @@ export const schema201 = (): Schema => {
     protocols {
       id
       name
+      slug
       type
       schemaVersion
       subgraphVersion

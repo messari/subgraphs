@@ -46,10 +46,11 @@ function DeploymentsTable({
   const columnLabels: { [x: string]: string } = {
     "Name/Network": "285px",
     "Indexed %": "80px",
-    "Current Block": "120px",
-    "Chain Head": "120px",
-    "Schema Version": "130px",
-    "Subgraph Version": "130px",
+    "Start Block": "100px",
+    "Current Block": "100px",
+    "Chain Head": "100px",
+    "Schema Version": "100px",
+    "Subgraph Version": "100px",
     "Non-Fatal Errors": "100px",
     "Entity Count": "100px",
   };

@@ -45,6 +45,10 @@ dataSources:
           file: ./abis/IERC20DetailedBytes.json
         - name: AaveOracle
           file: ./abis/AaveOracle.json
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
+        - name: UniswapV3Factory
+          file: ./abis/UniswapV3Factory.json
       eventHandlers:
         - event: AssetConfigUpdated(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleAssetConfigUpdated
@@ -65,6 +69,10 @@ templates:
           file: ./abis/PoolAddressesProvider.json
         - name: AaveOracle
           file: ./abis/AaveOracle.json
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
+        - name: UniswapV3Factory
+          file: ./abis/UniswapV3Factory.json
       eventHandlers:
         - event: PriceOracleUpdated(indexed address,indexed address)
           handler: handlePriceOracleUpdated
@@ -90,6 +98,10 @@ templates:
           file: ./abis/IERC20DetailedBytes.json
         - name: AaveOracle
           file: ./abis/AaveOracle.json
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
+        - name: UniswapV3Factory
+          file: ./abis/UniswapV3Factory.json
       eventHandlers:
         - event: Borrow(indexed address,address,indexed address,uint256,uint8,uint256,indexed uint16)
           handler: handleBorrow
@@ -158,6 +170,10 @@ templates:
           file: ./abis/AToken.json
         - name: AaveOracle
           file: ./abis/AaveOracle.json
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
+        - name: UniswapV3Factory
+          file: ./abis/UniswapV3Factory.json
       eventHandlers:
         - event: Burn(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleBurn
@@ -181,6 +197,10 @@ templates:
           file: ./abis/StableDebtToken.json
         - name: AaveOracle
           file: ./abis/AaveOracle.json
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
+        - name: UniswapV3Factory
+          file: ./abis/UniswapV3Factory.json
       eventHandlers:
         - event: Burn(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleBurn
@@ -202,6 +222,10 @@ templates:
           file: ./abis/VariableDebtToken.json
         - name: AaveOracle
           file: ./abis/AaveOracle.json
+        - name: UniswapV3Pool
+          file: ./abis/UniswapV3Pool.json
+        - name: UniswapV3Factory
+          file: ./abis/UniswapV3Factory.json
       eventHandlers:
         - event: Burn(indexed address,indexed address,uint256,uint256,uint256)
           handler: handleBurn

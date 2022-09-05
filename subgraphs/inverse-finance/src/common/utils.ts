@@ -27,6 +27,14 @@ export function decimalsToBigDecimal(decimals: i32): BigDecimal {
 
 //convert BigDecimal to BigInt by truncating the decimal places
 export function BigDecimalTruncateToBigInt(x: BigDecimal): BigInt {
-  let intStr = x.toString().split(".")[0]
-  return BigInt.fromString(intStr)
+  let intStr = x.toString().split(".")[0];
+  return BigInt.fromString(intStr);
+}
+
+export function bigIntToBDUseDecimals(quantity: BigInt, decimals: i32 = 18): BigDecimal {
+  return quantity.divDecimal(
+    BigInt.fromI32(10)
+      .pow(decimals as u8)
+      .toBigDecimal(),
+  );
 }

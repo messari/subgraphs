@@ -73,7 +73,7 @@ export function handleProposalExtended(event: ProposalExtended): void {
 
 // ProposalQueued(proposalId, eta)
 export function handleProposalQueued(event: ProposalQueued): void {
-  _handleProposalQueued(event.params.proposalId, event.params.eta);
+  _handleProposalQueued(event.params.proposalId, event.params.eta, event);
 }
 
 export function handleProposalThresholdSet(event: ProposalThresholdSet): void {

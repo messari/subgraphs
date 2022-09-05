@@ -1,14 +1,11 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../../../../configurations/configure";
-import { MasterChefSolarbeam } from "../../../../../generated/MasterChef/MasterChefSolarbeam";
+import { SolarDistributorV2 } from "../../../../../generated/MasterChef/SolarDistributorV2";
 import {
   LiquidityPool,
   _HelperStore,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import {
-  BIGINT_ONE,
-  INT_ZERO,
   MasterChef,
   RECENT_BLOCK_THRESHOLD,
 } from "../../../../../src/common/constants";
@@ -34,7 +31,7 @@ export function handleReward(
   pid: BigInt,
   amount: BigInt
 ): void {
-  let poolContract = MasterChefSolarbeam.bind(event.address);
+  let poolContract = SolarDistributorV2.bind(event.address);
   let masterChefPool = getOrCreateMasterChefStakingPool(
     event,
     MasterChef.MASTERCHEF,
@@ -65,11 +62,6 @@ export function handleReward(
     return;
   }
 
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
-  pool.rewardTokens = [
-    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-  ];
-
   // Update staked amounts
   // Positive for deposits, negative for withdraws
   pool.stakedOutputTokenAmount = !pool.stakedOutputTokenAmount
@@ -86,65 +78,59 @@ export function handleReward(
     return;
   }
 
-  // Get the pool allocation point to get the fractional awards given to this pool.
-  let getPoolInfo = poolContract.try_poolInfo(pid);
-  if (!getPoolInfo.reverted) {
-    let poolInfo = getPoolInfo.value;
-    masterChefPool.poolAllocPoint = poolInfo.value1;
+  // Get the reward tokens emitted per second for the pool. There can be multiple reward tokens per pool.
+  let getPoolRewardsPerSecond = poolContract.try_poolRewardsPerSec(pid);
+  let rewardTokenEmissionsAmountArray: BigInt[] = [];
+  let rewardTokenEmissionsUSDArray: BigDecimal[] = [];
+  let rewardTokenIds: string[] = [];
+  if (!getPoolRewardsPerSecond.reverted) {
+    // Value 0: Reward Token Address
+    // Value 3: Reward Token Emissions Per Second
+    for (
+      let index = 0;
+      index < getPoolRewardsPerSecond.value.value0.length;
+      index++
+    ) {
+      let rewardTokenAddresses = getPoolRewardsPerSecond.value.value0;
+      let rewardTokenEmissionsPerSecond = getPoolRewardsPerSecond.value.value3;
+
+      rewardTokenIds.push(
+        getOrCreateRewardToken(rewardTokenAddresses[index].toHexString()).id
+      );
+      let rewardToken = getOrCreateToken(
+        rewardTokenAddresses[index].toHexString()
+      );
+      let rewardTokenRateBigDecimal =
+        rewardTokenEmissionsPerSecond[index].toBigDecimal();
+
+      // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
+      let rewardTokenPerDay = getRewardsPerDay(
+        event.block.timestamp,
+        event.block.number,
+        rewardTokenRateBigDecimal,
+        masterChef.rewardTokenInterval
+      );
+
+      let rewardTokenPerDayRounded = BigInt.fromString(
+        roundToWholeNumber(rewardTokenPerDay).toString()
+      );
+      let rewardTokenEmissionsUSD = convertTokenToDecimal(
+        rewardTokenPerDayRounded,
+        rewardToken.decimals
+      ).times(rewardToken.lastPriceUSD!);
+
+      rewardTokenEmissionsAmountArray.push(rewardTokenPerDayRounded);
+      rewardTokenEmissionsUSDArray.push(rewardTokenEmissionsUSD);
+    }
   }
 
-  // Get the bonus multiplier if it is applicable.
-  let getMuliplier = poolContract.try_getMultiplier(
-    event.block.number.minus(BIGINT_ONE),
-    event.block.number
-  );
-  if (!getMuliplier.reverted) {
-    masterChefPool.multiplier = getMuliplier.value;
-  }
-
-  // Get the total allocation for all pools
-  let getTotalAlloc = poolContract.try_totalAllocPoint();
-  if (!getTotalAlloc.reverted) {
-    masterChef.totalAllocPoint = getTotalAlloc.value;
-  }
-
-  // Reward tokens emitted to all pools per block in aggregate
-  let getRewardTokenPerBlock = poolContract.try_solarPerBlock();
-  if (!getRewardTokenPerBlock.reverted) {
-    masterChef.adjustedRewardTokenRate = getRewardTokenPerBlock.value;
-    masterChef.lastUpdatedRewardRate = event.block.number;
-  }
-
-  // Calculate Reward Emission per Block to a specific pool
-  // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block
-  let poolRewardTokenRate = masterChefPool.multiplier
-    .times(masterChef.adjustedRewardTokenRate)
-    .times(masterChefPool.poolAllocPoint)
-    .div(masterChef.totalAllocPoint);
-
-  let rewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
-  // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let rewardTokenPerDay = getRewardsPerDay(
-    event.block.timestamp,
-    event.block.number,
-    rewardTokenRateBigDecimal,
-    masterChef.rewardTokenInterval
-  );
-
-  pool.rewardTokenEmissionsAmount = [
-    BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
-  ];
-  pool.rewardTokenEmissionsUSD = [
-    convertTokenToDecimal(
-      pool.rewardTokenEmissionsAmount![INT_ZERO],
-      rewardToken.decimals
-    ).times(rewardToken.lastPriceUSD!),
-  ];
+  pool.rewardTokens = rewardTokenIds;
+  pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmountArray;
+  pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSDArray;
 
   masterChefPool.lastRewardBlock = event.block.number;
 
   masterChefPool.save();
   masterChef.save();
-  rewardToken.save();
   pool.save();
 }

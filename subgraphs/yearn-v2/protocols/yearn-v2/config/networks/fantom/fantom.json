@@ -2,41 +2,24 @@
   "network": "fantom",
 
   "Registry_v1-Address": "0x727fe1759430df13655ddb0731dE0D0FDE929b04",
-  "Registry_v1-StartBlock": "18302800",
+  "Registry_v1-StartBlock": "18455565",
 
-  "registry_v2-isEnabled": false,
+  "registry_v2-isEnabled": true,
+  "registry_v2-Address": "0x41679043846d1b16b44fbf6e7fe531390e5bf092",
+  "registry_v2-StartBlock": "16159984",
+  
+
   "callHandlersEnabled": true,
 
+  "protocolId": "0x727fe1759430df13655ddb0731dE0D0FDE929b04",
+  "yearnTreasuryVault": "0x89716ad7edc3be3b35695789c475f3e7a3deb12a",
+  "defaultNetwork": "Network.FANTOM",
+
   "manualVaults": [
-    {
-      "name": "ftmYvWFTMVault",
-      "address": "0x0dec85e74a92c52b7f708c4b10207d9560cefaf0",
-      "startBlock": "16476356"
-    },
-    {
-      "name": "ftmYvMIMVault",
-      "address": "0x0a0b23d9786963de69cb2447dc125c49929419d8",
-      "startBlock": "18309707"
-    },
-    {
-      "name": "ftmYvUSDCVault",
-      "address": "0xef0210eb96c7eb36af8ed1c20306462764935607",
-      "startBlock": "18387308"
-    },
     {
       "name": "ftmYvDAIVault",
       "address": "0x637ec617c86d24e421328e6caea1d92114892439",
       "startBlock": "16158918"
-    },
-    {
-      "name": "ftmYvYFIVault",
-      "address": "0x2C850cceD00ce2b14AA9D658b7Cad5dF659493Db",
-      "startBlock": "16844703"
-    },
-    {
-      "name": "ftmYv2CRVVault",
-      "address": "0xA6A0cA45c2ceF0c5C0E0B58A8Ddd59209378B76A",
-      "startBlock": "16861262"
     }
   ]
 }

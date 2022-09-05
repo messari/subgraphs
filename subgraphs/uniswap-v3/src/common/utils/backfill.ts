@@ -17,6 +17,7 @@ import {
   getOrCreateDex,
   getOrCreateLPToken,
   getOrCreateToken,
+  getTradingFee,
 } from "../getters";
 import { updateTokenWhitelists } from "../updateMetrics";
 import { Pool as PoolTemplate } from "../../../generated/templates";
@@ -70,11 +71,18 @@ export function populateEmptyPools(event: ethereum.Event): void {
     pool.fees = createPoolFees(poolAddress, poolContract.fee());
     pool.createdTimestamp = event.block.timestamp;
     pool.createdBlockNumber = event.block.number;
-    pool.name = protocol.name + " " + LPtoken.symbol;
     pool.symbol = LPtoken.symbol;
     pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    pool.name =
+      protocol.name +
+      " " +
+      LPtoken.symbol +
+      " " +
+      getTradingFee(pool.id).toString() +
+      "%";
 
     poolAmounts.inputTokens = [token0.id, token1.id];
     poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];

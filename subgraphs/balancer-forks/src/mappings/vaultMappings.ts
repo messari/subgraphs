@@ -45,11 +45,14 @@ export function handleTokensRegistered(event: TokensRegistered): void {
   let inputTokens: string[] = [];
   let inputTokenLength = tokens.length;
   for (let idx = 0; idx < inputTokenLength; idx++) {
-    inputTokens.push(getOrCreateToken(tokens.at(idx)).id);
+    // Exception: StablePoolFactory added poolAddress in event params token
+    if (tokens.at(idx).equals(poolAddress)) continue;
+
+    inputTokens.push(getOrCreateToken(tokens.at(idx), event.block.number).id);
   }
 
   pool.inputTokens = inputTokens;
-  pool.inputTokenBalances = new Array<BigInt>(inputTokenLength).fill(
+  pool.inputTokenBalances = new Array<BigInt>(inputTokens.length).fill(
     constants.BIGINT_ZERO
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
@@ -75,6 +78,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   if (total.gt(constants.BIGINT_ZERO)) {
     Deposit(
       poolAddress,
+      inputTokens,
       deltas,
       fees,
       provider,
@@ -84,6 +88,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   } else {
     Withdraw(
       poolAddress,
+      inputTokens,
       deltas,
       fees,
       provider,

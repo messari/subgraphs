@@ -1,5 +1,4 @@
 import {
-  log,
   BigInt,
   Address,
   ethereum,
@@ -8,16 +7,15 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   getOrCreateToken,
+  getOrCreateLiquidityPool,
   getOrCreateDexAmmProtocol,
   getOrCreateLiquidityPoolFee,
 } from "./initializers";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { PoolFeesType, PoolTokensType } from "./types";
 import { Token, LiquidityPool } from "../../generated/schema";
 import { Vault as VaultContract } from "../../generated/Vault/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/Vault/ERC20";
-import { Gauge as LiquidityGaugeContract } from "../../generated/templates/gauge/Gauge";
 import { WeightedPool as WeightedPoolContract } from "../../generated/templates/WeightedPool/WeightedPool";
 import { FeesCollector as FeesCollectorContract } from "../../generated/templates/WeightedPool/FeesCollector";
 
@@ -36,8 +34,11 @@ export function readValue<T>(
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
-export function getOrCreateTokenFromString(tokenAddress: string): Token {
-  return getOrCreateToken(Address.fromString(tokenAddress));
+export function getOrCreateTokenFromString(
+  tokenAddress: string,
+  blockNumber: BigInt
+): Token {
+  return getOrCreateToken(Address.fromString(tokenAddress), blockNumber);
 }
 
 export function getTokenDecimals(tokenAddr: Address): BigDecimal {
@@ -64,17 +65,26 @@ export function getPoolTokensInfo(poolId: Bytes): PoolTokensType {
   );
 }
 
-export function getPoolFromGauge(gaugeAddress: Address): Address | null {
-  const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
+export function getOutputTokenPriceUSD(
+  poolAddress: Address,
+  block: ethereum.Block
+): BigDecimal {
+  const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  let poolAddress = readValue<Address>(
-    gaugeContract.try_lp_token(),
-    constants.NULL.TYPE_ADDRESS
+  if (pool.outputTokenSupply!.equals(constants.BIGINT_ZERO))
+    return constants.BIGDECIMAL_ZERO;
+
+  let outputToken = getOrCreateToken(poolAddress, block.number);
+
+  let outputTokenSupply = pool.outputTokenSupply!.divDecimal(
+    constants.BIGINT_TEN.pow(outputToken.decimals as u8).toBigDecimal()
   );
+  let outputTokenPriceUSD = pool.totalValueLockedUSD.div(outputTokenSupply);
 
-  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return null;
-  
-  return poolAddress;
+  outputToken.lastPriceUSD = outputTokenPriceUSD;
+  outputToken.save();
+
+  return outputTokenPriceUSD;
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
@@ -88,7 +98,29 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   );
 }
 
-export function getPoolTokenWeights(poolAddress: Address): BigDecimal[] {
+export function getPoolTokenWeightsForDynamicWeightPools(
+  poolAddress: Address
+): BigDecimal[] {
+  const poolContract = WeightedPoolContract.bind(poolAddress);
+
+  let scales = readValue<BigInt[]>(poolContract.try_getScalingFactors(), []);
+  let totalScale = scales
+    .reduce<BigInt>((sum, current) => sum.plus(current), constants.BIGINT_ZERO)
+    .toBigDecimal();
+
+  let inputTokenWeights: BigDecimal[] = [];
+  for (let idx = 0; idx < scales.length; idx++) {
+    inputTokenWeights.push(
+      scales.at(idx).divDecimal(totalScale).times(constants.BIGDECIMAL_HUNDRED)
+    );
+  }
+
+  return inputTokenWeights;
+}
+
+export function getPoolTokenWeightsForNormalizedPools(
+  poolAddress: Address
+): BigDecimal[] {
   const poolContract = WeightedPoolContract.bind(poolAddress);
 
   let weights = readValue<BigInt[]>(
@@ -113,28 +145,61 @@ export function getPoolTokenWeights(poolAddress: Address): BigDecimal[] {
   return inputTokenWeights;
 }
 
+export function getPoolTokenWeights(poolAddress: Address): BigDecimal[] {
+  let inputTokenWeights = getPoolTokenWeightsForNormalizedPools(poolAddress);
+  if (inputTokenWeights.length > 0) return inputTokenWeights;
+
+  inputTokenWeights = getPoolTokenWeightsForDynamicWeightPools(poolAddress);
+
+  return inputTokenWeights;
+}
+
 export function getPoolTVL(
   inputTokens: string[],
-  inputTokenBalances: BigInt[]
+  inputTokenBalances: BigInt[],
+  block: ethereum.Block
 ): BigDecimal {
   let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
   for (let idx = 0; idx < inputTokens.length; idx++) {
     let inputTokenBalance = inputTokenBalances[idx];
 
-    let inputTokenAddress = Address.fromString(inputTokens[idx]);
-    let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-    let inputTokenDecimals = getTokenDecimals(inputTokenAddress);
+    let inputToken = getOrCreateTokenFromString(inputTokens[idx], block.number);
 
     let amountUSD = inputTokenBalance
-      .divDecimal(inputTokenDecimals)
-      .times(inputTokenPrice.usdPrice)
-      .div(inputTokenPrice.decimalsBaseTen);
-
+      .divDecimal(
+        constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+      )
+      .times(inputToken.lastPriceUSD!);
     totalValueLockedUSD = totalValueLockedUSD.plus(amountUSD);
   }
 
   return totalValueLockedUSD;
+}
+
+export function getOutputTokenSupply(
+  poolAddress: Address,
+  oldSupply: BigInt
+): BigInt {
+  let poolContract = WeightedPoolContract.bind(poolAddress);
+
+  let totalSupply = readValue<BigInt>(
+    poolContract.try_totalSupply(),
+    oldSupply
+  );
+
+  if (poolAddress.equals(constants.AAVE_BOOSTED_POOL_ADDRESS)) {
+    // Exception: Aave Boosted Pool
+    // since this pool pre-mints all BPT, `totalSupply` * remains constant,
+    // whereas`getVirtualSupply` increases as users join the pool and decreases as they exit it
+
+    totalSupply = readValue<BigInt>(
+      poolContract.try_getVirtualSupply(),
+      oldSupply
+    );
+  }
+
+  return totalSupply;
 }
 
 export function getPoolFees(poolAddress: Address): PoolFeesType {
@@ -219,4 +284,34 @@ export function updateProtocolAfterNewLiquidityPool(
   protocol.totalPoolCount += 1;
 
   protocol.save();
+}
+
+// convert decimals
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let bd = constants.BIGDECIMAL_ONE;
+  for (
+    let i = constants.INT_ZERO;
+    i < (decimals as i32);
+    i = i + constants.INT_ONE
+  ) {
+    bd = bd.times(constants.BIGDECIMAL_TEN);
+  }
+  return bd;
+}
+
+// convert emitted values to tokens count
+export function convertTokenToDecimal(
+  tokenAmount: BigInt,
+  exchangeDecimals: i32
+): BigDecimal {
+  if (exchangeDecimals == constants.INT_ZERO) {
+    return tokenAmount.toBigDecimal();
+  }
+
+  return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals));
+}
+
+// Round BigDecimal to whole number
+export function roundToWholeNumber(n: BigDecimal): BigDecimal {
+  return n.truncate(0);
 }

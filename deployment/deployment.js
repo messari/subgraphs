@@ -19,7 +19,8 @@ if (
   args.network === undefined ||
   args.location === undefined ||
   args.printlogs === undefined ||
-  args.merge === undefined
+  args.merge === undefined ||
+  args.type === undefined
 ) {
   console.log(
     "Usage: node deployment.js --subgraph=" +
@@ -33,14 +34,20 @@ if (
       " --printlogs=" +
       args.printlogs +
       " --merge=" +
-      args.merge
+      args.merge +
+      " --type=" +
+      args.type
   );
   console.log(
     "Please check subgraph:deploy script in package.json. Make sure it matches example script in the deployments folder. "
   );
-} else if (!args.subgraph || !args.location) {
-  console.log("Please provide at least --SUBGRAPH and --LOCATION");
-} else if (args.subgraph && args.protocol && args.network && args.location) {
+} else if (!args.subgraph || !(args.location || args.type)) {
+  console.log(
+    "Please provide at least --SUBGRAPH and either --LOCATION or --TYPE"
+  );
+} else if (!["build", "deploy", ""].includes(args.type.toLowerCase())) {
+  console.log("Please provide --TYPE=build or --TYPE=deploy");
+} else if (args.subgraph && args.protocol && args.network) {
   if (args.subgraph in protocolNetworkMap == false) {
     console.log(
       "Error: please specify a a valid subgraph directory or add to configurations (e.g. uniswap-forks, compound-forks, qidao, etc"
@@ -92,12 +99,19 @@ if (
     } else {
       allScripts.set(
         location,
-        scripts(protocol, network, template, location, prepareConstants)
+        scripts(
+          protocol,
+          network,
+          template,
+          location,
+          prepareConstants,
+          args.type
+        )
       );
     }
     runCommands(allScripts, results, args, function (results) {});
   }
-} else if (args.subgraph && args.protocol && args.location) {
+} else if (args.subgraph && args.protocol) {
   if (args.subgraph in protocolNetworkMap == false) {
     console.log(
       "Error: please specify a a valid subgraph directory or add to configurations  (e.g. uniswap-forks, compound-forks, qidao, etc"
@@ -140,20 +154,28 @@ if (
             "deploy-on-merge"
           ]
         ) &&
-        ["true", "t"].includes(args.merge.toLowerCase())
+        ["true", "t"].includes(args.merge.toLowerCase()) &&
+        args.deploy != "build"
       ) {
         results += "Ignored in Deployment Configurations: " + location + "\n";
       } else {
         allScripts.set(
           location,
-          scripts(protocol, network, template, location, prepareConstants)
+          scripts(
+            protocol,
+            network,
+            template,
+            location,
+            prepareConstants,
+            args.type
+          )
         );
       }
     }
 
     runCommands(allScripts, results, args, function (results) {});
   }
-} else if (args.subgraph && args.location) {
+} else if (args.subgraph) {
   if (args.subgraph in protocolNetworkMap == false) {
     console.log(
       "Error: please specify a a valid subgraph directory or add to configurations  (e.g. uniswap-forks, compound-forks, qidao, etc"
@@ -198,7 +220,14 @@ if (
         } else {
           allScripts.set(
             location,
-            scripts(protocol, network, template, location, prepareConstants)
+            scripts(
+              protocol,
+              network,
+              template,
+              location,
+              prepareConstants,
+              args.type
+            )
           );
         }
       }
@@ -207,5 +236,5 @@ if (
     runCommands(allScripts, results, args, function (results) {});
   }
 } else {
-  console.log("UNKOWN - Please post issue on github.");
+  console.log("UNKNOWN - Please post issue on github.");
 }

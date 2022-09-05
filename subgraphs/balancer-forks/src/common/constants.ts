@@ -101,11 +101,22 @@ export namespace Protocol {
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 
+export namespace MasterChef {
+  export const MINICHEF = "MINICHEF";
+  export const MASTERCHEF = "MASTERCHEF";
+  export const MASTERCHEFV2 = "MASTERCHEFV2";
+  export const MASTERCHEFV3 = "MASTERCHEFV3";
+}
+
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const MAX_BPS = BigInt.fromI32(10000);
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
+export const INT_ZERO = 0 as i32;
+export const INT_ONE = 1 as i32;
+
+export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TEN = BigInt.fromI32(10);
@@ -113,24 +124,23 @@ export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_NEGATIVE_ONE = BigInt.fromString("-1");
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
+export const BIGDECIMAL_TEN = new BigDecimal(BIGINT_TEN);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 export const BIGDECIMAL_POINT_FOUR = BigDecimal.fromString("0.4");
 
-export const FEE_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
+export const DEFAULT_DECIMALS_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
+export const FEE_DENOMINATOR = DEFAULT_DECIMALS_DENOMINATOR;
 
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
-export const WEEKLY_BAL_EMISSIONS = BigDecimal.fromString("145000");
-export const DAILY_BAL_EMISSIONS = WEEKLY_BAL_EMISSIONS.div(
-  BigDecimal.fromString("7")
-);
+export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
 
-
-/////////////////////////////
-///// Protocol Specific /////
-/////////////////////////////
+/////////////////////////////////////
+///// Protocol/Network Specific /////
+/////////////////////////////////////
 
 export const VAULT_ADDRESS = Address.fromString(
   "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
@@ -138,9 +148,15 @@ export const VAULT_ADDRESS = Address.fromString(
 export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
   "0xce88686553686DA562CE7Cea497CE749DA109f9F"
 );
-export const BALANCER_TOKEN_ADDRESS = Address.fromString(
+export const PROTOCOL_TOKEN_ADDRESS = Address.fromString(
   "0xba100000625a3754423978a60c9317c58a424e3D"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
   "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD"
 );
+export const AAVE_BOOSTED_POOL_ADDRESS = Address.fromString(
+  "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2"
+);
+
+export const INFLATION_INTERVAL = "TIMESTAMP";
+export const STARTING_INFLATION_RATE = BigDecimal.fromString((0.23974867724).toString()).times(DEFAULT_DECIMALS_DENOMINATOR);

@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - id: files
-        uses: jitterbit/get-changed-files@v1
+        uses: Ana06/get-changed-files@v1.2
         continue-on-error: true
 
       - uses: actions/checkout@v2

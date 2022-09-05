@@ -2,54 +2,24 @@ import { styled } from "../styled";
 import { useNavigate } from "react-router";
 import { SearchInput } from "../common/utilComponents/SearchInput";
 import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
-import { Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { NewClient } from "../utils";
 import { useEffect, useMemo, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
 import { useQuery } from "@apollo/client";
 import { decentralizedNetworkSubgraphsQuery } from "../queries/decentralizedNetworkSubgraphsQuery";
+import DefiLlamaComparsionTab from "../interfaces/DefiLlamaComparisonTab";
 
 const DeploymentsLayout = styled("div")`
   padding: 0;
 `;
 
-function DeploymentsPage() {
-  const [ProtocolsToQuery, setProtocolsToQuery] = useState<{
-    [type: string]: { [proto: string]: { [network: string]: string } };
-  }>({});
-  const getData = () => {
-    fetch("/deployments.json", {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
-      .then(function (res) {
-        return res.json();
-      })
-      .then(function (json) {
-        setProtocolsToQuery(json);
-      })
-      .catch((err) => {
-        console.log(err);
-        fetch("/deployments.json", {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        })
-          .then(function (res) {
-            return res.json();
-          })
-          .then(function (json) {
-            setProtocolsToQuery(json);
-          })
-          .catch((err) => {
-            window.location.reload();
-          });
-      });
-  };
+interface DeploymentsPageProps {
+  ProtocolsToQuery: { [x: string]: any };
+  getData: any;
+}
 
+function DeploymentsPage({ ProtocolsToQuery, getData }: DeploymentsPageProps) {
   const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
@@ -75,38 +45,45 @@ function DeploymentsPage() {
       const decenDepos: { [x: string]: any } = { exchanges: {}, lending: {}, vaults: {}, generic: {} };
       const subs = decentralized.graphAccount.subgraphs;
       subs.forEach((sub: any, idx: number) => {
-        let name = sub.currentVersion.subgraphDeployment.originalName.toLowerCase().split(" ");
-        name.pop();
-        name = name.join("-");
-        const network = sub.currentVersion.subgraphDeployment.network.id;
-        const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
-        const subgraphId = sub.id;
-        const schemaVersion = sub.currentVersion.subgraphDeployment.schema
-          .split("\n")
-          .join("")
-          .split("#")
-          .find((x: string[]) => x.includes("Version:"))
-          .split("Version:")[1]
-          .trim();
-        const protocolTypeRaw = sub.currentVersion.subgraphDeployment.schema
-          .split("\n")
-          .join("")
-          .split("#")
-          .find((x: string[]) => x.includes("Subgraph Schema:"))
-          .split("Subgraph Schema:")[1]
-          .trim();
-        let protocolType = "generic";
-        if (protocolTypeRaw.toUpperCase().includes("LEND")) {
-          protocolType = "lending";
-        } else if (
-          protocolTypeRaw.toUpperCase().includes("EXCHANGE") ||
-          protocolTypeRaw.toUpperCase().includes("DEX")
-        ) {
-          protocolType = "exchanges";
-        } else if (protocolTypeRaw.toUpperCase().includes("VAULT") || protocolTypeRaw.toUpperCase().includes("YIELD")) {
-          protocolType = "vaults";
+        try {
+          let name = sub.currentVersion?.subgraphDeployment?.originalName?.toLowerCase()?.split(" ");
+          if (!name) {
+            name = sub?.displayName?.toLowerCase()?.split(" ");
+          }
+          name.pop();
+          name = name.join("-");
+          const network = sub.currentVersion.subgraphDeployment.network.id;
+          const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
+          const subgraphId = sub.id;
+          const schemaVersion = sub.currentVersion.subgraphDeployment.schema
+            .split("\n")
+            .join("")
+            .split("#")
+            .find((x: string[]) => x.includes("Version:"))
+            .split("Version:")[1]
+            .trim();
+          const protocolTypeRaw = sub.currentVersion.subgraphDeployment.schema
+            .split("\n")
+            .join("")
+            .split("#")
+            .find((x: string[]) => x.includes("Subgraph Schema:"))
+            .split("Subgraph Schema:")[1]
+            .trim();
+          let protocolType = "generic";
+          if (protocolTypeRaw.toUpperCase().includes("LEND")) {
+            protocolType = "lending";
+          } else if (
+            protocolTypeRaw.toUpperCase().includes("EXCHANGE") ||
+            protocolTypeRaw.toUpperCase().includes("DEX")
+          ) {
+            protocolType = "exchanges";
+          } else if (protocolTypeRaw.toUpperCase().includes("VAULT") || protocolTypeRaw.toUpperCase().includes("YIELD")) {
+            protocolType = "vaults";
+          }
+          decenDepos[protocolType][name] = { network, schemaVersion, deploymentId, subgraphId };
+        } catch (err) {
+          return;
         }
-        decenDepos[protocolType][name] = { network, schemaVersion, deploymentId, subgraphId };
       });
       setDecentralizedDeployments(decenDepos);
     }
@@ -119,9 +96,17 @@ function DeploymentsPage() {
   let decentralizedSubgraphTable = null;
   if (Object.keys(decentralizedDeployments)?.length) {
     decentralizedSubgraphTable = Object.keys(decentralizedDeployments).map((key) => {
-      if (!Object.keys(decentralizedDeployments[key]).length) {
+      const finalDeposList: any = {};
+      Object.keys(decentralizedDeployments[key]).forEach((x) => {
+        if (Object.keys(ProtocolsToQuery[key]).find((pro) => pro.includes(x))) {
+          finalDeposList[x] = decentralizedDeployments[key][x];
+        }
+      });
+
+      if (!Object.keys(finalDeposList).length) {
         return null;
       }
+
       return (
         <>
           <Typography
@@ -137,7 +122,7 @@ function DeploymentsPage() {
           <DeploymentsTable
             key={"depTable-" + key}
             clientIndexing={clientIndexing}
-            protocolsOnType={decentralizedDeployments[key]}
+            protocolsOnType={finalDeposList}
             protocolType={key}
             isDecentralizedNetworkTable={true}
           />
@@ -164,19 +149,16 @@ function DeploymentsPage() {
         >
           Load Subgraph
         </SearchInput>
+        <div style={{ width: "100%", textAlign: "right", marginTop: "20px" }}>
+          <Button variant="contained" color="primary" onClick={() => navigate("/comparison")}>
+            Defi Llama Comparison
+          </Button>
+        </div>
         {decentralizedSubgraphTable}
         <Typography variant="h4" align="center" sx={{ my: 4 }}>
           Hosted Service Subgraphs
         </Typography>
         {Object.keys(ProtocolsToQuery).map((key) => {
-          // map through Obj.keys of decentralizedDeployments[key], split them by space and lowercase. Then map through obj.keys of ProtocolsToQuery[key] and see if a similar key is found in both
-          // if (decentralizedDeployments[key]) {
-          //   Object.keys(decentralizedDeployments[key]).forEach(depo => {
-          //     const keyArr = depo.split("-")
-          //     const protocol = Object.keys(ProtocolsToQuery[key]).find(x => x.includes(keyArr[0]))
-          //   })
-          // }
-          // const allProtocolsOnKey = { ...ProtocolsToQuery[key], ...decentralizedDeployments[key] }
           return (
             <>
               <Typography

@@ -1,4 +1,10 @@
-import { Address, BigInt, log, BigDecimal } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  log,
+  BigDecimal,
+  dataSource
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   ProtocolData,
@@ -20,7 +26,7 @@ import {
   getOrElse,
   _handleActionPaused,
   snapshotFinancials,
-  _handleMarketEntered,
+  _handleMarketEntered
 } from "../../../src/mapping";
 import {
   cTokenDecimals,
@@ -29,6 +35,7 @@ import {
   exponentToBigDecimal,
   BIGDECIMAL_ZERO,
   SECONDS_PER_DAY,
+  Network
 } from "../../../src/constants";
 import {
   LendingProtocol,
@@ -36,7 +43,7 @@ import {
   Market,
   _DforceMarketStatus,
   RewardToken,
-  FinancialsDailySnapshot,
+  FinancialsDailySnapshot
 } from "../../../generated/schema";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 
@@ -45,7 +52,7 @@ import { CToken } from "../../../generated/Comptroller/CToken";
 import { PriceOracle } from "../../../generated/Comptroller/PriceOracle";
 import {
   CToken as CTokenTemplate,
-  Reward as RewardTemplate,
+  Reward as RewardTemplate
 } from "../../../generated/templates";
 import {
   getNetworkSpecificConstant,
@@ -56,16 +63,16 @@ import {
   PRICE_BASE,
   DISTRIBUTIONFACTOR_BASE,
   DF_ADDRESS,
-  MKR_ADDRESS,
+  MKR_ADDRESS
 } from "./constants";
 import {
   RewardDistributor,
   RewardDistributed,
-  NewRewardToken,
+  NewRewardToken
 } from "../../../generated/templates/Reward/RewardDistributor";
 import {
   stablecoin,
-  Transfer as StablecoinTransfer,
+  Transfer as StablecoinTransfer
 } from "../../../generated/USX/stablecoin";
 import {
   NewPriceOracle,
@@ -79,7 +86,7 @@ import {
   TransferPaused,
   Comptroller,
   MarketEntered,
-  MarketExited,
+  MarketExited
 } from "../../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -88,7 +95,7 @@ import {
   RepayBorrow,
   LiquidateBorrow,
   UpdateInterest as AccrueInterest,
-  NewReserveRatio,
+  NewReserveRatio
 } from "../../../generated/templates/CToken/CToken";
 
 // Constant values
@@ -106,6 +113,7 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 
 export function handleMarketEntered(event: MarketEntered): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.iToken.toHexString(),
     event.params.account.toHexString(),
     true
@@ -114,6 +122,7 @@ export function handleMarketEntered(event: MarketEntered): void {
 
 export function handleMarketExited(event: MarketExited): void {
   _handleMarketEntered(
+    comptrollerAddr,
     event.params.iToken.toHexString(),
     event.params.account.toHexString(),
     false
@@ -231,7 +240,7 @@ export function handleMintPaused(event: MintPaused): void {
   market.isActive = !anyTrue([
     _marketStatus.mintPaused,
     _marketStatus.redeemPaused,
-    _marketStatus.transferPaused,
+    _marketStatus.transferPaused
   ]);
 
   market.save();
@@ -254,7 +263,7 @@ export function handleRedeemPaused(event: RedeemPaused): void {
   market.isActive = !anyTrue([
     _marketStatus.mintPaused,
     _marketStatus.redeemPaused,
-    _marketStatus.transferPaused,
+    _marketStatus.transferPaused
   ]);
 
   market.save();
@@ -280,7 +289,7 @@ export function handleTransferPaused(event: TransferPaused): void {
     market.isActive = !anyTrue([
       _marketStatus.mintPaused,
       _marketStatus.redeemPaused,
-      _marketStatus.transferPaused,
+      _marketStatus.transferPaused
     ]);
 
     market.save();
@@ -410,6 +419,7 @@ export function handleUpdateInterest(event: AccrueInterest): void {
     comptrollerAddr,
     event.params.interestAccumulated,
     event.params.totalBorrows,
+    network.toLowerCase() == Network.MAINNET.toLowerCase(),
     event
   );
 }
@@ -507,7 +517,7 @@ export function handleRewardDistributed(event: RewardDistributed): void {
   let rewardToken = Token.load(rewardTokenId);
   if (rewardToken == null) {
     log.warning("[handleRewardDistributed] Token not found: {}", [
-      rewardTokenId,
+      rewardTokenId
     ]);
     return;
   }
@@ -639,7 +649,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "dForce v2",
     "dforce-v2",
     "2.0.1",
-    "1.1.0",
+    "1.1.4",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),

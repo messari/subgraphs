@@ -1,6 +1,3 @@
-import * as utils from "../common/utils";
-import * as constants from "../common/constants";
-import { BigInt, log } from "@graphprotocol/graph-ts";
 import {
   Vault as VaultStore,
   VaultFee as VaultFeeStore,
@@ -27,11 +24,14 @@ import {
   UpdateManagementFee as UpdateManagementFeeEvent,
   UpdatePerformanceFee as UpdatePerformanceFeeEvent,
 } from "../../generated/Registry_v1/Vault";
+import * as utils from "../common/utils";
 import { _Deposit } from "../modules/Deposit";
 import { _Withdraw } from "../modules/Withdraw";
+import * as constants from "../common/constants";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import { strategyReported } from "../modules/Strategy";
+import { getOrCreateVault } from "../common/initializers";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
-import { getOrCreateStrategy, getOrCreateVault } from "../common/initializers";
 
 export function handleStrategyAdded_v1(event: StrategyAddedV1Event): void {
   const vaultAddress = event.address;
@@ -40,14 +40,7 @@ export function handleStrategyAdded_v1(event: StrategyAddedV1Event): void {
 
   let vault = getOrCreateVault(vaultAddress, event.block);
   if (vault) {
-    let strategy = getOrCreateStrategy(
-      vaultAddress,
-      strategyAddress,
-      performanceFee
-    );
-
     StrategyTemplate.create(strategyAddress);
-    strategy.save();
 
     log.warning("[SetStrategy_v1] TxHash: {}, VaultId: {}, Strategy: {}", [
       event.transaction.hash.toHexString(),
@@ -64,14 +57,7 @@ export function handleStrategyAdded_v2(event: StrategyAddedV2Event): void {
 
   let vault = getOrCreateVault(vaultAddress, event.block);
   if (vault) {
-    let strategy = getOrCreateStrategy(
-      vaultAddress,
-      strategyAddress,
-      performanceFee
-    );
-
     StrategyTemplate.create(strategyAddress);
-    strategy.save();
 
     log.warning("[SetStrategy_v2] TxHash: {}, VaultId: {}, Strategy: {}", [
       event.transaction.hash.toHexString(),
@@ -110,7 +96,7 @@ export function handleDepositWithAmount(call: Deposit1Call): void {
     const sharesMinted = call.outputs.value0;
     const depositAmount = call.inputs._amount;
 
-    call.transaction
+    call.transaction;
     _Deposit(
       vaultAddress,
       call.transaction,
@@ -298,15 +284,7 @@ export function handleStrategyReported_v1(
   const vaultAddress = event.address;
   const strategyAddress = event.params.strategy;
 
-  strategyReported(
-    event.params.gain,
-    constants.BIGINT_ZERO,
-    event.params.debtAdded,
-    event.params.totalDebt,
-    event,
-    vaultAddress,
-    strategyAddress
-  );
+  strategyReported(event.params.gain, vaultAddress, strategyAddress, event);
 
   updateFinancials(event.block);
   updateVaultSnapshots(vaultAddress, event.block);
@@ -318,15 +296,7 @@ export function handleStrategyReported_v2(
   const vaultAddress = event.address;
   const strategyAddress = event.params.strategy;
 
-  strategyReported(
-    event.params.gain,
-    event.params.debtPaid,
-    event.params.debtAdded,
-    event.params.totalDebt,
-    event,
-    vaultAddress,
-    strategyAddress
-  );
+  strategyReported(event.params.gain, vaultAddress, strategyAddress, event);
 
   updateFinancials(event.block);
   updateVaultSnapshots(vaultAddress, event.block);

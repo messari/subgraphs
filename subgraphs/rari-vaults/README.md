@@ -56,12 +56,15 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ## Known Issues
 
+- Rari Vaults supports multiple input tokens, so to fit our schema we made a new pool for each input token to a pool. `totalPoolCount` is higher than the number of actual pools because of this.
 - Eth vault revenues are weird
 - Big spike in revenues around 10/21/2020 (may be okay since there is also a big spike in activity)
 - _Note_: `OutputTokenSupply/Price` should be the same for each vault with the same contract addresses (ie, USDC pool mStable and USDC)
   - However, `pricePerShare` is a function of each individual vaults `inputTokenBalance` and the overall Pool's `outputTokenSupply`
 - `DEFAULT_DECIMALS` is used in places where the `BigInt` value is offset by a factor of 1e18 on the contract-level
 - _Note_: `pricePerShare` is very small for some vaults b/c the `outputTokenSupply` is aggregated and there is little of the `inputToken`
+- Vault `totalValueLockedUSD` includes "unclaimed fees", since this is the only way to get individual token balances in a multi-token vault.
+  - _Note_: if anyone can figure out how to do it without this please make a PR!
 
 ## Reference and Useful Links
 
