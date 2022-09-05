@@ -525,8 +525,6 @@ type Market @entity {
   " Name of market "
   name: String
 
-  # TODO: getActiveMarkets
-  # Can we calculate this only at maturity / initialization instead of every block?
   " Is this market active or is it frozen "
   isActive: Boolean!
 
@@ -605,7 +603,7 @@ type Market @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
-  # TODO: pending
+  # TODO: exchangeRate
   " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
   exchangeRate: BigDecimal
 
@@ -757,7 +755,7 @@ type MarketDailySnapshot @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
-  # TODO: pending
+  # TODO: exchangeRate
   " Amount of input token per full share of output token. Only applies when the output token exists "
   exchangeRate: BigDecimal
 
@@ -854,7 +852,7 @@ type MarketHourlySnapshot @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
-  # TODO: pending
+  # TODO: exchangeRate
   " Amount of input token per full share of output token. Only applies when the output token exists "
   exchangeRate: BigDecimal
 
@@ -1227,11 +1225,11 @@ type Liquidate @entity {
   " Account that got liquidated "
   liquidatee: Account!
 
-  # TODO: cannot associate with a market
+  # BLOCKED: cannot associate without a market, no market info in event
   " The market of the collateral being used "
   market: Market
 
-  # TODO: cannot create a position without a market
+  # BLOCKED: cannot create/update position without a market, no market info in event
   " The user position changed by this event "
   position: Position
 
@@ -1245,7 +1243,7 @@ type Liquidate @entity {
   " Amount of collateral liquidated in USD "
   amountUSD: BigDecimal!
 
-  # TODO: pending
+  # TODO: profitUSD
   " Amount of profit from liquidation in USD "
   profitUSD: BigDecimal!
 }
