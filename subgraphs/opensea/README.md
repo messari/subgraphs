@@ -91,7 +91,7 @@ There are 2 main styles of order flows (i.e. how a trade is made):
 - Sell side order: Seller (maker) lists NFT on OpenSea, Buyer (taker) buys NFT
 - Buy side order: Buyer (maker) bids/makes offer on NFT on Opensea, Seller (taker) accepts offer
 
-In either case, when a taker (buyer/seller) accepts a price, an order is matched and a trade is facillitated.
+In either case, when a taker (buyer/seller) accepts a price, an order is matched and a trade is facilitated.
 
 ### Order Matching
 
@@ -184,17 +184,17 @@ Here is the lookup table for variables corresponding to the call inputs:
 
 The subgraph call handler flow can be broken down into several steps:
 
-1. Inspect `sell.target` to determine whether the trade is a single sale or bundle sale. This is the contract the the `calldata` is sent to be executed (via `delegatecall`). Known `sell.target`s:
+1. Inspect `sell.target` to determine whether the trade is a single sale or bundle sale. This is the contract the the `calldata` is sent to be executed (via `delegatecall`). Known `sell.target` addresses:
 
    - `WyvernAtomicizer` ([0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5](https://etherscan.io/address/0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5))
    - `MerkleValidator` ([0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7](https://etherscan.io/address/0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7))
    - Actual NFT (ERC721/ERC1155) Contract
 
-   If `sell.target` is `WyvernAtomicizer`, the trade is a bundle sale (`calldata` "atomicized" or broken down into separate calls to their respective contracts).
+   If `sell.target` is `WyvernAtomicizer`, the trade is a bundle sale (`calldata` broken down into separate calls to their respective contracts and executed atomically).
 
    For single sales, `sell.target` is `MerkleValidator` or the actual ERC721/ERC1155 contracts.
 
-   Note that `MerkleValidator` deployed at block `14128524` after `WyvernExchangeWithBulkCancellations` at block `14120913`, meaning prior to block `14128524`, `WyvernExchangeWithBulkCancellations` interacts directly with ERC721/ERC1155 contracts with their respective `transferFrom` and `safeTransferFrom` calls. `WyvernExchange` interacts directly with ERC721/ERC1155 contracts.
+   Note that `MerkleValidator` is deployed at block `14128524` after `WyvernExchangeWithBulkCancellations` at block `14120913`, meaning prior to block `14128524`, `WyvernExchangeWithBulkCancellations` interacts directly with ERC721/ERC1155 contracts with their respective `transferFrom` and `safeTransferFrom` calls. `WyvernExchange` interacts directly with ERC721/ERC1155 contracts.
 
 2. If single sale, merge `buy.calldata` and `sell.calldata` together with `guardedArrayReplace` and decode single NFT into relevant fields with function signature.
 
@@ -208,7 +208,7 @@ The subgraph call handler flow can be broken down into several steps:
 
    which should be the same. This recreates the `calldata` sent to `sell.target`.
 
-   To ensure that `calldata` can be decoded via the Ethereum API, the function selector/signature (first 4 bytes of `calldata`) needs to be validated using `checkCallDataFunctionSelector` as one that is recognized.
+   To ensure that `calldata` can be decoded via the Ethereum API, the function selector/signature (first 4 bytes of `calldata`) needs to be validated using `validateCallDataFunctionSelector` as one that is recognized.
 
    Here is the lookup table for relevant function selectors:
 
@@ -253,7 +253,9 @@ The subgraph call handler flow can be broken down into several steps:
    ```js
    function atomicize (address[] addrs, uint[] values, uint[] calldataLengths, bytes calldatas)
    ```
-
+   
+   Note that there is no need to validate function selector using `validateCallDataFunctionSelector` since `WyvernAtomicizer` only contains one method. 
+   
    Decoding the `atomicize` method returns a list of targets (ERC721/ERC1155 contract addresses), `calldata` lengths, and `calldata` blob which can be split up into a list of individual contract calls.
 
    Similar to how single NFTs are decoded, the "atomicized" list of `calldata` can be decoded into individual transfers.
