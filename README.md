@@ -178,6 +178,5 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | LooksRare | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![LooksRare](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/looksrare-ethereum) |
 | Sudoswap | 🔨 | 1.0.0 / 1.0.0 / 1.0.0 |  |
 | X2Y2 | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![X2Y2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/x2y2-ethereum) |
->>>>>>> master
 
 † Versions are schema version, subgraph version, methodology version respectively
