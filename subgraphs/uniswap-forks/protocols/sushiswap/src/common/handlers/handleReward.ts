@@ -13,14 +13,16 @@ import {
   INT_ZERO,
   MasterChef,
   RECENT_BLOCK_THRESHOLD,
-  UsageType,
 } from "../../../../../src/common/constants";
 import {
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "../../../../../src/common/getters";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
-import { getOrCreateMasterChef } from "../helpers";
+import {
+  getOrCreateMasterChef,
+  getOrCreateMasterChefStakingPool,
+} from "../../../../../src/common/masterchef/helpers";
 import {
   convertTokenToDecimal,
   roundToWholeNumber,
@@ -32,8 +34,7 @@ import {
 export function handleReward(
   event: ethereum.Event,
   pid: BigInt,
-  amount: BigInt,
-  usageType: string
+  amount: BigInt
 ): void {
   let poolContract = MasterChefSushiswap.bind(event.address);
   let masterChefPool = getOrCreateMasterChefStakingPool(
@@ -42,6 +43,7 @@ export function handleReward(
     pid
   );
   let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
+  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
   // Check if the liquidity pool address is available. Try to get it if not or return if the contract call was reverted
   if (!masterChefPool.poolAddress) {
@@ -65,18 +67,18 @@ export function handleReward(
   let pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
     return;
-  } else {
-    pool.rewardTokens = [
-      getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
-    ];
   }
 
+  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  pool.rewardTokens = [
+    getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
+  ];
+
   // Update staked amounts
-  if (usageType == UsageType.DEPOSIT) {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
-  } else {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
-  }
+  // Positive for deposits, negative for withdraws
+  pool.stakedOutputTokenAmount = !pool.stakedOutputTokenAmount
+    ? amount
+    : pool.stakedOutputTokenAmount!.plus(amount);
 
   // Return if you have calculated rewards recently - Performance Boost
   if (
@@ -110,53 +112,32 @@ export function handleReward(
     masterChef.totalAllocPoint = getTotalAlloc.value;
   }
 
-  // Address where allocation is moved to over time to reduce inflation.
-  // This is like a burn address, so that less reward tokens are minted into circulation over time
-  let getPoolInfo45 = poolContract.try_poolInfo(BigInt.fromI32(45));
-  let masterPoolAllocPID45: BigInt = BIGINT_ZERO;
-  if (!getPoolInfo45.reverted) {
-    masterPoolAllocPID45 = getPoolInfo45.value.value1;
-  }
-
   // Allocation from the MasterChefV2 Contract.
   // This portion of the allocation is fed into the MasterChevV2 contract.
   // This means the proportion of rewards at this allocation will be all rewards emitted by MasterChefV2.
   let getPoolInfo250 = poolContract.try_poolInfo(BigInt.fromI32(250));
-  let masterPoolAllocPID250: BigInt = BIGINT_ZERO;
+  let masterChefV2Alloc: BigInt;
   if (!getPoolInfo250.reverted) {
-    masterPoolAllocPID250 = getPoolInfo250.value.value1;
+    masterChefV2Alloc = getPoolInfo250.value.value1;
+  } else {
+    masterChefV2Alloc = BIGINT_ZERO;
   }
 
-  // Total allocation to staking pools that are giving out rewards to users in MasterChef (V1)
-  let usedTotalAllocation = masterChef.totalAllocPoint
-    .minus(masterPoolAllocPID45)
-    .minus(masterPoolAllocPID250);
-
-  // Calculate Reward Emission per Block to a specific pool
-  // Pools are allocated based on their fraction of the total allocation times the adjusted rewards emitted per block
-  masterChef.adjustedRewardTokenRate = usedTotalAllocation
-    .div(masterChef.totalAllocPoint)
-    .times(masterChef.rewardTokenRate);
+  // Adjusted Reward Emission are just the static reward rate
+  masterChef.adjustedRewardTokenRate = masterChef.rewardTokenRate;
   masterChef.lastUpdatedRewardRate = event.block.number;
 
-  log.warning("USED TOTAL ALLOCATION: " + usedTotalAllocation.toString(), []);
-  log.warning("TOTAL ALLOCATION: " + masterChef.totalAllocPoint.toString(), []);
-  log.warning(
-    "USED TOTAL ALLOCATION: " + masterChef.rewardTokenRate.toString(),
-    []
-  );
-  log.warning(
-    "ADJUSTED REWARD RATE: " + masterChef.adjustedRewardTokenRate.toString(),
-    []
-  );
+  // Calculate Adjusted Reward Emission per Block to the MasterChefV2 Contract
+  masterChefV2.adjustedRewardTokenRate = masterChefV2Alloc
+    .div(masterChef.totalAllocPoint)
+    .times(masterChef.rewardTokenRate);
+  masterChefV2.lastUpdatedRewardRate = event.block.number;
 
   // Calculate Reward Emission per Block
-  let poolRewardTokenRate = masterChef.adjustedRewardTokenRate
+  let poolRewardTokenRate = masterChefPool.multiplier
+    .times(masterChef.adjustedRewardTokenRate)
     .times(masterChefPool.poolAllocPoint)
     .div(masterChef.totalAllocPoint);
-
-  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
   let rewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
@@ -181,34 +162,7 @@ export function handleReward(
 
   masterChefPool.save();
   masterChef.save();
+  masterChefV2.save();
   rewardToken.save();
-  nativeToken.save();
   pool.save();
-}
-
-// Create a MasterChefStaking pool using the MasterChef pid for id.
-function getOrCreateMasterChefStakingPool(
-  event: ethereum.Event,
-  masterChefType: string,
-  pid: BigInt
-): _MasterChefStakingPool {
-  let masterChefPool = _MasterChefStakingPool.load(
-    masterChefType + "-" + pid.toString()
-  );
-
-  // Create entity to track masterchef pool mappings
-  if (!masterChefPool) {
-    masterChefPool = new _MasterChefStakingPool(
-      masterChefType + "-" + pid.toString()
-    );
-
-    masterChefPool.multiplier = BIGINT_ONE;
-    masterChefPool.poolAllocPoint = BIGINT_ZERO;
-    masterChefPool.lastRewardBlock = event.block.number;
-    log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
-
-    masterChefPool.save();
-  }
-
-  return masterChefPool;
 }

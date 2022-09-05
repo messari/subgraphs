@@ -28,7 +28,11 @@ const messagesByLevel = (
     for (let x = 0; x < issuesArray.length; x++) {
       let issuesMsg = (issuesArray[x].fieldName ? issuesArray[x].fieldName + ": " : "") + issuesArray[x].message;
       if (issuesArray[x].type === "SUM") {
-        issuesMsg = `All values in ${issuesArray[x].fieldName} are 0. Verify that this data is being mapped correctly.`;
+        let factors = "";
+        if (issuesArray[x].message) {
+          factors = "This field is derived from the following factors: " + issuesArray[x].message + ". ";
+        }
+        issuesMsg = `All values in ${issuesArray[x].fieldName} are 0. ${factors}Verify that this data is being mapped correctly.`;
       }
       if (issuesArray[x].type === "LIQ") {
         issuesMsg = `${issuesArray[x].fieldName} timeseries value cannot be higher than totalValueLockedUSD on the pool. Look at snapshot id ${issuesArray[x].message}`;
@@ -63,7 +67,13 @@ const messagesByLevel = (
         issuesMsg = issuesArray[x].message;
       }
       if (issuesArray[x].type === "TOK") {
-        issuesMsg = `'${issuesArray[x].fieldName}' in the timeseries data refers to a token that does not exist on this pool. '${issuesArray[x].message}' references an invalid index.`;
+        let endStr = `has elements up to index [${issuesArray[x]?.message?.split("///")[1]}]`;
+        if (issuesArray[x]?.message?.split("///")[1] === "-1") {
+          endStr = `is empty`;
+        }
+        issuesMsg = `${issuesArray[x].fieldName?.split("///")[0]} array has elements up to index [${
+          issuesArray[x].fieldName?.split("///")[1]
+        }], but ${issuesArray[x]?.message?.split("///")[0]} array ${endStr}.`;
       }
       if (issuesArray[x].type === "NEG") {
         const msgObj = JSON.parse(issuesArray[x].message);
@@ -77,6 +87,9 @@ const messagesByLevel = (
       }
       if (issuesArray[x].type === "RATEZERO") {
         issuesMsg = `'${issuesArray[x].fieldName}' has a zero rate.`;
+      }
+      if (issuesArray[x].type === "RATEDEC") {
+        issuesMsg = `'${issuesArray[x].fieldName}' has a rate between 0% and ${issuesArray[x].message}. Check that the decimals on this value are correct.`;
       }
       if (issuesArray[x].type === "EMPTY") {
         issuesMsg = `Entity ${issuesArray[x].fieldName} has no instances. This could mean that the pool was created but no transactions were detected on it.`;

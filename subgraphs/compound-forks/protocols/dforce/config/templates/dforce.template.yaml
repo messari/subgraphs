@@ -29,6 +29,10 @@ dataSources:
       eventHandlers:
         - event: MarketAdded(address,uint256,uint256,uint256,uint256,uint256)
           handler: handleMarketAdded
+        - event: MarketEntered(address,address)
+          handler: handleMarketEntered
+        - event: MarketExited(address,address)
+          handler: handleMarketExited
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle
         - event: NewCollateralFactor(address,uint256,uint256)

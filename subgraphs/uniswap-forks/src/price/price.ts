@@ -82,7 +82,7 @@ export function findUSDPricePerToken(
         if (
           pool.inputTokens[0] == token.id &&
           pool.totalValueLockedUSD.gt(
-            NetworkConfigs.getMinimumLiquidityThreshold()
+            NetworkConfigs.getMinimumLiquidityThresholdTrackPrice()
           )
         ) {
           // whitelist token is token1
@@ -103,7 +103,7 @@ export function findUSDPricePerToken(
         if (
           pool.inputTokens[1] == token.id &&
           pool.totalValueLockedUSD.gt(
-            NetworkConfigs.getMinimumLiquidityThreshold()
+            NetworkConfigs.getMinimumLiquidityThresholdTrackPrice()
           )
         ) {
           let whitelistToken = getOrCreateToken(pool.inputTokens[0]);
@@ -165,7 +165,7 @@ export function getTrackedVolumeUSD(
       if (
         reserve0USD
           .plus(reserve1USD)
-          .lt(NetworkConfigs.getMinimumLiquidityThreshold())
+          .lt(NetworkConfigs.getMinimumLiquidityThresholdTrackVolume())
       ) {
         return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
       }
@@ -177,7 +177,7 @@ export function getTrackedVolumeUSD(
       if (
         reserve0USD
           .times(BIGDECIMAL_TWO)
-          .lt(NetworkConfigs.getMinimumLiquidityThreshold())
+          .lt(NetworkConfigs.getMinimumLiquidityThresholdTrackVolume())
       ) {
         return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
       }
@@ -189,7 +189,7 @@ export function getTrackedVolumeUSD(
       if (
         reserve1USD
           .times(BIGDECIMAL_TWO)
-          .lt(NetworkConfigs.getMinimumLiquidityThreshold())
+          .lt(NetworkConfigs.getMinimumLiquidityThresholdTrackVolume())
       ) {
         return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
       }
@@ -218,7 +218,7 @@ export function getTrackedVolumeUSD(
   ) {
     return [
       tokenAmount0.times(price0USD),
-      BIGDECIMAL_ZERO,
+      tokenAmount0.times(price0USD),
       tokenAmount0.times(price0USD),
     ];
   }
@@ -229,7 +229,7 @@ export function getTrackedVolumeUSD(
     NetworkConfigs.getWhitelistTokens().includes(token1.id)
   ) {
     return [
-      BIGDECIMAL_ZERO,
+      tokenAmount1.times(price1USD),
       tokenAmount1.times(price1USD),
       tokenAmount1.times(price1USD),
     ];

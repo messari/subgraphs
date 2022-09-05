@@ -14,5 +14,5 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
     return BigInt.fromI32(18);
   }
 
-  return BigInt.fromI32(decimalsCall.value);
+  return decimalsCall.value;
 }

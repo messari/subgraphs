@@ -39,6 +39,8 @@ import {
   LiquidationCall,
   Repay,
   ReserveDataUpdated,
+  ReserveUsedAsCollateralDisabled,
+  ReserveUsedAsCollateralEnabled,
   Withdraw,
 } from "../../../generated/templates/LendingPool/LendingPool";
 import { AToken } from "../../../generated/templates/LendingPool/AToken";
@@ -57,6 +59,8 @@ import {
   _handleReserveDeactivated,
   _handleReserveFactorChanged,
   _handleReserveInitialized,
+  _handleReserveUsedAsCollateralDisabled,
+  _handleReserveUsedAsCollateralEnabled,
   _handleWithdraw,
 } from "../../../src/mapping";
 import {
@@ -253,16 +257,26 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     return;
   }
 
+  //
+  // Reward rate (rewards/second) in a market comes from try_assets(to)
+  // Supply side the to address is the aToken
+  // Borrow side the to address is the variableDebtToken
+
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let tryIncentiveController = aTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
     let incentiveControllerContract = AaveIncentivesController.bind(
       tryIncentiveController.value
     );
-    let tryRewardInfo = incentiveControllerContract.try_assets(
+    let trySupplyRewards = incentiveControllerContract.try_assets(
       Address.fromString(market.outputToken!)
     );
-    if (!tryRewardInfo.reverted) {
+    let tryBorrowRewards = incentiveControllerContract.try_assets(
+      Address.fromString(market.vToken)
+    );
+
+    // calculate supply rewards
+    if (!trySupplyRewards.reverted || !tryBorrowRewards.reverted) {
       let tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
       if (!tryRewardAsset.reverted) {
         // create reward tokens
@@ -279,7 +293,10 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
         // now get or create reward token and update fields
         let protocol = getOrCreateLendingProtocol(protocolData);
-        let rewardsPerDay = tryRewardInfo.value.value0.times(
+        let supplyRewardsPerDay = trySupplyRewards.value.value0.times(
+          BigInt.fromI32(SECONDS_PER_DAY)
+        );
+        let borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
           BigInt.fromI32(SECONDS_PER_DAY)
         );
 
@@ -304,15 +321,25 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
             Address.fromString(protocol.priceOracle)
           );
         }
-        
-        let rewardsPerDayUSD = rewardsPerDay
+
+        let supplyRewardsPerDayUSD = supplyRewardsPerDay
+          .toBigDecimal()
+          .div(exponentToBigDecimal(rewardDecimals))
+          .times(rewardTokenPriceUSD);
+        let borrowRewardsPerDayUSD = borrowRewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
           .times(rewardTokenPriceUSD);
 
         // set rewards to arrays
-        market.rewardTokenEmissionsAmount = [rewardsPerDay, rewardsPerDay];
-        market.rewardTokenEmissionsUSD = [rewardsPerDayUSD, rewardsPerDayUSD];
+        market.rewardTokenEmissionsAmount = [
+          supplyRewardsPerDay,
+          borrowRewardsPerDay,
+        ];
+        market.rewardTokenEmissionsUSD = [
+          supplyRewardsPerDayUSD,
+          borrowRewardsPerDayUSD,
+        ];
       }
     }
   }
@@ -333,6 +360,26 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     protocolData,
     event.params.reserve,
     assetPriceUSD
+  );
+}
+
+export function handleReserveUsedAsCollateralEnabled(
+  event: ReserveUsedAsCollateralEnabled
+): void {
+  // This Event handler enables a reserve/market to be used as collateral
+  _handleReserveUsedAsCollateralEnabled(
+    event.params.reserve,
+    event.params.user
+  );
+}
+
+export function handleReserveUsedAsCollateralDisabled(
+  event: ReserveUsedAsCollateralDisabled
+): void {
+  // This Event handler disables a reserve/market being used as collateral
+  _handleReserveUsedAsCollateralDisabled(
+    event.params.reserve,
+    event.params.user
   );
 }
 
@@ -382,9 +429,9 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.liquidatedCollateralAmount,
     event.params.collateralAsset,
     getProtocolData(),
-    event.params.debtAsset,
     event.params.liquidator,
-    event.params.user
+    event.params.user,
+    event.params.debtAsset
   );
 }
 
@@ -421,7 +468,11 @@ function getAssetPriceInUSDC(
       BIGINT_ZERO
     );
 
-    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
   }
 
   // Polygon Oracle returns price in ETH, must convert to USD with following method
@@ -431,7 +482,11 @@ function getAssetPriceInUSDC(
       BIGINT_ZERO
     );
 
-    return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    if (priceUSDCInEth.equals(BIGINT_ZERO)) {
+      return BIGDECIMAL_ZERO;
+    } else {
+      return oracleResult.toBigDecimal().div(priceUSDCInEth.toBigDecimal());
+    }
   }
 
   // Avalanche Oracle return the price offset by 8 decimals

@@ -53,11 +53,11 @@ function PoolOverviewTab({
   const [currentPage, setCurrentPage] = useState(skipAmtParam ? (parseInt(skipAmtParam) + 50) / 50 : 1);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
 
-  if (!!poolOverviewRequest.poolOverviewError && issues.filter((x) => x.fieldName === "PoolOverviewTab").length === 0) {
+  if (poolOverviewRequest.poolOverviewError && issues.filter((x) => x.fieldName === "Pool Overview Tab").length === 0) {
     issues.push({
       message: poolOverviewRequest?.poolOverviewError?.message + ". Refresh and try again.",
       type: "",
-      fieldName: "PoolOverviewTab",
+      fieldName: "Pool Overview Tab",
       level: "critical",
     });
   }
@@ -71,11 +71,22 @@ function PoolOverviewTab({
 
   let loadingEle = null;
   if (poolOverviewRequest.poolOverviewLoading) {
-    loadingEle = <div><CircularProgress sx={{ margin: 6 }} size={50} /></div>;
+    loadingEle = (
+      <div>
+        <CircularProgress sx={{ margin: 6 }} size={50} />
+      </div>
+    );
     if (pools.length === 0 || !pools) {
       return loadingEle;
     } else if (morePages) {
-      loadingEle = <div style={{ marginLeft: "16px", marginBottom: "15px" }}><div><CircularProgress sx={{ margin: 6 }} size={50} /></div><span >Loading results...</span></div>;
+      loadingEle = (
+        <div style={{ marginLeft: "16px", marginBottom: "15px" }}>
+          <div>
+            <CircularProgress sx={{ margin: 6 }} size={50} />
+          </div>
+          <span>Loading results...</span>
+        </div>
+      );
     }
   }
 
@@ -152,7 +163,9 @@ function PoolOverviewTab({
       {loadingEle}
       <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
         {prevButton}
-        <span>{totalPoolCount && !loadingEle ? `Page ${currentPage} out of ${Math.ceil(totalPoolCount / 50)}` : null}</span>
+        <span>
+          {totalPoolCount && !loadingEle ? `Page ${currentPage} out of ${Math.ceil(totalPoolCount / 50)}` : null}
+        </span>
         {nextButton}
       </div>
     </>

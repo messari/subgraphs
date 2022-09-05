@@ -26,12 +26,13 @@ dataSources:
           file: ./abis/ERC20.json
         - name: Core
           file: ./abis/tectonic/Core.json
-        - name: VVSlp
-          file: ./abis/tectonic/VVSlp.json
-
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
+        - event: MarketEntered(address,address)
+          handler: handleMarketEntered
+        - event: MarketExited(address,address)
+          handler: handleMarketExited
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle
         - event: NewCollateralFactor(address,uint256,uint256)
@@ -68,8 +69,6 @@ templates:
           file: ./abis/PriceOracle.json
         - name: Core
           file: ./abis/tectonic/Core.json
-        - name: VVSlp
-          file: ./abis/tectonic/VVSlp.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint

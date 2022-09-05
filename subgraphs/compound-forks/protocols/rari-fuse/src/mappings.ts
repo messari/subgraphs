@@ -31,6 +31,7 @@ import {
   setBorrowInterestRate,
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
+  _handleMarketEntered,
 } from "../../../src/mapping";
 import { PoolRegistered } from "../../../generated/FusePoolDirectory/FusePoolDirectory";
 import {
@@ -51,6 +52,8 @@ import {
 import {
   ActionPaused1,
   Comptroller,
+  MarketEntered,
+  MarketExited,
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
@@ -189,6 +192,22 @@ export function handlePoolRegistered(event: PoolRegistered): void {
 
 // Note: these are pool level functions in fuse, but each pool is a Comptroller impl
 // Source: https://docs.rari.capital/fuse
+
+export function handleMarketEntered(event: MarketEntered): void {
+  _handleMarketEntered(
+    event.params.cToken.toHexString(),
+    event.params.account.toHexString(),
+    true
+  );
+}
+
+export function handleMarketExited(event: MarketExited): void {
+  _handleMarketEntered(
+    event.params.cToken.toHexString(),
+    event.params.account.toHexString(),
+    false
+  );
+}
 
 // add a new market
 export function handleMarketListed(event: MarketListed): void {
@@ -352,28 +371,70 @@ export function handleMint(event: Mint): void {
   let minter = event.params.minter;
   let mintAmount = event.params.mintAmount;
   let factoryContract = Address.fromString(FACTORY_CONTRACT);
-  _handleMint(factoryContract, minter, mintAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.minter
+  );
+  _handleMint(
+    factoryContract,
+    minter,
+    mintAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleRedeem(event: Redeem): void {
   let redeemer = event.params.redeemer;
   let redeemAmount = event.params.redeemAmount;
   let factoryContract = Address.fromString(FACTORY_CONTRACT);
-  _handleRedeem(factoryContract, redeemer, redeemAmount, event);
+  let contract = CToken.bind(event.address);
+  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+    event.params.redeemer
+  );
+  _handleRedeem(
+    factoryContract,
+    redeemer,
+    redeemAmount,
+    balanceOfUnderlyingResult,
+    event
+  );
 }
 
 export function handleBorrow(event: Borrow): void {
   let borrower = event.params.borrower;
   let borrowAmount = event.params.borrowAmount;
   let factoryContract = Address.fromString(FACTORY_CONTRACT);
-  _handleBorrow(factoryContract, borrower, borrowAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleBorrow(
+    factoryContract,
+    borrower,
+    borrowAmount,
+    borrowBalanceStoredResult,
+    event
+  );
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
+  let borrower = event.params.borrower;
   let payer = event.params.payer;
   let repayAmount = event.params.repayAmount;
   let factoryContract = Address.fromString(FACTORY_CONTRACT);
-  _handleRepayBorrow(factoryContract, payer, repayAmount, event);
+  let contract = CToken.bind(event.address);
+  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+    event.params.borrower
+  );
+  _handleRepayBorrow(
+    factoryContract,
+    borrower,
+    payer,
+    repayAmount,
+    borrowBalanceStoredResult,
+    event
+  );
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
@@ -623,9 +684,10 @@ function updateMarket(
     return;
   }
 
-  if (updateMarketPrices) {
-    updateAllMarketPrices(comptroller, blockNumber);
-  }
+  // TODO: commented out until updateMarketPrices() is added into all comp forks
+  // if (updateMarketPrices) {
+  //   updateAllMarketPrices(comptroller, blockNumber);
+  // }
 
   // update this market's price no matter what
   // grab price of ETH then multiply by underlying price
@@ -747,7 +809,8 @@ function updateMarket(
   market.totalValueLockedUSD = underlyingSupplyUSD;
   market.totalDepositBalanceUSD = underlyingSupplyUSD;
 
-  market._borrowBalance = newTotalBorrow;
+  // TODO: commented out until updateMarketPrices() is added into all comp forks
+  // market._borrowBalance = newTotalBorrow;
   market.totalBorrowBalanceUSD = newTotalBorrow
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
@@ -974,67 +1037,68 @@ function updateRewards(
   market.save();
 }
 
-function updateAllMarketPrices(
-  comptrollerAddr: Address,
-  blockNumber: BigInt
-): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
-  if (!protocol) {
-    log.warning("[updateAllMarketPrices] protocol not found: {}", [
-      comptrollerAddr.toHexString(),
-    ]);
-    return;
-  }
-  let priceOracle = PriceOracle.bind(Address.fromString(protocol._priceOracle));
+// TODO: commented out until updateMarketPrices() is added into all comp forks
+// function updateAllMarketPrices(
+//   comptrollerAddr: Address,
+//   blockNumber: BigInt
+// ): void {
+//   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+//   if (!protocol) {
+//     log.warning("[updateAllMarketPrices] protocol not found: {}", [
+//       comptrollerAddr.toHexString(),
+//     ]);
+//     return;
+//   }
+//   let priceOracle = PriceOracle.bind(Address.fromString(protocol._priceOracle));
 
-  for (let i = 0; i < protocol._marketIDs.length; i++) {
-    let market = Market.load(protocol._marketIDs[i]);
-    if (!market) {
-      break;
-    }
-    let underlyingToken = Token.load(market.inputToken);
-    if (!underlyingToken) {
-      break;
-    }
+//   for (let i = 0; i < protocol._marketIDs.length; i++) {
+//     let market = Market.load(protocol._marketIDs[i]);
+//     if (!market) {
+//       break;
+//     }
+//     let underlyingToken = Token.load(market.inputToken);
+//     if (!underlyingToken) {
+//       break;
+//     }
 
-    // update market price
-    let customETHPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
-    let ethPriceUSD = customETHPrice.usdPrice.div(
-      customETHPrice.decimalsBaseTen
-    );
-    let tryUnderlyingPrice = priceOracle.try_getUnderlyingPrice(
-      Address.fromString(market.id)
-    );
+//     // update market price
+//     let customETHPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
+//     let ethPriceUSD = customETHPrice.usdPrice.div(
+//       customETHPrice.decimalsBaseTen
+//     );
+//     let tryUnderlyingPrice = priceOracle.try_getUnderlyingPrice(
+//       Address.fromString(market.id)
+//     );
 
-    let underlyingTokenPriceUSD: BigDecimal;
-    if (tryUnderlyingPrice.reverted) {
-      break;
-    } else {
-      let mantissaDecimalFactor = 18 - underlyingToken.decimals + 18;
-      let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
-      let priceInEth = tryUnderlyingPrice.value.toBigDecimal().div(bdFactor);
-      underlyingTokenPriceUSD = priceInEth.times(ethPriceUSD); // get price in USD
-    }
+//     let underlyingTokenPriceUSD: BigDecimal;
+//     if (tryUnderlyingPrice.reverted) {
+//       break;
+//     } else {
+//       let mantissaDecimalFactor = 18 - underlyingToken.decimals + 18;
+//       let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
+//       let priceInEth = tryUnderlyingPrice.value.toBigDecimal().div(bdFactor);
+//       underlyingTokenPriceUSD = priceInEth.times(ethPriceUSD); // get price in USD
+//     }
 
-    underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
-    underlyingToken.lastPriceBlockNumber = blockNumber;
-    underlyingToken.save();
+//     underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
+//     underlyingToken.lastPriceBlockNumber = blockNumber;
+//     underlyingToken.save();
 
-    market.inputTokenPriceUSD = underlyingTokenPriceUSD;
+//     market.inputTokenPriceUSD = underlyingTokenPriceUSD;
 
-    // update TVL, supplyUSD, borrowUSD
-    market.totalDepositBalanceUSD = market.inputTokenBalance
-      .toBigDecimal()
-      .div(exponentToBigDecimal(underlyingToken.decimals))
-      .times(underlyingTokenPriceUSD);
-    market.totalBorrowBalanceUSD = market._borrowBalance
-      .toBigDecimal()
-      .div(exponentToBigDecimal(underlyingToken.decimals))
-      .times(underlyingTokenPriceUSD);
-    market.totalValueLockedUSD = market.inputTokenBalance
-      .toBigDecimal()
-      .div(exponentToBigDecimal(underlyingToken.decimals))
-      .times(underlyingTokenPriceUSD);
-    market.save();
-  }
-}
+//     // update TVL, supplyUSD, borrowUSD
+//     market.totalDepositBalanceUSD = market.inputTokenBalance
+//       .toBigDecimal()
+//       .div(exponentToBigDecimal(underlyingToken.decimals))
+//       .times(underlyingTokenPriceUSD);
+//     market.totalBorrowBalanceUSD = market._borrowBalance
+//       .toBigDecimal()
+//       .div(exponentToBigDecimal(underlyingToken.decimals))
+//       .times(underlyingTokenPriceUSD);
+//     market.totalValueLockedUSD = market.inputTokenBalance
+//       .toBigDecimal()
+//       .div(exponentToBigDecimal(underlyingToken.decimals))
+//       .times(underlyingTokenPriceUSD);
+//     market.save();
+//   }
+// }

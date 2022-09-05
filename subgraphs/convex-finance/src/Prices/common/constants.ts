@@ -15,6 +15,9 @@ export const BIGDECIMAL_1E18 = BIGINT_TEN.pow(18).toBigDecimal();
 
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
+export const CRV_TRI_CRYPTO_ADDRESS = Address.fromString(
+  "0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"
+);
 export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
 export const ZERO_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"

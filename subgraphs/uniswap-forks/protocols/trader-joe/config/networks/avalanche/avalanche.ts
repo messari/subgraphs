@@ -1,9 +1,9 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Factory } from "../../../../../generated/Factory/Factory";
 import {
-  BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
+  MINIMUM_LIQUIDITY_FIVE_THOUSAND,
+  MINIMUM_LIQUIDITY_TEN_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
@@ -14,6 +14,7 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
+  TRADER_JOE_AVALANCHE_REWARD_TOKEN_RATE,
 } from "../../../src/common/constants";
 import {
   toLowerCase,
@@ -71,7 +72,7 @@ export class TraderJoeAvalancheConfigurations implements Configurations {
     return RewardIntervalType.TIMESTAMP;
   }
   getRewardTokenRate(): BigInt {
-    return BIGINT_ZERO;
+    return TRADER_JOE_AVALANCHE_REWARD_TOKEN_RATE;
   }
   getReferenceToken(): string {
     return toLowerCase("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7");
@@ -91,6 +92,7 @@ export class TraderJoeAvalancheConfigurations implements Configurations {
   getStableCoins(): string[] {
     return toLowerCaseList([
       "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e", // USDC
+      "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664", // USDC.e
       "0xc7198437980c041c805a1edcba50c1ce5db95118", // USDT.e
       "0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7", // USDT
       "0xde3a24028580884448a5397872046a019649b084", // USDT old
@@ -101,6 +103,7 @@ export class TraderJoeAvalancheConfigurations implements Configurations {
       "0xe4b9865c0866346ba3613ec122040a365637fb46", // USDT/wAVAX
       "0xf4003f4efbe8691b60249e6afbd307abe7758adb", // USDC/wAVAX
       "0xed8cbd9f0ce3c6986b22002f03c6475ceb7a6256", // USDT.e/wAVAX
+      "0xa389f9430876455c36478deea9769b7ca4e3ddb1", // USDC.e/wAVAX
       "0xbb4646a764358ee93c2a9c4a147d5aded527ab73", // USDT old/wAVAX
     ]);
   }
@@ -110,7 +113,10 @@ export class TraderJoeAvalancheConfigurations implements Configurations {
   getUntrackedTokens(): string[] {
     return [];
   }
-  getMinimumLiquidityThreshold(): BigDecimal {
-    return MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND;
+  getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
+    return MINIMUM_LIQUIDITY_TEN_THOUSAND;
+  }
+  getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
+    return MINIMUM_LIQUIDITY_FIVE_THOUSAND;
   }
 }

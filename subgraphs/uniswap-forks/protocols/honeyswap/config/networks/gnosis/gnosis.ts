@@ -102,7 +102,10 @@ export class HoneyswapXdaiConfigurations implements Configurations {
   getUntrackedTokens(): string[] {
     return [];
   }
-  getMinimumLiquidityThreshold(): BigDecimal {
+  getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
+    return MINIMUM_LIQUIDITY_ONE_THOUSAND;
+  }
+  getMinimumLiquidityThresholdTrackPrice(): BigDecimal {
     return MINIMUM_LIQUIDITY_ONE_THOUSAND;
   }
 }

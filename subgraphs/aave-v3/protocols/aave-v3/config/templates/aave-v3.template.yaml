@@ -105,6 +105,10 @@ templates:
           handler: handleSupply
         - event: Withdraw(indexed address,indexed address,indexed address,uint256)
           handler: handleWithdraw
+        - event: ReserveUsedAsCollateralEnabled(indexed address,indexed address)
+          handler: handleReserveUsedAsCollateralEnabled
+        - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
+          handler: handleReserveUsedAsCollateralDisabled
       file: ./protocols/aave-v3/src/mappings/Pool.ts
   - kind: ethereum
     name: PoolConfigurator
