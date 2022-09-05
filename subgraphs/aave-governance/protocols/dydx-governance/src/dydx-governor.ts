@@ -8,7 +8,7 @@ import {
 } from "../../../src/constants";
 import {
   getGovernance,
-  getOrCreateProposal,
+  getProposal,
   _handleProposalCanceled,
   _handleProposalCreated,
   _handleProposalExecuted,
@@ -65,7 +65,7 @@ export function handleProposalQueued(event: ProposalQueued): void {
 }
 
 export function handleVoteEmitted(event: VoteEmitted): void {
-  let proposal = getOrCreateProposal(event.params.id.toString());
+  let proposal = getProposal(event.params.id.toString());
 
   // if state is pending (i.e. the first vote), set state, quorum, delegates and tokenholders
   if (proposal.state == ProposalState.PENDING) {
