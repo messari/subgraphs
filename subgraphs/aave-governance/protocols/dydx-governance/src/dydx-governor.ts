@@ -61,7 +61,11 @@ export function handleProposalExecuted(event: ProposalExecuted): void {
 }
 
 export function handleProposalQueued(event: ProposalQueued): void {
-  _handleProposalQueued(event.params.id.toString(), event.params.executionTime);
+  _handleProposalQueued(
+    event.params.id.toString(),
+    event.params.executionTime,
+    event
+  );
 }
 
 export function handleVoteEmitted(event: VoteEmitted): void {
