@@ -2,6 +2,8 @@ type Governance @entity {
   "Unique entity used to keep track of common aggregated data"
   id: ID!
 
+  "Total Supply of token"
+  totalTokenSupply: BigInt!
   "Total number of token holders currently"
   currentTokenHolders: BigInt!
   "Total number of token holders"
@@ -220,4 +222,39 @@ type Delegate @entity {
 
   "Proposals that the delegate has created"
   proposals: [Proposal!]! @derivedFrom(field: "proposer")
+}
+
+# Timeseries Data
+type TokenDailySnapshot @entity {
+  "Number of days from Unix epoch time"
+  id: ID!
+  "Total Supply at snapshot"
+  totalSupply: BigInt!
+  "Number of tokenholders at snapshot"
+  tokenHolders: BigInt!
+  "Number of delegates at snapshot"
+  totalDelegates: BigInt!
+  "Block number of last block in snapshot"
+  blockNumber: BigInt!
+  "Timestamp of snapshot"
+  timestamp: BigInt!
+}
+
+type VoteDailySnapshot @entity {
+  "Number of days from Unix epoch time"
+  id: ID!
+  "Proposal this snapshot is associated with"
+  proposal: Proposal!
+  "Weighted votes against the proposal at snapshot"
+  forWeightedVotes: BigInt!
+  "Weighted votes abstaining to the proposal at snapshot"
+  againstWeightedVotes: BigInt!
+  "Weighted votes for the proposal at snapshot"
+  abstainWeightedVotes: BigInt!
+  "Total weighted for/against/abstaining votes at snapshot"
+  totalWeightedVotes: BigInt!
+  "Block number of last block in snapshot"
+  blockNumber: BigInt!
+  "Timestamp of snapshot"
+  timestamp: BigInt!
 }
