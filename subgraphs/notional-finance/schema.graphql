@@ -144,7 +144,7 @@ type InterestRate @entity {
 # #############################
 # ##### Protocol Metadata #####
 # #############################
-# 
+#
 interface Protocol {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
@@ -196,10 +196,12 @@ interface Protocol {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -315,10 +317,12 @@ type LendingProtocol implements Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -534,7 +538,7 @@ type Market @entity {
   " Can you borrow from this market "
   canBorrowFrom: Boolean!
 
-  # TODO: Should be an array, needs to be calculated per currency
+  # TODO: Should be an array, needs to be calculated for every collateralCurrency accepted
   " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
   maximumLTV: BigDecimal!
 
@@ -542,11 +546,15 @@ type Market @entity {
   " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
   liquidationThreshold: BigDecimal!
 
-  # TODO: Where do we get liquidation penalty percentage value from instead of hardcoding?
-  # Get liquidationDiscount from getCurrencyAndRates(currencyId).liquidationDiscount
+  # TODO: Dependent on exchangeRate, Should this be represented as liquidation discount x exchangeRate %?
+  # Will this be different depending on the collateral used for liquidation?
+  # Get liquidationDiscount from getCurrencyAndRates(currencyId).getEtheRate().liquidationDiscount => How should this be calculated per currency-collateral combination?
+  # https://docs.notional.finance/developer-documentation/how-to/liquidations a discount applied to the exchange rate between collateral an local currencies as an incentive to the liquidator.
+  # https://docs.notional.finance/governance/overview-of-governance-parameters/selected-parameters#deposit-shares
   " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
   liquidationPenalty: BigDecimal!
 
+  # TODO: Should this be cToken only or all tokens supported as collateral? Simplify it to be cToken
   " Token that need to be deposited to take a position in protocol "
   inputToken: Token!
 
@@ -559,6 +567,10 @@ type Market @entity {
 
   ##### Quantitative Data #####
 
+  # TODO: annualized interest rates from exchange rates
+  # https://docs.notional.finance/developer-documentation/how-to/lend-and-borrow-fcash#interest-rate-from-exchange-rate
+  # https://github.com/notional-finance/sdk-v2/blob/master/src/system/Market.ts#L189-L197
+  # getMarket(currencyId, maturity, settlementDate).value.impliedRate
   " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
   rates: [InterestRate!]!
 
@@ -883,7 +895,7 @@ type Account @entity {
   " Number of open positions this account has "
   openPositionCount: Int!
 
-" All closed positions this account has "
+  " All closed positions this account has "
   closedPositions: [Position!]!
 
   " Number of closed positions this account has "
@@ -1041,7 +1053,6 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-
 type Deposit @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
@@ -1225,11 +1236,11 @@ type Liquidate @entity {
   " Account that got liquidated "
   liquidatee: Account!
 
-  # BLOCKED: cannot associate without a market, no market info in event
+  # TODO: BLOCKED: cannot associate without a market, no market info in event
   " The market of the collateral being used "
   market: Market
 
-  # BLOCKED: cannot create/update position without a market, no market info in event
+  # TODO: BLOCKED: cannot create/update position without a market, no market info in event
   " The user position changed by this event "
   position: Position
 

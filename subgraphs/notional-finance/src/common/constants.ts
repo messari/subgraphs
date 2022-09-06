@@ -4,8 +4,8 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.0";
+export const PROTOCOL_SCHEMA_VERSION = "2.0.1";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -103,14 +103,11 @@ export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 export const UNPROVIDED_NAME: string = "NOT_PROVIDED";
 
-// TODO: fix this namespace
-// export namespace TokenAddress {
 export const cETH_ADDRESS = "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5";
 export const cDAI_ADDRESS = "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643";
 export const cUSDC_ADDRESS = "0x39AA39c021dfbaE8faC545936693aC917d5E7563";
 // export const cWBTC_ADDRESS = "0xC11b1268C1A384e55C48c2391d8d480264A3A7F4";
 export const cWBTC_ADDRESS = "0xccf4429db6322d5c611ee964527d42e5d685dd6a";
-// }
 
 ////////////////////////
 ///// Type Helpers /////

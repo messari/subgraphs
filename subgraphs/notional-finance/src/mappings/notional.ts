@@ -13,7 +13,15 @@ import {
   LiquidateLocalCurrency,
   Notional__getActiveMarketsResultValue0Struct,
 } from "../../generated/Notional/Notional";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, PROTOCOL_ID } from "../common/constants";
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_ZERO,
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  INT_ZERO,
+  PROTOCOL_ID,
+  SECONDS_PER_YEAR,
+} from "../common/constants";
 import { bigIntToBigDecimal } from "../common/numbers";
 import { getOrCreateAccount } from "../getters/account";
 import { getOrCreateMarket, getMarketsWithStatus } from "../getters/market";
@@ -96,7 +104,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
 
   for (let k = 0; k < markets.activeMarkets.length; k++) {
     if (!activeMarkets.includes(markets.activeMarkets[k])) {
-      // TODO: unnecessary to pass event, can we send a empty ethereum.Event instance?
+      // event is irrelevant
       let m = getOrCreateMarket(event, markets.activeMarkets[k]);
 
       // status
@@ -109,7 +117,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
       m.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
 
       // positions
-      // TODO: position counts should be 0; do we need to manually close positions as markets mature?
+      // TODO: should we update position counts manually to 0? do we need to manually close positions as markets mature?
       // positionCount
       // openPositionCount
       // closedPositionCount
@@ -181,11 +189,50 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   let absAmountUSD: BigDecimal = amountUSD;
   let absAmount: BigInt = cTokenAmount;
   let absfCashAmount: BigInt = fCashAmount;
-  if (amountUSD < BIGDECIMAL_ZERO) {
+  if (cTokenAmount < BIGINT_ZERO) {
     absAmountUSD = amountUSD.neg();
     absAmount = cTokenAmount.neg();
+  }
+  if (fCashAmount < BIGINT_ZERO) {
     absfCashAmount = fCashAmount.neg();
   }
+
+  // TODO: Need to deal with int and float formats for getting the rate
+  // let RATE_PRECISION: BigDecimal = BIGDECIMAL_ONE;
+  // let SECONDS_IN_YEAR: BigInt = BigInt.fromI32(60 * 60 * 24 * 365);
+  // let exchangeRate: BigDecimal = BIGDECIMAL_ZERO;
+  // exchangeRate = bigIntToBigDecimal(absfCashAmount.div(absAmount));
+
+  // let exchangeRateWithRatePrecision: BigDecimal = BIGDECIMAL_ZERO;
+  // exchangeRateWithRatePrecision = bigIntToBigDecimal(
+  //   bigIntToBigDecimal(absfCashAmount)
+  //     .times(RATE_PRECISION)
+  //     .div(absAmount)
+  // );
+
+  // let annualizedRate: BigDecimal = BIGDECIMAL_ZERO;
+  // let annualizedRateWithRatePrecision: BigInt = BIGINT_ZERO;
+  // let timeToMaturity: BigInt = maturity.minus(event.block.timestamp);
+  // annualizedRateWithRatePrecision = RATE_PRECISION;
+  // let whatever: BigInt = Math.log(
+  //   exchangeRateWithRatePrecision.div(RATE_PRECISION)
+  // )
+  //   .times(SECONDS_IN_YEAR)
+  //   .div(timeToMaturity)
+  //   .times(RATE_PRECISION);
+
+  // log.error(
+  //   " ---> currencyId: {}, absfCash: {}, absAssetCash: {}, exchangeRate: {}, exchangeRateWithRatePrecision: {}",
+  //   [
+  //     currencyId.toString(),
+  //     absfCashAmount.toString(),
+  //     absAmount.toString(),
+  //     exchangeRate.toString(),
+  //     exchangeRateWithRatePrecision.toString(),
+  //     // annualizedRate.toString(),
+  //     // annualizedRateWithRatePrecision.toString(),
+  //   ]
+  // );
 
   // identify transaction type
   // transactions of different user intention may call the same action type in notional smart contract design

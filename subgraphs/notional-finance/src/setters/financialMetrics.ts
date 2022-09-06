@@ -29,7 +29,6 @@ import {
 import { getOrCreateLendingProtocol } from "../getters/protocol";
 import { getOrCreateToken } from "../getters/token";
 
-// TODO: need right amountUSD
 export function updateFinancials(
   event: ethereum.Event,
   amountUSD: BigDecimal,
@@ -48,38 +47,33 @@ export function updateFinancials(
   let protocolSideRevenueUSD = feesUSD.times(NOTIONAL_PROTOCOL_REVENUE_SHARE);
 
   // market cumulatives
-  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  market.cumulativeTotalRevenueUSD =
+    market.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+  market.cumulativeSupplySideRevenueUSD =
+    market.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  market.cumulativeProtocolSideRevenueUSD =
+    market.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
   market.save();
 
   // protocol cumulatives
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSD);
 
   // financials daily - daily revenues
-  financialsDailySnapshots.dailyTotalRevenueUSD = financialsDailySnapshots.dailyTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  financialsDailySnapshots.dailySupplySideRevenueUSD = financialsDailySnapshots.dailySupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  financialsDailySnapshots.dailyProtocolSideRevenueUSD = financialsDailySnapshots.dailyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  financialsDailySnapshots.dailyTotalRevenueUSD =
+    financialsDailySnapshots.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+  financialsDailySnapshots.dailySupplySideRevenueUSD =
+    financialsDailySnapshots.dailySupplySideRevenueUSD.plus(
+      supplySideRevenueUSD
+    );
+  financialsDailySnapshots.dailyProtocolSideRevenueUSD =
+    financialsDailySnapshots.dailyProtocolSideRevenueUSD.plus(
+      protocolSideRevenueUSD
+    );
 
   // financials daily - cumulative revenues
   financialsDailySnapshots.cumulativeTotalRevenueUSD =
@@ -90,15 +84,14 @@ export function updateFinancials(
     protocol.cumulativeProtocolSideRevenueUSD;
 
   // market daily - daily revenues
-  marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailyTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  marketDailySnapshot.dailySupplySideRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  marketDailySnapshot.dailyProtocolSideRevenueUSD = marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  marketDailySnapshot.dailyTotalRevenueUSD =
+    marketDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+  marketDailySnapshot.dailySupplySideRevenueUSD =
+    marketDailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  marketDailySnapshot.dailyProtocolSideRevenueUSD =
+    marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+      protocolSideRevenueUSD
+    );
 
   // market daily - cumulative revenues
   marketDailySnapshot.cumulativeTotalRevenueUSD =
@@ -109,15 +102,14 @@ export function updateFinancials(
     market.cumulativeProtocolSideRevenueUSD;
 
   // market hourly - hourly revenues
-  marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlyTotalRevenueUSD.plus(
-    totalRevenueUSD
-  );
-  marketHourlySnapshot.hourlySupplySideRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
-    supplySideRevenueUSD
-  );
-  marketHourlySnapshot.hourlyProtocolSideRevenueUSD = marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
+  marketHourlySnapshot.hourlyTotalRevenueUSD =
+    marketHourlySnapshot.hourlyTotalRevenueUSD.plus(totalRevenueUSD);
+  marketHourlySnapshot.hourlySupplySideRevenueUSD =
+    marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSD);
+  marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
+    marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+      protocolSideRevenueUSD
+    );
 
   // market hourly - cumulative revenues
   marketHourlySnapshot.cumulativeTotalRevenueUSD =
@@ -127,7 +119,7 @@ export function updateFinancials(
   marketHourlySnapshot.cumulativeProtocolSideRevenueUSD =
     market.cumulativeProtocolSideRevenueUSD;
 
-  // TODO: liquidate metrics are still pending
+  // TODO: market liquidate metrics are still pending
   financialsDailySnapshots.cumulativeLiquidateUSD =
     protocol.cumulativeLiquidateUSD;
 
@@ -145,13 +137,11 @@ export function updateFinancials(
 // - sum Borrow Balances (markets) = protocol and financialsDailySnapshot TVL
 // This is dependent on having activeMarkets
 
-// TODO: new name
 export function updateTVLAndBalances(event: ethereum.Event): void {
   let protocol = getOrCreateLendingProtocol();
   let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
 
   // TVL
-  // TODO: can tokenAddresses be a constant namespace? see getTokenFromCurrency as well
   let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
   let tokenAddress = [cETH_ADDRESS, cDAI_ADDRESS, cUSDC_ADDRESS, cWBTC_ADDRESS];
   for (let i = 0; i < tokenAddress.length; i++) {
@@ -172,7 +162,6 @@ export function updateTVLAndBalances(event: ethereum.Event): void {
   let protocolTotalBorrowBalanceUSD = BIGDECIMAL_ZERO;
   let activeMarkets = getMarketsWithStatus(event).activeMarkets;
   for (let i = 0; i < activeMarkets.length; i++) {
-    // event doesn't matter
     let market = getOrCreateMarket(event, activeMarkets[i]);
     protocolTotalDepositBalanceUSD = protocolTotalDepositBalanceUSD.plus(
       market.totalDepositBalanceUSD
@@ -185,7 +174,8 @@ export function updateTVLAndBalances(event: ethereum.Event): void {
   financialsDailySnapshot.totalValueLockedUSD = protocolTotalValueLockedUSD;
   protocol.totalValueLockedUSD = protocolTotalValueLockedUSD;
 
-  financialsDailySnapshot.totalDepositBalanceUSD = protocolTotalDepositBalanceUSD;
+  financialsDailySnapshot.totalDepositBalanceUSD =
+    protocolTotalDepositBalanceUSD;
   protocol.totalDepositBalanceUSD = protocolTotalDepositBalanceUSD;
 
   financialsDailySnapshot.totalBorrowBalanceUSD = protocolTotalBorrowBalanceUSD;
@@ -245,27 +235,20 @@ export function updateMarket(
 
     // update deposit amounts
     market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
-    marketHourlySnapshot.cumulativeDepositUSD = marketHourlySnapshot.cumulativeDepositUSD.plus(
-      amountUSD
-    );
-    marketDailySnapshot.cumulativeDepositUSD = marketDailySnapshot.cumulativeDepositUSD.plus(
-      amountUSD
-    );
-    financialsDailySnapshot.cumulativeDepositUSD = financialsDailySnapshot.cumulativeDepositUSD.plus(
-      amountUSD
-    );
-    protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
-      amountUSD
-    );
-    marketHourlySnapshot.hourlyDepositUSD = marketHourlySnapshot.hourlyDepositUSD.plus(
-      amountUSD
-    );
-    marketDailySnapshot.dailyDepositUSD = marketDailySnapshot.dailyDepositUSD.plus(
-      amountUSD
-    );
-    financialsDailySnapshot.dailyDepositUSD = financialsDailySnapshot.dailyDepositUSD.plus(
-      amountUSD
-    );
+    marketHourlySnapshot.cumulativeDepositUSD =
+      marketHourlySnapshot.cumulativeDepositUSD.plus(amountUSD);
+    marketDailySnapshot.cumulativeDepositUSD =
+      marketDailySnapshot.cumulativeDepositUSD.plus(amountUSD);
+    financialsDailySnapshot.cumulativeDepositUSD =
+      financialsDailySnapshot.cumulativeDepositUSD.plus(amountUSD);
+    protocol.cumulativeDepositUSD =
+      protocol.cumulativeDepositUSD.plus(amountUSD);
+    marketHourlySnapshot.hourlyDepositUSD =
+      marketHourlySnapshot.hourlyDepositUSD.plus(amountUSD);
+    marketDailySnapshot.dailyDepositUSD =
+      marketDailySnapshot.dailyDepositUSD.plus(amountUSD);
+    financialsDailySnapshot.dailyDepositUSD =
+      financialsDailySnapshot.dailyDepositUSD.plus(amountUSD);
   } else if (transactionType == TransactionType.WITHDRAW) {
     // tvl in market
     let inputTokenBalance = market.inputTokenBalance.minus(amount);
@@ -282,16 +265,13 @@ export function updateMarket(
     ).times(priceUSD);
 
     // update withdraw amounts
-    marketDailySnapshot.dailyWithdrawUSD = marketDailySnapshot.dailyWithdrawUSD.plus(
-      amountUSD
-    );
-    financialsDailySnapshot.dailyWithdrawUSD = financialsDailySnapshot.dailyWithdrawUSD.plus(
-      amountUSD
-    );
+    marketDailySnapshot.dailyWithdrawUSD =
+      marketDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
+    financialsDailySnapshot.dailyWithdrawUSD =
+      financialsDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
   } else if (transactionType == TransactionType.BORROW) {
     // update total borrow amount
-    // TODO: This should also be inputToken
-    // TODO: if we take the output token we need to be able to get supply, price
+    // TODO: we are using cToken as outputToken but ideal we should be use fCash
     let outputTokenSupply = market.outputTokenSupply.plus(amount);
     market.outputTokenSupply = outputTokenSupply;
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(
@@ -301,25 +281,19 @@ export function updateMarket(
 
     // update borrow amounts
     market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
-    marketHourlySnapshot.cumulativeBorrowUSD = marketHourlySnapshot.cumulativeBorrowUSD.plus(
-      amountUSD
-    );
-    marketDailySnapshot.cumulativeBorrowUSD = marketDailySnapshot.cumulativeBorrowUSD.plus(
-      amountUSD
-    );
-    financialsDailySnapshot.cumulativeBorrowUSD = financialsDailySnapshot.cumulativeBorrowUSD.plus(
-      amountUSD
-    );
+    marketHourlySnapshot.cumulativeBorrowUSD =
+      marketHourlySnapshot.cumulativeBorrowUSD.plus(amountUSD);
+    marketDailySnapshot.cumulativeBorrowUSD =
+      marketDailySnapshot.cumulativeBorrowUSD.plus(amountUSD);
+    financialsDailySnapshot.cumulativeBorrowUSD =
+      financialsDailySnapshot.cumulativeBorrowUSD.plus(amountUSD);
     protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(amountUSD);
-    marketHourlySnapshot.hourlyBorrowUSD = marketHourlySnapshot.hourlyBorrowUSD.plus(
-      amountUSD
-    );
-    marketDailySnapshot.dailyBorrowUSD = marketDailySnapshot.dailyBorrowUSD.plus(
-      amountUSD
-    );
-    financialsDailySnapshot.dailyBorrowUSD = financialsDailySnapshot.dailyBorrowUSD.plus(
-      amountUSD
-    );
+    marketHourlySnapshot.hourlyBorrowUSD =
+      marketHourlySnapshot.hourlyBorrowUSD.plus(amountUSD);
+    marketDailySnapshot.dailyBorrowUSD =
+      marketDailySnapshot.dailyBorrowUSD.plus(amountUSD);
+    financialsDailySnapshot.dailyBorrowUSD =
+      financialsDailySnapshot.dailyBorrowUSD.plus(amountUSD);
   } else if (transactionType == TransactionType.REPAY) {
     // update total borrow amount
     let outputTokenSupply = market.outputTokenSupply.minus(amount);
@@ -330,12 +304,10 @@ export function updateMarket(
     ).times(priceUSD);
 
     // update repay amounts
-    marketDailySnapshot.dailyRepayUSD = marketDailySnapshot.dailyRepayUSD.plus(
-      amountUSD
-    );
-    financialsDailySnapshot.dailyRepayUSD = financialsDailySnapshot.dailyRepayUSD.plus(
-      amountUSD
-    );
+    marketDailySnapshot.dailyRepayUSD =
+      marketDailySnapshot.dailyRepayUSD.plus(amountUSD);
+    financialsDailySnapshot.dailyRepayUSD =
+      financialsDailySnapshot.dailyRepayUSD.plus(amountUSD);
   }
 
   // requires market and protocol to be udpated before snapshots

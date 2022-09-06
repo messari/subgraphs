@@ -54,7 +54,7 @@ export function getOrCreateMarket(
     market.maximumLTV = BIGDECIMAL_ZERO;
     market.liquidationThreshold = BIGDECIMAL_ZERO;
 
-    // TODO: verify liquidation penalty
+    // TODO: liquidation penalty methodology needs to be reviewed
     let notional = Notional.bind(Address.fromString(PROTOCOL_ID));
     let currencyAndRatesCallResult = notional.try_getCurrencyAndRates(
       parseInt(currencyId) as i32

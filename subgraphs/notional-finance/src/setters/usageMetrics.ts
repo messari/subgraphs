@@ -105,7 +105,6 @@ export function updateUsageMetrics(
   usageDailySnapshot.save();
 }
 
-// TODO: something wrong with addToArrayAtIndex resulting in all cumulativeUniqueMetrics being incorrect
 export function addAccountToProtocol(
   transactionType: string,
   account: Account,
