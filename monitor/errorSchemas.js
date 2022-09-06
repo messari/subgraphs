@@ -17,3 +17,52 @@ export const protocolErrorMessages = {
     totalBorrowBal: "Protocol level totalBorrowBalanceUSD has an unexpected value. The protocols listed below have a lower totalDepositBalanceUSD than totalBorrowBalanceUSD.",
     cumulativeLiquidate: "Protocol level cumulativeLiquidateUSD has an unexpected value. The protocols listed below have a lower cumulativeBorrowUSD than cumulativeLiquidateUSD.",
 }
+
+export const poolErrorMessages = {
+    totalValueLockedUSD: "The pools listed have a TVL below $1000 or above $100000000000.",
+    cumulativeSupplySideRevenueUSD: "The pools listed have a cumulativeSupplySideRevenueUSD below $100 or above $10000000000.",
+    cumulativeProtocolSideRevenueUSD: "The pools listed have a cumulativeProtocolSideRevenueUSD below $100 or above $10000000000.",
+    cumulativeTotalRevenueUSD: "The pools listed have a cumulativeTotalRevenueUSD value unequal to the sum of cumulativeSupplySideRevenueUSD and cumulativeProtocolSideRevenueUSD.",
+    cumulativeDepositUSD: "The pools listed have a cumulativeDepositUSD below $100.",
+    cumulativeBorrowUSD: "The pools listed have a cumulativeBorrowUSD value above the cumulativeDepositUSD value.",
+    cumulativeLiquidateUSD: "The pools listed have a cumulativeLiquidateUSD value above the cumulativeBorrowUSD value.",
+    totalDepositBalanceUSD: "The pools listed have a totalDepositBalanceUSD below $1000 or above $100000000000.",
+    totalBorrowBalanceUSD: "The pools listed have a totalBorrowBalanceUSD value above the totalDepositBalanceUSD value.",
+    outputTokenSupply: "The pools listed have an outputTokenSupply value of zero or less.",
+    outputTokenPriceUSD: "The pools listed have an outputTokenPriceUSD value below $0 or above $100000",
+    cumulativeVolumeUSD: "The pools listed have a cumulativeVolumeUSD value below $100 or above $10000000000."
+}
+
+export const errorsObj = {
+    lending: {
+        totalValueLockedUSD: [],
+        cumulativeSupplySideRevenueUSD: [],
+        cumulativeProtocolSideRevenueUSD: [],
+        cumulativeTotalRevenueUSD: [],
+        cumulativeDepositUSD: [],
+        cumulativeBorrowUSD: [],
+        cumulativeLiquidateUSD: [],
+        totalBorrowBalanceUSD: [],
+        totalDepositBalanceUSD: [],
+        outputTokenSupply: [],
+        outputTokenPriceUSD: [],
+    },
+    exchanges: {
+        totalValueLockedUSD: [],
+        cumulativeSupplySideRevenueUSD: [],
+        cumulativeProtocolSideRevenueUSD: [],
+        cumulativeTotalRevenueUSD: [],
+        cumulativeDepositUSD: [],
+        cumulativeVolumeUSD: [],
+        outputTokenSupply: [],
+        outputTokenPriceUSD: [],
+    },
+    vaults: {
+        totalValueLockedUSD: [],
+        cumulativeSupplySideRevenueUSD: [],
+        cumulativeProtocolSideRevenueUSD: [],
+        cumulativeTotalRevenueUSD: [],
+        outputTokenSupply: [],
+        outputTokenPriceUSD: [],
+    }
+}
