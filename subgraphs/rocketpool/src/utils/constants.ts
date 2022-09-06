@@ -177,7 +177,7 @@ export const DEPOSITPOOL = "0x4D05E3d48a938db4b7a9A59A802D5b45011BDe58";
 
 export const STORAGE = "0x1d8f8f00cfa6758d7bE78336684788Fb0ee0Fa46";
 
-export const NETWORKENCODE = Bytes.fromHexString(
+export const FEESENCODE = Bytes.fromHexString(
   "0x034cd2ba322813e095f0f5279fe7959f6a89e44e2f0f497703d997c9bc1ba0e0"
 );
 
@@ -187,4 +187,8 @@ export const PRICEENCODE = Bytes.fromHexString(
 
 export const NODEDEPOSIT_ENCODE = Bytes.fromHexString(
   "0xc5f0e8e643416573963c05884a77dfc5eba3461eb8d39b60a0a58aedca955fa5"
+);
+
+export const NETWORKBALANCES_ENCODE = Bytes.fromHexString(
+  "0x7630e125f1c009e5fc974f6dae77c6d5b1802979b36e6d7145463c21782af01e"
 );

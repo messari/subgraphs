@@ -18,6 +18,7 @@ export function getOrCreateProtocol(): Protocol {
     protocol = new Protocol(RETH_ADDRESS);
 
     // Metadata
+    protocol.id = RETH_ADDRESS;
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
     protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;

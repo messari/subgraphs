@@ -9,21 +9,19 @@ import {
   RPL_ADDRESS,
 } from "../utils/constants";
 
-// No POOL ADDRESS passed as argument because Pool == Protocol
 export function getOrCreatePool(
   blockNumber: BigInt,
-  blockTimestamp: BigInt,
-  poolAddress: string
+  blockTimestamp: BigInt
 ): Pool {
   let protocol = getOrCreateProtocol();
-  let pool = Pool.load(poolAddress);
+  let pool = Pool.load(protocol.id);
 
   if (!pool) {
-    pool = new Pool(poolAddress);
+    pool = new Pool(protocol.id);
 
     // Metadata
-    pool.name = poolAddress;
-    pool.symbol = "MINIPOOL";
+    pool.name = protocol.id;
+    pool.symbol = "RETH";
     pool.protocol = protocol.id;
     pool.createdTimestamp = blockTimestamp;
     pool.createdBlockNumber = blockNumber;
@@ -53,6 +51,7 @@ export function getOrCreatePool(
     pool.stakedOutputTokenAmount = null;
     pool.rewardTokenEmissionsAmount = null;
     pool.rewardTokenEmissionsUSD = null;
+    pool.miniPools = [];
 
     pool.save();
 
