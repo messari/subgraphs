@@ -220,6 +220,7 @@ export function handleBalanceUpdate(event: BalancesUpdated): void {
   if (pools) {
     var counter: i32;
     for (counter = 0; counter > pools.length; counter++) {
+      log.warning("[handleBalanceUpdate] pools exists", []);
       updateMinipoolTvlandRevenue(
         event.block,
         BIGINT_ZERO,

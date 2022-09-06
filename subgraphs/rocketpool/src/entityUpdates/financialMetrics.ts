@@ -48,7 +48,7 @@ export function updateMinipoolTvlandRevenue(
   Minipool.slashAmount = Minipool.slashAmount.plus(slashingAmount);
 
   if (totalRewardEth > BIGINT_ZERO) {
-    log.info("TotalRewardEth nonzero, updating revenue", [
+    log.warning("[getOrCreatePool] TotalRewardEth nonzero, updating revenue", [
       totalRewardEth.toString(),
     ]);
     let ratio = Minipool.inputTokenBalances[0].div(pool.inputTokenBalances[0]);

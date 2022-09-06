@@ -104,6 +104,7 @@ function getRETHpriceUSD(
     log.error("rethCall Reverted", []);
   } else {
     RETHratio = bigIntToBigDecimal(rethCall.value.div(ONE_ETH_IN_WEI));
+    log.warning("[getRETHpriceUSD] RETH Ratio: {}", [RETHratio.toString()]);
   }
 
   let ETH = getOrCreateToken(Address.fromString(ETH_ADDRESS), blockNumber);
