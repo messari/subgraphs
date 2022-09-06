@@ -18,6 +18,14 @@ export function getTokenPriceFromOneInch(
 ): CustomPriceType {
   const oneInchOracleContract = getOneInchOracleContract(network);
 
+  if (
+    constants.ONE_INCH_ORACLE_CONTRACT_ADDRESS.get(network).equals(
+      constants.ZERO_ADDRESS
+    )
+  ) {
+    return new CustomPriceType();
+  }
+
   if (!oneInchOracleContract) {
     return new CustomPriceType();
   }
