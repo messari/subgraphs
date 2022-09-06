@@ -1,14 +1,13 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
-
 ////////////////////
 ///// Versions /////
 ////////////////////
 
 export const PROTOCOL_NAME = "Euler";
 export const PROTOCOL_SLUG = "euler";
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.3";
+export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -95,6 +94,11 @@ export namespace TransactionType {
   export const REPAY = "REPAY";
 }
 
+export namespace ActivityType {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
@@ -157,8 +161,8 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 ///// Misc /////
 ////////////////
 
-export const ETH_SYMBOL = "ETH"
-export const ETH_NAME = "Ether"
+export const ETH_SYMBOL = "ETH";
+export const ETH_NAME = "Ether";
 export const USDC_SYMBOL = "USDC";
 
 //////////////////////////
@@ -168,10 +172,6 @@ export const USDC_SYMBOL = "USDC";
 export const CONFIG_FACTOR_SCALE = BigDecimal.fromString("4e9");
 export const RESERVE_FEE_SCALE = BigDecimal.fromString("4e9");
 export const EXEC_START_BLOCK_NUMBER = BigInt.fromI32(13711556);
-export const UNISWAP_Q192 = BigDecimal.fromString(
-  BigInt.fromI32(2)
-    .pow(192)
-    .toString(),
-);
+export const UNISWAP_Q192 = BigDecimal.fromString(BigInt.fromI32(2).pow(192).toString());
 export const DECIMAL_PRECISION = BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal();
 export const INTEREST_RATE_PRECISION = BigDecimal.fromString("1e25");
