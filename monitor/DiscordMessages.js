@@ -68,7 +68,13 @@ export async function sendDiscordMessage(message) {
 
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        return null;
     } catch (err) {
         console.log('ERROR', err, message)
+        if (err.response.status === 429) {
+            return await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        } else {
+            return null;
+        }
     }
 }

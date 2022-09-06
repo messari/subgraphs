@@ -1,6 +1,4 @@
 import axios from "axios";
-import { sendDiscordMessage } from "./DiscordMessages.js";
-import { protocolErrorMessages } from "./errorSchemas.js";
 
 export const protocolLevel = async (deployments) => {
     const endpointsList = [];

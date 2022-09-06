@@ -31,7 +31,8 @@ export const alertFailedIndexing = async (discordMessages, deployments) => {
     }
 }
 
-export const alertPoolLevelErrors = async (discordMessages, deployments, protocolType) => {
+export const alertPoolLevelErrors = async (discordMessages, deployments, protocolType, queriesToAttempt) => {
+    const promiseArr = [];
     Object.entries(deployments).forEach(([protocol, deployment]) => {
 
         const poolErrorMessage = discordMessages.find(x => {
@@ -61,13 +62,31 @@ export const alertPoolLevelErrors = async (discordMessages, deployments, protoco
         });
 
         if (newPoolErrorDiscordMessage.length > 1) {
-            sendDiscordMessage(newPoolErrorDiscordMessage.join(""));
+            const msgSendResult = sendDiscordMessage(newPoolErrorDiscordMessage.join(""));
+            promiseArr.push(msgSendResult);
         }
-    })
+    });
+    // Turn requests into a promise array 
+    await Promise.allSettled(promiseArr)
+        .then(
+            (response) => {
+                queriesToAttempt = response.map((res, idx) => {
+                    if (res?.reason?.response?.status === 429 && JSON.parse(res?.reason?.config?.data)?.content) {
+                        return JSON.parse(res?.reason?.config?.data)?.content;
+                    } else {
+                        return null;
+                    }
+                })
+            }
+        )
+        .catch((err) => console.log(err, 'err'));
+
+    return queriesToAttempt;
 }
 
 
-export const alertProtocolErrors = async (discordMessages, deployments) => {
+export const alertProtocolErrors = async (discordMessages, deployments, queriesToAttempt) => {
+    const promiseArr = [];
     const protocolErrorMessageObjs = discordMessages.filter(x => x.content.includes("**PROTOCOL ERRORS:**"));
     const protocolErrorMsgs = protocolErrorMessageObjs.map(msgObj => {
         return msgObj.content.split("TYPE:")[1];
@@ -147,7 +166,23 @@ LIST:
 
 ${val.join(",\n")}
 `;
-            sendDiscordMessage(newProtocolErrorDiscordMessage);
+            promiseArr.push(sendDiscordMessage(newProtocolErrorDiscordMessage));
         }
     })
+    // Turn requests into a promise array 
+    await Promise.allSettled(promiseArr)
+        .then(
+            (response) => {
+                queriesToAttempt = [...queriesToAttempt, response.map((res, idx) => {
+                    if (res?.reason?.response?.status === 429 && JSON.parse(res?.reason?.config?.data)?.content) {
+                        return JSON.parse(res?.reason?.config?.data)?.content;
+                    } else {
+                        null;
+                    }
+                })]
+            }
+        )
+        .catch((err) => console.log(err, 'err'));
+
+    return queriesToAttempt;
 }

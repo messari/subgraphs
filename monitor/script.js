@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getDiscordMessages } from "./DiscordMessages.js";
+import { getDiscordMessages, sendDiscordMessage } from "./DiscordMessages.js";
 import 'dotenv/config'
 import { protocolLevel } from "./protocolLevel.js";
 import { errorsObj } from "./errorSchemas.js";
@@ -173,19 +173,41 @@ async function executionFlow() {
     }
   });
   deployments = await protocolLevel(deployments);
+  let queriesToAttempt = [];
   const discordMessages = await getDiscordMessages([]);
   await alertFailedIndexing(discordMessages, deployments);
-  await alertProtocolErrors(discordMessages, deployments);
+  queriesToAttempt = await alertProtocolErrors(discordMessages, deployments, queriesToAttempt);
   deployments = await deploymentsOnPoolLevel(deployments);
   await sleep(5000);
 
-  await alertPoolLevelErrors(discordMessages, deployments, "lending");
+  const lendingPoolQueries = await alertPoolLevelErrors(discordMessages, deployments, "lending", queriesToAttempt);
   await sleep(5000);
-  await alertPoolLevelErrors(discordMessages, deployments, "vaults");
+  const vaultPoolQueries = await alertPoolLevelErrors(discordMessages, deployments, "vaults", queriesToAttempt);
   await sleep(5000);
-  await alertPoolLevelErrors(discordMessages, deployments, "exchanges");
+  const dexPoolQueries = await alertPoolLevelErrors(discordMessages, deployments, "exchanges", queriesToAttempt);
+  queriesToAttempt = [...queriesToAttempt, ...lendingPoolQueries, ...vaultPoolQueries, ...dexPoolQueries];
   await sleep(5000);
+
+  // await resolveQueriesToAttempt(queriesToAttempt.map(x => sendDiscordMessage(x)))
   executionFlow();
+}
+
+async function resolveQueriesToAttempt(queriesToAttempt) {
+  // Take the first 5 queries to attempt
+  const useQueries = queriesToAttempt.slice(0, 4);
+  const newQueriesArray = [...queriesToAttempt.slice(5)];
+  await Promise.all(useQueries)
+    .then(
+      (response) => (response.forEach((val, idx) => {
+        console.log('resp? ', newQueriesArray.length, idx, val)
+      }))
+    )
+    .catch((err) => console.log(err));
+
+  await sleep(5000);
+  if (newQueriesArray.length > 0) {
+    resolveQueriesToAttempt(newQueriesArray);
+  }
 }
 
 async function deploymentsOnPoolLevel(deployments) {
