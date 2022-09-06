@@ -45,13 +45,17 @@ export const WHITELIST_TOKENS_LIST: string[] = [
 ];
 
 export const CRV_TRI_CRYPTO_ADDRESS = Address.fromString(
-  '0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf'
+  "0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"
 );
 
+export const YEARNLENS_BLACKLIST: Address[] = [
+  Address.fromString("0x5f98805a4e8be255a32880fdec7f6728c6568ba0"), // LUSD
+];
+
 export const CURVE_CALCULATIONS_BLACKLIST: Address[] = [
-  Address.fromString('0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf'), // crvTriCrypto
-  Address.fromString('0xc4ad29ba4b3c580e6d59105fff484999997675ff') // crv3Crypto
-]
+  Address.fromString("0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf"), // crvTriCrypto
+  Address.fromString("0xc4ad29ba4b3c580e6d59105fff484999997675ff"), // crv3Crypto
+];
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
@@ -103,8 +107,11 @@ CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
 ///////////////////////////// SUSHISWAP CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const SUSHISWAP_DEFAULT_RESERVE_CALL =
-  new SushiSwapPair__getReservesResult(BIGINT_ZERO, BIGINT_ZERO, BIGINT_ZERO);
+export const SUSHISWAP_DEFAULT_RESERVE_CALL = new SushiSwapPair__getReservesResult(
+  BIGINT_ZERO,
+  BIGINT_ZERO,
+  BIGINT_ZERO
+);
 
 export const SUSHISWAP_CALCULATIONS_ADDRESS_MAP = new TypedMap<
   string,

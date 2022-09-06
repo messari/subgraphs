@@ -11,6 +11,9 @@ export function getYearnLensContract(network: string): YearnLensContract {
 export function getTokenPriceFromYearnLens(tokenAddr: Address, network: string): CustomPriceType {
   const yearnLensContract = getYearnLensContract(network);
 
+  if (constants.YEARNLENS_BLACKLIST.includes(tokenAddr))
+    return new CustomPriceType();
+
   if (!yearnLensContract) {
     return new CustomPriceType();
   }
