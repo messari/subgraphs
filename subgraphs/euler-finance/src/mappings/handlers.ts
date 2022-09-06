@@ -1,4 +1,4 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -26,7 +26,6 @@ import {
   VIEW_V2_START_BLOCK_NUMBER,
 } from "../common/constants";
 import { updateFinancials, updateMarketDailyMetrics, updateMarketHourlyMetrics, updateUsageMetrics } from "../common/metrics";
-import { BigInt } from "@graphprotocol/graph-ts";
 import {
   createBorrow,
   createDeposit,

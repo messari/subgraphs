@@ -1,4 +1,4 @@
-import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -38,7 +38,6 @@ import {
   CONFIG_FACTOR_SCALE,
   USDC_SYMBOL,
   DECIMAL_PRECISION,
-  USDC_ERC20_ADDRESS,
   INTEREST_RATE_PRECISION,
   SECONDS_PER_YEAR,
   RESERVE_FEE_SCALE,
@@ -49,8 +48,6 @@ import {
   updateMarketDailyMetrics,
   updateMarketHourlyMetrics,
 } from "../common/metrics";
-import { _MarketUtility } from "../../generated/schema";
-import { BigInt } from "@graphprotocol/graph-ts";
 import { getAssetTotalSupply } from "../common/tokens";
 
 export function updateAsset(event: AssetStatus): void {
