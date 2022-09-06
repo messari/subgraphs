@@ -69,7 +69,7 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.BLOCK;
+    return RewardIntervalType.TIMESTAMP;
   }
   getRewardTokenRate(): BigInt {
     return BIGINT_ZERO;

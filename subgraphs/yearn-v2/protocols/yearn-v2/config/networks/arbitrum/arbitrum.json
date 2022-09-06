@@ -6,6 +6,10 @@
 
   "registry_v2-isEnabled": false,
   "callHandlersEnabled": false,
-  
+
+  "protocolId": "0x3199437193625DCcD6F9C9e98BDf93582200Eb1f",
+  "yearnTreasuryVault": "0x1DEb47dCC9a35AD454Bf7f0fCDb03c09792C08c1",
+  "defaultNetwork": "Network.ARBITRUM_ONE",
+
   "manualVaults": []
 }
