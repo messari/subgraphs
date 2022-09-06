@@ -100,24 +100,19 @@ In line with the discussion under *Usage Metrics*, the financial metrics are fur
 The total revenue for Rocket Pool will be its ETH2 staking rewards from Beacon Chain. 
 
 > Total Revenue of Rocket Pool = $\sum$ Revenue from all the minipools
-
 Whereby, 
 
 > Revenue of each minipool = MAX(The ETH2 staking rewards - slashing, 0)
-
 #### Protocol-side Revenue
 It's arbitrary if node operators are the protocol-side. For now, we assume the node operatorw are the protocol-side and stakers of ETH are supply side. As such, 
 
 > Protocol-side revenue from each minipool = Revenue of each minipool x (50% + 50% x Commission rate)
-
 Whereby, 
 
 > Commission rate = the rate of commission to be paid by the stakers of ETH to the node operator, determined at the point the minipool is created and is within the range from 5% to 20%
-
 #### Supply-side Revenue
 
 > Supply-side revenue from each minipool = Revenue of each minipool x (50% - 50% x Commission rate)
-
 ### Rewards
 
 RPL inflation will initially be 5% per annum and will be split up amongst:
