@@ -126,6 +126,8 @@ export class UniswapV3MainnetConfigurations implements Configurations {
       "0xc581b735a1688071a1746c968e0798d642ede491", // EuroTether
       "0x04f2694c8fcee23e8fd0dfea1d4f5bb8c352111f", // Staked Olympus
       "0x398aea1c9ceb7de800284bb399a15e0efe5a9ec2", // Escrowed Illuvium
+      "0x8c6bf16c273636523c29db7db04396143770f6a0", // MoonRabbit
+      "0x4da27a545c0c5b758a6ba100e3a049001de870f5", // Staked AAVE
     ]);
   }
   getMinimumLiquidityThreshold(): BigDecimal {

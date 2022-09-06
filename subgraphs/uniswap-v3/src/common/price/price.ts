@@ -148,7 +148,8 @@ export function findUSDPricePerToken(
             nativeTokenValueLocked.gt(largestNativeTokenValue) &&
             nativeTokenValueLocked.gt(
               NetworkConfigs.getMinimumLiquidityThreshold()
-            )
+            ) &&
+            token1.lastPriceUSD != BIGDECIMAL_ZERO
           ) {
             largestNativeTokenValue = nativeTokenValueLocked;
             // token1 per our token * NativeToken per token1
@@ -167,7 +168,8 @@ export function findUSDPricePerToken(
             nativeTokenValueLocked.gt(largestNativeTokenValue) &&
             nativeTokenValueLocked.gt(
               NetworkConfigs.getMinimumLiquidityThreshold()
-            )
+            ) &&
+            token0.lastPriceUSD != BIGDECIMAL_ZERO
           ) {
             largestNativeTokenValue = nativeTokenValueLocked;
             // token0 per our token * NativeToken per token0
