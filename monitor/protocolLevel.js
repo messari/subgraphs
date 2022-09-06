@@ -1,6 +1,4 @@
 import axios from "axios";
-import { sendDiscordMessage } from "./DiscordMessages.js";
-import { protocolErrorMessages } from "./errorSchemas.js";
 
 export const protocolLevel = async (deployments) => {
     const endpointsList = [];
@@ -36,21 +34,24 @@ export const protocolLevel = async (deployments) => {
     });
 
     let protocolLevelData = [];
-    await Promise.all(promiseArr)
+    await Promise.allSettled(promiseArr)
         .then(
             (response) =>
-            (protocolLevelData = response.map((protocolData) => ({
-                data: protocolData.data.data,
-                url: protocolData.config.url,
-            })))
+            (protocolLevelData = response.map((protocolData) => {
+                if (!protocolData?.value) return null;
+                return ({
+                    data: protocolData?.value?.data?.data,
+                    url: protocolData?.value?.config?.url,
+                })
+            }))
         )
         .catch((err) => console.log(err));
     const specificDataPromiseArray = [];
-
     protocolLevelData.forEach((deployment) => {
-        if (!deployment.data) return;
-        if (!deployment.data?.protocols) return;
-        if (!deployment.data?.protocols[0]?.schemaVersion) return;
+        if (!deployment?.data) return;
+        if (!deployment?.data?.protocols) return;
+        if (!deployment?.data?.protocols[0]?.schemaVersion) return;
+
         const versionGroupArr =
             deployment.data?.protocols[0]?.schemaVersion?.split(".");
         versionGroupArr.pop();
@@ -150,20 +151,22 @@ export const protocolLevel = async (deployments) => {
     });
 
     let protocolTypeLevelData = [];
-    await Promise.all(specificDataPromiseArray)
+    await Promise.allSettled(specificDataPromiseArray)
         .then(
-            (response) =>
-            (protocolTypeLevelData = response.map((protocolData) => ({
-                protocol: protocolData.data.data,
-                url: protocolData.config.url,
-            })))
+            (response) => (protocolTypeLevelData = response.map((protocolData) => {
+                if (!protocolData?.value) return null;
+                return ({
+                    protocol: protocolData?.value?.data?.data,
+                    url: protocolData?.value?.config?.url,
+                })
+            }))
         )
         .catch((err) => console.log(err));
 
     protocolTypeLevelData.forEach((protocol) => {
         // find deployments objectbased on deployments.url === protocol.url
         const deploymentName = Object.keys(deployments).find(
-            (depoName) => deployments[depoName].url === protocol.url
+            (depoName) => deployments[depoName]?.url === protocol?.url
         );
         const deployment = { ...deployments[deploymentName] };
 
@@ -177,7 +180,6 @@ export const protocolLevel = async (deployments) => {
         const dataFields = Object.keys(data);
 
         const buildIssue = (value) => deploymentName + "//" + value;
-
         if (
             !(
                 data.totalValueLockedUSD > 10000 &&
@@ -189,7 +191,7 @@ export const protocolLevel = async (deployments) => {
 
         if (
             !(
-                data.cumulativeSupplySideRevenueUSD >= 1000 &&
+                data.cumulativeSupplySideRevenueUSD >= 0 &&
                 data.cumulativeSupplySideRevenueUSD <= 100000000000
             )
         ) {
@@ -198,7 +200,7 @@ export const protocolLevel = async (deployments) => {
 
         if (
             !(
-                data.cumulativeProtocolSideRevenueUSD >= 1000 &&
+                data.cumulativeProtocolSideRevenueUSD >= 0 &&
                 data.cumulativeProtocolSideRevenueUSD <= 100000000000
             )
         ) {
@@ -344,88 +346,4 @@ export const protocolLevel = async (deployments) => {
         });
     });
     return deploymentsObjToReturn;
-}
-
-export const alertProtocolErrors = async (discordMessages, deployments) => {
-    const protocolErrorMessageObjs = discordMessages.filter(x => x.content.includes("**PROTOCOL ERRORS:**"));
-    const protocolErrorMsgs = protocolErrorMessageObjs.map(msgObj => {
-        return msgObj.content.split("TYPE:")[1];
-    })
-
-    const alertedErrors = {
-        tvlRange: [],
-        cumulativeSupplySideRev: [],
-        cumulativeProtocolSideRev: [],
-        cumulativeTotalRev: [],
-        cumulativeVol: [],
-        cumulativeUniqueUsers: [],
-        totalPoolCount: [],
-        cumulativeUniqueDepos: [],
-        cumulativeUniqueBorrowers: [],
-        cumulativeUniqueLiquidators: [],
-        cumulativeUniqueLiquidatees: [],
-        openPositionCount: [],
-        cumulativePositionCount: [],
-        totalDepoBal: [],
-        cumulativeDepo: [],
-        totalBorrowBal: [],
-        cumulativeLiquidate: [],
-    };
-    protocolErrorMsgs.forEach(msgObj => {
-        const splitMsg = msgObj.split("LIST:");
-        const type = splitMsg[0].split('\n')[0].trim();
-        alertedErrors[type] = [...alertedErrors[type], ...splitMsg[1]].join('');
-    })
-
-    const errorsToAlert = {
-        tvlRange: [],
-        cumulativeSupplySideRev: [],
-        cumulativeProtocolSideRev: [],
-        cumulativeTotalRev: [],
-        cumulativeVol: [],
-        cumulativeUniqueUsers: [],
-        totalPoolCount: [],
-        cumulativeUniqueDepos: [],
-        cumulativeUniqueBorrowers: [],
-        cumulativeUniqueLiquidators: [],
-        cumulativeUniqueLiquidatees: [],
-        openPositionCount: [],
-        cumulativePositionCount: [],
-        totalDepoBal: [],
-        cumulativeDepo: [],
-        totalBorrowBal: [],
-        cumulativeLiquidate: [],
-    }
-
-    Object.entries(deployments).forEach(([depo, val]) => {
-        Object.entries(val.protocolErrors).forEach(([issueSet, issueArr]) => {
-            if (issueArr.length > 0) {
-                issueArr.forEach(iss => {
-                    if (iss.includes(depo) && !alertedErrors[issueSet].includes(depo)) {
-                        if ((depo.includes('pending') && iss.includes('pending')) || (!depo.includes('pending') && !iss.includes('pending'))) {
-                            errorsToAlert[issueSet].push(`Name: ${iss.split("//")[0]}, Value(s): ${iss.split("//")[1]}`);
-                        }
-                    }
-                })
-            }
-        });
-    });
-
-    const protocolErrs = [];
-    Object.entries(errorsToAlert).forEach(([type, val]) => {
-        if (val?.length > 0 && protocolErrs.join(" - ").length < 1400) {
-            const newprotocolErrorDiscordMessage = `
-**PROTOCOL ERRORS:**
-
-${protocolErrorMessages[type]}
-
-TYPE: ${type}
-
-LIST:
-
-${val.join(",\n")}
-`;
-            (sendDiscordMessage(newprotocolErrorDiscordMessage));
-        }
-    })
 }

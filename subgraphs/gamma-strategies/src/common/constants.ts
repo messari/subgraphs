@@ -7,7 +7,7 @@ import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 export const PROTOCOL_NAME = "Gamma Strategies";
 export const PROTOCOL_SLUG = "gamma-strategies";
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.1";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.2";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -195,4 +195,15 @@ export const TOKEN_PRICE_SOURCE_SKIPS = new TypedMap<Address, Array<string>>();
 TOKEN_PRICE_SOURCE_SKIPS.set(
   Address.fromString("0x77fba179c79de5b7653f68b5039af940ada60ce0"),
   [PriceSource.YEARN]
+);
+TOKEN_PRICE_SOURCE_SKIPS.set(
+  Address.fromString("0x1321f1f1aa541a56c31682c57b80ecfccd9bb288"),
+  [
+    PriceSource.YEARN,
+    PriceSource.CHAINLINK,
+    PriceSource.CURVE_CALC,
+    PriceSource.SUSHISWAP_CALC,
+    PriceSource.CURVE_ROUTER,
+    PriceSource.UNISWAP_ROUTER,
+  ]
 );

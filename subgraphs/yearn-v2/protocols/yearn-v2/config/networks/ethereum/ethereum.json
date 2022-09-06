@@ -10,6 +10,10 @@
 
   "callHandlersEnabled": true,
 
+  "protocolId": "0xe15461b18ee31b7379019dc523231c57d1cbc18c",
+  "yearnTreasuryVault": "0x93a62da5a14c80f265dabc077fcee437b1a0efde",
+  "defaultNetwork": "Network.MAINNET",
+  
   "manualVaults": [
     {
       "name": "YvWBTCVault",

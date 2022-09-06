@@ -1,19 +1,21 @@
 import axios from "axios";
 import { getDiscordMessages, sendDiscordMessage } from "./DiscordMessages.js";
 import 'dotenv/config'
-import { protocolLevel, alertProtocolErrors } from "./protocolLevel.js";
+import { protocolLevel } from "./protocolLevel.js";
+import { errorsObj } from "./errorSchemas.js";
+import { lendingPoolLevel } from "./poolLevel/lendingPoolLevel.js";
+import { vaultPoolLevel } from "./poolLevel/vaultPoolLevel.js";
+import { dexPoolLevel } from "./poolLevel/dexPoolLevel.js";
+import { alertFailedIndexing, alertPoolLevelErrors, alertProtocolErrors } from "./alerts.js";
 
-// Hour in milliseconds
-const hourMs = 3600000;
+const sleep = m => new Promise(r => setTimeout(r, m));
 
 executionFlow();
-setInterval(executionFlow, hourMs);
 
 async function executionFlow() {
   const { data } = await axios.get(
     "https://subgraphs.messari.io/deployments.json"
   );
-
   // deployments holds the errors for every protocol
   let deployments = {};
 
@@ -23,7 +25,8 @@ async function executionFlow() {
         const nameStr =
           deploymentString.split("name/")[1];
 
-        deployments[nameStr.split("/")[1]] = {
+        const deploymentsKey = nameStr.split("/")[1];
+        deployments[deploymentsKey] = {
           indexingError: null,
           indexedPercentage: 0,
           protocolErrors: {
@@ -45,22 +48,12 @@ async function executionFlow() {
             totalBorrowBal: [],
             cumulativeLiquidate: [],
           },
-          poolErrors: {
-            totalValueLockedUSD: [],
-            cumulativeSupplySideRevenueUSD: [],
-            cumulativeProtocolSideRevenueUSD: [],
-            cumulativeTotalRevenueUSD: [],
-            cumulativeDepositUSD: [],
-            cumulativeBorrowUSD: [],
-            cumulativeLiquidateUSD: [],
-            totalBorrowBalanceUSD: [],
-            totalDepositBalanceUSD: [],
-            outputTokenSupply: [],
-            outputTokenPriceUSD: [],
-          },
           url: deploymentString,
           protocolType: protocolType,
         };
+        if (protocolType && deploymentsKey && Object.keys(errorsObj).includes(protocolType)) {
+          deployments[deploymentsKey].poolErrors = JSON.parse(JSON.stringify(errorsObj[protocolType]));
+        }
       });
     });
   });
@@ -179,42 +172,47 @@ async function executionFlow() {
       delete deployments[realNameString];
     }
   });
-
   deployments = await protocolLevel(deployments);
-  // deployments = await lendingPoolLevel(deployments);
+  let queriesToAttempt = [];
+  const discordMessages = await getDiscordMessages([]);
+  await alertFailedIndexing(discordMessages, deployments);
+  queriesToAttempt = await alertProtocolErrors(discordMessages, deployments, queriesToAttempt);
+  deployments = await deploymentsOnPoolLevel(deployments);
+  await sleep(5000);
 
-  const discordMessages = await getDiscordMessages();
-  alertFailedIndexing(discordMessages, deployments);
-  alertProtocolErrors(discordMessages, deployments);
+  const lendingPoolQueries = await alertPoolLevelErrors(discordMessages, deployments, "lending", queriesToAttempt);
+  await sleep(5000);
+  const vaultPoolQueries = await alertPoolLevelErrors(discordMessages, deployments, "vaults", queriesToAttempt);
+  await sleep(5000);
+  const dexPoolQueries = await alertPoolLevelErrors(discordMessages, deployments, "exchanges", queriesToAttempt);
+  queriesToAttempt = [...queriesToAttempt, ...lendingPoolQueries, ...vaultPoolQueries, ...dexPoolQueries];
+  await sleep(5000);
+
+  // await resolveQueriesToAttempt(queriesToAttempt.map(x => sendDiscordMessage(x)))
+  executionFlow();
 }
 
-async function alertFailedIndexing(discordMessages, deployments) {
-  // Get the indexing error message objects from the last week 
-  const indexingErrorMessageObjs = discordMessages.filter(x => x.content.includes("**INDEXING ERRORS:**"))
+async function resolveQueriesToAttempt(queriesToAttempt) {
+  // Take the first 5 queries to attempt
+  const useQueries = queriesToAttempt.slice(0, 4);
+  const newQueriesArray = [...queriesToAttempt.slice(5)];
+  await Promise.all(useQueries)
+    .then(
+      (response) => (response.forEach((val, idx) => {
+        console.log('resp? ', newQueriesArray.length, idx, val)
+      }))
+    )
+    .catch((err) => console.log(err));
 
-  const indexingErrorDeposListStr = indexingErrorMessageObjs.map(msgObj => {
-    return msgObj.content.split("LIST:")[1];
-  })
-
-  // For testing, loop through deployments and take the deployments which have an indexing error and construct a message
-  const indexErrs = [];
-  Object.keys(deployments).forEach(depo => {
-    if (!!deployments[depo].indexingError && !indexingErrorDeposListStr.join('-').includes(depo) && indexErrs.join(" - ").length < 1400) {
-      indexErrs.push(`Name: "${depo}", Indexed: ${deployments[depo].indexedPercentage}%, Endpoint: ${deployments[depo].url}`);
-    }
-  })
-
-  const newIndexingErrorDiscordMessage = `
-**INDEXING ERRORS:**
-    
-The following deployments have encountered errors indexing. Fatal Errors were detected and stopped execution. This list is of deployments that have stopped deployment as of the past 7 days or failed deployments that have not been alerted in the prior week. 
-  
-LIST:
-  
-${indexErrs.join(",\n")}
-  `;
-
-  if (indexErrs.length > 0) {
-    const sendIndexingErrorDiscord = await sendDiscordMessage(newIndexingErrorDiscordMessage);
+  await sleep(5000);
+  if (newQueriesArray.length > 0) {
+    resolveQueriesToAttempt(newQueriesArray);
   }
+}
+
+async function deploymentsOnPoolLevel(deployments) {
+  deployments = await lendingPoolLevel(deployments);
+  deployments = await vaultPoolLevel(deployments);
+  deployments = await dexPoolLevel(deployments);
+  return deployments;
 }
