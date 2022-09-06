@@ -48,6 +48,11 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
+export namespace RewardIntervalType {
+  export const BLOCK = "BLOCK";
+  export const TIMESTAMP = "TIMESTAMP";
+}
+
 export namespace Protocol {
   export const NAME = "Stake DAO";
   export const SLUG = "stake-dao";
@@ -55,13 +60,26 @@ export namespace Protocol {
   export const TYPE = ProtocolType.YIELD;
 }
 
+export namespace NULL {
+  export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
+  export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
+}
+
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
-export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(1500);
-export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(50);
+
+export const USDC_DECIMALS = 6;
+export const DEFAULT_DECIMALS = BigInt.fromI32(18);
+export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
 export const BASE_PARAMS = BigInt.fromString("1000000000");
+export const FEE_DENOMINATOR = BigDecimal.fromString("10000");
 export const BASE_TOKENS = BigInt.fromString("1000000000000000000");
+
+export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(50);
+export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(1500);
+
+export const PROTOCOL_ID = "0x29D3782825432255041Db2EAfCB7174f5273f08A";
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
@@ -74,23 +92,22 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 
-export const ETHEREUM_PROTOCOL_ID =
-  "0x29D3782825432255041Db2EAfCB7174f5273f08A";
+/////////////////////////////////////
+///// Protocol/Network Specific /////
+/////////////////////////////////////
 
-export const USDC_DECIMALS = 6;
-export const DEFAULT_DECIMALS = BigInt.fromI32(18);
-export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
-export const ZERO_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
+export const OBSCELETE_FRAX_VAULT_ADDRESS = Address.fromString(
+  "0x99780beadd209cc3c7282536883ef58f4ff4e52f"
 );
+
 export const ANGLE_USDC_VAULT_ADDRESS = Address.fromString(
   "0xf3c2bdfCCb75CAFdA3D69d807c336bede956563f"
 );
+
 export const STABLE_MASTER_ADDRESS = Address.fromString(
   "0x5adDc89785D75C86aB939E9e15bfBBb7Fc086A87"
 );
+
 export const POOL_MANAGER_ADDRESS = Address.fromString(
   "0xe9f183FC656656f1F17af1F2b0dF79b8fF9ad8eD"
 );
-
-export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";

@@ -426,9 +426,6 @@ type Vault @entity {
   " All withdrawals made from this vault "
   withdraws: [Withdraw!]! @derivedFrom(field: "vault")
 
-  " Reward Token Addresses "
-  _rewardTokensIds: [String!]!
-
   " Address of the Strategy "
   _strategy: String!
 }

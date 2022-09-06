@@ -97,8 +97,14 @@ export function _Deposit(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
-  vault.outputTokenSupply = vault.outputTokenSupply!.plus(sharesMinted);
+  vault.inputTokenBalance = utils.readValue(
+    vaultContract.try_balance(),
+    constants.BIGINT_ZERO
+  );
+  vault.outputTokenSupply = utils.readValue(
+    vaultContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .toBigDecimal()

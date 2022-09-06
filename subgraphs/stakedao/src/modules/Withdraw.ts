@@ -108,8 +108,14 @@ export function _Withdraw(
     inputToken!.decimals as u8
   ).toBigDecimal();
 
-  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
-  vault.outputTokenSupply = vault.outputTokenSupply!.minus(sharesBurnt);
+  vault.inputTokenBalance = utils.readValue(
+    vaultContract.try_balance(),
+    constants.BIGINT_ZERO
+  );
+  vault.outputTokenSupply = utils.readValue(
+    vaultContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
 
   const withdrawalFees = utils
     .readValue<BigInt>(
