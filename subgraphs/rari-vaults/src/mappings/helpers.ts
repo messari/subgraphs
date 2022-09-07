@@ -64,6 +64,11 @@ export function createDeposit(
   let token = getOrCreateToken(asset);
   let vault = getOrCreateVault(event, vaultAddress, token.id);
   deposit.vault = vault.id;
+  let customPrice = getUsdPricePerToken(Address.fromString(asset));
+  let assetPriceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
+  token.lastPriceUSD = assetPriceUSD;
+  token.lastPriceBlockNumber = event.block.number;
+  token.save();
 
   // fill in vars
   deposit.hash = hash.toHexString();
@@ -78,7 +83,7 @@ export function createDeposit(
   deposit.amountUSD = amount
     .toBigDecimal()
     .div(exponentToBigDecimal(token.decimals))
-    .times(token.lastPriceUSD!);
+    .times(assetPriceUSD);
 
   deposit.save();
 
@@ -127,6 +132,11 @@ export function createWithdraw(
   let token = getOrCreateToken(asset);
   let vault = getOrCreateVault(event, vaultAddress, token.id);
   withdraw.vault = vault.id;
+  let customPrice = getUsdPricePerToken(Address.fromString(asset));
+  let assetPriceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
+  token.lastPriceUSD = assetPriceUSD;
+  token.lastPriceBlockNumber = event.block.number;
+  token.save();
 
   // calculate withdrawal fee amount in USD
   let withdrawalFeeUSD = BIGDECIMAL_ZERO;
@@ -134,7 +144,7 @@ export function createWithdraw(
     withdrawalFeeUSD = feeAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(token.decimals))
-      .times(token.lastPriceUSD!);
+      .times(assetPriceUSD);
   }
 
   // populate vars,
@@ -150,7 +160,7 @@ export function createWithdraw(
   withdraw.amountUSD = amount
     .toBigDecimal()
     .div(exponentToBigDecimal(token.decimals))
-    .times(token.lastPriceUSD!)
+    .times(assetPriceUSD)
     .minus(withdrawalFeeUSD);
 
   withdraw.save();
