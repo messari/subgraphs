@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getDiscordMessages, sendDiscordMessage } from "./DiscordMessages.js";
+import { getDiscordMessages, sendDiscordMessage } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
@@ -7,8 +7,8 @@ import { lendingPoolLevel } from "./poolLevel/lendingPoolLevel.js";
 import { vaultPoolLevel } from "./poolLevel/vaultPoolLevel.js";
 import { dexPoolLevel } from "./poolLevel/dexPoolLevel.js";
 import { alertFailedIndexing, alertPoolLevelErrors, alertProtocolErrors } from "./alerts.js";
+import { sleep } from "./util.js";
 
-const sleep = m => new Promise(r => setTimeout(r, m));
 
 executionFlow();
 
@@ -192,9 +192,9 @@ async function resolveQueriesToAttempt(queriesToAttempt, updatedDiscordMessages)
     // map useQueries and within filter updatedDiscordMessages.includes(useQueries[x].slice(0,80)) 
     useQueries = useQueries.filter(query => {
       const hasMsg = updatedDiscordMessages.filter(msg => {
-        return msg.content.includes(query.slice(0, 80))
+        return msg.content.includes(query.slice(0, 80));
       })
-      return hasMsg.length === 0
+      return hasMsg.length === 0;
     })
     await Promise.allSettled(useQueries.map(messageToSend => sendDiscordMessage(messageToSend)));
   } catch (err) {

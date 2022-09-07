@@ -1,4 +1,4 @@
-import { sendDiscordMessage } from "./DiscordMessages.js";
+import { sendDiscordMessage } from "./messageDiscord.js";
 import { poolErrorMessages, protocolErrorMessages } from "./errorSchemas.js";
 
 export const alertFailedIndexing = async (discordMessages, deployments) => {
@@ -14,7 +14,7 @@ export const alertFailedIndexing = async (discordMessages, deployments) => {
         if (!!deployments[depo].indexingError && !indexingErrorDeposListStr.join('-').includes(depo) && indexErrs.join(" - ").length < 1400) {
             indexErrs.push(`Name: "${depo}", Indexed: ${deployments[depo].indexedPercentage}%, Endpoint: ${deployments[depo].url}`);
         }
-    })
+    });
 
     const newIndexingErrorDiscordMessage = `
   **INDEXING ERRORS:**
