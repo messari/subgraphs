@@ -1,12 +1,6 @@
 # Introduction of Notional Finance
 
-*Note on 23 Aug 2022: due to the complexity of the protocol, there will be one or more interim versions of subgraph to test some of the parameters first and then a final to include all the implementations. This version of the methodology is based on the current and not the final version of the subgraph. Pending issues are addressed in the relevant sections of the article. Currently, the pending issues are:*
-
-- *treatment liquidity represented by nTokens (LP liquidity)*
-- *treatment of cToken collaterals not in any lending pool*
-- *separation of deposit/repayment, and separation of borrowing/withdrawal, by looking into the trade (optional)*
-- *compute interest rate and interest rate revenue (optional)*
-
+*Note on 7 Sept 2022: Notional Finance is one protocol with two services, a DEX (of fCASH and cTOKENs) and a lending and borrowing protocol. The two services are interwined and not divisible from a product perspective. For the purpose of subgraph, a version computing the statistics of the lending and borrowing services of Notional will be delivered first. In this version, liquidity represented by nTokens (LP liquidity) is not considered as part of lending or borrowing, as they are part of the DEX service. 
 
 ## Overview of Notional Finance
 Notional Finance is a protocol for decentralised fixed term, fixed rate lending. For now it only operates on Ethereum. 
@@ -119,9 +113,7 @@ Notional has a governance token NOTE, which is used for governance purpose and i
 ## Usage Metrics
 
 ### Pool Level
-*Amended on 22 Aug 2022* The pool of Notional can be classified by assets (DAI, USDC, ETH, BTC) and maturity date. E.g. DAI loans maturing on 25 Sept 2022, DAI loans maturing on 24 Dec 2022, ETH loans maturing on 24 Dec 2022, etc. This goes in line with the concept of "Markets" by Notional. (Ref: https://info.notional.finance/).
-
-~~Pools of Notional can be classified by assets (DAI, USDC, ETH, BTC) and . Theoretically, each asset can be further classified according to maturity, but it's difficult as the collaterals and nTOKENs do not have corresponding maturity.~~ (Pending issue: we might need separate classifications for collaterals and nTokens).
+The pool of Notional can be classified by assets (DAI, USDC, ETH, BTC) and maturity date. E.g. DAI loans maturing on 25 Sept 2022, DAI loans maturing on 24 Dec 2022, ETH loans maturing on 24 Dec 2022, etc. This goes in line with the concept of "Markets" by Notional. (Ref: https://info.notional.finance/).
 
 The usage of a Notional pool includes the following:
 - Liquidity providers provide/withdraw liquidity 
@@ -148,7 +140,7 @@ The protocol level metrics of the above items is the sum of the same metrics fro
 
 ## Financial Metrics
 
-### Pool Level (*Amended on 22 Aug 2022*)
+### Pool Level 
 
 The pool of Notional can be classified by assets (DAI, USDC, ETH, BTC) and maturity date. E.g. DAI loans maturing on 25 Sept 2022, DAI loans maturing on 24 Dec 2022, ETH loans maturing on 24 Dec 2022, etc. This goes in line with the concept of "Markets" by Notional. (Ref: https://info.notional.finance/).
 
@@ -158,14 +150,13 @@ The TVL of each pool is the value of cTOKEN in each pool. The value is the net r
 - Lenders deposit/withdraw cTOKENs
 - Borrower borrow/repay cTOKENs
 - ~~Borrowers deposit/release collaterals in cTOKENs~~ (Pending issue: collaterals do not go to any pool, so there should be another class for collaterals)
-- ~~Liquidity providers provide/withdraw cTOKENs as liquidity~~ (Pending issue: the split of the same cTokens allocated to each pool of different maturity dates is determined by governance parameters. Logically this part should be included as TVL. However, in the first implementation of the subgraph, we will first ignore this for TVL calculation.) 
 
 To simplify, the formula of Notional's TVL is:
 > TVL = $\sum$ value of cToken assets (cDAI, cUSDC, cETH, cWBTC) in the pool
 
 *Total Deposit Balance*
 
-This is the net result of all deposit/withdrawals. This should equal to TVL less the cTokens from liquidity providers. However, this is the balance of liquidity in the pool, and not a measure of the actual deposit volume. (Pending issue: there's no direct way to differentiate a deposit and a repayment in Notional, as they are both selling cTokens for fCASHs in the pool.) 
+This is the net result of all deposit/withdrawals. This should equal to TVL less the cTokens from liquidity providers. However, this is the balance of liquidity in the pool, and not a measure of the actual deposit volume. 
 
 > Total Deposit Balance = $\sum$ deposits of cTokens by users - $\sum$ withdrawal of cToken by users
 
@@ -178,7 +169,7 @@ This is the sum of all deposits. When a pool matures, this record stays with the
 
 *Total Borrowing Balance*
 
-This is the net result of all borrowing/repayments. This should equal to the total deposit balance, after adjusting for cToken changes in the pool. (Pending issue: there's no direct way to differentiate a borrowing and a withdrawal in Notional, as they are both selling fCASHs for cTokens in the pool.) 
+This is the net result of all borrowing/repayments. This should equal to the total deposit balance, after adjusting for cToken changes in the pool. 
 
 > Total Borrowing Balance = $\sum$ borrowings of cTokens by users - $\sum$ repayments of cToken by users
 
@@ -199,26 +190,36 @@ To simplify, the formula of Notional's Volume (combining lend, borrow, repay and
 *Revenue*
 
 Notional has two types of revenue:
-- Interests paid by borrowers to lenders. Different from Aave or Compound, Notional operates like a trading platform of zero-interest coupon (buying and selling fCASH), so the interests paid by borrowers to lenders do not accrue per block, but rather happens when each trade takes place. To simplify, we take the difference between the cTOKEN value and fCASH future value as the interest paid. For any given period, the higher of borrowing interests paid (selling fCASH) and lending interest paid (buying fCASH) is the interest revenue for that period. For more details please refer to Appendix: Consideration on Interest Revenue For Notional.
+- Revenue from lending and borrowing service. Interests paid by borrowers to lenders. Different from Aave or Compound, Notional operates like a trading platform of zero-interest coupon (buying and selling fCASH), so the interests paid by borrowers to lenders do not accrue per block, but rather happens when each trade takes place. To simplify, we take the difference between the cTOKEN value and fCASH future value as the interest paid. For any given period, the higher of borrowing interests paid (selling fCASH) and lending interest paid (buying fCASH) is the interest revenue for that period. For more details please refer to Appendix: Consideration on Interest Revenue For Notional.
 
-**(Pending issue: To simplify the revenue, we can presume the interest paid by borrowers to lenders is not revenue, i.e. only counting revenue generated to liquidity providers as revenue. To calculate this part of the revenue, we need to first compute the exchange rate/interest rate; and then differentiate deposit/repayments and borrowing/withdrawals. Interest revenue are derived based on the above.)** 
+To simplify, the formula of Notional's lending and borrowing revenue is:
+> Revenue = $\sum$ value of fCASH transacted * interest rate annualised * (loan duration in days / 365)
 
-- Fees paid by borrowers and lenders for each trade. Notional charges a fee for each transaction with the liquidity pool, e.g. borrow, repay, lend, withdraw. The fee rate is 0.3% per transaction for a 1-year loan, and pro rata for shorter maturity, i.e. 0.15% for 6-month loan. 80% of the fees go to the protocol and 20% goes to the liquidity provider. 
+- Revenue from DEX service (not include in the subgraph for the lending and borrowing service). Fees paid by borrowers and lenders for each trade. Notional charges a fee for each transaction with the liquidity pool, e.g. borrow, repay, lend, withdraw. The fee rate is 0.3% per transaction for a 1-year loan, and pro rata for shorter maturity, i.e. 0.15% for 6-month loan. 80% of the fees go to the protocol and 20% goes to the liquidity provider. In the DEX service, the protocol side revenue of Notional will be the 80% transaction fees generated from the transaction fees. The supply side revenue is the sum of 20% of the transaction fees. Interests paid to lenders are not counted as revenue, as suggested above.
   - Reference: https://docs.notional.finance/governance/overview-of-governance-parameters/selected-parameters#fees-and-incentives
   
-To simplify, the formula of Notional's Revenue is:
-> Revenue = $\sum$ value of fCASH transacted * fee rate of 0.3%
-
-As such, the protocol side revenue of Notional will be the 80% transaction fees generated from the transaction fees. The supply side revenue is the sum of 20% of the transaction fees. Interests paid to lenders are not counted as revenue, as suggested above.
-
 *Interest Rate*
 
 Theoretically, interest rate of Notional is derived from the exchange rate between the fCASH price and cTOKEN price. Notional uses an Oracle Rate, modified from the last traded rate, as the interest rate for internal computation. 
 - https://docs.notional.finance/notional-v2/fcash-valuation/interest-rate-oracles
 
+> Exchange rate = cToken price / fToken price 
+> Interest rate = Exchange rate - 1 / days to maturity * 365
+
+*Max LTV and Liquidation*
+
+Notional's Max LTV is unique. Each market may have different a max LTV depending on the collaterals used and borrowings of the user. 
+
+For each borrower, each of his collateral has a haircut rate (<1), and each of his debt has a buffer (>1). The two factors work together to determine the user's max LTV at his account level. When a user cannot maintain his max LTV ratio, then he can be liquidated. 
+ - https://docs.notional.finance/developer-documentation/how-to/liquidations (first 2 lines under key concepts).  
+ 
+Example: one account has 1 eth and borrowed 300 dai. ETH:DAI is now 1:400. ETH hair-cut is 0.8 and DAI debt buffer is 1.25.  So collateral value (in eth) is 1 x 0.8 = 0.8; and debt value (in ETH) is 300/400 X 12.5 = 0.9375.  As debt is more than collateral, the account can be liquidated.  
+
+ - https://docs.notional.finance/notional-v2/risk-and-collateralization/liquidation
+
 *Rewards*
 
-Rewards in NOTE token are given to liquidity providers.
+Rewards in NOTE token are given to liquidity providers. 
 
 ### Protocol Level
 The protocol level metrics of the above items is the sum of the same metrics from all pools. 
