@@ -67,20 +67,30 @@ export function updateMinipoolTvlandRevenue(
 
 export function updateProtocolAndPoolTvl(
   block: ethereum.Block,
-  amount: BigInt
+  amount: BigInt,
+  rewardAmount: BigInt
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
 
   // Pool
-  pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount)];
+  pool.inputTokenBalances[0] = pool.inputTokenBalances[0].plus(amount);
+  if (pool.inputTokenBalances.length == 1) {
+    pool.inputTokenBalances.push(rewardAmount);
+  } else {
+    pool.inputTokenBalances[1].plus(rewardAmount);
+  }
   // inputToken is ETH, price with ETH
-  pool.totalValueLockedUSD = bigIntToBigDecimal(
-    pool.inputTokenBalances[0]
-  ).times(
-    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
-      .lastPriceUSD!
-  );
+  pool.totalValueLockedUSD = bigIntToBigDecimal(pool.inputTokenBalances[0])
+    .times(
+      getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
+        .lastPriceUSD!
+    )
+    .plus(bigIntToBigDecimal(pool.inputTokenBalances[1]))
+    .times(
+      getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number)
+        .lastPriceUSD!
+    );
   pool.save();
 
   // Pool Daily and Hourly

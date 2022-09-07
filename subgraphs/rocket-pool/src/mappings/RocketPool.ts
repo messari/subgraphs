@@ -74,7 +74,7 @@ export function getStorageAddress(encode: Bytes): Address {
 /** handleEtherDeposit tracks ether deposited into rocketpool, which represents the TVL of the ETH staked in the pool. */
 export function handleEtherDeposit(event: EtherDeposited): void {
   updateUsageMetrics(event.block, event.transaction.from);
-  updateProtocolAndPoolTvl(event.block, event.params.amount);
+  updateProtocolAndPoolTvl(event.block, event.params.amount, BIGINT_ZERO);
   updateSnapshotsTvl(event.block);
 }
 
@@ -84,7 +84,8 @@ export function handleEtherWithdrawn(event: EtherWithdrawn): void {
   updateUsageMetrics(event.block, event.transaction.from);
   updateProtocolAndPoolTvl(
     event.block,
-    BIGINT_NEGATIVE_ONE.times(event.params.amount)
+    BIGINT_NEGATIVE_ONE.times(event.params.amount),
+    BIGINT_ZERO
   );
   updateSnapshotsTvl(event.block);
 }
@@ -107,7 +108,7 @@ export function handleMinipoolEnqueued(event: MinipoolEnqueued): void {
   );
 
   updateUsageMetrics(event.block, event.transaction.from);
-  updateProtocolAndPoolTvl(event.block, event.transaction.value);
+  updateProtocolAndPoolTvl(event.block, event.transaction.value, BIGINT_ZERO);
   updateSnapshotsTvl(event.block);
 }
 
@@ -128,7 +129,8 @@ export function handleMinipoolDequeued(event: MinipoolDequeued): void {
     updateUsageMetrics(event.block, event.transaction.from);
     updateProtocolAndPoolTvl(
       event.block,
-      BIGINT_NEGATIVE_ONE.times(event.transaction.value)
+      BIGINT_NEGATIVE_ONE.times(event.transaction.value),
+      BIGINT_ZERO
     );
     updateSnapshotsTvl(event.block);
   }
@@ -146,7 +148,8 @@ export function handleMinipoolRemoved(event: MinipoolRemoved): void {
   updateUsageMetrics(event.block, event.transaction.from);
   updateProtocolAndPoolTvl(
     event.block,
-    BIGINT_NEGATIVE_ONE.times(event.transaction.value)
+    BIGINT_NEGATIVE_ONE.times(event.transaction.value),
+    BIGINT_ZERO
   );
   updateSnapshotsTvl(event.block);
 }
@@ -155,29 +158,27 @@ export function handleMinipoolRemoved(event: MinipoolRemoved): void {
 //https://github.com/Data-Nexus/rocket-pool-mainnet/blob/master/src/mappings/rocketNodeStakingMapping.ts
 
 export function handleRPLStaked(event: RPLStaked): void {
-  let eth_amt = RPLamountinEth(event, event.params.amount);
-
   updateUsageMetrics(event.block, event.params.from);
-  updateProtocolAndPoolTvl(event.block, eth_amt);
+  updateProtocolAndPoolTvl(event.block, BIGINT_ZERO, event.params.amount);
   updateSnapshotsTvl(event.block);
 }
 
 export function handleRPLWithdrawn(event: RPLWithdrawn): void {
-  let eth_amt = RPLamountinEth(event, event.params.amount).times(
-    BigInt.fromString("-1")
-  );
   updateUsageMetrics(event.block, event.params.to);
-  updateProtocolAndPoolTvl(event.block, eth_amt);
+  updateProtocolAndPoolTvl(
+    event.block,
+    BIGINT_ZERO,
+    event.params.amount.times(BIGINT_NEGATIVE_ONE)
+  );
   updateSnapshotsTvl(event.block);
 }
 
 export function handleRPLSlashed(event: RPLSlashed): void {
-  let eth_amt = RPLamountinEth(event, event.params.amount);
   // update minipool tvl and revenue
   updateMinipoolTvlandRevenue(
     event.block,
     BIGINT_ZERO,
-    eth_amt,
+    event.params.amount,
     BIGINT_ZERO,
     event.params.node.toHexString()
   );
