@@ -417,7 +417,7 @@ export function updateTVL(event: ethereum.Event): void {
     vault.inputTokenBalance = tryTokenBalance.reverted
       ? vault.inputTokenBalance
       : tryTokenBalance.value;
-    vault.totalValueLockedUSD = inputToken.lastPriceUSD.times(
+    vault.totalValueLockedUSD = inputToken.lastPriceUSD!.times(
       vault.inputTokenBalance
         .toBigDecimal()
         .div(exponentToBigDecimal(inputToken.decimals))
@@ -482,7 +482,9 @@ export function updateOutputToken(
   }
 
   // calculate outputTokenPrice = TVL / outputTokenSupplyBD
-  let outputTokenPriceUSD = totalValueLockedUSD.div(outputTokenSupplyBD);
+  let outputTokenPriceUSD = outputTokenSupplyBD.equals(BIGDECIMAL_ZERO)
+    ? BIGDECIMAL_ZERO
+    : totalValueLockedUSD.div(outputTokenSupplyBD);
 
   // set outputTokenPrice
   for (let i = 0; i < protocol._vaultList.length; i++) {
