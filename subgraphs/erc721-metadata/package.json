@@ -2,6 +2,7 @@
   "name": "erc721-metadata",
   "license": "UNLICENSED",
   "scripts": {
+    "format": "npx prettier --write .",
     "codegen": "graph codegen",
     "build": "graph build",
     "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
@@ -13,5 +14,8 @@
     "@graphprotocol/graph-ts": "0.27.0",
     "minimist": "^1.2.6",
     "mustache": "^4.2.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.7.1"
   }
 }
