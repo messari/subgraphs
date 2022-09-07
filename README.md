@@ -135,7 +135,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | [Gamma Strategies](https://www.gamma.xyz/) | ✅ | 1.3.0 / 1.1.2 / 1.0.0 | [![Gamma Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/gamma-ethereum) [![Gamma Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/gamma-polygon) |
 | Harvest Finance | 🔨 | | |
 | Liquid Driver | 🔨 | | |
-| [Rari Vaults](https://rari.capital/) | 🛠 | 1.3.0 / 1.4.1 / 1.0.0 | [![Rari Vaults Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-vaults-ethereum) |
+| [Rari Vaults](https://rari.capital/) | 🛠 | 1.3.0 / 1.4.2 / 1.0.0 | [![Rari Vaults Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-vaults-ethereum) |
 | [Stake DAO](https://stakedao.org/) | 🛠 | 1.3.0 / 1.3.0 / 1.0.0 | [![Stake DAO](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/stake-dao-ethereum) |
 | [Tokemak](https://www.tokemak.xyz/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Tokemak](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/tokemak-ethereum) |
 | [Vesper Finance](https://vesper.finance/) | ✅ | 1.3.0 / 1.0.0 / 1.0.0 | [![Vesper Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/vesper-ethereum) |

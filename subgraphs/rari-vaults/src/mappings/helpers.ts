@@ -9,11 +9,11 @@ import {
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   DAI_VAULT_ADDRESS,
   DAI_VAULT_MANAGER_ADDRESS,
   DEFAULT_DECIMALS,
   ETHER_VAULT_MANAGER_ADDRESS,
-  ETH_ADDRESS,
   INT_TWO,
   RARI_DEPLOYER,
   USDC_VAULT_ADDRESS,
@@ -37,7 +37,7 @@ import { exponentToBigDecimal } from "../common/utils/utils";
 import { RariYieldFundManager } from "../../generated/RariYieldFundManager/RariYieldFundManager";
 import { RariStableFundManager } from "../../generated/RariUSDCFundManager/RariStableFundManager";
 import { RariEtherFundManager } from "../../generated/RariEtherFundManager/RariEtherFundManager";
-import { getUsdPrice } from "../prices";
+import { getUsdPricePerToken } from "../prices";
 import { ERC20 } from "../../generated/RariYieldFundManager/ERC20";
 
 //////////////////////////////
@@ -47,7 +47,6 @@ import { ERC20 } from "../../generated/RariYieldFundManager/ERC20";
 export function createDeposit(
   event: ethereum.Event,
   amount: BigInt,
-  amountUSD: BigDecimal,
   asset: string,
   vaultAddress: string
 ): void {
@@ -55,6 +54,8 @@ export function createDeposit(
   let hash = event.transaction.hash;
   let logIndex = event.transaction.index;
   let id = "deposit-" + hash.toHexString() + "-" + logIndex.toString();
+
+  updateTVL(event); // also updates inputTokenBalance and prices
 
   // create Deposit
   let deposit = new Deposit(id);
@@ -74,11 +75,12 @@ export function createDeposit(
   deposit.timestamp = event.block.timestamp;
   deposit.asset = token.id;
   deposit.amount = amount;
-  deposit.amountUSD = amountUSD;
+  deposit.amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(token.decimals))
+    .times(token.lastPriceUSD!);
 
   deposit.save();
-
-  updateTVL(event); // also updates inputTokenBalance
 
   // get outputToken Supply/price
   let outputTokenInfo = updateOutputToken(vault, vaultAddress, event);
@@ -107,8 +109,7 @@ export function createDeposit(
 export function createWithdraw(
   event: ethereum.Event,
   amount: BigInt,
-  amountUSD: BigDecimal,
-  afterFeeUSD: BigInt, // used to calculate withdrawal fee - only used in Yield Pool
+  feeAmount: BigInt, // used to calculate withdrawal fee
   asset: string,
   vaultAddress: string
 ): void {
@@ -117,6 +118,8 @@ export function createWithdraw(
   let logIndex = event.transaction.index;
   let id = "withdraw-" + hash.toHexString() + "-" + logIndex.toString();
 
+  updateTVL(event); // also updates inputTokenBalance and prices
+
   // create Deposit
   let withdraw = new Withdraw(id);
 
@@ -124,6 +127,15 @@ export function createWithdraw(
   let token = getOrCreateToken(asset);
   let vault = getOrCreateVault(event, vaultAddress, token.id);
   withdraw.vault = vault.id;
+
+  // calculate withdrawal fee amount in USD
+  let withdrawalFeeUSD = BIGDECIMAL_ZERO;
+  if (feeAmount.gt(BIGINT_ZERO)) {
+    withdrawalFeeUSD = feeAmount
+      .toBigDecimal()
+      .div(exponentToBigDecimal(token.decimals))
+      .times(token.lastPriceUSD!);
+  }
 
   // populate vars,
   withdraw.hash = hash.toHexString();
@@ -134,23 +146,14 @@ export function createWithdraw(
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
   withdraw.asset = token.id;
-  withdraw.amount = amount;
-  withdraw.amountUSD = amountUSD;
+  withdraw.amount = amount.minus(feeAmount);
+  withdraw.amountUSD = amount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(token.decimals))
+    .times(token.lastPriceUSD!)
+    .minus(withdrawalFeeUSD);
 
   withdraw.save();
-
-  updateTVL(event); // also updates inputTokenBalance
-
-  // calculate withdrawal fee
-  let withdrawalFee = BIGDECIMAL_ZERO;
-  if (vaultAddress == YIELD_VAULT_ADDRESS) {
-    withdrawalFee = amountUSD.minus(
-      afterFeeUSD.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS))
-    );
-    if (withdrawalFee.lt(BIGDECIMAL_ZERO)) {
-      withdrawalFee = BIGDECIMAL_ZERO;
-    }
-  }
 
   // get outputToken Supply/price
   let outputTokenInfo = updateOutputToken(vault, vaultAddress, event);
@@ -159,7 +162,7 @@ export function createWithdraw(
 
   // update fees/revenues/token balances
   updateYieldFees(vaultAddress);
-  updateRevenues(event, vault, withdrawalFee);
+  updateRevenues(event, vault, withdrawalFeeUSD);
 
   // calculate pricePerShare
   let decimals = token.decimals == -1 ? DEFAULT_DECIMALS : token.decimals;
@@ -403,11 +406,18 @@ export function updateTVL(event: ethereum.Event): void {
       tryTokenBalance = contract.try_getRawFundBalance(); // in ETH
     }
 
+    // update input token price
+    let customPrice = getUsdPricePerToken(Address.fromString(inputToken.id));
+    inputToken.lastPriceUSD = customPrice.usdPrice.div(
+      customPrice.decimalsBaseTen
+    );
+    inputToken.lastPriceBlockNumber = event.block.number;
+    inputToken.save();
+
     vault.inputTokenBalance = tryTokenBalance.reverted
       ? vault.inputTokenBalance
       : tryTokenBalance.value;
-    vault.totalValueLockedUSD = getUsdPrice(
-      Address.fromString(inputToken.id),
+    vault.totalValueLockedUSD = inputToken.lastPriceUSD.times(
       vault.inputTokenBalance
         .toBigDecimal()
         .div(exponentToBigDecimal(inputToken.decimals))
