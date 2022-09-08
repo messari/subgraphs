@@ -1,5 +1,6 @@
 import {
   BigInt,
+  ethereum,
   ipfs,
   json,
   JSONValue,
@@ -7,7 +8,7 @@ import {
   log,
   TypedMap,
 } from "@graphprotocol/graph-ts";
-import { ERC721, Transfer } from "../../generated/ERC721/ERC721";
+import { ERC721 } from "../../generated/ERC721/ERC721";
 import { Token, Attribute, Collection } from "../../generated/schema";
 import {
   IPFS_PREFIX,
@@ -31,7 +32,7 @@ export function normalize(strValue: string): string {
 }
 
 export function createToken(
-  event: Transfer,
+  event: ethereum.Event,
   contract: ERC721,
   tokenCollection: Collection,
   tokenId: BigInt
@@ -53,7 +54,7 @@ export function createToken(
   return newToken;
 }
 
-export function updateTokenMetadata(event: Transfer, token: Token): Token {
+export function updateTokenMetadata(event: ethereum.Event, token: Token): Token {
   if (token.tokenURI == null) {
     return token;
   }
