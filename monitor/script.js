@@ -1,14 +1,14 @@
 import axios from "axios";
-import { getDiscordMessages, sendDiscordMessage } from "./DiscordMessages.js";
+import { getDiscordMessages, sendDiscordMessage } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolLevel } from "./protocolLevel.js";
-import { errorsObj } from "./errorSchemas.js";
+import { errorsObj, protocolErrors } from "./errorSchemas.js";
 import { lendingPoolLevel } from "./poolLevel/lendingPoolLevel.js";
 import { vaultPoolLevel } from "./poolLevel/vaultPoolLevel.js";
 import { dexPoolLevel } from "./poolLevel/dexPoolLevel.js";
 import { alertFailedIndexing, alertPoolLevelErrors, alertProtocolErrors } from "./alerts.js";
+import { sleep } from "./util.js";
 
-const sleep = m => new Promise(r => setTimeout(r, m));
 
 executionFlow();
 
@@ -29,28 +29,10 @@ async function executionFlow() {
         deployments[deploymentsKey] = {
           indexingError: null,
           indexedPercentage: 0,
-          protocolErrors: {
-            tvlRange: [],
-            cumulativeSupplySideRev: [],
-            cumulativeProtocolSideRev: [],
-            cumulativeTotalRev: [],
-            cumulativeVol: [],
-            cumulativeUniqueUsers: [],
-            totalPoolCount: [],
-            cumulativeUniqueDepos: [],
-            cumulativeUniqueBorrowers: [],
-            cumulativeUniqueLiquidators: [],
-            cumulativeUniqueLiquidatees: [],
-            openPositionCount: [],
-            cumulativePositionCount: [],
-            totalDepoBal: [],
-            cumulativeDepo: [],
-            totalBorrowBal: [],
-            cumulativeLiquidate: [],
-          },
           url: deploymentString,
           protocolType: protocolType,
         };
+        deployments[deploymentsKey].protocolErrors = JSON.parse(JSON.stringify(protocolErrors));
         if (protocolType && deploymentsKey && Object.keys(errorsObj).includes(protocolType)) {
           deployments[deploymentsKey].poolErrors = JSON.parse(JSON.stringify(errorsObj[protocolType]));
         }
@@ -170,44 +152,61 @@ async function executionFlow() {
       deployments[realNameString].indexingError = indexData[indexDataName]?.fatalError?.message;
     } else if (!indexData[indexDataName] && indexDataName.includes("pending")) {
       delete deployments[realNameString];
+      return;
     }
+
+    if (parseFloat(deployments[realNameString]?.indexedPercentage) < 10) {
+      invalidDeployments.push(realNameString);
+      delete deployments[realNameString];
+    }
+
   });
   deployments = await protocolLevel(deployments);
   let queriesToAttempt = [];
   const discordMessages = await getDiscordMessages([]);
   await alertFailedIndexing(discordMessages, deployments);
   queriesToAttempt = await alertProtocolErrors(discordMessages, deployments, queriesToAttempt);
-  deployments = await deploymentsOnPoolLevel(deployments);
+  // deployments = await deploymentsOnPoolLevel(deployments);
+  // await sleep(5000);
+  // queriesToAttempt = await alertPoolLevelErrors(discordMessages, deployments, "lending", queriesToAttempt);
+  // await sleep(5000);
+  // queriesToAttempt = await alertPoolLevelErrors(discordMessages, deployments, "vaults", queriesToAttempt);
+  // await sleep(5000);
+  // queriesToAttempt = await alertPoolLevelErrors(discordMessages, deployments, "exchanges", queriesToAttempt);
   await sleep(5000);
 
-  const lendingPoolQueries = await alertPoolLevelErrors(discordMessages, deployments, "lending", queriesToAttempt);
-  await sleep(5000);
-  const vaultPoolQueries = await alertPoolLevelErrors(discordMessages, deployments, "vaults", queriesToAttempt);
-  await sleep(5000);
-  const dexPoolQueries = await alertPoolLevelErrors(discordMessages, deployments, "exchanges", queriesToAttempt);
-  queriesToAttempt = [...queriesToAttempt, ...lendingPoolQueries, ...vaultPoolQueries, ...dexPoolQueries];
-  await sleep(5000);
+  if (queriesToAttempt.length > 0) {
+    // Need to pull refreshed list of alert messages, in case posted but error was thrown as well.
+    const updatedDiscordMessages = await getDiscordMessages([]);
+    await resolveQueriesToAttempt(queriesToAttempt, updatedDiscordMessages);
+  }
 
-  // await resolveQueriesToAttempt(queriesToAttempt.map(x => sendDiscordMessage(x)))
-  executionFlow();
+  return executionFlow();
 }
 
-async function resolveQueriesToAttempt(queriesToAttempt) {
+async function resolveQueriesToAttempt(queriesToAttempt, updatedDiscordMessages) {
   // Take the first 5 queries to attempt
-  const useQueries = queriesToAttempt.slice(0, 4);
+  let useQueries = queriesToAttempt.slice(0, 5);
   const newQueriesArray = [...queriesToAttempt.slice(5)];
-  await Promise.all(useQueries)
-    .then(
-      (response) => (response.forEach((val, idx) => {
-        console.log('resp? ', newQueriesArray.length, idx, val)
-      }))
-    )
-    .catch((err) => console.log(err));
+  try {
+    // map useQueries and within filter updatedDiscordMessages.includes(useQueries[x].slice(0,80)) 
+    useQueries = useQueries.filter(query => {
+      const hasMsg = updatedDiscordMessages.filter(msg => {
+        return msg.content.includes(query.slice(0, 80));
+      })
+      return hasMsg.length === 0;
+    })
+    await Promise.allSettled(useQueries.map(messageToSend => sendDiscordMessage(messageToSend)));
+  } catch (err) {
+    console.log(err)
+  }
 
   await sleep(5000);
   if (newQueriesArray.length > 0) {
-    resolveQueriesToAttempt(newQueriesArray);
+    resolveQueriesToAttempt(newQueriesArray, updatedDiscordMessages);
+    return;
   }
+  return;
 }
 
 async function deploymentsOnPoolLevel(deployments) {

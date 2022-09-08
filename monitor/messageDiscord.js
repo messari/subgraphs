@@ -1,7 +1,6 @@
 import axios from 'axios';
 import moment from "moment";
-
-const sleep = m => new Promise(r => setTimeout(r, m));
+import { monitorVersion, sleep } from './util.js';
 
 export async function getDiscordMessages(messages) {
     const tempMessages = await fetchMessages(messages[messages.length - 1]?.id || "");
@@ -63,17 +62,16 @@ export async function sendDiscordMessage(message) {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",
     }
-
-    const postJSON = JSON.stringify({ "content": message })
-
+    const postJSON = JSON.stringify({ "content": message + '\n' + monitorVersion });
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return null;
     } catch (err) {
-        console.log('ERROR', err, message)
+        console.log('ERROR', err.response.status)
         if (err.response.status === 429) {
-            return await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+            return message;
         } else {
+            console.log(err.response.data.message)
             return null;
         }
     }

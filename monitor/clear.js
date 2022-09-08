@@ -1,4 +1,4 @@
-import { clearChannel } from "./DiscordMessages.js";
+import { clearChannel } from "./messageDiscord.js";
 import 'dotenv/config'
 
 clearChannel();

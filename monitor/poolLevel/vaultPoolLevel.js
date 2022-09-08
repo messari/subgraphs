@@ -19,16 +19,16 @@ export const vaultPoolLevel = async (deployments) => {
             type
             schemaVersion
         }
-      vaults(first: 1000) {
-        id
-        name
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        outputTokenSupply
-        outputTokenPriceUSD
-      }
+        vaults(first: 1000) {
+          id
+          name
+          totalValueLockedUSD
+          cumulativeSupplySideRevenueUSD
+          cumulativeProtocolSideRevenueUSD
+          cumulativeTotalRevenueUSD
+          outputTokenSupply
+          outputTokenPriceUSD
+        }
     }`;
 
     const promiseArr = [];
@@ -60,7 +60,7 @@ export const vaultPoolLevel = async (deployments) => {
                 };
             }))
         )
-        .catch((err) => console.log(err));
+        .catch((err) => console.log(err.code, err.errno));
 
     vaultLevelData.forEach((protocol, idx) => {
         if (!protocol?.vaults) return;

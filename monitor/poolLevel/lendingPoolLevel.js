@@ -19,21 +19,21 @@ export const lendingPoolLevel = async (deployments) => {
             type
             schemaVersion
         }
-      markets(first: 1000) {
-        id
-        name
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        cumulativeDepositUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
-        totalBorrowBalanceUSD
-        totalDepositBalanceUSD
-        outputTokenSupply
-        outputTokenPriceUSD
-      }
+        markets(first: 1000) {
+          id
+          name
+          totalValueLockedUSD
+          cumulativeSupplySideRevenueUSD
+          cumulativeProtocolSideRevenueUSD
+          cumulativeTotalRevenueUSD
+          cumulativeDepositUSD
+          cumulativeBorrowUSD
+          cumulativeLiquidateUSD
+          totalBorrowBalanceUSD
+          totalDepositBalanceUSD
+          outputTokenSupply
+          outputTokenPriceUSD
+        }
     }`;
 
     const promiseArr = [];
@@ -65,7 +65,7 @@ export const lendingPoolLevel = async (deployments) => {
                 };
             }))
         )
-        .catch((err) => console.log(err));
+        .catch((err) => console.log(err.code, err.errno));
 
     marketLevelData.forEach((protocol, idx) => {
         if (!protocol?.markets) return;
@@ -130,7 +130,7 @@ export const lendingPoolLevel = async (deployments) => {
             }
 
             currentIssueField = "cumulativeDepositUSD";
-            if (!(parseFloat(instance[currentIssueField]) > 100) && !issuesArrays[currentIssueField]?.includes(instance.id)) {
+            if (!(parseFloat(instance[currentIssueField]) > 0) && !issuesArrays[currentIssueField]?.includes(instance.id)) {
                 issuesArrays[currentIssueField].push(buildIssue(parseFloat(instance[currentIssueField])));
             }
 
