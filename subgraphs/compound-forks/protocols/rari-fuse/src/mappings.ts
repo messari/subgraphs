@@ -568,7 +568,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     event.block.timestamp,
     trollerAddr,
     blocksPerDayBD,
-    PROTOCOL_NETWORK.toLowerCase() == Network.ARBITRUM_ONE.toLowerCase()
+    true // update all prices on each transaction for arbitrum / ethereum
   );
   updateProtocol(Address.fromString(FACTORY_CONTRACT));
 
