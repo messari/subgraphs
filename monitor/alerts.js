@@ -1,4 +1,4 @@
-import { sendDiscordMessage } from "./DiscordMessages.js";
+import { sendDiscordMessage } from "./messageDiscord.js";
 import { poolErrorMessages, protocolErrorMessages } from "./errorSchemas.js";
 
 export const alertFailedIndexing = async (discordMessages, deployments) => {
@@ -14,7 +14,7 @@ export const alertFailedIndexing = async (discordMessages, deployments) => {
         if (!!deployments[depo].indexingError && !indexingErrorDeposListStr.join('-').includes(depo) && indexErrs.join(" - ").length < 1400) {
             indexErrs.push(`Name: "${depo}", Indexed: ${deployments[depo].indexedPercentage}%, Endpoint: ${deployments[depo].url}`);
         }
-    })
+    });
 
     const newIndexingErrorDiscordMessage = `
   **INDEXING ERRORS:**
@@ -34,7 +34,6 @@ export const alertFailedIndexing = async (discordMessages, deployments) => {
 export const alertPoolLevelErrors = async (discordMessages, deployments, protocolType, queriesToAttempt) => {
     const promiseArr = [];
     Object.entries(deployments).forEach(([protocol, deployment]) => {
-
         const poolErrorMessage = discordMessages.find(x => {
             return x.content.includes("**POOL ERRORS") && x.content.includes(protocol.split('-').join(' '));
         });
@@ -70,20 +69,18 @@ export const alertPoolLevelErrors = async (discordMessages, deployments, protoco
     await Promise.allSettled(promiseArr)
         .then(
             (response) => {
-                queriesToAttempt = response.map((res, idx) => {
+                response.forEach((res) => {
                     if (res?.reason?.response?.status === 429 && JSON.parse(res?.reason?.config?.data)?.content) {
-                        return JSON.parse(res?.reason?.config?.data)?.content;
-                    } else {
-                        return null;
+                        queriesToAttempt.push(JSON.parse(res?.reason?.config?.data)?.content);
+                    } else if (res?.value) {
+                        queriesToAttempt.push(res.value);
                     }
                 })
             }
         )
         .catch((err) => console.log(err, 'err'));
-
     return queriesToAttempt;
 }
-
 
 export const alertProtocolErrors = async (discordMessages, deployments, queriesToAttempt) => {
     const promiseArr = [];
@@ -173,16 +170,15 @@ ${val.join(",\n")}
     await Promise.allSettled(promiseArr)
         .then(
             (response) => {
-                queriesToAttempt = [...queriesToAttempt, response.map((res, idx) => {
+                response.forEach((res) => {
                     if (res?.reason?.response?.status === 429 && JSON.parse(res?.reason?.config?.data)?.content) {
-                        return JSON.parse(res?.reason?.config?.data)?.content;
-                    } else {
-                        null;
+                        queriesToAttempt.push(JSON.parse(res?.reason?.config?.data)?.content);
+                    } else if (res?.value) {
+                        queriesToAttempt.push(res.value);
                     }
-                })]
+                })
             }
         )
         .catch((err) => console.log(err, 'err'));
-
     return queriesToAttempt;
 }

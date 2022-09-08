@@ -64,73 +64,80 @@ export const protocolLevel = async (deployments) => {
                 queryToUse = ``;
             } else {
                 queryToUse = `
-      query {
-        dexAmmProtocols {
-          name
-          network
-          cumulativeVolumeUSD
-          cumulativeUniqueUsers
-              totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-        }
-      }`;
+                query {
+                    dexAmmProtocols {
+                        name
+                        network
+                        cumulativeVolumeUSD
+                        cumulativeUniqueUsers
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                    }
+                }`;
             }
         } else if (deployment.data.protocols[0].type.toUpperCase() === "LENDING") {
             if (versionGroup === "2.0") {
-                queryToUse = `query{ lendingProtocols {
-              name
-          network
-      totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-        cumulativeUniqueUsers
-        cumulativeUniqueDepositors
-        cumulativeUniqueBorrowers
-        cumulativeUniqueLiquidators
-        cumulativeUniqueLiquidatees
-        openPositionCount
-        cumulativePositionCount
-        totalPoolCount
-        totalDepositBalanceUSD
-        cumulativeDepositUSD
-        totalBorrowBalanceUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
-      }
-  }`;
+                queryToUse = `
+                query {
+                    lendingProtocols {
+                        name
+                        network
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                        cumulativeUniqueUsers
+                        cumulativeUniqueDepositors
+                        cumulativeUniqueBorrowers
+                        cumulativeUniqueLiquidators
+                        cumulativeUniqueLiquidatees
+                        openPositionCount
+                        cumulativePositionCount
+                        totalPoolCount
+                        totalDepositBalanceUSD
+                        cumulativeDepositUSD
+                        totalBorrowBalanceUSD
+                        cumulativeBorrowUSD
+                        cumulativeLiquidateUSD
+                    }
+                }`;
             } else {
-                queryToUse = `query { lendingProtocols {
-              name
-          network
-      totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-        cumulativeUniqueUsers
-        totalDepositBalanceUSD
-        cumulativeDepositUSD
-        totalBorrowBalanceUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
-      }
-      }`;
+                queryToUse = `
+                query {
+                    lendingProtocols {
+                        name
+                        network
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                        cumulativeUniqueUsers
+                        totalDepositBalanceUSD
+                        cumulativeDepositUSD
+                        totalBorrowBalanceUSD
+                        cumulativeBorrowUSD
+                        cumulativeLiquidateUSD
+                    }
+                }`;
             }
         } else if (deployment.data.protocols[0].type.toUpperCase() === "YIELD") {
             if (versionGroup === "2.0") {
                 queryToUse = ``;
             } else {
-                queryToUse = `query { yieldAggregators {
-              name
-          network
-      totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-          cumulativeUniqueUsers
-        }}`;
+                queryToUse = `
+                query {
+                    yieldAggregators {
+                        name
+                        network
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                        cumulativeUniqueUsers
+                    }
+                }`;
             }
         }
 
