@@ -67,7 +67,7 @@ Not applicable to Euler Finance
 
 Euler's collateral factor represents a risk-adjusted value of a user's collateral. In practice if a user deposits $1000 `USDC` and the collateral factor is `.9`, they have $900 `USDC` ($1000 * .9) of collateral to borrow from.
 
-Where Euler differs from other protocols is in the 2-sided approach. There is also a borrow factor. So yes, the user chas $900 to use as collateral, but they want to borrow `UNI`, and `UNI` has a borrow factor of `.7`.
+Where Euler differs from other protocols is in the 2-sided approach. There is also a borrow factor. So yes, the user has $900 to use as collateral, but they want to borrow `UNI`, and `UNI` has a borrow factor of `.7`.
 
 In this example the user could borrow ($900 * `.7` `UNI`) = $630 with their $1000 `USDC` deposit.
 
