@@ -93,7 +93,6 @@ import {
   INT_TWO,
   mantissaFactor,
   mantissaFactorBD,
-  Network,
   RewardTokenType,
 } from "../../../src/constants";
 import {
@@ -119,7 +118,6 @@ import { RewardsDistributorDelegator } from "../../../generated/templates/CToken
 let constants = getNetworkSpecificConstant();
 const FACTORY_CONTRACT = constants.fusePoolDirectoryAddress;
 const PROTOCOL_NETWORK = constants.network;
-const ETH_PRICEORACLE = constants.ethPriceOracle;
 
 //////////////////////
 //// Fuse Enum(s) ////
@@ -159,6 +157,7 @@ export function handlePoolRegistered(event: PoolRegistered): void {
 
   // create helper fuse pool entity
   let pool = new _FusePool(event.params.pool.comptroller.toHexString());
+  pool.name = event.params.pool.name;
   pool.poolNumber = event.params.index.toString();
   pool.marketIDs = [];
 
