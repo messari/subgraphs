@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt, Address, ethereum, dataSource, log } from "@graphprotocol/graph-ts";
-import { ActiveAccount, InterestRate } from "../../generated/schema";
+import { ActiveAccount, InterestRate, Market } from "../../generated/schema";
 import {
   SECONDS_PER_DAY,
   BIGDECIMAL_ZERO,
@@ -23,10 +23,11 @@ import {
   getOrCreateMarketHourlySnapshot,
   getDegenBoxAddress,
 } from "./getters";
-import { bigIntToBigDecimal } from "./utils/numbers";
+import { bigIntToBigDecimal, exponentToBigDecimal } from "./utils/numbers";
 import { DegenBox } from "../../generated/BentoBox/DegenBox";
 import { readValue } from "./utils/utils";
 import { getOrCreateAccount } from "../positions";
+import { Cauldron } from "../../generated/templates/Cauldron/Cauldron";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal, marketId: string): void {
@@ -326,6 +327,7 @@ export function updateMarketStats(
     usageHourlySnapshot.hourlyDepositCount += 1;
     usageDailySnapshot.dailyDepositCount += 1;
     market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
+    market.save();
 
     marketHourlySnapshot.cumulativeDepositUSD = marketHourlySnapshot.cumulativeDepositUSD.plus(amountUSD);
     marketDailySnapshot.cumulativeDepositUSD = marketDailySnapshot.cumulativeDepositUSD.plus(amountUSD);
@@ -339,17 +341,17 @@ export function updateMarketStats(
     market.inputTokenBalance = inputTokenBalance;
     market.totalValueLockedUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD!);
     market.totalDepositBalanceUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD!);
+    market.save();
+
     marketDailySnapshot.dailyWithdrawUSD = marketDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
     usageHourlySnapshot.hourlyWithdrawCount += 1;
     usageDailySnapshot.dailyWithdrawCount += 1;
     financialsDailySnapshot.dailyWithdrawUSD = financialsDailySnapshot.dailyWithdrawUSD.plus(amountUSD);
   } else if (eventType == EventType.BORROW) {
-    let outputTokenSupply = market.outputTokenSupply.plus(amount);
-    market.outputTokenSupply = outputTokenSupply;
-    market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, token.decimals).times(priceUSD!);
     usageHourlySnapshot.hourlyBorrowCount += 1;
     usageDailySnapshot.dailyBorrowCount += 1;
     market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
+    market.save();
 
     marketHourlySnapshot.cumulativeBorrowUSD = marketHourlySnapshot.cumulativeBorrowUSD.plus(amountUSD);
     marketDailySnapshot.cumulativeBorrowUSD = marketDailySnapshot.cumulativeBorrowUSD.plus(amountUSD);
@@ -359,9 +361,6 @@ export function updateMarketStats(
     marketDailySnapshot.dailyBorrowUSD = marketDailySnapshot.dailyBorrowUSD.plus(amountUSD);
     financialsDailySnapshot.dailyBorrowUSD = financialsDailySnapshot.dailyBorrowUSD.plus(amountUSD);
   } else if (eventType == EventType.REPAY) {
-    let outputTokenSupply = market.outputTokenSupply.minus(amount);
-    market.outputTokenSupply = outputTokenSupply;
-    market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, token.decimals).times(priceUSD!);
     marketDailySnapshot.dailyRepayUSD = marketDailySnapshot.dailyRepayUSD.plus(amountUSD);
     usageHourlySnapshot.hourlyRepayCount += 1;
     usageDailySnapshot.dailyRepayCount += 1;
@@ -398,4 +397,26 @@ function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
     snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
+}
+
+// update borrow amount for the given market
+export function updateBorrowAmount(market: Market): void {
+  let couldronContract = Cauldron.bind(Address.fromString(market.id));
+
+  // get total borrows
+  let tryBorrowBalance = couldronContract.try_totalBorrow();
+  if (tryBorrowBalance.reverted) {
+    log.warning("[updateBorrowAmount] Could not get borrow balance for market {}", [market.id]);
+    return;
+  }
+
+  // get mim and price since that is the only borrowable asset
+  let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
+  let mimBorrowed = tryBorrowBalance.value.value0;
+  market.outputTokenSupply = mimBorrowed;
+  market.totalBorrowBalanceUSD = mimBorrowed
+    .toBigDecimal()
+    .div(exponentToBigDecimal(mimToken.decimals))
+    .times(mimToken.lastPriceUSD!);
+  market.save();
 }
