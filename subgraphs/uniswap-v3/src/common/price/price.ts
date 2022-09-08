@@ -121,7 +121,7 @@ export function findUSDPricePerToken(
   let whiteList = tokenWhitelist.whitelistPools;
   // for now just take USD from pool with greatest TVL
   // need to update this to actually detect best rate based on liquidity distribution
-  let largestNativeTokenValue = BIGDECIMAL_ZERO;
+  let largestWhitelistTokenValue = BIGDECIMAL_ZERO;
   let priceSoFar = BIGDECIMAL_ZERO;
 
   // hardcoded fix for incorrect rates
@@ -145,13 +145,12 @@ export function findUSDPricePerToken(
             token1.lastPriceUSD!
           );
           if (
-            nativeTokenValueLocked.gt(largestNativeTokenValue) &&
+            nativeTokenValueLocked.gt(largestWhitelistTokenValue) &&
             nativeTokenValueLocked.gt(
               NetworkConfigs.getMinimumLiquidityThreshold()
-            ) &&
-            token1.lastPriceUSD != BIGDECIMAL_ZERO
+            )
           ) {
-            largestNativeTokenValue = nativeTokenValueLocked;
+            largestWhitelistTokenValue = nativeTokenValueLocked;
             // token1 per our token * NativeToken per token1
             priceSoFar = poolAmounts.tokenPrices[1].times(
               token1.lastPriceUSD as BigDecimal
@@ -165,13 +164,12 @@ export function findUSDPricePerToken(
             token0.lastPriceUSD!
           );
           if (
-            nativeTokenValueLocked.gt(largestNativeTokenValue) &&
+            nativeTokenValueLocked.gt(largestWhitelistTokenValue) &&
             nativeTokenValueLocked.gt(
               NetworkConfigs.getMinimumLiquidityThreshold()
-            ) &&
-            token0.lastPriceUSD != BIGDECIMAL_ZERO
+            )
           ) {
-            largestNativeTokenValue = nativeTokenValueLocked;
+            largestWhitelistTokenValue = nativeTokenValueLocked;
             // token0 per our token * NativeToken per token0
             priceSoFar = poolAmounts.tokenPrices[0].times(
               token0.lastPriceUSD as BigDecimal
