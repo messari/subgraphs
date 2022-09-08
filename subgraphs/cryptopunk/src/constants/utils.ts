@@ -27,9 +27,9 @@ export function getHighestBiddersAddress(punkIndex: BigInt): Address {
 }
 
 export function min(a: BigDecimal, b: BigDecimal): BigDecimal {
-  return a < b ? a : b; 
+  return a < b ? a : b;
 }
 
 export function max(a: BigDecimal, b: BigDecimal): BigDecimal {
-  return a>b? a: b; 
+  return a > b ? a : b;
 }

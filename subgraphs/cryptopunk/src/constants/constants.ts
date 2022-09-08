@@ -42,7 +42,7 @@ export namespace AccountType {
   export const COLLECTION_ACCOUNT = "COLLECTION_ACCOUNT";
 }
 
-export namespace TradeType{
+export namespace TradeType {
   export const BUYER = "Buyer";
   export const SELLER = "Seller";
 }

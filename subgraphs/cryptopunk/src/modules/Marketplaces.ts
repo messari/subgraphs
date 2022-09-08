@@ -1,4 +1,4 @@
-import {  BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { _Item, _User } from "../../generated/schema";
 import * as constants from "../constants/constants";
 import {
@@ -22,15 +22,15 @@ export function updateMarketplace(
   );
   marketplace.save();
 
-  
-
   createUserMarketplaceAccount(buyerAddress, block);
   createUserMarketplaceAccount(sellerAddress, block);
-  updateMarketplaceDailySnapshot(block,punkIndex);
+  updateMarketplaceDailySnapshot(block, punkIndex);
 }
 
-
-export function updateMarketplaceDailySnapshot(block:ethereum.Block,tokenId:BigInt): void{
+export function updateMarketplaceDailySnapshot(
+  block: ethereum.Block,
+  tokenId: BigInt
+): void {
   let marketplaceDailySnapshot = getOrCreateMarketplaceDailySnapshot(
     block.timestamp,
     block.number
@@ -39,12 +39,15 @@ export function updateMarketplaceDailySnapshot(block:ethereum.Block,tokenId:BigI
     block.timestamp.toI32() / constants.SECONDS_PER_DAY
   ).toString();
   let isUniqueDailyTradedItem = false;
-  let itemId="DAILY_TRADED_ITEM".concat("-").concat(noOfDaysSinceUnix).concat("-").concat(tokenId.toString())
+  let itemId = "DAILY_TRADED_ITEM"
+    .concat("-")
+    .concat(noOfDaysSinceUnix)
+    .concat("-")
+    .concat(tokenId.toString());
   let dailyTradedItem = _Item.load(itemId);
   if (!dailyTradedItem) {
     dailyTradedItem = new _Item(itemId);
     isUniqueDailyTradedItem = true;
-    
   }
   marketplaceDailySnapshot.tradeCount += 1;
   marketplaceDailySnapshot.dailyActiveTraders += 2;

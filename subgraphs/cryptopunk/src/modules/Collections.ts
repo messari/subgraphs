@@ -35,60 +35,14 @@ export function updateCollectionSnapshot(
     block.timestamp
   );
 
-  collectionDailySnapshot.dailyMinSalePrice = min(tokenAmount.divDecimal(
-    constants.ETH_DECIMALS
-  ), collectionDailySnapshot.dailyMinSalePrice);
-collectionDailySnapshot.dailyMaxSalePrice = max(tokenAmount.divDecimal(
-    constants.ETH_DECIMALS
-  ), collectionDailySnapshot.dailyMaxSalePrice);
-
-  
-
-  // if (
-  //   !lessThanEqual(
-  //     tokenAmount.divDecimal(constants.ETH_DECIMALS),
-  //     constants.BIGDECIMAL_ZERO
-  //   )
-  // ) {
-  //   if (
-  //     collectionDailySnapshot.dailyMinSalePrice.le(constants.BIGDECIMAL_ZERO)
-  //   ) {
-  //     collectionDailySnapshot.dailyMinSalePrice = tokenAmount.divDecimal(
-  //       constants.ETH_DECIMALS
-  //     );
-  //   }
-  //   if (
-  //     lessThanEqual(
-  //       tokenAmount.divDecimal(constants.ETH_DECIMALS),
-  //       collectionDailySnapshot.dailyMinSalePrice
-  //     )
-  //   ) {
-  //     collectionDailySnapshot.dailyMinSalePrice = tokenAmount.divDecimal(
-  //       constants.ETH_DECIMALS
-  //     );
-  //   }
-
-  //   if (
-  //     lessThanEqual(
-  //       collectionDailySnapshot.dailyMaxSalePrice,
-  //       constants.BIGDECIMAL_ZERO
-  //     )
-  //   ) {
-  //     collectionDailySnapshot.dailyMaxSalePrice = tokenAmount.divDecimal(
-  //       constants.ETH_DECIMALS
-  //     );
-  //   }
-  //   if (
-  //     greaterThanEqual(
-  //       tokenAmount.divDecimal(constants.ETH_DECIMALS),
-  //       collectionDailySnapshot.dailyMaxSalePrice
-  //     )
-  //   ) {
-  //     collectionDailySnapshot.dailyMaxSalePrice = tokenAmount.divDecimal(
-  //       constants.ETH_DECIMALS
-  //     );
-  //   }
-  // }
+  collectionDailySnapshot.dailyMinSalePrice = min(
+    tokenAmount.divDecimal(constants.ETH_DECIMALS),
+    collectionDailySnapshot.dailyMinSalePrice
+  );
+  collectionDailySnapshot.dailyMaxSalePrice = max(
+    tokenAmount.divDecimal(constants.ETH_DECIMALS),
+    collectionDailySnapshot.dailyMaxSalePrice
+  );
 
   collectionDailySnapshot.dailyTradeVolumeETH = collectionDailySnapshot.dailyTradeVolumeETH.plus(
     tokenAmount.divDecimal(constants.ETH_DECIMALS)

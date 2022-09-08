@@ -265,27 +265,35 @@ type CollectionDailySnapshot @entity {
   " Number of traded items of the day "
   dailyTradedItemCount: Int!
 }
+
 " A helper utility entity that works as a set for deduplication purpose. "
 type _User @entity {
   # MARKETPLACE_ACCOUNT-{ Account }
   # COLLECTION_ACCOUNT-{ Buyer/Seller }-{ Account }
   id: ID!
 }
+
 type _Item @entity {
   # DAILY_TRADED_ITEM - {# of days since Unix epoch time} - {TokenId}
   id: ID!
 }
+
 type _Bid @entity {
-  "{Token ID}-{bidder address} "
+  " {Token ID}-{bidder address} "
   id: ID!
-  "Bid amount in eth"
+
+  " Bid amount in eth"
   tokensBid: BigInt!
-  "NFT token ID"
+
+  " NFT token ID"
   tokenId: BigInt!
 
+  " Block number when the bid was placed "
   blockNumber: BigInt!
 
+  " Timestamp of the bid placed "
   timestamp: BigInt!
 
+  " Bidder address "
   bidder: String!
 }

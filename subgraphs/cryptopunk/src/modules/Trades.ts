@@ -1,10 +1,6 @@
 import * as constants from "../constants/constants";
 import { getOrCreateTrade } from "../constants/initializers";
-import {
-  BigInt,
-  Address,
-  ethereum,
-} from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   getHighestBiddersAddress,
   getSellerAddressFromPunksOfferedForSale,
