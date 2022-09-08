@@ -3718,6 +3718,16 @@
           "prepare:constants": false
         }
       }
+    },
+    "cryptopunk": {
+      "cryptopunk": {
+        "ethereum": {
+          "template": "cryptopunk.template.yaml",
+          "messari": "messari/cryptopunk",
+          "shashwatS22": "shashwatS22/cryptopunk",
+          "deploy-on-merge": false
+        }
+      }
     }
   }
 }
