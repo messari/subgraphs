@@ -29,6 +29,7 @@ export function getOrCreatePool(
     // Tokens
     pool.inputTokens = [
       getOrCreateToken(Address.fromString(ETH_ADDRESS), blockNumber).id,
+      getOrCreateToken(Address.fromString(RPL_ADDRESS), blockNumber).id,
     ];
     pool.outputToken = getOrCreateToken(
       Address.fromString(protocol.id),
@@ -45,7 +46,7 @@ export function getOrCreatePool(
     pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     // Quantitative Token Data
-    pool.inputTokenBalances = [BIGINT_ZERO];
+    pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
     pool.outputTokenSupply = BIGINT_ZERO;
     pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     pool.stakedOutputTokenAmount = null;

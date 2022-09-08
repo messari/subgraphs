@@ -11,6 +11,7 @@ import {
   ETH_SYMBOL,
   RETH_ADDRESS,
   ONE_ETH_IN_WEI,
+  BIGDECIMAL_ONE,
 } from "../utils/constants";
 
 export function getOrCreateToken(
@@ -104,14 +105,16 @@ function getRETHpriceUSD(
     log.error("rethCall Reverted", []);
   } else {
     RETHratio = bigIntToBigDecimal(rethCall.value.div(ONE_ETH_IN_WEI));
+
+    if (RETHratio.notEqual(BIGDECIMAL_ZERO)) {
+      let ETH = getOrCreateToken(Address.fromString(ETH_ADDRESS), blockNumber);
+      let ethPriceUSD = ETH.lastPriceUSD;
+
+      if (ethPriceUSD) {
+        RETHpriceUSD = ethPriceUSD.div(RETHratio);
+      }
+    }
     log.warning("[getRETHpriceUSD] RETH Ratio: {}", [RETHratio.toString()]);
-  }
-
-  let ETH = getOrCreateToken(Address.fromString(ETH_ADDRESS), blockNumber);
-  let ethPriceUSD = ETH.lastPriceUSD;
-
-  if (ethPriceUSD) {
-    RETHpriceUSD = ethPriceUSD.times(RETHratio);
   }
 
   return RETHpriceUSD;

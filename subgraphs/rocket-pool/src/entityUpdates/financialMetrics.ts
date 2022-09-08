@@ -75,11 +75,8 @@ export function updateProtocolAndPoolTvl(
 
   // Pool
   pool.inputTokenBalances[0] = pool.inputTokenBalances[0].plus(amount);
-  if (pool.inputTokenBalances.length == 1) {
-    pool.inputTokenBalances.push(rewardAmount);
-  } else {
-    pool.inputTokenBalances[1].plus(rewardAmount);
-  }
+  pool.inputTokenBalances[1] = pool.inputTokenBalances[1].plus(rewardAmount);
+
   // inputToken is ETH, price with ETH
   pool.totalValueLockedUSD = bigIntToBigDecimal(pool.inputTokenBalances[0])
     .times(
