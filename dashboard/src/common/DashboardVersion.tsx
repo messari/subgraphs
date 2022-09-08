@@ -12,5 +12,5 @@ const DashboardTag = styled("div")`
 `;
 
 export const DashboardVersion = () => {
-  return <DashboardTag>v1.4.2</DashboardTag>;
+  return <DashboardTag>v1.4.3</DashboardTag>;
 };
