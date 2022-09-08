@@ -216,6 +216,20 @@ export function handleBalanceUpdate(event: BalancesUpdated): void {
     BeaconChainRewardEth.toString(),
   ]);
 
+  let reth = RETH.bind(Address.fromString(RETH_ADDRESS));
+
+  let totalSupply = reth.try_totalSupply();
+
+  let totalsupply = BIGINT_ZERO;
+
+  if (totalSupply.reverted) {
+    log.error("[handleBalanceUpdate] Total supply call reverted", []);
+  } else {
+    totalsupply = totalSupply.value;
+  }
+
+  updateTotalRevenueMetrics(event.block, BIGINT_ZERO, totalsupply);
+
   const pool = getOrCreatePool(event.block.number, event.block.timestamp);
   const pools = pool.miniPools;
   if (pools) {

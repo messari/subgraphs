@@ -73,21 +73,34 @@ export function updateProtocolAndPoolTvl(
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
 
+  let rewardTokens = [
+    getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number).id,
+  ];
+
+  pool.rewardTokens = rewardTokens;
+
   // Pool
-  pool.inputTokenBalances[0] = pool.inputTokenBalances[0].plus(amount);
-  pool.inputTokenBalances[1] = pool.inputTokenBalances[1].plus(rewardAmount);
+  let inputTokenBalances: BigInt[] = [];
+  inputTokenBalances.push(pool.inputTokenBalances[0].plus(amount));
+  inputTokenBalances.push(pool.inputTokenBalances[1].plus(rewardAmount));
+
+  pool.inputTokenBalances = inputTokenBalances;
 
   // inputToken is ETH, price with ETH
-  pool.totalValueLockedUSD = bigIntToBigDecimal(pool.inputTokenBalances[0])
-    .times(
-      getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
-        .lastPriceUSD!
-    )
-    .plus(bigIntToBigDecimal(pool.inputTokenBalances[1]))
-    .times(
-      getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number)
-        .lastPriceUSD!
-    );
+
+  let ethTVLUSD = bigIntToBigDecimal(inputTokenBalances[0]).times(
+    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
+      .lastPriceUSD!
+  );
+
+  let rplTVLUSD = bigIntToBigDecimal(inputTokenBalances[1]).times(
+    getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number)
+      .lastPriceUSD!
+  );
+
+  let totalValueLockedUSD = ethTVLUSD.plus(rplTVLUSD);
+  pool.totalValueLockedUSD = totalValueLockedUSD;
+
   pool.save();
 
   // Pool Daily and Hourly
@@ -133,7 +146,7 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
 export function updateTotalRevenueMetrics(
   block: ethereum.Block,
   stakingRewards: BigInt,
-  totalShares: BigInt
+  totalShares: BigInt // of rETH
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
