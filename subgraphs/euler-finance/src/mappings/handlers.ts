@@ -18,7 +18,6 @@ import {
   getOrCreateProtocolUtility,
 } from "../common/getters";
 import {
-  BIGINT_ZERO,
   EULER_ADDRESS,
   EULER_GENERAL_VIEW_ADDRESS,
   ZERO_ADDRESS,
@@ -27,7 +26,6 @@ import {
   VIEW_V2_START_BLOCK_NUMBER,
 } from "../common/constants";
 import { updateFinancials, updateMarketDailyMetrics, updateMarketHourlyMetrics, updateUsageMetrics } from "../common/metrics";
-import { _MarketUtility } from "../../generated/schema";
 import { BigInt } from "@graphprotocol/graph-ts";
 import {
   createBorrow,
@@ -46,48 +44,53 @@ export function handleAssetStatus(event: AssetStatus): void {
 }
 
 export function handleBorrow(event: Borrow): void {
-  createBorrow(event)
+  let borrowUSD = createBorrow(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.BORROW);
-  updateFinancials(event.block);
-  updateMarketDailyMetrics(event.block, marketId);
-  updateMarketHourlyMetrics(event.block, marketId);
+  updateFinancials(event.block, borrowUSD, TransactionType.BORROW);
+  updateMarketDailyMetrics(event.block, marketId, borrowUSD, TransactionType.BORROW);
+  updateMarketHourlyMetrics(event.block, marketId, borrowUSD, TransactionType.BORROW);
+  updateProtocolAndMarkets(event.block);
 }
 
 export function handleDeposit(event: Deposit): void {
-  createDeposit(event);
+  let depositUSD = createDeposit(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.DEPOSIT);
-  updateFinancials(event.block);
-  updateMarketDailyMetrics(event.block, marketId);
-  updateMarketHourlyMetrics(event.block, marketId);
+  updateFinancials(event.block, depositUSD, TransactionType.DEPOSIT);
+  updateMarketDailyMetrics(event.block, marketId, depositUSD, TransactionType.DEPOSIT);
+  updateMarketHourlyMetrics(event.block, marketId, depositUSD, TransactionType.DEPOSIT);
+  updateProtocolAndMarkets(event.block);
 }
 
 export function handleRepay(event: Repay): void {
-  createRepay(event);
+  let repayUSD = createRepay(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.REPAY);
-  updateFinancials(event.block);
-  updateMarketDailyMetrics(event.block, marketId);
-  updateMarketHourlyMetrics(event.block, marketId);
+  updateFinancials(event.block, repayUSD, TransactionType.REPAY);
+  updateMarketDailyMetrics(event.block, marketId, repayUSD, TransactionType.REPAY);
+  updateMarketHourlyMetrics(event.block, marketId, repayUSD, TransactionType.REPAY);
+  updateProtocolAndMarkets(event.block);
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  createWithdraw(event);
+  let withdrawUSD = createWithdraw(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.WITHDRAW);
-  updateFinancials(event.block);
-  updateMarketDailyMetrics(event.block, marketId);
-  updateMarketHourlyMetrics(event.block, marketId);
+  updateFinancials(event.block, withdrawUSD, TransactionType.WITHDRAW);
+  updateMarketDailyMetrics(event.block, marketId, withdrawUSD, TransactionType.WITHDRAW);
+  updateMarketHourlyMetrics(event.block, marketId, withdrawUSD, TransactionType.WITHDRAW);
+  updateProtocolAndMarkets(event.block);
 }
 
 export function handleLiquidation(event: Liquidation): void {
-  createLiquidation(event);
+  let liquidateUSD = createLiquidation(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
-  updateFinancials(event.block);
-  updateMarketDailyMetrics(event.block, marketId);
-  updateMarketHourlyMetrics(event.block, marketId);
+  updateFinancials(event.block, liquidateUSD, TransactionType.LIQUIDATE);
+  updateMarketDailyMetrics(event.block, marketId, liquidateUSD, TransactionType.LIQUIDATE);
+  updateMarketHourlyMetrics(event.block, marketId, liquidateUSD, TransactionType.LIQUIDATE);
+  updateProtocolAndMarkets(event.block);
 }
 
 export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
@@ -136,19 +139,24 @@ function queryEulerGeneralView(marketIds: string[], block: ethereum.Block): Eule
   return result.value;
 }
 
-export function handleBlockUpdates(block: ethereum.Block): void {
-  if (!block.number.mod(BigInt.fromI32(257)).equals(BIGINT_ZERO)) {
-    return; // Do this update every 257 block (every ~60min).
+// initiates market / protocol updates in syncWithEulerGeneralView()
+function updateProtocolAndMarkets(block: ethereum.Block): void {
+  let blockNumber = block.number.toI32();
+  let protocolUtility = getOrCreateProtocolUtility(blockNumber);
+  let markets = protocolUtility.markets;
+
+  if (protocolUtility.lastBlockNumber >= blockNumber ) {
+    return; // Do this update every block
   }
 
-  const protocolUtility = getOrCreateProtocolUtility();
-  const markets = protocolUtility.markets;
-
-  const eulerViewQueryResult = queryEulerGeneralView(markets, block);
+  let eulerViewQueryResult = queryEulerGeneralView(markets, block);
   if (!eulerViewQueryResult) {
     return;
   }
 
+  // update block number
+  protocolUtility.lastBlockNumber = blockNumber;
+  protocolUtility.save();
+
   syncWithEulerGeneralView(eulerViewQueryResult, block);
-  updateFinancials(block);
 }

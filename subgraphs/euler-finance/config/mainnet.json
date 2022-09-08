@@ -1,8 +1,0 @@
-{
-  "network": "mainnet",
-  "address": "0x27182842E098f60e3D576794A5bFFb0777E025d3",
-  "startBlock": 13711760,
-  "execProxyAddress": "0x59828fdf7ee634aaad3f58b19fdba3b03e2d9d80",
-  "eulerGeneralViewAddress": "0x9D2B3052f5A3c156A34FC32cD08E9F5501720ea4",
-  "uniswapV3UsdWethPoolAddress": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8"
-}

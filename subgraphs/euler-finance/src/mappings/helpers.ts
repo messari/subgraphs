@@ -24,6 +24,9 @@ import {
   getOrCreateMarketUtility,
   getOrCreateRepay,
   getOrCreateProtocolUtility,
+  getOrCreateMarketDailySnapshot,
+  getOrCreateMarketHourlySnapshot,
+  getOrCreateFinancials,
 } from "../common/getters";
 import {
   BIGDECIMAL_ONE,
@@ -70,16 +73,15 @@ export function updateAsset(event: AssetStatus): void {
 
   market.totalDepositBalanceUSD = amountToUsd(event.params.totalBalances, marketUtility.twap, marketUtility.twapPrice);
   market.totalBorrowBalanceUSD = amountToUsd(event.params.totalBorrows, marketUtility.twap, marketUtility.twapPrice);
-  market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD);
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
   marketUtility.save();
   token.save();
   market.save();
 }
 
-export function createBorrow(event: Borrow): void {
+export function createBorrow(event: Borrow): BigDecimal {
   const borrow = getOrCreateBorrow(event);
-  const token = getOrCreateToken(event.params.underlying);
   const marketId = event.params.underlying.toHexString();
   const tokenId = event.params.underlying.toHexString();
   const accountAddress = event.params.account;
@@ -95,16 +97,18 @@ export function createBorrow(event: Borrow): void {
 
   if (borrow.amountUSD) {
     const market = getOrCreateMarket(marketId);
-    market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(borrow.amountUSD!);
+    market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(borrow.amountUSD);
     market.save();
 
     const protocol = getOrCreateLendingProtocol();
-    protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(borrow.amountUSD!);
+    protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(borrow.amountUSD);
     protocol.save();
   }
+
+  return borrow.amountUSD;
 }
 
-export function createDeposit(event: Deposit): void {
+export function createDeposit(event: Deposit): BigDecimal {
   const deposit = getOrCreateDeposit(event);
   const marketId = event.params.underlying.toHexString();
   const tokenId = event.params.underlying.toHexString();
@@ -125,9 +129,11 @@ export function createDeposit(event: Deposit): void {
   const protocol = getOrCreateLendingProtocol();
   protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(deposit.amountUSD);
   protocol.save();
+
+  return deposit.amountUSD;
 }
 
-export function createRepay(event: Repay): void {
+export function createRepay(event: Repay): BigDecimal {
   const repay = getOrCreateRepay(event);
   const marketId = event.params.underlying.toHexString();
   const market = getOrCreateMarket(marketId);
@@ -144,9 +150,11 @@ export function createRepay(event: Repay): void {
 
   repay.save();
   market.save();
+
+  return repay.amountUSD;
 }
 
-export function createWithdraw(event: Withdraw): void {
+export function createWithdraw(event: Withdraw): BigDecimal {
   const withdraw = getOrCreateWithdraw(event);
   const marketId = event.params.underlying.toHexString();
   const market = getOrCreateMarket(marketId);
@@ -163,48 +171,50 @@ export function createWithdraw(event: Withdraw): void {
 
   withdraw.save();
   market.save();
+
+  return withdraw.amountUSD;
 }
 
-export function createLiquidation(event: Liquidation): void {
+export function createLiquidation(event: Liquidation): BigDecimal {
   const liquidation = getOrCreateLiquidate(event);
   const collateralTokenId = event.params.underlying.toHexString();
-  const collateralToken = getOrCreateToken(event.params.underlying);
   const seizedTokenId = event.params.collateral.toHexString();
-  const seizedToken = getOrCreateToken(event.params.collateral);
+
+  // repay token market
+  let market = getOrCreateMarket(collateralTokenId);
 
   liquidation.market = collateralTokenId;
   liquidation.asset = seizedTokenId;
   liquidation.from = event.params.liquidator.toHexString();
-  liquidation.to = event.params.violator.toHexString();
+  liquidation.to = market.outputToken!; // eToken transfered to liquidator
+  liquidation.liquidatee = event.params.violator.toHexString();
   liquidation.amount = event.params.repay; // Amount is denominated in underlying (not in dToken)
 
-  if (collateralToken.lastPriceUSD) {
-    const collateralMarketUtility = getOrCreateMarketUtility(collateralTokenId);
-    liquidation.amountUSD = amountToUsd(
-      event.params.repay,
-      collateralMarketUtility.twap,
-      collateralMarketUtility.twapPrice,
-    );
-    const collateralMarket = getOrCreateMarket(collateralTokenId);
-    collateralMarket.cumulativeLiquidateUSD = collateralMarket.cumulativeLiquidateUSD.plus(liquidation.amountUSD!);
+  const collateralMarketUtility = getOrCreateMarketUtility(collateralTokenId);
+  liquidation.amountUSD = amountToUsd(
+    event.params.repay,
+    collateralMarketUtility.twap,
+    collateralMarketUtility.twapPrice,
+  );
+  const collateralMarket = getOrCreateMarket(collateralTokenId);
+  collateralMarket.cumulativeLiquidateUSD = collateralMarket.cumulativeLiquidateUSD.plus(liquidation.amountUSD);
 
-    if (seizedToken.lastPriceUSD) {
-      const seizedMarketUtility = getOrCreateMarketUtility(seizedTokenId);
-      const yieldUSD = amountToUsd(event.params._yield, seizedMarketUtility.twap, seizedMarketUtility.twapPrice);
-      liquidation.profitUSD = yieldUSD.minus(liquidation.amountUSD!);
-    }
-  }
+
+  const seizedMarketUtility = getOrCreateMarketUtility(seizedTokenId);
+  const yieldUSD = amountToUsd(event.params._yield, seizedMarketUtility.twap, seizedMarketUtility.twapPrice);
+  liquidation.profitUSD = yieldUSD.minus(liquidation.amountUSD);
   
   if (liquidation.amountUSD) {
-    const market = getOrCreateMarket(collateralTokenId);
-    market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(liquidation.amountUSD!);
+    market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(liquidation.amountUSD);
     market.save();
 
     const protocol = getOrCreateLendingProtocol();
-    protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidation.amountUSD!);
+    protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidation.amountUSD);
     protocol.save();
   }
   liquidation.save();
+
+  return liquidation.amountUSD;
 }
 
 function updateMarketLendingFactors(marketUtility: _MarketUtility, usdcMarketUtility: _MarketUtility): void {
@@ -241,7 +251,7 @@ export function updateLendingFactors(event: GovSetAssetConfig): void {
     // When USDC asset config is updated, max LTV and liquidation threshold for all currencies need
     // to be updated as well.
     const usdcMarketUtility = marketUtility;
-    const protocolUtility = getOrCreateProtocolUtility();
+    const protocolUtility = getOrCreateProtocolUtility(event.block.number.toI32());
     for (let i = 0; i < protocolUtility.markets.length; i += 1) {
       const marketId = protocolUtility.markets[i];
       const otherMarketUtility =
@@ -280,16 +290,21 @@ export function createMarket(event: MarketActivated): void {
   marketUtility.dToken = dToken.id;
   marketUtility.save();
 
-  const protocolUtility = getOrCreateProtocolUtility();
+  const protocolUtility = getOrCreateProtocolUtility(event.block.number.toI32());
   protocolUtility.markets = protocolUtility.markets.concat([market.id]);
   protocolUtility.save();
 }
 
+// general market / protocol updater
+// udpates:
+//    rates
+//    balances
+//    prices
+//    revenues
 export function syncWithEulerGeneralView(
   eulerViewQueryResponse: EulerGeneralView__doQueryResultRStruct,
   block: ethereum.Block,
 ): void {
-  // let ethUsdcExchangeRate: BigDecimal;
   let ethUsdcExchangeRate = BIGDECIMAL_ONE;
   const eulerViewMarkets = eulerViewQueryResponse.markets;
 
@@ -339,7 +354,7 @@ export function syncWithEulerGeneralView(
       .toBigDecimal()
       .div(tokenPrecision)
       .times(currPriceUsd);
-    market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD);
+    market.totalValueLockedUSD = market.totalDepositBalanceUSD;
     market.name = token.name;
     market.inputTokenBalance = eulerViewMarket.totalBalances;
     market.inputTokenPriceUSD = currPriceUsd;
@@ -386,8 +401,7 @@ export function syncWithEulerGeneralView(
       }
     }
 
-    market.save();
-
+    // find new revenue
     const secondsSinceLastUpdate = block.timestamp.minus(marketUtility.lastUpdateTimestamp);
 
     const supplyAPY = lendingRate.rate.div(BigDecimal.fromString("100"));
@@ -398,11 +412,34 @@ export function syncWithEulerGeneralView(
     const reserveYield = reserveAPY.times(secondsSinceLastUpdate.toBigDecimal()).div(SECONDS_PER_YEAR);
     const protocolSideRevenueSinceLastUpdate = reserveYield.times(market.totalDepositBalanceUSD);
 
-    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueSinceLastUpdate);
-    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueSinceLastUpdate);
-    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD
-      .plus(supplySideRevenueSinceLastUpdate)
+    const totalRevenueSinceLastUpdate = supplySideRevenueSinceLastUpdate
       .plus(protocolSideRevenueSinceLastUpdate);
+
+    // update protocol revenue
+    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD
+      .plus(supplySideRevenueSinceLastUpdate);
+    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD
+      .plus(protocolSideRevenueSinceLastUpdate);
+    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD
+      .plus(totalRevenueSinceLastUpdate);
+
+    // update market's revenue
+    market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD
+      .plus(supplySideRevenueSinceLastUpdate);
+    market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD
+      .plus(protocolSideRevenueSinceLastUpdate);
+    market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD
+      .plus(totalRevenueSinceLastUpdate);
+    market.save();
+
+    updateSnapshotRevenues(
+      market.id, 
+      block, 
+      supplySideRevenueSinceLastUpdate, 
+      protocolSideRevenueSinceLastUpdate, 
+      totalRevenueSinceLastUpdate
+    );
+
     protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
     protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);
     protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(market.totalDepositBalanceUSD);
@@ -413,8 +450,47 @@ export function syncWithEulerGeneralView(
     marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
     marketUtility.save();
     
-    updateMarketDailyMetrics(block, market.id);
-    updateMarketHourlyMetrics(block, market.id);
+    updateMarketDailyMetrics(block, market.id, BIGDECIMAL_ZERO);
+    updateMarketHourlyMetrics(block, market.id, BIGDECIMAL_ZERO);
   }
   protocol.save();
+}
+
+function updateSnapshotRevenues(
+  marketId: string, 
+  block: ethereum.Block,
+  supplySideRevenueDelta: BigDecimal, 
+  protocolSideRevenueDelta: BigDecimal, 
+  totalRevenueDelta: BigDecimal
+): void {
+  let marketDailySnapshot = getOrCreateMarketDailySnapshot(block, marketId);
+  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(block, marketId);
+  let financialSnapshot = getOrCreateFinancials(block.timestamp, block.number);
+
+  // update daily snapshot
+  marketDailySnapshot.dailySupplySideRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD
+    .plus(supplySideRevenueDelta);
+  marketDailySnapshot.dailyProtocolSideRevenueUSD = marketDailySnapshot.dailyProtocolSideRevenueUSD
+    .plus(protocolSideRevenueDelta);
+  marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailyTotalRevenueUSD
+    .plus(totalRevenueDelta);
+  marketDailySnapshot.save();
+
+  // update hourly snapshot
+  marketHourlySnapshot.hourlySupplySideRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD
+    .plus(supplySideRevenueDelta);
+  marketHourlySnapshot.hourlyProtocolSideRevenueUSD = marketHourlySnapshot.hourlyProtocolSideRevenueUSD
+    .plus(protocolSideRevenueDelta);
+  marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlyTotalRevenueUSD
+    .plus(totalRevenueDelta);
+  marketHourlySnapshot.save();
+
+  // update financials
+  financialSnapshot.dailySupplySideRevenueUSD = financialSnapshot.dailySupplySideRevenueUSD
+    .plus(supplySideRevenueDelta);
+  financialSnapshot.dailyProtocolSideRevenueUSD = financialSnapshot.dailyProtocolSideRevenueUSD
+    .plus(protocolSideRevenueDelta);
+  financialSnapshot.dailyTotalRevenueUSD = financialSnapshot.dailyTotalRevenueUSD
+    .plus(totalRevenueDelta);
+  financialSnapshot.save();
 }

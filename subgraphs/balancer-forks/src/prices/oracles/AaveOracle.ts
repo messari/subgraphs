@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { AaveOracleContract } from "../../../generated/UniswapV2Factory/AaveOracleContract";
+import { AaveOracleContract } from "../../../generated/Vault/AaveOracleContract";
 
 export function getAaveOracleContract(network: string): AaveOracleContract {
   return AaveOracleContract.bind(
@@ -23,7 +23,7 @@ export function getTokenPriceFromAaveOracle(
   ) {
     return new CustomPriceType();
   }
-  
+
   if (!aaveOracleContract) {
     return new CustomPriceType();
   }
