@@ -91,6 +91,7 @@ export function createDeposit(
   let outputTokenInfo = updateOutputToken(vault, vaultAddress, event);
   vault.outputTokenSupply = outputTokenInfo.supply;
   vault.outputTokenPriceUSD = outputTokenInfo.priceUSD;
+  vault.save();
 
   // update fees/revenues/token balances
   updateYieldFees(vaultAddress);
@@ -138,15 +139,6 @@ export function createWithdraw(
   token.lastPriceBlockNumber = event.block.number;
   token.save();
 
-  // calculate withdrawal fee amount in USD
-  let withdrawalFeeUSD = BIGDECIMAL_ZERO;
-  if (feeAmount.gt(BIGINT_ZERO)) {
-    withdrawalFeeUSD = feeAmount
-      .toBigDecimal()
-      .div(exponentToBigDecimal(token.decimals))
-      .times(assetPriceUSD);
-  }
-
   // populate vars,
   withdraw.hash = hash.toHexString();
   withdraw.logIndex = logIndex.toI32();
@@ -156,12 +148,11 @@ export function createWithdraw(
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
   withdraw.asset = token.id;
-  withdraw.amount = amount.minus(feeAmount);
+  withdraw.amount = amount;
   withdraw.amountUSD = amount
     .toBigDecimal()
     .div(exponentToBigDecimal(token.decimals))
-    .times(assetPriceUSD)
-    .minus(withdrawalFeeUSD);
+    .times(assetPriceUSD);
 
   withdraw.save();
 
@@ -169,6 +160,16 @@ export function createWithdraw(
   let outputTokenInfo = updateOutputToken(vault, vaultAddress, event);
   vault.outputTokenSupply = outputTokenInfo.supply;
   vault.outputTokenPriceUSD = outputTokenInfo.priceUSD;
+  vault.save();
+
+  // calculate withdrawal fee amount in USD
+  let withdrawalFeeUSD = BIGDECIMAL_ZERO;
+  if (feeAmount.gt(BIGINT_ZERO)) {
+    withdrawalFeeUSD = feeAmount
+      .toBigDecimal()
+      .div(exponentToBigDecimal(token.decimals))
+      .times(assetPriceUSD);
+  }
 
   // update fees/revenues/token balances
   updateYieldFees(vaultAddress);
