@@ -10,7 +10,7 @@
   "SpellAddress": "0xCE1bFFBD5374Dac86a2893119683F4911a2F7814",
   "SpellStartBlock": "4041085",
   "OffchainAggregatorEnabled": false,
-  "graftEnabled": true,
+  "graftEnabled": false,
   "subgraphId": "QmSocKSdMqtTd16UMQij75MqGWFQRogSmckWqA28c2wodX",
   "graftStartBlock": 6414400
 }
