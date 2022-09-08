@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt, Address, ethereum, dataSource, log } from "@graphprotocol/graph-ts";
-import { ActiveAccount } from "../../generated/schema";
+import { ActiveAccount, InterestRate } from "../../generated/schema";
 import {
   SECONDS_PER_DAY,
   BIGDECIMAL_ZERO,
@@ -177,7 +177,10 @@ export function updateMarketMetrics(event: ethereum.Event): void {
 
   marketHourlySnapshot.protocol = protocol.id;
   marketHourlySnapshot.market = market.id;
-  marketHourlySnapshot.rates = market.rates;
+  marketHourlySnapshot.rates = getSnapshotRates(
+    market.rates,
+    (event.block.timestamp.toI32() / SECONDS_PER_HOUR).toString(),
+  );
   marketHourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketHourlySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketHourlySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
@@ -193,7 +196,10 @@ export function updateMarketMetrics(event: ethereum.Event): void {
 
   marketDailySnapshot.protocol = protocol.id;
   marketDailySnapshot.market = market.id;
-  marketDailySnapshot.rates = market.rates;
+  marketHourlySnapshot.rates = getSnapshotRates(
+    market.rates,
+    (event.block.timestamp.toI32() / SECONDS_PER_DAY).toString(),
+  );
   marketDailySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketDailySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketDailySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
@@ -369,4 +375,27 @@ export function updateMarketStats(
   marketDailySnapshot.save();
   financialsDailySnapshot.save();
   protocol.save();
+}
+
+// create seperate InterestRate Entities for each market snapshot
+// this is needed to prevent snapshot rates from being pointers to the current rate
+function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
+  let snapshotRates: string[] = [];
+  for (let i = 0; i < rates.length; i++) {
+    let rate = InterestRate.load(rates[i]);
+    if (!rate) {
+      log.warning("[getSnapshotRates] rate {} not found, should not happen", [rates[i]]);
+      continue;
+    }
+
+    // create new snapshot rate
+    let snapshotRateId = rates[i].concat("-").concat(timeSuffix);
+    let snapshotRate = new InterestRate(snapshotRateId);
+    snapshotRate.side = rate.side;
+    snapshotRate.type = rate.type;
+    snapshotRate.rate = rate.rate;
+    snapshotRate.save();
+    snapshotRates.push(snapshotRateId);
+  }
+  return snapshotRates;
 }
