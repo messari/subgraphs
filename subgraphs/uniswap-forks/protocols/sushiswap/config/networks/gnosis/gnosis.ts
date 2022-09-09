@@ -16,10 +16,6 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
-import {
-  toLowerCase,
-  toLowerCaseList,
-} from "../../../../../src/common/utils/utils";
 
 export class SushiswapXdaiConfigurations implements Configurations {
   getNetwork(): string {
@@ -41,13 +37,11 @@ export class SushiswapXdaiConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
+    return "0xc35dadb65012ec5796536bd9864ed8773abc74c4";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString(
-        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
-      )
+      Address.fromString("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
     );
   }
   getTradeFee(): BigDecimal {
@@ -75,37 +69,37 @@ export class SushiswapXdaiConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0xe91d153e0b41518a2ce8dd3d7944fa863463a97d"); // wxDAI
+    return "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d"; // wxDAI
   }
   getRewardToken(): string {
-    return toLowerCase("0x2995D1317DcD4f0aB89f4AE60F3f020A4F17C7CE");
+    return "0x2995d1317dcd4f0ab89f4ae60f3f020a4f17c7ce";
   }
   getWhitelistTokens(): string[] {
-    return toLowerCaseList([
-      "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1", // wETH
-      "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // wXDAI
-      "0x8e5bbbb09ed1ebde8674cda39a0c169401db4252", // wBTC
-      "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // USDC
-      "0x4ecaba5870353805a9f068101a40e0f32ed605c6", // USDT
-      "0x44fa8e6f47987339850636f88629646662444217", // DAI
-      "0xfe7ed09c4956f7cdb54ec4ffcb9818db2d7025b8", // USDP
-    ]);
+    return [
+      "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1", // weth
+      "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // wxdai
+      "0x8e5bbbb09ed1ebde8674cda39a0c169401db4252", // wbtc
+      "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // usdc
+      "0x4ecaba5870353805a9f068101a40e0f32ed605c6", // usdt
+      "0x44fa8e6f47987339850636f88629646662444217", // dai
+      "0xfe7ed09c4956f7cdb54ec4ffcb9818db2d7025b8", // usdp
+    ];
   }
   getStableCoins(): string[] {
-    return toLowerCaseList([
-      "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", // USDC
-      "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d", // DAI
-      "0x4ECaBa5870353805a9F068101A40E0f32ed605C6", // USDT
-    ]);
+    return [
+      "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83", // usdc
+      "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d", // dai
+      "0x4ecaba5870353805a9f068101a40e0f32ed605c6", // usdt
+    ];
   }
   getStableOraclePools(): string[] {
-    return toLowerCaseList([
-      "0xa227c72a4055a9dc949cae24f54535fe890d3663", // wETH/USDC
-      "0x6685c047eab042297e659bfaa7423e94b4a14b9e", // wETH/USDT
-    ]);
+    return [
+      "0xa227c72a4055a9dc949cae24f54535fe890d3663", // weth/usdc
+      "0x6685c047eab042297e659bfaa7423e94b4a14b9e", // weth/usdt
+    ];
   }
   getUntrackedPairs(): string[] {
-    return toLowerCaseList([]);
+    return [];
   }
   getUntrackedTokens(): string[] {
     return [];

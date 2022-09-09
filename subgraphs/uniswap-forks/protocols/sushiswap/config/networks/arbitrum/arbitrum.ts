@@ -16,10 +16,6 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
-import {
-  toLowerCase,
-  toLowerCaseList,
-} from "../../../../../src/common/utils/utils";
 
 export class SushiswapArbitrumConfigurations implements Configurations {
   getNetwork(): string {
@@ -41,13 +37,11 @@ export class SushiswapArbitrumConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
+    return "0xc35dadb65012ec5796536bd9864ed8773abc74c4";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString(
-        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
-      )
+      Address.fromString("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
     );
   }
   getTradeFee(): BigDecimal {
@@ -75,35 +69,35 @@ export class SushiswapArbitrumConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x82aF49447D8a07e3bd95BD0d56f35241523fBab1");
+    return "0x82af49447d8a07e3bd95bd0d56f35241523fbab1";
   }
   getRewardToken(): string {
-    return toLowerCase("0xd4d42F0b6DEF4CE0383636770eF773390d85c61A");
+    return "0xd4d42f0b6def4ce0383636770ef773390d85c61a";
   }
   getWhitelistTokens(): string[] {
-    return toLowerCaseList([
-      "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // wETH
-      "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f", // wBTC
-      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
-      "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9", // USDT
-      "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8", // USDC
-    ]);
+    return [
+      "0x82af49447d8a07e3bd95bd0d56f35241523fbab1", // weth
+      "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f", // wbtc
+      "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1", // dai
+      "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9", // usdt
+      "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8", // usdc
+    ];
   }
   getStableCoins(): string[] {
-    return toLowerCaseList([
-      "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", // USDC
-      "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", // DAI
-      "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", // USDT
-    ]);
+    return [
+      "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8", // usdc
+      "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1", // dai
+      "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9", // usdt
+    ];
   }
   getStableOraclePools(): string[] {
-    return toLowerCaseList([
+    return [
       "0x905dfcd5649217c42684f23958568e533c711aa3", // wETH/USDC
       "0xcb0e5bfa72bbb4d16ab5aa0c60601c438f04b4ad", // wETH/USDT
-    ]);
+    ];
   }
   getUntrackedPairs(): string[] {
-    return toLowerCaseList([]);
+    return [];
   }
   getUntrackedTokens(): string[] {
     return [];

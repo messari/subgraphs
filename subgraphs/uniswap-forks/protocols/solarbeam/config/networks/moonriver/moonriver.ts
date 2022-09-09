@@ -16,10 +16,6 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
-import {
-  toLowerCase,
-  toLowerCaseList,
-} from "../../../../../src/common/utils/utils";
 
 export class SolarbeamMoonriverConfigurations implements Configurations {
   getNetwork(): string {
@@ -41,13 +37,11 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0x049581aEB6Fe262727f290165C29BDAB065a1B68");
+    return "0x049581aeb6fe262727f290165c29bdab065a1b68";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString(
-        toLowerCase("0x049581aEB6Fe262727f290165C29BDAB065a1B68")
-      )
+      Address.fromString("0x049581aEB6Fe262727f290165C29BDAB065a1B68")
     );
   }
   getTradeFee(): BigDecimal {
@@ -75,33 +69,33 @@ export class SolarbeamMoonriverConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x98878b06940ae243284ca214f92bb71a2b032b8a"); // wMOVR
+    return "0x98878b06940ae243284ca214f92bb71a2b032b8a"; // wMOVR
   }
   getRewardToken(): string {
-    return toLowerCase("0x6bd193ee6d2104f14f94e2ca6efefae561a4334b"); // SOLARBEAM
+    return "0x6bd193ee6d2104f14f94e2ca6efefae561a4334b"; // solar
   }
   getWhitelistTokens(): string[] {
-    return toLowerCaseList([
-      "0x98878b06940ae243284ca214f92bb71a2b032b8a", // wMOVR
-      "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d", // USDC
-      "0xb44a9b6905af7c801311e8f4e76932ee959c663c", // USDT
-      "0x5d9ab5522c64e1f6ef5e3627eccc093f56167818", //BUSD
-      "0x1a93b23281cc1cde4c4741353f3064709a16197d", //FRAX
-    ]);
+    return [
+      "0x98878b06940ae243284ca214f92bb71a2b032b8a", // wmovr
+      "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d", // usdc
+      "0xb44a9b6905af7c801311e8f4e76932ee959c663c", // usdt
+      "0x5d9ab5522c64e1f6ef5e3627eccc093f56167818", // busd
+      "0x1a93b23281cc1cde4c4741353f3064709a16197d", // frax
+    ];
   }
   getStableCoins(): string[] {
-    return toLowerCaseList([
-      "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d", // USDC
-      "0xb44a9b6905af7c801311e8f4e76932ee959c663c", // USDT
-    ]);
+    return [
+      "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d", // usdc
+      "0xb44a9b6905af7c801311e8f4e76932ee959c663c", // usdt
+    ];
   }
   getStableOraclePools(): string[] {
-    return toLowerCaseList([
-      "0xe537f70a8b62204832b8ba91940b77d3f79aeb81", // USDC/wMOVR
-    ]);
+    return [
+      "0xe537f70a8b62204832b8ba91940b77d3f79aeb81", // usdc/wmovr
+    ];
   }
   getUntrackedPairs(): string[] {
-    return toLowerCaseList([]);
+    return [];
   }
   getUntrackedTokens(): string[] {
     return [];

@@ -41,13 +41,11 @@ export class SushiswapCeloConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4");
+    return "0xc35dadb65012ec5796536bd9864ed8773abc74c4";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString(
-        toLowerCase("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
-      )
+      Address.fromString("0xc35DADB65012eC5796536bD9864eD8773aBc74C4")
     );
   }
   getTradeFee(): BigDecimal {
@@ -75,13 +73,13 @@ export class SushiswapCeloConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x2def4285787d58a2f811af24755a8150622f4361");
+    return "0x2def4285787d58a2f811af24755a8150622f4361";
   }
   getRewardToken(): string {
-    return toLowerCase("0x29dFce9c22003A4999930382Fd00f9Fd6133Acd1");
+    return "0x29dfce9c22003a4999930382fd00f9fd6133acd1";
   }
   getWhitelistTokens(): string[] {
-    return toLowerCaseList([
+    return [
       "0x471ece3750da237f93b8e339c536989b8978a438", // CELO
       "0x765de816845861e75a25fca122bb6898b8b1282a", // cUSD
       "0xef4229c8c3250c675f21bcefa42f58efbff6002a", // USDC
@@ -89,26 +87,26 @@ export class SushiswapCeloConfigurations implements Configurations {
       "0x90ca507a5d4458a4c6c6249d186b6dcb02a5bccd", // DAI
       "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73", // cEUR
       "0xbaab46e28388d2779e6e31fd00cf0e5ad95e327b", // wBTC
-    ]);
+    ];
   }
   getStableCoins(): string[] {
-    return toLowerCaseList([
+    return [
       "0xef4229c8c3250C675F21BCefa42f58EfbfF6002a", // USDC
       "0xe4fe50cdd716522a56204352f00aa110f731932d", // DAI
       "0xb020d981420744f6b0fedd22bb67cd37ce18a1d5", // USDT
       "0x765de816845861e75a25fca122bb6898b8b1282a", // Celo Dollar
-    ]);
+    ];
   }
   getStableOraclePools(): string[] {
-    return toLowerCaseList([
+    return [
       "0xbe6c36f49aac4ee12ca4b23765d9ea901be00683", // wETH/cuSD
       "0x93887e0fa9f6c375b2765a6fe885593f16f077f9", // wETH/USDC
       "0xc77398cfb7b0f7ab42bafc02abc20a69ce8cef7f", // wETH/USDT
       "0x62f6470fbb1b0f8d2b2c7f497e4e12f820c318a6", // wETH/DAI
-    ]);
+    ];
   }
   getUntrackedPairs(): string[] {
-    return toLowerCaseList([]);
+    return [];
   }
   getUntrackedTokens(): string[] {
     return [];

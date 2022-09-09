@@ -16,10 +16,6 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
-import {
-  toLowerCase,
-  toLowerCaseList,
-} from "../../../../../src/common/utils/utils";
 
 export class SushiswapHarmonyConfigurations implements Configurations {
   getNetwork(): string {
@@ -41,13 +37,11 @@ export class SushiswapHarmonyConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4");
+    return "0xc35dadb65012ec5796536bd9864ed8773abc74c4";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString(
-        toLowerCase("0xc35dadb65012ec5796536bd9864ed8773abc74c4")
-      )
+      Address.fromString("0xc35dadb65012ec5796536bd9864ed8773abc74c4")
     );
   }
   getTradeFee(): BigDecimal {
@@ -75,13 +69,13 @@ export class SushiswapHarmonyConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0xcf664087a5bb0237a0bad6742852ec6c8d69a27a"); // wONE
+    return "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a"; // wONE
   }
   getRewardToken(): string {
-    return toLowerCase("0xbec775cb42abfa4288de81f387a9b1a3c4bc552a");
+    return "0xbec775cb42abfa4288de81f387a9b1a3c4bc552a";
   }
   getWhitelistTokens(): string[] {
-    return toLowerCaseList([
+    return [
       "0xcf664087a5bb0237a0bad6742852ec6c8d69a27a",
       "0x6983d1e6def3690c4d616b13597a09e6193ea013",
       "0x3095c7557bcb296ccc6e363de01b760ba031f2d9",
@@ -89,24 +83,24 @@ export class SushiswapHarmonyConfigurations implements Configurations {
       "0x3c2b8be99c50593081eaa2a724f0b8285f5aba8f",
       "0xe176ebe47d621b984a73036b9da5d834411ef734",
       "0xef977d2f931c1978db5f6747666fa1eacb0d0339",
-    ]);
+    ];
   }
   getStableCoins(): string[] {
-    return toLowerCaseList([
+    return [
       "0x985458e523db3d53125813ed68c274899e9dfab4", // USDC
       "0xef977d2f931c1978db5f6747666fa1eacb0d0339", // DAI
       "0x3c2b8be99c50593081eaa2a724f0b8285f5aba8f", // USDT
-    ]);
+    ];
   }
   getStableOraclePools(): string[] {
-    return toLowerCaseList([
+    return [
       "0xbf255d8c30dbab84ea42110ea7dc870f01c0013a", // USDC/wETH
       "0x194f4a320cbda15a0910d1ae20e0049cdc50916e", // DAI/wWETH
       "0x2c7862b408bb3dbff277110ffde1b4eaa45c692a", // USDT/wETH
-    ]);
+    ];
   }
   getUntrackedPairs(): string[] {
-    return toLowerCaseList([]);
+    return [];
   }
   getUntrackedTokens(): string[] {
     return [];

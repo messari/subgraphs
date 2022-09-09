@@ -76,26 +76,26 @@ export class SpookyswapFantomConfigurations implements Configurations {
   }
   getWhitelistTokens(): string[] {
     return [
-      "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83", // WFTM
-      "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", // DAI
-      "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
-      "0x049d68029688eabf473097a2fc38ef61633a3c7a", // fUSDT
-      "0x74b23882a30290451A17c44f4F05243b6b58C76d", // WETH
-      "0x321162Cd933E2Be498Cd2267a90534A804051b11", // WBTC
+      "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83", // wftm
+      "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e", // dai
+      "0x04068da6c83afcfa0e13ba15a6696662335d5b75", // usdc
+      "0x049d68029688eabf473097a2fc38ef61633a3c7a", // fusdt
+      "0x74b23882a30290451a17c44f4f05243b6b58c76d", // weth
+      "0x321162cd933e2be498cd2267a90534a804051b11", // wbtc
     ];
   }
   getStableCoins(): string[] {
     return [
-      "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", // DAI
-      "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
-      "0x049d68029688eabf473097a2fc38ef61633a3c7a", // fUSDT
+      "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e", // dai
+      "0x04068da6c83afcfa0e13ba15a6696662335d5b75", // usdc
+      "0x049d68029688eabf473097a2fc38ef61633a3c7a", // fusdt
     ];
   }
   getStableOraclePools(): string[] {
     return [
-      "0xe120ffbda0d14f3bb6d6053e90e63c572a66a428", // FTM/DAI
-      "0x5965e53aa80a0bcf1cd6dbdd72e6a9b2aa047410", // fUSDT/FTM
-      "0x2b4c76d0dc16be1c31d4c1dc53bf9b45987fc75c", // USDC/FTM
+      "0xe120ffbda0d14f3bb6d6053e90e63c572a66a428", // ftm/dai
+      "0x5965e53aa80a0bcf1cd6dbdd72e6a9b2aa047410", // fusdt/ftm
+      "0x2b4c76d0dc16be1c31d4c1dc53bf9b45987fc75c", // usdc/ftm
     ];
   }
   getUntrackedPairs(): string[] {
