@@ -367,7 +367,7 @@
           "template": "rari-fuse.template.yaml",
           "messari": "messari/rari-fuse-arbitrum",
           "dmelotik": "dmelotik/fuse-official",
-          "deploy-on-merge": false
+          "deploy-on-merge": true
         },
         "ethereum": {
           "template": "rari-fuse.template.yaml",
