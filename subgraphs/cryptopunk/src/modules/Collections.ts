@@ -33,7 +33,7 @@ export function updateCollectionSnapshot(
   tokenId: BigInt
 ): void {
   let collectionDailySnapshot = getOrCreateCollectionDailySnapshot(
-    block.timestamp
+    block
   );
 
   collectionDailySnapshot.dailyMinSalePrice = min(

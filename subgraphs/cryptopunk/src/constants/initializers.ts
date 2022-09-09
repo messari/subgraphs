@@ -131,10 +131,10 @@ export function getOrCreateMarketplaceDailySnapshot(
 }
 
 export function getOrCreateCollectionDailySnapshot(
-  timestamp: BigInt
+  block:ethereum.Block
 ): CollectionDailySnapshot {
   let noOfDaysSinceUnix = (
-    timestamp.toI32() / constants.SECONDS_PER_DAY
+    block.timestamp.toI32() / constants.SECONDS_PER_DAY
   ).toString();
   let snapshotID = constants.CRYPTOPUNK_CONTRACT_ADDRESS.concat(
     "-"
@@ -163,7 +163,8 @@ export function getOrCreateCollectionDailySnapshot(
     collectionDailySnapshot.tradeCount = collection.tradeCount;
     collectionDailySnapshot.dailyTradedItemCount = 0;
 
-    collectionDailySnapshot.timestamp = timestamp;
+    collectionDailySnapshot.timestamp = block.timestamp;
+    collectionDailySnapshot.blockNumber = block.timestamp;
 
     collectionDailySnapshot.save();
   }
