@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol
-# Version: 2.0.1
+# Version: 2.1.0
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -122,7 +122,7 @@ enum PositionSide {
 # different duration/maturity per market. You can append a counter
 # to the IDs to differentiate.
 type InterestRate @entity {
-  " { Interest rate side }-{ Interest rate type }-{ Market ID }-{ Optional: # days/hours since epoch time } "
+  " { Interest rate side }-{ Interest rate type }-{ Market ID } "
   id: ID!
 
   " Interest rate in percentage APY. E.g. 5.21% should be stored as 5.21 "
@@ -196,10 +196,12 @@ interface Protocol {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -301,10 +303,12 @@ type LendingProtocol implements Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -542,6 +546,9 @@ type Market @entity {
 
   " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
   rates: [InterestRate!]!
+
+  " The Oracle used to determine the price conversion of the tokens in a market "
+  oracles: [MarketOracle!]! @derivedFrom(field: "market")
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -1002,6 +1009,58 @@ type PositionSnapshot @entity {
 }
 
 ##################################
+##### Oracle Data #####
+##################################
+
+enum OracleSource {
+  UNISWAP
+  BALANCER
+  CHAINLINK
+  YEARN
+  SUSHISWAP
+  CURVE
+  ## More can be added
+}
+
+"""
+Lending Protocols will typically use onchain Oracles as a method of determining the
+price between the assets in a market. This is the 'single source of truth' when it
+comes to LTV calculations for a position and whether or not a loan can/should be
+liquidated
+"""
+type MarketOracle @entity {
+  " { Smart contract address of the market } "
+  id: ID!
+
+  " The marketId that the Oracle is used for "
+  market: Market!
+
+  " The block this oracle was adopted for a market "
+  blockCreated: BigInt!
+
+  " The most recent block that the oracle was updated "
+  blockLU: BigInt!
+
+  " The timestamp this oracle was adopted for a market "
+  timestampCreated: BigInt!
+
+  " The most recent timestamp that the oracle was updated "
+  timestampLU: BigInt!
+
+  " Is the Oracle currently used as the source of truth for a market"
+  isActive: Boolean
+
+  " The conversion rate between the assets tracked in the oracle "
+  conversionRate: BigDecimal
+
+  " Conversion Rate in USD (differs if a market has 2 non-USD based assets)"
+  conversionRateUSD: BigDecimal
+
+  " The Protocol that is providing the oracle (nullable if non-standard source)"
+  oracleSource: OracleSource
+}
+
+##################################
 ##### Event-Level Data #####
 ##################################
 
@@ -1013,8 +1072,7 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-
-type Deposit @entity {
+type Deposit @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1052,7 +1110,7 @@ type Deposit @entity {
   amountUSD: BigDecimal!
 }
 
-type Withdraw @entity {
+type Withdraw @entity(immutable: true) {
   " { Transaction hash }-{ Log index }"
   id: ID!
 
@@ -1095,7 +1153,7 @@ type Withdraw @entity {
 }
 
 # For CDPs, use this for mint events
-type Borrow @entity {
+type Borrow @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1134,7 +1192,7 @@ type Borrow @entity {
 }
 
 # For CDPs, use this for burn events
-type Repay @entity {
+type Repay @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -1172,7 +1230,8 @@ type Repay @entity {
   amountUSD: BigDecimal!
 }
 
-type Liquidate @entity {
+# Liquidate Event Data
+type Liquidate @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
