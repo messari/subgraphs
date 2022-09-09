@@ -16,10 +16,6 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
-import {
-  toLowerCase,
-  toLowerCaseList,
-} from "../../../../../src/common/utils/utils";
 
 export class SushiswapCeloConfigurations implements Configurations {
   getNetwork(): string {

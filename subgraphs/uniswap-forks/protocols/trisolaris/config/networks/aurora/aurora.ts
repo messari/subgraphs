@@ -16,10 +16,6 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
-import {
-  toLowerCase,
-  toLowerCaseList,
-} from "../../../../../src/common/utils/utils";
 
 export class TrisolarisAuroraConfigurations implements Configurations {
   getNetwork(): string {
@@ -41,13 +37,11 @@ export class TrisolarisAuroraConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0xc66f594268041db60507f00703b152492fb176e7");
+    return "0xc66f594268041db60507f00703b152492fb176e7";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString(
-        toLowerCase("0xc66f594268041db60507f00703b152492fb176e7")
-      )
+      Address.fromString("0xc66f594268041db60507f00703b152492fb176e7")
     );
   }
   getTradeFee(): BigDecimal {
@@ -75,32 +69,32 @@ export class TrisolarisAuroraConfigurations implements Configurations {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d"); // wNEAR
+    return "0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d"; // wNEAR
   }
   getRewardToken(): string {
-    return toLowerCase("0xFa94348467f64D5A457F75F8bc40495D33c65aBB"); // Trisolaris
+    return "0xfa94348467f64d5a457f75f8bc40495d33c65abb"; // Trisolaris
   }
   getWhitelistTokens(): string[] {
-    return toLowerCaseList([
-      "0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d", // wNEAR
-      "0xb12bfca5a55806aaf64e99521918a4bf0fc40802", // USDC
-      "0x4988a896b1227218e4a686fde5eabdcabd91571f", // USDT
-    ]);
+    return [
+      "0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d", // wnear
+      "0xb12bfca5a55806aaf64e99521918a4bf0fc40802", // usdc
+      "0x4988a896b1227218e4a686fde5eabdcabd91571f", // usdt
+    ];
   }
   getStableCoins(): string[] {
-    return toLowerCaseList([
-      "0xb12bfca5a55806aaf64e99521918a4bf0fc40802", // USDC
-      "0x4988a896b1227218e4a686fde5eabdcabd91571f", // USDT
-    ]);
+    return [
+      "0xb12bfca5a55806aaf64e99521918a4bf0fc40802", // usdc
+      "0x4988a896b1227218e4a686fde5eabdcabd91571f", // usdt
+    ];
   }
   getStableOraclePools(): string[] {
-    return toLowerCaseList([
-      "0x20f8aefb5697b77e0bb835a8518be70775cda1b0", // USDC/wNEAR
-      "0x03b666f3488a7992b2385b12df7f35156d7b29cd", // USDT/wNEAR
-    ]);
+    return [
+      "0x20f8aefb5697b77e0bb835a8518be70775cda1b0", // usdc/wnear
+      "0x03b666f3488a7992b2385b12df7f35156d7b29cd", // usdt/wnear
+    ];
   }
   getUntrackedPairs(): string[] {
-    return toLowerCaseList([]);
+    return [];
   }
   getUntrackedTokens(): string[] {
     return [];
