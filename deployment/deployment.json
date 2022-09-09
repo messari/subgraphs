@@ -3723,7 +3723,7 @@
       "cryptopunk": {
         "ethereum": {
           "template": "cryptopunk.template.yaml",
-          "messari": "messari/cryptopunk",
+          "messari": "messari/cryptopunks-ethereum",
           "shashwatS22": "shashwatS22/cryptopunk",
           "deploy-on-merge": false
         }
