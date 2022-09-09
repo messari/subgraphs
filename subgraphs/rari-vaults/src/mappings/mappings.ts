@@ -34,7 +34,7 @@ import {
   updateVaultDailyMetrics,
   updateVaultHourlyMetrics,
 } from "../common/metrics";
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { getUsdPrice } from "../prices";
 import { exponentToBigDecimal } from "../common/utils/utils";
 
@@ -53,15 +53,7 @@ export function handleUSDCDeposit(event: USDCDeposit): void {
   }
 
   // create withdraw
-  createDeposit(
-    event,
-    event.params.amount,
-    event.params.amountUsd
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-    assetAddress,
-    USDC_VAULT_ADDRESS
-  );
+  createDeposit(event, event.params.amount, assetAddress, USDC_VAULT_ADDRESS);
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
 
@@ -81,13 +73,21 @@ export function handleUSDCWithdrawal(event: USDCWithdrawal): void {
   }
 
   // create withdraw
+  let feeAmount = BigInt.fromString(
+    event.params.amount
+      .toBigDecimal()
+      .times(
+        event.params.withdrawalFeeRate
+          .toBigDecimal()
+          .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+      )
+      .truncate(0)
+      .toString()
+  );
   createWithdraw(
     event,
     event.params.amount,
-    event.params.amountUsd
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-    BIGINT_ZERO,
+    feeAmount,
     assetAddress,
     USDC_VAULT_ADDRESS
   );
@@ -113,15 +113,7 @@ export function handleYieldDeposit(event: YieldDeposit): void {
     assetAddress = ZERO_ADDRESS;
   }
 
-  createDeposit(
-    event,
-    event.params.amount,
-    event.params.amountUsd
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-    assetAddress,
-    YIELD_VAULT_ADDRESS
-  );
+  createDeposit(event, event.params.amount, assetAddress, YIELD_VAULT_ADDRESS);
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
 
@@ -143,10 +135,7 @@ export function handleYieldWithdrawal(event: YieldWithdrawal): void {
   createWithdraw(
     event,
     event.params.amount,
-    event.params.amountUsd
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-    event.params.amountTransferred,
+    event.params.amount.minus(event.params.amountTransferred),
     assetAddress,
     YIELD_VAULT_ADDRESS
   );
@@ -172,15 +161,7 @@ export function handleDAIDeposit(event: DAIDeposit): void {
     assetAddress = ZERO_ADDRESS;
   }
 
-  createDeposit(
-    event,
-    event.params.amount,
-    event.params.amountUsd
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-    assetAddress,
-    DAI_VAULT_ADDRESS
-  );
+  createDeposit(event, event.params.amount, assetAddress, DAI_VAULT_ADDRESS);
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
 
@@ -199,13 +180,21 @@ export function handleDAIWithdrawal(event: DAIWithdrawal): void {
     assetAddress = ZERO_ADDRESS;
   }
 
+  let feeAmount = BigInt.fromString(
+    event.params.amount
+      .toBigDecimal()
+      .times(
+        event.params.withdrawalFeeRate
+          .toBigDecimal()
+          .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+      )
+      .truncate(0)
+      .toString()
+  );
   createWithdraw(
     event,
     event.params.amount,
-    event.params.amountUsd
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-    BIGINT_ZERO,
+    feeAmount,
     assetAddress,
     DAI_VAULT_ADDRESS
   );
@@ -225,12 +214,6 @@ export function handleEtherDeposit(event: EtherDeposit): void {
   createDeposit(
     event,
     event.params.amount,
-    getUsdPrice(
-      Address.fromString(ETH_ADDRESS),
-      event.params.amount
-        .toBigDecimal()
-        .div(exponentToBigDecimal(DEFAULT_DECIMALS))
-    ),
     ETH_ADDRESS, // only token in this pool
     ETHER_VAULT_ADDRESS
   );
@@ -246,12 +229,6 @@ export function handleEtherWithdrawal(event: EtherWithdrawal): void {
   createWithdraw(
     event,
     event.params.amount,
-    getUsdPrice(
-      Address.fromString(ETH_ADDRESS),
-      event.params.amount
-        .toBigDecimal()
-        .div(exponentToBigDecimal(DEFAULT_DECIMALS))
-    ),
     BIGINT_ZERO,
     ETH_ADDRESS,
     ETHER_VAULT_ADDRESS
