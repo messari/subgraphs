@@ -47,6 +47,7 @@ import {
   SCHEMA_VERSION,
   SOHM_ADDRESS,
   SUBGRAPH_VERSION,
+  VESPER_V_DOLLAR_ADDRESS,
   ZERO_ADDRESS,
 } from "./constants";
 import {
@@ -722,6 +723,21 @@ function updateMarket(
     blockTimestamp.toI32() <= 1643954408 // EOD 2/4
   ) {
     underlyingTokenPriceUSD = BigDecimal.fromString("0.99632525");
+  }
+
+  // create a threshold for Vesper Pool V-Dollar price to use another oracle if:
+  // the price is outside of the threshold ($0.50-$2.00)
+  if (
+    marketID.toLowerCase() == VESPER_V_DOLLAR_ADDRESS.toLowerCase() &&
+    (underlyingTokenPriceUSD.le(BigDecimal.fromString(".5")) ||
+      underlyingTokenPriceUSD.ge(BigDecimal.fromString("2")))
+  ) {
+    let customPrice = getUsdPricePerToken(
+      Address.fromString(market.inputToken)
+    );
+    underlyingTokenPriceUSD = customPrice.usdPrice.div(
+      customPrice.decimalsBaseTen
+    );
   }
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
