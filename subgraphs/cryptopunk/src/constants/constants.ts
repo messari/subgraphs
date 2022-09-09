@@ -46,10 +46,9 @@ export namespace TradeType {
   export const BUYER = "Buyer";
   export const SELLER = "Seller";
 }
-export const CRYPTOPUNK_MARKET_CONTRACT_ADDRESS =
-  "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB";
-export const CRYPTOPUNK_COLLECTION_CONTRACT_ADDRESS =
-  "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB";
+export const CRYPTOPUNK_CONTRACT_ADDRESS =
+  "0xb47e3cd837dDF8e4c57F05d70Ab865de6e193bbb";
+
 export const MARKETPLACE_NAME = "LARVALABS";
 export const MARKETPLACE_SLUG = "larvalabs";
 

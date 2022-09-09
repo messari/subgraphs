@@ -75,8 +75,7 @@ export function createTradeTransaction(
   );
   trade.timestamp = block.timestamp;
   trade.blockNumber = block.number;
-  trade.isBundle = false;
-  trade.collection = constants.CRYPTOPUNK_MARKET_CONTRACT_ADDRESS;
+  
   trade.amount = constants.BIGINT_ONE;
   trade.priceETH = tokenAmount.divDecimal(constants.ETH_DECIMALS);
   trade.strategy = strategy;

@@ -12,10 +12,10 @@ import * as constants from "./constants";
 
 export function getOrCreateMarketplace(): Marketplace {
   let marketplace = Marketplace.load(
-    constants.CRYPTOPUNK_MARKET_CONTRACT_ADDRESS
+    constants.CRYPTOPUNK_CONTRACT_ADDRESS
   );
   if (!marketplace) {
-    marketplace = new Marketplace(constants.CRYPTOPUNK_MARKET_CONTRACT_ADDRESS);
+    marketplace = new Marketplace(constants.CRYPTOPUNK_CONTRACT_ADDRESS);
     marketplace.name = constants.MARKETPLACE_NAME;
     marketplace.slug = constants.MARKETPLACE_SLUG;
     marketplace.network = constants.Network.MAINNET;
@@ -36,11 +36,11 @@ export function getOrCreateMarketplace(): Marketplace {
 
 export function getOrCreateCollection(): Collection {
   let collection = Collection.load(
-    constants.CRYPTOPUNK_COLLECTION_CONTRACT_ADDRESS
+    constants.CRYPTOPUNK_CONTRACT_ADDRESS
   );
   if (!collection) {
     collection = new Collection(
-      constants.CRYPTOPUNK_COLLECTION_CONTRACT_ADDRESS
+      constants.CRYPTOPUNK_CONTRACT_ADDRESS
     );
     collection.name = constants.CRYPTOPUNK_NAME;
     collection.symbol = constants.CRYPTOPUNK_SYMBOL;
@@ -75,7 +75,7 @@ export function getOrCreateTrade(
     trade.timestamp = constants.BIGINT_ZERO;
     trade.blockNumber = constants.BIGINT_ZERO;
     trade.isBundle = false;
-    trade.collection = constants.CRYPTOPUNK_COLLECTION_CONTRACT_ADDRESS;
+    trade.collection = constants.CRYPTOPUNK_CONTRACT_ADDRESS;
     trade.tokenId = constants.BIGINT_ZERO;
     trade.amount = constants.BIGINT_ZERO;
     trade.priceETH = constants.BIGDECIMAL_ZERO;
@@ -94,7 +94,7 @@ export function getOrCreateMarketplaceDailySnapshot(
   let noOfDaysSinceUnix = (
     timestamp.toI32() / constants.SECONDS_PER_DAY
   ).toString();
-  let snapshotID = constants.CRYPTOPUNK_MARKET_CONTRACT_ADDRESS.concat(
+  let snapshotID = constants.CRYPTOPUNK_CONTRACT_ADDRESS.concat(
     "-"
   ).concat(noOfDaysSinceUnix);
   let marketplaceDailySnapshot = MarketplaceDailySnapshot.load(snapshotID);
@@ -103,7 +103,7 @@ export function getOrCreateMarketplaceDailySnapshot(
 
     let marketplace = getOrCreateMarketplace();
     marketplaceDailySnapshot.marketplace =
-      constants.CRYPTOPUNK_MARKET_CONTRACT_ADDRESS;
+      constants.CRYPTOPUNK_CONTRACT_ADDRESS;
 
     marketplaceDailySnapshot.totalRevenueETH = constants.BIGDECIMAL_ZERO;
     marketplaceDailySnapshot.creatorRevenueETH = constants.BIGDECIMAL_ZERO;
@@ -136,7 +136,7 @@ export function getOrCreateCollectionDailySnapshot(
   let noOfDaysSinceUnix = (
     timestamp.toI32() / constants.SECONDS_PER_DAY
   ).toString();
-  let snapshotID = constants.CRYPTOPUNK_COLLECTION_CONTRACT_ADDRESS.concat(
+  let snapshotID = constants.CRYPTOPUNK_CONTRACT_ADDRESS.concat(
     "-"
   ).concat(noOfDaysSinceUnix);
   let collectionDailySnapshot = CollectionDailySnapshot.load(snapshotID);
@@ -146,7 +146,7 @@ export function getOrCreateCollectionDailySnapshot(
     let collection = getOrCreateCollection();
 
     collectionDailySnapshot.collection =
-      constants.CRYPTOPUNK_COLLECTION_CONTRACT_ADDRESS;
+      constants.CRYPTOPUNK_CONTRACT_ADDRESS;
 
     collectionDailySnapshot.totalRevenueETH = constants.BIGDECIMAL_ZERO;
     collectionDailySnapshot.dailyTradeVolumeETH = constants.BIGDECIMAL_ZERO;
