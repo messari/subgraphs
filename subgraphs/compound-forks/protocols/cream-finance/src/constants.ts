@@ -101,3 +101,28 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
 function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }
+
+// Cutoff blocks by chain
+// We want to cutoff all activity past 10/17/2021 as CREAM was "deprecated"
+// We will show that by zeroing out all values and not ingesting any more data
+const ARBITRUM_ONE_CUTOFF = 2286570;
+
+//
+//
+// this function will return the block number that represents 10/17/2021 for each chain
+// error if -1 is returned
+export function cutoffBlock(): i32 {
+  let network = dataSource.network();
+  if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
+    return ARBITRUM_ONE_CUTOFF;
+  } else if (equalsIgnoreCase(network, Network.BSC)) {
+  } else if (equalsIgnoreCase(network, Network.MAINNET)) {
+  } else if (equalsIgnoreCase(network, Network.MATIC)) {
+  } else {
+    // error: there are no networks that matched
+    log.warning("[cutoffBlock] Could not find cutoff date for network: {}", [
+      network,
+    ]);
+    return -1;
+  }
+}
