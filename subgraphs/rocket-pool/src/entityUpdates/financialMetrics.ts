@@ -73,12 +73,15 @@ export function updateProtocolAndPoolTvl(
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
 
-  let rewardTokens = [
+  let rewardTokens: string[] = [
     getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number).id,
   ];
 
+  log.error("[updateProtocolAndPoolTvl] reward tokens check: {}", [
+    rewardTokens[0],
+  ]);
   pool.rewardTokens = rewardTokens;
-
+  pool.save();
   // Pool
   let inputTokenBalances: BigInt[] = [];
   inputTokenBalances.push(pool.inputTokenBalances[0].plus(amount));
@@ -100,7 +103,6 @@ export function updateProtocolAndPoolTvl(
 
   let totalValueLockedUSD = ethTVLUSD.plus(rplTVLUSD);
   pool.totalValueLockedUSD = totalValueLockedUSD;
-
   pool.save();
 
   // Pool Daily and Hourly
