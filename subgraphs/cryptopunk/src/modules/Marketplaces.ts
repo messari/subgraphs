@@ -24,12 +24,14 @@ export function updateMarketplace(
 
   createUserMarketplaceAccount(buyerAddress, block);
   createUserMarketplaceAccount(sellerAddress, block);
-  updateMarketplaceDailySnapshot(block, punkIndex);
+  updateMarketplaceDailySnapshot(block, punkIndex, buyerAddress, sellerAddress);
 }
 
 export function updateMarketplaceDailySnapshot(
   block: ethereum.Block,
-  tokenId: BigInt
+  tokenId: BigInt,
+  buyerAddress: Address,
+  sellerAddress: Address
 ): void {
   let marketplaceDailySnapshot = getOrCreateMarketplaceDailySnapshot(
     block.timestamp,
@@ -49,8 +51,27 @@ export function updateMarketplaceDailySnapshot(
     dailyTradedItem = new _Item(itemId);
     isUniqueDailyTradedItem = true;
   }
+  let buyerId = constants.AccountType.DAILY_MARKETPLACE_ACCOUNT.concat(
+    "-"
+  ).concat(buyerAddress.toHexString());
+  let sellerId = constants.AccountType.DAILY_MARKETPLACE_ACCOUNT.concat(
+    "-"
+  ).concat(sellerAddress.toHexString());
+
+  let dailyBuyer = _User.load(buyerId);
+  if (!dailyBuyer) {
+    dailyBuyer = new _User(buyerId);
+    dailyBuyer.save();
+    marketplaceDailySnapshot.dailyActiveTraders += 1;
+  }
+  let dailySeller = _User.load(sellerId);
+  if (!dailySeller) {
+    dailySeller = new _User(sellerId);
+    dailySeller.save();
+    marketplaceDailySnapshot.dailyActiveTraders += 1;
+  }
+
   marketplaceDailySnapshot.tradeCount += 1;
-  marketplaceDailySnapshot.dailyActiveTraders += 2;
   marketplaceDailySnapshot.dailyTradedCollectionCount = 1;
   if (isUniqueDailyTradedItem) {
     marketplaceDailySnapshot.dailyTradedItemCount += 1;

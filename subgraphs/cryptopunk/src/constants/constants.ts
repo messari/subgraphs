@@ -40,6 +40,8 @@ export namespace SaleStrategy {
 export namespace AccountType {
   export const MARKETPLACE_ACCOUNT = "MARKETPLACE_ACCOUNT";
   export const COLLECTION_ACCOUNT = "COLLECTION_ACCOUNT";
+  export const DAILY_MARKETPLACE_ACCOUNT = "DAILY_MARKETPLACE_ACCOUNT";
+  export const DAILY_COLLECTION_ACCOUNT = "DAILY_COLLECTION_ACCOUNT";
 }
 
 export namespace TradeType {

@@ -270,6 +270,7 @@ type CollectionDailySnapshot @entity {
 type _User @entity {
   # MARKETPLACE_ACCOUNT-{ Account }
   # COLLECTION_ACCOUNT-{ Buyer/Seller }-{ Account }
+  # DAILY_MARKETPLACE_ACCOUNT-{Account}
   id: ID!
 }
 

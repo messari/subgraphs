@@ -1,6 +1,6 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import * as constants from "../constants/constants";
-import { _User } from "../../generated/schema";
+import { _Item, _User } from "../../generated/schema";
 import {
   getOrCreateCollectionDailySnapshot,
   getOrCreateCollection,
@@ -24,12 +24,13 @@ export function updateCollection(
   collection.save();
   createUserCollectionAccount(constants.TradeType.BUYER, buyerAddress);
   createUserCollectionAccount(constants.TradeType.SELLER, sellerAddress);
-  updateCollectionSnapshot(block, tokenAmount);
+  updateCollectionSnapshot(block, tokenAmount, punkIndex);
 }
 
 export function updateCollectionSnapshot(
   block: ethereum.Block,
-  tokenAmount: BigInt
+  tokenAmount: BigInt,
+  tokenId: BigInt
 ): void {
   let collectionDailySnapshot = getOrCreateCollectionDailySnapshot(
     block.timestamp
@@ -47,9 +48,16 @@ export function updateCollectionSnapshot(
   collectionDailySnapshot.dailyTradeVolumeETH = collectionDailySnapshot.dailyTradeVolumeETH.plus(
     tokenAmount.divDecimal(constants.ETH_DECIMALS)
   );
-
   collectionDailySnapshot.tradeCount += 1;
-  collectionDailySnapshot.dailyTradedItemCount += 1;
+  let dailyTradedItemId = "DAILY_TRADED_ITEM-"
+    .concat((block.timestamp.toI32() / constants.SECONDS_PER_DAY).toString())
+    .concat(tokenId.toString());
+  let dailyTradedItem = _Item.load(dailyTradedItemId);
+  if (!dailyTradedItem) {
+    dailyTradedItem = new _Item(dailyTradedItemId);
+    dailyTradedItem.save();
+    collectionDailySnapshot.dailyTradedItemCount += 1;
+  }
 
   collectionDailySnapshot.save();
 }
