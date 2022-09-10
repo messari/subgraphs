@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getDiscordMessages, sendDiscordMessage } from "./messageDiscord.js";
+import { constructEmbedMsg, getDiscordMessages, sendDiscordMessage } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
@@ -18,23 +18,28 @@ async function executionFlow() {
   );
   // deployments holds the errors for every protocol
   let deployments = {};
-
+  const protocolNames = [];
   Object.entries(data).forEach(([protocolType, protocolsOnType]) => {
-    Object.values(protocolsOnType).forEach((protocolObj) => {
-      Object.values(protocolObj).forEach((deploymentString) => {
+    Object.entries(protocolsOnType).forEach(([protocolName, protocolObj]) => {
+      Object.entries(protocolObj).forEach(([network, deploymentString]) => {
         const nameStr =
           deploymentString.split("name/")[1];
 
         const deploymentsKey = nameStr.split("/")[1];
         deployments[deploymentsKey] = {
+          protocolName: protocolName,
           indexingError: null,
           indexedPercentage: 0,
           url: deploymentString,
           protocolType: protocolType,
+          network: network
         };
         deployments[deploymentsKey].protocolErrors = JSON.parse(JSON.stringify(protocolErrors));
         if (protocolType && deploymentsKey && Object.keys(errorsObj).includes(protocolType)) {
           deployments[deploymentsKey].poolErrors = JSON.parse(JSON.stringify(errorsObj[protocolType]));
+        }
+        if (!protocolNames.includes(protocolName)) {
+          protocolNames.push(protocolName);
         }
       });
     });
@@ -164,8 +169,15 @@ async function executionFlow() {
   deployments = await protocolLevel(deployments);
   let queriesToAttempt = [];
   const discordMessages = await getDiscordMessages([]);
-  await alertFailedIndexing(discordMessages, deployments);
-  queriesToAttempt = await alertProtocolErrors(discordMessages, deployments, queriesToAttempt);
+
+  const messagesToPost = protocolNames.map(protocolName => {
+    const deploymentSet = Object.values(deployments).filter(depo => depo.protocolName === protocolName)
+    const embeddedMessage = constructEmbedMsg(protocolName, deploymentSet);
+    return embeddedMessage;
+  })
+
+  // await alertFailedIndexing(discordMessages, deployments);
+  // queriesToAttempt = await alertProtocolErrors(discordMessages, deployments, queriesToAttempt);
   // deployments = await deploymentsOnPoolLevel(deployments);
   // await sleep(5000);
   // queriesToAttempt = await alertPoolLevelErrors(discordMessages, deployments, "lending", queriesToAttempt);
@@ -173,15 +185,15 @@ async function executionFlow() {
   // queriesToAttempt = await alertPoolLevelErrors(discordMessages, deployments, "vaults", queriesToAttempt);
   // await sleep(5000);
   // queriesToAttempt = await alertPoolLevelErrors(discordMessages, deployments, "exchanges", queriesToAttempt);
-  await sleep(5000);
+  // await sleep(5000);
 
-  if (queriesToAttempt.length > 0) {
+  if (messagesToPost.length > 0) {
     // Need to pull refreshed list of alert messages, in case posted but error was thrown as well.
     const updatedDiscordMessages = await getDiscordMessages([]);
-    await resolveQueriesToAttempt(queriesToAttempt, updatedDiscordMessages);
+    await resolveQueriesToAttempt(messagesToPost, updatedDiscordMessages);
   }
 
-  return executionFlow();
+  // return executionFlow();
 }
 
 async function resolveQueriesToAttempt(queriesToAttempt, updatedDiscordMessages) {
@@ -190,12 +202,12 @@ async function resolveQueriesToAttempt(queriesToAttempt, updatedDiscordMessages)
   const newQueriesArray = [...queriesToAttempt.slice(5)];
   try {
     // map useQueries and within filter updatedDiscordMessages.includes(useQueries[x].slice(0,80)) 
-    useQueries = useQueries.filter(query => {
-      const hasMsg = updatedDiscordMessages.filter(msg => {
-        return msg.content.includes(query.slice(0, 80));
-      })
-      return hasMsg.length === 0;
-    })
+    // useQueries = useQueries.filter(query => {
+    //   const hasMsg = updatedDiscordMessages.filter(msg => {
+    //     return msg.content.includes(query.slice(0, 80));
+    //   })
+    //   return hasMsg.length === 0;
+    // })
     await Promise.allSettled(useQueries.map(messageToSend => sendDiscordMessage(messageToSend)));
   } catch (err) {
     console.log(err)
