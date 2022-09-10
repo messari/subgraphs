@@ -65,6 +65,8 @@ templates:
           file: ./abis/ERC20.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
+        - name: Oracle
+          file: ./abis/cream-finance/Oracle.json
 
         ###########################################
         ############## Price Oracle ###############

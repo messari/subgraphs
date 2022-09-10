@@ -69,7 +69,7 @@ import {
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 import { getUsdPricePerToken } from "./prices";
-import { ChainLinkContract } from "../../../generated/templates/CToken/ChainLinkContract";
+import { Oracle } from "../../../generated/templates/CToken/Oracle";
 
 // Global variables
 let isDeprecated = false;
@@ -342,6 +342,21 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   }
 
   let marketAddress = event.address;
+  let market = Market.load(marketAddress.toHexString());
+  if (!market) {
+    log.warning("[handleAccrueInterest] market not found: {}", [
+      marketAddress.toHexString(),
+    ]);
+    return;
+  }
+  let underlyingToken = Token.load(market.inputToken);
+  if (!underlyingToken) {
+    log.warning(
+      "[handleAccrueInterest] input token: {} not found in market: {}",
+      [market.inputToken, market.id]
+    );
+    return;
+  }
   let cTokenContract = CToken.bind(marketAddress);
   let protocol = getOrCreateProtocol();
   let oracleContract = PriceOracle.bind(
@@ -352,7 +367,11 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
-    oracleContract.try_getUnderlyingPrice(marketAddress),
+    getPriceUSD(
+      oracleContract.try_getUnderlyingPrice(marketAddress),
+      underlyingToken.decimals,
+      event.block.number.toI32()
+    ),
     unitPerYear
   );
   let interestAccumulated = event.params.interestAccumulated;
@@ -420,7 +439,9 @@ function getPriceUSD(
       // TODO: find way to get bnb price on chain here
     } else {
       // use chainlink oracle BNB/USD starting on block 1881676
-      let chainlinkOracle = ChainLinkContract.bind(BNB_USD_CHAINLINK_ORACLE);
+      let chainlinkOracle = Oracle.bind(
+        Address.fromString(BNB_USD_CHAINLINK_ORACLE)
+      );
       let tryPriceUSD = chainlinkOracle.try_latestAnswer();
       bnbPriceUSD = tryPriceUSD.reverted
         ? BIGDECIMAL_ZERO
