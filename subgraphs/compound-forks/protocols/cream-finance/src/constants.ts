@@ -30,6 +30,11 @@ export class NetworkSpecificConstant {
   }
 }
 
+// Notable addresses
+export const BNB_USD_CHAINLINK_ORACLE =
+  "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE";
+export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   let network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
@@ -37,12 +42,7 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
       Address.fromString("0x3d5BC3c8d13dcB8bF317092d84783c2697AE9258"),
       Network.MAINNET,
       ETHEREUM_BLOCKS_PER_YEAR,
-      new TokenData(
-        Address.fromString("0x0000000000000000000000000000000000000000"),
-        "Ether",
-        "ETH",
-        18
-      ),
+      new TokenData(Address.fromString(ETH_ADDRESS), "Ether", "ETH", 18),
       new TokenData(
         Address.fromString("0xD06527D5e56A3495252A528C4987003b712860eE"),
         "Cream Ether",
@@ -98,31 +98,10 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   }
 }
 
-function equalsIgnoreCase(a: string, b: string): boolean {
+export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }
 
-// Cutoff blocks by chain
-// We want to cutoff all activity past 10/17/2021 as CREAM was "deprecated"
-// We will show that by zeroing out all values and not ingesting any more data
-const ARBITRUM_ONE_CUTOFF = 2286570;
-
-//
-//
-// this function will return the block number that represents 10/17/2021 for each chain
-// error if -1 is returned
-export function cutoffBlock(): i32 {
-  let network = dataSource.network();
-  if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
-    return ARBITRUM_ONE_CUTOFF;
-  } else if (equalsIgnoreCase(network, Network.BSC)) {
-  } else if (equalsIgnoreCase(network, Network.MAINNET)) {
-  } else if (equalsIgnoreCase(network, Network.MATIC)) {
-  } else {
-    // error: there are no networks that matched
-    log.warning("[cutoffBlock] Could not find cutoff date for network: {}", [
-      network,
-    ]);
-    return -1;
-  }
-}
+// First ethereum block on october 17, 2021
+// we are cutting off activity after this block since CREAM ethereum was "deprecated"
+export const ETH_CUTOFF_BLOCK = 13535273;

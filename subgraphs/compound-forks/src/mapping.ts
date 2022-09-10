@@ -34,7 +34,6 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   cTokenDecimals,
-  cTokenDecimalsBD,
   exponentToBigDecimal,
   InterestRateSide,
   InterestRateType,
@@ -1931,7 +1930,7 @@ export function getOrCreateMarketHourlySnapshot(
   return snapshot;
 }
 
-function getTokenPriceUSD(
+export function getTokenPriceUSD(
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
   underlyingDecimals: i32
 ): BigDecimal {
