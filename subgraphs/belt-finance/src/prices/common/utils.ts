@@ -1,6 +1,6 @@
 import * as constants from "./constants";
-import { _ERC20 } from "../../../generated/UniswapV2Factory/_ERC20";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { _ERC20 } from "../../../generated/templates/Strategy/_ERC20";
 
 export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T): T {
   return callResult.reverted ? defaultValue : callResult.value;

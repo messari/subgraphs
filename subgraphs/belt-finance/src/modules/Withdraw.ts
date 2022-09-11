@@ -17,7 +17,6 @@ import {
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { getPriceOfOutputTokens } from "./Prices";
 import { updateRevenueSnapshots } from "./Revenue";
 import { getUsdPricePerToken } from "../prices/index";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
@@ -74,23 +73,9 @@ export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
   protocol.save();
 }
 
-export function getWithdrawFeePercentage(vaultContract: VaultContract): BigInt {
-  let withdrawFeePercentage = utils.readValue<BigInt>(
-    vaultContract.try_withdrawFee(),
-    constants.BIGINT_ZERO
-  );
-
-  if (withdrawFeePercentage.gt(constants.BIGINT_TEN.pow(14 as u8))) {
-    // v1 pools withdraw fee is stored in pow(10, 16) format
-
-    return withdrawFeePercentage.div(constants.BIGINT_TEN.pow(14 as u8));
-  }
-
-  return withdrawFeePercentage;
-}
-
 export function Withdraw(
   vaultAddress: Address,
+  strategyAddress: Address,
   withdrawAmount: BigInt,
   sharesBurnt: BigInt,
   transaction: ethereum.Transaction,
@@ -108,51 +93,29 @@ export function Withdraw(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  let withdrawFeePercentage = getWithdrawFeePercentage(vaultContract);
+  let withdrawFeePercentage = utils.getStrategyWithdrawalFees(
+    vaultAddress,
+    strategyAddress
+  );
 
-  let withdrawalFee = sharesBurnt
-    .times(withdrawFeePercentage)
-    .div(constants.MAX_BPS);
+  let withdrawalFeeUSD = withdrawAmountUSD
+    .times(withdrawFeePercentage.feePercentage!)
+    .div(constants.BIGDECIMAL_HUNDRED);
 
   vault.outputTokenSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
 
-  // let totalValue = utils.readValue<BigInt>(
-  //   vaultContract.try_totalValue(),
-  //   constants.BIGINT_ZERO
-  // );
-
-  // if (totalValue.equals(constants.BIGINT_ZERO)) {
-  //   let vaultTokenLocked = utils.readValue<BigInt>(
-  //     vaultContract.try_tokenLocked(),
-  //     constants.BIGINT_ZERO
-  //   );
-
-  //   let tokenInVault = utils.readValue<BigInt>(
-  //     vaultContract.try_tokensHere(),
-  //     constants.BIGINT_ZERO
-  //   );
-
-  //   totalValue = vaultTokenLocked.plus(tokenInVault);
-  // }
-  // vault.inputTokenBalance = totalValue;
+  vault.inputTokenBalance = utils.readValue<BigInt>(
+    vaultContract.try_calcPoolValueInToken(),
+    constants.BIGINT_ZERO
+  );
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .divDecimal(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
-
-  vault.outputTokenPriceUSD = getPriceOfOutputTokens(vaultAddress);
-
-  let outputTokenDecimals = utils.getTokenDecimals(vaultAddress);
-
-  // Protocol Side Revenue USD
-  let withdrawalFeeUSD = withdrawalFee
-    .toBigDecimal()
-    .div(outputTokenDecimals)
-    .times(vault.outputTokenPriceUSD!);
 
   vault.save();
 
@@ -175,15 +138,13 @@ export function Withdraw(
   UpdateMetricsAfterWithdraw(block);
 
   log.info(
-    "[Withdraw] vault: {}, sharesBurnt: {}, withdrawalFee: {}, withdrawalFeeUSD: {}, withdrawAmount: {}, withdrawAmountUSD: {}, outputTokenPriceUSD: {}, TxnHash: {}",
+    "[Withdraw] vault: {}, sharesBurnt: {}, withdrawAmount: {}, withdrawalFeeUSD: {}, withdrawAmountUSD: {}, TxnHash: {}",
     [
       vaultAddress.toHexString(),
       sharesBurnt.toString(),
-      withdrawalFee.toString(),
-      withdrawalFeeUSD.toString(),
       withdrawAmount.toString(),
+      withdrawalFeeUSD.toString(),
       withdrawAmountUSD.toString(),
-      vault.outputTokenPriceUSD!.toString(),
       transaction.hash.toHexString(),
     ]
   );

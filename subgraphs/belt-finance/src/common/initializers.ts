@@ -1,4 +1,12 @@
 import {
+  log,
+  BigInt,
+  Address,
+  ethereum,
+  BigDecimal,
+  DataSourceContext,
+} from "@graphprotocol/graph-ts";
+import {
   Token,
   Account,
   VaultFee,
@@ -13,7 +21,6 @@ import {
 import * as utils from "./utils";
 import * as constants from "./constants";
 import { Vault as VaultStore } from "../../generated/schema";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/templates/Strategy/ERC20";
@@ -48,10 +55,10 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
   return rewardToken;
 }
 
-export function getOrCreateFee(
+export function getOrCreateVaultFee(
   feeId: string,
   feeType: string,
-  feePercentage: BigInt = constants.BIGINT_ZERO
+  feePercentage: BigDecimal = constants.BIGDECIMAL_ZERO
 ): VaultFee {
   let fees = VaultFee.load(feeId);
 
@@ -59,9 +66,13 @@ export function getOrCreateFee(
     fees = new VaultFee(feeId);
 
     fees.feeType = feeType;
-    fees.feePercentage = feePercentage
-      .toBigDecimal()
-      .div(constants.BIGDECIMAL_HUNDRED);
+    fees.feePercentage = feePercentage;
+
+    fees.save();
+  }
+
+  if (feePercentage.notEqual(constants.BIGDECIMAL_ZERO)) {
+    fees.feePercentage = feePercentage;
 
     fees.save();
   }
@@ -294,7 +305,7 @@ export function getOrCreateVault(
     vault.protocol = constants.PROTOCOL_ID.toHexString();
 
     // There is no deposit limit on Belt Finanace
-    vault.depositLimit = constants.BIGINT_ZERO
+    vault.depositLimit = constants.BIGINT_ZERO;
 
     const inputToken = getOrCreateToken(vaultContract.token());
     vault.inputToken = inputToken.id;
@@ -316,40 +327,35 @@ export function getOrCreateVault(
     vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
-    const withdrawlFeeId =
-      utils.enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE) +
-      vaultAddress.toHexString();
+    let vaultStrategies = utils.getVaultStrategies(vaultAddress);
 
-    getOrCreateFee(withdrawlFeeId, constants.VaultFeeType.WITHDRAWAL_FEE);
+    let vaulFees: string[] = [];
 
-    const performanceFeeId =
-      utils.enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
-      vaultAddress.toHexString();
+    for (let idx = 0; idx < vaultStrategies.length; idx++) {
+      vaulFees.concat(
+        utils.getStrategyFees(vaultAddress, vaultStrategies.at(idx)).stringIds()
+      );
+    }
+    vault.fees = vaulFees;
 
-    getOrCreateFee(performanceFeeId, constants.VaultFeeType.PERFORMANCE_FEE);
+    for (let idx = 0; idx < vaultStrategies.length; idx++) {
+      let context = new DataSourceContext();
+      context.setString("vaultAddress", vaultAddress.toHexString());
 
-    vault.fees = [withdrawlFeeId, performanceFeeId];
-
-    // // Create Pool Accountant - Pool_v5
-    // let poolAccountant = utils.readValue<Address>(
-    //   vaultContract.try_poolAccountant(),
-    //   constants.NULL.TYPE_ADDRESS
-    // );
-    // if (poolAccountant.notEqual(constants.NULL.TYPE_ADDRESS))
-    //   PoolAccountantTemplate.create(poolAccountant);
+      let underlyingStrategy = utils.getUnderlyingStrategy(
+        vaultStrategies.at(idx)
+      );
+      StrategyTemplate.createWithContext(underlyingStrategy, context);
+    }
 
     utils.updateProtocolAfterNewVault(vaultAddress);
-
     vault.save();
 
-    log.warning(
-      "[NewVault] vault: {}, name: {}, inputToken: {}, poolAccountant: {}",
-      [
-        vaultAddress.toHexString(),
-        vault.name!,
-        inputToken.id,
-      ]
-    );
+    log.warning("[NewVault] vault: {}, name: {}, inputToken: {}", [
+      vault.id,
+      vault.name!,
+      inputToken.id,
+    ]);
   }
 
   return vault;

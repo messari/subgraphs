@@ -2,12 +2,11 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import {
-  UniswapPair as UniswapPairContract,
   UniswapPair__getReservesResult,
-} from "../../../generated/UniswapV2Factory/UniswapPair";
-
+  UniswapPair as UniswapPairContract,
+} from "../../../generated/templates/Strategy/UniswapPair";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { UniswapRouter as UniswapRouterContract } from "../../../generated/UniswapV2Factory/UniswapRouter";
+import { UniswapRouter as UniswapRouterContract } from "../../../generated/templates/Strategy/UniswapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
   if (tokenAddress == constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!) {
@@ -99,7 +98,10 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
       .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
       .toBigDecimal();
 
-    return CustomPriceType.initialize(amountOutBigDecimal, constants.USDC_DECIMALS_MAP.get(network)!);
+    return CustomPriceType.initialize(
+      amountOutBigDecimal, 
+      constants.USDC_DECIMALS_MAP.get(network)!.toI32() as u8
+    );
   }
 
   return new CustomPriceType();

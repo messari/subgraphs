@@ -18,6 +18,7 @@ import {
 import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
+import { updateRevenueSnapshots } from "./Revenue";
 import { getPriceOfOutputTokens, getPricePerShare } from "./Prices";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 
@@ -75,6 +76,7 @@ export function UpdateMetricsAfterDeposit(block: ethereum.Block): void {
 
 export function Deposit(
   vaultAddress: Address,
+  strategyAddress: Address,
   depositAmount: BigInt,
   sharesMinted: BigInt,
   transaction: ethereum.Transaction,
@@ -92,30 +94,24 @@ export function Deposit(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
+  let depositFeePercentage = utils.getStrategyWithdrawalFees(
+    vaultAddress,
+    strategyAddress
+  );
+
+  let depositFeeUSD = depositAmountUSD
+    .times(depositFeePercentage.feePercentage!)
+    .div(constants.BIGDECIMAL_HUNDRED);
+
   vault.outputTokenSupply = utils.readValue<BigInt>(
     vaultContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
 
-  // let totalValue = utils.readValue<BigInt>(
-  //   vaultContract.try_totalValue(),
-  //   constants.BIGINT_ZERO
-  // );
-
-  // if (totalValue.equals(constants.BIGINT_ZERO)) {
-  //   let vaultTokenLocked = utils.readValue<BigInt>(
-  //     vaultContract.try_tokenLocked(),
-  //     constants.BIGINT_ZERO
-  //   );
-
-  //   let tokenInVault = utils.readValue<BigInt>(
-  //     vaultContract.try_tokensHere(),
-  //     constants.BIGINT_ZERO
-  //   );
-
-  //   totalValue = vaultTokenLocked.plus(tokenInVault);
-  // }
-  // vault.inputTokenBalance = totalValue;
+  vault.inputTokenBalance = utils.readValue<BigInt>(
+    vaultContract.try_calcPoolValueInToken(),
+    constants.BIGINT_ZERO
+  );
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .divDecimal(inputTokenDecimals)
@@ -136,16 +132,24 @@ export function Deposit(
     block
   );
 
+  updateRevenueSnapshots(
+    vault,
+    constants.BIGDECIMAL_ZERO,
+    depositFeeUSD,
+    block
+  );
+
   utils.updateProtocolTotalValueLockedUSD();
   UpdateMetricsAfterDeposit(block);
 
   log.info(
-    "[Deposit] vault: {}, sharesMinted: {}, depositAmount: {}, depositAmountUSD: {}, TxnHash: {}",
+    "[Deposit] vault: {}, sharesMinted: {}, depositAmount: {}, depositAmountUSD: {}, depositFeeUSD: {}, TxnHash: {}",
     [
       vaultAddress.toHexString(),
       sharesMinted.toString(),
       depositAmount.toString(),
       depositAmountUSD.toString(),
+      depositFeeUSD.toString(),
       transaction.hash.toHexString(),
     ]
   );

@@ -5,8 +5,8 @@ import * as ARBITRUM_ONE from "../config/arbitrumOne";
 import * as POLYGON from "../config/polygon"
 
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
-import { UniswapPair__getReservesResult } from "../../../generated/UniswapV2Factory/UniswapPair";
-import { SushiSwapPair__getReservesResult } from "../../../generated/UniswapV2Factory/SushiSwapPair";
+import { UniswapPair__getReservesResult } from "../../../generated/templates/Strategy/UniswapPair";
+import { SushiSwapPair__getReservesResult } from "../../../generated/templates/Strategy/SushiSwapPair";
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// COMMON ////////////////////////////////
@@ -311,7 +311,7 @@ CHAIN_LINK_CONTRACT_ADDRESS.set(
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const USDC_DECIMALS_MAP = new TypedMap<string, i32>();
+export const USDC_DECIMALS_MAP = new TypedMap<string, BigInt>();
 USDC_DECIMALS_MAP.set(MAINNET.NETWORK_STRING, MAINNET.USDC_DECIMALS);
 USDC_DECIMALS_MAP.set(BSC.NETWORK_STRING, BSC.USDC_DECIMALS);
 USDC_DECIMALS_MAP.set(FANTOM.NETWORK_STRING, FANTOM.USDC_DECIMALS);

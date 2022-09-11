@@ -1,10 +1,10 @@
-import { BigInt, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { getPriceUsdc as getPriceUsdcSushi } from "./SushiSwapRouter";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/UniswapV2Factory/CurveRegistry";
-import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/UniswapV2Factory/CurvePoolRegistry";
+import { BigInt, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/templates/Strategy/CurveRegistry";
+import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/templates/Strategy/CurvePoolRegistry";
 
 export function getCurvePriceUsdc(curveLpTokenAddress: Address, network: string): CustomPriceType {
   let tokensMapping = constants.WHITELIST_TOKENS_MAP.get(network);
