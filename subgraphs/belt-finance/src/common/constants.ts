@@ -62,7 +62,7 @@ export namespace Protocol {
   export const NAME = "Belt Finance";
   export const SLUG = "belt-finance";
   export const SCHEMA_VERSION = "1.3.0";
-  export const SUBGRAPH_VERSION = "1.0.0";
+  export const SUBGRAPH_VERSION = "1.1.0";
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 
