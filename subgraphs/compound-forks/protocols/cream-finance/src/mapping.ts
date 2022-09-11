@@ -435,8 +435,7 @@ function getPriceUSD(
       // cannot use Chainlink oracle
       // using LP pair to derive price
       // this is in effect for the first 2 months
-      bnbPriceUSD = BIGDECIMAL_ZERO;
-      // TODO: find way to get bnb price on chain here
+      bnbPriceUSD = BIGDECIMAL_ZERO; // TODO: find way to get bnb price on chain here
     } else {
       // use chainlink oracle BNB/USD starting on block 1881676
       let chainlinkOracle = Oracle.bind(
