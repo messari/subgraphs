@@ -225,7 +225,7 @@
           "template": "banker-joe.template.yaml",
           "messari": "messari/banker-joe-avalanche",
           "dmelotik": "dmelotik/banker-joe-avalanche",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       },
       "tectonic": {
@@ -290,7 +290,7 @@
           "messari": "messari/dforce-arbitrum",
           "tnkrxyz": "tnkrxyz/dforce-arbitrum",
           "dmelotik": "dmelotik/dforce-arbitrum",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "avalanche": {
           "template": "dforce.template.yaml",
@@ -367,13 +367,13 @@
           "template": "rari-fuse.template.yaml",
           "messari": "messari/rari-fuse-arbitrum",
           "dmelotik": "dmelotik/fuse-official",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         },
         "ethereum": {
           "template": "rari-fuse.template.yaml",
           "messari": "messari/rari-fuse-ethereum",
           "dmelotik": "dmelotik/fuse-mainnet",
-          "deploy-on-merge": true
+          "deploy-on-merge": false
         }
       },
       "scream": {

@@ -75,3 +75,5 @@ Smart contracts: https://github.com/compound-finance/compound-protocol
 Contracts: https://github.com/CreamFi/cream-deployment
 
 Deployed addresses: https://docs.cream.finance/lending/lending-contract-address
+
+CREAM's api: https://api.cream.finance/api/documentations

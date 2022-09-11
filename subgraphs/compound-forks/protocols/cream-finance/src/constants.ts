@@ -102,6 +102,6 @@ export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }
 
-// First ethereum block on october 17, 2021
+// First ethereum block on October 27, 2021
 // we are cutting off activity after this block since CREAM ethereum was "deprecated"
-export const ETH_CUTOFF_BLOCK = 13535273;
+export const ETH_CUTOFF_BLOCK = 13499798;
