@@ -63,7 +63,7 @@ export class ApeswapBscConfigurations implements Configurations {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.TIMESTAMP;
+    return RewardIntervalType.BLOCK;
   }
   getRewardTokenRate(): BigInt {
     return BIGINT_ZERO;
