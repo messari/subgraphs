@@ -233,7 +233,7 @@ type TokenDailySnapshot @entity {
   "Number of tokenholders at snapshot"
   tokenHolders: BigInt!
   "Number of delegates at snapshot"
-  totalDelegates: BigInt!
+  delegates: BigInt!
   "Block number of last block in snapshot"
   blockNumber: BigInt!
   "Timestamp of snapshot"
