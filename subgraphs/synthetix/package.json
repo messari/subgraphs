@@ -1,0 +1,20 @@
+{
+  "name": "reference-subgraph",
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write .",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ this-username-is-taken/reference-subgraph",
+    "create-local": "graph create --node http://localhost:8020/ this-username-is-taken/reference-subgraph",
+    "remove-local": "graph remove --node http://localhost:8020/ this-username-is-taken/reference-subgraph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 this-username-is-taken/reference-subgraph"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.26.0",
+    "@graphprotocol/graph-ts": "0.24.1"
+  },
+  "devDependencies": {
+    "prettier": "2.6.1"
+  }
+}
