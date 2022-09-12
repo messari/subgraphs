@@ -937,6 +937,8 @@ export function _handleLiquidate(
     ]);
     return;
   }
+
+  // account for borrow being repaid by liquidator
   let positionId = subtractPosition(
     protocol,
     repayTokenMarket,
@@ -952,6 +954,29 @@ export function _handleLiquidate(
     ]);
     return;
   }
+
+  // account for borrower losing aToken (collateral)
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!))
+  subtractPosition(
+    protocol,
+    market, // collateral market
+    account,
+    aTokenContract.try_balanceOf(borrower),
+    PositionSide.LENDER,
+    -1, // not incrementing to not double count
+    event
+  )
+
+  // account for liquidator gaining aToken (seized collateral)
+  addPosition(
+    protocol,
+    market, // collateral market
+    liquidatorAccount,
+    aTokenContract.try_balanceOf(liquidator),
+    PositionSide.LENDER,
+    -1, // TODO: how do we classify a liquidator gaining collateral
+    event
+  )
 
   liquidate.position = positionId;
   liquidate.blockNumber = event.block.number;

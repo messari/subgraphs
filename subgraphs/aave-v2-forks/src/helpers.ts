@@ -1003,7 +1003,10 @@ export function getOrCreateMarket(
   return market;
 }
 
-export function getBorrowBalance(market: Market, account: Address): ethereum.CallResult<BigInt> {
+export function getBorrowBalance(
+  market: Market,
+  account: Address
+): ethereum.CallResult<BigInt> {
   let sDebtTokenBalance = BIGINT_ZERO;
   let vDebtTokenBalance = BIGINT_ZERO;
 
@@ -1011,14 +1014,18 @@ export function getBorrowBalance(market: Market, account: Address): ethereum.Cal
   if (market.vToken) {
     let vTokenContract = AToken.bind(Address.fromString(market.vToken));
     let tryVDebtTokenBalance = vTokenContract.try_balanceOf(account);
-    vDebtTokenBalance = tryVDebtTokenBalance.reverted ? BIGINT_ZERO : tryVDebtTokenBalance.value;
+    vDebtTokenBalance = tryVDebtTokenBalance.reverted
+      ? BIGINT_ZERO
+      : tryVDebtTokenBalance.value;
   }
 
   // get account's balance of stable debt
   if (market.sToken) {
     let sTokenContract = AToken.bind(Address.fromString(market.sToken));
     let trySDebtTokenBalance = sTokenContract.try_balanceOf(account);
-    sDebtTokenBalance = trySDebtTokenBalance.reverted ? BIGINT_ZERO : trySDebtTokenBalance.value;
+    sDebtTokenBalance = trySDebtTokenBalance.reverted
+      ? BIGINT_ZERO
+      : trySDebtTokenBalance.value;
   }
 
   let totalDebt = sDebtTokenBalance.plus(vDebtTokenBalance);
