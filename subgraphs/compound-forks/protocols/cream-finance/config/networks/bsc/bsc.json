@@ -1,5 +1,8 @@
 {
   "network": "bsc",
   "factoryAddress": "0x589de0f0ccf905477646599bb3e5c622c84cc0ba",
-  "startBlock": 100320
+  "startBlock": 100320,
+  "graftEnabled": true,
+  "subgraphId": "QmUWSMz3kFJ7CUQnv568epnoLaovvMMEpXXup5VnTfXjC1",
+  "graftStartBlock": 21274756
 }
