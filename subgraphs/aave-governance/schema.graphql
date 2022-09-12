@@ -17,6 +17,21 @@ type Governance @entity {
   "Total number of votes delegated expressed as a BigDecimal normalized value for the token"
   delegatedVotes: BigDecimal!
 
+  "Total Supply of staked token"
+  totalStakedTokenSupply: BigInt!
+  "Total number of staked token holders currently"
+  currentStakedTokenHolders: BigInt!
+  "Total number of staked token holders"
+  totalStakedTokenHolders: BigInt!
+  "Total number of staked token delegates participating on the governance currently"
+  currentStakedTokenDelegates: BigInt!
+  "Total number of staked token delegates that held delegated votes"
+  totalStakedTokenDelegates: BigInt!
+  "Total number of staked token votes delegated expressed in the smallest unit of the token"
+  delegatedStakedTokenVotesRaw: BigInt!
+  "Total number of staked token votes delegated expressed as a BigDecimal normalized value for the token"
+  delegatedStakedTokenVotes: BigDecimal!
+
   "Total number of proposals created"
   proposals: BigInt!
   "Number of proposals currently queued for execution"
@@ -202,6 +217,15 @@ type TokenHolder @entity {
   totalTokensHeldRaw: BigInt!
   "Total amount of tokens ever held by this address expressed as a BigDecimal normalized value"
   totalTokensHeld: BigDecimal!
+
+  "Token balance of this address expressed in the smallest unit of the token"
+  stakedTokenBalanceRaw: BigInt!
+  "Token balance of this address expressed as a BigDecimal normalized value"
+  stakedTokenBalance: BigDecimal!
+  "Total amount of tokens ever held by this address expressed in the smallest unit of the token"
+  totalStakedTokensHeldRaw: BigInt!
+  "Total amount of tokens ever held by this address expressed as a BigDecimal normalized value"
+  totalStakedTokensHeld: BigDecimal!
 }
 
 type Delegate @entity {
@@ -212,6 +236,11 @@ type Delegate @entity {
   delegatedVotesRaw: BigInt!
   "Amount of votes delegated to this delegate to be used on proposal votings expressed as a BigDecimal normalized value"
   delegatedVotes: BigDecimal!
+
+  "Amount of staked token votes delegated to this delegate to be used on proposal votings expressed in the smallest unit of the token"
+  delegatedStakedTokenVotesRaw: BigInt!
+  "Amount of staked token votes delegated to this delegate to be used on proposal votings expressed as a BigDecimal normalized value"
+  delegatedStakedTokenVotes: BigDecimal!
 
   "Total token holders that this delegate represents"
   tokenHoldersRepresentedAmount: Int!
@@ -233,10 +262,14 @@ type TokenDailySnapshot @entity {
   id: ID!
   "Total Supply at snapshot"
   totalSupply: BigInt!
-  "Number of tokenholders at snapshot"
+  "Number of token holders at snapshot"
   tokenHolders: BigInt!
+  "Number of staked token holders at snapshot"
+  stakedTokenHolders: BigInt!
   "Number of delegates at snapshot"
-  totalDelegates: BigInt!
+  delegates: BigInt!
+  "Number of staked token delegates at snapshot"
+  stakedTokenDelegates: BigInt!
   "Block number of last block in snapshot"
   blockNumber: BigInt!
   "Timestamp of snapshot"
