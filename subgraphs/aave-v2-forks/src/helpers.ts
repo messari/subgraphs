@@ -1012,7 +1012,7 @@ export function getBorrowBalance(
 
   // get account's balance of variable debt
   if (market.vToken) {
-    let vTokenContract = AToken.bind(Address.fromString(market.vToken));
+    let vTokenContract = AToken.bind(Address.fromString(market.vToken!));
     let tryVDebtTokenBalance = vTokenContract.try_balanceOf(account);
     vDebtTokenBalance = tryVDebtTokenBalance.reverted
       ? BIGINT_ZERO
@@ -1021,7 +1021,7 @@ export function getBorrowBalance(
 
   // get account's balance of stable debt
   if (market.sToken) {
-    let sTokenContract = AToken.bind(Address.fromString(market.sToken));
+    let sTokenContract = AToken.bind(Address.fromString(market.sToken!));
     let trySDebtTokenBalance = sTokenContract.try_balanceOf(account);
     sDebtTokenBalance = trySDebtTokenBalance.reverted
       ? BIGINT_ZERO

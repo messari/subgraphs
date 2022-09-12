@@ -402,7 +402,6 @@ export function _handleReserveDataUpdated(
     .minus(market.liquidityIndex)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
-  log.warning("prev liquidity index: {}", [market.liquidityIndex.toString()]);
   market.liquidityIndex = liquidityIndex; // must update to current liquidity index
   let newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
@@ -956,7 +955,7 @@ export function _handleLiquidate(
   }
 
   // account for borrower losing aToken (collateral)
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!))
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   subtractPosition(
     protocol,
     market, // collateral market
@@ -965,7 +964,7 @@ export function _handleLiquidate(
     PositionSide.LENDER,
     -1, // not incrementing to not double count
     event
-  )
+  );
 
   // account for liquidator gaining aToken (seized collateral)
   addPosition(
@@ -976,7 +975,7 @@ export function _handleLiquidate(
     PositionSide.LENDER,
     -1, // TODO: how do we classify a liquidator gaining collateral
     event
-  )
+  );
 
   liquidate.position = positionId;
   liquidate.blockNumber = event.block.number;
