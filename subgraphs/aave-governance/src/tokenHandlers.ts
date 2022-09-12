@@ -211,7 +211,7 @@ export function _handleStakedTokenTransfer(
 
   if (
     toHolderPreviousBalance == BIGINT_ZERO &&
-    toHolder.tokenBalanceRaw > BIGINT_ZERO
+    toHolder.stakedTokenBalanceRaw > BIGINT_ZERO
   ) {
     governance.currentStakedTokenHolders =
       governance.currentStakedTokenHolders.plus(BIGINT_ONE);
