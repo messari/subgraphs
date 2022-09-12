@@ -17,7 +17,7 @@ https.get(url, res => {
     });
     res.on('end', () => {
         data = JSON.parse(data);
-        const firstLevelKeys = Object.keys(data.subgraphs)
+        const firstLevelKeys = Object.keys(data.subgraphs);
         firstLevelKeys.forEach(x => {
             Object.keys(data.subgraphs[x]).forEach(y => {
                 Object.keys(data.subgraphs[x][y]).forEach(network => {
@@ -27,9 +27,9 @@ https.get(url, res => {
                     } else {
                         liveDeployments[data.subgraphs[x][y][network].messari] = "";
                     }
-                })
-            })
-        })
+                });
+            });
+        });
 
         const depIdPromArr = Object.keys(liveDeployments).map(key => {
             const options = {
@@ -37,17 +37,17 @@ https.get(url, res => {
                 path: '/subgraphs/name/' + key,
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                },
+                    'Content-Type': 'application/json'
+                }
             };
             const dataQuery = JSON.stringify({
                 query: `query DeploymentIDs {
                     _meta {
                       deployment
                     }
-                  }`,
+                  }`
             });
-            return getData(key, dataQuery, options)
+            return getData(key, dataQuery, options);
         })
 
 
@@ -59,31 +59,27 @@ https.get(url, res => {
                         formattedDeployments[Object.keys(liveDeployments)[idx]] = {
                             IPFS_Hash: dep._meta.deployment || 'N/A',
                             issues: []
-                        }
+                        };
                     }
                 }
                 if (!formattedDeployments[Object.keys(liveDeployments)[idx]]) {
                     formattedDeployments[Object.keys(liveDeployments)[idx]] = {
                         IPFS_Hash: 'N/A',
                         issues: ["Could not pull either current subgraph IPFS hash given subgraph name. Query attempted on _meta entity at endpoint https://api.thegraph.com/subgraphs/name/" + Object.keys(liveDeployments)[idx]]
-                    }
+                    };
                 }
                 if (listedNoName[Object.keys(liveDeployments)[idx]]) {
                     formattedDeployments[Object.keys(liveDeployments)[idx]].issues.push("deployment.json file does not have subgraph name string under the 'messari' key. Attempted to construct subgraph name from 'messari/(PROTOCOL)-(NETWORK)");
                 }
-                // if (!dep._meta.deployment) {
-                //     formattedDeployments[Object.keys(liveDeployments)[idx]].issues.push("Could not pull either current subgraph IPFS hash given subgraph name. Query attempted on _meta entity at endpoint https://api.thegraph.com/subgraphs/name/" + Object.keys(liveDeployments)[idx])
-                // }
             })
 
             const storeData = () => {
                 try {
-                    const nowDate = new Date().getMonth().toString() + '-' + new Date().getDate().toString() + '-' + new Date().getFullYear().toString()
+                    const nowDate = new Date().getMonth().toString() + '-' + new Date().getDate().toString() + '-' + new Date().getFullYear().toString();
                     const jsonPath = path.join(__dirname, 'Deployments_' + nowDate + '.json');
-                    fs.writeFileSync(jsonPath, JSON.stringify(formattedDeployments, null, '\t'))
-
+                    fs.writeFileSync(jsonPath, JSON.stringify(formattedDeployments, null, '\t'));
                 } catch (err) {
-                    console.error(err)
+                    console.error(err);
                 }
             }
             storeData()
@@ -102,10 +98,10 @@ async function getData(url, dataQuery, options) {
             });
             res.on('end', () => {
                 try {
-                    const parsedData = { ...JSON.parse(data).data, subgraphName: url }
-                    resolve(parsedData)
+                    const parsedData = { ...JSON.parse(data).data, subgraphName: url };
+                    resolve(parsedData);
                 } catch (e) {
-                    reject(e.message)
+                    reject(e.message);
                 }
             });
         });

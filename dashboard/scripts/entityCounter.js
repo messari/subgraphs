@@ -14,7 +14,7 @@ https.get(url, (res) => {
             Object.values(protocolsOnType).forEach((protocolObj) => {
                 deployments = [
                     ...deployments,
-                    ...Object.values(protocolObj).map((deploymentString) => deploymentString.split("name/")[1].split("/")[1]),
+                    ...Object.values(protocolObj).map((deploymentString) => deploymentString.split("name/")[1].split("/")[1])
                 ];
             });
         });
@@ -51,7 +51,7 @@ https.get(url, (res) => {
         let entityCount = 0;
 
         Promise.all(statusQueryPromiseArr).then((val) => {
-            val.forEach((dep, idx) => {
+            val.forEach((dep) => {
                 Object.values(dep).forEach((obj) => {
                     if (obj?.entityCount) {
                         entityCount += parseInt(obj?.entityCount);
