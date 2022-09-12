@@ -1,7 +1,25 @@
 import axios from 'axios';
 import moment from "moment";
 import { protocolErrorMessages } from './errorSchemas.js';
-import { monitorVersion, sleep } from './util.js';
+import { monitorVersion, ProtocolTypeEntityName, sleep } from './util.js';
+
+let colorIndex = 0;
+const colorsArray = [
+    0x32CD32,
+    0xff0000,
+    0x0000FF,
+    0xFFFF00,
+    0x800080,
+    0xFFA500,
+    0xFFFFFF,
+    0x964B00,
+    0xADD8E6,
+    0x006400,
+    0x30D5C8,
+    0xFF6700,
+    0xCBC3E3,
+    0x953553,
+];
 
 export async function getDiscordMessages(messages) {
     const tempMessages = await fetchMessages(messages[messages.length - 1]?.id || "");
@@ -56,8 +74,8 @@ export async function clearChannel() {
     }
 }
 
-export async function sendDiscordMessage(message) {
-    if (!Object.keys(message)?.length > 0 || !message) {
+export async function sendDiscordMessage(messageObjects, protocolName) {
+    if (!Object.keys(messageObjects)?.length > 0 || !messageObjects) {
         return null;
     }
     const baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages";
@@ -66,14 +84,28 @@ export async function sendDiscordMessage(message) {
         "Content-Type": "application/json",
     }
 
-    const postJSON = JSON.stringify({ "content": "TEST", "embeds": message });
+    let color = 0x32CD32;
+
+    colorIndex += 1;
+    if (colorIndex < colorsArray.length) {
+        color = colorsArray[colorIndex];
+    } else {
+        color = colorsArray[colorIndex % colorsArray.length]
+    }
+
+    messageObjects = messageObjects.map(x => {
+        x.color = color;
+        return x;
+    });
+
+    const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on ${protocolName}**\n`, "embeds": messageObjects });
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return null;
     } catch (err) {
         console.log('ERROR', err.response)
         if (err.response.status === 429) {
-            return message;
+            return messageObjects;
         } else {
             console.log(err.response.data.message)
             return null;
@@ -88,73 +120,50 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol) {
         title: "Indexing Errors",
         description: 'These subgraphs encountered a fatal error in indexing',
         fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Indexed %', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
-        timestamp: new Date().toISOString(),
-    };
-    const protocolErrorEmbed = {
-        title: "Protocol Errors",
-        description: 'After mapping through all of the subgraph deployments for this protocol, The errors listed in this section were detected within protocol level data.',
-        fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Type', value: '\u200b', inline: true }, { name: 'Value', value: '\u200b', inline: true }, { name: 'Issue Description', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
-        timestamp: new Date().toISOString(),
+        footer: { text: monitorVersion }
     };
 
-    deploymentsOnProtocol.forEach(depo => {
-        if (!!depo.indexingError && indexingErrorEmbed.fields.join(" - ").length < 1400) {
-            indexingErrorEmbed.fields.push({ name: '\u200b', value: depo.network, inline: true }, { name: '\u200b', value: depo.indexedPercentage + '%', inline: true }, { name: '\u200b', value: '\u200b', inline: false });
+    const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
+
+    deploymentsOnProtocol.forEach((depo) => {
+        let networkString = depo.network;
+        if (depo.pending) {
+            networkString += ' (PENDING)'
         }
+        const protocolErrorEmbed = {
+            title: `Protocol Errors on ${protocol}-${networkString}`,
+            color: placeholderColor,
+            description: 'After mapping through all of the subgraph deployments for this protocol, The errors listed in this section were detected within protocol level data.',
+            fields: [],
+            footer: { text: monitorVersion }
+        };
+        if (!!depo.indexingError) {
+            indexingErrorEmbed.color = placeholderColor;
+            indexingErrorEmbed.fields.push({ name: '\u200b', value: networkString, inline: true }, { name: '\u200b', value: depo.indexedPercentage + '%', inline: true }, { name: '\u200b', value: '\u200b', inline: false });
+        }
+        let errorsOnDeployment = false;
         Object.entries(depo.protocolErrors).forEach(([errorType, errorArray]) => {
             const protocolRows = [];
             if (errorArray.length > 0) {
-                errorArray.forEach((error, idx) => {
-                    let networkCol = '\u200b';
-                    if (idx === 0) {
-                        networkCol = depo.network;
-                    }
-                    protocolRows.push({ name: '\u200b', value: networkCol, inline: true }, { name: '\u200b', value: errorType, inline: true }, { name: '\u200b', value: error, inline: true }, { name: '\u200b', value: protocolErrorMessages[errorType], inline: true }, { name: '\u200b', value: '\u200b', inline: false })
+                if (errorsOnDeployment === false) {
+                    errorsOnDeployment = true;
+                }
+                errorArray.forEach((error) => {
+                    protocolRows.push({ name: 'Type', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`"${ProtocolTypeEntityName[depo.protocolType]}"`), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
                 });
             }
             protocolErrorEmbed.fields = [...protocolErrorEmbed.fields, ...protocolRows]
         });
+        if (protocolErrorEmbed.fields.length > 1) {
+            protocolErrorEmbed.url = `https://subgraphs.messari.io/subgraph?endpoint=${depo.url}&tab=protocol`;
+            embedObjects.push(protocolErrorEmbed);
+        }
     });
 
     if (indexingErrorEmbed.fields.length > 3) {
-        embedObjects.push(indexingErrorEmbed);
+        embedObjects.unshift(indexingErrorEmbed);
     }
 
-    if (protocolErrorEmbed.fields.length > 5) {
-        embedObjects.push(protocolErrorEmbed);
-    }
-
-
-
-
-    // Object.keys(deploymentsOnProtocol).forEach(depo => {
-    //     if (!!deploymentsOnProtocol[depo].indexingError && protocolErrors.join(" - ").length < 1400) {
-    //         protocolErrors.push({ value: depo, inline: true }, { value: deploymentsOnProtocol[depo].indexedPercentage + '%', inline: true }, { name: '\u200b', value: '\u200b', inline: false });
-    //     }
-    // });
-
-    // if (protocolErrors.length > 3) {
-    //     protocolErrorEmbed.fields = protocolErrors;
-    // }
-
-    // Dont send a message/content for each issue category
-    // In script.js create an array? of the different protocols
-    // Pass depos obj to this function, get all depos with key including the current protocol name
-
-
-    // Create a section for each issue type 
-
-    // Display all errors on embedded message, read messages should check if a message has been made on this protocol in the last week. No need to check if certain issues have been triggered yet or not
-
-
-
-    // In scrpt.js protocolsOnType mapping, take protocol name and add as a property in each deployment and push to a protocolNames array
-    // After issues mapping through all deployments, then map through protocolNames array and filter deployments where protocolName key === protocolNames x
-    // Call constructEmbedMsg function to create the embd msg for the protocol.
-    // Send this embed msg to the sendDiscordMessage function
-    // sendDiscordMessage function returns a promise rather than actually making the request at that moment
-    // push this promise to an array
-    // send this array to the function that executes 5 reqs and waits 5 seconds
     if (embedObjects.length > 0) {
         return embedObjects;
     }
