@@ -72,7 +72,7 @@ export class ApeswapBscConfigurations implements Configurations {
     return "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c";
   }
   getRewardToken(): string {
-    return "0x5d47baba0d66083c52009271faf3f50dcc01023c";
+    return "0x603c7f932ed1fc6575303d8fb018fdcbb0f39a95";
   }
   getWhitelistTokens(): string[] {
     return [
