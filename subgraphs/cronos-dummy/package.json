@@ -7,7 +7,7 @@
     "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
     "prepare:build": "graph codegen && graph build",
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
-    "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge} --type=${npm_config_type}"
+    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
   },
   "dependencies": {
     "@graphprotocol/graph-ts": "^0.27.0",
