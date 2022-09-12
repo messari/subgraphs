@@ -1,0 +1,264 @@
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: TroveManager
+    network: arbitrum-one
+    source:
+      address: "0x100EC08129e0FD59959df93a8b914944A3BbD5df"
+      abi: TroveManager
+      startBlock: 5559178
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: TroveManager
+          file: ./abis/TroveManager.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+      eventHandlers:
+        - event: TroveUpdated(indexed address,indexed address,uint256,uint256,uint256,uint8)
+          handler: handleTroveUpdated
+        - event: Redemption(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleRedemption
+        - event: TroveLiquidated(indexed address,indexed address,uint256,uint256,uint8)
+          handler: handleTroveLiquidated
+      file: ./src/mapping/TroveManager.ts
+  - kind: ethereum/contract
+    name: BorrowerOperations
+    network: arbitrum-one
+    source:
+      address: "0x3eEDF348919D130954929d4ff62D626f26ADBFa2"
+      abi: BorrowerOperations
+      startBlock: 5559230
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BorrowerOperations
+          file: ./abis/BorrowerOperations.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+      eventHandlers:
+        - event: VSTBorrowingFeePaid(indexed address,indexed address,uint256)
+          handler: handleVSTBorrowingFeePaid
+        - event: TroveUpdated(indexed address,indexed address,uint256,uint256,uint256,uint8)
+          handler: handleTroveUpdated
+      file: ./src/mapping/BorrowerOperations.ts
+  - name: PriceFeed
+    kind: ethereum/contract
+    network: arbitrum-one
+    source:
+      abi: PriceFeed
+      address: "0xd218Ba424A6166e37A454F8eCe2bf8eB2264eCcA"
+      startBlock: 8225990
+    mapping:
+      file: ./src/mapping/PriceFeed.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      entities:
+        - Token
+      abis:
+        - name: PriceFeed
+          file: ./abis/PriceFeedV2.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+      eventHandlers:
+        - event: TokenPriceUpdated(indexed address,uint256)
+          handler: handleTokenPriceUpdated
+  - kind: ethereum/contract
+    name: ActivePool
+    network: arbitrum-one
+    source:
+      address: "0xBE3dE7fB9Aa09B3Fa931868Fb49d5BA5fEe2eBb1"
+      abi: ActivePool
+      startBlock: 5559192
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: ActivePool
+          file: ./abis/ActivePool.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: PriceFeed
+          file: ./abis/PriceFeedV2.json
+      eventHandlers:
+        - event: ActivePoolAssetBalanceUpdated(address,uint256)
+          handler: handleActivePoolAssetBalanceUpdated
+        - event: ActivePoolVSTDebtUpdated(address,uint256)
+          handler: handleActivePoolVSTDebtUpdated
+      file: ./src/mapping/ActivePool.ts
+  - kind: ethereum/contract
+    name: CollSurplusPool
+    network: arbitrum-one
+    source:
+      address: "0x057fdD5cD208dAA715393982aAf7508350104B04"
+      abi: CollSurplusPool
+      startBlock: 5559219
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: CollSurplusPool
+          file: ./abis/CollSurplusPool.json
+      eventHandlers:
+        - event: CollBalanceUpdated(indexed address,uint256)
+          handler: handleCollBalanceUpdated
+      file: ./src/mapping/CollSurplusPool.ts
+  # As there are not any meaningful events to be generated during the stability pool contracts's creation,
+  # the stability pool for every asset has to be added here manually.
+  - kind: ethereum/contract
+    name: GOHMStabilityPool
+    network: arbitrum-one
+    source:
+      address: "0x6e53D20d674C27b858a005Cf4A72CFAaf4434ECB"
+      abi: StabilityPool
+      startBlock: 5561252
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: PriceFeed
+          file: ./abis/PriceFeedV2.json
+      eventHandlers:
+        - event: StabilityPoolAssetBalanceUpdated(uint256)
+          handler: handleStabilityPoolAssetBalanceUpdated
+        - event: StabilityPoolVSTBalanceUpdated(uint256)
+          handler: handleStabilityPoolVSTBalanceUpdated
+      file: ./src/mapping/StabilityPool.ts
+  - kind: ethereum/contract
+    name: ETHStabilityPool
+    network: arbitrum-one
+    source:
+      address: "0x64cA46508ad4559E1fD94B3cf48f3164B4a77E42"
+      abi: StabilityPool
+      startBlock: 5559567
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: PriceFeed
+          file: ./abis/PriceFeedV2.json
+      eventHandlers:
+        - event: StabilityPoolAssetBalanceUpdated(uint256)
+          handler: handleStabilityPoolAssetBalanceUpdated
+        - event: StabilityPoolVSTBalanceUpdated(uint256)
+          handler: handleStabilityPoolVSTBalanceUpdated
+      file: ./src/mapping/StabilityPool.ts
+  - kind: ethereum/contract
+    name: RENBTCStabilityPool
+    network: arbitrum-one
+    source:
+      address: "0x3282dfAf0fBba4d3E771C4E5F669Cb4E14D8adb0"
+      abi: StabilityPool
+      startBlock: 5559572
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: PriceFeed
+          file: ./abis/PriceFeedV2.json
+      eventHandlers:
+        - event: StabilityPoolAssetBalanceUpdated(uint256)
+          handler: handleStabilityPoolAssetBalanceUpdated
+        - event: StabilityPoolVSTBalanceUpdated(uint256)
+          handler: handleStabilityPoolVSTBalanceUpdated
+      file: ./src/mapping/StabilityPool.ts
+  - kind: ethereum/contract
+    name: GMXStabilityPool
+    network: arbitrum-one
+    source:
+      address: "0x78D46Cecf0AE4757F430d95B2d7Eaa18D7087872"
+      abi: StabilityPool
+      startBlock: 8603751
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: PriceFeed
+          file: ./abis/PriceFeedV2.json
+      eventHandlers:
+        - event: StabilityPoolAssetBalanceUpdated(uint256)
+          handler: handleStabilityPoolAssetBalanceUpdated
+        - event: StabilityPoolVSTBalanceUpdated(uint256)
+          handler: handleStabilityPoolVSTBalanceUpdated
+      file: ./src/mapping/StabilityPool.ts
+  - kind: ethereum/contract
+    name: DPXStabilityPool
+    network: arbitrum-one
+    source:
+      address: "0x0B1Be49dcB62D6cbc27e510361E910a8A30f37A9"
+      abi: StabilityPool
+      startBlock: 9523190
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: PriceFeed
+          file: ./abis/PriceFeedV2.json
+      eventHandlers:
+        - event: StabilityPoolAssetBalanceUpdated(uint256)
+          handler: handleStabilityPoolAssetBalanceUpdated
+        - event: StabilityPoolVSTBalanceUpdated(uint256)
+          handler: handleStabilityPoolVSTBalanceUpdated
+      file: ./src/mapping/StabilityPool.ts

@@ -491,6 +491,16 @@
         }
       }
     },
+    "vesta-finance": {
+      "vesta-finance": {
+        "arbitrum": {
+          "template": "vesta.finance.template.yaml",
+          "messari": "messari/vesta-finance-arbitrum",
+          "corerouter": "corerouter/vesta-finance",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "network": {
       "arweave": {
         "arweave-mainnet": {
