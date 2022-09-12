@@ -2,7 +2,7 @@ import {
   StabilityPool,
   StabilityPoolAssetBalanceUpdated,
   StabilityPoolVSTBalanceUpdated,
-} from "../../generated/StabilityPool/StabilityPool";
+} from "../../generated/ETHStabilityPool/StabilityPool";
 import { getCurrentAssetPrice } from "../entities/token";
 import { updateProtocolUSDLockedStabilityPool } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
