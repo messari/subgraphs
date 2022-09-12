@@ -67,6 +67,15 @@ export function getGovernance(): Governance {
     governance.totalDelegates = BIGINT_ZERO;
     governance.delegatedVotesRaw = BIGINT_ZERO;
     governance.delegatedVotes = BIGDECIMAL_ZERO;
+
+    governance.totalStakedTokenSupply = BIGINT_ZERO;
+    governance.currentStakedTokenHolders = BIGINT_ZERO;
+    governance.totalStakedTokenHolders = BIGINT_ZERO;
+    governance.currentStakedTokenDelegates = BIGINT_ZERO;
+    governance.totalStakedTokenDelegates = BIGINT_ZERO;
+    governance.delegatedStakedTokenVotesRaw = BIGINT_ZERO;
+    governance.delegatedStakedTokenVotes = BIGDECIMAL_ZERO;
+
     governance.proposalsQueued = BIGINT_ZERO;
     governance.proposalsExecuted = BIGINT_ZERO;
     governance.proposalsCanceled = BIGINT_ZERO;
@@ -92,6 +101,8 @@ export function getOrCreateDelegate(address: string): Delegate {
     delegate = new Delegate(address);
     delegate.delegatedVotesRaw = BIGINT_ZERO;
     delegate.delegatedVotes = BIGDECIMAL_ZERO;
+    delegate.delegatedStakedTokenVotesRaw = BIGINT_ZERO;
+    delegate.delegatedStakedTokenVotes = BIGDECIMAL_ZERO;
     delegate.tokenHoldersRepresentedAmount = 0;
     delegate.numberVotes = 0;
     delegate.save();
@@ -114,6 +125,10 @@ export function getOrCreateTokenHolder(address: string): TokenHolder {
     tokenHolder.tokenBalance = BIGDECIMAL_ZERO;
     tokenHolder.totalTokensHeldRaw = BIGINT_ZERO;
     tokenHolder.totalTokensHeld = BIGDECIMAL_ZERO;
+    tokenHolder.stakedTokenBalanceRaw = BIGINT_ZERO;
+    tokenHolder.stakedTokenBalance = BIGDECIMAL_ZERO;
+    tokenHolder.totalStakedTokensHeldRaw = BIGINT_ZERO;
+    tokenHolder.totalStakedTokensHeld = BIGDECIMAL_ZERO;
     tokenHolder.save();
 
     if (address != ZERO_ADDRESS) {
