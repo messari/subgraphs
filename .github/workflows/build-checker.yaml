@@ -1,7 +1,5 @@
 on: 
   push:
-    branches-ignore:
-        - master
 
 jobs:
   Deployment: 
@@ -12,9 +10,8 @@ jobs:
         continue-on-error: true
 
       - uses: actions/checkout@v2
-      - uses: steegecs/Subgraph-Build-Checker@main
+      - uses: steegecs/Subgraph-Build-Checker@test
         with: 
-          HOSTED_SERVICE_ACCESS_TOKEN: ${{ secrets.HOSTED_SERVICE_ACCESS_TOKEN }}
           CHANGED_FILES: "${{ steps.files.outputs.all }}"
           ABSOLUTE_PATH: ${{ github.workspace }}
           GRAPH_DEPLOYMENT_LOCATION: messari
