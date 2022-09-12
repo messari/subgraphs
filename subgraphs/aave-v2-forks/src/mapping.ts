@@ -40,6 +40,7 @@ import {
   addPosition,
   createAccount,
   createInterestRate,
+  getBorrowBalance,
   getOrCreateLendingProtocol,
   getOrCreateMarket,
   getOrCreateToken,
@@ -717,12 +718,11 @@ export function _handleBorrow(
   account.save();
 
   // update position
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let positionId = addPosition(
     protocol,
     market,
     account,
-    aTokenContract.try_balanceOf(accountID), // try getting balance of account
+    getBorrowBalance(market, accountID), // try getting balance of account in debt market
     PositionSide.BORROWER,
     EventType.BORROW,
     event
@@ -808,13 +808,12 @@ export function _handleRepay(
   account.repayCount += 1;
   account.save();
 
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let positionId = subtractPosition(
     protocol,
     market,
     account,
-    aTokenContract.try_balanceOf(accountID), // try getting balance of account
-    PositionSide.LENDER,
+    getBorrowBalance(market, accountID), // try getting balance of account in debt market
+    PositionSide.BORROWER,
     EventType.REPAY,
     event
   );
@@ -938,12 +937,11 @@ export function _handleLiquidate(
     ]);
     return;
   }
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let positionId = subtractPosition(
     protocol,
     repayTokenMarket,
     account, // the borrower
-    aTokenContract.try_balanceOf(borrower), // try getting balance of account
+    getBorrowBalance(repayTokenMarket, borrower), // try getting balance of account in debt market
     PositionSide.BORROWER,
     EventType.LIQUIDATEE,
     event
