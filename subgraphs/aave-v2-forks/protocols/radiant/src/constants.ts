@@ -16,7 +16,7 @@ export const RWETH_ADDRESS = "0x15b53d277af860f51c3e6843f8075007026bbb3a";
 
 export namespace Protocol {
   export const NAME = "Radiant Captital";
-  export const SLUG = "radiant-capital";
+  export const SLUG = "radiant";
   export const SCHEMA_VERSION = "2.0.1";
   export const SUBGRAPH_VERSION = "1.0.1";
   export const METHODOLOGY_VERSION = "1.0.0";
