@@ -545,6 +545,9 @@ type Market @entity {
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
+
+  " Aux: Timestamp of the last time rewards were calculated for this market. "
+  _lastRewardsUpdated: BigInt
   
   ##### Quantitative Data #####
 
