@@ -10,7 +10,6 @@ class Deployment {
     this.slug = args.slug.toLowerCase();
     this.deploy = args.deploy.toLowerCase();
     this.printlogs = args.printlogs.toLowerCase();
-    this.merge = args.merge.toLowerCase();
     this.deployments = {};
     this.scripts = new Map();
   }
