@@ -57,6 +57,9 @@ export const GOHM_ADDRESS = "0x0ab87046fBb341D058F17CBC4c1133F25a20a52f";
 export const FMIM_ADDRESS = "0xd9444bab79720e8223b83e5d913d00c679b44b65";
 export const VESPER_V_DOLLAR_ADDRESS =
   "0x2914e8c1c2c54e5335dc9554551438c59373e807";
+export const FLOAT_MARKET_ADDRESS =
+  "0x898beab27b8d44501de79b946f8d4c67918e1c47";
+export const FLOAT_ADDRESS = "0xb05097849bca421a3f51b249ba6cca4af4b97cb9";
 
 ///////////////////////////
 //// Protocol Specific ////
@@ -64,6 +67,6 @@ export const VESPER_V_DOLLAR_ADDRESS =
 
 export const PROTOCOL_NAME = "Rari Fuse";
 export const PROTOCOL_SLUG = "rari-fuse";
-export const SUBGRAPH_VERSION = "1.1.4";
+export const SUBGRAPH_VERSION = "1.1.5";
 export const SCHEMA_VERSION = "2.0.1";
 export const METHODOLOGY_VERSION = "1.0.0";
