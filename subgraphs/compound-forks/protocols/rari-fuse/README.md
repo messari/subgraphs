@@ -84,6 +84,7 @@ Fuse has had a number of hacks throughout it's life. There are numerous price or
   - This new price is calculated from our price library if the token price is outside of the threshold ($0.50-$2.00) as a backup
 - There was a weak price oracle exploit done on a FLOAT market on Janruary 14th, 2022. https://twitter.com/FloatProtocol/status/1482113645903446019
   - To fix the uncharacteristic spike we use another price oracle to get the price.
+  - Transaction: https://etherscan.io/tx/0x40db7bd89d2a3f7df2793ba4f5be9a2ca93463d6bb6af024e5cd1b73ff827248
 
 ## Reference and Useful Links
 
