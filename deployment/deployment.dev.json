@@ -3352,7 +3352,14 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      },
+      }
+    }
+  },
+  "dydx-governance": {
+    "schema": "governance",
+    "base": "aave-governance",
+    "protocol": "dydx-governance",
+    "deployments": {
       "dydx-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3377,7 +3384,7 @@
   "angle-governance": {
     "schema": "governance",
     "base": "openzeppelin-governor",
-    "protocol": "angle",
+    "protocol": "angle-governance",
     "deployments": {
       "angle-governance-ethereum": {
         "network": "ethereum",
@@ -3397,7 +3404,14 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      },
+      }
+    }
+  },
+  "code4rena-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "code4rena-governance",
+    "deployments": {
       "code4rena-governance-polygon": {
         "network": "polygon",
         "status": "dev",
@@ -3416,7 +3430,14 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      },
+      }
+    }
+  },
+  "ens-governance-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "ens-governance",
+    "deployments": {
       "ens-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3435,7 +3456,14 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      },
+      }
+    }
+  },
+  "euler-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "euler-governance",
+    "deployments": {
       "euler-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3454,7 +3482,14 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      },
+      }
+    }
+  },
+  "fei-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "fei-governance",
+    "deployments": {
       "fei-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3473,7 +3508,14 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      },
+      }
+    }
+  },
+  "hop-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "hop-governance",
+    "deployments": {
       "hop-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3492,7 +3534,14 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      },
+      }
+    }
+  },
+  "silo-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "silo-governance",
+    "deployments": {
       "silo-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3511,7 +3560,14 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      },
+      }
+    }
+  },
+  "truefi-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "truefi-governance",
+    "deployments": {
       "truefi-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3530,7 +3586,14 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      },
+      }
+    }
+  },
+  "unlock-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "unlock-governance",
+    "deployments": {
       "unlock-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
