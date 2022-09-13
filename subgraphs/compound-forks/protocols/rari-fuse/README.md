@@ -75,6 +75,14 @@ Count of Unique Addresses which have interacted with the protocol via any transa
     - A potential fix is to recalculate TVL in every market each time `AccrueInterest` emits. This would slow down syncing as lots of contract calls would be introduced.
   - `fMIM` seems to have price oracle manipulation between 2/1/22 - 2/4/22 so I took the average price and overrided any transactions within those timestamps
 
+## Fuse Issues and How it affects the subgraph
+
+Fuse has had a number of hacks throughout it's life. There are numerous price oracle manipulation hacks
+
+- Vesper pool (0x2914e8c1c2c54e5335dc9554551438c59373e807) exhibited price oracle manipulation on 11/2/2021 and 12/30/2021
+  - To correct the erroneous prices we override the pricing during those points in time to prevent unrealilistic numbers in our subgraph
+  - This new price is calculated from our price library if the token price is outside of the threshold ($0.50-$2.00) as a backup
+
 ## Reference and Useful Links
 
 Protocol: https://rari.capital/

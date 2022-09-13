@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { latestSchemaVersion } from "../constants";
 import { useNavigate } from "react-router";
 import { ApolloClient, NormalizedCacheObject, useQuery, useLazyQuery } from "@apollo/client";
-import { NewClient, parseSubgraphName, toPercent } from "../utils";
+import { formatIntToFixed2, NewClient, parseSubgraphName, toPercent } from "../utils";
 import { ProtocolQuery } from "../queries/protocolQuery";
 import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
 import { useEffect } from "react";
@@ -38,13 +38,6 @@ const StyledDeployment = styled(Card)<{
     statusColor = "white";
   }
 
-  const indexedStyles =
-    ($styleRules.fatalError || $styleRules.success) &&
-    `
-    .indexed {
-      color: ${statusColor};
-    }
-  `;
   return `
     background: rgba(22,24,29,0.9);
     background: linear-gradient(0deg, rgba(22,24,29,0.9) 0%, ${statusColor} 95%);
@@ -59,7 +52,9 @@ const StyledDeployment = styled(Card)<{
       box-shadow: 0 0 2px 1px ${alpha(theme.palette.primary.main, 0.6)};
     }
     
-    ${indexedStyles}
+    .indexed {
+      color: ${statusColor};
+    }
   `;
 });
 
@@ -69,6 +64,9 @@ interface DeploymentProps {
   subgraphID: string;
   clientIndexing: ApolloClient<NormalizedCacheObject>;
   currentDeployment: Boolean;
+  statusReturned: any;
+  statusLoading: any;
+  errorIndexing: any;
 }
 
 // This component is for each individual subgraph
@@ -78,7 +76,16 @@ export const Deployment = ({
   subgraphID,
   clientIndexing,
   currentDeployment,
+  statusReturned,
+  statusLoading,
+  errorIndexing
 }: DeploymentProps) => {
+  let statusKey = "";
+  let status: { [x: string]: any } = {};
+  if (statusReturned) {
+    statusKey = Object.keys(statusReturned).find(x => x.includes(networkName) && x.includes(subgraphID.split('-').join('_'))) || Object.keys(statusReturned)[0];
+    status = statusReturned[statusKey];
+  }
   const [endpointURL, setEndpointURL] = useState(deployment);
   const navigate = useNavigate();
   const navigateToSubgraph = (url: string) => () => {
@@ -88,21 +95,8 @@ export const Deployment = ({
     }
     navigate(`subgraph?endpoint=${url}&tab=protocol` + versionParam);
   };
-  // Pull the subgraph name to use as the variable input for the indexing status query
-  const subgraphName = parseSubgraphName(deployment);
-  const deploymentId = deployment.split("id/")[1];
-  const {
-    data: status,
-    error: errorIndexing,
-    loading: statusLoading,
-  } = useQuery(SubgraphStatusQuery(deployment), {
-    variables: { subgraphName, deploymentIds: [deploymentId ? deploymentId : ""] },
-    client: clientIndexing,
-  });
-  let statusData = status?.indexingStatusForCurrentVersion;
-  if (!currentDeployment) {
-    statusData = status?.indexingStatusForPendingVersion;
-  }
+
+  let statusData = status;
   let { nonFatalErrors, fatalError, synced } = statusData ?? {};
   if (status?.indexingStatuses) {
     statusData = status?.indexingStatuses[0];
@@ -131,7 +125,7 @@ export const Deployment = ({
 
   useEffect(() => {
     if (error || errorIndexing) {
-      console.log(deployment, "DEPLOYMENT ERR", error, errorIndexing, status, statusData, subgraphName);
+      console.log(deployment, "DEPLOYMENT ERR", error, errorIndexing, status);
     }
   }, [error]);
 
@@ -162,32 +156,17 @@ export const Deployment = ({
     statusColor = "#58BC82";
   }
 
-  // const subgraphDataClient = useMemo(() => NewClient("https://api.thegraph.com/explorer/graphql"), []);
+  let statusDataOnChain: { [x: string]: any } = {};
+  if (status?.chains?.length > 0) {
+    statusDataOnChain = status?.chains[0];
+  }
 
-  // const [getSubgraphData, {
-  //   data: subgraphData
-  // }] = useLazyQuery(subgraphDataQuery, { variables: { subgraphName: data?.protocols[0]?.slug + '-' + networkName }, client: subgraphDataClient })
-
-  // useEffect(() => {
-  //   if (data) {
-  //     getSubgraphData()
-  //   }
-  // }, [data])
-
-  // console.log(subgraphData)
-
-  const indexed = synced
+  const indexed = formatIntToFixed2(synced
     ? 100
     : toPercent(
-        statusData?.chains[0]?.latestBlock?.number - statusData?.chains[0]?.earliestBlock?.number || 0,
-        statusData?.chains[0]?.chainHeadBlock?.number - statusData?.chains[0]?.earliestBlock?.number,
-      );
-
-  // // const indexingRatio = (current block - earliest timeseries block)/(chain head block - earliest timeseries block) = ratio
-  // const indexingRatio = (statusData?.chains[0]?.latestBlock?.number - statusData?.chains[0]?.earliestBlock?.number) / (statusData?.chains[0]?.chainHeadBlock?.number - statusData?.chains[0]?.earliestBlock?.number)
-  // // (current time - deployed at time + ratio(deployed at time))/ratio = x
-  // let deployedAt = 1 //HIT THE NEW ENDPOINT AND GET deployedAt time
-  // const indexingETA = (Date.now() - deployedAt + indexingRatio * deployedAt) / indexingRatio
+      statusDataOnChain?.latestBlock?.number - statusDataOnChain?.earliestBlock?.number || 0,
+      statusDataOnChain?.chainHeadBlock?.number - statusDataOnChain?.earliestBlock?.number,
+    ));
 
   return (
     <TableRow sx={{ width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }} onClick={navigateToSubgraph(endpointURL)}>
@@ -208,18 +187,18 @@ export const Deployment = ({
       </TableCell>
       <TableCell sx={{ padding: "6px", textAlign: "right" }}>
         <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-          {Number(statusData?.chains[0]?.earliestBlock?.number)?.toLocaleString()}
+          {Number(statusDataOnChain?.earliestBlock?.number)?.toLocaleString()}
         </Typography>
       </TableCell>
       <TableCell sx={{ padding: "6px", textAlign: "right" }}>
         <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-          {Number(statusData?.chains[0]?.latestBlock?.number)?.toLocaleString() ||
+          {Number(statusDataOnChain?.latestBlock?.number)?.toLocaleString() ||
             Number(data?._meta?.block?.number)?.toLocaleString()}
         </Typography>
       </TableCell>
       <TableCell sx={{ padding: "6px", textAlign: "right" }}>
         <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-          {Number(statusData?.chains[0]?.chainHeadBlock?.number)?.toLocaleString() || "?"}
+          {Number(statusDataOnChain?.chainHeadBlock?.number)?.toLocaleString() || "?"}
         </Typography>
       </TableCell>
       <TableCell sx={{ padding: "6px", textAlign: "right" }}>
