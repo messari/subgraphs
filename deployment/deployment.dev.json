@@ -2663,7 +2663,7 @@
   },
   "apeswap": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "apeswap",
     "deployments": {
       "apeswap-bsc": {
@@ -2708,7 +2708,7 @@
   },
   "mm-finance": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "mm-finance",
     "deployments": {
       "mm-finance-polygon": {
@@ -2753,7 +2753,7 @@
   },
   "quickswap": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "quickswap",
     "deployments": {
       "quickswap-polygon": {
@@ -2779,7 +2779,7 @@
   },
   "solarbeam": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "solarbeam",
     "deployments": {
       "solarbeam-moonriver": {
@@ -2805,7 +2805,7 @@
   },
   "spiritswap": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "spiritswap",
     "deployments": {
       "spiritswap-fantom": {
@@ -2831,7 +2831,7 @@
   },
   "spookyswap": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "spookyswap",
     "deployments": {
       "spookyswap-fantom": {
@@ -2857,7 +2857,7 @@
   },
   "sushiswap": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "sushiswap",
     "deployments": {
       "sushiswap-arbitrum": {
@@ -3092,7 +3092,7 @@
   },
   "trader-joe": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "trader-joe",
     "deployments": {
       "trader-joe-avalanche": {
@@ -3118,7 +3118,7 @@
   },
   "trisolaris": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "trisolaris",
     "deployments": {
       "trisolaris-aurora": {
@@ -3144,7 +3144,7 @@
   },
   "ubeswap": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "ubeswap",
     "deployments": {
       "ubeswap-celo": {
@@ -3170,7 +3170,7 @@
   },
   "uniswap-v2": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "uniswap-v2",
     "deployments": {
       "uniswap-v2-ethereum": {
@@ -3196,7 +3196,7 @@
   },
   "vvs-finance": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "vvs-finance",
     "deployments": {
       "vvs-finance-cronos": {
@@ -3222,7 +3222,7 @@
   },
   "honeyswap": {
     "schema": "dex-amm",
-    "base": "uniswap-fork",
+    "base": "uniswap-forks",
     "protocol": "honeyswap",
     "deployments": {
       "honeyswap-gnosis": {
