@@ -808,7 +808,7 @@ type _MasterChef @entity {
   id: ID!
 
   " Address of the masterchef contract "
-  address: String!
+  address: String
 
   " Total allocation point of all staking pools "
   totalAllocPoint: BigInt!

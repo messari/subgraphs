@@ -3100,7 +3100,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
