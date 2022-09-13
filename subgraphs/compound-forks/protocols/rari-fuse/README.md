@@ -82,6 +82,9 @@ Fuse has had a number of hacks throughout it's life. There are numerous price or
 - Vesper pool (0x2914e8c1c2c54e5335dc9554551438c59373e807) exhibited price oracle manipulation on 11/2/2021 and 12/30/2021
   - To correct the erroneous prices we override the pricing during those points in time to prevent unrealilistic numbers in our subgraph
   - This new price is calculated from our price library if the token price is outside of the threshold ($0.50-$2.00) as a backup
+- There was a weak price oracle exploit done on a FLOAT market on Janruary 14th, 2022. https://twitter.com/FloatProtocol/status/1482113645903446019
+  - To fix the uncharacteristic spike we use another price oracle to get the price.
+  - Transaction: https://etherscan.io/tx/0x40db7bd89d2a3f7df2793ba4f5be9a2ca93463d6bb6af024e5cd1b73ff827248
 
 ## Reference and Useful Links
 
