@@ -9,7 +9,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.8",
+          "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -28,7 +28,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.8",
+          "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -47,7 +47,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.8",
+          "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -66,7 +66,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.8",
+          "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -85,7 +85,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.8",
+          "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -811,7 +811,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -1256,7 +1256,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -1275,7 +1275,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2642,10 +2642,10 @@
     "deployments": {
       "rari-vaults-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.4.1",
+          "subgraph": "1.4.2",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -3100,7 +3100,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -3567,7 +3567,7 @@
         },
         "deployment-ids": {
           "hosted-service": "vesper-ethereum",
-          "decentralized-network": "bancor-v3-ethereum"
+          "decentralized-network": "vesper-ethereum"
         },
         "files": {
           "template": "vesper.finance.template.yaml"
