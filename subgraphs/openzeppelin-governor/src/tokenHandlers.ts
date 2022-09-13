@@ -121,7 +121,7 @@ export function _handleTransfer(
   let dailySnapshot = getOrCreateTokenDailySnapshot(event.block);
   dailySnapshot.totalSupply = governance.totalTokenSupply;
   dailySnapshot.tokenHolders = governance.currentTokenHolders;
-  dailySnapshot.totalDelegates = governance.totalDelegates;
+  dailySnapshot.delegates = governance.currentDelegates;
   dailySnapshot.blockNumber = event.block.number;
   dailySnapshot.timestamp = event.block.timestamp;
   dailySnapshot.save();

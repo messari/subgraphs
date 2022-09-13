@@ -90,23 +90,23 @@ export const alertProtocolErrors = async (discordMessages, deployments, queriesT
     })
 
     const alertedErrors = {
-        tvlRange: [],
-        cumulativeSupplySideRev: [],
-        cumulativeProtocolSideRev: [],
-        cumulativeTotalRev: [],
-        cumulativeVol: [],
+        totalValueLockedUSD: [],
+        cumulativeSupplySideRevenueUSD: [],
+        cumulativeProtocolSideRevenueUSD: [],
+        cumulativeTotalRevenueUSD: [],
+        cumulativeVolumeUSD: [],
         cumulativeUniqueUsers: [],
         totalPoolCount: [],
-        cumulativeUniqueDepos: [],
+        cumulativeUniqueDepositors: [],
         cumulativeUniqueBorrowers: [],
         cumulativeUniqueLiquidators: [],
         cumulativeUniqueLiquidatees: [],
         openPositionCount: [],
         cumulativePositionCount: [],
-        totalDepoBal: [],
-        cumulativeDepo: [],
-        totalBorrowBal: [],
-        cumulativeLiquidate: [],
+        totalDepositBalanceUSD: [],
+        cumulativeDepositUSD: [],
+        totalBorrowBalanceUSD: [],
+        cumulativeLiquidateUSD: [],
     };
     protocolErrorMsgs.forEach(msgObj => {
         const splitMsg = msgObj.split("LIST:");
@@ -115,23 +115,23 @@ export const alertProtocolErrors = async (discordMessages, deployments, queriesT
     })
 
     const errorsToAlert = {
-        tvlRange: [],
-        cumulativeSupplySideRev: [],
-        cumulativeProtocolSideRev: [],
-        cumulativeTotalRev: [],
-        cumulativeVol: [],
+        totalValueLockedUSD: [],
+        cumulativeSupplySideRevenueUSD: [],
+        cumulativeProtocolSideRevenueUSD: [],
+        cumulativeTotalRevenueUSD: [],
+        cumulativeVolumeUSD: [],
         cumulativeUniqueUsers: [],
         totalPoolCount: [],
-        cumulativeUniqueDepos: [],
+        cumulativeUniqueDepositors: [],
         cumulativeUniqueBorrowers: [],
         cumulativeUniqueLiquidators: [],
         cumulativeUniqueLiquidatees: [],
         openPositionCount: [],
         cumulativePositionCount: [],
-        totalDepoBal: [],
-        cumulativeDepo: [],
-        totalBorrowBal: [],
-        cumulativeLiquidate: [],
+        totalDepositBalanceUSD: [],
+        cumulativeDepositUSD: [],
+        totalBorrowBalanceUSD: [],
+        cumulativeLiquidateUSD: [],
     }
 
     Object.entries(deployments).forEach(([depo, val]) => {

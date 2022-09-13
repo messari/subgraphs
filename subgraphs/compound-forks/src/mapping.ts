@@ -941,7 +941,7 @@ export function _handleLiquidateBorrow(
   liquidate.amount = seizeTokens;
   let gainUSD = seizeTokens
     .toBigDecimal()
-    .div(cTokenDecimalsBD)
+    .div(exponentToBigDecimal(liquidatedCToken.decimals))
     .times(liquidatedCTokenMarket.outputTokenPriceUSD);
   let lossUSD = repayAmount
     .toBigDecimal()

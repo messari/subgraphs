@@ -69,7 +69,7 @@ export class SushiswapHarmonyConfigurations implements Configurations {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.NONE;
+    return RewardIntervalType.TIMESTAMP;
   }
   getRewardTokenRate(): BigInt {
     return BIGINT_ZERO;

@@ -1,12 +1,12 @@
 import {
   BigInt,
-  BigDecimal,
   ethereum,
   ipfs,
   json,
   JSONValue,
   JSONValueKind,
   log,
+  TypedMap,
 } from "@graphprotocol/graph-ts";
 import { ERC721 } from "../../generated/ERC721/ERC721";
 import { Token, Attribute, Collection } from "../../generated/schema";
@@ -32,29 +32,29 @@ export function normalize(strValue: string): string {
 }
 
 export function createToken(
+  event: ethereum.Event,
   contract: ERC721,
   tokenCollection: Collection,
-  tokenId: BigInt,
-  block: ethereum.Block
+  tokenId: BigInt
 ): Token {
   let contractTokenId = tokenCollection.id + "-" + tokenId.toString();
 
   let newToken = new Token(contractTokenId);
   newToken.collection = tokenCollection.id;
   newToken.tokenId = tokenId;
-  newToken.blockNumber = block.number;
-  newToken.timestamp = block.timestamp;
+  newToken.blockNumber = event.block.number;
+  newToken.timestamp = event.block.timestamp;
 
   let metadataURI = contract.try_tokenURI(tokenId);
   if (!metadataURI.reverted) {
     newToken.tokenURI = normalize(metadataURI.value);
-    return updateTokenMetadata(contract, newToken);
+    return updateTokenMetadata(event, newToken);
   }
 
   return newToken;
 }
 
-export function updateTokenMetadata(contract: ERC721, token: Token): Token {
+export function updateTokenMetadata(event: ethereum.Event, token: Token): Token {
   if (token.tokenURI == null) {
     return token;
   }
@@ -85,7 +85,16 @@ export function updateTokenMetadata(contract: ERC721, token: Token): Token {
     return token;
   }
 
-  let dataObject = dataJson.value.toObject();
+  let dataObject = valueToObject(dataJson.value);
+  if (dataObject == null) {
+    log.warning("invalid metadata json, token id: {}, hash: {}, tx: {}", [
+      token.id,
+      hash,
+      event.transaction.hash.toHexString(),
+    ]);
+    return token;
+  }
+
   // Parse the token metadata according to OpenSea metadata standards.
   token.imageURI = valueToString(dataObject.get("image"));
   token.externalURI = valueToString(dataObject.get("external_url"));
@@ -97,11 +106,16 @@ export function updateTokenMetadata(contract: ERC721, token: Token): Token {
 
   let attributes = valueToArray(dataObject.get("attributes"));
   for (let i = 0; i < attributes.length; i++) {
-    if (attributes[i].kind != JSONValueKind.OBJECT) {
-      log.warning("non-standard attributes field, token id: {}", [token.id]);
+    let item = valueToObject(attributes[i]);
+    if (item == null) {
+      log.warning("invalid attributes field, token id: {}, hash: {}, tx: {}", [
+        token.id,
+        hash,
+        event.transaction.hash.toHexString(),
+      ]);
       continue;
     }
-    let item = attributes[i].toObject();
+
     let trait = valueToString(item.get("trait_type"));
     if (trait == null) {
       continue;
@@ -145,13 +159,29 @@ export function updateTokenMetadata(contract: ERC721, token: Token): Token {
 function valueToString(value: JSONValue | null): string | null {
   if (value != null && value.kind == JSONValueKind.STRING) {
     return value.toString();
+  } else {
+    return null;
   }
-  return null;
 }
 
 function valueToArray(value: JSONValue | null): Array<JSONValue> {
   if (value != null && value.kind == JSONValueKind.ARRAY) {
     return value.toArray();
+  } else {
+    return [];
   }
-  return [];
+}
+
+function valueToObject(value: JSONValue): TypedMap<string, JSONValue> | null {
+  // Decode JSON object
+  if (value.kind == JSONValueKind.OBJECT) {
+    return value.toObject();
+    // Decode JSON object (as an array)
+  } else if (value.kind == JSONValueKind.ARRAY) {
+    let arrayValue = valueToArray(value);
+    if (arrayValue.length == 1 && arrayValue[0].kind == JSONValueKind.OBJECT) {
+      return arrayValue[0].toObject();
+    }
+  }
+  return null;
 }
