@@ -1,16 +1,17 @@
 import axios from "axios";
-import { getDiscordMessages, sendDiscordMessage } from "./messageDiscord.js";
+import { clearChannel, constructEmbedMsg, getDiscordMessages, sendDiscordMessage } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
-import { lendingPoolLevel } from "./poolLevel/lendingPoolLevel.js";
-import { vaultPoolLevel } from "./poolLevel/vaultPoolLevel.js";
-import { dexPoolLevel } from "./poolLevel/dexPoolLevel.js";
-import { alertFailedIndexing, alertPoolLevelErrors, alertProtocolErrors } from "./alerts.js";
 import { sleep } from "./util.js";
+import fs from 'fs'
+import path from 'path'
 
+const dayMs = 3600000 * 24;
 
+clearChannel();
 executionFlow();
+setInterval(executionFlow, dayMs);
 
 async function executionFlow() {
   const { data } = await axios.get(
@@ -18,23 +19,28 @@ async function executionFlow() {
   );
   // deployments holds the errors for every protocol
   let deployments = {};
-
+  const protocolNames = [];
   Object.entries(data).forEach(([protocolType, protocolsOnType]) => {
-    Object.values(protocolsOnType).forEach((protocolObj) => {
-      Object.values(protocolObj).forEach((deploymentString) => {
+    Object.entries(protocolsOnType).forEach(([protocolName, protocolObj]) => {
+      Object.entries(protocolObj).forEach(([network, deploymentString]) => {
         const nameStr =
           deploymentString.split("name/")[1];
 
         const deploymentsKey = nameStr.split("/")[1];
         deployments[deploymentsKey] = {
+          protocolName: protocolName,
           indexingError: null,
           indexedPercentage: 0,
           url: deploymentString,
           protocolType: protocolType,
+          network: network
         };
         deployments[deploymentsKey].protocolErrors = JSON.parse(JSON.stringify(protocolErrors));
         if (protocolType && deploymentsKey && Object.keys(errorsObj).includes(protocolType)) {
           deployments[deploymentsKey].poolErrors = JSON.parse(JSON.stringify(errorsObj[protocolType]));
+        }
+        if (!protocolNames.includes(protocolName)) {
+          protocolNames.push(protocolName);
         }
       });
     });
@@ -107,6 +113,7 @@ async function executionFlow() {
   const currentStateDepos = deployments;
   Object.keys(currentStateDepos).forEach((name) => {
     deployments[name + "-pending"] = { ...deployments[name] };
+    deployments[name + "-pending"].pending = true;
   });
 
   const indexingStatusQueries = [
@@ -162,56 +169,42 @@ async function executionFlow() {
 
   });
   deployments = await protocolLevel(deployments);
-  let queriesToAttempt = [];
-  const discordMessages = await getDiscordMessages([]);
-  await alertFailedIndexing(discordMessages, deployments);
-  queriesToAttempt = await alertProtocolErrors(discordMessages, deployments, queriesToAttempt);
-  // deployments = await deploymentsOnPoolLevel(deployments);
-  // await sleep(5000);
-  // queriesToAttempt = await alertPoolLevelErrors(discordMessages, deployments, "lending", queriesToAttempt);
-  // await sleep(5000);
-  // queriesToAttempt = await alertPoolLevelErrors(discordMessages, deployments, "vaults", queriesToAttempt);
-  // await sleep(5000);
-  // queriesToAttempt = await alertPoolLevelErrors(discordMessages, deployments, "exchanges", queriesToAttempt);
-  await sleep(5000);
+  const messagesToPost = protocolNames.map(protocolName => {
+    const deploymentSet = Object.values(deployments).filter(depo => depo.protocolName === protocolName)
+    const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet);
+    return { message: embeddedMessages, protocolName: protocolName };
+  })
 
-  if (queriesToAttempt.length > 0) {
+  if (messagesToPost.length > 0) {
     // Need to pull refreshed list of alert messages, in case posted but error was thrown as well.
-    const updatedDiscordMessages = await getDiscordMessages([]);
-    await resolveQueriesToAttempt(queriesToAttempt, updatedDiscordMessages);
+    const currentDiscordMessages = await getDiscordMessages([]);
+    await resolveQueriesToAttempt(messagesToPost, currentDiscordMessages);
   }
-
-  return executionFlow();
+  return;
 }
 
-async function resolveQueriesToAttempt(queriesToAttempt, updatedDiscordMessages) {
+async function resolveQueriesToAttempt(queriesToAttempt, currentDiscordMessages) {
   // Take the first 5 queries to attempt
   let useQueries = queriesToAttempt.slice(0, 5);
   const newQueriesArray = [...queriesToAttempt.slice(5)];
   try {
-    // map useQueries and within filter updatedDiscordMessages.includes(useQueries[x].slice(0,80)) 
-    useQueries = useQueries.filter(query => {
-      const hasMsg = updatedDiscordMessages.filter(msg => {
-        return msg.content.includes(query.slice(0, 80));
+    // map useQueries and within filter currentDiscordMessages.includes(useQueries[x].slice(0,80)) 
+    useQueries = useQueries.filter(object => {
+      const hasMsg = currentDiscordMessages.filter(msg => {
+        return msg.content.includes(object.protocolName);
       })
       return hasMsg.length === 0;
     })
-    await Promise.allSettled(useQueries.map(messageToSend => sendDiscordMessage(messageToSend)));
+
+    await Promise.allSettled(useQueries.map(object => sendDiscordMessage(object.message, object.protocolName)));
   } catch (err) {
     console.log(err)
   }
 
   await sleep(5000);
   if (newQueriesArray.length > 0) {
-    resolveQueriesToAttempt(newQueriesArray, updatedDiscordMessages);
+    resolveQueriesToAttempt(newQueriesArray, currentDiscordMessages);
     return;
   }
   return;
-}
-
-async function deploymentsOnPoolLevel(deployments) {
-  deployments = await lendingPoolLevel(deployments);
-  deployments = await vaultPoolLevel(deployments);
-  deployments = await dexPoolLevel(deployments);
-  return deployments;
 }
