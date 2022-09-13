@@ -121,6 +121,11 @@ export function getPoolTokenWeightsForDynamicWeightPools(
 
   let inputTokenWeights: BigDecimal[] = [];
   for (let idx = 0; idx < scales.length; idx++) {
+    if (totalScale.equals(constants.BIGDECIMAL_ZERO)) {
+      inputTokenWeights.push(constants.BIGDECIMAL_ZERO);
+      continue;
+    }
+
     inputTokenWeights.push(
       scales.at(idx).divDecimal(totalScale).times(constants.BIGDECIMAL_HUNDRED)
     );
