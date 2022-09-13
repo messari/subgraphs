@@ -1,4 +1,5 @@
 import axios from "axios";
+import { errorNotification } from "./messageDiscord.js";
 import { formatIntToFixed2 } from "./util.js";
 
 export const protocolLevel = async (deployments) => {
@@ -46,7 +47,7 @@ export const protocolLevel = async (deployments) => {
                 })
             }))
         )
-        .catch((err) => console.log(err));
+        .catch((err) => errorNotification(err.message + ' protocolLevel() protocolLevel.js'));
     const specificDataPromiseArray = [];
     protocolLevelData.forEach((deployment) => {
         if (!deployment?.data) return;
@@ -169,7 +170,7 @@ export const protocolLevel = async (deployments) => {
                 })
             }))
         )
-        .catch((err) => console.log(err));
+        .catch((err) => errorNotification(err.message + ' protocolLevel() protocolLevel.js'));
 
     protocolTypeLevelData.forEach((protocol) => {
         // find deployments objectbased on deployments.url === protocol.url
