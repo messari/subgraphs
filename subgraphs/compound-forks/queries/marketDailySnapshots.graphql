@@ -1,0 +1,29 @@
+{
+  marketDailySnapshots {
+    id
+    market {
+      name
+    }
+    rates {
+      rate
+      side
+      type
+    }
+    totalValueLockedUSD
+    totalDepositBalanceUSD
+    dailyDepositUSD
+    cumulativeDepositUSD
+    totalBorrowBalanceUSD
+    dailyBorrowUSD
+    cumulativeBorrowUSD
+    dailyLiquidateUSD
+    cumulativeLiquidateUSD
+    inputTokenBalance
+    inputTokenPriceUSD
+    outputTokenSupply
+    outputTokenPriceUSD
+    exchangeRate
+    rewardTokenEmissionsAmount
+    rewardTokenEmissionsUSD
+  }
+}

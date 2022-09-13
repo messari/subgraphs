@@ -1,0 +1,73 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: UnlockProtocolGovernor
+    network: {{ network }}
+    source:
+      address: "{{ governorContractAddress }}"
+      abi: UnlockProtocolGovernor
+      startBlock: {{ governorContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: UnlockProtocolGovernor
+          file: ./abis/unlock-governance/UnlockProtocolGovernor.json
+      eventHandlers:
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleProposalQueued
+        - event: QuorumUpdated(uint256,uint256)
+          handler: handleQuorumUpdated
+        - event: TimelockChange(address,address)
+          handler: handleTimelockChange
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+        - event: VotingDelayUpdated(uint256,uint256)
+          handler: handleVotingDelayUpdated
+        - event: VotingPeriodUpdated(uint256,uint256)
+          handler: handleVotingPeriodUpdated
+      file: ./protocols/unlock-governance/src/unlock-protocol-governor.ts
+  - kind: ethereum/contract
+    name: UnlockDiscountTokenV3
+    network:  {{ network }}
+    source:
+      address: "{{ tokenContractAddress }}"
+      abi: UnlockDiscountTokenV3
+      startBlock: {{ tokenContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: UnlockDiscountTokenV3
+          file: ./abis/unlock-governance/UnlockDiscountTokenV3.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/unlock-governance/src/unlock-discount-token-v-3.ts

@@ -1,0 +1,13 @@
+{
+  "deployment": "MM_FINANCE_CRONOS",
+  "network": "mainnet",
+  "factory": {
+    "address": "0xd590cC180601AEcD6eeADD9B7f2B7611519544f4",
+    "startBlock": 437869
+  },
+  "masterMeerkatAddress": "0x6be34986fdd1a91e4634eb6b9f8017439b7b5edc",
+  "masterMeerkatStartBlock": 508625,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

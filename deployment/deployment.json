@@ -1,0 +1,1110 @@
+{
+  "subgraphs": {
+    "abracadabra": {
+      "abracadabra": {
+        "arbitrum": {
+          "template": "abracadabra.money.template.yaml",
+          "steegecs": "steegecs/abracadabra-money-arbitrum",
+          "messari": "messari/abracadabra-money-arbitrum",
+          "dmelotik": "dmelotik/abracadabra-arbitrum",
+          "deploy-on-merge": false
+        },
+        "avalanche": {
+          "template": "abracadabra.money.template.yaml",
+          "steegecs": "steegecs/abracadabra-money-avalanche",
+          "messari": "messari/abracadabra-money-avalanche",
+          "dmelotik": "dmelotik/abracadabra-avalanche",
+          "deploy-on-merge": true
+        },
+        "bsc": {
+          "template": "abracadabra.money.template.yaml",
+          "steegecs": "steegecs/abracadabra-money-bsc",
+          "messari": "messari/abracadabra-money-bsc",
+          "dmelotik": "dmelotik/abracadabra-bsc",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "abracadabra.money.template.yaml",
+          "steegecs": "steegecs/abracadabra-money-fantom",
+          "messari": "messari/abracadabra-money-fantom",
+          "dmelotik": "dmelotik/abracadabra-fantom",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "abracadabra.money.template.yaml",
+          "steegecs": "steegecs/abracadabra-money-ethereum",
+          "messari": "messari/abracadabra-money-ethereum",
+          "dmelotik": "dmelotik/abracadabra-ethereum",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "aave-v2-forks": {
+      "aave-v2": {
+        "ethereum-arc": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-arc-ethereum",
+          "dmelotik": "dmelotik/aave-v2-arc",
+          "deploy-on-merge": false
+        },
+        "avalanche": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-avalanche",
+          "dmelotik": "dmelotik/aave-v2-avalanche",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-ethereum",
+          "dmelotik": "dmelotik/aave-v2-ethereum",
+          "deploy-on-merge": false
+        },
+        "ethereum-amm": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-amm-ethereum",
+          "dmelotik": "dmelotik/aave-v2-ethereum-amm",
+          "deploy-on-merge": false
+        },
+        "polygon": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-v2-polygon",
+          "dmelotik": "dmelotik/aave-v2-polygon",
+          "deploy-on-merge": false
+        },
+        "ethereum-rwa": {
+          "template": "aave.v2.template.yaml",
+          "messari": "messari/aave-rwa-ethereum",
+          "dmelotik": "dmelotik/aave-v2-rwa",
+          "deploy-on-merge": false
+        }
+      },
+      "geist-finance": {
+        "fantom": {
+          "template": "geist.finance.template.yaml",
+          "messari": "messari/geist-finance-fantom",
+          "dmelotik": "dmelotik/geist-fantom",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "aave-v3": {
+      "aave-v3": {
+        "arbitrum": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-arbitrum",
+          "dmelotik": "dmelotik/aave-v3-arbitrum",
+          "deploy-on-merge": false
+        },
+        "avalanche": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-avalanche",
+          "dmelotik": "dmelotik/aave-v3-avalanche",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-fantom",
+          "dmelotik": "dmelotik/aave-v3-fantom",
+          "deploy-on-merge": false
+        },
+        "harmony": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-harmony",
+          "dmelotik": "dmelotik/aave-v3-harmony",
+          "deploy-on-merge": false
+        },
+        "polygon": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-polygon",
+          "dmelotik": "dmelotik/aave-v3-polygon",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "aave-v3.template.yaml",
+          "messari": "messari/aave-v3-optimism",
+          "dmelotik": "dmelotik/aave-v3-optimism",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "arrakis-finance": {
+      "arrakis-finance": {
+        "ethereum": {
+          "template": "arrakis.finance.template.yaml",
+          "messari": "messari/arrakis-finance-ethereum",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "convex-finance": {
+      "convex-finance": {
+        "ethereum": {
+          "template": "convex.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "balancer-forks": {
+      "balancer-v2": {
+        "arbitrum": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/balancer-v2-arbitrum",
+          "sevenshi": "sevenshi/balancer-v2-arbitrum",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "polygon": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/balancer-v2-polygon",
+          "sevenshi": "sevenshi/balancer-v2-matic",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "ethereum": {
+          "template": "balancer.v2.template.yaml",
+          "messari": "messari/balancer-v2-ethereum",
+          "sevenshi": "sevenshi/balancer-v2-ethereum",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "beethoven-x": {
+        "optimism": {
+          "template": "beethoven.x.optimism.template.yaml",
+          "messari": "messari/beethoven-x-optimism",
+          "sevenshi": "sevenshi/beets-optimism",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "fantom": {
+          "template": "beethoven.x.fantom.template.yaml",
+          "messari": "messari/beethoven-x-fantom",
+          "sevenshi": "sevenshi/beets-fantom",
+          "deploy-on-merge": true,
+          "prepare:constants": true
+        }
+      }
+    },
+    "beefy-finance": {
+      "beefy-finance": {
+        "aurora": {
+          "template": "beefy.finance.template.yaml",
+          "messari": "messari/beefy-finance-aurora",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "belt-finance": {
+      "belt-finance": {
+        "bsc": {
+          "template": "belt.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "bancor-v3": {
+      "bancor-v3": {
+        "ethereum": {
+          "template": "bancor.v3.template.yaml",
+          "messari": "messari/bancor-v3-ethereum",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "compound-forks": {
+      "aurigami": {
+        "aurora": {
+          "template": "aurigami.template.yaml",
+          "messari": "messari/aurigami-aurora",
+          "dmelotik": "dmelotik/aurigami-aurora",
+          "deploy-on-merge": false
+        }
+      },
+      "banker-joe": {
+        "avalanche": {
+          "template": "banker-joe.template.yaml",
+          "messari": "messari/banker-joe-avalanche",
+          "dmelotik": "dmelotik/banker-joe-avalanche",
+          "deploy-on-merge": true
+        }
+      },
+      "tectonic": {
+        "cronos": {
+          "template": "tectonic.template.yaml",
+          "deploy-on-merge": false
+        }
+      },
+      "bastion-protocol": {
+        "aurora": {
+          "template": "bastion-protocol.template.yaml",
+          "messari": "messari/bastion-protocol-aurora",
+          "dmelotik": "dmelotik/bastion-protocol",
+          "deploy-on-merge": false
+        }
+      },
+      "benqi": {
+        "avalanche": {
+          "template": "benqi.template.yaml",
+          "messari": "messari/benqi-avalanche",
+          "dmelotik": "dmelotik/benqi",
+          "deploy-on-merge": false
+        }
+      },
+      "compound-v2": {
+        "ethereum": {
+          "template": "compound-v2.template.yaml",
+          "messari": "messari/compound-v2-ethereum",
+          "dmelotik": "dmelotik/compound-ethereum",
+          "deploy-on-merge": false
+        }
+      },
+      "cream-finance": {
+        "arbitrum": {
+          "template": "cream-finance.template.yaml",
+          "messari": "messari/cream-finance-arbitrum",
+          "dmelotik": "dmelotik/cream-finance",
+          "deploy-on-merge": false
+        },
+        "bsc": {
+          "template": "cream-finance.template.yaml",
+          "messari": "messari/cream-finance-bsc",
+          "dmelotik": "dmelotik/cream-finance-bsc",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "cream-finance.template.yaml",
+          "messari": "messari/cream-finance-ethereum",
+          "dmelotik": "dmelotik/cream-finance-ethereum",
+          "deploy-on-merge": false
+        },
+        "polygon": {
+          "template": "cream-finance.template.yaml",
+          "messari": "messari/cream-finance-polygon",
+          "dmelotik": "dmelotik/cream-finance-polygon",
+          "deploy-on-merge": false
+        }
+      },
+      "dforce": {
+        "arbitrum": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-arbitrum",
+          "tnkrxyz": "tnkrxyz/dforce-arbitrum",
+          "dmelotik": "dmelotik/dforce-arbitrum",
+          "deploy-on-merge": true
+        },
+        "avalanche": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-avalanche",
+          "tnkrxyz": "tnkrxyz/dforce-avalanche",
+          "dmelotik": "dmelotik/dforce-avalanche",
+          "deploy-on-merge": false
+        },
+        "bsc": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-bsc",
+          "tnkrxyz": "tnkrxyz/dforce-bsc",
+          "dmelotik": "dmelotik/dforce-bsc",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-ethereum",
+          "tnkrxyz": "tnkrxyz/dforce",
+          "dmelotik": "dmelotik/dforce-ethereum",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-optimism",
+          "tnkrxyz": "tnkrxyz/dforce-optimism",
+          "dmelotik": "dmelotik/dforce-optimism",
+          "deploy-on-merge": false
+        },
+        "polygon": {
+          "template": "dforce.template.yaml",
+          "messari": "messari/dforce-polygon",
+          "tnkrxyz": "tnkrxyz/dforce-polygon",
+          "dmelotik": "dmelotik/dforce-polygon",
+          "deploy-on-merge": false
+        }
+      },
+      "iron-bank": {
+        "avalanche": {
+          "template": "iron-bank.template.yaml",
+          "messari": "messari/iron-bank-avalanche",
+          "dmelotik": "dmelotik/iron-bank",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "iron-bank.template.yaml",
+          "messari": "messari/iron-bank-fantom",
+          "dmelotik": "dmelotik/iron-bank-fantom",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "iron-bank.template.yaml",
+          "messari": "messari/iron-bank-ethereum",
+          "dmelotik": "dmelotik/iron-bank-ethereum",
+          "deploy-on-merge": false
+        }
+      },
+      "moonwell": {
+        "moonriver": {
+          "template": "moonwell.template.yaml",
+          "messari": "messari/moonwell-moonriver",
+          "dmelotik": "dmelotik/moonwell",
+          "deploy-on-merge": false
+        },
+        "moonbeam": {
+          "template": "moonwell.template.yaml",
+          "messari": "messari/moonwell-moonbeam",
+          "dmelotik": "dmelotik/moonwell-moonbeam",
+          "deploy-on-merge": false
+        }
+      },
+      "rari-fuse": {
+        "arbitrum": {
+          "template": "rari-fuse.template.yaml",
+          "messari": "messari/rari-fuse-arbitrum",
+          "dmelotik": "dmelotik/fuse-official",
+          "deploy-on-merge": true
+        },
+        "ethereum": {
+          "template": "rari-fuse.template.yaml",
+          "messari": "messari/rari-fuse-ethereum",
+          "dmelotik": "dmelotik/fuse-mainnet",
+          "deploy-on-merge": true
+        }
+      },
+      "scream": {
+        "fantom": {
+          "template": "scream.template.yaml",
+          "messari": "messari/scream-fantom",
+          "dmelotik": "dmelotik/scream",
+          "deploy-on-merge": false
+        }
+      },
+      "venus": {
+        "bsc": {
+          "template": "venus.template.yaml",
+          "messari": "messari/venus-protocol-bsc",
+          "dmelotik": "dmelotik/venus",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "cronos-dummy": {
+      "cronos-dummy": {
+        "cronos": {
+          "template": "cronos.dummy.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "curve-finance": {
+      "curve-finance": {
+        "arbitrum": {
+          "template": "curve.template.yaml",
+          "deploy-on-merge": false
+        },
+        "avalanche": {
+          "template": "curve.template.yaml",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "curve.template.yaml",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "curve.template.yaml",
+          "deploy-on-merge": false
+        },
+        "polygon": {
+          "template": "curve.template.yaml",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "curve.template.yaml",
+          "deploy-on-merge": false
+        },
+        "gnosis": {
+          "template": "curve.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "ellipsis-finance": {
+      "ellipsis-finance": {
+        "bsc": {
+          "template": "ellipsis.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "erc721-holders": {
+      "erc721-holders": {
+        "ethereum": {
+          "template": "erc721.holders.template.yaml",
+          "messari": "messari/erc721-holders",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "erc721-metadata": {
+      "erc721-metadata": {
+        "ethereum": {
+          "template": "erc721.metadata.template.yaml",
+          "messari": "messari/erc721-metadata",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "euler-finance": {
+      "euler-finance": {
+        "ethereum": {
+          "template": "euler.template.yaml",
+          "messari": "messari/euler-finance-ethereum",
+          "dmelotik": "dmelotik/euler-finance-ethereum",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "inverse-finance": {
+      "inverse-finance": {
+        "ethereum": {
+          "template": "inverse.finance.template.yaml",
+          "deploy-on-merge": true
+        }
+      }
+    },
+    "lido": {
+      "lido": {
+        "ethereum": {
+          "template": "lido.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "liquity": {
+      "liquity": {
+        "ethereum": {
+          "template": "liquity.template.yaml",
+          "deploy-on-merge": true
+        }
+      }
+    },
+    "network": {
+      "arweave": {
+        "arweave-mainnet": {
+          "template": "arweave.template.yaml",
+          "messari": "messari/network-arweave-mainnet",
+          "dmelotik": "dmelotik/network-arweave-mainnet",
+          "deploy-on-merge": false
+        }
+      },
+      "cosmos": {
+        "cosmoshub": {
+          "template": "cosmos.template.yaml",
+          "messari": "messari/network-cosmos",
+          "dmelotik": "dmelotik/network-cosmoshub",
+          "deploy-on-merge": false
+        },
+        "osmosis": {
+          "template": "cosmos.template.yaml",
+          "messari": "messari/network-osmosis",
+          "dmelotik": "dmelotik/network-osmosis",
+          "deploy-on-merge": false
+        }
+      },
+      "evm": {
+        "arbitrum": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-arbitrum",
+          "dmelotik": "dmelotik/network-arbitrum-one",
+          "deploy-on-merge": false
+        },
+        "aurora": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-aurora",
+          "dmelotik": "dmelotik/network-aurora",
+          "deploy-on-merge": false
+        },
+        "avalanche": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-avalanche",
+          "dmelotik": "dmelotik/network-avalanche",
+          "deploy-on-merge": false
+        },
+        "boba": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-boba",
+          "dmelotik": "dmelotik/network-boba",
+          "deploy-on-merge": false
+        },
+        "bsc": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-bsc",
+          "dmelotik": "dmelotik/network-bsc",
+          "deploy-on-merge": false
+        },
+        "celo": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-celo",
+          "dmelotik": "dmelotik/network-celo",
+          "deploy-on-merge": false
+        },
+        "clover": {
+          "template": "evm.template.yaml",
+          "messari": "messari/TODO",
+          "dmelotik": "dmelotik/network-clover",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-fantom",
+          "dmelotik": "dmelotik/network-fantom",
+          "deploy-on-merge": false
+        },
+        "fuse": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-fuse",
+          "dmelotik": "dmelotik/network-fuse",
+          "deploy-on-merge": false
+        },
+        "harmony": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-harmony",
+          "dmelotik": "dmelotik/network-harmony",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-ethereum",
+          "dmelotik": "dmelotik/network-mainnet",
+          "deploy-on-merge": false
+        },
+        "polygon": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-polygon",
+          "dmelotik": "dmelotik/network-matic",
+          "deploy-on-merge": false
+        },
+        "moonbeam": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-moonbeam",
+          "dmelotik": "dmelotik/network-moonbeam",
+          "deploy-on-merge": false
+        },
+        "moonriver": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-moonriver",
+          "dmelotik": "dmelotik/network-moonriver",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-optimism",
+          "dmelotik": "dmelotik/network-optimism",
+          "deploy-on-merge": false
+        },
+        "gnosis": {
+          "template": "evm.template.yaml",
+          "messari": "messari/network-gnosis",
+          "dmelotik": "dmelotik/network-xdai",
+          "deploy-on-merge": false
+        }
+      },
+      "near": {
+        "near-mainnet": {
+          "template": "near.template.yaml",
+          "messari": "messari/network-near",
+          "dmelotik": "dmelotik/network-near-mainnet",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "gamma-strategies": {
+      "gamma-strategies": {
+        "arbitrum": {
+          "template": "gamma.strategies.template.yaml",
+          "messari": "messari/gamma-arbitrum",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "gamma.strategies.template.yaml",
+          "messari": "messari/gamma-ethereum",
+          "deploy-on-merge": true
+        },
+        "polygon": {
+          "template": "gamma.strategies.template.yaml",
+          "messari": "messari/gamma-polygon",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "gamma.strategies.template.yaml",
+          "messari": "messari/gamma-optimism",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "makerdao": {
+      "makerdao": {
+        "ethereum": {
+          "template": "makerdao.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "maple-finance": {
+      "maple-finance": {
+        "ethereum": {
+          "template": "maple.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "stakedao": {
+      "stakedao": {
+        "ethereum": {
+          "template": "stakedao.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "saddle-finance": {
+      "saddle-finance": {
+        "arbitrum": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "saddle.finance.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "tokemak": {
+      "tokemak": {
+        "ethereum": {
+          "template": "tokemak.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "uniswap-v3": {
+      "uniswap-v3": {
+        "arbitrum": {
+          "template": "uniswap.v3.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "celo": {
+          "template": "uniswap.v3.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": false
+        },
+        "ethereum": {
+          "template": "uniswap.v3.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "optimism": {
+          "template": "uniswap.v3.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "polygon": {
+          "template": "uniswap.v3.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      }
+    },
+    "qidao": {
+      "qidao": {
+        "arbitrum": {
+          "template": "qidao.template.yaml",
+          "messari": "messari/qidao-arbitrum",
+          "deploy-on-merge": false
+        },
+        "avalanche": {
+          "template": "qidao.template.yaml",
+          "messari": "messari/qidao-avalanche",
+          "deploy-on-merge": false
+        },
+        "bsc": {
+          "template": "qidao.template.yaml",
+          "messari": "messari/qidao-bsc",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "qidao.template.yaml",
+          "messari": "messari/qidao-fantom",
+          "deploy-on-merge": false
+        },
+        "polygon": {
+          "template": "qidao.template.yaml",
+          "messari": "messari/qidao-polygon",
+          "deploy-on-merge": false
+        },
+        "moonriver": {
+          "template": "qidao.template.yaml",
+          "messari": "messari/qidao-moonriver",
+          "deploy-on-merge": false
+        },
+        "optimism": {
+          "template": "qidao.template.yaml",
+          "messari": "messari/qidao-optimism",
+          "deploy-on-merge": false
+        },
+        "gnosis": {
+          "template": "qidao.template.yaml",
+          "messari": "messari/qidao-gnosis",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "rari-vaults": {
+      "rari-vaults": {
+        "ethereum": {
+          "template": "rari-vaults.template.yaml",
+          "messari": "messari/rari-vaults-ethereum",
+          "dmelotik": "dmelotik/rari-vaults",
+          "deploy-on-merge": true
+        }
+      }
+    },
+    "uniswap-forks": {
+      "apeswap": {
+        "bsc": {
+          "template": "apeswap.bsc.template.yaml",
+          "steegecs": "steegecs/apeswap-bsc",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "polygon": {
+          "template": "apeswap.matic.template.yaml",
+          "steegecs": "steegecs/apeswap-matic",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "mm-finance": {
+        "polygon": {
+          "template": "mm.finance.template.yaml",
+          "messari": "messari/mm-finance-polygon",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "quickswap": {
+        "polygon": {
+          "template": "quickswap.template.yaml",
+          "steegecs": "steegecs/quickswap-matic",
+          "messari": "messari/quickswap-polygon",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "solarbeam": {
+        "moonriver": {
+          "template": "solarbeam.template.yaml",
+          "steegecs": "steegecs/solarbeam-moonriver",
+          "messari": "messari/solarbeam-moonriver",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "spiritswap": {
+        "fantom": {
+          "template": "spiritswap.template.yaml",
+          "steegecs": "steegecs/spiritswap-fantom",
+          "messari": "messari/spiritswap-fantom",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "spookyswap": {
+        "fantom": {
+          "template": "spookyswap.template.yaml",
+          "steegecs": "steegecs/spookyswap-fantom",
+          "messari": "messari/spookyswap-fantom",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "sushiswap": {
+        "arbitrum": {
+          "template": "sushiswap.alt.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "avalanche": {
+          "template": "uniswap.v2.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "bsc": {
+          "template": "uniswap.v2.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "celo": {
+          "template": "sushiswap.alt.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "fantom": {
+          "template": "sushiswap.alt.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "fuse": {
+          "template": "sushiswap.alt.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "ethereum": {
+          "template": "sushiswap.mainnet.template.yaml",
+          "steegecs": "steegecs/sushiswap-mainnet",
+          "messari": "messari/sushiswap-ethereum",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "harmony": {
+          "template": "sushiswap.alt.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "polygon": {
+          "template": "sushiswap.alt.template.yaml",
+          "steegecs": "steegecs/sushiswap-matic",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "moonbeam": {
+          "template": "sushiswap.alt.template.yaml",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "moonriver": {
+          "template": "sushiswap.alt.template.yaml",
+          "steegecs": "steegecs/sushiswap-moonriver",
+          "messari": "messari/sushiswap-moonriver",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "gnosis": {
+          "template": "sushiswap.alt.template.yaml",
+          "steegecs": "steegecs/sushiswap-xdai",
+          "messari": "messari/sushiswap-gnosis",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "trader-joe": {
+        "avalanche": {
+          "template": "trader.joe.template.yaml",
+          "steegecs": "steegecs/trader-joe-avalanche",
+          "messari": "messari/trader-joe-avalanche",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "trisolaris": {
+        "aurora": {
+          "template": "trisolaris.template.yaml",
+          "steegecs": "steegecs/trisolaris-aurora",
+          "messari": "messari/trisolaris-aurora",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "ubeswap": {
+        "celo": {
+          "template": "ubeswap-template.yaml",
+          "steegecs": "steegecs/ubeswap-celo",
+          "messari": "messari/ubeswap-celo",
+          "sevenshi": "sevenshi/ubeswap_celo",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "uniswap-v2": {
+        "ethereum": {
+          "template": "uniswap.v2.template.yaml",
+          "steegecs": "steegecs/uniswap-v2",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "vvs-finance": {
+        "cronos": {
+          "template": "vvs.finance.template.yaml",
+          "steegecs": "steegecs/trisolaris-aurora",
+          "messari": "messari/trisolaris-aurora",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      },
+      "honeyswap": {
+        "gnosis": {
+          "template": "honeyswap.template.yaml",
+          "mrbrianhobo": "mrbrianhobo/honeyswap-xdai",
+          "messari": "messari/honeyswap-gnosis",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        },
+        "polygon": {
+          "template": "honeyswap.matic.template.yaml",
+          "mrbrianhobo": "mrbrianhobo/honeyswap-polygon",
+          "deploy-on-merge": false,
+          "prepare:constants": true
+        }
+      }
+    },
+    "yearn-v2": {
+      "yearn-v2": {
+        "arbitrum": {
+          "template": "yearn.v2.template.yaml",
+          "deploy-on-merge": false
+        },
+        "fantom": {
+          "template": "yearn.v2.template.yaml",
+          "deploy-on-merge": false
+        },
+        "ethereum": {
+          "template": "yearn.v2.template.yaml",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "aave-governance": {
+      "aave-governance": {
+        "ethereum": {
+          "template": "aave-governance.template.yaml",
+          "danielkhoo": "danielkhoo/aave-governance",
+          "messari": "messari/aave-governance",
+          "deploy-on-merge": false
+        }
+      },
+      "dydx-governance": {
+        "ethereum": {
+          "template": "dydx-governance.template.yaml",
+          "danielkhoo": "danielkhoo/dydx-governance",
+          "messari": "messari/dydx-governance",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "openzeppelin-governor": {
+      "angle-governance": {
+        "ethereum": {
+          "template": "angle-governance.template.yaml",
+          "danielkhoo": "danielkhoo/angle-governance",
+          "messari": "messari/angle-governance",
+          "deploy-on-merge": true
+        }
+      },
+      "code4rena-governance": {
+        "polygon": {
+          "template": "code4rena-governance.template.yaml",
+          "danielkhoo": "danielkhoo/code4rena-governance",
+          "messari": "messari/code4rena-governance",
+          "deploy-on-merge": false
+        }
+      },
+      "ens-governance": {
+        "ethereum": {
+          "template": "ens-governance.template.yaml",
+          "danielkhoo": "danielkhoo/ens-governance",
+          "messari": "messari/ens-governance",
+          "deploy-on-merge": true
+        }
+      },
+      "euler-governance": {
+        "ethereum": {
+          "template": "euler-governance.template.yaml",
+          "danielkhoo": "danielkhoo/euler-governance",
+          "messari": "messari/euler-governance",
+          "deploy-on-merge": true
+        }
+      },
+      "fei-governance": {
+        "ethereum": {
+          "template": "fei-governance.template.yaml",
+          "danielkhoo": "danielkhoo/fei-governance",
+          "messari": "messari/fei-governance",
+          "deploy-on-merge": true
+        }
+      },
+      "hop-governance": {
+        "ethereum": {
+          "template": "hop-governance.template.yaml",
+          "danielkhoo": "danielkhoo/hop-governance",
+          "messari": "messari/hop-governance",
+          "deploy-on-merge": false
+        }
+      },
+      "silo-governance": {
+        "ethereum": {
+          "template": "silo-governance.template.yaml",
+          "danielkhoo": "danielkhoo/silo-governance",
+          "messari": "messari/silo-governance",
+          "deploy-on-merge": true
+        }
+      },
+      "truefi-governance": {
+        "ethereum": {
+          "template": "truefi-governance.template.yaml",
+          "danielkhoo": "danielkhoo/truefi-governance",
+          "messari": "messari/truefi-governance",
+          "deploy-on-merge": true
+        }
+      },
+      "unlock-governance": {
+        "ethereum": {
+          "template": "unlock-governance.template.yaml",
+          "danielkhoo": "danielkhoo/unlock-governance",
+          "messari": "messari/unlock-governance",
+          "deploy-on-merge": true
+        }
+      }
+    },
+    "vesper-finance": {
+      "vesper-finance": {
+        "ethereum": {
+          "template": "vesper.finance.template.yaml",
+          "messari": "messari/vesper-ethereum",
+          "deploy-on-merge": false
+        }
+      }
+    },
+    "badgerdao": {
+      "badgerdao": {
+        "ethereum": {
+          "template": "badgerdao.template.yaml",
+          "messari": "messari/badgerdao-ethereum"
+        }
+      }
+    },
+    "platypus-finance": {
+      "platypus-finance": {
+        "avalanche": {
+          "template": "platypus.template.yaml",
+          "messari": "messari/platypus-finance-avalanche",
+          "aditya-todi": "aditya-todi/platypus-finance-avalanche",
+          "deploy-on-merge": false
+        }
+      }
+    }
+  }
+}

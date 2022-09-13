@@ -1,0 +1,25 @@
+{
+  "network": "fantom",
+
+  "Registry_v1-Address": "0x727fe1759430df13655ddb0731dE0D0FDE929b04",
+  "Registry_v1-StartBlock": "18455565",
+
+  "registry_v2-isEnabled": true,
+  "registry_v2-Address": "0x41679043846d1b16b44fbf6e7fe531390e5bf092",
+  "registry_v2-StartBlock": "16159984",
+  
+
+  "callHandlersEnabled": true,
+
+  "protocolId": "0x727fe1759430df13655ddb0731dE0D0FDE929b04",
+  "yearnTreasuryVault": "0x89716ad7edc3be3b35695789c475f3e7a3deb12a",
+  "defaultNetwork": "Network.FANTOM",
+
+  "manualVaults": [
+    {
+      "name": "ftmYvDAIVault",
+      "address": "0x637ec617c86d24e421328e6caea1d92114892439",
+      "startBlock": "16158918"
+    }
+  ]
+}

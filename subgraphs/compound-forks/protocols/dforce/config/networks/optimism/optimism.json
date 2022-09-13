@@ -1,0 +1,9 @@
+{
+  "network": "optimism",
+  "comptrollerAddr": "0xA300A84D8970718Dac32f54F61Bd568142d8BCF4",
+  "startBlock": 486017,
+  "USXAddr": "0xbfD291DA8A403DAAF7e5E9DC1ec0aCEaCd4848B9",
+  "USXStartBlock": 486846,
+  "EUXAddr": "0x0000000000000000000000000000000000000000",
+  "EUXStartBlock": 0
+}

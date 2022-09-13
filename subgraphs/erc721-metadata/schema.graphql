@@ -1,0 +1,111 @@
+###
+# Subgraph Schema: ERC721 Token Detailed Metadata
+# Version: 1.0.0
+
+#############################################
+####### ERC721 Token Detailed Metadata ######
+#############################################
+
+type Token @entity {
+  " Address of the token, { Contract Address }-{ Token ID }  "
+  id: ID!
+
+  " Collection for the token "
+  collection: Collection!
+
+  " ID of the token from the collection "
+  tokenId: BigInt!
+
+  " URI of the token metadata"
+  tokenURI: String
+
+  " Describes the asset to which this token represents, defined in OpenSea metadata standards "
+  description: String
+
+  " URL which allows users to view the item on the colletion's site, defined in OpenSea metadata standards "
+  externalURI: String
+
+  " A URI pointing to a resource with mime type image, defined in OpenSea metadata standards "
+  imageURI: String
+
+  " Identifies the asset to which this token represents, defined in OpenSea metadata standards "
+  name: String
+
+  " Attributes for the token metadata, defined in OpenSea metadata standards "
+  attributes: [Attribute!] @derivedFrom(field: "token")
+
+  " Background color of the item, defined in OpenSea metadata standards "
+  backgroundColor: String
+
+  " A link to a multi-media attachment for the item, defined in OpenSea metadata standards "
+  animationURI: String
+
+  " A link to a YouTube video, defined in OpenSea metadata standards "
+  youtubeURI: String
+
+  " Block number when the subgraph gets the tokenURI and retrieves the detailed metadata information "
+  blockNumber: BigInt!
+
+  " Timestamp when the subgraph gets the tokenURI and retrieves the detailed metadata information "
+  timestamp: BigInt!
+}
+
+########################################
+####### Token Attributes Metadata ######
+########################################
+
+type Attribute @entity {
+  " { Contract ID }-{ Token ID }-{ Trait type } "
+  id: ID!
+
+  " The collection for the trait "
+  collection: Collection!
+
+  " ID of the token from the collection  "
+  tokenId: BigInt!
+
+  " Token metadata this attribute belongs to "
+  token: Token!
+
+  " Name of the trait, defined in OpenSea metadata standards "
+  traitType: String!
+
+  " Value of the trait, defined in OpenSea metadata standards "
+  value: String
+
+  " Maximum value for a numerical trait's possible values, defined in OpenSea metadata standards "
+  maxValue: String
+
+  " Indicates how the trait should be displayed, defined in OpenSea metadata standards "
+  displayType: String
+}
+
+################################
+####### ERC721 Collection ######
+################################
+
+type Collection @entity {
+  " ERC721 collection address "
+  id: ID!
+
+  " Flag for whether ERC721 metadata is supported "
+  supportsERC721Metadata: Boolean!
+
+  " Flag for whether the tokenURI in the collection has been updated  "
+  tokenURIUpdated: Boolean!
+
+  " Total number of unique tokens in the collection "
+  tokenCount: BigInt!
+
+  " Tokens in the collection "
+  tokens: [Token!]! @derivedFrom(field: "collection")
+}
+
+#####################################
+####### Non ERC721 Collections ######
+#####################################
+
+type NonERC721Collection @entity {
+  " Non ERC721 smart contract address "
+  id: ID!
+}

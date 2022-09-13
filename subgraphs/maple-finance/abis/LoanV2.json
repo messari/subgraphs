@@ -1,0 +1,530 @@
+[
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": true, "internalType": "address", "name": "borrower_", "type": "address" }],
+        "name": "BorrowerAccepted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": false, "internalType": "uint256", "name": "amount_", "type": "uint256" }],
+        "name": "CollateralPosted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "amount_", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "destination_", "type": "address" }
+        ],
+        "name": "CollateralRemoved",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "lender_", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount_", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "nextPaymentDueDate_", "type": "uint256" }
+        ],
+        "name": "Funded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "amount_", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "destination_", "type": "address" }
+        ],
+        "name": "FundsClaimed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "amount_", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "destination_", "type": "address" }
+        ],
+        "name": "FundsDrawnDown",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "amount_", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "destination_", "type": "address" }
+        ],
+        "name": "FundsRedirected",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": false, "internalType": "uint256", "name": "amount_", "type": "uint256" }],
+        "name": "FundsReturned",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "borrower_", "type": "address" },
+            { "indexed": false, "internalType": "address[2]", "name": "assets_", "type": "address[2]" },
+            { "indexed": false, "internalType": "uint256[3]", "name": "termDetails_", "type": "uint256[3]" },
+            { "indexed": false, "internalType": "uint256[3]", "name": "amounts_", "type": "uint256[3]" },
+            { "indexed": false, "internalType": "uint256[4]", "name": "rates_", "type": "uint256[4]" }
+        ],
+        "name": "Initialized",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": true, "internalType": "address", "name": "lender_", "type": "address" }],
+        "name": "LenderAccepted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "principalPaid_", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "interestPaid_", "type": "uint256" }
+        ],
+        "name": "LoanClosed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "bytes32", "name": "refinanceCommitment_", "type": "bytes32" },
+            { "indexed": false, "internalType": "address", "name": "refinancer_", "type": "address" },
+            { "indexed": false, "internalType": "bytes[]", "name": "calls_", "type": "bytes[]" }
+        ],
+        "name": "NewTermsAccepted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "bytes32", "name": "refinanceCommitment_", "type": "bytes32" },
+            { "indexed": false, "internalType": "address", "name": "refinancer_", "type": "address" },
+            { "indexed": false, "internalType": "bytes[]", "name": "calls_", "type": "bytes[]" }
+        ],
+        "name": "NewTermsProposed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "principalPaid_", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "interestPaid_", "type": "uint256" }
+        ],
+        "name": "PaymentMade",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": false, "internalType": "address", "name": "pendingBorrower_", "type": "address" }],
+        "name": "PendingBorrowerSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": false, "internalType": "address", "name": "pendingLender_", "type": "address" }],
+        "name": "PendingLenderSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "collateralRepossessed_", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "fundsRepossessed_", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "destination_", "type": "address" }
+        ],
+        "name": "Repossessed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "token_", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount_", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "destination_", "type": "address" }
+        ],
+        "name": "Skimmed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "toVersion_", "type": "uint256" },
+            { "indexed": false, "internalType": "bytes", "name": "arguments_", "type": "bytes" }
+        ],
+        "name": "Upgraded",
+        "type": "event"
+    },
+    { "inputs": [], "name": "acceptBorrower", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    { "inputs": [], "name": "acceptLender", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "refinancer_", "type": "address" },
+            { "internalType": "bytes[]", "name": "calls_", "type": "bytes[]" },
+            { "internalType": "uint256", "name": "amount_", "type": "uint256" }
+        ],
+        "name": "acceptNewTerms",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "borrower",
+        "outputs": [{ "internalType": "address", "name": "borrower_", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "amount_", "type": "uint256" },
+            { "internalType": "address", "name": "destination_", "type": "address" }
+        ],
+        "name": "claimFunds",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "claimableFunds",
+        "outputs": [{ "internalType": "uint256", "name": "claimableFunds_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "amount_", "type": "uint256" }],
+        "name": "closeLoan",
+        "outputs": [
+            { "internalType": "uint256", "name": "principal_", "type": "uint256" },
+            { "internalType": "uint256", "name": "interest_", "type": "uint256" }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "collateral",
+        "outputs": [{ "internalType": "uint256", "name": "collateral_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "collateralAsset",
+        "outputs": [{ "internalType": "address", "name": "collateralAsset_", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "collateralRequired",
+        "outputs": [{ "internalType": "uint256", "name": "collateralRequired_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "drawableFunds",
+        "outputs": [{ "internalType": "uint256", "name": "drawableFunds_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "amount_", "type": "uint256" },
+            { "internalType": "address", "name": "destination_", "type": "address" }
+        ],
+        "name": "drawdownFunds",
+        "outputs": [{ "internalType": "uint256", "name": "collateralPosted_", "type": "uint256" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "earlyFeeRate",
+        "outputs": [{ "internalType": "uint256", "name": "earlyFeeRate_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "endingPrincipal",
+        "outputs": [{ "internalType": "uint256", "name": "endingPrincipal_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "excessCollateral",
+        "outputs": [{ "internalType": "uint256", "name": "excessCollateral_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "factory",
+        "outputs": [{ "internalType": "address", "name": "factory_", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "lender_", "type": "address" },
+            { "internalType": "uint256", "name": "amount_", "type": "uint256" }
+        ],
+        "name": "fundLoan",
+        "outputs": [{ "internalType": "uint256", "name": "fundsLent_", "type": "uint256" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "fundsAsset",
+        "outputs": [{ "internalType": "address", "name": "fundsAsset_", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "drawdown_", "type": "uint256" }],
+        "name": "getAdditionalCollateralRequiredFor",
+        "outputs": [{ "internalType": "uint256", "name": "collateral_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getEarlyPaymentBreakdown",
+        "outputs": [
+            { "internalType": "uint256", "name": "principal_", "type": "uint256" },
+            { "internalType": "uint256", "name": "interest_", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getNextPaymentBreakdown",
+        "outputs": [
+            { "internalType": "uint256", "name": "principal_", "type": "uint256" },
+            { "internalType": "uint256", "name": "interest_", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "gracePeriod",
+        "outputs": [{ "internalType": "uint256", "name": "gracePeriod_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "implementation",
+        "outputs": [{ "internalType": "address", "name": "implementation_", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "interestRate",
+        "outputs": [{ "internalType": "uint256", "name": "interestRate_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "isProtocolPaused",
+        "outputs": [{ "internalType": "bool", "name": "paused_", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "lateFeeRate",
+        "outputs": [{ "internalType": "uint256", "name": "lateFeeRate_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "lateInterestPremium",
+        "outputs": [{ "internalType": "uint256", "name": "lateInterestPremium_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "lender",
+        "outputs": [{ "internalType": "address", "name": "lender_", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "amount_", "type": "uint256" }],
+        "name": "makePayment",
+        "outputs": [
+            { "internalType": "uint256", "name": "principal_", "type": "uint256" },
+            { "internalType": "uint256", "name": "interest_", "type": "uint256" }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "migrator_", "type": "address" },
+            { "internalType": "bytes", "name": "arguments_", "type": "bytes" }
+        ],
+        "name": "migrate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "nextPaymentDueDate",
+        "outputs": [{ "internalType": "uint256", "name": "nextPaymentDueDate_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "paymentInterval",
+        "outputs": [{ "internalType": "uint256", "name": "paymentInterval_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "paymentsRemaining",
+        "outputs": [{ "internalType": "uint256", "name": "paymentsRemaining_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "pendingBorrower",
+        "outputs": [{ "internalType": "address", "name": "pendingBorrower_", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "pendingLender",
+        "outputs": [{ "internalType": "address", "name": "pendingLender_", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "amount_", "type": "uint256" }],
+        "name": "postCollateral",
+        "outputs": [{ "internalType": "uint256", "name": "collateralPosted_", "type": "uint256" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "principal",
+        "outputs": [{ "internalType": "uint256", "name": "principal_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "principalRequested",
+        "outputs": [{ "internalType": "uint256", "name": "principalRequested_", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "refinancer_", "type": "address" },
+            { "internalType": "bytes[]", "name": "calls_", "type": "bytes[]" }
+        ],
+        "name": "proposeNewTerms",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "amount_", "type": "uint256" },
+            { "internalType": "address", "name": "destination_", "type": "address" }
+        ],
+        "name": "removeCollateral",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "destination_", "type": "address" }],
+        "name": "repossess",
+        "outputs": [
+            { "internalType": "uint256", "name": "collateralRepossessed_", "type": "uint256" },
+            { "internalType": "uint256", "name": "fundsRepossessed_", "type": "uint256" }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "amount_", "type": "uint256" }],
+        "name": "returnFunds",
+        "outputs": [{ "internalType": "uint256", "name": "fundsReturned_", "type": "uint256" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "newImplementation_", "type": "address" }],
+        "name": "setImplementation",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "pendingBorrower_", "type": "address" }],
+        "name": "setPendingBorrower",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "pendingLender_", "type": "address" }],
+        "name": "setPendingLender",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "token_", "type": "address" },
+            { "internalType": "address", "name": "destination_", "type": "address" }
+        ],
+        "name": "skim",
+        "outputs": [{ "internalType": "uint256", "name": "skimmed_", "type": "uint256" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "superFactory",
+        "outputs": [{ "internalType": "address", "name": "superFactory_", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "toVersion_", "type": "uint256" },
+            { "internalType": "bytes", "name": "arguments_", "type": "bytes" }
+        ],
+        "name": "upgrade",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]

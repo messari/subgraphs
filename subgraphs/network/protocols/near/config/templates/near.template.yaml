@@ -1,0 +1,20 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: near
+    name: blocks
+    network: {{ network }}
+    source:
+      startBlock: 0
+    mapping:
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Network
+        - Block
+        - Author
+      blockHandlers:
+        - handler: handleNearBlock
+      file: ./src/mapping.ts

@@ -1,0 +1,1015 @@
+[
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "hasInitialized",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_operator_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_quantity",
+                "type": "uint256"
+            },
+            {
+                "name": "_pubkeys",
+                "type": "bytes"
+            },
+            {
+                "name": "_signatures",
+                "type": "bytes"
+            }
+        ],
+        "name": "addSigningKeys",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_script",
+                "type": "bytes"
+            }
+        ],
+        "name": "getEVMScriptExecutor",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getRecoveryVault",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_numKeys",
+                "type": "uint256"
+            }
+        ],
+        "name": "assignNextSigningKeys",
+        "outputs": [
+            {
+                "name": "pubkeys",
+                "type": "bytes"
+            },
+            {
+                "name": "signatures",
+                "type": "bytes"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "SIGNATURE_LENGTH",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "SET_NODE_OPERATOR_ADDRESS_ROLE",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_operator_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_index",
+                "type": "uint256"
+            },
+            {
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "removeSigningKeysOperatorBH",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_name",
+                "type": "string"
+            }
+        ],
+        "name": "setNodeOperatorName",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_totalRewardShares",
+                "type": "uint256"
+            }
+        ],
+        "name": "getRewardsDistribution",
+        "outputs": [
+            {
+                "name": "recipients",
+                "type": "address[]"
+            },
+            {
+                "name": "shares",
+                "type": "uint256[]"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_active",
+                "type": "bool"
+            }
+        ],
+        "name": "setNodeOperatorActive",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "SET_NODE_OPERATOR_NAME_ROLE",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_operator_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_index",
+                "type": "uint256"
+            }
+        ],
+        "name": "removeSigningKey",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_operator_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_index",
+                "type": "uint256"
+            },
+            {
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "removeSigningKeys",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "ADD_NODE_OPERATOR_ROLE",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "allowRecoverability",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_operator_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_quantity",
+                "type": "uint256"
+            },
+            {
+                "name": "_pubkeys",
+                "type": "bytes"
+            },
+            {
+                "name": "_signatures",
+                "type": "bytes"
+            }
+        ],
+        "name": "addSigningKeysOperatorBH",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "appId",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getActiveNodeOperatorsCount",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_name",
+                "type": "string"
+            },
+            {
+                "name": "_rewardAddress",
+                "type": "address"
+            }
+        ],
+        "name": "addNodeOperator",
+        "outputs": [
+            {
+                "name": "id",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getInitializationBlock",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_operator_id",
+                "type": "uint256"
+            }
+        ],
+        "name": "getUnusedSigningKeyCount",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_rewardAddress",
+                "type": "address"
+            }
+        ],
+        "name": "setNodeOperatorRewardAddress",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_fullInfo",
+                "type": "bool"
+            }
+        ],
+        "name": "getNodeOperator",
+        "outputs": [
+            {
+                "name": "active",
+                "type": "bool"
+            },
+            {
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "name": "rewardAddress",
+                "type": "address"
+            },
+            {
+                "name": "stakingLimit",
+                "type": "uint64"
+            },
+            {
+                "name": "stoppedValidators",
+                "type": "uint64"
+            },
+            {
+                "name": "totalSigningKeys",
+                "type": "uint64"
+            },
+            {
+                "name": "usedSigningKeys",
+                "type": "uint64"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_token",
+                "type": "address"
+            }
+        ],
+        "name": "transferToVault",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_sender",
+                "type": "address"
+            },
+            {
+                "name": "_role",
+                "type": "bytes32"
+            },
+            {
+                "name": "_params",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "canPerform",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getEVMScriptRegistry",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "PUBKEY_LENGTH",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getNodeOperatorsCount",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_stakingLimit",
+                "type": "uint64"
+            }
+        ],
+        "name": "setNodeOperatorStakingLimit",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_operator_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_index",
+                "type": "uint256"
+            }
+        ],
+        "name": "getSigningKey",
+        "outputs": [
+            {
+                "name": "key",
+                "type": "bytes"
+            },
+            {
+                "name": "depositSignature",
+                "type": "bytes"
+            },
+            {
+                "name": "used",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_stoppedIncrement",
+                "type": "uint64"
+            }
+        ],
+        "name": "reportStoppedValidators",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_lido",
+                "type": "address"
+            }
+        ],
+        "name": "initialize",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "REPORT_STOPPED_VALIDATORS_ROLE",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getKeysOpIndex",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "kernel",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "SET_NODE_OPERATOR_ACTIVE_ROLE",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "SET_NODE_OPERATOR_LIMIT_ROLE",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_operator_id",
+                "type": "uint256"
+            }
+        ],
+        "name": "getTotalSigningKeyCount",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "isPetrified",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "MAX_NODE_OPERATORS_COUNT",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_operator_id",
+                "type": "uint256"
+            },
+            {
+                "name": "_index",
+                "type": "uint256"
+            }
+        ],
+        "name": "removeSigningKeyOperatorBH",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "MANAGE_SIGNING_KEYS",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [],
+        "name": "trimUnusedKeys",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "executor",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "script",
+                "type": "bytes"
+            },
+            {
+                "indexed": false,
+                "name": "input",
+                "type": "bytes"
+            },
+            {
+                "indexed": false,
+                "name": "returnData",
+                "type": "bytes"
+            }
+        ],
+        "name": "ScriptResult",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "vault",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "RecoverToVault",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "name": "rewardAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "stakingLimit",
+                "type": "uint64"
+            }
+        ],
+        "name": "NodeOperatorAdded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "active",
+                "type": "bool"
+            }
+        ],
+        "name": "NodeOperatorActiveSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "name",
+                "type": "string"
+            }
+        ],
+        "name": "NodeOperatorNameSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "rewardAddress",
+                "type": "address"
+            }
+        ],
+        "name": "NodeOperatorRewardAddressSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "stakingLimit",
+                "type": "uint64"
+            }
+        ],
+        "name": "NodeOperatorStakingLimitSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "totalStopped",
+                "type": "uint64"
+            }
+        ],
+        "name": "NodeOperatorTotalStoppedValidatorsReported",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "totalKeysTrimmed",
+                "type": "uint64"
+            }
+        ],
+        "name": "NodeOperatorTotalKeysTrimmed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "operatorId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "pubkey",
+                "type": "bytes"
+            }
+        ],
+        "name": "SigningKeyAdded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "operatorId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "pubkey",
+                "type": "bytes"
+            }
+        ],
+        "name": "SigningKeyRemoved",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "keysOpIndex",
+                "type": "uint256"
+            }
+        ],
+        "name": "KeysOpIndexSet",
+        "type": "event"
+    }
+]

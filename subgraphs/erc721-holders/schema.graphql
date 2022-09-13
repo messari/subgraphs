@@ -1,0 +1,214 @@
+###
+# Subgraph Schema: ERC721 Smart Contracts and Tokens
+# Version: 1.0.0
+
+#############################
+####### Token Metadata ######
+#############################
+
+type Token @entity {
+  " Address of the token, { Contract Address }-{ Token ID }  "
+  id: ID!
+
+  " Collection for the token "
+  collection: Collection!
+
+  " ID of the token from the collection "
+  tokenID: BigInt!
+
+  " URI of the token "
+  tokenURI: String
+
+  " The owner for the token "
+  owner: Account!
+
+  " Timestamp of the token's mint "
+  mintTime: BigInt!
+}
+
+#########################################
+####### ERC721 Collection Metadata ######
+#########################################
+
+type Collection @entity {
+  " ERC721 collection address "
+  id: ID!
+
+  " Name of the collection "
+  name: String
+
+  " Symbol of the collection "
+  symbol: String
+
+  " Flag for whether ERC721 metadata is supported "
+  supportsERC721Metadata: Boolean!
+
+  " Total number of unique minted tokens in the collection "
+  tokenCount: BigInt!
+
+  " Total number of unique token owners holding tokens in the collection "
+  ownerCount: BigInt!
+
+  " Total number of token transfer events "
+  transferCount: BigInt!
+
+  " Tokens in the collection "
+  tokens: [Token!]! @derivedFrom(field: "collection")
+
+  " List of token transfers "
+  transfers: [Transfer!]! @derivedFrom(field: "collection")
+
+  " Token holder's balance "
+  holdersBalance: [AccountBalance!]! @derivedFrom(field: "collection")
+
+  ##### Snapshots #####
+
+  " Daily snapshot for this collection "
+  dailyCollectionSnapshot: [CollectionDailySnapshot!]!
+    @derivedFrom(field: "collection")
+}
+
+###############################################
+####### ERC721 Collection Timeseries ######
+###############################################
+
+type CollectionDailySnapshot @entity {
+  " { collection address }-{ # of days since Unix epoch time } "
+  id: ID!
+
+  " Collection this snapshot is associated with "
+  collection: Collection!
+
+  " Total number of unique tokens in the collection for the specific day "
+  tokenCount: BigInt!
+
+  " Total number of unique token owners in the collection for the specific day "
+  ownerCount: BigInt!
+
+  " Total number of transfers in a day "
+  dailyTransferCount: Int!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+###############################
+##### Transfer Event Data #####
+###############################
+
+type Transfer @entity {
+  " { Contract ID }-{ Transaction hash }-{ Log index } "
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The ERC721 Collection this event belongs to "
+  collection: Collection!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: Int!
+
+  " ID of the token transferred "
+  tokenId: BigInt!
+
+  " Account that received the tokens "
+  to: Account!
+
+  " Account that sent the tokens "
+  from: Account!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+}
+
+##################################
+######## Account MetaData ########
+##################################
+
+# An account is a unique Ethereum address
+type Account @entity {
+  " Address of the account "
+  id: ID!
+
+  " Total number of unique tokens that this account holds "
+  tokenCount: BigInt!
+
+  " Tokens that this account holds "
+  tokens: [Token!]! @derivedFrom(field: "owner")
+
+  " Token transfers to this account "
+  transferTo: [Transfer!]! @derivedFrom(field: "to")
+
+  " Token transfers from this account "
+  transferFrom: [Transfer!]! @derivedFrom(field: "from")
+
+  " Token balances that this account holds "
+  balances: [AccountBalance!]! @derivedFrom(field: "account")
+
+  " Token balances snapshot that this account holds "
+  balancesSnapshot: [AccountBalanceDailySnapshot!]!
+    @derivedFrom(field: "account")
+}
+
+type AccountBalance @entity {
+  " { Address Of the Account }-{ Address of the Collection }"
+  id: ID!
+
+  " Account address "
+  account: Account!
+
+  " Collection address "
+  collection: Collection!
+
+  " Current token amount for the collection "
+  tokenCount: BigInt!
+
+  " Block number in which the balance was last modified "
+  blockNumber: BigInt!
+
+  " Timestamp in which the balance was last modified "
+  timestamp: BigInt!
+}
+
+###############################
+###### Account Timeseries #####
+###############################
+
+type AccountBalanceDailySnapshot @entity {
+  " { Address Of the Account }-{ Address of the Contract }-{ # of days since Unix epoch time } "
+  id: ID!
+
+  " Account address "
+  account: Account!
+
+  " Collection address "
+  collection: Collection!
+
+  " Current token amount for the collection "
+  tokenCount: BigInt!
+
+  " Block number in which the balance was last modified "
+  blockNumber: BigInt!
+
+  " Timestamp in which the balance was last modified "
+  timestamp: BigInt!
+}
+
+#####################################
+####### Non ERC721 Collections ######
+#####################################
+
+type NonERC721Collection @entity {
+  " Non ERC721 Smart contract address "
+  id: ID!
+}

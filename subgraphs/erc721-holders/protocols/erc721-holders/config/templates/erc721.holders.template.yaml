@@ -1,0 +1,30 @@
+specVersion: 0.0.4
+description: ERC721
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: ERC721
+    network: mainnet
+    source:
+      abi: ERC721
+      startBlock: 5806610
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Collection
+        - CollectionDailySnapshot
+        - Transfer
+        - Account
+        - AccountBalance
+        - AccountBalanceDailySnapshot
+      abis:
+        - name: ERC721
+          file: ./abis/ERC721.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mappings/collection.ts

@@ -1,0 +1,95 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum
+    name: Factory
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: Factory
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/apeswap/Factory.json
+        - name: TokenABI
+          file: ./abis/apeswap/ERC20.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+      file: ./src/mappings/factory.ts
+  - kind: ethereum
+    name: MiniChefV2
+    network: {{network}}
+    source:
+      address: "{{miniChefV2Address}}"
+      abi: MiniChefV2Apeswap
+      startBlock: {{miniChefV2StartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: 
+        - _CircularBuffer
+        - RewardToken
+      abis:
+        - name: MiniChefV2Apeswap
+          file: ./abis/apeswap/MiniChefV2Apeswap.json
+        - name: TokenABI
+          file: ./abis/apeswap/ERC20.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleWithdraw
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleEmergencyWithdraw
+        - event: LogSetPool(indexed uint256,uint256,indexed address,bool)
+          handler: handleLogSetPool
+        - event: LogPoolAddition(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleLogPoolAddition
+        - event: LogBananaPerSecond(uint256)
+          handler: handleLogBananaPerSecond
+      file: ./protocols/apeswap/src/mappings/masterchef/rewardMini.ts
+templates:
+  - kind: ethereum/contract
+    name: Pair
+    network: {{network}}
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities: []
+      abis:
+        - name: Pair
+          file: ./abis/apeswap/Pair.json
+        - name: Factory
+          file: ./abis/apeswap/Factory.json
+        - name: TokenABI
+          file: ./abis/apeswap/ERC20.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint112,uint112)
+          handler: handleSync
+          

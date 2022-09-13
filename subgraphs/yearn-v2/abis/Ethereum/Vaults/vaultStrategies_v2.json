@@ -1,0 +1,20 @@
+[
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "strategies",
+    "inputs": [{ "name": "arg0", "type": "address" }],
+    "outputs": [
+      { "name": "performanceFee", "type": "uint256" },
+      { "name": "activation", "type": "uint256" },
+      { "name": "debtRatio", "type": "uint256" },
+      { "name": "minDebtPerHarvest", "type": "uint256" },
+      { "name": "maxDebtPerHarvest", "type": "uint256" },
+      { "name": "lastReport", "type": "uint256" },
+      { "name": "totalDebt", "type": "uint256" },
+      { "name": "totalGain", "type": "uint256" },
+      { "name": "totalLoss", "type": "uint256" }
+    ],
+    "gas": 22641
+  }
+]

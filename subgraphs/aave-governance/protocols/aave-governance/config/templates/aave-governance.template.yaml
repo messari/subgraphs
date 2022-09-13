@@ -1,0 +1,102 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+features:
+  - ipfsOnEthereumContracts
+dataSources:
+  - kind: ethereum/contract
+    name: AaveGovernanceV2
+    network: {{ network }}
+    source:
+      address: "{{ governorContractAddress }}"
+      abi: AaveGovernanceV2
+      startBlock: {{ governorContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: AaveGovernanceV2
+          file: ./abis/aave-governance/AaveGovernanceV2.json
+        - name: Executor
+          file: ./abis/aave-governance/Executor.json
+        - name: GovernanceStrategy
+          file: ./abis/aave-governance/GovernanceStrategy.json
+      eventHandlers:
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalCreated(uint256,indexed address,indexed
+            address,address[],uint256[],string[],bytes[],bool[],uint256,uint256,address,bytes32)
+          handler: handleProposalCreated
+        - event: ProposalExecuted(uint256,indexed address)
+          handler: handleProposalExecuted
+        - event: ProposalQueued(uint256,uint256,indexed address)
+          handler: handleProposalQueued
+        - event: VoteEmitted(uint256,indexed address,bool,uint256)
+          handler: handleVoteEmitted
+        - event: VotingDelayChanged(uint256,indexed address)
+          handler: handleVotingDelayChanged
+      file: ./protocols/aave-governance/src/aave-governance-v-2.ts
+  - kind: ethereum/contract
+    name: AaveTokenV2
+    network: {{ network }}
+    source:
+      address: "{{ tokenContractAddress }}"
+      abi: AaveTokenV2
+      startBlock: {{ tokenContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: AaveTokenV2
+          file: ./abis/aave-governance/AaveTokenV2.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,uint8)
+          handler: handleDelegateChanged
+        - event: DelegatedPowerChanged(indexed address,uint256,uint8)
+          handler: handleDelegatedPowerChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/aave-governance/src/aave-token-v-2.ts
+  - kind: ethereum/contract
+    name: StakedTokenV2Rev3
+    network: {{ network }}
+    source:
+      address: "{{ secondTokenContractAddress }}"
+      abi: StakedTokenV2Rev3
+      startBlock: {{ secondTokenContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: StakedTokenV2Rev3
+          file: ./abis/aave-governance/StakedTokenV2Rev3.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,uint8)
+          handler: handleDelegateChanged
+        - event: DelegatedPowerChanged(indexed address,uint256,uint8)
+          handler: handleDelegatedPowerChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/aave-governance/src/staked-token-v-2-rev-3.ts

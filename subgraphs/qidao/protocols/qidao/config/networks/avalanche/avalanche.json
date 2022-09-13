@@ -1,0 +1,30 @@
+{
+  "chain": "avalanche",
+  "erc20Vaults": [
+    {
+      "name": "mooAaveAVAX",
+      "address": "0xfA19c1d104F4AEfb8d5564f02B3AdCa1b515da58",
+      "startBlock": 6404256
+    },
+    {
+      "name": "av3CRV",
+      "address": "0x13a7fe3ab741ea6301db8b164290be711f546a73",
+      "startBlock": 10354779
+    },
+    {
+      "name": "WETH",
+      "address": "0xa9122dacf3fccf1aae6b8ddd1f75b6267e5cbbb8",
+      "startBlock": 13342109
+    },
+    {
+      "name": "WBTC",
+      "address": "0x1f8f7a1d38e41eaf0ed916def29bdd13f2a3f11a",
+      "startBlock": 13047852
+    },
+    {
+      "name": "WAVAX",
+      "address": "0x73a755378788a4542a780002a75a7bae7f558730",
+      "startBlock": 13027152
+    }
+  ]
+}

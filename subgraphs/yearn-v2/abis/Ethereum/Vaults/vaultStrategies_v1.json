@@ -1,0 +1,19 @@
+[
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "strategies",
+    "inputs": [{ "type": "address", "name": "arg0" }],
+    "outputs": [
+      { "type": "uint256", "name": "performanceFee" },
+      { "type": "uint256", "name": "activation" },
+      { "type": "uint256", "name": "debtLimit" },
+      { "type": "uint256", "name": "rateLimit" },
+      { "type": "uint256", "name": "lastReport" },
+      { "type": "uint256", "name": "totalDebt" },
+      { "type": "uint256", "name": "totalGain" },
+      { "type": "uint256", "name": "totalLoss" }
+    ],
+    "gas": 10292
+  }
+]

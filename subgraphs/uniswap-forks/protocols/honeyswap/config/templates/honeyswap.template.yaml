@@ -1,0 +1,80 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Factory
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: Factory
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/factory.ts
+      entities:
+        - Token
+        - DexAmmProtocol
+        - LiquidityPool
+        - LiquidityPoolFee
+        - Protocol
+      abis:
+        - name: Factory
+          file: ./abis/honeyswap/Factory.json
+        - name: TokenABI
+          file: ./abis/honeyswap/ERC20.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+templates:
+  - kind: ethereum/contract
+    name: Pair
+    network: {{network}}
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities:
+        - LiqudityPool
+        - Token
+        - Deposit
+        - Withdraw
+        - Swap
+        - LiquidityPool
+        - LiquidityPoolFee
+        - DexAmmProtocol
+        - Token
+        - _Transaction
+        - _Mint
+        - _Burn
+        - _PricesUSD
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - _Account
+        - _DailyActiveAccount
+        - PoolDailySnapshot
+        - _TokenTracker
+      abis:
+        - name: Pair
+          file: ./abis/honeyswap/Pair.json
+        - name: Factory
+          file: ./abis/honeyswap/Factory.json
+        - name: TokenABI
+          file: ./abis/honeyswap/ERC20.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint112,uint112)
+          handler: handleSync
