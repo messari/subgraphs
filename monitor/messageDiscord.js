@@ -21,24 +21,48 @@ const colorsArray = [
     0x953553,
 ];
 
-export async function getDiscordMessages(messages) {
-    const tempMessages = await fetchMessages(messages[messages.length - 1]?.id || "");
+export async function errorNotification(error) {
 
-    messages = [...messages, ...tempMessages];
-    if (messages.length % 100 === 0 && messages.length !== 0 && tempMessages.length !== 0) {
-        await sleep(1000);
-        return getDiscordMessages(messages);
-    } else {
-        return messages;
+    await sleep(5000);
+    try {
+        const baseURL = "https://discordapp.com/api/channels/1019063880040861806/messages";
+        const headers = {
+            "Authorization": "Bot " + process.env.BOT_TOKEN,
+            "Content-Type": "application/json",
+        }
+        const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected**\n` + error });
+        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        return null;
+    } catch (err) {
+        errorNotification(err.message, 'errorNotification')
     }
 }
 
-export async function fetchMessages(before) {
+export async function getDiscordMessages(messages, channel_id) {
+    try {
+        const tempMessages = await fetchMessages(messages[messages.length - 1]?.id || "", channel_id);
+
+        messages = [...messages, ...tempMessages];
+        if (messages.length % 100 === 0 && messages.length !== 0 && tempMessages.length !== 0) {
+            await sleep(1000);
+            return getDiscordMessages(messages, channel_id);
+        } else {
+            return messages;
+        }
+    } catch (err) {
+        errorNotification(err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message + ' getDiscordMessages() messageDiscord.js');
+    }
+}
+
+export async function fetchMessages(before, channel_id) {
     let beforeQueryParam = "";
     if (before) {
         beforeQueryParam = "&before=" + before;
     }
-    const baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages?limit=100" + beforeQueryParam;
+    let baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages?limit=100" + beforeQueryParam;
+    if (channel_id) {
+        baseURL = "https://discordapp.com/api/channels/" + channel_id + "/messages?limit=100" + beforeQueryParam;
+    }
     const headers = {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",
@@ -53,24 +77,27 @@ export async function fetchMessages(before) {
 
         return previousWeekMessages;
     } catch (err) {
-        console.log(err);
+        errorNotification(err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message + ' fetchMessages() messageDiscord.js');
     }
 }
 
-export async function clearChannel() {
-    const msgs = await getDiscordMessages([]);
-    const baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages/bulk-delete";
-    const headers = {
-        "Authorization": "Bot " + process.env.BOT_TOKEN,
-        "Content-Type": "application/json",
-    }
-
-    const postJSON = JSON.stringify({ "messages": msgs.map(x => x.id).slice(0, 100) });
-
+export async function clearChannel(channel_id) {
     try {
+        const msgs = await getDiscordMessages([], channel_id);
+        let baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages/bulk-delete";
+        if (channel_id) {
+            baseURL = "https://discordapp.com/api/channels/" + channel_id + "/messages/bulk-delete";
+        }
+        const headers = {
+            "Authorization": "Bot " + process.env.BOT_TOKEN,
+            "Content-Type": "application/json",
+        }
+
+        const postJSON = JSON.stringify({ "messages": msgs.map(x => x.id).slice(0, 100) });
+
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
     } catch (err) {
-        console.log('ERROR', err)
+        errorNotification(err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message + ' clearChannel() messageDiscord.js');
     }
 }
 
@@ -107,7 +134,7 @@ export async function sendDiscordMessage(messageObjects, protocolName) {
         if (err.response.status === 429) {
             return messageObjects;
         } else {
-            console.log(err.response.data.message)
+            errorNotification(err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message + ' sendDiscordMessage() messageDiscord.js')
             return null;
         }
     }
@@ -131,7 +158,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol) {
             networkString += ' (PENDING)'
         }
         const protocolErrorEmbed = {
-            title: `Protocol Errors on ${protocol}-${networkString}`,
+            title: `Protocol Level Errors on ${protocol}-${networkString}`,
             color: placeholderColor,
             description: 'After mapping through all of the subgraph deployments for this protocol, The errors listed in this section were detected within protocol level data.',
             fields: [],
@@ -149,7 +176,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol) {
                     errorsOnDeployment = true;
                 }
                 errorArray.forEach((error) => {
-                    protocolRows.push({ name: 'Type', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`"${ProtocolTypeEntityName[depo.protocolType]}"`), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
+                    protocolRows.push({ name: 'Field', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`"${ProtocolTypeEntityName[depo.protocolType]}"`), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
                 });
             }
             protocolErrorEmbed.fields = [...protocolErrorEmbed.fields, ...protocolRows]

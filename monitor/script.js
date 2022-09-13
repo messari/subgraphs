@@ -1,5 +1,5 @@
 import axios from "axios";
-import { clearChannel, constructEmbedMsg, getDiscordMessages, sendDiscordMessage } from "./messageDiscord.js";
+import { clearChannel, constructEmbedMsg, errorNotification, getDiscordMessages, sendDiscordMessage } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
@@ -9,9 +9,13 @@ import path from 'path'
 
 const dayMs = 3600000 * 24;
 
-clearChannel();
-executionFlow();
-setInterval(executionFlow, dayMs);
+try {
+  clearChannel("");
+  executionFlow();
+  setInterval(executionFlow, dayMs);
+} catch (err) {
+  errorNotification(err.message + ' MAIN LOGIC script.js');
+}
 
 async function executionFlow() {
   const { data } = await axios.get(
@@ -130,7 +134,7 @@ async function executionFlow() {
         (resultData) => (resultData.data.data)
       ))
     )
-    .catch((err) => console.log(err));
+    .catch((err) => errorNotification(err.message + ' executionFlow() script.js'));
 
   indexData = { ...indexData[0], ...indexData[1] };
 
@@ -177,7 +181,7 @@ async function executionFlow() {
 
   if (messagesToPost.length > 0) {
     // Need to pull refreshed list of alert messages, in case posted but error was thrown as well.
-    const currentDiscordMessages = await getDiscordMessages([]);
+    const currentDiscordMessages = await getDiscordMessages([], "");
     await resolveQueriesToAttempt(messagesToPost, currentDiscordMessages);
   }
   return;
@@ -198,7 +202,7 @@ async function resolveQueriesToAttempt(queriesToAttempt, currentDiscordMessages)
 
     await Promise.allSettled(useQueries.map(object => sendDiscordMessage(object.message, object.protocolName)));
   } catch (err) {
-    console.log(err)
+    errorNotification(err.message + ' resolveQueriesToAttempt() script.js');
   }
 
   await sleep(5000);
