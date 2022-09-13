@@ -841,3 +841,12 @@ type _PoolPricingHelper @entity {
   " exchange rate of token in base token units, before decimal adjustments "
   priceTokenInBase: BigDecimal!
 }
+
+type _LiquidityGauge @entity {
+  " Gauge Address"
+  id: ID!
+  " Pool linked to this gauge "
+  pool: LiquidityPool!
+  " Whether gauge is currently active "
+  active: Boolean!
+}

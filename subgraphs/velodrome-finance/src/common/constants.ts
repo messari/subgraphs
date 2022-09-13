@@ -178,3 +178,4 @@ export const USDC_ADDRESS = "0x7f5c764cbc14f9669b88837ca1490cca17c31607"
 /////////////////////////////
 
 export const FACTORY_ADDRESS = "0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746";
+export const VELO_ADDRESS = "0x3c8b650257cfb5f272f799f5e2b4e65093a11a05"

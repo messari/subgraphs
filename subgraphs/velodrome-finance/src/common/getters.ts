@@ -129,24 +129,25 @@ export function getOrCreateUsageMetricHourlySnapshot(
 }
 
 export function getOrCreateLiquidityPoolDailySnapshot(
-  event: ethereum.Event
+  poolAddress: Address,
+  block: ethereum.Block
 ): LiquidityPoolDailySnapshot {
-  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let day = block.timestamp.toI32() / SECONDS_PER_DAY;
   let dayId = day.toString();
   let poolMetrics = LiquidityPoolDailySnapshot.load(
-    event.address.toHexString().concat("-").concat(dayId)
+    poolAddress.toHexString().concat("-").concat(dayId)
   );
 
   if (!poolMetrics) {
-    let pool = getLiquidityPool(event.address);
+    let pool = getLiquidityPool(poolAddress);
 
     poolMetrics = new LiquidityPoolDailySnapshot(
-      event.address.toHexString().concat("-").concat(dayId)
+      poolAddress.toHexString().concat("-").concat(dayId)
     );
     poolMetrics.protocol = FACTORY_ADDRESS;
-    poolMetrics.pool = event.address.toHexString();
-    poolMetrics.blockNumber = event.block.number;
-    poolMetrics.timestamp = event.block.timestamp;
+    poolMetrics.pool = poolAddress.toHexString();
+    poolMetrics.blockNumber = block.number;
+    poolMetrics.timestamp = block.timestamp;
 
     poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
     poolMetrics.cumulativeSupplySideRevenueUSD =
@@ -173,24 +174,25 @@ export function getOrCreateLiquidityPoolDailySnapshot(
 }
 
 export function getOrCreateLiquidityPoolHourlySnapshot(
-  event: ethereum.Event
+  poolAddress: Address,
+  block: ethereum.Block
 ): LiquidityPoolHourlySnapshot {
-  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  let hour = block.timestamp.toI32() / SECONDS_PER_HOUR;
 
   let hourId = hour.toString();
   let poolMetrics = LiquidityPoolHourlySnapshot.load(
-    event.address.toHexString().concat("-").concat(hourId)
+    poolAddress.toHexString().concat("-").concat(hourId)
   );
 
   if (!poolMetrics) {
-    let pool = getLiquidityPool(event.address);
+    let pool = getLiquidityPool(poolAddress);
     poolMetrics = new LiquidityPoolHourlySnapshot(
-      event.address.toHexString().concat("-").concat(hourId)
+      poolAddress.toHexString().concat("-").concat(hourId)
     );
     poolMetrics.protocol = FACTORY_ADDRESS;
-    poolMetrics.pool = event.address.toHexString();
-    poolMetrics.blockNumber = event.block.number;
-    poolMetrics.timestamp = event.block.timestamp;
+    poolMetrics.pool = poolAddress.toHexString();
+    poolMetrics.blockNumber = block.number;
+    poolMetrics.timestamp = block.timestamp;
 
     poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
     poolMetrics.cumulativeSupplySideRevenueUSD =
@@ -210,8 +212,8 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
     // poolMetrics.outputTokenSupply = pool.outputTokenSupply
     // poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD
 
-    poolMetrics.blockNumber = event.block.number;
-    poolMetrics.timestamp = event.block.timestamp;
+    poolMetrics.blockNumber = block.number;
+    poolMetrics.timestamp = block.timestamp;
 
     poolMetrics.save();
   }

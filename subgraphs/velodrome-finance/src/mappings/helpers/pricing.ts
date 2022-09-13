@@ -6,10 +6,11 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   USDC_ADDRESS,
+  USDC_DECIMALS,
   ZERO_ADDRESS,
 } from "../../common/constants";
 import { getLiquidityPool, getOrCreateToken } from "../../common/getters";
-import { safeDiv } from "../../common/utils/numbers";
+import { exponentToBigDecimal, safeDiv } from "../../common/utils/numbers";
 
 export function updatePoolPriceFromSwap(event: Swap): void {
   let pool = getLiquidityPool(event.address);
@@ -50,16 +51,16 @@ export function updatePoolPriceFromSwap(event: Swap): void {
   ) {
     // Swap is from token0 to token1
     helper.priceTokenInBase = token0IsBase
-      ? amountTokenOut.div(amountBaseIn)   //  Base In -> Token Out swap
-      : amountTokenIn.div(amountBaseOut);  //  Token In -> Base Out swap
+      ? amountBaseIn.div(amountTokenOut) //  Base In -> Token Out swap
+      : amountBaseOut.div(amountTokenIn); //  Token In -> Base Out swap
   } else if (
     event.params.amount1In > BIGINT_ZERO &&
     event.params.amount0Out > BIGINT_ZERO
   ) {
     // Swap is from token1 to token0
     helper.priceTokenInBase = token0IsBase
-      ? amountTokenIn.div(amountBaseOut)   // Token In -> Base Out swap
-      : amountTokenOut.div(amountBaseIn);  // Base In -> Token Out swap
+      ? amountBaseOut.div(amountTokenIn) // Token In -> Base Out swap
+      : amountBaseIn.div(amountTokenOut); // Base In -> Token Out swap
   } else {
     log.warning("Could not identify swap direction for tx: {}, log Index: {}", [
       event.transaction.hash.toHex(),
@@ -69,15 +70,14 @@ export function updatePoolPriceFromSwap(event: Swap): void {
   helper.save();
 
   if (event.block.number > token.lastPriceBlockNumber!) {
-    token.lastPriceUSD = helper.priceTokenInBase.times(
-      getBaseTokenRateInUSDC(event.address)
-    );
+    token.lastPriceUSD = helper.priceTokenInBase
+      .times(getBaseTokenRateInUSDC(event.address))
+      .times(exponentToBigDecimal(token.decimals))
+      .div(exponentToBigDecimal(USDC_DECIMALS));
     token.lastPriceBlockNumber = event.block.number;
     token.save();
   }
 }
-
-let USDC_DECIMAL_FACTOR = 10 ** 6;
 
 export function getBaseTokenRateInUSDC(poolAddress: Address): BigDecimal {
   let rate = BIGDECIMAL_ZERO;
@@ -98,10 +98,7 @@ export function getBaseTokenRateInUSDC(poolAddress: Address): BigDecimal {
       }
     }
   }
-  // After conversions the rate will always be in USDC, which has 6 decimals
-  return rate.div(
-    BigDecimal.fromString(USDC_DECIMAL_FACTOR.toString())
-  ) as BigDecimal;
+  return rate;
 }
 
 export function getExchangeRate(
@@ -113,12 +110,10 @@ export function getExchangeRate(
   if (baseTokenIndex == helper.baseTokenIndex) {
     rate = helper.priceTokenInBase;
   } else {
-    rate = safeDiv(BIGDECIMAL_ONE, helper.priceTokenInBase)
+    rate = safeDiv(BIGDECIMAL_ONE, helper.priceTokenInBase);
   }
 
   return rate;
 }
 
-export function updateLPTokenPrice(poolAddress: Address): void {
-
-}
+export function updateLPTokenPrice(poolAddress: Address): void {}

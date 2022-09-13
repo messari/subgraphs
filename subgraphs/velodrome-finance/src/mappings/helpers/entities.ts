@@ -6,6 +6,7 @@ import {
   LiquidityPoolFee,
   Swap,
   Withdraw,
+  _LiquidityGauge,
   _PoolPricingHelper,
 } from "../../../generated/schema";
 import { Pair as PairTemplate } from "../../../generated/templates";
@@ -68,8 +69,8 @@ export function createLiquidityPool(
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
-  pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-  pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+  pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
 
   pool._stable = stable;
 
@@ -280,4 +281,12 @@ export function createSwap(event: SwapEvent): void {
   }
 
   swap.save();
+}
+
+export function getOrCreateGauge(gaugeAddress: Address): _LiquidityGauge {
+  let gauge = _LiquidityGauge.load(gaugeAddress.toHex())
+  if (!gauge) {
+    gauge = new _LiquidityGauge(gaugeAddress.toHex())
+  }
+  return gauge
 }

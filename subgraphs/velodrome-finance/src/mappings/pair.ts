@@ -1,4 +1,3 @@
-import { log } from "@graphprotocol/graph-ts";
 import {
   Mint,
   Burn,
@@ -7,11 +6,7 @@ import {
   Transfer,
   Sync,
 } from "../../generated/templates/Pair/Pair";
-import {
-  createDeposit,
-  createWithdraw,
-  createSwap,
-} from "./helpers/entities";
+import { createDeposit, createWithdraw, createSwap } from "./helpers/entities";
 import {
   updateFinancials,
   updateUsageMetrics,
@@ -20,7 +15,6 @@ import {
 } from "../common/metrics";
 // import { getRewardsPerDay, RewardIntervalType } from "../common/rewards";
 import {
-  BIGDECIMAL_ONE,
   BIGINT_THOUSAND,
   BIGINT_ZERO,
   UsageType,
@@ -45,7 +39,7 @@ export function handleMint(event: Mint): void {
   updatePoolValue(event.address, event.block); // TVL, output token price
   updateUsageMetrics(event, event.params.sender, UsageType.DEPOSIT);
   updateFinancials(event);
-  updatePoolMetrics(event); // Syncs daily/hourly metrics with pool
+  updatePoolMetrics(event.address, event.block); // Syncs daily/hourly metrics with pool
 }
 
 export function handleBurn(event: Burn): void {
@@ -53,10 +47,7 @@ export function handleBurn(event: Burn): void {
   updatePoolValue(event.address, event.block); // TVL, output token price
   updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
   updateFinancials(event);
-  updatePoolMetrics(event); // Syncs daily/hourly metrics with pool
-
-  // // INT_ONE and BLOCK for reward amount and interval type are arbitrary since uniswap does not have reward emissions
-  // getRewardsPerDay(event.block.timestamp, event.block.number, BIGDECIMAL_ONE, RewardIntervalType.BLOCK)
+  updatePoolMetrics(event.address, event.block); // Syncs daily/hourly metrics with pool
 }
 
 export function handleSwap(event: Swap): void {
@@ -71,7 +62,7 @@ export function handleSwap(event: Swap): void {
   );
   updateUsageMetrics(event, event.params.sender, UsageType.SWAP);
   updateFinancials(event);
-  updatePoolMetrics(event); // Syncs daily/hourly metrics with pool
+  updatePoolMetrics(event.address, event.block); // Syncs daily/hourly metrics with pool
 }
 
 export function handleFees(event: Fees): void {

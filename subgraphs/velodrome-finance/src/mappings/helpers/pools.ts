@@ -1,9 +1,5 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import {
-  BIGDECIMAL_TWO,
-  BIGDECIMAL_ZERO,
-  ProtocolType,
-} from "../../common/constants";
+import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO } from "../../common/constants";
 import {
   getLiquidityPool,
   getOrCreateDex,
@@ -22,7 +18,6 @@ export function updateTokenBalances(
 ): void {
   let pool = getLiquidityPool(poolAddress);
   pool.inputTokenBalances = [balance0, balance1];
-
   pool.save();
 }
 
@@ -47,8 +42,12 @@ export function updatePoolValue(
     token1.decimals
   ).times(token1.lastPriceUSD!);
 
+  const previousPoolTvlUSD = pool.totalValueLockedUSD;
+
   pool.totalValueLockedUSD = reserve0USD.plus(reserve1USD);
-  protocol.totalValueLockedUSD = reserve0USD.plus(reserve1USD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD
+    .minus(previousPoolTvlUSD)
+    .plus(reserve0USD.plus(reserve1USD));
 
   pool.outputTokenPriceUSD = safeDiv(
     pool.totalValueLockedUSD,
@@ -119,10 +118,10 @@ export function updatePoolVolume(
     financialsDailySnapshot.dailyVolumeUSD.plus(amountTotalUSD);
   financialsDailySnapshot.cumulativeVolumeUSD =
     financialsDailySnapshot.cumulativeVolumeUSD.plus(amountTotalUSD);
-  financialsDailySnapshot.blockNumber = event.block.number
-  financialsDailySnapshot.timestamp = event.block.timestamp
+  financialsDailySnapshot.blockNumber = event.block.number;
+  financialsDailySnapshot.timestamp = event.block.timestamp;
 
-  let poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(event);
+  let poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(event.address, event.block);
   poolDailySnapshot.dailyVolumeUSD =
     poolDailySnapshot.dailyVolumeUSD.plus(amountTotalUSD);
   poolDailySnapshot.dailyVolumeByTokenAmount = [
@@ -135,10 +134,10 @@ export function updatePoolVolume(
   ];
   poolDailySnapshot.cumulativeVolumeUSD =
     poolDailySnapshot.cumulativeVolumeUSD.plus(amountTotalUSD);
-  poolDailySnapshot.blockNumber = event.block.number
-  poolDailySnapshot.timestamp = event.block.timestamp
+  poolDailySnapshot.blockNumber = event.block.number;
+  poolDailySnapshot.timestamp = event.block.timestamp;
 
-  let poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(event);
+  let poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(event.address, event.block);
   poolHourlySnapshot.hourlyVolumeUSD =
     poolHourlySnapshot.hourlyVolumeUSD.plus(amountTotalUSD);
   poolHourlySnapshot.hourlyVolumeByTokenAmount = [
@@ -151,8 +150,8 @@ export function updatePoolVolume(
   ];
   poolHourlySnapshot.cumulativeVolumeUSD =
     poolHourlySnapshot.cumulativeVolumeUSD.plus(amountTotalUSD);
-    poolHourlySnapshot.blockNumber = event.block.number
-    poolHourlySnapshot.timestamp = event.block.timestamp
+  poolHourlySnapshot.blockNumber = event.block.number;
+  poolHourlySnapshot.timestamp = event.block.timestamp;
 
   pool.save();
   protocol.save();

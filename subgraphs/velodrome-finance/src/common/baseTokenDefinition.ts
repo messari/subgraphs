@@ -26,14 +26,14 @@ export class BaseTokenDefinition {
 
     const USDC_sUSD = "0xd16232ad60188b68076a235c65d692090caba155";
     const USDC_DAI = "0x4f7ebc19844259386dbddb7b2eb759eefc6f8353";
-    const USDC_OP = "0x47029bc8f5cbe3b464004e87ef9c9419a48018cd";
+    const OP_USDC = "0x47029bc8f5cbe3b464004e87ef9c9419a48018cd";
     const WETH_USDC = "0x79c912fef520be002c2b6e57ec4324e260f38e50";
 
     let lookup = new TypedMap<Address, UsdPathConfig>();
     lookup.set(USDC, { pathUsdIdx: [-1], path: [ZERO_ADDRESS], priority: 4 });
     lookup.set(sUSD, { pathUsdIdx: [0], path: [USDC_sUSD], priority: 3 });
     lookup.set(DAI, { pathUsdIdx: [0], path: [USDC_DAI], priority: 2 });
-    lookup.set(OP, { pathUsdIdx: [0], path: [USDC_OP], priority: 1 });
+    lookup.set(OP, { pathUsdIdx: [1], path: [OP_USDC], priority: 1 });
     lookup.set(WETH, { pathUsdIdx: [1], path: [WETH_USDC], priority: 0 });
 
     return lookup as TypedMap<Address, UsdPathConfig>;

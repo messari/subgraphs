@@ -92,7 +92,11 @@ templates:
           handler: handleFees
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
         - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleSwap
+        - event: Sync(uint256,uint256)
+          handler: handleSync
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
