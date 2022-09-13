@@ -2,7 +2,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
-/////////////////////
+////////////////////
 
 // The network names corresponding to the Network enum in the schema.
 // They also correspond to the ones in `dataSource.network()` after converting to lower case.
