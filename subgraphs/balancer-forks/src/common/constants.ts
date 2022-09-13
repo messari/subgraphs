@@ -136,7 +136,7 @@ export const FEE_DENOMINATOR = DEFAULT_DECIMALS_DENOMINATOR;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
-export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7000);
 
 /////////////////////////////////////
 ///// Protocol/Network Specific /////

@@ -99,11 +99,22 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
 }
 
 export function getPoolTokenWeightsForDynamicWeightPools(
-  poolAddress: Address
+  poolAddress: Address,
+  inputTokens: string[]
 ): BigDecimal[] {
   const poolContract = WeightedPoolContract.bind(poolAddress);
 
-  let scales = readValue<BigInt[]>(poolContract.try_getScalingFactors(), []);
+  let scales: BigInt[] = [];
+  for (let idx = 0; idx < inputTokens.length; idx++) {
+    let scale = readValue<BigInt>(
+      poolContract.try_getScalingFactor(
+        Address.fromString(inputTokens.at(idx))
+      ),
+      constants.BIGINT_ZERO
+    );
+
+    scales.push(scale);
+  }
   let totalScale = scales
     .reduce<BigInt>((sum, current) => sum.plus(current), constants.BIGINT_ZERO)
     .toBigDecimal();
@@ -145,11 +156,17 @@ export function getPoolTokenWeightsForNormalizedPools(
   return inputTokenWeights;
 }
 
-export function getPoolTokenWeights(poolAddress: Address): BigDecimal[] {
+export function getPoolTokenWeights(
+  poolAddress: Address,
+  inputTokens: string[]
+): BigDecimal[] {
   let inputTokenWeights = getPoolTokenWeightsForNormalizedPools(poolAddress);
   if (inputTokenWeights.length > 0) return inputTokenWeights;
 
-  inputTokenWeights = getPoolTokenWeightsForDynamicWeightPools(poolAddress);
+  inputTokenWeights = getPoolTokenWeightsForDynamicWeightPools(
+    poolAddress,
+    inputTokens
+  );
 
   return inputTokenWeights;
 }
