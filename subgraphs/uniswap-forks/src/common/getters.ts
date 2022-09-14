@@ -51,6 +51,11 @@ export function getOrCreateDex(): DexAmmProtocol {
 
     protocol.save();
   }
+
+  protocol.schemaVersion = NetworkConfigs.getSchemaVersion();
+  protocol.subgraphVersion = NetworkConfigs.getSubgraphVersion();
+  protocol.methodologyVersion = NetworkConfigs.getMethodologyVersion();
+  
   return protocol;
 }
 
