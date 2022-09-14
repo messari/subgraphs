@@ -1,5 +1,4 @@
-// import { log } from '@graphprotocol/graph-ts'
-import { log } from "@graphprotocol/graph-ts";
+// import { log } from "@graphprotocol/graph-ts";
 import {
   Burn as BurnEvent,
   Initialize,
