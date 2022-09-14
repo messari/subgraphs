@@ -10,7 +10,7 @@ npm run build --ID=uniswap-v2-ethereum --SPAN=single
 Test 2 - Build all deployments for a protocol
 npm run build --ID=uniswap-v2 --SPAN=protocol
 
-Test 3 - Build all deployments for a protocol
+Test 3 - Build all deployments within a directory
 npm run build --ID=uniswap-v2 --SPAN=base
 
 Test 4 - Deploy a single deployment ID to Hosted Service
@@ -28,7 +28,7 @@ npm run build --ID=uniswap-v2-ethereum --SLUG=uniswap-v2-ethereum-other --SERVIC
 Test 8 - Deploy all deployments for a protocol
 npm run build --ID=apeswap --SPAN=protocol --SERVICE=h --TARGET=steegecs --DEPLOY=t
 
-Test 9 - Deploy all deployments for a base
+Test 9 - Deploy all deployments within a directory
 npm run build --ID=uniswap-fork --SPAN=base --SERVICE=h --TARGET=steegecs --DEPLOY=t
 
 

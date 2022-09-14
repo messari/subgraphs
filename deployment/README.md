@@ -3,32 +3,42 @@
 ## Usage:
 
 **Build a single deployment ID:**
-npm run build --ID=uniswap-v2-ethereum
-npm run build --ID=uniswap-v2-ethereum --SPAN=single
+
+`npm run build --ID=uniswap-v2-ethereum`
+`npm run build --ID=uniswap-v2-ethereum --SPAN=single`
 
 **Build all deployments for a protocol:**
-npm run build --ID=uniswap-v2 --SPAN=protocol
 
-**Build all deployments for a protocol:**
-npm run build --ID=uniswap-v2 --SPAN=base
+`npm run build --ID=uniswap-v2 --SPAN=protocol`
+
+**Build all deployments within a directory:**
+
+`npm run build --ID=uniswap-v2 --SPAN=base`
 
 **Deploy a single deployment ID to Hosted Service:**
-npm run build --ID=uniswap-v2-ethereum --SERVICE=h --TARGET=steegecs --DEPLOY=t
+
+`npm run build --ID=uniswap-v2-ethereum --SERVICE=h --TARGET=steegecs --DEPLOY=t`
 
 **Deploy a single deployment ID to Subgraph Studio:**
-npm run build --ID=compound-v2-ethereum --SERVICE=s --TARGET=steegecs --DEPLOY=t
+
+`npm run build --ID=compound-v2-ethereum --SERVICE=s --TARGET=steegecs --DEPLOY=t`
 
 **Deploy a single deployment ID to Cronos Portal:**
-npm run build --ID=vvs-finance --SERVICE=c --TARGET=steegecs --TOKEN={token} --DEPLOY=t
+
+`npm run build --ID=vvs-finance --SERVICE=c --TARGET=steegecs --TOKEN={token} --DEPLOY=t`
 
 **Deploy a single deployment ID to Hosted Service using a different slug than specified in JSON:**
-npm run build --ID=uniswap-v2-ethereum --SLUG=uniswap-v2-ethereum-other --SERVICE=h --TARGET=steegecs --DEPLOY=t
+
+`npm run build --ID=uniswap-v2-ethereum --SLUG=uniswap-v2-ethereum-other --SERVICE=h --TARGET=steegecs --DEPLOY=t`
 
 **Deploy all deployments for a protocol:**
-npm run build --ID=apeswap --SPAN=protocol --SERVICE=h --TARGET=steegecs --DEPLOY=t
 
-**Deploy all deployments for a base:**
-npm run build --ID=uniswap-fork --SPAN=base --SERVICE=h --TARGET=steegecs --DEPLOY=t
+`npm run build --ID=apeswap --SPAN=protocol --SERVICE=h --TARGET=steegecs --DEPLOY=t`
+
+**Deploy all deployments within a directory:**
+
+`npm run build --ID=uniswap-fork --SPAN=base --SERVICE=h --TARGET=steegecs --DEPLOY=t`
+
 
 
 - --PRINTLOGS
