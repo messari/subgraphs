@@ -143,6 +143,8 @@ export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
+export const EMPTY_STRING = "";
+
 /////////////////////
 ///// Date/Time /////
 /////////////////////
@@ -171,6 +173,9 @@ export const TROVE_MANAGER = "0x100EC08129e0FD59959df93a8b914944A3BbD5df";
 export const ACTIVE_POOL_CREATED_TIMESTAMP = BigInt.fromI32(1644224579);
 
 export const ACTIVE_POOL_CREATED_BLOCK = BigInt.fromI32(5559192);
+
+export const PRICE_ORACLE_V1_ADDRESS =
+  "0xc93408bfbea0bf3e53bedbce7d5c1e64db826702";
 
 export const VST_ADDRESS = "0x64343594Ab9b56e99087BfA6F2335Db24c2d1F17";
 

@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
@@ -9,6 +9,16 @@ export function bigIntToBigDecimal(
       .pow(decimals as u8)
       .toBigDecimal()
   );
+}
+
+// returns 10^exp
+export function exponentToBigDecimal(exp: i32 = 18): BigDecimal {
+  let bd = BigDecimal.fromString("1");
+  const ten = BigDecimal.fromString("10");
+  for (let i = 0; i < exp; i++) {
+    bd = bd.times(ten);
+  }
+  return bd;
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {

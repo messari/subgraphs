@@ -1,16 +1,21 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { IERC20Detailed } from "../../generated/TroveManager/IERC20Detailed";
+import { IERC20DetailedBytes } from "../../generated/TroveManager/IERC20DetailedBytes";
+import { PriceFeedV1 } from "../../generated/templates/PriceFeedV1/PriceFeedV1";
 import { Token } from "../../generated/schema";
+import { getLendingProtocol } from "../entities/protocol";
 import {
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
+  EMPTY_STRING,
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
+  PRICE_ORACLE_V1_ADDRESS,
   VST_ADDRESS,
 } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
-import { IERC20Detailed } from "../../generated/TroveManager/IERC20Detailed";
-import { IERC20DetailedBytes } from "../../generated/TroveManager/IERC20DetailedBytes";
 
 export const UNKNOWN_TOKEN_VALUE = "unknown";
 
@@ -19,7 +24,12 @@ export function getOrCreateAssetToken(tokenAddress: Address): Token {
 }
 
 export function getVSTToken(): Token {
-  return getOrCreateToken(Address.fromString(VST_ADDRESS));
+  const token = getOrCreateToken(Address.fromString(VST_ADDRESS));
+  if ((token.lastPriceUSD = BIGDECIMAL_ZERO)) {
+    token.lastPriceUSD = BIGDECIMAL_ONE;
+  }
+  token.save();
+  return token;
 }
 
 function getOrCreateToken(tokenAddress: Address): Token {
@@ -39,9 +49,24 @@ function getOrCreateToken(tokenAddress: Address): Token {
       token.decimals = fetchTokenDecimals(contract);
     }
     token.lastPriceUSD = BIGDECIMAL_ZERO;
+
+    let priceOracleAddress = PRICE_ORACLE_V1_ADDRESS;
+    const protocol = getLendingProtocol();
+    if (protocol != null && protocol._priceOracle != EMPTY_STRING) {
+      priceOracleAddress = protocol._priceOracle;
+    }
+
+    const priceFeedContract = PriceFeedV1.bind(
+      Address.fromString(priceOracleAddress)
+    );
+    const tryFetchPrice = priceFeedContract.try_fetchPrice(tokenAddress);
+    if (!tryFetchPrice.reverted) {
+      const price = tryFetchPrice.value;
+      token.lastPriceUSD = bigIntToBigDecimal(price);
+    }
+
     token.save();
   }
-
   return token;
 }
 

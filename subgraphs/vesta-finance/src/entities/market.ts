@@ -21,7 +21,6 @@ import {
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
-  ZERO_ADDRESS,
 } from "../utils/constants";
 import {
   addProtocolMarketAssets,
@@ -36,7 +35,7 @@ import {
   updateProtocolUSDLocked,
 } from "./protocol";
 import { getOrCreateAssetToken, getCurrentAssetPrice } from "./token";
-import { bigIntToBigDecimal } from "../utils/numbers";
+import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 
 export function getOrCreateMarket(asset: Address): Market {
@@ -54,7 +53,7 @@ export function getOrCreateMarket(asset: Address): Market {
     market.maximumLTV = MAXIMUM_LTV;
     market.liquidationThreshold = MAXIMUM_LTV;
     market.liquidationPenalty = LIQUIDATION_FEE_PERCENT;
-    market.inputToken = getOrCreateAssetToken(asset).id;
+    market.inputToken = inputToken.id;
     market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
@@ -218,11 +217,16 @@ export function setMarketVSTDebt(
 ): void {
   const debtUSD = bigIntToBigDecimal(debtVST);
   const market = getOrCreateMarket(asset);
+  const debtUSDChange = debtUSD.minus(market.totalBorrowBalanceUSD);
+  const debtVSTChange = BigInt.fromString(
+    debtUSDChange.times(exponentToBigDecimal()).toString()
+  );
   market.totalBorrowBalanceUSD = debtUSD;
   market.save();
+
   getOrCreateMarketSnapshot(event, market);
   getOrCreateMarketHourlySnapshot(event, market);
-  updateProtocolBorrowBalance(event, debtUSD, debtVST);
+  updateProtocolBorrowBalance(event, debtUSDChange, debtVSTChange);
 }
 
 export function setMarketAssetBalance(
@@ -241,6 +245,7 @@ export function setMarketAssetBalance(
   market.inputTokenBalance = balanceAsset;
   market.inputTokenPriceUSD = getCurrentAssetPrice(asset);
   market.save();
+
   getOrCreateMarketSnapshot(event, market);
   getOrCreateMarketHourlySnapshot(event, market);
   updateProtocolUSDLocked(event, netChangeUSD);

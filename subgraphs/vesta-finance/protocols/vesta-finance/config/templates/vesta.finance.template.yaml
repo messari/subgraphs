@@ -18,6 +18,8 @@ dataSources:
       abis:
         - name: TroveManager
           file: ./abis/TroveManager.json
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
@@ -55,30 +57,26 @@ dataSources:
         - event: TroveUpdated(indexed address,indexed address,uint256,uint256,uint256,uint8)
           handler: handleTroveUpdated
       file: ./src/mapping/BorrowerOperations.ts
-  - name: PriceFeed
+  - name: VestaParameters
     kind: ethereum/contract
     network: arbitrum-one
     source:
-      abi: PriceFeed
-      address: "0xd218Ba424A6166e37A454F8eCe2bf8eB2264eCcA"
-      startBlock: 8225990
+      abi: VestaParameters
+      address: "0x5F51B0A5E940A3a20502B5F59511B13788Ec6DDB"
+      startBlock: 5559245
     mapping:
-      file: ./src/mapping/PriceFeed.ts
+      file: ./src/mapping/VestaParameters.ts
       language: wasm/assemblyscript
       kind: ethereum/events
       apiVersion: 0.0.6
       entities:
         - Token
       abis:
-        - name: PriceFeed
-          file: ./abis/PriceFeedV2.json
-        - name: IERC20Detailed
-          file: ./abis/IERC20Detailed.json
-        - name: IERC20DetailedBytes
-          file: ./abis/IERC20DetailedBytes.json
+        - name: VestaParameters
+          file: ./abis/VestaParameters.json
       eventHandlers:
-        - event: TokenPriceUpdated(indexed address,uint256)
-          handler: handleTokenPriceUpdated
+        - event: PriceFeedChanged(indexed address)
+          handler: handlePriceFeedChanged
   - kind: ethereum/contract
     name: ActivePool
     network: arbitrum-one
@@ -94,12 +92,12 @@ dataSources:
       abis:
         - name: ActivePool
           file: ./abis/ActivePool.json
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
-        - name: PriceFeed
-          file: ./abis/PriceFeedV2.json
       eventHandlers:
         - event: ActivePoolAssetBalanceUpdated(address,uint256)
           handler: handleActivePoolAssetBalanceUpdated
@@ -142,12 +140,12 @@ dataSources:
       abis:
         - name: StabilityPool
           file: ./abis/StabilityPool.json
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
-        - name: PriceFeed
-          file: ./abis/PriceFeedV2.json
       eventHandlers:
         - event: StabilityPoolAssetBalanceUpdated(uint256)
           handler: handleStabilityPoolAssetBalanceUpdated
@@ -169,12 +167,12 @@ dataSources:
       abis:
         - name: StabilityPool
           file: ./abis/StabilityPool.json
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
-        - name: PriceFeed
-          file: ./abis/PriceFeedV2.json
       eventHandlers:
         - event: StabilityPoolAssetBalanceUpdated(uint256)
           handler: handleStabilityPoolAssetBalanceUpdated
@@ -196,12 +194,12 @@ dataSources:
       abis:
         - name: StabilityPool
           file: ./abis/StabilityPool.json
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
-        - name: PriceFeed
-          file: ./abis/PriceFeedV2.json
       eventHandlers:
         - event: StabilityPoolAssetBalanceUpdated(uint256)
           handler: handleStabilityPoolAssetBalanceUpdated
@@ -223,12 +221,12 @@ dataSources:
       abis:
         - name: StabilityPool
           file: ./abis/StabilityPool.json
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
-        - name: PriceFeed
-          file: ./abis/PriceFeedV2.json
       eventHandlers:
         - event: StabilityPoolAssetBalanceUpdated(uint256)
           handler: handleStabilityPoolAssetBalanceUpdated
@@ -250,15 +248,62 @@ dataSources:
       abis:
         - name: StabilityPool
           file: ./abis/StabilityPool.json
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
           file: ./abis/IERC20DetailedBytes.json
-        - name: PriceFeed
-          file: ./abis/PriceFeedV2.json
       eventHandlers:
         - event: StabilityPoolAssetBalanceUpdated(uint256)
           handler: handleStabilityPoolAssetBalanceUpdated
         - event: StabilityPoolVSTBalanceUpdated(uint256)
           handler: handleStabilityPoolVSTBalanceUpdated
       file: ./src/mapping/StabilityPool.ts
+templates:
+  - name: PriceFeedV1
+    kind: ethereum/contract
+    network: arbitrum-one
+    source:
+      abi: PriceFeedV1
+    mapping:
+      file: ./src/mapping/PriceFeed.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      entities: []
+      abis:
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
+        - name: PriceFeed
+          file: ./abis/PriceFeedV2.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+      eventHandlers:
+        - event: LastGoodPriceUpdated(indexed address,uint256)
+          handler: handleLastGoodPriceUpdated
+  - name: PriceFeed
+    kind: ethereum/contract
+    network: arbitrum-one
+    source:
+      abi: PriceFeed
+    mapping:
+      file: ./src/mapping/PriceFeed.ts
+      language: wasm/assemblyscript
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      entities: []
+      abis:
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
+        - name: PriceFeed
+          file: ./abis/PriceFeedV2.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+      eventHandlers:
+        - event: TokenPriceUpdated(indexed address,uint256)
+          handler: handleTokenPriceUpdated

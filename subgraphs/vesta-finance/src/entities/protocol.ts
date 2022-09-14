@@ -6,6 +6,7 @@ import {
 } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
+  EMPTY_STRING,
   INT_ONE,
   INT_ZERO,
   LendingType,
@@ -26,6 +27,10 @@ import {
   getOrCreateMarketSnapshot,
 } from "./market";
 import { getVSTToken } from "./token";
+
+export function getLendingProtocol(): LendingProtocol | null {
+  return LendingProtocol.load(TROVE_MANAGER);
+}
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
   let protocol = LendingProtocol.load(TROVE_MANAGER);
@@ -59,6 +64,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     protocol.openPositionCount = INT_ZERO;
     protocol.cumulativePositionCount = INT_ZERO;
+    protocol._priceOracle = EMPTY_STRING;
     protocol._marketAssets = [];
     protocol.save();
   }
@@ -234,6 +240,7 @@ export function updateProtocolUSDLocked(
   protocol.totalValueLockedUSD = totalValueLocked;
   protocol.totalDepositBalanceUSD = totalValueLocked;
   protocol.save();
+
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.save();
 }
@@ -241,11 +248,11 @@ export function updateProtocolUSDLocked(
 export function updateProtocolUSDLockedStabilityPool(
   event: ethereum.Event,
   asset: Address,
-  stabilityPoolTVL: BigDecimal
+  netChangeUSD: BigDecimal
 ): void {
   const protocol = getOrCreateLendingProtocol();
   const market = getOrCreateMarket(asset);
-  const totalValueLocked = market.totalValueLockedUSD.plus(stabilityPoolTVL);
+  const totalValueLocked = protocol.totalValueLockedUSD.plus(netChangeUSD);
   protocol.totalValueLockedUSD = totalValueLocked;
   protocol.totalDepositBalanceUSD = totalValueLocked;
   protocol.save();
@@ -255,12 +262,18 @@ export function updateProtocolUSDLockedStabilityPool(
 
 export function updateProtocolBorrowBalance(
   event: ethereum.Event,
-  borrowedUSD: BigDecimal,
-  totalLUSDSupply: BigInt
+  borrowedUSDChange: BigDecimal,
+  totalVSTSupplyChange: BigInt
 ): void {
   const protocol = getOrCreateLendingProtocol();
-  protocol.totalBorrowBalanceUSD = borrowedUSD;
-  protocol.mintedTokenSupplies = [totalLUSDSupply];
+  protocol.totalBorrowBalanceUSD =
+    protocol.totalBorrowBalanceUSD.plus(borrowedUSDChange);
+  if (protocol.mintedTokenSupplies == null) {
+    protocol.mintedTokenSupplies = [totalVSTSupplyChange];
+  } else {
+    protocol.mintedTokenSupplies![0] =
+      protocol.mintedTokenSupplies![0].plus(totalVSTSupplyChange);
+  }
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.save();
@@ -314,5 +327,11 @@ export function addProtocolMarketAssets(market: Market): void {
   const marketAssets = protocol._marketAssets;
   marketAssets.push(market.inputToken);
   protocol._marketAssets = marketAssets;
+  protocol.save();
+}
+
+export function updateProtocolPriceOracle(priceOracle: string): void {
+  const protocol = getOrCreateLendingProtocol();
+  protocol._priceOracle = priceOracle;
   protocol.save();
 }
