@@ -9,7 +9,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.9",
+          "subgraph": "1.2.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -28,7 +28,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.9",
+          "subgraph": "1.2.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -47,7 +47,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.9",
+          "subgraph": "1.2.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -66,7 +66,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.9",
+          "subgraph": "1.2.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -85,7 +85,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.9",
+          "subgraph": "1.2.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -407,7 +407,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -426,7 +426,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -445,7 +445,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -471,7 +471,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -490,7 +490,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -758,7 +758,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -811,7 +811,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.4",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -1256,7 +1256,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.4",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -1275,7 +1275,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.4",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2249,7 +2249,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2268,7 +2268,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2287,7 +2287,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2306,7 +2306,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2642,10 +2642,10 @@
     "deployments": {
       "rari-vaults-ethereum": {
         "network": "ethereum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.4.2",
+          "subgraph": "1.4.1",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2663,7 +2663,7 @@
   },
   "apeswap": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "apeswap",
     "deployments": {
       "apeswap-bsc": {
@@ -2708,7 +2708,7 @@
   },
   "mm-finance": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "mm-finance",
     "deployments": {
       "mm-finance-polygon": {
@@ -2735,7 +2735,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2753,7 +2753,7 @@
   },
   "quickswap": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "quickswap",
     "deployments": {
       "quickswap-polygon": {
@@ -2779,7 +2779,7 @@
   },
   "solarbeam": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "solarbeam",
     "deployments": {
       "solarbeam-moonriver": {
@@ -2805,7 +2805,7 @@
   },
   "spiritswap": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "spiritswap",
     "deployments": {
       "spiritswap-fantom": {
@@ -2813,7 +2813,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2831,7 +2831,7 @@
   },
   "spookyswap": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "spookyswap",
     "deployments": {
       "spookyswap-fantom": {
@@ -2839,7 +2839,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.4",
+          "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2857,7 +2857,7 @@
   },
   "sushiswap": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "sushiswap",
     "deployments": {
       "sushiswap-arbitrum": {
@@ -2865,7 +2865,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2884,7 +2884,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2903,7 +2903,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2922,7 +2922,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2941,7 +2941,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2960,7 +2960,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2979,7 +2979,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -3036,7 +3036,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -3055,7 +3055,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -3074,7 +3074,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -3092,7 +3092,7 @@
   },
   "trader-joe": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "trader-joe",
     "deployments": {
       "trader-joe-avalanche": {
@@ -3100,7 +3100,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -3118,7 +3118,7 @@
   },
   "trisolaris": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "trisolaris",
     "deployments": {
       "trisolaris-aurora": {
@@ -3144,7 +3144,7 @@
   },
   "ubeswap": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "ubeswap",
     "deployments": {
       "ubeswap-celo": {
@@ -3152,7 +3152,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -3170,7 +3170,7 @@
   },
   "uniswap-v2": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "uniswap-v2",
     "deployments": {
       "uniswap-v2-ethereum": {
@@ -3178,7 +3178,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -3196,7 +3196,7 @@
   },
   "vvs-finance": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "vvs-finance",
     "deployments": {
       "vvs-finance-cronos": {
@@ -3222,7 +3222,7 @@
   },
   "honeyswap": {
     "schema": "dex-amm",
-    "base": "uniswap-forks",
+    "base": "uniswap-fork",
     "protocol": "honeyswap",
     "deployments": {
       "honeyswap-gnosis": {
@@ -3352,14 +3352,7 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      }
-    }
-  },
-  "dydx-governance": {
-    "schema": "governance",
-    "base": "aave-governance",
-    "protocol": "dydx-governance",
-    "deployments": {
+      },
       "dydx-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3384,7 +3377,7 @@
   "angle-governance": {
     "schema": "governance",
     "base": "openzeppelin-governor",
-    "protocol": "angle-governance",
+    "protocol": "angle",
     "deployments": {
       "angle-governance-ethereum": {
         "network": "ethereum",
@@ -3404,14 +3397,7 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      }
-    }
-  },
-  "code4rena-governance": {
-    "schema": "governance",
-    "base": "openzeppelin-governor",
-    "protocol": "code4rena-governance",
-    "deployments": {
+      },
       "code4rena-governance-polygon": {
         "network": "polygon",
         "status": "dev",
@@ -3430,14 +3416,7 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      }
-    }
-  },
-  "ens-governance-governance": {
-    "schema": "governance",
-    "base": "openzeppelin-governor",
-    "protocol": "ens-governance",
-    "deployments": {
+      },
       "ens-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3456,14 +3435,7 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      }
-    }
-  },
-  "euler-governance": {
-    "schema": "governance",
-    "base": "openzeppelin-governor",
-    "protocol": "euler-governance",
-    "deployments": {
+      },
       "euler-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3482,14 +3454,7 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      }
-    }
-  },
-  "fei-governance": {
-    "schema": "governance",
-    "base": "openzeppelin-governor",
-    "protocol": "fei-governance",
-    "deployments": {
+      },
       "fei-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3508,14 +3473,7 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      }
-    }
-  },
-  "hop-governance": {
-    "schema": "governance",
-    "base": "openzeppelin-governor",
-    "protocol": "hop-governance",
-    "deployments": {
+      },
       "hop-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3534,14 +3492,7 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      }
-    }
-  },
-  "silo-governance": {
-    "schema": "governance",
-    "base": "openzeppelin-governor",
-    "protocol": "silo-governance",
-    "deployments": {
+      },
       "silo-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3560,14 +3511,7 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      }
-    }
-  },
-  "truefi-governance": {
-    "schema": "governance",
-    "base": "openzeppelin-governor",
-    "protocol": "truefi-governance",
-    "deployments": {
+      },
       "truefi-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3586,14 +3530,7 @@
           "prepare:yaml": true,
           "prepare:constants": false
         }
-      }
-    }
-  },
-  "unlock-governance": {
-    "schema": "governance",
-    "base": "openzeppelin-governor",
-    "protocol": "unlock-governance",
-    "deployments": {
+      },
       "unlock-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
@@ -3630,7 +3567,7 @@
         },
         "deployment-ids": {
           "hosted-service": "vesper-ethereum",
-          "decentralized-network": "vesper-ethereum"
+          "decentralized-network": "bancor-v3-ethereum"
         },
         "files": {
           "template": "vesper.finance.template.yaml"
