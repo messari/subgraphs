@@ -16,6 +16,9 @@ const NetworkLogos: Record<string, string> = {
   fuse: "https://assets.coingecko.com/coins/images/10347/small/vUXKHEe.png?1601523640",
   cronos: "https://assets.coingecko.com/coins/images/7310/small/oCw2s3GI_400x400.jpeg?1645172042",
   harmony: "https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793",
+  cosmos: "https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png?1555657960",
+  "boba": "https://assets.coingecko.com/coins/images/20285/small/BOBA.png?1636811576",
+  "near": "https://assets.coingecko.com/coins/images/10365/small/near_icon.png?1601359077"
 };
 
 interface NetworkLogoProps {

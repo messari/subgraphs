@@ -45,7 +45,7 @@ export const TablePoolOverview = ({
     let baseFieldCol = false;
     let inputTokenLabel = "Input Token";
     let inputTokenColWidth = 210;
-    if (protocolType === "EXCHANGE") {
+    if (protocolType === "EXCHANGE" || protocolType === "GENERIC") {
       inputTokenLabel = "Input Tokens";
       inputTokenColWidth = 220;
       optionalFields.push({
@@ -394,8 +394,8 @@ export const TablePoolOverview = ({
         if (pool?.totalValueLockedUSD && (pool?.dailyVolumeUSD || pool?.dailySupplySideRevenueUSD)) {
           returnObj.dailyVolumeUSD = pool?.dailyVolumeUSD;
           returnObj.dailySupplySideRevenueUSD = pool?.dailySupplySideRevenueUSD;
+          if (pool?.fees?.length > 0 && !pool?.dailySupplySideRevenueUSD) {
 
-          if (Object.keys(pool?.fees)?.length > 0 && !pool?.dailySupplySideRevenueUSD) {
             // CURRENTLY THE FEE IS BASED OFF OF THE POOL RATHER THAN THE TIME SERIES. THIS IS TEMPORARY
             const supplierFee = pool.fees.find((fee: { [x: string]: string }) => {
               return fee.feeType === "FIXED_LP_FEE" || fee.feeType === "DYNAMIC_LP_FEE";
@@ -500,6 +500,8 @@ export const TablePoolOverview = ({
             }
             returnObj.baseYield = "N/A//Base Yield could not be calculated, no fees or supply side revenue provided.";
           }
+        } else {
+          returnObj.baseYield = "N/A//Base Yield could not be calculated, no fees or supply side revenue provided.";
         }
       }
       return returnObj;

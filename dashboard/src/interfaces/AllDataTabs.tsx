@@ -7,7 +7,7 @@ import ProtocolTab from "./tabs/ProtocolTab";
 import { styled } from "../styled";
 import PoolOverviewTab from "./tabs/PoolOverviewTab";
 import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
-import { ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
+import { PoolName, ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 import PositionTab from "./tabs/PositionTab";
 
 const StyledTabs = styled(Tabs)`
@@ -175,7 +175,7 @@ function AllDataTabs({
           <TabPanel value="5">
             {/* POSITIONS TAB */}
             <PositionTab
-              positions={data?.market?.positions}
+              positions={data[PoolName[protocolType]]?.positions}
               poolId={poolId}
               poolsList={poolsListData}
               poolListLoading={poolListLoading}

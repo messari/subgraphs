@@ -1,7 +1,7 @@
 import { Versions } from "../constants";
 
-export const getSnapshotDailyVolume = (version: string): string => {
-  if (version?.includes(Versions.Schema120.split(".0")[0])) {
+export const getSnapshotDailyVolume = (version: string, type: string): string => {
+  if (version?.includes(Versions.Schema120.split(".0")[0]) && type === "EXCHANGE") {
     return `
       query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
         pool1: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool1Id}) {
@@ -46,7 +46,7 @@ export const getSnapshotDailyVolume = (version: string): string => {
         }
       }
     `;
-  } else {
+  } else if (type === "EXCHANGE") {
     return `
     query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
       pool1: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool1Id}) {
@@ -86,6 +86,51 @@ export const getSnapshotDailyVolume = (version: string): string => {
         dailySupplySideRevenueUSD
       }
       pool10: liquidityPoolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool10Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+    }
+  `;
+  } else {
+    return `
+    query Data($pool1Id: String!, $pool2Id: String!,$pool3Id: String!,$pool4Id: String!,$pool5Id: String!,$pool6Id: String!,$pool7Id: String!,$pool8Id: String!,$pool9Id: String!,$pool10Id: String!) {
+      pool1: poolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool1Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool2: poolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool2Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool3: poolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool3Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool4: poolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool4Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool5: poolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool5Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool6: poolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool6Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool7: poolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool7Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool8: poolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool8Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool9: poolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool9Id}) {
+        id
+        dailySupplySideRevenueUSD
+      }
+      pool10: poolDailySnapshots(first: 2, orderBy:timestamp, orderDirection: desc, where: {pool: $pool10Id}) {
         id
         dailySupplySideRevenueUSD
       }
