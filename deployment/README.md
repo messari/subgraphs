@@ -13,7 +13,7 @@
 `npm run build --ID=uniswap-v2 --SPAN=protocol`
 
 
-**Build all deployments for a protocol:**
+**Build all deployments within a directory:**
 
 `npm run build --ID=uniswap-v2 --SPAN=base`
 
