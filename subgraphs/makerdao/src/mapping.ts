@@ -220,7 +220,7 @@ export function handleVatSlip(event: VatNoteEvent): void {
     deltaCollateralUSD.toString(),
   ]);
 
-  handleTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
+  createTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
   updatePosition(event, owner, market.id, usr, ilk, deltaCollateral, BIGINT_ZERO);
   updateMarket(event, market, deltaCollateral, deltaCollateralUSD);
   updateUsageMetrics(event, [owner, owner, owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
@@ -291,7 +291,7 @@ export function handleVatFrob(event: VatNoteEvent): void {
     ],
   );
 
-  handleTransactions(event, market, v, w, BIGINT_ZERO, BIGDECIMAL_ZERO, dart, deltaDebtUSD);
+  createTransactions(event, market, v, w, BIGINT_ZERO, BIGDECIMAL_ZERO, dart, deltaDebtUSD);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
   updateUsageMetrics(event, [u, v, w], BIGDECIMAL_ZERO, deltaDebtUSD);
   updateProtocol(BIGDECIMAL_ZERO, deltaDebtUSD);
@@ -398,7 +398,7 @@ export function handleCatBite(event: BiteEvent): void {
     liquidationRevenueUSD.toString(),
   ]);
 
-  let liquidatee = getOwnerAddressFromCdp(urn.toHexString());
+  let liquidatee = getOwnerAddressFromUrn(urn.toHexString());
   liquidatee = getOwnerAddressFromProxy(liquidatee);
   //let debt = bigIntChangeDecimals(tab, RAD, WAD);
   let flipBidsStore = new _FlipBidsStore(storeID);
@@ -722,7 +722,7 @@ export function handleClipTakeBid(event: TakeEvent): void {
 
   let liquidator = event.transaction.from.toHexString();
   // translate possible proxy/urn handler address to owner address
-  liquidatee = getOwnerAddressFromCdp(liquidatee);
+  liquidatee = getOwnerAddressFromUrn(liquidatee);
   liquidatee = getOwnerAddressFromProxy(liquidatee);
 
   let storeID = event.address //clip contract
@@ -838,7 +838,7 @@ export function handleClipTakeBid(event: TakeEvent): void {
 
   //liquidate._finalized = true;
   //liquidate.save();
-  liquidatePosition(event, ilk, clipTakeStore.urn, liquidate.amount, clipTakeStore.art);
+  liquidatePosition(event, ilk, clipTakeStore.liquidatee!, liquidate.amount, clipTakeStore.art);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(
@@ -865,7 +865,7 @@ export function handleClipYankBid(event: ClipYankEvent): void {
 
   let liquidator = event.transaction.from.toHexString();
   // translate possible proxy/urn handler address to owner address
-  liquidatee = getOwnerAddressFromCdp(liquidatee);
+  liquidatee = getOwnerAddressFromUrn(liquidatee);
   liquidatee = getOwnerAddressFromProxy(liquidatee);
 
   let storeID = event.address //clip contract
@@ -904,7 +904,7 @@ export function handleClipYankBid(event: ClipYankEvent): void {
 
   log.info(
     "[handleClipYankBid]auction for liquidation {} (id {}) cancelled, assuming the msg sender {} won at ${} (profit ${})",
-    [liquidateID, id.toString(), liquidate.from, liquidate.amountUSD.toString(), liquidate.profitUSD.toString()],
+    [liquidateID, id.toString(), liquidator, liquidate.amountUSD.toString(), liquidate.profitUSD.toString()],
   );
 
   if (
@@ -921,33 +921,10 @@ export function handleClipYankBid(event: ClipYankEvent): void {
   //liquidate._finalized = true;
   liquidate.save();
 
-  liquidatePosition(event, ilk, liquidateStore.urn, liquidate.amount, liquidateStore.debt);
-  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateUsageMetrics(event, market, liquidatee, liquidator, amount, amountUSD, profitUSD);
-
-  log.info(
-    "[handleClipYankBid]auction for liquidation {} (id {}) cancelled, assuming the msg sender {} won at ${} (profit ${})",
-    [liquidateID, id.toString(), liquidate.liquidator, liquidate.amountUSD.toString(), liquidate.profitUSD.toString()],
-  );
-
-  if (
-    liquidate.amount.le(BIGINT_ZERO) ||
-    liquidate.amountUSD.le(BIGDECIMAL_ZERO) ||
-    liquidate.profitUSD.le(BIGDECIMAL_ZERO)
-  ) {
-    log.warning("[handleClipTakeBid]problematic values: amount={}, amountUSD={}, profitUSD={}", [
-      liquidate.amount.toString(),
-      liquidate.amountUSD.toString(),
-      liquidate.profitUSD.toString(),
-    ]);
-  }
-  //liquidate._finalized = true;
-  liquidate.save();
-
+  liquidatePosition(event, ilk, clipTakeStore.liquidatee!, liquidate.amount, clipTakeStore.art);
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
-  updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
 

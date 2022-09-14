@@ -160,24 +160,24 @@ export function updateMarket(
     // deltaCollateral can be positive or negative
     market.inputTokenBalance = market.inputTokenBalance.plus(deltaCollateral);
 
-    if (token.lastPriceUSD) {
-      market.inputTokenPriceUSD = token.lastPriceUSD!;
-      // here we "mark-to-market" - re-price total collateral using last price
-      market.totalDepositBalanceUSD = bigIntToBDUseDecimals(market.inputTokenBalance, token.decimals).times(
-        market.inputTokenPriceUSD,
-      );
-    } else if (deltaCollateralUSD != BIGDECIMAL_ZERO) {
-      market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(deltaCollateralUSD);
-    }
-
-    market.totalValueLockedUSD = market.totalDepositBalanceUSD;
-
     if (deltaCollateral.gt(BIGINT_ZERO)) {
       market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(deltaCollateralUSD);
     } else if (deltaCollateral.lt(BIGINT_ZERO)) {
       // ignore as we don't care about cumulativeWithdraw in a market
     }
   }
+
+  if (token.lastPriceUSD) {
+    market.inputTokenPriceUSD = token.lastPriceUSD!;
+    // here we "mark-to-market" - re-price total collateral using last price
+    market.totalDepositBalanceUSD = bigIntToBDUseDecimals(market.inputTokenBalance, token.decimals).times(
+      market.inputTokenPriceUSD,
+    );
+  } else if (deltaCollateralUSD != BIGDECIMAL_ZERO) {
+    market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(deltaCollateralUSD);
+  }
+
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
   if (deltaDebtUSD != BIGDECIMAL_ZERO) {
     market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(deltaDebtUSD);
@@ -206,6 +206,7 @@ export function updateMarket(
       market.cumulativeSupplySideRevenueUSD,
     );
   }
+
   market.save();
 
   snapshotMarket(
@@ -235,11 +236,11 @@ export function snapshotMarket(
     log.error("[snapshotMarket]Failed to get marketsnapshot for {}", [marketID]);
     return;
   }
-  let hours = (event.block.timestamp.toI32()/SECONDS_PER_HOUR).toString()
-  let hourlySnapshotRates = getSnapshotRates(market.rates, hours)
+  let hours = (event.block.timestamp.toI32() / SECONDS_PER_HOUR).toString();
+  let hourlySnapshotRates = getSnapshotRates(market.rates, hours);
 
-  let days = (event.block.timestamp.toI32()/SECONDS_PER_DAY).toString()
-  let dailySnapshotRates = getSnapshotRates(market.rates, days)
+  let days = (event.block.timestamp.toI32() / SECONDS_PER_DAY).toString();
+  let dailySnapshotRates = getSnapshotRates(market.rates, days);
 
   marketHourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketHourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;

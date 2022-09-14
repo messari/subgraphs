@@ -1306,9 +1306,9 @@ type _ClipTakeStore @entity {
   market: Market!
   " urn being liquidated "
   urn: String
-  " amount of collateral remaining to be auctioned "
   " Account being liquidated "
   liquidatee: String
+  " amount of collateral remaining to be auctioned "
   lot: BigInt!
   " borrower borrowed amount"
   art: BigInt!

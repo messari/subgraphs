@@ -6,13 +6,13 @@ export function extractCallData(bytes: Bytes, start: i32, end: i32): Bytes {
 
 export function bytes32ToAddress(bytes: Bytes): Address {
   //take the last 40 hexstring & convert it to address (20 bytes)
-  let address = bytes.toHexString().slice(26);
+  let address = bytes32ToAddressHexString(bytes)
   return Address.fromString(address);
 }
 
 export function bytes32ToAddressHexString(bytes: Bytes): string {
   //take the last 40 hexstring
-  return `0x${bytes.toHexString().slice(26)}`;
+  return bytes.toHexString().slice(26);
 }
 
 export function bytesToUnsignedBigInt(bytes: Bytes, bigEndian: boolean = true): BigInt {
