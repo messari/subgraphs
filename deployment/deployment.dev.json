@@ -112,7 +112,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.13",
+          "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -131,7 +131,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.13",
+          "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -150,7 +150,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.13",
+          "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -169,7 +169,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.13",
+          "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -188,7 +188,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.13",
+          "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -207,7 +207,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.13",
+          "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -2413,7 +2413,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.9",
+          "subgraph": "1.0.10",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
