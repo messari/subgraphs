@@ -1,0 +1,20 @@
+{
+  "chain": "moonriver",
+  "erc20Vaults": [
+    {
+      "name": "ETH",
+      "address": "0x4a0474E3262d4DB3306Cea4F207B5d66eC8E0AA9",
+      "startBlock": 1004167
+    },
+    {
+      "name": "ETH-USDC",
+      "address": "0x97D811A7eb99Ef4Cb027ad59800cE27E68Ee1109",
+      "startBlock": 1009349
+    },
+    {
+      "name": "MOVR",
+      "address": "0x5db6617ddf077d76cfd9d7fc0fa91aaabc3da683",
+      "startBlock": 1054266
+    }
+  ]
+}

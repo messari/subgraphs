@@ -1,0 +1,15 @@
+{
+  "chain": "optimism",
+  "erc20Vaults": [
+    {
+      "name": "WETH",
+      "address": "0x062016cd29fabb26c52bab646878987fc9b0bc55",
+      "startBlock": 5498667
+    },
+    {
+      "name": "WBTC",
+      "address": "0xb9c8f0d3254007ee4b98970b94544e473cd610ec",
+      "startBlock": 5386422
+    }
+  ]
+}

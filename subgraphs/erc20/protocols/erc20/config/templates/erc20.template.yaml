@@ -1,0 +1,91 @@
+specVersion: 0.0.4
+features:
+  - nonFatalErrors
+  - ipfsOnEthereumContracts
+schema:
+  file: ./schema.graphql
+dataSources:
+  # This approach uses a particular event emitted once very early to trigger the initial erc20 token list.
+  - kind: ethereum
+    name: TokenRegistry
+    network: mainnet
+    source:
+      address: "0x7f751820be4b1e44464268c425af6095995e045a"
+      abi: TokenRegistry
+      startBlock: 75570
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+      abis:
+        - name: TokenRegistry
+          file: ./abis/TokenRegistry.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Unknown(indexed bytes,indexed bytes)
+          topic0: "0xa9e319c3b10db96c5cee4bc3ebffa9c5581f222f14a4deb0df7ec2088ccd0974"
+          handler: initTokenList
+      file: ./src/mappings/registry.ts
+templates:
+  # These data sources templates exist to support the different types that a specific erc20 token could be.
+  - name: StandardToken
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: ERC20
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/token.ts
+      entities:
+        - TransferEvent
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+  - name: BurnableToken
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Burnable
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/token.ts
+      entities:
+        - BurnEvent
+      abis:
+        - name: Burnable
+          file: ./abis/Burnable.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Burn(indexed address,uint256)
+          handler: handleBurn
+  - name: MintableToken
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Mintable
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/token.ts
+      entities:
+        - MintEvent
+      abis:
+        - name: Mintable
+          file: ./abis/Mintable.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256)
+          handler: handleMint

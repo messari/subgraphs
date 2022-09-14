@@ -1,0 +1,175 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Manager
+    network: mainnet
+    source:
+      address: "0xA86e412109f77c45a3BC1c5870b880492Fb86A14"
+      startBlock: 12912471
+      abi: Manager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - NewVault
+      abis:
+        - name: Manager
+          file: ./abis/Manager.json
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ERC20
+          file: ./abis/ERC20Detailed.json
+      eventHandlers:
+        - event: PoolRegistered(address)
+          handler: handlePoolRegistered
+      file: ./src/mappings/managerMappings.ts
+  - kind: ethereum
+    name: Rewards
+    network: mainnet
+    source:
+      address: "0x79dD22579112d8a5F7347c5ED7E609e60da713C5"
+      startBlock: 12969749
+      abi: Rewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - NewVault
+      abis:
+        - name: Rewards
+          file: ./abis/Rewards.json
+        - name: ERC20
+          file: ./abis/ERC20Detailed.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Claimed(uint256,address,uint256)
+          handler: handleClaim
+      file: ./src/mappings/rewardMappings.ts
+  - kind: ethereum
+    name: OnChainVote
+    network: mainnet
+    source:
+      address: "0x43094eD6D6d214e43C31C38dA91231D2296Ca511"
+      startBlock: 13678805
+      abi: OnChainVote
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - NewVault
+      abis:
+        - name: OnChainVote
+          file: ./abis/OnChainVote.json
+      callHandlers:
+        - function: vote((address,bytes32,uint256,uint256,uint256,(bytes32,uint256)[]))
+          handler: handleUserVote
+      file: ./src/mappings/voteMappings.ts
+templates:
+  - name: Vault
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/vaultMappings.ts
+      entities:
+        - Vault
+        - Deposit
+        - Transaction
+        - Token
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ERC20
+          file: ./abis/ERC20Detailed.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: WithdrawalRequested(address,uint256)
+          handler: handleWithdrawRequest
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: depositFor(address,uint256)
+          handler: handleDepositWithRecipient
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdraw(uint256,bool)
+          handler: handleWithdrawEthPool

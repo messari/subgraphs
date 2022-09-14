@@ -1,0 +1,17 @@
+{
+  "network": "matic",
+  "hypervisorOrphan": [
+    {
+      "name": "USDC-ETH-500",
+      "address": "0x9c3b8D3d977bA1D58848565149Cb5Ac1689DFa5b",
+      "startBlock": 24465213
+    }
+  ],
+  "hypeRegistry": [
+    {
+      "name": "HypeRegistry",
+      "address": "0x0Ac4C7b794f3D7e7bF1093A4f179bA792CF15055",
+      "startBlock": 25305922
+    }
+  ]
+}

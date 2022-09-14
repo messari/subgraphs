@@ -1,0 +1,24 @@
+{
+  lendingProtocols {
+    id
+    name
+    slug
+    schemaVersion
+    subgraphVersion
+    methodologyVersion
+    network
+    type
+    lendingType
+    riskType
+    cumulativeUniqueUsers
+    totalValueLockedUSD
+    cumulativeSupplySideRevenueUSD
+    cumulativeProtocolSideRevenueUSD
+    cumulativeTotalRevenueUSD
+    totalDepositBalanceUSD
+    cumulativeDepositUSD
+    totalBorrowBalanceUSD
+    cumulativeBorrowUSD
+    cumulativeLiquidateUSD
+  }
+}

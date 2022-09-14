@@ -1,0 +1,135 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum/contract
+    name: Comptroller
+    network: {{ network }}
+    source:
+      address: "{{ factoryAddress }}"
+      abi: Comptroller
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Protocol
+        - Market
+        - Token
+      abis:
+        - name: Comptroller
+          file: ./abis/Comptroller.json
+        - name: CToken
+          file: ./abis/CToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: MarketListed(address)
+          handler: handleMarketListed
+        - event: MarketEntered(address,address)
+          handler: handleMarketEntered
+        - event: MarketExited(address,address)
+          handler: handleMarketExited
+        - event: NewPriceOracle(address,address)
+          handler: handleNewPriceOracle
+        - event: NewCollateralFactor(address,uint256,uint256)
+          handler: handleNewCollateralFactor
+        - event: NewLiquidationIncentive(uint256,uint256)
+          handler: handleNewLiquidationIncentive
+        - event: ActionPaused(address,string,bool)
+          handler: handleActionPaused
+      file: ./protocols/cream-finance/src/mapping.ts
+templates:
+  - name: CToken
+    kind: ethereum/contract
+    network: {{ network }}
+    source:
+      abi: CToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
+      abis:
+        - name: CToken
+          file: ./abis/CToken.json
+        - name: Comptroller
+          file: ./abis/Comptroller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: PriceOracle
+          file: ./abis/PriceOracle.json
+        - name: Oracle
+          file: ./abis/cream-finance/Oracle.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: AccrueInterest(uint256,uint256,uint256,uint256)
+          handler: handleAccrueInterest
+        - event: NewReserveFactor(uint256,uint256)
+          handler: handleNewReserveFactor
+      file: ./protocols/cream-finance/src/mapping.ts

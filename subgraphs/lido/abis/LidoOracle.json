@@ -1,0 +1,955 @@
+[
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getCurrentOraclesReportStatus",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
+        "name": "setAllowedBeaconBalanceAnnualRelativeIncrease",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "hasInitialized",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getVersion",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_script",
+                "type": "bytes"
+            }
+        ],
+        "name": "getEVMScriptExecutor",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "MANAGE_QUORUM",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_epochId",
+                "type": "uint256"
+            },
+            {
+                "name": "_beaconBalance",
+                "type": "uint64"
+            },
+            {
+                "name": "_beaconValidators",
+                "type": "uint32"
+            }
+        ],
+        "name": "reportBeacon",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getRecoveryVault",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getAllowedBeaconBalanceAnnualRelativeIncrease",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getAllowedBeaconBalanceRelativeDecrease",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getExpectedEpochId",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getLastCompletedReportDelta",
+        "outputs": [
+            {
+                "name": "postTotalPooledEther",
+                "type": "uint256"
+            },
+            {
+                "name": "preTotalPooledEther",
+                "type": "uint256"
+            },
+            {
+                "name": "timeElapsed",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_lido",
+                "type": "address"
+            },
+            {
+                "name": "_epochsPerFrame",
+                "type": "uint64"
+            },
+            {
+                "name": "_slotsPerEpoch",
+                "type": "uint64"
+            },
+            {
+                "name": "_secondsPerSlot",
+                "type": "uint64"
+            },
+            {
+                "name": "_genesisTime",
+                "type": "uint64"
+            },
+            {
+                "name": "_allowedBeaconBalanceAnnualRelativeIncrease",
+                "type": "uint256"
+            },
+            {
+                "name": "_allowedBeaconBalanceRelativeDecrease",
+                "type": "uint256"
+            }
+        ],
+        "name": "initialize",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getLido",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "SET_BEACON_REPORT_RECEIVER",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [],
+        "name": "finalizeUpgrade_v3",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "MANAGE_MEMBERS",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getCurrentFrame",
+        "outputs": [
+            {
+                "name": "frameEpochId",
+                "type": "uint256"
+            },
+            {
+                "name": "frameStartTime",
+                "type": "uint256"
+            },
+            {
+                "name": "frameEndTime",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "allowRecoverability",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_index",
+                "type": "uint256"
+            }
+        ],
+        "name": "getCurrentReportVariant",
+        "outputs": [
+            {
+                "name": "beaconBalance",
+                "type": "uint64"
+            },
+            {
+                "name": "beaconValidators",
+                "type": "uint32"
+            },
+            {
+                "name": "count",
+                "type": "uint16"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "appId",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getLastCompletedEpochId",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getInitializationBlock",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_addr",
+                "type": "address"
+            }
+        ],
+        "name": "setBeaconReportReceiver",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_token",
+                "type": "address"
+            }
+        ],
+        "name": "transferToVault",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "SET_BEACON_SPEC",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_sender",
+                "type": "address"
+            },
+            {
+                "name": "_role",
+                "type": "bytes32"
+            },
+            {
+                "name": "_params",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "canPerform",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getCurrentEpochId",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getEVMScriptRegistry",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_member",
+                "type": "address"
+            }
+        ],
+        "name": "addOracleMember",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getBeaconReportReceiver",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "SET_REPORT_BOUNDARIES",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_quorum",
+                "type": "uint256"
+            }
+        ],
+        "name": "setQuorum",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getQuorum",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "kernel",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getOracleMembers",
+        "outputs": [
+            {
+                "name": "",
+                "type": "address[]"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "isPetrified",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
+        "name": "setAllowedBeaconBalanceRelativeDecrease",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getBeaconSpec",
+        "outputs": [
+            {
+                "name": "epochsPerFrame",
+                "type": "uint64"
+            },
+            {
+                "name": "slotsPerEpoch",
+                "type": "uint64"
+            },
+            {
+                "name": "secondsPerSlot",
+                "type": "uint64"
+            },
+            {
+                "name": "genesisTime",
+                "type": "uint64"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_epochsPerFrame",
+                "type": "uint64"
+            },
+            {
+                "name": "_slotsPerEpoch",
+                "type": "uint64"
+            },
+            {
+                "name": "_secondsPerSlot",
+                "type": "uint64"
+            },
+            {
+                "name": "_genesisTime",
+                "type": "uint64"
+            }
+        ],
+        "name": "setBeaconSpec",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "MAX_MEMBERS",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getCurrentReportVariantsSize",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_member",
+                "type": "address"
+            }
+        ],
+        "name": "removeOracleMember",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "executor",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "script",
+                "type": "bytes"
+            },
+            {
+                "indexed": false,
+                "name": "input",
+                "type": "bytes"
+            },
+            {
+                "indexed": false,
+                "name": "returnData",
+                "type": "bytes"
+            }
+        ],
+        "name": "ScriptResult",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "vault",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "RecoverToVault",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "value",
+                "type": "uint256"
+            }
+        ],
+        "name": "AllowedBeaconBalanceAnnualRelativeIncreaseSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "value",
+                "type": "uint256"
+            }
+        ],
+        "name": "AllowedBeaconBalanceRelativeDecreaseSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "callback",
+                "type": "address"
+            }
+        ],
+        "name": "BeaconReportReceiverSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "member",
+                "type": "address"
+            }
+        ],
+        "name": "MemberAdded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "member",
+                "type": "address"
+            }
+        ],
+        "name": "MemberRemoved",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "quorum",
+                "type": "uint256"
+            }
+        ],
+        "name": "QuorumChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "epochId",
+                "type": "uint256"
+            }
+        ],
+        "name": "ExpectedEpochIdUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "epochsPerFrame",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "name": "slotsPerEpoch",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "name": "secondsPerSlot",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "name": "genesisTime",
+                "type": "uint64"
+            }
+        ],
+        "name": "BeaconSpecSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "epochId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "beaconBalance",
+                "type": "uint128"
+            },
+            {
+                "indexed": false,
+                "name": "beaconValidators",
+                "type": "uint128"
+            },
+            {
+                "indexed": false,
+                "name": "caller",
+                "type": "address"
+            }
+        ],
+        "name": "BeaconReported",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "epochId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "beaconBalance",
+                "type": "uint128"
+            },
+            {
+                "indexed": false,
+                "name": "beaconValidators",
+                "type": "uint128"
+            }
+        ],
+        "name": "Completed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "postTotalPooledEther",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "preTotalPooledEther",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "timeElapsed",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "name": "totalShares",
+                "type": "uint256"
+            }
+        ],
+        "name": "PostTotalShares",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "name": "version",
+                "type": "uint256"
+            }
+        ],
+        "name": "ContractVersionSet",
+        "type": "event"
+    }
+]

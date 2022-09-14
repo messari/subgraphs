@@ -1,0 +1,15 @@
+{
+  "chain": "arbitrum-one",
+  "erc20Vaults": [
+    {
+      "name": "WETH",
+      "address": "0xC76a3cBefE490Ae4450B2fCC2c38666aA99f7aa0",
+      "startBlock": 6847550
+    },
+    {
+      "name": "WBTC",
+      "address": "0xB237f4264938f0903F5EC120BB1Aa4beE3562FfF",
+      "startBlock": 9372406
+    }
+  ]
+}

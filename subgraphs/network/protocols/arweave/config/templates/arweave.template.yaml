@@ -1,0 +1,21 @@
+specVersion: 0.0.5
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: arweave
+    name: arweave-blocks
+    network: {{ network }}
+    source:
+      owner: "ID-OF-AN-OWNER"
+      startBlock: 0
+    mapping:
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Network
+        - Block
+        - Author
+      blockHandlers:
+        - handler: handleArweaveBlock
+      file: ./src/mapping.ts
