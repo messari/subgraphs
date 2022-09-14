@@ -18,7 +18,7 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   LIQUIDATION_FEE,
-  LIQUIDATION_RESERVE_LUSD,
+  LIQUIDATION_RESERVE_VST,
 } from "../utils/constants";
 import { _Trove } from "../../generated/schema";
 import {
@@ -196,7 +196,7 @@ function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
   );
   const profitUSD = amountLiquidatedUSD
     .times(LIQUIDATION_FEE)
-    .plus(LIQUIDATION_RESERVE_LUSD);
+    .plus(LIQUIDATION_RESERVE_VST);
   createLiquidate(
     event,
     asset,
@@ -211,6 +211,8 @@ function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
     .times(BIGDECIMAL_ONE.minus(LIQUIDATION_FEE))
     .minus(liquidatedDebtUSD);
 
-  addSupplySideRevenue(event, asset, supplySideRevenueUSD);
+  if (supplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
+    addSupplySideRevenue(event, asset, supplySideRevenueUSD);
+  }
   addProtocolSideRevenue(event, asset, profitUSD);
 }

@@ -188,4 +188,4 @@ export const MAXIMUM_LTV = BIGDECIMAL_ONE.div(MINIMUM_COLLATERAL_RATIO).times(
 export const LIQUIDATION_FEE_PERCENT = BigDecimal.fromString("0.5");
 export const LIQUIDATION_FEE = LIQUIDATION_FEE_PERCENT.div(BIGDECIMAL_HUNDRED);
 
-export const LIQUIDATION_RESERVE_LUSD = BigDecimal.fromString("200");
+export const LIQUIDATION_RESERVE_VST = BigDecimal.fromString("200");
