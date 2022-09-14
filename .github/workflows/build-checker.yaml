@@ -1,5 +1,7 @@
-on: 
-  push:
+on:  
+  pull_request:
+    branches:
+      - master
 
 jobs:
   Deployment: 
@@ -10,7 +12,7 @@ jobs:
         continue-on-error: true
 
       - uses: actions/checkout@v2
-      - uses: steegecs/Subgraph-Build-Checker@test
+      - uses: steegecs/Subgraph-Build-Checker@main
         with: 
           CHANGED_FILES: "${{ steps.files.outputs.all }}"
           ABSOLUTE_PATH: ${{ github.workspace }}
