@@ -35,7 +35,7 @@
 
 `npm run build --ID=apeswap --SPAN=protocol --SERVICE=h --TARGET=steegecs --DEPLOY=t`
 
-**Deploy all deployments for a base:**
+**Deploy all deployments within a directory:**
 
 `npm run build --ID=uniswap-fork --SPAN=base --SERVICE=h --TARGET=steegecs --DEPLOY=t`
 
