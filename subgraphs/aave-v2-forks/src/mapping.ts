@@ -41,6 +41,7 @@ import {
   createAccount,
   createInterestRate,
   getBorrowBalance,
+  getMarketByOutpuToken,
   getOrCreateLendingProtocol,
   getOrCreateMarket,
   getOrCreateToken,
@@ -50,6 +51,7 @@ import {
   updateMarketSnapshots,
   updateSnapshots,
 } from "./helpers";
+import { AToken as ATokenTemplate } from "../generated/templates";
 
 //////////////////////////
 ///// Helper Classes /////
@@ -108,6 +110,9 @@ export function _handleReserveInitialized(
   }
 
   market.save();
+
+  // create AToken template to watch Transfer
+  ATokenTemplate.create(outputToken);
 }
 
 export function _handleCollateralConfigurationChanged(
@@ -1033,4 +1038,73 @@ export function _handleLiquidate(
     event.block.timestamp,
     event.block.number
   );
+}
+
+//////////////////////
+//// AToken Event ////
+//////////////////////
+
+export function _handleTransfer(
+  event: ethereum.Event,
+  to: Address,
+  from: Address,
+  protocolData: ProtocolData
+): void {
+  let protocol = getOrCreateLendingProtocol(protocolData);
+  let market = getMarketByOutpuToken(event.address.toHexString(), protocolData);
+  if (!market) {
+    log.warning("[_handleTransfer] market not found: {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
+
+  // grab accounts
+  let toAccount = Account.load(to.toHexString());
+  if (!toAccount) {
+    if (to == Address.fromString(ZERO_ADDRESS)) {
+      toAccount = null;
+    } else {
+      toAccount = createAccount(to.toHexString());
+      toAccount.save();
+    }
+  }
+
+  let fromAccount = Account.load(from.toHexString());
+  if (!fromAccount) {
+    if (from == Address.fromString(ZERO_ADDRESS)) {
+      fromAccount = null;
+    } else {
+      fromAccount = createAccount(from.toHexString());
+      fromAccount.save();
+    }
+  }
+
+  let aTokenContract = AToken.bind(event.address);
+
+  // update balance from sender
+  if (fromAccount) {
+    subtractPosition(
+      protocol,
+      market,
+      fromAccount,
+      aTokenContract.try_balanceOf(from),
+      PositionSide.LENDER,
+      -1, // TODO: not sure how to classify this event yet
+      event
+    );
+  }
+
+  // update balance from receiver
+  if (toAccount) {
+    addPosition(
+      protocol,
+      market,
+      toAccount,
+      aTokenContract.try_balanceOf(to),
+      PositionSide.LENDER,
+      -1, // TODO: not sure how to classify this event yet
+      event
+    );
+  }
 }

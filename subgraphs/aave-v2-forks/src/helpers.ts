@@ -775,6 +775,29 @@ export function createAccount(accountID: string): Account {
   return account;
 }
 
+// returns the market based on the output token
+export function getMarketByOutpuToken(
+  outputTokenID: string,
+  protocolData: ProtocolData
+): Market | null {
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
+  for (let i = 0; i < protocol.marketIDs.length; i++) {
+    let market = Market.load(protocol.marketIDs[i]);
+
+    if (!market) {
+      continue;
+    }
+
+    if (market.outputToken!.toLowerCase() == outputTokenID.toLowerCase()) {
+      // we found a matching market!
+      return market;
+    }
+  }
+
+  return null; // no market found
+}
+
 ////////////////////////////
 ///// Internal Helpers /////
 ////////////////////////////
