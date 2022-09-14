@@ -38,6 +38,8 @@ import {
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
+  FLOAT_ADDRESS,
+  FLOAT_MARKET_ADDRESS,
   FMIM_ADDRESS,
   getNetworkSpecificConstant,
   GOHM_ADDRESS,
@@ -735,6 +737,17 @@ function updateMarket(
     let customPrice = getUsdPricePerToken(
       Address.fromString(market.inputToken)
     );
+    underlyingTokenPriceUSD = customPrice.usdPrice.div(
+      customPrice.decimalsBaseTen
+    );
+  }
+
+  // fix FLOAT price exploit and high dailyDeposit at block number 14006054
+  if (
+    marketID.toLowerCase() == FLOAT_MARKET_ADDRESS.toLowerCase() &&
+    blockNumber.toI32() == 14006054
+  ) {
+    let customPrice = getUsdPricePerToken(Address.fromString(FLOAT_ADDRESS));
     underlyingTokenPriceUSD = customPrice.usdPrice.div(
       customPrice.decimalsBaseTen
     );

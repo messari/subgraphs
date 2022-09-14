@@ -1,6 +1,14 @@
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum/contract
     name: Comptroller
@@ -65,6 +73,50 @@ templates:
           file: ./abis/ERC20.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
+        - name: Oracle
+          file: ./abis/cream-finance/Oracle.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint

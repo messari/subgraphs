@@ -26,7 +26,7 @@ export default function PositionTab({
     poolDropDown = (
       <PoolDropDown
         poolId={poolId}
-        markets={poolsList[poolNames]}
+        pools={poolsList[poolNames]}
         setPoolId={(x) => setPoolId(x)}
         setIssues={() => {
           // TODO: set issues
@@ -39,7 +39,7 @@ export default function PositionTab({
 
   let positionsData = null;
   if (!positions?.length) {
-    positionsData = <div>{poolId ? "No positions for this market" : ""}</div>;
+    positionsData = <div>{poolId ? "No positions for this pool" : ""}</div>;
   } else {
     const columns = Object.keys(positions[0])
       .filter((key) => {

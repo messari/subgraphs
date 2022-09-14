@@ -8,11 +8,15 @@ import { useState } from "react";
 import DefiLlamaComparsionTab from "./interfaces/DefiLlamaComparisonTab";
 
 function App() {
-  const [ProtocolsToQuery, setProtocolsToQuery] = useState<{
+  const [protocolsToQuery, setProtocolsToQuery] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
 
-  const getData = () => {
+  const [deploymentsInDevelopment, setDeploymentsInDevelopment] = useState<{
+    [type: string]: { [proto: string]: { [network: string]: string } };
+  }>({});
+
+  const getDeployments = () => {
     fetch("/deployments.json", {
       headers: {
         "Content-Type": "application/json",
@@ -45,15 +49,49 @@ function App() {
       });
   };
 
+  const getDevDeployments = () => {
+    fetch("/deployment.dev.json", {
+      headers: {
+        Method: "GET",
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (json) {
+        setDeploymentsInDevelopment(json);
+      })
+      .catch((err) => {
+        console.log(err);
+        fetch("/deployment.dev.json", {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (json) {
+            setDeploymentsInDevelopment(json);
+          })
+          .catch((err) => {
+            console.log('err', err)
+          });
+      });
+  };
+
   return (
     <div>
       <DashboardVersion />
       <Routes>
         <Route path="/">
-          <Route index element={<DeploymentsPage getData={() => getData()} ProtocolsToQuery={ProtocolsToQuery} />} />
+          <Route index element={<DeploymentsPage getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} getDevDeployments={() => getDevDeployments()} deploymentsInDevelopment={deploymentsInDevelopment} />} />
           <Route
             path="comparison"
-            element={<DefiLlamaComparsionTab deploymentJSON={ProtocolsToQuery} getData={() => getData()} />}
+            element={<DefiLlamaComparsionTab deploymentJSON={protocolsToQuery} getData={() => getDeployments()} />}
           />
           <Route path="subgraph" element={<ProtocolDashboard />} />
           <Route
