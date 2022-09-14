@@ -1,5 +1,5 @@
 const { executeDeployment } = require("./execution.js");
-const { validateDeploymentJson } = require("./validation/vailidateDeploymentJson.js");
+const { validateDeploymentJson } = require("./validation/validateDeploymentJson.js");
 const { Deployment } = require("./deploymentClass.js");
 const deploymentJsonData = require("./deployment.json");
 const args = require("minimist")(process.argv.slice(2));
