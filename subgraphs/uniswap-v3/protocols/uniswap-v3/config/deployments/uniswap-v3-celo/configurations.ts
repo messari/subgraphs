@@ -58,6 +58,10 @@ export class UniswapV3CeloConfigurations implements Configurations {
       "0x471ece3750da237f93b8e339c536989b8978a438", // celo
       "0x765de816845861e75a25fca122bb6898b8b1282a", // cudc
       "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73", // ceur
+      "0x02de4766c272abc10bc88c220d214a26960a7e92", // NCT
+      "0x32a9fe697a32135bfd313a6ac28792dae4d9979d", // cMC02
+      "0x66803fb87abd4aac3cbb3fad7c3aa01f6f3fb207", // wETH
+
     ];
   }
   getStableCoins(): string[] {
