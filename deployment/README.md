@@ -1,21 +1,35 @@
 # Deployment Instructions:
 
-## Deploys uniswap-v2 to ethereum in steegecs hosted service.
+## Usage:
 
-npm run build --ID=uniswap-v2-ethereum --TARGET=steegecs --SERVICE=h --DEPLOY=(true/t)
-
-**For deployments to Cronos network access token required:**
-
-npm run build --ID=vvs-finance-ethereum --TARGET=steegecs --SERVICE=c --ACCESS='access_token' --DEPLOY=(true/t)
-
-## Builds uniswap-v2 for ethereum
-
+**Build a single deployment ID:**
 npm run build --ID=uniswap-v2-ethereum
+npm run build --ID=uniswap-v2-ethereum --SPAN=single
 
-## Ommission of --NETWORK for any of these operations will deploy/check/build the protocol for all specified networks in deployment.json
-
-npm run build --ID=uniswap-v2 --SPAN=protocol --TARGET=steegecs --SERVICE=h --DEPLOY=(true/t)
+**Build all deployments for a protocol:**
 npm run build --ID=uniswap-v2 --SPAN=protocol
+
+**Build all deployments for a protocol:**
+npm run build --ID=uniswap-v2 --SPAN=base
+
+**Deploy a single deployment ID to Hosted Service:**
+npm run build --ID=uniswap-v2-ethereum --SERVICE=h --TARGET=steegecs --DEPLOY=t
+
+**Deploy a single deployment ID to Subgraph Studio:**
+npm run build --ID=compound-v2-ethereum --SERVICE=s --TARGET=steegecs --DEPLOY=t
+
+**Deploy a single deployment ID to Cronos Portal:**
+npm run build --ID=vvs-finance --SERVICE=c --TARGET=steegecs --TOKEN={token} --DEPLOY=t
+
+**Deploy a single deployment ID to Hosted Service using a different slug than specified in JSON:**
+npm run build --ID=uniswap-v2-ethereum --SLUG=uniswap-v2-ethereum-other --SERVICE=h --TARGET=steegecs --DEPLOY=t
+
+**Deploy all deployments for a protocol:**
+npm run build --ID=apeswap --SPAN=protocol --SERVICE=h --TARGET=steegecs --DEPLOY=t
+
+**Deploy all deployments for a base:**
+npm run build --ID=uniswap-fork --SPAN=base --SERVICE=h --TARGET=steegecs --DEPLOY=t
+
 
 - --PRINTLOGS
   - T/F/null - Set PRINTLOGS to 't' or 'true' to print all logs to the console instead of just to results.txt
@@ -30,9 +44,10 @@ npm run build --ID=uniswap-v2 --SPAN=protocol
 
 - This works by taking the inputs from `npm run build` and using them to configure the subgraph.yaml, and optionally, configurations/configure.ts with a particulalar set of constants, and subsequently deploying to the specified hosted service account.
 
-## How CI/CD deployment works:
+# How CI/CD deployment works:
 
-- The CI/CD deployment scripts and actions allow you to deploy, build, or check the readyness for deployment of multiple subgraphs at a time.
-- A response telling you if any information is missing or misplaced in the deployment.json, or if you specified invalid parameters or combinations in the script will be given. Errors will occur if your file structure does not conform to the standard -- See uniswap-forks as an example
-- --DEPLOY=false/f/"" executes a clean build by first removing generated, build, subgraph.yaml, and configure.ts files and folders.
-- --DEPLOY=true/t command excutes the same step as `build`, but it goes all the way to deployment.
+- The CI/CD deployment scripts and actions allow you to build and deploy a single or multiple subgraphs at a time.
+- You will get errors if the directory you try to deploy from does not comform to the standard directory structure (i.e. uniswap-forks).
+- Before each build or deploy, the script will validate the deployment.json, so incorrect or missing information will cause the script to fail, and a response will be given.
+- You must include the deployment you are trying to make within the deployment.json file. Go ahead and follow the current structure and include all fields in the other examples - further instructions on the deployment.json schema will soon be available.
+- Upon creation of a pull request to the `master` branch, or any changes thereof, will trigger a github action will run the `npm run build` command, which will build all protocols that have had changes to their code base.
