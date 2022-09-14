@@ -1,17 +1,18 @@
-## Deployment Instructions:
+# Deployment Instructions:
 
-# Deploys uniswap-v2 to ethereum in steegecs hosted service.
+## Deploys uniswap-v2 to ethereum in steegecs hosted service.
 
 npm run build --ID=uniswap-v2-ethereum --TARGET=steegecs --SERVICE=h --DEPLOY=(true/t)
 
-**For deployments to Cronos network access token required**
+**For deployments to Cronos network access token required:**
+
 npm run build --ID=vvs-finance-ethereum --TARGET=steegecs --SERVICE=c --ACCESS='access_token' --DEPLOY=(true/t)
 
-# Builds uniswap-v2 for ethereum
+## Builds uniswap-v2 for ethereum
 
 npm run build --ID=uniswap-v2-ethereum
 
-# Ommission of --NETWORK for any of these operations will deploy/check/build the protocol for all specified networks in deployment.json
+## Ommission of --NETWORK for any of these operations will deploy/check/build the protocol for all specified networks in deployment.json
 
 npm run build --ID=uniswap-v2 --SPAN=protocol --TARGET=steegecs --SERVICE=h --DEPLOY=(true/t)
 npm run build --ID=uniswap-v2 --SPAN=protocol
