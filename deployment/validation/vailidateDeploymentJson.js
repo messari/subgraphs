@@ -3,7 +3,7 @@
 /////////////////////////////////////////
 
 // Run tests before each build in CI/CD
-function testDeploymentJson(deploymentJsonMap) {
+function validateDeploymentJson(deploymentJsonMap) {
   // Checks if all necessary fields exist and contain valid values in the deployment.json
   for (const [protocol, protocolData] of Object.entries(deploymentJsonMap)) {
     // Check if protocol data is valid
@@ -329,4 +329,4 @@ function checkDuplicateIDs(deploymentJsonMap) {
   }
 }
 
-module.exports = { testDeploymentJson };
+module.exports = { validateDeploymentJson };
