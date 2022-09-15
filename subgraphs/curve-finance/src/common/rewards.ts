@@ -5,9 +5,10 @@
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+import * as utils from "./utils";
 import * as constants from "./constants";
 import { _CircularBuffer } from "../../generated/schema";
-import { log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WINDOW_SIZE_SECONDS, TIMESTAMP_STORAGE_INTERVALS, and BUFFER_SIZE can be modified. These are just recommended values - 'somewhat' arbitrary. //
@@ -217,7 +218,42 @@ function getOrCreateCircularBuffer(): _CircularBuffer {
 }
 
 function getStartingBlockRate(): BigDecimal {
-  // returns  mainnet block rate
+  // Block rates pulled from google searches - rough estimates
 
-  return BigDecimal.fromString("13.39");
+  if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)) {
+    return BigDecimal.fromString("13.39");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.ARBITRUM_ONE)) {
+    return BigDecimal.fromString("15");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.AURORA)) {
+    return BigDecimal.fromString("1.03");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.BSC)) {
+    return BigDecimal.fromString("5");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.CELO)) {
+    return BigDecimal.fromString("5");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.FANTOM)) {
+    return BigDecimal.fromString("1");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.FUSE)) {
+    return BigDecimal.fromString("1");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.OPTIMISM)) {
+    return BigDecimal.fromString("12.5");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MATIC)) {
+    return BigDecimal.fromString("2");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.XDAI)) {
+    return BigDecimal.fromString("5");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MOONBEAM)) {
+    return BigDecimal.fromString("13.39");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MOONRIVER)) {
+    return BigDecimal.fromString("13.39");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.AVALANCHE)) {
+    return BigDecimal.fromString("13.39");
+  } else if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.CRONOS)) {
+    return BigDecimal.fromString("5.5");
+  }
+
+  // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")
+  // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")
+  else {
+    log.warning("getStartingBlockRate(): Network not found", []);
+    return constants.BIGDECIMAL_ZERO;
+  }
 }

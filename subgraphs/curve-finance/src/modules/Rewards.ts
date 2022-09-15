@@ -3,7 +3,7 @@ import {
   BigInt,
   Address,
   ethereum,
-  BigDecimal,
+  dataSource,
 } from "@graphprotocol/graph-ts";
 import {
   getOrCreateToken,
@@ -104,7 +104,15 @@ export function getRewardsData_v3(gaugeAddress: Address): RewardsInfoType {
 
       rewardRates.push(rewardRate);
     } else {
-      rewardRates.push(constants.BIGINT_ZERO);
+      let rewardRate1Call = gaugeContract.try_reward_data1(rewardToken);
+
+      if (!rewardRate1Call.reverted) {
+        let rewardRate = rewardRate1Call.value.rate;
+
+        rewardRates.push(rewardRate);
+      } else {
+        rewardRates.push(constants.BIGINT_ZERO);
+      }
     }
   }
 
@@ -119,12 +127,21 @@ export function updateStakedOutputTokenAmount(
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   const gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
 
-  let gaugeWorkingSupply = utils.readValue<BigInt>(
-    gaugeContract.try_working_supply(),
+  let gaugeTotalSupply = utils.readValue<BigInt>(
+    gaugeContract.try_totalSupply(),
     constants.BIGINT_ZERO
   );
 
-  pool.stakedOutputTokenAmount = gaugeWorkingSupply;
+  pool.stakedOutputTokenAmount = gaugeTotalSupply;
+
+  if (utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)) {
+    let gaugeWorkingSupply = utils.readValue<BigInt>(
+      gaugeContract.try_working_supply(),
+      constants.BIGINT_ZERO
+    );
+    pool.stakedOutputTokenAmount = gaugeWorkingSupply;
+  }
+
   pool.save();
 }
 
@@ -135,7 +152,7 @@ export function updateControllerRewards(
 ): void {
   let gaugeContract = LiquidityGaugeContract.bind(gaugeAddress);
   let gaugeControllerContract = GaugeControllereContract.bind(
-    constants.Mainnet.GAUGE_CONTROLLER_ADDRESS
+    constants.GAUGE_CONTROLLER_ADDRESS
   );
 
   let inflationRate = utils
@@ -156,13 +173,32 @@ export function updateControllerRewards(
       ).toBigDecimal()
     );
 
+  if (
+    !utils.equalsIgnoreCase(dataSource.network(), constants.Network.MAINNET)
+  ) {
+    let lastRequest = utils.readValue<BigInt>(
+      gaugeControllerContract.try_last_request(gaugeAddress),
+      constants.BIGINT_ZERO
+    );
+    let weekNumber = lastRequest.div(constants.NUMBER_OF_WEEKS_DENOMINATOR);
+
+    inflationRate = utils
+      .readValue<BigInt>(
+        gaugeContract.try_inflation_rate1(weekNumber),
+        constants.BIGINT_ZERO
+      )
+      .toBigDecimal();
+
+    gaugeRelativeWeight = constants.BIGDECIMAL_POINT_FOUR;
+  }
+
   // Get the rewards per day for this gauge
   let protocolTokenRewardEmissionsPerDay = inflationRate
     .times(gaugeRelativeWeight)
     .times(constants.BIG_DECIMAL_SECONDS_PER_DAY);
 
   updateRewardTokenEmissions(
-    constants.Mainnet.CRV_TOKEN_ADDRESS,
+    constants.CRV_TOKEN_ADDRESS,
     poolAddress,
     BigInt.fromString(
       protocolTokenRewardEmissionsPerDay.truncate(0).toString()

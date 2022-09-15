@@ -5,7 +5,10 @@ import {
 import * as utils from "../common/utils";
 import { log } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
-import { NewGauge } from "../../generated/GaugeController/GaugeController";
+import {
+  NewGauge,
+  DeployedGauge,
+} from "../../generated/GaugeController/GaugeController";
 
 export function handleNewGauge(event: NewGauge): void {
   let gaugeAddress = event.params.addr;
@@ -16,8 +19,8 @@ export function handleNewGauge(event: NewGauge): void {
   let poolAddress = utils.getPoolFromLpToken(lpToken);
   if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
-  const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
 
   pool._gaugeAddress = gauge.id;
   gauge.poolAddress = pool.id;
@@ -26,11 +29,38 @@ export function handleNewGauge(event: NewGauge): void {
   pool.save();
 
   log.warning(
-    "[NewGauge] GaugeAddress: {}, PoolAddress: {}, lpToken:{}, TxnHash: {}",
+    "[NewGauge] PoolAddress: {}, GaugeAddress: {}, lpToken:{}, TxnHash: {}",
     [
-      gaugeAddress.toHexString(),
-      poolAddress.toHexString(),
+      pool.id,
+      gauge.id,
       lpToken.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+}
+
+export function handleDeployedGauge(event: DeployedGauge): void {
+  const gaugeAddress = event.params._gauge;
+  const lpTokenAddress = event.params._lp_token;
+
+  let poolAddress = utils.getPoolFromLpToken(lpTokenAddress);
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+  const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
+
+  pool._gaugeAddress = gauge.id;
+  gauge.poolAddress = pool.id;
+
+  gauge.save();
+  pool.save();
+
+  log.warning(
+    "[DeployedGauge] PoolAddress: {}, GaugeAddress: {}, lpToken:{}, TxnHash: {}",
+    [
+      pool.id,
+      gauge.id,
+      lpTokenAddress.toHexString(),
       event.transaction.hash.toHexString(),
     ]
   );

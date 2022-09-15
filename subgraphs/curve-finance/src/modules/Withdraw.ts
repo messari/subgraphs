@@ -40,7 +40,7 @@ export function createWithdrawTransaction(
     withdrawTransaction = new WithdrawTransaction(withdrawTransactionId);
 
     withdrawTransaction.pool = pool.id;
-    withdrawTransaction.protocol = constants.Mainnet.REGISTRY_ADDRESS.toHexString();
+    withdrawTransaction.protocol = constants.PROTOCOL_ID.toHexString();
 
     withdrawTransaction.to = constants.NULL.TYPE_STRING;
     if (transaction.to) withdrawTransaction.to = transaction.to!.toHexString();
@@ -226,7 +226,11 @@ export function Withdraw(
     block
   );
   pool.outputTokenSupply = tokenSupplyAfterWithdrawal;
-  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
+  pool.outputTokenPriceUSD = utils.getOrCreateTokenFromString(
+    pool.outputToken!,
+    block
+  ).lastPriceUSD!;
+
   pool.save();
 
   createWithdrawTransaction(

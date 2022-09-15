@@ -108,7 +108,10 @@ export function Swap(
     tokenIn = pool.inputTokens[sold_id.toI32()];
     tokenOut = pool.inputTokens[bought_id.toI32()];
   } else {
-    let underlyingCoins = utils.getPoolUnderlyingCoins(liquidityPoolAddress);
+    let underlyingCoins = utils.getPoolUnderlyingCoinsFromRegistry(
+      liquidityPoolAddress,
+      Address.fromString(pool._registryAddress)
+    );
 
     if (underlyingCoins.length == 0) return;
 

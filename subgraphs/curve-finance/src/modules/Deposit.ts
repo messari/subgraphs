@@ -130,7 +130,11 @@ export function Deposit(
     block
   );
   pool.outputTokenSupply = totalSupplyAfterDeposit;
-  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
+  pool.outputTokenPriceUSD = utils.getOrCreateTokenFromString(
+    pool.outputToken!,
+    block
+  ).lastPriceUSD!;
+
   pool.save();
 
   createDepositTransaction(

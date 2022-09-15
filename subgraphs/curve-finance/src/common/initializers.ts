@@ -88,17 +88,17 @@ export function getOrCreateLiquidityPoolFee(
 }
 
 export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(
-    constants.Mainnet.REGISTRY_ADDRESS.toHexString()
-  );
+  let protocolId = constants.PROTOCOL_ID.toHexString();
+  let protocol = DexAmmProtocol.load(protocolId);
 
   if (!protocol) {
-    protocol = new DexAmmProtocol(
-      constants.Mainnet.REGISTRY_ADDRESS.toHexString()
-    );
+    protocol = new DexAmmProtocol(protocolId);
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
-    protocol.network = constants.Network.MAINNET;
+    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
+    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
+    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
+    protocol.network = constants.Protocol.NETWORK;
     protocol.type = constants.ProtocolType.EXCHANGE;
 
     //////// Quantitative Data ////////
@@ -121,7 +121,10 @@ export function getOrCreateDexAmmProtocol(): DexAmmProtocol {
   return protocol;
 }
 
-export function getOrCreateToken(address: Address, block: ethereum.Block): Token {
+export function getOrCreateToken(
+  address: Address,
+  block: ethereum.Block
+): Token {
   let token = Token.load(address.toHexString());
 
   if (!token) {
@@ -141,7 +144,7 @@ export function getOrCreateToken(address: Address, block: ethereum.Block): Token
       token.decimals = constants.DEFAULT_DECIMALS.toI32();
     }
 
-    let tokenPrice = getUsdPricePerToken(address, block);
+    let tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = block.number;
     token.save();
@@ -152,9 +155,9 @@ export function getOrCreateToken(address: Address, block: ethereum.Block): Token
     !token.lastPriceBlockNumber ||
     block.number
       .minus(token.lastPriceBlockNumber!)
-      .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
+      .gt(constants.PRICE_CACHING_BLOCKS)
   ) {
-    let tokenPrice = getUsdPricePerToken(address, block);
+    let tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = block.number;
 
@@ -172,8 +175,7 @@ export function getOrCreateFinancialDailySnapshots(
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol =
-      constants.Mainnet.REGISTRY_ADDRESS.toHexString();
+    financialMetrics.protocol = constants.PROTOCOL_ID.toHexString();
 
     financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailyVolumeUSD = constants.BIGDECIMAL_ZERO;
@@ -206,7 +208,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id);
-    usageMetrics.protocol = constants.Mainnet.REGISTRY_ADDRESS.toHexString();
+    usageMetrics.protocol = constants.PROTOCOL_ID.toHexString();
 
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
@@ -237,7 +239,7 @@ export function getOrCreateUsageMetricsHourlySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(metricsID);
-    usageMetrics.protocol = constants.Mainnet.REGISTRY_ADDRESS.toHexString();
+    usageMetrics.protocol = constants.PROTOCOL_ID.toHexString();
 
     usageMetrics.hourlyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
@@ -266,7 +268,7 @@ export function getOrCreateLiquidityPoolDailySnapshots(
 
   if (!poolSnapshots) {
     poolSnapshots = new LiquidityPoolDailySnapshot(id);
-    poolSnapshots.protocol = constants.Mainnet.REGISTRY_ADDRESS.toHexString();
+    poolSnapshots.protocol = constants.PROTOCOL_ID.toHexString();
     poolSnapshots.pool = poolId;
 
     const pool = getOrCreateLiquidityPool(Address.fromString(poolId), block);
@@ -323,7 +325,7 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
 
   if (!poolSnapshots) {
     poolSnapshots = new LiquidityPoolHourlySnapshot(id);
-    poolSnapshots.protocol = constants.Mainnet.REGISTRY_ADDRESS.toHexString();
+    poolSnapshots.protocol = constants.PROTOCOL_ID.toHexString();
     poolSnapshots.pool = poolId;
 
     poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
@@ -392,19 +394,14 @@ export function getOrCreateLiquidityGauge(
   return liquidityGauge;
 }
 
-export function getOrCreateLpToken(
-  lpTokenAddress: Address,
-  poolAddress: Address | null = null
-): _LpToken {
+export function getOrCreateLpToken(lpTokenAddress: Address): _LpToken {
   let lpToken = _LpToken.load(lpTokenAddress.toHexString());
 
   if (!lpToken) {
     lpToken = new _LpToken(lpTokenAddress.toHexString());
     lpToken.poolAddress = constants.NULL.TYPE_STRING;
+    lpToken.registryAddress = constants.NULL.TYPE_STRING;
 
-    if (poolAddress) {
-      lpToken.poolAddress = poolAddress.toHexString();
-    }
     lpToken.save();
   }
 
@@ -412,67 +409,70 @@ export function getOrCreateLpToken(
 }
 
 export function getOrCreateLiquidityPool(
-  liquidityPoolAddress: Address,
+  poolAddress: Address,
   block: ethereum.Block
 ): LiquidityPoolStore {
-  let liquidityPool = LiquidityPoolStore.load(
-    liquidityPoolAddress.toHexString()
-  );
+  let pool = LiquidityPoolStore.load(poolAddress.toHexString());
 
-  if (!liquidityPool) {
-    liquidityPool = new LiquidityPoolStore(liquidityPoolAddress.toHexString());
+  if (!pool) {
+    pool = new LiquidityPoolStore(poolAddress.toHexString());
 
-    liquidityPool.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    liquidityPool.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    liquidityPool.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    liquidityPool.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
-    liquidityPool.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
+    pool.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    pool.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    pool.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    pool.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+    pool.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
 
-    const lpToken = utils.getLpTokenFromPool(liquidityPoolAddress, block);
+    const lpToken = utils.getLpTokenFromPool(poolAddress, block);
 
-    if (lpToken.id != constants.NULL.TYPE_STRING)
-      getOrCreateLpToken(Address.fromString(lpToken.id), liquidityPoolAddress);
+    if (lpToken.id != constants.NULL.TYPE_STRING) {
+      let lpTokenStore = getOrCreateLpToken(Address.fromString(lpToken.id));
+      lpTokenStore.poolAddress = poolAddress.toHexString();
 
-    liquidityPool.name = lpToken.name;
-    liquidityPool.symbol = lpToken.symbol;
-    liquidityPool.protocol = constants.Mainnet.REGISTRY_ADDRESS.toHexString();
+      lpTokenStore.save();
+    }
 
-    liquidityPool.inputTokens = utils.getPoolCoins(liquidityPoolAddress, block);
-    liquidityPool.inputTokenBalances = utils.getPoolBalances(
-      liquidityPoolAddress,
-      liquidityPool.inputTokens
+    pool.name = lpToken.name;
+    pool.symbol = lpToken.symbol;
+    pool.protocol = constants.PROTOCOL_ID.toHexString();
+
+    pool.inputTokens = utils.getPoolCoins(poolAddress, block);
+    pool.inputTokenBalances = utils.getPoolBalances(
+      poolAddress,
+      pool.inputTokens
     );
-    liquidityPool.inputTokenWeights = utils.getPoolTokenWeights(
-      liquidityPool.inputTokens,
-      liquidityPool.inputTokenBalances,
+    pool.inputTokenWeights = utils.getPoolTokenWeights(
+      pool.inputTokens,
+      pool.inputTokenBalances,
       constants.BIGDECIMAL_ZERO,
       block
     );
 
-    liquidityPool.outputToken = lpToken.id;
-    liquidityPool.outputTokenSupply = constants.BIGINT_ZERO;
-    liquidityPool.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
+    pool.outputToken = lpToken.id;
+    pool.outputTokenSupply = constants.BIGINT_ZERO;
+    pool.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
 
-    liquidityPool.rewardTokens = [];
-    liquidityPool.rewardTokenEmissionsAmount = [];
-    liquidityPool.rewardTokenEmissionsUSD = [];
+    pool.rewardTokens = [];
+    pool.rewardTokenEmissionsAmount = [];
+    pool.rewardTokenEmissionsUSD = [];
 
-    liquidityPool.fees = utils.getPoolFees(liquidityPoolAddress).stringIds();
-    liquidityPool.isSingleSided = false;
+    pool.fees = utils.getPoolFees(poolAddress).stringIds();
+    pool.isSingleSided = false;
 
-    liquidityPool.createdBlockNumber = block.number;
-    liquidityPool.createdTimestamp = block.timestamp;
+    pool.createdBlockNumber = block.number;
+    pool.createdTimestamp = block.timestamp;
 
-    utils.updateProtocolAfterNewLiquidityPool(liquidityPoolAddress);
+    utils.updateProtocolAfterNewLiquidityPool(poolAddress);
 
-    liquidityPool._gaugeAddress = constants.NULL.TYPE_STRING;
-    liquidityPool.save();
+    pool._registryAddress = constants.NULL.TYPE_STRING;
+    pool._gaugeAddress = constants.NULL.TYPE_STRING;
+    pool.save();
 
     log.warning(
       "[NewLiquidityPool] Pool: {}, inputTokens: [{}], outputToken/lpToken: {}",
-      [liquidityPool.id, liquidityPool.inputTokens.join(", "), lpToken.id]
+      [pool.id, pool.inputTokens.join(", "), lpToken.id]
     );
   }
 
-  return liquidityPool;
+  return pool;
 }
