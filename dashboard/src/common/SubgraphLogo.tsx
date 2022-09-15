@@ -32,12 +32,12 @@ const subgraphLogoMap: Record<string, string> = {
   curve: "https://assets.coingecko.com/coins/images/12124/small/Curve.png?1597369484",
   "mm-finance": "https://assets.coingecko.com/coins/images/22273/small/MMF200X200.png?1650448869",
   "ellipsis-finance": "https://assets.coingecko.com/coins/images/25444/small/ellipsis-light_%281%29.png?1651786591",
-  gamma: "https://storage.googleapis.com/subgraph-images/1654636003709gamma.jpg",
+  "gamma": "https://storage.googleapis.com/subgraph-images/1654636003709gamma.jpg",
   badgerdao: "https://storage.googleapis.com/subgraph-images/1651427188757badger.png",
   rari: "https://assets.coingecko.com/coins/images/12900/small/Rari_Logo_Transparent.png?1613978014",
-  vesper: "https://storage.googleapis.com/subgraph-images/1657324907963vesper.jpg",
+  "vesper": "https://storage.googleapis.com/subgraph-images/1657324907963vesper.jpg",
   "inverse-finance": "https://assets.coingecko.com/coins/images/14205/small/inverse_finance.jpg?1614921871",
-  convex: "https://assets.coingecko.com/coins/images/15585/small/convex.png?1621256328",
+  "convex": "https://assets.coingecko.com/coins/images/15585/small/convex.png?1621256328",
   aurigami: "https://assets.coingecko.com/coins/images/24074/small/EbB5N8IN_400x400.jpg?1646230298",
   "arrakis-finance": "https://storage.googleapis.com/subgraph-images/1657591665211arrakis.jpg",
   "cream-finance": "https://assets.coingecko.com/coins/images/11976/small/Cream.png?1596593418",
@@ -76,7 +76,10 @@ const subgraphMap: Record<string, string> = {
   "compound-v2": "compound",
   "yearn-v2": "yearn",
   "stakedao": "stake-dao",
-  "curve-finance": "curve"
+  "curve-finance": "curve",
+  "vesper-finance": "vesper",
+  "gamma-strategies": "gamma",
+  "convex-finance": "convex"
 };
 
 interface SubgraphLogoProps {

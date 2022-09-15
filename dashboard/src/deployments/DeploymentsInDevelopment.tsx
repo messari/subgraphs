@@ -72,7 +72,7 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment }: DeploymentsInDev
                 const tableRows = Object.keys(subgraph).map((subgraphName) => {
                     const protocol = subgraph[subgraphName];
                     return (
-                        <TableRow sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }}>
+                        <TableRow key={subgraphName + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }}>
                             <TableCell
                                 sx={{ padding: "0", borderLeft: `orange solid 6px`, verticalAlign: "middle", display: "flex" }}
                             >
@@ -80,7 +80,7 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment }: DeploymentsInDev
                                 <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
                                     {subgraphName}
                                 </span>
-                                {protocol.networks.map((x: string) => <NetworkLogo size={30} network={x} />)}
+                                {protocol.networks.map((x: string) => <NetworkLogo key={subgraphName + x + 'Logo'} size={30} network={x} />)}
                             </TableCell>
                             <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>

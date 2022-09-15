@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { Deployment } from "./Deployment";
 import { BoxProps } from "@mui/material";
 import { ApolloClient, gql, NormalizedCacheObject, useQuery } from "@apollo/client";
@@ -116,7 +116,7 @@ export const SubgraphDeployments = ({
     <>
       {deployments.map(({ network, deployment }) => {
         return (
-          <>
+          <Fragment key={deployment + 'CompGroup'}>
             <Deployment
               key={deployment + "-" + network}
               clientIndexing={clientIndexing}
@@ -139,7 +139,7 @@ export const SubgraphDeployments = ({
               statusLoading={statusLoadingPending}
               errorIndexing={errorIndexingPending}
             />
-          </>
+          </Fragment>
         );
       })}
     </>
