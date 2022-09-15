@@ -6,6 +6,7 @@ export function isNullEthValue(value: string): boolean {
 }
 
 export function amountToUsd(amount: BigInt, twap: BigInt, twapPrice: BigDecimal): BigDecimal {
+  
   if (twapPrice == BIGDECIMAL_ZERO) return BIGDECIMAL_ZERO;
 
   const twapD = twap.toBigDecimal();

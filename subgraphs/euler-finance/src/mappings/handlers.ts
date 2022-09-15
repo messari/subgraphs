@@ -144,8 +144,8 @@ function updateProtocolAndMarkets(block: ethereum.Block): void {
   let protocolUtility = getOrCreateProtocolUtility(blockNumber);
   let markets = protocolUtility.markets;
 
-  if (protocolUtility.lastBlockNumber >= blockNumber ) {
-    return; // Do this update every block
+  if (protocolUtility.lastBlockNumber <= blockNumber - 120 ) {
+    return; // Do this update every 120 blocks
   }
 
   let eulerViewQueryResult = queryEulerGeneralView(markets, block);
