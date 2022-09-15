@@ -1,5 +1,5 @@
 import axios from "axios";
-import { clearChannel, constructEmbedMsg, errorNotification, getDiscordMessages, sendDiscordMessage } from "./messageDiscord.js";
+import { clearChannel, constructEmbedMsg, errorNotification, getDiscordMessages, sendDiscordMessage, startProtocolThread } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
@@ -19,12 +19,32 @@ try {
 
 async function executionFlow() {
   const { data } = await axios.get(
-    "https://subgraphs.messari.io/deployments.json"
+    "https://subgraphs.messari.io/deployment.dev.json"
   );
   // deployments holds the errors for every protocol
+  const subgraphEndpoints = {};
+
+  if (Object.keys(data)?.length > 0) {
+    Object.keys(data).forEach((protocolName) => {
+      const protocol = data[protocolName];
+      if (!protocol.schema) {
+        return;
+      }
+      if (!Object.keys(subgraphEndpoints).includes(protocol.schema)) {
+        subgraphEndpoints[protocol.schema] = {};
+      }
+      if (!Object.keys(subgraphEndpoints[protocol.schema]).includes(protocolName)) {
+        subgraphEndpoints[protocol.schema][protocolName] = {};
+      }
+      Object.values(protocol.deployments).forEach((depoData) => {
+        subgraphEndpoints[protocol.schema][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["deployment-ids"]["hosted-service"];
+      });
+    });
+  }
+
   let deployments = {};
   const protocolNames = [];
-  Object.entries(data).forEach(([protocolType, protocolsOnType]) => {
+  Object.entries(subgraphEndpoints).forEach(([protocolType, protocolsOnType]) => {
     Object.entries(protocolsOnType).forEach(([protocolName, protocolObj]) => {
       Object.entries(protocolObj).forEach(([network, deploymentString]) => {
         const nameStr =
@@ -173,18 +193,54 @@ async function executionFlow() {
 
   });
   deployments = await protocolLevel(deployments);
+  // getCurrentMessages NEEDS TO RETURN MESSAGE ID AS WELL AS MESSAGE CONTENT
+  const protocolThreadsToStart = [];
+  const currentDiscordMessages = await getDiscordMessages([], "");
   const messagesToPost = protocolNames.map(protocolName => {
-    const deploymentSet = Object.values(deployments).filter(depo => depo.protocolName === protocolName)
-    const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet);
-    return { message: embeddedMessages, protocolName: protocolName };
-  })
+    let channel_id = null;
+    // Read main channel messages, See if protocol name has aready made a thread/ message
 
+    if (currentDiscordMessages.find(msg => msg.content.includes(protocolName))) {
+      channel_id = currentDiscordMessages.find(msg => msg.content.includes(protocolName)).id;
+    } else {
+      protocolThreadsToStart.push({ protocolName: protocolName, issues: [] });
+    }
+    // If not, pass Protocol name and error types into start protocol thread
+    // Start the thread and return the new channel ID (data.id)
+    const deploymentSet = Object.values(deployments).filter(depo => depo.protocolName === protocolName);
+    const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet);
+    return { message: embeddedMessages, protocolName: protocolName, channel: channel_id };
+  })
   if (messagesToPost.length > 0) {
     // Need to pull refreshed list of alert messages, in case posted but error was thrown as well.
-    const currentDiscordMessages = await getDiscordMessages([], "");
+
+    // call function to create threads, return object of protocol names to channel ids
+    // map messages to post, where channel is null take above object key of protocol name and set to channel
+
+    const channelMapping = await resolveThreadCreation(protocolThreadsToStart)
+
+    messagesToPost.forEach((msg, idx) => {
+      if (!msg.channel) {
+        messagesToPost[idx].channel = channelMapping[msg.protocolName];
+      }
+    });
+
     await resolveQueriesToAttempt(messagesToPost, currentDiscordMessages);
   }
   return;
+}
+
+async function resolveThreadCreation(protocols) {
+
+  try {
+    console.log(protocols)
+    const resolution = await Promise.allSettled(protocols.map(object => startProtocolThread(object.protocolName, object.issues)));
+    console.log(resolution, 'resolution')
+    // Transform resolution into mapping object ||| [protocolName] > channel id 
+    return resolution
+  } catch (err) {
+    errorNotification(err.message + ' resolveQueriesToAttempt() script.js');
+  }
 }
 
 async function resolveQueriesToAttempt(queriesToAttempt, currentDiscordMessages) {
@@ -200,7 +256,7 @@ async function resolveQueriesToAttempt(queriesToAttempt, currentDiscordMessages)
       return hasMsg.length === 0;
     })
 
-    await Promise.allSettled(useQueries.map(object => sendDiscordMessage(object.message, object.protocolName)));
+    await Promise.allSettled(useQueries.map(object => sendDiscordMessage(object.message, object.protocolName, object.channel)));
   } catch (err) {
     errorNotification(err.message + ' resolveQueriesToAttempt() script.js');
   }

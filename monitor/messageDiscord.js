@@ -41,7 +41,6 @@ export async function errorNotification(error) {
 export async function getDiscordMessages(messages, channel_id) {
     try {
         const tempMessages = await fetchMessages(messages[messages.length - 1]?.id || "", channel_id);
-
         messages = [...messages, ...tempMessages];
         if (messages.length % 100 === 0 && messages.length !== 0 && tempMessages.length !== 0) {
             await sleep(1000);
@@ -101,11 +100,12 @@ export async function clearChannel(channel_id) {
     }
 }
 
-export async function sendDiscordMessage(messageObjects, protocolName) {
+export async function sendDiscordMessage(messageObjects, protocolName, channel_id) {
     if (!Object.keys(messageObjects)?.length > 0 || !messageObjects) {
         return null;
     }
-    const baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages";
+    console.log(channel_id, 'channel')
+    const baseURL = "https://discordapp.com/api/channels/" + channel_id + "/messages";
     const headers = {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",
@@ -130,7 +130,7 @@ export async function sendDiscordMessage(messageObjects, protocolName) {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return null;
     } catch (err) {
-        console.log('ERROR', err.response)
+        // console.log('ERROR', err.response)
         if (err.response.status === 429) {
             return messageObjects;
         } else {
@@ -138,6 +138,78 @@ export async function sendDiscordMessage(messageObjects, protocolName) {
             return null;
         }
     }
+}
+
+
+// Read main channel messages, See if protocol name has aready made a thread/ message
+// If not, pass Protocol name and error types into start protocol thread
+// Start the thread and return the new channel ID (data.id)
+// Pass this channel id to sendDiscordMessage in order to post message for each depo into thread for protocol 
+
+export async function startProtocolThread(protocolName, issues) {
+    // This function sneds a request to discord and starts a thread for a protocol. All of the embedded messages within the protocol are messages/replies on this thread
+
+    // MUST SEND THE INITIAL MESSAGE
+    let baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages";
+
+    let headers = {
+        "Authorization": "Bot " + process.env.BOT_TOKEN,
+        "Content-Type": "application/json",
+    }
+    // https://discordapp.com/channels/1010184937565069342/1011361382760992828/1019212751249350688
+
+
+    let postJSON = JSON.stringify({ "content": "TEST" })
+    let msgId = ""
+    try {
+        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        msgId = data.id
+        console.log(data)
+    } catch (err) {
+        errorNotification(err)
+    }
+
+    baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages/" + msgId + "/threads";
+
+    headers = {
+        "Authorization": "Bot " + process.env.BOT_TOKEN,
+        "Content-Type": "application/json",
+    }
+    // https://discordapp.com/channels/1010184937565069342/1011361382760992828/1019212751249350688
+
+
+    postJSON = JSON.stringify({ "name": protocolName + ' ISSUES' })
+
+    try {
+        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        console.log(data)
+        return data.id;
+    } catch (err) {
+        errorNotification(err)
+    }
+
+}
+
+export async function sendThreadMessage() {
+    // This function sneds a request to discord and starts a thread for a protocol. All of the embedded messages within the protocol are messages/replies on this thread
+    const baseURL = "https://discordapp.com/api/channels/1019212751249350688/messages";
+
+    const headers = {
+        "Authorization": "Bot " + process.env.BOT_TOKEN,
+        "Content-Type": "application/json",
+    }
+    // https://discordapp.com/channels/1010184937565069342/1011361382760992828/1019212751249350688
+
+
+    const postJSON = JSON.stringify({ "content": "TEST" })
+
+    try {
+        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        console.log(data)
+    } catch (err) {
+        errorNotification(err)
+    }
+
 }
 
 export function constructEmbedMsg(protocol, deploymentsOnProtocol) {
