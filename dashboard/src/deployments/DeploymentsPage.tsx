@@ -17,13 +17,12 @@ const DeploymentsLayout = styled("div")`
 
 interface DeploymentsPageProps {
   protocolsToQuery: { [x: string]: any };
-  deploymentsInDevelopment: { [x: string]: any };
   getData: any;
-  getDevDeployments: any;
   subgraphCounts: any;
+  deploymentJSON: any;
 }
 
-function DeploymentsPage({ protocolsToQuery, getData, getDevDeployments, deploymentsInDevelopment, subgraphCounts }: DeploymentsPageProps) {
+function DeploymentsPage({ protocolsToQuery, getData, deploymentJSON, subgraphCounts }: DeploymentsPageProps) {
   const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
@@ -44,7 +43,6 @@ function DeploymentsPage({ protocolsToQuery, getData, getDevDeployments, deploym
 
   useEffect(() => {
     getData();
-    getDevDeployments();
   }, []);
 
   useEffect(() => {
@@ -173,7 +171,7 @@ function DeploymentsPage({ protocolsToQuery, getData, getDevDeployments, deploym
         </div>
 
         {showDeploymentsInDevelopment ? <>
-          <DeploymentsInDevelopment deploymentsInDevelopment={deploymentsInDevelopment} />
+          <DeploymentsInDevelopment deploymentsInDevelopment={deploymentJSON} />
           <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
             <Button variant="contained" color="primary" onClick={() => toggleShowDeploymentsInDevelopment(!showDeploymentsInDevelopment)}>
               {showDeploymentsInDevelopment ? "Hide" : "Show"} Subgraphs In Development
