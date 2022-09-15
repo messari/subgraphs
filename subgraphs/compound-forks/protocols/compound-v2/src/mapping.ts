@@ -16,6 +16,7 @@ import {
   RepayBorrow,
   LiquidateBorrow,
   NewReserveFactor,
+  Transfer,
   AccrueInterest as AccrueInterestNew,
 } from "../../../generated/templates/CToken/CToken";
 import { AccrueInterest as AccrueInterestOld } from "../../../generated/templates/CTokenOld/CTokenOld";
@@ -70,6 +71,7 @@ import {
   _handleNewReserveFactor,
   _handleRedeem,
   _handleRepayBorrow,
+  _handleTransfer,
 } from "../../../src/mapping";
 import { CToken, CTokenOld } from "../../../generated/templates";
 import {
@@ -182,6 +184,16 @@ export function handleNewReserveFactor(event: NewReserveFactor): void {
   let marketID = event.address.toHexString();
   let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
   _handleNewReserveFactor(marketID, newReserveFactorMantissa);
+}
+
+export function handleTransfer(event: Transfer): void {
+  _handleTransfer(
+    event,
+    event.address.toHexString(),
+    event.params.to,
+    event.params.from,
+    comptrollerAddr
+  );
 }
 
 export function handleAccrueInterestNew(event: AccrueInterestNew): void {

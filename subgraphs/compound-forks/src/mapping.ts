@@ -46,8 +46,10 @@ import {
   RiskType,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
+  ZERO_ADDRESS,
 } from "./constants";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
+import { CToken } from "../generated/templates/CToken/CToken";
 
 enum EventType {
   Deposit,
@@ -529,7 +531,9 @@ export function _handleRedeem(
     event
   );
   if (!positionID) {
-    log.warning("[handleRedeem] Failed to find position", []);
+    log.warning("[handleRedeem] Failed to find position for account: {}", [
+      account.id,
+    ]);
     return;
   }
 
@@ -747,7 +751,9 @@ export function _handleRepayBorrow(
     event
   );
   if (!positionID) {
-    log.warning("[handleRepayBorrow] Failed to find position", []);
+    log.warning("[handleRepayBorrow] Failed to find position for account: {}", [
+      borrowerAccount.id,
+    ]);
     return;
   }
 
@@ -1054,6 +1060,89 @@ export function _handleNewReserveFactor(
     .div(mantissaFactorBD);
   market._reserveFactor = reserveFactor;
   market.save();
+}
+
+export function _handleTransfer(
+  event: ethereum.Event,
+  marketID: string,
+  to: Address,
+  from: Address,
+  comptrollerAddr: Address
+): void {
+  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  if (protocol == null) {
+    log.warning("[_handleTransfer] protocol not found: {}", [
+      comptrollerAddr.toHexString(),
+    ]);
+    return;
+  }
+  let market = Market.load(marketID);
+  if (market == null) {
+    log.warning("[_handleTransfer] market not found: {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
+
+  // grab accounts
+  let toAccount = Account.load(to.toHexString());
+  if (!toAccount) {
+    if (
+      to == Address.fromString(ZERO_ADDRESS) ||
+      to.toHexString().toLowerCase() == marketID.toLowerCase()
+    ) {
+      toAccount = null;
+    } else {
+      toAccount = createAccount(to.toHexString());
+      toAccount.save();
+
+      protocol.cumulativeUniqueUsers++;
+      protocol.save();
+    }
+  }
+
+  let fromAccount = Account.load(from.toHexString());
+  if (!fromAccount) {
+    if (
+      from == Address.fromString(ZERO_ADDRESS) ||
+      from.toHexString().toLowerCase() == marketID.toLowerCase()
+    ) {
+      fromAccount = null;
+    } else {
+      fromAccount = createAccount(from.toHexString());
+      fromAccount.save();
+
+      protocol.cumulativeUniqueUsers++;
+      protocol.save();
+    }
+  }
+
+  let cTokenContract = CToken.bind(Address.fromString(marketID));
+  // update balance from sender
+  if (fromAccount) {
+    subtractPosition(
+      protocol,
+      market,
+      fromAccount,
+      cTokenContract.try_balanceOfUnderlying(from),
+      PositionSide.LENDER,
+      -1, // TODO: not sure how to classify this event yet
+      event
+    );
+  }
+
+  // update balance from receiver
+  if (toAccount) {
+    addPosition(
+      protocol,
+      market,
+      toAccount,
+      cTokenContract.try_balanceOfUnderlying(to),
+      PositionSide.LENDER,
+      -1, // TODO: not sure how to classify this event yet
+      event
+    );
+  }
 }
 
 /////////////////////////
