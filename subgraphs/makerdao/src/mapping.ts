@@ -15,9 +15,10 @@ import { Created } from "../generated/DSProxyFactory/DSProxyFactory";
 import { BuyGem, SellGem, PSM } from "../generated/PSM-USDC-A/PSM";
 import {
   getOrCreatePosition,
-  getPositionIDForAccount,
   getOrCreateAccount,
-  getOrCreateInternalPosition,
+  getOpenPosition,
+  getOwnerAddress,
+  getOrCreatePositionCounter,
 } from "./common/getters";
 import {
   Token,
@@ -28,7 +29,6 @@ import {
   _Chi,
   _Urn,
   _Proxy,
-  _InternalPosition,
   _PositionCounter,
   Position,
   Market,
@@ -164,7 +164,7 @@ export function handleVatRely(event: VatNoteEvent): void {
 
   log.info("[handleVatRely]ilk = {}/{}, market = {}, token = {}, name = {}, symbol = {}, decimals = {}", [
     ilk.toString(),
-    ilk.toHexString(),
+    ilk.toString(),
     marketID, //join (market address)
     tokenId, //gem (token address)
     tokenName,
@@ -203,25 +203,25 @@ export function handleVatSlip(event: VatNoteEvent): void {
     return;
   }
   let usr = bytes32ToAddressHexString(event.params.arg2);
-
-  let owner = getOwnerAddressFromUrn(usr);
-  owner = getOwnerAddressFromProxy(owner);
+  let owner = getOwnerAddress(usr);
   let wad = bytesToSignedBigInt(event.params.arg3);
 
   let market: Market = getMarketFromIlk(ilk)!;
   let token = getOrCreateToken(market.inputToken);
   let deltaCollateral = bigIntChangeDecimals(wad, WAD, token.decimals);
   let deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
-  log.info("[handleVatSlip]ilk/market: {}/{}, toke={}, deltaCollateral={}, deltaCollateralUSD={}", [
+  log.info("[handleVatSlip]ilk/market: {}/{}, token={}, usr={}, owner={}, deltaCollateral={}, deltaCollateralUSD={}", [
     ilk.toString(),
     market.id,
     token.name,
+    usr,
+    owner,
     deltaCollateral.toString(),
     deltaCollateralUSD.toString(),
   ]);
 
-  createTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
-  updatePosition(event, owner, market.id, usr, ilk, deltaCollateral, BIGINT_ZERO);
+  //createTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
+  //updatePosition(event, usr, ilk, deltaCollateral, BIGINT_ZERO);
   updateMarket(event, market, deltaCollateral, deltaCollateralUSD);
   updateUsageMetrics(event, [owner, owner, owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
   updateProtocol(deltaCollateralUSD, BIGDECIMAL_ZERO);
@@ -246,58 +246,79 @@ export function handleVatFrob(event: VatNoteEvent): void {
   // 6th arg dart: start = 4 (signature) + 4 * 32, end = start + 32
   let dart = bytesToSignedBigInt(extractCallData(event.params.data, 164, 196)); // change to debt
 
+  log.info("[handleVatFrob]block#={}, ilk={}, u={}, v={}, w={}, dink={}, dart={}", [
+    event.block.number.toString(),
+    ilk.toString(),
+    u,
+    v,
+    w,
+    dink.toString(),
+    dart.toString(),
+  ]);
+
+  /*
+  if (dart == BIGINT_ZERO) {
+    log.info(
+      "[handleVatFrob]No borrowing/repaying in transaction {}, skipping (deposit/withdraw is handled in handleVatSlip)",
+      [event.transaction.hash.toHexString()],
+    );
+    return;
+  }
+  */
+
   let market = getMarketFromIlk(ilk);
   if (market == null) {
     log.warning("[handleVatFrob]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
     return;
   }
 
+  let token = getOrCreateToken(market.inputToken);
+  let deltaCollateral = bigIntChangeDecimals(dink, WAD, token.decimals);
+  let deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
+
+  /*
+  if (deltaCollateral.gt(BIGINT_ZERO)) {
+    updatePosition(event, u, ilk, deltaCollateral, BIGINT_ZERO);
+  }
+
+  // frob can be used to transfer collateral/debt
+  // when u != v, u != w
+  if (u.toLowerCase() != v.toLowerCase() && dink.notEqual(BIGINT_ZERO)) {
+    transferPosition(event, ilk, v, u, PositionSide.LENDER, null, null, deltaCollateral);
+  }
+  if (u.toLowerCase() != w.toLowerCase() && dart.notEqual(BIGINT_ZERO)) {
+    transferPosition(event, ilk, v, w, PositionSide.BORROWER, null, null, dart);
+  }
+  */
+
   let urn = u;
 
-  // translate possible UrnHandler address to its owner address
-  u = getOwnerAddressFromUrn(u);
-  v = getOwnerAddressFromUrn(v);
-  w = getOwnerAddressFromUrn(w);
+  // translate possible UrnHandler/DSProxy address to its owner address
+  u = getOwnerAddress(u);
+  v = getOwnerAddress(v);
+  w = getOwnerAddress(w);
 
-  // translate possible DSProxy address to its owner address
-  u = getOwnerAddressFromProxy(u);
-  v = getOwnerAddressFromProxy(v);
-  w = getOwnerAddressFromProxy(w);
-
-  let token = getOrCreateToken(market.inputToken);
   market.inputTokenPriceUSD = token.lastPriceUSD!;
   // change in borrowing amount
   let deltaDebtUSD = bigIntToBDUseDecimals(dart, WAD); //in DAI
-  // alternatively, use dai mapping on chain, this includes stablity fees
+  // alternatively, use dai mapping on chain and include stablity fees
   //let vatContract = Vat.bind(Address.fromString(VAT_ADDRESS));
   //let dtab = dart.times(vatContract.ilks(ilk).getRate());
   //deltaDebtUSD = bigIntToBDUseDecimals(dtab, RAD);
 
-  log.info(
-    "[handleVatFrob]block#={}, ilk={}, market={}, u={}, v={}, w={}, dink={}, dart={}," +
-      "inputTokenBal={}, inputTokenPrice={}, totalBorrowUSD={}",
-    [
-      event.block.number.toString(),
-      ilk.toString(),
-      market.id,
-      u,
-      v,
-      w,
-      dink.toString(),
-      dart.toString(),
-      market.inputTokenBalance.toString(),
-      market.inputTokenPriceUSD.toString(),
-      market.totalBorrowBalanceUSD.toString(),
-    ],
-  );
+  log.info("[handleVatFrob]inputTokenBal={}, inputTokenPrice={}, totalBorrowUSD={}", [
+    market.inputTokenBalance.toString(),
+    market.inputTokenPriceUSD.toString(),
+    market.totalBorrowBalanceUSD.toString(),
+  ]);
 
-  createTransactions(event, market, v, w, BIGINT_ZERO, BIGDECIMAL_ZERO, dart, deltaDebtUSD);
+  createTransactions(event, market, v, w, deltaCollateral, deltaCollateralUSD, dart, deltaDebtUSD);
+  updatePosition(event, urn, ilk, deltaCollateral, dart);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
   updateUsageMetrics(event, [u, v, w], BIGDECIMAL_ZERO, deltaDebtUSD);
   updateProtocol(BIGDECIMAL_ZERO, deltaDebtUSD);
   //this needs to after updateProtocol as it uses protocol to do the update
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, deltaDebtUSD);
-  updatePosition(event, u, market.id, urn, ilk, BIGINT_ZERO, dart);
 }
 
 // function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
@@ -404,6 +425,7 @@ export function handleVatDebtSettlement(event: VatNoteEvent): void {
 // old liquidation
 export function handleCatBite(event: BiteEvent): void {
   let ilk = event.params.ilk; //market
+  let urn = event.params.urn.toHexString(); //liquidatee
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
@@ -420,7 +442,7 @@ export function handleCatBite(event: BiteEvent): void {
   //  .toHexString()
   //  .concat("-")
   //  .concat(event.logIndex.toString());
-  //getOrCreateLiquidate(LiquidateID, event, market, urn.toHexString());
+  //getOrCreateLiquidate(LiquidateID, event, market, urn());
 
   // remove borrowed amount from borrowed balance
   // collateral/tvl update is taken care of when it exits vat
@@ -439,21 +461,21 @@ export function handleCatBite(event: BiteEvent): void {
   log.info("[handleCatBite]storeID={}, ilk={}, urn={}: lot={}, art={}, tab={}, liquidation revenue=${}", [
     storeID,
     ilk.toString(),
-    urn.toHexString(),
+    urn,
     lot.toString(),
     art.toString(),
     tab.toString(),
     liquidationRevenueUSD.toString(),
   ]);
 
-  let liquidatee = getOwnerAddressFromUrn(urn.toHexString());
-  liquidatee = getOwnerAddressFromProxy(liquidatee);
+  let liquidatee = getOwnerAddress(urn);
   //let debt = bigIntChangeDecimals(tab, RAD, WAD);
   let flipBidsStore = new _FlipBidsStore(storeID);
   flipBidsStore.round = INT_ZERO;
-  flipBidsStore.urn = urn.toHexString();
+  flipBidsStore.urn = urn;
   flipBidsStore.liquidatee = liquidatee;
   flipBidsStore.lot = lot;
+  flipBidsStore.art = art;
   flipBidsStore.tab = tab; // not including liquidation penalty
   flipBidsStore.bid = BIGINT_ZERO;
   flipBidsStore.bidder = ZERO_ADDRESS;
@@ -544,7 +566,9 @@ export function handleDogBark(event: BarkEvent): void {
   clipTakeStore.market = market.id;
   clipTakeStore.urn = urn.toHexString();
   clipTakeStore.lot = lot;
+  clipTakeStore.art = art;
   clipTakeStore.tab = due; //not including penalty
+  clipTakeStore.tab0 = due;
   clipTakeStore.save();
 
   Clip.create(clip);
@@ -747,7 +771,30 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
 
   // update positions
   let ilk = Bytes.fromHexString(flipBidsStore.ilk);
-  liquidatePosition(event, ilk, flipBidsStore.urn, liquidate.amount, flipBidsStore.tab);
+  // TODO: debugging
+  let urn = flipBidsStore.urn;
+  let sides = [PositionSide.LENDER, PositionSide.BORROWER];
+  log.info("[]txhash={}", [event.transaction.hash.toHexString()]);
+  for (let si = 0; si <= 1; si++) {
+    let side = sides[si];
+    let counterEnity = getOrCreatePositionCounter(urn, ilk, side);
+    for (let counter = counterEnity.nextCount; counter >= 0; counter--) {
+      let positionID = `${urn}-${marketID}-${side}-${counter}`;
+      let position = Position.load(positionID);
+      if (position) {
+        log.info("[handleFlipEndAuction]{}: balance={}, account={}, hashClosed={}", [
+          positionID,
+          position.balance.toString(),
+          position.account,
+          position.hashClosed ? position.hashClosed! : "null",
+        ]);
+      } else {
+        log.info("[handleFlipEndAuction]{}: position not existing", [positionID]);
+      }
+    }
+  }
+
+  liquidatePosition(event, flipBidsStore.urn, ilk, liquidate.liquidator, liquidate.amount, flipBidsStore.art);
 
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
@@ -770,8 +817,7 @@ export function handleClipTakeBid(event: TakeEvent): void {
 
   let liquidator = event.transaction.from.toHexString();
   // translate possible proxy/urn handler address to owner address
-  liquidatee = getOwnerAddressFromUrn(liquidatee);
-  liquidatee = getOwnerAddressFromProxy(liquidatee);
+  liquidatee = getOwnerAddress(liquidatee);
 
   let storeID = event.address //clip contract
     .toHexString()
@@ -805,7 +851,7 @@ export function handleClipTakeBid(event: TakeEvent): void {
   );
 
   let deltaLot = clipTakeStore.lot.minus(lot);
-  //let deltaTab = clipTakeStore.tab.minus(tab);
+  let deltaTab = clipTakeStore.tab.minus(tab);
   let amount = bigIntChangeDecimals(deltaLot, WAD, token.decimals);
   let amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
   //let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(deltaTab, WAD));
@@ -884,9 +930,13 @@ export function handleClipTakeBid(event: TakeEvent): void {
     token.lastPriceUSD!.toString(),
   ]);
 
+  let debtRepaid = BigDecimalTruncateToBigInt(
+    clipTakeStore.art.times(deltaTab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
+  ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
+
   //liquidate._finalized = true;
   //liquidate.save();
-  liquidatePosition(event, ilk, clipTakeStore.liquidatee!, liquidate.amount, clipTakeStore.art);
+  liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.liquidator, liquidate.amount, debtRepaid);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(
@@ -913,8 +963,7 @@ export function handleClipYankBid(event: ClipYankEvent): void {
 
   let liquidator = event.transaction.from.toHexString();
   // translate possible proxy/urn handler address to owner address
-  liquidatee = getOwnerAddressFromUrn(liquidatee);
-  liquidatee = getOwnerAddressFromProxy(liquidatee);
+  liquidatee = getOwnerAddress(liquidatee);
 
   let storeID = event.address //clip contract
     .toHexString()
@@ -969,7 +1018,11 @@ export function handleClipYankBid(event: ClipYankEvent): void {
   //liquidate._finalized = true;
   liquidate.save();
 
-  liquidatePosition(event, ilk, clipTakeStore.liquidatee!, liquidate.amount, clipTakeStore.art);
+  let debtRepaid = BigDecimalTruncateToBigInt(
+    clipTakeStore.art.times(tab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
+  ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
+
+  liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.liquidator, liquidate.amount, debtRepaid);
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
@@ -989,7 +1042,7 @@ export function handleSpotFileMat(event: SpotNoteEvent): void {
     }
     let market = getMarketFromIlk(ilk);
     if (market == null) {
-      log.warning("[handleSpotFileMat]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
+      log.warning("[handleSpotFileMat]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toString()]);
       return;
     }
 
@@ -1044,7 +1097,7 @@ export function handleSpotPoke(event: PokeEvent): void {
   }
   let market = getMarketFromIlk(ilk);
   if (market == null) {
-    log.warning("[handleSpotPoke]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
+    log.warning("[handleSpotPoke]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toString()]);
     return;
   }
 
@@ -1077,7 +1130,7 @@ export function handleJugFileDuty(event: JugNoteEvent): void {
   if (what == "duty") {
     let market = getMarketFromIlk(ilk);
     if (market == null) {
-      log.error("[handleJugFileDuty]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
+      log.error("[handleJugFileDuty]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toString()]);
       return;
     }
 
@@ -1206,7 +1259,7 @@ export function handlePotDrip(event: PotNoteEvent): void {
 // Store cdpi, UrnHandler, and owner address
 export function handleNewCdp(event: NewCdp): void {
   let cdpi = event.params.cdp;
-  let owner = event.params.own.toHexString();
+  let owner = event.params.own.toHexString().toLowerCase();
   let contract = CdpManager.bind(event.address);
   let urnhandlerAddress = contract.urns(cdpi).toHexString();
   let ilk = contract.ilks(cdpi);
@@ -1223,21 +1276,10 @@ export function handleNewCdp(event: NewCdp): void {
 
   log.info("[handleNewCdp]cdpi={}, ilk={}, urn={}, owner={}", [
     cdpi.toString(),
-    ilk.toHexString(),
+    ilk.toString(),
     urnhandlerAddress,
     owner,
   ]);
-  let marketAddress = getMarketAddressFromIlk(ilk);
-  if (!marketAddress) {
-    log.warning("[handleNewCdp]ilk {} for cdpi {} doesn't match any existing market", [
-      ilk.toHexString(),
-      cdpi.toString(),
-    ]);
-    return;
-  }
-  let marketID = marketAddress.toHexString();
-  let internalPositionID = `${urnhandlerAddress}-${ilk.toHexString()}`;
-  let internalPosition = getOrCreateInternalPosition(internalPositionID, marketID, owner);
 }
 
 // Give a CDP position to a new owner
@@ -1245,28 +1287,36 @@ export function handleCdpGive(event: CdpNoteEvent): void {
   // update mapping between urnhandler and owner
   let cdpi = bytesToUnsignedBigInt(event.params.arg1);
   let dstAccountAddress = bytes32ToAddressHexString(event.params.arg2);
-  let contract = CdpManager.bind(event.address);
-  let srcUrnAddress = contract.urns(cdpi).toHexString();
-  let ilk = contract.ilks(cdpi);
-  let _cdpi = _Cdpi.load(cdpi.toString());
-  _cdpi!.ownerAddress = dstAccountAddress;
-  _cdpi!.save();
+  //let contract = CdpManager.bind(event.address);
+  //let srcUrnAddress = contract
+  //  .urns(cdpi)
+  //  .toHexString()
+  //  .toLowerCase();
+  //let ilk = contract.ilks(cdpi);
+  let _cdpi = _Cdpi.load(cdpi.toString())!;
+  let srcUrn = _cdpi.urn;
+  let ilk = _cdpi.ilk;
+  //let srcAccountAddressC = _cdpi.ownerAddress;
+  _cdpi.ownerAddress = dstAccountAddress;
+  _cdpi.save();
 
-  let _urn = _Urn.load(srcUrnAddress);
-  let srcAccountAddress = _urn!.ownerAddress;
+  let _urn = _Urn.load(srcUrn)!;
+  let srcAccountAddress = _urn.ownerAddress;
   // since it is a transfer of cdp position, the urn record should already exist
-  _urn!.ownerAddress = dstAccountAddress;
-  _urn!.save();
+  _urn.ownerAddress = dstAccountAddress;
+  _urn.save();
 
   log.info("[handleCdpGive] cdpi {} (ilk={}, urn={}) is given to {} from {}", [
     cdpi.toString(),
-    ilk.toHexString(),
-    srcUrnAddress,
+    ilk,
+    srcUrn,
     dstAccountAddress,
     srcAccountAddress,
   ]);
 
-  transferPosition(event, ilk, srcAccountAddress, dstAccountAddress, srcUrnAddress, null);
+  let ilkBytes = Bytes.fromHexString(ilk);
+  transferPosition(event, ilkBytes, srcUrn, srcUrn, PositionSide.LENDER, srcAccountAddress, dstAccountAddress);
+  transferPosition(event, ilkBytes, srcUrn, srcUrn, PositionSide.BORROWER, srcAccountAddress, dstAccountAddress);
 }
 
 // Move a position from cdpSrc urn to the cdpDst urn
@@ -1276,89 +1326,105 @@ export function handleCdpShift(event: CdpNoteEvent): void {
   let dstCdp = bytesToUnsignedBigInt(event.params.arg2);
 
   let srcCdpi = _Cdpi.load(srcCdp.toString());
-  let ilk = Bytes.fromHexString(srcCdpi!.ilk);
+  let srcIlk = Bytes.fromHexString(srcCdpi!.ilk);
   let srcUrnAddress = srcCdpi!.urn;
-  let srcAccountAddress = srcCdpi!.ownerAddress;
+  //let srcAccountAddress = srcCdpi!.ownerAddress;
+
   let dstCdpi = _Cdpi.load(dstCdp.toString());
-  let dstUrnAddress = srcCdpi!.urn;
-  let dstAccountAddress = dstCdpi!.ownerAddress;
+  // this should be the same as srcIlk
+  let dstIlk = Bytes.fromHexString(dstCdpi!.ilk);
+  let dstUrnAddress = dstCdpi!.urn;
+  //let dstAccountAddress = dstCdpi!.ownerAddress;
 
-  let srcInternalPositionID = `${srcUrnAddress}-${srcCdpi!.ilk}`;
-  let dstInternalPositionID = `${dstUrnAddress}-${srcCdpi!.ilk}`;
-  let srcInteralPosition = _InternalPosition.load(srcInternalPositionID)!;
-  let dstInternalPosition = getOrCreateInternalPosition(
-    dstInternalPositionID,
-    srcInteralPosition.marketAddress,
-    dstAccountAddress,
-  );
+  log.info("[handleCdpShift]cdpi {}/urn {}/ilk {} -> cdpi {}/urn {}/ilk {}", [
+    srcCdp.toString(),
+    srcUrnAddress,
+    srcIlk.toString(),
+    dstCdp.toString(),
+    dstUrnAddress,
+    dstIlk.toString(),
+  ]);
 
-  if (srcAccountAddress.toLowerCase() != dstAccountAddress.toLowerCase()) {
-    // transfer the position to new owner
-    // remapping of internal positions is done there too
-    transferPosition(event, ilk, srcAccountAddress, dstAccountAddress, srcUrnAddress, dstUrnAddress);
-  } else {
-    // move all internal positions to the new internal position ID
-    dstInternalPosition.lenderPositions = srcInteralPosition.lenderPositions;
-    dstInternalPosition.borrowerPositions = srcInteralPosition.borrowerPositions;
-    dstInternalPosition.save();
-
-    srcInteralPosition.lenderPositions = [];
-    srcInteralPosition.borrowerPositions = [];
-    srcInteralPosition.save();
-  }
+  transferPosition(event, srcIlk, srcUrnAddress, dstUrnAddress, PositionSide.LENDER);
+  transferPosition(event, srcIlk, srcUrnAddress, dstUrnAddress, PositionSide.BORROWER);
 }
 
+// Import a position from src urn to the urn owned by cdp
 export function handleCdpEnter(event: CdpNoteEvent): void {
-  let srcAccountAddress = bytes32ToAddress(event.params.arg1).toHexString();
+  let src = bytes32ToAddress(event.params.arg1).toHexString();
   let cdpi = bytesToUnsignedBigInt(event.params.arg2);
 
   let _cdpi = _Cdpi.load(cdpi.toString());
-  let dstAccountAddress = _cdpi!.ownerAddress;
-  let dstAccount = getOrCreateAccount(dstAccountAddress);
-  let dstUrnAddress = _cdpi!.urn;
+  let dst = _cdpi!.urn;
   let ilk = Bytes.fromHexString(_cdpi!.ilk);
-  let marketAddress = getMarketAddressFromIlk(ilk)!.toHexString();
 
-  if (srcAccountAddress.toLowerCase() != dstAccountAddress.toLowerCase()) {
-    // transfer position
-    transferPosition(event, ilk, srcAccountAddress, dstAccountAddress, null, dstUrnAddress);
-  } else {
-    // add positions to internal positions
-    let internalPositionID = `${dstUrnAddress}-${_cdpi!.ilk}`;
-    let internalPosition = getOrCreateInternalPosition(internalPositionID, marketAddress, dstAccountAddress);
-    if (internalPosition.lenderPositions.length == 0) {
-      let lenderPositions = getPositionIDForAccount(dstAccountAddress, marketAddress, PositionSide.LENDER);
-      let borrowerPositions = getPositionIDForAccount(dstAccountAddress, marketAddress, PositionSide.BORROWER);
-      internalPosition.lenderPositions = lenderPositions.concat(internalPosition.lenderPositions);
-      internalPosition.borrowerPositions = borrowerPositions.concat(internalPosition.borrowerPositions);
-      internalPosition.save();
-    }
-  }
+  transferPosition(event, ilk, src, dst, PositionSide.LENDER);
+  transferPosition(event, ilk, src, dst, PositionSide.BORROWER);
 }
 
+// Quit the Cdp system, migrating the cdp (ink, art) to a dst urn
 export function handleCdpQuit(event: CdpNoteEvent): void {
   let cdpi = bytesToUnsignedBigInt(event.params.arg1);
-  let dstAccountAddress = bytes32ToAddress(event.params.arg2).toHexString();
+  let dst = bytes32ToAddress(event.params.arg2).toHexString();
 
   let _cdpi = _Cdpi.load(cdpi.toString());
-  let srcAccountAddress = _cdpi!.ownerAddress;
-  let srcAccount = getOrCreateAccount(dstAccountAddress);
-  let srcUrnAddress = _cdpi!.urn;
+  let src = _cdpi!.urn;
   let ilk = Bytes.fromHexString(_cdpi!.ilk);
-  let marketAddress = getMarketAddressFromIlk(ilk)!.toHexString();
 
-  if (srcAccountAddress.toLowerCase() != dstAccountAddress.toLowerCase()) {
-    // transfer position
-    transferPosition(event, ilk, srcAccountAddress, dstAccountAddress, srcUrnAddress, null);
-  } else {
-    // remove positions from internal positions
-    let internalPositionID = `${srcUrnAddress}-${_cdpi!.ilk}`;
-    let internalPosition = getOrCreateInternalPosition(internalPositionID);
+  transferPosition(event, ilk, src, dst, PositionSide.LENDER);
+  transferPosition(event, ilk, src, dst, PositionSide.BORROWER);
+}
 
-    internalPosition.lenderPositions = [];
-    internalPosition.borrowerPositions = [];
-    internalPosition.save();
+// Transfer cdp collateral from the cdp address to a dst address
+export function handleCdpFlux(event: CdpNoteEvent): void {
+  let cdpi = bytesToUnsignedBigInt(event.params.arg1);
+  let dst = bytes32ToAddress(event.params.arg2).toHexString();
+  // 3rd arg: start = 4 + 2 * 32, end = start + 32
+  let wad = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
+  if (wad == BIGINT_ZERO) {
+    log.info("[handleCdpFlux]wad = 0, skip transferring position", []);
+    return;
   }
+  let _cdpi = _Cdpi.load(cdpi.toString());
+  let src = _cdpi!.urn;
+  let ilk = Bytes.fromHexString(_cdpi!.ilk);
+  let market: Market = getMarketFromIlk(ilk)!;
+  let token = getOrCreateToken(market.inputToken);
+  let transferAmount = bigIntChangeDecimals(wad, WAD, token.decimals);
+
+  log.info("[handleCdpFlux]transfer {} collateral from src {} to dst {} for ilk {}", [
+    wad.toString(),
+    src,
+    dst,
+    ilk.toString(),
+  ]);
+  transferPosition(event, ilk, src, dst, PositionSide.LENDER, null, null, transferAmount);
+}
+
+// Transfer DAI from the cdp address to a dst address
+export function handleCdpMove(event: CdpNoteEvent): void {
+  let cdpi = bytesToUnsignedBigInt(event.params.arg1);
+  let dst = bytes32ToAddress(event.params.arg2).toHexString();
+  // 3rd arg: start = 4 + 2 * 32, end = start + 32
+  let rad = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
+  if (rad == BIGINT_ZERO) {
+    log.info("[handleCdpMove]wad = 0, skip transferring position", []);
+    return;
+  }
+  let transferAmount = bigIntChangeDecimals(rad, RAD, WAD);
+
+  let _cdpi = _Cdpi.load(cdpi.toString());
+  let src = _cdpi!.urn;
+  let ilk = Bytes.fromHexString(_cdpi!.ilk);
+
+  log.info("[handleCdpMove]transfer {} DAI from src {} to dst {} for ilk {}", [
+    transferAmount.toString(),
+    src,
+    dst,
+    ilk.toString(),
+  ]);
+
+  transferPosition(event, ilk, src, dst, PositionSide.BORROWER, null, null, transferAmount);
 }
 
 // Store proxy address and owner address
@@ -1367,7 +1433,7 @@ export function handleCreateProxy(event: Created): void {
   let owner = event.params.owner;
 
   let _proxy = new _Proxy(proxy.toHexString());
-  _proxy.ownerAddress = owner.toHexString();
+  _proxy.ownerAddress = owner.toHexString().toLowerCase();
   _proxy.save();
 }
 

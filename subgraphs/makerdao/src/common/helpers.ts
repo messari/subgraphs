@@ -11,8 +11,8 @@ import {
   Token,
   Position,
   PositionSnapshot,
-  _InternalPosition,
   _Urn,
+  _PositionCounter,
 } from "../../generated/schema";
 import {
   getOrCreateMarketHourlySnapshot,
@@ -22,15 +22,15 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
   getOrCreateUsageMetricsDailySnapshot,
   getSnapshotRates,
-  getNextPositionCounter,
   getOrCreatePositionCounter,
   getOrCreateAccount,
   getOrCreateMarket,
   getOrCreatePosition,
   getMarketAddressFromIlk,
   getMarketFromIlk,
-  getPositionIDForAccount,
   getOwnerAddressFromUrn,
+  getOpenPosition,
+  getOwnerAddress,
 } from "./getters";
 import {
   BIGDECIMAL_ZERO,
@@ -48,6 +48,9 @@ import {
   INT_ONE,
   PositionSide,
   EventType,
+  BIGINT_TWELVE,
+  BIGINT_THOUSAND,
+  BIGINT_NEG_HUNDRED,
 } from "./constants";
 import { createEventID } from "../utils/strings";
 import { bigIntToBDUseDecimals } from "../utils/numbers";
@@ -416,44 +419,35 @@ export function updateFinancialsSnapshot(
 // Need to be called after createTransactions
 export function updatePosition(
   event: ethereum.Event,
-  accountAddress: string,
-  marketID: string,
   urn: string,
   ilk: Bytes,
   deltaCollateral: BigInt = BIGINT_ZERO,
   deltaDebt: BigInt = BIGINT_ZERO,
 ): void {
-  let lenderPositionPrefix = `${accountAddress}-${marketID}-${PositionSide.LENDER}`;
-  let borrowerPositionPrefix = `${accountAddress}-${marketID}-${PositionSide.BORROWER}`;
-  let lenderCounter = getOrCreatePositionCounter(accountAddress, marketID, PositionSide.LENDER);
-  let borrowerCounter = getOrCreatePositionCounter(accountAddress, marketID, PositionSide.BORROWER);
-  let lenderPositionID = `${lenderPositionPrefix}-${lenderCounter.nextCount}`;
-  let borrowerPositionID = `${borrowerPositionPrefix}-${borrowerCounter.nextCount}`;
-  let lenderPosition: Position | null = null;
-  let borrowerPosition: Position | null = null;
-
-  let internalPositionID = `${urn}-${ilk.toHexString()}`;
-  let internalPosition = _InternalPosition.load(internalPositionID);
-  if (internalPosition == null) {
-    internalPosition = new _InternalPosition(internalPositionID);
-    internalPosition.accountAddress = accountAddress;
-    internalPosition.marketAddress = marketID;
-    internalPosition.borrowerPositions = [];
-    internalPosition.lenderPositions = [];
-    internalPosition.save();
-  }
+  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  let accountAddress = getOwnerAddress(urn);
+  let eventID = createEventID(event); // deposit, withdraw, borrow, repay, liquidate
 
   let protocol = getOrCreateLendingProtocol();
   let market = getOrCreateMarket(marketID);
   let account = getOrCreateAccount(accountAddress);
 
-  let eventID = createEventID(event);
+  //let lenderPosition: Position | null = null;
+  //let borrowerPosition: Position | null = null;
 
-  if (deltaCollateral.gt(BIGINT_ZERO)) {
-    // deposit
-    lenderPosition = getOrCreatePosition(event, PositionSide.LENDER, marketID, accountAddress);
-    if (lenderPosition.depositCount == INT_ZERO) {
-      // this is a new lender position
+  if (deltaCollateral.notEqual(BIGINT_ZERO)) {
+    let lenderCounter = getOrCreatePositionCounter(urn, ilk, PositionSide.LENDER);
+    let lenderPosition = getOpenPosition(urn, ilk, PositionSide.LENDER);
+
+    if (lenderPosition == null) {
+      // this is a new lender position, deltaCollateral > 0
+      // because user cannot create a lender position with deltaCollateral <=0
+      lenderPosition = getOrCreatePosition(event, urn, ilk, PositionSide.LENDER, true);
+      assert(
+        deltaCollateral.gt(BIGINT_ZERO),
+        `[updatePosition]Creating new lender position ${lenderPosition.id} with deltaCollateral ${deltaCollateral} <= 0`,
+      );
+
       protocol.openPositionCount += INT_ONE;
       protocol.cumulativePositionCount += INT_ONE;
 
@@ -463,42 +457,34 @@ export function updatePosition(
 
       account.positionCount += INT_ONE;
       account.openPositionCount += INT_ONE;
-      let _positionIDList = account._positionIDList!;
-      _positionIDList.push(lenderPosition.id);
-      account._positionIDList = _positionIDList;
-
-      let lenderPositions = internalPosition.lenderPositions;
-      lenderPositions.push(lenderPosition.id);
-      internalPosition.lenderPositions = lenderPositions;
+      account.depositCount += INT_ONE;
     }
 
-    lenderPosition.depositCount += INT_ONE;
-    // adds to existing deposit
     lenderPosition.balance = lenderPosition.balance.plus(deltaCollateral);
-    lenderPosition.save();
+    assert(
+      lenderPosition.balance.ge(BIGINT_ZERO),
+      `[updatePosition]balance for position ${lenderPosition.id} ${lenderPosition.balance} < 0`,
+    );
 
-    // link event to position (createTransactions needs to be called first)
-    let deposit = Deposit.load(eventID)!;
-    deposit.position = lenderPosition.id;
-    deposit.save();
-  } else if (deltaCollateral.lt(BIGINT_ZERO)) {
-    lenderPosition = Position.load(lenderPositionID);
-    // withdraw
-    if (!lenderPosition) {
-      //this should not happen: cannot withdraw without deposit first
-      log.error("[updatePosition]withdraw from position {} without deposit at tx hash {}", [
-        lenderPositionID,
-        event.transaction.hash.toHexString(),
-      ]);
-    } else {
+    if (deltaCollateral.gt(BIGINT_ZERO)) {
+      // deposit
+      lenderPosition.depositCount += INT_ONE;
+
+      // link event to position (createTransactions needs to be called first)
+      let deposit = Deposit.load(eventID)!;
+      deposit.position = lenderPosition.id;
+      deposit.save();
+    } else if (deltaCollateral.lt(BIGINT_ZERO)) {
       lenderPosition.withdrawCount += INT_ONE;
-      lenderPosition.balance = lenderPosition.balance.minus(deltaCollateral);
+
       if (lenderPosition.balance == BIGINT_ZERO) {
         // close lender position
         lenderPosition.blockNumberClosed = event.block.number;
         lenderPosition.timestampClosed = event.block.timestamp;
-        lenderCounter.nextCount += 1; //increase nextCount after closing a position
-        lenderCounter.save();
+        lenderPosition.hashClosed = event.transaction.hash.toHexString();
+
+        //lenderCounter.nextCount += INT_ONE; //increase nextCount after closing a position
+        //lenderCounter.save();
 
         protocol.openPositionCount -= INT_ONE;
 
@@ -507,21 +493,36 @@ export function updatePosition(
 
         account.openPositionCount -= INT_ONE;
         account.closedPositionCount += INT_ONE;
+        account.withdrawCount += INT_ONE;
       }
-      lenderPosition.save();
 
       // link event to position (createTransactions needs to be called first)
       let withdraw = Withdraw.load(eventID)!;
       withdraw.position = lenderPosition.id;
       withdraw.save();
     }
+
+    log.info("[updatePosition]position positionID={}, account={}, balance={}", [
+      lenderPosition.id,
+      lenderPosition.account,
+      lenderPosition.balance.toString(),
+    ]);
+
+    lenderPosition.save();
+    snapshotPosition(event, lenderPosition);
   }
 
-  if (deltaDebt.gt(BIGINT_ZERO)) {
-    // borrow
-    borrowerPosition = getOrCreatePosition(event, PositionSide.BORROWER, marketID, accountAddress);
-    if (borrowerPosition.borrowCount == INT_ZERO) {
+  if (deltaDebt.notEqual(BIGINT_ZERO)) {
+    let borrowerCounter = getOrCreatePositionCounter(urn, ilk, PositionSide.BORROWER);
+    let borrowerPosition = getOpenPosition(urn, ilk, PositionSide.BORROWER);
+    if (borrowerPosition == null) {
       // new borrower position
+      borrowerPosition = getOrCreatePosition(event, urn, ilk, PositionSide.BORROWER, true);
+      assert(
+        deltaDebt.gt(BIGINT_ZERO),
+        `[updatePosition]Creating new borrower position ${borrowerPosition.id} with deltaDebt ${deltaDebt} <= 0`,
+      );
+
       protocol.openPositionCount += INT_ONE;
       protocol.cumulativePositionCount += INT_ONE;
 
@@ -531,39 +532,49 @@ export function updatePosition(
 
       account.positionCount += INT_ONE;
       account.openPositionCount += INT_ONE;
-      let _positionIDList = account._positionIDList!;
-      _positionIDList.push(borrowerPosition.id);
-      account._positionIDList = _positionIDList;
-
-      let borrowerPositions = internalPosition.borrowerPositions;
-      borrowerPositions.push(borrowerPosition.id);
-      internalPosition.borrowerPositions = borrowerPositions;
     }
-    borrowerPosition.borrowCount += INT_ONE;
+
     borrowerPosition.balance = borrowerPosition.balance.plus(deltaDebt);
-    borrowerPosition.save();
-    // link event to position (createTransactions needs to be called first)
-    let borrow = Borrow.load(eventID)!;
-    borrow.position = borrowerPosition.id;
-    borrow.save();
-  } else if (deltaDebt.lt(BIGINT_ZERO)) {
-    // repay
-    borrowerPosition = Position.load(borrowerPositionID);
-    if (!borrowerPosition) {
-      //this should not happen: cannot repay without borrow first
-      log.error("[updatePosition]repay position {} without borrowing at tx hash {}", [
-        borrowerPositionID,
-        event.transaction.hash.toHexString(),
-      ]);
-    } else {
+
+    assert(
+      // this may be less than 0, but not too negative (>-100)
+      // 1. at block 12507581, urn 0x03453d22095c0edd61cd40c3ccdc394a0e85dc1a
+      // repaid -203334964101176257798573 dai, when the borrow balance
+      // was 203334964101176257798572
+      // 2. at block 14055178, urn 0x1c47bb6773db2a441264c1af2c943d8bdfaf19fe
+      // repaid -30077488379451392498995529 dai, when the borrow balance
+      // was 30077488379451392498995503
+      //borrowerPosition.balance.ge(BIGINT_ZERO),
+      borrowerPosition.balance.ge(BIGINT_NEG_HUNDRED),
+      `[updatePosition]balance for position ${borrowerPosition.id} ${borrowerPosition.balance} < 0`,
+    );
+    if (borrowerPosition.balance.lt(BIGINT_ZERO) && borrowerPosition.balance.gt(BIGINT_NEG_HUNDRED)) {
+      log.warning(
+        "[updatePosition]A small negative borrow balance of {} for position {} with tx {}; deemed position closed (balance set to 0)",
+        [borrowerPosition.balance.toString(), borrowerPosition.id, event.transaction.hash.toHexString()],
+      );
+      borrowerPosition.balance = BIGINT_ZERO;
+    }
+
+    if (deltaDebt.gt(BIGINT_ZERO)) {
       borrowerPosition.borrowCount += INT_ONE;
-      borrowerPosition.balance = borrowerPosition.balance.minus(deltaDebt);
+      account.borrowCount += INT_ONE;
+
+      // link event to position (createTransactions needs to be called first)
+      let borrow = Borrow.load(eventID)!;
+      borrow.position = borrowerPosition.id;
+      borrow.save();
+    } else if (deltaDebt.lt(BIGINT_ZERO)) {
+      borrowerPosition.repayCount += INT_ONE;
+
       if (borrowerPosition.balance == BIGINT_ZERO) {
-        // close borrower position
+        // close borrowerPosition
         borrowerPosition.blockNumberClosed = event.block.number;
         borrowerPosition.timestampClosed = event.block.timestamp;
-        borrowerCounter.nextCount += INT_ONE;
-        borrowerCounter.save();
+        borrowerPosition.hashClosed = event.transaction.hash.toHexString();
+
+        //borrowerCounter.nextCount += INT_ONE;
+        //borrowerCounter.save();
 
         protocol.openPositionCount -= INT_ONE;
 
@@ -572,19 +583,20 @@ export function updatePosition(
 
         account.openPositionCount -= INT_ONE;
         account.closedPositionCount += INT_ONE;
+        account.repayCount += INT_ONE;
       }
-      borrowerPosition.save();
-      // link event to position (createTransactions needs to be called first)
+
       let repay = Repay.load(eventID)!;
       repay.position = borrowerPosition.id;
       repay.save();
     }
-  }
 
-  if (lenderPosition != null) {
-    snapshotPosition(event, lenderPosition);
-  }
-  if (borrowerPosition != null) {
+    log.info("[updatePosition]position positionID={}, account={}, balance={}", [
+      borrowerPosition.id,
+      borrowerPosition.account,
+      borrowerPosition.balance.toString(),
+    ]);
+    borrowerPosition.save();
     snapshotPosition(event, borrowerPosition);
   }
 
@@ -598,161 +610,98 @@ export function updatePosition(
 export function transferPosition(
   event: ethereum.Event,
   ilk: Bytes,
-  srcAccountAddress: string,
-  dstAccountAddress: string,
-  srcUrnAddress: string | null = null,
-  dstUrnAddress: string | null = null,
+  srcUrn: string, // src urn
+  dstUrn: string, // dst urn
+  side: string,
+  srcAccountAddress: string | null = null,
+  dstAccountAddress: string | null = null,
+  transferAmount: BigInt | null = null, // suport partial transfer of a position
 ): void {
   let protocol = getOrCreateLendingProtocol();
   let market: Market = getMarketFromIlk(ilk)!;
-  let srcAccount = getOrCreateAccount(srcAccountAddress);
-  let dstAccount = getOrCreateAccount(dstAccountAddress);
+  if (srcAccountAddress == null) {
+    srcAccountAddress = getOwnerAddress(srcUrn).toLowerCase();
+  }
+  let srcAccount = getOrCreateAccount(srcAccountAddress!);
 
-  let lenderPositions: string[] = [];
-  let borrowerPositions: string[] = [];
-  if (srcUrnAddress != null) {
-    let internalPositionID = `${srcUrnAddress!}-${ilk.toHexString()}`;
-    let internalPosition = _InternalPosition.load(internalPositionID);
-    if (internalPosition == null) {
-      internalPosition = new _InternalPosition(internalPositionID);
-      internalPosition.accountAddress = srcAccountAddress;
-      internalPosition.marketAddress = market.id;
-      internalPosition.borrowerPositions = getPositionIDForAccount(srcAccountAddress, market.id, PositionSide.LENDER);
-      internalPosition.lenderPositions = getPositionIDForAccount(srcAccountAddress, market.id, PositionSide.BORROWER);
-      internalPosition.save();
-    }
-
-    lenderPositions = internalPosition.lenderPositions;
-    borrowerPositions = internalPosition.borrowerPositions;
-  } else {
-    lenderPositions = getPositionIDForAccount(srcAccountAddress, market.id, PositionSide.LENDER, 1);
-    borrowerPositions = getPositionIDForAccount(srcAccountAddress, market.id, PositionSide.BORROWER, 1);
+  let srcPosition = getOpenPosition(srcUrn, ilk, side);
+  if (srcPosition == null) {
+    log.warning("[transferPosition]No open position found for source: urn {}/ilk {}/side {}; no transfer", [
+      srcUrn,
+      ilk.toHexString(),
+      side,
+    ]);
+    return;
   }
 
-  // close any open lender positions linked with src account
-  let openLenderBalance = BIGINT_ZERO;
-  for (let i: i32 = 0; i < lenderPositions.length; i++) {
-    let lenderPositionID = lenderPositions[i];
-    let lenderPosition: Position = Position.load(lenderPositionID)!;
-    if (lenderPosition.balance != BIGINT_ZERO) {
-      openLenderBalance = openLenderBalance.plus(lenderPosition.balance);
-      lenderPosition.balance = BIGINT_ZERO;
-      lenderPosition.hashClosed = event.transaction.hash.toHexString();
-      lenderPosition.blockNumberClosed = event.block.number;
-      lenderPosition.timestampClosed = event.block.timestamp;
-
-      // update position counts for protocl, market, and account
-      protocol.openPositionCount -= INT_ONE;
-
-      market.openPositionCount -= INT_ONE;
-      market.closedPositionCount += INT_ONE;
-
-      srcAccount.openPositionCount -= INT_ONE;
-      srcAccount.closedPositionCount += INT_ONE;
-
-      snapshotPosition(event, lenderPosition);
-    }
+  if (!transferAmount || transferAmount > srcPosition.balance) {
+    let transferAmountStr = transferAmount ? transferAmount.toString() : "null";
+    log.warning("[transferPosition]transferAmount {} > src position balance {} for {}", [
+      transferAmountStr,
+      srcPosition.balance.toString(),
+      srcPosition.id,
+    ]);
+    transferAmount = srcPosition.balance;
   }
+  assert(
+    transferAmount <= srcPosition.balance,
+    `[transferPosition]src ${srcUrn}/ilk ${ilk.toHexString()}/side ${side} transfer amount ${transferAmount.toString()} > balance ${
+      srcPosition.balance
+    }`,
+  );
 
-  // close any open borrower positions linked with src account
-  let openBorrowerBalance = BIGINT_ZERO;
-  for (let i: i32 = 0; i < borrowerPositions.length; i++) {
-    let borrowerPositionID = borrowerPositions[i];
-    let borrowerPosition = Position.load(borrowerPositionID);
-    if (borrowerPosition != null && borrowerPosition.balance != BIGINT_ZERO) {
-      openBorrowerBalance = openBorrowerBalance.plus(borrowerPosition.balance);
-      borrowerPosition.balance = BIGINT_ZERO;
-      borrowerPosition.hashClosed = event.transaction.hash.toHexString();
-      borrowerPosition.blockNumberClosed = event.block.number;
-      borrowerPosition.timestampClosed = event.block.timestamp;
-
-      // update position counts for protocl, market, and account
-      protocol.openPositionCount -= INT_ONE;
-
-      market.openPositionCount -= INT_ONE;
-      market.closedPositionCount += INT_ONE;
-
-      srcAccount.openPositionCount -= INT_ONE;
-      srcAccount.closedPositionCount += INT_ONE;
-
-      snapshotPosition(event, borrowerPosition);
-    }
+  srcPosition.balance = srcPosition.balance.minus(transferAmount);
+  if (srcPosition.balance == BIGINT_ZERO) {
+    srcPosition.blockNumberClosed = event.block.number;
+    srcPosition.timestampClosed = event.block.timestamp;
+    srcPosition.hashClosed = event.transaction.hash.toHexString();
+    protocol.openPositionCount -= INT_ONE;
+    market.openPositionCount -= INT_ONE;
+    market.closedPositionCount += INT_ONE;
+    srcAccount.openPositionCount -= INT_ONE;
+    srcAccount.closedPositionCount += INT_ONE;
   }
+  srcPosition.save();
+  snapshotPosition(event, srcPosition);
+  //let srcCounter = getOrCreatePositionCounter(srcUrn, ilk, side);
+  //srcCounter.nextCount += INT_ONE;
+  //srcCounter.save();
 
-  let newLenderPositions: string[] = [];
-  let newBorrowerPositions: string[] = [];
-  //open dst positions
-  if (openLenderBalance.gt(BIGINT_ZERO)) {
-    // force to open a new position even if there are open positions
-    let lenderPosition = getOrCreatePosition(event, PositionSide.LENDER, market.id, dstAccountAddress, true);
-    lenderPosition.balance = openLenderBalance;
-    lenderPosition.save();
-    newLenderPositions = [lenderPosition.id];
-
-    // update protocol, market, account openPositionCount
-    protocol.openPositionCount += INT_ONE;
-    protocol.cumulativePositionCount += INT_ONE;
-
-    market.positionCount += INT_ONE;
-    market.openPositionCount += INT_ONE;
-    market.lendingPositionCount += INT_ONE;
-
-    dstAccount.positionCount += INT_ONE;
-    dstAccount.openPositionCount += INT_ONE;
-    let _positionIDList = dstAccount._positionIDList!;
-    _positionIDList.push(lenderPosition.id);
-    dstAccount._positionIDList = _positionIDList;
-
-    snapshotPosition(event, lenderPosition);
+  if (dstAccountAddress == null) {
+    dstAccountAddress = getOwnerAddress(dstUrn).toLowerCase();
   }
+  let dstAccount = getOrCreateAccount(dstAccountAddress!);
 
-  if (openBorrowerBalance.gt(BIGINT_ZERO)) {
-    // force to open a new position even if there are open positions
-    let borrowerPosition = getOrCreatePosition(event, PositionSide.BORROWER, market.id, dstAccountAddress, true);
-    borrowerPosition.balance = openBorrowerBalance;
-    borrowerPosition.save();
-    newBorrowerPositions = [borrowerPosition.id];
+  // transfer srcUrn to dstUrn
+  // or partial transfer of a position (amount < position.balance)
+  let dstPosition = getOpenPosition(dstUrn, ilk, side);
+  if (!dstPosition) {
+    dstPosition = getOrCreatePosition(event, dstUrn, ilk, side, true);
+  }
+  //let dstPosition = getOrCreatePosition(event, dstUrn, ilk, side, false, dstAccountAddress);
 
-    // update protocol, market, account openPositionCount
-    protocol.openPositionCount += INT_ONE;
-    protocol.cumulativePositionCount += INT_ONE;
+  dstPosition.balance = dstPosition.balance.plus(transferAmount);
+  dstPosition.save();
+  snapshotPosition(event, dstPosition);
 
-    market.positionCount += INT_ONE;
-    market.openPositionCount += INT_ONE;
+  protocol.openPositionCount += INT_ONE;
+  market.openPositionCount += INT_ONE;
+  market.positionCount += INT_ONE;
+  if (side == PositionSide.BORROWER) {
     market.borrowingPositionCount += INT_ONE;
-
-    dstAccount.positionCount += INT_ONE;
-    dstAccount.openPositionCount += INT_ONE;
-    let _positionIDList = dstAccount._positionIDList!;
-    _positionIDList.push(borrowerPosition.id);
-    dstAccount._positionIDList = _positionIDList;
-
-    snapshotPosition(event, borrowerPosition);
+  } else if (side == PositionSide.LENDER) {
+    market.lendingPositionCount += INT_ONE;
   }
+  dstAccount.openPositionCount += INT_ONE;
 
-  if (dstUrnAddress == null) {
-    let internalPositionID = `${srcUrnAddress!}-${ilk.toHexString()}`;
-    let internalPosition: _InternalPosition = _InternalPosition.load(internalPositionID)!;
-    // reset internalPosition using new owner address (dst)
-    internalPosition.accountAddress = dstAccountAddress;
-    internalPosition.lenderPositions = newLenderPositions;
-    internalPosition.borrowerPositions = newBorrowerPositions;
-    internalPosition.save();
-  } else if (srcUrnAddress != null && srcUrnAddress!.toLowerCase() != dstUrnAddress!.toLowerCase()) {
-    // update the internal position because the urn address is also different
-    let dstInternalPositionID = `${dstUrnAddress!}-${ilk.toHexString()}`;
-    let dstInteralPosition = _InternalPosition.load(dstInternalPositionID);
-    if (dstInteralPosition == null) {
-      dstInteralPosition = new _InternalPosition(dstInternalPositionID);
-      dstInteralPosition.accountAddress = dstAccountAddress;
-      dstInteralPosition.lenderPositions = newLenderPositions;
-      dstInteralPosition.borrowerPositions = newBorrowerPositions;
-    } else {
-      dstInteralPosition.lenderPositions = newLenderPositions.concat(dstInteralPosition.lenderPositions);
-      dstInteralPosition.borrowerPositions = newBorrowerPositions.concat(dstInteralPosition.borrowerPositions);
-    }
-    dstInteralPosition.save();
-  }
+  log.info("[transferPosition]transfer position {}/is_urn {}/balance {} to {}/is_urn {}/balance {}", [
+    srcPosition.id,
+    srcPosition._is_urn.toString(),
+    srcPosition.balance.toString(),
+    dstPosition.id,
+    dstPosition._is_urn.toString(),
+    dstPosition.balance.toString(),
+  ]);
 
   protocol.save();
   market.save();
@@ -763,90 +712,95 @@ export function transferPosition(
 // handle liquidations for Position entity
 export function liquidatePosition(
   event: ethereum.Event,
-  ilk: Bytes,
   urn: string,
-  collateral: BigInt,
-  debt: BigInt,
+  ilk: Bytes,
+  liquidatorAddress: string,
+  collateral: BigInt, // net collateral liquidated
+  debt: BigInt, // debt repaid
 ): void {
   let protocol = getOrCreateLendingProtocol();
   let market: Market = getMarketFromIlk(ilk)!;
-  let accountAddress = getOwnerAddressFromUrn(urn);
+  let accountAddress = getOwnerAddress(urn);
   let account = getOrCreateAccount(accountAddress);
+  account.liquidateCount += INT_ONE;
 
-  // We are not adding EventType Prefix to Liquidate event
-  // because it won't collide with other events
+  let liquidator = getOrCreateAccount(liquidatorAddress);
+  liquidator.liquidationCount += INT_ONE;
+  liquidator.save();
+
   let liquidate = Liquidate.load(createEventID(event))!;
-  //TODO liquidation.positions list
 
-  let lenderPositionCounter = getOrCreatePositionCounter(accountAddress, market.id, PositionSide.LENDER);
-  let borrowerPositionCounter = getOrCreatePositionCounter(accountAddress, market.id, PositionSide.BORROWER);
-
-  let internalPositionID = `${urn}-${ilk.toHexString()}`;
-  let internalPosition: _InternalPosition = _InternalPosition.load(internalPositionID)!;
-  let borrowerPositions = internalPosition.borrowerPositions;
-  let lenderPositions = internalPosition.lenderPositions;
-  let debtToRepay = debt;
-  let collateralToLiquidate = collateral;
-  for (let i = 0; i < borrowerPositions.length; i++) {
-    let position: Position = Position.load(borrowerPositions[i])!;
-    if (debtToRepay.gt(BIGINT_ZERO) && position.balance.gt(BIGINT_ZERO)) {
-      if (position.balance.gt(debtToRepay)) {
-        // partial liquidation, unlikely for borrower side
-        position.balance = position.balance.minus(debtToRepay);
-      } else {
-        // full liquidation, close the position
-        position.balance = BIGINT_ZERO;
-        position.blockNumberClosed = event.block.number;
-        position.timestampClosed = event.block.timestamp;
-        position.hashClosed = event.transaction.hash.toHexString();
-
-        borrowerPositionCounter.nextCount += INT_ONE;
-        debtToRepay = debtToRepay.minus(position.balance);
-
-        protocol.openPositionCount -= INT_ONE;
-        market.openPositionCount -= INT_ONE;
-        market.closedPositionCount += INT_ONE;
-        account.openPositionCount -= INT_ONE;
-        account.closedPositionCount += INT_ONE;
-
-        //liquidate.position = position.id;
-      }
-      position.save();
-      snapshotPosition(event, position);
-    }
+  log.info("[liquidatePosition]urn={}, ilk={}, collateral={}, debt={}", [
+    urn,
+    ilk.toHexString(),
+    collateral.toString(),
+    debt.toString(),
+  ]);
+  let borrowerPosition = getOpenPosition(urn, ilk, PositionSide.BORROWER)!;
+  let lenderPosition = getOpenPosition(urn, ilk, PositionSide.LENDER)!;
+  if (debt > borrowerPosition.balance) {
+    //this can happen because of rounding
+    log.warning("[liquidatePosition]debt repaid {} > borrowing balance {}", [
+      debt.toString(),
+      borrowerPosition.balance.toString(),
+    ]);
+    debt = borrowerPosition.balance;
   }
+  borrowerPosition.balance = borrowerPosition.balance.minus(debt);
+  borrowerPosition.liquidationCount += INT_ONE;
 
-  for (let i = 0; i < lenderPositions.length; i++) {
-    let position: Position = Position.load(lenderPositions[i])!;
-    if (collateralToLiquidate.gt(BIGINT_ZERO) && position.balance.gt(BIGINT_ZERO)) {
-      if (position.balance.gt(collateralToLiquidate)) {
-        // partial liquidation
-        position.balance = position.balance.minus(collateralToLiquidate);
-      } else {
-        // full liquidation, close the position
-        position.balance = BIGINT_ZERO;
-        position.blockNumberClosed = event.block.number;
-        position.timestampClosed = event.block.timestamp;
-        position.hashClosed = event.transaction.hash.toHexString();
+  assert(
+    borrowerPosition.balance.ge(BIGINT_ZERO),
+    `[liquidatePosition]balance of position ${borrowerPosition.id} ${borrowerPosition.balance} < 0`,
+  );
+  // liquidation closes the borrowing side position
+  if (borrowerPosition.balance == BIGINT_ZERO) {
+    borrowerPosition.blockNumberClosed = event.block.number;
+    borrowerPosition.timestampClosed = event.block.timestamp;
+    borrowerPosition.hashClosed = event.transaction.hash.toHexString();
+    snapshotPosition(event, borrowerPosition);
 
-        lenderPositionCounter.nextCount += INT_ONE;
-        collateralToLiquidate = collateralToLiquidate.minus(position.balance);
-
-        protocol.openPositionCount -= INT_ONE;
-        market.openPositionCount -= INT_ONE;
-        market.closedPositionCount += INT_ONE;
-        account.openPositionCount -= INT_ONE;
-        account.closedPositionCount += INT_ONE;
-
-        liquidate.position = position.id;
-      }
-
-      position.save();
-      snapshotPosition(event, position);
-    }
+    protocol.openPositionCount -= INT_ONE;
+    market.openPositionCount -= INT_ONE;
+    market.closedPositionCount += INT_ONE;
+    market.borrowingPositionCount -= INT_ONE;
+    account.openPositionCount -= INT_ONE;
+    account.closedPositionCount += INT_ONE;
+    //let borrowCounter = getOrCreatePositionCounter(urn, ilk, PositionSide.BORROWER);
+    //borrowCounter.nextCount += INT_ONE;
+    //borrowCounter.save();
   }
-  borrowerPositionCounter.save();
-  lenderPositionCounter.save();
+  borrowerPosition.save();
+  snapshotPosition(event, borrowerPosition);
+
+  lenderPosition.balance = lenderPosition.balance.minus(collateral);
+  lenderPosition.liquidationCount += INT_ONE;
+
+  assert(
+    lenderPosition.balance.ge(BIGINT_ZERO),
+    `[liquidatePosition]balance of position ${lenderPosition.id} ${lenderPosition.balance} < 0`,
+  );
+  if (lenderPosition.balance == BIGINT_ZERO) {
+    // lender side is closed
+    lenderPosition.blockNumberClosed = event.block.number;
+    lenderPosition.timestampClosed = event.block.timestamp;
+    lenderPosition.hashClosed = event.transaction.hash.toHexString();
+
+    protocol.openPositionCount -= INT_ONE;
+    market.openPositionCount -= INT_ONE;
+    market.closedPositionCount += INT_ONE;
+    market.lendingPositionCount -= INT_ONE;
+    account.openPositionCount -= INT_ONE;
+    account.closedPositionCount += INT_ONE;
+    //let lenderCounter = getOrCreatePositionCounter(urn, ilk, PositionSide.LENDER);
+    //lenderCounter.nextCount += INT_ONE;
+    //lenderCounter.save();
+  }
+  lenderPosition.save();
+  snapshotPosition(event, lenderPosition);
+
+  //TODO: this should be an array/list including borrowerPosition and lenderPosition
+  liquidate.position = lenderPosition.id;
   liquidate.save();
 
   protocol.save();

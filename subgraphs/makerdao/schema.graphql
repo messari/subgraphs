@@ -1000,6 +1000,12 @@ type Position @entity {
   " Number of liquidations related to this position "
   liquidationCount: Int!
 
+  " is an urnhandler address (if position managed via cdp) "
+  _is_urn: Boolean
+
+  " is a DSProxy address "
+  _is_proxy: Boolean
+
   " Liquidation event related to this position (if exists) "
   liquidations: [Liquidate!]! @derivedFrom(field: "position")
 
@@ -1292,7 +1298,7 @@ type _FlipBidsStore @entity {
   " current highest bid "
   bid: BigInt!
   " Is the auction ended "
-  ended: Boolean!
+  ended: Boolean
 }
 
 # Helper entity for liquidate transaction (Clip contract)
@@ -1314,6 +1320,8 @@ type _ClipTakeStore @entity {
   art: BigInt!
   " amount of debt remaining to be repaid "
   tab: BigInt!
+  " amount of debt to be repaid "
+  tab0: BigInt
 }
 
 # Helper entity for calculating supply side revenue
@@ -1360,14 +1368,4 @@ type _PositionCounter @entity {
   id: ID!
   " Next count "
   nextCount: Int!
-}
-
-# Map vat internal position (urn) to entries in Position entity
-type _InternalPosition @entity {
-  " { ilk } - { Account Address } "
-  id: ID!
-  marketAddress: String!
-  accountAddress: String!
-  lenderPositions: [Position!]!
-  borrowerPositions: [Position!]!
 }

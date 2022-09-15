@@ -17,7 +17,6 @@ import {
   _PositionCounter,
   Position,
   Account,
-  _InternalPosition,
 } from "../../generated/schema";
 import { Versions } from "../versions";
 import {
@@ -466,20 +465,24 @@ export function getOrCreateAccount(accountID: string): Account {
 
 export function getOrCreatePosition(
   event: ethereum.Event,
+  address: string,
+  ilk: Bytes,
   side: string,
-  marketID: string,
-  accountAddress: string,
   newPosition: bool = false,
 ): Position {
-  let positionPrefix = `${accountAddress}-${marketID}-${side}`;
-  //let position = getOrCreatePosition()
-  let counterEnity = getOrCreatePositionCounter(accountAddress, marketID, side);
+  let _is_urn = getOwnerAddressFromUrn(address) == null ? false : true;
+  let _is_proxy = getOwnerAddressFromProxy(address) == null ? false : true;
+  let accountAddress = getOwnerAddress(address);
+  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  let positionPrefix = `${address}-${marketID}-${side}`;
+  let counterEnity = getOrCreatePositionCounter(address, ilk, side);
   let counter = counterEnity.nextCount;
   let positionID = `${positionPrefix}-${counter}`;
   let position = Position.load(positionID);
 
   if (newPosition && position != null) {
-    // increase the counter to create a new position
+    // increase the counter to force a new position
+    // this is necessary when receiving a transferred position
     counter += 1;
     positionID = `${positionPrefix}-${counter}`;
     position = Position.load(positionID);
@@ -492,6 +495,8 @@ export function getOrCreatePosition(
     position = new Position(positionID);
     position.market = marketID;
     position.account = accountAddress;
+    position._is_urn = _is_urn;
+    position._is_proxy = _is_proxy;
     position.hashOpened = event.transaction.hash.toHexString();
     position.blockNumberOpened = event.block.number;
     position.timestampOpened = event.block.timestamp;
@@ -511,15 +516,80 @@ export function getOrCreatePosition(
     position.save();
   }
 
+  log.info("[getOrCreatePosition]Get/create position positionID={}, account={}, balance={}", [
+    positionID,
+    accountAddress,
+    position.balance.toString(),
+  ]);
   return position;
 }
 
-export function getOrCreatePositionCounter(
-  accountAddress: string,
-  marketAddress: string,
-  side: string,
-): _PositionCounter {
-  let ID = `${accountAddress}-${marketAddress}-${side}`;
+// find the open position for the matching urn/ilk/side combination
+// there should be only one or none
+export function getOpenPosition(urn: string, ilk: Bytes, side: string): Position | null {
+  //let accountAddress = getOwnerAddress(urn);
+  //assert(accountAddress != urn, `urn ${urn} is not an Urn handler address`);
+  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  let nextCounter = getNextPositionCounter(urn, ilk, side);
+  log.info("[getOpenPosition]Finding open position for urn {}/ilk {}/side {}", [urn, ilk.toString(), side]);
+  for (let counter = nextCounter; counter >= 0; counter--) {
+    let positionID = `${urn}-${marketID}-${side}-${counter}`;
+    let position = Position.load(positionID);
+    if (position) {
+      let hashClosed = position.hashClosed != null ? position.hashClosed! : "null";
+      let balance = position.balance.toString();
+      let account = position.account;
+      // position is open
+      if (position.hashClosed == null) {
+        log.info(
+          "[getOpenPosition]found open position counter={}, position.id={}, account={}, balance={}, hashClosed={}",
+          [counter.toString(), positionID, account, balance, hashClosed],
+        );
+        return position;
+      } else {
+        log.info("[getOpenPosition]iterating counter={}, position.id={}, account={}, balance={}, hashClosed={}", [
+          counter.toString(),
+          positionID,
+          account,
+          balance,
+          hashClosed,
+        ]);
+      }
+    } else {
+      log.info("[getOpenPosition]iterating counter={}, position.id={} doesn't exist", [counter.toString(), positionID]);
+    }
+  }
+  log.info("[getOpenPosition]No open position for urn {}/ilk {}/side {}", [urn, ilk.toString(), side]);
+
+  return null;
+}
+
+/*
+export function getOpenPositionForAccount(accountAddress: string, ilk: Bytes, side: string): Position[] | null {
+  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  let nextCounter = getNextPositionCounter(ilk, side, null, accountAddress);
+  let positions: Position[] = [];
+  for (let counter = 0; counter <= nextCounter; counter++) {
+    let positionID = `${accountAddress}-${marketID}-${side}-${counter}`;
+    let position = Position.load(positionID);
+    // position is open with match urn (an account may own multiple urns)
+    if (position != null && position!.hashClosed == null) {
+      positions.push(position);
+    }
+  }
+  log.warning("[getOpenPosition]Cannot find open position for owner {}/ilk {}/side {}", [
+    accountAddress,
+    ilk.toString(),
+    side,
+  ]);
+
+  return null;
+}
+*/
+
+export function getOrCreatePositionCounter(urn: string, ilk: Bytes, side: string): _PositionCounter {
+  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  let ID = `${urn}-${marketID}-${side}`;
   let counterEnity = _PositionCounter.load(ID);
   if (!counterEnity) {
     counterEnity = new _PositionCounter(ID);
@@ -529,28 +599,11 @@ export function getOrCreatePositionCounter(
   return counterEnity;
 }
 
-export function getOrCreateInternalPosition(
-  id: string,
-  marketAddress: string | null = null,
-  accountAddress: string | null = null,
-): _InternalPosition {
-  let internalPosition = _InternalPosition.load(id);
-  if (internalPosition == null) {
-    internalPosition = new _InternalPosition(id);
-    internalPosition.marketAddress = marketAddress!;
-    internalPosition.accountAddress = accountAddress!;
-    internalPosition.lenderPositions = [];
-    internalPosition.borrowerPositions = [];
-    internalPosition.save();
-  }
-  return internalPosition;
-}
-
 ///////////////////////////
 ///////// Helpers /////////
 ///////////////////////////
-export function getNextPositionCounter(accountAddress: string, marketAddress: string, side: string): i32 {
-  let counterEnity = getOrCreatePositionCounter(accountAddress, marketAddress, side);
+export function getNextPositionCounter(urn: string, ilk: Bytes, side: string): i32 {
+  let counterEnity = getOrCreatePositionCounter(urn, ilk, side);
   return counterEnity.nextCount;
 }
 
@@ -564,24 +617,34 @@ export function getMarketAddressFromIlk(ilk: Bytes): Address | null {
 
 export function getMarketFromIlk(ilk: Bytes): Market | null {
   const marketAddress = getMarketAddressFromIlk(ilk);
-  return getOrCreateMarket(marketAddress!.toHexString());
+  if (marketAddress) {
+    return getOrCreateMarket(marketAddress.toHexString());
+  }
+  return null;
 }
 
-export function getOwnerAddressFromUrn(urn: string): string {
-  let owner = urn;
+export function getOwnerAddressFromUrn(urn: string): string | null {
   let _urn = _Urn.load(urn);
   if (_urn) {
-    owner = _urn.ownerAddress;
+    return _urn.ownerAddress;
   }
-  return owner;
+  return null;
 }
 
-export function getOwnerAddressFromProxy(proxy: string): string {
-  let owner = proxy;
+export function getOwnerAddressFromProxy(proxy: string): string | null {
   let _proxy = _Proxy.load(proxy);
   if (_proxy) {
-    owner = _proxy.ownerAddress;
+    return _proxy.ownerAddress;
   }
+  return null;
+}
+
+// get owner address from possible urn or proxy address
+// return itself if it is not an urn or proxy
+export function getOwnerAddress(address: string): string {
+  let owner = getOwnerAddressFromUrn(address);
+  owner = owner ? owner : getOwnerAddressFromProxy(address);
+  owner = owner ? owner : address;
   return owner;
 }
 
@@ -602,10 +665,13 @@ export function getSnapshotRates(rates: string[], timeSuffix: string): string[] 
     snapshotRate.type = rate.type;
     snapshotRate.rate = rate.rate;
     snapshotRate.save();
+
     snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
 }
+
+/*
 export function getPositionIDForAccount(
   accountAddress: string,
   market: string,
@@ -624,10 +690,12 @@ export function getPositionIDForAccount(
           if (position.balance.gt(BIGINT_ZERO)) {
             resultPositionIDs.push(positionID);
           }
+          break;
         case 0:
           if (position.balance == BIGINT_ZERO) {
             resultPositionIDs.push(positionID);
           }
+          break;
         default:
           resultPositionIDs.push(positionID);
       }
@@ -636,3 +704,4 @@ export function getPositionIDForAccount(
 
   return resultPositionIDs;
 }
+*/
