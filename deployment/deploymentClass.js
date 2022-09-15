@@ -10,14 +10,33 @@ class Deployment {
     this.slug = args.slug.toLowerCase();
     this.deploy = args.deploy.toLowerCase();
     this.printlogs = args.printlogs.toLowerCase();
+    this.allDeployments = {};
     this.deployments = {};
     this.scripts = new Map();
   }
 
   prepare() {
     this.isValidInput();
+    this.flattenDeploymentData();
     this.checkAndStageDeploymentData();
     this.prepareScripts();
+  }
+
+  flattenDeploymentData() {
+    let allDeployments = {}
+    for (const [protocol, protocolData] of Object.entries(this.data)) {
+      for (let [deployment, deploymentData] of Object.entries(
+        protocolData["deployments"]
+      )) {
+        deploymentData['protocol'] = protocolData['protocol']
+        deploymentData['base'] = protocolData['base']
+        deploymentData['schema'] = protocolData['schema']
+
+        allDeployments[deployment] = deploymentData
+      }
+    }
+
+    this.allDeployments = allDeployments
   }
 
   // Checks if you are wanting to deploy a single subgraph, all subgraphs for a protocol, or all subgraphs for all protocols for a fork
@@ -27,89 +46,68 @@ class Deployment {
 
     // Grabs specific deployment information for a single deployment id.
     if (span == "single") {
-      for (const [protocol, protocolData] of Object.entries(this.data)) {
-        for (const [deployment, deploymentData] of Object.entries(
-          protocolData["deployments"]
-        )) {
-          if (deployment == this.id) {
-            deployments.push(deploymentData);
-            this.deployments[protocolData["protocol"]] = deployments;
-          }
-        }
-      }
-      if (Object.keys(this.deployments).length == 0) {
+      if (this.allDeployments[this.id]) {
+        this.deployments[this.id] = this.allDeployments[this.id]
+      } else {
         throw "No deployment found for: " + this.id;
       }
     }
 
     // Grabs all deployments for a specific protocol.
     if (span == "protocol") {
-      if (!this.data[this.id]) {
+      for (const [deployment, deploymentData] of Object.entries(
+        this.allDeployments
+      )) {
+        if (deploymentData["protocol"] == this.id) {
+          this.deployments[deployment] = deploymentData
+        }
+      }
+
+      if (Object.keys(this.deployments).length == 0) {
         throw (
           "Please specifiy valid protocol or add this protocol in deployment.json for protocol: " +
           this.id
         );
       }
-
-      for (const [deployment, deploymentData] of Object.entries(
-        this.data[this.id]["deployments"]
-      )) {
-        deployments.push(deploymentData);
-      }
-
-      this.deployments[this.data[this.id]["protocol"]] = deployments;
     }
 
     // Grabs all deployments for a specific  base.
     if (span == "base") {
-      let protocolDatas = [];
-
-      for (const [protocol, protocolData] of Object.entries(this.data)) {
-        if (protocolData["base"] == this.id) {
-          protocolDatas.push(protocolData);
+      for (const [deployment, deploymentData] of Object.entries(
+        this.allDeployments
+      )) {
+        if (deploymentData["base"] == this.id) {
+          this.deployments[deployment] = deploymentData
         }
       }
 
-      if (protocolDatas.length == 0) {
+      if (Object.keys(this.deployments).length == 0) {
         throw (
           "Please specifiy valid base or add this base in deployment.json for base: " +
           this.id
         );
-      }
-
-      for (const protocolData of protocolDatas) {
-        for (const [deployment, deploymentData] of Object.entries(
-          protocolData["deployments"]
-        )) {
-          deployments.push(deploymentData);
-        }
-        this.deployments[protocolData["protocol"]] = deployments;
-        deployments = [];
       }
     }
   }
 
   // Checks if you are wanting to deploy a single network, all deployments for a protocol, or all protocols and networks for a fork
   prepareScripts() {
-    for (const [protocol, deployments] of Object.entries(this.deployments)) {
-      for (const deployment of deployments) {
-        if (
-          this.getDeploy() == false ||
-          deployment["deployment-ids"][this.getService()]
-        ) {
-          this.generateScripts(protocol, deployment);
-        }
+    for (const [deployment, deploymentData] of Object.entries(this.deployments)) {
+      if (
+        this.getDeploy() == false ||
+        deploymentData[this.getService()]
+      ) {
+        this.generateScripts(deployment, deploymentData);
       }
     }
   }
 
   // Generates scripts necessary for deployment.
-  generateScripts(protocol, deployment) {
+  generateScripts(deployment, deploymentData) {
     let scripts = [];
 
-    let location = this.getLocation(protocol, deployment);
-    let network = this.getNetwork(deployment);
-    let template = this.getTemplate(deployment);
+    let location = this.getLocation(deploymentData['protocol'], deploymentData);
+    let template = this.getTemplate(deploymentData);
 
     scripts.push("rm -rf build");
     scripts.push("rm -rf generated");
@@ -119,25 +117,25 @@ class Deployment {
 
     scripts.push(
       "npm run prepare:yaml --PROTOCOL=" +
-        protocol +
-        " --NETWORK=" +
-        network +
+        deploymentData['protocol'] +
+        " --ID=" +
+        deployment +
         " --TEMPLATE=" +
         template
     );
-    if (deployment["options"]["prepare:constants"] == true) {
+    if (deploymentData["options"]["prepare:constants"] == true) {
       scripts.push(
         "npm run prepare:constants --PROTOCOL=" +
-          protocol +
-          " --NETWORK=" +
-          network
+          deploymentData['protocol'] +
+          " --ID=" +
+          deployment
       );
     }
     scripts.push("graph codegen");
 
     // We don't want to deploy if we are building or just testing.
     if (this.getDeploy() == true) {
-      scripts.push(this.getDeploymentScript(location, deployment));
+      scripts.push(this.getDeploymentScript(location, deploymentData));
     } else {
       scripts.push("graph build");
     }
@@ -242,16 +240,16 @@ class Deployment {
     }
   }
 
-  getSubgraphVersion(deployment) {
-    return deployment["versions"]["subgraph"];
+  getSubgraphVersion(deploymentData) {
+    return deploymentData["versions"]["subgraph"];
   }
 
-  getNetwork(deployment) {
-    return deployment["network"];
+  getNetwork(deploymentData) {
+    return deploymentData["network"];
   }
 
-  getTemplate(deployment) {
-    return deployment["files"]["template"];
+  getTemplate(deploymentData) {
+    return deploymentData["files"]["template"];
   }
 
   getDeploy() {
@@ -269,17 +267,17 @@ class Deployment {
   }
 
   // Grabs the location of deployment.
-  getLocation(protocol, deployment) {
+  getLocation(protocol, deploymentData) {
     // Check if build first since you may not have a service and target prepared for build.
     if (this.getDeploy() == false) {
-      return protocol + "-" + deployment["network"];
+      return protocol + "-" + deploymentData["network"];
     }
 
     let location = "";
     if (this.slug) {
       location = this.slug;
     } else {
-      location = deployment["deployment-ids"][this.getService()];
+      location = deploymentData["deployment-ids"][this.getService()];
     }
 
     if (this.getService() == "decentralized-network") {
@@ -307,7 +305,7 @@ class Deployment {
   }
 
   // Get the deployment script with the proper endpoint, version, and authorization token.
-  getDeploymentScript(location, deployment) {
+  getDeploymentScript(location, deploymentData) {
     let deploymentScript = "";
     switch (this.getService()) {
       case "decentralized-network":
@@ -318,13 +316,13 @@ class Deployment {
             " --product subgraph-studio " +
             location +
             " --versionLabel " +
-            this.getSubgraphVersion(deployment);
+            this.getSubgraphVersion(deploymentData);
         } else {
           deploymentScript =
             "graph deploy --product subgraph-studio " +
             location +
             " --versionLabel " +
-            this.getSubgraphVersion(deployment);
+            this.getSubgraphVersion(deploymentData);
         }
         break;
       case "hosted-service":
@@ -346,7 +344,7 @@ class Deployment {
           " --access-token=" +
           this.token +
           " --node https://portal-api.cronoslabs.com/deploy --ipfs https://api.thegraph.com/ipfs --versionLabel=" +
-          this.getSubgraphVersion(deployment);
+          this.getSubgraphVersion(deploymentData);
         break;
       default:
         throw "Service is missing or not valid for: service=" + this.service;
