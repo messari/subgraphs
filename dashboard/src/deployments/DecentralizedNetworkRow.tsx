@@ -4,7 +4,6 @@ import { useNavigate } from "react-router";
 import { ApolloClient, NormalizedCacheObject, useQuery } from "@apollo/client";
 import { toPercent } from "../utils";
 import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
-import { useEffect } from "react";
 import { styled } from "../styled";
 import { alpha, Card, CircularProgress, TableRow, Typography } from "@mui/material";
 import { NetworkLogo } from "../common/NetworkLogo";
@@ -145,8 +144,8 @@ export const DecentralizedNetworkRow = ({ rowData, subgraphName, clientIndexing 
       <TableCell
         sx={{ padding: "6px", borderLeft: `${statusColor} solid 6px`, verticalAlign: "middle", display: "flex" }}
       >
-        <SubgraphLogo name={subgraphName} />
-        <NetworkLogo network={network} />
+        <SubgraphLogo size={40} name={subgraphName} />
+        <NetworkLogo size={40} network={network} />
         <span style={{ display: "inline-flex", alignItems: "center", paddingLeft: "6px", fontSize: "14px" }}>
           {subgraphName}-{network}
         </span>

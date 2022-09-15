@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
 import { latestSchemaVersion } from "../constants";
 import { useNavigate } from "react-router";
-import { ApolloClient, NormalizedCacheObject, useQuery, useLazyQuery } from "@apollo/client";
+import { ApolloClient, NormalizedCacheObject, useLazyQuery } from "@apollo/client";
 import { formatIntToFixed2, NewClient, parseSubgraphName, toPercent } from "../utils";
 import { ProtocolQuery } from "../queries/protocolQuery";
-import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
 import { useEffect } from "react";
 import { styled } from "../styled";
 import { alpha, Card, CircularProgress, TableRow, Typography } from "@mui/material";
@@ -173,8 +172,8 @@ export const Deployment = ({
       <TableCell
         sx={{ padding: "6px", borderLeft: `${statusColor} solid 6px`, verticalAlign: "middle", display: "flex" }}
       >
-        <SubgraphLogo name={subgraphID} />
-        <NetworkLogo network={networkName} />
+        <SubgraphLogo size={40} name={subgraphID} />
+        <NetworkLogo size={40} network={networkName} />
         <span style={{ display: "inline-flex", alignItems: "center", paddingLeft: "6px", fontSize: "14px" }}>
           {subgraphID}-{networkName}
           {!currentDeployment ? " (pending)" : null}
