@@ -1,3 +1,4 @@
+import { Address } from "@graphprotocol/graph-ts";
 import {
   Redemption,
   TroveLiquidated,
@@ -25,7 +26,6 @@ import {
   addProtocolSideRevenue,
   addSupplySideRevenue,
 } from "../entities/protocol";
-import { Address, log } from "@graphprotocol/graph-ts";
 import { updateUserPositionBalances } from "../entities/position";
 
 enum TroveManagerOperation {

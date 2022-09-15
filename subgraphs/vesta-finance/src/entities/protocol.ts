@@ -245,21 +245,6 @@ export function updateProtocolUSDLocked(
   financialsSnapshot.save();
 }
 
-export function updateProtocolUSDLockedStabilityPool(
-  event: ethereum.Event,
-  asset: Address,
-  netChangeUSD: BigDecimal
-): void {
-  const protocol = getOrCreateLendingProtocol();
-  const market = getOrCreateMarket(asset);
-  const totalValueLocked = protocol.totalValueLockedUSD.plus(netChangeUSD);
-  protocol.totalValueLockedUSD = totalValueLocked;
-  protocol.totalDepositBalanceUSD = totalValueLocked;
-  protocol.save();
-  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
-  financialsSnapshot.save();
-}
-
 export function updateProtocolBorrowBalance(
   event: ethereum.Event,
   borrowedUSDChange: BigDecimal,

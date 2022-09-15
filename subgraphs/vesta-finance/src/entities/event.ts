@@ -46,8 +46,16 @@ import {
   incrementProtocolLiquidateCount,
   incrementProtocolRepayCount,
   incrementProtocolWithdrawCount,
-  updateActiveAccounts,
 } from "./usage";
+
+export enum EventType {
+  Deposit,
+  Withdraw,
+  Borrow,
+  Repay,
+  Liquidate,
+  Liquidated,
+}
 
 export function createDeposit(
   event: ethereum.Event,

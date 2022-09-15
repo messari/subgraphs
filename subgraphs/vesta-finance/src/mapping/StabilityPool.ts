@@ -3,10 +3,9 @@ import {
   StabilityPool,
   StabilityPoolAssetBalanceUpdated,
   StabilityPoolVSTBalanceUpdated,
-} from "../../generated/ETHStabilityPool/StabilityPool";
+} from "../../generated/templates/StabilityPool/StabilityPool";
 import { getCurrentAssetPrice } from "../entities/token";
-import { updateProtocolUSDLockedStabilityPool } from "../entities/protocol";
-import { getOrCreateStabilityPool } from "../entities/stabilitypool";
+import { updateStabilityPoolUSDLocked } from "../entities/stabilitypool";
 import { bigIntToBigDecimal } from "../utils/numbers";
 /**
  * Asset balance was updated
@@ -51,13 +50,5 @@ function handleStabilityPoolBalanceUpdated(
   const totalValueLocked = bigIntToBigDecimal(totalAssetLocked)
     .times(getCurrentAssetPrice(asset))
     .plus(bigIntToBigDecimal(totalVSTLocked));
-
-  const stabilityPool = getOrCreateStabilityPool(asset);
-  const previousTotalValueLocked = stabilityPool.totalValueLocked;
-  stabilityPool.totalValueLocked = totalValueLocked;
-  updateProtocolUSDLockedStabilityPool(
-    event,
-    asset,
-    totalValueLocked.minus(previousTotalValueLocked)
-  );
+  updateStabilityPoolUSDLocked(event, asset, totalValueLocked);
 }

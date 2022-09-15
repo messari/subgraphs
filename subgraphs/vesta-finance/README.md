@@ -20,7 +20,7 @@ Sum across all Pools:
 
 `Collateral locked in Troves + VST and Collateral in stability pool`
 
-Ignores VST staked. Currently, the collaterals includes ETH, renBTC, gOHM, GMX and DPX. There was StakedGlp as collateral before but it isn't shown to users at the website's front-end interface now.
+Ignores VST staked. Currently, the collaterals includes ETH, renBTC, gOHM, GMX, DPX and GLP.
 
 ### Total Revenue USD
 

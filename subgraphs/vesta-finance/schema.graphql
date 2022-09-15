@@ -320,6 +320,9 @@ type LendingProtocol implements Protocol @entity {
 
   #### Add-Ons ####
 
+  " oracle for the protocol "
+  _priceOracle: String!
+
   " All market assets that belong to this protocol. protocol.markets won't work, see https://github.com/graphprotocol/graph-ts/issues/219 "
   _marketAssets: [ID!]!
 }
@@ -1236,9 +1239,9 @@ type ActiveAccount @entity {
   id: ID!
 }
 
-#####################################
+############################################
 ##### Vesta Finance specific entities #####
-#####################################
+###########################################
 
 type _Trove @entity {
   " Trove owner's address-asset's address "
@@ -1255,4 +1258,11 @@ type _Trove @entity {
   collateralSurplus: BigInt!
   " Last change to collateralSurplus "
   collateralSurplusChange: BigInt!
+}
+
+type _StabilityPool @entity {
+  " Stability pool asset address "
+  id: ID!
+  " Total amount of USD value locked in the asset's stability pool "
+  totalValueLocked: BigDecimal!
 }

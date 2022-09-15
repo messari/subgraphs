@@ -6,9 +6,9 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export const PROTOCOL_NAME = "Vesta Finance";
 export const PROTOCOL_SLUG = "vesta-finance";
-export const PROTOCOL_SCHEMA_VERSION = "1.0.0";
+export const PROTOCOL_SCHEMA_VERSION = "2.0.1";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
-export const PROTOCOL_METHODOLOGY_VERSION = "2.0.1";
+export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -167,6 +167,9 @@ export const ETH_NAME = "Ether";
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
+
+export const STABILITY_POOL_MANAGER =
+  "0x8aA2e4b1E9a626954b183966EB6665543c03F386";
 
 export const TROVE_MANAGER = "0x100EC08129e0FD59959df93a8b914944A3BbD5df";
 
