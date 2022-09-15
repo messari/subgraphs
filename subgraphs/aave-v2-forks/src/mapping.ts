@@ -1067,6 +1067,9 @@ export function _handleTransfer(
     } else {
       toAccount = createAccount(to.toHexString());
       toAccount.save();
+
+      protocol.cumulativeUniqueUsers++;
+      protocol.save();
     }
   }
 
@@ -1077,6 +1080,9 @@ export function _handleTransfer(
     } else {
       fromAccount = createAccount(from.toHexString());
       fromAccount.save();
+
+      protocol.cumulativeUniqueUsers++;
+      protocol.save();
     }
   }
 
