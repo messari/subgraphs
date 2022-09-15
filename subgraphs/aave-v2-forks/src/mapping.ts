@@ -1059,6 +1059,17 @@ export function _handleTransfer(
     return;
   }
 
+  // if the to / from addresses are the same as the aToken
+  // then this transfer is emitted as part of another event
+  // ie, a deposit, withdraw, borrow, repay, etc
+  // we want to let that handler take care of position updates
+  if (
+    to.toHexString().toLowerCase() == market.outputToken!.toLowerCase() ||
+    from.toHexString().toLowerCase() == market.outputToken!.toLowerCase()
+  ) {
+    return;
+  }
+
   // grab accounts
   let toAccount = Account.load(to.toHexString());
   if (!toAccount) {
