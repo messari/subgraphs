@@ -4,8 +4,7 @@
   "scripts": {
     "format": "npx prettier --write .",
     "codegen": "graph codegen",
-    "build": "graph build",
-    "deploy": "node ../../deployment/deployment.js --subgraph=${npm_config_subgraph} --protocol=${npm_config_protocol} --network=${npm_config_network} --location=${npm_config_location} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge} --type=${npm_config_type}",
+    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}",
     "create-local": "graph create --node http://localhost:8020/ yeti-finance",
     "remove-local": "graph remove --node http://localhost:8020/ yeti-finance",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 yeti-finance"

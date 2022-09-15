@@ -37,7 +37,7 @@ export class ApeswapMaticConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xCf083Be4164828f00cAE704EC15a36D711491284";
+    return "0xcf083be4164828f00cae704ec15a36d711491284";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
@@ -63,33 +63,33 @@ export class ApeswapMaticConfigurations implements Configurations {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.BLOCK;
+    return RewardIntervalType.TIMESTAMP;
   }
   getRewardTokenRate(): BigInt {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
+    return "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270";
   }
   getRewardToken(): string {
-    return "0x603c7f932ED1fc6575303D8Fb018fDCBb0f39a95";
+    return "0x5d47baba0d66083c52009271faf3f50dcc01023c";
   }
   getWhitelistTokens(): string[] {
     return [
-      "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC
+      "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270", // WMATIC
       "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063", // DAI
-      "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", // USDT
+      "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", // USDT
       "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", // USDC
       "0xa649325aa7c5093d12d6f98eb4378deae68ce23f", // BNB
-      "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", // WETH
+      "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619", // WETH
       "0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6", // WBTC
-      "0x5d47bAbA0d66083C52009271faF3F50DCc01023C", // BANANA
+      "0x5d47baba0d66083c52009271faf3f50dcc01023c", // BANANA
     ];
   }
   getStableCoins(): string[] {
     return [
       "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063", // DAI
-      "0xc2132D05D31c914a87C6611C10748AEb04B58e8F", // USDT
+      "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", // USDT
       "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", // USDC
     ];
   }

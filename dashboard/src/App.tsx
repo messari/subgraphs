@@ -83,12 +83,30 @@ function App() {
       });
   };
 
+
+  const depoCount = { totalCount: 0, prodCount: 0, devCount: 0, otherCount: 0 };
+
+  if (Object.keys(deploymentsInDevelopment)?.length > 0) {
+    Object.values(deploymentsInDevelopment).forEach((protocol) => {
+      Object.values(protocol.deployments).forEach((depoData: any) => {
+        depoCount.totalCount += 1;
+        if (depoData?.status === 'dev') {
+          depoCount.prodCount += 1;
+        } else if (depoData?.status === 'prod') {
+          depoCount.devCount += 1;
+        } else {
+          depoCount.otherCount += 1;
+        }
+      })
+    })
+  }
+
   return (
     <div>
       <DashboardVersion />
       <Routes>
         <Route path="/">
-          <Route index element={<DeploymentsPage getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} getDevDeployments={() => getDevDeployments()} deploymentsInDevelopment={deploymentsInDevelopment} />} />
+          <Route index element={<DeploymentsPage subgraphCounts={depoCount} getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} getDevDeployments={() => getDevDeployments()} deploymentsInDevelopment={deploymentsInDevelopment} />} />
           <Route
             path="comparison"
             element={<DefiLlamaComparsionTab deploymentJSON={protocolsToQuery} getData={() => getDeployments()} />}
