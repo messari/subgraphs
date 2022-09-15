@@ -1084,13 +1084,20 @@ export function _handleTransfer(
     return;
   }
 
+  // if to / from - marketID then the transfer is associated with another event
+  // ie, a mint, redeem, borrow, repay, liquidateBorrow
+  // we want to skip these and let the event handlers take care of updates
+  if (
+    to.toHexString().toLowerCase() == marketID.toLowerCase() ||
+    from.toHexString().toLowerCase() == marketID.toLowerCase()
+  ) {
+    return;
+  }
+
   // grab accounts
   let toAccount = Account.load(to.toHexString());
   if (!toAccount) {
-    if (
-      to == Address.fromString(ZERO_ADDRESS) ||
-      to.toHexString().toLowerCase() == marketID.toLowerCase()
-    ) {
+    if (to == Address.fromString(ZERO_ADDRESS)) {
       toAccount = null;
     } else {
       toAccount = createAccount(to.toHexString());
@@ -1103,10 +1110,7 @@ export function _handleTransfer(
 
   let fromAccount = Account.load(from.toHexString());
   if (!fromAccount) {
-    if (
-      from == Address.fromString(ZERO_ADDRESS) ||
-      from.toHexString().toLowerCase() == marketID.toLowerCase()
-    ) {
+    if (from == Address.fromString(ZERO_ADDRESS)) {
       fromAccount = null;
     } else {
       fromAccount = createAccount(from.toHexString());
