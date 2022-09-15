@@ -20,9 +20,10 @@ interface DeploymentsPageProps {
   deploymentsInDevelopment: { [x: string]: any };
   getData: any;
   getDevDeployments: any;
+  subgraphCounts: any;
 }
 
-function DeploymentsPage({ protocolsToQuery, getData, getDevDeployments, deploymentsInDevelopment }: DeploymentsPageProps) {
+function DeploymentsPage({ protocolsToQuery, getData, getDevDeployments, deploymentsInDevelopment, subgraphCounts }: DeploymentsPageProps) {
   const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
@@ -162,10 +163,23 @@ function DeploymentsPage({ protocolsToQuery, getData, getDevDeployments, deploym
         </div>
         <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
           <Button variant="contained" color="primary" onClick={() => toggleShowDeploymentsInDevelopment(!showDeploymentsInDevelopment)}>
-            Subgraphs In Development
+            {showDeploymentsInDevelopment ? "Hide" : "Show"} Subgraphs In Development
           </Button>
         </div>
-        <DeploymentsInDevelopment deploymentsInDevelopment={deploymentsInDevelopment} showDeploymentsInDevelopment={showDeploymentsInDevelopment} />
+        <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
+          <Typography variant="h6" align="right" sx={{ fontSize: "14px" }}>
+            {subgraphCounts.prodCount} out of {subgraphCounts.totalCount} total subgraphs are production ready
+          </Typography>
+        </div>
+
+        {showDeploymentsInDevelopment ? <>
+          <DeploymentsInDevelopment deploymentsInDevelopment={deploymentsInDevelopment} />
+          <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
+            <Button variant="contained" color="primary" onClick={() => toggleShowDeploymentsInDevelopment(!showDeploymentsInDevelopment)}>
+              {showDeploymentsInDevelopment ? "Hide" : "Show"} Subgraphs In Development
+            </Button>
+          </div>
+        </> : null}
         {decentralizedSubgraphTable}
         <Typography variant="h4" align="center" sx={{ my: 4 }}>
           Hosted Service Subgraphs

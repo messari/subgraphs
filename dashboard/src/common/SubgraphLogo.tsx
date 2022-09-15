@@ -56,7 +56,8 @@ const subgraphLogoMap: Record<string, string> = {
   "maple-finance": "https://assets.coingecko.com/coins/images/14097/small/Maple_Logo_Mark_Maple_Orange.png?1653381382",
   "cosmos": "https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png?1555657960",
   near: "https://assets.coingecko.com/coins/images/10365/small/near_icon.png?1601359077",
-  "trisolaris": "https://assets.coingecko.com/coins/images/20607/small/logo_-_2021-11-19T104946.772.png?1637290197"
+  "trisolaris": "https://assets.coingecko.com/coins/images/20607/small/logo_-_2021-11-19T104946.772.png?1637290197",
+  "arweave": "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616"
 };
 
 // used for protocols with multiple versions
@@ -80,11 +81,11 @@ const subgraphMap: Record<string, string> = {
 
 interface SubgraphLogoProps {
   name: string;
+  size: number;
 }
 
-export const SubgraphLogo = ({ name }: SubgraphLogoProps) => {
+export const SubgraphLogo = ({ name, size }: SubgraphLogoProps) => {
   const logoName = subgraphMap[name] ?? name;
   const url = subgraphLogoMap[logoName] ?? "";
-
-  return <Avatar src={url} />;
+  return <Avatar src={url} sx={{ height: size, width: size }} />;
 };
