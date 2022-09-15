@@ -4,6 +4,6 @@
   "startBlock": 13757683,
   "deployment": "UNISWAP_V3_CELO",
   "graftEnabled": false,
-  "subgraphId": "",
-  "graftStartBlock": 0
+  "subgraphId": "QmSc7pZu9tm455ZCLVK9CDdusdMGR3DfbsBQpvuYyUN13a",
+  "graftStartBlock": 15118044
 }
