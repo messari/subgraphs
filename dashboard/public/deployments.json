@@ -173,7 +173,8 @@
             "ethereum": "https://api.thegraph.com/subgraphs/name/messari/maple-finance-ethereum"
         },
         "moonwell": {
-            "moonriver": "https://api.thegraph.com/subgraphs/name/messari/moonwell-moonriver"
+            "moonriver": "https://api.thegraph.com/subgraphs/name/messari/moonwell-moonriver",
+            "moonbeam": "https://api.thegraph.com/subgraphs/name/messari/moonwell-moonbeam"
         },
         "qidao": {
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/qidao-arbitrum",
