@@ -5,24 +5,26 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/templates/PoolTemplate/CalculationsCurve";
 
 export function getCalculationsCurveContract(
-  network: string
+  contractAddress: Address
 ): CalculationsCurveContract | null {
-  let config = utils.getConfig();
-  if (utils.isNullAddress(config.curveCalculations()))
-    return null;
+  if (utils.isNullAddress(contractAddress)) return null;
 
-  return CalculationsCurveContract.bind(config.curveCalculations());
+  return CalculationsCurveContract.bind(contractAddress);
 }
 
-export function getTokenPriceFromCalculationCurve(
+export function getTokenPriceUSDC(
   tokenAddr: Address,
   network: string
 ): CustomPriceType {
-  const calculationCurveContract = getCalculationsCurveContract(network);
+  let config = utils.getConfig();
 
-  if (!calculationCurveContract) {
+  if (!config || config.curveCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
-  }
+
+  const calculationCurveContract = getCalculationsCurveContract(
+    config.curveCalculations()
+  );
+  if (!calculationCurveContract) return new CustomPriceType();
 
   let tokenPrice: BigDecimal = utils
     .readValue<BigInt>(

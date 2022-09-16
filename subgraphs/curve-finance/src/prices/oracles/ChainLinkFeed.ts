@@ -11,7 +11,7 @@ export function getChainLinkContract(): ChainLinkContract | null {
   return ChainLinkContract.bind(config.chainLink());
 }
 
-export function getTokenPriceFromChainLink(
+export function getTokenPriceUSDC(
   tokenAddr: Address,
   network: string
 ): CustomPriceType {

@@ -1,4 +1,5 @@
 import * as constants from "../common/constants";
+import { Configurations } from "../common/types";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 export const NETWORK_STRING = "avalanche";
@@ -67,7 +68,7 @@ export const USDC_ADDRESS = Address.fromString(
   "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 );
 
-export class config implements constants.Configurations {
+export class config implements Configurations {
   yearnLens(): Address {
     return YEARN_LENS_CONTRACT_ADDRESS;
   }

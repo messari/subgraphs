@@ -5,23 +5,24 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { YearnLensContract } from "../../../generated/templates/PoolTemplate/YearnLensContract";
 
 export function getYearnLensContract(
-  network: string
+  contractAddress: Address
 ): YearnLensContract | null {
-  let config = utils.getConfig();
-  if (!config || utils.isNullAddress(config.yearnLens())) return null;
+  if (utils.isNullAddress(contractAddress)) return null;
 
-  return YearnLensContract.bind(config.yearnLens());
+  return YearnLensContract.bind(contractAddress);
 }
 
-export function getTokenPriceFromYearnLens(
+export function getTokenPriceUSDC(
   tokenAddr: Address,
   network: string
 ): CustomPriceType {
-  const yearnLensContract = getYearnLensContract(network);
+  let config = utils.getConfig();
 
-  if (!yearnLensContract) {
+  if (!config || config.yearnLensBlacklist().includes(tokenAddr))
     return new CustomPriceType();
-  }
+
+  const yearnLensContract = getYearnLensContract(config.yearnLens());
+  if (!yearnLensContract) return new CustomPriceType();
 
   let tokenPrice: BigDecimal = utils
     .readValue<BigInt>(

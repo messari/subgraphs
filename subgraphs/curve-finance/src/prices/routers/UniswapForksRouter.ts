@@ -19,7 +19,7 @@ export function isLpToken(tokenAddress: Address, ethAddress: Address): bool {
   return true;
 }
 
-export function getPriceUsdc(
+export function getTokenPriceUSDC(
   tokenAddress: Address,
   network: string
 ): CustomPriceType {
@@ -179,8 +179,8 @@ export function getLpTokenTotalLiquidityUsdc(
 
   if (reservesCall.reverted) return new CustomPriceType();
 
-  let token0Price = getPriceUsdc(token0Address, network);
-  let token1Price = getPriceUsdc(token1Address, network);
+  let token0Price = getTokenPriceUSDC(token0Address, network);
+  let token1Price = getTokenPriceUSDC(token1Address, network);
 
   if (token0Price.reverted || token1Price.reverted) {
     return new CustomPriceType();

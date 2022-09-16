@@ -2,6 +2,8 @@
   "network": "moonbeam",
   "defaultNetwork": "Network.MOONBEAM",
 
+  "priceCaching": 1000,
+
   "poolInfoContract": "0x97E2768e8E73511cA874545DC5Ff8067eB19B787",
   "protocolAddress": "0x0000000022D53366457F9d5E68Ec105046FC4383",
   "crvTokenAddress": "0x7c598c96d02398d89fbcb9d41eab3df0c16f227d",

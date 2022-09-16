@@ -10,8 +10,9 @@ import * as AVALANCHE from "../config/avalanche";
 import * as ARBITRUM_ONE from "../config/arbitrum";
 
 import * as constants from "./constants";
-import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import { Configurations } from "./types";
 import { _ERC20 } from "../../../generated/templates/PoolTemplate/_ERC20";
+import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 
 export function isNullAddress(tokenAddr: Address): boolean {
   return tokenAddr.equals(constants.NULL.TYPE_ADDRESS) ? true : false;
@@ -35,7 +36,7 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
   return decimals;
 }
 
-export function getConfig(): constants.Configurations {
+export function getConfig(): Configurations {
   let network = dataSource.network();
 
   if (network == XDAI.NETWORK_STRING) {

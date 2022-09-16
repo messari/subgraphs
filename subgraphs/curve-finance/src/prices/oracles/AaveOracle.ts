@@ -4,22 +4,25 @@ import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { AaveOracleContract } from "../../../generated/templates/PoolTemplate/AaveOracleContract";
 
-export function getAaveOracleContract(): AaveOracleContract | null {
-  let config = utils.getConfig();
-  if (!config || utils.isNullAddress(config.aaveOracle())) return null;
+export function getAaveOracleContract(
+  contractAddress: Address
+): AaveOracleContract | null {
+  if (utils.isNullAddress(contractAddress)) return null;
 
-  return AaveOracleContract.bind(config.aaveOracle());
+  return AaveOracleContract.bind(contractAddress);
 }
 
-export function getTokenPriceFromAaveOracle(
+export function getTokenPriceUSDC(
   tokenAddr: Address,
   network: string
 ): CustomPriceType {
-  const aaveOracleContract = getAaveOracleContract();
+  let config = utils.getConfig();
 
-  if (!aaveOracleContract) {
+  if (!config || config.aaveOracleBlacklist().includes(tokenAddr))
     return new CustomPriceType();
-  }
+
+  const aaveOracleContract = getAaveOracleContract(config.aaveOracle());
+  if (!aaveOracleContract) return new CustomPriceType();
 
   let tokenPrice: BigDecimal = utils
     .readValue<BigInt>(

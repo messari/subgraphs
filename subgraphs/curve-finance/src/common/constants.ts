@@ -95,7 +95,7 @@ export namespace NULL {
 export namespace Protocol {
   export const NAME = "Curve Finance";
   export const SLUG = "curve-finance";
-  export const NETWORK = Network.FANTOM;
+  export const NETWORK = Network.MATIC;
   export const SCHEMA_VERSION = "1.3.0";
   export const SUBGRAPH_VERSION = "1.0.0";
   export const METHODOLOGY_VERSION = "1.0.0";
@@ -125,7 +125,7 @@ export const NUMBER_OF_WEEKS_DENOMINATOR = BigInt.fromI32(604800);
 export const DEFAULT_POOL_FEE = BigInt.fromString("4000000");
 export const DEFAULT_ADMIN_FEE = BigInt.fromString("5000000000");
 
-export const PRICE_CACHING_BLOCKS = BigInt.fromI32(50400);
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(50000);
 
 // Missing Name and Symbol for the ETH token
 export const ETH_ADDRESS = Address.fromString(
@@ -136,12 +136,12 @@ export const PROTOCOL_ID = Address.fromString(
   "0x0000000022D53366457F9d5E68Ec105046FC4383"
 );
 export const POOL_INFO_ADDRESS = Address.fromString(
-  "0x8cC6e2144906e81F496429A1590Ef5f86bb7558f"
+  "0x7544Fe3d184b6B55D6B36c3FCA1157eE0Ba30287"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "0xabc000d88f23bb45525e447528dbf656a9d55bf5"
+  "0xabC000d88f23Bb45525E447528DBF656A9D55bf5"
 );
 export const CRV_TOKEN_ADDRESS = Address.fromString(
-  "0x1E4F97b9f9F913c46F1632781732927B9019C68b"
+  "0x172370d5cd63279efa6d502dab29171933a610af"
 );
 
