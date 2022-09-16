@@ -4,9 +4,7 @@ import { Address } from "@graphprotocol/graph-ts";
 import { CustomPriceType } from "../common/types";
 import { ChainLinkContract } from "../../../generated/templates/PoolTemplate/ChainLinkContract";
 
-export function getChainLinkContract(
-  network: string
-): ChainLinkContract | null {
+export function getChainLinkContract(): ChainLinkContract | null {
   let config = utils.getConfig();
   if (!config || utils.isNullAddress(config.chainLink())) return null;
 
@@ -17,7 +15,7 @@ export function getTokenPriceFromChainLink(
   tokenAddr: Address,
   network: string
 ): CustomPriceType {
-  const chainLinkContract = getChainLinkContract(network);
+  const chainLinkContract = getChainLinkContract();
 
   if (!chainLinkContract) {
     return new CustomPriceType();

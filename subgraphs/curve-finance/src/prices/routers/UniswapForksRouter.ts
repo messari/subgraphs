@@ -1,7 +1,7 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { UniswapPair as UniswapPairContract } from "../../../generated/templates/PoolTemplate/UniswapPair";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/templates/PoolTemplate/UniswapRouter";
 
@@ -91,8 +91,8 @@ export function getPriceFromRouter(
   let amountOut = constants.BIGINT_ZERO;
   for (let idx = 0; idx < routerAddresses.length; idx++) {
     let routerAddress = routerAddresses.at(idx);
-    const uniswapForkRouter = UniswapRouterContract.bind(routerAddress);
 
+    const uniswapForkRouter = UniswapRouterContract.bind(routerAddress);
     let amountOutArray = uniswapForkRouter.try_getAmountsOut(amountIn, path);
 
     if (!amountOutArray.reverted) {

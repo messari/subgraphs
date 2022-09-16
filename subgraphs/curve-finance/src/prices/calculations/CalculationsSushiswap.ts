@@ -4,12 +4,9 @@ import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/templates/PoolTemplate/CalculationsSushiSwap";
 
-export function getSushiSwapContract(
-  network: string
-): CalculationsSushiContract | null {
+export function getSushiSwapContract(): CalculationsSushiContract | null {
   let config = utils.getConfig();
-  if (!config || utils.isNullAddress(config.sushiCalculations()))
-    return null;
+  if (!config || utils.isNullAddress(config.sushiCalculations())) return null;
 
   return CalculationsSushiContract.bind(config.sushiCalculations());
 }
@@ -18,7 +15,7 @@ export function getTokenPriceFromSushiSwap(
   tokenAddr: Address,
   network: string
 ): CustomPriceType {
-  const curveContract = getSushiSwapContract(network);
+  const curveContract = getSushiSwapContract();
   if (!curveContract) {
     return new CustomPriceType();
   }

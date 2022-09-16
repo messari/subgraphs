@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import { getUsdPricePerToken } from "..";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { BigInt, Address, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { CurveRegistry as CurveRegistryContract } from "../../../generated/templates/PoolTemplate/CurveRegistry";
 
 export function getCurvePriceUsdc(
@@ -13,11 +13,11 @@ export function getCurvePriceUsdc(
   if (!config) return new CustomPriceType();
 
   let price = constants.BIGDECIMAL_ZERO;
-  let basePrice = new CustomPriceType();
   const curveRegistryAdresses = config.curveRegistry();
 
-  for (let idx = 0; curveRegistryAdresses.length; idx++) {
-    let curveRegistry = curveRegistryAdresses.at(idx);
+  for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
+    let curveRegistry = curveRegistryAdresses[idx];
+
     let curveRegistryContract = CurveRegistryContract.bind(curveRegistry);
 
     let virtualPrice = getVirtualPrice(
@@ -32,13 +32,17 @@ export function getCurvePriceUsdc(
         constants.DEFAULT_DECIMALS.toI32() as u8
       ).toBigDecimal()
     );
-    basePrice = getBasePrice(curveLpTokenAddress, curveRegistryContract);
+
+    let basePrice = getBasePrice(curveLpTokenAddress, curveRegistryContract);
+    if (basePrice.reverted) continue;
+
+    return CustomPriceType.initialize(
+      price.times(basePrice.usdPrice),
+      basePrice.decimals
+    );
   }
 
-  return CustomPriceType.initialize(
-    price.times(basePrice.usdPrice),
-    basePrice.decimals
-  );
+  return new CustomPriceType();
 }
 
 export function getPoolFromLpToken(

@@ -1,7 +1,7 @@
 import {
+  getOrCreateLpToken,
   getOrCreateLiquidityPool,
   getOrCreateLiquidityGauge,
-  getOrCreateLpToken,
 } from "../common/initializers";
 import {
   PoolAdded,
@@ -20,6 +20,7 @@ import { PoolTemplate } from "../../generated/templates";
 export function handlePoolAdded(event: PoolAdded): void {
   const registryAddress = event.address;
   const poolAddress = event.params.pool;
+
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
 
   let lpToken = utils.getLpTokenFromRegistry(

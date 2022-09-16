@@ -11,7 +11,7 @@ export const YEARN_LENS_CONTRACT_ADDRESS = Address.fromString(
   "0x57aa88a0810dfe3f9b71a9b179dd8bf5f956c46a"
 );
 export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString("");
+export const AAVE_ORACLE_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
 export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
   "0x44536de2220987d098d1d29d3aafc7f7348e9ee4"
 );
@@ -43,16 +43,16 @@ export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
 /////////////////////////// BLACKLISTED TOKENS ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_BLACKLIST: Address[] = [];
-export const AAVE_ORACLE_BLACKLIST: Address[] = [];
-export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [];
-export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
+export const YEARN_LENS_BLACKLIST: Address[] = new Array();
+export const AAVE_ORACLE_BLACKLIST: Address[] = new Array();
+export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = new Array();
+export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = new Array();
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////////// HARDCODED STABLES ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const HARDCODED_STABLES: Address[] = [];
+export const HARDCODED_STABLES: Address[] = new Array();
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////

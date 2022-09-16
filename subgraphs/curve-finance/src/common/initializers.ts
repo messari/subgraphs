@@ -424,7 +424,6 @@ export function getOrCreateLiquidityPool(
     pool.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
 
     const lpToken = utils.getLpTokenFromPool(poolAddress, block);
-
     if (lpToken.id != constants.NULL.TYPE_STRING) {
       let lpTokenStore = getOrCreateLpToken(Address.fromString(lpToken.id));
       lpTokenStore.poolAddress = poolAddress.toHexString();
