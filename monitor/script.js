@@ -10,12 +10,13 @@ import path from 'path'
 const dayMs = 3600000 * 24;
 
 try {
-  clearChannel("");
   executionFlow();
   setInterval(executionFlow, dayMs);
 } catch (err) {
   errorNotification(err.message + ' MAIN LOGIC script.js');
 }
+
+const protocolNameToBaseMapping = {};
 
 async function executionFlow() {
   const { data } = await axios.get(
@@ -27,6 +28,7 @@ async function executionFlow() {
   if (Object.keys(data)?.length > 0) {
     Object.keys(data).forEach((protocolName) => {
       const protocol = data[protocolName];
+      protocolNameToBaseMapping[protocolName] = protocol.base;
       if (!protocol.schema) {
         return;
       }
@@ -203,7 +205,7 @@ async function executionFlow() {
     if (currentDiscordMessages.find(msg => msg.content.includes(protocolName))) {
       channel_id = currentDiscordMessages.find(msg => msg.content.includes(protocolName)).id;
     } else {
-      protocolThreadsToStart.push({ protocolName: protocolName, issues: [] });
+      protocolThreadsToStart.push({ protocolName: protocolName });
     }
     // If not, pass Protocol name and error types into start protocol thread
     // Start the thread and return the new channel ID (data.id)
@@ -217,38 +219,56 @@ async function executionFlow() {
     // call function to create threads, return object of protocol names to channel ids
     // map messages to post, where channel is null take above object key of protocol name and set to channel
 
-    const channelMapping = await resolveThreadCreation(protocolThreadsToStart)
-
+    const channelMapping = await resolveThreadCreation(protocolThreadsToStart, {})
+    console.log(channelMapping)
     messagesToPost.forEach((msg, idx) => {
       if (!msg.channel) {
         messagesToPost[idx].channel = channelMapping[msg.protocolName];
       }
     });
 
-    await resolveQueriesToAttempt(messagesToPost, currentDiscordMessages);
+    await resolveQueriesToAttempt(messagesToPost);
   }
   return;
 }
 
-async function resolveThreadCreation(protocols) {
-
+async function resolveThreadCreation(protocols, resolution) {
+  // Transform resolution into mapping object ||| [protocolName] > channel id 
+  const localRes = { ...resolution }
+  let useQueries = [...protocols];
+  useQueries = useQueries.slice(0, 5);
+  const newQueriesArray = [...protocols.slice(5)];
   try {
-    console.log(protocols)
-    const resolution = await Promise.allSettled(protocols.map(object => startProtocolThread(object.protocolName, object.issues)));
-    console.log(resolution, 'resolution')
-    // Transform resolution into mapping object ||| [protocolName] > channel id 
-    return resolution
+    const promiseSettle = await Promise.allSettled(useQueries.map(object => {
+      const base = protocolNameToBaseMapping[object.protocolName];
+      return startProtocolThread(object.protocolName, base)
+    }));
+    promiseSettle.forEach(res => {
+      localRes[res.value.protocolName] = res.value.channel;
+    })
   } catch (err) {
-    errorNotification(err.message + ' resolveQueriesToAttempt() script.js');
+    errorNotification(err.message + ' resolveThreadCreation() script.js');
   }
+
+  await sleep(5000);
+  if (newQueriesArray.length > 0) {
+    return resolveThreadCreation(newQueriesArray, localRes);
+  }
+  // create mapping and return
+  console.log(localRes)
+  return localRes;
+
 }
 
-async function resolveQueriesToAttempt(queriesToAttempt, currentDiscordMessages) {
+async function resolveQueriesToAttempt(queriesToAttempt) {
   // Take the first 5 queries to attempt
   let useQueries = queriesToAttempt.slice(0, 5);
   const newQueriesArray = [...queriesToAttempt.slice(5)];
   try {
     // map useQueries and within filter currentDiscordMessages.includes(useQueries[x].slice(0,80)) 
+
+    // from use queries, get the channel ids and fetch all the messages from the threads, then loop through for hasmsg
+
     useQueries = useQueries.filter(object => {
       const hasMsg = currentDiscordMessages.filter(msg => {
         return msg.content.includes(object.protocolName);

@@ -130,7 +130,6 @@ export async function sendDiscordMessage(messageObjects, protocolName, channel_i
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return null;
     } catch (err) {
-        // console.log('ERROR', err.response)
         if (err.response.status === 429) {
             return messageObjects;
         } else {
@@ -146,27 +145,21 @@ export async function sendDiscordMessage(messageObjects, protocolName, channel_i
 // Start the thread and return the new channel ID (data.id)
 // Pass this channel id to sendDiscordMessage in order to post message for each depo into thread for protocol 
 
-export async function startProtocolThread(protocolName, issues) {
-    // This function sneds a request to discord and starts a thread for a protocol. All of the embedded messages within the protocol are messages/replies on this thread
-
-    // MUST SEND THE INITIAL MESSAGE
+export async function startProtocolThread(protocolName, base) {
     let baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages";
-
     let headers = {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",
     }
-    // https://discordapp.com/channels/1010184937565069342/1011361382760992828/1019212751249350688
 
 
-    let postJSON = JSON.stringify({ "content": "TEST" })
+    let postJSON = JSON.stringify({ "content": protocolName + ' (Base: ' + base + ')' });
     let msgId = ""
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
-        msgId = data.id
-        console.log(data)
+        msgId = data.data.id;
     } catch (err) {
-        errorNotification(err)
+        errorNotification(err);
     }
 
     baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages/" + msgId + "/threads";
@@ -174,42 +167,16 @@ export async function startProtocolThread(protocolName, issues) {
     headers = {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",
-    }
-    // https://discordapp.com/channels/1010184937565069342/1011361382760992828/1019212751249350688
+    };
 
-
-    postJSON = JSON.stringify({ "name": protocolName + ' ISSUES' })
+    postJSON = JSON.stringify({ "name": protocolName + ' ISSUES' });
 
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
-        console.log(data)
-        return data.id;
+        return { channel: data.data.id, protocolName: protocolName };
     } catch (err) {
         errorNotification(err)
     }
-
-}
-
-export async function sendThreadMessage() {
-    // This function sneds a request to discord and starts a thread for a protocol. All of the embedded messages within the protocol are messages/replies on this thread
-    const baseURL = "https://discordapp.com/api/channels/1019212751249350688/messages";
-
-    const headers = {
-        "Authorization": "Bot " + process.env.BOT_TOKEN,
-        "Content-Type": "application/json",
-    }
-    // https://discordapp.com/channels/1010184937565069342/1011361382760992828/1019212751249350688
-
-
-    const postJSON = JSON.stringify({ "content": "TEST" })
-
-    try {
-        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
-        console.log(data)
-    } catch (err) {
-        errorNotification(err)
-    }
-
 }
 
 export function constructEmbedMsg(protocol, deploymentsOnProtocol) {
