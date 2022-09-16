@@ -939,10 +939,10 @@
     "deployments": {
       "cream-finance-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -958,10 +958,10 @@
       },
       "cream-finance-bsc": {
         "network": "bsc",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -977,10 +977,10 @@
       },
       "cream-finance-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
@@ -996,10 +996,10 @@
       },
       "cream-finance-polygon": {
         "network": "polygon",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
