@@ -2,7 +2,7 @@
   "network": "arbitrum-one",
   "fusePoolDirectoryAddress": "0xc201b8c8dd22c779025e16f1825c90e1e6dd6a08",
   "startBlock": 4704251,
-  "graftEnabled": true,
-  "subgraphId": "QmenyKvnvTu83C4MeP9u2Bb3eWUAHA4Es9BevdxYFfgpui",
+  "graftEnabled": false,
+  "subgraphId": "QmXJjBuWMAoxBmx939ZTrHMtF9rYTYTRosTrjsEwoqo4TD",
   "graftStartBlock": 11480560
 }
