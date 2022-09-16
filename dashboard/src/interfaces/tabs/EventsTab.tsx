@@ -39,7 +39,7 @@ function EventsTab({
     poolDropDown = (
       <PoolDropDown
         poolId={poolId}
-        markets={poolsList[poolNames]}
+        pools={poolsList[poolNames]}
         setPoolId={(x) => setPoolId(x)}
         setIssues={(x) => setIssues(x)}
       />

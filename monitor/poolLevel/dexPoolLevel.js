@@ -19,17 +19,17 @@ export const dexPoolLevel = async (deployments) => {
             type
             schemaVersion
         }
-      liquidityPools (first: 1000) {
-        id
-        name
-        totalValueLockedUSD
-        cumulativeSupplySideRevenueUSD
-        cumulativeProtocolSideRevenueUSD
-        cumulativeTotalRevenueUSD
-        cumulativeVolumeUSD
-        outputTokenSupply
-        outputTokenPriceUSD
-      }
+        liquidityPools (first: 1000) {
+          id
+          name
+          totalValueLockedUSD
+          cumulativeSupplySideRevenueUSD
+          cumulativeProtocolSideRevenueUSD
+          cumulativeTotalRevenueUSD
+          cumulativeVolumeUSD
+          outputTokenSupply
+          outputTokenPriceUSD
+        }
     }`;
 
     const promiseArr = [];
@@ -61,7 +61,7 @@ export const dexPoolLevel = async (deployments) => {
                 };
             }))
         )
-        .catch((err) => console.log(err));
+        .catch((err) => console.log(err.code, err.errno));
 
     poolLevelData.forEach((protocol, idx) => {
         if (!protocol?.liquidityPools) return;

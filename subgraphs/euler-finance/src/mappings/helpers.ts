@@ -1,4 +1,4 @@
-import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -38,7 +38,6 @@ import {
   CONFIG_FACTOR_SCALE,
   USDC_SYMBOL,
   DECIMAL_PRECISION,
-  USDC_ERC20_ADDRESS,
   INTEREST_RATE_PRECISION,
   SECONDS_PER_YEAR,
   RESERVE_FEE_SCALE,
@@ -49,8 +48,6 @@ import {
   updateMarketDailyMetrics,
   updateMarketHourlyMetrics,
 } from "../common/metrics";
-import { _MarketUtility } from "../../generated/schema";
-import { BigInt } from "@graphprotocol/graph-ts";
 import { getAssetTotalSupply } from "../common/tokens";
 
 export function updateAsset(event: AssetStatus): void {
@@ -217,51 +214,35 @@ export function createLiquidation(event: Liquidation): BigDecimal {
   return liquidation.amountUSD;
 }
 
-function updateMarketLendingFactors(marketUtility: _MarketUtility, usdcMarketUtility: _MarketUtility): void {
-  /**
-   * Euler has different collateral and borrow factors for all assets. This means that, in theory, there
-   * would be maximumLTV and collateralThreshold for every possible asset pair.
-   * 
-   * For the sake of simplicity when calculating maximumLTV and liquidationThreshold,
-   * let's assume borrowed asset is always USDC and collateral asset is always given asset.
-   *
-   * maximumLTV = usdcBorrowFactor * assetCollateralFactor 
-   * liquidationThreshold = maximumLTV
-   */
-  const market = getOrCreateMarket(marketUtility.id);
-
-  const marketCollateralFactor = marketUtility.collateralFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE);
-  const usdcBorrowFactorDecimal = usdcMarketUtility.borrowFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE);
-
-  market.maximumLTV = marketCollateralFactor.times(usdcBorrowFactorDecimal).times(BigDecimal.fromString('100'));
-  market.liquidationThreshold = market.maximumLTV;
-  if (market.maximumLTV != BIGDECIMAL_ZERO) {
-    market.canUseAsCollateral = true;
-  }
-  market.save();
-}
-
 export function updateLendingFactors(event: GovSetAssetConfig): void {
   const marketUtility = getOrCreateMarketUtility(event.params.underlying.toHexString());
   marketUtility.borrowFactor = event.params.newConfig.borrowFactor;
   marketUtility.collateralFactor = event.params.newConfig.collateralFactor;
   marketUtility.save();
 
-  if (event.params.underlying.toHexString() === USDC_ERC20_ADDRESS) {
-    // When USDC asset config is updated, max LTV and liquidation threshold for all currencies need
-    // to be updated as well.
-    const usdcMarketUtility = marketUtility;
-    const protocolUtility = getOrCreateProtocolUtility(event.block.number.toI32());
-    for (let i = 0; i < protocolUtility.markets.length; i += 1) {
-      const marketId = protocolUtility.markets[i];
-      const otherMarketUtility =
-        marketId !== USDC_ERC20_ADDRESS ? getOrCreateMarketUtility(marketId) : usdcMarketUtility;
-      updateMarketLendingFactors(otherMarketUtility, usdcMarketUtility);
-    }
-  } else {
-    const usdcMarketUtility = getOrCreateMarketUtility(USDC_ERC20_ADDRESS);
-    updateMarketLendingFactors(marketUtility, usdcMarketUtility);
-  }
+  /**
+   * Euler has different collateral and borrow factors for all assets. This means that, in theory, there
+   * would be maximumLTV and collateralThreshold for every possible asset pair.
+   * 
+   * For the sake of simplicity:
+   *  The maximumLTV is the collateral factor. This is the risk-adjusted liquidity of assets in a market
+   *  The liquidationThreshold is the borrow factor. If the borrow goes over the borrow factor 
+   *                times the collateral factor of the collateral's market the borrow is at 
+   *                risk of liquidation.
+   *
+   * maximumLTV = collateralFactor 
+   * liquidationThreshold = borrowFactor
+   */
+  let market = getOrCreateMarket(marketUtility.id);
+  market.maximumLTV = marketUtility
+    .collateralFactor
+    .toBigDecimal()
+    .div(CONFIG_FACTOR_SCALE);
+  market.liquidationThreshold = marketUtility
+    .borrowFactor
+    .toBigDecimal()
+    .div(CONFIG_FACTOR_SCALE);
+  market.save();
 }
 
 export function createMarket(event: MarketActivated): void {
@@ -432,13 +413,7 @@ export function syncWithEulerGeneralView(
       .plus(totalRevenueSinceLastUpdate);
     market.save();
 
-    updateSnapshotRevenues(
-      market.id, 
-      block, 
-      supplySideRevenueSinceLastUpdate, 
-      protocolSideRevenueSinceLastUpdate, 
-      totalRevenueSinceLastUpdate
-    );
+    updateSnapshotRevenues(market.id, block, supplySideRevenueSinceLastUpdate, protocolSideRevenueSinceLastUpdate, totalRevenueSinceLastUpdate);
 
     protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
     protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);

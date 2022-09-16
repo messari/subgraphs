@@ -50,12 +50,7 @@ export function handleTransfer(event: Transfer): void {
   let existingToken = Token.load(tokenCollection.id + "-" + tokenId.toString());
   if (existingToken == null) {
     // Store metadata for the specific tokenId.
-    let currentToken = createToken(
-      contract,
-      tokenCollection,
-      tokenId,
-      event.block
-    );
+    let currentToken = createToken(event, contract, tokenCollection, tokenId);
     currentToken.save();
 
     tokenCollection.tokenCount = tokenCollection.tokenCount.plus(BIGINT_ONE);
@@ -73,7 +68,7 @@ export function handleTransfer(event: Transfer): void {
       tokenCollection.save();
 
       existingToken.tokenURI = tokenURI;
-      existingToken = updateTokenMetadata(contract, existingToken);
+      existingToken = updateTokenMetadata(event, existingToken);
       existingToken.blockNumber = event.block.number;
       existingToken.timestamp = event.block.timestamp;
       existingToken.save();

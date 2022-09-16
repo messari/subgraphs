@@ -1286,6 +1286,8 @@ type _DforceMarketStatus @entity {
 type _FusePool @entity {
   " {Comptroller implementation} "
   id: ID!
+  " Pool name (given by pool admin) "
+  name: String!
   " Fuse pool  number "
   poolNumber: String!
   " Price oracle for the "

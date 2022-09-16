@@ -1,4 +1,4 @@
-// import { log } from '@graphprotocol/graph-ts'
+// import { log } from "@graphprotocol/graph-ts";
 import {
   Burn as BurnEvent,
   Initialize,
@@ -69,5 +69,5 @@ export function handleSwap(event: SwapEvent): void {
   );
   updateFinancials(event);
   updatePoolMetrics(event);
-  updateUsageMetrics(event, event.params.sender, UsageType.SWAP);
+  updateUsageMetrics(event, event.transaction.from, UsageType.SWAP);
 }

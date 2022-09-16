@@ -40,6 +40,7 @@ import {
   updateMarketMetrics,
   updateFinancials,
   updateTotalBorrows,
+  updateBorrowAmount,
 } from "./common/metrics";
 import { createMarket, createLiquidateEvent, updateTokenPrice } from "./common/setters";
 import { addAccountToProtocol, getOrCreateAccount, getOrCreatePosition, updatePositions } from "./positions";
@@ -171,6 +172,7 @@ export function handleLogBorrow(event: LogBorrow): void {
   borrowEvent.position = updatePositions(market.id, EventType.BORROW, borrowEvent.account, event);
   borrowEvent.save();
 
+  updateBorrowAmount(market);
   updateTotalBorrows(event);
   updateMarketStats(market.id, EventType.BORROW, getMIMAddress(dataSource.network()), event.params.amount, event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
@@ -320,6 +322,7 @@ export function handleLogRepay(event: LogRepay): void {
   repayEvent.position = updatePositions(market.id, EventType.REPAY, repayEvent.account, event, liquidation);
   repayEvent.save();
 
+  updateBorrowAmount(market);
   updateTotalBorrows(event);
   updateMarketStats(market.id, EventType.REPAY, getMIMAddress(dataSource.network()), event.params.part, event); // smart contract code subs event.params.part from totalBorrow
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats

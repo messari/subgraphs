@@ -37,11 +37,11 @@ export class ApeswapBscConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xCf083Be4164828f00cAE704EC15a36D711491284";
+    return "0x0841bd0b734e4f5853f0dd8d7ea041c241fb0da6";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString("0xCf083Be4164828f00cAE704EC15a36D711491284")
+      Address.fromString("0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6")
     );
   }
   getTradeFee(): BigDecimal {
@@ -63,7 +63,7 @@ export class ApeswapBscConfigurations implements Configurations {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.TIMESTAMP;
+    return RewardIntervalType.BLOCK;
   }
   getRewardTokenRate(): BigInt {
     return BIGINT_ZERO;
@@ -72,7 +72,7 @@ export class ApeswapBscConfigurations implements Configurations {
     return "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c";
   }
   getRewardToken(): string {
-    return "0x5d47bAbA0d66083C52009271faF3F50DCc01023C";
+    return "0x603c7f932ed1fc6575303d8fb018fdcbb0f39a95";
   }
   getWhitelistTokens(): string[] {
     return [
