@@ -102,12 +102,15 @@ function getRETHpriceUSD(
 ): BigDecimal {
   const RETHContract = RETH.bind(tokenAddress);
 
-  const rethCall = RETHContract.try_getRethValue(ONE_ETH_IN_WEI);
+  const rethCall = RETHContract.try_getExchangeRate();
   let RETHratio = BIGDECIMAL_ZERO;
   let RETHpriceUSD = BIGDECIMAL_ZERO;
   if (rethCall.reverted) {
-    log.error("rethCall Reverted", []);
+    log.error("[getRETHpriceUSD] rethCall Reverted", []);
   } else {
+    log.error("[getRETHpriceUSD] rethCall resolved to : {}", [
+      rethCall.value.toString(),
+    ]);
     RETHratio = bigIntToBigDecimal(rethCall.value.div(ONE_ETH_IN_WEI));
 
     if (RETHratio.notEqual(BIGDECIMAL_ZERO)) {
