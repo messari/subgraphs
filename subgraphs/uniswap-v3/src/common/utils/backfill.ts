@@ -21,7 +21,7 @@ import {
 } from "../getters";
 import { updateTokenWhitelists } from "../updateMetrics";
 import { Pool as PoolTemplate } from "../../../generated/templates";
-import { Pool } from "../../../generated/Factory/pool";
+import { Pool } from "../../../generated/Factory/Pool";
 import { createPoolFees } from "../creators";
 import { ERC20 } from "../../../generated/Factory/ERC20";
 import { convertTokenToDecimal } from "./utils";
