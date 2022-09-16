@@ -1,6 +1,8 @@
 import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
 import { getCurvePriceUsdc } from "./routers/CurveRouter";
+import { getTokenPriceFromOneInch } from "./oracles/1InchOracle";
+import { getTokenPriceFromAaveOracle } from "./oracles/AaveOracle";
 import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
 import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
 import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
@@ -38,26 +40,58 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 3. CalculationsCurve
-  let calculationsCurvePrice = getTokenPriceFromCalculationCurve(tokenAddr, network);
+  let calculationsCurvePrice = getTokenPriceFromCalculationCurve(
+    tokenAddr,
+    network
+  );
   if (!calculationsCurvePrice.reverted) {
     log.warning("[CalculationsCurve] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsCurvePrice.usdPrice.div(calculationsCurvePrice.decimalsBaseTen).toString(),
+      calculationsCurvePrice.usdPrice
+        .div(calculationsCurvePrice.decimalsBaseTen)
+        .toString(),
     ]);
     return calculationsCurvePrice;
   }
 
   // 4. CalculationsSushiSwap
-  let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(tokenAddr, network);
+  let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(
+    tokenAddr,
+    network
+  );
   if (!calculationsSushiSwapPrice.reverted) {
     log.warning("[CalculationsSushiSwap] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsSushiSwapPrice.usdPrice.div(calculationsSushiSwapPrice.decimalsBaseTen).toString(),
+      calculationsSushiSwapPrice.usdPrice
+        .div(calculationsSushiSwapPrice.decimalsBaseTen)
+        .toString(),
     ]);
     return calculationsSushiSwapPrice;
   }
 
-  // 5. Curve Router
+  // 5. One Inch Oracle
+  let oneInchOraclePrice = getTokenPriceFromOneInch(tokenAddr, network);
+  if (!oneInchOraclePrice.reverted) {
+    log.warning("[OneInchOracle] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      oneInchOraclePrice.usdPrice
+        .div(oneInchOraclePrice.decimalsBaseTen)
+        .toString(),
+    ]);
+    return oneInchOraclePrice;
+  }
+
+  // 6. Yearn Lens Oracle
+  let aaveOraclePrice = getTokenPriceFromAaveOracle(tokenAddr, network);
+  if (!aaveOraclePrice.reverted) {
+    log.warning("[AaveOracle] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      aaveOraclePrice.usdPrice.div(aaveOraclePrice.decimalsBaseTen).toString(),
+    ]);
+    return aaveOraclePrice;
+  }
+
+  // 7. Curve Router
   let curvePrice = getCurvePriceUsdc(tokenAddr, network);
   if (!curvePrice.reverted) {
     log.warning("[CurveRouter] tokenAddress: {}, Price: {}", [
@@ -67,7 +101,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return curvePrice;
   }
 
-  // 6. Uniswap Router
+  // 8. Uniswap Router
   let uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
   if (!uniswapPrice.reverted) {
     log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
@@ -77,7 +111,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return uniswapPrice;
   }
 
-  // 7. SushiSwap Router
+  // 9. SushiSwap Router
   let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
   if (!sushiswapPrice.reverted) {
     log.warning("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
@@ -87,12 +121,17 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return sushiswapPrice;
   }
 
-  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [tokenAddr.toHexString()]);
+  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
+    tokenAddr.toHexString(),
+  ]);
 
   return new CustomPriceType();
 }
 
-export function getUsdPrice(tokenAddr: Address, amount: BigDecimal): BigDecimal {
+export function getUsdPrice(
+  tokenAddr: Address,
+  amount: BigDecimal
+): BigDecimal {
   let tokenPrice = getUsdPricePerToken(tokenAddr);
 
   if (!tokenPrice.reverted) {

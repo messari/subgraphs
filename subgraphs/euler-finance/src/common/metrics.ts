@@ -8,12 +8,16 @@ import {
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
 } from "./getters";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount,  UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
-import { BIGINT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./constants";
+import { ActivityType, SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./constants";
 
 // updates a given FinancialDailySnapshot Entity
-export function updateFinancials(block: ethereum.Block): void {
+export function updateFinancials(
+    block: ethereum.Block,
+    amountUSD: BigDecimal,
+    eventType: string
+  ): void {
   // number of days since unix epoch
   let financialMetrics = getOrCreateFinancials(block.timestamp, block.number);
   let protocol = getOrCreateLendingProtocol();
@@ -36,30 +40,18 @@ export function updateFinancials(block: ethereum.Block): void {
   financialMetrics.blockNumber = block.number;
   financialMetrics.timestamp = block.timestamp;
 
-  // update daily metrics
-  const previousDayFinancials = getOrCreateFinancials(
-    block.timestamp.minus(BigInt.fromI32(SECONDS_PER_DAY)),
-    BIGINT_ZERO,
-  );
-
-  financialMetrics.dailyBorrowUSD = financialMetrics.cumulativeBorrowUSD.minus(
-    previousDayFinancials.cumulativeBorrowUSD,
-  );
-  financialMetrics.dailyDepositUSD = financialMetrics.cumulativeDepositUSD.minus(
-    previousDayFinancials.cumulativeDepositUSD,
-  );
-  financialMetrics.dailyLiquidateUSD = financialMetrics.cumulativeLiquidateUSD.minus(
-    previousDayFinancials.cumulativeLiquidateUSD,
-  );
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.cumulativeProtocolSideRevenueUSD.minus(
-    previousDayFinancials.cumulativeProtocolSideRevenueUSD,
-  );
-  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.cumulativeSupplySideRevenueUSD.minus(
-    previousDayFinancials.cumulativeSupplySideRevenueUSD,
-  );
-  financialMetrics.dailyTotalRevenueUSD = financialMetrics.cumulativeTotalRevenueUSD.minus(
-    previousDayFinancials.cumulativeTotalRevenueUSD,
-  );
+  // add to daily amounts
+  if (eventType == TransactionType.DEPOSIT) {
+    financialMetrics.dailyDepositUSD = financialMetrics.dailyDepositUSD.plus(amountUSD);
+  } else if (eventType == TransactionType.BORROW) {
+    financialMetrics.dailyBorrowUSD = financialMetrics.dailyBorrowUSD.plus(amountUSD);
+  } else if (eventType == TransactionType.REPAY) {
+    financialMetrics.dailyRepayUSD = financialMetrics.dailyRepayUSD.plus(amountUSD);
+  } else if (eventType == TransactionType.WITHDRAW) {
+    financialMetrics.dailyWithdrawUSD = financialMetrics.dailyWithdrawUSD.plus(amountUSD);
+  } else if (eventType == TransactionType.LIQUIDATE) {
+    financialMetrics.dailyLiquidateUSD = financialMetrics.dailyLiquidateUSD.plus(amountUSD);
+  }
 
   financialMetrics.save();
 }
@@ -85,6 +77,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   let accountId = from.toHexString();
   let account = Account.load(accountId);
   let protocol = getOrCreateLendingProtocol();
+  dailyMetrics.totalPoolCount = protocol.totalPoolCount;
   if (!account) {
     account = new Account(accountId);
     account.save();
@@ -96,7 +89,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   dailyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = from.toHexString() + "-" + id.toString();
+  let dailyActiveAccountId = ActivityType.DAILY + "-" + from.toHexString() + "-" + id.toString();
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -105,7 +98,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   }
 
   // create active account for hourlyMetrics
-  let hourlyActiveAccountId = dailyActiveAccountId + "-" + hour.toString();
+  let hourlyActiveAccountId = ActivityType.HOURLY + "-" + from.toHexString() + "-" + hour.toString();
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -121,7 +114,12 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
 }
 
 // update a given MarketDailySnapshot
-export function updateMarketDailyMetrics(block: ethereum.Block, marketId: string): void {
+export function updateMarketDailyMetrics(
+  block: ethereum.Block, 
+  marketId: string,
+  amountUSD: BigDecimal,
+  eventType: string | null = null
+): void {
   let marketMetrics = getOrCreateMarketDailySnapshot(block, marketId);
   let market = getOrCreateMarket(marketId);
 
@@ -132,6 +130,9 @@ export function updateMarketDailyMetrics(block: ethereum.Block, marketId: string
   // update other vars
   marketMetrics.rates = market.rates;
   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketMetrics.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketMetrics.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -146,11 +147,31 @@ export function updateMarketDailyMetrics(block: ethereum.Block, marketId: string
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   // Note: daily tracking of deposit/borrow/liquidate in respective functions in helpers.ts
 
+  // add to daily amounts  
+  if (eventType != null) {
+    if (eventType == TransactionType.DEPOSIT) {
+      marketMetrics.dailyDepositUSD = marketMetrics.dailyDepositUSD.plus(amountUSD);
+    } else if (eventType == TransactionType.BORROW) {
+      marketMetrics.dailyBorrowUSD = marketMetrics.dailyBorrowUSD.plus(amountUSD);
+    } else if (eventType == TransactionType.REPAY) {
+      marketMetrics.dailyRepayUSD = marketMetrics.dailyRepayUSD.plus(amountUSD);
+    } else if (eventType == TransactionType.WITHDRAW) {
+      marketMetrics.dailyWithdrawUSD = marketMetrics.dailyWithdrawUSD.plus(amountUSD);
+    } else if (eventType == TransactionType.LIQUIDATE) {
+      marketMetrics.dailyLiquidateUSD = marketMetrics.dailyLiquidateUSD.plus(amountUSD);
+    }
+  }
+
   marketMetrics.save();
 }
 
 // update a given MarketHourlySnapshot
-export function updateMarketHourlyMetrics(block: ethereum.Block, marketId: string): void {
+export function updateMarketHourlyMetrics(
+  block: ethereum.Block, 
+  marketId: string,
+  amountUSD: BigDecimal,
+  eventType: string | null = null
+): void {
   let marketMetrics = getOrCreateMarketHourlySnapshot(block, marketId);
   let market = getOrCreateMarket(marketId);
 
@@ -161,6 +182,9 @@ export function updateMarketHourlyMetrics(block: ethereum.Block, marketId: strin
   // update other vars
   marketMetrics.rates = market.rates;
   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
+  marketMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
+  marketMetrics.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD;
   marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketMetrics.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketMetrics.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -173,7 +197,22 @@ export function updateMarketHourlyMetrics(block: ethereum.Block, marketId: strin
   marketMetrics.exchangeRate = market.exchangeRate;
   marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-  // Note: hourly tracking of deposit/borrow/liquidate in respective functions in helpers.tss
+  // Note: hourly tracking of deposit/borrow/liquidate in respective functions in helpers.ts
+
+  // add to hourly amounts
+  if (!eventType) {
+    if (eventType == TransactionType.DEPOSIT) {
+      marketMetrics.hourlyDepositUSD = marketMetrics.hourlyDepositUSD.plus(amountUSD);
+    } else if (eventType == TransactionType.BORROW) {
+      marketMetrics.hourlyBorrowUSD = marketMetrics.hourlyBorrowUSD.plus(amountUSD);
+    } else if (eventType == TransactionType.REPAY) {
+      marketMetrics.hourlyRepayUSD = marketMetrics.hourlyRepayUSD.plus(amountUSD);
+    } else if (eventType == TransactionType.WITHDRAW) {
+      marketMetrics.hourlyWithdrawUSD = marketMetrics.hourlyWithdrawUSD.plus(amountUSD);
+    } else if (eventType == TransactionType.LIQUIDATE) {
+      marketMetrics.hourlyLiquidateUSD = marketMetrics.hourlyLiquidateUSD.plus(amountUSD);
+    }
+  }
 
   marketMetrics.save();
 }

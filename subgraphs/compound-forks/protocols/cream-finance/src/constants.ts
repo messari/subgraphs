@@ -30,6 +30,11 @@ export class NetworkSpecificConstant {
   }
 }
 
+// Notable addresses
+export const BNB_USD_CHAINLINK_ORACLE =
+  "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE";
+export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   let network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
@@ -37,12 +42,7 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
       Address.fromString("0x3d5BC3c8d13dcB8bF317092d84783c2697AE9258"),
       Network.MAINNET,
       ETHEREUM_BLOCKS_PER_YEAR,
-      new TokenData(
-        Address.fromString("0x0000000000000000000000000000000000000000"),
-        "Ether",
-        "ETH",
-        18
-      ),
+      new TokenData(Address.fromString(ETH_ADDRESS), "Ether", "ETH", 18),
       new TokenData(
         Address.fromString("0xD06527D5e56A3495252A528C4987003b712860eE"),
         "Cream Ether",
@@ -98,6 +98,10 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   }
 }
 
-function equalsIgnoreCase(a: string, b: string): boolean {
+export function equalsIgnoreCase(a: string, b: string): boolean {
   return a.replace("-", "_").toLowerCase() == b.replace("-", "_").toLowerCase();
 }
+
+// First ethereum block on October 27, 2021
+// we are cutting off activity after this block since CREAM ethereum was "deprecated"
+export const ETH_CUTOFF_BLOCK = 13499798;

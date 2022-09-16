@@ -1,4 +1,6 @@
 import axios from "axios";
+import { errorNotification } from "./messageDiscord.js";
+import { formatIntToFixed2 } from "./util.js";
 
 export const protocolLevel = async (deployments) => {
     const endpointsList = [];
@@ -45,7 +47,7 @@ export const protocolLevel = async (deployments) => {
                 })
             }))
         )
-        .catch((err) => console.log(err));
+        .catch((err) => errorNotification(err.message + ' protocolLevel() protocolLevel.js'));
     const specificDataPromiseArray = [];
     protocolLevelData.forEach((deployment) => {
         if (!deployment?.data) return;
@@ -64,73 +66,80 @@ export const protocolLevel = async (deployments) => {
                 queryToUse = ``;
             } else {
                 queryToUse = `
-      query {
-        dexAmmProtocols {
-          name
-          network
-          cumulativeVolumeUSD
-          cumulativeUniqueUsers
-              totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-        }
-      }`;
+                query {
+                    dexAmmProtocols {
+                        name
+                        network
+                        cumulativeVolumeUSD
+                        cumulativeUniqueUsers
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                    }
+                }`;
             }
         } else if (deployment.data.protocols[0].type.toUpperCase() === "LENDING") {
             if (versionGroup === "2.0") {
-                queryToUse = `query{ lendingProtocols {
-              name
-          network
-      totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-        cumulativeUniqueUsers
-        cumulativeUniqueDepositors
-        cumulativeUniqueBorrowers
-        cumulativeUniqueLiquidators
-        cumulativeUniqueLiquidatees
-        openPositionCount
-        cumulativePositionCount
-        totalPoolCount
-        totalDepositBalanceUSD
-        cumulativeDepositUSD
-        totalBorrowBalanceUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
-      }
-  }`;
+                queryToUse = `
+                query {
+                    lendingProtocols {
+                        name
+                        network
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                        cumulativeUniqueUsers
+                        cumulativeUniqueDepositors
+                        cumulativeUniqueBorrowers
+                        cumulativeUniqueLiquidators
+                        cumulativeUniqueLiquidatees
+                        openPositionCount
+                        cumulativePositionCount
+                        totalPoolCount
+                        totalDepositBalanceUSD
+                        cumulativeDepositUSD
+                        totalBorrowBalanceUSD
+                        cumulativeBorrowUSD
+                        cumulativeLiquidateUSD
+                    }
+                }`;
             } else {
-                queryToUse = `query { lendingProtocols {
-              name
-          network
-      totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-        cumulativeUniqueUsers
-        totalDepositBalanceUSD
-        cumulativeDepositUSD
-        totalBorrowBalanceUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
-      }
-      }`;
+                queryToUse = `
+                query {
+                    lendingProtocols {
+                        name
+                        network
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                        cumulativeUniqueUsers
+                        totalDepositBalanceUSD
+                        cumulativeDepositUSD
+                        totalBorrowBalanceUSD
+                        cumulativeBorrowUSD
+                        cumulativeLiquidateUSD
+                    }
+                }`;
             }
         } else if (deployment.data.protocols[0].type.toUpperCase() === "YIELD") {
             if (versionGroup === "2.0") {
                 queryToUse = ``;
             } else {
-                queryToUse = `query { yieldAggregators {
-              name
-          network
-      totalValueLockedUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-          cumulativeUniqueUsers
-        }}`;
+                queryToUse = `
+                query {
+                    yieldAggregators {
+                        name
+                        network
+                        totalValueLockedUSD
+                        cumulativeSupplySideRevenueUSD
+                        cumulativeProtocolSideRevenueUSD
+                        cumulativeTotalRevenueUSD
+                        cumulativeUniqueUsers
+                    }
+                }`;
             }
         }
 
@@ -161,7 +170,7 @@ export const protocolLevel = async (deployments) => {
                 })
             }))
         )
-        .catch((err) => console.log(err));
+        .catch((err) => errorNotification(err.message + ' protocolLevel() protocolLevel.js'));
 
     protocolTypeLevelData.forEach((protocol) => {
         // find deployments objectbased on deployments.url === protocol.url
@@ -179,14 +188,13 @@ export const protocolLevel = async (deployments) => {
 
         const dataFields = Object.keys(data);
 
-        const buildIssue = (value) => deploymentName + "//" + value;
         if (
             !(
                 data.totalValueLockedUSD > 10000 &&
                 data.totalValueLockedUSD < 100000000000
             )
         ) {
-            issuesArrays.tvlRange.push(buildIssue(parseFloat(data.totalValueLockedUSD).toFixed(2)));
+            issuesArrays.totalValueLockedUSD.push('$' + formatIntToFixed2(parseFloat(data.totalValueLockedUSD)));
         }
 
         if (
@@ -195,7 +203,7 @@ export const protocolLevel = async (deployments) => {
                 data.cumulativeSupplySideRevenueUSD <= 100000000000
             )
         ) {
-            issuesArrays.cumulativeSupplySideRev.push(buildIssue(parseFloat(data.cumulativeSupplySideRevenueUSD).toFixed(2)));
+            issuesArrays.cumulativeSupplySideRevenueUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeSupplySideRevenueUSD)));
         }
 
         if (
@@ -204,7 +212,7 @@ export const protocolLevel = async (deployments) => {
                 data.cumulativeProtocolSideRevenueUSD <= 100000000000
             )
         ) {
-            issuesArrays.cumulativeProtocolSideRev.push(buildIssue(parseFloat(data.cumulativeProtocolSideRevenueUSD).toFixed(2)));
+            issuesArrays.cumulativeProtocolSideRevenueUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeProtocolSideRevenueUSD)));
         }
 
         if (
@@ -213,37 +221,35 @@ export const protocolLevel = async (deployments) => {
                 parseFloat(data.cumulativeSupplySideRevenueUSD)
             ).toFixed(2) !== parseFloat(data.cumulativeTotalRevenueUSD).toFixed(2)
         ) {
-            const value = ((parseFloat(data.cumulativeProtocolSideRevenueUSD) +
-                parseFloat(data.cumulativeSupplySideRevenueUSD)) +
-                " " +
-                parseFloat(data.cumulativeTotalRevenueUSD).toFixed(2) +
-                " = " +
-                parseFloat(data.cumulativeProtocolSideRevenueUSD).toFixed(2) +
+            const value = (
+                '$' + formatIntToFixed2(parseFloat(data.cumulativeTotalRevenueUSD)) +
+                " != " +
+                '$' + formatIntToFixed2(parseFloat(data.cumulativeProtocolSideRevenueUSD)) +
                 " + " +
-                parseFloat(data.cumulativeProtocolSideRevenueUSD).toFixed(2));
+                '$' + formatIntToFixed2(parseFloat(data.cumulativeSupplySideRevenueUSD)));
 
-            issuesArrays.cumulativeTotalRev.push(buildIssue(value));
+            issuesArrays.cumulativeTotalRevenueUSD.push(value);
         }
 
         if (
             dataFields.includes("cumulativeVolumeUSD") &&
             !(parseFloat(data.cumulativeVolumeUSD) > 10000)
         ) {
-            issuesArrays.cumulativeVol.push(buildIssue(parseFloat(data.cumulativeVolumeUSD).toFixed(2)));
+            issuesArrays.cumulativeVolumeUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeVolumeUSD)));
         }
 
         if (
             dataFields.includes("cumulativeUniqueUsers") &&
             !(parseFloat(data.cumulativeUniqueUsers) > 100 && parseFloat(data.cumulativeUniqueUsers) < 100000000)
         ) {
-            issuesArrays.cumulativeUniqueUsers.push(buildIssue(data.cumulativeUniqueUsers));
+            issuesArrays.cumulativeUniqueUsers.push(data.cumulativeUniqueUsers);
         }
 
         if (
             dataFields.includes("totalPoolCount") &&
             !(parseFloat(data.totalPoolCount) > 0 && parseFloat(data.totalPoolCount) < 10000)
         ) {
-            issuesArrays.totalPoolCount.push(buildIssue(parseFloat(data.totalPoolCount)));
+            issuesArrays.totalPoolCount.push(data.totalPoolCount);
         }
 
         if (
@@ -251,7 +257,7 @@ export const protocolLevel = async (deployments) => {
             parseFloat(data.cumulativeUniqueDepositors) <
             parseFloat(data.cumulativeUniqueUsers)
         ) {
-            issuesArrays.cumulativeUniqueDepos.push(buildIssue(parseFloat(data.cumulativeUniqueDepositors)));
+            issuesArrays.cumulativeUniqueDepositors.push(data.cumulativeUniqueDepositors);
         }
 
         if (
@@ -259,7 +265,7 @@ export const protocolLevel = async (deployments) => {
             parseFloat(data.cumulativeUniqueBorrowers) <
             parseFloat(data.cumulativeUniqueUsers)
         ) {
-            issuesArrays.cumulativeUniqueBorrowers.push(buildIssue(parseFloat(data.cumulativeUniqueBorrowers).toFixed(2)));
+            issuesArrays.cumulativeUniqueBorrowers.push(data.cumulativeUniqueBorrowers);
         }
 
         if (
@@ -267,7 +273,7 @@ export const protocolLevel = async (deployments) => {
             parseFloat(data.cumulativeUniqueLiquidators) <
             parseFloat(data.cumulativeUniqueUsers)
         ) {
-            issuesArrays.cumulativeUniqueLiquidators.push(buildIssue(parseFloat(data.cumulativeUniqueLiquidators).toFixed(2)));
+            issuesArrays.cumulativeUniqueLiquidators.push(data.cumulativeUniqueLiquidators);
         }
 
         if (
@@ -275,14 +281,14 @@ export const protocolLevel = async (deployments) => {
             parseFloat(data.cumulativeUniqueLiquidatees) <
             parseFloat(data.cumulativeUniqueUsers)
         ) {
-            issuesArrays.cumulativeUniqueLiquidatees.push(buildIssue(parseFloat(data.cumulativeUniqueLiquidatees).toFixed(2)));
+            issuesArrays.cumulativeUniqueLiquidatees.push(data.cumulativeUniqueLiquidatees);
         }
 
         if (
             dataFields.includes("openPositionCount") &&
             !(parseFloat(data.openPositionCount) > 100 && parseFloat(data.openPositionCount) < 1000000000)
         ) {
-            issuesArrays.openPositionCount.push(buildIssue(parseFloat(data.openPositionCount).toFixed(2)));
+            issuesArrays.openPositionCount.push(data.openPositionCount);
         }
 
         if (
@@ -292,14 +298,14 @@ export const protocolLevel = async (deployments) => {
                 parseFloat(data.openPositionCount)
             )
         ) {
-            issuesArrays.cumulativePositionCount.push(buildIssue(parseFloat(data.cumulativePositionCount).toFixed(2)));
+            issuesArrays.cumulativePositionCount.push(data.cumulativePositionCount);
         }
 
         if (
             dataFields.includes("totalDepositBalanceUSD") &&
             !(parseFloat(data.totalDepositBalanceUSD) > 10000 && parseFloat(data.totalDepositBalanceUSD) < 100000000000)
         ) {
-            issuesArrays.totalDepoBal.push(buildIssue(parseFloat(data.totalDepositBalanceUSD).toFixed(2)));
+            issuesArrays.totalDepositBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalDepositBalanceUSD)));
         }
 
         if (
@@ -309,7 +315,7 @@ export const protocolLevel = async (deployments) => {
                 parseFloat(data.totalDepositBalanceUSD)
             )
         ) {
-            issuesArrays.cumulativeDepo.push(buildIssue(parseFloat(data.cumulativeDepositUSD).toFixed(2)));
+            issuesArrays.cumulativeDepositUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeDepositUSD)));
         }
 
         if (
@@ -319,7 +325,7 @@ export const protocolLevel = async (deployments) => {
                 parseFloat(data.totalDepositBalanceUSD)
             )
         ) {
-            issuesArrays.totalBorrowBal.push(buildIssue(parseFloat(data.totalBorrowBalanceUSD).toFixed(2)));
+            issuesArrays.totalBorrowBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalBorrowBalanceUSD)));
         }
 
         if (
@@ -329,7 +335,7 @@ export const protocolLevel = async (deployments) => {
                 parseFloat(data.cumulativeBorrowUSD)
             )
         ) {
-            issuesArrays.cumulativeLiquidate.push(buildIssue(parseFloat(data.cumulativeLiquidateUSD).toFixed(2)));
+            issuesArrays.cumulativeLiquidateUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeLiquidateUSD)));
         }
 
         deployments[deploymentName].protocolErrors = issuesArrays;

@@ -9,20 +9,25 @@ import DeploymentsTable from "./DeploymentsTable";
 import { useQuery } from "@apollo/client";
 import { decentralizedNetworkSubgraphsQuery } from "../queries/decentralizedNetworkSubgraphsQuery";
 import DefiLlamaComparsionTab from "../interfaces/DefiLlamaComparisonTab";
+import DeploymentsInDevelopment from "./DeploymentsInDevelopment";
 
 const DeploymentsLayout = styled("div")`
   padding: 0;
 `;
 
 interface DeploymentsPageProps {
-  ProtocolsToQuery: { [x: string]: any };
+  protocolsToQuery: { [x: string]: any };
   getData: any;
+  subgraphCounts: any;
+  deploymentJSON: any;
 }
 
-function DeploymentsPage({ ProtocolsToQuery, getData }: DeploymentsPageProps) {
+function DeploymentsPage({ protocolsToQuery, getData, deploymentJSON, subgraphCounts }: DeploymentsPageProps) {
   const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
+
+  const [showDeploymentsInDevelopment, toggleShowDeploymentsInDevelopment] = useState<boolean>(false);
 
   const clientDecentralizedEndpoint = useMemo(
     () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"),
@@ -98,7 +103,7 @@ function DeploymentsPage({ ProtocolsToQuery, getData }: DeploymentsPageProps) {
     decentralizedSubgraphTable = Object.keys(decentralizedDeployments).map((key) => {
       const finalDeposList: any = {};
       Object.keys(decentralizedDeployments[key]).forEach((x) => {
-        if (Object.keys(ProtocolsToQuery[key]).find((pro) => pro.includes(x))) {
+        if (Object.keys(protocolsToQuery[key]).find((pro) => pro.includes(x))) {
           finalDeposList[x] = decentralizedDeployments[key][x];
         }
       });
@@ -154,11 +159,30 @@ function DeploymentsPage({ ProtocolsToQuery, getData }: DeploymentsPageProps) {
             Defi Llama Comparison
           </Button>
         </div>
+        <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
+          <Button variant="contained" color="primary" onClick={() => toggleShowDeploymentsInDevelopment(!showDeploymentsInDevelopment)}>
+            {showDeploymentsInDevelopment ? "Hide" : "Show"} Subgraphs In Development
+          </Button>
+        </div>
+        <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
+          <Typography variant="h6" align="right" sx={{ fontSize: "14px" }}>
+            {subgraphCounts.prodCount} out of {subgraphCounts.totalCount} total subgraphs are production ready
+          </Typography>
+        </div>
+
+        {showDeploymentsInDevelopment ? <>
+          <DeploymentsInDevelopment deploymentsInDevelopment={deploymentJSON} />
+          <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
+            <Button variant="contained" color="primary" onClick={() => toggleShowDeploymentsInDevelopment(!showDeploymentsInDevelopment)}>
+              {showDeploymentsInDevelopment ? "Hide" : "Show"} Subgraphs In Development
+            </Button>
+          </div>
+        </> : null}
         {decentralizedSubgraphTable}
         <Typography variant="h4" align="center" sx={{ my: 4 }}>
           Hosted Service Subgraphs
         </Typography>
-        {Object.keys(ProtocolsToQuery).map((key) => {
+        {Object.keys(protocolsToQuery).map((key) => {
           return (
             <>
               <Typography
@@ -174,7 +198,7 @@ function DeploymentsPage({ ProtocolsToQuery, getData }: DeploymentsPageProps) {
               <DeploymentsTable
                 key={"depTable-" + key}
                 clientIndexing={clientIndexing}
-                protocolsOnType={ProtocolsToQuery[key]}
+                protocolsOnType={protocolsToQuery[key]}
                 protocolType={key}
                 isDecentralizedNetworkTable={false}
               />
@@ -182,7 +206,7 @@ function DeploymentsPage({ ProtocolsToQuery, getData }: DeploymentsPageProps) {
           );
         })}
       </DeploymentsLayout>
-    </DeploymentsContextProvider>
+    </DeploymentsContextProvider >
   );
 }
 

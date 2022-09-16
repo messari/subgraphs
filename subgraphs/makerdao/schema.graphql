@@ -1091,6 +1091,8 @@ type _FlipBidsStore @entity {
   liquidatee: String!
   " amount collateral "
   lot: BigInt!
+  " borrower borrowed amount"
+  art: BigInt!
   " amount of debt to be repaid "
   tab: BigInt!
   " current highest bidder "
@@ -1111,6 +1113,8 @@ type _ClipTakeStore @entity {
   market: Market!
   " amount of collateral remaining to be auctioned "
   lot: BigInt!
+  " borrower borrowed amount"
+  art: BigInt!
   " amount of debt remaining to be repaid "
   tab: BigInt!
 }

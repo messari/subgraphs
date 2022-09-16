@@ -93,7 +93,7 @@ function PoolTab({
         setIssues={(x) => {
           setTableIssues(x);
         }}
-        markets={poolsList[poolNames]}
+        pools={poolsList[poolNames]}
       />
     );
   } else if (poolListLoading) {

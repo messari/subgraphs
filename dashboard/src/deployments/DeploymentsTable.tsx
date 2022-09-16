@@ -118,6 +118,7 @@ function DeploymentsTable({
         {Object.keys(protocolsOnType).map((protocol) => {
           return (
             <DecentralizedNetworkRow
+              key={"decentralized-" + protocol}
               rowData={protocolsOnType[protocol]}
               subgraphName={protocol}
               clientIndexing={clientIndexing}

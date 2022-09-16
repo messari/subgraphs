@@ -42,17 +42,26 @@ export function getOrCreateMasterChef(
 ): _MasterChef {
   let masterChef = _MasterChef.load(masterChefType);
 
-  if (!masterChef) {
-    masterChef = new _MasterChef(masterChefType);
+  if (masterChef) {
+    if (masterChef.address) {
+      return masterChef;
+    }
+
     masterChef.address = event.address.toHexString();
-    masterChef.totalAllocPoint = BIGINT_ZERO;
-    masterChef.rewardTokenInterval = NetworkConfigs.getRewardIntervalType();
-    masterChef.rewardTokenRate = NetworkConfigs.getRewardTokenRate();
-    log.warning("MasterChef Type: " + masterChefType, []);
-    masterChef.adjustedRewardTokenRate = NetworkConfigs.getRewardTokenRate();
-    masterChef.lastUpdatedRewardRate = BIGINT_ZERO;
     masterChef.save();
+    return masterChef;
   }
+
+  masterChef = new _MasterChef(masterChefType);
+  masterChef.address = event.address.toHexString();
+  masterChef.totalAllocPoint = BIGINT_ZERO;
+  masterChef.rewardTokenInterval = NetworkConfigs.getRewardIntervalType();
+  masterChef.rewardTokenRate = NetworkConfigs.getRewardTokenRate();
+  log.warning("MasterChef Type: " + masterChefType, []);
+  masterChef.adjustedRewardTokenRate = NetworkConfigs.getRewardTokenRate();
+  masterChef.lastUpdatedRewardRate = BIGINT_ZERO;
+  masterChef.save();
+
   return masterChef;
 }
 

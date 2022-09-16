@@ -1,8 +1,0 @@
-{
-  "network": "ropsten",
-  "address": "0xfC3DD73e918b931be7DEfd0cc616508391bcc001",
-  "startBlock": 10855630,
-  "execProxyAddress": "0xf7b8611008ed073ef348fe130671688bbb20409d",
-  "eulerGeneralViewAddress": "0x03Ba7FB195C7DEa97a55B0639785f701781EB63D",
-  "uniswapV3UsdWethPoolAddress": "0x0236b1059E9D8602216646f5aAac36065e16126f"
-}

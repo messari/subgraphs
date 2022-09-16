@@ -205,18 +205,6 @@ function PoolTabEntity({
             dataFields[fieldName] = returnedData.currentEntityField;
             dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
 
-            if (
-              (capsFieldName === "HOURLYLIQUIDATEUSD" || capsFieldName === "DAILYLIQUIDATEUSD") &&
-              Number(value) > Number(timeseriesInstance.totalValueLockedUSD) &&
-              issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "LIQ").length === 0
-            ) {
-              issues.push({
-                type: "LIQ",
-                message: timeseriesInstance.id,
-                level: "critical",
-                fieldName: entityName + "-" + fieldName,
-              });
-            }
           }
 
           if (fieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField) {

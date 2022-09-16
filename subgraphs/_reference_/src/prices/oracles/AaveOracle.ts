@@ -16,6 +16,14 @@ export function getTokenPriceFromAaveOracle(
 ): CustomPriceType {
   const aaveOracleContract = getAaveOracleContract(network);
 
+  if (
+    constants.AAVE_ORACLE_CONTRACT_ADDRESS.get(network).equals(
+      constants.ZERO_ADDRESS
+    )
+  ) {
+    return new CustomPriceType();
+  }
+  
   if (!aaveOracleContract) {
     return new CustomPriceType();
   }

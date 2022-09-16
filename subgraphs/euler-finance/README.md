@@ -63,9 +63,19 @@ Not applicable to Euler Finance
 
 Not applicable to Euler Finance
 
+### Collateral Factor & Borrow Factor
+
+Euler's collateral factor represents a risk-adjusted value of a user's collateral. In practice if a user deposits $1000 `USDC` and the collateral factor is `.9`, they have $900 `USDC` ($1000 * .9) of collateral to borrow from.
+
+Where Euler differs from other protocols is in the 2-sided approach. There is also a borrow factor. So yes, the user has $900 to use as collateral, but they want to borrow `UNI`, and `UNI` has a borrow factor of `.7`.
+
+In this example the user could borrow ($900 * `.7` `UNI`) = $630 with their $1000 `USDC` deposit.
+
+### Liquidation Penalty (Incentive)
+
+On Euler the liquidation penalty is variable and decided on in a sort of Dutch Auction style. This reduces the opportunities of MEV and drives the "liquidation penalty" closer to the marginal operating cost of liquidating a borrow. [See more here](https://docs.euler.finance/getting-started/white-paper#mev-resistance)
+
 ## Reference and Useful Links
-
-
 
 * Protocol
     * [https://www.euler.finance/](https://www.euler.finance/) 
