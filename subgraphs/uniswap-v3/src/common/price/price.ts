@@ -3,7 +3,6 @@ import {
   _HelperStore,
   _LiquidityPoolAmount,
   Token,
-  LiquidityPool,
 } from "../../../generated/schema";
 import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import {
@@ -15,7 +14,6 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGDECIMAL_ONE,
-  BIGINT_ZERO,
   BIGDECIMAL_TWO,
   INT_ONE,
   INT_ZERO,
@@ -24,7 +22,6 @@ import {
   BIGDECIMAL_TEN_THOUSAND,
 } from "../constants";
 import {
-  exponentToBigDecimal,
   exponentToBigInt,
   safeDiv,
 } from "../utils/utils";
@@ -139,7 +136,7 @@ export function findUSDPricePerToken(
       let poolAmounts = getLiquidityPoolAmounts(poolAddress);
       let pool = getLiquidityPool(poolAddress);
 
-      if (pool.totalValueLockedUSD!.gt(BIGDECIMAL_ZERO)) {
+      if (pool.totalValueLockedUSD.gt(BIGDECIMAL_ZERO)) {
         if (pool.inputTokens[0] == token.id) {
           // whitelist token is token1
           let token1 = getOrCreateToken(pool.inputTokens[1]);
