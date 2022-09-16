@@ -52,10 +52,13 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 }
 
 export function getOrCreateRewardToken(address: Address): RewardToken {
-  let rewardToken = RewardToken.load(address.toHexString());
+  const rewardTokenId = RewardTokenType.DEPOSIT.toString()
+    .concat("-")
+    .concat(address.toHex());
+  let rewardToken = RewardToken.load(rewardTokenId);
   if (rewardToken == null) {
     let token = getOrCreateToken(address);
-    rewardToken = new RewardToken(address.toHexString());
+    rewardToken = new RewardToken(rewardTokenId);
     rewardToken.token = token.id;
     rewardToken.type = RewardTokenType.DEPOSIT;
     rewardToken.save();
@@ -282,6 +285,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.totalPoolCount = INT_ZERO;
     protocol._stableFee = BigDecimal.fromString("0.02"); // Value hardcoded in factory constructor
     protocol._volatileFee = BigDecimal.fromString("0.02"); // Value hardcoded in factory constructor
+    protocol._allPools = [];
 
     protocol.save();
   }

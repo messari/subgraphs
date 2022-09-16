@@ -256,6 +256,8 @@ type DexAmmProtocol implements Protocol @entity {
 
   " Fee in percentage for volatile pairs "
   _volatileFee: BigDecimal!
+
+  _allPools: [Bytes!]!
 }
 
 ###############################

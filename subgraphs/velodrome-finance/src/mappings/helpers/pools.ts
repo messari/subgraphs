@@ -1,5 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO } from "../../common/constants";
+import { PairFactory } from "../../../generated/PairFactory/PairFactory";
+import { BIGDECIMAL_HUNDRED, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, FACTORY_ADDRESS } from "../../common/constants";
 import {
   getLiquidityPool,
   getOrCreateDex,
@@ -9,6 +10,7 @@ import {
   getOrCreateToken,
 } from "../../common/getters";
 import { applyDecimals, safeDiv } from "../../common/utils/numbers";
+import { createPoolFees } from "./entities";
 
 //  Update token balances, which also
 export function updateTokenBalances(
@@ -158,4 +160,34 @@ export function updatePoolVolume(
   financialsDailySnapshot.save();
   poolDailySnapshot.save();
   poolHourlySnapshot.save();
+}
+
+export function updateAllPoolFees(): void {
+  let factoryContract = PairFactory.bind(Address.fromString(FACTORY_ADDRESS))
+  const stableFee = factoryContract.getFee(true).toBigDecimal().div(BIGDECIMAL_HUNDRED)
+  const volatileFee = factoryContract.getFee(false).toBigDecimal().div(BIGDECIMAL_HUNDRED)
+
+  let protocol = getOrCreateDex();
+
+  const stableFeeChanged = stableFee != protocol._stableFee
+  const volatileFeeChanged = volatileFee != protocol._volatileFee
+
+  if (!(stableFeeChanged && volatileFeeChanged)) {
+    return;
+  }
+
+  protocol._stableFee = stableFee;
+  protocol._volatileFee = volatileFee;
+
+  let allPools = protocol._allPools;
+  for (let i = 0; i < allPools.length; i++) {
+    let poolAddress = Address.fromBytes(allPools[i]);
+    let pool = getLiquidityPool(poolAddress);
+    if (pool._stable && stableFeeChanged) {
+      createPoolFees(poolAddress, stableFee);
+    } else if (!pool._stable && volatileFeeChanged) {
+      createPoolFees(poolAddress, volatileFee);
+    }
+  }
+  protocol.save();
 }

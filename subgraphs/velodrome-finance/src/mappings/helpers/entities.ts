@@ -74,7 +74,7 @@ export function createLiquidityPool(
 
   pool._stable = stable;
 
-  const poolTradingFees = getOrCreatePoolFees(
+  const poolTradingFees = createPoolFees(
     poolAddress,
     pool._stable ? protocol._stableFee : protocol._volatileFee
   );
@@ -84,7 +84,10 @@ export function createLiquidityPool(
   PairTemplate.create(poolAddress);
 
   createPoolPricingHelper(poolAddress, token0Address, token1Address);
-
+  
+  let allPools = protocol._allPools
+  allPools.push(poolAddress)
+  protocol._allPools = allPools
   protocol.totalPoolCount += 1;
 
   pool.save();
@@ -138,7 +141,7 @@ export function createPoolPricingHelper(
   return helper;
 }
 
-export function getOrCreatePoolFees(
+export function createPoolFees(
   poolAddress: Address,
   feePercentage: BigDecimal
 ): LiquidityPoolFee {

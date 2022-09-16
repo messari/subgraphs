@@ -1,13 +1,16 @@
 import { Address } from "@graphprotocol/graph-ts";
 import {
+  Deposit,
   DistributeReward,
   GaugeCreated,
   GaugeKilled,
-  GaugeRevived
+  GaugeRevived,
+  Withdraw
 } from "../../generated/Voter/Voter";
 import { updatePoolMetrics } from "../common/metrics";
 import { getOrCreateGauge } from "./helpers/entities";
-import { createGauge, killGauge, updateRewards } from "./helpers/rewards";
+import { updateAllPoolFees } from "./helpers/pools";
+import { createGauge, killGauge, updateRewards, updateStaked } from "./helpers/rewards";
 
 export function handleGaugeCreated(event: GaugeCreated): void {
   createGauge(event);
@@ -25,6 +28,20 @@ export function handleGaugeRevived(event: GaugeRevived): void {
   let gauge = getOrCreateGauge(event.params.gauge);
   gauge.active = true;
   gauge.save();
+}
+
+// Deposits of LP tokens into gauges
+export function handleDeposit(event: Deposit): void {
+  updateStaked(event.params.gauge, event.params.amount, true)
+  let gauge = getOrCreateGauge(event.params.gauge)
+  updatePoolMetrics(Address.fromString(gauge.pool), event.block);
+}
+
+// Withdraws of LP tokens from gauges
+export function handleWithdraw(event: Withdraw): void {
+  updateStaked(event.params.gauge, event.params.amount, false)
+  let gauge = getOrCreateGauge(event.params.gauge)
+  updatePoolMetrics(Address.fromString(gauge.pool), event.block);
 }
 
 export function handleDistributeReward(event: DistributeReward): void {

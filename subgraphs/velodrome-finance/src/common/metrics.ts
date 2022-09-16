@@ -44,8 +44,14 @@ export function updateRevenue(event: Fees): void {
   let protocol = getOrCreateDex();
   let pool = getLiquidityPool(event.address);
   let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
-  let poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(event.address, event.block);
-  let poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(event.address, event.block);
+  let poolDailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+    event.address,
+    event.block
+  );
+  let poolHourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+    event.address,
+    event.block
+  );
 
   let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]));
   let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]));
@@ -195,10 +201,19 @@ export function updateUsageMetrics(
 }
 
 // Update Pool Snapshots entities
-export function updatePoolMetrics(poolAddress: Address, block: ethereum.Block): void {
+export function updatePoolMetrics(
+  poolAddress: Address,
+  block: ethereum.Block
+): void {
   // get or create pool metrics
-  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(poolAddress, block);
-  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(poolAddress, block);
+  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(
+    poolAddress,
+    block
+  );
+  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(
+    poolAddress,
+    block
+  );
 
   let pool = getLiquidityPool(poolAddress);
 
@@ -214,6 +229,7 @@ export function updatePoolMetrics(poolAddress: Address, block: ethereum.Block): 
   poolMetricsDaily.inputTokenWeights = pool.inputTokenWeights;
   poolMetricsDaily.outputTokenSupply = pool.outputTokenSupply;
   poolMetricsDaily.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsDaily.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
   poolMetricsDaily.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   poolMetricsDaily.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
   poolMetricsDaily.blockNumber = block.number;
@@ -230,6 +246,7 @@ export function updatePoolMetrics(poolAddress: Address, block: ethereum.Block): 
   poolMetricsHourly.inputTokenWeights = pool.inputTokenWeights;
   poolMetricsHourly.outputTokenSupply = pool.outputTokenSupply;
   poolMetricsHourly.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetricsHourly.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
   poolMetricsHourly.rewardTokenEmissionsAmount =
     pool.rewardTokenEmissionsAmount;
   poolMetricsHourly.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
