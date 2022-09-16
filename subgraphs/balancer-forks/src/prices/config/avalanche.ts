@@ -2,32 +2,29 @@ import * as constants from "../common/constants";
 import { Configurations } from "../common/types";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-export const NETWORK_STRING = "fantom";
+export const NETWORK_STRING = "avalanche";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_CONTRACT_ADDRESS = Address.fromString(
-  "0x57aa88a0810dfe3f9b71a9b179dd8bf5f956c46a"
-);
+export const YEARN_LENS_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
 export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const AAVE_ORACLE_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
-export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x44536de2220987d098d1d29d3aafc7f7348e9ee4"
+export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
+
+export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
+  "0xEBd36016B3eD09D4693Ed4251c67Bd858c3c7C9C"
 );
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
-  "0x0b53e9df372e72d8fdcdbedfbb56059957a37128"
-);
+export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 
 export const CURVE_REGISTRY_ADDRESSES: Address[] = [
-  Address.fromString("0x0f854EA9F38ceA4B1c2FC79047E9D0134419D5d6"),
-  Address.fromString("0x4fb93D7d320E8A263F22f62C2059dFC2A8bCbC4c"),
+  Address.fromString("0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6"),
+  Address.fromString("0x90f421832199e93d01b64DaF378b183809EB0988"),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -35,25 +32,25 @@ export const CURVE_REGISTRY_ADDRESSES: Address[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
-  Address.fromString("0xbe4fc72f8293f9d3512d58b969c98c3f676cb957"), // Uniswap
-  Address.fromString("0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52"), // Spiritswap
-  Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506"), // Sushiswap
+  Address.fromString("0x60aE616a2155Ee3d9A68541Ba4544862310933d4"), // TraderJOE
+  Address.fromString("0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106"), // Pangolin
+  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"), // Sushiswap
 ];
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////// BLACKLISTED TOKENS ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const YEARN_LENS_BLACKLIST: Address[] = new Array();
-export const AAVE_ORACLE_BLACKLIST: Address[] = new Array();
-export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = new Array();
-export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = new Array();
+export const YEARN_LENS_BLACKLIST: Address[] = [];
+export const AAVE_ORACLE_BLACKLIST: Address[] = [];
+export const CURVE_CALCULATIONS_BLACKSLIST: Address[] = [];
+export const SUSHI_CALCULATIONS_BLACKSLIST: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////////// HARDCODED STABLES ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const HARDCODED_STABLES: Address[] = new Array();
+export const HARDCODED_STABLES: Address[] = [];
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
@@ -62,13 +59,13 @@ export const HARDCODED_STABLES: Address[] = new Array();
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0x658b0c7613e890ee50b8c4bc6a3f41ef411208ad"
+  "0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab"
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83"
+  "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
+  "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e"
 );
 
 export class config implements Configurations {
