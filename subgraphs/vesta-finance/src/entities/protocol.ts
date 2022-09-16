@@ -21,6 +21,7 @@ import {
   SECONDS_PER_DAY,
   TROVE_MANAGER,
 } from "../utils/constants";
+import { EventType } from "./event";
 import {
   getOrCreateMarket,
   getOrCreateMarketHourlySnapshot,
@@ -192,42 +193,79 @@ export function addSupplySideRevenue(
 
 export function addProtocolBorrowVolume(
   event: ethereum.Event,
-  borrowedUSD: BigDecimal
+  amountUSD: BigDecimal
 ): void {
-  const protocol = getOrCreateLendingProtocol();
-  protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(borrowedUSD);
-  protocol.save();
-  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
-  financialsSnapshot.dailyBorrowUSD =
-    financialsSnapshot.dailyBorrowUSD.plus(borrowedUSD);
-  financialsSnapshot.save();
+  addProtocolVolume(event, amountUSD, EventType.Borrow);
 }
 
 export function addProtocolDepositVolume(
   event: ethereum.Event,
-  depositedUSD: BigDecimal
+  amountUSD: BigDecimal
 ): void {
-  const protocol = getOrCreateLendingProtocol();
-  protocol.cumulativeDepositUSD =
-    protocol.cumulativeDepositUSD.plus(depositedUSD);
-  protocol.save();
-  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
-  financialsSnapshot.dailyDepositUSD =
-    financialsSnapshot.dailyDepositUSD.plus(depositedUSD);
-  financialsSnapshot.save();
+  addProtocolVolume(event, amountUSD, EventType.Deposit);
 }
 
 export function addProtocolLiquidateVolume(
   event: ethereum.Event,
-  liquidatedUSD: BigDecimal
+  amountUSD: BigDecimal
+): void {
+  addProtocolVolume(event, amountUSD, EventType.Liquidate);
+}
+
+export function addProtocolWithdrawVolume(
+  event: ethereum.Event,
+  amountUSD: BigDecimal
+): void {
+  addProtocolVolume(event, amountUSD, EventType.Withdraw);
+}
+
+export function addProtocolRepayVolume(
+  event: ethereum.Event,
+  amountUSD: BigDecimal
+): void {
+  addProtocolVolume(event, amountUSD, EventType.Repay);
+}
+
+function addProtocolVolume(
+  event: ethereum.Event,
+  amountUSD: BigDecimal,
+  eventType: EventType
 ): void {
   const protocol = getOrCreateLendingProtocol();
-  protocol.cumulativeLiquidateUSD =
-    protocol.cumulativeLiquidateUSD.plus(liquidatedUSD);
-  protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
-  financialsSnapshot.dailyLiquidateUSD =
-    financialsSnapshot.dailyLiquidateUSD.plus(liquidatedUSD);
+
+  switch (eventType) {
+    case EventType.Deposit:
+      protocol.cumulativeDepositUSD =
+        protocol.cumulativeDepositUSD.plus(amountUSD);
+      financialsSnapshot.dailyDepositUSD =
+        financialsSnapshot.dailyDepositUSD.plus(amountUSD);
+      break;
+    case EventType.Borrow:
+      protocol.cumulativeBorrowUSD =
+        protocol.cumulativeBorrowUSD.plus(amountUSD);
+      financialsSnapshot.dailyBorrowUSD =
+        financialsSnapshot.dailyBorrowUSD.plus(amountUSD);
+      break;
+    case EventType.Liquidate:
+      protocol.cumulativeLiquidateUSD =
+        protocol.cumulativeLiquidateUSD.plus(amountUSD);
+      financialsSnapshot.dailyLiquidateUSD =
+        financialsSnapshot.dailyLiquidateUSD.plus(amountUSD);
+      break;
+    case EventType.Withdraw:
+      financialsSnapshot.dailyWithdrawUSD =
+        financialsSnapshot.dailyWithdrawUSD.plus(amountUSD);
+      break;
+    case EventType.Repay:
+      financialsSnapshot.dailyRepayUSD =
+        financialsSnapshot.dailyRepayUSD.plus(amountUSD);
+      break;
+    default:
+      break;
+  }
+
+  protocol.save();
   financialsSnapshot.save();
 }
 

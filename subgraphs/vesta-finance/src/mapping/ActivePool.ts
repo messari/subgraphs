@@ -35,7 +35,6 @@ export function handleActivePoolAssetBalanceUpdated(
 
   const asset = event.params._asset;
   if (getStabilityPool(asset) == null) {
-    createStabilityPool(asset);
     const stabilityPoolManagerContract = StabilityPoolManager.bind(
       Address.fromString(STABILITY_POOL_MANAGER)
     );
@@ -44,6 +43,8 @@ export function handleActivePoolAssetBalanceUpdated(
     if (!tryGetAssetStabilityPool.reverted) {
       const assetStabilityPool = tryGetAssetStabilityPool.value;
       StabilityPool.create(assetStabilityPool);
+
+      createStabilityPool(asset);
     }
   }
 

@@ -33,6 +33,8 @@ import {
   incrementProtocolPositionCount,
   updateProtocolBorrowBalance,
   updateProtocolUSDLocked,
+  addProtocolWithdrawVolume,
+  addProtocolRepayVolume,
 } from "./protocol";
 import { getOrCreateAssetToken, getCurrentAssetPrice } from "./token";
 import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
@@ -301,8 +303,7 @@ function addMarketVolume(
   const market = getOrCreateMarket(asset);
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
   const hourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
-  const protocol = getOrCreateLendingProtocol();
-  const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
+
   switch (eventType) {
     case EventType.Deposit:
       market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
@@ -333,23 +334,18 @@ function addMarketVolume(
         dailySnapshot.dailyWithdrawUSD.plus(amountUSD);
       hourlySnapshot.hourlyWithdrawUSD =
         hourlySnapshot.hourlyWithdrawUSD.plus(amountUSD);
-
-      financialsSnapshot.dailyWithdrawUSD =
-        financialsSnapshot.dailyWithdrawUSD.plus(amountUSD);
-      financialsSnapshot.save();
+      addProtocolWithdrawVolume(event, amountUSD);
       break;
     case EventType.Repay:
       dailySnapshot.dailyRepayUSD = dailySnapshot.dailyRepayUSD.plus(amountUSD);
       hourlySnapshot.hourlyRepayUSD =
         hourlySnapshot.hourlyRepayUSD.plus(amountUSD);
-
-      financialsSnapshot.dailyRepayUSD =
-        financialsSnapshot.dailyRepayUSD.plus(amountUSD);
-      financialsSnapshot.save();
+      addProtocolRepayVolume(event, amountUSD);
       break;
     default:
       break;
   }
+
   market.save();
   dailySnapshot.save();
   hourlySnapshot.save();
