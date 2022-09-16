@@ -20,7 +20,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/factory.ts
+      file: ./src/mappings/Factory.ts
       entities:
         - Token
         - DexAmmProtocol
@@ -31,7 +31,7 @@ dataSources:
         - _LiquidityPoolAmount
       abis:
         - name: Factory
-          file: ./abis/factory.json
+          file: ./abis/Factory.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
@@ -75,7 +75,7 @@ templates:
         - name: Pool
           file: ./abis/pool.json
         - name: Factory
-          file: ./abis/factory.json
+          file: ./abis/Factory.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:

@@ -1,4 +1,4 @@
-import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   FeeSwitch,
@@ -13,7 +13,6 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
-import { toLowerCase } from "../../../../../src/common/utils/utils";
 
 export class UniswapV3CeloConfigurations implements Configurations {
   getNetwork(): string {
@@ -35,13 +34,11 @@ export class UniswapV3CeloConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return "0xd9dc0d8f754c027DF7eCB4BD381301cEC76CD32F".toLowerCase();
+    return "0xd9dc0d8f754c027df7ecb4bd381301cec76cd32f";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString(
-        "0xd9dc0d8f754c027DF7eCB4BD381301cEC76CD32F".toLowerCase()
-      )
+      Address.fromString("0xd9dc0d8f754c027DF7eCB4BD381301cEC76CD32F")
     );
   }
   getFeeOnOff(): string {
@@ -51,35 +48,39 @@ export class UniswapV3CeloConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): string {
-    return "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1".toLowerCase();
+    return "0x471ece3750da237f93b8e339c536989b8978a438";
   }
   getRewardToken(): string {
     return "";
   }
   getWhitelistTokens(): string[] {
-    return toLowerCase([
-      "0x471EcE3750Da237f93B8E339c536989b8978a438", // CELO
-      "0x765DE816845861e75A25fCA122bb6898B8B1282a", // cUDC
-      "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73", // cEUR
-    ]);
+    return [
+      "0x471ece3750da237f93b8e339c536989b8978a438", // celo
+      "0x765de816845861e75a25fca122bb6898b8b1282a", // cudc
+      "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73", // ceur
+      "0x02de4766c272abc10bc88c220d214a26960a7e92", // NCT
+      "0x32a9fe697a32135bfd313a6ac28792dae4d9979d", // cMC02
+      "0x66803fb87abd4aac3cbb3fad7c3aa01f6f3fb207", // wETH
+
+    ];
   }
   getStableCoins(): string[] {
-    return toLowerCase([
-      "0x765DE816845861e75A25fCA122bb6898B8B1282a", // cUSD
-    ]);
+    return [
+      "0x765de816845861e75a25fca122bb6898b8b1282a", // cusd
+    ];
   }
   getStableOraclePools(): string[] {
-    return toLowerCase([
-      "0x079e7A44F42E9cd2442C3B9536244be634e8f888", // CELO/cUSD - 0.3%
-    ]);
+    return [
+      "0x079e7a44f42e9cd2442c3b9536244be634e8f888", // celo/cusd - 0.3%
+    ];
   }
   getUntrackedPairs(): string[] {
-    return toLowerCase([]);
+    return [];
   }
   getUntrackedTokens(): string[] {
-    return toLowerCase([""]);
+    return [];
   }
   getMinimumLiquidityThreshold(): BigDecimal {
-    return BigDecimal.fromString("35000");
+    return BigDecimal.fromString("25000");
   }
 }
