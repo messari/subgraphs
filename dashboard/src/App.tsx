@@ -7,6 +7,7 @@ import { DashboardHeader } from "./graphs/DashboardHeader";
 import { useState } from "react";
 import DefiLlamaComparsionTab from "./interfaces/DefiLlamaComparisonTab";
 import { schemaMapping } from "./utils";
+import DeploymentsInDevelopment from "./deployments/DeploymentsInDevelopment";
 
 function App() {
   const [protocolsToQuery, setProtocolsToQuery] = useState<{
@@ -14,10 +15,10 @@ function App() {
   }>({});
 
   const getDeployments = () => {
-    fetch("/deployment.dev.json", {
+    fetch("https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json", {
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        Accept: "*/*",
       },
     })
       .then(function (res) {
@@ -28,21 +29,6 @@ function App() {
       })
       .catch((err) => {
         console.log(err);
-        fetch("/deploymentsFallback.json", {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        })
-          .then(function (res) {
-            return res.json();
-          })
-          .then(function (json) {
-            setProtocolsToQuery(json);
-          })
-          .catch((err) => {
-            window.location.reload();
-          });
       });
   };
 
@@ -81,11 +67,12 @@ function App() {
       <DashboardVersion />
       <Routes>
         <Route path="/">
-          <Route index element={<DeploymentsPage subgraphCounts={depoCount} getData={() => getDeployments()} protocolsToQuery={subgraphEndpoints} deploymentJSON={protocolsToQuery} />} />
+          <Route index element={<DeploymentsPage subgraphCounts={depoCount} getData={() => getDeployments()} protocolsToQuery={subgraphEndpoints} />} />
           <Route
             path="comparison"
             element={<DefiLlamaComparsionTab deploymentJSON={subgraphEndpoints} getData={() => getDeployments()} />}
           />
+          <Route path="development-status" element={<DeploymentsInDevelopment deploymentsInDevelopment={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route path="subgraph" element={<ProtocolDashboard />} />
           <Route
             path="*"
