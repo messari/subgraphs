@@ -1,8 +1,8 @@
-import { UniswapV3ArbitrumConfigurations } from "../../protocols/uniswap-v3/config/networks/arbitrum/arbitrum";
-import { UniswapV3MainnetConfigurations } from "../../protocols/uniswap-v3/config/networks/ethereum/ethereum";
-import { UniswapV3MaticConfigurations } from "../../protocols/uniswap-v3/config/networks/polygon/polygon";
-import { UniswapV3OptimismConfigurations } from "../../protocols/uniswap-v3/config/networks/optimism/optimism";
-import { UniswapV3CeloConfigurations } from "../../protocols/uniswap-v3/config/networks/celo/celo";
+import { UniswapV3ArbitrumConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-arbitrum/configurations";
+import { UniswapV3MainnetConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-ethereum/configurations";
+import { UniswapV3MaticConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-polygon/configurations";
+import { UniswapV3OptimismConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-optimism/configurations";
+import { UniswapV3CeloConfigurations } from "../../protocols/uniswap-v3/config/deployments/uniswap-v3-celo/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";

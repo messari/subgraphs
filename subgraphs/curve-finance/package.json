@@ -3,9 +3,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "rm -rf generated && graph codegen",
-    "prepare:yaml": "mustache protocols/curve-finance/networks/mainnet/mainnet.json protocols/curve-finance/templates/curve.template.yaml > subgraph.yaml",
-    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
-    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_target}",
+    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs}"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.32.0",
