@@ -61,12 +61,20 @@ export const FLOAT_MARKET_ADDRESS =
   "0x898beab27b8d44501de79b946f8d4c67918e1c47";
 export const FLOAT_ADDRESS = "0xb05097849bca421a3f51b249ba6cca4af4b97cb9";
 
+// blocklist markets
+// these pools have exotic tokens with low liquidity, and the prices are artificially inflated
+// removing so it does not convolute the data
+export const BLOCKLIST_MARKETS = [
+  "0xc0c997227922004da3a47185ac2be1d648db0062", // Stable Pool Party iStable Stablecoin
+  "0xc47560509492e787542203e44e7cd7abca477f8f", // testpool3 Lantern Adequate Monetary Product
+];
+
 ///////////////////////////
 //// Protocol Specific ////
 ///////////////////////////
 
 export const PROTOCOL_NAME = "Rari Fuse";
 export const PROTOCOL_SLUG = "rari-fuse";
-export const SUBGRAPH_VERSION = "1.1.5";
+export const SUBGRAPH_VERSION = "1.1.6";
 export const SCHEMA_VERSION = "2.0.1";
 export const METHODOLOGY_VERSION = "1.0.0";

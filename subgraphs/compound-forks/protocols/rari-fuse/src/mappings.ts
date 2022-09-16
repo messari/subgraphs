@@ -35,6 +35,7 @@ import {
 } from "../../../src/mapping";
 import { PoolRegistered } from "../../../generated/FusePoolDirectory/FusePoolDirectory";
 import {
+  BLOCKLIST_MARKETS,
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
@@ -215,6 +216,13 @@ export function handleMarketExited(event: MarketExited): void {
 
 // add a new market
 export function handleMarketListed(event: MarketListed): void {
+  // skip the blocklisted markets
+  if (
+    BLOCKLIST_MARKETS.includes(event.params.cToken.toHexString().toLowerCase())
+  ) {
+    return;
+  }
+
   let protocol = LendingProtocol.load(FACTORY_CONTRACT);
   if (!protocol) {
     // best effort

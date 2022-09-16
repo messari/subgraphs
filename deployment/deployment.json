@@ -1256,7 +1256,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.4",
+          "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
