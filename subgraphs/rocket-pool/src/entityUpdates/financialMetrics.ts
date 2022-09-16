@@ -84,19 +84,19 @@ export function updateProtocolAndPoolTvl(
   pool.save();
   // Pool
   let inputTokenBalances: BigInt[] = [];
-  inputTokenBalances.push(pool.inputTokenBalances[0].plus(amount));
-  inputTokenBalances.push(pool.inputTokenBalances[1].plus(rewardAmount));
+  inputTokenBalances.push(pool.inputTokenBalances[0].plus(rewardAmount));
+  inputTokenBalances.push(pool.inputTokenBalances[1].plus(amount));
 
   pool.inputTokenBalances = inputTokenBalances;
 
   // inputToken is ETH, price with ETH
 
-  let ethTVLUSD = bigIntToBigDecimal(inputTokenBalances[0]).times(
+  let ethTVLUSD = bigIntToBigDecimal(inputTokenBalances[1]).times(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
   );
 
-  let rplTVLUSD = bigIntToBigDecimal(inputTokenBalances[1]).times(
+  let rplTVLUSD = bigIntToBigDecimal(inputTokenBalances[0]).times(
     getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number)
       .lastPriceUSD!
   );

@@ -28,8 +28,8 @@ export function getOrCreatePool(
 
     // Tokens
     pool.inputTokens = [
-      getOrCreateToken(Address.fromString(ETH_ADDRESS), blockNumber).id,
       getOrCreateToken(Address.fromString(RPL_ADDRESS), blockNumber).id,
+      getOrCreateToken(Address.fromString(ETH_ADDRESS), blockNumber).id,
     ];
     pool.outputToken = getOrCreateToken(
       Address.fromString(protocol.id),
