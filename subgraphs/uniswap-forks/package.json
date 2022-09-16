@@ -3,10 +3,10 @@
   "scripts": {
     "format": "npx prettier --write .",
     "codegen": "graph codegen",
-    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
-    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
-    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
-    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs} --merge=${npm_config_merge}"
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.template.ts > configurations/configure.ts",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_target}",
+    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs}"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",

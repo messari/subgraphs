@@ -14,10 +14,9 @@ if (
   args.target == undefined ||
   args.span == undefined ||
   args.slug == undefined ||
-  args.printlogs == undefined ||
-  args.merge == undefined
+  args.printlogs == undefined
 ) {
-  throw "Please check package.json scripts in local subgraph folder. This error is being thrown becuase it is missing a parameteter in the 'deploy' script. You can find an updated version of the scripts in the deployments folder at the head of the directory.";
+  throw "Please check package.json scripts in local subgraph folder. This error is being thrown becuase it is missing a parameteter in the 'build' script. You can find an updated version of the scripts in the deployments folder at the head of the directory.";
 }
 
 const deploymentJsonMap = JSON.parse(JSON.stringify(deploymentJsonData));
