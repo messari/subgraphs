@@ -84,10 +84,15 @@ export function createLiquidityPool(
   PairTemplate.create(poolAddress);
 
   createPoolPricingHelper(poolAddress, token0Address, token1Address);
-  
-  let allPools = protocol._allPools
-  allPools.push(poolAddress)
-  protocol._allPools = allPools
+
+  let poolList = stable ? protocol._stablePools : protocol._volatilePools;
+  poolList.push(poolAddress)
+  if (stable) {
+    protocol._stablePools = poolList
+  } else {
+    protocol._volatilePools = poolList
+  }
+
   protocol.totalPoolCount += 1;
 
   pool.save();
@@ -287,9 +292,9 @@ export function createSwap(event: SwapEvent): void {
 }
 
 export function getOrCreateGauge(gaugeAddress: Address): _LiquidityGauge {
-  let gauge = _LiquidityGauge.load(gaugeAddress.toHex())
+  let gauge = _LiquidityGauge.load(gaugeAddress.toHex());
   if (!gauge) {
-    gauge = new _LiquidityGauge(gaugeAddress.toHex())
+    gauge = new _LiquidityGauge(gaugeAddress.toHex());
   }
-  return gauge
+  return gauge;
 }

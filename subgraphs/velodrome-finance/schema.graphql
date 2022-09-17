@@ -257,7 +257,13 @@ type DexAmmProtocol implements Protocol @entity {
   " Fee in percentage for volatile pairs "
   _volatileFee: BigDecimal!
 
-  _allPools: [Bytes!]!
+  " List of addresses of stable pools "
+  _stablePools: [Bytes!]!
+
+  " List of addresses of volatile pools "
+  _volatilePools: [Bytes!]!
+
+  _lastFeeCheckBlockNumber: BigInt!
 }
 
 ###############################

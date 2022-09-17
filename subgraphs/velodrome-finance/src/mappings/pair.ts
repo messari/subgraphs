@@ -29,6 +29,7 @@ import {
 import { _PoolPricingHelper } from "../../generated/schema";
 import { updatePoolPriceFromSwap } from "./helpers/pricing";
 import {
+  updateAllPoolFees,
   updatePoolValue,
   updatePoolVolume,
   updateTokenBalances,
@@ -62,6 +63,7 @@ export function handleSwap(event: Swap): void {
   );
   updateUsageMetrics(event, event.params.sender, UsageType.SWAP);
   updateFinancials(event);
+  updateAllPoolFees(event.block, false)
   updatePoolMetrics(event.address, event.block); // Syncs daily/hourly metrics with pool
 }
 

@@ -9,7 +9,6 @@ import {
 } from "../../generated/Voter/Voter";
 import { updatePoolMetrics } from "../common/metrics";
 import { getOrCreateGauge } from "./helpers/entities";
-import { updateAllPoolFees } from "./helpers/pools";
 import { createGauge, killGauge, updateRewards, updateStaked } from "./helpers/rewards";
 
 export function handleGaugeCreated(event: GaugeCreated): void {
