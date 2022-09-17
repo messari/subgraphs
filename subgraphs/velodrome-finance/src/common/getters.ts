@@ -287,6 +287,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol._volatileFee = BigDecimal.fromString("0.02"); // Value hardcoded in factory constructor
     protocol._stablePools = [];
     protocol._volatilePools = [];
+    protocol._lastFeeCheckBlockNumber = BIGINT_ZERO
 
     protocol.save();
   }
