@@ -6,7 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../configurations/configure";
 import { _CircularBuffer } from "../../generated/schema";
 import { Network } from "./constants";
 import {
@@ -233,33 +232,35 @@ function getOrCreateCircularBuffer(): _CircularBuffer {
 function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
-  if (NetworkConfigs.getNetwork() == Network.MAINNET) {
+  let network = dataSource.network().toUpperCase();
+
+  if (network == Network.MAINNET) {
     return BigDecimal.fromString("13.39");
-  } else if (NetworkConfigs.getNetwork() == Network.ARBITRUM_ONE) {
+  } else if (network == Network.ARBITRUM_ONE) {
     return BigDecimal.fromString("15");
-  } else if (NetworkConfigs.getNetwork() == Network.AURORA) {
+  } else if (network == Network.AURORA) {
     return BigDecimal.fromString("1.03");
-  } else if (NetworkConfigs.getNetwork() == Network.BSC) {
+  } else if (network == Network.BSC) {
     return BigDecimal.fromString("5");
-  } else if (NetworkConfigs.getNetwork() == Network.CELO) {
+  } else if (network == Network.CELO) {
     return BigDecimal.fromString("5");
-  } else if (NetworkConfigs.getNetwork() == Network.FANTOM) {
+  } else if (network == Network.FANTOM) {
     return BigDecimal.fromString("1");
-  } else if (NetworkConfigs.getNetwork() == Network.FUSE) {
+  } else if (network == Network.FUSE) {
     return BigDecimal.fromString("1");
-  } else if (NetworkConfigs.getNetwork() == Network.OPTIMISM) {
+  } else if (network == Network.OPTIMISM) {
     return BigDecimal.fromString("12.5");
-  } else if (NetworkConfigs.getNetwork() == Network.MATIC) {
+  } else if (network == Network.MATIC) {
     return BigDecimal.fromString("2");
-  } else if (NetworkConfigs.getNetwork() == Network.XDAI) {
+  } else if (network == Network.XDAI) {
     return BigDecimal.fromString("5");
-  } else if (NetworkConfigs.getNetwork() == Network.MOONBEAM) {
+  } else if (network == Network.MOONBEAM) {
     return BigDecimal.fromString("13.39");
-  } else if (NetworkConfigs.getNetwork() == Network.MOONRIVER) {
+  } else if (network == Network.MOONRIVER) {
     return BigDecimal.fromString("13.39");
-  } else if (NetworkConfigs.getNetwork() == Network.AVALANCHE) {
+  } else if (network == Network.AVALANCHE) {
     return BigDecimal.fromString("13.39");
-  } else if (NetworkConfigs.getNetwork() == Network.CRONOS) {
+  } else if (network == Network.CRONOS) {
     return BigDecimal.fromString("5.5");
   }
 

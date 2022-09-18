@@ -106,31 +106,3 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
-
-export const FACTORY_ADDRESS = new TypedMap<string, Address>();
-FACTORY_ADDRESS.set(
-  Network.MAINNET,
-  Address.fromString("0x8589427373D6D84E98730D7795D8f6f8731FDA16")
-);
-FACTORY_ADDRESS.set(
-  Network.BSC,
-  Address.fromString("0xce0042B868300000d44A59004Da54A005ffdcf9f")
-);
-
-export const TORN_ADDRESS = new TypedMap<string, Address>();
-TORN_ADDRESS.set(
-  Network.MAINNET,
-  Address.fromString("0x77777FeDdddFfC19Ff86DB637967013e6C6A116C")
-);
-TORN_ADDRESS.set(
-  Network.BSC,
-  Address.fromString("0x1ba8d3c4c219b124d351f603060663bd1bcd9bbf")
-);
-export const TORN_NAME = "TornadoCash";
-export const TORN_SYMBOL = "TORN";
-export const TORN_DECIMALS = 18;
-
-export const BNB_ADDRESS = "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c";
-export const BNB_NAME = "BNB";
-export const BNB_SYMBOL = "BNB";
-export const BNB_DECIMALS = 18;

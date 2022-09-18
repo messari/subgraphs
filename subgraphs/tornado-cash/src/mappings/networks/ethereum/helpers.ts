@@ -1,4 +1,4 @@
-import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 
 import {
   getOrCreateProtocol,
@@ -10,8 +10,9 @@ import {
   bigDecimalToBigInt,
 } from "../../../common/utils/numbers";
 import { getRewardsPerDay, RewardIntervalType } from "../../../common/rewards";
-import { BIGDECIMAL_ZERO, TORN_ADDRESS } from "../../../common/constants";
+import { BIGDECIMAL_ZERO } from "../../../common/constants";
 import { updatePoolMetrics, updateRevenue } from "../../../common/metrics";
+import { NetworkConfigs } from "../../../../configurations/configure";
 
 import {
   Deposit,
@@ -60,9 +61,8 @@ export function createWithdrawal(poolAddress: string, event: Withdrawal): void {
   ).times(inputToken.lastPriceUSD!);
 
   if (relayerFeeUsd != BIGDECIMAL_ZERO) {
-    let network = dataSource.network().toUpperCase();
     let protocolFeeToken = getOrCreateToken(
-      TORN_ADDRESS.get(network)!,
+      Address.fromString(NetworkConfigs.getRewardToken().get("address")!),
       event.block.number
     );
 
@@ -95,9 +95,8 @@ export function createRateChanged(
 export function createRewardSwap(event: Swap): void {
   let protocol = getOrCreateProtocol();
 
-  let network = dataSource.network().toUpperCase();
   let rewardToken = getOrCreateToken(
-    TORN_ADDRESS.get(network)!,
+    Address.fromString(NetworkConfigs.getRewardToken().get("address")!),
     event.block.number
   );
 

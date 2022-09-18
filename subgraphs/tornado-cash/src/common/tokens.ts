@@ -1,6 +1,8 @@
 /* eslint-disable prefer-const */
 import { Address, log } from "@graphprotocol/graph-ts";
 
+import { NetworkConfigs } from "../../configurations/configure";
+
 import { ERC20 } from "../../generated/TornadoCash01/ERC20";
 import { ERC20SymbolBytes } from "../../generated/TornadoCash01/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/TornadoCash01/ERC20NameBytes";
@@ -27,9 +29,8 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
       symbolValue = symbolResultBytes.value.toString();
     } else {
       // try with the static definition
-      let staticTokenDefinition = StaticTokenDefinition.fromAddress(
-        tokenAddress
-      );
+      let staticTokenDefinition =
+        StaticTokenDefinition.fromAddress(tokenAddress);
       if (staticTokenDefinition != null) {
         symbolValue = staticTokenDefinition.symbol;
       }
@@ -58,9 +59,8 @@ export function fetchTokenName(tokenAddress: Address): string {
       nameValue = nameResultBytes.value.toString();
     } else {
       // try with the static definition
-      let staticTokenDefinition = StaticTokenDefinition.fromAddress(
-        tokenAddress
-      );
+      let staticTokenDefinition =
+        StaticTokenDefinition.fromAddress(tokenAddress);
       if (staticTokenDefinition != null) {
         nameValue = staticTokenDefinition.name;
       }
@@ -93,6 +93,20 @@ export function isNullEthValue(value: string): boolean {
   return (
     value ==
     "0x0000000000000000000000000000000000000000000000000000000000000001"
+  );
+}
+
+export function isRewardToken(tokenAddress: Address): boolean {
+  return (
+    tokenAddress ===
+    Address.fromString(NetworkConfigs.getRewardToken().get("address")!)
+  );
+}
+
+export function isNativeToken(tokenAddress: Address): boolean {
+  return (
+    tokenAddress ===
+    Address.fromString(NetworkConfigs.getNativeToken().get("address")!)
   );
 }
 
