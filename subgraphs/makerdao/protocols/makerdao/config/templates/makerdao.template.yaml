@@ -278,6 +278,30 @@ dataSources:
       eventHandlers:
         - event: NewCdp(indexed address,indexed address,indexed uint256)
           handler: handleNewCdp
+        # Give cdp to a new address
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0xfcafcc6800000000000000000000000000000000000000000000000000000000"
+          handler: handleCdpGive
+        # Move a position from cdpSrc urn to the cdpDst urn
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0xe50322a200000000000000000000000000000000000000000000000000000000"
+          handler: handleCdpShift
+        # Import a position from src urn to the urn owned by cdp
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x7e348b7d00000000000000000000000000000000000000000000000000000000"
+          handler: handleCdpEnter
+        # Quit the Cdp system, migrating the cdp (ink, art) to a dst urn
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x1b0dbf7200000000000000000000000000000000000000000000000000000000"
+          handler: handleCdpQuit
+        # Transfer cdp collateral from the cdp address to a dst address
+        #- event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+        #  topic0: "0x9bb8f83800000000000000000000000000000000000000000000000000000000"
+        #  handler: handleCdpFlux
+        # Transfer DAI from the cdp address to a dst address
+        #- event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+        #  topic0: "0xf9f30db600000000000000000000000000000000000000000000000000000000"
+        #  handler: handleCdpMove
 
   # User may interact w/ maker contracts via a DSProxy contract
   - name: DSProxyFactory
