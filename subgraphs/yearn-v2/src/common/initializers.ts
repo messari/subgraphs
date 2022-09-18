@@ -1,7 +1,6 @@
 import {
   Token,
   Account,
-  _Strategy,
   YieldAggregator,
   VaultDailySnapshot,
   VaultHourlySnapshot,
@@ -16,23 +15,6 @@ import { Vault as VaultTemplate } from "../../generated/templates";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/Registry_v1/ERC20";
-
-export function getOrCreateStrategy(
-  vaultAddress: Address,
-  _strategyAddress: Address,
-  performanceFee: BigInt
-): _Strategy {
-  let strategy = _Strategy.load(_strategyAddress.toHexString());
-
-  if (!strategy) {
-    strategy = new _Strategy(_strategyAddress.toHexString());
-    strategy.lastReport = constants.BIGINT_ZERO;
-    strategy.totalDebt = constants.BIGINT_ZERO;
-    strategy.vaultAddress = vaultAddress;
-    strategy.performanceFee = performanceFee;
-  }
-  return strategy;
-}
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -50,16 +32,16 @@ export function getOrCreateAccount(id: string): Account {
 }
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
-  let protocol = YieldAggregator.load(constants.ETHEREUM_PROTOCOL_ID);
+  let protocol = YieldAggregator.load(constants.PROTOCOL_ID);
 
   if (!protocol) {
-    protocol = new YieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+    protocol = new YieldAggregator(constants.PROTOCOL_ID);
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
     protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
     protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
     protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
-    protocol.network = constants.Network.MAINNET;
+    protocol.network = constants.Protocol.NETWORK;
     protocol.type = constants.ProtocolType.YIELD;
 
     //////// Quantitative Data ////////
@@ -104,7 +86,7 @@ export function getOrCreateFinancialDailySnapshots(
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    financialMetrics.protocol = constants.PROTOCOL_ID;
 
     financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -135,7 +117,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id);
-    usageMetrics.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    usageMetrics.protocol = constants.PROTOCOL_ID;
 
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
@@ -165,7 +147,7 @@ export function getOrCreateUsageMetricsHourlySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(metricsID);
-    usageMetrics.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    usageMetrics.protocol = constants.PROTOCOL_ID;
 
     usageMetrics.hourlyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
@@ -193,7 +175,7 @@ export function getOrCreateVaultsDailySnapshots(
 
   if (!vaultSnapshots) {
     vaultSnapshots = new VaultDailySnapshot(id);
-    vaultSnapshots.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    vaultSnapshots.protocol = constants.PROTOCOL_ID;
     vaultSnapshots.vault = vaultId;
 
     vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
@@ -231,7 +213,7 @@ export function getOrCreateVaultsHourlySnapshots(
 
   if (!vaultSnapshots) {
     vaultSnapshots = new VaultHourlySnapshot(id);
-    vaultSnapshots.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    vaultSnapshots.protocol = constants.PROTOCOL_ID;
     vaultSnapshots.vault = vaultId;
 
     vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
@@ -262,7 +244,6 @@ export function getOrCreateVault(
   vaultAddress: Address,
   block: ethereum.Block
 ): VaultStore {
-
   let vault = VaultStore.load(vaultAddress.toHexString());
 
   if (!vault) {
@@ -271,7 +252,7 @@ export function getOrCreateVault(
     const vaultContract = VaultContract.bind(vaultAddress);
     vault.name = utils.readValue<string>(vaultContract.try_name(), "");
     vault.symbol = utils.readValue<string>(vaultContract.try_symbol(), "");
-    vault.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    vault.protocol = constants.PROTOCOL_ID;
     vault.depositLimit = utils.readValue<BigInt>(
       vaultContract.try_depositLimit(),
       constants.BIGINT_ZERO

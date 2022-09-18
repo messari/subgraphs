@@ -44,7 +44,7 @@ dataSources:
         - event: RedeemPaused(address,bool)
           handler: handleRedeemPaused
         - event: BorrowPaused(address,bool)
-          handler: handleDistributedBorrowerComp
+          handler: handleBorrowPaused
         - event: TransferPaused(bool)
           handler: handleTransferPaused
         - event: NewRewardDistributor(address,address)

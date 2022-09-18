@@ -240,10 +240,14 @@ export function updateProtocolRevenue(
     .times(volumeUSD)
     .times(constants.BIGDECIMAL_ONE.minus(poolFees.getProtocolFees));
 
+  let protocolSideRevenueUSD = poolFees.getTradingFees
+    .times(volumeUSD)
+    .times(poolFees.getProtocolFees);
+
   updateRevenueSnapshots(
     pool,
     supplySideRevenueUSD,
-    constants.BIGDECIMAL_ZERO,
+    protocolSideRevenueUSD,
     block
   );
 }

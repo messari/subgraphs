@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   ProposalCanceled,
   ProposalCreated,
@@ -24,7 +24,7 @@ import {
   _handleProposalExecuted,
   _handleProposalQueued,
   _handleVoteCast,
-  getOrCreateProposal,
+  getProposal,
   getGovernance,
 } from "../../../src/handlers";
 
@@ -33,7 +33,8 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 }
 
 export function handleProposalCreated(event: ProposalCreated): void {
-  let quorumVotes = FeiDAO.bind(event.address).quorum(
+  let quorumVotes = getQuorumFromContract(
+    event.address,
     event.block.number.minus(BIGINT_ONE)
   );
 
@@ -88,13 +89,15 @@ function getLatestProposalValues(
   proposalId: string,
   contractAddress: Address
 ): Proposal {
-  let proposal = getOrCreateProposal(proposalId);
+  let proposal = getProposal(proposalId);
 
   // On first vote, set state and quorum values
   if (proposal.state == ProposalState.PENDING) {
-    let contract = FeiDAO.bind(contractAddress);
     proposal.state = ProposalState.ACTIVE;
-    proposal.quorumVotes = contract.quorum(proposal.startBlock);
+    proposal.quorumVotes = getQuorumFromContract(
+      contractAddress,
+      proposal.startBlock
+    );
 
     let governance = getGovernance();
     proposal.tokenHoldersAtStart = governance.currentTokenHolders;
@@ -157,4 +160,20 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
   }
 
   return governanceFramework;
+}
+
+function getQuorumFromContract(
+  contractAddress: Address,
+  blockNumber: BigInt
+): BigInt {
+  let contract = FeiDAO.bind(contractAddress);
+  let quorumVotes = contract.quorum(blockNumber);
+
+  let governanceFramework = getGovernanceFramework(
+    contractAddress.toHexString()
+  );
+  governanceFramework.quorumVotes = quorumVotes;
+  governanceFramework.save();
+
+  return quorumVotes;
 }

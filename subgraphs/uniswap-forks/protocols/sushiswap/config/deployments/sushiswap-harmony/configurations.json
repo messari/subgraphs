@@ -1,0 +1,11 @@
+{
+  "deployment": "SUSHISWAP_HARMONY",
+  "network": "harmony",
+  "address": "0xc35dadb65012ec5796536bd9864ed8773abc74c4",
+  "startBlock": 11256082,
+  "miniChefAddress": "0x67da5f2ffaddff067ab9d5f025f8810634d84287",
+  "miniChefStartBlock": 14772723,
+  "graftEnabled": false,
+  "subgraphId": "QmPnp9AMVQ9pyHM4zVSF59BusjSy5n2yUQ81iRQrGURexG",
+  "graftStartBlock": 14772722
+}

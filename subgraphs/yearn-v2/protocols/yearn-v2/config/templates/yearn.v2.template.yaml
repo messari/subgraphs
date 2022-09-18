@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.5
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
@@ -12,7 +12,7 @@ dataSources:
       abi: Registry_v1
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - NewVault
@@ -82,7 +82,7 @@ dataSources:
       startBlock: {{registry_v2-StartBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - Vault
@@ -154,7 +154,7 @@ dataSources:
       abi: Vault
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mappings/vaultMappings.ts
       entities:
@@ -228,8 +228,10 @@ dataSources:
 
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v1
+          receipt: true
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v2
+          receipt: true
         
       {{#callHandlersEnabled}}
       callHandlers:
@@ -256,7 +258,7 @@ templates:
       abi: Vault
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mappings/vaultMappings.ts
       entities:
@@ -329,8 +331,10 @@ templates:
 
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v1
+          receipt: true
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v2
+          receipt: true
       {{#callHandlersEnabled}}
       callHandlers:
         - function: deposit()
@@ -357,7 +361,7 @@ templates:
       abi: Strategy
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       file: ./src/mappings/strategyMappings.ts
       entities:

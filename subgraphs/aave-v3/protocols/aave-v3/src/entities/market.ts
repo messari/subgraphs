@@ -381,6 +381,8 @@ export function updateMarketRewardTokens(
   market.rewardTokens = rewardTokens;
   market.rewardTokenEmissionsAmount = rewardTokenEmissions;
   market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+  
+  sortRewardTokens(market);
   updateMarketRewardTokenEmissions(event, market);
 }
 
@@ -445,4 +447,44 @@ function updateMarketTVL(event: ethereum.Event, market: Market): void {
   market.totalValueLockedUSD = totalValueLocked;
   market.totalDepositBalanceUSD = totalValueLocked;
   updateMarketRewardTokenEmissions(event, market);
+}
+
+function sortRewardTokens(market: Market): void {
+  if (market.rewardTokens!.length <= 1) {
+    return;
+  }
+
+  let tokens = market.rewardTokens;
+  let emissions = market.rewardTokenEmissionsAmount;
+  let emissionsUSD = market.rewardTokenEmissionsUSD;
+  multiArraySort(tokens!, emissions!, emissionsUSD!);
+
+  market.rewardTokens = tokens;
+  market.rewardTokenEmissionsAmount = emissions;
+  market.rewardTokenEmissionsUSD = emissionsUSD;
+}
+
+function multiArraySort(ref: Array<string>, arr1: Array<BigInt>, arr2: Array<BigDecimal>): void {
+  if (ref.length != arr1.length || ref.length != arr2.length) {
+    // cannot sort
+    return;
+  }
+
+  let sorter : Array<Array<string>> = [];
+  for (let i = 0; i < ref.length; i++) {
+    sorter[i] = [ref[i], arr1[i].toString(), arr2[i].toString()];
+  }
+
+  sorter.sort(function(a: Array<string>, b: Array<string>): i32 {
+    if (a[0] < b[0]) {
+      return -1;
+    }
+    return 1;
+  });
+
+  for (let i = 0; i < sorter.length; i++) {
+    ref[i] = sorter[i][0];
+    arr1[i] = BigInt.fromString(sorter[i][1]);
+    arr2[i] = BigDecimal.fromString(sorter[i][2]);
+  }
 }

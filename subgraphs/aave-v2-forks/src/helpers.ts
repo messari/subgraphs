@@ -26,6 +26,7 @@ import {
   SECONDS_PER_DAY,
   PositionSide,
   BIGDECIMAL_ONE,
+  BIGINT_ONE,
 } from "./constants";
 import {
   Account,
@@ -47,7 +48,7 @@ import {
 } from "../generated/schema";
 import { ProtocolData } from "./mapping";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
-import { IPriceOracleGetter } from "../generated/templates/LendingPool/IPriceOracleGetter";
+import { IPriceOracleGetter } from "../generated/LendingPool/IPriceOracleGetter";
 
 ////////////////////////
 ///// Initializers /////
@@ -981,7 +982,7 @@ export function getOrCreateMarket(
     market.rewardTokens = []; // updated once used
     market.rewardTokenEmissionsAmount = [];
     market.rewardTokenEmissionsUSD = [];
-    market.liquidityIndex = BIGINT_ZERO;
+    market.liquidityIndex = BIGINT_ONE; // this is init to 1e27
     // these are set in reserveInitialized()
     market.createdTimestamp = BIGINT_ZERO;
     market.createdBlockNumber = BIGINT_ZERO;

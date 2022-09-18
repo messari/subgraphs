@@ -76,9 +76,10 @@ export function getOutputTokenPriceUSD(
 
   let outputToken = getOrCreateToken(poolAddress, block.number);
 
-  let outputTokenPriceUSD = pool.totalValueLockedUSD.div(
-    pool.outputTokenSupply!.toBigDecimal()
+  let outputTokenSupply = pool.outputTokenSupply!.divDecimal(
+    constants.BIGINT_TEN.pow(outputToken.decimals as u8).toBigDecimal()
   );
+  let outputTokenPriceUSD = pool.totalValueLockedUSD.div(outputTokenSupply);
 
   outputToken.lastPriceUSD = outputTokenPriceUSD;
   outputToken.save();

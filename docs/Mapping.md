@@ -65,6 +65,12 @@ Some fields in some of our entities are arrays that contain information compleme
 
 Since the GraphQL API will sort `inputTokens` in ascending order, its values might not map with the values in `inputTokenAmounts` (even though they did match when saved). Fields that behave in this way need to be sorted from the subgraph, ensuring the order is always the same, so positions don't get messed up. Using the same example, before saving `inputTokens` we should already sort them in ascending order and then map to `inputTokenAmounts`.
 
+### Snapshot Interest Rates
+
+When building a subgraph to our lending schema you will notice `InterstRate`s in our daily and hourly snapshots. If you copy the rate from the market like you would `totalValueLockedUSD` you are creating a pointer to that rate, which gets updated frequently. As a result you will see every snapshot shares the same `InterestRate` entity so historical rates are missed.
+
+To combat this you need to create a new entity for each snapshot. To do this you can append `{# of days/hours since epoch time}` to the end of a rate entity to create daily/hourly copies. You can find an example of this in [compound-forks.getSnapshotRates()](../subgraphs/compound-forks/src/mapping.ts)
+
 ## Testing
 
 ### Matchstick

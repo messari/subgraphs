@@ -122,7 +122,7 @@ enum PositionSide {
 # different duration/maturity per market. You can append a counter
 # to the IDs to differentiate.
 type InterestRate @entity {
-  " { Interest rate side }-{ Interest rate type }-{ Market ID } "
+  " { Interest rate side }-{ Interest rate type }-{ Market ID }-{ Optional: # days/hours since epoch time } "
   id: ID!
 
   " Interest rate in percentage APY. E.g. 5.21% should be stored as 5.21 "

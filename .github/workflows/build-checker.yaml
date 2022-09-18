@@ -1,0 +1,20 @@
+on:  
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  Deployment: 
+    runs-on: ubuntu-latest
+    steps: 
+      - id: files
+        uses: Ana06/get-changed-files@v1.2
+        continue-on-error: true
+
+      - uses: actions/checkout@v2
+      - uses: steegecs/Subgraph-Build-Checker@main
+        with: 
+          CHANGED_FILES: "${{ steps.files.outputs.all }}"
+          ABSOLUTE_PATH: ${{ github.workspace }}
+          GRAPH_DEPLOYMENT_LOCATION: messari
+          

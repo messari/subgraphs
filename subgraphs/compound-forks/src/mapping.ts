@@ -34,7 +34,6 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   cTokenDecimals,
-  cTokenDecimalsBD,
   exponentToBigDecimal,
   InterestRateSide,
   InterestRateType,
@@ -941,7 +940,7 @@ export function _handleLiquidateBorrow(
   liquidate.amount = seizeTokens;
   let gainUSD = seizeTokens
     .toBigDecimal()
-    .div(cTokenDecimalsBD)
+    .div(exponentToBigDecimal(liquidatedCToken.decimals))
     .times(liquidatedCTokenMarket.outputTokenPriceUSD);
   let lossUSD = repayAmount
     .toBigDecimal()
@@ -1931,7 +1930,7 @@ export function getOrCreateMarketHourlySnapshot(
   return snapshot;
 }
 
-function getTokenPriceUSD(
+export function getTokenPriceUSD(
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
   underlyingDecimals: i32
 ): BigDecimal {
@@ -1946,7 +1945,10 @@ function getMarketHourlySnapshotID(marketID: string, timestamp: i32): string {
   return marketID.concat("-").concat((timestamp / SECONDS_PER_HOUR).toString());
 }
 
-function getMarketDailySnapshotID(marketID: string, timestamp: i32): string {
+export function getMarketDailySnapshotID(
+  marketID: string,
+  timestamp: i32
+): string {
   return marketID.concat("-").concat((timestamp / SECONDS_PER_DAY).toString());
 }
 

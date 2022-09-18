@@ -38,7 +38,7 @@ export function createDepositTransaction(
     depositTransaction = new DepositTransaction(transactionId);
 
     depositTransaction.vault = vaultAddress.toHexString();
-    depositTransaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    depositTransaction.protocol = constants.PROTOCOL_ID;
 
     depositTransaction.to = to.toHexString();
     depositTransaction.from = transaction.from.toHexString();

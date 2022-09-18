@@ -1,66 +1,51 @@
 import axios from "axios";
-import { getDiscordMessages, sendDiscordMessage } from "./DiscordMessages.js";
+import { clearChannel, constructEmbedMsg, errorNotification, getDiscordMessages, sendDiscordMessage } from "./messageDiscord.js";
 import 'dotenv/config'
-import { protocolLevel, alertProtocolErrors } from "./protocolLevel.js";
+import { protocolLevel } from "./protocolLevel.js";
+import { errorsObj, protocolErrors } from "./errorSchemas.js";
+import { sleep } from "./util.js";
+import fs from 'fs'
+import path from 'path'
 
-// Hour in milliseconds
-const hourMs = 3600000;
+const dayMs = 3600000 * 24;
 
-executionFlow();
-setInterval(executionFlow, hourMs);
+try {
+  clearChannel("");
+  executionFlow();
+  setInterval(executionFlow, dayMs);
+} catch (err) {
+  errorNotification(err.message + ' MAIN LOGIC script.js');
+}
 
 async function executionFlow() {
   const { data } = await axios.get(
     "https://subgraphs.messari.io/deployments.json"
   );
-
   // deployments holds the errors for every protocol
   let deployments = {};
-
+  const protocolNames = [];
   Object.entries(data).forEach(([protocolType, protocolsOnType]) => {
-    Object.values(protocolsOnType).forEach((protocolObj) => {
-      Object.values(protocolObj).forEach((deploymentString) => {
+    Object.entries(protocolsOnType).forEach(([protocolName, protocolObj]) => {
+      Object.entries(protocolObj).forEach(([network, deploymentString]) => {
         const nameStr =
           deploymentString.split("name/")[1];
 
-        deployments[nameStr.split("/")[1]] = {
+        const deploymentsKey = nameStr.split("/")[1];
+        deployments[deploymentsKey] = {
+          protocolName: protocolName,
           indexingError: null,
           indexedPercentage: 0,
-          protocolErrors: {
-            tvlRange: [],
-            cumulativeSupplySideRev: [],
-            cumulativeProtocolSideRev: [],
-            cumulativeTotalRev: [],
-            cumulativeVol: [],
-            cumulativeUniqueUsers: [],
-            totalPoolCount: [],
-            cumulativeUniqueDepos: [],
-            cumulativeUniqueBorrowers: [],
-            cumulativeUniqueLiquidators: [],
-            cumulativeUniqueLiquidatees: [],
-            openPositionCount: [],
-            cumulativePositionCount: [],
-            totalDepoBal: [],
-            cumulativeDepo: [],
-            totalBorrowBal: [],
-            cumulativeLiquidate: [],
-          },
-          poolErrors: {
-            totalValueLockedUSD: [],
-            cumulativeSupplySideRevenueUSD: [],
-            cumulativeProtocolSideRevenueUSD: [],
-            cumulativeTotalRevenueUSD: [],
-            cumulativeDepositUSD: [],
-            cumulativeBorrowUSD: [],
-            cumulativeLiquidateUSD: [],
-            totalBorrowBalanceUSD: [],
-            totalDepositBalanceUSD: [],
-            outputTokenSupply: [],
-            outputTokenPriceUSD: [],
-          },
           url: deploymentString,
           protocolType: protocolType,
+          network: network
         };
+        deployments[deploymentsKey].protocolErrors = JSON.parse(JSON.stringify(protocolErrors));
+        if (protocolType && deploymentsKey && Object.keys(errorsObj).includes(protocolType)) {
+          deployments[deploymentsKey].poolErrors = JSON.parse(JSON.stringify(errorsObj[protocolType]));
+        }
+        if (!protocolNames.includes(protocolName)) {
+          protocolNames.push(protocolName);
+        }
       });
     });
   });
@@ -132,6 +117,7 @@ async function executionFlow() {
   const currentStateDepos = deployments;
   Object.keys(currentStateDepos).forEach((name) => {
     deployments[name + "-pending"] = { ...deployments[name] };
+    deployments[name + "-pending"].pending = true;
   });
 
   const indexingStatusQueries = [
@@ -148,7 +134,7 @@ async function executionFlow() {
         (resultData) => (resultData.data.data)
       ))
     )
-    .catch((err) => console.log(err));
+    .catch((err) => errorNotification(err.message + ' executionFlow() script.js'));
 
   indexData = { ...indexData[0], ...indexData[1] };
 
@@ -177,44 +163,52 @@ async function executionFlow() {
       deployments[realNameString].indexingError = indexData[indexDataName]?.fatalError?.message;
     } else if (!indexData[indexDataName] && indexDataName.includes("pending")) {
       delete deployments[realNameString];
+      return;
     }
+
+    if (parseFloat(deployments[realNameString]?.indexedPercentage) < 10) {
+      invalidDeployments.push(realNameString);
+      delete deployments[realNameString];
+    }
+
   });
-
   deployments = await protocolLevel(deployments);
-  // deployments = await lendingPoolLevel(deployments);
+  const messagesToPost = protocolNames.map(protocolName => {
+    const deploymentSet = Object.values(deployments).filter(depo => depo.protocolName === protocolName)
+    const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet);
+    return { message: embeddedMessages, protocolName: protocolName };
+  })
 
-  const discordMessages = await getDiscordMessages();
-  alertFailedIndexing(discordMessages, deployments);
-  alertProtocolErrors(discordMessages, deployments);
+  if (messagesToPost.length > 0) {
+    // Need to pull refreshed list of alert messages, in case posted but error was thrown as well.
+    const currentDiscordMessages = await getDiscordMessages([], "");
+    await resolveQueriesToAttempt(messagesToPost, currentDiscordMessages);
+  }
+  return;
 }
 
-async function alertFailedIndexing(discordMessages, deployments) {
-  // Get the indexing error message objects from the last week 
-  const indexingErrorMessageObjs = discordMessages.filter(x => x.content.includes("**INDEXING ERRORS:**"))
+async function resolveQueriesToAttempt(queriesToAttempt, currentDiscordMessages) {
+  // Take the first 5 queries to attempt
+  let useQueries = queriesToAttempt.slice(0, 5);
+  const newQueriesArray = [...queriesToAttempt.slice(5)];
+  try {
+    // map useQueries and within filter currentDiscordMessages.includes(useQueries[x].slice(0,80)) 
+    useQueries = useQueries.filter(object => {
+      const hasMsg = currentDiscordMessages.filter(msg => {
+        return msg.content.includes(object.protocolName);
+      })
+      return hasMsg.length === 0;
+    })
 
-  const indexingErrorDeposListStr = indexingErrorMessageObjs.map(msgObj => {
-    return msgObj.content.split("LIST:")[1];
-  })
-
-  // For testing, loop through deployments and take the deployments which have an indexing error and construct a message
-  const indexErrs = [];
-  Object.keys(deployments).forEach(depo => {
-    if (!!deployments[depo].indexingError && !indexingErrorDeposListStr.join('-').includes(depo) && indexErrs.join(" - ").length < 1400) {
-      indexErrs.push(`Name: "${depo}", Indexed: ${deployments[depo].indexedPercentage}%, Endpoint: ${deployments[depo].url}`);
-    }
-  })
-
-  const newIndexingErrorDiscordMessage = `
-**INDEXING ERRORS:**
-    
-The following deployments have encountered errors indexing. Fatal Errors were detected and stopped execution. This list is of deployments that have stopped deployment as of the past 7 days or failed deployments that have not been alerted in the prior week. 
-  
-LIST:
-  
-${indexErrs.join(",\n")}
-  `;
-
-  if (indexErrs.length > 0) {
-    const sendIndexingErrorDiscord = await sendDiscordMessage(newIndexingErrorDiscordMessage);
+    await Promise.allSettled(useQueries.map(object => sendDiscordMessage(object.message, object.protocolName)));
+  } catch (err) {
+    errorNotification(err.message + ' resolveQueriesToAttempt() script.js');
   }
+
+  await sleep(5000);
+  if (newQueriesArray.length > 0) {
+    resolveQueriesToAttempt(newQueriesArray, currentDiscordMessages);
+    return;
+  }
+  return;
 }

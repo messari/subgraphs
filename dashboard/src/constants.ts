@@ -8,6 +8,7 @@ export namespace ProtocolType {
 export namespace Versions {
   export const Schema120 = "1.2.0";
   export const Schema130 = "1.3.0";
+  export const Schema200 = "2.0.0";
   export const Schema201 = "2.0.1";
 
   // Array to list out the different schema versions available

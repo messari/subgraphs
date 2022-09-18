@@ -15,6 +15,7 @@ export const decentralizedNetworkSubgraphsQuery = gql`
             }
           }
         }
+        displayName
       }
     }
   }

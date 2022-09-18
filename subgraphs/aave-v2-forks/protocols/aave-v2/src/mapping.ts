@@ -21,7 +21,7 @@ import {
   ReserveDeactivated,
   ReserveFactorChanged,
   ReserveInitialized,
-} from "../../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
+} from "../../../generated/LendingPoolConfigurator/LendingPoolConfigurator";
 import {
   Borrow,
   Deposit,
@@ -33,8 +33,8 @@ import {
   ReserveUsedAsCollateralEnabled,
   Unpaused,
   Withdraw,
-} from "../../../generated/templates/LendingPool/LendingPool";
-import { AToken } from "../../../generated/templates/LendingPool/AToken";
+} from "../../../generated/LendingPool/LendingPool";
+import { AToken } from "../../../generated/LendingPool/AToken";
 import {
   ProtocolData,
   _handleBorrow,
@@ -72,9 +72,9 @@ import {
   SECONDS_PER_DAY,
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
-import { AaveIncentivesController } from "../../../generated/templates/LendingPool/AaveIncentivesController";
-import { StakedAave } from "../../../generated/templates/LendingPool/StakedAave";
-import { IPriceOracleGetter } from "../../../generated/templates/LendingPool/IPriceOracleGetter";
+import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
+import { StakedAave } from "../../../generated/LendingPool/StakedAave";
+import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
 
 function getProtocolData(): ProtocolData {
   let letants = getNetworkSpecificConstant();
@@ -109,9 +109,9 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     event,
     event.params.asset,
     event.params.aToken,
-    event.params.stableDebtToken,
     event.params.variableDebtToken,
-    getProtocolData()
+    getProtocolData(),
+    event.params.stableDebtToken
   );
 }
 
@@ -161,6 +161,7 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   let protocolData = getProtocolData();
+  let protocol = getOrCreateLendingProtocol(protocolData);
 
   // update rewards if there is an incentive controller
   let market = Market.load(event.params.reserve.toHexString());
@@ -182,84 +183,89 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     let incentiveControllerContract = AaveIncentivesController.bind(
       tryIncentiveController.value
     );
-    let trySupplyRewards = incentiveControllerContract.try_assets(
-      Address.fromString(market.outputToken!)
-    );
     let tryBorrowRewards = incentiveControllerContract.try_assets(
       Address.fromString(market.vToken!)
     );
+    let trySupplyRewards = incentiveControllerContract.try_assets(
+      Address.fromString(market.outputToken!)
+    );
+    let tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
 
-    // calculate supply rewards
-    if (!trySupplyRewards.reverted || !tryBorrowRewards.reverted) {
-      let tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
-      if (!tryRewardAsset.reverted) {
-        // create reward tokens
-        let depositRewardToken = getOrCreateRewardToken(
-          tryRewardAsset.value,
-          RewardTokenType.DEPOSIT
-        );
-        let borrowRewardToken = getOrCreateRewardToken(
-          tryRewardAsset.value,
-          RewardTokenType.BORROW
-        );
-        let rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
-        market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
+    if (!tryRewardAsset.reverted) {
+      // get reward tokens
+      let borrowRewardToken = getOrCreateRewardToken(
+        tryRewardAsset.value,
+        RewardTokenType.BORROW
+      );
+      let depositRewardToken = getOrCreateRewardToken(
+        tryRewardAsset.value,
+        RewardTokenType.DEPOSIT
+      );
 
-        // now get or create reward token and update fields
-        let protocol = getOrCreateLendingProtocol(protocolData);
-        let supplyRewardsPerDay = trySupplyRewards.value.value0.times(
-          BigInt.fromI32(SECONDS_PER_DAY)
-        );
-        let borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
-          BigInt.fromI32(SECONDS_PER_DAY)
-        );
+      // always ordered [borrow, deposit/supply]
+      let rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
+      let rewardEmissions = [BIGINT_ZERO, BIGINT_ZERO];
+      let rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+      let rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
 
-        // get price of reward token (if stkAAVE it is tied to the price of AAVE)
-        let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
-        if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
-          // get staked token if possible to grab price of staked token
-          let stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
-          let tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
-          if (!tryStakedToken.reverted) {
-            rewardTokenPriceUSD = getAssetPriceInUSDC(
-              tryStakedToken.value,
-              Address.fromString(protocol.priceOracle)
-            );
-          }
-        }
-
-        // if reward token price was not found then use old method
-        if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
+      // get reward token price
+      // get price of reward token (if stkAAVE it is tied to the price of AAVE)
+      let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
+      if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
+        // get staked token if possible to grab price of staked token
+        let stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
+        let tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
+        if (!tryStakedToken.reverted) {
           rewardTokenPriceUSD = getAssetPriceInUSDC(
-            tryRewardAsset.value,
+            tryStakedToken.value,
             Address.fromString(protocol.priceOracle)
           );
         }
+      }
 
-        let supplyRewardsPerDayUSD = supplyRewardsPerDay
-          .toBigDecimal()
-          .div(exponentToBigDecimal(rewardDecimals))
-          .times(rewardTokenPriceUSD);
+      // if reward token price was not found then use old method
+      if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
+        rewardTokenPriceUSD = getAssetPriceInUSDC(
+          tryRewardAsset.value,
+          Address.fromString(protocol.priceOracle)
+        );
+      }
+
+      // we check borrow first since it will show up first in graphql ordering
+      // see explanation in docs/Mapping.md#Array Sorting When Querying
+      if (!tryBorrowRewards.reverted) {
+        // update borrow rewards
+        let borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
+          BigInt.fromI32(SECONDS_PER_DAY)
+        );
+        rewardEmissions[0] = borrowRewardsPerDay;
         let borrowRewardsPerDayUSD = borrowRewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
           .times(rewardTokenPriceUSD);
-
-        // set rewards to arrays
-        market.rewardTokenEmissionsAmount = [
-          supplyRewardsPerDay,
-          borrowRewardsPerDay,
-        ];
-        market.rewardTokenEmissionsUSD = [
-          supplyRewardsPerDayUSD,
-          borrowRewardsPerDayUSD,
-        ];
+        rewardEmissionsUSD[0] = borrowRewardsPerDayUSD;
       }
+
+      if (!trySupplyRewards.reverted) {
+        // update deposit rewards
+        let supplyRewardsPerDay = trySupplyRewards.value.value0.times(
+          BigInt.fromI32(SECONDS_PER_DAY)
+        );
+        rewardEmissions[1] = supplyRewardsPerDay;
+        let supplyRewardsPerDayUSD = supplyRewardsPerDay
+          .toBigDecimal()
+          .div(exponentToBigDecimal(rewardDecimals))
+          .times(rewardTokenPriceUSD);
+        rewardEmissionsUSD[1] = supplyRewardsPerDayUSD;
+      }
+
+      market.rewardTokens = rewardTokens;
+      market.rewardTokenEmissionsAmount = rewardEmissions;
+      market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+      market.save();
     }
   }
-  market.save();
 
-  let protocol = getOrCreateLendingProtocol(protocolData);
   let assetPriceUSD = getAssetPriceInUSDC(
     Address.fromString(market.inputToken),
     Address.fromString(protocol.priceOracle)

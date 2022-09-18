@@ -33,6 +33,7 @@ export function handleTransfer(event: Transfer): void {
   _handleTransfer(
     event.params.from.toHexString(),
     event.params.to.toHexString(),
-    event.params.value
+    event.params.value,
+    event
   );
 }

@@ -2,7 +2,7 @@ import * as constants from "../common/constants";
 import { VaultFee } from "../../generated/schema";
 import { getOrCreateYieldAggregator } from "./initializers";
 import { Vault as VaultStore } from "../../generated/schema";
-import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/Registry_v1/ERC20";
 
 export function enumToPrefix(snake: string): string {
@@ -20,7 +20,7 @@ export function readValue<T>(
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
-export function getTokenDecimals(tokenAddr: Address): BigInt {
+export function getTokenDecimals(tokenAddr: Address): BigDecimal {
   const token = ERC20Contract.bind(tokenAddr);
 
   let decimals = readValue<BigInt>(
@@ -28,7 +28,7 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
     constants.DEFAULT_DECIMALS
   );
 
-  return decimals;
+  return constants.BIGINT_TEN.pow(decimals.toI32() as u8).toBigDecimal();
 }
 
 export function createFeeType(

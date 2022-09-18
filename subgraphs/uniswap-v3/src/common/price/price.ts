@@ -105,7 +105,6 @@ export function updateNativeTokenPriceInUSD(): Token {
     nativeToken.lastPriceUSD = largestPool.tokenPrices[tokenIndicator];
   }
 
-  log.warning("NATIVE PRICE: " + nativeToken.lastPriceUSD!.toString(), []);
   return nativeToken;
 }
 
