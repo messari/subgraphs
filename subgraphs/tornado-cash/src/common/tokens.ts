@@ -98,14 +98,14 @@ export function isNullEthValue(value: string): boolean {
 
 export function isRewardToken(tokenAddress: Address): boolean {
   return (
-    tokenAddress ===
+    tokenAddress ==
     Address.fromString(NetworkConfigs.getRewardToken().get("address")!)
   );
 }
 
 export function isNativeToken(tokenAddress: Address): boolean {
   return (
-    tokenAddress ===
+    tokenAddress ==
     Address.fromString(NetworkConfigs.getNativeToken().get("address")!)
   );
 }
@@ -127,7 +127,7 @@ class StaticTokenDefinition {
 
   // Get all tokens with a static defintion
   static getStaticDefinitions(): Array<StaticTokenDefinition> {
-    let staticDefinitions = new Array<StaticTokenDefinition>(7);
+    let staticDefinitions = new Array<StaticTokenDefinition>(6);
 
     // Add DGD
     let tokenDGD = new StaticTokenDefinition(
@@ -183,15 +183,6 @@ class StaticTokenDefinition {
     );
     staticDefinitions.push(tokenHPB);
 
-    // Add TORN
-    let tokenTORN = new StaticTokenDefinition(
-      Address.fromString("0x77777FeDdddFfC19Ff86DB637967013e6C6A116C"),
-      "TORN",
-      "TornadoCash",
-      18 as i32
-    );
-    staticDefinitions.push(tokenTORN);
-
     return staticDefinitions;
   }
 
@@ -199,12 +190,6 @@ class StaticTokenDefinition {
   static fromAddress(tokenAddress: Address): StaticTokenDefinition | null {
     let staticDefinitions = this.getStaticDefinitions();
     let tokenAddressHex = tokenAddress.toHexString();
-
-    log.info("TORN address: {}", [tokenAddressHex]);
-    log.info("static {} address: {}", [
-      staticDefinitions[6].name,
-      staticDefinitions[6].address.toHexString(),
-    ]);
 
     // Search the definition using the address
     for (let i = 0; i < staticDefinitions.length; i++) {
