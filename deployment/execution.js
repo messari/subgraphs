@@ -1,4 +1,4 @@
-const exec = require("child_process").exec;
+const { exec } = require("child_process");
 const fs = require("fs");
 
 /**
@@ -8,25 +8,27 @@ const fs = require("fs");
 async function executeDeployment(deployment, callback) {
   let logs = "";
   let results = "RESULTS:\n";
-  var deploymentIndex = 0;
-  var scriptIndex = 0;
-  var httpCounter = 0;
-  let allDeployments = Array.from(deployment.scripts.keys());
+  let deploymentIndex = 0;
+  let scriptIndex = 0;
+  let httpCounter = 0;
+  const allDeployments = Array.from(deployment.scripts.keys());
 
   function next() {
     if (deploymentIndex < allDeployments.length) {
       exec(
-        deployment.scripts.get(allDeployments[deploymentIndex])[scriptIndex++],
-        function (error, stdout, stderr) {
-          logs = logs + "stdout: " + stdout;
-          logs = logs + "stderr: " + stderr;
+        deployment.scripts.get(allDeployments[deploymentIndex])[scriptIndex],
+        (error, stdout, stderr) => {
+          logs = `${logs}stdout: ${stdout}`;
+          logs = `${logs}stderr: ${stderr}`;
+
+          scriptIndex += 1;
 
           if (stderr.includes("HTTP error")) {
             if (httpCounter >= 2) {
-              deploymentIndex++;
+              deploymentIndex += 1;
               scriptIndex = 0;
             }
-            httpCounter++;
+            httpCounter += 1;
           }
 
           if (error !== null) {
@@ -34,44 +36,34 @@ async function executeDeployment(deployment, callback) {
               stderr.includes("HTTP error deploying the subgraph") &&
               httpCounter < 3
             ) {
-              httpCounter++;
+              httpCounter += 1;
               console.log(
-                "HTTP error on deployment " +
-                  httpCounter.toString() +
-                  " for " +
-                  allDeployments[deploymentIndex] +
-                  ". Trying Again..."
+                `HTTP error on deployment ${httpCounter.toString()} for ${
+                  allDeployments[deploymentIndex]
+                }. Trying Again...`
               );
             } else {
-              logs = logs + "Exec error: " + error;
-              if (deployment.getDeploy() == false) {
-                results +=
-                  "Build Failed: " + allDeployments[deploymentIndex] + "\n";
+              logs = `${logs}Exec error: ${error}`;
+              if (deployment.getDeploy() === false) {
+                results += `Build Failed: ${allDeployments[deploymentIndex]}\n`;
               } else {
-                results +=
-                  "Deployment Failed: " +
-                  allDeployments[deploymentIndex] +
-                  "\n";
+                results += `Deployment Failed: ${allDeployments[deploymentIndex]}\n`;
               }
-              logs = logs + "error: " + error;
-              deploymentIndex++;
+              logs = `${logs}error: ${error}`;
+              deploymentIndex += 1;
               scriptIndex = 0;
               httpCounter = 0;
             }
           } else if (
-            scriptIndex ==
+            scriptIndex ===
             deployment.scripts.get(allDeployments[deploymentIndex]).length
           ) {
-            if (deployment.getDeploy() == false) {
-              results +=
-                "Build Successful: " + allDeployments[deploymentIndex] + "\n";
+            if (deployment.getDeploy() === false) {
+              results += `Build Successful: ${allDeployments[deploymentIndex]}\n`;
             } else {
-              results +=
-                "Deployment Successful: " +
-                allDeployments[deploymentIndex] +
-                "\n";
+              results += `Deployment Successful: ${allDeployments[deploymentIndex]}\n`;
             }
-            deploymentIndex++;
+            deploymentIndex += 1;
             scriptIndex = 0;
             httpCounter = 1;
           }
@@ -82,19 +74,15 @@ async function executeDeployment(deployment, callback) {
       );
     } else {
       // all done here
-      fs.writeFile(
-        "results.txt",
-        logs.replace(/\u001b[^m]*?m/g, ""),
-        function (err) {
-          if (err) throw err;
-        }
-      );
+      fs.writeFile("results.txt", logs.replace(/\u00[^m]*?m/g, ""), (err) => {
+        if (err) throw new Error(err).message;
+      });
 
       // Print the logs if printlogs is 't' or 'true'
       if (deployment.printlogs) {
         console.log(logs);
       }
-      console.log("\n" + results + "END" + "\n\n");
+      console.log(`\n${results}END\n\n`);
       callback(results);
     }
   }
