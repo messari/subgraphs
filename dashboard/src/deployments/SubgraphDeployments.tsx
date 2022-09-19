@@ -114,7 +114,23 @@ export const SubgraphDeployments = ({
 
   return (
     <>
-      {deployments.map(({ network, deployment }) => {
+      {deployments.map(({ network, deployment }, idx) => {
+        let pendingDeployment = null;
+        if (!!Object.values(status)[idx]) {
+          pendingDeployment = (
+            <Deployment
+              key={"pending-" + deployment + "-" + network}
+              clientIndexing={clientIndexing}
+              subgraphID={name}
+              networkName={network}
+              deployment={deployment}
+              currentDeployment={false}
+              statusReturned={statusPending}
+              statusLoading={statusLoadingPending}
+              errorIndexing={errorIndexingPending}
+            />
+          );
+        }
         return (
           <Fragment key={deployment + 'CompGroup'}>
             <Deployment
@@ -128,17 +144,7 @@ export const SubgraphDeployments = ({
               statusLoading={statusLoading}
               errorIndexing={errorIndexing}
             />
-            <Deployment
-              key={"pending-" + deployment + "-" + network}
-              clientIndexing={clientIndexing}
-              subgraphID={name}
-              networkName={network}
-              deployment={deployment}
-              currentDeployment={false}
-              statusReturned={statusPending}
-              statusLoading={statusLoadingPending}
-              errorIndexing={errorIndexingPending}
-            />
+            {pendingDeployment}
           </Fragment>
         );
       })}

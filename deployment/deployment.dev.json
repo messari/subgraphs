@@ -1642,8 +1642,89 @@
       }
     }
   },
-  "liquity": {
+  "rocket-pool": {
     "schema": "generic",
+    "base": "rocket-pool",
+    "protocol": "rocket-pool",
+    "deployments": {
+      "rocket-pool-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "N/A",
+          "subgraph": "N/A",
+          "methodology": "N/A"
+        },
+        "deployment-ids": {
+          "hosted-service": "rocket-pool-ethereum",
+          "decentralized-network": "rocket-pool-ethereum"
+        },
+        "files": {
+          "template": "rocket-pool.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
+  "tornado-cash": {
+    "schema": "generic",
+    "base": "tornado-cash",
+    "protocol": "tornado-cash",
+    "deployments": {
+      "tornado-cash-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "N/A",
+          "subgraph": "N/A",
+          "methodology": "N/A"
+        },
+        "deployment-ids": {
+          "hosted-service": "tornado-cash-ethereum",
+          "decentralized-network": "tornado-cash-ethereum"
+        },
+        "files": {
+          "template": "tornado-cash.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
+  "graph-protocol": {
+    "schema": "generic",
+    "base": "graph-protocol",
+    "protocol": "graph-protocol",
+    "deployments": {
+      "graph-protocol-graph": {
+        "network": "graph",
+        "status": "dev",
+        "versions": {
+          "schema": "N/A",
+          "subgraph": "N/A",
+          "methodology": "N/A"
+        },
+        "deployment-ids": {
+          "hosted-service": "graph-protocol-graph",
+          "decentralized-network": "graph-protocol-graph"
+        },
+        "files": {
+          "template": "graph-protocol.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
+  "liquity": {
+    "schema": "lending",
     "base": "liquity",
     "protocol": "liquity",
     "deployments": {
