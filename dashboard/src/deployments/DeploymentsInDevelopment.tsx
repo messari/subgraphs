@@ -2,6 +2,7 @@ import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRo
 import { SubgraphLogo } from "../common/SubgraphLogo";
 import { NetworkLogo } from "../common/NetworkLogo";
 import { useNavigate } from "react-router";
+import DeploymentsInDevelopmentRow from "./DeploymentsInDevelopmentRow";
 
 interface DeploymentsInDevelopment {
     deploymentsInDevelopment: { [x: string]: any };
@@ -60,7 +61,7 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
             if (!Object.keys(deposInProgress[protocol.schema]).includes(protocolName)) {
                 deposInProgress[protocol.schema][protocolName] = { status: true, schemaVersions: [], subgraphVersions: [], methodologyVersions: [], networks: [] };
             }
-            deposInProgress[protocol.schema][protocolName].networks.push({ chain: deploymentData.network, hostedServiceId: deploymentData["deployment-ids"]["hosted-service"] });
+            deposInProgress[protocol.schema][protocolName].networks.push({ chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId: deploymentData["deployment-ids"]["hosted-service"] });
             if (!deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
                 deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
             }
@@ -90,41 +91,7 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
             {Object.entries(deposInProgress).map(([schemaType, subgraph]) => {
                 const tableRows = Object.keys(subgraph).map((subgraphName) => {
                     const protocol = subgraph[subgraphName];
-                    return (
-                        <TableRow key={subgraphName + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }}>
-                            <TableCell
-                                sx={{ padding: "0", borderLeft: `orange solid 6px`, verticalAlign: "middle", display: "flex" }}
-                            >
-                                {!subgraphName.includes('evm') && !subgraphName.includes('erc721') ? <SubgraphLogo name={subgraphName} size={30} /> : null}
-                                <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
-                                    {subgraphName}
-                                </span>
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right", display: "flex" }}>
-                                {protocol.networks.map((x: { [x: string]: any }) => <a href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo key={subgraphName + x.chain + 'Logo'} size={30} network={x.chain} /></a>)}
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {protocol?.status ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-                                    {protocol?.schemaVersions?.length > 0 ? protocol?.schemaVersions.join(", ") : "N/A"}
-                                </Typography>
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-                                    {protocol?.subgraphVersions?.length > 0 ? protocol?.subgraphVersions.join(", ") : "N/A"}
-                                </Typography>
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-                                    {protocol?.methodologyVersions?.length > 0 ? protocol?.methodologyVersions.join(", ") : "N/A"}
-                                </Typography>
-                            </TableCell>
-                        </TableRow>
-                    );
+                    return (<DeploymentsInDevelopmentRow subgraphName={subgraphName} protocol={protocol} />);
                 });
                 return (
                     <TableContainer>

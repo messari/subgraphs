@@ -93,6 +93,11 @@ interface SubgraphLogoProps {
 
 export const SubgraphLogo = ({ name, size }: SubgraphLogoProps) => {
   const logoName = subgraphMap[name] ?? name;
-  const url = subgraphLogoMap[logoName] ?? "";
-  return <Avatar src={url} sx={{ height: size, width: size }} />;
+  let src = subgraphLogoMap[logoName];
+  let opacity = 1;
+  if (!src) {
+    src = subgraphLogoMap.uniswap;
+    opacity = 0;
+  }
+  return <Avatar src={src} sx={{ height: size, width: size, opacity }} />;
 };
