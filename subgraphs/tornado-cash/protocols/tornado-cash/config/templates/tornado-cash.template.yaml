@@ -299,12 +299,14 @@ dataSources:
         - Protocol
         - Token
       abis:
+        # mainnet uses an older abi `TornadoCashETH`
+        # other chains (BSC, Arbitrum, Optimism, Matic, Avax) use the newer abi `TornadoCashBNB`
         - name: TornadoCashETH
           file: ./abis/TornadoCashETH.json
-        - name: TornadoCashERC20
-          file: ./abis/TornadoCashERC20.json
         - name: TornadoCashBNB
           file: ./abis/TornadoCashBNB.json
+        - name: TornadoCashERC20
+          file: ./abis/TornadoCashERC20.json
 
         - name: ERC20
           file: ./abis/ERC20.json
