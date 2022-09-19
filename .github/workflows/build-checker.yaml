@@ -5,7 +5,7 @@ on:
 
 jobs:
   Deployment: 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps: 
       - id: files
         uses: Ana06/get-changed-files@v1.2
