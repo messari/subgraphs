@@ -1,4 +1,4 @@
-import { TornadoCashMainnetConfigurations } from "../../protocols/tornado-cash/config/deployments/tornado-cash-ethereum/configurations";
+import { TornadoCashMainnetConfigurations } from "../../protocols/tornado-cash/config/deployments/tornado-cash-mainnet/configurations";
 import { TornadoCashBscConfigurations } from "../../protocols/tornado-cash/config/deployments/tornado-cash-bsc/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
