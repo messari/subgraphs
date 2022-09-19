@@ -107,6 +107,7 @@ export function getStrategyDepositFees(
   let depositFees = getOrCreateVaultFee(
     enumToPrefix(constants.VaultFeeType.DEPOSIT_FEE)
       .concat(vaultAddress.toHexString())
+      .concat("-")
       .concat(strategyAddress.toHexString()),
     constants.VaultFeeType.DEPOSIT_FEE,
     entranceFeeNumer
@@ -122,8 +123,7 @@ export function getStrategyWithdrawalFees(
   vaultAddress: Address,
   strategyAddress: Address
 ): VaultFee {
-  let underlyingStrategyAddress = getUnderlyingStrategy(strategyAddress);
-  const strategyContract = StrategyContract.bind(underlyingStrategyAddress);
+  const strategyContract = StrategyContract.bind(strategyAddress);
 
   let withdrawFeeNumer = readValue<BigInt>(
     strategyContract.try_withdrawFeeNumer(),
@@ -137,7 +137,8 @@ export function getStrategyWithdrawalFees(
   let withdrawalFees = getOrCreateVaultFee(
     enumToPrefix(constants.VaultFeeType.WITHDRAWAL_FEE)
       .concat(vaultAddress.toHexString())
-      .concat(underlyingStrategyAddress.toHexString()),
+      .concat("-")
+      .concat(strategyAddress.toHexString()),
     constants.VaultFeeType.WITHDRAWAL_FEE,
     withdrawFeeNumer
       .div(withdrawFeeDenom)
@@ -152,8 +153,7 @@ export function getStrategyPerformaceFees(
   vaultAddress: Address,
   strategyAddress: Address
 ): VaultFee {
-  let underlyingStrategyAddress = getUnderlyingStrategy(strategyAddress);
-  const strategyContract = StrategyContract.bind(underlyingStrategyAddress);
+  const strategyContract = StrategyContract.bind(strategyAddress);
 
   let buyBackRate = readValue<BigInt>(
     strategyContract.try_buyBackRate(),
@@ -171,7 +171,8 @@ export function getStrategyPerformaceFees(
   let performanceFees = getOrCreateVaultFee(
     enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE)
       .concat(vaultAddress.toHexString())
-      .concat(underlyingStrategyAddress.toHexString()),
+      .concat("-")
+      .concat(strategyAddress.toHexString()),
     constants.VaultFeeType.PERFORMANCE_FEE,
     buyBackRate
       .plus(buyBackPoolRate)
@@ -203,7 +204,7 @@ export function getVaultFees(vaultAddress: Address): string[] {
   let vaulFees: string[] = [];
 
   for (let idx = 0; idx < vaultStrategies.length; idx++) {
-    vaulFees.concat(
+    vaulFees = vaulFees.concat(
       getStrategyFees(vaultAddress, vaultStrategies.at(idx)).stringIds()
     );
   }
