@@ -39,23 +39,25 @@ function App() {
   if (Object.keys(protocolsToQuery)?.length > 0) {
     Object.keys(protocolsToQuery).forEach((protocolName: string) => {
       const protocol: any = protocolsToQuery[protocolName];
-      const schemaType = schemaMapping[protocol.schema];
-      if (!schemaType) {
-        return;
+      let schemaType = schemaMapping[protocol.schema];
+      if (schemaType) {
+        if (!Object.keys(subgraphEndpoints).includes(schemaType)) {
+          subgraphEndpoints[schemaType] = {};
+        }
+        if (!Object.keys(subgraphEndpoints[schemaType]).includes(protocolName)) {
+          subgraphEndpoints[schemaType][protocolName] = {};
+        }
       }
-      if (!Object.keys(subgraphEndpoints).includes(schemaType)) {
-        subgraphEndpoints[schemaType] = {};
-      }
-      if (!Object.keys(subgraphEndpoints[schemaType]).includes(protocolName)) {
-        subgraphEndpoints[schemaType][protocolName] = {};
-      }
+
       Object.values(protocol.deployments).forEach((depoData: any) => {
-        subgraphEndpoints[schemaType][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["deployment-ids"]["hosted-service"];
+        if (schemaType) {
+          subgraphEndpoints[schemaType][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["deployment-ids"]["hosted-service"];
+        }
         depoCount.totalCount += 1;
         if (depoData?.status === 'dev') {
-          depoCount.prodCount += 1;
-        } else if (depoData?.status === 'prod') {
           depoCount.devCount += 1;
+        } else if (depoData?.status === 'prod') {
+          depoCount.prodCount += 1;
         } else {
           depoCount.otherCount += 1;
         }
