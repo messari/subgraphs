@@ -166,7 +166,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
         <Typography variant="h4" align="center" sx={{ my: 4 }}>
           Hosted Service Subgraphs
         </Typography>
-        {Object.keys(protocolsToQuery).map((key) => {
+        {Object.keys(protocolsToQuery).sort().map((key) => {
           return (
             <>
               <Typography
