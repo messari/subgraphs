@@ -85,6 +85,7 @@ Fuse has had a number of hacks throughout it's life. There are numerous price or
 - There was a weak price oracle exploit done on a FLOAT market on Janruary 14th, 2022. https://twitter.com/FloatProtocol/status/1482113645903446019
   - To fix the uncharacteristic spike we use another price oracle to get the price.
   - Transaction: https://etherscan.io/tx/0x40db7bd89d2a3f7df2793ba4f5be9a2ca93463d6bb6af024e5cd1b73ff827248
+- There is an unusually high `dailyDepositUSD` on April 30, 2022. This is a result of reentrancy attacks: https://twitter.com/BlockSecTeam/status/1520350965274386433?s=20&t=UQ6FVaxg-3Sd7weIH3rUZA
 
 ## Reference and Useful Links
 
