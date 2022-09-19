@@ -51,7 +51,7 @@ export function updateMinipoolTvlandRevenue(
     log.warning("[getOrCreatePool] TotalRewardEth nonzero, updating revenue", [
       totalRewardEth.toString(),
     ]);
-    let ratio = Minipool.inputTokenBalances[0].div(pool.inputTokenBalances[0]);
+    let ratio = Minipool.inputTokenBalances[0].div(pool.inputTokenBalances[1]);
     let miniPoolRewardEth = ratio.times(totalRewardEth);
     let miniPoolRewardUSD = bigIntToBigDecimal(miniPoolRewardEth).times(
       getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
@@ -61,6 +61,7 @@ export function updateMinipoolTvlandRevenue(
     Minipool.cumulativeProtocolSideRevenueUSD = miniPoolRewardUSD.times(
       BIGDECIMAL_HALF.minus(BIGDECIMAL_HALF.times(Minipool.comissionRate))
     );
+    Minipool.save();
   }
   Minipool.save();
 }

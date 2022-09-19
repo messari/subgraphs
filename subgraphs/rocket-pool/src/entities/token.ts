@@ -36,20 +36,27 @@ export function getOrCreateToken(
   }
 
   // Optional lastPriceUSD and lastPriceBlockNumber, but used in financialMetrics
-  if (tokenAddress.equals(Address.fromString(RETH_ADDRESS))) {
-    let rethpriceUSD: BigDecimal | null = null;
-    rethpriceUSD = getRETHpriceUSD(
-      Address.fromString(RETH_ADDRESS),
-      blockNumber
-    );
-    log.warning("[getOrCreateToken]rethPriceUSD call result: {} ", [
-      rethpriceUSD.toString(),
-    ]);
+  // if (tokenAddress.equals(Address.fromString(RETH_ADDRESS))) {
+  //   let rethpriceUSD: BigDecimal | null = null;
+  //   rethpriceUSD = getRETHpriceUSD(
+  //     Address.fromString(RETH_ADDRESS),
+  //     blockNumber
+  //   );
+  //   log.warning("[getOrCreateToken]rethPriceUSD call result: {} ", [
+  //     rethpriceUSD.toString(),
+  //   ]);
 
-    token.lastPriceUSD = rethpriceUSD;
-    token.lastPriceBlockNumber = blockNumber;
+  //   token.lastPriceUSD = rethpriceUSD;
+  //   token.lastPriceBlockNumber = blockNumber;
+  //   token.save();
+
+  //   return token;
+  // }
+  if (
+    token.lastPriceBlockNumber &&
+    token.lastPriceBlockNumber!.equals(blockNumber)
+  ) {
     token.save();
-
     return token;
   }
   let price = getUsdPricePerToken(tokenAddress);
