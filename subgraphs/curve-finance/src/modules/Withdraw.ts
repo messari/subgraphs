@@ -162,20 +162,16 @@ export function Withdraw(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  if (
-    !tokenSupplyAfterWithdrawal &&
-    outputTokenBurntAmount.equals(constants.BIGINT_NEGATIVE_ONE)
-  ) {
-    outputTokenBurntAmount = pool.outputTokenSupply!.minus(
-      tokenSupplyAfterWithdrawal!
+  if (!tokenSupplyAfterWithdrawal)
+    tokenSupplyAfterWithdrawal = utils.getOutputTokenSupply(
+      Address.fromString(pool.outputToken!),
+      pool.outputTokenSupply!
     );
-  }
 
-  if (!tokenSupplyAfterWithdrawal) {
-    tokenSupplyAfterWithdrawal = pool.outputTokenSupply!.minus(
-      outputTokenBurntAmount
+  if (outputTokenBurntAmount.equals(constants.BIGINT_NEGATIVE_ONE))
+    outputTokenBurntAmount = pool.outputTokenSupply!.minus(
+      tokenSupplyAfterWithdrawal
     );
-  }
 
   if (withdrawnTokenAmounts.length == 1) {
     // Exception: Remove Liquidity One has no information about input token

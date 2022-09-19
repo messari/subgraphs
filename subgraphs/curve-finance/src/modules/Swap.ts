@@ -117,6 +117,11 @@ export function Swap(
 
     tokenIn = underlyingCoins[sold_id.toI32()].toHexString();
     tokenOut = underlyingCoins[bought_id.toI32()].toHexString();
+
+    if (bought_id.toI32() == 0) {
+      // Exception: https://etherscan.io/address/0x06cb22615ba53e60d67bf6c341a0fd5e718e1655#code#L750
+      tokenIn = pool.inputTokens.at(-1);
+    }
   }
 
   let tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);

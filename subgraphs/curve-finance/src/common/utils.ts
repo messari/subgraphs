@@ -340,6 +340,21 @@ export function updateProtocolTotalValueLockedUSD(): void {
   protocol.save();
 }
 
+export function getOutputTokenSupply(
+  lpTokenAddress: Address,
+  oldSupply: BigInt
+): BigInt {
+  const lpTokenContract = ERC20Contract.bind(lpTokenAddress);
+
+  let outputTokenSupply = readValue<BigInt>(
+    lpTokenContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
+  if (outputTokenSupply.equals(constants.BIGINT_ZERO)) return oldSupply;
+
+  return outputTokenSupply;
+}
+
 export function updateProtocolAfterNewLiquidityPool(
   poolAddress: Address
 ): void {
