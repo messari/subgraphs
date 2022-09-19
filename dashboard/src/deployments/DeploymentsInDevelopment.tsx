@@ -85,7 +85,7 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
                 </Button>
             </div>
             <Typography variant="h4" align="center" sx={{ my: 4 }}>
-                Subgraphs Development Status ({(totalDepoCounter - deposInProgressCount)} complete /{totalDepoCounter} deployments)
+                {totalDepoCounter - deposInProgressCount} prod-ready, {deposInProgressCount} under development, {totalDepoCounter} subgraph deployments
             </Typography>
             {Object.entries(deposInProgress).map(([schemaType, subgraph]) => {
                 const tableRows = Object.keys(subgraph).map((subgraphName) => {
@@ -106,7 +106,7 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
                                 {protocol.networks.map((x: { [x: string]: any }) => <a href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo key={subgraphName + x.chain + 'Logo'} size={30} network={x.chain} /></a>)}
                             </TableCell>
                             <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {protocol?.status ? <img height="24px" width="24px" src="https://github.githubassets.com/images/icons/emoji/unicode/2705.png" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                                {protocol?.status ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
                             </TableCell>
                             <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>

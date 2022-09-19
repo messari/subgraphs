@@ -23,7 +23,8 @@ const NetworkLogos: Record<string, string> = {
   "arweave-mainnet": "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616",
   "arweave": "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616",
   "near-mainnet": "https://assets.coingecko.com/coins/images/10365/small/near_icon.png?1601359077",
-  "clover": "https://assets.coingecko.com/coins/images/15278/small/photo_2022-03-24_10-22-33.jpg?1648531786"
+  "clover": "https://assets.coingecko.com/coins/images/15278/small/photo_2022-03-24_10-22-33.jpg?1648531786",
+  "graph": "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566"
 };
 
 interface NetworkLogoProps {
