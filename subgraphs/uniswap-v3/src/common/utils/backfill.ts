@@ -69,6 +69,7 @@ export function populateEmptyPools(event: ethereum.Event): void {
     pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     pool.fees = createPoolFees(poolAddress, poolContract.fee());
+    pool.isSingleSided = false;
     pool.createdTimestamp = event.block.timestamp;
     pool.createdBlockNumber = event.block.number;
     pool.symbol = LPtoken.symbol;
