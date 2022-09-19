@@ -776,7 +776,7 @@ export function createAccount(accountID: string): Account {
 }
 
 // returns the market based on the output token
-export function getMarketByOutpuToken(
+export function getMarketByOutputToken(
   outputTokenID: string,
   protocolData: ProtocolData
 ): Market | null {
