@@ -1,5 +1,5 @@
-import { TornadoCashMainnetConfigurations } from "../../protocols/tornado-cash/config/networks/ethereum/ethereum";
-import { TornadoCashBscConfigurations } from "../../protocols/tornado-cash/config/networks/bsc/bsc";
+import { TornadoCashMainnetConfigurations } from "../../protocols/tornado-cash/config/deployments/tornado-cash-ethereum/configurations";
+import { TornadoCashBscConfigurations } from "../../protocols/tornado-cash/config/deployments/tornado-cash-bsc/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
