@@ -12,11 +12,11 @@ import {
 import {
   getOrCreateVault,
   getOrCreateYieldAggregator,
+  getOrCreateTokenFromString,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../prices";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
 import { getPriceOfOutputTokens, getPricePerShare } from "./Prices";
@@ -85,14 +85,13 @@ export function Deposit(
   const vault = getOrCreateVault(vaultAddress, block);
   let vaultContract = VaultContract.bind(vaultAddress);
 
-  let inputTokenAddress = Address.fromString(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
+  let inputToken = getOrCreateTokenFromString(vault.inputToken, block);
 
   let depositAmountUSD = depositAmount
-    .divDecimal(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .divDecimal(
+      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+    )
+    .times(inputToken.lastPriceUSD!);
 
   let depositFeePercentage = utils.getStrategyWithdrawalFees(
     vaultAddress,
@@ -114,13 +113,14 @@ export function Deposit(
   );
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
-    .divDecimal(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .divDecimal(
+      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+    )
+    .times(inputToken.lastPriceUSD!);
 
   let pricePerShare = getPricePerShare(vaultAddress);
   vault.pricePerShare = pricePerShare.toBigDecimal();
-  vault.outputTokenPriceUSD = getPriceOfOutputTokens(vaultAddress);
+  vault.outputTokenPriceUSD = getPriceOfOutputTokens(vaultAddress, block);
 
   vault.save();
 

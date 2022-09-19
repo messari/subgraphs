@@ -45,11 +45,11 @@ SUSHISWAP_ROUTER_ADDRESS.set(
 export const UNISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0x3a6d8cA21D1CF76F653A67577FA0D27453350dD8") // Biswap v2 Router
+  Address.fromString("0x10ED43C718714eb63d5aA57B78B54704E256024E") // Pancakeswap v2 Router
 );
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x10ED43C718714eb63d5aA57B78B54704E256024E") // Pancakeswap v2 Router
+  Address.fromString("0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F") // Pancakeswap v1 Router
 );
 
 export const UNISWAP_PATH_OVERRIDE = new TypedMap<Address, Address[]>();

@@ -81,6 +81,8 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(1200);
+
 export const PROTOCOL_ID = Address.fromString(
   "0xB543248F75fd9f64D10c247b5a57F142EFF88Aac"
 );

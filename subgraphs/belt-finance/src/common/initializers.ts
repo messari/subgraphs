@@ -24,6 +24,7 @@ import { Vault as VaultStore } from "../../generated/schema";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/templates/Strategy/ERC20";
+import { getUsdPricePerToken } from "../prices";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -40,12 +41,15 @@ export function getOrCreateAccount(id: string): Account {
   return account;
 }
 
-export function getOrCreateRewardToken(address: Address): RewardToken {
+export function getOrCreateRewardToken(
+  address: Address,
+  block: ethereum.Block
+): RewardToken {
   let rewardToken = RewardToken.load(address.toHexString());
 
   if (!rewardToken) {
     rewardToken = new RewardToken(address.toHexString());
-    const token = getOrCreateToken(address);
+    const token = getOrCreateToken(address, block);
     rewardToken.token = token.id;
     rewardToken.type = constants.RewardTokenType.DEPOSIT;
 
@@ -108,7 +112,10 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
   return protocol;
 }
 
-export function getOrCreateToken(address: Address): Token {
+export function getOrCreateToken(
+  address: Address,
+  block: ethereum.Block
+): Token {
   let token = Token.load(address.toHexString());
 
   if (!token) {
@@ -125,7 +132,28 @@ export function getOrCreateToken(address: Address): Token {
     token.save();
   }
 
+  if (
+    !token.lastPriceUSD ||
+    !token.lastPriceBlockNumber ||
+    block.number
+      .minus(token.lastPriceBlockNumber!)
+      .gt(constants.PRICE_CACHING_BLOCKS)
+  ) {
+    let tokenPrice = getUsdPricePerToken(address);
+    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceBlockNumber = block.number;
+
+    token.save();
+  }
+
   return token;
+}
+
+export function getOrCreateTokenFromString(
+  tokenAddress: string,
+  block: ethereum.Block
+): Token {
+  return getOrCreateToken(Address.fromString(tokenAddress), block);
 }
 
 export function getOrCreateFinancialDailySnapshots(
@@ -307,11 +335,11 @@ export function getOrCreateVault(
     // There is no deposit limit on Belt Finanace
     vault.depositLimit = constants.BIGINT_ZERO;
 
-    const inputToken = getOrCreateToken(vaultContract.token());
+    const inputToken = getOrCreateToken(vaultContract.token(), block);
     vault.inputToken = inputToken.id;
     vault.inputTokenBalance = constants.BIGINT_ZERO;
 
-    const outputToken = getOrCreateToken(vaultAddress);
+    const outputToken = getOrCreateToken(vaultAddress, block);
     vault.outputToken = outputToken.id;
     vault.outputTokenSupply = constants.BIGINT_ZERO;
 
@@ -329,14 +357,7 @@ export function getOrCreateVault(
 
     let vaultStrategies = utils.getVaultStrategies(vaultAddress);
 
-    let vaulFees: string[] = [];
-
-    for (let idx = 0; idx < vaultStrategies.length; idx++) {
-      vaulFees.concat(
-        utils.getStrategyFees(vaultAddress, vaultStrategies.at(idx)).stringIds()
-      );
-    }
-    vault.fees = vaulFees;
+    vault.fees = utils.getVaultFees(vaultAddress);
 
     for (let idx = 0; idx < vaultStrategies.length; idx++) {
       let context = new DataSourceContext();

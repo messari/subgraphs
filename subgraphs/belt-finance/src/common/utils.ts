@@ -197,6 +197,20 @@ export function getStrategyFees(
   return new PoolFeesType(depositFees, withdrawalFees, performanceFees);
 }
 
+export function getVaultFees(vaultAddress: Address): string[] {
+  const vaultStrategies = getVaultStrategies(vaultAddress);
+
+  let vaulFees: string[] = [];
+
+  for (let idx = 0; idx < vaultStrategies.length; idx++) {
+    vaulFees.concat(
+      getStrategyFees(vaultAddress, vaultStrategies.at(idx)).stringIds()
+    );
+  }
+
+  return vaulFees;
+}
+
 export function updateProtocolTotalValueLockedUSD(): void {
   const protocol = getOrCreateYieldAggregator();
   const vaultIds = protocol._vaultIds;

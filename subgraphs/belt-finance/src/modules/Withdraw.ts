@@ -12,13 +12,13 @@ import {
 import {
   getOrCreateVault,
   getOrCreateYieldAggregator,
+  getOrCreateTokenFromString,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
-import { getUsdPricePerToken } from "../prices/index";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 
 export function createWithdrawTransaction(
@@ -84,14 +84,13 @@ export function Withdraw(
   const vault = getOrCreateVault(vaultAddress, block);
   let vaultContract = VaultContract.bind(vaultAddress);
 
-  let inputTokenAddress = Address.fromString(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = utils.getTokenDecimals(inputTokenAddress);
+  let inputToken = getOrCreateTokenFromString(vault.inputToken, block);
 
   let withdrawAmountUSD = withdrawAmount
-    .divDecimal(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .divDecimal(
+      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+    )
+    .times(inputToken.lastPriceUSD!);
 
   let withdrawFeePercentage = utils.getStrategyWithdrawalFees(
     vaultAddress,
@@ -113,9 +112,10 @@ export function Withdraw(
   );
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
-    .divDecimal(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .divDecimal(
+      constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
+    )
+    .times(inputToken.lastPriceUSD!);
 
   vault.save();
 
