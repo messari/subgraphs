@@ -230,7 +230,7 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
   let swapFee = readValue<BigInt>(
     poolContract.try_getSwapFeePercentage(),
     constants.BIGINT_ZERO
-  );
+  ).divDecimal(constants.FEE_DENOMINATOR);
 
   const tradingFeeId =
     enumToPrefix(constants.LiquidityPoolFeeType.FIXED_TRADING_FEE) +
@@ -238,9 +238,7 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
   let tradingFee = getOrCreateLiquidityPoolFee(
     tradingFeeId,
     constants.LiquidityPoolFeeType.FIXED_TRADING_FEE,
-    swapFee
-      .divDecimal(constants.FEE_DENOMINATOR)
-      .times(constants.BIGDECIMAL_HUNDRED)
+    swapFee.times(constants.BIGDECIMAL_HUNDRED)
   );
 
   const feesCollectorContract = FeesCollectorContract.bind(
@@ -250,7 +248,7 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
   let protocolFees = readValue<BigInt>(
     feesCollectorContract.try_getSwapFeePercentage(),
     constants.BIGINT_ZERO
-  );
+  ).divDecimal(constants.FEE_DENOMINATOR);
 
   const protocolFeeId =
     enumToPrefix(constants.LiquidityPoolFeeType.FIXED_PROTOCOL_FEE) +
@@ -258,9 +256,7 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
   let protocolFee = getOrCreateLiquidityPoolFee(
     protocolFeeId,
     constants.LiquidityPoolFeeType.FIXED_PROTOCOL_FEE,
-    protocolFees
-      .divDecimal(constants.FEE_DENOMINATOR)
-      .times(constants.BIGDECIMAL_HUNDRED)
+    protocolFees.times(swapFee).times(constants.BIGDECIMAL_HUNDRED)
   );
 
   const lpFeeId =
@@ -269,9 +265,7 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
   let lpFee = getOrCreateLiquidityPoolFee(
     lpFeeId,
     constants.LiquidityPoolFeeType.FIXED_LP_FEE,
-    protocolFees
-      .divDecimal(constants.FEE_DENOMINATOR)
-      .times(constants.BIGDECIMAL_HUNDRED)
+    protocolFees.times(swapFee).times(constants.BIGDECIMAL_HUNDRED)
   );
 
   return new PoolFeesType(tradingFee, protocolFee, lpFee);

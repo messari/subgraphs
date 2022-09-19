@@ -136,7 +136,7 @@ export const FEE_DENOMINATOR = DEFAULT_DECIMALS_DENOMINATOR;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
-export const PRICE_CACHING_BLOCKS = BigInt.fromI32(50000);
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(7200);
 
 /////////////////////////////////////
 ///// Protocol/Network Specific /////
