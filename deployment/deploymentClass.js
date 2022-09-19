@@ -95,7 +95,7 @@ class Deployment {
     for (const [deployment, deploymentData] of Object.entries(this.deployments)) {
       if (
         this.getDeploy() == false ||
-        deploymentData[this.getService()]
+        deploymentData["deployment-ids"][this.getService()]
       ) {
         this.generateScripts(deployment, deploymentData);
       }
