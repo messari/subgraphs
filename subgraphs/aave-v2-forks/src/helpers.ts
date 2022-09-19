@@ -348,7 +348,7 @@ export function snapshotUsage(
     protocol.cumulativeUniqueDepositors;
   dailySnapshot.cumulativeUniqueBorrowers = protocol.cumulativeUniqueBorrowers;
   dailySnapshot.cumulativeUniqueLiquidators =
-    protocol.cumulativeUniqueDepositors;
+    protocol.cumulativeUniqueLiquidators;
   dailySnapshot.cumulativeUniqueLiquidatees =
     protocol.cumulativeUniqueLiquidatees;
   if (isNewTx) {
