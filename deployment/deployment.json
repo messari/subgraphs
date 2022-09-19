@@ -1668,6 +1668,32 @@
       }
     }
   },
+  "truefi": {
+    "schema": "lending",
+    "base": "truefi",
+    "protocol": "truefi",
+    "deployments": {
+      "truefi-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "truefi-ethereum"
+        },
+        "files": {
+          "template": "truefi.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
   "arweave": {
     "schema": "network",
     "base": "network",
