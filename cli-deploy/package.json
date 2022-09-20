@@ -1,0 +1,24 @@
+{
+  "name": "cli-deploy",
+  "license": "MIT",
+  "version": "1.0.0",
+  "description": "A cli helper to make deploying subgraphs even easier.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write \"**/*.js\""
+  },
+  "keywords": [],
+  "author": "dmelotik",
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "clear": "^0.1.0",
+    "clui": "^0.3.6",
+    "configstore": "^6.0.0",
+    "figlet": "^1.5.2",
+    "inquirer": "^9.1.2",
+    "minimist": "^1.2.6",
+    "node-fetch": "^2.6.1",
+    "prettier": "^2.7.1"
+  }
+}
