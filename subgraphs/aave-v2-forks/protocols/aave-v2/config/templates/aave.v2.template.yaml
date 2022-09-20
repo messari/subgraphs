@@ -133,3 +133,21 @@ dataSources:
         - event: Unpaused()
           handler: handleUnpaused
       file: ./protocols/aave-v2/src/mapping.ts
+templates:
+  - kind: ethereum/contract
+    name: AToken
+    network: {{ network }}
+    source:
+      abi: AToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: AToken
+          file: ./abis/aave-v2/AToken.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/aave-v2/src/mapping.ts

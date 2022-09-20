@@ -49,6 +49,7 @@ import {
 import { ProtocolData } from "./mapping";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
 import { IPriceOracleGetter } from "../generated/LendingPool/IPriceOracleGetter";
+import { AToken } from "../generated/LendingPool/AToken";
 
 ////////////////////////
 ///// Initializers /////
@@ -774,6 +775,29 @@ export function createAccount(accountID: string): Account {
   return account;
 }
 
+// returns the market based on the output token
+export function getMarketByOutputToken(
+  outputTokenID: string,
+  protocolData: ProtocolData
+): Market | null {
+  let protocol = getOrCreateLendingProtocol(protocolData);
+
+  for (let i = 0; i < protocol.marketIDs.length; i++) {
+    let market = Market.load(protocol.marketIDs[i]);
+
+    if (!market) {
+      continue;
+    }
+
+    if (market.outputToken!.toLowerCase() == outputTokenID.toLowerCase()) {
+      // we found a matching market!
+      return market;
+    }
+  }
+
+  return null; // no market found
+}
+
 ////////////////////////////
 ///// Internal Helpers /////
 ////////////////////////////
@@ -1000,4 +1024,34 @@ export function getOrCreateMarket(
   }
 
   return market;
+}
+
+export function getBorrowBalance(
+  market: Market,
+  account: Address
+): ethereum.CallResult<BigInt> {
+  let sDebtTokenBalance = BIGINT_ZERO;
+  let vDebtTokenBalance = BIGINT_ZERO;
+
+  // get account's balance of variable debt
+  if (market.vToken) {
+    let vTokenContract = AToken.bind(Address.fromString(market.vToken!));
+    let tryVDebtTokenBalance = vTokenContract.try_balanceOf(account);
+    vDebtTokenBalance = tryVDebtTokenBalance.reverted
+      ? BIGINT_ZERO
+      : tryVDebtTokenBalance.value;
+  }
+
+  // get account's balance of stable debt
+  if (market.sToken) {
+    let sTokenContract = AToken.bind(Address.fromString(market.sToken!));
+    let trySDebtTokenBalance = sTokenContract.try_balanceOf(account);
+    sDebtTokenBalance = trySDebtTokenBalance.reverted
+      ? BIGINT_ZERO
+      : trySDebtTokenBalance.value;
+  }
+
+  let totalDebt = sDebtTokenBalance.plus(vDebtTokenBalance);
+
+  return ethereum.CallResult.fromValue(totalDebt);
 }

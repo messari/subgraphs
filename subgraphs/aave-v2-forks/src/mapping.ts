@@ -40,6 +40,8 @@ import {
   addPosition,
   createAccount,
   createInterestRate,
+  getBorrowBalance,
+  getMarketByOutputToken,
   getOrCreateLendingProtocol,
   getOrCreateMarket,
   getOrCreateToken,
@@ -49,6 +51,7 @@ import {
   updateMarketSnapshots,
   updateSnapshots,
 } from "./helpers";
+import { AToken as ATokenTemplate } from "../generated/templates";
 
 //////////////////////////
 ///// Helper Classes /////
@@ -107,6 +110,9 @@ export function _handleReserveInitialized(
   }
 
   market.save();
+
+  // create AToken template to watch Transfer
+  ATokenTemplate.create(outputToken);
 }
 
 export function _handleCollateralConfigurationChanged(
@@ -401,7 +407,6 @@ export function _handleReserveDataUpdated(
     .minus(market.liquidityIndex)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
-  log.warning("prev liquidity index: {}", [market.liquidityIndex.toString()]);
   market.liquidityIndex = liquidityIndex; // must update to current liquidity index
   let newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
@@ -717,12 +722,11 @@ export function _handleBorrow(
   account.save();
 
   // update position
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let positionId = addPosition(
     protocol,
     market,
     account,
-    aTokenContract.try_balanceOf(accountID), // try getting balance of account
+    getBorrowBalance(market, accountID), // try getting balance of account in debt market
     PositionSide.BORROWER,
     EventType.BORROW,
     event
@@ -808,13 +812,12 @@ export function _handleRepay(
   account.repayCount += 1;
   account.save();
 
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let positionId = subtractPosition(
     protocol,
     market,
     account,
-    aTokenContract.try_balanceOf(accountID), // try getting balance of account
-    PositionSide.LENDER,
+    getBorrowBalance(market, accountID), // try getting balance of account in debt market
+    PositionSide.BORROWER,
     EventType.REPAY,
     event
   );
@@ -938,12 +941,13 @@ export function _handleLiquidate(
     ]);
     return;
   }
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+
+  // account for borrow being repaid by liquidator
   let positionId = subtractPosition(
     protocol,
     repayTokenMarket,
     account, // the borrower
-    aTokenContract.try_balanceOf(borrower), // try getting balance of account
+    getBorrowBalance(repayTokenMarket, borrower), // try getting balance of account in debt market
     PositionSide.BORROWER,
     EventType.LIQUIDATEE,
     event
@@ -954,6 +958,29 @@ export function _handleLiquidate(
     ]);
     return;
   }
+
+  // account for borrower losing aToken (collateral)
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  subtractPosition(
+    protocol,
+    market, // collateral market
+    account,
+    aTokenContract.try_balanceOf(borrower),
+    PositionSide.LENDER,
+    -1, // not incrementing to not double count
+    event
+  );
+
+  // account for liquidator gaining aToken (seized collateral)
+  addPosition(
+    protocol,
+    market, // collateral market
+    liquidatorAccount,
+    aTokenContract.try_balanceOf(liquidator),
+    PositionSide.LENDER,
+    -1, // TODO: how do we classify a liquidator gaining collateral
+    event
+  );
 
   liquidate.position = positionId;
   liquidate.blockNumber = event.block.number;
@@ -1011,4 +1038,90 @@ export function _handleLiquidate(
     event.block.timestamp,
     event.block.number
   );
+}
+
+//////////////////////
+//// AToken Event ////
+//////////////////////
+
+export function _handleTransfer(
+  event: ethereum.Event,
+  to: Address,
+  from: Address,
+  protocolData: ProtocolData
+): void {
+  let protocol = getOrCreateLendingProtocol(protocolData);
+  let market = getMarketByOutputToken(event.address.toHexString(), protocolData);
+  if (!market) {
+    log.warning("[_handleTransfer] market not found: {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
+
+  // if the to / from addresses are the same as the aToken
+  // then this transfer is emitted as part of another event
+  // ie, a deposit, withdraw, borrow, repay, etc
+  // we want to let that handler take care of position updates
+  if (
+    to.toHexString().toLowerCase() == market.outputToken!.toLowerCase() ||
+    from.toHexString().toLowerCase() == market.outputToken!.toLowerCase()
+  ) {
+    return;
+  }
+
+  // grab accounts
+  let toAccount = Account.load(to.toHexString());
+  if (!toAccount) {
+    if (to == Address.fromString(ZERO_ADDRESS)) {
+      toAccount = null;
+    } else {
+      toAccount = createAccount(to.toHexString());
+      toAccount.save();
+
+      protocol.cumulativeUniqueUsers++;
+      protocol.save();
+    }
+  }
+
+  let fromAccount = Account.load(from.toHexString());
+  if (!fromAccount) {
+    if (from == Address.fromString(ZERO_ADDRESS)) {
+      fromAccount = null;
+    } else {
+      fromAccount = createAccount(from.toHexString());
+      fromAccount.save();
+
+      protocol.cumulativeUniqueUsers++;
+      protocol.save();
+    }
+  }
+
+  let aTokenContract = AToken.bind(event.address);
+
+  // update balance from sender
+  if (fromAccount) {
+    subtractPosition(
+      protocol,
+      market,
+      fromAccount,
+      aTokenContract.try_balanceOf(from),
+      PositionSide.LENDER,
+      -1, // TODO: not sure how to classify this event yet
+      event
+    );
+  }
+
+  // update balance from receiver
+  if (toAccount) {
+    addPosition(
+      protocol,
+      market,
+      toAccount,
+      aTokenContract.try_balanceOf(to),
+      PositionSide.LENDER,
+      -1, // TODO: not sure how to classify this event yet
+      event
+    );
+  }
 }
