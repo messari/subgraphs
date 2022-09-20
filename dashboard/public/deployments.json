@@ -196,6 +196,9 @@
         "tectonic": {
             "cronos": "https://graph.cronoslabs.com/subgraphs/name/messari/tectonic"
         },
+        "truefi": {
+            "ethereum": "https://api.thegraph.com/subgraphs/name/messari/truefi-ethereum"
+        },
         "venus": {
             "bsc": "https://api.thegraph.com/subgraphs/name/messari/venus-protocol-bsc"
         }

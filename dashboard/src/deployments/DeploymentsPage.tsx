@@ -159,7 +159,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
         </div>
         <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
           <Typography variant="h6" align="right" sx={{ fontSize: "14px" }}>
-            {subgraphCounts.prodCount} prod-ready, {subgraphCounts.totalCount - subgraphCounts.prodCount} under development, {subgraphCounts.totalCount} subgraph deployments
+            {subgraphCounts.prodCount} prod-ready, {subgraphCounts.devCount} under development, {subgraphCounts.totalCount} subgraph deployments
           </Typography>
         </div>
         {decentralizedSubgraphTable}

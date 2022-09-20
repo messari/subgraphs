@@ -16,7 +16,7 @@ function App() {
   }>({});
 
   const getDeployments = () => {
-    fetch("https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.dev.json", {
+    fetch("https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json", {
       method: "GET",
       headers: {
         Accept: "*/*",
@@ -33,13 +33,14 @@ function App() {
       });
   };
 
-  const depoCount = { totalCount: 0, prodCount: 0, devCount: 0, otherCount: 0 };
+  const depoCount = { totalCount: 0, prodCount: 0, devCount: 0 };
   // Construct subgraph endpoints
   const subgraphEndpoints: { [x: string]: any } = {};
 
   if (Object.keys(protocolsToQuery)?.length > 0) {
     Object.keys(protocolsToQuery).forEach((protocolName: string) => {
       const protocol: any = protocolsToQuery[protocolName];
+      let isDev = false;
       let schemaType = schemaMapping[protocol.schema];
       if (schemaType) {
         if (!Object.keys(subgraphEndpoints).includes(schemaType)) {
@@ -52,17 +53,25 @@ function App() {
 
       Object.values(protocol.deployments).forEach((depoData: any) => {
         if (schemaType) {
-          subgraphEndpoints[schemaType][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["deployment-ids"]["hosted-service"];
+          if (!!subgraphEndpoints[schemaType][protocolName][depoData.network]) {
+            const protocolKeyArr = depoData["deployment-ids"]["hosted-service"].split('-');
+            const networkKey = protocolKeyArr.pop();
+            subgraphEndpoints[schemaType][protocolKeyArr.join('-')] = {};
+            subgraphEndpoints[schemaType][protocolKeyArr.join('-')][networkKey] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["deployment-ids"]["hosted-service"];
+          } else {
+            subgraphEndpoints[schemaType][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["deployment-ids"]["hosted-service"];
+          }
         }
         depoCount.totalCount += 1;
         if (depoData?.status === 'dev') {
-          depoCount.devCount += 1;
-        } else if (depoData?.status === 'prod') {
-          depoCount.prodCount += 1;
-        } else {
-          depoCount.otherCount += 1;
+          isDev = true;
         }
       })
+      if (isDev) {
+        depoCount.devCount += 1;
+      } else {
+        depoCount.prodCount += 1;
+      }
     })
   }
   return (

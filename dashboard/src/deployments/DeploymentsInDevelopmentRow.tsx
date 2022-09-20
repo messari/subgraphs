@@ -16,7 +16,7 @@ function DeploymentsInDevelopmentRow({ protocol, subgraphName }: DeploymentsInDe
             return (
                 <TableRow onClick={() => (window.location.href = ("https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId))} key={subgraphName + depo.chain + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }}>
                     <TableCell
-                        sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", borderLeft: `orange solid 6px`, verticalAlign: "middle", display: "flex" }}
+                        sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${depo?.status === "prod" ? "#58BC82" : "#B8301C"} solid 34px`, verticalAlign: "middle", display: "flex" }}
                     >
                         <SubgraphLogo name={subgraphName} size={30} />
                         <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
@@ -25,7 +25,7 @@ function DeploymentsInDevelopmentRow({ protocol, subgraphName }: DeploymentsInDe
                     </TableCell>
                     <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                     </TableCell>
-                    <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right", display: "flex" }}>
+                    <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
                         <NetworkLogo key={subgraphName + depo.chain + 'Logo'} size={30} network={depo.chain} />
                     </TableCell>
                     <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
@@ -59,7 +59,7 @@ function DeploymentsInDevelopmentRow({ protocol, subgraphName }: DeploymentsInDe
                 }
             }} key={subgraphName + "DepInDevRow"} sx={{ cursor: "pointer", height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }}>
                 <TableCell
-                    sx={{ padding: "0", borderLeft: `orange solid 6px`, verticalAlign: "middle", display: "flex" }}
+                    sx={{ padding: "0", borderLeft: `${protocol?.status ? "#58BC82" : "#B8301C"} solid 6px`, verticalAlign: "middle", display: "flex" }}
                 >
                     <SubgraphLogo name={subgraphName} size={30} />
                     <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
@@ -99,7 +99,7 @@ function DeploymentsInDevelopmentRow({ protocol, subgraphName }: DeploymentsInDe
             }
         }} key={subgraphName + "DepInDevRow"} sx={{ cursor: protocol.networks.length > 1 ? "pointer" : "cursor", height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }}>
             <TableCell
-                sx={{ padding: "0", borderLeft: `orange solid 6px`, verticalAlign: "middle", display: "flex" }}
+                sx={{ padding: "0", borderLeft: `${protocol?.status ? "#58BC82" : "#B8301C"} solid 6px`, verticalAlign: "middle", display: "flex" }}
             >
                 <SubgraphLogo name={subgraphName} size={30} />
                 <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
