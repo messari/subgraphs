@@ -1,4 +1,5 @@
 # Introduction of Notional Finance
+## Version 1.1.0
 
 *Note on 7 Sept 2022: Notional Finance is one protocol with two services, a DEX (of fCASH and cTOKENs) and a lending and borrowing protocol. The two services are interwined and not divisible from a product perspective. For the purpose of subgraph, a version computing the statistics of the lending and borrowing services of Notional will be delivered first. In this version, liquidity represented by nTokens (LP liquidity) is not considered as part of lending or borrowing, as they are part of the DEX service. 
 
