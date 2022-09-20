@@ -1,5 +1,5 @@
 import axios from "axios";
-import { clearChannel, constructEmbedMsg, errorNotification, getDiscordMessages, sendDiscordMessage, startProtocolThread } from "./messageDiscord.js";
+import { fetchMessages, constructEmbedMsg, errorNotification, getDiscordMessages, sendDiscordMessage, startProtocolThread } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
@@ -195,35 +195,50 @@ async function executionFlow() {
 
   });
   deployments = await protocolLevel(deployments);
-  // getCurrentMessages NEEDS TO RETURN MESSAGE ID AS WELL AS MESSAGE CONTENT
   const protocolThreadsToStart = [];
   const currentDiscordMessages = await getDiscordMessages([], "");
-  const messagesToPost = protocolNames.map(protocolName => {
-    let channel_id = null;
-    // Read main channel messages, See if protocol name has aready made a thread/ message
 
+  let protocolNameToChannelMapping = {};
+  protocolNames.forEach(protocolName => {
     if (currentDiscordMessages.find(msg => msg.content.includes(protocolName))) {
-      channel_id = currentDiscordMessages.find(msg => msg.content.includes(protocolName)).id;
+      const channel_id = currentDiscordMessages.find(msg => msg.content.includes(protocolName)).id;
+      protocolNameToChannelMapping[protocolName] = channel_id;
     } else {
       protocolThreadsToStart.push({ protocolName: protocolName });
     }
-    // If not, pass Protocol name and error types into start protocol thread
-    // Start the thread and return the new channel ID (data.id)
+  })
+
+  const channelMapping = await resolveThreadCreation(protocolThreadsToStart, protocolNameToChannelMapping);
+  protocolNameToChannelMapping = { ...protocolNameToChannelMapping, ...channelMapping };
+  let channelIdToIssuesMapping = {};
+
+  Object.keys(protocolNameToChannelMapping).forEach(protocolName => {
+    const channelId = protocolNameToChannelMapping[protocolName];
+    channelIdToIssuesMapping[channelId] = {};
+    Object.keys(deployments).filter(x => {
+      return deployments[x].protocolName === protocolName;
+    }).forEach(x => {
+      if (deployments[x].pending) {
+        channelIdToIssuesMapping[channelId][deployments[x].network + '-pending'] = [];
+      } else {
+        channelIdToIssuesMapping[channelId][deployments[x].network] = [];
+      }
+    });
+  });
+  channelIdToIssuesMapping = await pullMessagesByThread(Object.keys(channelIdToIssuesMapping), channelIdToIssuesMapping);
+
+  const messagesToPost = protocolNames.map(protocolName => {
+    let channel_id = protocolNameToChannelMapping[protocolName] || null;
+
     const deploymentSet = Object.values(deployments).filter(depo => depo.protocolName === protocolName);
-    const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet);
+    const issuesOnThread = channelIdToIssuesMapping[channel_id];
+    const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet, issuesOnThread);
     return { message: embeddedMessages, protocolName: protocolName, channel: channel_id };
   })
   if (messagesToPost.length > 0) {
-    // Need to pull refreshed list of alert messages, in case posted but error was thrown as well.
-
-    // call function to create threads, return object of protocol names to channel ids
-    // map messages to post, where channel is null take above object key of protocol name and set to channel
-
-    const channelMapping = await resolveThreadCreation(protocolThreadsToStart, {})
-    console.log(channelMapping)
     messagesToPost.forEach((msg, idx) => {
       if (!msg.channel) {
-        messagesToPost[idx].channel = channelMapping[msg.protocolName];
+        messagesToPost[idx].channel = protocolNameToChannelMapping[msg.protocolName];
       }
     });
 
@@ -232,19 +247,66 @@ async function executionFlow() {
   return;
 }
 
-async function resolveThreadCreation(protocols, resolution) {
-  // Transform resolution into mapping object ||| [protocolName] > channel id 
-  const localRes = { ...resolution }
+async function pullMessagesByThread(channelIdList, channelIdToIssuesMapping) {
+  const channelIdToIssuesMappingCopy = JSON.parse(JSON.stringify(channelIdToIssuesMapping));
+  const channelIdsListCopy = JSON.parse(JSON.stringify([...channelIdList]));
+
+  const useQueries = channelIdsListCopy.slice(0, 5);
+  const newQueriesArray = [...channelIdsListCopy.slice(5)];
+  try {
+    const fetchMessagesPromiseArr = useQueries.map(channelId => {
+      return fetchMessages("", channelId);
+    });
+    const promiseSettle = await Promise.allSettled(fetchMessagesPromiseArr);
+
+    promiseSettle.forEach((res) => {
+      if (res?.value?.length > 0) {
+        res.value.forEach(protocolMessageObject => {
+          const networkList = Object.keys(channelIdToIssuesMappingCopy[protocolMessageObject.channel_id]);
+          if (networkList.length === 0) {
+            return;
+          }
+          networkList.forEach(chain => {
+            const chainStr = chain.split('-pending')[0];
+            const isPending = chain.split('-pending').length > 1;
+
+            const embedObjectOnChain = protocolMessageObject.embeds.find(x => x.title.includes(chainStr) && x.title.toUpperCase().includes("PROTOCOL LEVEL ERRORS") && ((x.title.toUpperCase().includes("PENDING") && isPending) || (!x.title.toUpperCase().includes("PENDING") && !isPending)));
+            if (!embedObjectOnChain) {
+              return;
+            }
+            const fieldCells = embedObjectOnChain.fields.filter(cell => cell.name === "Field").map(x => x.value);
+            if (fieldCells) {
+
+              channelIdToIssuesMappingCopy[protocolMessageObject.channel_id][chainStr] = fieldCells;
+            }
+          });
+        });
+      }
+    });
+  } catch (err) {
+    console.log(err);
+    errorNotification(err.message + ' pullMessagesByThread() script.js');
+  }
+
+  await sleep(5000);
+  if (newQueriesArray.length > 0) {
+    return pullMessagesByThread(newQueriesArray, channelIdToIssuesMappingCopy);
+  }
+  return channelIdToIssuesMappingCopy;
+}
+
+async function resolveThreadCreation(protocols, threadsCreated) {
+  const threadsCreatedCopy = { ...threadsCreated };
   let useQueries = [...protocols];
   useQueries = useQueries.slice(0, 5);
   const newQueriesArray = [...protocols.slice(5)];
   try {
     const promiseSettle = await Promise.allSettled(useQueries.map(object => {
       const base = protocolNameToBaseMapping[object.protocolName];
-      return startProtocolThread(object.protocolName, base)
+      return startProtocolThread(object.protocolName, base);
     }));
     promiseSettle.forEach(res => {
-      localRes[res.value.protocolName] = res.value.channel;
+      threadsCreatedCopy[res.value.protocolName] = res.value.channel;
     })
   } catch (err) {
     errorNotification(err.message + ' resolveThreadCreation() script.js');
@@ -252,12 +314,9 @@ async function resolveThreadCreation(protocols, resolution) {
 
   await sleep(5000);
   if (newQueriesArray.length > 0) {
-    return resolveThreadCreation(newQueriesArray, localRes);
+    return resolveThreadCreation(newQueriesArray, threadsCreatedCopy);
   }
-  // create mapping and return
-  console.log(localRes)
-  return localRes;
-
+  return threadsCreatedCopy;
 }
 
 async function resolveQueriesToAttempt(queriesToAttempt) {
@@ -265,25 +324,13 @@ async function resolveQueriesToAttempt(queriesToAttempt) {
   let useQueries = queriesToAttempt.slice(0, 5);
   const newQueriesArray = [...queriesToAttempt.slice(5)];
   try {
-    // map useQueries and within filter currentDiscordMessages.includes(useQueries[x].slice(0,80)) 
-
-    // from use queries, get the channel ids and fetch all the messages from the threads, then loop through for hasmsg
-
-    useQueries = useQueries.filter(object => {
-      const hasMsg = currentDiscordMessages.filter(msg => {
-        return msg.content.includes(object.protocolName);
-      })
-      return hasMsg.length === 0;
-    })
-
     await Promise.allSettled(useQueries.map(object => sendDiscordMessage(object.message, object.protocolName, object.channel)));
   } catch (err) {
     errorNotification(err.message + ' resolveQueriesToAttempt() script.js');
   }
-
   await sleep(5000);
   if (newQueriesArray.length > 0) {
-    resolveQueriesToAttempt(newQueriesArray, currentDiscordMessages);
+    resolveQueriesToAttempt(newQueriesArray);
     return;
   }
   return;

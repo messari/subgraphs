@@ -73,10 +73,9 @@ export async function fetchMessages(before, channel_id) {
         const previousWeekMessages = data.data.filter(obj => {
             return moment(new Date(obj.timestamp)).isSameOrAfter(timeAgo);
         });
-
         return previousWeekMessages;
     } catch (err) {
-        errorNotification(err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message + ' fetchMessages() messageDiscord.js');
+        errorNotification(channel_id + ' ' + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message + ' fetchMessages() messageDiscord.js');
     }
 }
 
@@ -104,7 +103,6 @@ export async function sendDiscordMessage(messageObjects, protocolName, channel_i
     if (!Object.keys(messageObjects)?.length > 0 || !messageObjects) {
         return null;
     }
-    console.log(channel_id, 'channel')
     const baseURL = "https://discordapp.com/api/channels/" + channel_id + "/messages";
     const headers = {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
@@ -179,7 +177,7 @@ export async function startProtocolThread(protocolName, base) {
     }
 }
 
-export function constructEmbedMsg(protocol, deploymentsOnProtocol) {
+export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThread) {
 
     const embedObjects = [];
     const indexingErrorEmbed = {
@@ -193,7 +191,9 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol) {
 
     deploymentsOnProtocol.forEach((depo) => {
         let networkString = depo.network;
+        let issuesSet = issuesOnThread[networkString];
         if (depo.pending) {
+            issuesSet = issuesOnThread[networkString + '-pending'];
             networkString += ' (PENDING)'
         }
         const protocolErrorEmbed = {
@@ -209,6 +209,9 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol) {
         }
         let errorsOnDeployment = false;
         Object.entries(depo.protocolErrors).forEach(([errorType, errorArray]) => {
+            if (issuesSet?.includes(errorType)) {
+                return;
+            }
             const protocolRows = [];
             if (errorArray.length > 0) {
                 if (errorsOnDeployment === false) {
