@@ -26,8 +26,6 @@ dataSources:
         - name: cryptopunkContract
           file: ./abis/cryptopunkContract.json
       eventHandlers:
-        - event: PunkOffered(indexed uint256,uint256,indexed address)
-          handler: handlePunkOffered
         - event: PunkBidEntered(indexed uint256,uint256,indexed address)
           handler: handlePunkBidEntered
         - event: PunkBought(indexed uint256,uint256,indexed address,indexed address)
