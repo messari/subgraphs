@@ -95,6 +95,7 @@ export function createBorrow(event: Borrow): BigDecimal {
   // see transaction: https://etherscan.io/tx/0x77885d38a6c496fdc39675f57185ab8bb11e8d1f14eb9f4a536fc1c4d24d84d2
   if (marketId.toLowerCase() == CRYPTEX_MARKET_ID.toLowerCase() && event.block.number.equals(BigInt.fromI32(15358330))) {
     // this is the price of CTX on August 17, 2022 at 11AM UTC-0
+    // see: https://www.coingecko.com/en/coins/cryptex-finance
     const CTX_PRICE = BigDecimal.fromString('3.98');
     borrow.amountUSD = borrow.amount.toBigDecimal().div(DECIMAL_PRECISION).times(CTX_PRICE);
   } else {

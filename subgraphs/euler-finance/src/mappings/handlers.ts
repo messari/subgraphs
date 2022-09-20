@@ -145,7 +145,10 @@ function updateProtocolAndMarkets(block: ethereum.Block): void {
   let markets = protocolUtility.markets;
 
   if (protocolUtility.lastBlockNumber >= blockNumber - 120 ) {
-    return; // Do this update every 120 blocks
+    // Do this update every 120 blocks
+    // this equates to about 30 minutes on ethereum mainnet
+    // this is done since the following logic slows down the indexer
+    return;
   }
 
   let eulerViewQueryResult = queryEulerGeneralView(markets, block);
