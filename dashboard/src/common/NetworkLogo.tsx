@@ -33,5 +33,11 @@ interface NetworkLogoProps {
 }
 
 export const NetworkLogo = ({ network, size }: NetworkLogoProps) => {
-  return <Avatar sx={{ height: size, width: size }} src={NetworkLogos[network] ?? ""} />;
+  let src = NetworkLogos[network];
+  let opacity = 1;
+  if (!src) {
+    src = NetworkLogos.ethereum;
+    opacity = 0;
+  }
+  return <Avatar sx={{ height: size, width: size, opacity }} src={src} />;
 };

@@ -24,7 +24,12 @@ import {
   AccrueInterest,
   NewReserveFactor,
 } from "../../../generated/templates/CToken/CToken";
-import { LendingProtocol, Market, Token } from "../../../generated/schema";
+import {
+  FinancialsDailySnapshot,
+  LendingProtocol,
+  Market,
+  Token,
+} from "../../../generated/schema";
 import {
   cTokenDecimals,
   BIGINT_ZERO,
@@ -32,6 +37,7 @@ import {
   BIGDECIMAL_ZERO,
   exponentToBigDecimal,
   cTokenDecimalsBD,
+  SECONDS_PER_DAY,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -54,6 +60,8 @@ import {
   _handleActionPaused,
   _handleMarketEntered,
   getTokenPriceUSD,
+  getOrCreateMarketDailySnapshot,
+  getOrCreateMarketHourlySnapshot,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
@@ -83,7 +91,10 @@ let nativeToken = constant.nativeToken;
 let nativeCToken = constant.nativeCToken;
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -93,7 +104,10 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -106,7 +120,10 @@ export function handleMarketEntered(event: MarketEntered): void {
 }
 
 export function handleMarketExited(event: MarketExited): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -119,7 +136,10 @@ export function handleMarketExited(event: MarketExited): void {
 }
 
 export function handleMarketListed(event: MarketListed): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -191,7 +211,10 @@ export function handleMarketListed(event: MarketListed): void {
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -203,7 +226,10 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -213,7 +239,10 @@ export function handleNewLiquidationIncentive(
 }
 
 export function handleActionPaused(event: ActionPaused1): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -224,7 +253,10 @@ export function handleActionPaused(event: ActionPaused1): void {
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -234,7 +266,10 @@ export function handleNewReserveFactor(event: NewReserveFactor): void {
 }
 
 export function handleMint(event: Mint): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -254,7 +289,10 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleRedeem(event: Redeem): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -274,7 +312,10 @@ export function handleRedeem(event: Redeem): void {
 }
 
 export function handleBorrow(event: BorrowEvent): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -294,7 +335,10 @@ export function handleBorrow(event: BorrowEvent): void {
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -316,7 +360,10 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -337,7 +384,10 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 }
 
 export function handleAccrueInterest(event: AccrueInterest): void {
-  if (isDeprecated || deprecateSubgraph(event.block.number.toI32())) {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
     return;
   }
 
@@ -393,7 +443,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "CREAM Finance",
     "cream-finance",
     "2.0.1",
-    "1.1.4",
+    "1.1.5",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
@@ -469,11 +519,11 @@ function getPriceUSD(
 
 // this function will deprecate Ethereum subgraph after 10/17/2022
 // return false if not deprecated
-function deprecateSubgraph(blockNumber: i32): boolean {
+function deprecateSubgraph(blockNumber: BigInt, timestamp: BigInt): boolean {
   if (
     isDeprecated ||
     !equalsIgnoreCase(network, Network.MAINNET) ||
-    blockNumber < ETH_CUTOFF_BLOCK
+    blockNumber.toI32() < ETH_CUTOFF_BLOCK
   ) {
     // skip if already deprecated, not ethereum, or not past the CUTOFF block
     return false;
@@ -482,16 +532,20 @@ function deprecateSubgraph(blockNumber: i32): boolean {
   let protocol = getOrCreateProtocol();
 
   // deprecate markets first
-  deprecateMarkets(protocol._marketIDs);
+  deprecateMarkets(protocol._marketIDs, blockNumber, timestamp);
 
   // finish off with the protocol
-  deprecateProtocol(protocol);
+  deprecateProtocol(protocol, timestamp);
 
   isDeprecated = true;
   return true;
 }
 
-function deprecateMarkets(marketIDList: string[]): void {
+function deprecateMarkets(
+  marketIDList: string[],
+  blockNumber: BigInt,
+  timestamp: BigInt
+): void {
   for (let i = 0; i < marketIDList.length; i++) {
     let market = Market.load(marketIDList[i]);
     if (!market) {
@@ -516,13 +570,84 @@ function deprecateMarkets(marketIDList: string[]): void {
     market._borrowBalance = BIGINT_ZERO;
 
     market.save();
+
+    // clear out last marketDaily / hourly snapshot
+    clearMarketSnapshots(market, blockNumber, timestamp);
   }
 }
 
-function deprecateProtocol(protocol: LendingProtocol): void {
+function deprecateProtocol(protocol: LendingProtocol, timestamp: BigInt): void {
   protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
   protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
   protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
 
   protocol.save();
+
+  // clear out last financialsDailySnapshot
+  clearFinancialSnapshot(timestamp);
+}
+
+function clearFinancialSnapshot(timestamp: BigInt): void {
+  let financialsDailySnapshotID = (
+    timestamp.toI32() / SECONDS_PER_DAY
+  ).toString();
+  let financiasDailySnapshot = FinancialsDailySnapshot.load(
+    financialsDailySnapshotID
+  );
+  if (!financiasDailySnapshot) {
+    log.warning(
+      "[clearFinancialSnapshot] could not find FinancialsDailySnapshot with ID {}",
+      [financialsDailySnapshotID]
+    );
+    return;
+  }
+
+  financiasDailySnapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  financiasDailySnapshot.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  financiasDailySnapshot.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  financiasDailySnapshot.save();
+}
+
+function clearMarketSnapshots(
+  market: Market,
+  blockNumber: BigInt,
+  timestamp: BigInt
+): void {
+  let marketDailySnapshot = getOrCreateMarketDailySnapshot(
+    market,
+    timestamp,
+    blockNumber
+  );
+
+  // clear out aggregated fields
+  marketDailySnapshot.rates = [];
+  marketDailySnapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  marketDailySnapshot.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  marketDailySnapshot.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  marketDailySnapshot.inputTokenBalance = BIGINT_ZERO;
+  marketDailySnapshot.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+  marketDailySnapshot.outputTokenSupply = BIGINT_ZERO;
+  marketDailySnapshot.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  marketDailySnapshot.exchangeRate = BIGDECIMAL_ZERO;
+  marketDailySnapshot.rewardTokenEmissionsAmount = [];
+  marketDailySnapshot.rewardTokenEmissionsUSD = [];
+  marketDailySnapshot.save();
+
+  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
+    market,
+    timestamp,
+    blockNumber
+  );
+  marketHourlySnapshot.rates = [];
+  marketHourlySnapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.inputTokenBalance = BIGINT_ZERO;
+  marketHourlySnapshot.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.outputTokenSupply = BIGINT_ZERO;
+  marketHourlySnapshot.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.exchangeRate = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.rewardTokenEmissionsAmount = [];
+  marketHourlySnapshot.rewardTokenEmissionsUSD = [];
+  marketHourlySnapshot.save();
 }

@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",
-    "@graphprotocol/graph-ts": "0.26.0"
+    "@graphprotocol/graph-ts": "0.26.0",
+    "minimist": "^1.2.6"
   },
   "devDependencies": {
+    "eslint": "^8.23.1",
     "mustache": "^3.1.0"
   }
 }

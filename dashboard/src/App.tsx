@@ -1,7 +1,7 @@
 import ProtocolDashboard from "./interfaces/ProtocolDashboard";
 import DeploymentsPage from "./deployments/DeploymentsPage";
 import { Route, Routes } from "react-router";
-import { DashboardVersion } from "./common/DashboardVersion";
+import { dashboardVersion, DashboardVersion } from "./common/DashboardVersion";
 import IssuesDisplay from "./interfaces/IssuesDisplay";
 import { DashboardHeader } from "./graphs/DashboardHeader";
 import { useState } from "react";
@@ -10,12 +10,13 @@ import { schemaMapping } from "./utils";
 import DeploymentsInDevelopment from "./deployments/DeploymentsInDevelopment";
 
 function App() {
+  console.log('RUNNING VERSION ' + dashboardVersion);
   const [protocolsToQuery, setProtocolsToQuery] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
 
   const getDeployments = () => {
-    fetch("https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json", {
+    fetch("https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.dev.json", {
       method: "GET",
       headers: {
         Accept: "*/*",
