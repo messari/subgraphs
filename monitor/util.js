@@ -5,6 +5,7 @@ export const sleep = m => new Promise(r => setTimeout(r, m));
 export const ProtocolTypeEntityName = {
     exchange: "dexAmmProtocol",
     exchanges: "dexAmmProtocol",
+    "dex-amm": "dexAmmProtocol",
     lending: "lendingProtocol",
     yield: "yieldAggregator",
     yields: "yieldAggregator",

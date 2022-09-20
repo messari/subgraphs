@@ -137,12 +137,6 @@ export async function sendDiscordMessage(messageObjects, protocolName, channel_i
     }
 }
 
-
-// Read main channel messages, See if protocol name has aready made a thread/ message
-// If not, pass Protocol name and error types into start protocol thread
-// Start the thread and return the new channel ID (data.id)
-// Pass this channel id to sendDiscordMessage in order to post message for each depo into thread for protocol 
-
 export async function startProtocolThread(protocolName, base) {
     let baseURL = "https://discordapp.com/api/channels/" + process.env.CHANNEL_ID + "/messages";
     let headers = {
@@ -173,69 +167,74 @@ export async function startProtocolThread(protocolName, base) {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return { channel: data.data.id, protocolName: protocolName };
     } catch (err) {
-        errorNotification(err)
+        errorNotification(err);
     }
 }
 
-export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThread) {
-
-    const embedObjects = [];
-    const indexingErrorEmbed = {
-        title: "Indexing Errors",
-        description: 'These subgraphs encountered a fatal error in indexing',
-        fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Indexed %', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
-        footer: { text: monitorVersion }
-    };
-
-    const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
-
-    deploymentsOnProtocol.forEach((depo) => {
-        let networkString = depo.network;
-        let issuesSet = issuesOnThread[networkString];
-        if (depo.pending) {
-            issuesSet = issuesOnThread[networkString + '-pending'];
-            networkString += ' (PENDING)'
-        }
-        const protocolErrorEmbed = {
-            title: `Protocol Level Errors on ${protocol}-${networkString}`,
-            color: placeholderColor,
-            description: 'After mapping through all of the subgraph deployments for this protocol, The errors listed in this section were detected within protocol level data.',
-            fields: [],
+export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThread, indexDeploymentIssues) {
+    try {
+        const embedObjects = [];
+        const indexingErrorEmbed = {
+            title: "Indexing Errors",
+            description: 'These subgraphs encountered a fatal error in indexing',
+            fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Indexed %', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
             footer: { text: monitorVersion }
         };
-        if (!!depo.indexingError) {
-            indexingErrorEmbed.color = placeholderColor;
-            indexingErrorEmbed.fields.push({ name: '\u200b', value: networkString, inline: true }, { name: '\u200b', value: depo.indexedPercentage + '%', inline: true }, { name: '\u200b', value: '\u200b', inline: false });
-        }
-        let errorsOnDeployment = false;
-        Object.entries(depo.protocolErrors).forEach(([errorType, errorArray]) => {
-            if (issuesSet?.includes(errorType)) {
-                return;
-            }
-            const protocolRows = [];
-            if (errorArray.length > 0) {
-                if (errorsOnDeployment === false) {
-                    errorsOnDeployment = true;
+
+        const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
+
+        deploymentsOnProtocol.forEach((depo) => {
+            let networkString = depo.network;
+            let issuesSet = [];
+            if (!!issuesOnThread) {
+                issuesSet = issuesOnThread[networkString];
+                if (depo.pending) {
+                    issuesSet = issuesOnThread[networkString + '-pending'];
+                    networkString += ' (PENDING)';
                 }
-                errorArray.forEach((error) => {
-                    protocolRows.push({ name: 'Field', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`"${ProtocolTypeEntityName[depo.protocolType]}"`), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
-                });
             }
-            protocolErrorEmbed.fields = [...protocolErrorEmbed.fields, ...protocolRows]
+            const protocolErrorEmbed = {
+                title: `Protocol Level Errors on ${protocol}-${networkString}`,
+                color: placeholderColor,
+                description: 'After mapping through all of the subgraph deployments for this protocol, The errors listed in this section were detected within protocol level data.',
+                fields: [],
+                footer: { text: monitorVersion }
+            };
+            if (!!depo.indexingError && !indexDeploymentIssues.includes(networkString)) {
+                indexingErrorEmbed.color = placeholderColor;
+                indexingErrorEmbed.fields.push({ name: '\u200b', value: networkString, inline: true }, { name: '\u200b', value: depo.indexedPercentage + '%', inline: true }, { name: '\u200b', value: '\u200b', inline: false });
+            }
+            let errorsOnDeployment = false;
+            Object.entries(depo.protocolErrors).forEach(([errorType, errorArray]) => {
+                if (issuesSet?.includes(errorType)) {
+                    return;
+                }
+                const protocolRows = [];
+                if (errorArray.length > 0) {
+                    if (errorsOnDeployment === false) {
+                        errorsOnDeployment = true;
+                    }
+                    errorArray.forEach((error) => {
+                        protocolRows.push({ name: 'Field', value: errorType, inline: true }, { name: 'Value', value: error, inline: true }, { name: 'Description', value: protocolErrorMessages[errorType].split("'Protocol'").join(`"${ProtocolTypeEntityName[depo.protocolType]}"`), inline: true }, { name: '\u200b', value: '\u200b', inline: false })
+                    });
+                }
+                protocolErrorEmbed.fields = [...protocolErrorEmbed.fields, ...protocolRows];
+            });
+            if (protocolErrorEmbed.fields.length > 1) {
+                protocolErrorEmbed.url = `https://subgraphs.messari.io/subgraph?endpoint=${depo.url}&tab=protocol`;
+                embedObjects.push(protocolErrorEmbed);
+            }
         });
-        if (protocolErrorEmbed.fields.length > 1) {
-            protocolErrorEmbed.url = `https://subgraphs.messari.io/subgraph?endpoint=${depo.url}&tab=protocol`;
-            embedObjects.push(protocolErrorEmbed);
+
+        if (indexingErrorEmbed.fields.length > 3) {
+            embedObjects.unshift(indexingErrorEmbed);
         }
-    });
 
-    if (indexingErrorEmbed.fields.length > 3) {
-        embedObjects.unshift(indexingErrorEmbed);
+        if (embedObjects.length > 0) {
+            return embedObjects;
+        }
+        return null;
+    } catch (err) {
+        errorNotification(err);
     }
-
-    if (embedObjects.length > 0) {
-        return embedObjects;
-    }
-    return null;
-
 }

@@ -138,7 +138,7 @@ async function executionFlow() {
 
   const currentStateDepos = deployments;
   Object.keys(currentStateDepos).forEach((name) => {
-    deployments[name + "-pending"] = { ...deployments[name] };
+    deployments[name + "-pending"] = JSON.parse(JSON.stringify({ ...deployments[name] }));
     deployments[name + "-pending"].pending = true;
   });
 
@@ -210,29 +210,34 @@ async function executionFlow() {
 
   const channelMapping = await resolveThreadCreation(protocolThreadsToStart, protocolNameToChannelMapping);
   protocolNameToChannelMapping = { ...protocolNameToChannelMapping, ...channelMapping };
-  let channelIdToIssuesMapping = {};
+  let channelToProtocolIssuesMapping = {};
+  let channelToIndexIssuesMapping = {};
 
   Object.keys(protocolNameToChannelMapping).forEach(protocolName => {
     const channelId = protocolNameToChannelMapping[protocolName];
-    channelIdToIssuesMapping[channelId] = {};
+    channelToProtocolIssuesMapping[channelId] = {};
+    channelToIndexIssuesMapping[channelId] = [];
     Object.keys(deployments).filter(x => {
       return deployments[x].protocolName === protocolName;
     }).forEach(x => {
       if (deployments[x].pending) {
-        channelIdToIssuesMapping[channelId][deployments[x].network + '-pending'] = [];
+        channelToProtocolIssuesMapping[channelId][deployments[x].network + '-pending'] = [];
       } else {
-        channelIdToIssuesMapping[channelId][deployments[x].network] = [];
+        channelToProtocolIssuesMapping[channelId][deployments[x].network] = [];
       }
     });
   });
-  channelIdToIssuesMapping = await pullMessagesByThread(Object.keys(channelIdToIssuesMapping), channelIdToIssuesMapping);
 
+  const issuesMapping = await pullMessagesByThread(Object.keys(channelToProtocolIssuesMapping), channelToProtocolIssuesMapping, channelToIndexIssuesMapping);
+  channelToProtocolIssuesMapping = issuesMapping.channelToProtocolIssuesMapping;
+  channelToIndexIssuesMapping = issuesMapping.channelToIndexIssuesMapping;
   const messagesToPost = protocolNames.map(protocolName => {
     let channel_id = protocolNameToChannelMapping[protocolName] || null;
 
     const deploymentSet = Object.values(deployments).filter(depo => depo.protocolName === protocolName);
-    const issuesOnThread = channelIdToIssuesMapping[channel_id];
-    const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet, issuesOnThread);
+    const protocolIssuesOnThread = channelToProtocolIssuesMapping[channel_id];
+    const indexDeploymentIssues = channelToIndexIssuesMapping[channel_id];
+    const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet, protocolIssuesOnThread, indexDeploymentIssues);
     return { message: embeddedMessages, protocolName: protocolName, channel: channel_id };
   })
   if (messagesToPost.length > 0) {
@@ -241,14 +246,14 @@ async function executionFlow() {
         messagesToPost[idx].channel = protocolNameToChannelMapping[msg.protocolName];
       }
     });
-
     await resolveQueriesToAttempt(messagesToPost);
   }
+  console.log('FINISH')
   return;
 }
 
-async function pullMessagesByThread(channelIdList, channelIdToIssuesMapping) {
-  const channelIdToIssuesMappingCopy = JSON.parse(JSON.stringify(channelIdToIssuesMapping));
+async function pullMessagesByThread(channelIdList, channelToProtocolIssuesMapping, channelToIndexIssuesMapping) {
+  const channelToProtocolIssuesMappingCopy = JSON.parse(JSON.stringify(channelToProtocolIssuesMapping));
   const channelIdsListCopy = JSON.parse(JSON.stringify([...channelIdList]));
 
   const useQueries = channelIdsListCopy.slice(0, 5);
@@ -262,7 +267,7 @@ async function pullMessagesByThread(channelIdList, channelIdToIssuesMapping) {
     promiseSettle.forEach((res) => {
       if (res?.value?.length > 0) {
         res.value.forEach(protocolMessageObject => {
-          const networkList = Object.keys(channelIdToIssuesMappingCopy[protocolMessageObject.channel_id]);
+          const networkList = Object.keys(channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id]);
           if (networkList.length === 0) {
             return;
           }
@@ -276,10 +281,19 @@ async function pullMessagesByThread(channelIdList, channelIdToIssuesMapping) {
             }
             const fieldCells = embedObjectOnChain.fields.filter(cell => cell.name === "Field").map(x => x.value);
             if (fieldCells) {
-
-              channelIdToIssuesMappingCopy[protocolMessageObject.channel_id][chainStr] = fieldCells;
+              channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id][chainStr] = fieldCells;
             }
           });
+          const indexingErrorObject = protocolMessageObject.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
+          if (!indexingErrorObject) {
+            return;
+          }
+          channelToIndexIssuesMapping[protocolMessageObject.channel_id] = indexingErrorObject.fields.filter(x => {
+            return x.value.toUpperCase() !== x.value;
+          }).map(x => x.value);
+          if (!channelToIndexIssuesMapping[protocolMessageObject.channel_id]) {
+            channelToIndexIssuesMapping[protocolMessageObject.channel_id] = [];
+          }
         });
       }
     });
@@ -290,9 +304,10 @@ async function pullMessagesByThread(channelIdList, channelIdToIssuesMapping) {
 
   await sleep(5000);
   if (newQueriesArray.length > 0) {
-    return pullMessagesByThread(newQueriesArray, channelIdToIssuesMappingCopy);
+    return pullMessagesByThread(newQueriesArray, channelToProtocolIssuesMappingCopy, channelToIndexIssuesMapping);
   }
-  return channelIdToIssuesMappingCopy;
+
+  return { channelToProtocolIssuesMapping: channelToProtocolIssuesMappingCopy, channelToIndexIssuesMapping };
 }
 
 async function resolveThreadCreation(protocols, threadsCreated) {
@@ -306,7 +321,9 @@ async function resolveThreadCreation(protocols, threadsCreated) {
       return startProtocolThread(object.protocolName, base);
     }));
     promiseSettle.forEach(res => {
-      threadsCreatedCopy[res.value.protocolName] = res.value.channel;
+      if (res?.value) {
+        threadsCreatedCopy[res?.value?.protocolName] = res?.value?.channel;
+      }
     })
   } catch (err) {
     errorNotification(err.message + ' resolveThreadCreation() script.js');
