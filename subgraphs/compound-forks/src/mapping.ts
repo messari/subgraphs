@@ -1533,22 +1533,6 @@ export function updateMarket(
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
 
-  // TODO: remove this line before review
-  if (market.id == "0xe5308dc623101508952948b141fd9eabd3337d99") {
-    log.error(
-      "block: {}, totalSupply: {}, cumulativeDeposits: ${}, exchangeRate: {}, inputTokenBalance: {}, tvl: ${}, inputTokenPrice: ${}",
-      [
-        blockNumber.toString(),
-        updateMarketData.totalSupplyResult.value.toString(),
-        market.cumulativeDepositUSD.toString(),
-        market.exchangeRate!.toString(),
-        market.inputTokenBalance.toString(),
-        market.totalValueLockedUSD.toString(),
-        market.inputTokenPriceUSD.toString(),
-      ]
-    );
-  }
-
   if (updateMarketData.supplyRateResult.reverted) {
     log.warning("[updateMarket] Failed to get supplyRate of Market {}", [
       marketID,
