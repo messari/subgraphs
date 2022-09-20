@@ -48,7 +48,8 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
         </TableHead>
     );
     let totalDepoCounter = 0;
-    let deposInProgressCount = 0;
+    let protocolsInProgressCount = 0;
+    let protocolsProdReadyCount = 0;
     const deposInProgress: { [x: string]: any } = {};
     Object.entries(deploymentsInDevelopment).forEach(([protocolName, protocol]) => {
         Object.keys(protocol.deployments).forEach((depoKey) => {
@@ -72,10 +73,15 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
                 deposInProgress[protocol.schema][protocolName]?.schemaVersions?.push(deploymentData?.versions?.schema);
             }
             if (deploymentData?.status === 'dev') {
-                deposInProgressCount += 1;
                 deposInProgress[protocol.schema][protocolName].status = false;
             }
         });
+        if (deposInProgress[protocol.schema][protocolName].status === false) {
+            protocolsInProgressCount += 1;
+        } else {
+            protocolsProdReadyCount += 1;
+        }
+
     });
 
     return (
@@ -86,7 +92,7 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
                 </Button>
             </div>
             <Typography variant="h4" align="center" sx={{ my: 4 }}>
-                {totalDepoCounter - deposInProgressCount} prod-ready, {deposInProgressCount} under development, {totalDepoCounter} subgraph deployments
+                {protocolsProdReadyCount} prod-ready, {protocolsInProgressCount} under development, {totalDepoCounter} subgraph deployments
             </Typography>
             {Object.entries(deposInProgress).map(([schemaType, subgraph]) => {
                 const tableRows = Object.keys(subgraph).map((subgraphName) => {
