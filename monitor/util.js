@@ -1,10 +1,11 @@
-export const monitorVersion = "v1.0.4";
+export const monitorVersion = "v1.0.5";
 
 export const sleep = m => new Promise(r => setTimeout(r, m));
 
 export const ProtocolTypeEntityName = {
     exchange: "dexAmmProtocol",
     exchanges: "dexAmmProtocol",
+    "dex-amm": "dexAmmProtocol",
     lending: "lendingProtocol",
     yield: "yieldAggregator",
     yields: "yieldAggregator",
