@@ -81,12 +81,6 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
   _handleNewPriceOracle(protocol, newPriceOracle);
 }
 
-export function handleNewReserveFactor(event: NewReserveFactor): void {
-  let marketID = event.address.toHexString();
-  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
-  _handleNewReserveFactor(marketID, newReserveFactorMantissa);
-}
-
 export function handleMarketEntered(event: MarketEntered): void {
   _handleMarketEntered(
     comptrollerAddr,
