@@ -47,7 +47,7 @@ type Delegate @entity {
   numberVotes: Int!
 }
 
-type Vote @entity(immutable: true) {
+type Vote @entity {
   "Delegate ID + spell ID"
   id: ID!
   "Voting weight expressed in the vote"
