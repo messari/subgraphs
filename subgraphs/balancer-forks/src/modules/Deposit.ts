@@ -15,12 +15,15 @@ import {
   getOrCreateDexAmmProtocol,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
+  getOrCreateLiquidityPoolDailySnapshots,
 } from "../common/initializers";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
+import { getOrCreatePosition, updatePositions } from "./Position";
+import { getStat, updateStat } from "./Stat";
 
 export function createDepositTransaction(
-  liquidityPool: LiquidityPoolStore,
+  pool: LiquidityPoolStore,
   inputTokenAmounts: BigInt[],
   outputTokenMintedAmount: BigInt,
   amountUSD: BigDecimal,
@@ -38,19 +41,21 @@ export function createDepositTransaction(
   if (!depositTransaction) {
     depositTransaction = new DepositTransaction(transactionId);
 
-    depositTransaction.pool = liquidityPool.id;
+    depositTransaction.pool = pool.id;
     depositTransaction.protocol = getOrCreateDexAmmProtocol().id;
 
-    depositTransaction.to = liquidityPool.id;
-    depositTransaction.from = provider.toHexString();
+    depositTransaction.account = provider.toHexString();
 
     depositTransaction.hash = transaction.hash.toHexString();
     depositTransaction.logIndex = transaction.index.toI32();
+    depositTransaction.nonce = transaction.nonce;
+    depositTransaction.gasLimit = transaction.gasLimit;
+    depositTransaction.gasPrice = transaction.gasPrice;
 
-    depositTransaction.inputTokens = liquidityPool.inputTokens;
+    depositTransaction.inputTokens = pool.inputTokens;
     depositTransaction.inputTokenAmounts = inputTokenAmounts;
 
-    depositTransaction.outputToken = liquidityPool.outputToken;
+    depositTransaction.outputToken = pool.outputToken;
     depositTransaction.outputTokenAmount = outputTokenMintedAmount;
 
     depositTransaction.amountUSD = amountUSD;
@@ -58,24 +63,40 @@ export function createDepositTransaction(
     depositTransaction.timestamp = block.timestamp;
     depositTransaction.blockNumber = block.number;
 
+    depositTransaction.position = getOrCreatePosition(
+      pool.id,
+      provider.toHexString(),
+      transaction,
+      block
+    ).id;
+
     depositTransaction.save();
   }
 
   return depositTransaction;
 }
 
-export function UpdateMetricsAfterDeposit(block: ethereum.Block): void {
+export function UpdateMetricsAfterDeposit(
+  block: ethereum.Block,
+  amountToken: BigInt,
+  amountUSD: BigDecimal
+): void {
   const protocol = getOrCreateDexAmmProtocol();
 
   // Update hourly and daily deposit transaction count
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
   const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
 
-  metricsDailySnapshot.dailyDepositCount += 1;
   metricsHourlySnapshot.hourlyDepositCount += 1;
 
   metricsDailySnapshot.save();
   metricsHourlySnapshot.save();
+
+  updateStat(
+    getStat(metricsDailySnapshot.depositStats),
+    amountToken,
+    amountUSD
+  );
 
   protocol.save();
 }
@@ -87,7 +108,8 @@ export function Deposit(
   fees: BigInt[],
   provider: Address,
   transaction: ethereum.Transaction,
-  block: ethereum.Block
+  block: ethereum.Block,
+  transactionLogIndex: BigInt
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
@@ -150,8 +172,25 @@ export function Deposit(
     block
   );
 
+  updatePositions(
+    pool,
+    constants.UsageType.DEPOSIT,
+    provider,
+    outputTokenMintedAmount,
+    transaction,
+    block,
+    transactionLogIndex
+  );
+
   utils.updateProtocolTotalValueLockedUSD();
-  UpdateMetricsAfterDeposit(block);
+  UpdateMetricsAfterDeposit(block, outputTokenMintedAmount, depositAmountUSD);
+
+  let poolDailySnaphot = getOrCreateLiquidityPoolDailySnapshots(pool.id, block);
+  updateStat(
+    getStat(poolDailySnaphot.depositStats),
+    outputTokenMintedAmount,
+    depositAmountUSD
+  );
 
   log.info(
     "[AddLiquidity] LiquidityPool: {}, sharesMinted: {}, depositAmount: [{}], inputTokenBalances: [{}], depositAmountUSD: {}, fees: {}, TxnHash: {}",

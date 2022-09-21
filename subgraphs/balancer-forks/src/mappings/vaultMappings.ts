@@ -86,7 +86,8 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
       fees,
       provider,
       event.transaction,
-      event.block
+      event.block,
+      event.transactionLogIndex
     );
   } else {
     Withdraw(
@@ -96,7 +97,8 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
       fees,
       provider,
       event.transaction,
-      event.block
+      event.block,
+      event.transactionLogIndex
     );
   }
 
