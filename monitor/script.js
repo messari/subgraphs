@@ -20,7 +20,7 @@ const protocolNameToBaseMapping = {};
 
 async function executionFlow() {
   const { data } = await axios.get(
-    "https://subgraphs.messari.io/deployment.dev.json"
+    "https://subgraphs.messari.io/deployment.json"
   );
   // deployments holds the errors for every protocol
   const subgraphEndpoints = {};

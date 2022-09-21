@@ -1,4 +1,4 @@
-export const monitorVersion = "v1.0.5";
+export const monitorVersion = "v1.0.6";
 
 export const sleep = m => new Promise(r => setTimeout(r, m));
 
