@@ -1,0 +1,68 @@
+type Slate @entity {
+  "Unique Slate ID, produced by hashing the addresses in the slate"
+  id: ID!
+  "Transaction hash of the Slate creation"
+  txnHash: String!
+  "Block number slate was created "
+  creationBlock: BigInt!
+  "Timestamp of block slate was created in"
+  creationTime: BigInt!
+
+  "Spells that are on this slate"
+  yays: [Spell!]!
+
+  # Voters
+}
+
+# Also referred to as Executive Proposal
+type Spell @entity {
+  "Spell's contract address"
+  id: ID!
+  "Spell description"
+  description: String!
+  "Flag if the Spell has been cast"
+  done: Boolean
+  "Timestamp of Spell cast"
+  lifted: BigInt
+  "Number of votes for the Spell"
+  totalVotes: BigInt!
+  "Weighted voting power for the Spell"
+  totalWeightedVotes: BigInt!
+}
+
+type Delegate @entity {
+  "A Delegate is any address that has been delegated with voting tokens by a token holder, id is the blockchain address of said delegate"
+  id: String!
+
+  "Delegate voting power expressed in the smallest unit of the token"
+  votingPowerRaw: BigInt!
+  "Delegate voting power expressed as a BigDecimal normalized value"
+  votingPower: BigDecimal!
+
+  # TokenHoldersRepresented
+
+  "Votes that a delegate has made in different spells"
+  votes: [Vote!]! @derivedFrom(field: "voter")
+  "Number of spells voted on"
+  numberVotes: Int!
+}
+
+type Vote @entity(immutable: true) {
+  "Delegate ID + spell ID"
+  id: ID!
+  "Voting weight expressed in the vote"
+  weight: BigInt!
+  "Reason for voting choice"
+  reason: String
+  "Delegate that emitted the vote"
+  voter: Delegate!
+  "spell that is being voted on"
+  spell: Spell!
+
+  "Block number vote is cast in"
+  block: BigInt!
+  "Timestamp of block vote was cast in"
+  blockTime: BigInt!
+  "Transaction hash of the vote"
+  txnHash: String!
+}
