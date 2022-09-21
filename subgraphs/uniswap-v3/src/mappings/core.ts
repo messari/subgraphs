@@ -64,7 +64,7 @@ export function handleSwap(event: SwapEvent): void {
     event.params.amount0,
     event.params.amount1,
     event.params.recipient,
-    event.params.sender,
+    event.transaction.from,
     event.params.sqrtPriceX96
   );
   updateFinancials(event);

@@ -128,3 +128,5 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
 export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
+
+export const MOST_RECENT_TRANSACTION = "MOST_RECENT_TRANSACTION";

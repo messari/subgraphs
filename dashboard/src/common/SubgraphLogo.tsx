@@ -60,7 +60,8 @@ const subgraphLogoMap: Record<string, string> = {
   "arweave": "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616",
   "rocket-pool": "https://assets.coingecko.com/coins/images/2090/small/rocket_pool_%28RPL%29.png?1637662441",
   "tornado-cash": "https://assets.coingecko.com/coins/images/13496/small/ZINt8NSB_400x400.jpg?1609193407",
-  "graph": "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566"
+  "graph": "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566",
+  "truefi": "https://assets.coingecko.com/coins/images/13180/small/truefi_glyph_color.png?1617610941"
 };
 
 // used for protocols with multiple versions
