@@ -20,11 +20,11 @@ import {
 } from "../../generated/schema";
 import * as utils from "./utils";
 import * as constants from "./constants";
+import { getUsdPricePerToken } from "../prices";
 import { Vault as VaultStore } from "../../generated/schema";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/templates/Strategy/ERC20";
-import { getUsdPricePerToken } from "../prices";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
