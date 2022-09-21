@@ -55,6 +55,9 @@ export function handleStaking(
 
     pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
     pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+     if (!pool.stakedOutputTokenAmount) {
+    pool.stakedOutputTokenAmount = constants.BIGINT_ZERO;
+  }
     if (type == "WITHDRAW") {
       pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
     }
