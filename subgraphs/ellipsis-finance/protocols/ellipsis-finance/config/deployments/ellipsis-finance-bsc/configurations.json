@@ -19,7 +19,12 @@
       "name": "StakingV2",
       "address": "0x5B74C99AA2356B4eAa7B85dC486843eDff8Dfdbe"
     }
-  ]
+  ],
+  "graftEnabled":true,
+  "subgraphId":"QmVnwVVhwg4oVUECtQNvVUh22oAqnhULVGrvH3tPVvGHtV",
+  "graftStartBlock":16887400
+
+
   
 
 }

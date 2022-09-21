@@ -337,11 +337,19 @@ export function getPoolFromLpToken(lpTokenAddress: Address): Address {
   let factoryContract = FactoryContract.bind(
     constants.FACTORY_ADDRESS
   );
-
+let registryContract = RegistryContract.bind(
+    constants.REGISTRY_ADDRESS
+  );
   let poolAddress = readValue<Address>(
     factoryContract.try_get_pool_from_lp_token(lpTokenAddress),
     constants.NULL.TYPE_ADDRESS
   );
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) {
+    poolAddress = readValue<Address>(
+      registryContract.try_get_pool_from_lp_token(lpTokenAddress),
+      constants.NULL.TYPE_ADDRESS
+    );
+  }
 
   return poolAddress;
 }

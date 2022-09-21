@@ -34,19 +34,23 @@ export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
 }
 export function handleDepositV2(event: DepositV2): void {
     let amount = event.params.amount;
-    let token = event.params.token;
+  let token = event.params.token;
+
+  
     handleStakingV2(constants.UsageType.DEPOSIT, event.block, event.address, amount, token);
     
 }
 export function handleWithdrawV2(event: WithdrawV2): void {
 let amount = event.params.amount;
-    let token = event.params.token;
+  let token = event.params.token;
+
     handleStakingV2(constants.UsageType.WITHDRAW, event.block, event.address, amount, token);
     
 }
 export function handleEmergencyWithdrawV2(event: EmergencyWithdrawV2): void {
     let amount = event.params.amount;
-    let token = event.params.token;
+  let token = event.params.token;
+
     handleStakingV2(constants.UsageType.WITHDRAW , event.block, event.address, amount, token);
     
 }

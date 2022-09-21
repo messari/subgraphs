@@ -3,6 +3,8 @@ description: ...
 graft:
   base: {{subgraphId}} # Subgraph ID of base subgraph
   block: {{graftStartBlock}} # Block number
+features:
+  - grafting
 {{/graftEnabled}}
 specVersion: 0.0.2
 schema:
@@ -93,7 +95,7 @@ dataSources:
     source:
       address: "0xcce949De564fE60e7f96C85e55177F8B9E4CF61b"
       abi: Staking
-      startBlock: 5938178
+      startBlock: 15020650
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
