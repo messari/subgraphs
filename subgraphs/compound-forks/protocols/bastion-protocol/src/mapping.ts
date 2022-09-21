@@ -73,7 +73,7 @@ import {
   REWARD_TOKENS,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
-import { RewardDistributor } from "../../../generated/RewardDistributor/RewardDistributor";
+import { RewardDistributor } from "../../../generated/templates/CToken/RewardDistributor";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
