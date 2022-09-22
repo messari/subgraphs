@@ -18,6 +18,10 @@ type Slate @entity {
 type Spell @entity {
   "Spell's contract address"
   id: ID!
+  "Block number spell was created in"
+  creationBlock: BigInt!
+  "Timestamp of block spell was created in"
+  creationTime: BigInt!
   "Spell description"
   description: String!
   "Flag if the Spell has been cast"

@@ -1,16 +1,10 @@
-import { BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { LogNote, DSChief } from "../generated/DSChief/DSChief";
 import { DSSpell } from "../generated/DSChief/DSSpell";
 import { Slate, Spell, Delegate, Vote } from "../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO } from "./constants";
+import { hexToNumberString, toDecimal } from "./helpers";
 
-function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
-  return value.divDecimal(
-    BigInt.fromI32(10)
-      .pow(<u8>decimals)
-      .toBigDecimal()
-  );
-}
 function getSlate(id: string): Slate {
   let slate = Slate.load(id);
   if (!slate) {
@@ -49,7 +43,8 @@ function createVote(
 
 export function handleLock(event: LogNote): void {
   let sender = event.params.guy; // guy is the sender
-  let amount = event.params.wad; // wad is the amount being locked
+  let amountStr = hexToNumberString(event.params.foo.toHexString());
+  let amount = BigInt.fromString(amountStr); //.foo is the amount being locked
 
   let delegate = getDelegate(sender.toHexString());
   delegate.votingPowerRaw = delegate.votingPowerRaw.plus(amount);
@@ -59,7 +54,8 @@ export function handleLock(event: LogNote): void {
 
 export function handleFree(event: LogNote): void {
   let sender = event.params.guy; // guy is the sender
-  let amount = event.params.wad; // wad is the amount being locked
+  let amountStr = hexToNumberString(event.params.foo.toHexString());
+  let amount = BigInt.fromString(amountStr); //.foo is the amount being locked
 
   let delegate = getDelegate(sender.toHexString());
   delegate.votingPowerRaw = delegate.votingPowerRaw.minus(amount);
@@ -88,14 +84,14 @@ export function handleVote(event: LogNote): void {
 
     if (!spell) {
       spell = new Spell(spellID);
+      spell.creationBlock = event.block.number;
+      spell.creationTime = event.block.timestamp;
       spell.description = "";
 
       let dsSpell = DSSpell.bind(spellAddress);
       let dsDescription = dsSpell.try_description();
-      let dsDone = dsSpell.try_done();
-      if (!dsDescription.reverted && !dsDone.reverted) {
+      if (!dsDescription.reverted) {
         spell.description = dsDescription.value;
-        spell.done = dsDone.value;
       }
       spell.totalVotes = BIGINT_ZERO;
       spell.totalWeightedVotes = BIGINT_ZERO;
