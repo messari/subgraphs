@@ -5,6 +5,7 @@ import {
 } from "../common/initializers";
 import {
   PoolAdded,
+  PoolAdded1,
   BasePoolAdded,
   MetaPoolDeployed,
   PlainPoolDeployed,
@@ -20,6 +21,8 @@ import { PoolTemplate } from "../../generated/templates";
 export function handlePoolAdded(event: PoolAdded): void {
   const registryAddress = event.address;
   const poolAddress = event.params.pool;
+
+  if (utils.isPoolRegistered(poolAddress)) return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
 
@@ -54,9 +57,50 @@ export function handlePoolAdded(event: PoolAdded): void {
   ]);
 }
 
+export function handlePoolAddedWithRate(event: PoolAdded1): void {
+  const registryAddress = event.address;
+  const poolAddress = event.params.pool;
+
+  if (utils.isPoolRegistered(poolAddress)) return;
+
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+
+  let lpToken = utils.getLpTokenFromRegistry(
+    poolAddress,
+    registryAddress,
+    event.block
+  );
+
+  if (!lpToken)
+    lpToken = utils.getOrCreateTokenFromString(pool.outputToken!, event.block);
+
+  const lpTokenStore = getOrCreateLpToken(Address.fromString(lpToken.id));
+
+  lpTokenStore.registryAddress = registryAddress.toHexString();
+  lpTokenStore.poolAddress = poolAddress.toHexString();
+
+  pool._registryAddress = registryAddress.toHexString();
+  pool.name = lpToken.name;
+  pool.symbol = lpToken.symbol;
+  pool.outputToken = lpToken.id;
+
+  lpTokenStore.save();
+  pool.save();
+
+  PoolTemplate.create(poolAddress);
+
+  log.warning("[PoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
+    pool.id,
+    registryAddress.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
+}
+
 export function handleBasePoolAdded(event: BasePoolAdded): void {
   const poolAddress = event.params.base_pool;
   const registryAddress = event.address.toHexString();
+
+  if (utils.isPoolRegistered(poolAddress)) return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   pool._registryAddress = registryAddress;
@@ -77,6 +121,7 @@ export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
 
   const poolAddress = utils.getPoolFromCoins(registryAddress, coins);
   if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+  if (utils.isPoolRegistered(poolAddress)) return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   pool._registryAddress = registryAddress.toHexString();
@@ -133,7 +178,9 @@ export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
   if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
+
   pool._registryAddress = registryAddress.toHexString();
+  pool.outputToken = lpToken.toHexString();
   pool.save();
 
   PoolTemplate.create(poolAddress);
@@ -153,17 +200,13 @@ export function handleLiquidityGaugeDeployed(
 ): void {
   const registryAddress = event.address;
   const poolAddress = event.params.pool;
-  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
-
   const gaugeAddress = event.params.gauge;
+
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
 
-  pool._registryAddress = registryAddress.toHexString();
-  pool._gaugeAddress = gauge.id;
   gauge.poolAddress = pool.id;
-
   gauge.save();
-  pool.save();
 
   log.warning(
     "[LiquidityGaugeDeployed] GaugeAddress: {}, PoolAddress: {}, registryAddress: {}, TxnHash: {}",
@@ -181,16 +224,13 @@ export function handleLiquidityGaugeDeployedWithToken(
 ): void {
   const lpToken = event.params.token;
   const registryAddress = event.address;
-
   const poolAddress = event.params.pool;
-  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
-
   const gaugeAddress = event.params.gauge;
+
+  const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
 
-  pool._registryAddress = registryAddress.toHexString();
   pool.outputToken = lpToken.toHexString();
-  pool._gaugeAddress = gauge.id;
   gauge.poolAddress = pool.id;
 
   gauge.save();

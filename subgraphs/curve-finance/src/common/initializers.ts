@@ -274,8 +274,6 @@ export function getOrCreateLiquidityPoolDailySnapshots(
     const pool = getOrCreateLiquidityPool(Address.fromString(poolId), block);
     let inputTokenLength = pool.inputTokens.length;
 
-    poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-
     poolSnapshots.dailyVolumeByTokenAmount = new Array<BigInt>(
       inputTokenLength
     ).fill(constants.BIGINT_ZERO);
@@ -283,15 +281,17 @@ export function getOrCreateLiquidityPoolDailySnapshots(
       inputTokenLength
     ).fill(constants.BIGDECIMAL_ZERO);
 
+    poolSnapshots.totalValueLockedUSD = pool.totalValueLockedUSD;
+  
     poolSnapshots.inputTokenBalances = pool.inputTokenBalances;
     poolSnapshots.inputTokenWeights = pool.inputTokenWeights;
 
-    poolSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    poolSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.outputTokenSupply = pool.outputTokenSupply;
+    poolSnapshots.outputTokenPriceUSD = pool.outputTokenPriceUSD;
 
-    poolSnapshots.rewardTokenEmissionsAmount = null;
-    poolSnapshots.rewardTokenEmissionsUSD = null;
-    poolSnapshots.stakedOutputTokenAmount = null;
+    poolSnapshots.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+    poolSnapshots.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+    poolSnapshots.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
 
     poolSnapshots.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -328,11 +328,9 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
     poolSnapshots.protocol = constants.PROTOCOL_ID.toHexString();
     poolSnapshots.pool = poolId;
 
-    poolSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-
     const pool = getOrCreateLiquidityPool(Address.fromString(poolId), block);
-    let inputTokenLength = pool.inputTokens.length;
 
+    let inputTokenLength = pool.inputTokens.length;
     poolSnapshots.hourlyVolumeByTokenAmount = new Array<BigInt>(
       inputTokenLength
     ).fill(constants.BIGINT_ZERO);
@@ -340,15 +338,17 @@ export function getOrCreateLiquidityPoolHourlySnapshots(
       inputTokenLength
     ).fill(constants.BIGDECIMAL_ZERO);
 
+    poolSnapshots.totalValueLockedUSD = pool.totalValueLockedUSD;
+
     poolSnapshots.inputTokenBalances = pool.inputTokenBalances;
     poolSnapshots.inputTokenWeights = pool.inputTokenWeights;
 
-    poolSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    poolSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
+    poolSnapshots.outputTokenSupply = pool.outputTokenSupply;
+    poolSnapshots.outputTokenPriceUSD = pool.outputTokenPriceUSD;
 
-    poolSnapshots.rewardTokenEmissionsAmount = null;
-    poolSnapshots.rewardTokenEmissionsUSD = null;
-    poolSnapshots.stakedOutputTokenAmount = null;
+    poolSnapshots.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+    poolSnapshots.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+    poolSnapshots.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
 
     poolSnapshots.hourlySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     poolSnapshots.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;

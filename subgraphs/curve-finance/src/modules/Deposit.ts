@@ -121,7 +121,7 @@ export function Deposit(
   );
   pool.totalValueLockedUSD = utils.getPoolTVL(
     utils.getOrCreateTokenFromString(pool.outputToken!, block),
-    pool.outputTokenSupply!
+    totalSupplyAfterDeposit
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,

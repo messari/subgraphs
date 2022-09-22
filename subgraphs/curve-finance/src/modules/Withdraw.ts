@@ -26,13 +26,13 @@ export function createWithdrawTransaction(
   outputTokenBurntAmount: BigInt,
   amountUSD: BigDecimal,
   provider: Address,
-  transaction: ethereum.Transaction,
+  event: ethereum.Event,
   block: ethereum.Block
 ): WithdrawTransaction {
   let withdrawTransactionId = "withdraw-"
-    .concat(transaction.hash.toHexString())
+    .concat(event.transaction.hash.toHexString())
     .concat("-")
-    .concat(transaction.index.toString());
+    .concat(event.logIndex.toString());
 
   let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
@@ -43,12 +43,12 @@ export function createWithdrawTransaction(
     withdrawTransaction.protocol = constants.PROTOCOL_ID.toHexString();
 
     withdrawTransaction.to = constants.NULL.TYPE_STRING;
-    if (transaction.to) withdrawTransaction.to = transaction.to!.toHexString();
+    if (event.transaction.to) withdrawTransaction.to = event.transaction.to!.toHexString();
 
     withdrawTransaction.from = provider.toHexString();
 
-    withdrawTransaction.hash = transaction.hash.toHexString();
-    withdrawTransaction.logIndex = transaction.index.toI32();
+    withdrawTransaction.hash = event.transaction.hash.toHexString();
+    withdrawTransaction.logIndex = event.logIndex.toI32();
 
     withdrawTransaction.inputTokens = pool.inputTokens;
     withdrawTransaction.inputTokenAmounts = inputTokenAmounts;
@@ -213,7 +213,7 @@ export function Withdraw(
   );
   pool.totalValueLockedUSD = utils.getPoolTVL(
     utils.getOrCreateTokenFromString(pool.outputToken!, block),
-    pool.outputTokenSupply!
+    tokenSupplyAfterWithdrawal
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
@@ -235,7 +235,7 @@ export function Withdraw(
     outputTokenBurntAmount,
     withdrawAmountUSD,
     provider,
-    transaction,
+    event,
     block
   );
   utils.updateProtocolTotalValueLockedUSD();

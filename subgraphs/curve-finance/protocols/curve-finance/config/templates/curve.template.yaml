@@ -84,9 +84,11 @@ dataSources:
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         # Pool Registry events
-        - event: PoolAdded(indexed address,bytes)
+        - event: PoolAdded(indexed address)
           handler: handlePoolAdded
-        
+        - event: PoolAdded(indexed address,bytes)
+          handler: handlePoolAddedWithRate
+
         # Factory Pool Registry Events
         - event: BasePoolAdded(address)
           handler: handleBasePoolAdded

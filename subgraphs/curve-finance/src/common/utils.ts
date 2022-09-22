@@ -64,6 +64,13 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   );
 }
 
+export function isPoolRegistered(poolAddress: Address): boolean {
+  const pool = LiquidityPool.load(poolAddress.toHexString());
+
+  if (!pool) return true;
+  return false;
+}
+
 export function getLpTokenFromPool(
   poolAddress: Address,
   block: ethereum.Block
