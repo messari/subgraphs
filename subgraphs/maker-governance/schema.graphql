@@ -24,10 +24,16 @@ type Spell @entity {
   creationTime: BigInt!
   "Spell description"
   description: String!
+  "Timestamp of Spell lift"
+  liftedBlock: BigInt
+  "Voting power when lifted"
+  liftedWith: BigInt
   "Flag if the Spell has been cast"
-  done: Boolean
+  cast: Boolean
   "Timestamp of Spell cast"
-  lifted: BigInt
+  castBlock: BigInt
+  "Voting power when cast"
+  castWith: BigInt
   "Number of votes for the Spell"
   totalVotes: BigInt!
   "Weighted voting power for the Spell"

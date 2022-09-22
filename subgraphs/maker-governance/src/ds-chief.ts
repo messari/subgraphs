@@ -10,43 +10,13 @@ import { LogNote, DSChief, Etch } from "../generated/DSChief/DSChief";
 import { DSSpell } from "../generated/DSChief/DSSpell";
 import { Slate, Spell, Delegate, Vote } from "../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO } from "./constants";
-import { hexToNumberString, toDecimal } from "./helpers";
-
-function getSlate(id: string): Slate {
-  let slate = Slate.load(id);
-  if (!slate) {
-    slate = new Slate(id);
-    slate.yays = [];
-  }
-  return slate;
-}
-function getDelegate(address: string): Delegate {
-  let delegate = Delegate.load(address);
-  if (!delegate) {
-    delegate = new Delegate(address);
-    delegate.votingPowerRaw = BIGINT_ZERO;
-    delegate.votingPower = BIGDECIMAL_ZERO;
-    delegate.numberVotes = 0;
-  }
-  return delegate;
-}
-function createVote(
-  sender: string,
-  spellID: string,
-  weight: BigInt,
-  event: ethereum.Event
-): void {
-  let voteId = sender.concat("-").concat(spellID);
-  let vote = new Vote(voteId);
-  vote.weight = weight;
-  vote.reason = "";
-  vote.voter = sender;
-  vote.spell = spellID;
-  vote.block = event.block.number;
-  vote.blockTime = event.block.timestamp;
-  vote.txnHash = event.transaction.hash.toHexString();
-  vote.save();
-}
+import {
+  createVote,
+  getDelegate,
+  hexToNumberString,
+  toDecimal,
+} from "./helpers";
+import { DSSpell as DSSpellTemplate } from "../generated/templates";
 
 export function handleLock(event: LogNote): void {
   let sender = event.params.guy; // guy is the sender
@@ -105,7 +75,6 @@ function _handleSlateVote(
 
     let spellID = spellAddress.toHexString();
     let spell = Spell.load(spellID);
-
     if (!spell) {
       spell = new Spell(spellID);
       spell.creationBlock = event.block.number;
@@ -119,6 +88,9 @@ function _handleSlateVote(
       }
       spell.totalVotes = BIGINT_ZERO;
       spell.totalWeightedVotes = BIGINT_ZERO;
+
+      // Track this new spell
+      DSSpellTemplate.create(spellAddress);
     }
     spell.totalVotes = spell.totalVotes.plus(BIGINT_ONE);
     spell.totalWeightedVotes = spell.totalWeightedVotes.plus(
@@ -136,4 +108,13 @@ function _handleSlateVote(
     slateResponse = dsChief.try_slates(slateID, BigInt.fromI32(++i));
   }
   slate.save();
+}
+export function handleLift(event: LogNote): void {
+  let spellID = event.params.foo.toHexString(); // foo is the spellID
+  let spell = Spell.load(spellID);
+  if (!spell) return;
+
+  spell.liftedBlock = event.block.number;
+  spell.liftedWith = spell.totalWeightedVotes;
+  spell.save();
 }

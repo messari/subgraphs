@@ -1,4 +1,6 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Delegate, Vote } from "../generated/schema";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "./constants";
 
 export function hexToNumberString(hex: string): string {
   let hexNumber = BigInt.fromI32(0);
@@ -24,4 +26,33 @@ export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
       .pow(<u8>decimals)
       .toBigDecimal()
   );
+}
+
+export function getDelegate(address: string): Delegate {
+  let delegate = Delegate.load(address);
+  if (!delegate) {
+    delegate = new Delegate(address);
+    delegate.votingPowerRaw = BIGINT_ZERO;
+    delegate.votingPower = BIGDECIMAL_ZERO;
+    delegate.numberVotes = 0;
+  }
+  return delegate;
+}
+
+export function createVote(
+  sender: string,
+  spellID: string,
+  weight: BigInt,
+  event: ethereum.Event
+): void {
+  let voteId = sender.concat("-").concat(spellID);
+  let vote = new Vote(voteId);
+  vote.weight = weight;
+  vote.reason = "";
+  vote.voter = sender;
+  vote.spell = spellID;
+  vote.block = event.block.number;
+  vote.blockTime = event.block.timestamp;
+  vote.txnHash = event.transaction.hash.toHexString();
+  vote.save();
 }
