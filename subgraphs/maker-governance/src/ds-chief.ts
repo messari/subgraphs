@@ -1,5 +1,12 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { LogNote, DSChief } from "../generated/DSChief/DSChief";
+import {
+  BigInt,
+  Address,
+  Bytes,
+  ethereum,
+  log,
+  crypto,
+} from "@graphprotocol/graph-ts";
+import { LogNote, DSChief, Etch } from "../generated/DSChief/DSChief";
 import { DSSpell } from "../generated/DSChief/DSSpell";
 import { Slate, Spell, Delegate, Vote } from "../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO } from "./constants";
@@ -65,13 +72,30 @@ export function handleFree(event: LogNote): void {
 
 export function handleVote(event: LogNote): void {
   let sender = event.params.guy.toHexString(); // guy is the sender
-  let delegate = getDelegate(sender);
-
   let slateID = event.params.foo; // foo is slate id
-  let slate = getSlate(slateID.toHexString());
-  slate.txnHash = event.transaction.hash.toHexString();
-  slate.creationBlock = event.block.number;
-  slate.creationTime = event.block.timestamp;
+  _handleSlateVote(sender, slateID, event);
+}
+
+export function handleEtch(event: Etch): void {
+  let sender = event.transaction.from.toHexString();
+  let slateID = event.params.slate;
+  _handleSlateVote(sender, slateID, event);
+}
+
+function _handleSlateVote(
+  sender: string,
+  slateID: Bytes,
+  event: ethereum.Event
+): void {
+  let delegate = getDelegate(sender);
+  let slate = Slate.load(slateID.toHexString());
+  if (!slate) {
+    slate = new Slate(slateID.toHexString());
+    slate.yays = [];
+    slate.txnHash = event.transaction.hash.toHexString();
+    slate.creationBlock = event.block.number;
+    slate.creationTime = event.block.timestamp;
+  }
 
   let i = 0;
   let dsChief = DSChief.bind(event.address);

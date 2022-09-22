@@ -32,6 +32,9 @@ type Spell @entity {
   totalVotes: BigInt!
   "Weighted voting power for the Spell"
   totalWeightedVotes: BigInt!
+
+  "Votes associated to this spell"
+  votes: [Vote!]! @derivedFrom(field: "spell")
 }
 
 type Delegate @entity {
