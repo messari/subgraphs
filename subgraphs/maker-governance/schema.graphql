@@ -1,3 +1,32 @@
+type GovernanceFramework @entity {
+  "Governance framework contract address"
+  id: String!
+  "Name of the governance framework"
+  name: String!
+  "Type of governance framework"
+  type: GovernanceFrameworkType!
+
+  "The contract address associated with the governance token used for voting on the governance framework proposals"
+  tokenAddress: String!
+  "Total Supply of token"
+  totalTokenSupply: BigInt!
+  "Total number of token holders currently"
+  currentTokenHolders: BigInt!
+  "Total number of delegates participating on the governance currently"
+  currentDelegates: BigInt!
+
+  "Total number of spells created"
+  spells: BigInt!
+}
+
+enum GovernanceFrameworkType {
+  GovernorAlpha
+  GovernorBravo
+  OZGovernor
+  AaveGovernanceV2
+  MakerGovernance
+}
+
 type Slate @entity {
   "Unique Slate ID, produced by hashing the addresses in the slate"
   id: ID!
@@ -10,28 +39,35 @@ type Slate @entity {
 
   "Spells that are on this slate"
   yays: [Spell!]!
-
-  # Voters
 }
 
 # Also referred to as Executive Proposal
 type Spell @entity {
   "Spell's contract address"
   id: ID!
+  "Spell description"
+  description: String!
+  "State of the spell"
+  state: SpellState!
+
   "Block number spell was created in"
   creationBlock: BigInt!
   "Timestamp of block spell was created in"
   creationTime: BigInt!
-  "Spell description"
-  description: String!
+  "Transaction hash of Spell lift"
+  liftedTxnHash: String
   "Timestamp of Spell lift"
-  liftedBlock: BigInt
+  liftedTime: BigInt
   "Voting power when lifted"
   liftedWith: BigInt
-  "Flag if the Spell has been cast"
-  cast: Boolean
+  "Transaction hash of Spell scheduled"
+  scheduledTxnHash: String
+  "Timestamp of Spell scheduled"
+  scheduledTime: BigInt
+  "Transaction hash of Spell cast"
+  castTxnHash: String
   "Timestamp of Spell cast"
-  castBlock: BigInt
+  castTime: BigInt
   "Voting power when cast"
   castWith: BigInt
   "Number of votes for the Spell"
@@ -41,6 +77,12 @@ type Spell @entity {
 
   "Votes associated to this spell"
   votes: [Vote!]! @derivedFrom(field: "spell")
+}
+enum SpellState {
+  ACTIVE
+  LIFTED
+  SCHEDULED
+  CAST
 }
 
 type Delegate @entity {

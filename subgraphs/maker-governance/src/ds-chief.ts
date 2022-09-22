@@ -1,15 +1,8 @@
-import {
-  BigInt,
-  Address,
-  Bytes,
-  ethereum,
-  log,
-  crypto,
-} from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { LogNote, DSChief, Etch } from "../generated/DSChief/DSChief";
 import { DSSpell } from "../generated/DSChief/DSSpell";
-import { Slate, Spell, Delegate, Vote } from "../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO } from "./constants";
+import { Slate, Spell } from "../generated/schema";
+import { BIGINT_ONE, BIGINT_ZERO, SpellState } from "./constants";
 import {
   createVote,
   getDelegate,
@@ -77,9 +70,10 @@ function _handleSlateVote(
     let spell = Spell.load(spellID);
     if (!spell) {
       spell = new Spell(spellID);
+      spell.description = "";
+      spell.state = SpellState.ACTIVE;
       spell.creationBlock = event.block.number;
       spell.creationTime = event.block.timestamp;
-      spell.description = "";
 
       let dsSpell = DSSpell.bind(spellAddress);
       let dsDescription = dsSpell.try_description();
@@ -114,7 +108,9 @@ export function handleLift(event: LogNote): void {
   let spell = Spell.load(spellID);
   if (!spell) return;
 
-  spell.liftedBlock = event.block.number;
+  spell.state = SpellState.LIFTED;
+  spell.liftedTxnHash = event.transaction.hash.toHexString();
+  spell.liftedTime = event.block.number;
   spell.liftedWith = spell.totalWeightedVotes;
   spell.save();
 }
