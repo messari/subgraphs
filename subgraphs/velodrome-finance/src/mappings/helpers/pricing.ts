@@ -5,6 +5,7 @@ import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  MINIMUM_LIQUIDITY_USD,
   USDC_ADDRESS,
   USDC_DECIMALS,
   ZERO_ADDRESS,
@@ -17,6 +18,10 @@ export function updatePoolPriceFromSwap(event: Swap): void {
   let helper = _PoolPricingHelper.load(event.address.toHex())!;
 
   if (!helper.whitelisted) {
+    return;
+  }
+
+  if (pool.totalValueLockedUSD < MINIMUM_LIQUIDITY_USD) {
     return;
   }
 

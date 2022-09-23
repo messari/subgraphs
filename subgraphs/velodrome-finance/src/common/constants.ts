@@ -152,6 +152,7 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
 export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
+export const BIGDECIMAL_THOUSAND = new BigDecimal(BIGINT_THOUSAND);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -181,3 +182,4 @@ export const USDC_ADDRESS = "0x7f5c764cbc14f9669b88837ca1490cca17c31607"
 export const FACTORY_ADDRESS = "0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746";
 export const VELO_ADDRESS = "0x3c8b650257cfb5f272f799f5e2b4e65093a11a05"
 export const FEE_CHECK_INTERVAL_BLOCKS = BigInt.fromI32(900) // ~ 1 block every 2 seconds on optimism. 900 blocks ~ 30 mins.
+export const MINIMUM_LIQUIDITY_USD = BIGDECIMAL_THOUSAND
