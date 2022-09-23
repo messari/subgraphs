@@ -96,6 +96,7 @@ export function handleStakingV2(
   if (!pool.stakedOutputTokenAmount) {
     pool.stakedOutputTokenAmount = constants.BIGINT_ZERO;
   }
+  
   if (type == "WITHDRAW") {
     pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   }

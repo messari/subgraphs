@@ -53,7 +53,7 @@
     "type": "function",
     "name": "get_coins",
     "inputs": [{ "name": "_pool", "type": "address" }],
-    "outputs": [{ "name": "", "type": "address[8]" }],
+    "outputs": [{ "name": "", "type": "address[4]" }],
     "gas": 22975
   },
   {

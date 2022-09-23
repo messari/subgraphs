@@ -22,7 +22,7 @@ export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
 
 export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
    let registryAddress = event.address;
-  let poolAddress = event.params.base_pool;
+  let poolAddress = event.params.pool;
 
   if (utils.checkIfPoolExists(poolAddress)) return;
   getOrCreateLiquidityPool(poolAddress, event.block);

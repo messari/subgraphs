@@ -54,7 +54,7 @@
   },
   {
     "name": "get_coins",
-    "outputs": [{ "type": "address[8]", "name": "" }],
+    "outputs": [{ "type": "address[4]", "name": "" }],
     "inputs": [{ "type": "address", "name": "_pool" }],
     "stateMutability": "view",
     "type": "function",

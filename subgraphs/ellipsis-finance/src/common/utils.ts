@@ -18,6 +18,7 @@ import {
 import * as constants from "./constants";
 import * as utils from "./utils";
 import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
+import { LpToken as LPTokenContract } from "../../generated/Factory/LpToken";
 import { PoolFeesType } from "./types";
 
 export function enumToPrefix(snake: string): string {
@@ -353,3 +354,21 @@ let registryContract = RegistryContract.bind(
 
   return poolAddress;
 }
+
+// export function getLpTokenTotalSupply(lpTokenAddress: Address) { 
+//   let lpTokenContract = LPTokenContract.bind(lpTokenAddress);
+
+// }
+// export function getVirtualPriceFromPool(poolAddress: Address) { 
+//   let poolContract = PoolContract.bind(poolAddress);
+//   let virtualPrice = readValue<BigInt>(poolContract.try_get_virtual_price(), constants.BIGINT_ZERO);
+//   return virtualPrice;
+// }
+// export function getVirtualPriceFromLpToken(lpTokenAddress: Address) {
+//   let registryContract = RegistryContract.bind(lpTokenAddress);
+//   let virtualPrice = readValue<BigInt>(registryContract.try_get_virtual_price_from_lp_token(lpTokenAddress), constants.BIGINT_ZERO);
+//   return virtualPrice;
+// }
+// export function getPriceUSDFromVritualPrice() {
+  
+// }

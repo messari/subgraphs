@@ -36,7 +36,7 @@ export function handleAddLiquidity(event: AddLiquidity): void  {
 }
 export function handleRemoveLiquidity(event: RemoveLiquidity) : void {
       const provider = event.params.provider;
-  const liquidityPoolAddress = event.address;
+  const liquidityPoolAddress = event. address;
   const withdrawnCoinAmounts = event.params.token_amounts;
   const tokenSupplyAfterWithdrawal = event.params.token_supply;
 
@@ -57,7 +57,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity) : void {
 }
 export function handleRemoveLiquidityImbalance(event: RemoveLiquidityImbalance) : void {
     const provider = event.params.provider;
-  const liquidityPoolAddress = event.address;
+  const liquidityPoolAddress = event. address;
   const withdrawnTokenAmounts = event.params.token_amounts;
   const tokenSupplyAfterWithdrawal = event.params.token_supply;
 

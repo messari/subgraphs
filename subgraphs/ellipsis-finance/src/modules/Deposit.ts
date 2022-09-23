@@ -52,6 +52,7 @@ export function createDepositTransaction(
     depositTransaction.inputTokenAmounts = inputTokenAmounts;
 
     depositTransaction.outputToken = liquidityPool.outputToken;
+    
     depositTransaction.outputTokenAmount = outputTokenMintedAmount;
 
     depositTransaction.amountUSD = amountUSD;

@@ -66,7 +66,7 @@ export function getUnderlyingCoinFromPool(
   curveRegistry: CurveRegistryContract,
   network: string,
 ): Address {
-  let coinsArray = curveRegistry.try_get_underlying_coins(poolAddress);
+  let coinsArray = curveRegistry.try_get_coins(poolAddress);
 
   let coins: Address[];
 
