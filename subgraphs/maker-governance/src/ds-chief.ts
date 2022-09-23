@@ -102,6 +102,10 @@ function _handleSlateVote(
     slateResponse = dsChief.try_slates(slateID, BigInt.fromI32(++i));
   }
   slate.save();
+
+  delegate.slate = slate.id;
+  delegate.numberVotes = delegate.numberVotes + 1;
+  delegate.save();
 }
 export function handleLift(event: LogNote): void {
   let spellID = event.params.foo.toHexString(); // foo is the spellID
@@ -110,7 +114,7 @@ export function handleLift(event: LogNote): void {
 
   spell.state = SpellState.LIFTED;
   spell.liftedTxnHash = event.transaction.hash.toHexString();
-  spell.liftedTime = event.block.number;
+  spell.liftedTime = event.block.timestamp;
   spell.liftedWith = spell.totalWeightedVotes;
   spell.save();
 }
