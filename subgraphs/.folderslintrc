@@ -15,9 +15,6 @@
 
     "### uniswap forks structure ###",
     "uniswap-forks/configurations/*",
-    "uniswap-forks/protocols/*/config/deployments/*",
-    "uniswap-forks/protocols/*/config/templates",
-    "uniswap-forks/protocols/*/src/**",
 
     "### specific outliers ###",
     "uniswap-v3/configurations/*",
