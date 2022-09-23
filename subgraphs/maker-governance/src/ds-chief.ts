@@ -1,22 +1,41 @@
-import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { LogNote, DSChief, Etch } from "../generated/DSChief/DSChief";
 import { DSSpell } from "../generated/DSChief/DSSpell";
-import { Slate, Spell } from "../generated/schema";
-import { BIGINT_ONE, BIGINT_ZERO, SpellState } from "./constants";
+import { VoteDelegate } from "../generated/DSChief/VoteDelegate";
+import { Slate, Spell, Vote, Delegate } from "../generated/schema";
 import {
-  createVote,
-  getDelegate,
-  hexToNumberString,
-  toDecimal,
-} from "./helpers";
-import { DSSpell as DSSpellTemplate } from "../generated/templates";
+  BIGDECIMAL_ZERO,
+  BIGINT_ONE,
+  BIGINT_ZERO,
+  SpellState,
+} from "./constants";
+import { getDelegate, hexToNumberString, toDecimal } from "./helpers";
+import {
+  // DSSpell as DSSpellTemplate,
+  VoteDelegate as VoteDelegateTemplate,
+} from "../generated/templates";
 
 export function handleLock(event: LogNote): void {
   let sender = event.params.guy; // guy is the sender
   let amountStr = hexToNumberString(event.params.foo.toHexString());
   let amount = BigInt.fromString(amountStr); //.foo is the amount being locked
 
-  let delegate = getDelegate(sender.toHexString());
+  let delegate = Delegate.load(sender.toHexString());
+  if (!delegate) {
+    delegate = new Delegate(sender.toHexString());
+    delegate.tokenHoldersRepresented = 0;
+    delegate.numberVotes = 0;
+
+    // Check if vote delegate contract by calling chief()
+    let voteDelegate = VoteDelegate.bind(sender);
+    let res = voteDelegate.try_chief();
+    // will revert if not a contract
+    if (!res.reverted) {
+      // Track this new vote delegate contract
+      VoteDelegateTemplate.create(sender);
+    }
+  }
+
   delegate.votingPowerRaw = delegate.votingPowerRaw.plus(amount);
   delegate.votingPower = delegate.votingPower.plus(toDecimal(amount));
   delegate.save();
@@ -84,34 +103,60 @@ function _handleSlateVote(
       spell.totalWeightedVotes = BIGINT_ZERO;
 
       // Track this new spell
-      DSSpellTemplate.create(spellAddress);
+      // DSSpellTemplate.create(spellAddress);
     }
+
+    let voteId = sender
+      .concat("-")
+      .concat(slateID.toHexString())
+      .concat("-")
+      .concat(spellID);
+    // Check for double vote
+    let vote = Vote.load(voteId);
+    if (vote) {
+      log.error("Vote double count {}, txn {}, subtracting previous vote", [
+        voteId,
+        event.transaction.hash.toHexString(),
+      ]);
+      // subtract previous vote weight
+      spell.totalWeightedVotes = spell.totalWeightedVotes.minus(vote.weight);
+      spell.totalVotes = spell.totalVotes.minus(BIGINT_ONE);
+    }
+    // overwrite vote
+    vote = new Vote(voteId);
+    vote.weight = delegate.votingPowerRaw;
+    vote.reason = "";
+    vote.voter = sender;
+    vote.spell = spellID;
+    vote.block = event.block.number;
+    vote.blockTime = event.block.timestamp;
+    vote.txnHash = event.transaction.hash.toHexString();
+    vote.save();
+
     spell.totalVotes = spell.totalVotes.plus(BIGINT_ONE);
     spell.totalWeightedVotes = spell.totalWeightedVotes.plus(
       delegate.votingPowerRaw
     );
     spell.save();
 
-    createVote(sender, spellID, delegate.votingPowerRaw, event);
-
-    if (slate.yays.length == 0) {
-      slate.yays = slate.yays.concat([spellID]);
-    }
+    slate.yays = slate.yays.concat([spellID]);
 
     // loop through slate indices until a revert breaks it
     slateResponse = dsChief.try_slates(slateID, BigInt.fromI32(++i));
   }
   slate.save();
 
-  delegate.slate = slate.id;
+  delegate.currentSpells = slate.yays;
   delegate.numberVotes = delegate.numberVotes + 1;
   delegate.save();
 }
-export function handleLift(event: LogNote): void {
-  let spellID = event.params.foo.toHexString(); // foo is the spellID
-  let spell = Spell.load(spellID);
-  if (!spell) return;
 
+export function handleLift(event: LogNote): void {
+  // foo is the spellID in bytes, we trim and convert to address
+  let spellID = Address.fromString(event.params.foo.toHexString().slice(26));
+
+  let spell = Spell.load(spellID.toHexString());
+  if (!spell) return;
   spell.state = SpellState.LIFTED;
   spell.liftedTxnHash = event.transaction.hash.toHexString();
   spell.liftedTime = event.block.timestamp;
