@@ -67,8 +67,8 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
 export function isPoolRegistered(poolAddress: Address): boolean {
   const pool = LiquidityPool.load(poolAddress.toHexString());
 
-  if (!pool) return true;
-  return false;
+  if (!pool) return false;
+  return true;
 }
 
 export function getLpTokenFromPool(
