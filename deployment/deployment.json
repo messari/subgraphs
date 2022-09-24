@@ -2377,9 +2377,9 @@
   "radiant": {
     "schema": "lending",
     "base": "aave-v2-forks",
-    "protocol": "radiant",
+    "protocol": "radiant-capital",
     "deployments": {
-      "radiant-arbitrum": {
+      "radiant-capital-arbitrum": {
         "network": "arbitrum",
         "status": "prod",
         "versions": {
@@ -2388,10 +2388,10 @@
           "methodology": "1.0.0"
         },
         "deployment-ids": {
-          "hosted-service": "radiant-arbitrum"
+          "hosted-service": "radiant-capital-arbitrum"
         },
         "files": {
-          "template": "radiant.template.yaml"
+          "template": "radiant.capital.template.yaml"
         },
         "options": {
           "prepare:yaml": true,

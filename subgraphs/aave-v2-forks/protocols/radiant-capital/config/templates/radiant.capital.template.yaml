@@ -30,7 +30,7 @@ dataSources:
       eventHandlers:
         - event: PriceOracleUpdated(indexed address)
           handler: handlePriceOracleUpdated
-      file: ./protocols/radiant/src/mapping.ts
+      file: ./protocols/radiant-capital/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPool
     network: {{ network }}
@@ -51,11 +51,11 @@ dataSources:
         - Liquidate
       abis:
         - name: ChefIncentivesController
-          file: ./abis/radiant/ChefIncentivesController.json
+          file: ./abis/radiant-capital/ChefIncentivesController.json
         - name: UniswapV2Pair
-          file: ./abis/radiant/UniswapV2Pair.json
+          file: ./abis/radiant-capital/UniswapV2Pair.json
         - name: RToken
-          file: ./abis/radiant/RToken.json
+          file: ./abis/radiant-capital/RToken.json
         - name: AToken
           file: ./abis/aave-v2/AToken.json
         - name: VariableDebtToken
@@ -63,7 +63,7 @@ dataSources:
         - name: StableDebtToken
           file: ./abis/StableDebtToken.json
         - name: LendingPool
-          file: ./abis/radiant/LendingPoolRadiant.json # custom LiquidationCall event
+          file: ./abis/radiant-capital/LendingPoolRadiant.json # custom LiquidationCall event
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20NameBytes
@@ -81,7 +81,7 @@ dataSources:
           handler: handleBorrow
         - event: Repay(indexed address,indexed address,indexed address,uint256)
           handler: handleRepay
-        - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
+        - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool,address)
           handler: handleLiquidationCall
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleReserveDataUpdated
@@ -93,7 +93,7 @@ dataSources:
           handler: handlePaused
         - event: Unpaused()
           handler: handleUnpaused
-      file: ./protocols/radiant/src/mapping.ts
+      file: ./protocols/radiant-capital/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator
     network: {{ network }}
@@ -109,11 +109,11 @@ dataSources:
         - Market
       abis:
         - name: RToken
-          file: ./abis/radiant/RToken.json
+          file: ./abis/radiant-capital/RToken.json
         - name: LendingPoolConfigurator
           file: ./abis/LendingPoolConfigurator.json
         - name: LendingPool
-          file: ./abis/radiant/LendingPoolRadiant.json # custom LiquidationCall event
+          file: ./abis/radiant-capital/LendingPoolRadiant.json # custom LiquidationCall event
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20NameBytes
@@ -135,4 +135,22 @@ dataSources:
           handler: handleReserveDeactivated
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
-      file: ./protocols/radiant/src/mapping.ts
+      file: ./protocols/radiant-capital/src/mapping.ts
+templates:
+  - kind: ethereum/contract
+    name: AToken
+    network: {{ network }}
+    source:
+      abi: AToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: AToken
+          file: ./abis/aave-v2/AToken.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/radiant-capital/src/mapping.ts
