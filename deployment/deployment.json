@@ -863,7 +863,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.3",
+          "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
         "deployment-ids": {
