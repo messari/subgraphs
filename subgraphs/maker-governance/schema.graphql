@@ -88,12 +88,16 @@ enum SpellState {
 type Delegate @entity {
   "A Delegate is any address that has been delegated with voting tokens by a token holder, id is the blockchain address of said delegate"
   id: String!
+  "Is a vote delegate contract"
+  isVoteDelegate: Boolean
 
   "Delegate voting power expressed in the smallest unit of the token"
   votingPowerRaw: BigInt!
   "Delegate voting power expressed as a BigDecimal normalized value"
   votingPower: BigDecimal!
 
+  "Delegations that this contract has received"
+  delegations: [Delegation!]!
   "Number of token holders delegate represents"
   tokenHoldersRepresented: Int!
 
@@ -104,6 +108,14 @@ type Delegate @entity {
   votes: [Vote!]! @derivedFrom(field: "voter")
   "Number of spells voted on"
   numberVotes: Int!
+}
+type Delegation @entity {
+  "delegate-delegator"
+  id: String!
+  "Address of the delegator"
+  delegator: String!
+  "Total amount delegated"
+  amount: BigInt!
 }
 
 type Vote @entity {

@@ -34,6 +34,8 @@ export function getDelegate(address: string): Delegate {
     delegate = new Delegate(address);
     delegate.votingPowerRaw = BIGINT_ZERO;
     delegate.votingPower = BIGDECIMAL_ZERO;
+    delegate.delegations = [];
+    delegate.tokenHoldersRepresented = 0;
     delegate.numberVotes = 0;
   }
   return delegate;

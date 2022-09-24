@@ -23,6 +23,8 @@ export function handleLock(event: LogNote): void {
   let delegate = Delegate.load(sender.toHexString());
   if (!delegate) {
     delegate = new Delegate(sender.toHexString());
+    delegate.votingPowerRaw = BIGINT_ZERO;
+    delegate.votingPower = BIGDECIMAL_ZERO;
     delegate.tokenHoldersRepresented = 0;
     delegate.numberVotes = 0;
 
@@ -31,6 +33,7 @@ export function handleLock(event: LogNote): void {
     let res = voteDelegate.try_chief();
     // will revert if not a contract
     if (!res.reverted) {
+      delegate.isVoteDelegate = true;
       // Track this new vote delegate contract
       VoteDelegateTemplate.create(sender);
     }
