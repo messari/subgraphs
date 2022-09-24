@@ -50,9 +50,9 @@ export function updateMarketRewards(
   let tryTotalRewardsPerSecond = incentiveController.try_rewardsPerSecond();
 
   if (
-    tryDepPoolInfo.reverted &&
-    tryBorPoolInfo.reverted &&
-    tryTotalAllocPoint.reverted &&
+    tryDepPoolInfo.reverted ||
+    tryBorPoolInfo.reverted ||
+    tryTotalAllocPoint.reverted ||
     tryTotalRewardsPerSecond.reverted
   ) {
     return;
