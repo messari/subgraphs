@@ -41,12 +41,14 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleTransfer,
   _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
 import { BIGDECIMAL_ZERO, exponentToBigDecimal } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { updateMarketRewards } from "./rewards";
+import { Transfer } from "../../../generated/templates/AToken/AToken";
 
 function getProtocolData(): ProtocolData {
   return new ProtocolData(
@@ -251,4 +253,12 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.user,
     event.params.debtAsset
   );
+}
+
+//////////////////////
+//// AToken Event ////
+//////////////////////
+
+export function handleTransfer(event: Transfer): void {
+  _handleTransfer(event, event.params.to, event.params.from, getProtocolData());
 }
