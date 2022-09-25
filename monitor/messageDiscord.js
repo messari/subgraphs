@@ -5,8 +5,7 @@ import { monitorVersion, ProtocolTypeEntityName, sleep, colorsArray } from './ut
 
 // Error handling functions
 
-export async function errorNotification(error) {
-
+export async function errorNotification(error, channelId = process.env.CHANNEL_ID) {
     await sleep(5000);
     try {
         const baseURL = "https://discordapp.com/api/channels/1019063880040861806/messages";
@@ -14,7 +13,7 @@ export async function errorNotification(error) {
             "Authorization": "Bot " + process.env.BOT_TOKEN,
             "Content-Type": "application/json",
         }
-        const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected**\n` + error });
+        const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor on Channel ${channelId}- Errors detected**\n` + error });
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return null;
     } catch (err) {
@@ -35,7 +34,7 @@ export async function getDiscordMessages(messages, channelId = process.env.CHANN
             return messages;
         }
     } catch (err) {
-        errorNotification("ERROR LOCATION 7 " + err?.message + ' URL: ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message + ' ' + channelId);
+        errorNotification("ERROR LOCATION 7 " + err?.message + ' URL: ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
@@ -58,7 +57,7 @@ export async function fetchMessages(before, channelId = process.env.CHANNEL_ID) 
         });
         return previousWeekMessages;
     } catch (err) {
-        errorNotification("ERROR LOCATION 8 " + err?.message + ' URL: ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message + ' ' + channelId);
+        errorNotification("ERROR LOCATION 8 " + err?.message + ' URL: ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
@@ -72,7 +71,7 @@ export async function getChannel(channelId = process.env.CHANNEL_ID) {
     try {
         const data = await axios.get(baseURL, { "headers": { ...headers } });
     } catch (err) {
-        errorNotification("ERROR LOCATION 9 " + channelId + ' ' + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message);
+        errorNotification("ERROR LOCATION 9 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
@@ -95,7 +94,7 @@ export async function clearChannel(channelId = process.env.CHANNEL_ID) {
         await Promise.allSettled(deletions);
         clearMessages(channelId);
     } catch (err) {
-        errorNotification("ERROR LOCATION 10 " + channelId + ' ' + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message);
+        errorNotification("ERROR LOCATION 10 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
@@ -113,11 +112,11 @@ export async function clearMessages(channelId = process.env.CHANNEL_ID) {
         const postJSON = JSON.stringify({ "messages": msgs.map(x => x.id).slice(0, 100) });
         await axios.post(baseURL + "/messages/bulk-delete", postJSON, { "headers": { ...headers } });
     } catch (err) {
-        errorNotification("ERROR LOCATION 11 " + channelId + ' ' + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message);
+        errorNotification("ERROR LOCATION 11 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
-export async function deleteSingleMessage(messageId, channelId) {
+export async function deleteSingleMessage(messageId, channelId = process.env.CHANNEL_ID) {
     try {
         const headers = {
             "Authorization": "Bot " + process.env.BOT_TOKEN,
@@ -127,7 +126,7 @@ export async function deleteSingleMessage(messageId, channelId) {
         await axios.delete(baseURL, { "headers": { ...headers } });
         return;
     } catch (err) {
-        errorNotification("ERROR LOCATION 22 " + channelId + ' ' + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message);
+        errorNotification("ERROR LOCATION 22 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
@@ -165,7 +164,7 @@ export async function sendDiscordMessage(messageObjects, protocolName, channelId
         if (err.response.status === 429) {
             return messageObjects;
         } else {
-            errorNotification("ERROR LOCATION 12 " + channelId + ' ' + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message);
+            errorNotification("ERROR LOCATION 12 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
             return null;
         }
     }
@@ -184,7 +183,7 @@ export async function startProtocolThread(protocolName, base, channelId = proces
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         msgId = data.data.id;
     } catch (err) {
-        errorNotification("ERROR LOCATION 13 " + channelId + ' ' + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message);
+        errorNotification("ERROR LOCATION 13 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 
     baseURL = "https://discordapp.com/api/channels/" + channelId + "/messages/" + msgId + "/threads";
@@ -198,7 +197,7 @@ export async function startProtocolThread(protocolName, base, channelId = proces
         if (!!msgId) {
             deleteSingleMessage(msgId, channelId);
         }
-        errorNotification("ERROR LOCATION 14 " + channelId + ' ' + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message);
+        errorNotification("ERROR LOCATION 14 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
