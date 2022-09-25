@@ -2,10 +2,14 @@ import axios from "axios";
 import { errorNotification } from "./messageDiscord.js";
 import { formatIntToFixed2 } from "./util.js";
 
-export const protocolLevel = async (deployments) => {
+export const protocolLevel = async (deployments, invalidDeployments) => {
     const endpointsList = [];
 
-    Object.values(deployments).forEach((depo) => {
+    Object.keys(deployments).forEach((key) => {
+        if (invalidDeployments.includes(key)) {
+            return;
+        }
+        const depo = deployments[key];
         if (!depo.indexingError) {
             endpointsList.push(depo.url);
         }
@@ -47,7 +51,7 @@ export const protocolLevel = async (deployments) => {
                 })
             }))
         )
-        .catch((err) => errorNotification(err.message + ' protocolLevel() protocolLevel.js'));
+        .catch((err) => errorNotification("ERROR LOCATION 16 " + err.message));
     const specificDataPromiseArray = [];
     protocolLevelData.forEach((deployment) => {
         if (!deployment?.data) return;
@@ -170,10 +174,9 @@ export const protocolLevel = async (deployments) => {
                 })
             }))
         )
-        .catch((err) => errorNotification(err.message + ' protocolLevel() protocolLevel.js'));
+        .catch((err) => errorNotification("ERROR LOCATION 17 " + err.message));
 
     protocolTypeLevelData.forEach((protocol) => {
-        // find deployments objectbased on deployments.url === protocol.url
         const deploymentName = Object.keys(deployments).find(
             (depoName) => deployments[depoName]?.url === protocol?.url
         );
@@ -215,10 +218,10 @@ export const protocolLevel = async (deployments) => {
         }
 
         if (
-            (
+            Math.abs((
                 parseFloat(data.cumulativeProtocolSideRevenueUSD) +
                 parseFloat(data.cumulativeSupplySideRevenueUSD)
-            ).toFixed(2) !== parseFloat(data.cumulativeTotalRevenueUSD).toFixed(2)
+            ) - parseFloat(data.cumulativeTotalRevenueUSD)) > 100
         ) {
             const value = (
                 '$' + formatIntToFixed2(parseFloat(data.cumulativeTotalRevenueUSD)) +
