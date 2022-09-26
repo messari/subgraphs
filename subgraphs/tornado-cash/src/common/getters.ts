@@ -240,15 +240,15 @@ export function getOrCreatePoolDailySnapshot(
 export function getOrCreatePoolHourlySnapshot(
   event: ethereum.Event
 ): PoolHourlySnapshot {
-  let dayId = getDaysSinceEpoch(event.block.timestamp.toI32());
+  let hourId = getHoursSinceEpoch(event.block.timestamp.toI32());
 
   let poolMetrics = PoolHourlySnapshot.load(
-    event.address.toHexString().concat("-").concat(dayId)
+    event.address.toHexString().concat("-").concat(hourId)
   );
 
   if (!poolMetrics) {
     poolMetrics = new PoolHourlySnapshot(
-      event.address.toHexString().concat("-").concat(dayId)
+      event.address.toHexString().concat("-").concat(hourId)
     );
 
     poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
