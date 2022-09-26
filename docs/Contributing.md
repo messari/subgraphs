@@ -34,6 +34,37 @@ At this point you will just need to follow the "Reviewing" process until your PR
 
 > This is an iterative process that takes time, so don't think it will always be easy.
 
+## Subgraph Directory Structure Guidelines
+
+All our subgraphs share the same build and deployment scripts. They are used during development, when deploying a subgraph, and during our CI validation pipelines. These scripts expect all subgraphs to follow a given directory structure. So for them to work without adding extra hassle, and to keep code itself organized in a consistent and predictable manner, we require all subgraphs to follow this structure. 
+
+Our CI pipelines on PRs automatically validate that this structure is followed, to enforce it and make sure things don't break in case of error. To do so we are using [folderslint](). It is a simple tool that allows you to define some rules and then validates that they are met. The rules are very simple, it is a set of paths that are whitelisted. These are contained at `/subgraphs/.folderslintrc`.
+
+The directory structure for a given subgraph should be as follows (this might eventually go out of date, so always refer to the code to see the actual rules):
+
+```
+subgraphs/
+    someProtocolName/
+        abis/
+            (no limitations on child directories here)
+        protocols/
+            (might have more than 1 in the case of forks)
+            someProtocolName/
+                config/
+                    deployments/
+                        someProtocolName-ethereum/
+                            configurations.json
+                        someProtocolName-arbitrum/
+                            configurations.json
+                    templates/
+                        someProtocol.template.yaml
+                src/
+                    (protocol/deployment specific code)
+        src/
+            (code common to all protocols in this subgraph)
+```
+
+
 ## Rebasing
 
 ### Why rebase?
