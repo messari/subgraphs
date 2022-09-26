@@ -61,7 +61,7 @@ export function handleTransfer(event: TransferEvent): void {
   }
 
   // ERC721 collection created via registry list (name/symbol field initialized null)
-  if (tokenCollection.name == null && tokenCollection.symbol == null) {
+  if (tokenCollection.name == null && tokenCollection.symbol == null && tokenCollection.transferCount.equals(BIGINT_ZERO)) {
     tokenCollection = updateCollectionDetails(contract, tokenCollection);
   }
 
