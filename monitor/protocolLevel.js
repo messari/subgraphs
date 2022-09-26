@@ -184,13 +184,12 @@ export const protocolLevel = async (deployments) => {
         if (!protocol?.protocol) return;
         const data = protocol.protocol[Object.keys(protocol.protocol)[0]][0];
         if (!data) return;
-        const url = protocol.url;
 
         const dataFields = Object.keys(data);
 
         if (
             !(
-                data.totalValueLockedUSD > 10000 &&
+                data.totalValueLockedUSD >= 0 &&
                 data.totalValueLockedUSD < 100000000000
             )
         ) {
@@ -233,21 +232,21 @@ export const protocolLevel = async (deployments) => {
 
         if (
             dataFields.includes("cumulativeVolumeUSD") &&
-            !(parseFloat(data.cumulativeVolumeUSD) > 10000)
+            !(parseFloat(data.cumulativeVolumeUSD) >= 0)
         ) {
             issuesArrays.cumulativeVolumeUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeVolumeUSD)));
         }
 
         if (
             dataFields.includes("cumulativeUniqueUsers") &&
-            !(parseFloat(data.cumulativeUniqueUsers) > 100 && parseFloat(data.cumulativeUniqueUsers) < 100000000)
+            !(parseFloat(data.cumulativeUniqueUsers) >= 0 && parseFloat(data.cumulativeUniqueUsers) < 100000000)
         ) {
             issuesArrays.cumulativeUniqueUsers.push(data.cumulativeUniqueUsers);
         }
 
         if (
             dataFields.includes("totalPoolCount") &&
-            !(parseFloat(data.totalPoolCount) > 0 && parseFloat(data.totalPoolCount) < 10000)
+            !(parseFloat(data.totalPoolCount) >= 0 && parseFloat(data.totalPoolCount) < 10000)
         ) {
             issuesArrays.totalPoolCount.push(data.totalPoolCount);
         }
@@ -286,7 +285,7 @@ export const protocolLevel = async (deployments) => {
 
         if (
             dataFields.includes("openPositionCount") &&
-            !(parseFloat(data.openPositionCount) > 100 && parseFloat(data.openPositionCount) < 1000000000)
+            !(parseFloat(data.openPositionCount) >= 0 && parseFloat(data.openPositionCount) < 1000000000)
         ) {
             issuesArrays.openPositionCount.push(data.openPositionCount);
         }
@@ -303,7 +302,7 @@ export const protocolLevel = async (deployments) => {
 
         if (
             dataFields.includes("totalDepositBalanceUSD") &&
-            !(parseFloat(data.totalDepositBalanceUSD) > 10000 && parseFloat(data.totalDepositBalanceUSD) < 100000000000)
+            !(parseFloat(data.totalDepositBalanceUSD) >= 0 && parseFloat(data.totalDepositBalanceUSD) < 100000000000)
         ) {
             issuesArrays.totalDepositBalanceUSD.push('$' + formatIntToFixed2(parseFloat(data.totalDepositBalanceUSD)));
         }
@@ -337,7 +336,6 @@ export const protocolLevel = async (deployments) => {
         ) {
             issuesArrays.cumulativeLiquidateUSD.push('$' + formatIntToFixed2(parseFloat(data.cumulativeLiquidateUSD)));
         }
-
         deployments[deploymentName].protocolErrors = issuesArrays;
     });
 

@@ -57,7 +57,11 @@ const subgraphLogoMap: Record<string, string> = {
   "cosmos": "https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png?1555657960",
   near: "https://assets.coingecko.com/coins/images/10365/small/near_icon.png?1601359077",
   "trisolaris": "https://assets.coingecko.com/coins/images/20607/small/logo_-_2021-11-19T104946.772.png?1637290197",
-  "arweave": "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616"
+  "arweave": "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616",
+  "rocket-pool": "https://assets.coingecko.com/coins/images/2090/small/rocket_pool_%28RPL%29.png?1637662441",
+  "tornado-cash": "https://assets.coingecko.com/coins/images/13496/small/ZINt8NSB_400x400.jpg?1609193407",
+  "graph": "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566",
+  "truefi": "https://assets.coingecko.com/coins/images/13180/small/truefi_glyph_color.png?1617610941"
 };
 
 // used for protocols with multiple versions
@@ -79,7 +83,8 @@ const subgraphMap: Record<string, string> = {
   "curve-finance": "curve",
   "vesper-finance": "vesper",
   "gamma-strategies": "gamma",
-  "convex-finance": "convex"
+  "convex-finance": "convex",
+  "graph-protocol": "graph"
 };
 
 interface SubgraphLogoProps {
@@ -89,6 +94,11 @@ interface SubgraphLogoProps {
 
 export const SubgraphLogo = ({ name, size }: SubgraphLogoProps) => {
   const logoName = subgraphMap[name] ?? name;
-  const url = subgraphLogoMap[logoName] ?? "";
-  return <Avatar src={url} sx={{ height: size, width: size }} />;
+  let src = subgraphLogoMap[logoName];
+  let opacity = 1;
+  if (!src) {
+    src = subgraphLogoMap.uniswap;
+    opacity = 0;
+  }
+  return <Avatar src={src} sx={{ height: size, width: size, opacity }} />;
 };

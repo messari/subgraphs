@@ -461,8 +461,10 @@ function PoolTabEntity({
 
       // Push the Reward APR fields to the bottom of the charts section
       if (field.toUpperCase().includes("REWARDAPR") && dataFields[field].length > 0) {
-        rewardChart[field] = dataFields[field];
-        delete dataFields[field];
+        if ((field.toUpperCase() === "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length === 1) || (field.toUpperCase() !== "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length > 1)) {
+          rewardChart[field] = dataFields[field];
+          delete dataFields[field];
+        }
       }
 
       // separate all of the rates fields to the ratesChart object

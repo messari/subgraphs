@@ -197,8 +197,14 @@ export function getRewardsPerDay(
   );
 
   // Estimate block speed for the window in seconds.
-  let unnormalizedBlockSpeed =
+  let unnormalizedBlockSpeed: BigDecimal;
+  if (windowSecondsCount.equals(BIGDECIMAL_ZERO)) {
+    unnormalizedBlockSpeed = BIGDECIMAL_ZERO;
+  } else {
+    unnormalizedBlockSpeed =
     WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
+  }
+   
 
   // block speed converted to specified rate.
   let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(

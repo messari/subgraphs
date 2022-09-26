@@ -2,53 +2,56 @@
 
 ## Usage:
 
+WARN:
+- Recommended to use lowercase letters for npm config keys. Uppercase letters may not be recognized by some systems.
+
 **Build a single deployment ID:**
 
-`npm run build --ID=uniswap-v2-ethereum`
-`npm run build --ID=uniswap-v2-ethereum --SPAN=single`
+`npm run build --id=uniswap-v2-ethereum`
+`npm run build --id=uniswap-v2-ethereum --span=single`
 
 **Build all deployments for a protocol:**
 
-`npm run build --ID=uniswap-v2 --SPAN=protocol`
+`npm run build --id=uniswap-v2 --span=protocol`
 
 **Build all deployments within a directory:**
 
-`npm run build --ID=uniswap-v2 --SPAN=base`
+`npm run build --id=uniswap-v2 --span=base`
 
 **Deploy a single deployment ID to Hosted Service:**
 
-`npm run build --ID=uniswap-v2-ethereum --SERVICE=h --TARGET=steegecs --DEPLOY=t`
+`npm run build --id=uniswap-v2-ethereum --service=h --target=steegecs --deploy=t`
 
 **Deploy a single deployment ID to Subgraph Studio:**
 
-`npm run build --ID=compound-v2-ethereum --SERVICE=s --TARGET=steegecs --DEPLOY=t`
+`npm run build --id=compound-v2-ethereum --service=s --target=steegecs --deploy=t`
 
 **Deploy a single deployment ID to Cronos Portal:**
 
-`npm run build --ID=vvs-finance --SERVICE=c --TARGET=steegecs --TOKEN={token} --DEPLOY=t`
+`npm run build --id=vvs-finance --service=c --target=steegecs --token={token} --deploy=t`
 
 **Deploy a single deployment ID to Hosted Service using a different slug than specified in JSON:**
 
-`npm run build --ID=uniswap-v2-ethereum --SLUG=uniswap-v2-ethereum-other --SERVICE=h --TARGET=steegecs --DEPLOY=t`
+`npm run build --id=uniswap-v2-ethereum --SLUG=uniswap-v2-ethereum-other --service=h --target=steegecs --deploy=t`
 
 **Deploy all deployments for a protocol:**
 
-`npm run build --ID=apeswap --SPAN=protocol --SERVICE=h --TARGET=steegecs --DEPLOY=t`
+`npm run build --id=apeswap --span=protocol --service=h --target=steegecs --deploy=t`
 
 **Deploy all deployments within a directory:**
 
-`npm run build --ID=uniswap-fork --SPAN=base --SERVICE=h --TARGET=steegecs --DEPLOY=t`
+`npm run build --id=uniswap-fork --span=base --service=h --target=steegecs --deploy=t`
 
 
 
-- --PRINTLOGS
+- --printlogs
   - T/F/null - Set PRINTLOGS to 't' or 'true' to print all logs to the console instead of just to results.txt
-- --MERGE
+- --merge
   - T/F/null - Specifies whether this deployment is triggered by a merge. Should only be set to merge in the deployment action unless for testing.
-- --ACCESS
+- --access
   - Specify the access token for deploying to a particular service. If not specified, deployment with occur for the current access location.
   - This is a required parameter when deploying to CRONOS chain.
-- --SLUG
+- --slug
 
   - Specify slug optionally on deployments to a single network to use an alternative deployment location than is specified in the deployment.json
 

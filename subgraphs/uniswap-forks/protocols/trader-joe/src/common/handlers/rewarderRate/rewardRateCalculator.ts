@@ -280,7 +280,7 @@ export class RewarderCalculator {
       return BIGINT_ZERO;
     }
 
-    let c = MasterChefV2TraderJoe.bind(Address.fromString(this.mc.address)); // v2 and v3 have the same definition for this method.
+    let c = MasterChefV2TraderJoe.bind(Address.fromString(this.mc.address!)); // v2 and v3 have the same definition for this method.
     let call = c.try_userInfo(BigInt.fromString(pid), user);
     if (call.reverted) {
       log.error("unable to get user staked lp: {}", [user.toHexString()]);

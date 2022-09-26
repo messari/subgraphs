@@ -8,8 +8,6 @@ import { useEffect, useMemo, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
 import { useQuery } from "@apollo/client";
 import { decentralizedNetworkSubgraphsQuery } from "../queries/decentralizedNetworkSubgraphsQuery";
-import DefiLlamaComparsionTab from "../interfaces/DefiLlamaComparisonTab";
-import DeploymentsInDevelopment from "./DeploymentsInDevelopment";
 
 const DeploymentsLayout = styled("div")`
   padding: 0;
@@ -19,15 +17,12 @@ interface DeploymentsPageProps {
   protocolsToQuery: { [x: string]: any };
   getData: any;
   subgraphCounts: any;
-  deploymentJSON: any;
 }
 
-function DeploymentsPage({ protocolsToQuery, getData, deploymentJSON, subgraphCounts }: DeploymentsPageProps) {
+function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: DeploymentsPageProps) {
   const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
-
-  const [showDeploymentsInDevelopment, toggleShowDeploymentsInDevelopment] = useState<boolean>(false);
 
   const clientDecentralizedEndpoint = useMemo(
     () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"),
@@ -35,8 +30,6 @@ function DeploymentsPage({ protocolsToQuery, getData, deploymentJSON, subgraphCo
   );
   const {
     data: decentralized,
-    error: decentralizedQueryError,
-    loading: decentralizedQueryLoading,
   } = useQuery(decentralizedNetworkSubgraphsQuery, {
     client: clientDecentralizedEndpoint,
   });
@@ -160,29 +153,20 @@ function DeploymentsPage({ protocolsToQuery, getData, deploymentJSON, subgraphCo
           </Button>
         </div>
         <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
-          <Button variant="contained" color="primary" onClick={() => toggleShowDeploymentsInDevelopment(!showDeploymentsInDevelopment)}>
-            {showDeploymentsInDevelopment ? "Hide" : "Show"} Subgraphs In Development
+          <Button variant="contained" color="primary" onClick={() => navigate("/development-status")}>
+            Development Status Table
           </Button>
         </div>
         <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
           <Typography variant="h6" align="right" sx={{ fontSize: "14px" }}>
-            {subgraphCounts.prodCount} out of {subgraphCounts.totalCount} total subgraphs are production ready
+            {subgraphCounts.prodCount} prod-ready, {subgraphCounts.devCount} under development, {subgraphCounts.totalCount} subgraph deployments
           </Typography>
         </div>
-
-        {showDeploymentsInDevelopment ? <>
-          <DeploymentsInDevelopment deploymentsInDevelopment={deploymentJSON} />
-          <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
-            <Button variant="contained" color="primary" onClick={() => toggleShowDeploymentsInDevelopment(!showDeploymentsInDevelopment)}>
-              {showDeploymentsInDevelopment ? "Hide" : "Show"} Subgraphs In Development
-            </Button>
-          </div>
-        </> : null}
         {decentralizedSubgraphTable}
         <Typography variant="h4" align="center" sx={{ my: 4 }}>
           Hosted Service Subgraphs
         </Typography>
-        {Object.keys(protocolsToQuery).map((key) => {
+        {Object.keys(protocolsToQuery).sort().map((key) => {
           return (
             <>
               <Typography

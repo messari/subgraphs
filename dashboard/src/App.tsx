@@ -1,23 +1,25 @@
 import ProtocolDashboard from "./interfaces/ProtocolDashboard";
 import DeploymentsPage from "./deployments/DeploymentsPage";
 import { Route, Routes } from "react-router";
-import { DashboardVersion } from "./common/DashboardVersion";
+import { dashboardVersion, DashboardVersion } from "./common/DashboardVersion";
 import IssuesDisplay from "./interfaces/IssuesDisplay";
 import { DashboardHeader } from "./graphs/DashboardHeader";
 import { useState } from "react";
 import DefiLlamaComparsionTab from "./interfaces/DefiLlamaComparisonTab";
 import { schemaMapping } from "./utils";
+import DeploymentsInDevelopment from "./deployments/DeploymentsInDevelopment";
 
 function App() {
+  console.log('RUNNING VERSION ' + dashboardVersion);
   const [protocolsToQuery, setProtocolsToQuery] = useState<{
     [type: string]: { [proto: string]: { [network: string]: string } };
   }>({});
 
   const getDeployments = () => {
-    fetch("/deployment.dev.json", {
+    fetch("https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json", {
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
+        Accept: "*/*",
       },
     })
       .then(function (res) {
@@ -28,52 +30,48 @@ function App() {
       })
       .catch((err) => {
         console.log(err);
-        fetch("/deploymentsFallback.json", {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        })
-          .then(function (res) {
-            return res.json();
-          })
-          .then(function (json) {
-            setProtocolsToQuery(json);
-          })
-          .catch((err) => {
-            window.location.reload();
-          });
       });
   };
 
-  const depoCount = { totalCount: 0, prodCount: 0, devCount: 0, otherCount: 0 };
+  const depoCount = { totalCount: 0, prodCount: 0, devCount: 0 };
   // Construct subgraph endpoints
   const subgraphEndpoints: { [x: string]: any } = {};
 
   if (Object.keys(protocolsToQuery)?.length > 0) {
     Object.keys(protocolsToQuery).forEach((protocolName: string) => {
       const protocol: any = protocolsToQuery[protocolName];
-      const schemaType = schemaMapping[protocol.schema];
-      if (!schemaType) {
-        return;
+      let isDev = false;
+      let schemaType = schemaMapping[protocol.schema];
+      if (schemaType) {
+        if (!Object.keys(subgraphEndpoints).includes(schemaType)) {
+          subgraphEndpoints[schemaType] = {};
+        }
+        if (!Object.keys(subgraphEndpoints[schemaType]).includes(protocolName)) {
+          subgraphEndpoints[schemaType][protocolName] = {};
+        }
       }
-      if (!Object.keys(subgraphEndpoints).includes(schemaType)) {
-        subgraphEndpoints[schemaType] = {};
-      }
-      if (!Object.keys(subgraphEndpoints[schemaType]).includes(protocolName)) {
-        subgraphEndpoints[schemaType][protocolName] = {};
-      }
+
       Object.values(protocol.deployments).forEach((depoData: any) => {
-        subgraphEndpoints[schemaType][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["deployment-ids"]["hosted-service"];
+        if (schemaType) {
+          if (!!subgraphEndpoints[schemaType][protocolName][depoData.network]) {
+            const protocolKeyArr = depoData["deployment-ids"]["hosted-service"].split('-');
+            const networkKey = protocolKeyArr.pop();
+            subgraphEndpoints[schemaType][protocolKeyArr.join('-')] = {};
+            subgraphEndpoints[schemaType][protocolKeyArr.join('-')][networkKey] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["deployment-ids"]["hosted-service"];
+          } else {
+            subgraphEndpoints[schemaType][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["deployment-ids"]["hosted-service"];
+          }
+        }
         depoCount.totalCount += 1;
         if (depoData?.status === 'dev') {
-          depoCount.prodCount += 1;
-        } else if (depoData?.status === 'prod') {
-          depoCount.devCount += 1;
-        } else {
-          depoCount.otherCount += 1;
+          isDev = true;
         }
       })
+      if (isDev) {
+        depoCount.devCount += 1;
+      } else {
+        depoCount.prodCount += 1;
+      }
     })
   }
   return (
@@ -81,11 +79,12 @@ function App() {
       <DashboardVersion />
       <Routes>
         <Route path="/">
-          <Route index element={<DeploymentsPage subgraphCounts={depoCount} getData={() => getDeployments()} protocolsToQuery={subgraphEndpoints} deploymentJSON={protocolsToQuery} />} />
+          <Route index element={<DeploymentsPage subgraphCounts={depoCount} getData={() => getDeployments()} protocolsToQuery={subgraphEndpoints} />} />
           <Route
             path="comparison"
             element={<DefiLlamaComparsionTab deploymentJSON={subgraphEndpoints} getData={() => getDeployments()} />}
           />
+          <Route path="development-status" element={<DeploymentsInDevelopment deploymentsInDevelopment={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route path="subgraph" element={<ProtocolDashboard />} />
           <Route
             path="*"
