@@ -28,7 +28,6 @@ import {
   addProtocolDepositVolume,
   addProtocolLiquidateVolume,
   decrementProtocolOpenPositionCount,
-  getOrCreateFinancialsSnapshot,
   getOrCreateLendingProtocol,
   incrementProtocolPositionCount,
   updateProtocolBorrowBalance,
@@ -254,38 +253,6 @@ export function setMarketAssetBalance(
   updateProtocolUSDLocked(event, netChangeUSD);
 }
 
-export function addMarketDepositVolume(
-  event: ethereum.Event,
-  asset: Address,
-  amountUSD: BigDecimal
-): void {
-  addMarketVolume(event, asset, amountUSD, EventType.Deposit);
-}
-
-export function addMarketWithdrawVolume(
-  event: ethereum.Event,
-  asset: Address,
-  amountUSD: BigDecimal
-): void {
-  addMarketVolume(event, asset, amountUSD, EventType.Withdraw);
-}
-
-export function addMarketLiquidateVolume(
-  event: ethereum.Event,
-  asset: Address,
-  amountUSD: BigDecimal
-): void {
-  addMarketVolume(event, asset, amountUSD, EventType.Liquidate);
-}
-
-export function addMarketBorrowVolume(
-  event: ethereum.Event,
-  asset: Address,
-  amountUSD: BigDecimal
-): void {
-  addMarketVolume(event, asset, amountUSD, EventType.Borrow);
-}
-
 export function addMarketRepayVolume(
   event: ethereum.Event,
   asset: Address,
@@ -294,7 +261,7 @@ export function addMarketRepayVolume(
   addMarketVolume(event, asset, amountUSD, EventType.Repay);
 }
 
-function addMarketVolume(
+export function addMarketVolume(
   event: ethereum.Event,
   asset: Address,
   amountUSD: BigDecimal,

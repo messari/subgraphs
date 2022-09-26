@@ -13,14 +13,7 @@ import {
   Withdraw,
 } from "../../generated/schema";
 import { BIGINT_ZERO, PositionSide } from "../utils/constants";
-import {
-  addMarketBorrowVolume,
-  addMarketDepositVolume,
-  addMarketLiquidateVolume,
-  addMarketRepayVolume,
-  addMarketWithdrawVolume,
-  getOrCreateMarket,
-} from "./market";
+import { addMarketVolume, getOrCreateMarket } from "./market";
 import { getOrCreateAssetToken, getVSTToken } from "./token";
 import { prefixID } from "../utils/strings";
 import {
@@ -94,7 +87,7 @@ export function createDeposit(
   deposit.amount = amountAsset;
   deposit.amountUSD = amountUSD;
   deposit.save();
-  addMarketDepositVolume(event, asset, amountUSD);
+  addMarketVolume(event, asset, amountUSD, EventType.Deposit);
   incrementAccountDepositCount(account);
   incrementPositionDepositCount(position);
   incrementProtocolDepositCount(event, account);
@@ -138,7 +131,7 @@ export function createWithdraw(
   withdraw.amount = amountAsset;
   withdraw.amountUSD = amountUSD;
   withdraw.save();
-  addMarketWithdrawVolume(event, asset, amountUSD);
+  addMarketVolume(event, asset, amountUSD, EventType.Withdraw);
   incrementAccountWithdrawCount(account);
   incrementPositionWithdrawCount(position);
   incrementProtocolWithdrawCount(event, account);
@@ -181,7 +174,7 @@ export function createBorrow(
   borrow.amount = amountVST;
   borrow.amountUSD = amountUSD;
   borrow.save();
-  addMarketBorrowVolume(event, asset, amountUSD);
+  addMarketVolume(event, asset, amountUSD, EventType.Borrow);
   incrementAccountBorrowCount(account);
   incrementPositionBorrowCount(position);
   incrementProtocolBorrowCount(event, account);
@@ -225,7 +218,7 @@ export function createRepay(
   repay.amount = amountVST;
   repay.amountUSD = amountUSD;
   repay.save();
-  addMarketRepayVolume(event, asset, amountUSD);
+  addMarketVolume(event, asset, amountUSD, EventType.Repay);
   incrementAccountRepayCount(account);
   incrementPositionRepayCount(position);
   incrementProtocolRepayCount(event, account);
@@ -277,7 +270,7 @@ export function createLiquidate(
   liquidate.amountUSD = amountLiquidatedUSD;
   liquidate.profitUSD = profitUSD;
   liquidate.save();
-  addMarketLiquidateVolume(event, asset, amountLiquidatedUSD);
+  addMarketVolume(event, asset, amountLiquidatedUSD, EventType.Liquidate);
   incrementAccountLiquidationCount(account);
   incrementPositionLiquidationCount(borrowerPosition);
   incrementPositionLiquidationCount(lenderPosition);
