@@ -1,6 +1,6 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { Delegate, Vote } from "../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "./constants";
+import { Delegate, GovernanceFramework, Vote } from "../generated/schema";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, GOVERNANCE_TYPE, MKR_TOKEN } from "./constants";
 
 export function hexToNumberString(hex: string): string {
   let hexNumber = BigInt.fromI32(0);
@@ -32,6 +32,7 @@ export function getDelegate(address: string): Delegate {
   let delegate = Delegate.load(address);
   if (!delegate) {
     delegate = new Delegate(address);
+    delegate.isVoteDelegate = false;
     delegate.votingPowerRaw = BIGINT_ZERO;
     delegate.votingPower = BIGDECIMAL_ZERO;
     delegate.delegations = [];
@@ -39,4 +40,22 @@ export function getDelegate(address: string): Delegate {
     delegate.numberVotes = 0;
   }
   return delegate;
+}
+
+export function getGovernanceFramework(contractAddress: string): GovernanceFramework {
+  let framework = GovernanceFramework.load(contractAddress);
+  if (!framework) {
+    framework = new GovernanceFramework(contractAddress)
+    framework.name = "MakerGovernance"
+    framework.type = GOVERNANCE_TYPE
+    framework.tokenAddress = MKR_TOKEN
+    framework.totalTokenSupply = BIGINT_ZERO //TODO
+    framework.currentTokenHolders = BIGINT_ZERO //TODO
+    framework.currentDelegates = BIGINT_ZERO //TODO
+
+    framework.currentTokenLockedInChief = BIGINT_ZERO //TODO
+    framework.currentTokenDelegated = BIGINT_ZERO //TODO
+    framework.spells = 0
+  }
+  return framework
 }

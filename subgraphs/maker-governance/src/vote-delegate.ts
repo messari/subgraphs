@@ -16,7 +16,7 @@ export function handleDelegateLock(event: Lock): void {
     delegation.amount = BIGINT_ZERO;
     delegate.delegations = delegate.delegations.concat([delegationID]);
   }
-  if (delegation.amount === BIGINT_ZERO) {
+  if (delegation.amount.equals(BIGINT_ZERO)) {
     delegate.tokenHoldersRepresented = delegate.tokenHoldersRepresented + 1;
   }
   delegation.amount = delegation.amount.plus(event.params.wad);
@@ -32,9 +32,8 @@ export function handleDelegateFree(event: Free): void {
   let delegationID = delegate.id + "-" + sender;
   let delegation = Delegation.load(delegationID);
   if (!delegation) return;
-
   delegation.amount = delegation.amount.minus(event.params.wad);
-  if (delegation.amount === BIGINT_ZERO) {
+  if (delegation.amount.equals(BIGINT_ZERO)) {
     delegate.tokenHoldersRepresented = delegate.tokenHoldersRepresented - 1;
   }
   delegation.save();

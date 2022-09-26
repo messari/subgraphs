@@ -10,13 +10,19 @@ type GovernanceFramework @entity {
   tokenAddress: String!
   "Total Supply of token"
   totalTokenSupply: BigInt!
-  "Total number of token holders currently"
+  "Number of token holders currently"
   currentTokenHolders: BigInt!
-  "Total number of delegates participating on the governance currently"
+  "Number of delegates participating on the governance currently"
   currentDelegates: BigInt!
 
+  "MKR locked in chief i.e. total voting power"
+  currentTokenLockedInChief: BigInt!
+  "Amount of voting power delegated"
+  currentTokenDelegated: BigInt!
+  "Current spell that is the 'hat'"
+  currentHat: Spell
   "Total number of spells created"
-  spells: BigInt!
+  spells: Int!
 }
 
 enum GovernanceFrameworkType {
