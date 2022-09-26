@@ -24,16 +24,12 @@ import {
 } from "../utils/constants";
 import {
   addProtocolMarketAssets,
-  addProtocolBorrowVolume,
-  addProtocolDepositVolume,
-  addProtocolLiquidateVolume,
+  addProtocolVolume,
   decrementProtocolOpenPositionCount,
   getOrCreateLendingProtocol,
   incrementProtocolPositionCount,
   updateProtocolBorrowBalance,
   updateProtocolUSDLocked,
-  addProtocolWithdrawVolume,
-  addProtocolRepayVolume,
 } from "./protocol";
 import { getOrCreateAssetToken, getCurrentAssetPrice } from "./token";
 import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
@@ -277,7 +273,7 @@ export function addMarketVolume(
       dailySnapshot.dailyDepositUSD =
         dailySnapshot.dailyDepositUSD.plus(amountUSD);
       hourlySnapshot.hourlyDepositUSD.plus(amountUSD);
-      addProtocolDepositVolume(event, amountUSD);
+      addProtocolVolume(event, amountUSD, EventType.Deposit);
       break;
     case EventType.Borrow:
       market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
@@ -285,7 +281,7 @@ export function addMarketVolume(
         dailySnapshot.dailyBorrowUSD.plus(amountUSD);
       hourlySnapshot.hourlyBorrowUSD =
         hourlySnapshot.hourlyBorrowUSD.plus(amountUSD);
-      addProtocolBorrowVolume(event, amountUSD);
+      addProtocolVolume(event, amountUSD, EventType.Borrow);
       break;
     case EventType.Liquidate:
       market.cumulativeLiquidateUSD =
@@ -294,20 +290,20 @@ export function addMarketVolume(
         dailySnapshot.dailyLiquidateUSD.plus(amountUSD);
       hourlySnapshot.hourlyLiquidateUSD =
         hourlySnapshot.hourlyLiquidateUSD.plus(amountUSD);
-      addProtocolLiquidateVolume(event, amountUSD);
+      addProtocolVolume(event, amountUSD, EventType.Liquidate);
       break;
     case EventType.Withdraw:
       dailySnapshot.dailyWithdrawUSD =
         dailySnapshot.dailyWithdrawUSD.plus(amountUSD);
       hourlySnapshot.hourlyWithdrawUSD =
         hourlySnapshot.hourlyWithdrawUSD.plus(amountUSD);
-      addProtocolWithdrawVolume(event, amountUSD);
+      addProtocolVolume(event, amountUSD, EventType.Withdraw);
       break;
     case EventType.Repay:
       dailySnapshot.dailyRepayUSD = dailySnapshot.dailyRepayUSD.plus(amountUSD);
       hourlySnapshot.hourlyRepayUSD =
         hourlySnapshot.hourlyRepayUSD.plus(amountUSD);
-      addProtocolRepayVolume(event, amountUSD);
+      addProtocolVolume(event, amountUSD, EventType.Repay);
       break;
     default:
       break;

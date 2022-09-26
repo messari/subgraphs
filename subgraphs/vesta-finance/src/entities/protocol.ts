@@ -191,42 +191,7 @@ export function addSupplySideRevenue(
   marketHourlySnapshot.save();
 }
 
-export function addProtocolBorrowVolume(
-  event: ethereum.Event,
-  amountUSD: BigDecimal
-): void {
-  addProtocolVolume(event, amountUSD, EventType.Borrow);
-}
-
-export function addProtocolDepositVolume(
-  event: ethereum.Event,
-  amountUSD: BigDecimal
-): void {
-  addProtocolVolume(event, amountUSD, EventType.Deposit);
-}
-
-export function addProtocolLiquidateVolume(
-  event: ethereum.Event,
-  amountUSD: BigDecimal
-): void {
-  addProtocolVolume(event, amountUSD, EventType.Liquidate);
-}
-
-export function addProtocolWithdrawVolume(
-  event: ethereum.Event,
-  amountUSD: BigDecimal
-): void {
-  addProtocolVolume(event, amountUSD, EventType.Withdraw);
-}
-
-export function addProtocolRepayVolume(
-  event: ethereum.Event,
-  amountUSD: BigDecimal
-): void {
-  addProtocolVolume(event, amountUSD, EventType.Repay);
-}
-
-function addProtocolVolume(
+export function addProtocolVolume(
   event: ethereum.Event,
   amountUSD: BigDecimal,
   eventType: EventType
