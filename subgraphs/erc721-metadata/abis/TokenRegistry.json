@@ -1,0 +1,19 @@
+[
+  {
+    "anonymous": true,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "param0",
+        "type": "bytes"
+      },
+      {
+        "indexed": true,
+        "name": "param1",
+        "type": "bytes"
+      }
+    ],
+    "name": "Unknown",
+    "type": "event"
+  }
+]

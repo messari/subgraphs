@@ -45,11 +45,14 @@ export function createToken(
   newToken.blockNumber = event.block.number;
   newToken.timestamp = event.block.timestamp;
 
-  let metadataURI = contract.try_tokenURI(tokenId);
-  if (!metadataURI.reverted) {
-    newToken.tokenURI = normalize(metadataURI.value);
-    return updateTokenMetadata(event, newToken);
-  }
+  // Only if the collection supports ERC721 metadata, the detailed token metadata information will be stored.
+  if (tokenCollection.supportsERC721Metadata) {
+    let metadataURI = contract.try_tokenURI(tokenId);
+    if (!metadataURI.reverted) {
+      newToken.tokenURI = normalize(metadataURI.value);
+      return updateTokenMetadata(event, newToken);
+    }
+  } 
 
   return newToken;
 }

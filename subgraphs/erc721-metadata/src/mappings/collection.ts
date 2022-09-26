@@ -34,17 +34,15 @@ export function handleTransfer(event: Transfer): void {
 
     // Save info for the ERC721 collection
     let supportsERC721Metadata = supportsInterface(contract, "5b5e139f");
-    tokenCollection = new Collection(collectionId);
-    tokenCollection.supportsERC721Metadata = supportsERC721Metadata;
-    tokenCollection.tokenURIUpdated = false;
-    tokenCollection.tokenCount = BIGINT_ZERO;
-
+    tokenCollection = getOrCreateCollection(collectionId, supportsERC721Metadata);
     tokenCollection.save();
   }
 
-  // Only if the collection supports ERC721 metadata, the detailed token metadata information will be stored.
-  if (!tokenCollection.supportsERC721Metadata) {
-    return;
+  // ERC721 collection created via registry list (supportsERC721Metadata defaults to false until ERC721 transfer is indexed)
+  if (tokenCollection.tokenCount.equals(BIGINT_ZERO)) {
+    let supportsERC721Metadata = supportsInterface(contract, "5b5e139f");
+    tokenCollection.supportsERC721Metadata = supportsERC721Metadata;
+    tokenCollection.save();
   }
 
   let existingToken = Token.load(tokenCollection.id + "-" + tokenId.toString());
@@ -55,6 +53,11 @@ export function handleTransfer(event: Transfer): void {
 
     tokenCollection.tokenCount = tokenCollection.tokenCount.plus(BIGINT_ONE);
     tokenCollection.save();
+    return;
+  }
+
+  // Only if the collection supports ERC721 metadata, the detailed token metadata information will be stored.
+  if (!tokenCollection.supportsERC721Metadata) {
     return;
   }
 
@@ -108,4 +111,19 @@ function isERC721Supported(contract: ERC721): boolean {
   }
 
   return true;
+}
+
+export function getOrCreateCollection(
+  collectionAddress: string,
+  supportsERC721Metadata: boolean
+): Collection {
+  let tokenCollection = Collection.load(collectionAddress);
+  if (!tokenCollection) {
+    tokenCollection = new Collection(collectionAddress);
+    tokenCollection.supportsERC721Metadata = supportsERC721Metadata;
+    tokenCollection.tokenURIUpdated = false;
+    tokenCollection.tokenCount = BIGINT_ZERO;
+  }
+
+  return tokenCollection;
 }

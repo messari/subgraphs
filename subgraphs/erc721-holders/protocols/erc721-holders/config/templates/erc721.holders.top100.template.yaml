@@ -1,0 +1,55 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  # This approach uses a particular event emitted once very early to trigger the initial ERC721 token list.
+  - kind: ethereum
+    name: TokenRegistry
+    network: mainnet
+    source:
+      address: "0x7f751820be4b1e44464268c425af6095995e045a"
+      abi: TokenRegistry
+      startBlock: 75570
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Collection
+      abis:
+        - name: TokenRegistry
+          file: ./abis/TokenRegistry.json
+        - name: ERC721
+          file: ./abis/ERC721.json
+      eventHandlers:
+        - event: Unknown(indexed bytes,indexed bytes)
+          topic0: "0xa9e319c3b10db96c5cee4bc3ebffa9c5581f222f14a4deb0df7ec2088ccd0974"
+          handler: initTokenList
+      file: ./src/mappings/registry.ts
+templates:
+  # These data sources templates exist to support the different types that a specific ERC721 token could be.
+  - name: ERC721
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: ERC721
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Collection
+        - CollectionDailySnapshot
+        - Transfer
+        - Account
+        - AccountBalance
+        - AccountBalanceDailySnapshot
+      abis:
+        - name: ERC721
+          file: ./abis/ERC721.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mappings/collection.ts
+      
