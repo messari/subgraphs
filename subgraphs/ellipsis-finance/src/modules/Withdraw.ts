@@ -92,7 +92,7 @@ function getInputToken(
   let receipt = event.receipt;
   if (!receipt) return constants.NULL.TYPE_ADDRESS;
 
-  let logs = event. receipt!.logs;
+  let logs = event.receipt!.logs;
   if (!logs) return constants.NULL.TYPE_ADDRESS;
 
   for (let i = 0; i < logs.length; ++i) {
@@ -217,7 +217,7 @@ export function Withdraw(
   );
   pool.totalValueLockedUSD = utils.getPoolTVL(
     pool.inputTokens,
-      pool.inputTokenBalances!,
+    pool.inputTokenBalances!,
     block
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(
@@ -227,7 +227,7 @@ export function Withdraw(
     block
   );
   pool.outputTokenSupply = tokenSupplyAfterWithdrawal;
-  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
+  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD2(poolAddress,block);
   pool.save();
 
   createWithdrawTransaction(

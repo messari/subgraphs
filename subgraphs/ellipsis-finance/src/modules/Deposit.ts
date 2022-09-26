@@ -52,7 +52,7 @@ export function createDepositTransaction(
     depositTransaction.inputTokenAmounts = inputTokenAmounts;
 
     depositTransaction.outputToken = liquidityPool.outputToken;
-    
+
     depositTransaction.outputTokenAmount = outputTokenMintedAmount;
 
     depositTransaction.amountUSD = amountUSD;
@@ -124,8 +124,8 @@ export function Deposit(
     
     
   pool.totalValueLockedUSD = utils.getPoolTVL(
-   pool.inputTokens,
-      pool.inputTokenBalances !,
+  pool.inputTokens,
+      pool.inputTokenBalances ,
     block
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(
@@ -135,7 +135,8 @@ export function Deposit(
     block
   );
   pool.outputTokenSupply = totalSupplyAfterDeposit;
-  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
+
+  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD2(poolAddress,block);
   pool.save();
 
   createDepositTransaction(

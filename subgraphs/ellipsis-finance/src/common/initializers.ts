@@ -15,7 +15,7 @@ import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/E
 import { LpToken as LPTokenContract } from "../../generated/Factory/LpToken";
 import { Pool as PoolContract } from "../../generated/templates/PoolTemplate/Pool";
 
-import { Address, ethereum, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import * as constants from "./constants";
 import * as utils from "./utils";
 import { getUsdPricePerToken } from "../prices";
@@ -348,9 +348,10 @@ export function getOrCreateToken(
     let tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = block.number;
-
-    token.save();
+    
+    token.save(); 
   }
+  log.warning("[getOrCreateToken] tokenName {} tokenId {} lastPriceUSD {}",[token.name,token.id,token.lastPriceUSD!.toString()])
 
   return token;
 }
@@ -410,6 +411,7 @@ export function getOrCreateRewardToken(
 
     rewardToken.save();
   }
+ 
 
   return rewardToken;
 }

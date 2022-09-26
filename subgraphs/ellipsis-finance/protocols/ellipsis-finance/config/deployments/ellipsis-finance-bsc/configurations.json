@@ -2,11 +2,18 @@
   "registeries": [
     {
       "name": "Registry",
-      "address": "0x266Bb386252347b03C7B6eB37F950f476D7c3E63"
+      "address": "0x266Bb386252347b03C7B6eB37F950f476D7c3E63",
+      "startBlock": 17209000
     },
     {
-      "name": "Factory",
-      "address": "0xf65bed27e96a367c61e0e06c54e14b16b84a5870"
+      "name": "Registry_V2",
+      "address": "0xAB38213cB4400f19b1b28bfc4f8B00792AC164A7",
+      "startBlock":20350777
+    },
+    {
+      "name": "Registry_V3",
+      "address": "0xa5d748a3234A81120Df7f23c9Ea665587dc8d871",
+      "startBlock":20349998
     }
   ],
   "staking": [

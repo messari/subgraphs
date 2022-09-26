@@ -89,13 +89,91 @@ dataSources:
           handler: handleMetaPoolDeployed
       file: ./src/mappings/factory.ts
 
+  {{#registeries}}
+  - kind: ethereum
+    name: "{{name}}"
+    network: bsc
+    source:
+      address: "{{address}}"
+      abi: Registry
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - PoolAdded
+        - PoolRemoved
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Pool
+          file: ./abis/Pool.json
+        - name: Staking
+          file: ./abis/Staking.json
+        - name: StakingV2
+          file: ./abis/StakingV2.json
+        - name: Registry
+          file: ./abis/Registry.json
+        - name: LpToken
+          file: ./abis/LpToken.json
+        - name: IERC20
+          file: ./abis/IERC20.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: AaveOracle
+          file: ./abis/Prices/Aave/Oracle.json  
+        - name: OneInchOracle
+          file: ./abis/Prices/1Inch/Oracle.json 
+      eventHandlers:
+        - event: PoolAdded(indexed address)
+          handler: handlePoolAdded
+      file: ./src/mappings/registry.ts  
+  {{/registeries}}
+
+
   - kind: ethereum
     name: Staking
     network: bsc
     source:
       address: "0xcce949De564fE60e7f96C85e55177F8B9E4CF61b"
       abi: Staking
-      startBlock: 15020650
+      startBlock: 5938178
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -245,80 +323,7 @@ dataSources:
           handler: handleEmergencyWithdrawV2
       file: ./src/mappings/staking.ts
 
-  - kind: ethereum
-    name: Registry
-    network: bsc
-    source:
-      address: "0x266Bb386252347b03C7B6eB37F950f476D7c3E63"
-      abi: Registry
-      startBlock: 17209000
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - PoolAdded
-        - PoolRemoved
-      abis:
-        - name: Factory
-          file: ./abis/Factory.json
-        - name: Pool
-          file: ./abis/Pool.json
-        - name: Staking
-          file: ./abis/Staking.json
-        - name: StakingV2
-          file: ./abis/StakingV2.json
-        - name: Registry
-          file: ./abis/Registry.json
-        - name: LpToken
-          file: ./abis/LpToken.json
-        - name: IERC20
-          file: ./abis/IERC20.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # ERC20
-        - name: _ERC20
-          file: ./abis/Prices/ERC20.json
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-        - name: AaveOracle
-          file: ./abis/Prices/Aave/Oracle.json  
-        - name: OneInchOracle
-          file: ./abis/Prices/1Inch/Oracle.json 
-      eventHandlers:
-        - event: PoolAdded(indexed address)
-          handler: handlePoolAdded
-      file: ./src/mappings/registry.ts  
+
 
 templates:
   - kind: ethereum

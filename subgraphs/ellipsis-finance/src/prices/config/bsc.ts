@@ -10,10 +10,10 @@ export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 export const CURVE_REGISTRY_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
+  "0x266Bb386252347b03C7B6eB37F950f476D7c3E63"
 );
 export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
+  "0xf65bed27e96a367c61e0e06c54e14b16b84a5870"
 );
 
 ///////////////////////////////////////////////////////////////////////////

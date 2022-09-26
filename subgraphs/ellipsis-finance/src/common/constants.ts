@@ -224,7 +224,7 @@ export namespace NULL {
   export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
   export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
 }
-export const BSC_AVERAGE_BLOCK_PER_HOUR = BigInt.fromString("5");
+export const BSC_AVERAGE_BLOCK_PER_HOUR = BigInt.fromString("10000");
 
 export const BIGINT_TEN = BigInt.fromI32(10);
 
