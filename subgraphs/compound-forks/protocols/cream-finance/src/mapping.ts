@@ -62,6 +62,8 @@ import {
   _handleMarketEntered,
   getTokenPriceUSD,
   _handleTransfer,
+  getOrCreateMarketDailySnapshot,
+  getOrCreateMarketHourlySnapshot,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
