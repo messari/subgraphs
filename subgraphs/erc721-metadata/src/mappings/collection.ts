@@ -34,7 +34,10 @@ export function handleTransfer(event: Transfer): void {
 
     // Save info for the ERC721 collection
     let supportsERC721Metadata = supportsInterface(contract, "5b5e139f");
-    tokenCollection = getOrCreateCollection(collectionId, supportsERC721Metadata);
+    tokenCollection = getOrCreateCollection(
+      collectionId,
+      supportsERC721Metadata
+    );
     tokenCollection.save();
   }
 

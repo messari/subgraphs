@@ -1,7 +1,7 @@
 import { Address, log } from "@graphprotocol/graph-ts";
 
 import { Unknown as UnknownEvent } from "../../generated/TokenRegistry/TokenRegistry";
-import { ERC721 } from "../../generated/ERC721/ERC721"
+import { ERC721 } from "../../generated/ERC721/ERC721";
 import { ERC721 as ERC721Template } from "../../generated/templates";
 import { Collection } from "../../generated/schema";
 
@@ -19,14 +19,14 @@ export function initTokenList(event: UnknownEvent): void {
     if (!tokenCollection) {
       let contractAddress = Address.fromString(collectionId);
       let contract = ERC721.bind(contractAddress);
-      let collection = getOrCreateCollection(
-        contract,
-        collectionId,
-        false
-      );
-      
+      let collection = getOrCreateCollection(contract, collectionId, false);
+
       // Workaround for ENS (doesn't support name/symbol field in ERC721 contract)
-      if (contractAddress.equals(Address.fromString("0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85"))) {
+      if (
+        contractAddress.equals(
+          Address.fromString("0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85")
+        )
+      ) {
         collection.name = "Ethereum Name Service";
         collection.symbol = "ENS";
         log.debug("ENS name set: {}", [collection.id]);
@@ -37,10 +37,12 @@ export function initTokenList(event: UnknownEvent): void {
       ERC721Template.create(contractAddress);
 
       log.debug("Adding ERC721 token to registry, address: {}", [
-        collection.id
+        collection.id,
       ]);
     } else {
-      log.warning("ERC721 Token already in registry, address: {}", [tokenCollection.id]);
+      log.warning("ERC721 Token already in registry, address: {}", [
+        tokenCollection.id,
+      ]);
     }
   }
 }

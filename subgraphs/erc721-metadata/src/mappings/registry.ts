@@ -17,20 +17,19 @@ export function initTokenList(event: UnknownEvent): void {
     let tokenCollection = Collection.load(collectionId);
     if (!tokenCollection) {
       let contractAddress = Address.fromString(collectionId);
-      let collection = getOrCreateCollection(
-        collectionId,
-        false
-      );
+      let collection = getOrCreateCollection(collectionId, false);
 
       collection.save();
 
       ERC721Template.create(contractAddress);
 
       log.debug("Adding ERC721 token to registry, address: {}", [
-        collection.id
+        collection.id,
       ]);
     } else {
-      log.warning("ERC721 Token already in registry, address: {}", [tokenCollection.id]);
+      log.warning("ERC721 Token already in registry, address: {}", [
+        tokenCollection.id,
+      ]);
     }
   }
 }
