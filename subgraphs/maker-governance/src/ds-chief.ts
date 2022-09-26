@@ -2,16 +2,26 @@ import { BigInt, Bytes, Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { LogNote, DSChief, Etch } from "../generated/DSChief/DSChief";
 import { DSSpell } from "../generated/DSChief/DSSpell";
 import { VoteDelegate } from "../generated/DSChief/VoteDelegate";
-import { Slate, Spell, Vote, Delegate } from "../generated/schema";
+import {
+  Slate,
+  Spell,
+  Vote,
+  Delegate,
+} from "../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ONE,
   BIGINT_ZERO,
   SpellState,
 } from "./constants";
-import { getDelegate, hexToNumberString, toDecimal } from "./helpers";
 import {
-  // DSSpell as DSSpellTemplate,
+  getDelegate,
+  getGovernanceFramework,
+  hexToNumberString,
+  toDecimal,
+} from "./helpers";
+import {
+  DSSpell as DSSpellTemplate,
   VoteDelegate as VoteDelegateTemplate,
 } from "../generated/templates";
 
@@ -20,11 +30,14 @@ export function handleLock(event: LogNote): void {
   let amountStr = hexToNumberString(event.params.foo.toHexString());
   let amount = BigInt.fromString(amountStr); //.foo is the amount being locked
 
+  let newDelegateCount = 0;
   let delegate = Delegate.load(sender.toHexString());
   if (!delegate) {
     delegate = new Delegate(sender.toHexString());
+    delegate.isVoteDelegate = false;
     delegate.votingPowerRaw = BIGINT_ZERO;
     delegate.votingPower = BIGDECIMAL_ZERO;
+    delegate.delegations = [];
     delegate.tokenHoldersRepresented = 0;
     delegate.numberVotes = 0;
 
@@ -36,12 +49,20 @@ export function handleLock(event: LogNote): void {
       delegate.isVoteDelegate = true;
       // Track this new vote delegate contract
       VoteDelegateTemplate.create(sender);
+
+      newDelegateCount = 1;
     }
   }
 
   delegate.votingPowerRaw = delegate.votingPowerRaw.plus(amount);
   delegate.votingPower = delegate.votingPower.plus(toDecimal(amount));
   delegate.save();
+
+  let framework = getGovernanceFramework(event.address.toHexString());
+  framework.currentTokenLockedInChief =
+    framework.currentTokenLockedInChief.plus(amount);
+  framework.totalDelegates = framework.totalDelegates + newDelegateCount;
+  framework.save();
 }
 
 export function handleFree(event: LogNote): void {
@@ -53,6 +74,11 @@ export function handleFree(event: LogNote): void {
   delegate.votingPowerRaw = delegate.votingPowerRaw.minus(amount);
   delegate.votingPower = delegate.votingPower.minus(toDecimal(amount));
   delegate.save();
+
+  let framework = getGovernanceFramework(event.address.toHexString());
+  framework.currentTokenLockedInChief =
+    framework.currentTokenLockedInChief.minus(amount);
+  framework.save();
 }
 
 export function handleVote(event: LogNote): void {
@@ -81,7 +107,7 @@ function _handleSlateVote(
     slate.creationBlock = event.block.number;
     slate.creationTime = event.block.timestamp;
   }
-
+  let newSpellCount = 0;
   let i = 0;
   let dsChief = DSChief.bind(event.address);
   let slateResponse = dsChief.try_slates(slateID, BigInt.fromI32(i));
@@ -106,14 +132,12 @@ function _handleSlateVote(
       spell.totalWeightedVotes = BIGINT_ZERO;
 
       // Track this new spell
-      // DSSpellTemplate.create(spellAddress);
+      DSSpellTemplate.create(spellAddress);
+
+      newSpellCount = newSpellCount + 1;
     }
 
-    let voteId = sender
-      .concat("-")
-      .concat(slateID.toHexString())
-      .concat("-")
-      .concat(spellID);
+    let voteId = sender.concat("-").concat(spellID);
     // Check for double vote
     let vote = Vote.load(voteId);
     if (vote) {
@@ -152,6 +176,10 @@ function _handleSlateVote(
   delegate.currentSpells = slate.yays;
   delegate.numberVotes = delegate.numberVotes + 1;
   delegate.save();
+
+  let framework = getGovernanceFramework(event.address.toHexString());
+  framework.spells = framework.spells + newSpellCount;
+  framework.save();
 }
 
 export function handleLift(event: LogNote): void {
@@ -165,4 +193,9 @@ export function handleLift(event: LogNote): void {
   spell.liftedTime = event.block.timestamp;
   spell.liftedWith = spell.totalWeightedVotes;
   spell.save();
+
+  // Update governance framework everytime a spell is lifted
+  let framework = getGovernanceFramework(event.address.toHexString());
+  framework.currentHat = spell.id;
+  framework.save();
 }

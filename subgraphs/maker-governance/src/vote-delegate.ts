@@ -1,7 +1,7 @@
 import { Delegation } from "../generated/schema";
 import { Lock, Free } from "../generated/DSChief/VoteDelegate";
-import { getDelegate } from "./helpers";
-import { BIGINT_ZERO } from "./constants";
+import { getDelegate, getGovernanceFramework } from "./helpers";
+import { BIGINT_ZERO, CHIEF } from "./constants";
 
 export function handleDelegateLock(event: Lock): void {
   let sender = event.params.usr.toHexString();
@@ -22,6 +22,10 @@ export function handleDelegateLock(event: Lock): void {
   delegation.amount = delegation.amount.plus(event.params.wad);
   delegation.save();
   delegate.save();
+
+  let framework = getGovernanceFramework(CHIEF);
+  framework.currentTokenDelegated = framework.currentTokenDelegated.plus(event.params.wad);
+  framework.save();
 }
 
 export function handleDelegateFree(event: Free): void {
@@ -38,4 +42,8 @@ export function handleDelegateFree(event: Free): void {
   }
   delegation.save();
   delegate.save();
+
+  let framework = getGovernanceFramework(CHIEF);
+  framework.currentTokenDelegated = framework.currentTokenDelegated.minus(event.params.wad);
+  framework.save();
 }

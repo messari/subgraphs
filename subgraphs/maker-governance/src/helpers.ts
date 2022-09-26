@@ -1,6 +1,11 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Delegate, GovernanceFramework, Vote } from "../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, GOVERNANCE_TYPE, MKR_TOKEN } from "./constants";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  GOVERNANCE_TYPE,
+  MKR_TOKEN,
+} from "./constants";
 
 export function hexToNumberString(hex: string): string {
   let hexNumber = BigInt.fromI32(0);
@@ -42,20 +47,21 @@ export function getDelegate(address: string): Delegate {
   return delegate;
 }
 
-export function getGovernanceFramework(contractAddress: string): GovernanceFramework {
+export function getGovernanceFramework(
+  contractAddress: string
+): GovernanceFramework {
   let framework = GovernanceFramework.load(contractAddress);
   if (!framework) {
-    framework = new GovernanceFramework(contractAddress)
-    framework.name = "MakerGovernance"
-    framework.type = GOVERNANCE_TYPE
-    framework.tokenAddress = MKR_TOKEN
-    framework.totalTokenSupply = BIGINT_ZERO //TODO
-    framework.currentTokenHolders = BIGINT_ZERO //TODO
-    framework.currentDelegates = BIGINT_ZERO //TODO
-
-    framework.currentTokenLockedInChief = BIGINT_ZERO //TODO
-    framework.currentTokenDelegated = BIGINT_ZERO //TODO
-    framework.spells = 0
+    framework = new GovernanceFramework(contractAddress);
+    framework.name = "MakerGovernance";
+    framework.type = GOVERNANCE_TYPE;
+    framework.tokenAddress = MKR_TOKEN;
+    framework.totalTokenSupply = BIGINT_ZERO; //TODO
+    framework.currentTokenHolders = BIGINT_ZERO; //TODO
+    framework.totalDelegates = 0;
+    framework.currentTokenLockedInChief = BIGINT_ZERO;
+    framework.currentTokenDelegated = BIGINT_ZERO; //TODO
+    framework.spells = 0;
   }
-  return framework
+  return framework;
 }

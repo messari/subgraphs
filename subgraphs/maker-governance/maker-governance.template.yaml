@@ -23,6 +23,8 @@ dataSources:
           file: ./abis/DSChief.json
         - name: DSSpell
           file: ./abis/DSSpell.json
+        - name: VoteDelegate
+          file: ./abis/VoteDelegate.json
       eventHandlers:
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,uint256,bytes)
           topic0: '0xdd46706400000000000000000000000000000000000000000000000000000000' # lock(uint)
@@ -33,9 +35,9 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,uint256,bytes)
           topic0: '0xa69beaba00000000000000000000000000000000000000000000000000000000' # vote(bytes32)
           handler: handleVote
-        - event: Etch(indexed bytes32) # etch event as a proxy to vote array so we can capture the slate id
-          topic0: '0x4f0892983790f53eea39a7a496f6cb40e8811b313871337b6a761efc6c67bb1f'
-          handler: handleEtch
+        # - event: Etch(indexed bytes32) # etch event as a proxy to vote array so we can capture the slate id
+        #   topic0: '0x4f0892983790f53eea39a7a496f6cb40e8811b313871337b6a761efc6c67bb1f'
+        #   handler: handleEtch
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,uint256,bytes)
           topic0: '0x3c278bd500000000000000000000000000000000000000000000000000000000' # lift(address)
           handler: handleLift
@@ -61,6 +63,33 @@ templates:
         - name: DSSpell
           file: ./abis/DSSpell.json
       callHandlers:
+        - function: schedule()
+          handler: handleSchedule
         - function: cast()
           handler: handleCast
       file: ./src/ds-spell.ts
+  - kind: ethereum
+    name: VoteDelegate
+    network: mainnet
+    source:
+      abi: VoteDelegate
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Slate
+        - Spell
+        - Delegate
+        - Vote
+      abis:
+        - name: DSChief
+          file: ./abis/DSChief.json
+        - name: VoteDelegate
+          file: ./abis/VoteDelegate.json
+      eventHandlers:
+        - event: Lock(indexed address,uint256)
+          handler: handleDelegateLock
+        - event: Free(indexed address,uint256)
+          handler: handleDelegateFree
+      file: ./src/vote-delegate.ts
