@@ -2,7 +2,7 @@ export const protocolErrorMessages = {
     totalValueLockedUSD: "This field on 'Protocol' entity has a value below $0 or above $100,000,000,000.",
     cumulativeSupplySideRevenueUSD: "This field on 'Protocol' entity has a value below $0 or above $100,000,000,000.",
     cumulativeProtocolSideRevenueUSD: "This field on 'Protocol' entity has a value below $0 or above $100,000,000,000.",
-    cumulativeTotalRevenueUSD: "'Protocol' entity has a cumulativeTotalRevenueUSD that does not equal cumulativeProtocolSideRevenueUSD + cumulativeSupplySideRevenueUSD.",
+    cumulativeTotalRevenueUSD: "'Protocol' entity has a cumulativeTotalRevenueUSD that is not within $1000 of the value of cumulativeProtocolSideRevenueUSD + cumulativeSupplySideRevenueUSD",
     cumulativeVolumeUSD: "This field on 'Protocol' entity has a negative value.",
     cumulativeUniqueUsers: "This field on 'Protocol' entity has a value belo 0 or greater than 100,000,000.",
     totalPoolCount: "This field on 'Protocol' entity has less than 0 pools or more than 10,000 pools.",
