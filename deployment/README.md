@@ -64,3 +64,7 @@ WARN:
 - Before each build or deploy, the script will validate the deployment.json, so incorrect or missing information will cause the script to fail, and a response will be given.
 - You must include the deployment you are trying to make within the deployment.json file. Go ahead and follow the current structure and include all fields in the other examples - further instructions on the deployment.json schema will soon be available.
 - Upon creation of a pull request to the `master` branch, or any changes thereof, will trigger a github action will run the `npm run build` command, which will build all protocols that have had changes to their code base.
+
+> *Note*: To ensure this works with your subgraph you need to make these calls from the root of the subgraph's directory. 
+
+> *In addition*, when adding a new subgraph it must have the particular scripts found in any existing subgraph's `package.json` file.
