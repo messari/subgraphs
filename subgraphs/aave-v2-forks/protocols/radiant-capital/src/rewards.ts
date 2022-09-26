@@ -26,8 +26,8 @@ export function updateMarketRewards(
 ): void {
   const TWELVE_HOURS = BigInt.fromI32(SECONDS_PER_DAY / 2);
   if (
-    market._lastRewardsUpdated &&
-    !event.block.timestamp.minus(market._lastRewardsUpdated!).gt(TWELVE_HOURS)
+    market.lastRewardsUpdated &&
+    !event.block.timestamp.minus(market.lastRewardsUpdated!).gt(TWELVE_HOURS)
   ) {
     return;
   }
@@ -101,7 +101,7 @@ export function updateMarketRewards(
     depositRewardsPerDay,
   ];
   market.rewardTokenEmissionsUSD = [borRewardsPerDayUSD, depRewardsPerDayUSD];
-  market._lastRewardsUpdated = event.block.timestamp;
+  market.lastRewardsUpdated = event.block.timestamp;
   market.save();
 }
 
