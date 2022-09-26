@@ -1,0 +1,345 @@
+# prettier-ignore
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: TruefiPoolLegacy
+    network: mainnet
+    source:
+      address: "0xa1e72267084192Db7387c8CC1328fadE470e4149"
+      abi: TruefiPool2
+      startBlock: 11280398
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: TruefiPool2
+          file: ./abis/TruefiPool2.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: ChainlinkTruUsdcOracle
+          file: ./abis/ChainlinkTruUsdcOracle.json
+        - name: ChainlinkTruUsdtOracle
+          file: ./abis/ChainlinkTruUsdtOracle.json
+        - name: ChainlinkTruBusdOracle
+          file: ./abis/ChainlinkTruBusdOracle.json
+        - name: ChainlinkTruTusdOracle
+          file: ./abis/ChainlinkTruTusdOracle.json
+      eventHandlers:
+        - event: Joined(indexed address,uint256,uint256)
+          handler: handleJoin
+        - event: Exited(indexed address,uint256)
+          handler: handleExit
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferForLegacyPool
+      file: ./src/mappings/TruefiPool.ts
+  - kind: ethereum
+    name: PoolFactory
+    network: mainnet
+    source:
+      address: "0x1391D9223E08845e536157995085fE0Cef8Bd393"
+      abi: PoolFactory
+      startBlock: 12467597
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: PoolFactory
+          file: ./abis/PoolFactory.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+      eventHandlers:
+        - event: PoolCreated(address,address)
+          handler: handlePoolCreated
+      file: ./src/mappings/PoolFactory.ts
+  - kind: ethereum
+    name: LoanFactory
+    network: mainnet
+    source:
+      address: "0x4ACE6dE67E9a9EDFf5c2d0a584390Fb5394119e7"
+      abi: LoanFactory
+      startBlock: 11280381
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: LoanFactory
+          file: ./abis/LoanFactory.json
+      eventHandlers:
+        - event: LoanTokenCreated(address)
+          handler: handleLoanTokenCreated
+      file: ./src/mappings/LoanFactory.ts
+  - kind: ethereum
+    name: LoanFactory2
+    network: mainnet
+    source:
+      address: "0x69d844fB5928d0e7Bc530cC6325A88e53d6685BC"
+      abi: LoanFactory
+      startBlock: 12467595
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: LoanFactory
+          file: ./abis/LoanFactory.json
+      eventHandlers:
+        - event: LoanTokenCreated(address)
+          handler: handleLoanTokenCreated
+      file: ./src/mappings/LoanFactory.ts
+  - kind: ethereum
+    name: ManagedPortfolioFactory
+    network: mainnet
+    source:
+      address: "0x17b7b75FD4288197cFd99D20e13B0dD9da1FF3E7"
+      abi: ManagedPortfolioFactory
+      startBlock: 14043986
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: ManagedPortfolioFactory
+          file: ./abis/ManagedPortfolioFactory.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+      eventHandlers:
+        - event: PortfolioCreated(address,address)
+          handler: handlePortfolioCreated
+      file: ./src/mappings/ManagedPortfolioFactory.ts
+  - kind: ethereum
+    name: BulletLoans
+    network: mainnet
+    source:
+      address: "0x8262F360bd5E08a7f4128a1ddBB7D2a17F479239"
+      abi: BulletLoans
+      startBlock: 14043906
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BulletLoans
+          file: ./abis/BulletLoans.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: ManagedPortfolio
+          file: ./abis/ManagedPortfolio.json
+        - name: ChainlinkTruUsdcOracle
+          file: ./abis/ChainlinkTruUsdcOracle.json
+        - name: ChainlinkTruUsdtOracle
+          file: ./abis/ChainlinkTruUsdtOracle.json
+        - name: ChainlinkTruBusdOracle
+          file: ./abis/ChainlinkTruBusdOracle.json
+        - name: ChainlinkTruTusdOracle
+          file: ./abis/ChainlinkTruTusdOracle.json
+      eventHandlers:
+        - event: LoanCreated(uint256)
+          handler: handleLoanCreated
+        - event: LoanRepaid(uint256,uint256)
+          handler: handleLoanRepaid
+      file: ./src/mappings/BulletLoans.ts
+  - kind: ethereum
+    name: LinearTrueDistributor
+    network: mainnet
+    source:
+      address: "0xc7ab606e551bebd69f7611cda1fc473f8e5b8f70"
+      abi: LinearTrueDistributor
+      startBlock: 13091196
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: LinearTrueDistributor
+          file: ./abis/LinearTrueDistributor.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: ChainlinkTruUsdcOracle
+          file: ./abis/ChainlinkTruUsdcOracle.json
+      callHandlers:
+        - function: initialize(uint256,uint256,uint256,address)
+          handler: handleInitialize
+      file: ./src/mappings/LinearTrueDistributor.ts
+  - kind: ethereum
+    name: Liquidator
+    network: mainnet
+    source:
+      address: "0xc87079dbcc6835abb3c85c0366122f5fe7c28271"
+      abi: Liquidator2
+      startBlock: 13086738
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Liquidator2
+          file: ./abis/Liquidator2.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: ChainlinkTruUsdcOracle
+          file: ./abis/ChainlinkTruUsdcOracle.json
+      eventHandlers:
+        - event: Liquidated(address,uint256,uint256)
+          handler: handleLiquidated
+      file: ./src/mappings/Liquidator.ts
+templates:
+  - kind: ethereum
+    name: TruefiPool2
+    network: mainnet
+    source:
+      abi: TruefiPool2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: TruefiPool2
+          file: ./abis/TruefiPool2.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: ChainlinkTruUsdcOracle
+          file: ./abis/ChainlinkTruUsdcOracle.json
+        - name: ChainlinkTruUsdtOracle
+          file: ./abis/ChainlinkTruUsdtOracle.json
+        - name: ChainlinkTruBusdOracle
+          file: ./abis/ChainlinkTruBusdOracle.json
+        - name: ChainlinkTruTusdOracle
+          file: ./abis/ChainlinkTruTusdOracle.json
+      eventHandlers:
+        - event: Joined(indexed address,uint256,uint256)
+          handler: handleJoin
+        - event: Exited(indexed address,uint256)
+          handler: handleExit
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/TruefiPool.ts
+  - kind: ethereum
+    name: LoanToken
+    network: mainnet
+    source:
+      abi: LoanToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: LoanToken
+          file: ./abis/LoanToken.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: TruefiPool2
+          file: ./abis/TruefiPool2.json
+        - name: ChainlinkTruUsdcOracle
+          file: ./abis/ChainlinkTruUsdcOracle.json
+        - name: ChainlinkTruUsdtOracle
+          file: ./abis/ChainlinkTruUsdtOracle.json
+        - name: ChainlinkTruBusdOracle
+          file: ./abis/ChainlinkTruBusdOracle.json
+        - name: ChainlinkTruTusdOracle
+          file: ./abis/ChainlinkTruTusdOracle.json
+      eventHandlers:
+        - event: Withdrawn(address)
+          handler: handleWithdrawn
+        - event: Redeemed(address,uint256,uint256)
+          handler: handleRedeemed
+      file: ./src/mappings/LoanToken.ts
+  - kind: ethereum
+    name: ManagedPortfolio
+    network: mainnet
+    source:
+      abi: ManagedPortfolio
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: ManagedPortfolio
+          file: ./abis/ManagedPortfolio.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        - name: ChainlinkTruUsdcOracle
+          file: ./abis/ChainlinkTruUsdcOracle.json
+        - name: ChainlinkTruUsdtOracle
+          file: ./abis/ChainlinkTruUsdtOracle.json
+        - name: ChainlinkTruBusdOracle
+          file: ./abis/ChainlinkTruBusdOracle.json
+        - name: ChainlinkTruTusdOracle
+          file: ./abis/ChainlinkTruTusdOracle.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Deposited(indexed address,uint256)
+          handler: handleDeposit
+        - event: Withdrawn(indexed address,uint256,uint256)
+          handler: handleWithdraw
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/ManagedPortfolio.ts

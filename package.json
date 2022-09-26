@@ -5,8 +5,6 @@
   },
   "devDependencies": {
     "eslint": "^8.23.1",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-prettier": "^8.5.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1"
@@ -16,8 +14,8 @@
     "*.{ts,css,md}": "prettier --write"
   },
   "scripts": {
-    "prettier": "prettier --loglevel silent --write \"**/*.{md,jsx,tsx,ts,json,html,css,js,yml}\"",
-    "prettier-check": "prettier --loglevel silent --write --check \"**/*.{md,jsx,tsx,ts,json,html,css,js,yml}\"",
+    "prettier": "prettier --loglevel silent --write \"**/*.{md,jsx,tsx,ts,json,html,css,js}\"",
+    "prettier-check": "prettier --loglevel silent --write --check \"**/*.{md,jsx,tsx,ts,json,html,css,js}\"",
     "lint:fix": "npx eslint --fix --max-warnings 0",
     "lint": "npx eslint",
     "prepare": "husky install"
