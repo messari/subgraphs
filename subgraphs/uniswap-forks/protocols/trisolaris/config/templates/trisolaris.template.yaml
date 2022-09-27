@@ -12,9 +12,9 @@ dataSources:
     name: Factory
     network: {{network}}
     source:
-      address: "0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac"
+      address: "{{factory.address}}"
       abi: Factory
-      startBlock: 10794229
+      startBlock: {{factory.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -33,9 +33,9 @@ dataSources:
     name: MasterChef
     network: {{network}}
     source:
-      address: "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd"
+      address: "{{MasterChefAddress}}"
       abi: MasterChefTrisolaris
-      startBlock: 10794230
+      startBlock: {{MasterChefStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -59,9 +59,9 @@ dataSources:
     name: MasterChefV2
     network: {{network}}
     source:
-      address: "0xef0881ec094552b2e128cf945ef17a6752b4ec5d"
+      address: "{{MasterChefV2Address}}"
       abi: MasterChefV2Trisolaris
-      startBlock: 12428169
+      startBlock: {{MasterChefV2StartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
