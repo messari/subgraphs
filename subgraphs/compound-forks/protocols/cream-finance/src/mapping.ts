@@ -23,6 +23,7 @@ import {
   LiquidateBorrow,
   AccrueInterest,
   NewReserveFactor,
+  Transfer,
 } from "../../../generated/templates/CToken/CToken";
 import {
   FinancialsDailySnapshot,
@@ -60,6 +61,7 @@ import {
   _handleActionPaused,
   _handleMarketEntered,
   getTokenPriceUSD,
+  _handleTransfer,
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
 } from "../../../src/mapping";
@@ -433,6 +435,16 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     totalBorrows,
     false, // do not update all prices
     event
+  );
+}
+
+export function handleTransfer(event: Transfer): void {
+  _handleTransfer(
+    event,
+    event.address.toHexString(),
+    event.params.to,
+    event.params.from,
+    comptrollerAddr
   );
 }
 

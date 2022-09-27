@@ -32,6 +32,7 @@ import {
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
   _handleMarketEntered,
+  _handleTransfer,
 } from "../../../src/mapping";
 import { PoolRegistered } from "../../../generated/FusePoolDirectory/FusePoolDirectory";
 import {
@@ -71,6 +72,7 @@ import {
   NewReserveFactor,
   Redeem,
   RepayBorrow,
+  Transfer,
 } from "../../../generated/templates/CToken/CToken";
 import {
   NewAdminFee,
@@ -609,6 +611,17 @@ export function handleNewReserveFactor(event: NewReserveFactor): void {
   let marketID = event.address.toHexString();
   let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
   _handleNewReserveFactor(marketID, newReserveFactorMantissa);
+}
+
+export function handleTransfer(event: Transfer): void {
+  let factoryContract = Address.fromString(FACTORY_CONTRACT);
+  _handleTransfer(
+    event,
+    event.address.toHexString(),
+    event.params.to,
+    event.params.from,
+    factoryContract
+  );
 }
 
 /////////////////
