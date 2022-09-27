@@ -1643,7 +1643,7 @@
     }
   },
   "liquity": {
-    "schema": "generic",
+    "schema": "lending",
     "base": "liquity",
     "protocol": "liquity",
     "deployments": {
@@ -3712,6 +3712,257 @@
         },
         "files": {
           "template": "platypus.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
+  "erc20": {
+    "schema": "erc20",
+    "base": "erc20",
+    "protocol": "erc20",
+    "deployments": {
+      "erc20-holders-2017": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "erc20-holders-2017"
+        },
+        "files": {
+          "template": "erc20.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "erc20-holders-2018": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "erc20-holders-2018"
+        },
+        "files": {
+          "template": "erc20.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "erc20-holders-2019": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "erc20-holders-2019"
+        },
+        "files": {
+          "template": "erc20.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "erc20-holders-2020": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "erc20-holders-2020"
+        },
+        "files": {
+          "template": "erc20.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "erc20-holders-2021": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "erc20-holders-2021"
+        },
+        "files": {
+          "template": "erc20.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "erc20-holders-2022": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "erc20-holders-2022"
+        },
+        "files": {
+          "template": "erc20.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      }
+    }
+  },
+  "opensea-v1": {
+    "schema": "nft-marketplace",
+    "base": "opensea",
+    "protocol": "opensea-v1",
+    "deployments": {
+      "opensea-v1-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "opensea-v1-ethereum"
+        },
+        "files": {
+          "template": "opensea.v1.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      }
+    }
+  },
+  "opensea-v2": {
+    "schema": "nft-marketplace",
+    "base": "opensea",
+    "protocol": "opensea-v2",
+    "deployments": {
+      "opensea-v2-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "opensea-v2-ethereum"
+        },
+        "files": {
+          "template": "opensea.v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      }
+    }
+  },
+  "seaport": {
+    "schema": "nft-marketplace",
+    "base": "seaport",
+    "protocol": "seaport",
+    "deployments": {
+      "seaport-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "opensea-seaport-ethereum"
+        },
+        "files": {
+          "template": "seaport.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      }
+    }
+  },
+  "x2y2": {
+    "schema": "nft-marketplace",
+    "base": "x2y2",
+    "protocol": "x2y2",
+    "deployments": {
+      "x2y2-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "x2y2-ethereum"
+        },
+        "files": {
+          "template": "x2y2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
+  "looksrare": {
+    "schema": "nft-marketplace",
+    "base": "looksrare",
+    "protocol": "looksrare",
+    "deployments": {
+      "looksrare-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "looksrare-ethereum"
+        },
+        "files": {
+          "template": "looksrare.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
