@@ -11,17 +11,7 @@ import {
   MarketDailySnapshot,
   MarketHourlySnapshot,
 } from "../../generated/schema";
-import {
-  ACTIVE_POOL_CREATED_BLOCK,
-  ACTIVE_POOL_CREATED_TIMESTAMP,
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  INT_ZERO,
-  LIQUIDATION_FEE_PERCENT,
-  MAXIMUM_LTV,
-  SECONDS_PER_DAY,
-  SECONDS_PER_HOUR,
-} from "../utils/constants";
+import { VestaParameters } from "../../generated/VestaParameters/VestaParameters";
 import {
   addProtocolMarketAssets,
   addProtocolVolume,
@@ -32,9 +22,23 @@ import {
   updateProtocolUSDLocked,
 } from "./protocol";
 import { getOrCreateAssetToken, getCurrentAssetPrice } from "./token";
-import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 import { EventType } from "./event";
+import { bigIntToBigDecimal, exponentToBigDecimal } from "../utils/numbers";
+import {
+  ACTIVE_POOL_CREATED_BLOCK,
+  ACTIVE_POOL_CREATED_TIMESTAMP,
+  BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  INT_ZERO,
+  LIQUIDATION_FEE_PERCENT,
+  MAXIMUM_LTV,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+  VESTA_PARAMETERS_ADDRESS,
+} from "../utils/constants";
 
 export function getOrCreateMarket(asset: Address): Market {
   const id = asset.toHexString();
@@ -42,14 +46,15 @@ export function getOrCreateMarket(asset: Address): Market {
   if (!market) {
     const id = asset.toHexString();
     const inputToken = getOrCreateAssetToken(asset);
+    const maxLTV = setMaxLTV(id);
     market = new Market(id);
     market.protocol = getOrCreateLendingProtocol().id;
     market.name = inputToken.name;
     market.isActive = true;
     market.canUseAsCollateral = true;
     market.canBorrowFrom = true;
-    market.maximumLTV = MAXIMUM_LTV;
-    market.liquidationThreshold = MAXIMUM_LTV;
+    market.maximumLTV = maxLTV;
+    market.liquidationThreshold = maxLTV;
     market.liquidationPenalty = LIQUIDATION_FEE_PERCENT;
     market.inputToken = inputToken.id;
     market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -77,6 +82,7 @@ export function getOrCreateMarket(asset: Address): Market {
     market.closedPositionCount = INT_ZERO;
     market.lendingPositionCount = INT_ZERO;
     market.borrowingPositionCount = INT_ZERO;
+
     market.save();
 
     addProtocolMarketAssets(market);
@@ -335,4 +341,19 @@ export function closeMarketPosition(market: Market): void {
   market.closedPositionCount += 1;
   market.save();
   decrementProtocolOpenPositionCount();
+}
+
+function setMaxLTV(asset: string): BigDecimal {
+  let MaxLTV = MAXIMUM_LTV;
+
+  const contract = VestaParameters.bind(
+    Address.fromString(VESTA_PARAMETERS_ADDRESS)
+  );
+  const tryMCR = contract.try_MCR(Address.fromString(asset));
+  if (!tryMCR.reverted && tryMCR.value != BIGINT_ZERO) {
+    const adjustedMCR = bigIntToBigDecimal(tryMCR.value);
+    MaxLTV = BIGDECIMAL_ONE.div(adjustedMCR).times(BIGDECIMAL_HUNDRED);
+  }
+
+  return MaxLTV;
 }

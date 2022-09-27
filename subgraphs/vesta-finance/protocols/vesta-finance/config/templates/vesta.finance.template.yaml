@@ -74,9 +74,17 @@ dataSources:
       abis:
         - name: VestaParameters
           file: ./abis/VestaParameters.json
+        - name: PriceFeedV1
+          file: ./abis/PriceFeedV1.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
       eventHandlers:
         - event: PriceFeedChanged(indexed address)
           handler: handlePriceFeedChanged
+        - event: MCRChanged(uint256,uint256)
+          handler: handleMCRChanged
   - kind: ethereum/contract
     name: ActivePool
     network: arbitrum-one
@@ -96,6 +104,8 @@ dataSources:
           file: ./abis/PriceFeedV1.json
         - name: StabilityPoolManager
           file: ./abis/StabilityPoolManager.json
+        - name: VestaParameters
+          file: ./abis/VestaParameters.json
         - name: IERC20Detailed
           file: ./abis/IERC20Detailed.json
         - name: IERC20DetailedBytes
