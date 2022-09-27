@@ -1193,6 +1193,7 @@ export function snapshotFinancials(
     protocol.cumulativeProtocolSideRevenueUSD;
   snapshot.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD;
+  snapshot.mintedTokenSupplies = protocol.mintedTokenSupplies;
 
   let dailyDepositUSD = BIGDECIMAL_ZERO;
   let dailyBorrowUSD = BIGDECIMAL_ZERO;
