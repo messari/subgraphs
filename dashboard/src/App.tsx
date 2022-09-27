@@ -8,6 +8,7 @@ import { useState } from "react";
 import DefiLlamaComparsionTab from "./interfaces/DefiLlamaComparisonTab";
 import { schemaMapping } from "./utils";
 import DeploymentsInDevelopment from "./deployments/DeploymentsInDevelopment";
+import DeploymentsTable from "./deployments/DeploymentsTable";
 
 function App() {
   console.log('RUNNING VERSION ' + dashboardVersion);
@@ -79,12 +80,12 @@ function App() {
       <DashboardVersion />
       <Routes>
         <Route path="/">
-          <Route index element={<DeploymentsPage subgraphCounts={depoCount} getData={() => getDeployments()} protocolsToQuery={subgraphEndpoints} />} />
+          <Route index element={<DeploymentsPage getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} />} />
           <Route
             path="comparison"
             element={<DefiLlamaComparsionTab deploymentJSON={subgraphEndpoints} getData={() => getDeployments()} />}
           />
-          <Route path="development-status" element={<DeploymentsInDevelopment deploymentsInDevelopment={protocolsToQuery} getData={() => getDeployments()} />} />
+          <Route path="development-status" element={<DeploymentsInDevelopment protocolsToQuery={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route path="subgraph" element={<ProtocolDashboard />} />
           <Route
             path="*"

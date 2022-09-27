@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { latestSchemaVersion } from "../constants";
+import { latestSchemaVersions } from "../constants";
 import { useNavigate } from "react-router";
 import { ApolloClient, NormalizedCacheObject, useLazyQuery } from "@apollo/client";
 import { formatIntToFixed2, NewClient, parseSubgraphName, toPercent } from "../utils";
@@ -61,7 +61,6 @@ interface DeploymentProps {
   networkName: string;
   deployment: string;
   subgraphID: string;
-  clientIndexing: ApolloClient<NormalizedCacheObject>;
   currentDeployment: Boolean;
   statusReturned: any;
   statusLoading: any;
@@ -73,7 +72,6 @@ export const Deployment = ({
   networkName,
   deployment,
   subgraphID,
-  clientIndexing,
   currentDeployment,
   statusReturned,
   statusLoading,
@@ -130,8 +128,8 @@ export const Deployment = ({
 
   const { schemaOutdated, indexedSuccess } = useMemo(() => {
     return {
-      schemaOutdated: schemaVersion && schemaVersion !== latestSchemaVersion,
-      indexedSuccess: synced && schemaVersion === latestSchemaVersion,
+      schemaOutdated: schemaVersion && schemaVersion !== latestSchemaVersions,
+      indexedSuccess: synced && schemaVersion === latestSchemaVersions,
     };
   }, [schemaVersion, fatalError, synced]);
   if (loading || statusLoading) {

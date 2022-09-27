@@ -121,7 +121,6 @@ export const SubgraphDeployments = ({
             pendingDeployment = (
               <Deployment
                 key={"pending-" + deployment + "-" + network}
-                clientIndexing={clientIndexing}
                 subgraphID={name}
                 networkName={network}
                 deployment={deployment}
@@ -137,7 +136,6 @@ export const SubgraphDeployments = ({
           <Fragment key={deployment + 'CompGroup'}>
             <Deployment
               key={deployment + "-" + network}
-              clientIndexing={clientIndexing}
               subgraphID={name}
               networkName={network}
               deployment={deployment}

@@ -15,7 +15,7 @@ export namespace Versions {
   export const SchemaVersions = [Schema120, Schema130, Schema201];
 }
 
-export const latestSchemaVersion = "1.3.0";
+export const latestSchemaVersions = ["1.3.0", "2.0.1"];
 export const SubgraphBaseUrl = "https://api.thegraph.com/subgraphs/name/";
 export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",

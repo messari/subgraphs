@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { latestSchemaVersion } from "../constants";
+import { latestSchemaVersions } from "../constants";
 import { useNavigate } from "react-router";
 import { ApolloClient, NormalizedCacheObject, useQuery } from "@apollo/client";
 import { toPercent } from "../utils";
@@ -97,8 +97,8 @@ export const DecentralizedNetworkRow = ({ rowData, subgraphName, clientIndexing 
 
   const { schemaOutdated, indexedSuccess } = useMemo(() => {
     return {
-      schemaOutdated: schemaVersion && schemaVersion !== latestSchemaVersion,
-      indexedSuccess: synced && schemaVersion === latestSchemaVersion,
+      schemaOutdated: schemaVersion && schemaVersion !== latestSchemaVersions,
+      indexedSuccess: synced && schemaVersion === latestSchemaVersions,
     };
   }, [schemaVersion, fatalError, synced]);
   if (statusLoading) {
