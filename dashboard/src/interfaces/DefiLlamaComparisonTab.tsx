@@ -51,6 +51,9 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   const [defiLlamaData, setDefiLlamaData] = useState<{ [x: string]: any }>({});
   const [defiLlamaProtocols, setDefiLlamaProtocols] = useState<any[]>([]);
   const [isMonthly, setIsMonthly] = useState(false);
+  const [includeStakedTVL, setIncludeStakedTVL] = useState(true);
+  const [includeBorrowedTVL, setIncludeBorrowedTVL] = useState(true);
+
   const client = useMemo(() => {
     return new ApolloClient({
       link: new HttpLink({
@@ -169,14 +172,14 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   }, [issuesState]);
 
   let chart = null;
-  if (
-    Object.keys(defiLlamaData).length > 0 &&
+  let chartRenderCondition = (Object.keys(defiLlamaData).length > 0 &&
     financialsData?.financialsDailySnapshots &&
-    defiLlamaData.name.toLowerCase() === defiLlamaSlug?.split(" (")[0].toLowerCase()
-  ) {
+    defiLlamaData.name.toLowerCase() === defiLlamaSlug?.split(" (")[0].toLowerCase());
 
-    let stakedDataset = "";
-    let borrowedDataset = "";
+  let stakedDataset = "";
+  let borrowedDataset = "";
+  if (chartRenderCondition) {
+
     let dataset: string = "";
 
     Object.keys(defiLlamaData.chainTvls).forEach((chain) => {
@@ -204,13 +207,13 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
         const date = toDate(x.date);
         if (defiLlamaData.chainTvls[stakedDataset]) {
           const stakedDatapoint = defiLlamaData.chainTvls[stakedDataset]?.tvl?.find((x: any) => toDate(x.date) === date);
-          if (stakedDatapoint) {
+          if (stakedDatapoint && includeStakedTVL) {
             value += stakedDatapoint.totalLiquidityUSD;
           }
         }
         if (defiLlamaData.chainTvls[borrowedDataset]) {
           const borrowedDatapoint = defiLlamaData.chainTvls[borrowedDataset]?.tvl?.find((x: any) => toDate(x.date) === date);
-          if (borrowedDatapoint) {
+          if (borrowedDatapoint && includeBorrowedTVL) {
             value += borrowedDatapoint.totalLiquidityUSD;
           }
         }
@@ -302,6 +305,26 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
     chart = <CircularProgress sx={{ my: 5 }} size={40} />;
   }
 
+  let valueToggles = null;
+  if (chartRenderCondition) {
+    let stakedTVL = null;
+    if (stakedDataset) {
+      stakedTVL = <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => setIncludeStakedTVL(!includeStakedTVL)}>{includeStakedTVL ? "Disclude Staked TVL" : "Include Staked TVL"}</Button>
+    }
+
+    let borrowedTVL = null;
+    if (borrowedDataset) {
+      borrowedTVL = <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => setIncludeBorrowedTVL(!includeBorrowedTVL)}>{includeBorrowedTVL ? "Disclude Borrowed TVL" : "Include Borrowed TVL"}</Button>
+    }
+
+    valueToggles = (
+      <div style={{ display: "flex" }}>
+        {stakedTVL}
+        {borrowedTVL}
+      </div>
+    )
+  }
+
   return (
     <>
       <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => navigate("/")}>
@@ -317,6 +340,7 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
       />
       <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
       {chart}
+      {valueToggles}
     </>
   );
 }

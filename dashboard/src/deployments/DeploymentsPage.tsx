@@ -97,7 +97,6 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
       Object.keys(decentralizedDeployments[key]).forEach((x) => {
         if (Object.keys(protocolsToQuery).find((pro) => pro.includes(x))) {
           decenDeposToSubgraphIds[x] = decentralizedDeployments[key][x]?.subgraphId;
-
         }
       });
     });
@@ -132,7 +131,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
         </div>
 
         <Typography variant="h3" align="center" sx={{ my: 4 }}>
-          Subgraphs
+          Deployed Subgraphs
         </Typography>
         <DeploymentsTable getData={() => getData()} protocolsToQuery={protocolsToQuery} decenDeposToSubgraphIds={decenDeposToSubgraphIds} />
       </DeploymentsLayout>

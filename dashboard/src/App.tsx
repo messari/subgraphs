@@ -8,7 +8,6 @@ import { useState } from "react";
 import DefiLlamaComparsionTab from "./interfaces/DefiLlamaComparisonTab";
 import { schemaMapping } from "./utils";
 import DeploymentsInDevelopment from "./deployments/DeploymentsInDevelopment";
-import DeploymentsTable from "./deployments/DeploymentsTable";
 
 function App() {
   console.log('RUNNING VERSION ' + dashboardVersion);

@@ -80,7 +80,7 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds }
             if (!Object.keys(deposInProgress[protocol.schema]).includes(protocolName)) {
                 deposInProgress[protocol.schema][protocolName] = { status: true, schemaVersions: [], subgraphVersions: [], methodologyVersions: [], networks: [] };
             }
-            deposInProgress[protocol.schema][protocolName].networks.push({ chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId: deploymentData["deployment-ids"]["hosted-service"], decentralizedNetworkId: deploymentData["deployment-ids"]["decentralized-network"] || null });
+            deposInProgress[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId: deploymentData["deployment-ids"]["hosted-service"], decentralizedNetworkId: deploymentData["deployment-ids"]["decentralized-network"] || null });
             if (!deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
                 deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
             }
@@ -104,13 +104,13 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds }
 
     return (
         <>
-            {Object.entries(deposInProgress).map(([schemaType, subgraph]) => {
+            {Object.entries(deposInProgress).sort().map(([schemaType, subgraph]) => {
                 if (!Object.keys(schemaMapping).includes(schemaType)) {
                     return null;
                 } else {
                     schemaType = schemaMapping[schemaType];
                 }
-                const tableRows = Object.keys(subgraph).map((subgraphName) => {
+                const tableRows = Object.keys(subgraph).sort().map((subgraphName) => {
                     const protocol = subgraph[subgraphName];
                     return (<ProtocolRow subgraphName={subgraphName} protocol={protocol} clientIndexing={clientIndexing} decenDeposToSubgraphIds={decenDeposToSubgraphIds} />);
                 });
