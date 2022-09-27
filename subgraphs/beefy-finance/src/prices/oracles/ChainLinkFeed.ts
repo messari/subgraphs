@@ -6,9 +6,7 @@ import { ERC20 } from "../../../generated/aave-aave-eol/ERC20";
 import { ZERO_ADDRESS } from "../common/constants";
 import { CHAIN_LINK_USD_ADDRESS } from "../common/constants";
 
-export function getChainLinkContract(
-  asset: string
-): ChainlinkOracle {
+export function getChainLinkContract(asset: string): ChainlinkOracle {
   for (let i = 0; i < oracles.length; i++) {
     if (oracles[i][0] === asset) {
       return ChainlinkOracle.bind(Address.fromString(oracles[i][1]));
@@ -17,7 +15,9 @@ export function getChainLinkContract(
   return ChainlinkOracle.bind(ZERO_ADDRESS);
 }
 
-export function getTokenPriceFromChainLink(tokenAddr: Address): CustomPriceType {
+export function getTokenPriceFromChainLink(
+  tokenAddr: Address
+): CustomPriceType {
   const tokenContract = ERC20.bind(tokenAddr);
   const symbol = tokenContract.symbol();
   const chainLinkContract = getChainLinkContract(symbol);

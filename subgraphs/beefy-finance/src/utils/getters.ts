@@ -59,10 +59,7 @@ export function getBeefyFinanceOrCreate(vaultId: string): YieldAggregator {
     beefy.schemaVersion = "1.2.1";
     beefy.subgraphVersion = "1.0.2";
     beefy.methodologyVersion = "1.1.0";
-    beefy.network = dataSource
-      .network()
-      .toUpperCase()
-      .replace("-", "_");
+    beefy.network = dataSource.network().toUpperCase().replace("-", "_");
     beefy.type = "YIELD";
     beefy.totalValueLockedUSD = BIGDECIMAL_ZERO;
     beefy.protocolControlledValueUSD = BIGDECIMAL_ZERO;

@@ -1,12 +1,4 @@
 {
   "extends": "@graphprotocol/graph-ts/types/tsconfig.base.json",
-  "include": ["src", "setup"],
-  "compilerOptions": {
-    "lib": ["es2015"],
-    "noLib": false,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "types": ["node"]
-  }
+  "include": ["src", "setup"]
 }
