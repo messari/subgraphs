@@ -66,6 +66,12 @@ To be added
 
 To be added
 
+## Usage
+
+### Prepare
+
+`npm run prepare:yaml --TEMPLATE=liquity.template.yaml --PROTOCOL=liquity --NETWORK=ethereum`
+
 ## Smart Contract Interactions
 
 ### Events included in the subgraph

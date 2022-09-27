@@ -9,6 +9,8 @@ import {
   ACTIVE_POOL_CREATED_BLOCK,
   ACTIVE_POOL_CREATED_TIMESTAMP,
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  INT_ZERO,
   LIQUIDATION_FEE_PERCENT,
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
@@ -18,8 +20,10 @@ import {
   addProtocolBorrowVolume,
   addProtocolDepositVolume,
   addProtocolLiquidateVolume,
+  decrementProtocolOpenPositionCount,
   getOrCreateFinancialsSnapshot,
   getOrCreateLiquityProtocol,
+  incrementProtocolPositionCount,
   updateProtocolBorrowBalance,
   updateProtocolUSDLocked,
 } from "./protocol";
@@ -46,6 +50,25 @@ export function getOrCreateMarket(): Market {
     market.rates = [getOrCreateStableBorrowerInterestRate(ACTIVE_POOL).id];
     market.createdTimestamp = ACTIVE_POOL_CREATED_TIMESTAMP;
     market.createdBlockNumber = ACTIVE_POOL_CREATED_BLOCK;
+
+    market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    market.inputTokenBalance = BIGINT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.outputTokenSupply = BIGINT_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.positionCount = INT_ZERO;
+    market.openPositionCount = INT_ZERO;
+    market.closedPositionCount = INT_ZERO;
+    market.lendingPositionCount = INT_ZERO;
+    market.borrowingPositionCount = INT_ZERO;
     market.save();
   }
   return market;
@@ -67,10 +90,13 @@ export function getOrCreateMarketSnapshot(
     marketSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     marketSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     marketSnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-
+    marketSnapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
     marketSnapshot.dailyWithdrawUSD = BIGDECIMAL_ZERO;
     marketSnapshot.dailyRepayUSD = BIGDECIMAL_ZERO;
   }
+  marketSnapshot.rates = market.rates;
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketSnapshot.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD;
@@ -84,6 +110,11 @@ export function getOrCreateMarketSnapshot(
   marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketSnapshot.inputTokenBalance = market.inputTokenBalance;
   marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  marketSnapshot.outputTokenSupply = market.outputTokenSupply;
+  marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  marketSnapshot.exchangeRate = market.exchangeRate;
+  marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+  marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   marketSnapshot.blockNumber = event.block.number;
   marketSnapshot.timestamp = event.block.timestamp;
   marketSnapshot.save();
@@ -107,10 +138,13 @@ export function getOrCreateMarketHourlySnapshot(
     marketSnapshot.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     marketSnapshot.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     marketSnapshot.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
-
+    marketSnapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
     marketSnapshot.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
     marketSnapshot.hourlyRepayUSD = BIGDECIMAL_ZERO;
   }
+  marketSnapshot.rates = market.rates;
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketSnapshot.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD;
@@ -124,6 +158,11 @@ export function getOrCreateMarketHourlySnapshot(
   marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketSnapshot.inputTokenBalance = market.inputTokenBalance;
   marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  marketSnapshot.outputTokenSupply = market.outputTokenSupply;
+  marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  marketSnapshot.exchangeRate = market.exchangeRate;
+  marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+  marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   marketSnapshot.blockNumber = event.block.number;
   marketSnapshot.timestamp = event.block.timestamp;
   marketSnapshot.save();
@@ -254,4 +293,27 @@ export function addMarketBorrowVolume(
     hourlySnapshot.hourlyBorrowUSD.plus(borrowedUSD);
   hourlySnapshot.save();
   addProtocolBorrowVolume(event, borrowedUSD);
+}
+
+export function openMarketBorrowerPosition(market: Market): void {
+  market.openPositionCount += 1;
+  market.positionCount += 1;
+  market.borrowingPositionCount += 1;
+  market.save();
+  incrementProtocolPositionCount();
+}
+
+export function openMarketLenderPosition(market: Market): void {
+  market.openPositionCount += 1;
+  market.positionCount += 1;
+  market.lendingPositionCount += 1;
+  market.save();
+  incrementProtocolPositionCount();
+}
+
+export function closeMarketPosition(market: Market): void {
+  market.openPositionCount -= 1;
+  market.closedPositionCount += 1;
+  market.save();
+  decrementProtocolOpenPositionCount();
 }

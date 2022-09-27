@@ -1,4 +1,3 @@
-// import { log } from "@graphprotocol/graph-ts";
 import { log } from "@graphprotocol/graph-ts";
 import {
   Deposit,
@@ -15,7 +14,9 @@ import {
 import {
   BIGINT_NEG_ONE,
   MasterChef,
+  ZERO_ADDRESS,
 } from "../../../../../src/common/constants";
+import { setPoolRewarder } from "../../common/handlers/handleRewarder";
 import { updateMasterChef } from "../../common/handlers/handleRewardV2";
 import {
   createMasterChefStakingPool,
@@ -25,7 +26,12 @@ import {
 
 // A deposit or stake for the pool specific MasterChef.
 export function handleDeposit(event: Deposit): void {
-  updateMasterChef(event, event.params.pid, event.params.amount);
+  updateMasterChef(
+    event,
+    event.params.pid,
+    event.params.amount,
+    event.params.user
+  );
 }
 
 // A withdraw or unstaking for the pool specific MasterChef.
@@ -33,7 +39,8 @@ export function handleWithdraw(event: Withdraw): void {
   updateMasterChef(
     event,
     event.params.pid,
-    event.params.amount.times(BIGINT_NEG_ONE)
+    event.params.amount.times(BIGINT_NEG_ONE),
+    event.params.user
   );
 }
 
@@ -42,7 +49,8 @@ export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
   updateMasterChef(
     event,
     event.params.pid,
-    event.params.amount.times(BIGINT_NEG_ONE)
+    event.params.amount.times(BIGINT_NEG_ONE),
+    event.params.user
   );
 }
 
@@ -61,6 +69,11 @@ export function handleAdd(event: Add): void {
     MasterChef.MASTERCHEFV2
   );
   masterChefV2Pool.poolAllocPoint = event.params.allocPoint;
+
+  if (event.params.rewarder.toHexString() != ZERO_ADDRESS) {
+    setPoolRewarder(event.params.rewarder, masterChefV2Pool);
+  }
+
   masterChefV2Pool.save();
 }
 
@@ -76,6 +89,11 @@ export function handleSet(event: Set): void {
     MasterChef.MASTERCHEFV2
   );
   masterChefV2Pool.poolAllocPoint = event.params.allocPoint;
+
+  if (event.params.overwrite) {
+    setPoolRewarder(event.params.rewarder, masterChefV2Pool);
+  }
+
   masterChefV2Pool.save();
 }
 

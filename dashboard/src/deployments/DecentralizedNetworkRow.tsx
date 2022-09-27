@@ -4,7 +4,6 @@ import { useNavigate } from "react-router";
 import { ApolloClient, NormalizedCacheObject, useQuery } from "@apollo/client";
 import { toPercent } from "../utils";
 import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
-import { useEffect } from "react";
 import { styled } from "../styled";
 import { alpha, Card, CircularProgress, TableRow, Typography } from "@mui/material";
 import { NetworkLogo } from "../common/NetworkLogo";
@@ -96,12 +95,6 @@ export const DecentralizedNetworkRow = ({ rowData, subgraphName, clientIndexing 
 
   const schemaVersion = rowData?.schemaVersion;
 
-  useEffect(() => {
-    if (errorIndexing) {
-      console.log(rowData, "DEPLOYMENT ERR", errorIndexing, status, statusData, subgraphName);
-    }
-  }, [errorIndexing]);
-
   const { schemaOutdated, indexedSuccess } = useMemo(() => {
     return {
       schemaOutdated: schemaVersion && schemaVersion !== latestSchemaVersion,
@@ -129,32 +122,12 @@ export const DecentralizedNetworkRow = ({ rowData, subgraphName, clientIndexing 
     statusColor = "#58BC82";
   }
 
-  // const subgraphDataClient = useMemo(() => NewClient("https://api.thegraph.com/explorer/graphql"), []);
-
-  // const [getSubgraphData, {
-  //   data: subgraphData
-  // }] = useLazyQuery(subgraphDataQuery, { variables: { subgraphName: data?.protocols[0]?.slug + '-' + networkName }, client: subgraphDataClient })
-
-  // useEffect(() => {
-  //   if (data) {
-  //     getSubgraphData()
-  //   }
-  // }, [data])
-
-  // console.log(subgraphData)
-
   const indexed = synced
     ? 100
     : toPercent(
-        statusData?.chains[0]?.latestBlock?.number - statusData?.chains[0]?.earliestBlock?.number || 0,
-        statusData?.chains[0]?.chainHeadBlock?.number - statusData?.chains[0]?.earliestBlock?.number,
-      );
-
-  // // const indexingRatio = (current block - earliest timeseries block)/(chain head block - earliest timeseries block) = ratio
-  // const indexingRatio = (statusData?.chains[0]?.latestBlock?.number - statusData?.chains[0]?.earliestBlock?.number) / (statusData?.chains[0]?.chainHeadBlock?.number - statusData?.chains[0]?.earliestBlock?.number)
-  // // (current time - deployed at time + ratio(deployed at time))/ratio = x
-  // let deployedAt = 1 //HIT THE NEW ENDPOINT AND GET deployedAt time
-  // const indexingETA = (Date.now() - deployedAt + indexingRatio * deployedAt) / indexingRatio
+      statusData?.chains[0]?.latestBlock?.number - statusData?.chains[0]?.earliestBlock?.number || 0,
+      statusData?.chains[0]?.chainHeadBlock?.number - statusData?.chains[0]?.earliestBlock?.number,
+    );
 
   let network = rowData.network;
   if (network === "mainnet") {
@@ -171,8 +144,8 @@ export const DecentralizedNetworkRow = ({ rowData, subgraphName, clientIndexing 
       <TableCell
         sx={{ padding: "6px", borderLeft: `${statusColor} solid 6px`, verticalAlign: "middle", display: "flex" }}
       >
-        <SubgraphLogo name={subgraphName} />
-        <NetworkLogo network={network} />
+        <SubgraphLogo size={40} name={subgraphName} />
+        <NetworkLogo size={40} network={network} />
         <span style={{ display: "inline-flex", alignItems: "center", paddingLeft: "6px", fontSize: "14px" }}>
           {subgraphName}-{network}
         </span>

@@ -1,7 +1,7 @@
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 import { useEffect } from "react";
 import { percentageFieldList } from "../constants";
-import { convertTokenDecimals } from "../utils";
+import { convertTokenDecimals, formatIntToFixed2 } from "../utils";
 import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
 
 function checkValueFalsey(
@@ -39,6 +39,7 @@ function checkValueFalsey(
 
 interface SchemaTableProps {
   entityData: { [x: string]: any };
+  protocolType: string;
   schemaName: string;
   dataFields: { [x: string]: string };
   issuesProps: { message: string; type: string; level: string; fieldName: string }[];
@@ -47,11 +48,12 @@ interface SchemaTableProps {
   >;
 }
 
-function SchemaTable({ entityData, schemaName, dataFields, issuesProps, setIssues }: SchemaTableProps) {
+function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesProps, setIssues }: SchemaTableProps) {
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   let schema: (JSX.Element | null)[] = [];
   if (entityData) {
     schema = Object.keys(entityData).map((fieldName: string) => {
+      let additionalElement = null;
       if (fieldName === "__typename") {
         return null;
       }
@@ -148,14 +150,140 @@ function SchemaTable({ entityData, schemaName, dataFields, issuesProps, setIssue
               decimals = entityData?.rewardTokens[idx]?.token?.decimals;
               tokenNames.push(entityData.rewardTokens[idx]?.token?.name || "TOKEN [" + idx + "]");
             }
-            return convertTokenDecimals(val, decimals).toString();
+            return formatIntToFixed2(convertTokenDecimals(val, decimals));
           });
           dataType += " [" + tokenNames.join(",") + "]";
           if (fieldName.toUpperCase() === "REWARDTOKENEMISSIONSAMOUNT") {
             value = "[ " + decimalMapped.join(", ") + " ]";
+            const rewardFactors: string[] = [];
+            let rewardFactorsStr = "N/A";
+            let rewardAPRs: string[] = entityData?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
+              let apr = 0;
+              if (protocolType === "LENDING" && (entityData.rewardTokens[idx]?.type === "BORROW" || entityData.rewardTokens[idx]?.token?.type === "BORROW")) {
+                if (
+                  !Number(entityData.totalBorrowBalanceUSD) &&
+                  issues.filter(
+                    (x) => x.fieldName === `${entityData.name}-totalBorrowBalanceUSD-pool value`,
+                  ).length === 0
+                ) {
+                  issues.push({
+                    type: "VAL",
+                    message: `${entityData.name
+                      } does not have a valid 'totalBorrowBalanceUSD' value. Reward APR (BORROWER) could not be properly calculated.`,
+                    level: "critical",
+                    fieldName: `${entityData.name}-totalBorrowBalanceUSD-pool value`,
+                  });
+                } else if (Number(entityData.totalBorrowBalanceUSD)) {
+                  apr = (Number(val) / Number(entityData.totalBorrowBalanceUSD)) * 100 * 365;
+                  rewardFactorsStr = `(${Number(val).toFixed(2)} (Daily Reward Emissions) / ${Number(
+                    entityData.totalBorrowBalanceUSD,
+                  ).toFixed(2)} (Borrow balance)) * 100 * 365 = ${apr.toFixed(2)}%`;
+                }
+              } else if (protocolType === "LENDING") {
+                if (
+                  !Number(entityData.totalDepositBalanceUSD) &&
+                  !Number(entityData.totalValueLockedUSD) &&
+                  issues.filter(
+                    (x) =>
+                      x.fieldName ===
+                      `${entityData.name} - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
+                  ).length === 0
+                ) {
+                  issues.push({
+                    type: "VAL",
+                    message: `${entityData.name
+                      } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
+                    level: "critical",
+                    fieldName: `${entityData.name
+                      } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
+                  });
+                } else if (entityData.totalDepositBalanceUSD) {
+                  apr = (Number(val) / Number(entityData.totalDepositBalanceUSD)) * 100 * 365;
+                  rewardFactorsStr = `(${Number(val).toFixed(2)}(Daily Reward Emissions) / ${Number(
+                    entityData.totalDepositBalanceUSD,
+                  ).toFixed(2)} (Deposit balance)) * 100 * 365 = ${apr.toFixed(2)}% `;
+                } else if (Number(entityData.totalValueLockedUSD)) {
+                  apr = (Number(val) / Number(entityData.totalValueLockedUSD)) * 100 * 365;
+                  rewardFactorsStr = `(${Number(val).toFixed(2)}(Daily Reward Emissions) / ${Number(
+                    entityData.totalValueLockedUSD,
+                  ).toFixed(2)} (TVL)) * 100 * 365 = ${apr.toFixed(2)}% `;
+                }
+              } else {
+                let outputStakedFactor = Number(entityData?.stakedOutputTokenAmount) / Number(entityData?.outputTokenSupply);
+                if (!outputStakedFactor) {
+                  outputStakedFactor = 1;
+                }
+                apr = (Number(val) / (Number(entityData.totalValueLockedUSD) * outputStakedFactor)) * 100 * 365;
+                rewardFactorsStr = `(${Number(val).toFixed(2)}(Daily Reward Emissions) / (${Number(
+                  entityData.totalValueLockedUSD,
+                ).toFixed(2)} (TVL) * (${Number(entityData?.stakedOutputTokenAmount)} (Staked Output Token) / ${Number(
+                  entityData?.outputTokenSupply,
+                )} (Output Token Supply)))) * 100 * 365 = ${apr.toFixed(2)}% `;
+              }
+              if (
+                Number(apr) === 0 &&
+                issues.filter(
+                  (x) =>
+                    x.fieldName ===
+                    `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                ).length === 0
+              ) {
+                issues.push({
+                  type: "RATEZERO",
+                  message: "",
+                  level: "warning",
+                  fieldName: `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                });
+              }
+              if (
+                isNaN(apr) &&
+                issues.filter(
+                  (x) =>
+                    x.fieldName ===
+                    `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                ).length === 0
+              ) {
+                issues.push({
+                  type: "NAN",
+                  message: "",
+                  level: "critical",
+                  fieldName: `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                });
+              }
+              if (
+                Number(apr) < 0 &&
+                issues.filter(
+                  (x) =>
+                    x.fieldName ===
+                    `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                ).length === 0
+              ) {
+                issues.push({
+                  type: "RATENEG",
+                  message: "",
+                  level: "critical",
+                  fieldName: `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                });
+              }
+              rewardFactors.push("Token [" + idx + "] " + rewardFactorsStr);
+              return Number(apr).toFixed(2) + "%";
+            });
+            if (rewardAPRs.length >= 1) {
+              const dataType = rewardAPRs.map((x, idx) => `${entityData.rewardTokens[idx]?.token?.name} (${entityData.rewardTokens[idx]?.type}) APR%`)
+              additionalElement = (
+                <TableRow key="reward-APRs">
+                  <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
+                    reward APRs: <b>[{dataType.join(', ')}]</b>
+                  </TableCell>
+                  <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
+                    [{rewardAPRs.join(', ')}]
+                  </TableCell>
+                </TableRow>
+              );
+            }
           } else if (fieldName.toUpperCase() === "REWARDTOKENEMISSIONSUSD") {
             value = value.map((val: string) => {
-              return "$" + Number(Number(val).toFixed(2)).toLocaleString();
+              return "$" + formatIntToFixed2(Number(val));
             });
             value = "[" + value.join(", ") + "]";
           }
@@ -313,15 +441,16 @@ function SchemaTable({ entityData, schemaName, dataFields, issuesProps, setIssue
         }
       }
       return (
-        <TableRow key={fieldName}>
-          <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
-            {fieldName}: <b>{dataType}</b>
-          </TableCell>
-          <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
-            {value}
-          </TableCell>
-        </TableRow>
-      );
+        <>{additionalElement}
+          <TableRow key={fieldName}>
+            <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
+              {fieldName}: <b>{dataType}</b>
+            </TableCell>
+            <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
+              {value}
+            </TableCell>
+          </TableRow>
+        </>);
     });
   }
 
@@ -347,7 +476,7 @@ function SchemaTable({ entityData, schemaName, dataFields, issuesProps, setIssue
     <>
       {schemaHeader}
       <TableContainer component={Paper} sx={{ justifyContent: "center", display: "flex", alignItems: "center" }}>
-        <Table sx={{ maxWidth: 800 }} aria-label="simple table">
+        <Table key="Table" sx={{ maxWidth: 800 }} aria-label="simple table">
           <TableBody>{schema}</TableBody>
         </Table>
       </TableContainer>

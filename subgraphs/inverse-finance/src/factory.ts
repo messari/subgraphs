@@ -42,7 +42,7 @@ export function handleMarketListed(event: MarketListed): void {
   getOrCreateMarket(marketAddr, event);
 
   let marketMetrics = getOrCreateUsageMetricsDailySnapshot(event);
-  marketMetrics.totalPoolCount += INT_ONE;
+  marketMetrics.totalPoolCount = protocol.totalPoolCount;
   marketMetrics.save();
 
   // trigger CToken template

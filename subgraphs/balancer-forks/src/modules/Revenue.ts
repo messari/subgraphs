@@ -86,7 +86,7 @@ export function updateRevenueSnapshots(
   );
 
   pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
-    supplySideRevenueUSD
+    totalRevenueUSD
   );
   poolDailySnapshot.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
   poolDailySnapshot.dailyTotalRevenueUSD = poolDailySnapshot.dailyTotalRevenueUSD.plus(

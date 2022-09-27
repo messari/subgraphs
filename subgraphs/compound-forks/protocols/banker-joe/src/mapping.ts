@@ -17,8 +17,14 @@ import {
   LiquidateBorrow,
   AccrueInterest,
   NewReserveFactor,
+  Transfer,
 } from "../../../generated/templates/CToken/CToken";
-import { LendingProtocol, Token } from "../../../generated/schema";
+import {
+  LendingProtocol,
+  Market,
+  MarketDailySnapshot,
+  Token,
+} from "../../../generated/schema";
 import {
   cTokenDecimals,
   Network,
@@ -45,6 +51,8 @@ import {
   getOrElse,
   _handleActionPaused,
   _handleMarketEntered,
+  getMarketDailySnapshotID,
+  _handleTransfer,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
@@ -254,6 +262,31 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
   let interestAccumulated = event.params.interestAccumulated;
   let totalBorrows = event.params.totalBorrows;
+
+  // check for the state of canBorrowFrom and canUseAsCollateral on this market
+  // the events do not seem to reflect the contract state
+  let marketDailySnapshotID = getMarketDailySnapshotID(
+    marketAddress.toHexString(),
+    event.block.timestamp.toI32()
+  );
+  let marketDailySnapshot = MarketDailySnapshot.load(marketDailySnapshotID);
+  if (!marketDailySnapshot) {
+    // make a check for canBorrowFrom / canUseAsCollateral
+    let comptroller = Comptroller.bind(comptrollerAddr);
+    let tryBorrowPaused = comptroller.try_borrowGuardianPaused(marketAddress);
+    let tryMintPaused = comptroller.try_mintGuardianPaused(marketAddress);
+    let market = Market.load(marketAddress.toHexString());
+    if (market) {
+      market.canBorrowFrom = !tryBorrowPaused.reverted
+        ? !tryBorrowPaused.value
+        : market.canBorrowFrom;
+      market.isActive = !tryMintPaused.reverted
+        ? !tryMintPaused.value
+        : market.isActive;
+      market.save();
+    }
+  }
+
   _handleAccrueInterest(
     updateMarketData,
     comptrollerAddr,
@@ -264,6 +297,16 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
 }
 
+export function handleTransfer(event: Transfer): void {
+  _handleTransfer(
+    event,
+    event.address.toHexString(),
+    event.params.to,
+    event.params.from,
+    comptrollerAddr
+  );
+}
+
 function getOrCreateProtocol(): LendingProtocol {
   let comptroller = Comptroller.bind(comptrollerAddr);
   let protocolData = new ProtocolData(
@@ -271,7 +314,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Banker Joe",
     "banker-joe",
     "2.0.1",
-    "1.1.2",
+    "1.1.5",
     "1.0.0",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),

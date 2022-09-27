@@ -1,117 +1,69 @@
-const exec = require("child_process").exec;
+const { exec } = require("child_process");
 const fs = require("fs");
-
-/**
- * @param {string} protocol - Protocol that is being deployed
- * @param {string} network - Network that the protocol is being deployed to
- * @param {string} template - Template location that will be used to create subgraph.yaml
- * @param {string} location - Location in the subgraph will be deployed to {e.g. messari/uniswap-v2-ethereum}
- */
-function scripts(protocol, network, template, location, constants) {
-  let scripts = [];
-  let removeResults = "rm -rf results.txt";
-  let removeConfig = "rm -rf configurations/configure.ts";
-  let removeSubgraphYaml = "rm -rf subgraph.yaml";
-  let prepareYaml =
-    "npm run prepare:yaml --PROTOCOL=" +
-    protocol +
-    " --NETWORK=" +
-    network +
-    " --TEMPLATE=" +
-    template;
-  let prepareConstants =
-    "npm run prepare:constants --PROTOCOL=" +
-    protocol +
-    " --NETWORK=" +
-    network;
-  let codegen = "graph codegen";
-  let deployment = "npm run deploy:subgraph --LOCATION=" + location;
-
-  scripts.push(removeResults);
-  scripts.push(removeConfig);
-  scripts.push(removeSubgraphYaml);
-  scripts.push(prepareYaml);
-  if (constants == true) {
-    scripts.push(prepareConstants);
-  }
-  scripts.push(codegen);
-  scripts.push(deployment);
-
-  return scripts;
-}
-
-function getDeploymentNetwork(network) {
-  let deployNetwork = "";
-  switch (network) {
-    case "mainnet":
-      deployNetwork = "ethereum";
-      break;
-    case "xdai":
-      deployNetwork = "gnosis";
-      break;
-    case "matic":
-      deployNetwork = "polygon";
-      break;
-    default:
-      deployNetwork = network;
-  }
-  return deployNetwork;
-}
 
 /**
  * @param {string[]} array - Protocol that is being deployed
  * @param {string} callback
  */
-async function runCommands(allScripts, results, args, callback) {
+async function executeDeployment(deployment, callback) {
   let logs = "";
-  var deploymentIndex = 0;
-  var scriptIndex = 0;
-  var httpCounter = 1;
-  let allDeployments = Array.from(allScripts.keys());
+  let results = "RESULTS:\n";
+  let deploymentIndex = 0;
+  let scriptIndex = 0;
+  let httpCounter = 0;
+  const allDeployments = Array.from(deployment.scripts.keys());
 
   function next() {
     if (deploymentIndex < allDeployments.length) {
       exec(
-        allScripts.get(allDeployments[deploymentIndex])[scriptIndex++],
-        function (error, stdout, stderr) {
-          logs = logs + "stdout: " + stdout;
-          logs = logs + "stderr: " + stderr;
+        deployment.scripts.get(allDeployments[deploymentIndex])[scriptIndex],
+        (error, stdout, stderr) => {
+          logs = `${logs}stdout: ${stdout}`;
+          logs = `${logs}stderr: ${stderr}`;
+
+          scriptIndex += 1;
+
           if (stderr.includes("HTTP error")) {
             if (httpCounter >= 2) {
-              deploymentIndex++;
+              deploymentIndex += 1;
               scriptIndex = 0;
             }
-            httpCounter++;
+            httpCounter += 1;
           }
+
           if (error !== null) {
             if (
               stderr.includes("HTTP error deploying the subgraph") &&
-              httpCounter <= 3
+              httpCounter < 3
             ) {
-              httpCounter++;
+              httpCounter += 1;
               console.log(
-                "HTTP error on deployment " +
-                  httpCounter.toString() +
-                  " for " +
-                  allDeployments[deploymentIndex] +
-                  ". Trying Again..."
+                `HTTP error on deployment ${httpCounter.toString()} for ${
+                  allDeployments[deploymentIndex]
+                }. Trying Again...`
               );
             } else {
-              logs = logs + "Exec error: " + error;
-              results +=
-                "Deployment Failed: " + allDeployments[deploymentIndex] + "\n";
-              console.log(error);
-              deploymentIndex++;
+              logs = `${logs}Exec error: ${error}`;
+              if (deployment.getDeploy() === false) {
+                results += `Build Failed: ${allDeployments[deploymentIndex]}\n`;
+              } else {
+                results += `Deployment Failed: ${allDeployments[deploymentIndex]}\n`;
+              }
+              logs = `${logs}error: ${error}`;
+              deploymentIndex += 1;
               scriptIndex = 0;
-              httpCounter = 1;
+              httpCounter = 0;
             }
           } else if (
-            scriptIndex ==
-            allScripts.get(allDeployments[deploymentIndex]).length
+            scriptIndex ===
+            deployment.scripts.get(allDeployments[deploymentIndex]).length
           ) {
-            results +=
-              "Deployment Successful: " + allDeployments[deploymentIndex] + "\n";
-            deploymentIndex++;
+            if (deployment.getDeploy() === false) {
+              results += `Build Successful: ${allDeployments[deploymentIndex]}\n`;
+            } else {
+              results += `Deployment Successful: ${allDeployments[deploymentIndex]}\n`;
+            }
+            deploymentIndex += 1;
             scriptIndex = 0;
             httpCounter = 1;
           }
@@ -122,19 +74,15 @@ async function runCommands(allScripts, results, args, callback) {
       );
     } else {
       // all done here
-      fs.writeFile(
-        "results.txt",
-        logs.replace(/\u001b[^m]*?m/g, ""),
-        function (err) {
-          if (err) throw err;
-        }
-      );
+      fs.writeFile("results.txt", logs.replace(/\u00[^m]*?m/g, ""), (err) => {
+        if (err) throw new Error(err).message;
+      });
 
       // Print the logs if printlogs is 't' or 'true'
-      if (["true", "t"].includes(args.printlogs.toLowerCase())) {
+      if (deployment.printlogs) {
         console.log(logs);
       }
-      console.log("\n" + results + "END" + "\n\n");
+      console.log(`\n${results}END\n\n`);
       callback(results);
     }
   }
@@ -143,4 +91,4 @@ async function runCommands(allScripts, results, args, callback) {
   next();
 }
 
-module.exports = { scripts, getDeploymentNetwork, runCommands };
+module.exports = { executeDeployment };

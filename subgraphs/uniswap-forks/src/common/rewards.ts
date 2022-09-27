@@ -64,6 +64,7 @@ export const CIRCULAR_BUFFER = "CIRCULAR_BUFFER";
 export namespace RewardIntervalType {
   export const BLOCK = "BLOCK";
   export const TIMESTAMP = "TIMESTAMP";
+  export const NONE = "NONE";
 }
 
 // Forecast period. This gives you the time period that you want to estimate count of blocks per interval, based on moving average block speed.
@@ -96,6 +97,11 @@ export function getRewardsPerDay(
   rewardRate: BigDecimal,
   rewardType: string
 ): BigDecimal {
+  if (rewardType == RewardIntervalType.NONE) {
+    log.warning("Reward type is NONE. Returning 0.", []);
+    return BIGDECIMAL_ZERO;
+  }
+
   let circularBuffer = getOrCreateCircularBuffer();
 
   // Create entity for the current block
@@ -284,6 +290,8 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("13.39");
   } else if (NetworkConfigs.getNetwork() == Network.CRONOS) {
     return BigDecimal.fromString("5.5");
+  } else if (NetworkConfigs.getNetwork() == Network.HARMONY) {
+    return BigDecimal.fromString("0.5");
   }
 
   // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")

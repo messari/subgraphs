@@ -128,3 +128,9 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
   }
   return result.toBigDecimal();
 }
+
+/////////////////////////////
+/////     Addresses     /////
+/////////////////////////////
+
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";

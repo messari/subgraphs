@@ -3,7 +3,7 @@ import { CircularProgress, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -33,9 +33,6 @@ const messagesByLevel = (
           factors = "This field is derived from the following factors: " + issuesArray[x].message + ". ";
         }
         issuesMsg = `All values in ${issuesArray[x].fieldName} are 0 (or null). ${factors}Verify that this data is being mapped correctly.`;
-      }
-      if (issuesArray[x].type === "LIQ") {
-        issuesMsg = `${issuesArray[x].fieldName} timeseries value cannot be higher than totalValueLockedUSD on the pool. Look at snapshot id ${issuesArray[x].message}`;
       }
       if (issuesArray[x].type === "CUMULATIVE") {
         issuesMsg = `
@@ -71,9 +68,8 @@ const messagesByLevel = (
         if (issuesArray[x]?.message?.split("///")[1] === "-1") {
           endStr = `is empty`;
         }
-        issuesMsg = `${issuesArray[x].fieldName?.split("///")[0]} array has elements up to index [${
-          issuesArray[x].fieldName?.split("///")[1]
-        }], but ${issuesArray[x]?.message?.split("///")[0]} array ${endStr}.`;
+        issuesMsg = `${issuesArray[x].fieldName?.split("///")[0]} array has elements up to index [${issuesArray[x].fieldName?.split("///")[1]
+          }], but ${issuesArray[x]?.message?.split("///")[0]} array ${endStr}.`;
       }
       if (issuesArray[x].type === "NEG") {
         const msgObj = JSON.parse(issuesArray[x].message);
@@ -96,6 +92,10 @@ const messagesByLevel = (
       }
       if (issuesArray[x].type === "BORROW") {
         issuesMsg = `Entity ${issuesArray[x].fieldName} could not calculate BORROW Reward APR. The Pool Borrow Balance is not available.`;
+      }
+      if (issuesArray[x].type === "QRY") {
+        const params = issuesArray[x].message.split("//").join(", ");
+        issuesMsg = `Error fetching subgraph data - Could not load protocol from query parameters ${params}`;
       }
       issuesMsgs.push(<li key={`${x}-${issuesArray[x].fieldName}`}>{issuesMsg}</li>);
     }

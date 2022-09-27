@@ -17,12 +17,11 @@ import {
   Token,
   Withdraw,
 } from "../generated/schema";
-import { AToken } from "../generated/templates/LendingPool/AToken";
-import { StableDebtToken } from "../generated/templates/LendingPool/StableDebtToken";
-import { VariableDebtToken } from "../generated/templates/LendingPool/VariableDebtToken";
+import { AToken } from "../generated/LendingPool/AToken";
+import { StableDebtToken } from "../generated/LendingPool/StableDebtToken";
+import { VariableDebtToken } from "../generated/LendingPool/VariableDebtToken";
 import {
   BIGDECIMAL_HUNDRED,
-  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
@@ -32,16 +31,19 @@ import {
   InterestRateType,
   INT_FOUR,
   INT_TWO,
-  INT_ZERO,
   PositionSide,
   rayToWad,
   RAY_OFFSET,
+  ZERO_ADDRESS,
 } from "./constants";
 import {
   addPosition,
   createAccount,
   createInterestRate,
+  getBorrowBalance,
+  getMarketByOutputToken,
   getOrCreateLendingProtocol,
+  getOrCreateMarket,
   getOrCreateToken,
   snapshotUsage,
   subtractPosition,
@@ -49,6 +51,7 @@ import {
   updateMarketSnapshots,
   updateSnapshots,
 } from "./helpers";
+import { AToken as ATokenTemplate } from "../generated/templates";
 
 //////////////////////////
 ///// Helper Classes /////
@@ -86,89 +89,41 @@ export function _handleReserveInitialized(
   event: ethereum.Event,
   underlyingToken: Address,
   outputToken: Address,
-  stableDebtToken: Address,
   variableDebtToken: Address,
-  protocolData: ProtocolData
+  protocolData: ProtocolData,
+  stableDebtToken: Address = Address.fromString(ZERO_ADDRESS)
 ): void {
   // create tokens
-  let underlyingTokenEntity = getOrCreateToken(underlyingToken);
   let outputTokenEntity = getOrCreateToken(outputToken);
-  let stableDebtTokenEntity = getOrCreateToken(stableDebtToken);
   let variableDebtTokenEntity = getOrCreateToken(variableDebtToken);
 
-  // get protocol
-  let protocol = getOrCreateLendingProtocol(protocolData);
-  protocol.totalPoolCount++;
-  let markets = protocol.marketIDs;
-  markets.push(underlyingToken.toHexString());
-  protocol.marketIDs = markets;
-  protocol.save();
+  // update and initialize specofic market variables
+  let market = getOrCreateMarket(underlyingToken, protocolData);
 
-  // Create a new Market
-  let market = new Market(underlyingToken.toHexString());
-
-  market.protocol = protocol.name;
   market.name = outputTokenEntity.name;
-  market.isActive = true; // initialized to true on creation
-  market.canUseAsCollateral = true; // only stopped when protocol is paused
-  market.canBorrowFrom = true; // this field changes occasinally, but all markets are set to true after creation
-  market.maximumLTV = BIGDECIMAL_ZERO;
-  market.liquidationThreshold = BIGDECIMAL_ZERO;
-  market.liquidationPenalty = BIGDECIMAL_ZERO;
-  market.inputToken = underlyingTokenEntity.id;
   market.outputToken = outputTokenEntity.id;
-  market.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-  market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
-  market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-  market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
-  market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-  market.inputTokenBalance = BIGINT_ZERO;
-  market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
-  market.outputTokenSupply = BIGINT_ZERO;
-  market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  market.exchangeRate = BIGDECIMAL_ONE; // this is constant
-  market.reserveFactor = BIGDECIMAL_ZERO;
-  market.totalStableValueLocked = BIGINT_ZERO;
-  market.totalVariableValueLocked = BIGINT_ZERO;
-  market.rewardTokens = []; // updated once used
-  market.rewardTokenEmissionsAmount = [];
-  market.rewardTokenEmissionsUSD = [];
-  market.sToken = stableDebtTokenEntity.id;
-  market.vToken = variableDebtTokenEntity.id;
-  market.liquidityIndex = BIGINT_ZERO;
-  market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
-  market.positionCount = INT_ZERO;
-  market.openPositionCount = INT_ZERO;
-  market.closedPositionCount = INT_ZERO;
-  market.lendingPositionCount = INT_ZERO;
-  market.borrowingPositionCount = INT_ZERO;
-  market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
-  market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  market.rates = []; // calculated in event ReserveDataUpdated
-  market.prePauseState = [true, true, true];
+  market.createdTimestamp = event.block.timestamp;
+  market.vToken = variableDebtTokenEntity.id;
+  if (stableDebtToken != Address.fromString(ZERO_ADDRESS)) {
+    market.sToken = getOrCreateToken(stableDebtToken).id;
+  }
 
   market.save();
+
+  // create AToken template to watch Transfer
+  ATokenTemplate.create(outputToken);
 }
 
 export function _handleCollateralConfigurationChanged(
   marketId: Address,
   liquidationPenalty: BigInt,
   liquidationThreshold: BigInt,
-  maximumLTV: BigInt
+  maximumLTV: BigInt,
+  protocolData: ProtocolData
 ): void {
   // Adjust market LTV, liquidation, and collateral data when a reserve's collateral configuration has changed
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.warning("[CollateralConfigurationChanged] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
+  let market = getOrCreateMarket(marketId, protocolData);
 
   market.maximumLTV = maximumLTV.toBigDecimal().div(BIGDECIMAL_HUNDRED);
   market.liquidationThreshold = liquidationThreshold
@@ -188,14 +143,11 @@ export function _handleCollateralConfigurationChanged(
   market.save();
 }
 
-export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.warning("[BorrowingEnabledOnReserve] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
+export function _handleBorrowingEnabledOnReserve(
+  marketId: Address,
+  protocolData: ProtocolData
+): void {
+  let market = getOrCreateMarket(marketId, protocolData);
 
   market.canBorrowFrom = true;
   market.prePauseState = [
@@ -206,14 +158,11 @@ export function _handleBorrowingEnabledOnReserve(marketId: Address): void {
   market.save();
 }
 
-export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.warning("[BorrowingDisabledOnReserve] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
+export function _handleBorrowingDisabledOnReserve(
+  marketId: Address,
+  protocolData: ProtocolData
+): void {
+  let market = getOrCreateMarket(marketId, protocolData);
 
   market.canBorrowFrom = false;
   market.prePauseState = [
@@ -224,14 +173,11 @@ export function _handleBorrowingDisabledOnReserve(marketId: Address): void {
   market.save();
 }
 
-export function _handleReserveActivated(marketId: Address): void {
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.warning("[ReserveActivated] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
+export function _handleReserveActivated(
+  marketId: Address,
+  protocolData: ProtocolData
+): void {
+  let market = getOrCreateMarket(marketId, protocolData);
 
   market.isActive = true;
   market.prePauseState = [
@@ -242,14 +188,11 @@ export function _handleReserveActivated(marketId: Address): void {
   market.save();
 }
 
-export function _handleReserveDeactivated(marketId: Address): void {
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.warning("[ReserveDeactivated] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
+export function _handleReserveDeactivated(
+  marketId: Address,
+  protocolData: ProtocolData
+): void {
+  let market = getOrCreateMarket(marketId, protocolData);
 
   market.isActive = false;
   market.prePauseState = [
@@ -262,15 +205,10 @@ export function _handleReserveDeactivated(marketId: Address): void {
 
 export function _handleReserveFactorChanged(
   marketId: Address,
-  reserveFactor: BigInt
+  reserveFactor: BigInt,
+  protocolData: ProtocolData
 ): void {
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.warning("[ReserveFactorChanged] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
+  let market = getOrCreateMarket(marketId, protocolData);
 
   market.reserveFactor = reserveFactor
     .toBigDecimal()
@@ -285,13 +223,7 @@ export function _handleReserveUsedAsCollateralEnabled(
 ): void {
   let protocol = getOrCreateLendingProtocol(protocolData);
 
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.warning("[ReserveUsedAsCollateralEnabled] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
+  let market = getOrCreateMarket(marketId, protocolData);
 
   // grab account
   let account = Account.load(accountID.toHexString());
@@ -310,15 +242,10 @@ export function _handleReserveUsedAsCollateralEnabled(
 
 export function _handleReserveUsedAsCollateralDisabled(
   marketId: Address,
-  accountID: Address
+  accountID: Address,
+  protocolData: ProtocolData
 ): void {
-  let market = Market.load(marketId.toHexString());
-  if (!market) {
-    log.warning("[ReserveUsedAsCollateralDisabled] Market not found: {}", [
-      marketId.toHexString(),
-    ]);
-    return;
-  }
+  let market = getOrCreateMarket(marketId, protocolData);
 
   // grab account
   let account = Account.load(accountID.toHexString());
@@ -395,7 +322,7 @@ export function _handleReserveDataUpdated(
 ): void {
   let market = Market.load(marketId.toHexString());
   if (!market) {
-    log.warning("[ReserveDataUpdated] Market not found: {}", [
+    log.warning("[_handlReserveDataUpdated] Market not found {}", [
       marketId.toHexString(),
     ]);
     return;
@@ -410,18 +337,21 @@ export function _handleReserveDataUpdated(
   market.outputTokenPriceUSD = assetPriceUSD;
 
   // get current borrow balance
-  let stableDebtContract = StableDebtToken.bind(
-    Address.fromString(market.sToken)
-  );
+  let trySBorrowBalance: ethereum.CallResult<BigInt> | null = null;
+  if (market.sToken) {
+    let stableDebtContract = StableDebtToken.bind(
+      Address.fromString(market.sToken!)
+    );
+    trySBorrowBalance = stableDebtContract.try_totalSupply();
+  }
   let variableDebtContract = VariableDebtToken.bind(
-    Address.fromString(market.vToken)
+    Address.fromString(market.vToken!)
   );
-  let trySBorrowBalance = stableDebtContract.try_totalSupply();
   let tryVBorrowBalance = variableDebtContract.try_totalSupply();
   let sBorrowBalance = BIGINT_ZERO;
   let vBorrowBalance = BIGINT_ZERO;
 
-  if (!trySBorrowBalance.reverted) {
+  if (trySBorrowBalance != null && !trySBorrowBalance.reverted) {
     sBorrowBalance = trySBorrowBalance.value;
   }
   if (!tryVBorrowBalance.reverted) {
@@ -429,7 +359,11 @@ export function _handleReserveDataUpdated(
   }
 
   // broken if both revert
-  if (trySBorrowBalance.reverted && tryVBorrowBalance.reverted) {
+  if (
+    trySBorrowBalance != null &&
+    trySBorrowBalance.reverted &&
+    tryVBorrowBalance.reverted
+  ) {
     log.warning("[ReserveDataUpdated] No borrow balance found", []);
     return;
   }
@@ -505,15 +439,6 @@ export function _handleReserveDataUpdated(
   ]);
 
   // update rates
-  let sBorrowRate = createInterestRate(
-    market.id,
-    InterestRateSide.BORROWER,
-    InterestRateType.STABLE,
-    rayToWad(stableBorrowRate)
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
-  );
-
   let vBorrowRate = createInterestRate(
     market.id,
     InterestRateSide.BORROWER,
@@ -532,7 +457,21 @@ export function _handleReserveDataUpdated(
       .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
 
-  market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
+  if (market.sToken) {
+    // geist does not have stable borrow rates
+    let sBorrowRate = createInterestRate(
+      market.id,
+      InterestRateSide.BORROWER,
+      InterestRateType.STABLE,
+      rayToWad(stableBorrowRate)
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
+    );
+    market.rates = [depositRate.id, vBorrowRate.id, sBorrowRate.id];
+  } else {
+    market.rates = [depositRate.id, vBorrowRate.id];
+  }
+
   market.save();
 
   // update protocol TVL / BorrowUSD / SupplyUSD
@@ -783,12 +722,11 @@ export function _handleBorrow(
   account.save();
 
   // update position
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let positionId = addPosition(
     protocol,
     market,
     account,
-    aTokenContract.try_balanceOf(accountID), // try getting balance of account
+    getBorrowBalance(market, accountID), // try getting balance of account in debt market
     PositionSide.BORROWER,
     EventType.BORROW,
     event
@@ -874,13 +812,12 @@ export function _handleRepay(
   account.repayCount += 1;
   account.save();
 
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let positionId = subtractPosition(
     protocol,
     market,
     account,
-    aTokenContract.try_balanceOf(accountID), // try getting balance of account
-    PositionSide.LENDER,
+    getBorrowBalance(market, accountID), // try getting balance of account in debt market
+    PositionSide.BORROWER,
     EventType.REPAY,
     event
   );
@@ -1002,14 +939,16 @@ export function _handleLiquidate(
     log.warning("[Liquidate] Repay token market not found on protocol: {}", [
       repayToken.toHexString(),
     ]);
+    return;
   }
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+
+  // account for borrow being repaid by liquidator
   let positionId = subtractPosition(
     protocol,
-    market,
-    account,
-    aTokenContract.try_balanceOf(borrower), // try getting balance of account
-    PositionSide.LENDER,
+    repayTokenMarket,
+    account, // the borrower
+    getBorrowBalance(repayTokenMarket, borrower), // try getting balance of account in debt market
+    PositionSide.BORROWER,
     EventType.LIQUIDATEE,
     event
   );
@@ -1019,6 +958,29 @@ export function _handleLiquidate(
     ]);
     return;
   }
+
+  // account for borrower losing aToken (collateral)
+  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  subtractPosition(
+    protocol,
+    market, // collateral market
+    account,
+    aTokenContract.try_balanceOf(borrower),
+    PositionSide.LENDER,
+    -1, // not incrementing to not double count
+    event
+  );
+
+  // account for liquidator gaining aToken (seized collateral)
+  addPosition(
+    protocol,
+    market, // collateral market
+    liquidatorAccount,
+    aTokenContract.try_balanceOf(liquidator),
+    PositionSide.LENDER,
+    -1, // TODO: how do we classify a liquidator gaining collateral
+    event
+  );
 
   liquidate.position = positionId;
   liquidate.blockNumber = event.block.number;
@@ -1076,4 +1038,90 @@ export function _handleLiquidate(
     event.block.timestamp,
     event.block.number
   );
+}
+
+//////////////////////
+//// AToken Event ////
+//////////////////////
+
+export function _handleTransfer(
+  event: ethereum.Event,
+  to: Address,
+  from: Address,
+  protocolData: ProtocolData
+): void {
+  let protocol = getOrCreateLendingProtocol(protocolData);
+  let market = getMarketByOutputToken(event.address.toHexString(), protocolData);
+  if (!market) {
+    log.warning("[_handleTransfer] market not found: {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
+
+  // if the to / from addresses are the same as the aToken
+  // then this transfer is emitted as part of another event
+  // ie, a deposit, withdraw, borrow, repay, etc
+  // we want to let that handler take care of position updates
+  if (
+    to.toHexString().toLowerCase() == market.outputToken!.toLowerCase() ||
+    from.toHexString().toLowerCase() == market.outputToken!.toLowerCase()
+  ) {
+    return;
+  }
+
+  // grab accounts
+  let toAccount = Account.load(to.toHexString());
+  if (!toAccount) {
+    if (to == Address.fromString(ZERO_ADDRESS)) {
+      toAccount = null;
+    } else {
+      toAccount = createAccount(to.toHexString());
+      toAccount.save();
+
+      protocol.cumulativeUniqueUsers++;
+      protocol.save();
+    }
+  }
+
+  let fromAccount = Account.load(from.toHexString());
+  if (!fromAccount) {
+    if (from == Address.fromString(ZERO_ADDRESS)) {
+      fromAccount = null;
+    } else {
+      fromAccount = createAccount(from.toHexString());
+      fromAccount.save();
+
+      protocol.cumulativeUniqueUsers++;
+      protocol.save();
+    }
+  }
+
+  let aTokenContract = AToken.bind(event.address);
+
+  // update balance from sender
+  if (fromAccount) {
+    subtractPosition(
+      protocol,
+      market,
+      fromAccount,
+      aTokenContract.try_balanceOf(from),
+      PositionSide.LENDER,
+      -1, // TODO: not sure how to classify this event yet
+      event
+    );
+  }
+
+  // update balance from receiver
+  if (toAccount) {
+    addPosition(
+      protocol,
+      market,
+      toAccount,
+      aTokenContract.try_balanceOf(to),
+      PositionSide.LENDER,
+      -1, // TODO: not sure how to classify this event yet
+      event
+    );
+  }
 }

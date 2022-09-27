@@ -1,4 +1,3 @@
-import { ActiveAccount } from "../../generated/schema";
 import {
   getOrCreateVault,
   getOrCreateAccount,
@@ -10,6 +9,7 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
 import * as constants from "../common/constants";
+import { ActiveAccount } from "../../generated/schema";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {

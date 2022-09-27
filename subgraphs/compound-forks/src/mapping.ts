@@ -34,7 +34,6 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   cTokenDecimals,
-  cTokenDecimalsBD,
   exponentToBigDecimal,
   InterestRateSide,
   InterestRateType,
@@ -47,8 +46,10 @@ import {
   RiskType,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
+  ZERO_ADDRESS,
 } from "./constants";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
+import { CToken } from "../generated/templates/CToken/CToken";
 
 enum EventType {
   Deposit,
@@ -115,7 +116,7 @@ export function _handleNewCollateralFactor(
   newCollateralFactorMantissa: BigInt
 ): void {
   let market = Market.load(marketID);
-  if (market == null) {
+  if (!market) {
     log.warning("[handleNewCollateralFactor] Market not found: {}", [marketID]);
     return;
   }
@@ -530,7 +531,9 @@ export function _handleRedeem(
     event
   );
   if (!positionID) {
-    log.warning("[handleRedeem] Failed to find position", []);
+    log.warning("[handleRedeem] Failed to find position for account: {}", [
+      account.id,
+    ]);
     return;
   }
 
@@ -748,7 +751,9 @@ export function _handleRepayBorrow(
     event
   );
   if (!positionID) {
-    log.warning("[handleRepayBorrow] Failed to find position", []);
+    log.warning("[handleRepayBorrow] Failed to find position for account: {}", [
+      borrowerAccount.id,
+    ]);
     return;
   }
 
@@ -925,12 +930,15 @@ export function _handleLiquidateBorrow(
   // Not much to do other than associating with the borrower position
   // Because compound liquidate() emits both RepayBorrow and Liquidate
   // All logic should be handled on RepayBorrow already
-  liquidate.position = borrower
-    .toHexString()
-    .concat("-")
-    .concat(repayTokenMarketID)
-    .concat("-")
-    .concat(PositionSide.BORROWER);
+  let positionId = whichPosition(borrower, repayTokenMarketID);
+  if (!positionId) {
+    log.warning(
+      "[_liquidateBorrow] cannot find associated position for liquidation {}",
+      [liquidateID]
+    );
+    return;
+  }
+  liquidate.position = positionId!;
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.market = liquidatedCTokenID!;
@@ -938,7 +946,7 @@ export function _handleLiquidateBorrow(
   liquidate.amount = seizeTokens;
   let gainUSD = seizeTokens
     .toBigDecimal()
-    .div(cTokenDecimalsBD)
+    .div(exponentToBigDecimal(liquidatedCToken.decimals))
     .times(liquidatedCTokenMarket.outputTokenPriceUSD);
   let lossUSD = repayAmount
     .toBigDecimal()
@@ -1043,7 +1051,7 @@ export function _handleNewReserveFactor(
   newReserveFactorMantissa: BigInt
 ): void {
   let market = Market.load(marketID);
-  if (market == null) {
+  if (!market) {
     log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
     return;
   }
@@ -1052,6 +1060,93 @@ export function _handleNewReserveFactor(
     .div(mantissaFactorBD);
   market._reserveFactor = reserveFactor;
   market.save();
+}
+
+export function _handleTransfer(
+  event: ethereum.Event,
+  marketID: string,
+  to: Address,
+  from: Address,
+  comptrollerAddr: Address
+): void {
+  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  if (!protocol) {
+    log.warning("[_handleTransfer] protocol not found: {}", [
+      comptrollerAddr.toHexString(),
+    ]);
+    return;
+  }
+  let market = Market.load(marketID);
+  if (!market) {
+    log.warning("[_handleTransfer] market not found: {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
+
+  // if to / from - marketID then the transfer is associated with another event
+  // ie, a mint, redeem, borrow, repay, liquidateBorrow
+  // we want to skip these and let the event handlers take care of updates
+  if (
+    to.toHexString().toLowerCase() == marketID.toLowerCase() ||
+    from.toHexString().toLowerCase() == marketID.toLowerCase()
+  ) {
+    return;
+  }
+
+  // grab accounts
+  let toAccount = Account.load(to.toHexString());
+  if (!toAccount) {
+    if (to == Address.fromString(ZERO_ADDRESS)) {
+      toAccount = null;
+    } else {
+      toAccount = createAccount(to.toHexString());
+      toAccount.save();
+
+      protocol.cumulativeUniqueUsers++;
+      protocol.save();
+    }
+  }
+
+  let fromAccount = Account.load(from.toHexString());
+  if (!fromAccount) {
+    if (from == Address.fromString(ZERO_ADDRESS)) {
+      fromAccount = null;
+    } else {
+      fromAccount = createAccount(from.toHexString());
+      fromAccount.save();
+
+      protocol.cumulativeUniqueUsers++;
+      protocol.save();
+    }
+  }
+
+  let cTokenContract = CToken.bind(Address.fromString(marketID));
+  // update balance from sender
+  if (fromAccount) {
+    subtractPosition(
+      protocol,
+      market,
+      fromAccount,
+      cTokenContract.try_balanceOfUnderlying(from),
+      PositionSide.LENDER,
+      -1, // TODO: not sure how to classify this event yet
+      event
+    );
+  }
+
+  // update balance from receiver
+  if (toAccount) {
+    addPosition(
+      protocol,
+      market,
+      toAccount,
+      cTokenContract.try_balanceOfUnderlying(to),
+      PositionSide.LENDER,
+      -1, // TODO: not sure how to classify this event yet
+      event
+    );
+  }
 }
 
 /////////////////////////
@@ -1928,7 +2023,7 @@ export function getOrCreateMarketHourlySnapshot(
   return snapshot;
 }
 
-function getTokenPriceUSD(
+export function getTokenPriceUSD(
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
   underlyingDecimals: i32
 ): BigDecimal {
@@ -1943,7 +2038,10 @@ function getMarketHourlySnapshotID(marketID: string, timestamp: i32): string {
   return marketID.concat("-").concat((timestamp / SECONDS_PER_HOUR).toString());
 }
 
-function getMarketDailySnapshotID(marketID: string, timestamp: i32): string {
+export function getMarketDailySnapshotID(
+  marketID: string,
+  timestamp: i32
+): string {
   return marketID.concat("-").concat((timestamp / SECONDS_PER_DAY).toString());
 }
 
@@ -2266,4 +2364,47 @@ export function updateAllMarketPrices(
       .times(underlyingTokenPriceUSD);
     market.save();
   }
+}
+
+//
+//
+// This function finds the position modified by a liquidateBorrow()
+function whichPosition(account: Address, market: string): string | null {
+  // check if position has been created
+  let counterID = account
+    .toHexString()
+    .concat("-")
+    .concat(market)
+    .concat("-")
+    .concat(PositionSide.BORROWER);
+  let positionCounter = _PositionCounter.load(counterID);
+  if (!positionCounter) {
+    log.warning("[whichPosition] position counter {} not found", [counterID]);
+    return null;
+  }
+
+  // first check if the position was not closed
+  // ie, nextPosition is not associated with a new position yet
+  let positionID = counterID
+    .concat("-")
+    .concat(positionCounter.nextCount.toString());
+  let position = Position.load(positionID);
+  if (!position) {
+    // next check if the previous position exists
+    // ie, the position associated was closed
+    positionID = counterID
+      .concat("-")
+      .concat((positionCounter.nextCount--).toString());
+    position = Position.load(positionID);
+    if (!position) {
+      log.warning("[whichPosition] position not found for liquidate", []);
+      return null;
+    }
+  }
+
+  // update position liquidation count
+  position.liquidationCount += 1;
+  position.save();
+
+  return position.id;
 }

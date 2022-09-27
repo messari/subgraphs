@@ -153,3 +153,5 @@ templates:
           handler: handleNewFuseFee
         - event: NewAdminFee(uint256,uint256)
           handler: handleNewAdminFee
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer

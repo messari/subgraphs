@@ -14,23 +14,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities:
-        - _Trove
-        - Deposit
-        - Withdraw
-        - Borrow
-        - Repay
-        - Liquidate
-        - LendingProtocol
-        - Market
-        - MarketDailySnapshot
-        - MarketHourlySnapshot
-        - Token
-        - UsageMetricsDailySnapshot
-        - UsageMetricsHourlySnapshot
-        - ActiveAccount
-        - Account
-        - FinancialsDailySnapshot
+      entities: []
       abis:
         - name: TroveManager
           file: ./abis/TroveManager.json
@@ -53,22 +37,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities:
-        - FinancialsDailySnapshot
-        - LendingProtocol
-        - _Trove
-        - Deposit
-        - Withdraw
-        - Borrow
-        - Repay
-        - Market
-        - MarketDailySnapshot
-        - MarketHourlySnapshot
-        - Token
-        - ActiveAccount
-        - UsageMetricsDailySnapshot
-        - UsageMetricsHourlySnapshot
-        - Account
+      entities: []
       abis:
         - name: BorrowerOperations
           file: ./abis/BorrowerOperations.json
@@ -109,13 +78,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities:
-        - Market
-        - LendingProtocol
-        - Token
-        - MarketDailySnapshot
-        - MarketHourlySnapshot
-        - FinancialsDailySnapshot
+      entities: []
       abis:
         - name: ActivePool
           file: ./abis/ActivePool.json
@@ -136,16 +99,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities:
-        - _Trove
-        - Withdraw
-        - LendingProtocol
-        - Market
-        - Token
-        - ActiveAccount
-        - UsageMetricsDailySnapshot
-        - UsageMetricsHourlySnapshot
-        - Account
+      entities: []
       abis:
         - name: CollSurplusPool
           file: ./abis/CollSurplusPool.json
@@ -164,11 +118,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities:
-        - LendingProtocol
-        - Token
-        - FinancialsDailySnapshot
-        - Market
+      entities: []
       abis:
         - name: StabilityPool
           file: ./abis/StabilityPool.json

@@ -28,6 +28,28 @@ Protocol level data involves subgraph data that does not apply to any specific p
 
 Below the table, timeseries data is divided into their own sections. On the Protocol level the timeseries entities are `financialsDailySnapshots`, `usageMetricsDailySnapshots`, and depending on the subgraph schema version possibly `usageMetricsHourlySnapshots`. All of the fields on these entities are mapped through and rendered into charts plotting each data point on a given snapshot.
 
+#### Data Issues Auto Detected for QA purposes:
+
+- Any field has a cumulative timeseries value of 0. Varying severity levels depending on field.
+- No snapshots for a protocol
+- Cumulative field lowers from any given snapshot to the next
+- TVL on protocol is less than 1,000 or above 1,000,000,000,000
+- Total revenue is not equal to protocol side + supply side (with tolerance)
+- Individual transactions do not add up to total transaction number
+- Protocol level current values are falsy
+- Mismatch between minted token properties and mintedTokenSupplies field
+
+### Pool Overview Tab
+
+This tab is to get a quick summary on all pools on the protocol. It displays fields such as TVL, tokens, reward tokens and yields for each pool. The data is queried in batches of 10, rendering up to 50 pools per page. Clicking on a row will bring you to that pool's "Pool Tab"
+
+#### Data Issues Auto Detected for QA purposes:
+
+- No pools on protocol entity
+- All timeseries values for reward APRs/rates are 0
+- TVL on pool is less than 1,000 or above 1,000,000,000,000
+- Difference between amount of elements in reward token array on pool vs amount of elements in rewardTokenEmissions fields
+
 ### Pool Tab
 
 Before a pool is selected, a text input/drop down box appears prompting selection. Once a pool is selected, a query is sent to pull the appropriate pool data.
@@ -36,11 +58,29 @@ Once pool data is loaded, the top of the page displays a table containing data o
 
 Below the table, timeseries data is divided into their own sections. On the Pool level the timeseries entities are `...DailySnapshots`, and `...HourlySnapshots` for the given pool. All of the fields on these entities are mapped through and rendered into charts plotting each data point on a given snapshot. Data for fields with multiple indexes are broken down into their own charts. For example, timeseries data involving reward tokens are broken down into a chart for each reward token. The broken down charts are labeled by name or index in the array.
 
+#### Data Issues Auto Detected for QA purposes:
+
+- Any field has a cumulative timeseries value of 0. Varying severity levels depending on field.
+- No snapshots on a pool
+- Daily/Hourly liquidate values above the total TVL on a pool
+- Reward token is of type BORROW but totalBorrowBalanceUSD field falsy or type LENDING but totalDepositBalanceUSD falsy
+- Pool current APR value or base yield are falsy
+- Pool does not contain fees data or fee percentage misrepresented as by a certain amount of decimals points
+- TVL on pool is less than 1,000 or above 1,000,000,000,000
+- Difference between elements in input tokens array vs fields recording timeseries values related to tokens
+- Field on pool level has detected a negative value at some point (not applied to array values in timeseries)
+- inputTokenWeights do not add up to 1.00 (with .01 tolerance)
+
 ### Events Tab
 
 Before a pool is selected, a text input/drop down box appears prompting selection. Once a pool is selected, a query is sent to pull the appropriate event data on the pool.
 
 Once the pool data is loaded, a table for each event type is loaded. The table contains entries for each instance of an event. If an event type for the protocol type has no instances, a message is rendered in place of the event table.
+
+#### Data Issues Auto Detected for QA purposes:
+
+- Pool does not have any events of a certain type
+- Events are present that are not linked to any pool
 
 ## Troubleshooting
 

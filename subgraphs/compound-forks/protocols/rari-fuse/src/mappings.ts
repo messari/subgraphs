@@ -32,12 +32,16 @@ import {
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
   _handleMarketEntered,
+  _handleTransfer,
 } from "../../../src/mapping";
 import { PoolRegistered } from "../../../generated/FusePoolDirectory/FusePoolDirectory";
 import {
+  BLOCKLIST_MARKETS,
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
+  FLOAT_ADDRESS,
+  FLOAT_MARKET_ADDRESS,
   FMIM_ADDRESS,
   getNetworkSpecificConstant,
   GOHM_ADDRESS,
@@ -47,6 +51,7 @@ import {
   SCHEMA_VERSION,
   SOHM_ADDRESS,
   SUBGRAPH_VERSION,
+  VESPER_V_DOLLAR_ADDRESS,
   ZERO_ADDRESS,
 } from "./constants";
 import {
@@ -67,6 +72,7 @@ import {
   NewReserveFactor,
   Redeem,
   RepayBorrow,
+  Transfer,
 } from "../../../generated/templates/CToken/CToken";
 import {
   NewAdminFee,
@@ -93,7 +99,6 @@ import {
   INT_TWO,
   mantissaFactor,
   mantissaFactorBD,
-  Network,
   RewardTokenType,
 } from "../../../src/constants";
 import {
@@ -119,7 +124,6 @@ import { RewardsDistributorDelegator } from "../../../generated/templates/CToken
 let constants = getNetworkSpecificConstant();
 const FACTORY_CONTRACT = constants.fusePoolDirectoryAddress;
 const PROTOCOL_NETWORK = constants.network;
-const ETH_PRICEORACLE = constants.ethPriceOracle;
 
 //////////////////////
 //// Fuse Enum(s) ////
@@ -159,6 +163,7 @@ export function handlePoolRegistered(event: PoolRegistered): void {
 
   // create helper fuse pool entity
   let pool = new _FusePool(event.params.pool.comptroller.toHexString());
+  pool.name = event.params.pool.name;
   pool.poolNumber = event.params.index.toString();
   pool.marketIDs = [];
 
@@ -213,6 +218,13 @@ export function handleMarketExited(event: MarketExited): void {
 
 // add a new market
 export function handleMarketListed(event: MarketListed): void {
+  // skip the blocklisted markets
+  if (
+    BLOCKLIST_MARKETS.includes(event.params.cToken.toHexString().toLowerCase())
+  ) {
+    return;
+  }
+
   let protocol = LendingProtocol.load(FACTORY_CONTRACT);
   if (!protocol) {
     // best effort
@@ -568,7 +580,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     event.block.timestamp,
     trollerAddr,
     blocksPerDayBD,
-    PROTOCOL_NETWORK.toLowerCase() == Network.ARBITRUM_ONE.toLowerCase() ? true : false // update all prices if network is arbitrum
+    true // update all prices on each transaction for arbitrum / ethereum
   );
   updateProtocol(Address.fromString(FACTORY_CONTRACT));
 
@@ -599,6 +611,17 @@ export function handleNewReserveFactor(event: NewReserveFactor): void {
   let marketID = event.address.toHexString();
   let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
   _handleNewReserveFactor(marketID, newReserveFactorMantissa);
+}
+
+export function handleTransfer(event: Transfer): void {
+  let factoryContract = Address.fromString(FACTORY_CONTRACT);
+  _handleTransfer(
+    event,
+    event.address.toHexString(),
+    event.params.to,
+    event.params.from,
+    factoryContract
+  );
 }
 
 /////////////////
@@ -723,6 +746,32 @@ function updateMarket(
     blockTimestamp.toI32() <= 1643954408 // EOD 2/4
   ) {
     underlyingTokenPriceUSD = BigDecimal.fromString("0.99632525");
+  }
+
+  // create a threshold for Vesper Pool V-Dollar price to use another oracle if:
+  // the price is outside of the threshold ($0.50-$2.00)
+  if (
+    marketID.toLowerCase() == VESPER_V_DOLLAR_ADDRESS.toLowerCase() &&
+    (underlyingTokenPriceUSD.le(BigDecimal.fromString(".5")) ||
+      underlyingTokenPriceUSD.ge(BigDecimal.fromString("2")))
+  ) {
+    let customPrice = getUsdPricePerToken(
+      Address.fromString(market.inputToken)
+    );
+    underlyingTokenPriceUSD = customPrice.usdPrice.div(
+      customPrice.decimalsBaseTen
+    );
+  }
+
+  // fix FLOAT price exploit and high dailyDeposit at block number 14006054
+  if (
+    marketID.toLowerCase() == FLOAT_MARKET_ADDRESS.toLowerCase() &&
+    blockNumber.toI32() == 14006054
+  ) {
+    let customPrice = getUsdPricePerToken(Address.fromString(FLOAT_ADDRESS));
+    underlyingTokenPriceUSD = customPrice.usdPrice.div(
+      customPrice.decimalsBaseTen
+    );
   }
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;

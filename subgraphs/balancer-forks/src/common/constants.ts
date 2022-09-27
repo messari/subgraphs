@@ -93,9 +93,9 @@ export namespace NULL {
 }
 
 export namespace Protocol {
-  export const NAME = "Beethoven X";
-  export const SLUG = "beethoven-x";
-  export const NETWORK = Network.FANTOM;
+  export const NAME = "Balancer v2";
+  export const SLUG = "balancer-v2";
+  export const NETWORK = Network.MAINNET;
   export const SCHEMA_VERSION = "1.3.0";
   export const SUBGRAPH_VERSION = "1.1.0";
   export const METHODOLOGY_VERSION = "1.0.0";
@@ -130,9 +130,7 @@ export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const BIGDECIMAL_NEGATIVE_ONE = BigDecimal.fromString("-1");
 export const BIGDECIMAL_POINT_FOUR = BigDecimal.fromString("0.4");
 
-export const DEFAULT_DECIMALS_DENOMINATOR = BigDecimal.fromString(
-  "1000000000000000000"
-);
+export const DEFAULT_DECIMALS_DENOMINATOR = BigDecimal.fromString("1000000000000000000");
 export const FEE_DENOMINATOR = DEFAULT_DECIMALS_DENOMINATOR;
 
 export const USDC_DECIMALS = 6;
@@ -145,19 +143,20 @@ export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
 /////////////////////////////////////
 
 export const VAULT_ADDRESS = Address.fromString(
-  "0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce"
+  "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
 );
 export const PROTOCOL_FEES_COLLECTOR_ADDRESS = Address.fromString(
-  "0xc6920d3a369e7c8bd1a22dbe385e11d1f7af948f"
+  "0xce88686553686DA562CE7Cea497CE749DA109f9F"
 );
 export const PROTOCOL_TOKEN_ADDRESS = Address.fromString(
-  "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e"
+  "0xba100000625a3754423978a60c9317c58a424e3D"
 );
 export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
+  "0xC128468b7Ce63eA702C1f104D55A2566b13D3ABD"
+);
+export const AAVE_BOOSTED_POOL_ADDRESS = Address.fromString(
+  "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2"
 );
 
 export const INFLATION_INTERVAL = "TIMESTAMP";
-export const STARTING_INFLATION_RATE = BigDecimal.fromString(
-  (0).toString()
-).times(DEFAULT_DECIMALS_DENOMINATOR);
+export const STARTING_INFLATION_RATE = BigDecimal.fromString((0.23974867724).toString()).times(DEFAULT_DECIMALS_DENOMINATOR);

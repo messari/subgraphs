@@ -84,36 +84,52 @@ In line with the discussion under *Usage Metrics*, the financial metrics are fur
 
 *Stakers of ETH*
 
-- Sum of ETH staked in the staking pool
+- Balance of ETH staked in the staking pool
 
 *Node Operators*
 
-- Minipool contribution of ETH in blocks of 16 ETH by node operators
+- Minipool ETH balance
+   - Initially contributed by node operator and from the staking pool, 16 ETH each
+   - The accrued ETH2 rewards from Beacon Chain, net of slashing
+   
 - RPL staked (optional, it's debatable if governance token staking is TVL)
-
-*Others*
-- The accrued ETH2 rewards from Beacon Chain should also be included as part of TVL, as this is the practice by Lido (regardless if the LP token is a rebase token or not).
 
 ### Revenue
 
-The total revenue for Rocket Pool will be its ETH2 staking rewards from Beacon Chain. Then, depending on how whether the node operators are defined as protocol, the split of revenue can be further separated into supply-side and protocol-side. See Usage Metrics for details.
+#### Total Revenue
+The total revenue for Rocket Pool will be its ETH2 staking rewards from Beacon Chain. 
 
-*Stakers of ETH*
+> Total Revenue of Rocket Pool = $\sum$ Revenue from all the minipools
 
-- ETH2 staking rewards, less the amount of commission paid to node operators
+Whereby, 
 
-*Node Operators*
+> Revenue of each minipool = MAX(The ETH2 staking rewards - slashing, 0)
 
-- ETH2 staking rewards on their contribution of 16 ETH for each minipool
-- Commission of 5% to 20% on the ETH2 staking rewards on the other 16 ETH matched by the protocol
+#### Protocol-side Revenue
+It's arbitrary if node operators are the protocol-side. For now, we assume the node operatorw are the protocol-side and stakers of ETH are supply side. As such, 
+
+> Protocol-side revenue from each minipool = Revenue of each minipool x (50% + 50% x Commission rate)
+
+Whereby, 
+
+> Commission rate = the rate of commission to be paid by the stakers of ETH to the node operator, determined at the point the minipool is created and is within the range from 5% to 20%
+
+#### Supply-side Revenue
+
+> Supply-side revenue from each minipool = Revenue of each minipool x (50% - 50% x Commission rate)
 
 ### Rewards
 
 RPL inflation will initially be 5% per annum and will be split up amongst:
-— Node Operators staking RPL as collateral (70%)
-— Oracle DAO members providing various oracle data (15%)
-— Protocol DAO Treasury to fund decentralised development (15%)
+
+- Node Operators staking RPL as collateral (70%)
+- Oracle DAO members providing various oracle data (15%)
+- Protocol DAO Treasury to fund decentralised development (15%)
 
 ### Protocol Owned Liquidity
 
 There's no protocol owned liquidity by Rocket Pool smart contract. The protocol has a treasury which is mainly RPL. 
+
+However, if node operators are considered as protocol-side, then the Protocol Onwed Liquidity is then the sum of minipool ETH balances less 16 ETH for each pool.
+
+> Protocol Owned Liquidity = $\sum$ MAX(Minipool ETH balance - 16 ETH, 0)

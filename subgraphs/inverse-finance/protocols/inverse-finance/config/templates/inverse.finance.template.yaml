@@ -19,6 +19,8 @@ dataSources:
       abis:
         - name: INV
           file: ./abis/INV.json
+        - name: CErc20
+          file: ./abis/CErc20.json
       eventHandlers:
         - event: OwnerChanged(address,address)
           handler: handleOwnerChanged
@@ -105,6 +107,8 @@ dataSources:
       abis:
         - name: Stablizer
           file: ./abis/Stablizer.json
+        - name: CErc20
+          file: ./abis/CErc20.json
       eventHandlers:
         - event: Sell(indexed address,uint256,uint256)
           handler: handleSell

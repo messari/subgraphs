@@ -190,9 +190,10 @@ export const schema120 = (): Schema => {
       }
       protocols {
         id
-        methodologyVersion
         name
         type
+        slug
+        methodologyVersion
         schemaVersion
         subgraphVersion
       }
@@ -483,9 +484,10 @@ export const schema130 = (): Schema => {
       }
       protocols {
         id
-        methodologyVersion
         name
         type
+        slug
+        methodologyVersion
         schemaVersion
         subgraphVersion
       }
