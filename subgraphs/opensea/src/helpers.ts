@@ -7,40 +7,45 @@ import {
 } from "@graphprotocol/graph-ts";
 import { ERC165 } from "../generated/OpenSeaV2/ERC165";
 import { NftMetadata } from "../generated/OpenSeaV2/NftMetadata";
+import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
 import {
   Collection,
   CollectionDailySnapshot,
   Marketplace,
   MarketplaceDailySnapshot,
 } from "../generated/schema";
+import { NetworkConfigs } from "../configurations/configure";
 import {
-  Network,
-  EXCHANGE_MARKETPLACE_NAME,
+  NftStandard,
   BIGDECIMAL_ZERO,
-  EXCHANGE_MARKETPLACE_SLUG,
-  EXCHANGE_MARKETPLACE_ADDRESS,
+  BIGDECIMAL_MAX,
+  BIGINT_ZERO,
   NULL_ADDRESS,
   WETH_ADDRESS,
   MANTISSA_FACTOR,
-  BIGINT_ZERO,
   SECONDS_PER_DAY,
-  BIGDECIMAL_MAX,
-  SaleStrategy,
   ERC721_INTERFACE_IDENTIFIER,
   ERC1155_INTERFACE_IDENTIFIER,
-  NftStandard,
 } from "./constants";
+import {
+  DecodedTransferResult,
+  calculateMatchPrice,
+  decode_atomicize_Method,
+  decode_nftTransfer_Method,
+  getFunctionSelector,
+  validateCallDataFunctionSelector,
+} from "./utils";
 
 export function getOrCreateMarketplace(marketplaceID: string): Marketplace {
   let marketplace = Marketplace.load(marketplaceID);
   if (!marketplace) {
     marketplace = new Marketplace(marketplaceID);
-    marketplace.name = EXCHANGE_MARKETPLACE_NAME;
-    marketplace.slug = EXCHANGE_MARKETPLACE_SLUG;
-    marketplace.network = Network.MAINNET;
-    marketplace.schemaVersion = "1.0.0";
-    marketplace.subgraphVersion = "1.0.0";
-    marketplace.methodologyVersion = "1.0.0";
+    marketplace.name = NetworkConfigs.getProtocolName();
+    marketplace.slug = NetworkConfigs.getProtocolSlug();
+    marketplace.network = NetworkConfigs.getNetwork();
+    marketplace.schemaVersion = NetworkConfigs.getSchemaVersion();
+    marketplace.subgraphVersion = NetworkConfigs.getSubgraphVersion();
+    marketplace.methodologyVersion = NetworkConfigs.getMethodologyVersion();
     marketplace.collectionCount = 0;
     marketplace.tradeCount = 0;
     marketplace.cumulativeTradeVolumeETH = BIGDECIMAL_ZERO;
@@ -88,7 +93,7 @@ export function getOrCreateCollection(collectionID: string): Collection {
     collection.save();
 
     let marketplace = getOrCreateMarketplace(
-      EXCHANGE_MARKETPLACE_ADDRESS.toHexString()
+      NetworkConfigs.getMarketplaceAddress()
     );
     marketplace.collectionCount += 1;
     marketplace.save();
@@ -105,7 +110,7 @@ export function getOrCreateMarketplaceDailySnapshot(
   let snapshot = MarketplaceDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketplaceDailySnapshot(snapshotID);
-    snapshot.marketplace = EXCHANGE_MARKETPLACE_ADDRESS.toHexString();
+    snapshot.marketplace = NetworkConfigs.getMarketplaceAddress();
     snapshot.blockNumber = BIGINT_ZERO;
     snapshot.timestamp = BIGINT_ZERO;
     snapshot.collectionCount = 0;
@@ -188,29 +193,65 @@ function getNftStandard(collectionID: string): string {
   return NftStandard.UNKNOWN;
 }
 
-export function getSaleStrategy(saleKind: i32): string {
-  if (saleKind == 0) {
-    return SaleStrategy.STANDARD_SALE;
-  } else {
-    return SaleStrategy.DUTCH_AUCTION;
-  }
-}
-
-export function calcTradeVolumeETH(
-  paymentToken: Address,
-  basePrice: BigInt
+/**
+ * Calculates trade/order price in BigDecimal
+ * NOTE: currently ignores non-ETH/WETH trades
+ */
+export function calcTradePriceETH(
+  call: AtomicMatch_Call,
+  paymentToken: Address
 ): BigDecimal {
   if (paymentToken == NULL_ADDRESS || paymentToken == WETH_ADDRESS) {
-    return basePrice.toBigDecimal().div(MANTISSA_FACTOR);
+    let price = calculateMatchPrice(call);
+    return price.toBigDecimal().div(MANTISSA_FACTOR);
   } else {
     return BIGDECIMAL_ZERO;
   }
 }
 
-export function min(a: BigDecimal, b: BigDecimal): BigDecimal {
-  return a.lt(b) ? a : b;
+export function decodeSingleNftData(
+  call: AtomicMatch_Call,
+  callData: Bytes
+): DecodedTransferResult | null {
+  let sellTarget = call.inputs.addrs[11];
+  if (!validateCallDataFunctionSelector(callData)) {
+    log.warning(
+      "[checkCallDataFunctionSelector] returned false, Method ID: {}, transaction hash: {}, target: {}",
+      [
+        getFunctionSelector(callData),
+        call.transaction.hash.toHexString(),
+        sellTarget.toHexString(),
+      ]
+    );
+    return null;
+  } else {
+    return decode_nftTransfer_Method(sellTarget, callData);
+  }
 }
 
-export function max(a: BigDecimal, b: BigDecimal): BigDecimal {
-  return a.lt(b) ? b : a;
+export function decodeBundleNftData(
+  call: AtomicMatch_Call,
+  callDatas: Bytes
+): DecodedTransferResult[] {
+  let decodedTransferResults: DecodedTransferResult[] = [];
+  let decodedAtomicizeResult = decode_atomicize_Method(callDatas);
+  for (let i = 0; i < decodedAtomicizeResult.targets.length; i++) {
+    let target = decodedAtomicizeResult.targets[i];
+    let calldata = decodedAtomicizeResult.callDatas[i];
+    // Skip unrecognized method calls
+    if (!validateCallDataFunctionSelector(calldata)) {
+      log.warning(
+        "[checkCallDataFunctionSelector] returned false in atomicize, Method ID: {}, transaction hash: {}, target: {}",
+        [
+          getFunctionSelector(calldata),
+          call.transaction.hash.toHexString(),
+          target.toHexString(),
+        ]
+      );
+    } else {
+      let singleNftTransferResult = decode_nftTransfer_Method(target, calldata);
+      decodedTransferResults.push(singleNftTransferResult);
+    }
+  }
+  return decodedTransferResults;
 }

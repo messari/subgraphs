@@ -1,5 +1,7 @@
 import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
+export const PROTOCOL_SCHEMA_VERSION = "1.0.0";
+
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
@@ -38,6 +40,12 @@ export namespace SaleStrategy {
   export const PRIVATE_SALE = "PRIVATE_SALE";
 }
 
+export namespace Side {
+  export const BUY = "BUY_SIDE";
+  export const SELL = "SELL_SIDE";
+}
+
+// Represents native ETH when used in the paymentToken field
 export const NULL_ADDRESS = Address.zero();
 export const WETH_ADDRESS = Address.fromString(
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
@@ -46,11 +54,7 @@ export const WETH_ADDRESS = Address.fromString(
 export const WYVERN_ATOMICIZER_ADDRESS = Address.fromString(
   "0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5"
 );
-export const EXCHANGE_MARKETPLACE_ADDRESS = Address.fromString(
-  "0x7f268357A8c2552623316e2562D90e642bB538E5"
-);
-export const EXCHANGE_MARKETPLACE_NAME = "OpenSea Wyvern Exchange v2";
-export const EXCHANGE_MARKETPLACE_SLUG = "opensea-v2";
+
 export const EXCHANGE_MARKETPLACE_FEE = BigInt.fromI32(250);
 
 // Function Selectors for ERC721/1155 Transfer Methods
@@ -65,9 +69,9 @@ export const ERC1155_SAFE_TRANSFER_FROM_SELECTOR = "0xf242432a";
 // 0xfb16a595 matchERC721UsingCriteria(address,address,address,uint256,bytes32,bytes32[])
 // 0xc5a0236e matchERC721WithSafeTransferUsingCriteria(address,address,address,uint256,bytes32,bytes32[])
 // 0x96809f90 matchERC1155UsingCriteria(address,address,address,uint256,uint256,bytes32,bytes32[])
-export const MATCH_ERC721_TRANSFER_FROM_SELCTOR = "0xfb16a595";
-export const MATCH_ERC721_SAFE_TRANSFER_FROM_SELCTOR = "0xc5a0236e";
-export const MATCH_ERC115_SAFE_TRANSFER_FROM_SELCTOR = "0x96809f90";
+export const MATCH_ERC721_TRANSFER_FROM_SELECTOR = "0xfb16a595";
+export const MATCH_ERC721_SAFE_TRANSFER_FROM_SELECTOR = "0xc5a0236e";
+export const MATCH_ERC1155_SAFE_TRANSFER_FROM_SELECTOR = "0x96809f90";
 
 export const ETHABI_DECODE_PREFIX = Bytes.fromHexString(
   "0000000000000000000000000000000000000000000000000000000000000020"

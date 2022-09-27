@@ -1,3 +1,5 @@
 generated/
 node_modules/
 build/
+*template.ts
+*template.yaml

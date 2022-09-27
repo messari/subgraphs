@@ -1,24 +1,24 @@
-# OpenSea v2 Marketplace Subgraph (Wyvern Exchange)
+# OpenSea Marketplace Subgraph (Wyvern Exchange)
 
-Deployment: [messari/opensea-v2-ethereum](https://thegraph.com/hosted-service/subgraph/messari/opensea-v2-ethereum)
-
-Subgraph Status: [Okgraph](https://okgraph.xyz/?q=messari%2Fopensea-v2-ethereum)
+| Name                        | Subgraph Deployment                                                                                     | Status                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| OpenSea: Wyvern Exchange V1 | [messari/opensea-v1-ethereum](https://thegraph.com/hosted-service/subgraph/messari/opensea-v1-ethereum) | [Okgraph](https://okgraph.xyz/?q=messari%2Fopensea-v1-ethereum) |
+| OpenSea: Wyvern Exchange V2 | [messari/opensea-v2-ethereum](https://thegraph.com/hosted-service/subgraph/messari/opensea-v2-ethereum) | [Okgraph](https://okgraph.xyz/?q=messari%2Fopensea-v2-ethereum) |
 
 ## Relevant Info
 
-Exchange Contract Address: `WyvernExchangeWithBulkCancellations` ([0x7f268357A8c2552623316e2562D90e642bB538E5](https://etherscan.io/address/0x7f268357a8c2552623316e2562d90e642bb538e5))
-
-Start Block: `14120913`
-
-Atomicizer Contract Address: `WyvernAtomicizer` ([0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5](https://etherscan.io/address/0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5))
-
-Merkle Validator Contract Address: `MerkleValidator` ([0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7](https://etherscan.io/address/0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7))
+| Contract                                     | Contract Address                                                                                                      | Start Block |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `WyvernExchange` (v2.2)                      | [0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b](https://etherscan.io/address/0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b) | `5774644`   |
+| `WyvernExchangeWithBulkCancellations` (v2.3) | [0x7f268357A8c2552623316e2562D90e642bB538E5](https://etherscan.io/address/0x7f268357a8c2552623316e2562d90e642bb538e5) | `14120913`  |
+| `WyvernAtomicizer`                           | [0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5](https://etherscan.io/address/0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5) | `5220302`   |
+| `MerkleValidator`                            | [0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7](https://etherscan.io/address/0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7) | `14128524`  |
 
 ## Methodology
 
 ### Event Handlers vs Call Handlers
 
-For the OpenSea `WyvernExchangeWithBulkCancellations` contract, the events emitted do not provide enough information to index with Messari's standardized schema. The event that indicates a trade has been made is `OrdersMatched` but it only surfaces a few fields:
+For the OpenSea `WyvernExchange` contracts, the events emitted do not provide enough information to index with Messari's standardized schema. The event that indicates a trade has been made is `OrdersMatched` but it only surfaces a few fields:
 
 ```js
 event OrdersMatched(bytes32 buyHash, bytes32 sellHash, address indexed maker, address indexed taker, uint price, bytes32 indexed metadata)
@@ -91,7 +91,7 @@ There are 2 main styles of order flows (i.e. how a trade is made):
 - Sell side order: Seller (maker) lists NFT on OpenSea, Buyer (taker) buys NFT
 - Buy side order: Buyer (maker) bids/makes offer on NFT on Opensea, Seller (taker) accepts offer
 
-In either case, when a taker (buyer/seller) accepts a price, an order is matched and a trade is facillitated.
+In either case, when a taker (buyer/seller) accepts a price, an order is matched and a trade is facilitated.
 
 ### Order Matching
 
@@ -184,21 +184,21 @@ Here is the lookup table for variables corresponding to the call inputs:
 
 The subgraph call handler flow can be broken down into several steps:
 
-1. Inspect `sell.target` to determine whether the trade is a single sale or bundle sale. This is the contract the the `calldata` is sent to be executed (via `delegatecall`). Known `sell.target`s:
+1. Inspect `sell.target` to determine whether the trade is a single sale or bundle sale. This is the contract the the `calldata` is sent to be executed (via `delegatecall`). Known `sell.target` addresses:
 
    - `WyvernAtomicizer` ([0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5](https://etherscan.io/address/0xc99f70bfd82fb7c8f8191fdfbfb735606b15e5c5))
    - `MerkleValidator` ([0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7](https://etherscan.io/address/0xBAf2127B49fC93CbcA6269FAdE0F7F31dF4c88a7))
    - Actual NFT (ERC721/ERC1155) Contract
 
-   If `sell.target` is `WyvernAtomicizer`, the trade is a bundle sale (`calldata` "atomicized" or broken down into separate calls to their respective contracts).
+   If `sell.target` is `WyvernAtomicizer`, the trade is a bundle sale (`calldata` broken down into separate calls to their respective contracts and executed atomically).
 
-   For single sales, `sell.target` is `MerkleValidator`.
+   For single sales, `sell.target` is `MerkleValidator` or the actual ERC721/ERC1155 contracts.
 
-   Note that `MerkleValidator` deployed at block `14128524` after `WyvernExchangeWithBulkCancellations` at block `14120913`, meaning prior to block `14128524`, `WyvernExchangeWithBulkCancellations` interacts directly with ERC721/ERC1155 contracts with their respective `transferFrom` and `safeTransferFrom` calls.
+   Note that `MerkleValidator` is deployed at block `14128524` after `WyvernExchangeWithBulkCancellations` at block `14120913`, meaning prior to block `14128524`, `WyvernExchangeWithBulkCancellations` interacts directly with ERC721/ERC1155 contracts with their respective `transferFrom` and `safeTransferFrom` calls. `WyvernExchange` interacts directly with ERC721/ERC1155 contracts.
 
-2. If single sale, merge `buy.calldata` and `sell.calldata` together with `guardedArrayReplace` and decode into relevant fields with function signature.
+2. If single sale, merge `buy.calldata` and `sell.calldata` together with `guardedArrayReplace` and decode single NFT into relevant fields with function signature.
 
-   Note that `guardedArrayReplace`, as described in the `WyvernExchangeWithBulkCancellations` contract, replaces bytes in an array with bytes in another array, guarded by a bitmask. If an order is matched, the merged `calldata` can be found via:
+   Note that `guardedArrayReplace`, as described in the `WyvernExchange` contracts, replaces bytes in an array with bytes in another array, guarded by a bitmask. If an order is matched, the merged `calldata` can be found via:
 
    ```js
    guardedArrayReplace(calldataBuy, calldataSell, replacementPatternBuy);
@@ -208,7 +208,7 @@ The subgraph call handler flow can be broken down into several steps:
 
    which should be the same. This recreates the `calldata` sent to `sell.target`.
 
-   To ensure that `calldata` can be decoded via the Ethereum API, the function selector/signature (first 4 bytes of `calldata`) needs to be validated using `checkCallDataFunctionSelector` as one that is recognized.
+   To ensure that `calldata` can be decoded via the Ethereum API, the function selector/signature (first 4 bytes of `calldata`) needs to be validated using `validateCallDataFunctionSelector` as one that is recognized.
 
    Here is the lookup table for relevant function selectors:
 
@@ -235,7 +235,48 @@ The subgraph call handler flow can be broken down into several steps:
 
    Note that since the `calldata` for `MerkleValidator` contains dynamic data, `ethabi` (library that `graph-ts` uses for the Ethereum API) has difficulty recognizing/decoding the data unless the prefix `0000000000000000000000000000000000000000000000000000000000000020` is added. Read more [here](https://medium.com/@r2d2_68242/indexing-transaction-input-data-in-a-subgraph-6ff5c55abf20) and [`ethabi` docs](https://github.com/rust-ethereum/ethabi).
 
-3. Extract other call inputs to create new `Trade` entity.
+   For direct ERC721/ERC1155 transfers, decoding the `calldata` yields:
+
+   ```js
+   address from,
+   address to,
+   uint256 tokenId,
+   uint256 amount, // for ERC1155 transfers
+   ```
+
+   Note that direct transfers not using `MerkleValidator`, `calldata` does not yield token contract address. Token contract address is `sell.target` in the Order struct.
+
+   If bundle sale, decode bundle NFT data sent to `WyvernAtomicizer` in the `atomicize` method.
+
+   https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/WyvernAtomicizer.sol#L18
+
+   ```js
+   function atomicize (address[] addrs, uint[] values, uint[] calldataLengths, bytes calldatas)
+   ```
+   
+   Note that there is no need to validate function selector using `validateCallDataFunctionSelector` since `WyvernAtomicizer` only contains one method. 
+   
+   Decoding the `atomicize` method returns a list of targets (ERC721/ERC1155 contract addresses), `calldata` lengths, and `calldata` blob which can be split up into a list of individual contract calls.
+
+   Similar to how single NFTs are decoded, the "atomicized" list of `calldata` can be decoded into individual transfers.
+
+3. Calculate trade price.
+
+   Trade price (for `FixedPrice` and `DutchAuction` trades) is calculated according to `calculateMatchPrice` and `calculateFinalPrice` as found in the `WyvernExchange` contracts:
+
+   https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/ExchangeCore.sol#L460
+
+   ```js
+   function calculateMatchPrice(Order memory buy, Order memory sell)
+   ```
+
+   https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/SaleKindInterface.sol#L70
+
+   ```js
+   function calculateFinalPrice(Side side, SaleKind saleKind, uint basePrice, uint extra, uint listingTime, uint expirationTime)
+   ```
+
+4. Extract other call inputs to create new `Trade` entity.
 
 - `sell.saleKind` denotes if sale strategy is `FixedPrice` or `DutchAuction`
   - `0` for `FixedPrice`
@@ -245,21 +286,37 @@ The subgraph call handler flow can be broken down into several steps:
   - `0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2` for WETH
   - Subgraph does not track other currencies currently
 - `buy.basePrice`/`sell.basePrice` denotes base trade price
+  - Note that Dutch Auction sales use `calculateMatchPrice` to determine trade price
 - `buy.maker` denotes the NFT buyer (sale taker/bid maker)
+
+  Known Exceptions:
+
+  - [Genie swaps](https://www.genie.xyz/)
+    - `buy.maker`: Genie: GenieSwap ([`0x0a267cf51ef038fc00e71801f5a524aec06e4f07`](https://etherscan.io/address/0x0a267cf51ef038fc00e71801f5a524aec06e4f07))
+    - NFT receiver: NFT buyer
+  - [Gem swaps](https://www.gem.xyz/)
+    - `buy.maker`: Gem: GemSwap / Gem: GemSwap 2 ([`0xf24629fbb477e10f2cf331c2b7452d8596b5c7a5`](https://etherscan.io/address/0xf24629fbb477e10f2cf331c2b7452d8596b5c7a5)/[`0x83c8f28c26bf6aaca652df1dbbe0e1b56f8baba2`](https://etherscan.io/address/0x83c8f28c26bf6aaca652df1dbbe0e1b56f8baba2))
+    - NFT receiver: NFT buyer
+  - [Nifty Gateway](https://www.niftygateway.com/)
+    - `buy.maker`: [`0x8279648470eb92cbcd00ceb8ca30c2adfac20740`](https://etherscan.io/address/0x8279648470eb92cbcd00ceb8ca30c2adfac20740)
+    - NFT receiver: [Nifty Gateway: Omnibus](https://help.niftygateway.com/hc/en-us/articles/4409003713299-An-Explanation-of-Nifty-Gateway-s-Custody-Option) ([`0xe052113bd7d7700d623414a0a4585bcae754e9d5`](https://etherscan.io/address/0xe052113bd7d7700d623414a0a4585bcae754e9d5))
+
 - `sell.maker` denotes the NFT seller (sale maker/bid taker)
 
-4. Update `Collection`/`Marketplace` entities.
+5. Update `Collection`/`Marketplace` entities.
 
-- Royalty/Revenue Fees calculated by taking fee payment and subtracting known OpenSea marketplace fee (2.5% on all trades)
+   Royalty/Revenue Fees calculated by taking fee payment and subtracting known OpenSea marketplace fee (2.5% on all trades)
 
-  1. Determine whether trade is buy side or sell side
-     - `sell.feeRecipient` is not zero address: sell side
-     - `sell.feeRecipient` is zero address: buy side
-  2. Get `sell.makerRelayerFee` or `buy.takerRelayerFee` (in basis points).
+   1. Determine whether trade is buy side or sell side
 
-     This fee percentage subtracted by known OpenSea marketplace fee yields collection royalty fee/creator revenue.
+   - `sell.feeRecipient` is not zero address: sell side
+   - `sell.feeRecipient` is zero address: buy side
 
-  Note that this does not seem to be the case for bundle sales (need to inspect bundle sales more granularly).
+   2. Get `sell.makerRelayerFee` or `buy.takerRelayerFee` (in basis points).
+
+   This fee percentage subtracted by known OpenSea marketplace fee yields collection royalty fee/creator revenue.
+
+Note that this does not seem to be the case for bundle sales (need to inspect bundle sales more granularly).
 
 ## Example Transactions
 

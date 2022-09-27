@@ -3,20 +3,20 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: OpenSeaV2
-    network: mainnet
+    name: OpenSeaV1
+    network: {{ network }}
     source:
-      address: "0x7f268357A8c2552623316e2562D90e642bB538E5"
-      abi: OpenSeaV2
-      startBlock: 14120913
+      address: "{{address}}"
+      abi: OpenSeaV1
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: OpenSeaV2
-          file: ./abis/OpenSeaV2.json
+        - name: OpenSeaV1
+          file: ./abis/OpenSeaV1.json
         - name: ERC165
           file: ./abis/ERC165.json
         - name: NftMetadata
