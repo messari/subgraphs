@@ -116,7 +116,7 @@ export function _handleNewCollateralFactor(
   newCollateralFactorMantissa: BigInt
 ): void {
   let market = Market.load(marketID);
-  if (market == null) {
+  if (!market) {
     log.warning("[handleNewCollateralFactor] Market not found: {}", [marketID]);
     return;
   }
@@ -1051,7 +1051,7 @@ export function _handleNewReserveFactor(
   newReserveFactorMantissa: BigInt
 ): void {
   let market = Market.load(marketID);
-  if (market == null) {
+  if (!market) {
     log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
     return;
   }
@@ -1070,14 +1070,14 @@ export function _handleTransfer(
   comptrollerAddr: Address
 ): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
-  if (protocol == null) {
+  if (!protocol) {
     log.warning("[_handleTransfer] protocol not found: {}", [
       comptrollerAddr.toHexString(),
     ]);
     return;
   }
   let market = Market.load(marketID);
-  if (market == null) {
+  if (!market) {
     log.warning("[_handleTransfer] market not found: {}", [
       event.address.toHexString(),
     ]);
