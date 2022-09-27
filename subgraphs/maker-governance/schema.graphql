@@ -108,7 +108,7 @@ type Delegate @entity {
   tokenHoldersRepresented: Int!
 
   "Current slate of spells delegate is voting for"
-  currentSpells: [Spell!]
+  currentSpells: [Spell!]!
 
   "Votes that a delegate has made in different spells"
   votes: [Vote!]! @derivedFrom(field: "voter")

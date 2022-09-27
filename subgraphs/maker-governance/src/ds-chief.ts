@@ -1,6 +1,5 @@
 import { BigInt, Bytes, Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { LogNote, DSChief, Etch } from "../generated/DSChief/DSChief";
-import { DSSpell } from "../generated/DSChief/DSSpell";
+import { LogNote, Etch } from "../generated/DSChief/DSChief";
 import { VoteDelegate } from "../generated/DSChief/VoteDelegate";
 import {
   Slate,
@@ -15,13 +14,15 @@ import {
   SpellState,
 } from "./constants";
 import {
+  addWeightToSpells,
+  createSlate,
   getDelegate,
   getGovernanceFramework,
   hexToNumberString,
+  removeWeightFromSpells,
   toDecimal,
 } from "./helpers";
 import {
-  DSSpell as DSSpellTemplate,
   VoteDelegate as VoteDelegateTemplate,
 } from "../generated/templates";
 
@@ -39,6 +40,7 @@ export function handleLock(event: LogNote): void {
     delegate.votingPower = BIGDECIMAL_ZERO;
     delegate.delegations = [];
     delegate.tokenHoldersRepresented = 0;
+    delegate.currentSpells = [];
     delegate.numberVotes = 0;
 
     // Check if vote delegate contract by calling chief()
@@ -56,6 +58,7 @@ export function handleLock(event: LogNote): void {
 
   delegate.votingPowerRaw = delegate.votingPowerRaw.plus(amount);
   delegate.votingPower = delegate.votingPower.plus(toDecimal(amount));
+  addWeightToSpells(delegate.currentSpells, amount)
   delegate.save();
 
   let framework = getGovernanceFramework(event.address.toHexString());
@@ -73,6 +76,7 @@ export function handleFree(event: LogNote): void {
   let delegate = getDelegate(sender.toHexString());
   delegate.votingPowerRaw = delegate.votingPowerRaw.minus(amount);
   delegate.votingPower = delegate.votingPower.minus(toDecimal(amount));
+  removeWeightFromSpells(delegate.currentSpells, amount)
   delegate.save();
 
   let framework = getGovernanceFramework(event.address.toHexString());
@@ -101,85 +105,50 @@ function _handleSlateVote(
   let delegate = getDelegate(sender);
   let slate = Slate.load(slateID.toHexString());
   if (!slate) {
-    slate = new Slate(slateID.toHexString());
-    slate.yays = [];
-    slate.txnHash = event.transaction.hash.toHexString();
-    slate.creationBlock = event.block.number;
-    slate.creationTime = event.block.timestamp;
+    slate = createSlate(slateID, event)
   }
-  let newSpellCount = 0;
-  let i = 0;
-  let dsChief = DSChief.bind(event.address);
-  let slateResponse = dsChief.try_slates(slateID, BigInt.fromI32(i));
-  while (!slateResponse.reverted) {
-    let spellAddress = slateResponse.value;
 
-    let spellID = spellAddress.toHexString();
+  // Remove votes from previous spells
+  removeWeightFromSpells(delegate.currentSpells, delegate.votingPowerRaw)
+
+  for (let i = 0; i < slate.yays.length; i++) {
+    let spellID = slate.yays[i]
     let spell = Spell.load(spellID);
-    if (!spell) {
-      spell = new Spell(spellID);
-      spell.description = "";
-      spell.state = SpellState.ACTIVE;
-      spell.creationBlock = event.block.number;
-      spell.creationTime = event.block.timestamp;
-
-      let dsSpell = DSSpell.bind(spellAddress);
-      let dsDescription = dsSpell.try_description();
-      if (!dsDescription.reverted) {
-        spell.description = dsDescription.value;
+    if (spell) {
+      let voteId = sender.concat("-").concat(spellID);
+      let vote = Vote.load(voteId);
+      if (vote) {
+        // Handle for double vote
+        log.error("Vote double count {}, txn {}, subtracting previous vote", [
+          voteId,
+          event.transaction.hash.toHexString(),
+        ]);
+        // subtract previous vote weight
+        spell.totalWeightedVotes = spell.totalWeightedVotes.minus(vote.weight);
+        spell.totalVotes = spell.totalVotes.minus(BIGINT_ONE);
       }
-      spell.totalVotes = BIGINT_ZERO;
-      spell.totalWeightedVotes = BIGINT_ZERO;
+      // overwrite vote
+      vote = new Vote(voteId);
+      vote.weight = delegate.votingPowerRaw;
+      vote.reason = "";
+      vote.voter = sender;
+      vote.spell = spellID;
+      vote.block = event.block.number;
+      vote.blockTime = event.block.timestamp;
+      vote.txnHash = event.transaction.hash.toHexString();
+      vote.save();
 
-      // Track this new spell
-      DSSpellTemplate.create(spellAddress);
-
-      newSpellCount = newSpellCount + 1;
+      spell.totalVotes = spell.totalVotes.plus(BIGINT_ONE);
+      spell.totalWeightedVotes = spell.totalWeightedVotes.plus(
+        delegate.votingPowerRaw
+      );
+      spell.save()
     }
-
-    let voteId = sender.concat("-").concat(spellID);
-    // Check for double vote
-    let vote = Vote.load(voteId);
-    if (vote) {
-      log.error("Vote double count {}, txn {}, subtracting previous vote", [
-        voteId,
-        event.transaction.hash.toHexString(),
-      ]);
-      // subtract previous vote weight
-      spell.totalWeightedVotes = spell.totalWeightedVotes.minus(vote.weight);
-      spell.totalVotes = spell.totalVotes.minus(BIGINT_ONE);
-    }
-    // overwrite vote
-    vote = new Vote(voteId);
-    vote.weight = delegate.votingPowerRaw;
-    vote.reason = "";
-    vote.voter = sender;
-    vote.spell = spellID;
-    vote.block = event.block.number;
-    vote.blockTime = event.block.timestamp;
-    vote.txnHash = event.transaction.hash.toHexString();
-    vote.save();
-
-    spell.totalVotes = spell.totalVotes.plus(BIGINT_ONE);
-    spell.totalWeightedVotes = spell.totalWeightedVotes.plus(
-      delegate.votingPowerRaw
-    );
-    spell.save();
-
-    slate.yays = slate.yays.concat([spellID]);
-
-    // loop through slate indices until a revert breaks it
-    slateResponse = dsChief.try_slates(slateID, BigInt.fromI32(++i));
   }
-  slate.save();
 
   delegate.currentSpells = slate.yays;
   delegate.numberVotes = delegate.numberVotes + 1;
   delegate.save();
-
-  let framework = getGovernanceFramework(event.address.toHexString());
-  framework.spells = framework.spells + newSpellCount;
-  framework.save();
 }
 
 export function handleLift(event: LogNote): void {
