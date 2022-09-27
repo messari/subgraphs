@@ -1,12 +1,12 @@
-import { Network, PROTOCOL_SCHEMA_VERSION } from "../../../../../src/constants";
+import { Network, PROTOCOL_SCHEMA_VERSION } from "../../../../src/constants";
 import {
   PROTOCOL_MARKETPLACE_ADDRESS,
   PROTOCOL_MARKETPLACE_NAME,
   PROTOCOL_MARKETPLACE_SLUG,
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_SUBGRAPH_VERSION,
-} from "../../../src/constants";
-import { Configurations } from "../../../../../configurations/configurations/interface";
+} from "../../src/constants";
+import { Configurations } from "../../../../configurations/configurations/interface";
 
 export class OpenSeaV1Configurations implements Configurations {
   getNetwork(): string {

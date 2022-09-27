@@ -1,0 +1,57 @@
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LooksRareExchange
+    network: mainnet
+    source:
+      address: "0x59728544b08ab483533076417fbbb2fd0b17ce3a"
+      abi: LooksRareExchange
+      startBlock: 13885625
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: LooksRareExchange
+          file: ./abis/LooksRareExchange.json
+        - name: ExecutionStrategy
+          file: ./abis/ExecutionStrategy.json
+        - name: ERC165
+          file: ./abis/ERC165.json
+        - name: NftMetadata
+          file: ./abis/NftMetadata.json
+      eventHandlers:
+        - event: RoyaltyPayment(indexed address,indexed uint256,indexed address,address,uint256)
+          handler: handleRoyaltyPayment
+        - event: TakerAsk(bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256)
+          handler: handleTakerAsk
+        - event: TakerBid(bytes32,uint256,indexed address,indexed address,indexed address,address,address,uint256,uint256,uint256)
+          handler: handleTakerBid
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: RoyaltyFeeRegistry
+    network: mainnet
+    source:
+      address: "0x55010472a93921a117aad9b055c141060c8d8022"
+      abi: RoyaltyFeeRegistry
+      startBlock: 13885615
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: RoyaltyFeeRegistry
+          file: ./abis/RoyaltyFeeRegistry.json
+        - name: ERC165
+          file: ./abis/ERC165.json
+        - name: NftMetadata
+          file: ./abis/NftMetadata.json
+      eventHandlers:
+        - event: RoyaltyFeeUpdate(indexed address,indexed address,indexed address,uint256)
+          handler: handleRoyaltyFeeUpdate
+      file: ./src/mapping.ts

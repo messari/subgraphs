@@ -1,6 +1,6 @@
 import { log } from "@graphprotocol/graph-ts";
-import { OpenSeaV1Configurations } from "../../protocols/opensea-v1/config/networks/ethereum/ethereum";
-import { OpenSeaV2Configurations } from "../../protocols/opensea-v2/config/networks/ethereum/ethereum";
+import { OpenSeaV1Configurations } from "../../protocols/opensea-v1/deployments/opensea-v1-ethereum/configurations";
+import { OpenSeaV2Configurations } from "../../protocols/opensea-v2/deployments/opensea-v2-ethereum/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 
