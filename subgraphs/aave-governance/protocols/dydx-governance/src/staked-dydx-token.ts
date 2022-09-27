@@ -2,7 +2,7 @@ import {
   DelegateChanged,
   DelegatedPowerChanged,
   Transfer,
-} from "../../../generated/StakedTokenV2Rev3/StakedTokenV2Rev3";
+} from "../../../generated/DydxToken/DydxToken";
 import {
   _handleDelegateChanged,
   _handleDelegatedPowerChanged,
