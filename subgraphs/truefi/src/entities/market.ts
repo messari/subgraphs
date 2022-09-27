@@ -535,9 +535,9 @@ function updateMarketTVL(
     );
 
     market.totalValueLockedUSD = totalValueLockedUSD;
-    market.totalDepositBalanceUSD = new BigDecimal(
-      market.inputTokenBalance
-    ).times(inputTokenPriceUSD);
+    market.totalDepositBalanceUSD = new BigDecimal(market.inputTokenBalance)
+      .div(exponentToBigDecimal(inputToken.decimals))
+      .times(inputTokenPriceUSD);
   }
 
   market.save();
