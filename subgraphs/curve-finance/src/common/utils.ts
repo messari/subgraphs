@@ -107,10 +107,9 @@ export function getLpTokenFromRegistry(
     registryContract.try_get_lp_token(poolAddress),
     constants.NULL.TYPE_ADDRESS
   );
-  if (lpToken.equals(constants.NULL.TYPE_ADDRESS))
-    return getOrCreateToken(lpToken, block);
+  if (lpToken.equals(constants.NULL.TYPE_ADDRESS)) return null;
 
-  return null;
+  return getOrCreateToken(lpToken, block);
 }
 
 export function getPoolFromCoins(
