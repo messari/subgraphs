@@ -3862,7 +3862,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     }
@@ -3888,7 +3888,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     }
@@ -3914,7 +3914,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         }
       }
     }
