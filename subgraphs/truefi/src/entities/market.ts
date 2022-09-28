@@ -476,7 +476,7 @@ function updateMarketTVL(
   let totalValueLockedUSD: BigDecimal = BIGDECIMAL_NEGATIVE_ONE;
   const inputToken = getTokenById(market.inputToken);
   const outputToken = getTokenById(market.outputToken!);
-  let marketValue: BigInt = BIGINT_ZERO;
+  let marketValue: BigInt = BIGINT_ZERO; // amount of input tokens in native units
 
   if (isPool) {
     const poolContract = TruefiPool2.bind(Address.fromString(market.id));
@@ -520,24 +520,22 @@ function updateMarketTVL(
           getTokenById(market.outputToken!).decimals
         )
       );
-      market.exchangeRate = marketValue
-        .divDecimal(market.outputTokenSupply.toBigDecimal())
-        .times(
-          exponentToBigDecimal(outputToken.decimals - inputToken.decimals)
+      market.inputTokenBalance = marketValue;
+
+      // exchange rate = inputTokenBalance / outputTokenSupply
+      // ie, normalize to how much inputToken for each outputToken
+      market.exchangeRate = market.inputTokenBalance
+        .toBigDecimal()
+        .div(exponentToBigDecimal(inputToken.decimals))
+        .div(
+          market.outputTokenSupply
+            .toBigDecimal()
+            .div(exponentToBigDecimal(outputToken.decimals))
         );
     }
 
-    market.inputTokenBalance = BigInt.fromString(
-      market
-        .exchangeRate!.times(market.outputTokenSupply.toBigDecimal())
-        .toString()
-        .split(".")[0]
-    );
-
     market.totalValueLockedUSD = totalValueLockedUSD;
-    market.totalDepositBalanceUSD = new BigDecimal(market.inputTokenBalance)
-      .div(exponentToBigDecimal(inputToken.decimals))
-      .times(inputTokenPriceUSD);
+    market.totalDepositBalanceUSD = totalValueLockedUSD;
   }
 
   market.save();
