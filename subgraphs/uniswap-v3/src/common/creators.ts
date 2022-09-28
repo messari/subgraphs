@@ -441,3 +441,53 @@ export function createSwapHandleVolumeAndFees(
   token0.save();
   token1.save();
 }
+
+export function collectFees(
+  event: ethereum.Event,
+  amount0: BigInt,
+  amount1: BigInt
+): void {
+  // update fee growth
+  let pool = getLiquidityPool(event.address.toHexString());
+  let poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
+  let protocol = getOrCreateDex();
+
+  // Update the pool balances for collected fees in native amount
+  pool.inputTokenBalances = [
+    pool.inputTokenBalances[INT_ZERO].plus(amount0),
+    pool.inputTokenBalances[INT_ONE].plus(amount1),
+  ];
+
+  let token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
+  let token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
+
+  // Get formatted amounts collected.
+  let amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
+  let amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
+
+  // Update the pool balances for collected fees in converted amount
+  poolAmounts.inputTokenBalances = [
+    poolAmounts.inputTokenBalances[INT_ZERO].plus(amount0Converted),
+    poolAmounts.inputTokenBalances[INT_ONE].plus(amount1Converted),
+  ];
+
+  // Subtract the TVL of the pool from the protocol before fee collection
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
+    pool.totalValueLockedUSD
+  );
+
+  // Update the pool's TVL after fee collection
+  pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
+    .times(token0.lastPriceUSD!)
+    .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
+
+  // Update the protocol's TVL after fee collection
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+    pool.totalValueLockedUSD
+  );
+
+  // save entities
+  pool.save();
+  poolAmounts.save();
+  protocol.save();
+}

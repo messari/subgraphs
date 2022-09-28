@@ -1,17 +1,26 @@
 // import { log } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Burn as BurnEvent,
   Initialize,
   Mint as MintEvent,
   Swap as SwapEvent,
+  Collect as CollectEvent,
   SetFeeProtocol,
 } from "../../generated/templates/Pool/Pool";
-import { UsageType } from "../common/constants";
+import { INT_ONE, INT_ZERO, UsageType } from "../common/constants";
 import {
   createDeposit,
   createWithdraw,
   createSwapHandleVolumeAndFees,
+  collectFees,
 } from "../common/creators";
+import {
+  getLiquidityPool,
+  getLiquidityPoolAmounts,
+  getOrCreateDex,
+  getOrCreateToken,
+} from "../common/getters";
 import {
   updatePrices,
   updatePoolMetrics,
@@ -19,6 +28,7 @@ import {
   updateUsageMetrics,
   updateFinancials,
 } from "../common/updateMetrics";
+import { convertTokenToDecimal } from "../common/utils/utils";
 
 // Emitted when a given liquidity pool is first created.
 export function handleInitialize(event: Initialize): void {
@@ -70,4 +80,11 @@ export function handleSwap(event: SwapEvent): void {
   updateFinancials(event);
   updatePoolMetrics(event);
   updateUsageMetrics(event, event.transaction.from, UsageType.SWAP);
+}
+
+export function handleCollect(event: CollectEvent): void {
+  collectFees(event, event.params.amount0, event.params.amount1);
+  updateFinancials(event);
+  updatePoolMetrics(event);
+  updateUsageMetrics(event, event.transaction.from, UsageType.COLLECT);
 }
