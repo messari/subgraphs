@@ -67,6 +67,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.cumulativePositionCount = INT_ZERO;
     protocol._priceOracle = EMPTY_STRING;
     protocol._marketAssets = [];
+    protocol._bonusToSPCallEnabled = false;
     protocol.save();
   }
   return protocol;

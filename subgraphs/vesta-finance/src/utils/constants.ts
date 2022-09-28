@@ -195,3 +195,5 @@ export const LIQUIDATION_FEE_PERCENT = BigDecimal.fromString("0.5");
 export const LIQUIDATION_FEE = LIQUIDATION_FEE_PERCENT.div(BIGDECIMAL_HUNDRED);
 
 export const LIQUIDATION_RESERVE_VST = BigDecimal.fromString("30");
+
+export const BONUS_TO_SP = BigDecimal.fromString("0.1");

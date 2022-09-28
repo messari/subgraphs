@@ -32,8 +32,8 @@ import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  BONUS_TO_SP,
   INT_ZERO,
-  LIQUIDATION_FEE_PERCENT,
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
@@ -47,6 +47,7 @@ export function getOrCreateMarket(asset: Address): Market {
     const id = asset.toHexString();
     const inputToken = getOrCreateAssetToken(asset);
     const maxLTV = setMaxLTV(id);
+    const liquidationPenalty = setLiquidationPenalty(id);
     market = new Market(id);
     market.protocol = getOrCreateLendingProtocol().id;
     market.name = inputToken.name;
@@ -55,7 +56,7 @@ export function getOrCreateMarket(asset: Address): Market {
     market.canBorrowFrom = true;
     market.maximumLTV = maxLTV;
     market.liquidationThreshold = maxLTV;
-    market.liquidationPenalty = LIQUIDATION_FEE_PERCENT;
+    market.liquidationPenalty = liquidationPenalty;
     market.inputToken = inputToken.id;
     market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -356,4 +357,18 @@ function setMaxLTV(asset: string): BigDecimal {
   }
 
   return MaxLTV;
+}
+
+function setLiquidationPenalty(asset: string): BigDecimal {
+  let adjustedBonusToSP = BONUS_TO_SP;
+
+  const contract = VestaParameters.bind(
+    Address.fromString(VESTA_PARAMETERS_ADDRESS)
+  );
+  const tryBonusToSP = contract.try_BonusToSP(Address.fromString(asset));
+  if (!tryBonusToSP.reverted) {
+    adjustedBonusToSP = bigIntToBigDecimal(tryBonusToSP.value);
+  }
+
+  return adjustedBonusToSP;
 }

@@ -85,6 +85,8 @@ dataSources:
           handler: handlePriceFeedChanged
         - event: MCRChanged(uint256,uint256)
           handler: handleMCRChanged
+        - event: BonusToSPChanged(uint256,uint256)
+          handler: handleBonusToSPChanged
   - kind: ethereum/contract
     name: ActivePool
     network: arbitrum-one

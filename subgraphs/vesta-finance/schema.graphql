@@ -325,6 +325,9 @@ type LendingProtocol implements Protocol @entity {
 
   " All market assets that belong to this protocol. protocol.markets won't work, see https://github.com/graphprotocol/graph-ts/issues/219 "
   _marketAssets: [ID!]!
+
+  " flag to indicate whether the bonusToSP function call is enabled in Vesta Parameters smart contract for the protocol "
+  _bonusToSPCallEnabled: Boolean!
 }
 
 ###############################
