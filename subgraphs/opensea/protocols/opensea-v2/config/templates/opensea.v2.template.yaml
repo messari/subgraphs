@@ -3,11 +3,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: OpenSeaV1
+    name: OpenSea
     network: {{ network }}
     source:
       address: "{{address}}"
-      abi: OpenSeaV1
+      abi: OpenSea
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
@@ -15,8 +15,8 @@ dataSources:
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: OpenSeaV1
-          file: ./abis/OpenSeaV1.json
+        - name: OpenSea
+          file: ./abis/OpenSeaV2.json
         - name: ERC165
           file: ./abis/ERC165.json
         - name: NftMetadata

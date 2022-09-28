@@ -3,11 +3,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: OpenSeaV1
+    name: OpenSea
     network: mainnet
     source:
       address: "0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b"
-      abi: OpenSeaV1
+      abi: OpenSea
       startBlock: 5774644
     mapping:
       kind: ethereum/events
@@ -15,7 +15,7 @@ dataSources:
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: OpenSeaV1
+        - name: OpenSea
           file: ./abis/OpenSeaV1.json
         - name: ERC165
           file: ./abis/ERC165.json
