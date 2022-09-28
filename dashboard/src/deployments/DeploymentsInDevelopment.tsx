@@ -5,14 +5,14 @@ import { useNavigate } from "react-router";
 import DeploymentsInDevelopmentRow from "./DeploymentsInDevelopmentRow";
 
 interface DeploymentsInDevelopment {
-    deploymentsInDevelopment: { [x: string]: any };
+    protocolsToQuery: { [x: string]: any };
     getData: any;
 }
 
-function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: DeploymentsInDevelopment) {
+function DeploymentsInDevelopment({ protocolsToQuery, getData }: DeploymentsInDevelopment) {
     const navigate = useNavigate();
 
-    if (Object.keys(deploymentsInDevelopment).length === 0) {
+    if (Object.keys(protocolsToQuery).length === 0) {
         getData();
         return null;
     }
@@ -51,7 +51,7 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
     let protocolsInProgressCount = 0;
     let protocolsProdReadyCount = 0;
     const deposInProgress: { [x: string]: any } = {};
-    Object.entries(deploymentsInDevelopment).forEach(([protocolName, protocol]) => {
+    Object.entries(protocolsToQuery).forEach(([protocolName, protocol]) => {
         Object.keys(protocol.deployments).forEach((depoKey) => {
             totalDepoCounter += 1;
             const deploymentData: any = protocol.deployments[depoKey];

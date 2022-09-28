@@ -88,52 +88,19 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
   }, [decentralized]);
 
   const navigate = useNavigate();
-  const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
   window.scrollTo(0, 0);
 
-  let decentralizedSubgraphTable = null;
+
+  const decenDeposToSubgraphIds: any = {};
   if (Object.keys(decentralizedDeployments)?.length) {
-    decentralizedSubgraphTable = Object.keys(decentralizedDeployments).map((key) => {
-      const finalDeposList: any = {};
+    Object.keys(decentralizedDeployments).forEach((key) => {
       Object.keys(decentralizedDeployments[key]).forEach((x) => {
-        if (Object.keys(protocolsToQuery[key]).find((pro) => pro.includes(x))) {
-          finalDeposList[x] = decentralizedDeployments[key][x];
+        if (Object.keys(protocolsToQuery).find((pro) => pro.includes(x))) {
+          decenDeposToSubgraphIds[x] = decentralizedDeployments[key][x]?.subgraphId;
         }
       });
-
-      if (!Object.keys(finalDeposList).length) {
-        return null;
-      }
-
-      return (
-        <>
-          <Typography
-            key={"typography-" + key}
-            variant="h4"
-            align="left"
-            fontWeight={500}
-            fontSize={28}
-            sx={{ padding: "6px", my: 2 }}
-          >
-            {key.toUpperCase()}
-          </Typography>
-          <DeploymentsTable
-            key={"depTable-" + key}
-            clientIndexing={clientIndexing}
-            protocolsOnType={finalDeposList}
-            protocolType={key}
-            isDecentralizedNetworkTable={true}
-          />
-        </>
-      );
     });
-    decentralizedSubgraphTable.unshift(
-      <Typography variant="h4" align="center" sx={{ my: 4 }}>
-        Decentralized Network Subgraphs
-      </Typography>,
-    );
   }
-
   return (
     <DeploymentsContextProvider>
       <DeploymentsLayout>
@@ -162,33 +129,11 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
             {subgraphCounts.prodCount} prod-ready, {subgraphCounts.devCount} under development, {subgraphCounts.totalCount} subgraph deployments
           </Typography>
         </div>
-        {decentralizedSubgraphTable}
-        <Typography variant="h4" align="center" sx={{ my: 4 }}>
-          Hosted Service Subgraphs
+
+        <Typography variant="h3" align="center" sx={{ my: 4 }}>
+          Deployed Subgraphs
         </Typography>
-        {Object.keys(protocolsToQuery).sort().map((key) => {
-          return (
-            <>
-              <Typography
-                key={"typography-" + key}
-                variant="h4"
-                align="left"
-                fontWeight={500}
-                fontSize={28}
-                sx={{ padding: "6px", my: 2 }}
-              >
-                {key.toUpperCase()}
-              </Typography>
-              <DeploymentsTable
-                key={"depTable-" + key}
-                clientIndexing={clientIndexing}
-                protocolsOnType={protocolsToQuery[key]}
-                protocolType={key}
-                isDecentralizedNetworkTable={false}
-              />
-            </>
-          );
-        })}
+        <DeploymentsTable getData={() => getData()} protocolsToQuery={protocolsToQuery} decenDeposToSubgraphIds={decenDeposToSubgraphIds} />
       </DeploymentsLayout>
     </DeploymentsContextProvider >
   );
