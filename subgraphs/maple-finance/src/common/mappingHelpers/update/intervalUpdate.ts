@@ -90,8 +90,6 @@ function intervalUpdateMarket(event: ethereum.Event, market: Market): Market {
         .times(powBigDecimal(TEN_BD, outputToken.decimals - inputToken.decimals))
         .times(market.exchangeRate);
 
-    const inputTokenBalanceUSD = getTokenAmountInUSD(event, inputToken, market.inputTokenBalance);
-
     market.totalDepositBalanceUSD = getTokenAmountInUSD(event, inputToken, market._totalDepositBalance);
     market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
