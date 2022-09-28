@@ -116,19 +116,7 @@ function _handleSlateVote(
     let spell = Spell.load(spellID);
     if (spell) {
       let voteId = sender.concat("-").concat(spellID);
-      let vote = Vote.load(voteId);
-      if (vote) {
-        // Handle for double vote
-        log.error("Vote double count {}, txn {}, subtracting previous vote", [
-          voteId,
-          event.transaction.hash.toHexString(),
-        ]);
-        // subtract previous vote weight
-        spell.totalWeightedVotes = spell.totalWeightedVotes.minus(vote.weight);
-        spell.totalVotes = spell.totalVotes.minus(BIGINT_ONE);
-      }
-      // overwrite vote
-      vote = new Vote(voteId);
+      let vote = new Vote(voteId);
       vote.weight = delegate.votingPowerRaw;
       vote.reason = "";
       vote.voter = sender;
