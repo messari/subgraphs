@@ -286,6 +286,9 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of trades (swaps) in a day "
   dailySwapCount: Int!
 
+  " Total number of collections (remove accrued fees) in a day "
+  dailyCollectCount: Int!
+
   " Total number of pools "
   totalPoolCount: Int!
 
@@ -320,6 +323,9 @@ type UsageMetricsHourlySnapshot @entity {
 
   " Total number of trades (swaps) in an hour "
   hourlySwapCount: Int!
+
+  " Total number of collections (remove accrued fees) in an hour "
+  hourlyCollectCount: Int!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -786,6 +792,50 @@ type Swap implements Event @entity {
 
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
+
+  " The pool involving this transaction "
+  pool: LiquidityPool!
+}
+
+type Collect implements Event @entity {
+  " collect-{ Transaction hash }-{ Log index }"
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: DexAmmProtocol!
+
+  " Address that received the tokens "
+  to: String!
+
+  " Address that sent the tokens "
+  from: String!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
+  inputTokens: [Token!]!
+
+  " Output token of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
+  outputToken: Token
+
+  " Amount of input tokens in the token's native unit "
+  inputTokenAmounts: [BigInt!]!
+
+  " Amount of output tokens in the token's native unit "
+  outputTokenAmount: BigInt
+
+  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
+  amountUSD: BigDecimal!
 
   " The pool involving this transaction "
   pool: LiquidityPool!

@@ -5,6 +5,7 @@ import {
   Deposit,
   Withdraw,
   Swap,
+  Collect,
   _HelperStore,
   _LiquidityPoolAmount,
   LiquidityPoolFee,
@@ -444,6 +445,7 @@ export function createSwapHandleVolumeAndFees(
 
 export function collectFees(
   event: ethereum.Event,
+  owner: Address,
   amount0: BigInt,
   amount1: BigInt
 ): void {
@@ -464,6 +466,11 @@ export function collectFees(
   // Get formatted amounts collected.
   let amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
   let amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
+
+  // Get the value in USD of the deposit
+  let amountUSD = amount0Converted
+    .times(token0.lastPriceUSD!)
+    .plus(amount1Converted.times(token1.lastPriceUSD!));
 
   // Update the pool balances for collected fees in converted amount
   poolAmounts.inputTokenBalances = [
@@ -486,7 +493,27 @@ export function collectFees(
     pool.totalValueLockedUSD
   );
 
+  let collect = new Collect(
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString())
+  );
+
+  collect.hash = event.transaction.hash.toHexString();
+  collect.logIndex = event.logIndex.toI32();
+  collect.protocol = protocol.id;
+  collect.to = owner.toHexString();
+  collect.from = pool.id;
+  collect.blockNumber = event.block.number;
+  collect.timestamp = event.block.timestamp;
+  collect.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
+  collect.inputTokenAmounts = [amount0, amount1];
+  collect.pool = pool.id;
+  collect.amountUSD = amountUSD;
+
   // save entities
+  collect.save();
   pool.save();
   poolAmounts.save();
   protocol.save();
