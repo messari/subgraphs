@@ -12,15 +12,18 @@
           "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "abracadabra-money-arbitrum"
-        },
         "files": {
           "template": "abracadabra.money.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "abracadabra-money-arbitrum",
+            "query-id": "abracadabra-money-arbitrum"
+          }
         }
       },
       "abracadabra-avalanche": {
@@ -31,15 +34,18 @@
           "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "abracadabra-money-avalanche"
-        },
         "files": {
           "template": "abracadabra.money.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "abracadabra-money-avalanche",
+            "query-id": "abracadabra-money-avalanche"
+          }
         }
       },
       "abracadabra-bsc": {
@@ -50,15 +56,18 @@
           "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "abracadabra-money-bsc"
-        },
         "files": {
           "template": "abracadabra.money.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "abracadabra-money-bsc",
+            "query-id": "abracadabra-money-bsc"
+          }
         }
       },
       "abracadabra-fantom": {
@@ -69,15 +78,18 @@
           "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "abracadabra-money-fantom"
-        },
         "files": {
           "template": "abracadabra.money.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "abracadabra-money-fantom",
+            "query-id": "abracadabra-money-fantom"
+          }
         }
       },
       "abracadabra-ethereum": {
@@ -88,16 +100,22 @@
           "subgraph": "1.2.9",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "abracadabra-money-ethereum",
-          "decentralized-network": "abracadabra-money-ethereum"
-        },
         "files": {
           "template": "abracadabra.money.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "abracadabra-money-ethereum",
+            "query-id": "abracadabra-money-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "abracadabra-money-ethereum",
+            "query-id": "3Gkei7B24o9C2bCoAbQpApZqMStPta7oCAnNhmNv5dab"
+          }
         }
       }
     }
@@ -115,15 +133,18 @@
           "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-arc-ethereum"
-        },
         "files": {
           "template": "aave.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-arc-ethereum",
+            "query-id": "aave-arc-ethereum"
+          }
         }
       },
       "aave-v2-avalanche": {
@@ -134,15 +155,18 @@
           "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-v2-avalanche"
-        },
         "files": {
           "template": "aave.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v2-avalanche",
+            "query-id": "aave-v2-avalanche"
+          }
         }
       },
       "aave-v2-ethereum": {
@@ -153,15 +177,22 @@
           "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-v2-ethereum"
-        },
         "files": {
           "template": "aave.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v2-ethereum",
+            "query-id": "aave-v2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "aave-v2-ethereum",
+            "query-id": "84CvqQHYhydZzr2KSth8s1AFYpBRzUbVJXq6PWuZm9U9"
+          }
         }
       },
       "aave-amm-ethereum": {
@@ -172,15 +203,18 @@
           "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-amm-ethereum"
-        },
         "files": {
           "template": "aave.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-amm-ethereum",
+            "query-id": "aave-amm-ethereum"
+          }
         }
       },
       "aave-v2-polygon": {
@@ -191,15 +225,18 @@
           "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-v2-polygon"
-        },
         "files": {
           "template": "aave.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v2-polygon",
+            "query-id": "aave-v2-polygon"
+          }
         }
       },
       "aave-rwa-ethereum": {
@@ -210,15 +247,18 @@
           "subgraph": "1.2.14",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-rwa-ethereum"
-        },
         "files": {
           "template": "aave.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-rwa-ethereum",
+            "query-id": "aave-rwa-ethereum"
+          }
         }
       }
     }
@@ -236,15 +276,18 @@
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-v3-arbitrum"
-        },
         "files": {
           "template": "aave-v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v3-arbitrum",
+            "query-id": "aave-v3-arbitrum"
+          }
         }
       },
       "aave-v3-avalanche": {
@@ -255,15 +298,18 @@
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-v3-avalanche"
-        },
         "files": {
           "template": "aave-v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v3-avalanche",
+            "query-id": "aave-v3-avalanche"
+          }
         }
       },
       "aave-v3-fantom": {
@@ -274,15 +320,18 @@
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-v3-fantom"
-        },
         "files": {
           "template": "aave-v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v3-fantom",
+            "query-id": "aave-v3-fantom"
+          }
         }
       },
       "aave-v3-harmony": {
@@ -293,15 +342,18 @@
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-v3-harmony"
-        },
         "files": {
           "template": "aave-v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v3-harmony",
+            "query-id": "aave-v3-harmony"
+          }
         }
       },
       "aave-v3-polygon": {
@@ -312,15 +364,18 @@
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-v3-polygon"
-        },
         "files": {
           "template": "aave-v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v3-polygon",
+            "query-id": "aave-v3-polygon"
+          }
         }
       },
       "aave-v3-optimism": {
@@ -331,15 +386,18 @@
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-v3-optimism"
-        },
         "files": {
           "template": "aave-v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-v3-optimism",
+            "query-id": "aave-v3-optimism"
+          }
         }
       }
     }
@@ -357,16 +415,22 @@
           "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "arrakis-finance-ethereum",
-          "decentralized-network": "arrakis-finance-ethereum"
-        },
         "files": {
           "template": "arrakis.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "arrakis-finance-ethereum",
+            "query-id": "arrakis-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "arrakis-finance-ethereum",
+            "query-id": "9WiZHUk2d3rM4sEQ4NSz6ihFRc2zWmPj7yk8w51dNdhT"
+          }
         }
       }
     }
@@ -384,15 +448,22 @@
           "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "convex-finance-ethereum"
-        },
         "files": {
           "template": "convex.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "convex-finance-ethereum",
+            "query-id": "convex-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "convex-finance-ethereum",
+            "query-id": "CVVEQi1VRgQYwX5r6tPjD1Leiao2nETLYC6pHTWVNPtk"
+          }
         }
       }
     }
@@ -410,15 +481,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "balancer-v2-arbitrum"
-        },
         "files": {
           "template": "balancer.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "balancer-v2-arbitrum",
+            "query-id": "balancer-v2-arbitrum"
+          }
         }
       },
       "balancer-v2-polygon": {
@@ -429,15 +503,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "balancer-v2-polygon"
-        },
         "files": {
           "template": "balancer.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "balancer-v2-polygon",
+            "query-id": "balancer-v2-polygon"
+          }
         }
       },
       "balancer-v2-ethereum": {
@@ -448,15 +525,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "balancer-v2-ethereum"
-        },
         "files": {
           "template": "balancer.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "balancer-v2-ethereum",
+            "query-id": "balancer-v2-ethereum"
+          }
         }
       }
     }
@@ -474,15 +554,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beethoven-x-fantom"
-        },
         "files": {
           "template": "beethoven.x.fantom.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beethoven-x-fantom",
+            "query-id": "beethoven-x-fantom"
+          }
         }
       },
       "beethoven-x-optimism": {
@@ -493,15 +576,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beethoven-x-optimism"
-        },
         "files": {
           "template": "beethoven.x.optimism.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beethoven-x-optimism",
+            "query-id": "beethoven-x-optimism"
+          }
         }
       }
     }
@@ -519,15 +605,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-arbitrum"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-arbitrum",
+            "query-id": "beefy-finance-arbitrum"
+          }
         }
       },
       "beefy-finance-avalanche": {
@@ -538,15 +627,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-avalanche"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-avalanche",
+            "query-id": "beefy-finance-avalanche"
+          }
         }
       },
       "beefy-finance-aurora": {
@@ -557,15 +649,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-aurora"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-aurora",
+            "query-id": "beefy-finance-aurora"
+          }
         }
       },
       "beefy-finance-celo": {
@@ -576,15 +671,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-celo"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-celo",
+            "query-id": "beefy-finance-celo"
+          }
         }
       },
       "beefy-finance-fantom": {
@@ -595,15 +693,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-fantom"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-fantom",
+            "query-id": "beefy-finance-fantom"
+          }
         }
       },
       "beefy-finance-fuse": {
@@ -614,15 +715,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-fuse"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-fuse",
+            "query-id": "beefy-finance-fuse"
+          }
         }
       },
       "beefy-finance-harmony": {
@@ -633,15 +737,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-harmony"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-harmony",
+            "query-id": "beefy-finance-harmony"
+          }
         }
       },
       "beefy-finance-moonbeam": {
@@ -652,15 +759,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-moonbeam"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-moonbeam",
+            "query-id": "beefy-finance-moonbeam"
+          }
         }
       },
       "beefy-finance-moonriver": {
@@ -671,15 +781,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-moonriver"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-moonriver",
+            "query-id": "beefy-finance-moonriver"
+          }
         }
       },
       "beefy-finance-polygon": {
@@ -690,15 +803,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-polygon"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-polygon",
+            "query-id": "beefy-finance-polygon"
+          }
         }
       },
       "beefy-finance-bsc": {
@@ -709,15 +825,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "beefy-finance-bsc"
-        },
         "files": {
           "template": "beefy.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-bsc",
+            "query-id": "beefy-finance-bsc"
+          }
         }
       }
     }
@@ -735,15 +854,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "belt-finance-bsc"
-        },
         "files": {
           "template": "belt.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "belt-finance-bsc",
+            "query-id": "belt-finance-bsc"
+          }
         }
       }
     }
@@ -761,16 +883,22 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "bancor-v3-ethereum",
-          "decentralized-network": "bancor-v3-ethereum"
-        },
         "files": {
           "template": "bancor.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "bancor-v3-ethereum",
+            "query-id": "bancor-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "bancor-v3-ethereum",
+            "query-id": "B35cLTayreXTML6fXPTrFNSYx7mKyDuuV51LjVxWwWjp"
+          }
         }
       }
     }
@@ -788,15 +916,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aurigami-aurora"
-        },
         "files": {
           "template": "aurigami.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aurigami-aurora",
+            "query-id": "aurigami-aurora"
+          }
         }
       }
     }
@@ -814,15 +945,18 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "banker-joe-avalanche"
-        },
         "files": {
           "template": "banker-joe.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "banker-joe-avalanche",
+            "query-id": "banker-joe-avalanche"
+          }
         }
       }
     }
@@ -840,15 +974,18 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "cronos-portal": "tectonic"
-        },
         "files": {
           "template": "tectonic.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "cronos-portal": {
+            "slug": "tectonic",
+            "query-id": "tectonic"
+          }
         }
       }
     }
@@ -866,15 +1003,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "bastion-protocol-aurora"
-        },
         "files": {
           "template": "bastion-protocol.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "bastion-protocol-aurora",
+            "query-id": "bastion-protocol-aurora"
+          }
         }
       }
     }
@@ -892,15 +1032,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "benqi-avalanche"
-        },
         "files": {
           "template": "benqi.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "benqi-avalanche",
+            "query-id": "benqi-avalanche"
+          }
         }
       }
     }
@@ -918,16 +1061,22 @@
           "subgraph": "1.7.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "compound-v2-ethereum",
-          "decentralized-network": "compound-v2-ethereum"
-        },
         "files": {
           "template": "compound-v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "compound-v2-ethereum",
+            "query-id": "compound-v2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "compound-v2-ethereum",
+            "query-id": "6tGbL7WBx287EZwGUvvcQdL6m67JGMJrma3JSTtt5SV7"
+          }
         }
       }
     }
@@ -945,15 +1094,18 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "cream-finance-arbitrum"
-        },
         "files": {
           "template": "cream-finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cream-finance-arbitrum",
+            "query-id": "cream-finance-arbitrum"
+          }
         }
       },
       "cream-finance-bsc": {
@@ -964,15 +1116,18 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "cream-finance-bsc"
-        },
         "files": {
           "template": "cream-finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cream-finance-bsc",
+            "query-id": "cream-finance-bsc"
+          }
         }
       },
       "cream-finance-ethereum": {
@@ -983,15 +1138,18 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "cream-finance-ethereum"
-        },
         "files": {
           "template": "cream-finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cream-finance-ethereum",
+            "query-id": "cream-finance-ethereum"
+          }
         }
       },
       "cream-finance-polygon": {
@@ -1002,15 +1160,18 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "cream-finance-polygon"
-        },
         "files": {
           "template": "cream-finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cream-finance-polygon",
+            "query-id": "cream-finance-polygon"
+          }
         }
       }
     }
@@ -1028,15 +1189,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "dforce-arbitrum"
-        },
         "files": {
           "template": "dforce.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "dforce-arbitrum",
+            "query-id": "dforce-arbitrum"
+          }
         }
       },
       "dforce-avalanche": {
@@ -1047,15 +1211,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "dforce-avalanche"
-        },
         "files": {
           "template": "dforce.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "dforce-avalanche",
+            "query-id": "dforce-avalanche"
+          }
         }
       },
       "dforce-bsc": {
@@ -1066,15 +1233,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "dforce-bsc"
-        },
         "files": {
           "template": "dforce.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "dforce-bsc",
+            "query-id": "dforce-bsc"
+          }
         }
       },
       "dforce-ethereum": {
@@ -1085,15 +1255,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "dforce-ethereum"
-        },
         "files": {
           "template": "dforce.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "dforce-ethereum",
+            "query-id": "dforce-ethereum"
+          }
         }
       },
       "dforce-optimism": {
@@ -1104,15 +1277,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "dforce-optimism"
-        },
         "files": {
           "template": "dforce.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "dforce-optimism",
+            "query-id": "dforce-optimism"
+          }
         }
       },
       "dforce-polygon": {
@@ -1123,15 +1299,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "dforce-polygon"
-        },
         "files": {
           "template": "dforce.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "dforce-polygon",
+            "query-id": "dforce-polygon"
+          }
         }
       }
     }
@@ -1149,15 +1328,18 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "iron-bank-avalanche"
-        },
         "files": {
           "template": "iron-bank.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "iron-bank-avalanche",
+            "query-id": "iron-bank-avalanche"
+          }
         }
       },
       "iron-bank-ethereum": {
@@ -1168,16 +1350,22 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "iron-bank-ethereum",
-          "decentralized-network": "iron-bank-ethereum"
-        },
         "files": {
           "template": "iron-bank.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "iron-bank-ethereum",
+            "query-id": "iron-bank-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "iron-bank-ethereum",
+            "query-id": "98GG74FxxsG25Ltd8qvJ9BRfFmQWyN1AkS92MZBG1BsR"
+          }
         }
       },
       "iron-bank-fantom": {
@@ -1188,15 +1376,18 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "iron-bank-fantom"
-        },
         "files": {
           "template": "iron-bank.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "iron-bank-fantom",
+            "query-id": "iron-bank-fantom"
+          }
         }
       }
     }
@@ -1214,15 +1405,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "moonwell-moonbeam"
-        },
         "files": {
           "template": "moonwell.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "moonwell-moonbeam",
+            "query-id": "moonwell-moonbeam"
+          }
         }
       },
       "moonwell-moonriver": {
@@ -1233,15 +1427,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "moonwell-moonriver"
-        },
         "files": {
           "template": "moonwell.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "moonwell-moonriver",
+            "query-id": "moonwell-moonriver"
+          }
         }
       }
     }
@@ -1259,15 +1456,18 @@
           "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "rari-fuse-arbitrum"
-        },
         "files": {
           "template": "rari-fuse.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "rari-fuse-arbitrum",
+            "query-id": "rari-fuse-arbitrum"
+          }
         }
       },
       "rari-fuse-ethereum": {
@@ -1278,15 +1478,18 @@
           "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "rari-fuse-ethereum"
-        },
         "files": {
           "template": "rari-fuse.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "rari-fuse-ethereum",
+            "query-id": "rari-fuse-ethereum"
+          }
         }
       }
     }
@@ -1304,15 +1507,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "scream-fantom"
-        },
         "files": {
           "template": "scream.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "scream-fantom",
+            "query-id": "scream-fantom"
+          }
         }
       }
     }
@@ -1330,15 +1536,18 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "venus-bsc"
-        },
         "files": {
           "template": "venus.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "venus-bsc",
+            "query-id": "venus-bsc"
+          }
         }
       }
     }
@@ -1356,15 +1565,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "curve-finance-arbitrum"
-        },
         "files": {
           "template": "curve.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-arbitrum",
+            "query-id": "curve-finance-arbitrum"
+          }
         }
       },
       "curve-finance-avalanche": {
@@ -1375,15 +1587,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "curve-finance-avalanche"
-        },
         "files": {
           "template": "curve.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-avalanche",
+            "query-id": "curve-finance-avalanche"
+          }
         }
       },
       "curve-finance-ethereum": {
@@ -1394,15 +1609,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "curve-finance-ethereum"
-        },
         "files": {
           "template": "curve.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-ethereum",
+            "query-id": "curve-finance-ethereum"
+          }
         }
       },
       "curve-finance-fantom": {
@@ -1413,15 +1631,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "curve-finance-fantom"
-        },
         "files": {
           "template": "curve.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-fantom",
+            "query-id": "curve-finance-fantom"
+          }
         }
       },
       "curve-finance-gnosis": {
@@ -1432,15 +1653,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "curve-finance-gnosis"
-        },
         "files": {
           "template": "curve.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-gnosis",
+            "query-id": "curve-finance-gnosis"
+          }
         }
       },
       "curve-finance-optimism": {
@@ -1451,15 +1675,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "curve-finance-optimism"
-        },
         "files": {
           "template": "curve.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-optimism",
+            "query-id": "curve-finance-optimism"
+          }
         }
       },
       "curve-finance-polygon": {
@@ -1470,15 +1697,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "curve-finance-polygon"
-        },
         "files": {
           "template": "curve.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "curve-finance-polygon",
+            "query-id": "curve-finance-polygon"
+          }
         }
       }
     }
@@ -1496,15 +1726,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "ellipsis-finance-bsc"
-        },
         "files": {
           "template": "ellipsis.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "ellipsis-finance-bsc",
+            "query-id": "ellipsis-finance-bsc"
+          }
         }
       }
     }
@@ -1522,15 +1755,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "erc721-holders"
-        },
         "files": {
           "template": "erc721.holders.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "erc721-holders",
+            "query-id": "erc721-holders"
+          }
         }
       }
     }
@@ -1548,15 +1784,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "erc721-metadata"
-        },
         "files": {
           "template": "erc721.metadata.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "erc721-metadata",
+            "query-id": "erc721-metadata"
+          }
         }
       }
     }
@@ -1574,16 +1813,22 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "euler-finance-ethereum",
-          "decentralized-network": "euler-finance-ethereum"
-        },
         "files": {
           "template": "euler.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "euler-finance-ethereum",
+            "query-id": "euler-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "euler-finance-ethereum",
+            "query-id": "8cLf29KxAedWLVaEqjV8qKomdwwXQxjptBZFrqWNH5u2"
+          }
         }
       }
     }
@@ -1601,16 +1846,22 @@
           "subgraph": "1.2.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "inverse-finance-ethereum",
-          "decentralized-network": "inverse-finance-ethereum"
-        },
         "files": {
           "template": "inverse.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "inverse-finance-ethereum",
+            "query-id": "inverse-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "inverse-finance-ethereum",
+            "query-id": "FQ6JYszEKApsBpAmiHesRsd9Ygc6mzmpNRANeVQFYoVX"
+          }
         }
       }
     }
@@ -1628,16 +1879,22 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "lido-ethereum",
-          "decentralized-network": "lido-ethereum"
-        },
         "files": {
           "template": "lido.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "lido-ethereum",
+            "query-id": "lido-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "lido-ethereum",
+            "query-id": "XYcD9VeUvSvuqrsV5pFauXk7jQy9hrnhe5Kb7REyuxm"
+          }
         }
       }
     }
@@ -1655,15 +1912,18 @@
           "subgraph": "1.2.0",
           "methodology": "1.0.1"
         },
-        "deployment-ids": {
-          "hosted-service": "liquity-ethereum"
-        },
         "files": {
           "template": "liquity.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "liquity-ethereum",
+            "query-id": "liquity-ethereum"
+          }
         }
       }
     }
@@ -1681,15 +1941,18 @@
           "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "truefi-ethereum"
-        },
         "files": {
           "template": "truefi.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "truefi-ethereum",
+            "query-id": "truefi-ethereum"
+          }
         }
       }
     }
@@ -1707,15 +1970,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "arweave-mainnet"
-        },
         "files": {
           "template": "arweave.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "arweave-mainnet",
+            "query-id": "arweave-mainnet"
+          }
         }
       }
     }
@@ -1733,15 +1999,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-cosmos"
-        },
         "files": {
           "template": "cosmos.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-cosmos",
+            "query-id": "network-cosmos"
+          }
         }
       },
       "osmosis": {
@@ -1752,15 +2021,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-osmosis"
-        },
         "files": {
           "template": "cosmos.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-osmosis",
+            "query-id": "network-osmosis"
+          }
         }
       }
     }
@@ -1778,15 +2050,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-arbitrum"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-arbitrum",
+            "query-id": "network-arbitrum"
+          }
         }
       },
       "evm-aurora": {
@@ -1797,15 +2072,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-aurora"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-aurora",
+            "query-id": "network-aurora"
+          }
         }
       },
       "evm-avalanche": {
@@ -1816,15 +2094,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-avalanche"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-avalanche",
+            "query-id": "network-avalanche"
+          }
         }
       },
       "evm-boba": {
@@ -1835,15 +2116,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-boba"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-boba",
+            "query-id": "network-boba"
+          }
         }
       },
       "evm-bsc": {
@@ -1854,15 +2138,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-bsc"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-bsc",
+            "query-id": "network-bsc"
+          }
         }
       },
       "evm-celo": {
@@ -1873,15 +2160,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-celo"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-celo",
+            "query-id": "network-celo"
+          }
         }
       },
       "evm-clover": {
@@ -1892,15 +2182,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-clover"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-clover",
+            "query-id": "network-clover"
+          }
         }
       },
       "evm-fantom": {
@@ -1911,15 +2204,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-fantom"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-fantom",
+            "query-id": "network-fantom"
+          }
         }
       },
       "evm-fuse": {
@@ -1930,15 +2226,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-fuse"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-fuse",
+            "query-id": "network-fuse"
+          }
         }
       },
       "evm-harmony": {
@@ -1949,15 +2248,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-harmony"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-harmony",
+            "query-id": "network-harmony"
+          }
         }
       },
       "evm-ethereum": {
@@ -1968,15 +2270,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-ethereum"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-ethereum",
+            "query-id": "network-ethereum"
+          }
         }
       },
       "evm-polygon": {
@@ -1987,15 +2292,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-polygon"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-polygon",
+            "query-id": "network-polygon"
+          }
         }
       },
       "evm-moonbeam": {
@@ -2006,15 +2314,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-moonbeam"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-moonbeam",
+            "query-id": "network-moonbeam"
+          }
         }
       },
       "evm-moonriver": {
@@ -2025,15 +2336,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-moonriver"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-moonriver",
+            "query-id": "network-moonriver"
+          }
         }
       },
       "evm-optimism": {
@@ -2044,15 +2358,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-optimism"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-optimism",
+            "query-id": "network-optimism"
+          }
         }
       },
       "evm-gnosis": {
@@ -2063,15 +2380,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-gnosis"
-        },
         "files": {
           "template": "evm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-gnosis",
+            "query-id": "network-gnosis"
+          }
         }
       }
     }
@@ -2089,15 +2409,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "network-near-mainnet"
-        },
         "files": {
           "template": "near.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "network-near-mainnet",
+            "query-id": "network-near-mainnet"
+          }
         }
       }
     }
@@ -2115,15 +2438,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "gamma-arbitrum"
-        },
         "files": {
           "template": "gamma.strategies.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gamma-arbitrum",
+            "query-id": "gamma-arbitrum"
+          }
         }
       },
       "gamma-strategies-ethereum": {
@@ -2134,16 +2460,22 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "gamma-ethereum",
-          "decentralized-network": "gamma-ethereum"
-        },
         "files": {
           "template": "gamma.strategies.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gamma-ethereum",
+            "query-id": "gamma-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "gamma-ethereum",
+            "query-id": "8PUSqUn6dSkoxJb3LDLmdKHzbHFn1cz7XjbSob5uiR4v"
+          }
         }
       },
       "gamma-strategies-optimism": {
@@ -2154,15 +2486,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "gamma-optimism"
-        },
         "files": {
           "template": "gamma.strategies.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gamma-optimism",
+            "query-id": "gamma-optimism"
+          }
         }
       },
       "gamma-strategies-polygon": {
@@ -2173,15 +2508,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "gamma-polygon"
-        },
         "files": {
           "template": "gamma.strategies.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "gamma-polygon",
+            "query-id": "gamma-polygon"
+          }
         }
       }
     }
@@ -2199,15 +2537,22 @@
           "subgraph": "1.2.0",
           "methodology": "1.0.1"
         },
-        "deployment-ids": {
-          "hosted-service": "makerdao-ethereum"
-        },
         "files": {
           "template": "makerdao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "makerdao-ethereum",
+            "query-id": "makerdao-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "makerdao-ethereum",
+            "query-id": "G1KHEQkA7shnPZahHUmKcerfpqBMNnL9xJzWGAVrj7n7"
+          }
         }
       }
     }
@@ -2225,16 +2570,22 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "maple-finance-ethereum",
-          "decentralized-network": "maple-finance-ethereum"
-        },
         "files": {
           "template": "maple.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "maple-finance-ethereum",
+            "query-id": "maple-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "maple-finance-ethereum",
+            "query-id": "5H97eNhy9fVHcqRXZtCV2UxHG2DbzcFA7yth1TaVZ45x"
+          }
         }
       }
     }
@@ -2252,15 +2603,18 @@
           "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "stakedao-ethereum"
-        },
         "files": {
           "template": "stakedao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "stakedao-ethereum",
+            "query-id": "stakedao-ethereum"
+          }
         }
       }
     }
@@ -2278,15 +2632,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "saddle-finance-arbitrum"
-        },
         "files": {
           "template": "saddle.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "saddle-finance-arbitrum",
+            "query-id": "saddle-finance-arbitrum"
+          }
         }
       },
       "saddle-finance-ethereum": {
@@ -2297,15 +2654,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "saddle-finance-ethereum"
-        },
         "files": {
           "template": "saddle.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "saddle-finance-ethereum",
+            "query-id": "saddle-finance-ethereum"
+          }
         }
       },
       "saddle-finance-fantom": {
@@ -2316,15 +2676,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "saddle-finance-fantom"
-        },
         "files": {
           "template": "saddle.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "saddle-finance-fantom",
+            "query-id": "saddle-finance-fantom"
+          }
         }
       },
       "saddle-finance-optimism": {
@@ -2335,15 +2698,18 @@
           "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "saddle-finance-optimism"
-        },
         "files": {
           "template": "saddle.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "saddle-finance-optimism",
+            "query-id": "saddle-finance-optimism"
+          }
         }
       }
     }
@@ -2361,15 +2727,18 @@
           "subgraph": "1.0.10",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "geist-finance-fantom"
-        },
         "files": {
           "template": "geist.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "geist-finance-fantom",
+            "query-id": "geist-finance-fantom"
+          }
         }
       }
     }
@@ -2387,15 +2756,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "tokemak-ethereum"
-        },
         "files": {
           "template": "tokemak.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tokemak-ethereum",
+            "query-id": "tokemak-ethereum"
+          }
         }
       }
     }
@@ -2413,15 +2785,18 @@
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "uniswap-v3-arbitrum"
-        },
         "files": {
           "template": "uniswap.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v3-arbitrum",
+            "query-id": "uniswap-v3-arbitrum"
+          }
         }
       },
       "uniswap-v3-celo": {
@@ -2432,15 +2807,18 @@
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "uniswap-v3-celo"
-        },
         "files": {
           "template": "uniswap.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v3-celo",
+            "query-id": "uniswap-v3-celo"
+          }
         }
       },
       "uniswap-v3-ethereum": {
@@ -2451,15 +2829,18 @@
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "uniswap-v3-ethereum"
-        },
         "files": {
           "template": "uniswap.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v3-ethereum",
+            "query-id": "uniswap-v3-ethereum"
+          }
         }
       },
       "uniswap-v3-optimism": {
@@ -2470,15 +2851,18 @@
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "uniswap-v3-optimism"
-        },
         "files": {
           "template": "uniswap.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v3-optimism",
+            "query-id": "uniswap-v3-optimism"
+          }
         }
       },
       "uniswap-v3-polygon": {
@@ -2489,15 +2873,18 @@
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "uniswap-v3-polygon"
-        },
         "files": {
           "template": "uniswap.v3.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v3-polygon",
+            "query-id": "uniswap-v3-polygon"
+          }
         }
       }
     }
@@ -2515,15 +2902,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "qidao-arbitrum"
-        },
         "files": {
           "template": "qidao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-arbitrum",
+            "query-id": "qidao-arbitrum"
+          }
         }
       },
       "qidao-avalanche": {
@@ -2534,15 +2924,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "qidao-avalanche"
-        },
         "files": {
           "template": "qidao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-avalanche",
+            "query-id": "qidao-avalanche"
+          }
         }
       },
       "qidao-bsc": {
@@ -2553,15 +2946,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "qidao-bsc"
-        },
         "files": {
           "template": "qidao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-bsc",
+            "query-id": "qidao-bsc"
+          }
         }
       },
       "qidao-fantom": {
@@ -2572,15 +2968,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "qidao-fantom"
-        },
         "files": {
           "template": "qidao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-fantom",
+            "query-id": "qidao-fantom"
+          }
         }
       },
       "qidao-polygon": {
@@ -2591,15 +2990,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "qidao-polygon"
-        },
         "files": {
           "template": "qidao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-polygon",
+            "query-id": "qidao-polygon"
+          }
         }
       },
       "qidao-moonriver": {
@@ -2610,15 +3012,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "qidao-moonriver"
-        },
         "files": {
           "template": "qidao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-moonriver",
+            "query-id": "qidao-moonriver"
+          }
         }
       },
       "qidao-optimism": {
@@ -2629,15 +3034,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "qidao-optimism"
-        },
         "files": {
           "template": "qidao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-optimism",
+            "query-id": "qidao-optimism"
+          }
         }
       },
       "qidao-gnosis": {
@@ -2648,15 +3056,18 @@
           "subgraph": "1.1.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "qidao-gnosis"
-        },
         "files": {
           "template": "qidao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "qidao-gnosis",
+            "query-id": "qidao-gnosis"
+          }
         }
       }
     }
@@ -2674,15 +3085,18 @@
           "subgraph": "1.4.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "rari-vaults-ethereum"
-        },
         "files": {
           "template": "rari-vaults.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "rari-vaults-ethereum",
+            "query-id": "rari-vaults-ethereum"
+          }
         }
       }
     }
@@ -2700,15 +3114,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "apeswap-bsc"
-        },
         "files": {
           "template": "apeswap.bsc.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "apeswap-bsc",
+            "query-id": "apeswap-bsc"
+          }
         }
       },
       "apeswap-polygon": {
@@ -2719,15 +3136,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "apeswap-polygon"
-        },
         "files": {
           "template": "apeswap.matic.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "apeswap-polygon",
+            "query-id": "apeswap-polygon"
+          }
         }
       }
     }
@@ -2745,15 +3165,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "mm-finance-polygon"
-        },
         "files": {
           "template": "mm.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mm-finance-polygon",
+            "query-id": "mm-finance-polygon"
+          }
         }
       },
       "mm-finance-cronos": {
@@ -2764,15 +3187,18 @@
           "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "mm-finance-cronos"
-        },
         "files": {
           "template": "mm.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "mm-finance-cronos",
+            "query-id": "mm-finance-cronos"
+          }
         }
       }
     }
@@ -2790,15 +3216,18 @@
           "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "quickswap-polygon"
-        },
         "files": {
           "template": "quickswap.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "quickswap-polygon",
+            "query-id": "quickswap-polygon"
+          }
         }
       }
     }
@@ -2816,15 +3245,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "solarbeam-moonriver"
-        },
         "files": {
           "template": "solarbeam.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "solarbeam-moonriver",
+            "query-id": "solarbeam-moonriver"
+          }
         }
       }
     }
@@ -2842,15 +3274,18 @@
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "spiritswap-fantom"
-        },
         "files": {
           "template": "spiritswap.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "spiritswap-fantom",
+            "query-id": "spiritswap-fantom"
+          }
         }
       }
     }
@@ -2868,15 +3303,18 @@
           "subgraph": "1.1.4",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "spookyswap-fantom"
-        },
         "files": {
           "template": "spookyswap.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "spookyswap-fantom",
+            "query-id": "spookyswap-fantom"
+          }
         }
       }
     }
@@ -2894,15 +3332,22 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-arbitrum"
-        },
         "files": {
           "template": "sushiswap.alt.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-arbitrum",
+            "query-id": "sushiswap-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-arbitrum",
+            "query-id": "7h1x51fyT5KigAhXd8sdE3kzzxQDJxxz1y66LTFiC3mS"
+          }
         }
       },
       "sushiswap-avalanche": {
@@ -2913,15 +3358,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-avalanche"
-        },
         "files": {
           "template": "uniswap.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-avalanche",
+            "query-id": "sushiswap-avalanche"
+          }
         }
       },
       "sushiswap-bsc": {
@@ -2932,15 +3380,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-bsc"
-        },
         "files": {
           "template": "uniswap.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-bsc",
+            "query-id": "sushiswap-bsc"
+          }
         }
       },
       "sushiswap-celo": {
@@ -2951,15 +3402,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-celo"
-        },
         "files": {
           "template": "sushiswap.alt.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-celo",
+            "query-id": "sushiswap-celo"
+          }
         }
       },
       "sushiswap-fantom": {
@@ -2970,15 +3424,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-fantom"
-        },
         "files": {
           "template": "sushiswap.alt.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-fantom",
+            "query-id": "sushiswap-fantom"
+          }
         }
       },
       "sushiswap-fuse": {
@@ -2989,15 +3446,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-fuse"
-        },
         "files": {
           "template": "sushiswap.alt.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-fuse",
+            "query-id": "sushiswap-fuse"
+          }
         }
       },
       "sushiswap-ethereum": {
@@ -3008,15 +3468,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-ethereum"
-        },
         "files": {
           "template": "sushiswap.mainnet.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-ethereum",
+            "query-id": "sushiswap-ethereum"
+          }
         }
       },
       "sushiswap-harmony": {
@@ -3027,15 +3490,18 @@
           "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-harmony"
-        },
         "files": {
           "template": "sushiswap.alt.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-harmony",
+            "query-id": "sushiswap-harmony"
+          }
         }
       },
       "sushiswap-polygon": {
@@ -3046,15 +3512,18 @@
           "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-polygon"
-        },
         "files": {
           "template": "sushiswap.alt.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-polygon",
+            "query-id": "sushiswap-polygon"
+          }
         }
       },
       "sushiswap-moonbeam": {
@@ -3065,15 +3534,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-moonbeam"
-        },
         "files": {
           "template": "sushiswap.alt.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-moonbeam",
+            "query-id": "sushiswap-moonbeam"
+          }
         }
       },
       "sushiswap-moonriver": {
@@ -3084,15 +3556,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-moonriver"
-        },
         "files": {
           "template": "sushiswap.alt.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-moonriver",
+            "query-id": "sushiswap-moonriver"
+          }
         }
       },
       "sushiswap-gnosis": {
@@ -3103,15 +3578,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "sushiswap-gnosis"
-        },
         "files": {
           "template": "sushiswap.alt.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "sushiswap-gnosis",
+            "query-id": "sushiswap-gnosis"
+          }
         }
       }
     }
@@ -3129,15 +3607,18 @@
           "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "trader-joe-avalanche"
-        },
         "files": {
           "template": "trader.joe.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "trader-joe-avalanche",
+            "query-id": "trader-joe-avalanche"
+          }
         }
       }
     }
@@ -3155,15 +3636,18 @@
           "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "trisolaris-aurora"
-        },
         "files": {
           "template": "trisolaris.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "trisolaris-aurora",
+            "query-id": "trisolaris-aurora"
+          }
         }
       }
     }
@@ -3181,15 +3665,18 @@
           "subgraph": "1.1.5",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "ubeswap-celo"
-        },
         "files": {
           "template": "ubeswap-template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "ubeswap-celo",
+            "query-id": "ubeswap-celo"
+          }
         }
       }
     }
@@ -3207,15 +3694,18 @@
           "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "uniswap-v2-ethereum"
-        },
         "files": {
           "template": "uniswap.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-v2-ethereum",
+            "query-id": "uniswap-v2-ethereum"
+          }
         }
       }
     }
@@ -3233,15 +3723,18 @@
           "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "cronos-portal": "vvs-finance"
-        },
         "files": {
           "template": "vvs.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "cronos-portal": {
+            "slug": "vvs-finance",
+            "query-id": "vvs-finance"
+          }
         }
       }
     }
@@ -3259,15 +3752,18 @@
           "subgraph": "1.0.3",
           "methodology": "1.0.1"
         },
-        "deployment-ids": {
-          "hosted-service": "honeyswap-gnosis"
-        },
         "files": {
           "template": "honeyswap.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "honeyswap-gnosis",
+            "query-id": "honeyswap-gnosis"
+          }
         }
       },
       "honeyswap-polygon": {
@@ -3278,15 +3774,18 @@
           "subgraph": "1.0.3",
           "methodology": "1.0.1"
         },
-        "deployment-ids": {
-          "hosted-service": "honeyswap-polygon"
-        },
         "files": {
           "template": "honeyswap.matic.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "honeyswap-polygon",
+            "query-id": "honeyswap-polygon"
+          }
         }
       }
     }
@@ -3330,15 +3829,22 @@
           "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "yearn-v2-arbitrum"
-        },
         "files": {
           "template": "yearn.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "yearn-v2-arbitrum",
+            "query-id": "yearn-v2-arbitrum"
+          },
+          "decentralized-network": {
+            "slug": "yearn-v2-arbitrum",
+            "query-id": "3CDiQ2hSrftreri8FLqsVAVTv9QNkEBszGZiDdmL4UQJ"
+          }
         }
       },
       "yearn-v2-ethereum": {
@@ -3349,15 +3855,18 @@
           "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "yearn-v2-ethereum"
-        },
         "files": {
           "template": "yearn.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "yearn-v2-ethereum",
+            "query-id": "yearn-v2-ethereum"
+          }
         }
       },
       "yearn-v2-fantom": {
@@ -3368,15 +3877,18 @@
           "subgraph": "1.2.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "yearn-v2-fantom"
-        },
         "files": {
           "template": "yearn.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "yearn-v2-fantom",
+            "query-id": "yearn-v2-fantom"
+          }
         }
       }
     }
@@ -3394,15 +3906,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "aave-governance"
-        },
         "files": {
           "template": "aave-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-governance",
+            "query-id": "aave-governance"
+          }
         }
       }
     }
@@ -3420,15 +3935,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "dydx-governance"
-        },
         "files": {
           "template": "dydx-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "dydx-governance",
+            "query-id": "dydx-governance"
+          }
         }
       }
     }
@@ -3446,15 +3964,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "angle-governance"
-        },
         "files": {
           "template": "angle-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "angle-governance",
+            "query-id": "angle-governance"
+          }
         }
       }
     }
@@ -3472,15 +3993,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "code4rena-governance"
-        },
         "files": {
           "template": "code4rena-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "code4rena-governance",
+            "query-id": "code4rena-governance"
+          }
         }
       }
     }
@@ -3498,15 +4022,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "ens-governance"
-        },
         "files": {
           "template": "ens-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "ens-governance",
+            "query-id": "ens-governance"
+          }
         }
       }
     }
@@ -3524,15 +4051,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "euler-governance"
-        },
         "files": {
           "template": "euler-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "euler-governance",
+            "query-id": "euler-governance"
+          }
         }
       }
     }
@@ -3550,15 +4080,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "fei-governance"
-        },
         "files": {
           "template": "fei-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "fei-governance",
+            "query-id": "fei-governance"
+          }
         }
       }
     }
@@ -3576,15 +4109,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "hop-governance"
-        },
         "files": {
           "template": "hop-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "hop-governance",
+            "query-id": "hop-governance"
+          }
         }
       }
     }
@@ -3602,15 +4138,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "silo-governance"
-        },
         "files": {
           "template": "silo-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "silo-governance",
+            "query-id": "silo-governance"
+          }
         }
       }
     }
@@ -3628,15 +4167,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "truefi-governance"
-        },
         "files": {
           "template": "truefi-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "truefi-governance",
+            "query-id": "truefi-governance"
+          }
         }
       }
     }
@@ -3654,15 +4196,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "unlock-governance"
-        },
         "files": {
           "template": "unlock-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "unlock-governance",
+            "query-id": "unlock-governance"
+          }
         }
       }
     }
@@ -3680,16 +4225,22 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "vesper-ethereum",
-          "decentralized-network": "vesper-ethereum"
-        },
         "files": {
           "template": "vesper.finance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "vesper-ethereum",
+            "query-id": "vesper-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "vesper-ethereum",
+            "query-id": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si"
+          }
         }
       }
     }
@@ -3707,15 +4258,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "badgerdao-ethereum"
-        },
         "files": {
           "template": "badgerdao.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "badgerdao-ethereum",
+            "query-id": "badgerdao-ethereum"
+          }
         }
       }
     }
@@ -3733,15 +4287,18 @@
           "subgraph": "1.3.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "platypus-finance-avalanche"
-        },
         "files": {
           "template": "platypus.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "platypus-finance-avalanche",
+            "query-id": "platypus-finance-avalanche"
+          }
         }
       }
     },
@@ -3769,15 +4326,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "erc20-holders-2017"
-        },
         "files": {
           "template": "erc20.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "erc20-holders-2017",
+            "query-id": "erc20-holders-2017"
+          }
         }
       },
       "erc20-holders-2018": {
@@ -3788,15 +4348,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "erc20-holders-2018"
-        },
         "files": {
           "template": "erc20.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "erc20-holders-2018",
+            "query-id": "erc20-holders-2018"
+          }
         }
       },
       "erc20-holders-2019": {
@@ -3807,15 +4370,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "erc20-holders-2019"
-        },
         "files": {
           "template": "erc20.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "erc20-holders-2019",
+            "query-id": "erc20-holders-2019"
+          }
         }
       },
       "erc20-holders-2020": {
@@ -3826,15 +4392,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "erc20-holders-2020"
-        },
         "files": {
           "template": "erc20.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "erc20-holders-2020",
+            "query-id": "erc20-holders-2020"
+          }
         }
       },
       "erc20-holders-2021": {
@@ -3845,15 +4414,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "erc20-holders-2021"
-        },
         "files": {
           "template": "erc20.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "erc20-holders-2021",
+            "query-id": "erc20-holders-2021"
+          }
         }
       },
       "erc20-holders-2022": {
@@ -3864,15 +4436,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "erc20-holders-2022"
-        },
         "files": {
           "template": "erc20.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "erc20-holders-2022",
+            "query-id": "erc20-holders-2022"
+          }
         }
       }
     }
@@ -3890,15 +4465,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "opensea-v1-ethereum"
-        },
         "files": {
           "template": "opensea.v1.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "opensea-v1-ethereum",
+            "query-id": "opensea-v1-ethereum"
+          }
         }
       }
     }
@@ -3916,15 +4494,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "opensea-v2-ethereum"
-        },
         "files": {
           "template": "opensea.v2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "opensea-v2-ethereum",
+            "query-id": "opensea-v2-ethereum"
+          }
         }
       }
     }
@@ -3942,15 +4523,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "opensea-seaport-ethereum"
-        },
         "files": {
           "template": "seaport.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "opensea-seaport-ethereum",
+            "query-id": "opensea-seaport-ethereum"
+          }
         }
       }
     }
@@ -3968,15 +4552,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "x2y2-ethereum"
-        },
         "files": {
           "template": "x2y2.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "x2y2-ethereum",
+            "query-id": "x2y2-ethereum"
+          }
         }
       }
     }
@@ -3994,15 +4581,18 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "looksrare-ethereum"
-        },
         "files": {
           "template": "looksrare.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "looksrare-ethereum",
+            "query-id": "looksrare-ethereum"
+          }
         }
       }
     }

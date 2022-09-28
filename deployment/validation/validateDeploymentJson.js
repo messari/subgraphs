@@ -167,37 +167,43 @@ function checkDeploymentsIDsPresentAndValid(
   deployment,
   deploymentData
 ) {
-  if (!deploymentData["deployment-ids"]) {
+  if (!deploymentData["services"]) {
     throw new Error(
-      `Please specify deployment-ids in deployment.json for protocol: ${protocol} deployment: ${deployment}`
+      `Please specify services in deployment.json for protocol: ${protocol} deployment: ${deployment}`
     ).message;
   }
 
   // Make sure there is at least one deployment ID
-  if (Object.keys(deploymentData["deployment-ids"]).length === 0) {
+  if (Object.keys(deploymentData["services"]).length === 0) {
     throw new Error(
-      `Please specify at least one deployment-id in deployment.json for protocol: ${protocol} deployment: ${deployment}`
+      `Please specify at least one services in deployment.json for protocol: ${protocol} deployment: ${deployment}`
     ).message;
   }
 
   // Make sure all deployment IDs are valid
-  for (const [deploymentID, location] of Object.entries(
-    deploymentData["deployment-ids"]
+  for (const [service, serviceData] of Object.entries(
+    deploymentData["services"]
   )) {
     if (
       !["hosted-service", "cronos-portal", "decentralized-network"].includes(
-        deploymentID
+        service
       )
     ) {
       throw new Error(
-        `Invalid deployment-id in deployment.json for protocol: ${protocol} deployment: ${deployment} deployment-id: ${deploymentID}`
+        `Invalid service in deployment.json for protocol: ${protocol} deployment: ${deployment} service: ${service}`
       ).message;
     }
 
-    if (!location) {
+    if (!serviceData["slug"]) {
       throw new Error(
-        `Please specify deployment-id in deployment.json for protocol: ${protocol} deployment: ${deployment} deployment-id: ${deploymentID}`
-      ).message;
+        `Missing slug for service in deployment.json for protocol: ${protocol} deployment: ${deployment} service: ${service}`
+      );
+    }
+
+    if (!serviceData["query-id"]) {
+      throw new Error(
+        `Missing query id for service in deployment.json for protocol: ${protocol} deployment: ${deployment} service: ${service}`
+      );
     }
   }
 }
