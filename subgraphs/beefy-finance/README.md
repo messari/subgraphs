@@ -59,7 +59,40 @@ Protocol fees are applied by `chargeFees()` function and paid in wrapped native 
 - https://api.beefy.finance/
 - https://defillama.com/protocol/beefy-finance
 
-## Deploying
+## Deployment
+
+### Undeerstanding the Beefy Finance nuance
+
+Beefy Finance does not have a registry or factory contract. Therefore we cannot use templates in our manifest (subgraph) to dynamically include new vaults/strategies to watch for events.
+
+The workaround to this is adding every vault/strategy pair to each chains manifest file. This means each chain will have a different template file.
+
+> If they add a registry (or factory) contract in the future we can simply add a template onto our subgraph and then we are back to normalcy. However, we still need to have each vault/strategy manually added that predates the registry/factory contract.
+
+### Template File Source
+
+In order to generate the template manifest files we will use the script under `./setup` and the source of the vault/strategy contract data is sourced from Beefy Finance directly. You can find that data under `./setup/data`.
+
+> *Tip*: You can format the data into json using https://jsonformatter.curiousconcept.com/#
+
+<details>
+<summary>Source of `./setup/data`</summary>
+Arbitrum: https://github.com/beefyfinance/beefy-app/blob/master/src/features/configure/vault/arbitrum_pools.js
+<br>
+</details>
+
+### Generating Templates
+
+From that file there are a few transformations done using `./setup/buildManifest.js` to generate the template files.
+
+1. We first add in a filler contract in order to have a standard `./generated` folder to import from.
+2. The file sourced from beefy api only has the vault address, so we need to use web3 to get the strategy address and `startBlock`.
+3. That is all we need to build the manifest file. Action 2 occurs on each vault in every chain.
+
+The output is a template file for each chain under `./protocols/beefy-finance/config/templates/beefy/.[CHAIN].template.yaml`
+
+
+## OLD [TODO Deprecate]
 
 Before deploying, run
 
@@ -79,3 +112,4 @@ Simply run `make network=bsc deployment=messari/beefy-finance-bsc` for example
 - On Celo, sushiswap oracle fails to fetch prices of LP tokens
 - Since the workaround to calculate deposit and withdraws amounts is not perfect (if more calls to the same vault are done in the same block there could be interferences between events) some negative amounts could occasionally come up
 - Some vaults do not emit all the needed events for a complete tracking of all the metrics, so some old data may be missing
+- The main issue with Beefy Finance is that there is no registry or factory contract to emit events and store the addresses of the vaults / strategies. This requires a lot of overhead on our part to support and is described in greater detail under ##Deployment
