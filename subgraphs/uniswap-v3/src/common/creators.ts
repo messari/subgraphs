@@ -456,8 +456,8 @@ export function collectFees(
 
   // Update the pool balances for collected fees in native amount
   pool.inputTokenBalances = [
-    pool.inputTokenBalances[INT_ZERO].plus(amount0),
-    pool.inputTokenBalances[INT_ONE].plus(amount1),
+    pool.inputTokenBalances[INT_ZERO].minus(amount0),
+    pool.inputTokenBalances[INT_ONE].minus(amount1),
   ];
 
   let token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
@@ -474,8 +474,8 @@ export function collectFees(
 
   // Update the pool balances for collected fees in converted amount
   poolAmounts.inputTokenBalances = [
-    poolAmounts.inputTokenBalances[INT_ZERO].plus(amount0Converted),
-    poolAmounts.inputTokenBalances[INT_ONE].plus(amount1Converted),
+    poolAmounts.inputTokenBalances[INT_ZERO].minus(amount0Converted),
+    poolAmounts.inputTokenBalances[INT_ONE].minus(amount1Converted),
   ];
 
   // Subtract the TVL of the pool from the protocol before fee collection
