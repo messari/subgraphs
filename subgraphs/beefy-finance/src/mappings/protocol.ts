@@ -9,7 +9,7 @@ import {
   BeefyStrategy,
   ChargedFees,
   Withdraw,
-} from "../../generated/aave-aave-eol/BeefyStrategy";
+} from "../../generated/Standard/BeefyStrategy";
 import { User, Vault, VaultFee, YieldAggregator } from "../../generated/schema";
 import {
   BIGDECIMAL_HUNDRED,

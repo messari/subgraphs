@@ -73,38 +73,29 @@ The workaround to this is adding every vault/strategy pair to each chains manife
 
 In order to generate the template manifest files we will use the script under `./setup` and the source of the vault/strategy contract data is sourced from Beefy Finance directly. You can find that data under `./setup/data`.
 
-> *Tip*: You can format the data into json using https://jsonformatter.curiousconcept.com/#
+> _Tip_: You can format the data into json using https://jsonformatter.curiousconcept.com/#
 
-<details>
-<summary>Source of `./setup/data`</summary>
-Arbitrum: https://github.com/beefyfinance/beefy-app/blob/master/src/features/configure/vault/arbitrum_pools.js
-<br>
-</details>
+Source of respective network deployments: https://github.com/beefyfinance/beefy-app/tree/master/src/features/configure/vault
 
 ### Generating Templates
 
-From that file there are a few transformations done using `./setup/buildManifest.js` to generate the template files.
+From that file there are a few transformations done to generate the template files.
+
+To run:
+
+```bash
+cd beefy-finance
+npm install
+node ./setup/buildManifest.js [NETWORK]
+```
 
 1. We first add in a filler contract in order to have a standard `./generated` folder to import from.
 2. The file sourced from beefy api only has the vault address, so we need to use web3 to get the strategy address and `startBlock`.
 3. That is all we need to build the manifest file. Action 2 occurs on each vault in every chain.
 
-The output is a template file for each chain under `./protocols/beefy-finance/config/templates/beefy/.[CHAIN].template.yaml`
+The output is a template file for each chain under `./protocols/beefy-finance/config/templates/beefy.[CHAIN].template.yaml`
 
-
-## OLD [TODO Deprecate]
-
-Before deploying, run
-
-`yarn write-yaml ${network}`
-
-to build the yaml file for the correct chain; than you can deploy using
-
-`yarn deploy ${githubuser/subgraphname}`
-
-### Using the Makefile
-
-Simply run `make network=bsc deployment=messari/beefy-finance-bsc` for example
+From here you can build, run, and deploy the subgraph as normal.
 
 ## Known Issues
 

@@ -8,8 +8,8 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { getPriceUsdc as getPriceUsdcSushi } from "./SushiSwapRouter";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/aave-aave-eol/CurveRegistry";
-import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/aave-aave-eol/CurvePoolRegistry";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/Standard/CurveRegistry";
+import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/Standard/CurvePoolRegistry";
 
 export function getCurvePriceUsdc(
   curveLpTokenAddress: Address,

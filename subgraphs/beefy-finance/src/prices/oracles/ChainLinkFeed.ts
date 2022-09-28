@@ -1,8 +1,8 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { CustomPriceType } from "../common/types";
-import { ChainlinkOracle } from "../../../generated/aave-aave-eol/ChainlinkOracle";
+import { ChainlinkOracle } from "../../../generated/Standard/ChainlinkOracle";
 import { polygonOracles as oracles } from "./oracles";
-import { ERC20 } from "../../../generated/aave-aave-eol/ERC20";
+import { ERC20 } from "../../../generated/Standard/ERC20";
 import { ZERO_ADDRESS } from "../common/constants";
 import { CHAIN_LINK_USD_ADDRESS } from "../common/constants";
 

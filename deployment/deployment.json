@@ -671,7 +671,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.arbitrum.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -693,7 +693,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.avalanche.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -715,7 +715,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.aurora.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -737,7 +737,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.celo.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -759,7 +759,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.fantom.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -781,7 +781,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.fuse.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -803,7 +803,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.harmony.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -825,7 +825,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.moonbeam.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -847,7 +847,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.moonriver.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -869,7 +869,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.polygon.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -891,7 +891,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.bsc.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
