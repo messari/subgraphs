@@ -1,25 +1,25 @@
 {{#graftEnabled}}
-description: ...
 graft:
-  base: {{subgraphId}} # Subgraph ID of base subgraph
-  block: {{graftStartBlock}} # Block number
+  base: {{subgraphId}}
+  block: {{graftStartBlock}}
 features:
   - grafting
 {{/graftEnabled}}
-specVersion: 0.0.2
+specVersion: 0.0.5
 schema:
   file: ./schema.graphql
 dataSources:
+  {{#factories}}
   - kind: ethereum
-    name: Factory
+    name: "{{name}}"
     network: bsc
     source:
-      address: "0xf65BEd27e96a367c61e0E06C54e14B16b84a5870"
+      address: "{{address}}"
       abi: Factory
-      startBlock: 15020708
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -87,7 +87,10 @@ dataSources:
           handler: handlePlainPoolDeployed
         - event: MetaPoolDeployed(address,address,address[2],address,uint256,uint256,address)
           handler: handleMetaPoolDeployed
+        - event: CryptoPoolDeployed(address,address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleCryptoPoolDeployed
       file: ./src/mappings/factory.ts
+  {{/factories}}
 
   {{#registeries}}
   - kind: ethereum
@@ -99,7 +102,7 @@ dataSources:
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - PoolAdded
@@ -166,17 +169,16 @@ dataSources:
       file: ./src/mappings/registry.ts  
   {{/registeries}}
 
-
   - kind: ethereum
     name: Staking
     network: bsc
     source:
       address: "0xcce949De564fE60e7f96C85e55177F8B9E4CF61b"
       abi: Staking
-      startBlock: 5938178
+      startBlock: 15020708
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -244,7 +246,6 @@ dataSources:
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
       file: ./src/mappings/staking.ts
-
   - kind: ethereum
     name: StakingV2
     network: bsc
@@ -254,7 +255,7 @@ dataSources:
       startBlock: 16866837
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -322,9 +323,6 @@ dataSources:
         - event: EmergencyWithdraw(indexed address,indexed address,uint256)
           handler: handleEmergencyWithdrawV2
       file: ./src/mappings/staking.ts
-
-
-
 templates:
   - kind: ethereum
     name: PoolTemplate
@@ -333,7 +331,7 @@ templates:
       abi: Pool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities: []
       abis:
@@ -396,11 +394,20 @@ templates:
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity
+        - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleAddLiquidity
         - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
           handler: handleRemoveLiquidity
         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityImbalance(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
         - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+          receipt: true
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
           handler: handleRemoveLiquidityOne
           receipt: true
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)

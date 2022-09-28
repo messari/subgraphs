@@ -112,8 +112,8 @@ export function Swap(
 
     if (underlyingCoins.length == 0) return;
 
-    tokenIn = underlyingCoins[sold_id.toI32()].toHexString();
-    tokenOut = underlyingCoins[bought_id.toI32()].toHexString();
+    tokenIn = underlyingCoins[sold_id.toI32()];
+    tokenOut = underlyingCoins[bought_id.toI32()];
   }
 
   let tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);

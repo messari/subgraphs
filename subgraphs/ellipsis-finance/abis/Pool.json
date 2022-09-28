@@ -36,11 +36,34 @@
     "type": "event"
   },
   {
+    "name": "AddLiquidity",
+    "inputs": [
+      { "name": "provider", "type": "address", "indexed": true },
+      { "name": "token_amounts", "type": "uint256[3]", "indexed": false },
+      { "name": "fees", "type": "uint256[3]", "indexed": false },
+      { "name": "invariant", "type": "uint256", "indexed": false },
+      { "name": "token_supply", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
     "name": "RemoveLiquidity",
     "inputs": [
       { "name": "provider", "type": "address", "indexed": true },
       { "name": "token_amounts", "type": "uint256[2]", "indexed": false },
       { "name": "fees", "type": "uint256[2]", "indexed": false },
+      { "name": "token_supply", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "RemoveLiquidity",
+    "inputs": [
+      { "name": "provider", "type": "address", "indexed": true },
+      { "name": "token_amounts", "type": "uint256[3]", "indexed": false },
+      { "name": "fees", "type": "uint256[3]", "indexed": false },
       { "name": "token_supply", "type": "uint256", "indexed": false }
     ],
     "anonymous": false,
@@ -58,11 +81,33 @@
     "type": "event"
   },
   {
+    "name": "RemoveLiquidityOne",
+    "inputs": [
+      { "name": "provider", "type": "address", "indexed": true },
+      { "name": "token_amount", "type": "uint256", "indexed": false },
+      { "name": "coin_amount", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
     "name": "RemoveLiquidityImbalance",
     "inputs": [
       { "name": "provider", "type": "address", "indexed": true },
       { "name": "token_amounts", "type": "uint256[2]", "indexed": false },
       { "name": "fees", "type": "uint256[2]", "indexed": false },
+      { "name": "invariant", "type": "uint256", "indexed": false },
+      { "name": "token_supply", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "RemoveLiquidityImbalance",
+    "inputs": [
+      { "name": "provider", "type": "address", "indexed": true },
+      { "name": "token_amounts", "type": "uint256[3]", "indexed": false },
+      { "name": "fees", "type": "uint256[3]", "indexed": false },
       { "name": "invariant", "type": "uint256", "indexed": false },
       { "name": "token_supply", "type": "uint256", "indexed": false }
     ],

@@ -124,3 +124,4 @@ WHITELIST_TOKENS.set(
   "LINK",
   Address.fromString("0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd")
 );
+

@@ -1,4 +1,8 @@
-
+import {
+  updateFinancials,
+  updatePoolSnapshots,
+  updateUsageMetrics,
+} from "../modules/Metrics";
 import {
   AddLiquidity,
   TokenExchange,
@@ -7,14 +11,13 @@ import {
   TokenExchangeUnderlying,
   RemoveLiquidityImbalance,
 } from "../../generated/templates/PoolTemplate/Pool";
-import { Deposit } from "../modules/Deposit";
-import { updateFinancials, updatePoolSnapshots, updateUsageMetrics } from "../modules/Metrics";
 import { Swap } from "../modules/Swap";
+import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
-import * as constants from '../common/constants';
+import * as constants from "../common/constants";
 
-export function handleAddLiquidity(event: AddLiquidity): void  {
-     const liquidityPoolAddress = event.address;
+export function handleAddLiquidity(event: AddLiquidity): void {
+  const liquidityPoolAddress = event.address;
 
   const provider = event.params.provider;
   const tokenAmounts = event.params.token_amounts;
@@ -32,11 +35,10 @@ export function handleAddLiquidity(event: AddLiquidity): void  {
   updateUsageMetrics(event.block, provider);
   updatePoolSnapshots(liquidityPoolAddress, event.block);
   updateFinancials(event.block);
-    
 }
-export function handleRemoveLiquidity(event: RemoveLiquidity) : void {
-      const provider = event.params.provider;
-  const liquidityPoolAddress = event. address;
+export function handleRemoveLiquidity(event: RemoveLiquidity): void {
+  const provider = event.params.provider;
+  const liquidityPoolAddress = event.address;
   const withdrawnCoinAmounts = event.params.token_amounts;
   const tokenSupplyAfterWithdrawal = event.params.token_supply;
 
@@ -55,9 +57,11 @@ export function handleRemoveLiquidity(event: RemoveLiquidity) : void {
   updatePoolSnapshots(liquidityPoolAddress, event.block);
   updateFinancials(event.block);
 }
-export function handleRemoveLiquidityImbalance(event: RemoveLiquidityImbalance) : void {
-    const provider = event.params.provider;
-  const liquidityPoolAddress = event. address;
+export function handleRemoveLiquidityImbalance(
+  event: RemoveLiquidityImbalance
+): void {
+  const provider = event.params.provider;
+  const liquidityPoolAddress = event.address;
   const withdrawnTokenAmounts = event.params.token_amounts;
   const tokenSupplyAfterWithdrawal = event.params.token_supply;
 
@@ -76,8 +80,8 @@ export function handleRemoveLiquidityImbalance(event: RemoveLiquidityImbalance) 
   updatePoolSnapshots(liquidityPoolAddress, event.block);
   updateFinancials(event.block);
 }
-export function handleRemoveLiquidityOne(event: RemoveLiquidityOne) : void {
-    const provider = event.params.provider;
+export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
+  const provider = event.params.provider;
   const liquidityPoolAddress = event.address;
   const withdrawnCoinAmounts = event.params.coin_amount;
   const outputTokenBurntAmount = event.params.token_amount;
@@ -97,8 +101,8 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne) : void {
   updatePoolSnapshots(liquidityPoolAddress, event.block);
   updateFinancials(event.block);
 }
-export function handleTokenExchange(event: TokenExchange): void  {
-    const buyer = event.params.buyer;
+export function handleTokenExchange(event: TokenExchange): void {
+  const buyer = event.params.buyer;
   const liquidityPoolAddress = event.address;
 
   const soldId = event.params.sold_id;
@@ -122,8 +126,10 @@ export function handleTokenExchange(event: TokenExchange): void  {
   updatePoolSnapshots(liquidityPoolAddress, event.block);
   updateFinancials(event.block);
 }
-export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying) : void {
-     const buyer = event.params.buyer;
+export function handleTokenExchangeUnderlying(
+  event: TokenExchangeUnderlying
+): void {
+  const buyer = event.params.buyer;
   const liquidityPoolAddress = event.address;
   const soldId = event.params.sold_id;
   const amountIn = event.params.tokens_sold;

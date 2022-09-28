@@ -101,7 +101,7 @@ export function Deposit(
 
   for (let idx = 0; idx < depositedCoinAmounts.length; idx++) {
     let inputToken = getOrCreateToken(
-     Address.fromString( pool.inputTokens[idx]),
+    Address.fromString( pool.inputTokens[idx]),
       block
     );
 
@@ -135,8 +135,9 @@ export function Deposit(
     block
   );
   pool.outputTokenSupply = totalSupplyAfterDeposit;
-
-  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD2(poolAddress,block);
+  
+  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD2(poolAddress, block);
+  
   pool.save();
 
   createDepositTransaction(

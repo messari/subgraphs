@@ -9,11 +9,23 @@
       "name": "Registry_V2",
       "address": "0xAB38213cB4400f19b1b28bfc4f8B00792AC164A7",
       "startBlock":20350777
+    }
+  ],
+  "factories":[
+    {
+      "name": "Factory",
+      "address": "0xf65bed27e96a367c61e0e06c54e14b16b84a5870",
+      "startBlock": 15020708
     },
     {
-      "name": "Registry_V3",
+      "name": "Factory_V2",
       "address": "0xa5d748a3234A81120Df7f23c9Ea665587dc8d871",
-      "startBlock":20349998
+      "startBlock": 20349998
+    },
+    {
+      "name": "Factory_V3",
+      "address": "0x41871A4c63d8Fae4855848cd1790ed237454A5C4",
+      "startBlock": 20525978
     }
   ],
   "staking": [
@@ -21,12 +33,12 @@
       "name": "Staking",
       "address": "0xcce949De564fE60e7f96C85e55177F8B9E4CF61b"
     },
-
     {
       "name": "StakingV2",
       "address": "0x5B74C99AA2356B4eAa7B85dC486843eDff8Dfdbe"
     }
   ],
+
   "graftEnabled": false,
   "subgraphId": "QmcAUqAMESx6LHGtBEgzZmxxiVXvSsPuuDkWUrQVaHUqcS",
   "graftStartBlock": 16887400

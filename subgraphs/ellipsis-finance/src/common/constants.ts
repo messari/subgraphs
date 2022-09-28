@@ -5,7 +5,10 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ////////////////////
 
 export const PROTOCOL_NAME = "Ellipsis Finance";
-export const PROTOCOL_SLUG = "ellipsis-finance";
+export const PROTOCOL_SLUG = "ellipses-finance";
+export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.1";
+export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -224,7 +227,7 @@ export namespace NULL {
   export const TYPE_STRING = "0x0000000000000000000000000000000000000000";
   export const TYPE_ADDRESS = Address.fromString(TYPE_STRING);
 }
-export const BSC_AVERAGE_BLOCK_PER_HOUR = BigInt.fromString("10000");
+export const BSC_AVERAGE_BLOCK_PER_HOUR = BigInt.fromString("46000");
 
 export const BIGINT_TEN = BigInt.fromI32(10);
 

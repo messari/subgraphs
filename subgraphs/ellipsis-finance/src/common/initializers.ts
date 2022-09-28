@@ -1,24 +1,23 @@
 import {
-  Account,
-  DexAmmProtocol,
-  FinancialsDailySnapshot,
-  LiquidityPool,
-  LiquidityPoolDailySnapshot,
-  LiquidityPoolFee,
-  LiquidityPoolHourlySnapshot,
-  RewardToken,
   Token,
+  Account,
+  RewardToken,
+  LiquidityPool,
+  DexAmmProtocol,
+  LiquidityPoolFee,
+  FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
+  LiquidityPoolDailySnapshot,
   UsageMetricsHourlySnapshot,
+  LiquidityPoolHourlySnapshot,
 } from "../../generated/schema";
-import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
-import { LpToken as LPTokenContract } from "../../generated/Factory/LpToken";
-import { Pool as PoolContract } from "../../generated/templates/PoolTemplate/Pool";
-
-import { Address, ethereum, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-import * as constants from "./constants";
 import * as utils from "./utils";
+import * as constants from "./constants";
 import { getUsdPricePerToken } from "../prices";
+import { LpToken as LPTokenContract } from "../../generated/Factory/LpToken";
+import { Address, ethereum, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
+import { PoolTemplate } from "../../generated/templates";
 
 export function getOrCreateLiquidityPool(
   address: Address,
@@ -27,6 +26,7 @@ export function getOrCreateLiquidityPool(
   let poolId = address.toHexString();
   let liquidityPool = LiquidityPool.load(poolId);
   if (!liquidityPool) {
+
     liquidityPool = new LiquidityPool(poolId);
     liquidityPool.protocol = constants.REGISTRY_ADDRESS.toHexString();
     liquidityPool.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
@@ -49,6 +49,8 @@ export function getOrCreateLiquidityPool(
     );
 
     liquidityPool.inputTokens = utils.getPoolCoins(address, block);
+    liquidityPool._underlyingTokens = utils.getPoolUnderlyingCoins(address);
+
     liquidityPool.inputTokenBalances = utils.getPoolBalances(
       address,
       liquidityPool.inputTokens
@@ -73,6 +75,8 @@ export function getOrCreateLiquidityPool(
     liquidityPool.createdBlockNumber = block.number;
     utils.updateProtocolAfterNewLiquidityPool(address);
     liquidityPool.save();
+
+    PoolTemplate.create(address);
   }
   return liquidityPool;
 }
@@ -348,10 +352,9 @@ export function getOrCreateToken(
     let tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = block.number;
-    
-    token.save(); 
+
+    token.save();
   }
-  log.warning("[getOrCreateToken] tokenName {} tokenId {} lastPriceUSD {}",[token.name,token.id,token.lastPriceUSD!.toString()])
 
   return token;
 }
@@ -379,7 +382,6 @@ export function getOrCreateLiquidityPoolFee(
 
   return fees;
 }
-
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -411,7 +413,5 @@ export function getOrCreateRewardToken(
 
     rewardToken.save();
   }
- 
-
   return rewardToken;
 }

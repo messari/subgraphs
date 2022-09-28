@@ -5,21 +5,21 @@ import {
   ethereum,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
-import { Pool as PoolContract } from "../../generated/templates/PoolTemplate/Pool";
-import { Registry as RegistryContract } from "../../generated/Registry/Registry";
-import { Factory as FactoryContract } from "../../generated/Factory/Factory";
-import { Token, LiquidityPool } from "../../generated/schema";
 import {
-  getOrCreateDexAmmProtocol,
-  getOrCreateLiquidityPool,
-  getOrCreateLiquidityPoolFee,
   getOrCreateToken,
+  getOrCreateLiquidityPool,
+  getOrCreateDexAmmProtocol,
+  getOrCreateLiquidityPoolFee,
 } from "./initializers";
-import * as constants from "./constants";
 import * as utils from "./utils";
-import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
-import { LpToken as LPTokenContract } from "../../generated/Factory/LpToken";
 import { PoolFeesType } from "./types";
+import * as constants from "./constants";
+import { Token, LiquidityPool } from "../../generated/schema";
+import { LpToken as LPTokenContract } from "../../generated/Factory/LpToken";
+import { Factory as FactoryContract } from "../../generated/Factory/Factory";
+import { Registry as RegistryContract } from "../../generated/Registry/Registry";
+import { Pool as PoolContract } from "../../generated/templates/PoolTemplate/Pool";
+import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -109,6 +109,7 @@ export function getPoolCoins(
 
   return inputTokens;
 }
+
 export function getPoolBalances(
   poolAddress: Address,
   inputTokens: string[]
@@ -300,19 +301,25 @@ export function getOutputTokenPriceUSD(
     constants.BIGINT_TEN.pow(lpToken.decimals as u8).toBigDecimal()
   );
   let outputTokenPriceUSD = pool.totalValueLockedUSD.div(outputTokenSupply);
-  
- 
+
   return outputTokenPriceUSD;
 }
-export function getPoolUnderlyingCoins(poolAddress: Address): Address[] {
+export function getPoolUnderlyingCoins(poolAddress: Address): string[] {
+  let coins: string[] = [];
   const registryContract = RegistryContract.bind(constants.REGISTRY_ADDRESS);
 
   let underlyingCoins = readValue<Address[]>(
     registryContract.try_get_underlying_coins(poolAddress),
     []
   );
+
   if (underlyingCoins.length != 0) {
-    return underlyingCoins;
+    for (let i = 0; i < underlyingCoins.length; i++) {
+      if (!underlyingCoins[i].equals(constants.ADDRESS_ZERO)) {
+        coins.push(underlyingCoins[i].toHexString());
+      }
+    }
+    return coins;
   }
   const factoryContract = FactoryContract.bind(constants.FACTORY_ADDRESS);
 
@@ -320,8 +327,12 @@ export function getPoolUnderlyingCoins(poolAddress: Address): Address[] {
     factoryContract.try_get_underlying_coins(poolAddress),
     []
   );
-
-  return underlyingCoins;
+  for (let i = 0; i < underlyingCoins.length; i++) {
+    if (!underlyingCoins[i].equals(constants.ADDRESS_ZERO)) {
+      coins.push(underlyingCoins[i].toHexString());
+    }
+  }
+  return coins;
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
@@ -338,12 +349,12 @@ export function getPoolFromLpToken(lpTokenAddress: Address): Address {
   let factoryContract = FactoryContract.bind(constants.FACTORY_ADDRESS);
   let registryContract = RegistryContract.bind(constants.REGISTRY_ADDRESS);
   let poolAddress = readValue<Address>(
-    factoryContract.try_get_pool_from_lp_token(lpTokenAddress),
+    registryContract.try_get_pool_from_lp_token(lpTokenAddress),
     constants.NULL.TYPE_ADDRESS
   );
   if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) {
     poolAddress = readValue<Address>(
-      registryContract.try_get_pool_from_lp_token(lpTokenAddress),
+      factoryContract.try_get_pool_from_lp_token(lpTokenAddress),
       constants.NULL.TYPE_ADDRESS
     );
   }
@@ -359,7 +370,6 @@ export function getVirtualPriceFromPool(poolAddress: Address): BigDecimal {
   ).divDecimal(
     constants.BIGINT_TEN.pow(constants.DEFAULT_DECIMALS as u8).toBigDecimal()
   );
-  log.warning("[getVirtualPriceFromPool] poolAddress {} virtualPrice {}",[poolAddress.toHexString(),virtualPrice.toString()]);
   return virtualPrice;
 }
 export function getOutputTokenPriceUSD2(
@@ -368,18 +378,48 @@ export function getOutputTokenPriceUSD2(
 ): BigDecimal {
   let virtualPrice = getVirtualPriceFromPool(poolAddress);
   let pool = getOrCreateLiquidityPool(poolAddress, block);
+
   let coins = pool.inputTokens;
   let bestTokenPriceUSD = constants.BIGDECIMAL_ZERO;
   let tokenName = "";
+  let underlyingCoins = pool._underlyingTokens;
   for (let i = 0; i < coins.length; i++) {
     let token = getOrCreateToken(Address.fromString(coins[i]), block);
-
     if (token.lastPriceUSD!.gt(constants.BIGDECIMAL_ZERO)) {
       bestTokenPriceUSD = token.lastPriceUSD!;
       tokenName = token.name;
       break;
     }
   }
-  log.warning("[getOutputTokenPriceUSD2] poolAddress {} outputTokenPriceUSD {} tokenName {} ", [poolAddress.toHexString(), bestTokenPriceUSD.toString(),tokenName]);
+  if (bestTokenPriceUSD.le(constants.BIGDECIMAL_ZERO)) {
+    if (underlyingCoins!.length > 0) {
+      for (let i = 0; i < underlyingCoins!.length; i++) {
+        let token = getOrCreateToken(
+          Address.fromString(underlyingCoins![i]),
+          block
+        );
+        if (token.lastPriceUSD!.gt(constants.BIGDECIMAL_ZERO)) {
+          bestTokenPriceUSD = token.lastPriceUSD!;
+          tokenName = token.name;
+          break;
+        }
+      }
+    }
+  }
+
+  let outputToken = getOrCreateTokenFromString(pool.outputToken!, block);
+
+  outputToken.lastPriceUSD = bestTokenPriceUSD.times(virtualPrice);
+  outputToken.save();
+
   return bestTokenPriceUSD.times(virtualPrice);
+}
+export function getMinterFromLpToken(lpTokenAddress: Address): Address {
+  let lpTokenContract = LPTokenContract.bind(lpTokenAddress);
+  let minter = readValue<Address>(
+    lpTokenContract.try_minter(),
+    constants.ADDRESS_ZERO
+  );
+
+  return minter;
 }

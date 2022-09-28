@@ -217,7 +217,7 @@ export function Withdraw(
   );
   pool.totalValueLockedUSD = utils.getPoolTVL(
     pool.inputTokens,
-    pool.inputTokenBalances!,
+    pool.inputTokenBalances,
     block
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(

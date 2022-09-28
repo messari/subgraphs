@@ -465,6 +465,9 @@ type LiquidityPool @entity {
 
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
+ 
+  " Helper field to save pools underlying tokens"
+  _underlyingTokens: [Token!] 
 }
 
 #################################
