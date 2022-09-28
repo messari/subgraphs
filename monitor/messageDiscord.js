@@ -13,7 +13,7 @@ export async function errorNotification(error, channelId = process.env.CHANNEL_I
             "Authorization": "Bot " + process.env.BOT_TOKEN,
             "Content-Type": "application/json",
         }
-        const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor on Channel ${channelId}- Errors detected**\n` + error });
+        const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor from ${process.env.CHANNEL_ID} on Channel ${channelId}- Errors detected**\n` + error });
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return null;
     } catch (err) {
@@ -212,7 +212,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         };
 
         const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
-
+        const indexErrorEmbedDepos = {}
         deploymentsOnProtocol.forEach((depo) => {
             let networkString = depo.network;
             let issuesSet = [];
@@ -232,7 +232,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             };
             if (!!depo.indexingError && !indexDeploymentIssues.includes(networkString)) {
                 indexingErrorEmbed.color = placeholderColor;
-                indexingErrorEmbed.fields.push({ name: '\u200b', value: networkString, inline: true }, { name: '\u200b', value: depo.indexedPercentage + '%', inline: true }, { name: '\u200b', value: '\u200b', inline: false });
+                indexingErrorEmbed.fields.push({ name: '\u200b', value: `[${networkString}](https://okgraph.xyz/?q=messari%2F${protocol}-${networkString})\n\n[${networkString}](https://okgraph.xyz/?q=messari%2F${protocol}-${networkString})`, inline: true }, { name: '\u200b', value: depo.indexedPercentage + '%', inline: true }, { name: '\u200b', value: '\u200b', inline: false });
             }
             let errorsOnDeployment = false;
             Object.entries(depo.protocolErrors).forEach(([errorType, errorArray]) => {
