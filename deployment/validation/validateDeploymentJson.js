@@ -194,7 +194,7 @@ function checkDeploymentsIDsPresentAndValid(
       ).message;
     }
 
-    if (!serviceData["subgraph-slug"]) {
+    if (!serviceData["slug"]) {
       throw new Error(
         `Missing slug for service in deployment.json for protocol: ${protocol} deployment: ${deployment} service: ${service}`
       );

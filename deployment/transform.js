@@ -8,7 +8,7 @@ const deploymentJsonData = require("./deployment.json");
 //         let services = {}
 //         console.log(deployment)
 //         for (const [service, slug] of Object.entries(deploymentData['deployment-ids'])) {
-//             services[service] = {"subgraph-slug": slug, "query-id": slug}
+//             services[service] = {"slug": slug, "query-id": slug}
 //         }
 //         console.log(services)
 //         delete deploymentJsonData[protocol]["deployments"][deployment]['deployment-ids']

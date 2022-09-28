@@ -21,7 +21,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "abracadabra-money-arbitrum",
+            "slug": "abracadabra-money-arbitrum",
             "query-id": "abracadabra-money-arbitrum"
           }
         }
@@ -43,7 +43,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "abracadabra-money-avalanche",
+            "slug": "abracadabra-money-avalanche",
             "query-id": "abracadabra-money-avalanche"
           }
         }
@@ -65,7 +65,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "abracadabra-money-bsc",
+            "slug": "abracadabra-money-bsc",
             "query-id": "abracadabra-money-bsc"
           }
         }
@@ -87,7 +87,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "abracadabra-money-fantom",
+            "slug": "abracadabra-money-fantom",
             "query-id": "abracadabra-money-fantom"
           }
         }
@@ -109,11 +109,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "abracadabra-money-ethereum",
+            "slug": "abracadabra-money-ethereum",
             "query-id": "abracadabra-money-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "abracadabra-money-ethereum",
+            "slug": "abracadabra-money-ethereum",
             "query-id": "3Gkei7B24o9C2bCoAbQpApZqMStPta7oCAnNhmNv5dab"
           }
         }
@@ -142,7 +142,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-arc-ethereum",
+            "slug": "aave-arc-ethereum",
             "query-id": "aave-arc-ethereum"
           }
         }
@@ -164,7 +164,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-v2-avalanche",
+            "slug": "aave-v2-avalanche",
             "query-id": "aave-v2-avalanche"
           }
         }
@@ -186,11 +186,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-v2-ethereum",
+            "slug": "aave-v2-ethereum",
             "query-id": "aave-v2-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "aave-v2-ethereum",
+            "slug": "aave-v2-ethereum",
             "query-id": "84CvqQHYhydZzr2KSth8s1AFYpBRzUbVJXq6PWuZm9U9"
           }
         }
@@ -212,7 +212,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-amm-ethereum",
+            "slug": "aave-amm-ethereum",
             "query-id": "aave-amm-ethereum"
           }
         }
@@ -234,7 +234,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-v2-polygon",
+            "slug": "aave-v2-polygon",
             "query-id": "aave-v2-polygon"
           }
         }
@@ -256,7 +256,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-rwa-ethereum",
+            "slug": "aave-rwa-ethereum",
             "query-id": "aave-rwa-ethereum"
           }
         }
@@ -285,7 +285,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-v3-arbitrum",
+            "slug": "aave-v3-arbitrum",
             "query-id": "aave-v3-arbitrum"
           }
         }
@@ -307,7 +307,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-v3-avalanche",
+            "slug": "aave-v3-avalanche",
             "query-id": "aave-v3-avalanche"
           }
         }
@@ -329,7 +329,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-v3-fantom",
+            "slug": "aave-v3-fantom",
             "query-id": "aave-v3-fantom"
           }
         }
@@ -351,7 +351,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-v3-harmony",
+            "slug": "aave-v3-harmony",
             "query-id": "aave-v3-harmony"
           }
         }
@@ -373,7 +373,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-v3-polygon",
+            "slug": "aave-v3-polygon",
             "query-id": "aave-v3-polygon"
           }
         }
@@ -395,7 +395,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-v3-optimism",
+            "slug": "aave-v3-optimism",
             "query-id": "aave-v3-optimism"
           }
         }
@@ -424,11 +424,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "arrakis-finance-ethereum",
+            "slug": "arrakis-finance-ethereum",
             "query-id": "arrakis-finance-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "arrakis-finance-ethereum",
+            "slug": "arrakis-finance-ethereum",
             "query-id": "9WiZHUk2d3rM4sEQ4NSz6ihFRc2zWmPj7yk8w51dNdhT"
           }
         }
@@ -457,11 +457,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "convex-finance-ethereum",
+            "slug": "convex-finance-ethereum",
             "query-id": "convex-finance-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "convex-finance-ethereum",
+            "slug": "convex-finance-ethereum",
             "query-id": "CVVEQi1VRgQYwX5r6tPjD1Leiao2nETLYC6pHTWVNPtk"
           }
         }
@@ -490,7 +490,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "balancer-v2-arbitrum",
+            "slug": "balancer-v2-arbitrum",
             "query-id": "balancer-v2-arbitrum"
           }
         }
@@ -512,7 +512,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "balancer-v2-polygon",
+            "slug": "balancer-v2-polygon",
             "query-id": "balancer-v2-polygon"
           }
         }
@@ -534,7 +534,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "balancer-v2-ethereum",
+            "slug": "balancer-v2-ethereum",
             "query-id": "balancer-v2-ethereum"
           }
         }
@@ -563,7 +563,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beethoven-x-fantom",
+            "slug": "beethoven-x-fantom",
             "query-id": "beethoven-x-fantom"
           }
         }
@@ -585,7 +585,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beethoven-x-optimism",
+            "slug": "beethoven-x-optimism",
             "query-id": "beethoven-x-optimism"
           }
         }
@@ -614,7 +614,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-arbitrum",
+            "slug": "beefy-finance-arbitrum",
             "query-id": "beefy-finance-arbitrum"
           }
         }
@@ -636,7 +636,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-avalanche",
+            "slug": "beefy-finance-avalanche",
             "query-id": "beefy-finance-avalanche"
           }
         }
@@ -658,7 +658,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-aurora",
+            "slug": "beefy-finance-aurora",
             "query-id": "beefy-finance-aurora"
           }
         }
@@ -680,7 +680,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-celo",
+            "slug": "beefy-finance-celo",
             "query-id": "beefy-finance-celo"
           }
         }
@@ -702,7 +702,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-fantom",
+            "slug": "beefy-finance-fantom",
             "query-id": "beefy-finance-fantom"
           }
         }
@@ -724,7 +724,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-fuse",
+            "slug": "beefy-finance-fuse",
             "query-id": "beefy-finance-fuse"
           }
         }
@@ -746,7 +746,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-harmony",
+            "slug": "beefy-finance-harmony",
             "query-id": "beefy-finance-harmony"
           }
         }
@@ -768,7 +768,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-moonbeam",
+            "slug": "beefy-finance-moonbeam",
             "query-id": "beefy-finance-moonbeam"
           }
         }
@@ -790,7 +790,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-moonriver",
+            "slug": "beefy-finance-moonriver",
             "query-id": "beefy-finance-moonriver"
           }
         }
@@ -812,7 +812,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-polygon",
+            "slug": "beefy-finance-polygon",
             "query-id": "beefy-finance-polygon"
           }
         }
@@ -834,7 +834,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "beefy-finance-bsc",
+            "slug": "beefy-finance-bsc",
             "query-id": "beefy-finance-bsc"
           }
         }
@@ -863,7 +863,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "belt-finance-bsc",
+            "slug": "belt-finance-bsc",
             "query-id": "belt-finance-bsc"
           }
         }
@@ -892,11 +892,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "bancor-v3-ethereum",
+            "slug": "bancor-v3-ethereum",
             "query-id": "bancor-v3-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "bancor-v3-ethereum",
+            "slug": "bancor-v3-ethereum",
             "query-id": "B35cLTayreXTML6fXPTrFNSYx7mKyDuuV51LjVxWwWjp"
           }
         }
@@ -925,7 +925,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aurigami-aurora",
+            "slug": "aurigami-aurora",
             "query-id": "aurigami-aurora"
           }
         }
@@ -954,7 +954,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "banker-joe-avalanche",
+            "slug": "banker-joe-avalanche",
             "query-id": "banker-joe-avalanche"
           }
         }
@@ -983,7 +983,7 @@
         },
         "services": {
           "cronos-portal": {
-            "subgraph-slug": "tectonic",
+            "slug": "tectonic",
             "query-id": "tectonic"
           }
         }
@@ -1012,7 +1012,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "bastion-protocol-aurora",
+            "slug": "bastion-protocol-aurora",
             "query-id": "bastion-protocol-aurora"
           }
         }
@@ -1041,7 +1041,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "benqi-avalanche",
+            "slug": "benqi-avalanche",
             "query-id": "benqi-avalanche"
           }
         }
@@ -1070,11 +1070,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "compound-v2-ethereum",
+            "slug": "compound-v2-ethereum",
             "query-id": "compound-v2-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "compound-v2-ethereum",
+            "slug": "compound-v2-ethereum",
             "query-id": "6tGbL7WBx287EZwGUvvcQdL6m67JGMJrma3JSTtt5SV7"
           }
         }
@@ -1103,7 +1103,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "cream-finance-arbitrum",
+            "slug": "cream-finance-arbitrum",
             "query-id": "cream-finance-arbitrum"
           }
         }
@@ -1125,7 +1125,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "cream-finance-bsc",
+            "slug": "cream-finance-bsc",
             "query-id": "cream-finance-bsc"
           }
         }
@@ -1147,7 +1147,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "cream-finance-ethereum",
+            "slug": "cream-finance-ethereum",
             "query-id": "cream-finance-ethereum"
           }
         }
@@ -1169,7 +1169,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "cream-finance-polygon",
+            "slug": "cream-finance-polygon",
             "query-id": "cream-finance-polygon"
           }
         }
@@ -1198,7 +1198,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "dforce-arbitrum",
+            "slug": "dforce-arbitrum",
             "query-id": "dforce-arbitrum"
           }
         }
@@ -1220,7 +1220,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "dforce-avalanche",
+            "slug": "dforce-avalanche",
             "query-id": "dforce-avalanche"
           }
         }
@@ -1242,7 +1242,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "dforce-bsc",
+            "slug": "dforce-bsc",
             "query-id": "dforce-bsc"
           }
         }
@@ -1264,7 +1264,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "dforce-ethereum",
+            "slug": "dforce-ethereum",
             "query-id": "dforce-ethereum"
           }
         }
@@ -1286,7 +1286,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "dforce-optimism",
+            "slug": "dforce-optimism",
             "query-id": "dforce-optimism"
           }
         }
@@ -1308,7 +1308,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "dforce-polygon",
+            "slug": "dforce-polygon",
             "query-id": "dforce-polygon"
           }
         }
@@ -1337,7 +1337,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "iron-bank-avalanche",
+            "slug": "iron-bank-avalanche",
             "query-id": "iron-bank-avalanche"
           }
         }
@@ -1359,11 +1359,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "iron-bank-ethereum",
+            "slug": "iron-bank-ethereum",
             "query-id": "iron-bank-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "iron-bank-ethereum",
+            "slug": "iron-bank-ethereum",
             "query-id": "98GG74FxxsG25Ltd8qvJ9BRfFmQWyN1AkS92MZBG1BsR"
           }
         }
@@ -1385,7 +1385,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "iron-bank-fantom",
+            "slug": "iron-bank-fantom",
             "query-id": "iron-bank-fantom"
           }
         }
@@ -1414,7 +1414,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "moonwell-moonbeam",
+            "slug": "moonwell-moonbeam",
             "query-id": "moonwell-moonbeam"
           }
         }
@@ -1436,7 +1436,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "moonwell-moonriver",
+            "slug": "moonwell-moonriver",
             "query-id": "moonwell-moonriver"
           }
         }
@@ -1465,7 +1465,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "rari-fuse-arbitrum",
+            "slug": "rari-fuse-arbitrum",
             "query-id": "rari-fuse-arbitrum"
           }
         }
@@ -1487,7 +1487,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "rari-fuse-ethereum",
+            "slug": "rari-fuse-ethereum",
             "query-id": "rari-fuse-ethereum"
           }
         }
@@ -1516,7 +1516,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "scream-fantom",
+            "slug": "scream-fantom",
             "query-id": "scream-fantom"
           }
         }
@@ -1545,7 +1545,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "venus-bsc",
+            "slug": "venus-bsc",
             "query-id": "venus-bsc"
           }
         }
@@ -1574,7 +1574,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "curve-finance-arbitrum",
+            "slug": "curve-finance-arbitrum",
             "query-id": "curve-finance-arbitrum"
           }
         }
@@ -1596,7 +1596,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "curve-finance-avalanche",
+            "slug": "curve-finance-avalanche",
             "query-id": "curve-finance-avalanche"
           }
         }
@@ -1618,7 +1618,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "curve-finance-ethereum",
+            "slug": "curve-finance-ethereum",
             "query-id": "curve-finance-ethereum"
           }
         }
@@ -1640,7 +1640,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "curve-finance-fantom",
+            "slug": "curve-finance-fantom",
             "query-id": "curve-finance-fantom"
           }
         }
@@ -1662,7 +1662,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "curve-finance-gnosis",
+            "slug": "curve-finance-gnosis",
             "query-id": "curve-finance-gnosis"
           }
         }
@@ -1684,7 +1684,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "curve-finance-optimism",
+            "slug": "curve-finance-optimism",
             "query-id": "curve-finance-optimism"
           }
         }
@@ -1706,7 +1706,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "curve-finance-polygon",
+            "slug": "curve-finance-polygon",
             "query-id": "curve-finance-polygon"
           }
         }
@@ -1735,7 +1735,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "ellipsis-finance-bsc",
+            "slug": "ellipsis-finance-bsc",
             "query-id": "ellipsis-finance-bsc"
           }
         }
@@ -1764,7 +1764,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "erc721-holders",
+            "slug": "erc721-holders",
             "query-id": "erc721-holders"
           }
         }
@@ -1793,7 +1793,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "erc721-metadata",
+            "slug": "erc721-metadata",
             "query-id": "erc721-metadata"
           }
         }
@@ -1822,11 +1822,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "euler-finance-ethereum",
+            "slug": "euler-finance-ethereum",
             "query-id": "euler-finance-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "euler-finance-ethereum",
+            "slug": "euler-finance-ethereum",
             "query-id": "8cLf29KxAedWLVaEqjV8qKomdwwXQxjptBZFrqWNH5u2"
           }
         }
@@ -1855,11 +1855,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "inverse-finance-ethereum",
+            "slug": "inverse-finance-ethereum",
             "query-id": "inverse-finance-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "inverse-finance-ethereum",
+            "slug": "inverse-finance-ethereum",
             "query-id": "FQ6JYszEKApsBpAmiHesRsd9Ygc6mzmpNRANeVQFYoVX"
           }
         }
@@ -1888,11 +1888,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "lido-ethereum",
+            "slug": "lido-ethereum",
             "query-id": "lido-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "lido-ethereum",
+            "slug": "lido-ethereum",
             "query-id": "XYcD9VeUvSvuqrsV5pFauXk7jQy9hrnhe5Kb7REyuxm"
           }
         }
@@ -1921,7 +1921,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "liquity-ethereum",
+            "slug": "liquity-ethereum",
             "query-id": "liquity-ethereum"
           }
         }
@@ -1950,7 +1950,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "truefi-ethereum",
+            "slug": "truefi-ethereum",
             "query-id": "truefi-ethereum"
           }
         }
@@ -1979,7 +1979,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "arweave-mainnet",
+            "slug": "arweave-mainnet",
             "query-id": "arweave-mainnet"
           }
         }
@@ -2008,7 +2008,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-cosmos",
+            "slug": "network-cosmos",
             "query-id": "network-cosmos"
           }
         }
@@ -2030,7 +2030,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-osmosis",
+            "slug": "network-osmosis",
             "query-id": "network-osmosis"
           }
         }
@@ -2059,7 +2059,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-arbitrum",
+            "slug": "network-arbitrum",
             "query-id": "network-arbitrum"
           }
         }
@@ -2081,7 +2081,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-aurora",
+            "slug": "network-aurora",
             "query-id": "network-aurora"
           }
         }
@@ -2103,7 +2103,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-avalanche",
+            "slug": "network-avalanche",
             "query-id": "network-avalanche"
           }
         }
@@ -2125,7 +2125,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-boba",
+            "slug": "network-boba",
             "query-id": "network-boba"
           }
         }
@@ -2147,7 +2147,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-bsc",
+            "slug": "network-bsc",
             "query-id": "network-bsc"
           }
         }
@@ -2169,7 +2169,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-celo",
+            "slug": "network-celo",
             "query-id": "network-celo"
           }
         }
@@ -2191,7 +2191,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-clover",
+            "slug": "network-clover",
             "query-id": "network-clover"
           }
         }
@@ -2213,7 +2213,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-fantom",
+            "slug": "network-fantom",
             "query-id": "network-fantom"
           }
         }
@@ -2235,7 +2235,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-fuse",
+            "slug": "network-fuse",
             "query-id": "network-fuse"
           }
         }
@@ -2257,7 +2257,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-harmony",
+            "slug": "network-harmony",
             "query-id": "network-harmony"
           }
         }
@@ -2279,7 +2279,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-ethereum",
+            "slug": "network-ethereum",
             "query-id": "network-ethereum"
           }
         }
@@ -2301,7 +2301,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-polygon",
+            "slug": "network-polygon",
             "query-id": "network-polygon"
           }
         }
@@ -2323,7 +2323,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-moonbeam",
+            "slug": "network-moonbeam",
             "query-id": "network-moonbeam"
           }
         }
@@ -2345,7 +2345,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-moonriver",
+            "slug": "network-moonriver",
             "query-id": "network-moonriver"
           }
         }
@@ -2367,7 +2367,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-optimism",
+            "slug": "network-optimism",
             "query-id": "network-optimism"
           }
         }
@@ -2389,7 +2389,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-gnosis",
+            "slug": "network-gnosis",
             "query-id": "network-gnosis"
           }
         }
@@ -2418,7 +2418,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "network-near-mainnet",
+            "slug": "network-near-mainnet",
             "query-id": "network-near-mainnet"
           }
         }
@@ -2447,7 +2447,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "gamma-arbitrum",
+            "slug": "gamma-arbitrum",
             "query-id": "gamma-arbitrum"
           }
         }
@@ -2469,11 +2469,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "gamma-ethereum",
+            "slug": "gamma-ethereum",
             "query-id": "gamma-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "gamma-ethereum",
+            "slug": "gamma-ethereum",
             "query-id": "8PUSqUn6dSkoxJb3LDLmdKHzbHFn1cz7XjbSob5uiR4v"
           }
         }
@@ -2495,7 +2495,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "gamma-optimism",
+            "slug": "gamma-optimism",
             "query-id": "gamma-optimism"
           }
         }
@@ -2517,7 +2517,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "gamma-polygon",
+            "slug": "gamma-polygon",
             "query-id": "gamma-polygon"
           }
         }
@@ -2546,11 +2546,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "makerdao-ethereum",
+            "slug": "makerdao-ethereum",
             "query-id": "makerdao-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "makerdao-ethereum",
+            "slug": "makerdao-ethereum",
             "query-id": "G1KHEQkA7shnPZahHUmKcerfpqBMNnL9xJzWGAVrj7n7"
           }
         }
@@ -2579,11 +2579,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "maple-finance-ethereum",
+            "slug": "maple-finance-ethereum",
             "query-id": "maple-finance-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "maple-finance-ethereum",
+            "slug": "maple-finance-ethereum",
             "query-id": "5H97eNhy9fVHcqRXZtCV2UxHG2DbzcFA7yth1TaVZ45x"
           }
         }
@@ -2612,7 +2612,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "stakedao-ethereum",
+            "slug": "stakedao-ethereum",
             "query-id": "stakedao-ethereum"
           }
         }
@@ -2641,7 +2641,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "saddle-finance-arbitrum",
+            "slug": "saddle-finance-arbitrum",
             "query-id": "saddle-finance-arbitrum"
           }
         }
@@ -2663,7 +2663,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "saddle-finance-ethereum",
+            "slug": "saddle-finance-ethereum",
             "query-id": "saddle-finance-ethereum"
           }
         }
@@ -2685,7 +2685,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "saddle-finance-fantom",
+            "slug": "saddle-finance-fantom",
             "query-id": "saddle-finance-fantom"
           }
         }
@@ -2707,7 +2707,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "saddle-finance-optimism",
+            "slug": "saddle-finance-optimism",
             "query-id": "saddle-finance-optimism"
           }
         }
@@ -2736,7 +2736,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "geist-finance-fantom",
+            "slug": "geist-finance-fantom",
             "query-id": "geist-finance-fantom"
           }
         }
@@ -2765,7 +2765,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "tokemak-ethereum",
+            "slug": "tokemak-ethereum",
             "query-id": "tokemak-ethereum"
           }
         }
@@ -2794,7 +2794,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "uniswap-v3-arbitrum",
+            "slug": "uniswap-v3-arbitrum",
             "query-id": "uniswap-v3-arbitrum"
           }
         }
@@ -2816,7 +2816,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "uniswap-v3-celo",
+            "slug": "uniswap-v3-celo",
             "query-id": "uniswap-v3-celo"
           }
         }
@@ -2838,7 +2838,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "uniswap-v3-ethereum",
+            "slug": "uniswap-v3-ethereum",
             "query-id": "uniswap-v3-ethereum"
           }
         }
@@ -2860,7 +2860,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "uniswap-v3-optimism",
+            "slug": "uniswap-v3-optimism",
             "query-id": "uniswap-v3-optimism"
           }
         }
@@ -2882,7 +2882,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "uniswap-v3-polygon",
+            "slug": "uniswap-v3-polygon",
             "query-id": "uniswap-v3-polygon"
           }
         }
@@ -2911,7 +2911,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "qidao-arbitrum",
+            "slug": "qidao-arbitrum",
             "query-id": "qidao-arbitrum"
           }
         }
@@ -2933,7 +2933,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "qidao-avalanche",
+            "slug": "qidao-avalanche",
             "query-id": "qidao-avalanche"
           }
         }
@@ -2955,7 +2955,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "qidao-bsc",
+            "slug": "qidao-bsc",
             "query-id": "qidao-bsc"
           }
         }
@@ -2977,7 +2977,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "qidao-fantom",
+            "slug": "qidao-fantom",
             "query-id": "qidao-fantom"
           }
         }
@@ -2999,7 +2999,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "qidao-polygon",
+            "slug": "qidao-polygon",
             "query-id": "qidao-polygon"
           }
         }
@@ -3021,7 +3021,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "qidao-moonriver",
+            "slug": "qidao-moonriver",
             "query-id": "qidao-moonriver"
           }
         }
@@ -3043,7 +3043,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "qidao-optimism",
+            "slug": "qidao-optimism",
             "query-id": "qidao-optimism"
           }
         }
@@ -3065,7 +3065,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "qidao-gnosis",
+            "slug": "qidao-gnosis",
             "query-id": "qidao-gnosis"
           }
         }
@@ -3094,7 +3094,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "rari-vaults-ethereum",
+            "slug": "rari-vaults-ethereum",
             "query-id": "rari-vaults-ethereum"
           }
         }
@@ -3123,7 +3123,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "apeswap-bsc",
+            "slug": "apeswap-bsc",
             "query-id": "apeswap-bsc"
           }
         }
@@ -3145,7 +3145,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "apeswap-polygon",
+            "slug": "apeswap-polygon",
             "query-id": "apeswap-polygon"
           }
         }
@@ -3174,7 +3174,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "mm-finance-polygon",
+            "slug": "mm-finance-polygon",
             "query-id": "mm-finance-polygon"
           }
         }
@@ -3196,7 +3196,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "mm-finance-cronos",
+            "slug": "mm-finance-cronos",
             "query-id": "mm-finance-cronos"
           }
         }
@@ -3225,7 +3225,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "quickswap-polygon",
+            "slug": "quickswap-polygon",
             "query-id": "quickswap-polygon"
           }
         }
@@ -3254,7 +3254,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "solarbeam-moonriver",
+            "slug": "solarbeam-moonriver",
             "query-id": "solarbeam-moonriver"
           }
         }
@@ -3283,7 +3283,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "spiritswap-fantom",
+            "slug": "spiritswap-fantom",
             "query-id": "spiritswap-fantom"
           }
         }
@@ -3312,7 +3312,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "spookyswap-fantom",
+            "slug": "spookyswap-fantom",
             "query-id": "spookyswap-fantom"
           }
         }
@@ -3341,11 +3341,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-arbitrum",
+            "slug": "sushiswap-arbitrum",
             "query-id": "sushiswap-arbitrum"
           },
           "decentralized-network": {
-            "subgraph-slug": "sushiswap-arbitrum",
+            "slug": "sushiswap-arbitrum",
             "query-id": "7h1x51fyT5KigAhXd8sdE3kzzxQDJxxz1y66LTFiC3mS"
           }
         }
@@ -3367,7 +3367,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-avalanche",
+            "slug": "sushiswap-avalanche",
             "query-id": "sushiswap-avalanche"
           }
         }
@@ -3389,7 +3389,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-bsc",
+            "slug": "sushiswap-bsc",
             "query-id": "sushiswap-bsc"
           }
         }
@@ -3411,7 +3411,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-celo",
+            "slug": "sushiswap-celo",
             "query-id": "sushiswap-celo"
           }
         }
@@ -3433,7 +3433,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-fantom",
+            "slug": "sushiswap-fantom",
             "query-id": "sushiswap-fantom"
           }
         }
@@ -3455,7 +3455,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-fuse",
+            "slug": "sushiswap-fuse",
             "query-id": "sushiswap-fuse"
           }
         }
@@ -3477,7 +3477,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-ethereum",
+            "slug": "sushiswap-ethereum",
             "query-id": "sushiswap-ethereum"
           }
         }
@@ -3499,7 +3499,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-harmony",
+            "slug": "sushiswap-harmony",
             "query-id": "sushiswap-harmony"
           }
         }
@@ -3521,7 +3521,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-polygon",
+            "slug": "sushiswap-polygon",
             "query-id": "sushiswap-polygon"
           }
         }
@@ -3543,7 +3543,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-moonbeam",
+            "slug": "sushiswap-moonbeam",
             "query-id": "sushiswap-moonbeam"
           }
         }
@@ -3565,7 +3565,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-moonriver",
+            "slug": "sushiswap-moonriver",
             "query-id": "sushiswap-moonriver"
           }
         }
@@ -3587,7 +3587,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "sushiswap-gnosis",
+            "slug": "sushiswap-gnosis",
             "query-id": "sushiswap-gnosis"
           }
         }
@@ -3616,7 +3616,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "trader-joe-avalanche",
+            "slug": "trader-joe-avalanche",
             "query-id": "trader-joe-avalanche"
           }
         }
@@ -3645,7 +3645,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "trisolaris-aurora",
+            "slug": "trisolaris-aurora",
             "query-id": "trisolaris-aurora"
           }
         }
@@ -3674,7 +3674,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "ubeswap-celo",
+            "slug": "ubeswap-celo",
             "query-id": "ubeswap-celo"
           }
         }
@@ -3703,7 +3703,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "uniswap-v2-ethereum",
+            "slug": "uniswap-v2-ethereum",
             "query-id": "uniswap-v2-ethereum"
           }
         }
@@ -3732,7 +3732,7 @@
         },
         "services": {
           "cronos-portal": {
-            "subgraph-slug": "vvs-finance",
+            "slug": "vvs-finance",
             "query-id": "vvs-finance"
           }
         }
@@ -3761,7 +3761,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "honeyswap-gnosis",
+            "slug": "honeyswap-gnosis",
             "query-id": "honeyswap-gnosis"
           }
         }
@@ -3783,7 +3783,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "honeyswap-polygon",
+            "slug": "honeyswap-polygon",
             "query-id": "honeyswap-polygon"
           }
         }
@@ -3812,11 +3812,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "yearn-v2-arbitrum",
+            "slug": "yearn-v2-arbitrum",
             "query-id": "yearn-v2-arbitrum"
           },
           "decentralized-network": {
-            "subgraph-slug": "yearn-v2-arbitrum",
+            "slug": "yearn-v2-arbitrum",
             "query-id": "3CDiQ2hSrftreri8FLqsVAVTv9QNkEBszGZiDdmL4UQJ"
           }
         }
@@ -3838,7 +3838,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "yearn-v2-ethereum",
+            "slug": "yearn-v2-ethereum",
             "query-id": "yearn-v2-ethereum"
           }
         }
@@ -3860,7 +3860,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "yearn-v2-fantom",
+            "slug": "yearn-v2-fantom",
             "query-id": "yearn-v2-fantom"
           }
         }
@@ -3889,7 +3889,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "aave-governance",
+            "slug": "aave-governance",
             "query-id": "aave-governance"
           }
         }
@@ -3918,7 +3918,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "dydx-governance",
+            "slug": "dydx-governance",
             "query-id": "dydx-governance"
           }
         }
@@ -3947,7 +3947,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "angle-governance",
+            "slug": "angle-governance",
             "query-id": "angle-governance"
           }
         }
@@ -3976,7 +3976,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "code4rena-governance",
+            "slug": "code4rena-governance",
             "query-id": "code4rena-governance"
           }
         }
@@ -4005,7 +4005,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "ens-governance",
+            "slug": "ens-governance",
             "query-id": "ens-governance"
           }
         }
@@ -4034,7 +4034,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "euler-governance",
+            "slug": "euler-governance",
             "query-id": "euler-governance"
           }
         }
@@ -4063,7 +4063,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "fei-governance",
+            "slug": "fei-governance",
             "query-id": "fei-governance"
           }
         }
@@ -4092,7 +4092,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "hop-governance",
+            "slug": "hop-governance",
             "query-id": "hop-governance"
           }
         }
@@ -4121,7 +4121,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "silo-governance",
+            "slug": "silo-governance",
             "query-id": "silo-governance"
           }
         }
@@ -4150,7 +4150,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "truefi-governance",
+            "slug": "truefi-governance",
             "query-id": "truefi-governance"
           }
         }
@@ -4179,7 +4179,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "unlock-governance",
+            "slug": "unlock-governance",
             "query-id": "unlock-governance"
           }
         }
@@ -4208,11 +4208,11 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "vesper-ethereum",
+            "slug": "vesper-ethereum",
             "query-id": "vesper-ethereum"
           },
           "decentralized-network": {
-            "subgraph-slug": "vesper-ethereum",
+            "slug": "vesper-ethereum",
             "query-id": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si"
           }
         }
@@ -4241,7 +4241,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "badgerdao-ethereum",
+            "slug": "badgerdao-ethereum",
             "query-id": "badgerdao-ethereum"
           }
         }
@@ -4270,7 +4270,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "platypus-finance-avalanche",
+            "slug": "platypus-finance-avalanche",
             "query-id": "platypus-finance-avalanche"
           }
         }
@@ -4299,7 +4299,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "erc20-holders-2017",
+            "slug": "erc20-holders-2017",
             "query-id": "erc20-holders-2017"
           }
         }
@@ -4321,7 +4321,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "erc20-holders-2018",
+            "slug": "erc20-holders-2018",
             "query-id": "erc20-holders-2018"
           }
         }
@@ -4343,7 +4343,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "erc20-holders-2019",
+            "slug": "erc20-holders-2019",
             "query-id": "erc20-holders-2019"
           }
         }
@@ -4365,7 +4365,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "erc20-holders-2020",
+            "slug": "erc20-holders-2020",
             "query-id": "erc20-holders-2020"
           }
         }
@@ -4387,7 +4387,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "erc20-holders-2021",
+            "slug": "erc20-holders-2021",
             "query-id": "erc20-holders-2021"
           }
         }
@@ -4409,7 +4409,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "erc20-holders-2022",
+            "slug": "erc20-holders-2022",
             "query-id": "erc20-holders-2022"
           }
         }
@@ -4438,7 +4438,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "opensea-v1-ethereum",
+            "slug": "opensea-v1-ethereum",
             "query-id": "opensea-v1-ethereum"
           }
         }
@@ -4467,7 +4467,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "opensea-v2-ethereum",
+            "slug": "opensea-v2-ethereum",
             "query-id": "opensea-v2-ethereum"
           }
         }
@@ -4496,7 +4496,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "opensea-seaport-ethereum",
+            "slug": "opensea-seaport-ethereum",
             "query-id": "opensea-seaport-ethereum"
           }
         }
@@ -4525,7 +4525,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "x2y2-ethereum",
+            "slug": "x2y2-ethereum",
             "query-id": "x2y2-ethereum"
           }
         }
@@ -4554,7 +4554,7 @@
         },
         "services": {
           "hosted-service": {
-            "subgraph-slug": "looksrare-ethereum",
+            "slug": "looksrare-ethereum",
             "query-id": "looksrare-ethereum"
           }
         }
