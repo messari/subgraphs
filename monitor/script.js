@@ -36,6 +36,9 @@ async function executionFlow() {
         const nameStr =
           deploymentString.split("name/")[1];
         const deploymentsKey = nameStr.split("/")[1];
+        if (!deploymentsKey) {
+          return;
+        }
         deployments[deploymentsKey] = {
           protocolName: protocolName,
           indexingError: null,

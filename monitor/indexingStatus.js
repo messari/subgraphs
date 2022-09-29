@@ -19,7 +19,11 @@ export async function generateEndpoints(data, protocolNameToBaseMapping) {
           subgraphEndpoints[protocol.schema][protocolName] = {};
         }
         Object.values(protocol.deployments).forEach((depoData) => {
-          subgraphEndpoints[protocol.schema][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["deployment-ids"]["hosted-service"];
+          let hostedServiceId = "";
+          if (!!depoData?.services["hosted-service"]) {
+            hostedServiceId = depoData?.services["hosted-service"]?.slug;
+          }
+          subgraphEndpoints[protocol.schema][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + hostedServiceId;
         });
       });
     }
@@ -43,6 +47,7 @@ export async function indexStatusFlow(deployments) {
         deployments[realNameString].url =
           "https://api.thegraph.com/subgraphs/id/" +
           indexData[indexDataName]?.subgraph;
+        deployments[realNameString].hash = indexData[indexDataName]?.subgraph;
       }
 
       let indexedPercentage = ((indexData[indexDataName]?.chains[0]?.latestBlock?.number - indexData[indexDataName]?.chains[0]?.earliestBlock?.number) / (indexData[indexDataName]?.chains[0]?.chainHeadBlock?.number - indexData[indexDataName]?.chains[0]?.earliestBlock?.number)) || 0;
@@ -87,7 +92,9 @@ export async function getIndexingStatusData(indexingStatusQueriesArray) {
           (resultData) => (resultData.data.data)
         ))
       )
-      .catch((err) => errorNotification("ERROR LOCATION 3 " + err.message));
+      .catch((err) => {
+        errorNotification("ERROR LOCATION 3 " + err.message)
+      });
 
     indexData = { ...indexData[0], ...indexData[1] };
     return indexData;
@@ -102,9 +109,7 @@ export async function generateIndexStatusQuery(deployments) {
 
   const queryContents = `
   subgraph
-  node
   synced
-  health
   fatalError {
     message
     handler
@@ -114,7 +119,6 @@ export async function generateIndexStatusQuery(deployments) {
     handler
   }
   chains {
-    network
     chainHeadBlock {
       number
     }
@@ -163,7 +167,6 @@ export async function generateIndexStatusQuery(deployments) {
     });
     fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += "}";
     fullPendingQueryArray[fullPendingQueryArray.length - 1] += "}";
-
     const currentStateDepos = JSON.parse(JSON.stringify(deployments));
     Object.keys(currentStateDepos).forEach((name) => {
       deployments[name + "-pending"] = JSON.parse(JSON.stringify({ ...deployments[name] }));
@@ -173,7 +176,6 @@ export async function generateIndexStatusQuery(deployments) {
       ...fullCurrentQueryArray,
       ...fullPendingQueryArray,
     ];
-
     return { deployments, indexingStatusQueries };
   } catch (err) {
     errorNotification("ERROR LOCATION 5 " + err.message);
