@@ -36,8 +36,7 @@ export function handleMCRChanged(event: MCRChanged): void {
       const tryMCR = contract.try_MCR(Address.fromString(assets[i]));
       if (!tryMCR.reverted && tryMCR.value != BIGINT_ZERO) {
         const adjustedMCR = bigIntToBigDecimal(tryMCR.value);
-        const MaxLTV =
-          BIGDECIMAL_ONE.div(adjustedMCR).times(BIGDECIMAL_HUNDRED);
+        const MaxLTV = BIGDECIMAL_HUNDRED.div(adjustedMCR);
         market.maximumLTV = MaxLTV;
         market.liquidationThreshold = MaxLTV;
 
