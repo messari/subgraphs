@@ -30,7 +30,13 @@ async function main(network) {
   const web3 = new Web3(providers[0][network]);
 
   // get the list of vaults from ./data
-  const networkVaultList = require(`./data/${network}.json`);
+  try {
+    var networkVaultList = require(`./data/${network}.json`);
+  } catch (e) {
+    console.log(`./data/${network}.json not found`);
+    return;
+  }
+  
   if (networkVaultList.length == 0) {
     console.log(`no vaults found for network ${network}`);
     return;
@@ -79,7 +85,7 @@ async function main(network) {
 
   const templateLocation = `./protocols/beefy-finance/config/templates/beefy.${network}.template.yaml`;
   await writeYamlFile(templateLocation, manifest);
-  console.log(`wrote template to ${templateLocation}`);
+  console.log(`wrote template to ${templateLocation} with ${i + 1} vaults`);
 }
 
 // get the strategy address from the vault

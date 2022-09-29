@@ -59,9 +59,7 @@ Protocol fees are applied by `chargeFees()` function and paid in wrapped native 
 - https://api.beefy.finance/
 - https://defillama.com/protocol/beefy-finance
 
-## Deployment
-
-### Undeerstanding the Beefy Finance nuance
+## Undeerstanding the Beefy Finance nuance
 
 Beefy Finance does not have a registry or factory contract. Therefore we cannot use templates in our manifest (subgraph) to dynamically include new vaults/strategies to watch for events.
 
@@ -95,7 +93,20 @@ node ./setup/buildManifest.js [NETWORK]
 
 The output is a template file for each chain under `./protocols/beefy-finance/config/templates/beefy.[CHAIN].template.yaml`
 
+
+### Deployment
+
 From here you can build, run, and deploy the subgraph as normal.
+
+### Adding New Vaults
+
+Simply go to the `./setup/data` folder and add the new vault address to the respective chain file. Then run the `buildManifest.js` script again and you will have a new template file.
+
+> Note: The fields you need in `./setup/data` are `createdAt`, `id`, and `earnContractAddress` . The rest of the fields are not needed. But that is what comes from the data source at beefy.
+
+### Adding Templates to the Manifest
+
+This is simple, but manual. Generally templates are small, so you can just manually add it to the end of the manifest file.
 
 ## Known Issues
 
