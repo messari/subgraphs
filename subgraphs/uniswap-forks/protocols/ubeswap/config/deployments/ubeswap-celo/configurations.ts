@@ -94,7 +94,7 @@ export class UbeswapCeloConfigurations implements Configurations {
       "0x00be915b9dcf56a3cbe739d9b9c202ca692409ec", // ube
       "0x64defa3544c695db8c535d289d843a189aa26b98", // mcUSD1
       "0x918146359264c492bd6934071c6bd31c854edbc3", // mcUSD2
-      "0x2a3684e9dc20b857375ea04235f2f7edbe818fa7", // USDC
+      "0x17700282592d6917f6a73d0bf8accf4d578c131e", // MOO
     ]);
   }
   getStableCoins(): string[] {
