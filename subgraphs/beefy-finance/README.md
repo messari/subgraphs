@@ -93,7 +93,6 @@ node ./setup/buildManifest.js [NETWORK]
 
 The output is a template file for each chain under `./protocols/beefy-finance/config/templates/beefy.[CHAIN].template.yaml`
 
-
 ### Deployment
 
 From here you can build, run, and deploy the subgraph as normal.

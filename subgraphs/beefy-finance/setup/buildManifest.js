@@ -10,7 +10,7 @@ const providers = [
     bsc: "https://rpc.ankr.com/bsc",
     avalanche: "https://ava-mainnet.public.blastapi.io/ext/bc/C/rpc	",
     heco: "https://http-mainnet.hecochain.com",
-    matic: "https://matic-mainnet-full-rpc.bwarelabs.com",
+    polygon: "https://matic-mainnet-full-rpc.bwarelabs.com",
     fantom: "https://rpc.ankr.com/fantom",
     harmony: "https://api.harmony.one",
     arbitrum: "https://arb1.arbitrum.io/rpc	",
@@ -27,19 +27,34 @@ const providers = [
 
 async function main(network) {
   // setup web3 for given network
+  if (!providers[0][network]) {
+    console.log(`ERROR: No RPC for network ${network}`);
+    return;
+  }
   const web3 = new Web3(providers[0][network]);
 
   // get the list of vaults from ./data
   try {
     var networkVaultList = require(`./data/${network}.json`);
   } catch (e) {
-    console.log(`./data/${network}.json not found`);
+    console.log(`ERROR: ./data/${network}.json not found`);
     return;
   }
-  
+
   if (networkVaultList.length == 0) {
-    console.log(`no vaults found for network ${network}`);
+    console.log(`ERROR: no vaults found for network ${network}`);
     return;
+  }
+
+  // normalize network name to the graph constants
+  // polygon -> matic
+  // arbitrum -> arbitrum-one
+  var coloquialNetworkName = network;
+  if (network == "polygon") {
+    network = "matic";
+  }
+  if (network == "arbitrum") {
+    network = "arbitrum-one";
   }
 
   // begin the building of the manifest file
@@ -56,7 +71,8 @@ async function main(network) {
 
   // loop through vaults as defined in ./data/{network}.json
   // add each new strategy in the list to the manifest
-  for (let i = 0; i < networkVaultList.length; i++) {
+  let i = 0;
+  for (; i < networkVaultList.length; i++) {
     const strategyAddress = await getStrategyAddress(
       web3,
       networkVaultList[i].earnContractAddress,
@@ -83,9 +99,11 @@ async function main(network) {
     }
   }
 
-  const templateLocation = `./protocols/beefy-finance/config/templates/beefy.${network}.template.yaml`;
+  const templateLocation = `./protocols/beefy-finance/config/templates/beefy.${coloquialNetworkName}.template.yaml`;
   await writeYamlFile(templateLocation, manifest);
-  console.log(`wrote template to ${templateLocation} with ${i + 1} vaults`);
+  console.log(
+    `SUCCESS: wrote template to ${templateLocation} with ${i + 1} vaults`
+  );
 }
 
 // get the strategy address from the vault
