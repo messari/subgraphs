@@ -12,7 +12,7 @@ import {
   _RewarderProbe,
   LiquidityPool,
 } from "../../../../../../generated/schema";
-import { Rewarder } from "../../../../../../generated/templates/Rewarder/Rewarder";
+import { Rewarder } from "../../../../../../generated/MasterChefV2/Rewarder";
 import {
   BIGINT_ZERO,
   BIGINT_ONE,
