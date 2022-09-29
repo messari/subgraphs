@@ -2756,15 +2756,18 @@
           "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "radiant-capital-arbitrum"
-        },
         "files": {
           "template": "radiant.capital.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
           "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "radiant-capital-arbitrum",
+            "query-id": "radiant-capital-arbitrum"
+          }
         }
       }
     }
