@@ -1,9 +1,5 @@
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { SubgraphLogo } from "../common/SubgraphLogo";
-import { NetworkLogo } from "../common/NetworkLogo";
-import { useNavigate } from "react-router";
-import DeploymentsInDevelopmentRow from "./DeploymentsInDevelopmentRow";
-import ProtocolRow from "./ProtocolRow";
+import ProtocolSection from "./ProtocolSection";
 import { useMemo } from "react";
 import { NewClient, schemaMapping } from "../utils";
 
@@ -14,11 +10,6 @@ interface DeploymentsTable {
 }
 
 function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds }: DeploymentsTable) {
-
-    // can receive protocolsToQuery or subgraph endpoints. subgraph endpoints is the old retired structure
-    // Update to only use new protocolsToQueryStructure
-
-    const navigate = useNavigate();
     const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
 
     if (Object.keys(protocolsToQuery).length === 0) {
@@ -65,46 +56,50 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds }
             </TableRow>
         </TableHead>
     );
-    let totalDepoCounter = 0;
-    let protocolsInProgressCount = 0;
-    let protocolsProdReadyCount = 0;
-    const deposInProgress: { [x: string]: any } = {};
+
+    const deposToPass: { [x: string]: any } = {};
     Object.entries(protocolsToQuery).forEach(([protocolName, protocol]) => {
         Object.keys(protocol.deployments).forEach((depoKey) => {
-            totalDepoCounter += 1;
             const deploymentData: any = protocol.deployments[depoKey];
-            // Defeault status column in table is prod, when at least one depo on protocol is dev, the whoel row is dev
-            if (!Object.keys(deposInProgress).includes(protocol.schema)) {
-                deposInProgress[protocol.schema] = {};
+            if (!deploymentData?.services) {
+                return;
             }
-            if (!Object.keys(deposInProgress[protocol.schema]).includes(protocolName)) {
-                deposInProgress[protocol.schema][protocolName] = { status: true, schemaVersions: [], subgraphVersions: [], methodologyVersions: [], networks: [] };
-            }
-            deposInProgress[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId: deploymentData["deployment-ids"]["hosted-service"], decentralizedNetworkId: deploymentData["deployment-ids"]["decentralized-network"] || null });
-            if (!deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
-                deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
-            }
-            if (!deposInProgress[protocol.schema][protocolName]?.subgraphVersions?.includes(deploymentData?.versions?.subgraph)) {
-                deposInProgress[protocol.schema][protocolName]?.subgraphVersions?.push(deploymentData?.versions?.subgraph);
-            }
-            if (!deposInProgress[protocol.schema][protocolName]?.schemaVersions?.includes(deploymentData?.versions?.schema)) {
-                deposInProgress[protocol.schema][protocolName]?.schemaVersions?.push(deploymentData?.versions?.schema);
-            }
-            if (deploymentData?.status === 'dev') {
-                deposInProgress[protocol.schema][protocolName].status = false;
+            if ((!!deploymentData["services"]["hosted-service"] || !!deploymentData["services"]["decentralized-network"])) {
+                if (!Object.keys(deposToPass).includes(protocol.schema)) {
+                    deposToPass[protocol.schema] = {};
+                }
+                if (!Object.keys(deposToPass[protocol.schema]).includes(protocolName)) {
+                    deposToPass[protocol.schema][protocolName] = { status: true, schemaVersions: [], subgraphVersions: [], methodologyVersions: [], networks: [] };
+                }
+                let decentralizedNetworkId = null;
+                if (!!deploymentData["services"]["decentralized-network"]) {
+                    decentralizedNetworkId = deploymentData["services"]["decentralized-network"]["slug"];
+                }
+                let hostedServiceId = null;
+                if (!!deploymentData["services"]["hosted-service"]) {
+                    hostedServiceId = deploymentData["services"]["hosted-service"]["slug"];
+                }
+                deposToPass[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId, decentralizedNetworkId });
+                if (!deposToPass[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
+                    deposToPass[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
+                }
+                if (!deposToPass[protocol.schema][protocolName]?.subgraphVersions?.includes(deploymentData?.versions?.subgraph)) {
+                    deposToPass[protocol.schema][protocolName]?.subgraphVersions?.push(deploymentData?.versions?.subgraph);
+                }
+                if (!deposToPass[protocol.schema][protocolName]?.schemaVersions?.includes(deploymentData?.versions?.schema)) {
+                    deposToPass[protocol.schema][protocolName]?.schemaVersions?.push(deploymentData?.versions?.schema);
+                }
+                if (deploymentData?.status === 'dev') {
+                    deposToPass[protocol.schema][protocolName].status = false;
+                }
             }
         });
-        if (deposInProgress[protocol.schema][protocolName].status === false) {
-            protocolsInProgressCount += 1;
-        } else {
-            protocolsProdReadyCount += 1;
-        }
 
     });
 
     return (
         <>
-            {Object.entries(deposInProgress).sort().map(([schemaType, subgraph]) => {
+            {Object.entries(deposToPass).sort().map(([schemaType, subgraph]) => {
                 if (!Object.keys(schemaMapping).includes(schemaType)) {
                     return null;
                 } else {
@@ -112,10 +107,10 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds }
                 }
                 const tableRows = Object.keys(subgraph).sort().map((subgraphName) => {
                     const protocol = subgraph[subgraphName];
-                    return (<ProtocolRow subgraphName={subgraphName} protocol={protocol} clientIndexing={clientIndexing} decenDeposToSubgraphIds={decenDeposToSubgraphIds} />);
+                    return (<ProtocolSection key={"ProtocolSection-" + subgraphName.toUpperCase()} subgraphName={subgraphName} protocol={protocol} clientIndexing={clientIndexing} decenDeposToSubgraphIds={decenDeposToSubgraphIds} />);
                 });
                 return (
-                    <TableContainer>
+                    <TableContainer key={"TableContainer-" + schemaType.toUpperCase()}>
                         <Typography
                             key={"typography-" + schemaType}
                             variant="h4"
