@@ -1,0 +1,28 @@
+{
+  "comments": "### comments are written like this because of lack of a better way ¯\\_(ツ)_/¯ ###",
+  "rules": [
+    "### graph build outputs and node modules ###",
+    "*/generated/**",
+    "*/build/**",
+    "*/node_modules/**",
+
+    "### generic subgraph structure ###",
+    "*/abis/**",
+    "*/protocols/*/config/deployments/*",
+    "*/protocols/*/config/templates/",
+    "*/protocols/*/src/**",
+    "*/src/**",
+
+    "### uniswap forks structure ###",
+    "uniswap-forks/configurations/*",
+
+    "### specific outliers ###",
+    "uniswap-v3/configurations/*",
+    "maple-finance/validation/**",
+    "maple-finance/docs/**",
+    "beefy-finance/setup/**",
+    "compound-forks/queries/**",
+    "erc20/data/**",
+    "erc20/configurations/*"
+   ]
+}
