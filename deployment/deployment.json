@@ -2743,6 +2743,32 @@
       }
     }
   },
+  "radiant": {
+    "schema": "lending",
+    "base": "aave-v2-forks",
+    "protocol": "radiant-capital",
+    "deployments": {
+      "radiant-capital-arbitrum": {
+        "network": "arbitrum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.0.1",
+          "methodology": "1.0.0"
+        },
+        "deployment-ids": {
+          "hosted-service": "radiant-capital-arbitrum"
+        },
+        "files": {
+          "template": "radiant.capital.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
+  },
   "tokemak": {
     "schema": "yield-aggregator",
     "base": "tokemak",
