@@ -77,7 +77,9 @@ function retrieveBonusToSP(
       if (tryBonusToSP.reverted) {
         return;
       } else {
-        market.liquidationPenalty = bigIntToBigDecimal(tryBonusToSP.value);
+        market.liquidationPenalty = bigIntToBigDecimal(
+          tryBonusToSP.value
+        ).times(BIGDECIMAL_HUNDRED);
         market.save();
 
         if (!protocol._bonusToSPCallEnabled) {

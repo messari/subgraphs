@@ -186,14 +186,11 @@ export const ACTIVE_POOL_CREATED_TIMESTAMP = BigInt.fromI32(1644224579);
 export const ACTIVE_POOL_CREATED_BLOCK = BigInt.fromI32(5559192);
 
 export const MINIMUM_COLLATERAL_RATIO = BigDecimal.fromString("1.1");
-
-export const MAXIMUM_LTV = BIGDECIMAL_ONE.div(MINIMUM_COLLATERAL_RATIO).times(
-  BIGDECIMAL_HUNDRED
-);
+export const MAXIMUM_LTV = BIGDECIMAL_HUNDRED.div(MINIMUM_COLLATERAL_RATIO);
 
 export const LIQUIDATION_FEE_PERCENT = BigDecimal.fromString("0.5");
 export const LIQUIDATION_FEE = LIQUIDATION_FEE_PERCENT.div(BIGDECIMAL_HUNDRED);
 
 export const LIQUIDATION_RESERVE_VST = BigDecimal.fromString("30");
 
-export const BONUS_TO_SP = BigDecimal.fromString("0.1");
+export const BONUS_TO_SP = BigDecimal.fromString("10");

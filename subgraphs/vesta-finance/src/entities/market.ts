@@ -353,7 +353,7 @@ function setMaxLTV(asset: string): BigDecimal {
   const tryMCR = contract.try_MCR(Address.fromString(asset));
   if (!tryMCR.reverted && tryMCR.value != BIGINT_ZERO) {
     const adjustedMCR = bigIntToBigDecimal(tryMCR.value);
-    MaxLTV = BIGDECIMAL_ONE.div(adjustedMCR).times(BIGDECIMAL_HUNDRED);
+    MaxLTV = BIGDECIMAL_HUNDRED.div(adjustedMCR);
   }
 
   return MaxLTV;
@@ -367,7 +367,9 @@ function setLiquidationPenalty(asset: string): BigDecimal {
   );
   const tryBonusToSP = contract.try_BonusToSP(Address.fromString(asset));
   if (!tryBonusToSP.reverted) {
-    adjustedBonusToSP = bigIntToBigDecimal(tryBonusToSP.value);
+    adjustedBonusToSP = bigIntToBigDecimal(tryBonusToSP.value).times(
+      BIGDECIMAL_HUNDRED
+    );
   }
 
   return adjustedBonusToSP;
