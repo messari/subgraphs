@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
 import { useQuery } from "@apollo/client";
 import { decentralizedNetworkSubgraphsQuery } from "../queries/decentralizedNetworkSubgraphsQuery";
+import DevCountTable from "./DevCountTable";
 
 const DeploymentsLayout = styled("div")`
   padding: 0;
@@ -21,8 +22,10 @@ interface DeploymentsPageProps {
 
 function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: DeploymentsPageProps) {
   const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
-    [type: string]: { [proto: string]: { [network: string]: string } };
+    [type: string]: { [proto: string]: { [network: string]: any } };
   }>({});
+
+  const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
   const clientDecentralizedEndpoint = useMemo(
     () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"),
@@ -41,7 +44,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
   useEffect(() => {
     if (decentralized && !Object.keys(decentralizedDeployments)?.length) {
       const decenDepos: { [x: string]: any } = { exchanges: {}, lending: {}, vaults: {}, generic: {} };
-      const subs = decentralized.graphAccount.subgraphs;
+      const subs = [...decentralized.graphAccounts[0].subgraphs, ...decentralized.graphAccounts[1].subgraphs];
       subs.forEach((sub: any, idx: number) => {
         try {
           let name = sub.currentVersion?.subgraphDeployment?.originalName?.toLowerCase()?.split(" ");
@@ -52,6 +55,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
           name = name.join("-");
           const network = sub.currentVersion.subgraphDeployment.network.id;
           const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
+          const curatorSignals = sub.currentVersion.subgraphDeployment.curatorSignals;
           const subgraphId = sub.id;
           const schemaVersion = sub.currentVersion.subgraphDeployment.schema
             .split("\n")
@@ -78,7 +82,7 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
           } else if (protocolTypeRaw.toUpperCase().includes("VAULT") || protocolTypeRaw.toUpperCase().includes("YIELD")) {
             protocolType = "vaults";
           }
-          decenDepos[protocolType][name] = { network, schemaVersion, deploymentId, subgraphId };
+          decenDepos[protocolType][name] = { network, schemaVersion, deploymentId, subgraphId, curatorSignals };
         } catch (err) {
           return;
         }
@@ -90,17 +94,37 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
   const navigate = useNavigate();
   window.scrollTo(0, 0);
 
-
   const decenDeposToSubgraphIds: any = {};
   if (Object.keys(decentralizedDeployments)?.length) {
     Object.keys(decentralizedDeployments).forEach((key) => {
       Object.keys(decentralizedDeployments[key]).forEach((x) => {
-        if (Object.keys(protocolsToQuery).find((pro) => pro.includes(x))) {
-          decenDeposToSubgraphIds[x] = decentralizedDeployments[key][x]?.subgraphId;
+        const protocolObj = Object.keys(protocolsToQuery).find((pro) => pro.includes(x));
+        if (protocolObj) {
+          let networkStr = decentralizedDeployments[key][x]?.network;
+          if (networkStr === "mainnet") {
+            networkStr = "ethereum";
+          }
+          if (networkStr === "matic") {
+            networkStr = "polygon";
+          }
+          let hasValidSignals = false;
+          let signalCount = 0;
+          decentralizedDeployments[key][x]?.curatorSignals?.forEach((x: any) => signalCount += x?.signal);
+          if (signalCount > 0) {
+            hasValidSignals = true;
+          }
+          decenDeposToSubgraphIds[x + "-" + networkStr] = hasValidSignals;
         }
       });
     });
   }
+
+  // counts section
+  let devCountTable = null;
+  if (!!showSubgraphCountTable) {
+    devCountTable = <DevCountTable subgraphCounts={subgraphCounts} />;
+  }
+
   return (
     <DeploymentsContextProvider>
       <DeploymentsLayout>
@@ -125,11 +149,11 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
           </Button>
         </div>
         <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
-          <Typography variant="h6" align="right" sx={{ fontSize: "14px" }}>
-            {subgraphCounts.prodCount} prod-ready, {subgraphCounts.devCount} under development, {subgraphCounts.totalCount} subgraph deployments
-          </Typography>
+          <Button variant="contained" color="primary" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
+            {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
+          </Button>
         </div>
-
+        {devCountTable}
         <Typography variant="h3" align="center" sx={{ my: 4 }}>
           Deployed Subgraphs
         </Typography>

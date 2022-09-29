@@ -55,6 +55,9 @@ function DeploymentsInDevelopment({ protocolsToQuery, getData }: DeploymentsInDe
         Object.keys(protocol.deployments).forEach((depoKey) => {
             totalDepoCounter += 1;
             const deploymentData: any = protocol.deployments[depoKey];
+            if (!deploymentData?.services) {
+                return;
+            }
             // Defeault status column in table is prod, when at least one depo on protocol is dev, the whoel row is dev
             if (!Object.keys(deposInProgress).includes(protocol.schema)) {
                 deposInProgress[protocol.schema] = {};
@@ -62,7 +65,11 @@ function DeploymentsInDevelopment({ protocolsToQuery, getData }: DeploymentsInDe
             if (!Object.keys(deposInProgress[protocol.schema]).includes(protocolName)) {
                 deposInProgress[protocol.schema][protocolName] = { status: true, schemaVersions: [], subgraphVersions: [], methodologyVersions: [], networks: [] };
             }
-            deposInProgress[protocol.schema][protocolName].networks.push({ chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId: deploymentData["deployment-ids"]["hosted-service"] });
+            let hostedServiceId = null;
+            if (!!deploymentData["services"]["hosted-service"]) {
+                hostedServiceId = deploymentData["services"]["hosted-service"]["slug"];
+            }
+            deposInProgress[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId });
             if (!deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
                 deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
             }
@@ -76,7 +83,7 @@ function DeploymentsInDevelopment({ protocolsToQuery, getData }: DeploymentsInDe
                 deposInProgress[protocol.schema][protocolName].status = false;
             }
         });
-        if (deposInProgress[protocol.schema][protocolName].status === false) {
+        if (deposInProgress[protocol.schema][protocolName]?.status === false) {
             protocolsInProgressCount += 1;
         } else {
             protocolsProdReadyCount += 1;

@@ -13,6 +13,10 @@ function DeploymentsInDevelopmentRow({ protocol, subgraphName }: DeploymentsInDe
 
     if (showDeposDropDown) {
         const deposOnProtocol = protocol.networks.map((depo: any) => {
+            let chainLabel = depo.chain;
+            if (protocol.networks.filter((x: any) => x.chain === depo.chain).length > 1) {
+                chainLabel = depo.deploymentName;
+            }
             return (
                 <TableRow onClick={() => (window.location.href = ("https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId))} key={subgraphName + depo.chain + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }}>
                     <TableCell
@@ -20,7 +24,7 @@ function DeploymentsInDevelopmentRow({ protocol, subgraphName }: DeploymentsInDe
                     >
                         <SubgraphLogo name={subgraphName} size={30} />
                         <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
-                            {depo.chain}
+                            {chainLabel}
                         </span>
                     </TableCell>
                     <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>

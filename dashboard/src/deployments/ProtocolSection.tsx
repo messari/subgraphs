@@ -7,14 +7,14 @@ import { SubgraphLogo } from "../common/SubgraphLogo";
 import { latestSchemaVersions } from "../constants";
 import { formatIntToFixed2, toPercent } from "../utils";
 
-interface ProtocolRow {
+interface ProtocolSection {
     protocol: { [x: string]: any };
     subgraphName: string;
     clientIndexing: any;
     decenDeposToSubgraphIds: { [x: string]: string };
 }
 
-function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgraphIds }: ProtocolRow) {
+function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToSubgraphIds }: ProtocolSection) {
     const [showDeposDropDown, toggleShowDeposDropDown] = useState<boolean>(false);
     const navigate = useNavigate();
     const navigateToSubgraph = (url: string) => () => {
@@ -69,17 +69,6 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
               ${queryContents}
             }
         `);
-        if (!!depo?.decentralizedNetworkId) {
-            fullCurrentQueryArray.push(`        
-                ${depo?.hostedServiceId
-                    ?.split("-")
-                    ?.join(
-                        "_"
-                    )}_decen: indexingStatusForCurrentVersion(subgraphName: "messari/${depo?.decentralizedNetworkId}") {
-                  ${queryContents}
-                }
-            `);
-        }
     });
     fullCurrentQueryArray.push("}");
     fullPendingQueryArray.push("}");
@@ -109,7 +98,7 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
 
     if (showDeposDropDown) {
         if (statusLoading || statusLoadingPending) {
-            return protocol.networks.map(() => <div style={{ width: "100%" }}><CircularProgress size={30} /></div>);
+            return protocol.networks.map((key: any, idx: number) => <div key={"Loader" + idx} style={{ width: "100%" }}><CircularProgress size={30} /></div>);
         }
 
         if (!status || !!errorIndexing) {
@@ -132,18 +121,29 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
                         statusPendingDataOnChain = pendingObject?.chains[0];
                     }
 
-                    const indexedPending = formatIntToFixed2(syncedPending
-                        ? 100
-                        : toPercent(
-                            statusPendingDataOnChain?.latestBlock?.number - statusPendingDataOnChain?.earliestBlock?.number || 0,
-                            statusPendingDataOnChain?.chainHeadBlock?.number - statusPendingDataOnChain?.earliestBlock?.number,
-                        ));
                     let highlightColor = "#B8301C";
                     if (!pendingObject?.fatalError) {
                         highlightColor = "#EFCB68";
                     }
+
+                    let indexedPending = formatIntToFixed2(toPercent(
+                        statusPendingDataOnChain?.latestBlock?.number - statusPendingDataOnChain?.earliestBlock?.number || 0,
+                        statusPendingDataOnChain?.chainHeadBlock?.number - statusPendingDataOnChain?.earliestBlock?.number,
+                    ));
+
+                    if (syncedPending) {
+                        highlightColor = "#58BC82";
+                        indexedPending = formatIntToFixed2(100);
+                    }
+
+                    let schemaCell = <span>{depo?.versions?.schema}</span>;
+
+                    if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
+                        schemaCell = <Tooltip title="This deployment does not have the latest schema verison" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
+                    }
+
                     pendingRow = (
-                        <TableRow onClick={() => navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`)} key={subgraphName + depo.chain + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                        <TableRow onClick={() => navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`)} key={subgraphName + depo.hostedServiceId + "DepInDevRow-PENDING"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                             <TableCell
                                 sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${highlightColor} solid 34px`, verticalAlign: "middle", display: "flex" }}
                             >
@@ -156,7 +156,7 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
 
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
-                                <NetworkLogo key={subgraphName + depo.chain + 'Logo'} size={30} network={depo.chain} />
+                                <NetworkLogo key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {indexedPending ? indexedPending + "%" : "N/A"}
@@ -172,7 +172,7 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-                                    {depo?.versions?.schema || "N/A"}
+                                    {schemaCell}
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
@@ -191,27 +191,29 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
                 }
             }
             let decenRow = null;
-            if (!!status[depoKey + "_decen"]) {
-                const decenObject = status[depoKey + "_decen"];
-                let { syncedPending } = decenObject ?? {};
+            if (!!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.decentralizedNetworkId) || !!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.hostedServiceId)) {
+                const decenObject = status[depoKey];
+                let syncedDecen = decenObject?.synced ?? {};
                 let statusDecenDataOnChain: { [x: string]: any } = {};
                 if (decenObject?.chains?.length > 0) {
                     statusDecenDataOnChain = decenObject?.chains[0];
                 }
 
-                const indexedPending = formatIntToFixed2(syncedPending
-                    ? 100
-                    : toPercent(
-                        statusDecenDataOnChain?.latestBlock?.number - statusDecenDataOnChain?.earliestBlock?.number || 0,
-                        statusDecenDataOnChain?.chainHeadBlock?.number - statusDecenDataOnChain?.earliestBlock?.number,
-                    ));
                 let highlightColor = "#B8301C";
                 if (!decenObject?.fatalError) {
                     highlightColor = "#EFCB68";
-                    if (latestSchemaVersions.includes(depo?.versions?.schema)) {
-                        highlightColor = "#58BC82";
-                    }
                 }
+
+                let indexedDecen = formatIntToFixed2(toPercent(
+                    statusDecenDataOnChain?.latestBlock?.number - statusDecenDataOnChain?.earliestBlock?.number || 0,
+                    statusDecenDataOnChain?.chainHeadBlock?.number - statusDecenDataOnChain?.earliestBlock?.number,
+                ));
+
+                if (syncedDecen) {
+                    highlightColor = "#58BC82";
+                    indexedDecen = formatIntToFixed2(100);
+                }
+
                 const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(x => subgraphName.includes(x));
                 let decenSubgraphId = decenObject?.subgraph;
                 if (decenSubgraphKey) {
@@ -220,8 +222,21 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
                 const endpointURL =
                     "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + decenSubgraphId;
 
+                let schemaCell = <span>{depo?.versions?.schema}</span>;
+
+                if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
+                    schemaCell = <Tooltip title="This deployment does not have the latest schema verison" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
+                }
+                let curationSymbol = null;
+                if (!decenDeposToSubgraphIds[depo?.decentralizedNetworkId] && !decenDeposToSubgraphIds[depo?.hostedServiceId]) {
+                    curationSymbol = (
+                        <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "10px" }}>
+                            <Tooltip title="No curation on this Subgraph" placement="top" ><span style={{ padding: "0 5px", borderRadius: "50%", color: "#B8301C", border: "#B8301C 1.5px solid", cursor: "default", fontWeight: "800" }}>!</span></Tooltip>
+                        </span>
+                    );
+                }
                 decenRow = (
-                    <TableRow onClick={navigateToSubgraph(endpointURL)} key={subgraphName + depo.chain + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                    <TableRow onClick={navigateToSubgraph(endpointURL)} key={subgraphName + depo.hostedServiceId + "DepInDevRow-DECEN"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell
                             sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${highlightColor} solid 34px`, verticalAlign: "middle", display: "flex" }}
                         >
@@ -229,19 +244,19 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
                             <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
                                 {chainLabel}
                             </span>
-                            <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px", color: "#58BC82" }}>
-                                <Tooltip title="This deployment is hosted on the decentralized network" placement="top" ><b style={{ cursor: "default" }}>Ⓓ</b></Tooltip>
+                            <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 0px 0px 10px", fontSize: "14px", color: "#6f2c8a" }}>
+                                <Tooltip title="This deployment is hosted on the decentralized network" placement="top" ><span style={{ cursor: "default" }}><b>Ⓓ</b></span></Tooltip>
                             </span>
-
+                            {curationSymbol}
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", padding: "0", paddingRight: "16px", textAlign: "right" }}>
 
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
-                            <NetworkLogo key={subgraphName + depo.chain + 'Logo'} size={30} network={depo.chain} />
+                            <NetworkLogo key={subgraphName + depo.chain + 'Logo-DECEN'} size={30} network={depo.chain} />
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                            {indexedPending ? indexedPending + "%" : "N/A"}
+                            {indexedDecen ? indexedDecen + "%" : "N/A"}
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                             {Number(statusDecenDataOnChain?.earliestBlock?.number)?.toLocaleString()}
@@ -254,7 +269,7 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                             <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-                                {depo?.versions?.schema || "N/A"}
+                                {schemaCell}
                             </Typography>
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
@@ -268,7 +283,7 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
                                 {parseInt(decenObject?.entityCount) ? parseInt(decenObject?.entityCount)?.toLocaleString() : "N/A"}
                             </Typography>
                         </TableCell>
-                    </TableRow>
+                    </TableRow >
                 );
             }
             const currentObject = status[depoKey];
@@ -277,28 +292,35 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
             if (currentObject?.chains?.length > 0) {
                 statusDataOnChain = currentObject?.chains[0];
             }
-            let indexed = formatIntToFixed2(synced
-                ? 100
-                : toPercent(
-                    statusDataOnChain?.latestBlock?.number - statusDataOnChain?.earliestBlock?.number || 0,
-                    statusDataOnChain?.chainHeadBlock?.number - statusDataOnChain?.earliestBlock?.number,
-                ));
+
+            let highlightColor = "#B8301C";
+            if (!currentObject?.fatalError) {
+                highlightColor = "#EFCB68";
+            }
+            let indexed = formatIntToFixed2(toPercent(
+                statusDataOnChain?.latestBlock?.number - statusDataOnChain?.earliestBlock?.number || 0,
+                statusDataOnChain?.chainHeadBlock?.number - statusDataOnChain?.earliestBlock?.number,
+            ));
+            if (synced) {
+                indexed = formatIntToFixed2(100);
+                highlightColor = "#58BC82";
+            }
 
             if (Object.keys(statusDataOnChain)?.length === 0) {
                 indexed = "";
             }
 
-            let highlightColor = "#B8301C";
-            if (!currentObject?.fatalError && !!indexed) {
-                highlightColor = "#EFCB68";
-                if (latestSchemaVersions.includes(depo?.versions?.schema)) {
-                    highlightColor = "#58BC82";
-                }
+            let schemaCell = <span>{depo?.versions?.schema}</span>;
+
+            if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
+                schemaCell = <Tooltip title="This deployment does not have the latest schema verison" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
             }
+
+
             return (
                 <>
                     {decenRow}
-                    <TableRow onClick={() => navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol`)} key={subgraphName + depo.chain + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                    <TableRow onClick={() => navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol`)} key={subgraphName + depo.hostedServiceId + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell
                             sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${highlightColor} solid 34px`, verticalAlign: "middle", display: "flex" }}
                         >
@@ -311,7 +333,7 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
 
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
-                            <NetworkLogo key={subgraphName + depo.chain + 'Logo'} size={30} network={depo.chain} />
+                            <NetworkLogo key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
                         </TableCell>
 
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
@@ -328,7 +350,7 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                             <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-                                {depo?.versions?.schema || "N/A"}
+                                {schemaCell}
                             </Typography>
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
@@ -366,7 +388,7 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
 
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", display: "flex" }}>
-                    {protocol.networks.map((x: { [x: string]: any }) => <a href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo key={subgraphName + x.chain + 'Logo'} size={30} network={x.chain} /></a>)}
+                    {protocol.networks.map((x: { [x: string]: any }) => <a key={"CellNetwork-" + x.chain + x.hostedServiceId} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo size={30} network={x.chain} /></a>)}
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
                     -
@@ -394,12 +416,24 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
             {depoRowsOnProtocol}
         </>)
     }
+
+    let schemaCell = <span>N/A</span>;
+    if (protocol?.schemaVersions?.length > 0) {
+        const schemaColored = protocol?.schemaVersions?.map((x: string) => {
+            if (latestSchemaVersions.includes(x)) {
+                return <span>{x}</span>;
+            }
+            return <span style={{ color: "#FFA500" }}>{x}</span>;
+        })
+
+        schemaCell = <span>{schemaColored}</span>;
+    }
     return (
         <TableRow onClick={() => {
             toggleShowDeposDropDown(!showDeposDropDown);
         }} key={subgraphName + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
             <TableCell
-                sx={{ padding: "0 0 0 6px", verticalAlign: "middle", display: "flex" }}
+                sx={{ padding: "0 0 0 6px", verticalAlign: "middle", display: "flex", height: "35px" }}
             >
 
                 <Tooltip title="Click To View All Deployments On This Protocol" placement="top" >
@@ -417,10 +451,10 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
                     <img height="24px" width="24px" src="https://cdn2.iconfinder.com/data/icons/50-material-design-round-corner-style/44/Dropdown_2-512.png" />
                 </Tooltip>
             </TableCell>
-            <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", display: "flex" }}>
+            <TableCell sx={{ padding: "0 6px 1px 0", textAlign: "right", display: "flex" }}>
                 <Tooltip title="Click To View All Deployments On This Protocol" placement="top" >
                     <>
-                        {protocol.networks.map((x: { [x: string]: any }) => <a href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo key={subgraphName + x.chain + 'Logo'} size={30} network={x.chain} /></a>)}
+                        {protocol.networks.map((x: { [x: string]: any }) => <a key={subgraphName + x.hostedServiceId + 'Logo'} style={{ height: "100%", border: x.chain === "polygon" ? "#FFA500 4px solid" : "#58BC82 4px solid", borderRadius: "50%" }} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo size={28} network={x.chain} /></a>)}
                     </>
                 </Tooltip>
             </TableCell>
@@ -440,7 +474,7 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
                 <Tooltip title="Click To View All Deployments On This Protocol" placement="top" >
 
                     <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-                        {protocol?.schemaVersions?.length > 0 ? protocol?.schemaVersions.join(", ") : "N/A"}
+                        {schemaCell}
                     </Typography>
                 </Tooltip>
             </TableCell>
@@ -456,8 +490,8 @@ function ProtocolRow({ protocol, subgraphName, clientIndexing, decenDeposToSubgr
             <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
 
             </TableCell>
-        </TableRow>
+        </TableRow >
     )
 }
 
-export default ProtocolRow;
+export default ProtocolSection;
