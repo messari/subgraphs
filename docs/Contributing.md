@@ -73,7 +73,7 @@ Whenever there are merge conflicts you should rebase *instead* of merge. The rea
 
 How does this happen?
 
-The version of `master` you initally branched off is not the current version. New commits have been added, and some of them conflict with your changes. Answer: rebase.
+The version of `master` you initially branched off is not the current version. New commits have been added, and some of them conflict with your changes. Answer: rebase.
 
 Sometimes you need to make a change based off a `feature-branch` that hasn't been merged into `master` yet. Once `feature-branch` is merged into `master` you want to rebase onto `master` to clean up the branch commit history. 
 
@@ -97,11 +97,11 @@ In general you want to keep PRs small when possible. This way it is easier to re
 
 ### What should be included in a PR?
 
-To keep PRs small follow thse guidelines, and use them to make educated choices about other scenarios you might run into:
+To keep PRs small follow these guidelines, and use them to make educated choices about other scenarios you might run into:
 
 - If you are formatting code outside of the scope of your PR it should be in a separate PR
 - Isolate bug fixes into individual PRs, do not combine them. If they depend on each other use your judgement if they should be together or not. You can always branch off a `feature-branch`
-- Use a single PR for each feature (ie, a new subgraph has it's own PR)
+- Use a single PR for each feature (ie, a new subgraph has its own PR)
 
 ### Merging
 
@@ -198,7 +198,7 @@ Start by setting the upstream branch on your local repo to `messari/subgraphs`
 git remote add upstream https://github.com/messari/subgraphs.git
 ```
 
-Then navigate to a folder where you can keep this bash script executable (or create a new foler). A good location is `~/bin`
+Then navigate to a folder where you can keep this bash script executable (or create a new folder). A good location is `~/bin`
 
 Once you are here create a file named `git-sync` and put the following text in it:
 
