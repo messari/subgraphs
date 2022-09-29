@@ -23,6 +23,11 @@
     "beefy-finance/setup/**",
     "compound-forks/queries/**",
     "erc20/data/**",
-    "erc20/configurations/*"
+    "erc20/configurations/*",
+    "cryptopunk/**",
+    "looksrare/**",
+    "opensea/**",
+    "x2y2/**",
+    "seaport/**"
    ]
 }
