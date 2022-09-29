@@ -4301,16 +4301,6 @@
           }
         }
       }
-    },
-    "cryptopunk": {
-      "cryptopunk": {
-        "ethereum": {
-          "template": "cryptopunk.template.yaml",
-          "messari": "messari/cryptopunks-ethereum",
-          "shashwatS22": "shashwatS22/cryptopunks",
-          "deploy-on-merge": false
-        }
-      }
     }
   },
   "erc20": {
