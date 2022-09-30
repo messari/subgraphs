@@ -12,9 +12,7 @@
     "*/protocols/*/config/templates/",
     "*/protocols/*/src/**",
     "*/src/**",
-
-    "### uniswap forks structure ###",
-    "uniswap-forks/configurations/*",
+    "*/configurations/*",
 
     "### specific outliers ###",
     "uniswap-v3/configurations/*",
