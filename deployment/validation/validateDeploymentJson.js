@@ -258,6 +258,30 @@ function checkDuplicateIDs(deploymentJsonMap) {
   }
 }
 
+function checkProtocolArgumentCount(protocol, protocolData) {
+  if (Object.keys(protocolData).length !== 4) {
+    throw new Error(
+      `Invalid number of arguments for protocol: ${protocol} - must have 4 arguments: schema, base, protocol, deployments`
+    ).message;
+  }
+}
+
+function checkDeploymentsArgumentCount(protocol, deployment, deploymentData) {
+  if (Object.keys(deploymentData).length !== 6) {
+    throw new Error(
+      `Invalid number of arguments for protocol: ${protocol} deployment: ${deployment} - must have 6 arguments: versions, services, files, options, status, networks`
+    ).message;
+  }
+}
+
+function checkVersionsArgumentsCount(protocol, deployment, deploymentData) {
+  if (Object.keys(deploymentData.versions).length !== 3) {
+    throw new Error(
+      `Invalid number of arguments for protocol: ${protocol} deployment: ${deployment} versions - must have 3 arguments: schema, subgraph, methodology`
+    ).message;
+  }
+}
+
 // Run tests before each build in CI/CD
 function validateDeploymentJson(deploymentJsonMap) {
   // Checks if all necessary fields exist and contain valid values in the deployment.json
@@ -267,6 +291,7 @@ function validateDeploymentJson(deploymentJsonMap) {
     checkBasePresent(protocol, protocolData);
     checkProtocolPresent(protocol, protocolData);
     checkDeploymentsPresent(protocol, protocolData);
+    checkProtocolArgumentCount(protocol, protocolData);
 
     for (const [deployment, deploymentData] of Object.entries(
       protocolData.deployments
@@ -278,6 +303,8 @@ function validateDeploymentJson(deploymentJsonMap) {
       checkDeploymentsIDsPresentAndValid(protocol, deployment, deploymentData);
       checkTemplatePresent(protocol, deployment, deploymentData);
       checkOptionsPresent(protocol, deployment, deploymentData);
+      checkDeploymentsArgumentCount(protocol, deployment, deploymentData);
+      checkVersionsArgumentsCount(protocol, deployment, deploymentData);
     }
   }
 
