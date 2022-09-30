@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   ActiveUser,
   FinancialsDailySnapshot,
@@ -11,7 +11,29 @@ import {
   BIGINT_ZERO,
   BIGINT_ONE,
 } from "../prices/common/constants";
+import { getOrCreateFinancials } from "./getters";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./time";
+
+export function updateFinancialSnapshotRevenue(
+  newProtocolSideRevenueUSD: BigDecimal,
+  newSupplySideRevenueUSD: BigDecimal,
+  newTotalRevenueUSD: BigDecimal,
+  event: ethereum.Event
+): void {
+  const financialDailySnapshot = getOrCreateFinancials(event);
+
+  financialDailySnapshot.dailyProtocolSideRevenueUSD =
+    financialDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+      newProtocolSideRevenueUSD
+    );
+  financialDailySnapshot.dailySupplySideRevenueUSD =
+    financialDailySnapshot.dailySupplySideRevenueUSD.plus(
+      newSupplySideRevenueUSD
+    );
+  financialDailySnapshot.dailyTotalRevenueUSD =
+    financialDailySnapshot.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+  financialDailySnapshot.save();
+}
 
 export function getProtocolHourlyId(
   block: ethereum.Block,

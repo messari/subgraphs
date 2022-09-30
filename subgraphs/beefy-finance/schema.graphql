@@ -406,6 +406,9 @@ type Vault @entity {
 
   " The native token of the vault. This is what revenue is calculated/distributed in "
   _nativeToken: Token!
+
+  " The output token of the strategy contract. This is different from outputToken. "
+  _strategyOutputToken: Token
 }
 
 #################################

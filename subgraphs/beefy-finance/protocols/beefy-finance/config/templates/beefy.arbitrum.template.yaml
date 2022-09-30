@@ -8,7 +8,7 @@ dataSources:
     source:
       address: '0x0000000000000000000000000000000000000000'
       abi: BeefyStrategy
-      startBlock: 27507238
+      startBlock: 27506794
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -59,9 +59,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: stargate-arb-eth
@@ -120,9 +118,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: stargate-arb-usdc
@@ -181,9 +177,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: stargate-arb-usdt
@@ -478,9 +472,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: spell-mim-crv
@@ -539,9 +531,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-arb-spell-weth
@@ -600,9 +590,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-arb-weth-mim
@@ -661,9 +649,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-arb-eth-usdc
@@ -722,9 +708,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: curve-arb-tricrypto
@@ -783,9 +767,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: curve-arb-2pool
@@ -844,9 +826,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: curve-arb-ren
@@ -905,9 +885,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-arb-wbtc-weth
@@ -966,9 +944,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-arb-sushi-eth
@@ -1027,9 +1003,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-arb-weth-usdt
@@ -1088,9 +1062,7 @@ dataSources:
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: arbi-bifi-maxi

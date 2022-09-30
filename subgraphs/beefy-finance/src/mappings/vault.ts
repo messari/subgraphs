@@ -1,15 +1,16 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
-import { Vault } from "../../generated/schema";
+import { Vault, VaultFee } from "../../generated/schema";
 import {
   BeefyStrategy,
-  ChargedFees,
   Deposit,
   StratHarvest,
+  StratHarvest1,
+  StratHarvest2,
   Withdraw,
 } from "../../generated/Standard/BeefyStrategy";
 import { BeefyVault } from "../../generated/Standard/BeefyVault";
-import { getOrCreateToken, getOrCreateVault } from "../utils/getters";
+import { getFees, getOrCreateToken, getOrCreateVault } from "../utils/getters";
 import { createDeposit } from "./deposit";
 import { createWithdraw } from "./withdraw";
 import {
@@ -22,11 +23,13 @@ import {
   BIGINT_ZERO,
 } from "../prices/common/constants";
 import {
-  updateProtocolRevenueFromChargedFees,
+  updateProtocolRevenue,
   updateProtocolRevenueFromHarvest,
   updateProtocolRevenueFromWithdraw,
   updateProtocolUsage,
 } from "./protocol";
+import { ERC20 } from "../../generated/Standard/ERC20";
+import { BIGDECIMAL_HUNDRED, exponentToBigDecimal } from "../utils/constants";
 
 export function updateVaultAndSnapshots(
   vault: Vault,
@@ -145,6 +148,7 @@ export function handleWithdraw(event: Withdraw): void {
   updateProtocolRevenueFromWithdraw(event, vault, withdrawnAmount);
 }
 
+// StratHarvest (includes tvl in params)
 export function handleStratHarvestWithAmount(event: StratHarvest): void {
   const vault = getOrCreateVault(event.address, event);
   if (!vault) {
@@ -155,7 +159,8 @@ export function handleStratHarvestWithAmount(event: StratHarvest): void {
   updateProtocolRevenueFromHarvest(event, event.params.wantHarvested, vault);
 }
 
-export function handleStratHarvest(event: StratHarvest): void {
+// StratHarvest1 (just messge sender)
+export function handleStratHarvest(event: StratHarvest1): void {
   const vault = getOrCreateVault(event.address, event);
   if (!vault) {
     return;
@@ -172,12 +177,127 @@ export function handleStratHarvest(event: StratHarvest): void {
   }
 }
 
-export function handleChargedFees(event: ChargedFees): void {
+// StratHarvest2 (harvester and timestamp)
+export function handleStratHarvestWithTimestamp(event: StratHarvest2): void {
   const vault = getOrCreateVault(event.address, event);
   if (!vault) {
     return;
   }
 
-  updateVaultAndSnapshots(vault, event.block);
-  updateProtocolRevenueFromChargedFees(event, vault); //si rompe qua!
+  const strategyContract = BeefyStrategy.bind(event.address);
+  const balance = strategyContract.try_balanceOf();
+  if (!balance.reverted) {
+    const amountHarvested = balance.value.minus(vault.inputTokenBalance);
+    updateVaultAndSnapshots(vault, event.block);
+    updateProtocolRevenueFromHarvest(event, amountHarvested, vault);
+  } else {
+    updateVaultAndSnapshots(vault, event.block);
+  }
+}
+
+/////////////////
+//// Helpers ////
+/////////////////
+
+// This helper function carries out the transformations of the Harvest event
+// The harvest event is emitted from a Strategy Contract
+// This event occurs when rebalancing / auto compounding occurs
+// Fees are also generated from this event. This function will calculate:
+//     protocolSideRevenue
+//     supplySideRevenue
+//     totalRevenue
+function updateRevenueFromHarvest(
+  event: ethereum.Event,
+  strategyAddress: Address
+): void {
+  const vault = getOrCreateVault(strategyAddress, event);
+  if (!vault) {
+    log.warning("Vault not found for strategy {}", [
+      strategyAddress.toHexString(),
+    ]);
+    return;
+  }
+  const strategyContract = BeefyStrategy.bind(strategyAddress);
+  if (vault._strategyOutputToken) {
+    const strategyOutputTokenContract = ERC20.bind(
+      Address.fromString(vault._strategyOutputToken)
+    );
+
+    const tryBalance =
+      strategyOutputTokenContract.try_balanceOf(strategyAddress);
+    if (tryBalance.reverted) {
+      log.warning(
+        "Failed to get balance of strategy output token in strategy contract: {}",
+        [strategyAddress.toHexString()]
+      );
+      return;
+    }
+
+    // Optional 1- Check for _strategyOutputToken Balance to be > 0 in the Strategy Contract
+    if (tryBalance.value.le(BIGINT_ZERO)) {
+      log.warning(
+        "No revenue to calculate because strategy output token balance is 0: {}",
+        [strategyAddress.toHexString()]
+      );
+      return;
+    }
+  }
+
+  // 2- Check that the native token balance of the Strategy Contract is > 0
+  const nativeTokenContract = ERC20.bind(
+    Address.fromString(vault._nativeToken)
+  );
+  const tryNativeTokenBalance =
+    nativeTokenContract.try_balanceOf(strategyAddress);
+  if (tryNativeTokenBalance.reverted) {
+    log.warning(
+      "Failed to get balance of native token in strategy contract: {}",
+      [strategyAddress.toHexString()]
+    );
+    return;
+  }
+
+  if (tryNativeTokenBalance.value.gt(BIGINT_ZERO)) {
+    // at this point we charge the performance fee on this
+    // whatever is left over after the performance fee is supplySideRevenue
+    const nativeToken = getOrCreateToken(
+      Address.fromString(vault._nativeToken),
+      event.block
+    ); // update price
+
+    vault.fees = getFees(vault.id, strategyContract);
+    vault.save();
+
+    // fees are generally 4.5% performance fee
+    const perfFee = VaultFee.load(vault.fees[0]);
+    if (!perfFee) {
+      log.warning("No perf fee found for vault {}", [vault.id]);
+      return;
+    }
+    const performanceFeeNormalized =
+      perfFee.feePercentage.div(BIGDECIMAL_HUNDRED);
+
+    const performanceFeeDelta = tryNativeTokenBalance.value
+      .toBigDecimal()
+      .div(exponentToBigDecimal(nativeToken.decimals))
+      .times(performanceFeeNormalized);
+    const protocolSideRevenueDelta = performanceFeeDelta.times(
+      nativeToken.lastPriceUSD!
+    );
+    const supplySideRevenueDelta = tryNativeTokenBalance.value
+      .toBigDecimal()
+      .div(exponentToBigDecimal(nativeToken.decimals))
+      .minus(performanceFeeDelta)
+      .times(nativeToken.lastPriceUSD!);
+    const totalRevenueDelta = protocolSideRevenueDelta.plus(
+      supplySideRevenueDelta
+    );
+
+    updateProtocolRevenue(
+      protocolSideRevenueDelta,
+      supplySideRevenueDelta,
+      totalRevenueDelta,
+      event
+    );
+  }
 }

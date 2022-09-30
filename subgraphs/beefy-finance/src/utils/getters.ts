@@ -6,6 +6,7 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
+  FinancialsDailySnapshot,
   Token,
   Vault,
   VaultFee,
@@ -28,10 +29,12 @@ import {
   PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SLUG,
   PROTOCOL_SUBGRAPH_VERSION,
+  SECONDS_PER_DAY,
   VaultFeeType,
 } from "./constants";
 import { BeefyVault } from "../../generated/Standard/BeefyVault";
 
+// also updates price of token
 export function getOrCreateToken(
   tokenAddress: Address,
   block: ethereum.Block
@@ -121,6 +124,16 @@ export function getOrCreateVault(
     vault.pricePerShare = BIGINT_ZERO;
     vault._strategyAddress = strategyAddress.toHexString();
     vault._nativeToken = nativeToken.id;
+
+    // create strategy output token
+    const tryStratOutput = strategyContract.try_output();
+    if (!tryStratOutput.reverted) {
+      vault._strategyOutputToken = getOrCreateToken(
+        tryStratOutput.value,
+        event.block
+      ).id;
+    }
+
     vault.save();
   }
 
@@ -133,6 +146,14 @@ export function getFees(
   strategyContract: BeefyStrategy
 ): string[] {
   let fees: string[] = [];
+
+  // Always a 4.5% performance fee (calculated on harvest)
+  // this way we know performance fee is always in position 0
+  const perfFee = new VaultFee(VaultFeeType.PERFORMANCE_FEE + "-" + vaultId);
+  perfFee.feePercentage = BigDecimal.fromString("4.5");
+  perfFee.feeType = VaultFeeType.PERFORMANCE_FEE;
+  perfFee.save();
+  fees.push(perfFee.id);
 
   // check for withdrawal fee
   // withdrawal fee = withdrawalFee() / WITHDRAWAL_MAX() * 100
@@ -154,13 +175,6 @@ export function getFees(
     withdrawalFee.save();
     fees.push(withdrawalFee.id);
   }
-
-  // Always a 4.5% performance fee (calculated on harvest)
-  const perfFee = new VaultFee(VaultFeeType.PERFORMANCE_FEE + "-" + vaultId);
-  perfFee.feePercentage = BigDecimal.fromString("4.5");
-  perfFee.feeType = VaultFeeType.PERFORMANCE_FEE;
-  perfFee.save();
-  fees.push(perfFee.id);
 
   return fees;
 }
@@ -190,4 +204,30 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
   }
 
   return yieldAggregator;
+}
+
+export function getOrCreateFinancials(
+  event: ethereum.Event
+): FinancialsDailySnapshot {
+  // Number of days since Unix epoch
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+
+  let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+
+  if (!financialMetrics) {
+    financialMetrics = new FinancialsDailySnapshot(id.toString());
+    financialMetrics.protocol = PROTOCOL_ID;
+    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.blockNumber = event.block.number;
+    financialMetrics.timestamp = event.block.timestamp;
+
+    financialMetrics.save();
+  }
+  return financialMetrics;
 }

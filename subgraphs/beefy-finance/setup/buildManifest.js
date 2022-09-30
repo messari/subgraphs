@@ -247,11 +247,7 @@ function createNewDataSource(
         },
         {
           event: "StratHarvest(indexed address,indexed uint256)",
-          handler: "handleStratHarvest",
-        },
-        {
-          event: "ChargedFees(uint256,uint256,uint256)",
-          handler: "handleChargedFees",
+          handler: "handleStratHarvestWithTimestamp",
         },
       ],
       file: "./src/mappings/vault.ts",

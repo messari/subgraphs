@@ -161,6 +161,16 @@ export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
+// returns 10^exp
+export function exponentToBigDecimal(exp: i32): BigDecimal {
+  let bd = BigDecimal.fromString("1");
+  const ten = BigDecimal.fromString("10");
+  for (let i = 0; i < exp; i++) {
+    bd = bd.times(ten);
+  }
+  return bd;
+}
+
 /////////////////////
 ///// Date/Time /////
 /////////////////////

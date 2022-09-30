@@ -26,9 +26,33 @@ import {
 } from "../utils/getters";
 import {
   updateDailyFinancialSnapshot,
+  updateFinancialSnapshotRevenue,
   updateUsageMetricsDailySnapshot,
   updateUsageMetricsHourlySnapshot,
 } from "../utils/metrics";
+
+export function updateProtocolRevenue(
+  newProtocolSideRevenueUSD: BigDecimal,
+  newSupplySideRevenueUSD: BigDecimal,
+  newTotalRevenueUSD: BigDecimal,
+  event: ethereum.Event
+): void {
+  const protocol = getOrCreateYieldAggregator();
+  protocol.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD.plus(newProtocolSideRevenueUSD);
+  protocol.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+  protocol.save();
+
+  updateFinancialSnapshotRevenue(
+    newProtocolSideRevenueUSD,
+    newSupplySideRevenueUSD,
+    newTotalRevenueUSD,
+    event
+  );
+}
 
 export function updateProtocolUsage(
   event: ethereum.Event,
