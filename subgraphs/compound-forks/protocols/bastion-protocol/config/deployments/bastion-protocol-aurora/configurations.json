@@ -1,5 +1,8 @@
 {
   "network": "aurora",
   "factoryAddress": "0x6De54724e128274520606f038591A00C5E94a1F6",
-  "startBlock": "60837829"
+  "startBlock": "60837829",
+  "graftEnabled": true,
+  "subgraphId": "QmZ5d1HDicDzKkrp86FxPEKMHjAiRjCAtRbHvJyeUDx6dX",
+  "graftStartBlock": 67915500
 }

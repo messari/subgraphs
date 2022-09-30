@@ -253,6 +253,18 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
+  if (
+    event.block.number.toI32() >= 67915511 &&
+    event.block.number.toI32() <= 67915618
+  ) {
+    log.warning("Liquidate: {} block: {} amount: {}", [
+      event.transaction.hash.toHexString(),
+      event.block.number.toString(),
+      event.params.repayAmount.toString(),
+      event.params.seizeTokens.toString(),
+    ]);
+  }
+
   let cTokenCollateral = event.params.cTokenCollateral;
   let liquidator = event.params.liquidator;
   let borrower = event.params.borrower;
