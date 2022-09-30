@@ -4632,8 +4632,11 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "tornado-cash-mainnet"
+        "services": {
+          "hosted-service": {
+            "slug": "tornado-cash-mainnet",
+            "query-id": "tornado-cash-mainnet"
+          }
         },
         "files": {
           "template": "tornado-cash.template.yaml"
@@ -4651,8 +4654,11 @@
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
-        "deployment-ids": {
-          "hosted-service": "tornado-cash-bsc"
+        "services": {
+          "hosted-service": {
+            "slug": "tornado-cash-bsc",
+            "query-id": "tornado-cash-bsc"
+          }
         },
         "files": {
           "template": "tornado-cash.template.yaml"
