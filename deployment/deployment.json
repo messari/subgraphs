@@ -4625,7 +4625,7 @@
     "protocol": "tornado-cash",
     "deployments": {
       "tornado-cash-mainnet": {
-        "network": "mainnet",
+        "network": "ethereum",
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
