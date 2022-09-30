@@ -64,7 +64,7 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds }
             if (!deploymentData?.services) {
                 return;
             }
-            if ((!!deploymentData["services"]["hosted-service"] || !!deploymentData["services"]["decentralized-network"])) {
+            if (!!deploymentData["services"]["hosted-service"] || !!deploymentData["services"]["decentralized-network"] || !!deploymentData["services"]["cronos-portal"]) {
                 if (!Object.keys(deposToPass).includes(protocol.schema)) {
                     deposToPass[protocol.schema] = {};
                 }
@@ -78,6 +78,9 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds }
                 let hostedServiceId = null;
                 if (!!deploymentData["services"]["hosted-service"]) {
                     hostedServiceId = deploymentData["services"]["hosted-service"]["slug"];
+                }
+                if (!!deploymentData["services"]["cronos-portal"]) {
+                    hostedServiceId = deploymentData["services"]["cronos-portal"]["slug"];
                 }
                 deposToPass[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId, decentralizedNetworkId });
                 if (!deposToPass[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
