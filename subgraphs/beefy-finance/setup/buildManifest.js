@@ -66,7 +66,7 @@ async function main(network) {
     createNewDataSource(
       "Standard",
       "0x0000000000000000000000000000000000000000",
-      0,
+      await getStartBlockByTimestamp(web3, 1664502925), // 9/29/2022 just so it doesn't start indexing from the beginning of time
       network
     )
   );

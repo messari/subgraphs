@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
-import { Vault, VaultFee } from "../../generated/schema";
+import { Vault } from "../../generated/schema";
 import {
   BeefyStrategy,
   ChargedFees,
@@ -9,24 +9,17 @@ import {
   Withdraw,
 } from "../../generated/Standard/BeefyStrategy";
 import { BeefyVault } from "../../generated/Standard/BeefyVault";
-import {
-  getBeefyFinanceOrCreate,
-  getTokenOrCreate,
-  getVaultFromStrategyOrCreate,
-} from "../utils/getters";
+import { getOrCreateToken, getOrCreateVault } from "../utils/getters";
 import { createDeposit } from "./deposit";
 import { createWithdraw } from "./withdraw";
 import {
   updateVaultDailySnapshot,
   updateVaultHourlySnapshot,
 } from "../utils/snapshots";
-import { fetchTokenName, fetchTokenSymbol } from "./token";
 import {
-  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_TEN,
   BIGINT_ZERO,
-  ZERO_ADDRESS,
 } from "../prices/common/constants";
 import {
   updateProtocolRevenueFromChargedFees,
@@ -34,49 +27,6 @@ import {
   updateProtocolRevenueFromWithdraw,
   updateProtocolUsage,
 } from "./protocol";
-
-export function createVaultFromStrategy(
-  strategyAddress: Address,
-  event: ethereum.Event
-): Vault {
-  const strategyContract = BeefyStrategy.bind(strategyAddress);
-  const vaultAddress = strategyContract.vault();
-  const vault = new Vault(vaultAddress.toHex());
-  const vaultContract = BeefyVault.bind(vaultAddress);
-  vault.name = fetchTokenName(vaultAddress);
-  vault.symbol = fetchTokenSymbol(vaultAddress);
-  vault.strategy = strategyAddress.toHex();
-  vault.inputTokenBalance = BIGINT_ZERO;
-
-  let want = strategyContract.try_want();
-  if (want.reverted) {
-    want = vaultContract.try_token();
-  }
-  if (want.reverted) {
-    vault.inputToken = getTokenOrCreate(ZERO_ADDRESS, event.block).id;
-  } else {
-    vault.inputToken = getTokenOrCreate(want.value, event.block).id;
-  }
-  vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
-
-  vault.outputToken = getTokenOrCreate(vaultAddress, event.block).id;
-  vault.fees = getFees(vault.id, strategyContract);
-  vault.createdTimestamp = event.block.timestamp;
-  vault.createdBlockNumber = event.block.number;
-
-  vault.outputTokenSupply = BIGINT_ZERO;
-  vault.pricePerShare = BIGINT_ZERO;
-  vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-
-  const beefy = getBeefyFinanceOrCreate(vault.id);
-  vault.protocol = beefy.id;
-  vault.save();
-  if (beefy.vaults[0] != vault.id) {
-    beefy.vaults = beefy.vaults.concat([vault.id]);
-    beefy.save();
-  }
-  return vault;
-}
 
 export function updateVaultAndSnapshots(
   vault: Vault,
@@ -109,7 +59,7 @@ export function updateVaultAndSnapshots(
   if (wantCall.reverted) {
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
   } else {
-    const inputToken = getTokenOrCreate(wantCall.value, block);
+    const inputToken = getOrCreateToken(wantCall.value, block);
     vault.totalValueLockedUSD = inputToken.lastPriceUSD
       .times(vault.inputTokenBalance.toBigDecimal())
       .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
@@ -124,6 +74,7 @@ export function updateVaultAndSnapshots(
   updateVaultDailySnapshot(block, vault);
 }
 
+<<<<<<< HEAD
 export function getFees(
   vaultId: string,
   strategyContract: BeefyStrategy
@@ -167,17 +118,27 @@ export function getFees(
   return fees;
 }
 
+=======
+>>>>>>> 2525f756 (update fees / refactor code)
 export function handleDeposit(event: Deposit): void {
-  const vault = getVaultFromStrategyOrCreate(event.address, event);
+  const vault = getOrCreateVault(event.address, event);
+  if (!vault) {
+    return;
+  }
+
   const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
   createDeposit(event, depositedAmount, vault.id);
 
   updateVaultAndSnapshots(vault, event.block);
-  updateProtocolUsage(event, vault, true, false);
+  updateProtocolUsage(event, true, false);
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  const vault = getVaultFromStrategyOrCreate(event.address, event);
+  const vault = getOrCreateVault(event.address, event);
+  if (!vault) {
+    return;
+  }
+
   const withdrawnAmount = event.params.tvl.minus(vault.inputTokenBalance);
   createWithdraw(event, withdrawnAmount, vault.id);
   updateVaultAndSnapshots(vault, event.block);
@@ -185,13 +146,21 @@ export function handleWithdraw(event: Withdraw): void {
 }
 
 export function handleStratHarvestWithAmount(event: StratHarvest): void {
-  const vault = getVaultFromStrategyOrCreate(event.address, event);
+  const vault = getOrCreateVault(event.address, event);
+  if (!vault) {
+    return;
+  }
+
   updateVaultAndSnapshots(vault, event.block);
   updateProtocolRevenueFromHarvest(event, event.params.wantHarvested, vault);
 }
 
 export function handleStratHarvest(event: StratHarvest): void {
-  const vault = getVaultFromStrategyOrCreate(event.address, event);
+  const vault = getOrCreateVault(event.address, event);
+  if (!vault) {
+    return;
+  }
+
   const strategyContract = BeefyStrategy.bind(event.address);
   const balance = strategyContract.try_balanceOf();
   if (!balance.reverted) {
@@ -204,7 +173,11 @@ export function handleStratHarvest(event: StratHarvest): void {
 }
 
 export function handleChargedFees(event: ChargedFees): void {
-  const vault = getVaultFromStrategyOrCreate(event.address, event);
+  const vault = getOrCreateVault(event.address, event);
+  if (!vault) {
+    return;
+  }
+
   updateVaultAndSnapshots(vault, event.block);
   updateProtocolRevenueFromChargedFees(event, vault); //si rompe qua!
 }

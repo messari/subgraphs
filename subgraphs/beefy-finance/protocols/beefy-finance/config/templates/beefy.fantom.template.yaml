@@ -8,7 +8,7 @@ dataSources:
     source:
       address: '0x0000000000000000000000000000000000000000'
       abi: BeefyStrategy
-      startBlock: 0
+      startBlock: 48054992
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

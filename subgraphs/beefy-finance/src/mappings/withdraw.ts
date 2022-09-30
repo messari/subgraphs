@@ -4,12 +4,9 @@ import {
   BeefyStrategy,
   Withdraw as WithdrawEvent,
 } from "../../generated/Standard/BeefyStrategy";
-import { getTokenOrCreate } from "../utils/getters";
-import {
-  BIGINT_TEN,
-  PROTOCOL_ID,
-  ZERO_ADDRESS_STRING,
-} from "../prices/common/constants";
+import { getOrCreateToken } from "../utils/getters";
+import { BIGINT_TEN, ZERO_ADDRESS_STRING } from "../prices/common/constants";
+import { PROTOCOL_ID } from "../utils/constants";
 
 export function createWithdraw(
   event: WithdrawEvent,
@@ -29,7 +26,7 @@ export function createWithdraw(
   withdraw.timestamp = event.block.timestamp;
 
   const strategyContract = BeefyStrategy.bind(event.address);
-  const asset = getTokenOrCreate(strategyContract.want(), event.block);
+  const asset = getOrCreateToken(strategyContract.want(), event.block);
   withdraw.asset = asset.id;
   withdraw.amount = withdrawnAmount;
   withdraw.amountUSD = asset.lastPriceUSD

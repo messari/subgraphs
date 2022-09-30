@@ -1,7 +1,7 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Standard/ERC20";
 
-export function fetchTokenDecimals(tokenAddress: Address): number {
+export function fetchTokenDecimals(tokenAddress: Address): i32 {
   const tokenContract = ERC20.bind(tokenAddress);
   const call = tokenContract.try_decimals();
   if (call.reverted) {

@@ -10,18 +10,8 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   BIGINT_ONE,
-  PROTOCOL_ID,
 } from "../prices/common/constants";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./time";
-
-export function getProtocolDailyId(
-  block: ethereum.Block,
-  protocol: YieldAggregator
-): string {
-  const daysSinceEpoch = getDaysSinceEpoch(block.timestamp.toI32()).toString();
-  const id = protocol.id.concat("-").concat(daysSinceEpoch);
-  return id;
-}
 
 export function getProtocolHourlyId(
   block: ethereum.Block,
@@ -38,7 +28,7 @@ export function updateUsageMetricsDailySnapshot(
   deposit: boolean,
   withdraw: boolean
 ): UsageMetricsDailySnapshot {
-  const id = getProtocolDailyId(event.block, protocol);
+  const id = getDaysSinceEpoch(event.block.timestamp.toI32()).toString();
   let protocolDailySnapshot = UsageMetricsDailySnapshot.load(id);
   if (protocolDailySnapshot == null) {
     protocolDailySnapshot = new UsageMetricsDailySnapshot(id);
@@ -142,16 +132,13 @@ export function updateDailyFinancialSnapshot(
   block: ethereum.Block,
   protocol: YieldAggregator
 ): FinancialsDailySnapshot {
-  const id = getProtocolDailyId(block, protocol);
+  const id = getDaysSinceEpoch(block.timestamp.toI32()).toString();
   let dailyFinancialSnapshot = FinancialsDailySnapshot.load(id);
   if (!dailyFinancialSnapshot) {
     dailyFinancialSnapshot = createDailyFinancialSnapshot(block, protocol);
   }
 
   dailyFinancialSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  dailyFinancialSnapshot.protocolControlledValueUSD =
-    protocol.protocolControlledValueUSD;
-
   dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD;
   dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD =
@@ -193,12 +180,10 @@ export function createDailyFinancialSnapshot(
   block: ethereum.Block,
   protocol: YieldAggregator
 ): FinancialsDailySnapshot {
-  const id = getProtocolDailyId(block, protocol);
+  const id = getDaysSinceEpoch(block.timestamp.toI32()).toString();
   const dailyFinancialSnapshot = new FinancialsDailySnapshot(id);
   dailyFinancialSnapshot.protocol = protocol.id;
   dailyFinancialSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  dailyFinancialSnapshot.protocolControlledValueUSD =
-    dailyFinancialSnapshot.protocolControlledValueUSD;
 
   dailyFinancialSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
   dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -249,14 +234,10 @@ function findPreviousFinancialSnapshot(
   block: ethereum.Block
 ): FinancialsDailySnapshot | null {
   let day = getDaysSinceEpoch(block.timestamp.toI32()) - 1;
-  let previousSnapshot = FinancialsDailySnapshot.load(
-    PROTOCOL_ID.concat("-").concat(day.toString())
-  );
+  let previousSnapshot = FinancialsDailySnapshot.load(day.toString());
   while (!previousSnapshot && day > 0) {
     day--;
-    previousSnapshot = FinancialsDailySnapshot.load(
-      PROTOCOL_ID.concat("-").concat(day.toString())
-    );
+    previousSnapshot = FinancialsDailySnapshot.load(day.toString());
   }
   return previousSnapshot;
 }

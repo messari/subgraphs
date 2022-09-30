@@ -19,21 +19,23 @@ import {
   BIGINT_ZERO,
   WHITELIST_TOKENS_MAP,
 } from "../prices/common/constants";
-import { getBeefyFinanceOrCreate, getTokenOrCreate } from "../utils/getters";
+import {
+  getOrCreateYieldAggregator,
+  getOrCreateToken,
+  getFees,
+} from "../utils/getters";
 import {
   updateDailyFinancialSnapshot,
   updateUsageMetricsDailySnapshot,
   updateUsageMetricsHourlySnapshot,
 } from "../utils/metrics";
-import { getFees } from "./vault";
 
 export function updateProtocolUsage(
   event: ethereum.Event,
-  vault: Vault,
   deposit: boolean,
   withdraw: boolean
 ): void {
-  const protocol = getBeefyFinanceOrCreate(vault.id);
+  const protocol = getOrCreateYieldAggregator();
   protocol.totalValueLockedUSD = getTvlUsd(protocol);
   protocol.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers.plus(
     isNewUser(event.transaction.from)
@@ -49,9 +51,9 @@ export function updateProtocolRevenueFromHarvest(
   amountHarvested: BigInt,
   vault: Vault
 ): void {
-  updateProtocolUsage(event, vault, false, false);
-  const protocol = getBeefyFinanceOrCreate(vault.id);
-  const token = getTokenOrCreate(
+  updateProtocolUsage(event, false, false);
+  const protocol = getOrCreateYieldAggregator();
+  const token = getOrCreateToken(
     Address.fromString(vault.inputToken.split("x")[1]),
     event.block
   );
@@ -67,7 +69,7 @@ export function updateProtocolRevenueFromHarvest(
 
   vault.fees = getFees(
     vault.id,
-    BeefyStrategy.bind(Address.fromString(vault.strategy.split("x")[1]))
+    BeefyStrategy.bind(Address.fromString(vault._strategyAddress))
   );
   vault.save();
 
@@ -78,14 +80,14 @@ export function updateProtocolRevenueFromChargedFees(
   event: ChargedFees,
   vault: Vault
 ): void {
-  updateProtocolUsage(event, vault, false, false);
-  const protocol = getBeefyFinanceOrCreate(vault.id);
+  updateProtocolUsage(event, false, false);
+  const protocol = getOrCreateYieldAggregator();
   const tokensMap = WHITELIST_TOKENS_MAP.get(dataSource.network());
   const native = tokensMap!.get("WETH")!;
-  const token = getTokenOrCreate(native, event.block);
+  const token = getOrCreateToken(native, event.block);
   vault.fees = getFees(
     vault.id,
-    BeefyStrategy.bind(Address.fromString(vault.strategy.split("x")[1]))
+    BeefyStrategy.bind(Address.fromString(vault._strategyAddress))
   );
   vault.save();
   const transactionRevenue = event.params.beefyFees
@@ -108,15 +110,15 @@ export function updateProtocolRevenueFromWithdraw(
   vault: Vault,
   withdrawnAmount: BigInt
 ): void {
-  updateProtocolUsage(event, vault, false, true);
-  const protocol = getBeefyFinanceOrCreate(vault.id);
-  const token = getTokenOrCreate(
-    Address.fromString(vault.inputToken.split("x")[1]),
+  updateProtocolUsage(event, false, true);
+  const protocol = getOrCreateYieldAggregator();
+  const token = getOrCreateToken(
+    Address.fromString(vault.inputToken),
     event.block
   );
   const fees = getFees(
     vault.id,
-    BeefyStrategy.bind(Address.fromString(vault.strategy.split("x")[1]))
+    BeefyStrategy.bind(Address.fromString(vault._strategyAddress))
   );
   vault.fees = fees;
   vault.save();
@@ -143,9 +145,9 @@ export function updateProtocolRevenueFromWithdraw(
 
 export function getTvlUsd(protocol: YieldAggregator): BigDecimal {
   let tvlUsd = BIGDECIMAL_ZERO;
-  if (protocol.vaults) {
-    for (let i = 0; i < protocol.vaults.length; i++) {
-      const vault = Vault.load(protocol.vaults[i]);
+  if (protocol._vaults) {
+    for (let i = 0; i < protocol._vaults.length; i++) {
+      const vault = Vault.load(protocol._vaults[i]);
       if (vault) {
         tvlUsd = tvlUsd.plus(vault.totalValueLockedUSD);
       }

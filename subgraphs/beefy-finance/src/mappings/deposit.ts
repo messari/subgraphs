@@ -4,12 +4,9 @@ import {
   BeefyStrategy,
   Deposit as DepositEvent,
 } from "../../generated/Standard/BeefyStrategy";
-import { getTokenOrCreate } from "../utils/getters";
-import {
-  BIGINT_TEN,
-  PROTOCOL_ID,
-  ZERO_ADDRESS_STRING,
-} from "../prices/common/constants";
+import { getOrCreateToken } from "../utils/getters";
+import { BIGINT_TEN, ZERO_ADDRESS_STRING } from "../prices/common/constants";
+import { PROTOCOL_ID } from "../utils/constants";
 
 export function createDeposit(
   event: DepositEvent,
@@ -29,7 +26,7 @@ export function createDeposit(
   deposit.timestamp = event.block.timestamp;
 
   const strategyContract = BeefyStrategy.bind(event.address);
-  const asset = getTokenOrCreate(strategyContract.want(), event.block);
+  const asset = getOrCreateToken(strategyContract.want(), event.block);
   deposit.asset = asset.id;
   deposit.amount = depositedAmount;
   deposit.amountUSD = asset.lastPriceUSD

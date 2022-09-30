@@ -77,9 +77,6 @@ enum VaultFeeType {
   " Fees charged by the protocol during harvest, in percentages of the interest accrued "
   PERFORMANCE_FEE
 
-  "Fees charged by the protocol during harvest, destinated to the strategy creator"
-  STRATEGIST_FEE
-
   " Fees charged by the protocol during harvest, destinated to the keeper"
   MANAGEMENT_FEE
 }
@@ -216,10 +213,10 @@ type YieldAggregator implements Protocol @entity {
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
-  ##### Vaults #####
+  ##### Add Ons #####
 
   " All vaults that belong to this protocol "
-  vaults: [Vault!]!
+  _vaults: [Vault!]!
 }
 
 ###############################
@@ -339,9 +336,6 @@ type Vault @entity {
   " Symbol of Vault (e.g. ONS) "
   symbol: String
 
-  " Strategy of the vault "
-  strategy: String!
-
   " Token that need to be deposited to take a position in protocol "
   inputToken: Token!
 
@@ -404,6 +398,14 @@ type Vault @entity {
 
   " All withdrawals made from this Vault "
   withdraws: [Withdraw!] @derivedFrom(field: "vault")
+
+  ##### Add Ons #####
+
+  " Strategy contract address of the vault "
+  _strategyAddress: String!
+
+  " The native token of the vault. This is what revenue is calculated/distributed in "
+  _nativeToken: Token!
 }
 
 #################################
