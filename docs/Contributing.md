@@ -34,6 +34,37 @@ At this point you will just need to follow the "Reviewing" process until your PR
 
 > This is an iterative process that takes time, so don't think it will always be easy.
 
+## Subgraph Directory Structure Guidelines
+
+All our subgraphs share the same build and deployment scripts. They are used during development, when deploying a subgraph, and during our CI validation pipelines. These scripts expect all subgraphs to follow a given directory structure. So for them to work without adding extra hassle, and to keep code itself organized in a consistent and predictable manner, we require all subgraphs to follow this structure. 
+
+Our CI pipelines on PRs automatically validate that this structure is followed, to enforce it and make sure things don't break in case of error. To do so we are using [folderslint](). It is a simple tool that allows you to define some rules and then validates that they are met. The rules are very simple, it is a set of paths that are whitelisted. These are contained at `/subgraphs/.folderslintrc`.
+
+The directory structure for a given subgraph should be as follows (this might eventually go out of date, so always refer to the code to see the actual rules):
+
+```
+subgraphs/
+    someProtocolName/
+        abis/
+            (no limitations on child directories here)
+        protocols/
+            (might have more than 1 in the case of forks)
+            someProtocolName/
+                config/
+                    deployments/
+                        someProtocolName-ethereum/
+                            configurations.json
+                        someProtocolName-arbitrum/
+                            configurations.json
+                    templates/
+                        someProtocol.template.yaml
+                src/
+                    (protocol/deployment specific code)
+        src/
+            (code common to all protocols in this subgraph)
+```
+
+
 ## Rebasing
 
 ### Why rebase?
@@ -42,7 +73,7 @@ Whenever there are merge conflicts you should rebase *instead* of merge. The rea
 
 How does this happen?
 
-The version of `master` you initally branched off is not the current version. New commits have been added, and some of them conflict with your changes. Answer: rebase.
+The version of `master` you initially branched off is not the current version. New commits have been added, and some of them conflict with your changes. Answer: rebase.
 
 Sometimes you need to make a change based off a `feature-branch` that hasn't been merged into `master` yet. Once `feature-branch` is merged into `master` you want to rebase onto `master` to clean up the branch commit history. 
 
@@ -66,11 +97,11 @@ In general you want to keep PRs small when possible. This way it is easier to re
 
 ### What should be included in a PR?
 
-To keep PRs small follow thse guidelines, and use them to make educated choices about other scenarios you might run into:
+To keep PRs small follow these guidelines, and use them to make educated choices about other scenarios you might run into:
 
 - If you are formatting code outside of the scope of your PR it should be in a separate PR
 - Isolate bug fixes into individual PRs, do not combine them. If they depend on each other use your judgement if they should be together or not. You can always branch off a `feature-branch`
-- Use a single PR for each feature (ie, a new subgraph has it's own PR)
+- Use a single PR for each feature (ie, a new subgraph has its own PR)
 
 ### Merging
 
@@ -167,7 +198,7 @@ Start by setting the upstream branch on your local repo to `messari/subgraphs`
 git remote add upstream https://github.com/messari/subgraphs.git
 ```
 
-Then navigate to a folder where you can keep this bash script executable (or create a new foler). A good location is `~/bin`
+Then navigate to a folder where you can keep this bash script executable (or create a new folder). A good location is `~/bin`
 
 Once you are here create a file named `git-sync` and put the following text in it:
 

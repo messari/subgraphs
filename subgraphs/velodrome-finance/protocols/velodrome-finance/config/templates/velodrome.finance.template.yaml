@@ -1,0 +1,115 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+{{#graft}}
+features:
+  - grafting
+graft:
+  base: {{base}}
+  block: {{block}}
+{{/graft}}
+dataSources:
+  {{#factory}}
+  - kind: ethereum
+    name: PairFactory
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: PairFactory
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - YieldAggregator
+      abis:
+        - name: PairFactory
+          file: ./abis/PairFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,bool,address,uint256)
+          handler: handlePairCreated
+      file: ./src/mappings/pairFactory.ts
+  {{/factory}}
+  {{#voter}}
+  - kind: ethereum
+    name: Voter
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: Voter
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - YieldAggregator
+      abis:
+        - name: Voter
+          file: ./abis/Voter.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: GaugeCreated(indexed address,address,address,indexed address,indexed address)
+          handler: handleGaugeCreated
+        - event: GaugeKilled(indexed address)
+          handler: handleGaugeKilled
+        - event: GaugeRevived(indexed address)
+          handler: handleGaugeRevived
+        - event: Deposit(indexed address,indexed address,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256)
+          handler: handleWithdraw
+        - event: DistributeReward(indexed address,indexed address,uint256)
+          handler: handleDistributeReward
+      file: ./src/mappings/rewards.ts
+  {{/voter}}
+templates:
+  - name: Pair
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/pair.ts
+      entities:
+        - YieldAggregator
+        - Pool
+      abis:
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: PairFactory
+          file: ./abis/PairFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Fees(indexed address,uint256,uint256)
+          handler: handleFees
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Sync(uint256,uint256)
+          handler: handleSync
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer

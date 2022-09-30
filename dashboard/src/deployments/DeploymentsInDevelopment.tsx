@@ -5,14 +5,14 @@ import { useNavigate } from "react-router";
 import DeploymentsInDevelopmentRow from "./DeploymentsInDevelopmentRow";
 
 interface DeploymentsInDevelopment {
-    deploymentsInDevelopment: { [x: string]: any };
+    protocolsToQuery: { [x: string]: any };
     getData: any;
 }
 
-function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: DeploymentsInDevelopment) {
+function DeploymentsInDevelopment({ protocolsToQuery, getData }: DeploymentsInDevelopment) {
     const navigate = useNavigate();
 
-    if (Object.keys(deploymentsInDevelopment).length === 0) {
+    if (Object.keys(protocolsToQuery).length === 0) {
         getData();
         return null;
     }
@@ -51,10 +51,13 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
     let protocolsInProgressCount = 0;
     let protocolsProdReadyCount = 0;
     const deposInProgress: { [x: string]: any } = {};
-    Object.entries(deploymentsInDevelopment).forEach(([protocolName, protocol]) => {
+    Object.entries(protocolsToQuery).forEach(([protocolName, protocol]) => {
         Object.keys(protocol.deployments).forEach((depoKey) => {
             totalDepoCounter += 1;
             const deploymentData: any = protocol.deployments[depoKey];
+            if (!deploymentData?.services) {
+                return;
+            }
             // Defeault status column in table is prod, when at least one depo on protocol is dev, the whoel row is dev
             if (!Object.keys(deposInProgress).includes(protocol.schema)) {
                 deposInProgress[protocol.schema] = {};
@@ -62,7 +65,14 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
             if (!Object.keys(deposInProgress[protocol.schema]).includes(protocolName)) {
                 deposInProgress[protocol.schema][protocolName] = { status: true, schemaVersions: [], subgraphVersions: [], methodologyVersions: [], networks: [] };
             }
-            deposInProgress[protocol.schema][protocolName].networks.push({ chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId: deploymentData["deployment-ids"]["hosted-service"] });
+            let hostedServiceId = null;
+            if (!!deploymentData["services"]["hosted-service"]) {
+                hostedServiceId = deploymentData["services"]["hosted-service"]["slug"];
+            }
+            if (!!deploymentData["services"]["cronos-portal"]) {
+                hostedServiceId = deploymentData["services"]["cronos-portal"]["slug"];
+            }
+            deposInProgress[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId });
             if (!deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
                 deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
             }
@@ -76,7 +86,7 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
                 deposInProgress[protocol.schema][protocolName].status = false;
             }
         });
-        if (deposInProgress[protocol.schema][protocolName].status === false) {
+        if (deposInProgress[protocol.schema][protocolName]?.status === false) {
             protocolsInProgressCount += 1;
         } else {
             protocolsProdReadyCount += 1;

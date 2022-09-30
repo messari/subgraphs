@@ -112,7 +112,7 @@ function ProtocolDashboard() {
 
   // By default, set the schema version to the user selected. If user has not selected, go to the version on the protocol entity
   let schemaVersion = subgraphToQuery.version;
-  if (!schemaVersion && protocolSchemaData?.protocols[0]?.schemaVersion) {
+  if (protocolSchemaData?.protocols[0]?.schemaVersion) {
     schemaVersion = protocolSchemaData.protocols[0].schemaVersion;
   }
   let protocolIdString = searchParams.get("protocolId");
@@ -845,7 +845,6 @@ function ProtocolDashboard() {
   if (data) {
     errorDisplayProps = null;
   }
-
   return (
     <div className="ProtocolDashboard">
       <DashboardHeader
