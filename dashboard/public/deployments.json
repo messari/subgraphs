@@ -186,6 +186,9 @@
             "optimism": "https://api.thegraph.com/subgraphs/name/messari/qidao-optimism",
             "polygon": "https://api.thegraph.com/subgraphs/name/messari/qidao-polygon"
         },
+        "radiant": {
+            "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/radiant-arbitrum"
+        },
         "rari-fuse": {
             "ethereum": "https://api.thegraph.com/subgraphs/name/messari/rari-fuse-ethereum",
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/rari-fuse-arbitrum"

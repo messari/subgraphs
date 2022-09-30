@@ -28,10 +28,8 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
       subgraph
       node
       synced
-      health
       fatalError {
         message
-        handler
       }
       chains {
         network
@@ -49,23 +47,23 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
         }
       }
       entityCount`;
-
+    const aliasToProtocol: any = {};
     protocol.networks.forEach((depo: any) => {
+        const alias = depo?.hostedServiceId
+            ?.split("-")
+            ?.join(
+                "_"
+            );
+
+        aliasToProtocol[alias] = depo?.name;
+
         fullCurrentQueryArray.push(`        
-              ${depo?.hostedServiceId
-                ?.split("-")
-                ?.join(
-                    "_"
-                )}: indexingStatusForCurrentVersion(subgraphName: "messari/${depo?.hostedServiceId}") {
+              ${alias}: indexingStatusForCurrentVersion(subgraphName: "messari/${depo?.hostedServiceId}") {
                 ${queryContents}
               }
           `);
         fullPendingQueryArray.push(`        
-            ${depo?.hostedServiceId
-                ?.split("-")
-                ?.join(
-                    "_"
-                )}_pending: indexingStatusForPendingVersion(subgraphName: "messari/${depo?.hostedServiceId}") {
+            ${alias}_pending: indexingStatusForPendingVersion(subgraphName: "messari/${depo?.hostedServiceId}") {
               ${queryContents}
             }
         `);
@@ -88,6 +86,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
     }] = useLazyQuery(gql`${fullPendingQueryArray.join("")}`, {
         client: clientIndexing,
     });
+
 
     useEffect(() => {
         if (showDeposDropDown && !status) {
@@ -214,18 +213,18 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                     indexedDecen = formatIntToFixed2(100);
                 }
 
-                const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(x => subgraphName.includes(x));
+                const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(x => x.includes(subgraphName));
                 let decenSubgraphId = decenObject?.subgraph;
                 if (decenSubgraphKey) {
                     decenSubgraphId = decenDeposToSubgraphIds[decenSubgraphKey];
                 }
-                const endpointURL =
+                let endpointURL =
                     "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + decenSubgraphId;
 
                 let schemaCell = <span>{depo?.versions?.schema}</span>;
 
                 if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
-                    schemaCell = <Tooltip title="This deployment does not have the latest schema verison" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
+                    schemaCell = <Tooltip title="This deployment does not have the latest schema version" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
                 }
                 let curationSymbol = null;
                 if (!decenDeposToSubgraphIds[depo?.decentralizedNetworkId] && !decenDeposToSubgraphIds[depo?.hostedServiceId]) {
@@ -316,11 +315,15 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 schemaCell = <Tooltip title="This deployment does not have the latest schema verison" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
             }
 
+            let subgraphUrlBase = "";
+            if (depo.chain === "cronos") {
+                subgraphUrlBase = "https://graph.cronoslabs.com/subgraphs/name/";
+            }
 
             return (
                 <>
                     {decenRow}
-                    <TableRow onClick={() => navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol`)} key={subgraphName + depo.hostedServiceId + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                    <TableRow onClick={() => navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`)} key={subgraphName + depo.hostedServiceId + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell
                             sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${highlightColor} solid 34px`, verticalAlign: "middle", display: "flex" }}
                         >
@@ -454,7 +457,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
             <TableCell sx={{ padding: "0 6px 1px 0", textAlign: "right", display: "flex" }}>
                 <Tooltip title="Click To View All Deployments On This Protocol" placement="top" >
                     <>
-                        {protocol.networks.map((x: { [x: string]: any }) => <a key={subgraphName + x.hostedServiceId + 'Logo'} style={{ height: "100%", border: x.chain === "polygon" ? "#FFA500 4px solid" : "#58BC82 4px solid", borderRadius: "50%" }} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo size={28} network={x.chain} /></a>)}
+                        {protocol.networks.map((x: { [x: string]: any }) => <a key={subgraphName + x.hostedServiceId + 'Logo'} style={{ height: "100%", border: "#58BC82 4px solid", borderRadius: "50%" }} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo size={28} network={x.chain} /></a>)}
                     </>
                 </Tooltip>
             </TableCell>

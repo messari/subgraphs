@@ -69,6 +69,9 @@ function DeploymentsInDevelopment({ protocolsToQuery, getData }: DeploymentsInDe
             if (!!deploymentData["services"]["hosted-service"]) {
                 hostedServiceId = deploymentData["services"]["hosted-service"]["slug"];
             }
+            if (!!deploymentData["services"]["cronos-portal"]) {
+                hostedServiceId = deploymentData["services"]["cronos-portal"]["slug"];
+            }
             deposInProgress[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId });
             if (!deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
                 deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
