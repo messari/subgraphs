@@ -17,7 +17,6 @@ import {
 import { Swap } from "../modules/Swap";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
-import * as constants from "../common/constants";
 
 export function handleTokenExchange(event: TokenExchange): void {
   const buyer = event.params.buyer;
@@ -123,7 +122,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   Withdraw(
     liquidityPoolAddress,
     withdrawnCoinAmounts,
-    constants.BIGINT_NEGATIVE_ONE,
+    null,
     tokenSupplyAfterWithdrawal,
     provider,
     event.transaction,
@@ -148,7 +147,7 @@ export function handleRemoveLiquidityWithFees(
   Withdraw(
     liquidityPoolAddress,
     withdrawnCoinAmounts,
-    constants.BIGINT_NEGATIVE_ONE,
+    null,
     tokenSupplyAfterWithdrawal,
     provider,
     event.transaction,
@@ -164,12 +163,11 @@ export function handleRemoveLiquidityWithFees(
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
   const provider = event.params.provider;
   const liquidityPoolAddress = event.address;
-  const withdrawnCoinAmounts = event.params.coin_amount;
   const outputTokenBurntAmount = event.params.token_amount;
 
   Withdraw(
     liquidityPoolAddress,
-    [withdrawnCoinAmounts],
+    [],
     outputTokenBurntAmount,
     null,
     provider,
@@ -188,15 +186,13 @@ export function handleRemoveLiquidityOneWithSupply(
 ): void {
   const provider = event.params.provider;
   const liquidityPoolAddress = event.address;
-  const withdrawnCoinAmounts = event.params.coin_amount;
   const outputTokenBurntAmount = event.params.token_amount;
-  const tokenSupplyAfterWithdrawal = event.params.token_supply;
 
   Withdraw(
     liquidityPoolAddress,
-    [withdrawnCoinAmounts],
+    [],
     outputTokenBurntAmount,
-    tokenSupplyAfterWithdrawal,
+    null,
     provider,
     event.transaction,
     event.block,
@@ -219,7 +215,7 @@ export function handleRemoveLiquidityImbalance(
   Withdraw(
     liquidityPoolAddress,
     withdrawnTokenAmounts,
-    constants.BIGINT_NEGATIVE_ONE,
+    null,
     tokenSupplyAfterWithdrawal,
     provider,
     event.transaction,

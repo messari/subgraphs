@@ -43,7 +43,8 @@ export function createWithdrawTransaction(
     withdrawTransaction.protocol = constants.PROTOCOL_ID.toHexString();
 
     withdrawTransaction.to = constants.NULL.TYPE_STRING;
-    if (event.transaction.to) withdrawTransaction.to = event.transaction.to!.toHexString();
+    if (event.transaction.to)
+      withdrawTransaction.to = event.transaction.to!.toHexString();
 
     withdrawTransaction.from = provider.toHexString();
 
@@ -83,17 +84,24 @@ export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
   protocol.save();
 }
 
-function getInputToken(
-  event: ethereum.Event,
-  poolAddress: Address,
+export function getWithdrawnTokenAmounts(
+  liquidityPoolAddress: Address,
   provider: Address,
-  amount: BigInt
-): Address {
+  inputTokens: string[],
+  event: ethereum.Event
+): BigInt[] {
   let receipt = event.receipt;
-  if (!receipt) return constants.NULL.TYPE_ADDRESS;
+  if (!receipt) {
+    return new Array<BigInt>(inputTokens.length).fill(constants.BIGINT_ZERO);
+  }
 
   let logs = event.receipt!.logs;
-  if (!logs) return constants.NULL.TYPE_ADDRESS;
+  if (!logs) {
+    return new Array<BigInt>(inputTokens.length).fill(constants.BIGINT_ZERO);
+  }
+
+  let inputToken = constants.NULL.TYPE_ADDRESS;
+  let inputTokenAmount = constants.BIGINT_ZERO;
 
   for (let i = 0; i < logs.length; ++i) {
     let log = logs.at(i);
@@ -106,39 +114,21 @@ function getInputToken(
       let _from = ethereum.decode("address", log.topics.at(1))!.toAddress();
       let _to = ethereum.decode("address", log.topics.at(2))!.toAddress();
 
-      if (_from == poolAddress && _to == provider) {
+      if (_from == liquidityPoolAddress && _to == provider) {
         let data = ethereum.decode("uint256", log.data);
 
-        if (data && data.toBigInt().equals(amount)) {
-          let inputToken = log.address;
-
-          return inputToken;
+        if (data) {
+          inputToken = log.address;
+          inputTokenAmount = data.toBigInt();
         }
       }
     }
   }
 
-  return constants.NULL.TYPE_ADDRESS;
-}
-
-export function getWithdrawnTokenAmounts(
-  liquidityPoolAddress: Address,
-  provider: Address,
-  inputTokens: string[],
-  inputTokenAmount: BigInt,
-  event: ethereum.Event
-): BigInt[] {
-  let inputToken = getInputToken(
-    event,
-    liquidityPoolAddress,
-    provider,
-    inputTokenAmount
-  );
-
   let withdrawnTokenAmounts = new Array<BigInt>();
 
   for (let idx = 0; idx < inputTokens.length; idx++) {
-    if (inputTokens[idx] == inputToken.toHexString()) {
+    if (Address.fromString(inputTokens.at(idx)).equals(inputToken)) {
       withdrawnTokenAmounts.push(inputTokenAmount);
 
       continue;
@@ -153,7 +143,7 @@ export function getWithdrawnTokenAmounts(
 export function Withdraw(
   poolAddress: Address,
   withdrawnTokenAmounts: BigInt[],
-  outputTokenBurntAmount: BigInt,
+  outputTokenBurntAmount: BigInt | null,
   tokenSupplyAfterWithdrawal: BigInt | null,
   provider: Address,
   transaction: ethereum.Transaction,
@@ -168,19 +158,18 @@ export function Withdraw(
       pool.outputTokenSupply!
     );
 
-  if (outputTokenBurntAmount.equals(constants.BIGINT_NEGATIVE_ONE))
+  if (!outputTokenBurntAmount)
     outputTokenBurntAmount = pool.outputTokenSupply!.minus(
       tokenSupplyAfterWithdrawal
     );
 
-  if (withdrawnTokenAmounts.length == 1) {
+  if (withdrawnTokenAmounts.length == 0) {
     // Exception: Remove Liquidity One has no information about input token
 
     withdrawnTokenAmounts = getWithdrawnTokenAmounts(
       poolAddress,
       provider,
       pool.inputTokens,
-      withdrawnTokenAmounts[0],
       event
     );
   }
