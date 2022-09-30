@@ -1561,7 +1561,7 @@
         "network": "arbitrum",
         "status": "dev",
         "versions": {
-          "schema": "1.2.1",
+          "schema": "1.3.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -1583,7 +1583,7 @@
         "network": "avalanche",
         "status": "dev",
         "versions": {
-          "schema": "1.2.1",
+          "schema": "1.3.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -1605,7 +1605,7 @@
         "network": "ethereum",
         "status": "dev",
         "versions": {
-          "schema": "1.2.1",
+          "schema": "1.3.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -1627,7 +1627,7 @@
         "network": "fantom",
         "status": "dev",
         "versions": {
-          "schema": "1.2.1",
+          "schema": "1.3.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -1649,7 +1649,7 @@
         "network": "gnosis",
         "status": "dev",
         "versions": {
-          "schema": "1.2.1",
+          "schema": "1.3.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -1671,7 +1671,7 @@
         "network": "optimism",
         "status": "dev",
         "versions": {
-          "schema": "1.2.1",
+          "schema": "1.3.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -1693,7 +1693,7 @@
         "network": "polygon",
         "status": "dev",
         "versions": {
-          "schema": "1.2.1",
+          "schema": "1.3.0",
           "subgraph": "1.0.0",
           "methodology": "1.0.0"
         },
@@ -1894,6 +1894,64 @@
           "decentralized-network": {
             "slug": "lido-ethereum",
             "query-id": "XYcD9VeUvSvuqrsV5pFauXk7jQy9hrnhe5Kb7REyuxm"
+          }
+        }
+      }
+    }
+  },
+  "tornado-cash": {
+    "schema": "generic",
+    "base": "tornado-cash",
+    "protocol": "tornado-cash",
+    "deployments": {
+      "tornado-cash-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "N/A",
+          "subgraph": "N/A",
+          "methodology": "N/A"
+        },
+        "files": {
+          "template": "tornado-cash.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "tornado-cash-ethereum",
+            "query-id": "tornado-cash-ethereum"
+          }
+        }
+      }
+    }
+  },
+  "rocket-pool": {
+    "schema": "generic",
+    "base": "rocket-pool",
+    "protocol": "rocket-pool",
+    "deployments": {
+      "rocket-pool-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "N/A",
+          "subgraph": "N/A",
+          "methodology": "N/A"
+        },
+        "files": {
+          "template": "rocket-pool.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "rocket-pool-ethereum",
+            "query-id": "rocket-pool-ethereum"
           }
         }
       }
@@ -2746,9 +2804,9 @@
   "radiant": {
     "schema": "lending",
     "base": "aave-v2-forks",
-    "protocol": "radiant-capital",
+    "protocol": "radiant",
     "deployments": {
-      "radiant-capital-arbitrum": {
+      "radiant-arbitrum": {
         "network": "arbitrum",
         "status": "prod",
         "versions": {
@@ -2757,7 +2815,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "radiant.capital.template.yaml"
+          "template": "radiant.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -2765,8 +2823,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "radiant-capital-arbitrum",
-            "query-id": "radiant-capital-arbitrum"
+            "slug": "radiant-arbitrum",
+            "query-id": "radiant-arbitrum"
           }
         }
       }
@@ -3225,8 +3283,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "mm-finance-cronos",
-            "query-id": "mm-finance-cronos"
+            "slug": "mm-finance",
+            "query-id": "mm-finance"
           }
         }
       }
