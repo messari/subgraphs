@@ -213,7 +213,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                     indexedDecen = formatIntToFixed2(100);
                 }
 
-                const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(x => subgraphName.includes(x));
+                const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(x => x.includes(subgraphName));
                 let decenSubgraphId = decenObject?.subgraph;
                 if (decenSubgraphKey) {
                     decenSubgraphId = decenDeposToSubgraphIds[decenSubgraphKey];
@@ -221,11 +221,10 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 let endpointURL =
                     "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + decenSubgraphId;
 
-
                 let schemaCell = <span>{depo?.versions?.schema}</span>;
 
                 if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
-                    schemaCell = <Tooltip title="This deployment does not have the latest schema verison" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
+                    schemaCell = <Tooltip title="This deployment does not have the latest schema version" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
                 }
                 let curationSymbol = null;
                 if (!decenDeposToSubgraphIds[depo?.decentralizedNetworkId] && !decenDeposToSubgraphIds[depo?.hostedServiceId]) {

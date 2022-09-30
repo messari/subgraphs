@@ -65,7 +65,6 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
           const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
           const curatorSignals = sub.currentVersion.subgraphDeployment.curatorSignals;
           const subgraphId = sub.id;
-
           decenDepos[name] = { network, deploymentId, subgraphId, curatorSignals };
         } catch (err) {
           return;
@@ -90,13 +89,13 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         if (networkStr === "matic") {
           networkStr = "polygon";
         }
-        let hasValidSignals = false;
+        let subgraphIdToMap = "";
         let signalCount = 0;
-        decentralizedDeployments[x]?.curatorSignals?.forEach((x: any) => signalCount += x?.signal);
+        decentralizedDeployments[x]?.curatorSignals?.forEach((signalObj: any) => signalCount += signalObj?.signal);
         if (signalCount > 0) {
-          hasValidSignals = true;
+          subgraphIdToMap = decentralizedDeployments[x]?.subgraphId;
         }
-        decenDeposToSubgraphIds[x + "-" + networkStr] = hasValidSignals;
+        decenDeposToSubgraphIds[x + "-" + networkStr] = subgraphIdToMap;
       }
     });
   }
