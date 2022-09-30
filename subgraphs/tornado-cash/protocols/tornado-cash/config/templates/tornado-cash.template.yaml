@@ -1,0 +1,364 @@
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  {{#isNetworkMainnet}}
+  - kind: ethereum/contract
+    name: TornadoCashRewardSwap
+    network: {{ network }}
+    source:
+      address: "0x5cab7692D4E94096462119ab7bF57319726Eed2A"
+      abi: TornadoCashRewardSwap
+      startBlock: 11474710
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: {{{ file }}}
+      entities:
+        - Protocol
+        - Pool
+        - Token
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+      abis:
+        - name: TornadoCashRewardSwap
+          file: ./abis/TornadoCashRewardSwap.json
+
+        - name: TornadoCashETH
+          file: ./abis/TornadoCashETH.json
+        - name: TornadoCashERC20
+          file: ./abis/TornadoCashERC20.json
+
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: UniswapV1DAI
+          file: ./abis/Prices/Uniswap/v1/DAI.json
+        - name: UniswapV1USDC
+          file: ./abis/Prices/Uniswap/v1/USDC.json
+        - name: UniswapV1cDAI
+          file: ./abis/Prices/Uniswap/v1/cDAI.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Swap(indexed address,uint256,uint256)
+          handler: handleRewardSwap
+  - kind: ethereum/contract
+    name: TornadoCashMiner
+    network: {{ network }}
+    source:
+      address: "0x746Aebc06D2aE31B71ac51429A19D54E797878E9"
+      abi: TornadoCashMiner
+      startBlock: 11474718
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: {{{ file }}}
+      entities:
+        - Pool
+        - Token
+        - PoolDailySnapshot
+        - PoolHourlySnapshot
+      abis:
+        - name: TornadoCashMiner
+          file: ./abis/TornadoCashMiner.json
+
+        - name: TornadoCashETH
+          file: ./abis/TornadoCashETH.json
+        - name: TornadoCashERC20
+          file: ./abis/TornadoCashERC20.json
+
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: UniswapV1DAI
+          file: ./abis/Prices/Uniswap/v1/DAI.json
+        - name: UniswapV1USDC
+          file: ./abis/Prices/Uniswap/v1/USDC.json
+        - name: UniswapV1cDAI
+          file: ./abis/Prices/Uniswap/v1/cDAI.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: RateChanged(address,uint256)
+          handler: handleRateChanged
+  - kind: ethereum/contract
+    name: TornadoCashFeeManager
+    network: {{ network }}
+    source:
+      address: "0x5f6c97C6AD7bdd0AE7E0Dd4ca33A4ED3fDabD4D7"
+      abi: TornadoCashFeeManager
+      startBlock: 14173128
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: {{{ file }}}
+      entities:
+        - Pool
+      abis:
+        - name: TornadoCashFeeManager
+          file: ./abis/TornadoCashFeeManager.json
+
+        - name: TornadoCashETH
+          file: ./abis/TornadoCashETH.json
+        - name: TornadoCashERC20
+          file: ./abis/TornadoCashERC20.json
+
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: UniswapV1DAI
+          file: ./abis/Prices/Uniswap/v1/DAI.json
+        - name: UniswapV1USDC
+          file: ./abis/Prices/Uniswap/v1/USDC.json
+        - name: UniswapV1cDAI
+          file: ./abis/Prices/Uniswap/v1/cDAI.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: FeeUpdated(indexed address,uint256)
+          handler: handleFeeUpdated
+  - kind: ethereum/contract
+    name: TornadoCashRelayerRegistry
+    network: {{ network }}
+    source:
+      address: "0x58E8dCC13BE9780fC42E8723D8EaD4CF46943dF2"
+      abi: TornadoCashRelayerRegistry
+      startBlock: 14173129
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: {{{ file }}}
+      entities:
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: TornadoCashRelayerRegistry
+          file: ./abis/TornadoCashRelayerRegistry.json
+      eventHandlers:
+        - event: StakeAddedToRelayer(address,uint256)
+          handler: handleStakeAddedToRelayer
+        - event: StakeBurned(address,uint256)
+          handler: handleStakeBurned
+  - kind: ethereum/contract
+    name: TornadoCashStakingRewards
+    network: {{ network }}
+    source:
+      address: "0x2FC93484614a34f26F7970CBB94615bA109BB4bf"
+      abi: TornadoCashStakingRewards
+      startBlock: 14173348
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: {{{ file }}}
+      entities:
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+      abis:
+        - name: TornadoCashStakingRewards
+          file: ./abis/TornadoCashStakingRewards.json
+      eventHandlers:
+        - event: RewardsClaimed(indexed address,uint256)
+          handler: handleStakingRewardsClaimed
+  {{/isNetworkMainnet}}
+
+  {{#pools}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ network }}
+    source:
+      address: "{{ address }}"
+      abi: {{ abi }}
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: {{{ file }}}
+      entities:
+        - Pool
+        - Protocol
+        - Token
+      abis:
+        # mainnet uses an older abi `TornadoCashETH`
+        # other chains (BSC, Arbitrum, Optimism, Matic, Avax) use the newer abi `TornadoCashBNB`
+        - name: TornadoCashETH
+          file: ./abis/TornadoCashETH.json
+        - name: TornadoCashBNB
+          file: ./abis/TornadoCashBNB.json
+        - name: TornadoCashERC20
+          file: ./abis/TornadoCashERC20.json
+
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: UniswapV1DAI
+          file: ./abis/Prices/Uniswap/v1/DAI.json
+        - name: UniswapV1USDC
+          file: ./abis/Prices/Uniswap/v1/USDC.json
+        - name: UniswapV1cDAI
+          file: ./abis/Prices/Uniswap/v1/cDAI.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Deposit(indexed bytes32,uint32,uint256)
+          handler: handleDeposit
+        - event: Withdrawal(address,bytes32,indexed address,uint256)
+          handler: handleWithdrawal
+  {{/pools}}

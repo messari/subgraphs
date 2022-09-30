@@ -19,14 +19,15 @@ Currently, it is fixed at 0.3% . Some pools remain without fees, either because 
 
 Due to the OFAC sanction recently, most the web services of Tornado Cash are affected. The following are the sites and their backups:
 
-- Protocol site: https://app.tornado.cash/
-  - https://ipfs.io/ipfs/bafybeicu2anhh7cxbeeakzqjfy3pisok2nakyiemm3jxd66ng35ib6y5ri/  
-- Docs: https://docs.tornado.cash/
-  - Introduction (cached): https://webcache.googleusercontent.com/search?q=cache:bQAucJ24f78J:https://docs.tornado.cash/&cd=3&hl=zh-CN&ct=clnk&gl=sg
-  - Relayer (cached): https://webcache.googleusercontent.com/search?q=cache:hmXYtuLQfXQJ:https://docs.tornado.cash/general/how-to-become-a-relayer
-  - How to use with TOR (cached): https://webcache.googleusercontent.com/search?q=cache:wH5XFMOVI0QJ:https://docs.tornado.cash/general/how-to-use-tornado-cash-with-tor
-  - Anonymity mining (cached): https://webcache.googleusercontent.com/search?q=cache:pRxbB6rJk6YJ:https://docs.tornado.cash/tornado-cash-classic/anonymity-mining
-- Smart Contracts (cached):https://webcache.googleusercontent.com/search?q=cache:FTw69XNSzv0J:https://docs.tornado.cash/general/tornado-cash-smart-contracts 
+- Protocol site: https://tornadocash.eth.link/
+  - https://ipfs.io/ipfs/bafybeicu2anhh7cxbeeakzqjfy3pisok2nakyiemm3jxd66ng35ib6y5ri/
+- Token: https://etherscan.io/address/0x77777feddddffc19ff86db637967013e6c6a116c (Mainnet)
+  - https://bscscan.com/address/0x1ba8d3c4c219b124d351f603060663bd1bcd9bbf (Bsc)
+- Docs (forked): https://github.com/Garf1eld99/docs/blob/en/SUMMARY.md
+  - Introduction: https://github.com/Garf1eld99/docs/blob/en/README.md
+  - Relayer: https://github.com/Garf1eld99/docs/blob/en/general/how-to-become-a-relayer.md
+  - Anonymity mining: https://github.com/Garf1eld99/docs/blob/en/tornado-cash-classic/anonymity-mining.md
+- Smart Contracts: https://github.com/Garf1eld99/docs/blob/en/general/tornado-cash-smart-contracts.md
 
 ## Tornado Cash accepted tokens on different chains
 - Ethereum Blockchain : ETH (Ethereum), DAI (Dai), cDAI (Compound Dai), USDC (USD Coin), USDT (Tether) & WBTC (Wrapped Bitcoin)
@@ -64,17 +65,27 @@ E.g the TVL of Tornado Cash on Ethereum is the sum of ETH, DAI, cDAI, USDC, USDT
 
 ### Revenue
 
-> Total Revenue = $\sum$ Portion of the withdrawn amount paid to a relayer
+> Total Revenue (in pool token) = $\sum$ Portion of the withdrawn amount paid to a relayer
 
-In a withdrawal transaction, the amount is split into two: one portion (usually the bigger portion) paid to the user; the other portion paid the the relayer to cover transaction cost born the the relayer and relayer's fee
+In a withdrawal transaction, the amount is split into two: 
+- one portion (usually the bigger portion) paid to the user
+- the other portion paid to the relayer to cover transaction cost borne by the relayer and relayer's fee
 
-> Protocol-side revenue = $\sum$ Fee rate when applicable *  Value of withdrawals 
+> Protocol-side revenue (in TORN token) = $\sum$ Fee rate when applicable *  Value of withdrawals 
 
-The fee rate, as stated in the Relayer section, is 0.3% or 0% for some pools. 
+To become a relayer, a user has to stake a minimum of 300 TORN tokens (minimum stake value is decided by governance vote) in governance vault. The protocol collects a fee directly from the relayer’s staked balance for each withdrawal. 
+- The fee rate, as stated in the Relayer section, is 0.3% or 0% for some pools. The calculated pool fee can be obtained from the `FeeUpdated` [event](https://etherscan.io/address/0xf4B067dD14e95Bab89Be928c07Cb22E3c94E0DAA#code#F33#L80). 
+Pool fee is [updated](https://etherscan.io/address/0xf4B067dD14e95Bab89Be928c07Cb22E3c94E0DAA#code#F33#L87) at every `updateFeeTimeLimit` (currently set to 172800 seconds, or 48 hours) or if the current and the expected fee [deviation](https://etherscan.io/address/0xf4B067dD14e95Bab89Be928c07Cb22E3c94E0DAA#code#F33#L151) is too large.
+- TORN tokens, equivalent to this calculated pool fee, are [burned](https://etherscan.io/address/0x01e2919679362dFBC9ee1644Ba9C6da6D6245BB1#code#F1#L238) from relayer's staked balance.
 
 > Supply-side revenue = Total Revenue - Protocol-side revenue
 
 Arguably, the difference between the total revenue and protocol-side revenue here is not for the liquidity providers, but for the relayers. Relayers earn a revenue from each withdrawal transaction, to cover the transaction cost (gas fee) and the 0.3% protocol fee charged by Tornado Cash, and keep the remaining as their service income. Liquidity providers do not share revenue generated in Tornado Cash.
+
+> **Note**
+> Since the pool fee calculated by the protocol is updated every 48 hours or when the deviation from expected fee is too large, high volatility in TORN price compared to pool token price during this period, can cause unexpected revenues.
+> If increment in TORN price to increment in pool token price becomes larger, protocol-side revenue (protocol fee) increases and can even be greater than the total revenue (relayer's fee) and hence supply-side revenue (relayer's profits) for these snapshots can be negative. In effect relayers will lose money, until the pool fee is adjusted to accomodate for this volatility.
+> Reverse is true as well, if increment in TORN price to increment in pool token price becomes smaller, relayers will make more commission.
 
 ### Rewards
 
