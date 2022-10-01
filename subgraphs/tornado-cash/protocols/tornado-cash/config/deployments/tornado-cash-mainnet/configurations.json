@@ -1,0 +1,122 @@
+{
+  "deployment": "TORNADOCASH_MAINNET",
+  "network": "mainnet",
+  "isNetworkMainnet": true,
+  "file": "./src/mappings/networks/ethereum/handlers.ts",
+  "pools": [
+    {
+      "name": "TornadoCash01",
+      "address": "0x12d66f87a04a9e220743712ce6d9bb1b5616b8fc",
+      "abi": "TornadoCashETH",
+      "startBlock": 9116966
+    },
+    {
+      "name": "TornadoCash1",
+      "address": "0x47CE0C6eD5B0Ce3d3A51fdb1C52DC66a7c3c2936",
+      "abi": "TornadoCashETH",
+      "startBlock": 9117609
+    },
+    {
+      "name": "TornadoCash10",
+      "address": "0x910cbd523d972eb0a6f4cae4618ad62622b39dbf",
+      "abi": "TornadoCashETH",
+      "startBlock": 9117720
+    },
+    {
+      "name": "TornadoCash100",
+      "address": "0xa160cdab225685da1d56aa342ad8841c3b53f291",
+      "abi": "TornadoCashETH",
+      "startBlock": 9161895
+    },
+    {
+      "name": "TornadoCash100DAI",
+      "address": "0xD4B88Df4D29F5CedD6857912842cff3b20C8Cfa3",
+      "abi": "TornadoCashERC20",
+      "startBlock": 9117612
+    },
+    {
+      "name": "TornadoCash1000DAI",
+      "address": "0xfd8610d20aa15b7b2e3be39b396a1bc3516c7144",
+      "abi": "TornadoCashERC20",
+      "startBlock": 9161917
+    },
+    {
+      "name": "TornadoCash10000DAI",
+      "address": "0x07687e702b410Fa43f4cB4Af7FA097918ffD2730",
+      "abi": "TornadoCashERC20",
+      "startBlock": 12066007
+    },
+    {
+      "name": "TornadoCash100000DAI",
+      "address": "0x23773E65ed146A459791799d01336DB287f25334",
+      "abi": "TornadoCashERC20",
+      "startBlock": 12066048
+    },
+    {
+      "name": "TornadoCash5000cDAI",
+      "address": "0x22aaA7720ddd5388A3c0A3333430953C68f1849b",
+      "abi": "TornadoCashERC20",
+      "startBlock": 9161938
+    },
+    {
+      "name": "TornadoCash50000cDAI",
+      "address": "0x03893a7c7463AE47D46bc7f091665f1893656003",
+      "abi": "TornadoCashERC20",
+      "startBlock": 12069037
+    },
+    {
+      "name": "TornadoCash500000cDAI",
+      "address": "0x2717c5e28cf931547B621a5dddb772Ab6A35B701",
+      "abi": "TornadoCashERC20",
+      "startBlock": 12067606
+    },
+    {
+      "name": "TornadoCash5000000cDAI",
+      "address": "0xD21be7248e0197Ee08E0c20D4a96DEBdaC3D20Af",
+      "abi": "TornadoCashERC20",
+      "startBlock": 12066053
+    },
+    {
+      "name": "TornadoCash100USDC",
+      "address": "0x4736dCf1b7A3d580672CcE6E7c65cd5cc9cFBa9D",
+      "abi": "TornadoCashERC20",
+      "startBlock": 9161965
+    },
+    {
+      "name": "TornadoCash1000USDC",
+      "address": "0xd96f2B1c14Db8458374d9Aca76E26c3D18364307",
+      "abi": "TornadoCashERC20",
+      "startBlock": 9161958
+    },
+    {
+      "name": "TornadoCash100USDT",
+      "address": "0x169AD27A470D064DEDE56a2D3ff727986b15D52B",
+      "abi": "TornadoCashERC20",
+      "startBlock": 9162005
+    },
+    {
+      "name": "TornadoCash1000USDT",
+      "address": "0x0836222F2B2B24A3F36f98668Ed8F0B38D1a872f",
+      "abi": "TornadoCashERC20",
+      "startBlock": 9162012
+    },
+    {
+      "name": "TornadoCash01WBTC",
+      "address": "0x178169B423a011fff22B9e3F3abeA13414dDD0F1",
+      "abi": "TornadoCashERC20",
+      "startBlock": 12067529
+    },
+    {
+      "name": "TornadoCash1WBTC",
+      "address": "0x610B717796ad172B316836AC95a2ffad065CeaB4",
+      "abi": "TornadoCashERC20",
+      "startBlock": 12066652
+    },
+    {
+      "name": "TornadoCash10WBTC",
+      "address": "0xbB93e510BbCD0B7beb5A853875f9eC60275CF498",
+      "abi": "TornadoCashERC20",
+      "startBlock": 12067591
+    }
+  ]
+}

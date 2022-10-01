@@ -7,7 +7,7 @@ interface DevCountTableProps {
 
 function DevCountTable({ subgraphCounts }: DevCountTableProps) {
     return (
-        <div style={{ width: "65%", margin: "0 0 20px 34%" }}>
+        <div style={{ width: "98%", margin: "1%" }}>
             <TableContainer sx={{ marginBottom: "20px", fontSize: "12px" }}>
                 <Typography
                     variant="h4"

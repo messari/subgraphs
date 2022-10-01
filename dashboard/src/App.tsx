@@ -33,10 +33,13 @@ function App() {
       });
   };
 
+  const aliasToProtocol: any = {};
+
   const depoCount: any = { all: { totalCount: 0, prodCount: 0, devCount: 0 } };
   // Construct subgraph endpoints
   const subgraphEndpoints: { [x: string]: any } = {};
-
+  const endpointSlugs: string[] = [];
+  const endpointSlugsByType: any = {};
   if (Object.keys(protocolsToQuery)?.length > 0) {
     Object.keys(protocolsToQuery).forEach((protocolName: string) => {
       const protocol: any = protocolsToQuery[protocolName];
@@ -66,6 +69,18 @@ function App() {
           } else {
             subgraphEndpoints[schemaType][protocolName][depoData.network] = "https://api.thegraph.com/subgraphs/name/messari/" + depoData["services"]["hosted-service"]["slug"];
           }
+          endpointSlugs.push(depoData["services"]["hosted-service"]["slug"]);
+          if (!endpointSlugsByType[schemaType]) {
+            endpointSlugsByType[schemaType] = [depoData["services"]["hosted-service"]["slug"]];
+          } else {
+            endpointSlugsByType[schemaType].push(depoData["services"]["hosted-service"]["slug"]);
+          }
+          const alias = depoData["services"]["hosted-service"]["slug"]
+            ?.split("-")
+            ?.join(
+              "_"
+            );
+          aliasToProtocol[alias] = protocol?.protocol;
         }
         if (!depoCount[schemaType]) {
           depoCount[schemaType] = { totalCount: 0, prodCount: 0, devCount: 0 };
@@ -85,12 +100,91 @@ function App() {
       }
     })
   }
+
+  // Generate indexing queries
+
+
+  const queryContents = `
+  subgraph
+  synced
+  fatalError {
+    message
+  }
+  chains {
+    chainHeadBlock {
+      number
+    }
+    earliestBlock {
+      number
+    }
+    latestBlock {
+      number
+    }
+    lastHealthyBlock {
+      number
+    }
+  }
+  entityCount`;
+
+  const indexingStatusQueries: any = {};
+  Object.keys(endpointSlugsByType).forEach((protocolType: string) => {
+    let fullCurrentQueryArray = ["query {"];
+    let fullPendingQueryArray = ["query {"];
+    endpointSlugsByType[protocolType].forEach((name: string) => {
+      if (fullCurrentQueryArray[fullCurrentQueryArray.length - 1].length > 75000 || fullPendingQueryArray[fullPendingQueryArray.length - 1].length > 75000) {
+        return;
+      }
+      fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += `      
+                ${name
+          .split("-")
+          .join(
+            "_"
+          )}: indexingStatusForCurrentVersion(subgraphName: "messari/${name}") {
+                  ${queryContents}
+                }
+            `;
+      fullPendingQueryArray[fullPendingQueryArray.length - 1] += `      
+              ${name
+          .split("-")
+          .join(
+            "_"
+          )}_pending: indexingStatusForPendingVersion(subgraphName: "messari/${name}") {
+                ${queryContents}
+              }
+          `;
+      if (fullCurrentQueryArray[fullCurrentQueryArray.length - 1].length > 80000) {
+        fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += "}";
+        fullCurrentQueryArray.push(" query Status {");
+      }
+      if (fullPendingQueryArray[fullPendingQueryArray.length - 1].length > 80000) {
+        fullPendingQueryArray[fullPendingQueryArray.length - 1] += "}";
+        fullPendingQueryArray.push(" query Status {");
+      }
+    });
+    fullCurrentQueryArray[fullCurrentQueryArray.length - 1] += "}";
+    fullPendingQueryArray[fullPendingQueryArray.length - 1] += "}";
+
+    if (endpointSlugs.length === 0) {
+      fullCurrentQueryArray = [`    query {
+        indexingStatuses(subgraphs: "") {
+          subgraph
+        }
+      }`];
+      fullPendingQueryArray = [`    query {
+        indexingStatuses(subgraphs: "") {
+          subgraph
+        }
+      }`];
+    }
+    indexingStatusQueries[protocolType] = { fullCurrentQueryArray, fullPendingQueryArray };
+  })
+
   return (
     <div>
       <DashboardVersion />
       <Routes>
         <Route path="/">
-          <Route index element={<DeploymentsPage getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} />} />
+          <Route index element={<DeploymentsPage getData={() => getDeployments()} protocolsToQuery={protocolsToQuery} subgraphCounts={depoCount} indexingStatusQueries={indexingStatusQueries} endpointSlugs={endpointSlugs} aliasToProtocol={aliasToProtocol} />} />
           <Route
             path="comparison"
             element={<DefiLlamaComparsionTab deploymentJSON={subgraphEndpoints} getData={() => getDeployments()} />}
