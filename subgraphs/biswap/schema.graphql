@@ -248,6 +248,18 @@ type DexAmmProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
+
+  " Liquidity pool IDs "
+  _poolIDs: [ID!]!
+
+#   " Default trading fee rate (0-1) that applies at the protocol level "
+#   _defaultTradingFeeRate: BigDecimal!
+# 
+#   " Netfork fee rate (0-1) that applies at the protocol level. It goes to protocol fee "
+#   _networkFeeRate: BigDecimal!
+# 
+#   " Withdrawal fee rate (0-1) that applies at the protocol level. Occurs whenver user withdraws. It goes to protocol fee "
+#   _withdrawalFeeRate: BigDecimal!
 }
 
 ###############################
