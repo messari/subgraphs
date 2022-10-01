@@ -65,6 +65,10 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0xf24e23eb00000000000000000000000000000000000000000000000000000000"
           handler: handleVatDebtSettlement
+        # function fork(bytes32,address,address,int256,int256)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x870c616d00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatFork
 
   # Borrow rate
   - name: Jug

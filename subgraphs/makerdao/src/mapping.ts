@@ -300,6 +300,54 @@ export function handleVatFrob(event: VatNoteEvent): void {
   updatePosition(event, u, market.id, urn, ilk, BIGINT_ZERO, dart);
 }
 
+// function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
+// needed for position transfer
+export function handleVatFork(event: VatNoteEvent): void {
+  let ilk = event.params.arg1;
+  let src = bytes32ToAddress(event.params.arg2).toHexString();
+  let dst = bytes32ToAddress(event.params.arg3).toHexString();
+
+  // fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
+  // 4th arg dink: start = 4 (signature) + 3 * 32, end = start + 32
+  let dink = bytesToSignedBigInt(extractCallData(event.params.data, 100, 132)); // change to collateral
+  // 5th arg dart: start = 4 (signature) + 4 * 32, end = start + 32
+  let dart = bytesToSignedBigInt(extractCallData(event.params.data, 132, 164)); // change to debt
+
+  let market: Market = getMarketFromIlk(ilk)!;
+  let token = getOrCreateToken(market.inputToken);
+  let collateralTransferAmount = bigIntChangeDecimals(dink, WAD, token.decimals);
+  let debtTransferAmount = dart;
+
+  log.info("[handleVatFork]ilk={}, src={}, dst={}, dink={}, dart={}", [
+    ilk.toString(),
+    src,
+    dst,
+    collateralTransferAmount.toString(),
+    debtTransferAmount.toString(),
+  ]);
+
+  if (dink.gt(BIGINT_ZERO)) {
+    transferPosition(event, ilk, src, dst, PositionSide.LENDER, null, null, collateralTransferAmount);
+  } else if (dink.lt(BIGINT_ZERO)) {
+    transferPosition(
+      event,
+      ilk,
+      dst,
+      src,
+      PositionSide.LENDER,
+      null,
+      null,
+      collateralTransferAmount.times(BIGINT_NEG_ONE),
+    );
+  }
+
+  if (dart.gt(BIGINT_ZERO)) {
+    transferPosition(event, ilk, src, dst, PositionSide.BORROWER, null, null, debtTransferAmount);
+  } else if (dart.lt(BIGINT_ZERO)) {
+    transferPosition(event, ilk, dst, src, PositionSide.BORROWER, null, null, debtTransferAmount.times(BIGINT_NEG_ONE));
+  }
+}
+
 // update total revenue (stability fee)
 export function handleVatFold(event: VatNoteEvent): void {
   let ilk = event.params.arg1;

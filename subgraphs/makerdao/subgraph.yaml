@@ -1,6 +1,11 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+features:
+  - grafting
+graft:
+  base: QmTJ85GRY4BnF3CN5rU2KcgFg7fbVCnGUbvfCQKaUoYiC6
+  block: 11107956
 dataSources:
   # Vault
   - name: Vat
@@ -46,6 +51,10 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x7608870300000000000000000000000000000000000000000000000000000000"
           handler: handleVatFrob
+        # function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x870c616d00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatFork
         ### Collect stability fee ###
         # function fold(bytes32 i, address u, int256 rate)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
