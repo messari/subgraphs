@@ -12,137 +12,77 @@ interface ProtocolSection {
     subgraphName: string;
     clientIndexing: any;
     decenDeposToSubgraphIds: { [x: string]: string };
+    tableExpanded: boolean;
+    isLoaded: boolean;
+    isLoadedPending: boolean;
+    indexQueryError: boolean;
+    indexQueryErrorPending: boolean;
 }
 
-function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToSubgraphIds }: ProtocolSection) {
-    const [showDeposDropDown, toggleShowDeposDropDown] = useState<boolean>(false);
+function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
+    const [showDeposDropDown, toggleShowDeposDropDown] = useState<boolean>(true);
     const navigate = useNavigate();
     const navigateToSubgraph = (url: string) => () => {
         navigate(`subgraph?endpoint=${url}&tab=protocol`);
     };
 
-    const fullCurrentQueryArray = ["query Status {"];
-    const fullPendingQueryArray = ["query Status {"];
-
-    const queryContents = `
-      subgraph
-      node
-      synced
-      fatalError {
-        message
-      }
-      chains {
-        network
-        chainHeadBlock {
-          number
-        }
-        earliestBlock {
-          number
-        }
-        latestBlock {
-          number
-        }
-        lastHealthyBlock {
-          number
-        }
-      }
-      entityCount`;
-    const aliasToProtocol: any = {};
-    protocol.networks.forEach((depo: any) => {
-        const alias = depo?.hostedServiceId
-            ?.split("-")
-            ?.join(
-                "_"
-            );
-
-        aliasToProtocol[alias] = depo?.name;
-
-        fullCurrentQueryArray.push(`        
-              ${alias}: indexingStatusForCurrentVersion(subgraphName: "messari/${depo?.hostedServiceId}") {
-                ${queryContents}
-              }
-          `);
-        fullPendingQueryArray.push(`        
-            ${alias}_pending: indexingStatusForPendingVersion(subgraphName: "messari/${depo?.hostedServiceId}") {
-              ${queryContents}
-            }
-        `);
-    });
-    fullCurrentQueryArray.push("}");
-    fullPendingQueryArray.push("}");
-
-    const [fetchStatus, {
-        data: status,
-        error: errorIndexing,
-        loading: statusLoading,
-    }] = useLazyQuery(gql`${fullCurrentQueryArray.join("")}`, {
-        client: clientIndexing,
-    });
-
-    const [fetchStatusPending, {
-        data: statusPending,
-        error: errorIndexingPending,
-        loading: statusLoadingPending,
-    }] = useLazyQuery(gql`${fullPendingQueryArray.join("")}`, {
-        client: clientIndexing,
-    });
-
-
     useEffect(() => {
-        if (showDeposDropDown && !status) {
-            fetchStatus();
-            fetchStatusPending();
+        toggleShowDeposDropDown(tableExpanded);
+    }, [tableExpanded])
+
+    let hasDecentralizedDepo = false;
+    protocol.networks.forEach((depo: any) => {
+        if (!!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.decentralizedNetworkId) || !!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.hostedServiceId)) {
+            hasDecentralizedDepo = true;
         }
-    }, [showDeposDropDown])
+    })
 
     if (showDeposDropDown) {
-        if (statusLoading || statusLoadingPending) {
-            return protocol.networks.map((key: any, idx: number) => <div key={"Loader" + idx} style={{ width: "100%" }}><CircularProgress size={30} /></div>);
-        }
-
-        if (!status || !!errorIndexing) {
-            return null;
-        }
-
         const depoRowsOnProtocol = protocol.networks.map((depo: any) => {
             let chainLabel = depo.chain;
             if (protocol.networks.filter((x: any) => x.chain === depo.chain).length > 1) {
                 chainLabel = depo.deploymentName;
             }
             let pendingRow = null;
-            const depoKey = depo?.hostedServiceId?.split("-")?.join("_");
-            if (!!statusPending) {
-                if (!!statusPending[depoKey + "_pending"]) {
-                    const pendingObject = statusPending[depoKey + "_pending"];
-                    let { syncedPending } = pendingObject ?? {};
-                    let statusPendingDataOnChain: { [x: string]: any } = {};
-                    if (pendingObject?.chains?.length > 0) {
-                        statusPendingDataOnChain = pendingObject?.chains[0];
-                    }
+            if (!!depo?.pendingIndexStatus) {
+                const pendingObject = depo!.pendingIndexStatus;
+                let { syncedPending } = pendingObject ?? {};
+                let statusPendingDataOnChain: { [x: string]: any } = {};
+                if (pendingObject?.chains?.length > 0) {
+                    statusPendingDataOnChain = pendingObject?.chains[0];
+                }
 
-                    let highlightColor = "#B8301C";
-                    if (!pendingObject?.fatalError) {
-                        highlightColor = "#EFCB68";
-                    }
+                let highlightColor = "#B8301C";
+                if (!pendingObject?.fatalError) {
+                    highlightColor = "#EFCB68";
+                }
 
-                    let indexedPending = formatIntToFixed2(toPercent(
-                        statusPendingDataOnChain?.latestBlock?.number - statusPendingDataOnChain?.earliestBlock?.number || 0,
-                        statusPendingDataOnChain?.chainHeadBlock?.number - statusPendingDataOnChain?.earliestBlock?.number,
-                    ));
+                let indexedPending = formatIntToFixed2(toPercent(
+                    statusPendingDataOnChain?.latestBlock?.number - statusPendingDataOnChain?.earliestBlock?.number || 0,
+                    statusPendingDataOnChain?.chainHeadBlock?.number - statusPendingDataOnChain?.earliestBlock?.number,
+                ));
 
-                    if (syncedPending) {
-                        highlightColor = "#58BC82";
-                        indexedPending = formatIntToFixed2(100);
-                    }
+                if (syncedPending) {
+                    highlightColor = "#58BC82";
+                    indexedPending = formatIntToFixed2(100);
+                }
 
-                    let schemaCell = <span>{depo?.versions?.schema}</span>;
+                let schemaCell = <span>{depo?.versions?.schema}</span>;
 
-                    if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
-                        schemaCell = <Tooltip title="This deployment does not have the latest schema verison" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
-                    }
+                if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
+                    schemaCell = <Tooltip title="This deployment does not have the latest schema verison" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
+                }
 
+                if (!isLoadedPending) {
                     pendingRow = (
-                        <TableRow onClick={() => navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`)} key={subgraphName + depo.hostedServiceId + "DepInDevRow-PENDING"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                        <TableRow onClick={() => {
+                            if (!pendingObject?.fatalError) {
+                                navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`)
+                            } else {
+                                window.location.href = "https://okgraph.xyz/?q=" + pendingObject?.subgraph;
+                            }
+                        }
+                        } key={subgraphName + depo.hostedServiceId + "DepInDevRow-PENDING"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                             <TableCell
                                 sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${highlightColor} solid 34px`, verticalAlign: "middle", display: "flex" }}
                             >
@@ -156,6 +96,65 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
                                 <NetworkLogo key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                                {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                                <CircularProgress size={20} />
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                                <CircularProgress size={20} />
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                                <CircularProgress size={20} />
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                                <CircularProgress size={20} />
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                                <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+                                    {schemaCell}
+                                </Typography>
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                                <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+                                    {depo?.versions?.subgraph || "N/A"}
+                                </Typography>
+                            </TableCell>
+
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                                <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+                                    <CircularProgress size={20} />
+                                </Typography>
+                            </TableCell>
+                        </TableRow>
+                    )
+                } else {
+                    pendingRow = (
+                        <TableRow onClick={() => {
+                            if (!pendingObject?.fatalError) {
+                                navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`)
+                            } else {
+                                window.location.href = "https://okgraph.xyz/?q=" + pendingObject?.subgraph;
+                            }
+                        }} key={subgraphName + depo.hostedServiceId + "DepInDevRow-PENDING"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                            <TableCell
+                                sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${highlightColor} solid 34px`, verticalAlign: "middle", display: "flex" }}
+                            >
+                                <SubgraphLogo name={subgraphName} size={30} />
+                                <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
+                                    {chainLabel} (PENDING)
+                                </span>
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
+                                <NetworkLogo key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
+                            </TableCell>
+                            <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                                {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {indexedPending ? indexedPending + "%" : "N/A"}
@@ -191,7 +190,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
             }
             let decenRow = null;
             if (!!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.decentralizedNetworkId) || !!Object.keys(decenDeposToSubgraphIds)?.includes(depo?.hostedServiceId)) {
-                const decenObject = status[depoKey];
+                const decenObject = depo?.indexStatus;
                 let syncedDecen = decenObject?.synced ?? {};
                 let statusDecenDataOnChain: { [x: string]: any } = {};
                 if (decenObject?.chains?.length > 0) {
@@ -255,6 +254,9 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                             <NetworkLogo key={subgraphName + depo.chain + 'Logo-DECEN'} size={30} network={depo.chain} />
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                            {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                             {indexedDecen ? indexedDecen + "%" : "N/A"}
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
@@ -285,7 +287,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                     </TableRow >
                 );
             }
-            const currentObject = status[depoKey];
+            const currentObject = depo?.indexStatus;
             let { synced } = currentObject ?? {};
             let statusDataOnChain: { [x: string]: any } = {};
             if (currentObject?.chains?.length > 0) {
@@ -320,10 +322,71 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 subgraphUrlBase = "https://graph.cronoslabs.com/subgraphs/name/";
             }
 
+            if (!isLoaded) {
+                return (<>
+                    <TableRow onClick={() => {
+                        if (!currentObject?.fatalError) {
+                            navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`);
+                        } else {
+                            window.location.href = "https://okgraph.xyz/?q=messari/" + depo.hostedServiceId;
+                        }
+                    }} key={subgraphName + depo.hostedServiceId + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                        <TableCell
+                            sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `rgb(55, 55, 55) solid 34px`, verticalAlign: "middle", display: "flex" }}
+                        >
+                            <SubgraphLogo name={subgraphName} size={30} />
+                            <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
+                                {chainLabel}
+                            </span>
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
+                            <NetworkLogo key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                            {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                            <CircularProgress size={20} />
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                            <CircularProgress size={20} />
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                            <CircularProgress size={20} />
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                            <CircularProgress size={20} />
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                            <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+                                {schemaCell}
+                            </Typography>
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                            <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
+                                {depo?.versions?.subgraph || "N/A"}
+                            </Typography>
+                        </TableCell>
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                            <CircularProgress size={20} />
+                        </TableCell>
+                    </TableRow>
+                    {pendingRow}
+                </>)
+            }
+
             return (
                 <>
                     {decenRow}
-                    <TableRow onClick={() => navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`)} key={subgraphName + depo.hostedServiceId + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                    <TableRow onClick={() => {
+                        if (!currentObject?.fatalError) {
+                            navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`);
+                        } else {
+                            window.location.href = "https://okgraph.xyz/?q=messari/" + depo.hostedServiceId;
+                        }
+                    }} key={subgraphName + depo.hostedServiceId + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell
                             sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${highlightColor} solid 34px`, verticalAlign: "middle", display: "flex" }}
                         >
@@ -338,7 +401,9 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
                             <NetworkLogo key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
                         </TableCell>
-
+                        <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                            {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
+                        </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                             {indexed ? indexed + "%" : "N/A"}
                         </TableCell>
@@ -387,11 +452,14 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                     </span>
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                    <img height="24px" width="24px" src="https://cdn2.iconfinder.com/data/icons/50-material-design-round-corner-style/44/Dropdown_2-512.png" />
+                    <img className="rotated" height="24px" width="24px" src="https://cdn2.iconfinder.com/data/icons/50-material-design-round-corner-style/44/Dropdown_2-512.png" />
 
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", display: "flex" }}>
                     {protocol.networks.map((x: { [x: string]: any }) => <a key={"CellNetwork-" + x.chain + x.hostedServiceId} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo size={30} network={x.chain} /></a>)}
+                </TableCell>
+                <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                    {protocol?.status ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
                     -
@@ -431,6 +499,16 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
         schemaCell = <span>{schemaColored}</span>;
     }
+
+    let decenDepoElement = null;
+    if (hasDecentralizedDepo) {
+        decenDepoElement = (
+            <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 0px 0px 10px", fontSize: "14px", color: "#6f2c8a" }}>
+                <Tooltip title="This deployment is hosted on the decentralized network" placement="top" ><span style={{ cursor: "default" }}><b>Ⓓ</b></span></Tooltip>
+            </span>
+        );
+    }
+
     return (
         <TableRow onClick={() => {
             toggleShowDeposDropDown(!showDeposDropDown);
@@ -447,7 +525,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                         {subgraphName}
                     </span>
                 </Tooltip>
-
+                {decenDepoElement}
             </TableCell>
             <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
                 <Tooltip title="Click To View All Deployments On This Protocol" placement="top" >
@@ -457,9 +535,21 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
             <TableCell sx={{ padding: "0 6px 1px 0", textAlign: "right", display: "flex" }}>
                 <Tooltip title="Click To View All Deployments On This Protocol" placement="top" >
                     <>
-                        {protocol.networks.map((x: { [x: string]: any }) => <a key={subgraphName + x.hostedServiceId + 'Logo'} style={{ height: "100%", border: "#58BC82 4px solid", borderRadius: "50%" }} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo size={28} network={x.chain} /></a>)}
+                        {protocol.networks.map((x: { [x: string]: any }) => {
+                            let borderColor = "#FFA500";
+                            if (!!x?.indexStatus?.synced) {
+                                borderColor = "#58BC82";
+                            }
+                            if (!!x?.indexStatus?.fatalError) {
+                                borderColor = "#B8301C";
+                            }
+                            return <a key={subgraphName + x.hostedServiceId + 'Logo'} style={{ height: "100%", border: borderColor + " 4px solid", borderRadius: "50%" }} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo size={28} network={x.chain} /></a>
+                        })}
                     </>
                 </Tooltip>
+            </TableCell>
+            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
+                {protocol?.status ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
             </TableCell>
             <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
 

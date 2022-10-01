@@ -31,6 +31,12 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
 
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
+  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
+  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
+
+  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
+  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
+
   const [indexingStatus, setIndexingStatus] = useState<any>(false);
   const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
   const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
@@ -108,7 +114,20 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
 
   let indexingCalls = null;
   if (endpointSlugs.length > 0) {
-    indexingCalls = <IndexingCalls setIndexingStatus={setIndexingStatus} setPendingIndexingStatus={setPendingIndexingStatus} indexingStatusQueries={indexingStatusQueries} />
+    indexingCalls = (
+      <IndexingCalls
+        setIndexingStatus={setIndexingStatus}
+        setPendingIndexingStatus={setPendingIndexingStatus}
+        indexingStatusQueries={indexingStatusQueries}
+        setIndexingStatusLoaded={setIndexingStatusLoaded}
+        setIndexingStatusLoadedPending={setIndexingStatusLoadedPending}
+        setIndexingStatusError={setIndexingStatusError}
+        setIndexingStatusErrorPending={setIndexingStatusErrorPending}
+        indexingStatusLoaded={indexingStatusLoaded}
+        indexingStatusLoadedPending={indexingStatusLoadedPending}
+        indexingStatusError={indexingStatusError}
+        indexingStatusErrorPending={indexingStatusErrorPending}
+      />)
   }
 
   if (!!indexingStatus) {
@@ -117,6 +136,12 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
       if (protocolsToQuery[aliasToProtocol[depo]]) {
         if (!!protocolsToQuery[aliasToProtocol[depo]].deployments[deploymentStr]) {
           protocolsToQuery[aliasToProtocol[depo]].deployments[deploymentStr].indexStatus = indexingStatus[depo];
+        } else {
+          const network = deploymentStr.split("-").pop() || "";
+          const depoKey = (Object.keys(protocolsToQuery[aliasToProtocol[depo]].deployments).find((x: any) => {
+            return protocolsToQuery[aliasToProtocol[depo]].deployments[x].network === network
+          }) || "");
+          protocolsToQuery[aliasToProtocol[depo]].deployments[depoKey].indexStatus = indexingStatus[depo];
         }
       }
     })
@@ -154,25 +179,28 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         <Typography variant="h3" align="center" sx={{ my: 6 }}>
           Deployed Subgraphs
         </Typography>
-        <div style={{ display: "flex", width: "70%", marginLeft: "15%" }}>
-          <div style={{ width: "100%", textAlign: "center", marginTop: "10px", borderRight: "#6656F8 4px solid" }}>
+        <div style={{ display: "flex", width: "60%", marginLeft: "20%" }}>
+          <div style={{ width: "100%", textAlign: "center", marginTop: "10px", borderRight: "#6656F8 2px solid" }}>
             <span className="Menu-Options" onClick={() => navigate("/comparison")}>
-              Defi Llama Comparison
+              DefiLlama Comparison
             </span>
           </div>
-          <div style={{ width: "100%", textAlign: "center", marginTop: "10px", borderRight: "#6656F8 4px solid" }}>
+          <div style={{ width: "100%", textAlign: "center", marginTop: "10px", borderLeft: "#6656F8 2px solid" }}>
             <span className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
               {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
             </span>
           </div>
-          <div style={{ width: "100%", textAlign: "center", marginTop: "10px" }}>
-            <span className="Menu-Options" onClick={() => navigate("/development-status")}>
-              Development Status Table
-            </span>
-          </div>
         </div>
         {devCountTable}
-        <DeploymentsTable getData={() => getData()} protocolsToQuery={protocolsToQuery} decenDeposToSubgraphIds={decenDeposToSubgraphIds} />
+        <DeploymentsTable
+          getData={() => getData()}
+          protocolsToQuery={protocolsToQuery}
+          decenDeposToSubgraphIds={decenDeposToSubgraphIds}
+          indexingStatusLoaded={indexingStatusLoaded}
+          indexingStatusLoadedPending={indexingStatusLoadedPending}
+          indexingStatusError={indexingStatusError}
+          indexingStatusErrorPending={indexingStatusErrorPending}
+        />
       </DeploymentsLayout>
       {indexingCalls}
     </DeploymentsContextProvider >
