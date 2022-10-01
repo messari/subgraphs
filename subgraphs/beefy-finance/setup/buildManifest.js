@@ -22,6 +22,7 @@ const providers = [
     aurora: "https://mainnet.aurora.dev",
     moonbeam: "https://rpc.ankr.com/moonbeam",
     oasis: "https://emerald.oasis.dev",
+    optimism: "https://rpc.ankr.com/optimism",
   },
 ];
 
@@ -73,10 +74,15 @@ async function main(network) {
   // add each new strategy in the list to the manifest
   let i = 0;
   for (; i < networkVaultList.length; i++) {
+    // skip BIFI staking pools
+    if (networkVaultList[i].isGovVault) {
+      console.log(`Skipping BIFI staking pool ${networkVaultList[i].name}`);
+      continue;
+    }
+
     const strategyAddress = await getStrategyAddress(
       web3,
-      networkVaultList[i].earnContractAddress,
-      network
+      networkVaultList[i].earnContractAddress
     );
     const startBlock = await getStartBlockByTimestamp(
       web3,
