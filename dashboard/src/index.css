@@ -34,3 +34,7 @@ code {
 .Menu-Options:hover {
   text-decoration: underline;
 }
+
+.rotated {
+  transform: rotate(180deg);
+}
