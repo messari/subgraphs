@@ -91,19 +91,17 @@ export function getWithdrawnTokenAmounts(
   event: ethereum.Event
 ): BigInt[] {
   let receipt = event.receipt;
-  if (!receipt) {
+  if (!receipt)
     return new Array<BigInt>(inputTokens.length).fill(constants.BIGINT_ZERO);
-  }
 
   let logs = event.receipt!.logs;
-  if (!logs) {
+  if (!logs)
     return new Array<BigInt>(inputTokens.length).fill(constants.BIGINT_ZERO);
-  }
 
   let inputToken = constants.NULL.TYPE_ADDRESS;
   let inputTokenAmount = constants.BIGINT_ZERO;
 
-  for (let i = 0; i < logs.length; ++i) {
+  for (let i = 0; i < logs.length; i++) {
     let log = logs.at(i);
     let topic_signature = log.topics.at(0);
     if (
@@ -114,7 +112,7 @@ export function getWithdrawnTokenAmounts(
       let _from = ethereum.decode("address", log.topics.at(1))!.toAddress();
       let _to = ethereum.decode("address", log.topics.at(2))!.toAddress();
 
-      if (_from == liquidityPoolAddress && _to == provider) {
+      if (_from.equals(liquidityPoolAddress) && _to.equals(provider)) {
         let data = ethereum.decode("uint256", log.data);
 
         if (data) {
@@ -125,12 +123,11 @@ export function getWithdrawnTokenAmounts(
     }
   }
 
-  let withdrawnTokenAmounts = new Array<BigInt>();
+  let withdrawnTokenAmounts: BigInt[] = [];
 
   for (let idx = 0; idx < inputTokens.length; idx++) {
     if (Address.fromString(inputTokens.at(idx)).equals(inputToken)) {
       withdrawnTokenAmounts.push(inputTokenAmount);
-
       continue;
     }
 
