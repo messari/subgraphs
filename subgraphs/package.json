@@ -1,0 +1,13 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write ."
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "^5.38.0",
+    "eslint": "^8.23.1",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "typescript": "^4.8.3"
+  }
+}

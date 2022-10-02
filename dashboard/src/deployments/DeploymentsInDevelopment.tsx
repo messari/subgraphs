@@ -2,16 +2,17 @@ import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRo
 import { SubgraphLogo } from "../common/SubgraphLogo";
 import { NetworkLogo } from "../common/NetworkLogo";
 import { useNavigate } from "react-router";
+import DeploymentsInDevelopmentRow from "./DeploymentsInDevelopmentRow";
 
 interface DeploymentsInDevelopment {
-    deploymentsInDevelopment: { [x: string]: any };
+    protocolsToQuery: { [x: string]: any };
     getData: any;
 }
 
-function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: DeploymentsInDevelopment) {
+function DeploymentsInDevelopment({ protocolsToQuery, getData }: DeploymentsInDevelopment) {
     const navigate = useNavigate();
 
-    if (Object.keys(deploymentsInDevelopment).length === 0) {
+    if (Object.keys(protocolsToQuery).length === 0) {
         getData();
         return null;
     }
@@ -47,12 +48,16 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
         </TableHead>
     );
     let totalDepoCounter = 0;
-    let deposInProgressCount = 0;
+    let protocolsInProgressCount = 0;
+    let protocolsProdReadyCount = 0;
     const deposInProgress: { [x: string]: any } = {};
-    Object.entries(deploymentsInDevelopment).forEach(([protocolName, protocol]) => {
+    Object.entries(protocolsToQuery).forEach(([protocolName, protocol]) => {
         Object.keys(protocol.deployments).forEach((depoKey) => {
             totalDepoCounter += 1;
             const deploymentData: any = protocol.deployments[depoKey];
+            if (!deploymentData?.services) {
+                return;
+            }
             // Defeault status column in table is prod, when at least one depo on protocol is dev, the whoel row is dev
             if (!Object.keys(deposInProgress).includes(protocol.schema)) {
                 deposInProgress[protocol.schema] = {};
@@ -60,7 +65,14 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
             if (!Object.keys(deposInProgress[protocol.schema]).includes(protocolName)) {
                 deposInProgress[protocol.schema][protocolName] = { status: true, schemaVersions: [], subgraphVersions: [], methodologyVersions: [], networks: [] };
             }
-            deposInProgress[protocol.schema][protocolName].networks.push({ chain: deploymentData.network, hostedServiceId: deploymentData["deployment-ids"]["hosted-service"] });
+            let hostedServiceId = null;
+            if (!!deploymentData["services"]["hosted-service"]) {
+                hostedServiceId = deploymentData["services"]["hosted-service"]["slug"];
+            }
+            if (!!deploymentData["services"]["cronos-portal"]) {
+                hostedServiceId = deploymentData["services"]["cronos-portal"]["slug"];
+            }
+            deposInProgress[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId });
             if (!deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
                 deposInProgress[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
             }
@@ -71,10 +83,15 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
                 deposInProgress[protocol.schema][protocolName]?.schemaVersions?.push(deploymentData?.versions?.schema);
             }
             if (deploymentData?.status === 'dev') {
-                deposInProgressCount += 1;
                 deposInProgress[protocol.schema][protocolName].status = false;
             }
         });
+        if (deposInProgress[protocol.schema][protocolName]?.status === false) {
+            protocolsInProgressCount += 1;
+        } else {
+            protocolsProdReadyCount += 1;
+        }
+
     });
 
     return (
@@ -85,46 +102,12 @@ function DeploymentsInDevelopment({ deploymentsInDevelopment, getData }: Deploym
                 </Button>
             </div>
             <Typography variant="h4" align="center" sx={{ my: 4 }}>
-                Subgraphs Development Status ({(totalDepoCounter - deposInProgressCount)} complete /{totalDepoCounter} deployments)
+                {protocolsProdReadyCount} prod-ready, {protocolsInProgressCount} under development, {totalDepoCounter} subgraph deployments
             </Typography>
             {Object.entries(deposInProgress).map(([schemaType, subgraph]) => {
                 const tableRows = Object.keys(subgraph).map((subgraphName) => {
                     const protocol = subgraph[subgraphName];
-                    return (
-                        <TableRow key={subgraphName + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)" }}>
-                            <TableCell
-                                sx={{ padding: "0", borderLeft: `orange solid 6px`, verticalAlign: "middle", display: "flex" }}
-                            >
-                                {!subgraphName.includes('evm') && !subgraphName.includes('erc721') ? <SubgraphLogo name={subgraphName} size={30} /> : null}
-                                <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
-                                    {subgraphName}
-                                </span>
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right", display: "flex" }}>
-                                {protocol.networks.map((x: { [x: string]: any }) => <a href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo key={subgraphName + x.chain + 'Logo'} size={30} network={x.chain} /></a>)}
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {protocol?.status ? <img height="24px" width="24px" src="https://github.githubassets.com/images/icons/emoji/unicode/2705.png" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-                                    {protocol?.schemaVersions?.length > 0 ? protocol?.schemaVersions.join(", ") : "N/A"}
-                                </Typography>
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-                                    {protocol?.subgraphVersions?.length > 0 ? protocol?.subgraphVersions.join(", ") : "N/A"}
-                                </Typography>
-                            </TableCell>
-                            <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
-                                    {protocol?.methodologyVersions?.length > 0 ? protocol?.methodologyVersions.join(", ") : "N/A"}
-                                </Typography>
-                            </TableCell>
-                        </TableRow>
-                    );
+                    return (<DeploymentsInDevelopmentRow subgraphName={subgraphName} protocol={protocol} />);
                 });
                 return (
                     <TableContainer>

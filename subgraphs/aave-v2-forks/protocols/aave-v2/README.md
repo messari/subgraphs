@@ -54,6 +54,11 @@ To be added
 
 Not applicable to Aave
 
+## Issues
+
+- The WETH gateways seem to be giving the most trouble on positional entities.
+  - ie, a lot of the withdraw events not found is due to weth gateways acting as a third actor in transactions
+
 ## Useful links and references
 
 Existing Subgraph: https://thegraph.com/hosted-service/subgraph/aave/protocol-v2

@@ -1,5 +1,11 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  Bytes,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import {
@@ -48,8 +54,13 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalPoolCount = INT_ZERO;
     protocol._regenesis = false;
-    protocol.save();
   }
+
+  protocol.schemaVersion = NetworkConfigs.getSchemaVersion();
+  protocol.subgraphVersion = NetworkConfigs.getSubgraphVersion();
+  protocol.methodologyVersion = NetworkConfigs.getMethodologyVersion();
+  protocol.save();
+
   return protocol;
 }
 

@@ -17,6 +17,7 @@ import {
   LiquidateBorrow,
   AccrueInterest,
   NewReserveFactor,
+  Transfer,
 } from "../../../generated/templates/CToken/CToken";
 import { LendingProtocol, Token } from "../../../generated/schema";
 import {
@@ -45,6 +46,7 @@ import {
   getOrElse,
   _handleActionPaused,
   _handleMarketEntered,
+  _handleTransfer,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
@@ -273,6 +275,16 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
 }
 
+export function handleTransfer(event: Transfer): void {
+  _handleTransfer(
+    event,
+    event.address.toHexString(),
+    event.params.to,
+    event.params.from,
+    comptrollerAddr
+  );
+}
+
 function getOrCreateProtocol(): LendingProtocol {
   let comptroller = Comptroller.bind(comptrollerAddr);
   let protocolData = new ProtocolData(
@@ -280,7 +292,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Venus",
     "venus",
     "2.0.1",
-    "1.1.4",
+    "1.1.5",
     "1.0.0",
     Network.BSC,
     comptroller.try_liquidationIncentiveMantissa(),

@@ -53,6 +53,7 @@ import {
   _handleReserveInitialized,
   _handleReserveUsedAsCollateralDisabled,
   _handleReserveUsedAsCollateralEnabled,
+  _handleTransfer,
   _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
@@ -75,6 +76,7 @@ import { Market } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
 import { StakedAave } from "../../../generated/LendingPool/StakedAave";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
+import { Transfer } from "../../../generated/templates/AToken/AToken";
 
 function getProtocolData(): ProtocolData {
   let letants = getNetworkSpecificConstant();
@@ -363,6 +365,14 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     event.params.user,
     event.params.debtAsset
   );
+}
+
+//////////////////////
+//// AToken Event ////
+//////////////////////
+
+export function handleTransfer(event: Transfer): void {
+  _handleTransfer(event, event.params.to, event.params.from, getProtocolData());
 }
 
 ///////////////////

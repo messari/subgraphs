@@ -136,6 +136,8 @@ templates:
           handler: handleLiquidateBorrow
         - event: NewReserveFactor(uint256,uint256)
           handler: handleNewReserveFactor
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
           handler: handleAccrueInterestNew
   - name: CTokenOld

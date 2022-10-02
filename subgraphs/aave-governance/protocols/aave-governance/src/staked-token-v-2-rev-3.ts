@@ -6,7 +6,7 @@ import {
 import {
   _handleDelegateChanged,
   _handleDelegatedPowerChanged,
-  _handleTransfer,
+  _handleStakedTokenTransfer,
 } from "../../../src/tokenHandlers";
 
 // DelegateChanged(indexed address,indexed address,indexed address)
@@ -24,15 +24,17 @@ export function handleDelegatedPowerChanged(
   _handleDelegatedPowerChanged(
     event.params.delegationType,
     event.params.user.toHexString(),
-    event.params.amount
+    event.params.amount,
+    true
   );
 }
 
 // // Transfer(indexed address,indexed address,uint256)
 export function handleTransfer(event: Transfer): void {
-  _handleTransfer(
+  _handleStakedTokenTransfer(
     event.params.from.toHexString(),
     event.params.to.toHexString(),
-    event.params.value
+    event.params.value,
+    event
   );
 }

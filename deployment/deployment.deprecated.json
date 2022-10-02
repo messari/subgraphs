@@ -493,6 +493,16 @@
         }
       }
     },
+    "truefi": {
+      "truefi": {
+        "ethereum": {
+          "template": "truefi.template.yaml",
+          "messari": "messari/truefi-ethereum",
+          "corerouter": "corerouter/truefi",
+          "deploy-on-merge": true
+        }
+      }
+    },
     "network": {
       "arweave": {
         "arweave-mainnet": {

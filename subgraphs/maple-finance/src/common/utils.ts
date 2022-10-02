@@ -137,7 +137,7 @@ export function readCallResult<T>(
  * @param call call to create the event from
  */
 export function createEventFromCall(call: ethereum.Call): ethereum.Event {
-    return new ethereum.Event(call.from, ZERO_BI, ZERO_BI, null, call.block, call.transaction, []);
+    return new ethereum.Event(call.from, ZERO_BI, ZERO_BI, null, call.block, call.transaction, [], null);
 }
 
 /**

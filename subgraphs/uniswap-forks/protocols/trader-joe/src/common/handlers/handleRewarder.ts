@@ -1,6 +1,6 @@
 import { Address, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts";
-import { Rewarder } from "../../../../../generated/templates/Rewarder/Rewarder";
+import { Rewarder } from "../../../../../generated/MasterChefV2/Rewarder";
 import { TokenABI as ERC20 } from "../../../../../generated/templates/Pair/TokenABI";
 import {
   _MasterChefAddressToPid,
@@ -12,7 +12,6 @@ import {
 } from "../../../../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
-  BIGINT_TEN,
   BIGINT_ZERO,
   ZERO_ADDRESS,
 } from "../../../../../src/common/constants";

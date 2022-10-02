@@ -1,146 +1,172 @@
-import { SubgraphDeployments } from "./SubgraphDeployments";
-import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { useState } from "react";
-import Placeholder from "./Placeholder";
-import LazyLoad from "react-lazyload";
-import { DecentralizedNetworkRow } from "./DecentralizedNetworkRow";
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import ProtocolSection from "./ProtocolSection";
+import { useMemo, useState } from "react";
+import { NewClient, schemaMapping } from "../utils";
 
 interface DeploymentsTable {
-  clientIndexing: ApolloClient<NormalizedCacheObject>;
-  protocolsOnType: any;
-  protocolType: string;
-  isDecentralizedNetworkTable: Boolean;
+    protocolsToQuery: { [x: string]: any };
+    getData: any;
+    decenDeposToSubgraphIds: { [x: string]: string };
+    indexingStatusLoaded: any;
+    indexingStatusLoadedPending: any;
+    indexingStatusError: any;
+    indexingStatusErrorPending: any;
 }
 
-function DeploymentsTable({
-  protocolsOnType,
-  clientIndexing,
-  protocolType,
-  isDecentralizedNetworkTable,
-}: DeploymentsTable) {
-  const initialLoaded: { [x: string]: Boolean } = {};
-  if (!isDecentralizedNetworkTable) {
-    Object.keys(protocolsOnType).forEach((p, idx) => {
-      if (idx < 1) {
-        initialLoaded[p] = true;
-      } else {
-        initialLoaded[p] = false;
-      }
-    });
-  }
+function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, indexingStatusLoaded, indexingStatusLoadedPending, indexingStatusError, indexingStatusErrorPending }: DeploymentsTable) {
+    const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
+    const [tableExpanded, setTableExpanded] = useState<any>({ lending: true, exchanges: true, vaults: true, generic: true });
+    if (Object.keys(protocolsToQuery).length === 0) {
+        getData();
+        return null;
+    }
+    const columnLabels: string[] = [
+        "Name",
+        "",
+        "Network",
+        "Status",
+        "Indexed %",
+        "Start Block",
+        "Current Block",
+        "Chain Head",
+        "Schema",
+        "Subgraph",
+        "Entity Count",
+    ];
 
-  const [deploymentsLoadedState, setDeploymentsLoaded] = useState(initialLoaded);
-  const deploymentsLoaded: { [x: string]: any } = {};
-  const placeholders: { [x: string]: any } = {};
-  if (!isDecentralizedNetworkTable) {
-    Object.keys(protocolsOnType).forEach((x) => {
-      if (deploymentsLoadedState[x] === true) {
-        deploymentsLoaded[x] = protocolsOnType[x];
-      } else {
-        placeholders[x] = protocolsOnType[x];
-      }
-    });
-  }
-
-  const columnLabels: { [x: string]: string } = {
-    "Name/Network": "285px",
-    "Indexed %": "80px",
-    "Start Block": "100px",
-    "Current Block": "100px",
-    "Chain Head": "100px",
-    "Schema Version": "100px",
-    "Subgraph Version": "100px",
-    "Non-Fatal Errors": "100px",
-    "Entity Count": "100px",
-  };
-
-  const tableHead = (
-    <TableHead sx={{ height: "30px" }}>
-      <TableRow sx={{ height: "30px" }}>
-        {Object.keys(columnLabels).map((x, idx) => {
-          const style: { [x: string]: string } = {
-            minWidth: columnLabels[x],
-            maxWidth: columnLabels[x],
-            padding: "6px",
-          };
-          let textAlign = "left";
-          if (idx !== 0) {
-            textAlign = "right";
-          }
-          if (idx === Object.keys(columnLabels).length - 1) {
-            style.paddingRight = "30px";
-          }
-          return (
-            <TableCell key={"column" + x} sx={style}>
-              <Typography variant="h5" fontSize={14} fontWeight={500} sx={{ margin: "0", width: "100%", textAlign }}>
-                {x}
-              </Typography>
-            </TableCell>
-          );
-        })}
-      </TableRow>
-    </TableHead>
-  );
-
-  let loadedTableBody = (
-    <>
-      {Object.keys(deploymentsLoaded).map((protocol) => {
-        return (
-          <SubgraphDeployments
-            clientIndexing={clientIndexing}
-            key={"DeploymentsOnProtocol-" + protocolType + "-" + protocol}
-            protocol={{ name: protocol, deploymentMap: protocolsOnType[protocol] }}
-          />
-        );
-      })}
-    </>
-  );
-
-  let placeholderTableBody: JSX.Element | null = (
-    <div>
-      {Object.keys(placeholders).map((deployment) => {
-        return (
-          <LazyLoad key={"dep-" + deployment} height={53} offset={100}>
-            <Placeholder
-              deploymentsLoaded={deploymentsLoadedState}
-              deploymentKey={deployment}
-              setDeploymentsLoaded={(x: any) => setDeploymentsLoaded(x)}
-            />
-          </LazyLoad>
-        );
-      })}
-    </div>
-  );
-  if (isDecentralizedNetworkTable) {
-    loadedTableBody = (
-      <>
-        {Object.keys(protocolsOnType).map((protocol) => {
-          return (
-            <DecentralizedNetworkRow
-              key={"decentralized-" + protocol}
-              rowData={protocolsOnType[protocol]}
-              subgraphName={protocol}
-              clientIndexing={clientIndexing}
-            />
-          );
-        })}
-      </>
+    const tableHead = (
+        <TableHead sx={{ height: "20px" }}>
+            <TableRow sx={{ height: "20px" }}>
+                {columnLabels.map((x, idx) => {
+                    let textAlign = "left";
+                    let paddingLeft = "0px";
+                    let minWidth = "auto"
+                    let maxWidth = "auto";
+                    if (idx > 2) {
+                        textAlign = "right";
+                        paddingLeft = "16px";
+                    }
+                    if (idx === 0) {
+                        minWidth = "300px";
+                        maxWidth = "300px";
+                    }
+                    return (
+                        <TableCell sx={{ paddingLeft, minWidth, maxWidth }} key={"column" + x}>
+                            <Typography variant="h5" fontSize={14} fontWeight={500} sx={{ margin: "0", width: "100%", textAlign }}>
+                                {x}
+                            </Typography>
+                        </TableCell>
+                    );
+                })}
+            </TableRow>
+        </TableHead>
     );
-    placeholderTableBody = null;
-  }
 
-  return (
-    <>
-      <TableContainer>
-        <Table stickyHeader>
-          {tableHead}
-          <TableBody>{loadedTableBody}</TableBody>
-        </Table>
-      </TableContainer>
-      {placeholderTableBody}
-    </>
-  );
+    const deposToPass: { [x: string]: any } = {};
+    Object.entries(protocolsToQuery).forEach(([protocolName, protocol]) => {
+        Object.keys(protocol.deployments).forEach((depoKey) => {
+            const deploymentData: any = protocol.deployments[depoKey];
+            if (!deploymentData?.services) {
+                return;
+            }
+            if (!!deploymentData["services"]["hosted-service"] || !!deploymentData["services"]["decentralized-network"] || !!deploymentData["services"]["cronos-portal"]) {
+                if (!Object.keys(deposToPass).includes(protocol.schema)) {
+                    deposToPass[protocol.schema] = {};
+                }
+                if (!Object.keys(deposToPass[protocol.schema]).includes(protocolName)) {
+                    deposToPass[protocol.schema][protocolName] = { status: true, schemaVersions: [], subgraphVersions: [], methodologyVersions: [], networks: [] };
+                }
+                let decentralizedNetworkId = null;
+                if (!!deploymentData["services"]["decentralized-network"]) {
+                    decentralizedNetworkId = deploymentData["services"]["decentralized-network"]["slug"];
+                }
+                let hostedServiceId = null;
+                if (!!deploymentData["services"]["hosted-service"]) {
+                    hostedServiceId = deploymentData["services"]["hosted-service"]["slug"];
+                }
+                if (!!deploymentData["services"]["cronos-portal"]) {
+                    hostedServiceId = deploymentData["services"]["cronos-portal"]["slug"];
+                }
+                deposToPass[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, indexStatus: deploymentData?.indexStatus, pendingIndexStatus: deploymentData?.pendingIndexStatus, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId, decentralizedNetworkId });
+                if (!deposToPass[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
+                    deposToPass[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
+                }
+                if (!deposToPass[protocol.schema][protocolName]?.subgraphVersions?.includes(deploymentData?.versions?.subgraph)) {
+                    deposToPass[protocol.schema][protocolName]?.subgraphVersions?.push(deploymentData?.versions?.subgraph);
+                }
+                if (!deposToPass[protocol.schema][protocolName]?.schemaVersions?.includes(deploymentData?.versions?.schema)) {
+                    deposToPass[protocol.schema][protocolName]?.schemaVersions?.push(deploymentData?.versions?.schema);
+                }
+                if (deploymentData?.status === 'dev') {
+                    deposToPass[protocol.schema][protocolName].status = false;
+                }
+            }
+        });
+    });
+
+    return (
+        <>
+            {Object.entries(deposToPass).sort().map(([schemaType, subgraph]) => {
+                if (!Object.keys(schemaMapping).includes(schemaType)) {
+                    return null;
+                } else {
+                    schemaType = schemaMapping[schemaType];
+                }
+                const isLoaded = indexingStatusLoaded[schemaType];
+                const isLoadedPending = indexingStatusLoadedPending[schemaType];
+                const indexQueryError = indexingStatusError[schemaType];
+                const indexQueryErrorPending = indexingStatusErrorPending[schemaType];
+                const tableRows = Object.keys(subgraph).sort().map((subgraphName) => {
+                    const protocol = subgraph[subgraphName];
+                    return (
+                        <ProtocolSection
+                            key={"ProtocolSection-" + subgraphName.toUpperCase()}
+                            subgraphName={subgraphName}
+                            protocol={protocol}
+                            clientIndexing={clientIndexing}
+                            decenDeposToSubgraphIds={decenDeposToSubgraphIds}
+                            tableExpanded={tableExpanded[schemaType]}
+                            isLoaded={isLoaded}
+                            isLoadedPending={isLoadedPending}
+                            indexQueryError={indexQueryError}
+                            indexQueryErrorPending={indexQueryErrorPending}
+                        />);
+                });
+                return (
+                    <TableContainer sx={{ my: 8 }} key={"TableContainer-" + schemaType.toUpperCase()}>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography
+                                key={"typography-" + schemaType}
+                                variant="h4"
+                                align="left"
+                                fontWeight={500}
+                                fontSize={28}
+                                sx={{ padding: "6px", my: 2 }}
+                            >
+                                {schemaType.toUpperCase()}
+                            </Typography>
+                            <Typography
+                                key={"typography-" + schemaType}
+                                variant="h4"
+                                align="left"
+                                fontWeight={500}
+                                fontSize={18}
+                                sx={{ padding: "6px", my: 2 }}
+                            >
+                                <span style={{ color: "white", cursor: "pointer", margin: "4px" }} onClick={() => setTableExpanded({ ...tableExpanded, [schemaType]: !tableExpanded[schemaType] })}>
+                                    <u>{tableExpanded[schemaType] ? "Collapse" : "Expand"} Table</u>
+                                </span>
+                            </Typography>
+                        </div>
+                        <Table stickyHeader>
+                            {tableHead}
+                            <TableBody>{tableRows}</TableBody>
+                        </Table>
+                    </TableContainer>
+                )
+            })}
+        </>
+    );
 }
 
 export default DeploymentsTable;

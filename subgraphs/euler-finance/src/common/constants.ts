@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////
 ///// Versions /////
@@ -7,7 +7,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 export const PROTOCOL_NAME = "Euler";
 export const PROTOCOL_SLUG = "euler";
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.1";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.2";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -112,6 +112,7 @@ export const USDC_WETH_03_ADDRESS = "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8"
 export const USDC_ERC20_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const EULER_GENERAL_VIEW_ADDRESS = "0x9D2B3052f5A3c156A34FC32cD08E9F5501720ea4";
 export const EULER_GENERAL_VIEW_V2_ADDRESS = "0xACC25c4d40651676FEEd43a3467F3169e3E68e42";
+export const CRYPTEX_MARKET_ID = "0x321c2fe4446c7c963dc41dd58879af648838f98d";
 
 export const VIEW_V2_START_BLOCK_NUMBER = BigInt.fromI32(14482429);
 
