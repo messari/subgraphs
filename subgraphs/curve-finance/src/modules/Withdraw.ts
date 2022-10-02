@@ -103,6 +103,9 @@ export function getWithdrawnTokenAmounts(
 
   for (let i = 0; i < logs.length; i++) {
     let log = logs.at(i);
+
+    if (log.topics.length == 0) continue;
+
     let topic_signature = log.topics.at(0);
     if (
       crypto
