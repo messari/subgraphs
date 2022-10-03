@@ -74,7 +74,7 @@ export function handleStakingV2(
   lpTokenAddress: Address,
   block: ethereum.Block
 ): void {
-  let poolAddress = utils.getPoolFromLpToken(lpTokenAddress);
+  let poolAddress = utils.getMinterFromLpToken(lpTokenAddress);
   if (poolAddress == constants.ADDRESS_ZERO) {
     return;
   }
@@ -86,9 +86,9 @@ export function handleStakingV2(
 
   log.warning("[handleStakingV2] Pool Id{}", [pool.id]);
   let poolInfoCall = stakingContractV2.try_poolInfo(lpTokenAddress);
-  if (!poolInfoCall.reverted) {
+  if (poolInfoCall.reverted)  return; 
     let rewardsPerSecond = BigDecimal.fromString(
-      poolInfoCall.value.value1.toString()
+      poolInfoCall.value.getRewardsPerSecond() .toString()
     );
     let rewardTokensPerDay = getRewardsPerDay(
       block.timestamp,
@@ -103,14 +103,6 @@ export function handleStakingV2(
       BigInt.fromString(rewardTokensPerDay.truncate(0).toString()),
       block
     );
-    if (!pool.stakedOutputTokenAmount) {
-      pool.stakedOutputTokenAmount = constants.BIGINT_ZERO;
-    }
-
-    pool.stakedOutputTokenAmount = poolInfoCall.value.value0;
-  }
-
-  pool.save();
 }
 
 export function updateRewardTokenEmissions(
