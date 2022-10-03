@@ -1,165 +1,152 @@
-# GMX
+# GMX Protocol Subgraph Metrics Methodology v1.0.0
 
-This is for the Generic Schema of Messari Subgraph.
+Introduction:
 
-## Business Summary
+GMX is a decentralized spot and perpetual exchange featuring a unique multi-asset pool that earns fees for liquidity providers. The platform supports swaps with minimal fees and trades without price impact.
 
-GMX is a mix of non-custodial spot and perpetual exchange which supports low swap fees and zero impact trades.
-The protocol officially launched first on Arbitrum network in September 2021, and then expanded to Avalanche network in January 2022.
-Trading is supported through a unique multi-asset liquidity pool that generates rewards for liquidity providers in multiple ways such as market making, swap fees, leverage trading (this includes position opening & closing fees, borrowing fees, and swap fees), and asset rebalancing which are channeled back to liquidity providers.
-The business of the protocol can be divided and summarized as follows:
+Note:
 
-### GLP
-
-The GLP Index Composition is made up of a basket of assets that is used as the counter party for swaps and leverage trading. Liquidity providers add liquidity by minting GLP to add assets to the multi-asset pool. LPs then hold GLP, an LP token for the multi-asset pool.
-
-GLP holders get the balance of the pool, which are affected by trading gans and losss, as well as trading fees, position fees, and borrowing fees.
-
-The token weights of the GLP Index Composition are automatically adjusted based on the open positions of traders.
-
-- On Arbitrum, GLP holders receive Escrowed GMX (esGMX) rewards as well as 70% of the platform’s generated fees in the form of $ETH.
-- On Avalanche, GLP holders receive esGMX rewards as well as 70% of platform fees in the form of $AVAX.
-
-GLP holders or the liquidity providers get all the collateral when positions are liquidated.
-
-### Spot & Perpetual Exchange Traders
-
-Traders can utilize the liquidity for leveraged trading or swaps with zero price impact. Pricing feed is supported and secured by Chainlink Oracles and an aggregate of prices from leading volume exchanges such as Binance and FTX.
-Traders need to post collateral first to open a long or short position for any asset in the index with a leverage of up to 30x.
-When a trader closes his position in profit, he gets paid out in the token for his long position (ETH for example) or stablecoins for short position (USDC for example).
-Successful traders are paid out by the liquidity pool and on the other side, unsuccessful traders payout to liquidity providers.
-Traders will get automatically liquidated when the loss plus the borrow fee approaches the value of the collateral they posted.
-
-### GMX
-
-GMX is used in governance and can be staked to receive three types of rewards such as Escrowed GMX (esGMX), Multiplier Points, and platform fees distributed in ETH or AVAX. Multiplier Points (MPs) can be staked for platform fee rewards by compounding. MPs reward the long-term holders without additional inflation.
-
-### Referral rewards
-
-Referral rewards has three tiers and this helps to ensure that referrers receive rebates for users they bring to the platform.
-
-- Tier 1: 5% discount for traders, 5% rebates to referrer
-- Tier 2: 10% discount for traders, 10% rebates to referrer
-- Tier 3: 10% discount for traders, 15% rebates to referrer paid in ETH / AVAX, 5% rebates to referrer paid in esGMX
-  Note: Referral codes are case-sensitive, and it must be created on both Arbitrum and Avalanche in order to qualify for rebates on both networks.
+- GMX is currently running on Arbitrum and Avalanche.
+- Before its rebranding to “GMX” the protocol was called “Gambit” and ran on Binance Smart Chain. After the rebranding Gambit has been phased out and there is no noteworthy activity anymore which is why BSC was not considered in this report.
 
 ## Useful Links
 
-Protocol:
+- Protocol
+  - [https://gmx.io/](https://gmx.io/)
+- Docs
+  - [https://gmxio.gitbook.io/gmx/](https://gmxio.gitbook.io/gmx/)
+  - [https://gmx-io.notion.site/gmx-io/GMX-Technical-Overview-47fc5ed832e243afb9e97e8a4a036353](https://gmx-io.notion.site/gmx-io/GMX-Technical-Overview-47fc5ed832e243afb9e97e8a4a036353)
+- Smart contracts
+  - [https://github.com/gmx-io](https://github.com/gmx-io)
+- Deployed addresses
+  - [https://gmxio.gitbook.io/gmx/contracts](https://gmxio.gitbook.io/gmx/contracts)
+- Protocol stats
+  - [https://stats.gmx.io/](https://stats.gmx.io/)
+  - [https://gmx.io/dashboard](https://gmx.io/dashboard)
+- Governance forum
+  - [https://gov.gmx.io](https://gov.gmx.io)
+- GMX Medium
+  - [https://medium.com/@gmx.io](https://medium.com/@gmx.io)
 
-- https://app.gmx.io/#/trade
+## Usage Metrics
 
-Docs:
+**Active Users, Total Unique Users & Daily Transaction Count**
 
-- https://gmxio.gitbook.io/gmx/
+Transactions of interest on GMX include:
 
-Smart contracts:
-
-- https://gmxio.gitbook.io/gmx/contracts
-
-Tokenomics:
-
-- https://gmxio.gitbook.io/gmx/tokenomics
-
-## Rewards and Fees
-
-### Rewards for staking GLP and GMX
-
-Stakers earn the GMX emissions per block:
-
-> Reward Rate for GLP holders = Rewards received in esGMX _ GLP Price / Balance of the Staked GLP pool
-> Reward Rate for GMX holders = Rewards received in esGMX _ GMX Price / Balance of the Staked GMX pool
-> Reward Rate for esGMX stakers = Rewards received in esGMX * GMX Price / Balance of the Staked eGMX pool
-> *Note: 30% of the platform fees generated from swaps and leverage trading are converted to ETH or AVAX and distributed to staked GMX tokens. On the other hand, GLP token holders earn 70% of platform fees distributed in ETH or AVAX.\*
-
-### Fees for opening or closing a position
-
-> Open position fee = 0.1% _ Trader’s position size
-> Close position fee = 0.1% _ Trader’s position size
-
-- Reference: https://gmxio.gitbook.io/gmx/trading
-
-### Fees for borrowing
-
-> Borrow fee = (assets borrowed by traders) / (total assets in pool) \* Borrow Fee Rate%
-> Note: Traders need to pay a borrowing fee every hour. The fee is calculated based on utilization and this similar to money market protocols like AAVE. The max borrow fee would be at 100% utilization which is 0.01% per hour.
-
-- Reference: https://gmxio.gitbook.io/gmx/trading
-
-### Swap Fees for the conversion of the asset to its USD value
-
-There is a 0.3% swap fee when depositing collateral into a long position. For example, ETH amount to USD value. The purpose of this is to prevent deposits from being used as a zero-fee swap.
-Note: This applies for long positions only. It does not also apply for withdrawing of collateral from longs and shorts.
-
-- Reference: https://gmxio.gitbook.io/gmx/trading
-
-## User Metrics
-
-### Classification of Pools
-
-Each asset or token included in the GLP is a pool in the subgraph. As of writing, there are eight different assets in Arbitrum network and six assets in Avalanche network.
-
-### GLP
-
-- Mint GLP token by supplying the assets
-- Burn GLP tokens to redeem any index asset
-- Claim rewards
-- Purchase insurance via GMX’s platform
-
-### Spot & Perpetual Exchange Traders
-
-- Swap tokens
-- Open a long or short position
-- Provide specific amount of collateral in any asset available
-- Edit position to change the margin level
-- Set stop-loss and take-profit orders
-- Close the position
-
-### GMX
-
-- Purchase GMX token
-- Stake GMX to receive rewards and platform fees
-- Unstake GMX
-- Stake earned esGMX to increase the amount of rewards
-- Convert esGMX to actual GMX tokens after vesting
-- Stake Multiplier Points to earn more platform fee rewards
-- Claim all the rewards
+- Swapping (excluding swaps of the protocol token)
+- Opening a position (long / short)
+- Closing a position (long / short; 3 options: manual closing, stop-loss, liquidations)
+- Staking GMX
+- Minting GLP
+- Redeeming GLP
+- Depositing collateral
+- Withdrawing collateral
+- Compounding esGMX
+- Claiming esGMX
+- Staking GLP should not be considered because after buying GLP, these tokens will be automatically staked so this is not a transaction actively triggered by users.
 
 ## Financial Metrics
 
-Please refer to the "Classification of Pools" under User Metrics for Pools.
+**Total Value Locked USD**
 
-### TVL
+TVL = GMX staked (all chains) + GLP supply \* GLP price
 
-> TVL of a Pool = ∑ value of the specific asset in the pool
-> TVL of the Protocol = ∑ TVL of all single pools
-> _Note: The collateral of traders are reserved in the GLP pool. Hence, there are two types of transactions to track the TVL, which are the users who provide liquidity and another one for the traders who provide collaterals before trading._
+Note that GLP is specific to the network and the price & supply will differ between Arbitrum & Avalanche. So for TVL among all chains, it should be calculated as follows: \
 
-### Total Revenue
+TVL = GMX staked (all chains) + (GLP supply on Arbitrum _ GLP price on Arbitrum) + (GLP supply on Avalanche _ GLP price on Avalanche)
 
-> Total Revenue of a Pool = ∑ poistion opening & closing fees, borrowing fees, and swap fees
-> Please refer to the Fee section of details of the fees charged by GMX.
+GMX has a Floor Price Fund (FPF). The assets in the FPF were not deposited in the protocol and should therefore not be included in the TVL calculation.
 
-#### Supply Side Revenue
+Assets in the FPF are accumulated by:
 
-> Supply Side Revenue = 70% * Total Revenue
-> *Note: The generated fees distributed are based on the amount remaining after deducting rewards and the network costs of keepers, which typically costs around 1% of the total fees.\*
+- provision of GMX/ETH liquidity that is provided and owned by the protocol
+- 50% of funds received through[ Olympus bonds](https://pro.olympusdao.finance/#/partners/GMX)
 
-#### Protocol Side Revenue
+**Protocol Controlled Value USD**
 
-> Protocol Side Revenue = 30% * Total Revenue
-> *Note: The generated fees distributed are based on the amount remaining after deducting referral rewards and the network costs of keepers, which typically costs around 1% of the total fees.\*
+There is a sale of 10,000 GMX each month through Olympus bonds Olympus Pro-Bond marketplace for protocol-owned liquidity, 50% goes to the floor price fund, and 50% for marketing activities. The starting price is at 0.9 \* GMX market price at the time.
 
-#### Rewards
+Source: https://gov.gmx.io/t/treasury-diversification-through-the-sale-of-esgmx-tokens/73/29
 
-GMX provides esGMX rewards goes to liquidity providers and GMX token holders, in the ratio of 70:30. GMX token holders also receive Multiplier Point rewards, which do not value but are entitlements for receiving trading fee rewards.
+**Total Revenue USD**
 
-## Protocol Owned Liquidity
+Total Revenue generated on GMX is the sum of:
 
-The GMX token has a Floor Price Fund that is denominated in $ETH and $GLP. This can grow in two ways:
+1. Fees generated from swapping
+2. Fees generated from minting GLP
+3. Fees generated from burning GLP
+4. Fees from liquidations
+5. Fees from margin trading
 
-- GMX/ETH liquidity is provided and owned by the protocol, the generated fees from this trading pair will be converted to GLP and deposited into the floor price fund
-- 50% of funds received through Olympus bonds are given to the floor price fund, the other 50% is used for marketing
-  The purpose of floor price fund is to help ensure liquidity in GLP and provide a reliable stream of $ETH rewards for GMX stakers. As the floor price fund grows, this can be used to buyback and burn GMX tokens if the (Floor Price Fund) / (Total Supply of GMX) is less than the market price. As a result, GMX will have a minimum price in terms of ETH and GLP.
-  Note: According to the GMX’s documentation, 2 million out 13.25 (15.04%) max supply of GMX tokens is to be managed by the floor price fund.
-  Reference: https://gmxio.gitbook.io/gmx/tokenomics
+As a calculation, this could be described as:
+
+Total Revenue = Fees from swapping + Fees from minting GLP + Fees from burning GLP + Fees from liquidations + Fees from margin trading
+
+Total Revenue for GMX can be described as the sum of all Platform Fees.
+
+**Supply Side Revenue USD**
+
+In general fees for GMX are split 30/70 between staked GMX/GLP and paid out in either wETH or wAVAX depending on which chain the user staked their assets.
+
+The two assets GMX and GLP can be defined as follows:
+
+- GMX: The utility and governance token, accrues 30% of the platform's generated fees (if staked).
+- GLP: The platform's liquidity provider token. Holders of the GLP token earn Escrowed GMX rewards and 70% of platform fees distributed in ETH/AVAX.
+
+For GMX the supply side revenue can be calculated as the share of trading fees that goes to the liquidity providers:
+
+Supply Side Revenue = (Total Revenue - Costs of Keepers - Referral Rewards) \* Supply Side Fees
+
+\
+Supply Side Fees in this case would be equal to a fixed parameter of 70%. Platform Fees in the case of GMX are equal to Total Revenues (see the formula in the respective section) since all fees are distributed between staked GMX & GLP holders. Referral Rewards are further explained in the section ‘Reward Tokens & Reward Token Emissions Amount’.
+
+**Protocol Revenue USD**
+
+For GMX protocol revenue can be calculated as the share of trading fees that goes to the stakers of the protocol token. Staked GMX receives three types of rewards:
+
+- Escrowed GMX
+- Multiplier Points
+- ETH / AVAX Rewards (Platform Fees)
+
+Protocol Revenue = (Total Revenue - Costs of Keepers - Referral Rewards) \* (1- Supply Side Fees) \
+ \
+Supply Side Fees in this case would be equal to a fixed parameter of 70%. Platform Fees in the case of GMX are equal to Total Revenues (see the formula in the respective section) since all fees are distributed between staked GMX & GLP holders.
+
+## Pool-Level Metrics
+
+**Pool Total Value Locked USD**
+
+The Pool TVL of GMX is the No. of Assets Deposited in the GLP \* Price of the Asset. On the GMX dashboard (https://gmx.io/dashboard), this is shown as “GLP Index Composition”. Please note that there are two GLP: One for Arbitrum and one for Avalanche.
+
+Pool Total Value Locked = No. of Assets Deposited in the GLP \* Price of the Asset
+
+**Reward Tokens & Reward Token Emissions Amount**
+
+**Escrowed GMX:**
+
+Escrowed GMX was and will be distributed at the following rate starting from 1 Sep 2021:
+
+- 100,000 Escrowed GMX tokens per month to GMX stakers
+- 100,000 Escrowed GMX tokens per month to GLP holders on Arbitrum
+- 50,000 Escrowed GMX tokens per month to GLP holders on Avalanche from Jan 2022 - Mar 2022
+- 25,000 Escrowed GMX tokens per month to GLP holders on Avalanche from Apr 2022 - Dec 2022
+
+Escrowed GMX rewards are distributed every second to staked tokens and can be converted into GMX tokens through vesting. Note for future maintenance of the subgraph: A very recent governance decision will update esGMX emissions from fixed to dynamic starting from June 2022.
+
+(Source: https://snapshot.org/#/gmx.eth/proposal/0xb370249628b2226c6a7e771b2959c3b2e80eada36ad3618a7fc39f964213643e)
+
+**Multiplier Points: **
+
+GMX stakers receive Multiplier Points every second at a fixed rate of 100% APR. Example: 1000 GMX staked for one year would earn 1000 Multiplier Points. Multiplier points can be staked for fee rewards. Each multiplier point will earn the same amount of ETH / AVAX rewards as a regular GMX token.
+
+When GMX or Escrowed GMX tokens are unstaked, the proportional amount of Multiplier Points is burnt. For example, if 1000 GMX is staked and 500 Multiplier Points have been earned so far, then unstaking 300 GMX would burn 150 (300 / 1000 \* 500) Multiplier Points. The burn will apply to the total amount of Multiplier Points which includes both staked and unstaked Multiplier Points.
+
+**Referral Rewards:**
+
+The GMX Referral Program provides fee discounts and the earning of rebates. In the course of this program, esGMX is paid out to Tier 3 referrers. The payout price of esGMX is based on the 7-day TWAP of GMX. Note that there is a cap of 5000 esGMX distributed per week. If the price of GMX is $30 the full 5% bonus can be paid for total Tier 3 referral volumes up to $3 billion per week. esGMX tokens distributed for this program do not require GMX or GLP to vest. The discounts and rebates are distributed as ETH on Arbitrum and AVAX on Avalanche every Wednesday.
+
+**ETH Rewards:**
+
+In their launch announcement on Medium, additional ETH rewards were mentioned. They read as follows: With the start of GMX on Arbitrum, $72,072.62 USD worth of ETH that has been collected from trading fees on BSC was distributed to GMX stakers over 4 weeks. However, these rewards are not mentioned in the official documentation. \
+(Source: https://medium.com/@gmx.io/gmx-launch-plan-8ecf60254410)
