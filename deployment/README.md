@@ -3,6 +3,7 @@
 ## Usage:
 
 WARN:
+
 - Recommended to use lowercase letters for npm config keys. Uppercase letters may not be recognized by some systems.
 
 **Build a single deployment ID:**
@@ -32,7 +33,7 @@ WARN:
 
 **Deploy a single deployment ID to Hosted Service using a different slug than specified in JSON:**
 
-`npm run build --id=uniswap-v2-ethereum --SLUG=uniswap-v2-ethereum-other --service=h --target=steegecs --deploy=t`
+`npm run build --id=bastion-protocol-aurora --SLUG=bastion-skeleton --service=h --target=dmelotik --deploy=t`
 
 **Deploy all deployments for a protocol:**
 
@@ -41,8 +42,6 @@ WARN:
 **Deploy all deployments within a directory:**
 
 `npm run build --id=uniswap-fork --span=base --service=h --target=steegecs --deploy=t`
-
-
 
 - --printlogs
   - T/F/null - Set PRINTLOGS to 't' or 'true' to print all logs to the console instead of just to results.txt
@@ -65,6 +64,6 @@ WARN:
 - You must include the deployment you are trying to make within the deployment.json file. Go ahead and follow the current structure and include all fields in the other examples - further instructions on the deployment.json schema will soon be available.
 - Upon creation of a pull request to the `master` branch, or any changes thereof, will trigger a github action will run the `npm run build` command, which will build all protocols that have had changes to their code base.
 
-> *Note*: To ensure this works with your subgraph you need to make these calls from the root of the subgraph's directory. 
+> _Note_: To ensure this works with your subgraph you need to make these calls from the root of the subgraph's directory.
 
-> *In addition*, when adding a new subgraph it must have the particular scripts found in any existing subgraph's `package.json` file.
+> _In addition_, when adding a new subgraph it must have the particular scripts found in any existing subgraph's `package.json` file.
