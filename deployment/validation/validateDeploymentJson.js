@@ -167,37 +167,43 @@ function checkDeploymentsIDsPresentAndValid(
   deployment,
   deploymentData
 ) {
-  if (!deploymentData["deployment-ids"]) {
+  if (!deploymentData["services"]) {
     throw new Error(
-      `Please specify deployment-ids in deployment.json for protocol: ${protocol} deployment: ${deployment}`
+      `Please specify services in deployment.json for protocol: ${protocol} deployment: ${deployment}`
     ).message;
   }
 
   // Make sure there is at least one deployment ID
-  if (Object.keys(deploymentData["deployment-ids"]).length === 0) {
+  if (Object.keys(deploymentData["services"]).length === 0) {
     throw new Error(
-      `Please specify at least one deployment-id in deployment.json for protocol: ${protocol} deployment: ${deployment}`
+      `Please specify at least one services in deployment.json for protocol: ${protocol} deployment: ${deployment}`
     ).message;
   }
 
   // Make sure all deployment IDs are valid
-  for (const [deploymentID, location] of Object.entries(
-    deploymentData["deployment-ids"]
+  for (const [service, serviceData] of Object.entries(
+    deploymentData["services"]
   )) {
     if (
       !["hosted-service", "cronos-portal", "decentralized-network"].includes(
-        deploymentID
+        service
       )
     ) {
       throw new Error(
-        `Invalid deployment-id in deployment.json for protocol: ${protocol} deployment: ${deployment} deployment-id: ${deploymentID}`
+        `Invalid service in deployment.json for protocol: ${protocol} deployment: ${deployment} service: ${service}`
       ).message;
     }
 
-    if (!location) {
+    if (!serviceData["slug"]) {
       throw new Error(
-        `Please specify deployment-id in deployment.json for protocol: ${protocol} deployment: ${deployment} deployment-id: ${deploymentID}`
-      ).message;
+        `Missing slug for service in deployment.json for protocol: ${protocol} deployment: ${deployment} service: ${service}`
+      );
+    }
+
+    if (!serviceData["query-id"]) {
+      throw new Error(
+        `Missing query id for service in deployment.json for protocol: ${protocol} deployment: ${deployment} service: ${service}`
+      );
     }
   }
 }
@@ -252,6 +258,30 @@ function checkDuplicateIDs(deploymentJsonMap) {
   }
 }
 
+function checkProtocolArgumentCount(protocol, protocolData) {
+  if (Object.keys(protocolData).length !== 4) {
+    throw new Error(
+      `Invalid number of arguments for protocol: ${protocol} - must have 4 arguments: schema, base, protocol, deployments`
+    ).message;
+  }
+}
+
+function checkDeploymentsArgumentCount(protocol, deployment, deploymentData) {
+  if (Object.keys(deploymentData).length !== 6) {
+    throw new Error(
+      `Invalid number of arguments for protocol: ${protocol} deployment: ${deployment} - must have 6 arguments: versions, services, files, options, status, networks`
+    ).message;
+  }
+}
+
+function checkVersionsArgumentsCount(protocol, deployment, deploymentData) {
+  if (Object.keys(deploymentData.versions).length !== 3) {
+    throw new Error(
+      `Invalid number of arguments for protocol: ${protocol} deployment: ${deployment} versions - must have 3 arguments: schema, subgraph, methodology`
+    ).message;
+  }
+}
+
 // Run tests before each build in CI/CD
 function validateDeploymentJson(deploymentJsonMap) {
   // Checks if all necessary fields exist and contain valid values in the deployment.json
@@ -261,6 +291,7 @@ function validateDeploymentJson(deploymentJsonMap) {
     checkBasePresent(protocol, protocolData);
     checkProtocolPresent(protocol, protocolData);
     checkDeploymentsPresent(protocol, protocolData);
+    checkProtocolArgumentCount(protocol, protocolData);
 
     for (const [deployment, deploymentData] of Object.entries(
       protocolData.deployments
@@ -272,6 +303,8 @@ function validateDeploymentJson(deploymentJsonMap) {
       checkDeploymentsIDsPresentAndValid(protocol, deployment, deploymentData);
       checkTemplatePresent(protocol, deployment, deploymentData);
       checkOptionsPresent(protocol, deployment, deploymentData);
+      checkDeploymentsArgumentCount(protocol, deployment, deploymentData);
+      checkVersionsArgumentsCount(protocol, deployment, deploymentData);
     }
   }
 

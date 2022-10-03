@@ -61,6 +61,7 @@ Not applicable to CREAM Finance
 ### Notes
 
 - BSC and Ethereum deployments have oracles that return the price in BNB and ETH respectively
+- Unable to get pricing data for BSC deployment before November 2, 2020. Unable to reliably get the price of BNB on chain.
 - The ethereum deployment is "deprecated" after October 27th, 2021.
   - See the article here: https://creamdotfinance.medium.com/moving-forward-post-exploit-next-steps-for-c-r-e-a-m-finance-1ad05e2066d5
 

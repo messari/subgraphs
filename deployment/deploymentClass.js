@@ -94,7 +94,7 @@ class Deployment {
     )) {
       if (
         this.getDeploy() === false ||
-        deploymentData["deployment-ids"][this.getService()]
+        deploymentData["services"][this.getService()]["slug"]
       ) {
         this.generateScripts(deployment, deploymentData);
       }
@@ -265,7 +265,7 @@ class Deployment {
     if (this.slug) {
       location = this.slug;
     } else {
-      location = deploymentData["deployment-ids"][this.getService()];
+      location = deploymentData["services"][this.getService()]["slug"];
     }
 
     if (this.getService() === "decentralized-network") {

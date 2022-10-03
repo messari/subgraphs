@@ -8,7 +8,6 @@ import {
 import {
   ETHEREUM_BLOCKS_PER_YEAR,
   BSC_BLOCKS_PER_YEAR,
-  ARBITRUM_BLOCKS_PER_YEAR,
   MATIC_BLOCKS_PER_YEAR,
   AVALANCHE_BLOCKS_PER_YEAR,
   Network,
@@ -19,12 +18,17 @@ import {
 // setting OPTIMISM_BLOCKS_PER_YEAR to 0 will be fine
 const OPTIMISM_BLOCKS_PER_YEAR = 0;
 
-const ARBITRUM_BLOCKS_PER_DAY = ARBITRUM_BLOCKS_PER_YEAR / 365;
 const AVALANCHE_BLOCKS_PER_DAY = AVALANCHE_BLOCKS_PER_YEAR / 365;
 const BSC_BLOCKS_PER_DAY = BSC_BLOCKS_PER_YEAR / 365;
 const ETHEREUM_BLOCKS_PER_DAY = ETHEREUM_BLOCKS_PER_YEAR / 365;
 const MATIC_BLOCKS_PER_DAY = MATIC_BLOCKS_PER_YEAR / 365;
 const OPTIMISM_BLOCKS_PER_DAY = OPTIMISM_BLOCKS_PER_YEAR / 365;
+
+// For interest rate and reward emission calculation,
+// dforce use ethereum block number
+// see discussion in https://github.com/messari/subgraphs/issues/939
+const ARBITRUM_BLOCKS_PER_YEAR = ETHEREUM_BLOCKS_PER_YEAR;
+const ARBITRUM_BLOCKS_PER_DAY = ETHEREUM_BLOCKS_PER_DAY;
 
 export class NetworkSpecificConstant {
   comptrollerAddr: Address;

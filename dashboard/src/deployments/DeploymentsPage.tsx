@@ -8,6 +8,8 @@ import { useEffect, useMemo, useState } from "react";
 import DeploymentsTable from "./DeploymentsTable";
 import { useQuery } from "@apollo/client";
 import { decentralizedNetworkSubgraphsQuery } from "../queries/decentralizedNetworkSubgraphsQuery";
+import DevCountTable from "./DevCountTable";
+import IndexingCalls from "./IndexingCalls";
 
 const DeploymentsLayout = styled("div")`
   padding: 0;
@@ -17,12 +19,27 @@ interface DeploymentsPageProps {
   protocolsToQuery: { [x: string]: any };
   getData: any;
   subgraphCounts: any;
+  indexingStatusQueries: any;
+  endpointSlugs: string[];
+  aliasToProtocol: any;
 }
 
-function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: DeploymentsPageProps) {
+function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingStatusQueries, endpointSlugs, aliasToProtocol }: DeploymentsPageProps) {
   const [decentralizedDeployments, setDecentralizedDeployments] = useState<{
-    [type: string]: { [proto: string]: { [network: string]: string } };
+    [type: string]: { [network: string]: any };
   }>({});
+
+  const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
+
+  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
+  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
+
+  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
+  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
+
+  const [indexingStatus, setIndexingStatus] = useState<any>(false);
+  const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
+  const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
 
   const clientDecentralizedEndpoint = useMemo(
     () => NewClient("https://api.thegraph.com/subgraphs/name/graphprotocol/graph-network-mainnet"),
@@ -40,8 +57,8 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
 
   useEffect(() => {
     if (decentralized && !Object.keys(decentralizedDeployments)?.length) {
-      const decenDepos: { [x: string]: any } = { exchanges: {}, lending: {}, vaults: {}, generic: {} };
-      const subs = decentralized.graphAccount.subgraphs;
+      const decenDepos: { [x: string]: any } = {};
+      const subs = [...decentralized.graphAccounts[0].subgraphs, ...decentralized.graphAccounts[1].subgraphs];
       subs.forEach((sub: any, idx: number) => {
         try {
           let name = sub.currentVersion?.subgraphDeployment?.originalName?.toLowerCase()?.split(" ");
@@ -52,33 +69,9 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
           name = name.join("-");
           const network = sub.currentVersion.subgraphDeployment.network.id;
           const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
+          const curatorSignals = sub.currentVersion.subgraphDeployment.curatorSignals;
           const subgraphId = sub.id;
-          const schemaVersion = sub.currentVersion.subgraphDeployment.schema
-            .split("\n")
-            .join("")
-            .split("#")
-            .find((x: string[]) => x.includes("Version:"))
-            .split("Version:")[1]
-            .trim();
-          const protocolTypeRaw = sub.currentVersion.subgraphDeployment.schema
-            .split("\n")
-            .join("")
-            .split("#")
-            .find((x: string[]) => x.includes("Subgraph Schema:"))
-            .split("Subgraph Schema:")[1]
-            .trim();
-          let protocolType = "generic";
-          if (protocolTypeRaw.toUpperCase().includes("LEND")) {
-            protocolType = "lending";
-          } else if (
-            protocolTypeRaw.toUpperCase().includes("EXCHANGE") ||
-            protocolTypeRaw.toUpperCase().includes("DEX")
-          ) {
-            protocolType = "exchanges";
-          } else if (protocolTypeRaw.toUpperCase().includes("VAULT") || protocolTypeRaw.toUpperCase().includes("YIELD")) {
-            protocolType = "vaults";
-          }
-          decenDepos[protocolType][name] = { network, schemaVersion, deploymentId, subgraphId };
+          decenDepos[name] = { network, deploymentId, subgraphId, curatorSignals };
         } catch (err) {
           return;
         }
@@ -90,17 +83,86 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
   const navigate = useNavigate();
   window.scrollTo(0, 0);
 
-
   const decenDeposToSubgraphIds: any = {};
   if (Object.keys(decentralizedDeployments)?.length) {
-    Object.keys(decentralizedDeployments).forEach((key) => {
-      Object.keys(decentralizedDeployments[key]).forEach((x) => {
-        if (Object.keys(protocolsToQuery).find((pro) => pro.includes(x))) {
-          decenDeposToSubgraphIds[x] = decentralizedDeployments[key][x]?.subgraphId;
+    Object.keys(decentralizedDeployments).forEach((x) => {
+      const protocolObj = Object.keys(protocolsToQuery).find((pro) => pro.includes(x));
+      if (protocolObj) {
+        let networkStr = decentralizedDeployments[x]?.network;
+        if (networkStr === "mainnet") {
+          networkStr = "ethereum";
         }
-      });
+        if (networkStr === "matic") {
+          networkStr = "polygon";
+        }
+        let subgraphIdToMap = "";
+        let signalCount = 0;
+        decentralizedDeployments[x]?.curatorSignals?.forEach((signalObj: any) => signalCount += signalObj?.signal);
+        if (signalCount > 0) {
+          subgraphIdToMap = decentralizedDeployments[x]?.subgraphId;
+        }
+        decenDeposToSubgraphIds[x + "-" + networkStr] = subgraphIdToMap;
+      }
     });
   }
+
+  // counts section
+  let devCountTable = null;
+  if (!!showSubgraphCountTable) {
+    devCountTable = <DevCountTable subgraphCounts={subgraphCounts} />;
+  }
+
+  let indexingCalls = null;
+  if (endpointSlugs.length > 0) {
+    indexingCalls = (
+      <IndexingCalls
+        setIndexingStatus={setIndexingStatus}
+        setPendingIndexingStatus={setPendingIndexingStatus}
+        indexingStatusQueries={indexingStatusQueries}
+        setIndexingStatusLoaded={setIndexingStatusLoaded}
+        setIndexingStatusLoadedPending={setIndexingStatusLoadedPending}
+        setIndexingStatusError={setIndexingStatusError}
+        setIndexingStatusErrorPending={setIndexingStatusErrorPending}
+        indexingStatusLoaded={indexingStatusLoaded}
+        indexingStatusLoadedPending={indexingStatusLoadedPending}
+        indexingStatusError={indexingStatusError}
+        indexingStatusErrorPending={indexingStatusErrorPending}
+      />)
+  }
+
+  if (!!indexingStatus) {
+    Object.keys(indexingStatus).forEach((depo: string) => {
+      const deploymentStr = depo.split("_").join("-");
+      if (protocolsToQuery[aliasToProtocol[depo]]) {
+        if (!!protocolsToQuery[aliasToProtocol[depo]].deployments[deploymentStr]) {
+          protocolsToQuery[aliasToProtocol[depo]].deployments[deploymentStr].indexStatus = indexingStatus[depo];
+        } else {
+          const network = deploymentStr.split("-").pop() || "";
+          const depoKey = (Object.keys(protocolsToQuery[aliasToProtocol[depo]].deployments).find((x: any) => {
+            return protocolsToQuery[aliasToProtocol[depo]].deployments[x].network === network
+          }) || "");
+          protocolsToQuery[aliasToProtocol[depo]].deployments[depoKey].indexStatus = indexingStatus[depo];
+        }
+      }
+    })
+  }
+
+  if (!!pendingIndexingStatus) {
+    Object.keys(pendingIndexingStatus).forEach((depo: string) => {
+      if (!pendingIndexingStatus[depo]) {
+        return;
+      }
+      const depoNoPendingArr = depo.split("_");
+      depoNoPendingArr.pop()
+      const deploymentStr = depoNoPendingArr.join("-");
+      if (protocolsToQuery[aliasToProtocol[depoNoPendingArr.join("_")]]) {
+        if (!!protocolsToQuery[aliasToProtocol[depoNoPendingArr.join("_")]].deployments[deploymentStr]) {
+          protocolsToQuery[aliasToProtocol[depoNoPendingArr.join("_")]].deployments[deploymentStr].pendingIndexStatus = pendingIndexingStatus[depo];
+        }
+      }
+    })
+  }
+
   return (
     <DeploymentsContextProvider>
       <DeploymentsLayout>
@@ -114,27 +176,33 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts }: Deployme
         >
           Load Subgraph
         </SearchInput>
-        <div style={{ width: "100%", textAlign: "right", marginTop: "20px" }}>
-          <Button variant="contained" color="primary" onClick={() => navigate("/comparison")}>
-            Defi Llama Comparison
-          </Button>
-        </div>
-        <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
-          <Button variant="contained" color="primary" onClick={() => navigate("/development-status")}>
-            Development Status Table
-          </Button>
-        </div>
-        <div style={{ width: "100%", textAlign: "right", marginTop: "30px" }}>
-          <Typography variant="h6" align="right" sx={{ fontSize: "14px" }}>
-            {subgraphCounts.prodCount} prod-ready, {subgraphCounts.devCount} under development, {subgraphCounts.totalCount} subgraph deployments
-          </Typography>
-        </div>
-
-        <Typography variant="h3" align="center" sx={{ my: 4 }}>
+        <Typography variant="h3" align="center" sx={{ my: 6 }}>
           Deployed Subgraphs
         </Typography>
-        <DeploymentsTable getData={() => getData()} protocolsToQuery={protocolsToQuery} decenDeposToSubgraphIds={decenDeposToSubgraphIds} />
+        <div style={{ display: "flex", width: "60%", marginLeft: "20%" }}>
+          <div style={{ width: "100%", textAlign: "center", marginTop: "10px", borderRight: "#6656F8 2px solid" }}>
+            <span className="Menu-Options" onClick={() => navigate("/comparison")}>
+              DefiLlama Comparison
+            </span>
+          </div>
+          <div style={{ width: "100%", textAlign: "center", marginTop: "10px", borderLeft: "#6656F8 2px solid" }}>
+            <span className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
+              {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
+            </span>
+          </div>
+        </div>
+        {devCountTable}
+        <DeploymentsTable
+          getData={() => getData()}
+          protocolsToQuery={protocolsToQuery}
+          decenDeposToSubgraphIds={decenDeposToSubgraphIds}
+          indexingStatusLoaded={indexingStatusLoaded}
+          indexingStatusLoadedPending={indexingStatusLoadedPending}
+          indexingStatusError={indexingStatusError}
+          indexingStatusErrorPending={indexingStatusErrorPending}
+        />
       </DeploymentsLayout>
+      {indexingCalls}
     </DeploymentsContextProvider >
   );
 }
