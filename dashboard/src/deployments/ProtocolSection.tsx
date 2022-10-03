@@ -1,6 +1,5 @@
-import { gql, useLazyQuery } from "@apollo/client";
 import { CircularProgress, TableCell, TableRow, Tooltip, Typography } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { NetworkLogo } from "../common/NetworkLogo";
 import { SubgraphLogo } from "../common/SubgraphLogo";
@@ -17,14 +16,12 @@ interface ProtocolSection {
     isLoadedPending: boolean;
     indexQueryError: boolean;
     indexQueryErrorPending: boolean;
+    validationSupported: boolean;
 }
 
-function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
-    const [showDeposDropDown, toggleShowDeposDropDown] = useState<boolean>(true);
+function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
+    const [showDeposDropDown, toggleShowDeposDropDown] = useState<boolean>(false);
     const navigate = useNavigate();
-    const navigateToSubgraph = (url: string) => () => {
-        navigate(`subgraph?endpoint=${url}&tab=protocol`);
-    };
 
     useEffect(() => {
         toggleShowDeposDropDown(tableExpanded);
@@ -76,6 +73,10 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 if (!isLoadedPending) {
                     pendingRow = (
                         <TableRow onClick={() => {
+                            if (!validationSupported) {
+                                window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending";
+                                return;
+                            }
                             if (!pendingObject?.fatalError) {
                                 navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`)
                             } else {
@@ -133,6 +134,10 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 } else {
                     pendingRow = (
                         <TableRow onClick={() => {
+                            if (!validationSupported) {
+                                window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending";
+                                return;
+                            }
                             if (!pendingObject?.fatalError) {
                                 navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`)
                             } else {
@@ -234,7 +239,13 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                     );
                 }
                 decenRow = (
-                    <TableRow onClick={navigateToSubgraph(endpointURL)} key={subgraphName + depo.hostedServiceId + "DepInDevRow-DECEN"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
+                    <TableRow onClick={() => {
+                        if (!validationSupported) {
+                            window.location.href = `https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview`;
+                            return;
+                        }
+                        navigate(`subgraph?endpoint=${endpointURL}&tab=protocol`)
+                    }} key={subgraphName + depo.hostedServiceId + "DepInDevRow-DECEN"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell
                             sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${highlightColor} solid 34px`, verticalAlign: "middle", display: "flex" }}
                         >
@@ -325,6 +336,10 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
             if (!isLoaded) {
                 return (<>
                     <TableRow onClick={() => {
+                        if (!validationSupported) {
+                            window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId;
+                            return;
+                        }
                         if (!currentObject?.fatalError) {
                             navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`);
                         } else {
@@ -381,6 +396,10 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 <>
                     {decenRow}
                     <TableRow onClick={() => {
+                        if (!validationSupported) {
+                            window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId;
+                            return;
+                        }
                         if (!currentObject?.fatalError) {
                             navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`);
                         } else {
@@ -536,7 +555,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 <Tooltip title="Click To View All Deployments On This Protocol" placement="top" >
                     <>
                         {protocol.networks.map((x: { [x: string]: any }) => {
-                            let borderColor = "#FFA500";
+                            let borderColor = "#EFCB68";
                             if (!!x?.indexStatus?.synced) {
                                 borderColor = "#58BC82";
                             }

@@ -91,7 +91,6 @@ function DeploymentsInDevelopment({ protocolsToQuery, getData }: DeploymentsInDe
         } else {
             protocolsProdReadyCount += 1;
         }
-
     });
 
     return (
