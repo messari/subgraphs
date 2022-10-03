@@ -1546,7 +1546,7 @@
         "services": {
           "hosted-service": {
             "slug": "venus-protocol-bsc",
-            "query-id": "venus--protocol-bsc"
+            "query-id": "venus-protocol-bsc"
           }
         }
       }
