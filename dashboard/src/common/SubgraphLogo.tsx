@@ -62,7 +62,8 @@ const subgraphLogoMap: Record<string, string> = {
   "tornado-cash": "https://assets.coingecko.com/coins/images/13496/small/ZINt8NSB_400x400.jpg?1609193407",
   "graph": "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566",
   "truefi": "https://assets.coingecko.com/coins/images/13180/small/truefi_glyph_color.png?1617610941",
-  "radiant": "https://assets.coingecko.com/coins/images/26536/small/Radiant-Logo-200x200.png?1658715865"
+  "radiant": "https://assets.coingecko.com/coins/images/26536/small/Radiant-Logo-200x200.png?1658715865",
+  "velodrome": "https://assets.coingecko.com/coins/images/25783/small/velo.png?1653817876"
 };
 
 // used for protocols with multiple versions

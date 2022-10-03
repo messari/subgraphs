@@ -15,7 +15,7 @@ interface DeploymentsTable {
 
 function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, indexingStatusLoaded, indexingStatusLoadedPending, indexingStatusError, indexingStatusErrorPending }: DeploymentsTable) {
     const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
-    const [tableExpanded, setTableExpanded] = useState<any>({ lending: true, exchanges: true, vaults: true, generic: true });
+    const [tableExpanded, setTableExpanded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
     if (Object.keys(protocolsToQuery).length === 0) {
         getData();
         return null;
@@ -107,8 +107,9 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, 
     return (
         <>
             {Object.entries(deposToPass).sort().map(([schemaType, subgraph]) => {
+                let validationSupported = true;
                 if (!Object.keys(schemaMapping).includes(schemaType)) {
-                    return null;
+                    validationSupported = false;
                 } else {
                     schemaType = schemaMapping[schemaType];
                 }
@@ -126,6 +127,7 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, 
                             clientIndexing={clientIndexing}
                             decenDeposToSubgraphIds={decenDeposToSubgraphIds}
                             tableExpanded={tableExpanded[schemaType]}
+                            validationSupported={validationSupported}
                             isLoaded={isLoaded}
                             isLoadedPending={isLoadedPending}
                             indexQueryError={indexQueryError}
