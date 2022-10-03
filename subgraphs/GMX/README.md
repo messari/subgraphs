@@ -5,11 +5,8 @@ This is for the Generic Schema of Messari Subgraph.
 ## Business Summary
 
 GMX is a mix of non-custodial spot and perpetual exchange which supports low swap fees and zero impact trades.
-
 The protocol officially launched first on Arbitrum network in September 2021, and then expanded to Avalanche network in January 2022.
-
 Trading is supported through a unique multi-asset liquidity pool that generates rewards for liquidity providers in multiple ways such as market making, swap fees, leverage trading (this includes position opening & closing fees, borrowing fees, and swap fees), and asset rebalancing which are channeled back to liquidity providers.
-
 The business of the protocol can be divided and summarized as follows:
 
 ### GLP
@@ -28,13 +25,9 @@ GLP holders or the liquidity providers get all the collateral when positions are
 ### Spot & Perpetual Exchange Traders
 
 Traders can utilize the liquidity for leveraged trading or swaps with zero price impact. Pricing feed is supported and secured by Chainlink Oracles and an aggregate of prices from leading volume exchanges such as Binance and FTX.
-
 Traders need to post collateral first to open a long or short position for any asset in the index with a leverage of up to 30x.
-
 When a trader closes his position in profit, he gets paid out in the token for his long position (ETH for example) or stablecoins for short position (USDC for example).
-
 Successful traders are paid out by the liquidity pool and on the other side, unsuccessful traders payout to liquidity providers.
-
 Traders will get automatically liquidated when the loss plus the borrow fee approaches the value of the collateral they posted.
 
 ### GMX
@@ -48,8 +41,7 @@ Referral rewards has three tiers and this helps to ensure that referrers receive
 - Tier 1: 5% discount for traders, 5% rebates to referrer
 - Tier 2: 10% discount for traders, 10% rebates to referrer
 - Tier 3: 10% discount for traders, 15% rebates to referrer paid in ETH / AVAX, 5% rebates to referrer paid in esGMX
-
-Note: Referral codes are case-sensitive, and it must be created on both Arbitrum and Avalanche in order to qualify for rebates on both networks.
+  Note: Referral codes are case-sensitive, and it must be created on both Arbitrum and Avalanche in order to qualify for rebates on both networks.
 
 ## Useful Links
 
@@ -97,7 +89,6 @@ Stakers earn the GMX emissions per block:
 ### Swap Fees for the conversion of the asset to its USD value
 
 There is a 0.3% swap fee when depositing collateral into a long position. For example, ETH amount to USD value. The purpose of this is to prevent deposits from being used as a zero-fee swap.
-
 Note: This applies for long positions only. It does not also apply for withdrawing of collateral from longs and shorts.
 
 - Reference: https://gmxio.gitbook.io/gmx/trading
@@ -168,11 +159,7 @@ GMX provides esGMX rewards goes to liquidity providers and GMX token holders, in
 The GMX token has a Floor Price Fund that is denominated in $ETH and $GLP. This can grow in two ways:
 
 - GMX/ETH liquidity is provided and owned by the protocol, the generated fees from this trading pair will be converted to GLP and deposited into the floor price fund
-
 - 50% of funds received through Olympus bonds are given to the floor price fund, the other 50% is used for marketing
-
-The purpose of floor price fund is to help ensure liquidity in GLP and provide a reliable stream of $ETH rewards for GMX stakers. As the floor price fund grows, this can be used to buyback and burn GMX tokens if the (Floor Price Fund) / (Total Supply of GMX) is less than the market price. As a result, GMX will have a minimum price in terms of ETH and GLP.
-
-Note: According to the GMX’s documentation, 2 million out 13.25 (15.04%) max supply of GMX tokens is to be managed by the floor price fund.
-
-Reference: https://gmxio.gitbook.io/gmx/tokenomics
+  The purpose of floor price fund is to help ensure liquidity in GLP and provide a reliable stream of $ETH rewards for GMX stakers. As the floor price fund grows, this can be used to buyback and burn GMX tokens if the (Floor Price Fund) / (Total Supply of GMX) is less than the market price. As a result, GMX will have a minimum price in terms of ETH and GLP.
+  Note: According to the GMX’s documentation, 2 million out 13.25 (15.04%) max supply of GMX tokens is to be managed by the floor price fund.
+  Reference: https://gmxio.gitbook.io/gmx/tokenomics
