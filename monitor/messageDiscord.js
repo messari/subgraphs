@@ -13,7 +13,7 @@ export async function errorNotification(error, channelId = process.env.CHANNEL_I
             "Authorization": "Bot " + process.env.BOT_TOKEN,
             "Content-Type": "application/json",
         }
-        const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor on Channel ${channelId}- Errors detected**\n` + error });
+        const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor from ${process.env.CHANNEL_ID} on Channel ${channelId}- Errors detected**\n` + error });
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return null;
     } catch (err) {
@@ -212,7 +212,8 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         };
 
         const placeholderColor = colorsArray[Math.floor(Math.random() * 8)];
-
+        const indexErrorEmbedDepos = {};
+        const indexErrorPendingHash = {};
         deploymentsOnProtocol.forEach((depo) => {
             let networkString = depo.network;
             let issuesSet = [];
@@ -232,7 +233,10 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             };
             if (!!depo.indexingError && !indexDeploymentIssues.includes(networkString)) {
                 indexingErrorEmbed.color = placeholderColor;
-                indexingErrorEmbed.fields.push({ name: '\u200b', value: networkString, inline: true }, { name: '\u200b', value: depo.indexedPercentage + '%', inline: true }, { name: '\u200b', value: '\u200b', inline: false });
+                indexErrorEmbedDepos[networkString] = depo?.indexedPercentage;
+                if (!!depo.pending) {
+                    indexErrorPendingHash[networkString] = depo?.hash;
+                }
             }
             let errorsOnDeployment = false;
             Object.entries(depo.protocolErrors).forEach(([errorType, errorArray]) => {
@@ -255,8 +259,20 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 embedObjects.push(protocolErrorEmbed);
             }
         });
+        if (Object.keys(indexErrorEmbedDepos)?.length > 0) {
+            let labelValue = "";
+            let percentageValue = "";
 
-        if (indexingErrorEmbed.fields.length > 3) {
+            Object.keys(indexErrorEmbedDepos)?.forEach(networkString => {
+                if (networkString.includes(' (PENDING')) {
+                    labelValue += `[${networkString.split(' ')[0]}-PENDING](https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]})\n\n`;
+
+                } else {
+                    labelValue += `[${networkString}](https://okgraph.xyz/?q=messari%2F${protocol}-${networkString})\n\n`;
+                }
+                percentageValue += indexErrorEmbedDepos[networkString] + '%\n\n';
+            })
+            indexingErrorEmbed.fields.push({ name: '\u200b', value: labelValue, inline: true }, { name: '\u200b', value: percentageValue, inline: true }, { name: '\u200b', value: '\u200b', inline: false });
             embedObjects.unshift(indexingErrorEmbed);
         }
 
