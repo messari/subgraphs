@@ -26,6 +26,7 @@
     "looksrare/**",
     "opensea/**",
     "x2y2/**",
-    "seaport/**"
+    "seaport/**",
+    "goldfinch/**"
    ]
 }
