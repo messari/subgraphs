@@ -196,10 +196,12 @@ interface Protocol {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -301,10 +303,12 @@ type LendingProtocol implements Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -639,21 +643,6 @@ type Market @entity {
 
   ##### Events #####
 
-  " All deposits made to this market "
-  deposits: [Deposit!]! @derivedFrom(field: "market")
-
-  " All withdrawals made from this market "
-  withdraws: [Withdraw!]! @derivedFrom(field: "market")
-
-  " All borrows from this market "
-  borrows: [Borrow!]! @derivedFrom(field: "market")
-
-  " All repayments to this market "
-  repays: [Repay!]! @derivedFrom(field: "market")
-
-  " All liquidations made to this market "
-  liquidates: [Liquidate!]! @derivedFrom(field: "market")
-
   ### Add-Ons ###
 
   _reserveFactor: BigDecimal!
@@ -905,14 +894,8 @@ type Account @entity {
   " Number of times this account liquidated a position "
   liquidateCount: Int!
 
-  " All liquidation events where this account was the liquidator "
-  liquidates: [Liquidate!]! @derivedFrom(field: "liquidator")
-
   " Number of times this account has been liquidated "
   liquidationCount: Int!
-
-  " All liquidation events where this account got liquidated "
-  liquidations: [Liquidate!]! @derivedFrom(field: "liquidatee")
 
   _enabledCollaterals: [Market!]!
 }
@@ -981,9 +964,6 @@ type Position @entity {
   " Number of liquidations related to this position "
   liquidationCount: Int!
 
-  " Liquidation event related to this position (if exists) "
-  liquidations: [Liquidate!]! @derivedFrom(field: "position")
-
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
 }
@@ -1032,7 +1012,6 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-
 type Deposit @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
@@ -1211,28 +1190,20 @@ type Liquidate @entity {
   timestamp: BigInt!
 
   " Account that carried out the liquidation "
-  liquidator: Account!
+  liquidator: Bytes!
 
   " Account that got liquidated "
-  liquidatee: Account!
+  liquidatee: Bytes!
 
   " The market of the collateral being used "
-  market: Market!
-
-  " The user position changed by this event "
-  position: Position!
+  market: Bytes!
 
   " Asset repaid (borrowed) "
-  asset: Token!
+  asset: Bytes!
 
   " Amount of collateral liquidated in native units "
-  amount: BigInt!
-
-  " Amount of collateral liquidated in USD "
-  amountUSD: BigDecimal!
-
-  " Amount of profit from liquidation in USD "
-  profitUSD: BigDecimal!
+  siezeAmount: BigInt!
+  repayAmount: BigInt!
 }
 
 # Helper entity for calculating daily/hourly active users
