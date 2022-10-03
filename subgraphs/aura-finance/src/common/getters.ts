@@ -8,11 +8,6 @@ import {
 } from "@graphprotocol/graph-ts";
 
 import {
-  PROTOCOL_NAME,
-  PROTOCOL_SLUG,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
   ProtocolType,
   BIGDECIMAL_ZERO,
   BIGDECIMAL_HUNDRED,
@@ -29,7 +24,7 @@ import { prefixID } from "./utils/strings";
 import { readValue } from "./utils/ethereum";
 import { bigIntToBigDecimal } from "./utils/numbers";
 import { CustomFeesType, PoolInfoType } from "./types";
-import { getPoolTokensInfo, isBPT, getPoolTokenWeights } from "./utils/pools";
+import { getPoolTokensInfo, isBPT, getPoolTokenWeights } from "./pools";
 
 import {
   Token,
@@ -55,11 +50,11 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
 
   if (!protocol) {
     protocol = new YieldAggregator(protocolId);
-    protocol.name = PROTOCOL_NAME;
-    protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
+    protocol.name = NetworkConfigs.getProtocolName();
+    protocol.slug = NetworkConfigs.getProtocolSlug();
+    protocol.schemaVersion = NetworkConfigs.getSchemaVersion();
+    protocol.subgraphVersion = NetworkConfigs.getSubgraphVersion();
+    protocol.methodologyVersion = NetworkConfigs.getMethodologyVersion();
     protocol.network = NetworkConfigs.getNetwork();
     protocol.type = ProtocolType.YIELD;
 
@@ -203,10 +198,13 @@ export function getOrCreateBalancerPoolToken(
       token = getOrCreateBalancerPoolToken(tokenAddress, blockNumber);
     }
 
+    if (INACURATE_PRICEFEED_TOKENS.includes(Address.fromString(token.id))) {
+      token.lastPriceUSD = BIGDECIMAL_ZERO;
+    }
+
     if (
       !knownPriceForAtleastOnePoolToken &&
-      token.lastPriceUSD != BIGDECIMAL_ZERO &&
-      !INACURATE_PRICEFEED_TOKENS.includes(Address.fromString(token.id))
+      token.lastPriceUSD != BIGDECIMAL_ZERO
     ) {
       knownPriceForAtleastOnePoolToken = true;
       knownPricePoolTokenIndex = idx;
@@ -221,8 +219,7 @@ export function getOrCreateBalancerPoolToken(
     let poolTVL = BIGDECIMAL_ZERO;
     for (let idx = 0; idx < tokens.length; idx++) {
       if (
-        tokens[idx].lastPriceUSD == BIGDECIMAL_ZERO ||
-        INACURATE_PRICEFEED_TOKENS.includes(Address.fromString(tokens[idx].id))
+        tokens[idx].lastPriceUSD == BIGDECIMAL_ZERO
       ) {
         let unknownPricePoolToken = tokens[idx];
 

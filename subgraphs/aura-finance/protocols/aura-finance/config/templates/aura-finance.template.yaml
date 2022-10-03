@@ -31,17 +31,17 @@ dataSources:
       abis:
         - name: Booster
           file: ./abis/AuraBooster.json
-        - name: WeightedPool
-          file: ./abis/AuraWeightedPool.json
         - name: BaseRewardPool
           file: ./abis/AuraBaseRewardPool.json
-        - name: StablePool
-          file: ./abis/AuraStablePool.json
         - name: AuraToken
           file: ./abis/AuraToken.json
 
         - name: BalancerVault
           file: ./abis/BalancerVault.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
+        - name: StablePool
+          file: ./abis/BalancerStablePool.json
 
         - name: ERC20
           file: ./abis/ERC20.json
@@ -124,17 +124,17 @@ templates:
       abis:
         - name: Booster
           file: ./abis/AuraBooster.json
-        - name: WeightedPool
-          file: ./abis/AuraWeightedPool.json
         - name: BaseRewardPool
           file: ./abis/AuraBaseRewardPool.json
-        - name: StablePool
-          file: ./abis/AuraStablePool.json
         - name: AuraToken
           file: ./abis/AuraToken.json
 
         - name: BalancerVault
           file: ./abis/BalancerVault.json
+        - name: WeightedPool
+          file: ./abis/BalancerWeightedPool.json
+        - name: StablePool
+          file: ./abis/BalancerStablePool.json
 
         - name: ERC20
           file: ./abis/ERC20.json

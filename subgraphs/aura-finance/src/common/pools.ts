@@ -5,15 +5,15 @@ import {
   BIGINT_ZERO,
   ZERO_ADDRESS,
   BIGINT_TEN,
-} from "../constants";
-import { readValue } from "./ethereum";
-import { PoolTokensType } from "../types";
-import { DEFAULT_DECIMALS } from "../../prices/common/constants";
+} from "./constants";
+import { readValue } from "./utils/ethereum";
+import { PoolTokensType } from "./types";
+import { DEFAULT_DECIMALS } from "../prices/common/constants";
 
-import { _RewardPool } from "../../../generated/schema";
-import { BalancerVault } from "../../../generated/Booster/BalancerVault";
-import { WeightedPool } from "../../../generated/Booster/WeightedPool";
-import { StablePool } from "../../../generated/Booster/StablePool";
+import { _RewardPool } from "../../generated/schema";
+import { BalancerVault } from "../../generated/Booster/BalancerVault";
+import { WeightedPool } from "../../generated/Booster/WeightedPool";
+import { StablePool } from "../../generated/Booster/StablePool";
 
 export function getPoolTokensInfo(poolAddress: Address): PoolTokensType {
   const poolContract = WeightedPool.bind(poolAddress);
