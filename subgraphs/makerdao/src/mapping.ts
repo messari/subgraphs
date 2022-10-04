@@ -430,7 +430,6 @@ export function handleCatBite(event: BiteEvent): void {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
   }
-  let urn = event.params.urn; //liquidatee
   let flip = event.params.flip; //auction contract
   let id = event.params.id; //auction id
   let lot = event.params.ink;
