@@ -1,22 +1,22 @@
-import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
-import { createMockedFunction, newMockCall, assert } from "matchstick-as";
-import { AddVaultAndStrategyCall } from "../generated/Controller/ControllerContract";
+import { Address, ethereum, BigInt, BigDecimal } from '@graphprotocol/graph-ts'
+import { createMockedFunction, newMockCall, assert } from 'matchstick-as'
+import { AddVaultAndStrategyCall } from '../generated/Controller/ControllerContract'
 
 export function mockCall(
   vault: Address,
   strategy: Address
 ): AddVaultAndStrategyCall {
-  let to = Address.fromString("0x222412af183bceadefd72e4cb1b71f1889953b1c");
-  let from = Address.fromString("0x0000000000000000000000000000000000000001");
-  let call = newMockCall();
-  call.to = to;
-  call.from = from;
+  let to = Address.fromString('0x222412af183bceadefd72e4cb1b71f1889953b1c')
+  let from = Address.fromString('0x0000000000000000000000000000000000000001')
+  let call = newMockCall()
+  call.to = to
+  call.from = from
   call.inputValues = [
-    new ethereum.EventParam("vault", ethereum.Value.fromAddress(vault)),
-    new ethereum.EventParam("strategy", ethereum.Value.fromAddress(strategy)),
-  ];
+    new ethereum.EventParam('vault', ethereum.Value.fromAddress(vault)),
+    new ethereum.EventParam('strategy', ethereum.Value.fromAddress(strategy)),
+  ]
 
-  return changetype<AddVaultAndStrategyCall>(call);
+  return changetype<AddVaultAndStrategyCall>(call)
 }
 
 export function mockERC20(
@@ -25,15 +25,15 @@ export function mockERC20(
   symbol: string,
   decimals: i32
 ): void {
-  createMockedFunction(address, "name", "name():(string)").returns([
+  createMockedFunction(address, 'name', 'name():(string)').returns([
     ethereum.Value.fromString(name),
-  ]);
-  createMockedFunction(address, "symbol", "symbol():(string)").returns([
+  ])
+  createMockedFunction(address, 'symbol', 'symbol():(string)').returns([
     ethereum.Value.fromString(symbol),
-  ]);
-  createMockedFunction(address, "decimals", "decimals():(uint8)").returns([
+  ])
+  createMockedFunction(address, 'decimals', 'decimals():(uint8)').returns([
     ethereum.Value.fromI32(decimals),
-  ]);
+  ])
 }
 
 export function mockChainLink(
@@ -45,8 +45,8 @@ export function mockChainLink(
 ): void {
   createMockedFunction(
     contractAddress,
-    "latestRoundData",
-    "latestRoundData(address,address):(uint80,int256,uint256,uint256,uint80)"
+    'latestRoundData',
+    'latestRoundData(address,address):(uint80,int256,uint256,uint256,uint80)'
   )
     .withArgs([
       ethereum.Value.fromAddress(baseAddress),
@@ -58,18 +58,18 @@ export function mockChainLink(
       ethereum.Value.fromI32(0),
       ethereum.Value.fromI32(0),
       ethereum.Value.fromI32(0),
-    ]);
+    ])
 
   createMockedFunction(
     contractAddress,
-    "decimals",
-    "decimals(address,address):(uint8)"
+    'decimals',
+    'decimals(address,address):(uint8)'
   )
     .withArgs([
       ethereum.Value.fromAddress(baseAddress),
       ethereum.Value.fromAddress(quoteAddress),
     ])
-    .returns([ethereum.Value.fromI32(decimals)]);
+    .returns([ethereum.Value.fromI32(decimals)])
 }
 
 export function mockUniswapRouter(
@@ -80,14 +80,14 @@ export function mockUniswapRouter(
 ): void {
   createMockedFunction(
     contractAddress,
-    "getAmountsOut",
-    "getAmountsOut(uint256,address[]):(uint256[])"
+    'getAmountsOut',
+    'getAmountsOut(uint256,address[]):(uint256[])'
   )
     .withArgs([
       ethereum.Value.fromUnsignedBigInt(amountIn),
       ethereum.Value.fromAddressArray(path),
     ])
-    .returns([ethereum.Value.fromUnsignedBigIntArray([amountIn, amountOut])]);
+    .returns([ethereum.Value.fromUnsignedBigIntArray([amountIn, amountOut])])
 }
 
 export function mockYearnLens(
@@ -97,11 +97,11 @@ export function mockYearnLens(
 ): void {
   createMockedFunction(
     contractAddress,
-    "getPriceUsdcRecommended",
-    "getPriceUsdcRecommended(address):(uint256)"
+    'getPriceUsdcRecommended',
+    'getPriceUsdcRecommended(address):(uint256)'
   )
     .withArgs([ethereum.Value.fromAddress(tokenAddress)])
-    .returns([ethereum.Value.fromUnsignedBigInt(usdcValue)]);
+    .returns([ethereum.Value.fromUnsignedBigInt(usdcValue)])
 }
 
 export function assertERC20(
@@ -111,22 +111,17 @@ export function assertERC20(
   symbol: string,
   decimals: BigInt | null
 ): void {
-  assert.fieldEquals(
-    entity,
-    address.toHexString(),
-    "id",
-    address.toHexString()
-  );
-  assert.fieldEquals(entity, address.toHexString(), "name", name);
-  assert.fieldEquals(entity, address.toHexString(), "symbol", symbol);
+  assert.fieldEquals(entity, address.toHexString(), 'id', address.toHexString())
+  assert.fieldEquals(entity, address.toHexString(), 'name', name)
+  assert.fieldEquals(entity, address.toHexString(), 'symbol', symbol)
 
   if (decimals)
     assert.fieldEquals(
       entity,
       address.toHexString(),
-      "decimals",
+      'decimals',
       decimals.toString()
-    );
+    )
 }
 
 export function assertToken(
@@ -135,7 +130,7 @@ export function assertToken(
   symbol: string,
   decimals: BigInt
 ): void {
-  assertERC20("Token", address, name, symbol, decimals);
+  assertERC20('Token', address, name, symbol, decimals)
 }
 
 export function assertVault(
@@ -151,50 +146,50 @@ export function assertVault(
   inputTokenBalance: BigInt,
   protocol: string
 ): void {
-  assertERC20("Vault", address, name, symbol, null);
+  assertERC20('Vault', address, name, symbol, null)
   assert.fieldEquals(
-    "Vault",
+    'Vault',
     address.toHexString(),
-    "inputToken",
+    'inputToken',
     inputToken.toHexString()
-  );
+  )
   assert.fieldEquals(
-    "Vault",
+    'Vault',
     address.toHexString(),
-    "outputToken",
+    'outputToken',
     outputToken.toHexString()
-  );
+  )
   assert.fieldEquals(
-    "Vault",
+    'Vault',
     address.toHexString(),
-    "depositLimit",
+    'depositLimit',
     depositLimit.toString()
-  );
+  )
   assert.fieldEquals(
-    "Vault",
+    'Vault',
     address.toHexString(),
-    "createdTimestamp",
+    'createdTimestamp',
     createdTimestamp.toString()
-  );
+  )
   assert.fieldEquals(
-    "Vault",
+    'Vault',
     address.toHexString(),
-    "createdBlockNumber",
+    'createdBlockNumber',
     createdBlockNumber.toString()
-  );
+  )
   assert.fieldEquals(
-    "Vault",
+    'Vault',
     address.toHexString(),
-    "totalValueLockedUSD",
+    'totalValueLockedUSD',
     totalValueLockedUSD.toString()
-  );
+  )
   assert.fieldEquals(
-    "Vault",
+    'Vault',
     address.toHexString(),
-    "inputTokenBalance",
+    'inputTokenBalance',
     inputTokenBalance.toString()
-  );
-  assert.fieldEquals("Vault", address.toHexString(), "protocol", protocol);
+  )
+  assert.fieldEquals('Vault', address.toHexString(), 'protocol', protocol)
 }
 
 export function assertProtocol(
@@ -213,69 +208,69 @@ export function assertProtocol(
   cumulativeTotalRevenueUSD: BigDecimal,
   cumulativeUniqueUsers: i32
 ): void {
-  assert.fieldEquals("YieldAggregator", address.toHexString(), "name", name);
-  assert.fieldEquals("YieldAggregator", address.toHexString(), "slug", slug);
+  assert.fieldEquals('YieldAggregator', address.toHexString(), 'name', name)
+  assert.fieldEquals('YieldAggregator', address.toHexString(), 'slug', slug)
   assert.fieldEquals(
-    "YieldAggregator",
+    'YieldAggregator',
     address.toHexString(),
-    "schemaVersion",
+    'schemaVersion',
     schemaVersion
-  );
+  )
   assert.fieldEquals(
-    "YieldAggregator",
+    'YieldAggregator',
     address.toHexString(),
-    "subgraphVersion",
+    'subgraphVersion',
     subgraphVersion
-  );
+  )
   assert.fieldEquals(
-    "YieldAggregator",
+    'YieldAggregator',
     address.toHexString(),
-    "methodologyVersion",
+    'methodologyVersion',
     methodologyVersion
-  );
+  )
   assert.fieldEquals(
-    "YieldAggregator",
+    'YieldAggregator',
     address.toHexString(),
-    "network",
+    'network',
     network
-  );
-  assert.fieldEquals("YieldAggregator", address.toHexString(), "type", type);
+  )
+  assert.fieldEquals('YieldAggregator', address.toHexString(), 'type', type)
 
   assert.fieldEquals(
-    "YieldAggregator",
+    'YieldAggregator',
     address.toHexString(),
-    "totalValueLockedUSD",
+    'totalValueLockedUSD',
     totalValueLockedUSD.toString()
-  );
+  )
   assert.fieldEquals(
-    "YieldAggregator",
+    'YieldAggregator',
     address.toHexString(),
-    "protocolControlledValueUSD",
+    'protocolControlledValueUSD',
     protocolControlledValueUSD.toString()
-  );
+  )
   assert.fieldEquals(
-    "YieldAggregator",
+    'YieldAggregator',
     address.toHexString(),
-    "cumulativeSupplySideRevenueUSD",
+    'cumulativeSupplySideRevenueUSD',
     cumulativeSupplySideRevenueUSD.toString()
-  );
+  )
   assert.fieldEquals(
-    "YieldAggregator",
+    'YieldAggregator',
     address.toHexString(),
-    "cumulativeProtocolSideRevenueUSD",
+    'cumulativeProtocolSideRevenueUSD',
     cumulativeProtocolSideRevenueUSD.toString()
-  );
+  )
 
   assert.fieldEquals(
-    "YieldAggregator",
+    'YieldAggregator',
     address.toHexString(),
-    "cumulativeTotalRevenueUSD",
+    'cumulativeTotalRevenueUSD',
     cumulativeTotalRevenueUSD.toString()
-  );
+  )
   assert.fieldEquals(
-    "YieldAggregator",
+    'YieldAggregator',
     address.toHexString(),
-    "cumulativeUniqueUsers",
+    'cumulativeUniqueUsers',
     cumulativeUniqueUsers.toString()
-  );
+  )
 }
