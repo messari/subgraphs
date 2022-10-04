@@ -69,9 +69,9 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
           name = name.join("-");
           const network = sub.currentVersion.subgraphDeployment.network.id;
           const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
-          const curatorSignals = sub.currentVersion.subgraphDeployment.curatorSignals;
+          const signalledTokens = sub.currentVersion.subgraphDeployment.signalledTokens;
           const subgraphId = sub.id;
-          decenDepos[name] = { network, deploymentId, subgraphId, curatorSignals };
+          decenDepos[name] = { network, deploymentId, subgraphId, signalledTokens };
         } catch (err) {
           return;
         }
@@ -95,11 +95,9 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         if (networkStr === "matic") {
           networkStr = "polygon";
         }
-        let subgraphIdToMap = "";
-        let signalCount = 0;
-        decentralizedDeployments[x]?.curatorSignals?.forEach((signalObj: any) => signalCount += signalObj?.signal);
-        if (signalCount > 0) {
-          subgraphIdToMap = decentralizedDeployments[x]?.subgraphId;
+        let subgraphIdToMap = { id: "", signal: 0 };
+        if (decentralizedDeployments[x]?.signalledTokens > 0) {
+          subgraphIdToMap = { id: decentralizedDeployments[x]?.subgraphId, signal: decentralizedDeployments[x]?.signalledTokens };
         }
         decenDeposToSubgraphIds[x + "-" + networkStr] = subgraphIdToMap;
       }
@@ -185,15 +183,20 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         <Typography variant="h3" align="center" sx={{ my: 5 }}>
           Deployed Subgraphs
         </Typography>
-        <div style={{ display: "flex", width: "40%", marginLeft: "30%" }}>
+        <div style={{ display: "flex", width: "55%", marginLeft: "23%" }}>
           <div style={{ width: "100%", textAlign: "center", marginTop: "0", borderRight: "#6656F8 2px solid" }}>
             <span className="Menu-Options" onClick={() => navigate("/comparison")}>
               DefiLlama Comparison
             </span>
           </div>
-          <div style={{ width: "100%", textAlign: "center", marginTop: "0", borderLeft: "#6656F8 2px solid", paddingLeft: "16px" }}>
+          <div style={{ width: "100%", textAlign: "center", marginTop: "0", borderLeft: "#6656F8 2px solid", borderRight: "#6656F8 2px solid", paddingLeft: "16px" }}>
             <span className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
               {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
+            </span>
+          </div>
+          <div style={{ width: "100%", textAlign: "center", marginTop: "0", borderLeft: "#6656F8 2px solid" }}>
+            <span className="Menu-Options" onClick={() => navigate("protocols-list")}>
+              Protocols To Develop
             </span>
           </div>
         </div>
