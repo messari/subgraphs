@@ -92,13 +92,14 @@ export class PangolinAvalancheConfigurations implements Configurations {
       "0xde3a24028580884448a5397872046a019649b084", // USDT old
     ];
   }
-  getStableOraclePools(): string[] { // TODO - Need to change these values as they currently incorrect!
+  getStableOraclePools(): string[] {
     return [
-      "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc", // USDC/wETH created 10008355
-      "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11", // DAI/wETH created block 10042267
-      "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852", // USDT/wETH created block 10093341
+      "0xe3ba3d5e3f98eeff5e9eddd5bd20e476202770da", // USDt/wAVAX
+      "0x0e0100ab771e9288e0aa97e11557e6654c3a9665", // USDC/wAVAX
+      "0xbd918ed441767fe7924e99f6a0e0b568ac1970d9", // USDC.e/wAVAX
     ];
   }
+
   getUntrackedPairs(): string[] {
     return [];
   }
