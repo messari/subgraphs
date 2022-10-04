@@ -93,6 +93,10 @@ export function handleVote(event: LogNote): void {
 
 export function handleEtch(event: Etch): void {
   let sender = event.transaction.from.toHexString();
+  // Check if txn is coming from a vote delegate contract, if so treat it as sender
+  if (event.transaction.to && event.transaction.to != event.address) {
+    sender = event.transaction.to!.toHexString()
+  }
   let slateID = event.params.slate;
   _handleSlateVote(sender, slateID, event);
 }
