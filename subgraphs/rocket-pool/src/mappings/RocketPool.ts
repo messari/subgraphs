@@ -230,11 +230,13 @@ export function handleBalanceUpdate(event: BalancesUpdated): void {
 
   updateTotalRevenueMetrics(event.block, BIGINT_ZERO, totalsupply);
 
-  const pool = getOrCreatePool(event.block.number, event.block.timestamp);
+  let pool = getOrCreatePool(event.block.number, event.block.timestamp);
   const pools = pool.miniPools;
   if (pools) {
     var counter: i32;
-    for (counter = 0; counter > pools.length; counter++) {
+    var cumrevCounter: BigDecimal = BIGDECIMAL_ZERO;
+    var cumprotocolrevCounter: BigDecimal = BIGDECIMAL_ZERO;
+    for (counter = 0; counter < pools.length; counter++) {
       updateMinipoolTvlandRevenue(
         event.block,
         BIGINT_ZERO,
@@ -248,16 +250,14 @@ export function handleBalanceUpdate(event: BalancesUpdated): void {
         event.block.timestamp,
         pools[counter]
       );
-      pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(
-        minipool.cumulativeTotalRevenueUSD
+      cumrevCounter = cumrevCounter.plus(minipool.cumulativeTotalRevenueUSD);
+      cumprotocolrevCounter = cumprotocolrevCounter.plus(
+        minipool.cumulativeProtocolSideRevenueUSD
       );
-      pool.cumulativeProtocolSideRevenueUSD =
-        pool.cumulativeProtocolSideRevenueUSD.plus(
-          minipool.cumulativeProtocolSideRevenueUSD
-        );
-      pool.save();
     }
-
+    pool.cumulativeTotalRevenueUSD = cumrevCounter;
+    pool.cumulativeProtocolSideRevenueUSD = cumprotocolrevCounter;
+    pool.save();
     updateSupplySideRevenueMetrics(event.block);
   }
 }

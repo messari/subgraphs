@@ -1,5 +1,5 @@
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-import { Token } from "../../generated/schema";
+import { Token, RewardToken } from "../../generated/schema";
 import { ERC20 } from "../../generated/rocketVault/ERC20";
 import { RETH } from "../../generated/rocketVault/RETH";
 import { getUsdPricePerToken } from "../prices";
@@ -132,4 +132,22 @@ function getRETHpriceUSD(
   }
 
   return RETHpriceUSD;
+}
+
+export function getOrCreateRewardToken(
+  address: Address,
+  type: string,
+  blocknumber: BigInt
+): RewardToken {
+  let token = getOrCreateToken(address, blocknumber);
+
+  let rewardTokenId = `${token.id}-${type}`;
+  let rewardToken = RewardToken.load(rewardTokenId);
+  if (!rewardToken) {
+    rewardToken = new RewardToken(rewardTokenId);
+    rewardToken.token = token.id;
+    rewardToken.type = type;
+    rewardToken.save();
+  }
+  return rewardToken;
 }

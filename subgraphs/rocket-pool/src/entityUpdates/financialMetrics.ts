@@ -17,7 +17,7 @@ import {
   RPL_ADDRESS,
   BIGDECIMAL_HALF,
 } from "../utils/constants";
-import { getOrCreateToken } from "../entities/token";
+import { getOrCreateRewardToken, getOrCreateToken } from "../entities/token";
 import { getOrCreateMinipool } from "../entities/Minipool";
 
 const PROTOCOL_ID = RETH_ADDRESS;
@@ -61,7 +61,6 @@ export function updateMinipoolTvlandRevenue(
     Minipool.cumulativeProtocolSideRevenueUSD = miniPoolRewardUSD.times(
       BIGDECIMAL_HALF.minus(BIGDECIMAL_HALF.times(Minipool.comissionRate))
     );
-    Minipool.save();
   }
   Minipool.save();
 }
@@ -75,14 +74,10 @@ export function updateProtocolAndPoolTvl(
   const protocol = getOrCreateProtocol();
 
   let rewardTokens: string[] = [
-    getOrCreateToken(Address.fromString(RPL_ADDRESS), block.number).id,
+    // getOrCreateRewardToken(Address.fromString(RPL_ADDRESS), 'staking', block.number).id,
   ];
 
-  log.error("[updateProtocolAndPoolTvl] reward tokens check: {}", [
-    rewardTokens[0],
-  ]);
-  pool.rewardTokens = rewardTokens;
-  pool.save();
+  // pool.rewardTokens = rewardTokens;
   // Pool
   let inputTokenBalances: BigInt[] = [];
   inputTokenBalances.push(pool.inputTokenBalances[0].plus(rewardAmount));
@@ -331,18 +326,21 @@ export function getOrCreateFinancialDailyMetrics(
 ): FinancialsDailySnapshot {
   let dayId: string = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
   let financialMetrics = FinancialsDailySnapshot.load(dayId);
+  let pool = getOrCreatePool(block.number, block.timestamp);
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(dayId);
     financialMetrics.protocol = PROTOCOL_ID;
 
-    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD =
+      pool.cumulativeProtocolSideRevenueUSD;
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD =
+      pool.cumulativeSupplySideRevenueUSD;
   }
 
   // Set block number and timestamp to the latest for snapshots
@@ -365,18 +363,20 @@ export function getOrCreatePoolsDailySnapshot(
     poolMetrics = new PoolDailySnapshot(dayId);
     poolMetrics.protocol = getOrCreateProtocol().id;
     poolMetrics.pool = getOrCreatePool(block.number, block.timestamp).id;
+    let pool = getOrCreatePool(block.number, block.timestamp);
 
-    poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+    poolMetrics.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+    poolMetrics.cumulativeSupplySideRevenueUSD =
+      pool.cumulativeSupplySideRevenueUSD;
+    poolMetrics.cumulativeProtocolSideRevenueUSD =
+      pool.cumulativeProtocolSideRevenueUSD;
     poolMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-
-    poolMetrics.inputTokenBalances = [BIGINT_ZERO];
-    poolMetrics.outputTokenSupply = BIGINT_ZERO;
-    poolMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    poolMetrics.inputTokenBalances = pool.inputTokenBalances;
+    poolMetrics.outputTokenSupply = pool.outputTokenSupply;
+    poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   }
 
   // Set block number and timestamp to the latest for snapshots
@@ -394,23 +394,26 @@ export function getOrCreatePoolsHourlySnapshot(
 ): PoolHourlySnapshot {
   let hourId: string = (block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
   let poolMetrics = PoolHourlySnapshot.load(hourId);
+  let pool = getOrCreatePool(block.number, block.timestamp);
 
   if (!poolMetrics) {
     poolMetrics = new PoolHourlySnapshot(hourId);
     poolMetrics.protocol = getOrCreateProtocol().id;
     poolMetrics.pool = getOrCreatePool(block.number, block.timestamp).id;
 
-    poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    poolMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-    poolMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    poolMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+    poolMetrics.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+    poolMetrics.cumulativeSupplySideRevenueUSD =
+      pool.cumulativeSupplySideRevenueUSD;
+    poolMetrics.cumulativeProtocolSideRevenueUSD =
+      pool.cumulativeProtocolSideRevenueUSD;
     poolMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
-    poolMetrics.inputTokenBalances = [BIGINT_ZERO];
-    poolMetrics.outputTokenSupply = BIGINT_ZERO;
-    poolMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    poolMetrics.inputTokenBalances = pool.inputTokenBalances;
+    poolMetrics.outputTokenSupply = pool.outputTokenSupply;
+    poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   }
 
   // Set block number and timestamp to the latest for snapshots

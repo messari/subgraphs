@@ -1,7 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Pool } from "../../generated/schema";
 import { getOrCreateProtocol } from "./protocol";
-import { getOrCreateToken } from "./token";
+import { getOrCreateToken, getOrCreateRewardToken } from "./token";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
@@ -36,7 +36,7 @@ export function getOrCreatePool(
       blockNumber
     ).id;
     pool.rewardTokens = [
-      getOrCreateToken(Address.fromString(RPL_ADDRESS), blockNumber).id,
+      // getOrCreateRewardToken(Address.fromString(RPL_ADDRESS), 'staking', blockNumber).id,
     ];
 
     // Quantitative Revenue Data
