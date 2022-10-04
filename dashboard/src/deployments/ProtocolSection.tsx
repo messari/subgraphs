@@ -4,13 +4,13 @@ import { useNavigate } from "react-router";
 import { NetworkLogo } from "../common/NetworkLogo";
 import { SubgraphLogo } from "../common/SubgraphLogo";
 import { latestSchemaVersions } from "../constants";
-import { formatIntToFixed2, toPercent } from "../utils";
+import { convertTokenDecimals, formatIntToFixed2, toPercent } from "../utils";
 
 interface ProtocolSection {
     protocol: { [x: string]: any };
     subgraphName: string;
     clientIndexing: any;
-    decenDeposToSubgraphIds: { [x: string]: string };
+    decenDeposToSubgraphIds: { [x: string]: any };
     tableExpanded: boolean;
     isLoaded: boolean;
     isLoadedPending: boolean;
@@ -220,7 +220,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 const decenSubgraphKey = Object.keys(decenDeposToSubgraphIds)?.find(x => x.includes(subgraphName));
                 let decenSubgraphId = decenObject?.subgraph;
                 if (decenSubgraphKey) {
-                    decenSubgraphId = decenDeposToSubgraphIds[decenSubgraphKey];
+                    decenSubgraphId = decenDeposToSubgraphIds[decenSubgraphKey]?.id;
                 }
                 let endpointURL =
                     "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + decenSubgraphId;
@@ -230,11 +230,23 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
                     schemaCell = <Tooltip title="This deployment does not have the latest schema version" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
                 }
-                let curationSymbol = null;
-                if (!decenDeposToSubgraphIds[depo?.decentralizedNetworkId] && !decenDeposToSubgraphIds[depo?.hostedServiceId]) {
-                    curationSymbol = (
+                let decenDeposBySubgraphId = decenDeposToSubgraphIds[depo?.decentralizedNetworkId];
+                if (!decenDeposBySubgraphId) {
+                    decenDeposBySubgraphId = decenDeposToSubgraphIds[depo?.hostedServiceId];
+                }
+
+                let curationElement = null;
+                if (!decenDeposBySubgraphId?.id) {
+                    curationElement = (
                         <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "10px" }}>
                             <Tooltip title="No curation on this Subgraph" placement="top" ><span style={{ padding: "0 5px", borderRadius: "50%", color: "#B8301C", border: "#B8301C 1.5px solid", cursor: "default", fontWeight: "800" }}>!</span></Tooltip>
+                        </span>
+                    );
+                } else if (decenDeposBySubgraphId?.signal > 0) {
+                    let convertedSignalAmount = convertTokenDecimals(decenDeposBySubgraphId?.signal, 21).toFixed(1);
+                    curationElement = (
+                        <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
+                            <Tooltip title="Current Curation Signal" placement="top" ><span style={{ padding: "0", cursor: "default", fontWeight: "800" }}>{convertedSignalAmount}K GRT</span></Tooltip>
                         </span>
                     );
                 }
@@ -253,10 +265,10 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                             <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "14px" }}>
                                 {chainLabel}
                             </span>
-                            <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 0px 0px 10px", fontSize: "14px", color: "#6f2c8a" }}>
-                                <Tooltip title="This deployment is hosted on the decentralized network" placement="top" ><span style={{ cursor: "default" }}><b>Ⓓ</b></span></Tooltip>
+                            <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "10px" }}>
+                                <Tooltip title="This deployment is hosted on the decentralized network" placement="top" ><span style={{ padding: "2px 6px", borderRadius: "50%", backgroundColor: "rgb(102,86,248)", cursor: "default", fontWeight: "800" }}>D</span></Tooltip>
                             </span>
-                            {curationSymbol}
+                            {curationElement}
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", padding: "0", paddingRight: "16px", textAlign: "right" }}>
 
@@ -509,11 +521,11 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
     let schemaCell = <span>N/A</span>;
     if (protocol?.schemaVersions?.length > 0) {
-        const schemaColored = protocol?.schemaVersions?.map((x: string) => {
+        const schemaColored = protocol?.schemaVersions?.map((x: string, idx: number) => {
             if (latestSchemaVersions.includes(x)) {
                 return <span>{x}</span>;
             }
-            return <span style={{ color: "#FFA500" }}>{x}</span>;
+            return <span key={subgraphName + "-protocol-schemaVerRow-" + idx} style={{ color: "#FFA500" }}>{x}</span>;
         })
 
         schemaCell = <span>{schemaColored}</span>;
@@ -522,8 +534,8 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
     let decenDepoElement = null;
     if (hasDecentralizedDepo) {
         decenDepoElement = (
-            <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 0px 0px 10px", fontSize: "14px", color: "#6f2c8a" }}>
-                <Tooltip title="This deployment is hosted on the decentralized network" placement="top" ><span style={{ cursor: "default" }}><b>Ⓓ</b></span></Tooltip>
+            <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "10px" }}>
+                <Tooltip title="This protocol has deployments hosted on the decentralized network" placement="top" ><span style={{ padding: "2px 6px", borderRadius: "50%", backgroundColor: "rgb(102,86,248)", cursor: "default", fontWeight: "800" }}>D</span></Tooltip>
             </span>
         );
     }
