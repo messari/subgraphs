@@ -14,7 +14,7 @@ export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
   let poolAddress = event.params.pool;
 
   if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block);
+  getOrCreateLiquidityPool(poolAddress, event.block, registryAddress);
 
   log.warning(
     "[PlainPoolDeployed] PoolAddress: {}, Registry: {}, TxnHash: {}",
@@ -31,7 +31,7 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
   let poolAddress = event.params.pool;
 
   if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block);
+  getOrCreateLiquidityPool(poolAddress, event.block,registryAddress);
 
   
   log.warning("[MetaPoolDeployed] PoolAddress: {}, Registry: {}, TxnHash: {}", [
@@ -46,7 +46,7 @@ export function handleBasePoolAdded(event: BasePoolAdded): void {
   let poolAddress = event.params.base_pool;
 
   if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block);
+  getOrCreateLiquidityPool(poolAddress, event.block,registryAddress);
 
   log.warning("[BasePoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
     poolAddress.toHexString(),
@@ -60,7 +60,7 @@ export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
   let poolAddress = event.params.pool;
 
   if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block);
+  getOrCreateLiquidityPool(poolAddress, event.block,registryAddress);
 
   log.warning("[MetaPoolDeployed] PoolAddress: {}, Registry: {}, TxnHash: {}", [
     poolAddress.toHexString(),

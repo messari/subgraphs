@@ -8,7 +8,7 @@ export function handlePoolAdded(event: PoolAdded): void {
   let poolAddress = event.params .pool;
   let registryAddress = event.address;
   if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block);
+  getOrCreateLiquidityPool(poolAddress, event.block,registryAddress);
 
   log.warning("[PoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
     poolAddress.toHexString(),

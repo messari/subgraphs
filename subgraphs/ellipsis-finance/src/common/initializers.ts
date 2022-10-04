@@ -21,12 +21,12 @@ import { PoolTemplate } from "../../generated/templates";
 
 export function getOrCreateLiquidityPool(
   address: Address,
-  block: ethereum.Block
+  block: ethereum.Block,
+  registryAddress: Address = constants.ADDRESS_ZERO
 ): LiquidityPool {
   let poolId = address.toHexString();
   let liquidityPool = LiquidityPool.load(poolId);
   if (!liquidityPool) {
-
     liquidityPool = new LiquidityPool(poolId);
     liquidityPool.protocol = constants.REGISTRY_ADDRESS.toHexString();
     liquidityPool.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
@@ -34,7 +34,11 @@ export function getOrCreateLiquidityPool(
     liquidityPool.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     liquidityPool.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
     liquidityPool.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
-
+    
+    if (!registryAddress.equals(constants.ADDRESS_ZERO)) {
+      liquidityPool._registry = registryAddress.toHexString();
+      liquidityPool.save();
+    }
     let lpToken = utils.getLpTokenFromPool(address, block);
 
     let lpTokenContract = LPTokenContract.bind(Address.fromString(lpToken.id));

@@ -79,6 +79,21 @@ export function getLpTokenFromPool(
     factoryContract.try_get_lp_token(poolAddress),
     constants.NULL.TYPE_ADDRESS
   );
+
+  if (lpTokenAddress.notEqual(constants.NULL.TYPE_ADDRESS))
+    return getOrCreateToken(lpTokenAddress, block);
+
+  let newRegistryAddress = getOrCreateLiquidityPool(
+    poolAddress,
+    block
+  )._registry;
+  let newFactoryContract = FactoryContract.bind(
+    Address.fromString(newRegistryAddress!)
+  );
+  lpTokenAddress = readValue<Address>(
+    newFactoryContract.try_get_lp_token(poolAddress),
+    constants.NULL.TYPE_ADDRESS
+  );
   if (lpTokenAddress.notEqual(constants.NULL.TYPE_ADDRESS))
     return getOrCreateToken(lpTokenAddress, block);
 

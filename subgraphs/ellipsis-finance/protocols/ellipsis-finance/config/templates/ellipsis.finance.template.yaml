@@ -1,3 +1,4 @@
+specVersion: 0.0.5
 {{#graftEnabled}}
 graft:
   base: {{subgraphId}}
@@ -5,7 +6,6 @@ graft:
 features:
   - grafting
 {{/graftEnabled}}
-specVersion: 0.0.5
 schema:
   file: ./schema.graphql
 dataSources:
@@ -396,9 +396,13 @@ dataSources:
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity
+        - event: AddLiquidity(indexed address,uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
         - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
           handler: handleAddLiquidity
         - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256)
           handler: handleRemoveLiquidity
         - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
           handler: handleRemoveLiquidity
@@ -413,6 +417,8 @@ dataSources:
           handler: handleRemoveLiquidityOne
           receipt: true
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
@@ -488,6 +494,8 @@ templates:
           
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: AddLiquidity(indexed address,uint256[2],uint256,uint256)
           handler: handleAddLiquidity
         - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
           handler: handleAddLiquidity
