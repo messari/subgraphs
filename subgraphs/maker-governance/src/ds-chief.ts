@@ -1,12 +1,7 @@
 import { BigInt, Bytes, Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { LogNote, Etch } from "../generated/DSChief/DSChief";
 import { VoteDelegate } from "../generated/DSChief/VoteDelegate";
-import {
-  Slate,
-  Spell,
-  Vote,
-  Delegate,
-} from "../generated/schema";
+import { Slate, Spell, Vote, Delegate } from "../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ONE,
@@ -22,9 +17,7 @@ import {
   removeWeightFromSpells,
   toDecimal,
 } from "./helpers";
-import {
-  VoteDelegate as VoteDelegateTemplate,
-} from "../generated/templates";
+import { VoteDelegate as VoteDelegateTemplate } from "../generated/templates";
 
 export function handleLock(event: LogNote): void {
   let sender = event.params.guy; // guy is the sender
@@ -58,7 +51,7 @@ export function handleLock(event: LogNote): void {
 
   delegate.votingPowerRaw = delegate.votingPowerRaw.plus(amount);
   delegate.votingPower = delegate.votingPower.plus(toDecimal(amount));
-  addWeightToSpells(delegate.currentSpells, amount)
+  addWeightToSpells(delegate.currentSpells, amount);
   delegate.save();
 
   let framework = getGovernanceFramework(event.address.toHexString());
@@ -76,7 +69,7 @@ export function handleFree(event: LogNote): void {
   let delegate = getDelegate(sender.toHexString());
   delegate.votingPowerRaw = delegate.votingPowerRaw.minus(amount);
   delegate.votingPower = delegate.votingPower.minus(toDecimal(amount));
-  removeWeightFromSpells(delegate.currentSpells, amount)
+  removeWeightFromSpells(delegate.currentSpells, amount);
   delegate.save();
 
   let framework = getGovernanceFramework(event.address.toHexString());
@@ -95,7 +88,7 @@ export function handleEtch(event: Etch): void {
   let sender = event.transaction.from.toHexString();
   // Check if txn is coming from a vote delegate contract, if so treat it as sender
   if (event.transaction.to && event.transaction.to != event.address) {
-    sender = event.transaction.to!.toHexString()
+    sender = event.transaction.to!.toHexString();
   }
   let slateID = event.params.slate;
   _handleSlateVote(sender, slateID, event);
@@ -109,14 +102,14 @@ function _handleSlateVote(
   let delegate = getDelegate(sender);
   let slate = Slate.load(slateID.toHexString());
   if (!slate) {
-    slate = createSlate(slateID, event)
+    slate = createSlate(slateID, event);
   }
 
   // Remove votes from previous spells
-  removeWeightFromSpells(delegate.currentSpells, delegate.votingPowerRaw)
+  removeWeightFromSpells(delegate.currentSpells, delegate.votingPowerRaw);
 
   for (let i = 0; i < slate.yays.length; i++) {
-    let spellID = slate.yays[i]
+    let spellID = slate.yays[i];
     let spell = Spell.load(spellID);
     if (spell) {
       let voteId = sender.concat("-").concat(spellID);
@@ -134,7 +127,7 @@ function _handleSlateVote(
       spell.totalWeightedVotes = spell.totalWeightedVotes.plus(
         delegate.votingPowerRaw
       );
-      spell.save()
+      spell.save();
     }
   }
 

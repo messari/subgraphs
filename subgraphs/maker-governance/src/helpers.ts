@@ -1,5 +1,10 @@
 import { BigDecimal, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { Delegate, GovernanceFramework, Spell, Slate } from "../generated/schema";
+import {
+  Delegate,
+  GovernanceFramework,
+  Spell,
+  Slate,
+} from "../generated/schema";
 import { DSChief } from "../generated/DSChief/DSChief";
 import { DSSpell } from "../generated/DSChief/DSSpell";
 import {
@@ -9,9 +14,7 @@ import {
   MKR_TOKEN,
   SpellState,
 } from "./constants";
-import {
-  DSSpell as DSSpellTemplate,
-} from "../generated/templates";
+import { DSSpell as DSSpellTemplate } from "../generated/templates";
 
 export function hexToNumberString(hex: string): string {
   let hexNumber = BigInt.fromI32(0);
@@ -120,7 +123,7 @@ export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
   framework.save();
 
   slate.save();
-  return slate
+  return slate;
 }
 
 export function addWeightToSpells(spellIDs: string[], weight: BigInt): void {
@@ -128,16 +131,19 @@ export function addWeightToSpells(spellIDs: string[], weight: BigInt): void {
     let spell = Spell.load(spellIDs[i]);
     if (spell) {
       spell.totalWeightedVotes = spell.totalWeightedVotes.plus(weight);
-      spell.save()
+      spell.save();
     }
   }
 }
-export function removeWeightFromSpells(spellIDs: string[], weight: BigInt): void {
+export function removeWeightFromSpells(
+  spellIDs: string[],
+  weight: BigInt
+): void {
   for (let i = 0; i < spellIDs.length; i++) {
     let spell = Spell.load(spellIDs[i]);
     if (spell) {
       spell.totalWeightedVotes = spell.totalWeightedVotes.minus(weight);
-      spell.save()
+      spell.save();
     }
   }
 }

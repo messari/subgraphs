@@ -24,7 +24,9 @@ export function handleDelegateLock(event: Lock): void {
   delegate.save();
 
   let framework = getGovernanceFramework(CHIEF);
-  framework.currentTokenDelegated = framework.currentTokenDelegated.plus(event.params.wad);
+  framework.currentTokenDelegated = framework.currentTokenDelegated.plus(
+    event.params.wad
+  );
   framework.save();
 }
 
@@ -44,6 +46,8 @@ export function handleDelegateFree(event: Free): void {
   delegate.save();
 
   let framework = getGovernanceFramework(CHIEF);
-  framework.currentTokenDelegated = framework.currentTokenDelegated.minus(event.params.wad);
+  framework.currentTokenDelegated = framework.currentTokenDelegated.minus(
+    event.params.wad
+  );
   framework.save();
 }
