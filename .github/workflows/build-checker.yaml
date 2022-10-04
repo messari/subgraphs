@@ -67,5 +67,5 @@ jobs:
         with: 
           CHANGED_FILES: "${{ steps.files.outputs.all }}"
           ABSOLUTE_PATH: ${{ github.workspace }}
-          GRAPH_DEPLOYMENT_LOCATION: steegecs
+          GRAPH_DEPLOYMENT_LOCATION: messari
           
