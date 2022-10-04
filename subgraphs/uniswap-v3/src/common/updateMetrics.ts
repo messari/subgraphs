@@ -88,9 +88,6 @@ export function updateUsageMetrics(
   } else if (usageType == UsageType.SWAP) {
     usageMetricsDaily.dailySwapCount += INT_ONE;
     usageMetricsHourly.hourlySwapCount += INT_ONE;
-  } else if (usageType == UsageType.COLLECT) {
-    usageMetricsDaily.dailyCollectCount += INT_ONE;
-    usageMetricsHourly.hourlyCollectCount += INT_ONE;
   }
 
   // Number of days since Unix epoch

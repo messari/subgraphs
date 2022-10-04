@@ -5,7 +5,6 @@ import {
   Deposit,
   Withdraw,
   Swap,
-  Collect,
   _HelperStore,
   _LiquidityPoolAmount,
   LiquidityPoolFee,
@@ -172,10 +171,7 @@ export function createDeposit(
     .times(token0.lastPriceUSD!)
     .plus(amount1Converted.times(token1.lastPriceUSD!));
 
-  // reset tvl aggregates until new amounts calculated
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    pool.totalValueLockedUSD
-  );
+  let oldPoolTVL = pool.totalValueLockedUSD;
 
   // Update pool balances adjusted for decimals and not adjusted
   let poolInputTokenBalances: BigInt[] = [
@@ -196,9 +192,9 @@ export function createDeposit(
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
   // Add pool value back to protocol total value locked
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    pool.totalValueLockedUSD
-  );
+  // reset aggregates with new amounts
+  let delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
   let deposit = new Deposit(
     event.transaction.hash
@@ -228,13 +224,15 @@ export function createDeposit(
   protocol.save();
 }
 
-// Create a deposit from a Burn event from a particular pool contract.
+// Create a deposit from a Burn event or Collect event from a particular pool contract.
 // Also, updated token balances and total value locked.
 export function createWithdraw(
   event: ethereum.Event,
   owner: Address,
+  recipient: Address,
   amount0: BigInt,
-  amount1: BigInt
+  amount1: BigInt,
+  isCollect: boolean
 ): void {
   let poolAddress = event.address.toHexString();
 
@@ -250,15 +248,13 @@ export function createWithdraw(
   let amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
   let amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
 
-  // Get the value in USD of the deposit
+  // Get the value in USD of the withdrawal (or collection)
   let amountUSD = amount0Converted
     .times(token0.lastPriceUSD!)
     .plus(amount1Converted.times(token1.lastPriceUSD!));
 
   // reset tvl aggregates until new amounts calculated
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    pool.totalValueLockedUSD
-  );
+  let oldPoolTVL = pool.totalValueLockedUSD;
 
   // Update pool balances adjusted for decimals and not adjusted
   let poolInputTokenBalances: BigInt[] = [
@@ -279,9 +275,8 @@ export function createWithdraw(
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
   // reset aggregates with new amounts
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    pool.totalValueLockedUSD
-  );
+  let delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
   let withdrawal = new Withdraw(
     event.transaction.hash
@@ -293,7 +288,7 @@ export function createWithdraw(
   withdrawal.hash = event.transaction.hash.toHexString();
   withdrawal.logIndex = event.logIndex.toI32();
   withdrawal.protocol = protocol.id;
-  withdrawal.to = owner.toHexString();
+  withdrawal.to = recipient.toHexString();
   withdrawal.from = pool.id;
   withdrawal.blockNumber = event.block.number;
   withdrawal.timestamp = event.block.timestamp;
@@ -301,6 +296,7 @@ export function createWithdraw(
   withdrawal.inputTokenAmounts = [amount0, amount1];
   withdrawal.pool = pool.id;
   withdrawal.amountUSD = amountUSD;
+  withdrawal.isCollect = isCollect;
 
   withdrawal.save();
   pool.save();
@@ -379,9 +375,7 @@ export function createSwapHandleVolumeAndFees(
   token0.lastPriceBlockNumber = event.block.number;
   token1.lastPriceBlockNumber = event.block.number;
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    pool.totalValueLockedUSD
-  );
+  let oldPoolTVL = pool.totalValueLockedUSD;
 
   /**
    * Things afffected by new USD rates
@@ -391,9 +385,9 @@ export function createSwapHandleVolumeAndFees(
     .times(token0.lastPriceUSD!)
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    pool.totalValueLockedUSD
-  );
+  // reset aggregates with new amounts
+  let delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
   // create Swap event
   let swap = new Swap(
@@ -441,80 +435,4 @@ export function createSwapHandleVolumeAndFees(
   swap.save();
   token0.save();
   token1.save();
-}
-
-export function collectFees(
-  event: ethereum.Event,
-  owner: Address,
-  amount0: BigInt,
-  amount1: BigInt
-): void {
-  // update fee growth
-  let pool = getLiquidityPool(event.address.toHexString());
-  let poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
-  let protocol = getOrCreateDex();
-
-  // Update the pool balances for collected fees in native amount
-  pool.inputTokenBalances = [
-    pool.inputTokenBalances[INT_ZERO].minus(amount0),
-    pool.inputTokenBalances[INT_ONE].minus(amount1),
-  ];
-
-  let token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
-  let token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
-
-  // Get formatted amounts collected.
-  let amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
-  let amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
-
-  // Get the value in USD of the deposit
-  let amountUSD = amount0Converted
-    .times(token0.lastPriceUSD!)
-    .plus(amount1Converted.times(token1.lastPriceUSD!));
-
-  // Update the pool balances for collected fees in converted amount
-  poolAmounts.inputTokenBalances = [
-    poolAmounts.inputTokenBalances[INT_ZERO].minus(amount0Converted),
-    poolAmounts.inputTokenBalances[INT_ONE].minus(amount1Converted),
-  ];
-
-  // Subtract the TVL of the pool from the protocol before fee collection
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    pool.totalValueLockedUSD
-  );
-
-  // Update the pool's TVL after fee collection
-  pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
-    .times(token0.lastPriceUSD!)
-    .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
-
-  // Update the protocol's TVL after fee collection
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    pool.totalValueLockedUSD
-  );
-
-  let collect = new Collect(
-    event.transaction.hash
-      .toHexString()
-      .concat("-")
-      .concat(event.logIndex.toString())
-  );
-
-  collect.hash = event.transaction.hash.toHexString();
-  collect.logIndex = event.logIndex.toI32();
-  collect.protocol = protocol.id;
-  collect.to = owner.toHexString();
-  collect.from = pool.id;
-  collect.blockNumber = event.block.number;
-  collect.timestamp = event.block.timestamp;
-  collect.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
-  collect.inputTokenAmounts = [amount0, amount1];
-  collect.pool = pool.id;
-  collect.amountUSD = amountUSD;
-
-  // save entities
-  collect.save();
-  pool.save();
-  poolAmounts.save();
-  protocol.save();
 }

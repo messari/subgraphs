@@ -12,7 +12,6 @@ import {
   createDeposit,
   createWithdraw,
   createSwapHandleVolumeAndFees,
-  collectFees,
 } from "../common/creators";
 import {
   updatePrices,
@@ -51,8 +50,10 @@ export function handleBurn(event: BurnEvent): void {
   createWithdraw(
     event,
     event.params.owner,
+    event.params.owner,
     event.params.amount0,
-    event.params.amount1
+    event.params.amount1,
+    false
   );
   updateUsageMetrics(event, event.params.owner, UsageType.WITHDRAW);
   updateFinancials(event);
@@ -75,13 +76,15 @@ export function handleSwap(event: SwapEvent): void {
 }
 
 export function handleCollect(event: CollectEvent): void {
-  collectFees(
+  createWithdraw(
     event,
     event.params.owner,
+    event.params.recipient,
     event.params.amount0,
-    event.params.amount1
+    event.params.amount1,
+    true
   );
   updateFinancials(event);
   updatePoolMetrics(event);
-  updateUsageMetrics(event, event.transaction.from, UsageType.COLLECT);
+  updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
 }

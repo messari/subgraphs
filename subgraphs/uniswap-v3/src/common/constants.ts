@@ -66,7 +66,6 @@ export namespace UsageType {
   export const DEPOSIT = "DEPOSIT";
   export const WITHDRAW = "WITHDRAW";
   export const SWAP = "SWAP";
-  export const COLLECT = "COLLECT";
 }
 
 export namespace FeeSwitch {
