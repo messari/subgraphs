@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault, VaultFee } from "../../generated/schema";
 import {
@@ -10,7 +10,12 @@ import {
   Withdraw,
 } from "../../generated/Standard/BeefyStrategy";
 import { BeefyVault } from "../../generated/Standard/BeefyVault";
-import { getFees, getOrCreateToken, getOrCreateVault } from "../utils/getters";
+import {
+  getFees,
+  getOrCreateToken,
+  getOrCreateVault,
+  getOrCreateVaultDailySnapshot,
+} from "../utils/getters";
 import { createDeposit } from "./deposit";
 import { createWithdraw } from "./withdraw";
 import {
@@ -24,20 +29,23 @@ import {
 } from "../prices/common/constants";
 import {
   updateProtocolRevenue,
-  updateProtocolRevenueFromHarvest,
   updateProtocolRevenueFromWithdraw,
   updateProtocolUsage,
 } from "./protocol";
 import { ERC20 } from "../../generated/Standard/ERC20";
 import { BIGDECIMAL_HUNDRED, exponentToBigDecimal } from "../utils/constants";
 
+// This function updates the vault's metrics from contract calls
+// This includes:
+//   totalValueLockedUSD
+//   totalBorrowBalanceUSD
+//
+// Then it will update any snapshots with the latest metrics
 export function updateVaultAndSnapshots(
   vault: Vault,
   block: ethereum.Block
 ): void {
-  const vaultContract = BeefyVault.bind(
-    Address.fromString(vault.id.split("x")[1])
-  );
+  const vaultContract = BeefyVault.bind(Address.fromString(vault.id));
   let call = vaultContract.try_balance();
   if (call.reverted) {
     vault.inputTokenBalance = BIGINT_ZERO;
@@ -150,49 +158,44 @@ export function handleWithdraw(event: Withdraw): void {
 
 // StratHarvest (includes tvl in params)
 export function handleStratHarvestWithAmount(event: StratHarvest): void {
+  updateRevenueFromHarvest(event, event.address);
+
   const vault = getOrCreateVault(event.address, event);
   if (!vault) {
+    log.warning("[handleStratHarvestWithAmount] Vault not found: {}", [
+      event.address.toHexString(),
+    ]);
     return;
   }
-
   updateVaultAndSnapshots(vault, event.block);
-  updateProtocolRevenueFromHarvest(event, event.params.wantHarvested, vault);
 }
 
 // StratHarvest1 (just messge sender)
 export function handleStratHarvest(event: StratHarvest1): void {
+  updateRevenueFromHarvest(event, event.address);
+
   const vault = getOrCreateVault(event.address, event);
   if (!vault) {
+    log.warning("[handleStratHarvest] Vault not found: {}", [
+      event.address.toHexString(),
+    ]);
     return;
   }
-
-  const strategyContract = BeefyStrategy.bind(event.address);
-  const balance = strategyContract.try_balanceOf();
-  if (!balance.reverted) {
-    const amountHarvested = balance.value.minus(vault.inputTokenBalance);
-    updateVaultAndSnapshots(vault, event.block);
-    updateProtocolRevenueFromHarvest(event, amountHarvested, vault);
-  } else {
-    updateVaultAndSnapshots(vault, event.block);
-  }
+  updateVaultAndSnapshots(vault, event.block);
 }
 
 // StratHarvest2 (harvester and timestamp)
 export function handleStratHarvestWithTimestamp(event: StratHarvest2): void {
+  updateRevenueFromHarvest(event, event.address);
+
   const vault = getOrCreateVault(event.address, event);
   if (!vault) {
+    log.warning("[handleStratHarvestWithTimestamp] Vault not found: {}", [
+      event.address.toHexString(),
+    ]);
     return;
   }
-
-  const strategyContract = BeefyStrategy.bind(event.address);
-  const balance = strategyContract.try_balanceOf();
-  if (!balance.reverted) {
-    const amountHarvested = balance.value.minus(vault.inputTokenBalance);
-    updateVaultAndSnapshots(vault, event.block);
-    updateProtocolRevenueFromHarvest(event, amountHarvested, vault);
-  } else {
-    updateVaultAndSnapshots(vault, event.block);
-  }
+  updateVaultAndSnapshots(vault, event.block);
 }
 
 /////////////////
@@ -299,5 +302,11 @@ function updateRevenueFromHarvest(
       totalRevenueDelta,
       event
     );
+
+    // update vault.dailyTotalRevenueUSD
+    const vaultDailySnapshot = getOrCreateVaultDailySnapshot(vault.id, event);
+    vaultDailySnapshot.dailyTotalRevenueUSD =
+      vaultDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueDelta);
+    vaultDailySnapshot.save();
   }
 }

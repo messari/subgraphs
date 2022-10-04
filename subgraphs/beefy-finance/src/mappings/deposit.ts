@@ -14,7 +14,7 @@ export function createDeposit(
   vaultId: string
 ): Deposit {
   const deposit = new Deposit(
-    event.transaction.hash.toHexString().concat(`-${event.transaction.index}`)
+    event.transaction.hash.toHexString().concat(`-${event.transactionLogIndex}`)
   );
 
   deposit.hash = event.transaction.hash.toHexString();

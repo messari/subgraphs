@@ -9,7 +9,9 @@ import {
   FinancialsDailySnapshot,
   Token,
   Vault,
+  VaultDailySnapshot,
   VaultFee,
+  VaultHourlySnapshot,
   YieldAggregator,
 } from "../../generated/schema";
 import { BeefyStrategy } from "../../generated/Standard/BeefyStrategy";
@@ -33,6 +35,7 @@ import {
   VaultFeeType,
 } from "./constants";
 import { BeefyVault } from "../../generated/Standard/BeefyVault";
+import { getDaysSinceEpoch, getHoursSinceEpoch } from "./time";
 
 // also updates price of token
 export function getOrCreateToken(
@@ -230,4 +233,79 @@ export function getOrCreateFinancials(
     financialMetrics.save();
   }
   return financialMetrics;
+}
+
+export function getOrCreateVaultDailySnapshot(
+  vaultId: string,
+  event: ethereum.Event
+): VaultDailySnapshot {
+  const id = getVaultDailyId(event.block, vaultId);
+
+  let vaultDailySnapshot = VaultDailySnapshot.load(id);
+  if (!vaultDailySnapshot) {
+    vaultDailySnapshot = new VaultDailySnapshot(id);
+    vaultDailySnapshot.protocol = PROTOCOL_ID;
+    vaultDailySnapshot.vault = vaultId;
+    vaultDailySnapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    vaultDailySnapshot.inputTokenBalance = BIGINT_ZERO;
+    vaultDailySnapshot.outputTokenSupply = BIGINT_ZERO;
+    vaultDailySnapshot.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    vaultDailySnapshot.pricePerShare = BIGINT_ZERO;
+    vaultDailySnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+  }
+
+  vaultDailySnapshot.blockNumber = event.block.number;
+  vaultDailySnapshot.timestamp = event.block.timestamp;
+  vaultDailySnapshot.save();
+
+  return vaultDailySnapshot;
+}
+
+export function getOrCreateVaultHourlySnapshot(
+  vaultId: string,
+  event: ethereum.Event
+): VaultHourlySnapshot {
+  const id = getVaultHourlyId(event.block, vaultId);
+
+  let vaultHourlySnapshot = VaultHourlySnapshot.load(id);
+  if (!vaultHourlySnapshot) {
+    vaultHourlySnapshot = new VaultHourlySnapshot(id);
+    vaultHourlySnapshot.protocol = PROTOCOL_ID;
+    vaultHourlySnapshot.vault = vaultId;
+    vaultHourlySnapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    vaultHourlySnapshot.inputTokenBalance = BIGINT_ZERO;
+    vaultHourlySnapshot.outputTokenSupply = BIGINT_ZERO;
+    vaultHourlySnapshot.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    vaultHourlySnapshot.pricePerShare = BIGINT_ZERO;
+  }
+
+  vaultHourlySnapshot.blockNumber = event.block.number;
+  vaultHourlySnapshot.timestamp = event.block.timestamp;
+  vaultHourlySnapshot.save();
+
+  return vaultHourlySnapshot;
+}
+
+/////////////////
+//// Helpers ////
+/////////////////
+
+export function getVaultDailyId(
+  block: ethereum.Block,
+  vaultId: string
+): string {
+  const daysSinceEpoch = getDaysSinceEpoch(block.timestamp.toI32()).toString();
+  const id = vaultId.concat("-").concat(daysSinceEpoch);
+  return id;
+}
+
+export function getVaultHourlyId(
+  block: ethereum.Block,
+  vaultId: string
+): string {
+  const hoursSinceEpoch = getHoursSinceEpoch(
+    block.timestamp.toI32()
+  ).toString();
+  const id = vaultId.concat("-").concat(hoursSinceEpoch);
+  return id;
 }

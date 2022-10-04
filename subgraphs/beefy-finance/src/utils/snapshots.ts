@@ -6,39 +6,14 @@ import {
   VaultHourlySnapshot,
 } from "../../generated/schema";
 import { BIGDECIMAL_ZERO } from "../prices/common/constants";
-
-export function getVaultDailyId(
-  block: ethereum.Block,
-  vaultId: string
-): string {
-  const daysSinceEpoch = getDaysSinceEpoch(block.timestamp.toI32()).toString();
-  const id = vaultId.concat("-").concat(daysSinceEpoch);
-  return id;
-}
-
-export function getVaultHourlyId(
-  block: ethereum.Block,
-  vaultId: string
-): string {
-  const hoursSinceEpoch = getHoursSinceEpoch(
-    block.timestamp.toI32()
-  ).toString();
-  const id = vaultId.concat("-").concat(hoursSinceEpoch);
-  return id;
-}
+import { getOrCreateVaultDailySnapshot } from "./getters";
 
 export function updateVaultDailySnapshot(
   block: ethereum.Block,
   vault: Vault
 ): VaultDailySnapshot {
   const id = getVaultDailyId(block, vault.id);
-  let vaultDailySnapshot = VaultDailySnapshot.load(id);
-  if (vaultDailySnapshot == null) {
-    vaultDailySnapshot = new VaultDailySnapshot(id);
-    vaultDailySnapshot.protocol = vault.protocol;
-    vaultDailySnapshot.vault = vault.id;
-    vaultDailySnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-  }
+  let vaultDailySnapshot = getOrCreateVaultDailySnapshot(vault.id);
   vaultDailySnapshot.inputTokenBalance = vault.inputTokenBalance;
   if (vault.outputTokenSupply) {
     vaultDailySnapshot.outputTokenSupply = vault.outputTokenSupply;

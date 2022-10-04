@@ -70,65 +70,6 @@ export function updateProtocolUsage(
   updateUsageMetricsHourlySnapshot(event, protocol, deposit, withdraw);
 }
 
-export function updateProtocolRevenueFromHarvest(
-  event: ethereum.Event,
-  amountHarvested: BigInt,
-  vault: Vault
-): void {
-  updateProtocolUsage(event, false, false);
-  const protocol = getOrCreateYieldAggregator();
-  const token = getOrCreateToken(
-    Address.fromString(vault.inputToken.split("x")[1]),
-    event.block
-  );
-  const transactionRevenue = amountHarvested
-    .toBigDecimal()
-    .times(token.lastPriceUSD)
-    .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
-  protocol.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD.plus(transactionRevenue);
-  protocol.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD.plus(transactionRevenue);
-  protocol.save();
-
-  vault.fees = getFees(
-    vault.id,
-    BeefyStrategy.bind(Address.fromString(vault._strategyAddress))
-  );
-  vault.save();
-
-  updateDailyFinancialSnapshot(event.block, protocol);
-}
-
-export function updateProtocolRevenueFromChargedFees(
-  event: ChargedFees,
-  vault: Vault
-): void {
-  updateProtocolUsage(event, false, false);
-  const protocol = getOrCreateYieldAggregator();
-  const tokensMap = WHITELIST_TOKENS_MAP.get(dataSource.network());
-  const native = tokensMap!.get("WETH")!;
-  const token = getOrCreateToken(native, event.block);
-  vault.fees = getFees(
-    vault.id,
-    BeefyStrategy.bind(Address.fromString(vault._strategyAddress))
-  );
-  vault.save();
-  const transactionRevenue = event.params.beefyFees
-    .plus(event.params.strategistFees)
-    .plus(event.params.callFees)
-    .toBigDecimal()
-    .times(token.lastPriceUSD)
-    .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
-  protocol.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD.plus(transactionRevenue);
-  protocol.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD.plus(transactionRevenue);
-  protocol.save();
-
-  updateDailyFinancialSnapshot(event.block, protocol);
-}
-
 export function updateProtocolRevenueFromWithdraw(
   event: Withdraw,
   vault: Vault,

@@ -14,7 +14,7 @@ export function createWithdraw(
   vaultId: string
 ): Withdraw {
   const withdraw = new Withdraw(
-    event.transaction.hash.toHexString().concat(`-${event.transaction.index}`)
+    event.transaction.hash.toHexString().concat(`-${event.transactionLogIndex}`)
   );
 
   withdraw.hash = event.transaction.hash.toHexString();
