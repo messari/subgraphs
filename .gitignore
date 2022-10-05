@@ -153,3 +153,4 @@ dist
 
 # Matchstick generated file
 .bin
+.latest.json
