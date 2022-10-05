@@ -5,7 +5,6 @@
     "*/generated/**",
     "*/build/**",
     "*/node_modules/**",
-
     "### generic subgraph structure ###",
     "*/abis/**",
     "*/protocols/*/config/deployments/*",
@@ -13,7 +12,6 @@
     "*/protocols/*/src/**",
     "*/src/**",
     "*/configurations/*",
-
     "### specific outliers ###",
     "uniswap-v3/configurations/*",
     "maple-finance/validation/**",
@@ -26,7 +24,6 @@
     "looksrare/**",
     "opensea/**",
     "x2y2/**",
-    "seaport/**",
-    "goldfinch/**"
-   ]
+    "seaport/**"
+  ]
 }
