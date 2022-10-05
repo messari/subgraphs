@@ -51,11 +51,7 @@ export async function fetchMessages(before, channelId = process.env.CHANNEL_ID) 
 
     try {
         const data = await axios.get(baseURL, { "headers": { ...headers } });
-        const timeAgo = new Date(Date.now() - ((86400000 * 7)));
-        const previousWeekMessages = data.data.filter(obj => {
-            return moment(new Date(obj.timestamp)).isSameOrAfter(timeAgo);
-        });
-        return previousWeekMessages;
+        return data.data;
     } catch (err) {
         errorNotification("ERROR LOCATION 8 " + err?.message + ' URL: ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
@@ -113,6 +109,60 @@ export async function clearMessages(channelId = process.env.CHANNEL_ID) {
         await axios.post(baseURL + "/messages/bulk-delete", postJSON, { "headers": { ...headers } });
     } catch (err) {
         errorNotification("ERROR LOCATION 11 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
+    }
+}
+
+export async function getAllThreadsToClear(deleteMsgsFromBeforeTS, channelId = process.env.CHANNEL_ID) {
+    const msgs = await getDiscordMessages([], channelId);
+    await clearAllThreads(msgs, deleteMsgsFromBeforeTS);
+}
+
+export async function clearAllThreads(msgs, deleteMsgsFromBeforeTS) {
+    // Take the first 5 queries to attempt
+    let useMsgs = msgs.slice(0, 5);
+    const newMsgsArray = [...msgs.slice(5)];
+    try {
+        await Promise.allSettled(useMsgs.map(msg => clearThread(deleteMsgsFromBeforeTS, msg.id)));
+    } catch (err) {
+        errorNotification("ERROR LOCATION 23 " + err.message);
+    }
+    await sleep(5000);
+    if (newMsgsArray.length > 0) {
+        clearAllThreads(newMsgsArray, deleteMsgsFromBeforeTS);
+        return;
+    }
+    return;
+}
+
+export async function clearThread(deleteMsgsFromBeforeTS, channelId = process.env.CHANNEL_ID) {
+    // This function is called to clear all the messages within a provided thread(channel)
+    // Delete all messages (except fr head message) older than 7d
+    let messages = []
+    try {
+        const msgs = await getDiscordMessages([], channelId);
+        const baseURL = "https://discordapp.com/api/channels/" + channelId;
+        const headers = {
+            "Authorization": "Bot " + process.env.BOT_TOKEN,
+            "Content-Type": "application/json",
+        }
+
+        const timeAgo = new Date(deleteMsgsFromBeforeTS)
+        messages = msgs.filter(x => moment(new Date(x.timestamp)).isSameOrBefore(timeAgo)).map(x => x.id).slice(0, 100)
+        messages.pop();
+        if (messages.length === 1) {
+            deleteSingleMessage(messages[0], channelId);
+            return;
+        }
+        if (messages.length === 0) {
+            return;
+        }
+        const postJSON = JSON.stringify({ "messages": messages });
+        await axios.post(baseURL + "/messages/bulk-delete", postJSON, { "headers": { ...headers } });
+    } catch (err) {
+        if (err.response.status === 400 && messages.length === 1) {
+            deleteSingleMessage(messages[0], channelId);
+        }
+        errorNotification("ERROR LOCATION 24 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
@@ -207,7 +257,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         const indexingErrorEmbed = {
             title: "Indexing Errors",
             description: 'These subgraphs encountered a fatal error in indexing',
-            fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Indexed %', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
+            fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Failed At Block', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
             footer: { text: monitorVersion }
         };
 
@@ -231,11 +281,20 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 fields: [],
                 footer: { text: monitorVersion }
             };
-            if (!!depo.indexingError && !indexDeploymentIssues.includes(networkString)) {
-                indexingErrorEmbed.color = placeholderColor;
-                indexErrorEmbedDepos[networkString] = depo?.indexedPercentage;
+            if (!!depo.indexingError) {
+                const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
+                let issueHasBeenAlerted = false;
                 if (!!depo.pending) {
-                    indexErrorPendingHash[networkString] = depo?.hash;
+                    issueHasBeenAlerted = (indexDeploymentIssues.find(x => x.chain.includes(networkString.split(' ')[0] + "-PENDING") && x.indexed.includes(depo?.indexingError?.toString()) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS)) || false);
+                } else {
+                    issueHasBeenAlerted = (indexDeploymentIssues.find(x => x.chain.includes(networkString) && x.indexed.includes(depo?.indexingError?.toString()) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS)) || false);
+                }
+                if (!issueHasBeenAlerted) {
+                    indexingErrorEmbed.color = placeholderColor;
+                    indexErrorEmbedDepos[networkString] = depo?.indexingError;
+                    if (!!depo.pending) {
+                        indexErrorPendingHash[networkString] = depo?.hash;
+                    }
                 }
             }
             let errorsOnDeployment = false;
@@ -261,18 +320,19 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         });
         if (Object.keys(indexErrorEmbedDepos)?.length > 0) {
             let labelValue = "";
-            let percentageValue = "";
+            let failureBlock = "";
 
             Object.keys(indexErrorEmbedDepos)?.forEach(networkString => {
                 if (networkString.includes(' (PENDING')) {
-                    labelValue += `[${networkString.split(' ')[0]}-PENDING](https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]})\n\n`;
+                    labelValue += `\n[${networkString.split(' ')[0]}-PENDING](https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]})\n`;
 
                 } else {
-                    labelValue += `[${networkString}](https://okgraph.xyz/?q=messari%2F${protocol}-${networkString})\n\n`;
+                    labelValue += `\n[${networkString}](https://okgraph.xyz/?q=messari%2F${protocol}-${networkString})\n`;
                 }
-                percentageValue += indexErrorEmbedDepos[networkString] + '%\n\n';
+                failureBlock += '\n' + indexErrorEmbedDepos[networkString] + '\n';
             })
-            indexingErrorEmbed.fields.push({ name: '\u200b', value: labelValue, inline: true }, { name: '\u200b', value: percentageValue, inline: true }, { name: '\u200b', value: '\u200b', inline: false });
+            indexingErrorEmbed.fields[0].value += labelValue;
+            indexingErrorEmbed.fields[1].value += failureBlock;
             embedObjects.unshift(indexingErrorEmbed);
         }
 

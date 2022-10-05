@@ -32,16 +32,28 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIssue
                             channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id][chainStr] = fieldCells;
                         }
                     });
+
+                    if (!channelToIndexIssuesMapping[protocolMessageObject.channel_id]) {
+                        channelToIndexIssuesMapping[protocolMessageObject.channel_id] = [];
+                    }
+                    // This checks all of the embeds within this message. Other messages in this protocol thread could have embeds with the same title/category
                     const indexingErrorObject = protocolMessageObject.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
                     if (!indexingErrorObject) {
                         return;
                     }
-                    channelToIndexIssuesMapping[protocolMessageObject.channel_id] = indexingErrorObject.fields.filter(x => {
-                        return x.value.toUpperCase() !== x.value;
-                    }).map(x => x.value);
-                    if (!channelToIndexIssuesMapping[protocolMessageObject.channel_id]) {
-                        channelToIndexIssuesMapping[protocolMessageObject.channel_id] = [];
+                    const chainLine = indexingErrorObject.fields.find(x => x.name === "Chain")?.value;
+                    if (!chainLine) {
+                        return;
                     }
+                    const indexedLine = indexingErrorObject.fields.find(x => x.name === "Failed At Block")?.value;
+                    if (!indexedLine) {
+                        return;
+                    }
+                    const linesByChainArr = chainLine.split('\n').join('-----').split('-----');
+                    const linesByIndexedArr = indexedLine.split('\n').join('-----').split('-----');
+                    linesByChainArr.forEach((line, idx) => {
+                        channelToIndexIssuesMapping[protocolMessageObject.channel_id].push({ chain: line, indexed: linesByIndexedArr[idx], timestamp: protocolMessageObject.timestamp });
+                    })
                 });
             }
         });

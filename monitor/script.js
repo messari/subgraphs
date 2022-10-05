@@ -1,16 +1,16 @@
 import axios from "axios";
-import { constructEmbedMsg, errorNotification, getDiscordMessages } from "./messageDiscord.js";
+import { constructEmbedMsg, errorNotification, getAllThreadsToClear, getDiscordMessages } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
 import { pullMessagesByThread, resolveQueriesToAttempt, resolveThreadCreation } from "./resolutions.js";
 import { generateEndpoints, indexStatusFlow } from "./indexingStatus.js";
 
-const dayMs = 3600000 * 24;
+const hourMs = 3600000;
 
 try {
   executionFlow();
-  setInterval(executionFlow, dayMs);
+  setInterval(executionFlow, hourMs);
 } catch (err) {
   errorNotification("ERROR LOCATION 21 " + err.message + ' MAIN LOGIC script.js');
 }
@@ -57,6 +57,8 @@ async function executionFlow() {
       });
     });
   });
+
+  await getAllThreadsToClear(Date.now() - (86400000 * 7), process.env.CHANNEL_ID);
 
   const indexStatusFlowObject = await indexStatusFlow(deployments);
   deployments = indexStatusFlowObject.deployments;

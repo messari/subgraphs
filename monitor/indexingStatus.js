@@ -43,6 +43,10 @@ export async function indexStatusFlow(deployments) {
     const invalidDeployments = [];
     Object.keys(indexData).forEach((indexDataName) => {
       const realNameString = indexDataName.split("_").join("-");
+      if (!indexData[indexDataName] && indexDataName.includes("pending")) {
+        delete deployments[realNameString];
+        return;
+      }
       if (indexDataName.includes("pending")) {
         deployments[realNameString].url =
           "https://api.thegraph.com/subgraphs/id/" +
@@ -57,15 +61,14 @@ export async function indexStatusFlow(deployments) {
       }
       deployments[realNameString].indexedPercentage = indexedPercentage.toFixed(2);
 
+      if (!!indexData[indexDataName]?.fatalError) {
+        deployments[realNameString].indexingError = indexData[indexDataName]?.fatalError?.block?.number;
+      }
+
       if (
-        (!indexData[indexDataName] && !indexDataName.includes("pending")) ||
-        !!indexData[indexDataName]?.fatalError
+        !indexData[indexDataName]
       ) {
         invalidDeployments.push(realNameString);
-        deployments[realNameString].indexingError = indexData[indexDataName]?.fatalError?.message;
-      } else if (!indexData[indexDataName] && indexDataName.includes("pending")) {
-        delete deployments[realNameString];
-        return;
       }
 
       if (parseFloat(deployments[realNameString]?.indexedPercentage) < 10) {
@@ -83,7 +86,6 @@ export async function getIndexingStatusData(indexingStatusQueriesArray) {
     const indexingStatusQueries = indexingStatusQueriesArray.map((query) =>
       axios.post("https://api.thegraph.com/index-node/graphql", { query: query })
     );
-
     let indexData = [];
     await Promise.all(indexingStatusQueries)
       .then(
@@ -95,7 +97,6 @@ export async function getIndexingStatusData(indexingStatusQueriesArray) {
       .catch((err) => {
         errorNotification("ERROR LOCATION 3 " + err.message)
       });
-
     indexData = { ...indexData[0], ...indexData[1] };
     return indexData;
   } catch (err) {
@@ -111,12 +112,9 @@ export async function generateIndexStatusQuery(deployments) {
   subgraph
   synced
   fatalError {
-    message
-    handler
-  }
-  nonFatalErrors {
-    message
-    handler
+    block {
+      number
+    }
   }
   chains {
     chainHeadBlock {
@@ -128,11 +126,7 @@ export async function generateIndexStatusQuery(deployments) {
     latestBlock {
       number
     }
-    lastHealthyBlock {
-      number
-    }
-  }
-  entityCount`;
+  }`;
 
   try {
 
