@@ -55,7 +55,10 @@ export function handleTokensRegistered(event: TokensRegistered): void {
   pool.inputTokenBalances = new Array<BigInt>(inputTokens.length).fill(
     constants.BIGINT_ZERO
   );
-  pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
+  pool.inputTokenWeights = utils.getPoolTokenWeights(
+    poolAddress,
+    pool.inputTokens
+  );
   pool.save();
 }
 

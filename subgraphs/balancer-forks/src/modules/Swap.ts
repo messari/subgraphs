@@ -141,7 +141,10 @@ export function Swap(
     pool.inputTokenBalances,
     block
   );
-  pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
+  pool.inputTokenWeights = utils.getPoolTokenWeights(
+    poolAddress,
+    pool.inputTokens
+  );
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(volumeUSD);
   pool.save();
 
