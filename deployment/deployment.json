@@ -4244,12 +4244,12 @@
       }
     }
   },
-  "compound-governance": {
+  "uniswap-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
-    "protocol": "compound-governance",
+    "protocol": "uniswap-governance",
     "deployments": {
-      "compound-governance-ethereum": {
+      "uniswap-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -4258,7 +4258,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "compound-governance.template.yaml"
+          "template": "uniswap-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -4266,8 +4266,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "compound-governance",
-            "query-id": "compound-governance"
+            "slug": "uniswap-governance",
+            "query-id": "uniswap-governance"
           }
         }
       }

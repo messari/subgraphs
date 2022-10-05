@@ -257,44 +257,6 @@
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "expiration",
-        "type": "uint256"
-      }
-    ],
-    "name": "WhitelistAccountExpirationSet",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "oldGuardian",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "newGuardian",
-        "type": "address"
-      }
-    ],
-    "name": "WhitelistGuardianSet",
-    "type": "event"
-  },
-  {
     "constant": true,
     "inputs": [],
     "name": "BALLOT_TYPEHASH",
@@ -378,7 +340,7 @@
   {
     "constant": false,
     "inputs": [
-      { "internalType": "address", "name": "governorAlpha", "type": "address" }
+      { "internalType": "uint256", "name": "proposalCount", "type": "uint256" }
     ],
     "name": "_initiate",
     "outputs": [],
@@ -443,29 +405,6 @@
     "type": "function"
   },
   {
-    "constant": false,
-    "inputs": [
-      { "internalType": "address", "name": "account", "type": "address" },
-      { "internalType": "uint256", "name": "expiration", "type": "uint256" }
-    ],
-    "name": "_setWhitelistAccountExpiration",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      { "internalType": "address", "name": "account", "type": "address" }
-    ],
-    "name": "_setWhitelistGuardian",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "constant": true,
     "inputs": [],
     "name": "admin",
@@ -523,21 +462,6 @@
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "comp",
-    "outputs": [
-      {
-        "internalType": "contract CompInterface",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -612,7 +536,7 @@
     "constant": false,
     "inputs": [
       { "internalType": "address", "name": "timelock_", "type": "address" },
-      { "internalType": "address", "name": "comp_", "type": "address" },
+      { "internalType": "address", "name": "uni_", "type": "address" },
       { "internalType": "uint256", "name": "votingPeriod_", "type": "uint256" },
       { "internalType": "uint256", "name": "votingDelay_", "type": "uint256" },
       {
@@ -625,17 +549,6 @@
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      { "internalType": "address", "name": "account", "type": "address" }
-    ],
-    "name": "isWhitelisted",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "payable": false,
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -782,6 +695,17 @@
   {
     "constant": true,
     "inputs": [],
+    "name": "uni",
+    "outputs": [
+      { "internalType": "contract UniInterface", "name": "", "type": "address" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
     "name": "votingDelay",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "payable": false,
@@ -793,24 +717,6 @@
     "inputs": [],
     "name": "votingPeriod",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "whitelistAccountExpirations",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "whitelistGuardian",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "payable": false,
     "stateMutability": "view",
     "type": "function"

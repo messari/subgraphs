@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   ProposalCanceled,
   ProposalCreated,
@@ -34,7 +34,7 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
-  let quorumVotes = GovernorBravoDelegate.bind(event.address).quorumVotes();
+  let quorumVotes = getQuorumFromContract(event.address);
 
   // FIXME: Prefer to use a single object arg for params
   // e.g.  { proposalId: event.params.proposalId, proposer: event.params.proposer, ...}
@@ -141,7 +141,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework.version = NA;
 
     governanceFramework.contractAddress = contractAddress;
-    governanceFramework.tokenAddress = contract.comp().toHexString();
+    governanceFramework.tokenAddress = contract.uni().toHexString();
     governanceFramework.timelockAddress = contract.timelock().toHexString();
 
     governanceFramework.votingDelay = contract.votingDelay();
@@ -151,4 +151,18 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
   }
 
   return governanceFramework;
+}
+
+function getQuorumFromContract(contractAddress: Address): BigInt {
+  let contract = GovernorBravoDelegate.bind(contractAddress);
+  let quorumVotes = contract.quorumVotes();
+
+  // Update quorum at the contract level as well
+  let governanceFramework = getGovernanceFramework(
+    contractAddress.toHexString()
+  );
+  governanceFramework.quorumVotes = quorumVotes;
+  governanceFramework.save();
+
+  return quorumVotes;
 }

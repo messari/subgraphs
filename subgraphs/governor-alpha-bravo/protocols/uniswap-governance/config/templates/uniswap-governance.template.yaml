@@ -22,7 +22,7 @@ dataSources:
         - Delegate
       abis:
         - name: GovernorBravoDelegate
-          file: ./abis/compound-governance/GovernorBravoDelegate.json
+          file: ./abis/uniswap-governance/GovernorBravoDelegate.json
       eventHandlers:
         - event: ProposalCanceled(uint256)
           handler: handleProposalCanceled
@@ -40,13 +40,13 @@ dataSources:
           handler: handleVotingDelaySet
         - event: VotingPeriodSet(uint256,uint256)
           handler: handleVotingPeriodSet
-      file: ./protocols/compound-governance/src/governor-bravo-delegate.ts
+      file: ./protocols/uniswap-governance/src/governor-bravo-delegate.ts
   - kind: ethereum/contract
-    name: Comp
+    name: Uni
     network:  {{ network }}
     source:
       address: "{{ tokenContractAddress }}"
-      abi: Comp
+      abi: Uni
       startBlock: {{ tokenContractStartBlock }}
     mapping:
       kind: ethereum/events
@@ -59,8 +59,8 @@ dataSources:
         - TokenHolder
         - Delegate
       abis:
-        - name: Comp
-          file: ./abis/compound-governance/Comp.json
+        - name: Uni
+          file: ./abis/uniswap-governance/Uni.json
       eventHandlers:
         - event: DelegateChanged(indexed address,indexed address,indexed address)
           handler: handleDelegateChanged
@@ -68,4 +68,4 @@ dataSources:
           handler: handleDelegateVotesChanged
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./protocols/compound-governance/src/comp.ts
+      file: ./protocols/uniswap-governance/src/uni.ts
