@@ -1,11 +1,6 @@
 import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { assert, describe, test } from 'matchstick-as'
-import {
-  getChainLinkPricePerToken,
-  getPrice,
-  getUniswapPricePerToken,
-  getYearnLensPricePerToken,
-} from '../../src/utils/prices'
+import { prices } from '../../src/utils/prices'
 import {
   mockChainLink,
   mockERC20,
@@ -30,7 +25,7 @@ describe('prices', () => {
         8
       )
 
-      const result = getChainLinkPricePerToken(tokenAddress)
+      const result = prices.getChainLinkPricePerToken(tokenAddress)
 
       assert.stringEquals('0.99975399', result!.toString())
     })
@@ -47,7 +42,7 @@ describe('prices', () => {
         BigInt.fromString('991234')
       )
 
-      const result = getUniswapPricePerToken(tokenAddress)
+      const result = prices.getUniswapPricePerToken(tokenAddress)
 
       assert.stringEquals('0.991234', result!.toString())
     })
@@ -61,7 +56,7 @@ describe('prices', () => {
         BigInt.fromString('991234')
       )
 
-      const result = getYearnLensPricePerToken(tokenAddress)
+      const result = prices.getYearnLensPricePerToken(tokenAddress)
 
       assert.stringEquals('0.991234', result!.toString())
     })
@@ -69,7 +64,7 @@ describe('prices', () => {
 
   describe('getPrice', () => {
     test('returns amount in USD', () => {
-      const result = getPrice(tokenAddress, BigDecimal.fromString('2'))
+      const result = prices.getPrice(tokenAddress, BigDecimal.fromString('2'))
 
       assert.stringEquals('1.99950798', result.toString())
     })

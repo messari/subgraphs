@@ -5,7 +5,7 @@ import { tokens } from './utils/tokens'
 import { vaults } from './utils/vaults'
 import { Vault as VaultTemplate } from '../generated/templates'
 import { Vault } from '../generated/schema'
-import { getPricePerToken } from './utils/prices'
+import { prices } from './utils/prices'
 import { protocols } from './utils/protocols'
 import { constants } from './utils/constants'
 
@@ -43,7 +43,7 @@ export function handleAddVaultAndStrategy(call: AddVaultAndStrategyCall): void {
   inputToken.name = erc20Values.name
   inputToken.symbol = erc20Values.symbol
   inputToken.decimals = erc20Values.decimals
-  inputToken.lastPriceUSD = getPricePerToken(underlying)
+  inputToken.lastPriceUSD = prices.getPricePerToken(underlying)
   inputToken.lastPriceBlockNumber = call.block.number
 
   inputToken.save()
