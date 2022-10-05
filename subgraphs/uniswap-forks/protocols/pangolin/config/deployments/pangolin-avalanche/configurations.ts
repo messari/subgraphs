@@ -60,7 +60,7 @@ export class PangolinAvalancheConfigurations implements Configurations {
     return BigDecimal.fromString("0.3");
   }
   getFeeOnOff(): string {
-    return FeeSwitch.ON;
+    return FeeSwitch.OFF;
   }
   getRewardIntervalType(): string {
     return RewardIntervalType.NONE;
