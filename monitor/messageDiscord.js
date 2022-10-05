@@ -323,9 +323,6 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             let failureBlock = "";
 
             Object.keys(indexErrorEmbedDepos)?.forEach(networkString => {
-                if (networkString.includes("arbitrum")) {
-                    return
-                }
                 if (networkString.includes(' (PENDING')) {
                     labelValue += `\n[${networkString.split(' ')[0]}-PENDING](https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]})\n`;
 
