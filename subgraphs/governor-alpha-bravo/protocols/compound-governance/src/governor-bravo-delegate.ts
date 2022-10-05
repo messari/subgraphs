@@ -21,6 +21,7 @@ import {
 import { GovernorBravoDelegate } from "../../../generated/GovernorBravoDelegate/GovernorBravoDelegate";
 import { GovernanceFramework, Proposal } from "../../../generated/schema";
 import {
+  BIGINT_ONE,
   GovernanceFrameworkType,
   NA,
   ProposalState,
@@ -80,7 +81,12 @@ function getLatestProposalValues(
   if (proposal.state == ProposalState.PENDING) {
     let contract = GovernorBravoDelegate.bind(contractAddress);
     proposal.state = ProposalState.ACTIVE;
-    proposal.quorumVotes = contract.quorumVotes();
+    let res = contract.try_quorumVotes();
+    if (!res.reverted) {
+      proposal.quorumVotes = res.value;
+    } else {
+      proposal.quorumVotes = BIGINT_ONE;
+    }
 
     let governance = getGovernance();
     proposal.tokenHoldersAtStart = governance.currentTokenHolders;
