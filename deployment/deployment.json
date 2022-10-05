@@ -4657,6 +4657,10 @@
           "hosted-service": {
             "slug": "tornado-cash-mainnet",
             "query-id": "tornado-cash-mainnet"
+          },
+          "decentralized-network": {
+            "slug": "tornado-cash-classic-ethereum",
+            "query-id": "FxhN13aCD2H1f9vagrVueGjHwguZ7JkfuDZrMvKthdk5"
           }
         },
         "files": {
