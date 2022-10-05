@@ -63,7 +63,7 @@ export class PangolinAvalancheConfigurations implements Configurations {
     return FeeSwitch.OFF;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.NONE;
+    return RewardIntervalType.TIMESTAMP;
   }
   getRewardTokenRate(): BigInt {
     return BIGINT_ZERO;
