@@ -4645,7 +4645,7 @@
     "base": "tornado-cash",
     "protocol": "tornado-cash",
     "deployments": {
-      "tornado-cash-mainnet": {
+      "tornado-cash-classic-ethereum": {
         "network": "ethereum",
         "status": "prod",
         "versions": {
@@ -4655,8 +4655,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "tornado-cash-mainnet",
-            "query-id": "tornado-cash-mainnet"
+            "slug": "tornado-cash-classic-ethereum",
+            "query-id": "tornado-cash-classic-ethereum"
           },
           "decentralized-network": {
             "slug": "tornado-cash-classic-ethereum",
@@ -4671,7 +4671,7 @@
           "prepare:constants": true
         }
       },
-      "tornado-cash-bsc": {
+      "tornado-cash-classic-bsc": {
         "network": "bsc",
         "status": "prod",
         "versions": {
@@ -4681,8 +4681,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "tornado-cash-bsc",
-            "query-id": "tornado-cash-bsc"
+            "slug": "tornado-cash-classic-bsc",
+            "query-id": "tornado-cash-classic-bsc"
           }
         },
         "files": {
