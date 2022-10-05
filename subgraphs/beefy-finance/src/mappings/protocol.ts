@@ -9,10 +9,6 @@ import {
   getOrCreateYieldAggregator,
   getOrCreateFinancials,
 } from "../utils/getters";
-import {
-  updateUsageMetricsDailySnapshot,
-  updateUsageMetricsHourlySnapshot,
-} from "../utils/metrics";
 
 export function updateProtocolRevenue(
   newProtocolSideRevenueUSD: BigDecimal,
@@ -53,19 +49,12 @@ export function updateProtocolRevenue(
   financialDailySnapshot.save();
 }
 
-export function updateProtocolUsage(
-  event: ethereum.Event,
-  deposit: boolean,
-  withdraw: boolean
-): void {
+export function updateProtocolUsage(event: ethereum.Event): void {
   const protocol = getOrCreateYieldAggregator();
   protocol.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers.plus(
     isNewUser(event.transaction.from)
   );
   protocol.save();
-
-  updateUsageMetricsDailySnapshot(event, protocol, deposit, withdraw);
-  updateUsageMetricsHourlySnapshot(event, protocol, deposit, withdraw);
 }
 
 // updates the protocol tvl after a vault's tvl has been updated
@@ -87,6 +76,10 @@ export function updateProtocolTVL(): BigDecimal {
 
   return tvlUsd;
 }
+
+/////////////////
+//// Helpers ////
+/////////////////
 
 function isNewUser(user: Address): BigInt {
   let userEntity = User.load(user.toHexString());

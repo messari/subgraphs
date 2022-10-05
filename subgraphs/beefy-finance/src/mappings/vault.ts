@@ -1,13 +1,11 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault, VaultFee } from "../../generated/schema";
 import {
   BeefyStrategy,
-  Deposit,
   StratHarvest,
   StratHarvest1,
   StratHarvest2,
-  Withdraw,
 } from "../../generated/Standard/BeefyStrategy";
 import { BeefyVault } from "../../generated/Standard/BeefyVault";
 import { Transfer } from "../../generated/templates/BeefyVault/BeefyVault";
@@ -18,8 +16,7 @@ import {
   getOrCreateVault,
   getOrCreateVaultDailySnapshot,
 } from "../utils/getters";
-import { createDeposit } from "./deposit";
-import { createWithdraw } from "./withdraw";
+import { createDeposit, createWithdraw } from "./transaction";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
 import {
   updateProtocolRevenue,
@@ -32,7 +29,11 @@ import {
   exponentToBigDecimal,
   ZERO_ADDRESS,
 } from "../utils/constants";
-import { updateVaultSnapshots } from "../utils/snapshots";
+import {
+  updateUsageMetricsDailySnapshot,
+  updateUsageMetricsHourlySnapshot,
+  updateVaultSnapshots,
+} from "../utils/metrics";
 
 // This function updates the vault's metrics from contract calls
 // This includes:
@@ -95,28 +96,6 @@ export function updateVaultAndSnapshots(
   updateVaultSnapshots(event, vault);
 }
 
-// export function handleDeposit(event: Deposit): void {
-//   const vault = getOrCreateVault(event.address, event);
-//   if (!vault) {
-//     return;
-//   }
-
-//   const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
-//   createDeposit(event, depositedAmount, vault.id);
-
-//   updateProtocolUsage(event, true, false);
-// }
-
-// export function handleWithdraw(event: Withdraw): void {
-//   const vault = getOrCreateVault(event.address, event);
-//   if (!vault) {
-//     return;
-//   }
-
-//   const withdrawnAmount = event.params.tvl.minus(vault.inputTokenBalance);
-//   createWithdraw(event, withdrawnAmount, vault.id);
-// }
-
 // StratHarvest (includes tvl in params)
 export function handleStratHarvestWithAmount(event: StratHarvest): void {
   updateRevenueFromHarvest(event, event.address);
@@ -142,7 +121,16 @@ export function handleTransfer(event: Transfer): void {
     return;
   }
 
-  const vault = getOrCreateVault(event.address, event);
+  const vaultContract = BeefyVault.bind(event.address);
+  const tryStartegyAddress = vaultContract.try_strategy();
+  if (tryStartegyAddress.reverted) {
+    log.warning(
+      "[handleTransfer] failed to get strategy address from vault: {}",
+      [event.address.toHexString()]
+    );
+    return;
+  }
+  const vault = getOrCreateVault(tryStartegyAddress.value, event);
   if (!vault) {
     log.warning("[handleTransfer] Vault not found: {}", [
       event.address.toHexString(),
@@ -150,21 +138,80 @@ export function handleTransfer(event: Transfer): void {
     return;
   }
 
-  // check if a deposit
-  // from address is null
-  if (event.params.from.toHexString() == ZERO_ADDRESS) {
-    // to get the deposited amount from the shares:
-    // amount = (balance() * shares) / totalSupply()
+  const inputToken = getOrCreateToken(
+    Address.fromString(vault.inputToken),
+    event.block
+  );
+  const outputToken = getOrCreateToken(
+    Address.fromString(vault.outputToken!),
+    event.block,
+    true
+  );
+
+  // to get the deposited/withdrawn amount from the shares:
+  // amount = (balance() * shares) / totalSupply()
+  // amount = inputTokenBalance * shares / outputTokenSupply
+  let amountBI: BigInt;
+  let amountUSD: BigDecimal;
+  if (vault.outputTokenSupply!.equals(BIGINT_ZERO)) {
+    amountBI = event.params.value;
+    amountUSD = event.params.value
+      .toBigDecimal()
+      .div(exponentToBigDecimal(inputToken.decimals))
+      .times(inputToken.lastPriceUSD!);
+  } else {
+    const amountBD = vault.inputTokenBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(inputToken.decimals))
+      .times(
+        event.params.value
+          .toBigDecimal()
+          .div(exponentToBigDecimal(inputToken.decimals))
+      )
+      .div(
+        vault
+          .outputTokenSupply!.toBigDecimal()
+          .div(exponentToBigDecimal(outputToken.decimals))
+      );
+    amountBI = BigInt.fromString(
+      amountBD
+        .times(exponentToBigDecimal(inputToken.decimals))
+        .truncate(0)
+        .toString()
+    );
+    amountUSD = amountBD.times(inputToken.lastPriceUSD!);
   }
 
-  // check if a withdraw
-  // to address is null
+  // handle deposit
+  if (event.params.from.toHexString() == ZERO_ADDRESS) {
+    createDeposit(
+      event,
+      event.params.to.toHexString(),
+      vault.inputToken,
+      amountBI,
+      amountUSD,
+      vault.id
+    );
+
+    updateProtocolUsage(event);
+    updateUsageMetricsDailySnapshot(event, true, false);
+    updateUsageMetricsHourlySnapshot(event, true, false);
+  }
+
+  // handle withdraw
   if (event.params.to.toHexString() == ZERO_ADDRESS) {
-    // to get the withdrawn amount from the shares:
-    //
-    // calculate withdrawal fee if we need to pull inputTokens
-    // from the strategy contract (use the )
-    // TODO: calc withdrawal fee
+    createWithdraw(
+      event,
+      event.params.from.toHexString(),
+      vault.inputToken,
+      amountBI,
+      amountUSD,
+      vault.id
+    );
+
+    updateProtocolUsage(event);
+    updateUsageMetricsDailySnapshot(event, false, true);
+    updateUsageMetricsHourlySnapshot(event, false, true);
   }
 }
 
@@ -191,32 +238,8 @@ function updateRevenueFromHarvest(
     return;
   }
   const strategyContract = BeefyStrategy.bind(strategyAddress);
-  if (vault._strategyOutputToken) {
-    const strategyOutputTokenContract = ERC20.bind(
-      Address.fromString(vault._strategyOutputToken!)
-    );
 
-    const tryBalance =
-      strategyOutputTokenContract.try_balanceOf(strategyAddress);
-    if (tryBalance.reverted) {
-      log.warning(
-        "Failed to get balance of strategy output token in strategy contract: {}",
-        [strategyAddress.toHexString()]
-      );
-      return;
-    }
-
-    // Optional 1- Check for _strategyOutputToken Balance to be > 0 in the Strategy Contract
-    if (tryBalance.value.le(BIGINT_ZERO)) {
-      log.warning(
-        "No revenue to calculate because strategy output token balance is 0: {}",
-        [strategyAddress.toHexString()]
-      );
-      return;
-    }
-  }
-
-  // 2- Check that the native token balance of the Strategy Contract is > 0
+  // 1- Check that the native token balance of the Strategy Contract is > 0
   const nativeTokenContract = ERC20.bind(
     Address.fromString(vault._nativeToken)
   );
@@ -260,8 +283,8 @@ function updateRevenueFromHarvest(
     const supplySideRevenueDelta = tryNativeTokenBalance.value
       .toBigDecimal()
       .div(exponentToBigDecimal(nativeToken.decimals))
-      .minus(performanceFeeDelta)
-      .times(nativeToken.lastPriceUSD!);
+      .times(nativeToken.lastPriceUSD!)
+      .minus(performanceFeeDelta);
     const totalRevenueDelta = protocolSideRevenueDelta.plus(
       supplySideRevenueDelta
     );
@@ -278,6 +301,17 @@ function updateRevenueFromHarvest(
     vaultDailySnapshot.dailyTotalRevenueUSD =
       vaultDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueDelta);
     vaultDailySnapshot.save();
+
+    // TODO: remove
+    log.warning(
+      "HARVEST: {} nativeBal: {} supply side rev ${} protocol side rev ${}",
+      [
+        event.transaction.hash.toHexString(),
+        tryNativeTokenBalance.value.toString(),
+        supplySideRevenueDelta.toString(),
+        protocolSideRevenueDelta.toString(),
+      ]
+    );
   }
 
   // udpate vault values and snapshots

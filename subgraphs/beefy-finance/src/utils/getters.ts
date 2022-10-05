@@ -34,7 +34,8 @@ import {
   SECONDS_PER_DAY,
   VaultFeeType,
 } from "./constants";
-import { BeefyVault } from "../../generated/Standard/BeefyVault";
+import { BeefyVault } from "../../generated/templates";
+import { BeefyVault as BeefyVaultContract } from "../../generated/Standard/BeefyVault";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./time";
 
 // also updates price of token
@@ -70,18 +71,18 @@ export function getOrCreateVault(
   event: ethereum.Event
 ): Vault | null {
   const strategyContract = BeefyStrategy.bind(strategyAddress);
-  const vaultId = strategyContract.vault().toHexString();
+  const tryVaultAddress = strategyContract.try_vault();
+  if (tryVaultAddress.reverted) {
+    log.warning("Could not get vault address from strategy {}", [
+      strategyAddress.toHexString(),
+    ]);
+    return null;
+  }
+
+  const vaultId = tryVaultAddress.value.toHexString();
   let vault = Vault.load(vaultId);
   if (!vault) {
-    const strategyContract = BeefyStrategy.bind(strategyAddress);
-    const tryVaultAddress = strategyContract.try_vault();
-    if (tryVaultAddress.reverted) {
-      log.warning("Failed to get vault address from strategy {}", [
-        strategyAddress.toHexString(),
-      ]);
-      return null;
-    }
-    const vaultContract = BeefyVault.bind(tryVaultAddress.value);
+    const vaultContract = BeefyVaultContract.bind(tryVaultAddress.value);
 
     // create native token
     const tryNativeToken = strategyContract.try_native();
@@ -118,7 +119,7 @@ export function getOrCreateVault(
     yieldAggregator.save();
 
     // create vault entity
-    const vault = new Vault(tryVaultAddress.value.toHex());
+    const vault = new Vault(tryVaultAddress.value.toHexString());
     vault.protocol = yieldAggregator.id;
     vault.name = outputToken.name;
     vault.symbol = outputToken.symbol;
@@ -145,6 +146,9 @@ export function getOrCreateVault(
     }
 
     vault.save();
+
+    // create vault template
+    BeefyVault.create(tryVaultAddress.value);
   }
 
   return vault;

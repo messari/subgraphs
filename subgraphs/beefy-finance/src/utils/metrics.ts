@@ -3,9 +3,15 @@ import {
   ActiveUser,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
+  Vault,
   YieldAggregator,
 } from "../../generated/schema";
 import { BIGINT_ZERO, BIGINT_ONE } from "../prices/common/constants";
+import {
+  getOrCreateVaultDailySnapshot,
+  getOrCreateVaultHourlySnapshot,
+  getOrCreateYieldAggregator,
+} from "./getters";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./time";
 
 export function getProtocolHourlyId(
@@ -17,12 +23,33 @@ export function getProtocolHourlyId(
   return id;
 }
 
+export function updateVaultSnapshots(
+  event: ethereum.Event,
+  vault: Vault
+): void {
+  const vaultDailySnapshot = getOrCreateVaultDailySnapshot(vault.id, event);
+  vaultDailySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultDailySnapshot.inputTokenBalance = vault.inputTokenBalance;
+  vaultDailySnapshot.outputTokenSupply = vault.outputTokenSupply;
+  vaultDailySnapshot.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  vaultDailySnapshot.pricePerShare = vault.pricePerShare;
+  vaultDailySnapshot.save();
+
+  const vaultHourlySnapshot = getOrCreateVaultHourlySnapshot(vault.id, event);
+  vaultHourlySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultHourlySnapshot.inputTokenBalance = vault.inputTokenBalance;
+  vaultHourlySnapshot.outputTokenSupply = vault.outputTokenSupply;
+  vaultHourlySnapshot.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  vaultHourlySnapshot.pricePerShare = vault.pricePerShare;
+  vaultHourlySnapshot.save();
+}
+
 export function updateUsageMetricsDailySnapshot(
   event: ethereum.Event,
-  protocol: YieldAggregator,
   deposit: boolean,
   withdraw: boolean
 ): UsageMetricsDailySnapshot {
+  const protocol = getOrCreateYieldAggregator();
   const id = getDaysSinceEpoch(event.block.timestamp.toI32()).toString();
   let protocolDailySnapshot = UsageMetricsDailySnapshot.load(id);
   if (protocolDailySnapshot == null) {
@@ -72,10 +99,10 @@ export function updateUsageMetricsDailySnapshot(
 
 export function updateUsageMetricsHourlySnapshot(
   event: ethereum.Event,
-  protocol: YieldAggregator,
   deposit: boolean,
   withdraw: boolean
 ): UsageMetricsHourlySnapshot {
+  const protocol = getOrCreateYieldAggregator();
   const id = getProtocolHourlyId(event.block, protocol);
   let protocolHourlySnapshot = UsageMetricsHourlySnapshot.load(id);
   if (protocolHourlySnapshot == null) {
