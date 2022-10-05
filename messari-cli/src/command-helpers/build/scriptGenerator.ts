@@ -1,3 +1,5 @@
+import * as fs from 'fs'
+
 export interface ScriptGeneratorArgs {
   token: string
   service: string
@@ -8,6 +10,18 @@ export interface ScriptGeneratorArgs {
   deploy: boolean
   log: boolean
   version: string
+}
+
+interface DeploymentData {
+  protocol: string
+  deployment: string
+  base: string
+  schema: string
+  network: string
+  status: string
+  versions: Map<string, string>
+  files: Map<string, string>
+  options: Map<string, string>
 }
 
 export class ScriptGenerator {
@@ -85,6 +99,7 @@ export class ScriptGenerator {
         deploymentData.protocol = this.data[protocol].protocol
         deploymentData.base = this.data[protocol].base
         deploymentData.schema = this.data[protocol].schema
+        deploymentData.deployment = deployment
 
         allDeployments[deployment] = deploymentData
       }
@@ -125,7 +140,7 @@ export class ScriptGenerator {
 
     // Grabs all deployments for a specific  base.
     if (this.scope === 'base') {
-      for (const [deployment, deploymentData] of Object.entries(
+      for (const [deployment, deploymentData] of Object.values(
         this.allDeployments
       )) {
         if (deploymentData.base === this.id) {
@@ -143,20 +158,21 @@ export class ScriptGenerator {
 
   // Checks if you are wanting to deploy a single network, all deployments for a protocol, or all protocols and networks for a fork
   prepareScripts() {
-    for (const [deployment, deploymentData] of Object.entries(
-      this.deployments
-    )) {
+    for (const deploymentData of Object.values(this.deployments)) {
       if (
         this.deploy === false ||
         deploymentData['services'][this.getService()]['slug']
       ) {
-        this.generateScripts(deployment, deploymentData)
+        this.writeDeploymentJsonContext(deploymentData)
+        this.generateScripts(deploymentData)
       }
     }
   }
 
+  generateContext() {}
+
   // Generates scripts necessary for deployment.
-  generateScripts(deployment, deploymentData) {
+  generateScripts(deploymentData) {
     const scripts: string[] = []
 
     const location = this.getLocation(deploymentData.protocol, deploymentData)
@@ -168,11 +184,15 @@ export class ScriptGenerator {
     scripts.push('rm -rf subgraph.yaml')
 
     scripts.push(
-      `mustache protocols/${deploymentData.protocol}/config/deployments/${deployment}/configurations.json protocols/${deploymentData.protocol}/config/templates/${deploymentData.files.template} > subgraph.yaml`
+      `mustache protocols/${deploymentData.protocol}/config/deployments/${deploymentData.deployment}/configurations.json protocols/${deploymentData.protocol}/config/templates/${deploymentData.files.template} > subgraph.yaml`
     )
+    scripts.push(
+      `mustache protocols/${deploymentData.protocol}/config/deployments/${deploymentData.deployment}/deploymentJsonContext.json ../../deployment/context/template.mustache > deploymentJsonContext.ts`
+    )
+
     if (deploymentData.options['prepare:constants'] === true) {
       scripts.push(
-        `mustache protocols/${deploymentData.protocol}/config/deployments/${deployment}/configurations.json configurations/configure.template.ts > configurations/configure.ts`
+        `npm run prepare:constants --PROTOCOL=${deploymentData.protocol} --id=${deploymentData.deployment}`
       )
     }
     scripts.push('graph codegen')
@@ -185,6 +205,13 @@ export class ScriptGenerator {
     }
 
     this.scripts.set(location, scripts)
+  }
+
+  writeDeploymentJsonContext(deploymentData: DeploymentData) {
+    fs.writeFileSync(
+      `./protocols/${deploymentData.protocol}/config/deployments/${deploymentData.deployment}/deploymentJsonContext.json`,
+      JSON.stringify(deploymentData, null, 2)
+    )
   }
 
   // Grabs the location of deployment.
