@@ -120,10 +120,10 @@
       }
     }
   },
-  "aave-v2": {
+  "aave-arc": {
     "schema": "lending",
     "base": "aave-v2-forks",
-    "protocol": "aave-v2",
+    "protocol": "aave-arc",
     "deployments": {
       "aave-arc-ethereum": {
         "network": "ethereum",
@@ -146,7 +146,72 @@
             "query-id": "aave-arc-ethereum"
           }
         }
-      },
+      }
+    }
+  },
+  "aave-amm": {
+    "schema": "lending",
+    "base": "aave-v2-forks",
+    "protocol": "aave-amm",
+    "deployments": {
+      "aave-amm-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.2.14",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "aave.v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-amm-ethereum",
+            "query-id": "aave-amm-ethereum"
+          }
+        }
+      }
+    }
+  },
+  "aave-rwa": {
+    "schema": "lending",
+    "base": "aave-v2-forks",
+    "protocol": "aave-rwa",
+    "deployments": {
+      "aave-rwa-ethereum": {
+        "network": "ethereum",
+        "status": "prod",
+        "versions": {
+          "schema": "2.0.1",
+          "subgraph": "1.2.14",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "aave.v2.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "aave-rwa-ethereum",
+            "query-id": "aave-rwa-ethereum"
+          }
+        }
+      }
+    }
+  },
+  "aave-v2": {
+    "schema": "lending",
+    "base": "aave-v2-forks",
+    "protocol": "aave-v2",
+    "deployments": {
       "aave-v2-avalanche": {
         "network": "avalanche",
         "status": "prod",
@@ -195,28 +260,6 @@
           }
         }
       },
-      "aave-amm-ethereum": {
-        "network": "ethereum",
-        "status": "prod",
-        "versions": {
-          "schema": "2.0.1",
-          "subgraph": "1.2.14",
-          "methodology": "1.0.0"
-        },
-        "files": {
-          "template": "aave.v2.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": false
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "aave-amm-ethereum",
-            "query-id": "aave-amm-ethereum"
-          }
-        }
-      },
       "aave-v2-polygon": {
         "network": "polygon",
         "status": "prod",
@@ -236,28 +279,6 @@
           "hosted-service": {
             "slug": "aave-v2-polygon",
             "query-id": "aave-v2-polygon"
-          }
-        }
-      },
-      "aave-rwa-ethereum": {
-        "network": "ethereum",
-        "status": "prod",
-        "versions": {
-          "schema": "2.0.1",
-          "subgraph": "1.2.14",
-          "methodology": "1.0.0"
-        },
-        "files": {
-          "template": "aave.v2.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": false
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "aave-rwa-ethereum",
-            "query-id": "aave-rwa-ethereum"
           }
         }
       }
@@ -3224,9 +3245,9 @@
           "prepare:constants": true
         },
         "services": {
-          "hosted-service": {
-            "slug": "mm-finance-cronos",
-            "query-id": "mm-finance-cronos"
+          "cronos-portal": {
+            "slug": "mm-finance",
+            "query-id": "mm-finance"
           }
         }
       }
