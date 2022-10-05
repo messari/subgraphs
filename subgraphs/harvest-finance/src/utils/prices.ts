@@ -5,119 +5,125 @@ import { UniswapRouterContract } from '../../generated/Controller/UniswapRouterC
 import { tokens } from './tokens'
 import { constants } from './constants'
 
-export function getPricePerToken(tokenAddress: Address): BigDecimal {
-  const chainLinkPricePerToken = getChainLinkPricePerToken(tokenAddress)
+export namespace prices {
+  export function getPricePerToken(tokenAddress: Address): BigDecimal {
+    const chainLinkPricePerToken = getChainLinkPricePerToken(tokenAddress)
 
-  if (chainLinkPricePerToken) return chainLinkPricePerToken
+    if (chainLinkPricePerToken) return chainLinkPricePerToken
 
-  const yearnLensPricePerToken = getYearnLensPricePerToken(tokenAddress)
+    const yearnLensPricePerToken = getYearnLensPricePerToken(tokenAddress)
 
-  if (yearnLensPricePerToken) return yearnLensPricePerToken
+    if (yearnLensPricePerToken) return yearnLensPricePerToken
 
-  const uniswapPricePerToken = getUniswapPricePerToken(tokenAddress)
+    const uniswapPricePerToken = getUniswapPricePerToken(tokenAddress)
 
-  if (uniswapPricePerToken) return uniswapPricePerToken
+    if (uniswapPricePerToken) return uniswapPricePerToken
 
-  return BigDecimal.fromString('0')
-}
-
-export function getUniswapPricePerToken(
-  tokenAddress: Address
-): BigDecimal | null {
-  const contract = UniswapRouterContract.bind(
-    constants.UNISWAP_ROUTER_CONTRACT_ADDRESS
-  )
-
-  const path = [tokenAddress, constants.WETH_ADDRESS, constants.USDC_ADDRESS]
-
-  const tokenData = tokens.getData(tokenAddress)
-
-  if (tokenData == null) return null
-
-  const tokenDecimals = tokenData.decimals
-
-  const usdcData = tokens.getData(constants.USDC_ADDRESS)
-
-  if (usdcData == null) return null
-
-  const usdcDecimals = usdcData.decimals
-
-  const usdcBase10 = BigInt.fromI32(10).pow(usdcDecimals as u8)
-
-  const amountIn = BigInt.fromI32(10).pow(tokenDecimals as u8)
-
-  const callResult = contract.try_getAmountsOut(amountIn, path)
-
-  if (callResult.reverted) {
-    log.warning('UniswapRouter getAmountsOutCall Reverted token: {}', [
-      tokenAddress.toHexString(),
-    ])
-    return null
+    return BigDecimal.fromString('0')
   }
 
-  return callResult.value.pop().toBigDecimal().div(usdcBase10.toBigDecimal())
-}
+  export function getUniswapPricePerToken(
+    tokenAddress: Address
+  ): BigDecimal | null {
+    const contract = UniswapRouterContract.bind(
+      constants.UNISWAP_ROUTER_CONTRACT_ADDRESS
+    )
 
-export function getYearnLensPricePerToken(
-  tokenAddress: Address
-): BigDecimal | null {
-  const contract = YearnLensContract.bind(constants.YEARN_LENS_CONTRACT_ADDRESS)
+    const path = [tokenAddress, constants.WETH_ADDRESS, constants.USDC_ADDRESS]
 
-  const callResult = contract.try_getPriceUsdcRecommended(tokenAddress)
+    const tokenData = tokens.getData(tokenAddress)
 
-  if (callResult.reverted) {
-    log.warning('YearnLens getPriceUsdcRecommendedCall Reverted token: {}', [
-      tokenAddress.toHexString(),
-    ])
-    return null
+    if (tokenData == null) return null
+
+    const tokenDecimals = tokenData.decimals
+
+    const usdcData = tokens.getData(constants.USDC_ADDRESS)
+
+    if (usdcData == null) return null
+
+    const usdcDecimals = usdcData.decimals
+
+    const usdcBase10 = BigInt.fromI32(10).pow(usdcDecimals as u8)
+
+    const amountIn = BigInt.fromI32(10).pow(tokenDecimals as u8)
+
+    const callResult = contract.try_getAmountsOut(amountIn, path)
+
+    if (callResult.reverted) {
+      log.warning('UniswapRouter getAmountsOutCall Reverted token: {}', [
+        tokenAddress.toHexString(),
+      ])
+      return null
+    }
+
+    return callResult.value.pop().toBigDecimal().div(usdcBase10.toBigDecimal())
   }
 
-  const usdcBase10 = BigInt.fromI32(10).pow(6)
+  export function getYearnLensPricePerToken(
+    tokenAddress: Address
+  ): BigDecimal | null {
+    const contract = YearnLensContract.bind(
+      constants.YEARN_LENS_CONTRACT_ADDRESS
+    )
 
-  return callResult.value.toBigDecimal().div(usdcBase10.toBigDecimal())
-}
+    const callResult = contract.try_getPriceUsdcRecommended(tokenAddress)
 
-export function getChainLinkPricePerToken(
-  tokenAddress: Address
-): BigDecimal | null {
-  const contract = ChainLinkContract.bind(constants.CHAIN_LINK_CONTRACT_ADDRESS)
+    if (callResult.reverted) {
+      log.warning('YearnLens getPriceUsdcRecommendedCall Reverted token: {}', [
+        tokenAddress.toHexString(),
+      ])
+      return null
+    }
 
-  const latestRoundDataCall = contract.try_latestRoundData(
-    tokenAddress,
-    constants.CHAIN_LINK_USD_ADDRESS
-  )
+    const usdcBase10 = BigInt.fromI32(10).pow(6)
 
-  if (latestRoundDataCall.reverted) {
-    log.warning('ChainLink latestRoundDataCall Reverted base: {}', [
-      tokenAddress.toHexString(),
-    ])
-    return null
+    return callResult.value.toBigDecimal().div(usdcBase10.toBigDecimal())
   }
 
-  const decimalsCall = contract.try_decimals(
-    tokenAddress,
-    constants.CHAIN_LINK_USD_ADDRESS
-  )
+  export function getChainLinkPricePerToken(
+    tokenAddress: Address
+  ): BigDecimal | null {
+    const contract = ChainLinkContract.bind(
+      constants.CHAIN_LINK_CONTRACT_ADDRESS
+    )
 
-  if (decimalsCall.reverted) {
-    log.warning('ChainLink decimalsCall Reverted base: {}', [
-      tokenAddress.toHexString(),
-    ])
-    return null
+    const latestRoundDataCall = contract.try_latestRoundData(
+      tokenAddress,
+      constants.CHAIN_LINK_USD_ADDRESS
+    )
+
+    if (latestRoundDataCall.reverted) {
+      log.warning('ChainLink latestRoundDataCall Reverted base: {}', [
+        tokenAddress.toHexString(),
+      ])
+      return null
+    }
+
+    const decimalsCall = contract.try_decimals(
+      tokenAddress,
+      constants.CHAIN_LINK_USD_ADDRESS
+    )
+
+    if (decimalsCall.reverted) {
+      log.warning('ChainLink decimalsCall Reverted base: {}', [
+        tokenAddress.toHexString(),
+      ])
+      return null
+    }
+
+    const decimals = decimalsCall.value
+
+    const decimalsBase10 = BigInt.fromI32(10).pow(decimals as u8)
+
+    return latestRoundDataCall.value.value1
+      .toBigDecimal()
+      .div(decimalsBase10.toBigDecimal())
   }
 
-  const decimals = decimalsCall.value
-
-  const decimalsBase10 = BigInt.fromI32(10).pow(decimals as u8)
-
-  return latestRoundDataCall.value.value1
-    .toBigDecimal()
-    .div(decimalsBase10.toBigDecimal())
-}
-
-export function getPrice(
-  tokenAddress: Address,
-  amount: BigDecimal
-): BigDecimal {
-  return getPricePerToken(tokenAddress).times(amount)
+  export function getPrice(
+    tokenAddress: Address,
+    amount: BigDecimal
+  ): BigDecimal {
+    return getPricePerToken(tokenAddress).times(amount)
+  }
 }

@@ -6,7 +6,7 @@ import {
 } from '../generated/Controller/VaultContract'
 import { Vault } from '../generated/schema'
 import { Token } from '../generated/schema'
-import { getPricePerToken } from './utils/prices'
+import { prices } from './utils/prices'
 import { deposits } from './utils/deposits'
 import { withdraws } from './utils/withdraws'
 import { metrics } from './utils/metrics'
@@ -42,7 +42,9 @@ export function handleWithdraw(event: WithdrawEvent): void {
 
   const token = Token.load(vault.inputToken)
   if (token) {
-    const tokenPriceUSD = getPricePerToken(Address.fromString(vault.inputToken))
+    const tokenPriceUSD = prices.getPricePerToken(
+      Address.fromString(vault.inputToken)
+    )
 
     token.lastPriceUSD = tokenPriceUSD
     token.lastPriceBlockNumber = event.block.number
@@ -94,7 +96,9 @@ export function handleDeposit(event: DepositEvent): void {
   // TODO: avoid duplicated code, move to a function or something
   const token = Token.load(vault.inputToken)
   if (token) {
-    const tokenPriceUSD = getPricePerToken(Address.fromString(vault.inputToken))
+    const tokenPriceUSD = prices.getPricePerToken(
+      Address.fromString(vault.inputToken)
+    )
 
     token.lastPriceUSD = tokenPriceUSD
     token.lastPriceBlockNumber = event.block.number
