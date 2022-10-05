@@ -40,7 +40,8 @@ import { getDaysSinceEpoch, getHoursSinceEpoch } from "./time";
 // also updates price of token
 export function getOrCreateToken(
   tokenAddress: Address,
-  block: ethereum.Block
+  block: ethereum.Block,
+  isOutputToken: boolean = false
 ): Token {
   const tokenId = tokenAddress.toHexString();
   let token = Token.load(tokenId);
@@ -51,13 +52,15 @@ export function getOrCreateToken(
     token.decimals = fetchTokenDecimals(tokenAddress);
   }
 
-  const price = getUsdPricePerToken(tokenAddress);
-  if (price.reverted) {
-    token.lastPriceUSD = BIGDECIMAL_ZERO;
-  } else {
-    token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+  if (!isOutputToken) {
+    const price = getUsdPricePerToken(tokenAddress);
+    if (price.reverted) {
+      token.lastPriceUSD = BIGDECIMAL_ZERO;
+    } else {
+      token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+    }
+    token.lastPriceBlockNumber = block.number;
   }
-  token.lastPriceBlockNumber = block.number;
   token.save();
   return token;
 }
@@ -101,7 +104,11 @@ export function getOrCreateVault(
     const inputToken = getOrCreateToken(tryInputToken.value, event.block);
 
     // create output token
-    const outputToken = getOrCreateToken(tryVaultAddress.value, event.block);
+    const outputToken = getOrCreateToken(
+      tryVaultAddress.value,
+      event.block,
+      true
+    );
 
     // add vault to yield aggregator
     const yieldAggregator = getOrCreateYieldAggregator();
@@ -227,11 +234,12 @@ export function getOrCreateFinancials(
     financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.blockNumber = event.block.number;
-    financialMetrics.timestamp = event.block.timestamp;
-
-    financialMetrics.save();
   }
+
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
+  financialMetrics.save();
+
   return financialMetrics;
 }
 

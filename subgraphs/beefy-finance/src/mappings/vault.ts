@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault, VaultFee } from "../../generated/schema";
 import {
@@ -10,192 +10,162 @@ import {
   Withdraw,
 } from "../../generated/Standard/BeefyStrategy";
 import { BeefyVault } from "../../generated/Standard/BeefyVault";
+import { Transfer } from "../../generated/templates/BeefyVault/BeefyVault";
 import {
   getFees,
+  getOrCreateFinancials,
   getOrCreateToken,
   getOrCreateVault,
   getOrCreateVaultDailySnapshot,
 } from "../utils/getters";
 import { createDeposit } from "./deposit";
 import { createWithdraw } from "./withdraw";
-import {
-  updateVaultDailySnapshot,
-  updateVaultHourlySnapshot,
-} from "../utils/snapshots";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_TEN,
-  BIGINT_ZERO,
-} from "../prices/common/constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
 import {
   updateProtocolRevenue,
-  updateProtocolRevenueFromWithdraw,
+  updateProtocolTVL,
   updateProtocolUsage,
 } from "./protocol";
 import { ERC20 } from "../../generated/Standard/ERC20";
-import { BIGDECIMAL_HUNDRED, exponentToBigDecimal } from "../utils/constants";
+import {
+  BIGDECIMAL_HUNDRED,
+  exponentToBigDecimal,
+  ZERO_ADDRESS,
+} from "../utils/constants";
+import { updateVaultSnapshots } from "../utils/snapshots";
 
 // This function updates the vault's metrics from contract calls
 // This includes:
-//   totalValueLockedUSD
-//   totalBorrowBalanceUSD
+//   totalValueLockedUSD, inputTokenBalance, outputTokenSupply, outputTokenPriceUSD, pricePerShare
 //
 // Then it will update any snapshots with the latest metrics
 export function updateVaultAndSnapshots(
   vault: Vault,
-  block: ethereum.Block
+  event: ethereum.Event
 ): void {
   const vaultContract = BeefyVault.bind(Address.fromString(vault.id));
-  let call = vaultContract.try_balance();
-  if (call.reverted) {
-    vault.inputTokenBalance = BIGINT_ZERO;
-  } else {
-    vault.inputTokenBalance = call.value;
+
+  const tryVaultBalance = vaultContract.try_balance();
+  if (!tryVaultBalance.reverted) {
+    vault.inputTokenBalance = tryVaultBalance.value;
   }
-  call = vaultContract.try_totalSupply();
-  if (call.reverted) {
-    vault.outputTokenSupply = BIGINT_ZERO;
-  } else {
-    vault.outputTokenSupply = call.value;
+
+  const tryVaultTotalSupply = vaultContract.try_totalSupply();
+  if (!tryVaultTotalSupply.reverted) {
+    vault.outputTokenSupply = tryVaultTotalSupply.value;
   }
-  call = vaultContract.try_getPricePerFullShare();
-  if (call.reverted) {
-    vault.pricePerShare = BIGINT_ZERO;
+
+  const tryVaultPricePerShare = vaultContract.try_getPricePerFullShare();
+  if (!tryVaultPricePerShare.reverted) {
+    vault.pricePerShare = tryVaultPricePerShare.value;
   } else {
-    vault.pricePerShare = call.value.div(
-      BigInt.fromI32(vaultContract.decimals())
-    );
+    // just in case getPricePerFullShare() is not implemented
+    vault.pricePerShare = vault.inputTokenBalance.div(vault.outputTokenSupply!);
   }
-  const wantCall = vaultContract.try_want();
-  if (wantCall.reverted) {
-    vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  } else {
-    const inputToken = getOrCreateToken(wantCall.value, block);
-    vault.totalValueLockedUSD = inputToken.lastPriceUSD
-      .times(vault.inputTokenBalance.toBigDecimal())
-      .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
-  }
-  const outputSupply = vault.outputTokenSupply;
-  if (outputSupply && outputSupply != BIGINT_ZERO)
+
+  // update prices and TVL
+  const inputToken = getOrCreateToken(
+    Address.fromString(vault.inputToken),
+    event.block
+  ); // also updates price
+  const outputToken = getOrCreateToken(
+    Address.fromString(vault.outputToken!),
+    event.block,
+    true
+  );
+  vault.totalValueLockedUSD = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(exponentToBigDecimal(inputToken.decimals))
+    .times(inputToken.lastPriceUSD!);
+  if (vault.outputTokenSupply!.gt(BIGINT_ZERO)) {
     vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
-      outputSupply.toBigDecimal()
+      vault
+        .outputTokenSupply!.toBigDecimal()
+        .div(exponentToBigDecimal(outputToken.decimals))
     );
+  } else {
+    vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  }
   vault.save();
-  updateVaultHourlySnapshot(block, vault);
-  updateVaultDailySnapshot(block, vault);
+
+  // update snapshots
+  const financialDailySnapshot = getOrCreateFinancials(event);
+  financialDailySnapshot.totalValueLockedUSD = updateProtocolTVL();
+  financialDailySnapshot.save();
+  updateVaultSnapshots(event, vault);
 }
 
-<<<<<<< HEAD
-export function getFees(
-  vaultId: string,
-  strategyContract: BeefyStrategy
-): string[] {
-  const fees: string[] = [];
-  let call = strategyContract.try_STRATEGIST_FEE();
-  if (!call.reverted) {
-    const strategistFee = new VaultFee("STRATEGIST_FEE-" + vaultId);
-    strategistFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
-    strategistFee.feeType = "STRATEGIST_FEE";
-    strategistFee.save();
-    fees.push(strategistFee.id);
-  }
+// export function handleDeposit(event: Deposit): void {
+//   const vault = getOrCreateVault(event.address, event);
+//   if (!vault) {
+//     return;
+//   }
 
-  call = strategyContract.try_withdrawalFee();
-  if (!call.reverted) {
-    const withdrawalFee = new VaultFee("WITHDRAWAL_FEE-" + vaultId);
-    withdrawalFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
-    withdrawalFee.feeType = "WITHDRAWAL_FEE";
-    withdrawalFee.save();
-    fees.push(withdrawalFee.id);
-  }
+//   const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
+//   createDeposit(event, depositedAmount, vault.id);
 
-  call = strategyContract.try_callFee();
-  if (!call.reverted) {
-    const callFee = new VaultFee("MANAGEMENT_FEE-" + vaultId);
-    callFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
-    callFee.feeType = "MANAGEMENT_FEE";
-    callFee.save();
-    fees.push(callFee.id);
-  }
+//   updateProtocolUsage(event, true, false);
+// }
 
-  call = strategyContract.try_beefyFee();
-  if (!call.reverted) {
-    const beefyFee = new VaultFee("PERFORMANCE_FEE-" + vaultId);
-    beefyFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
-    beefyFee.feeType = "PERFORMANCE_FEE";
-    beefyFee.save();
-    fees.push(beefyFee.id);
-  }
-  return fees;
-}
+// export function handleWithdraw(event: Withdraw): void {
+//   const vault = getOrCreateVault(event.address, event);
+//   if (!vault) {
+//     return;
+//   }
 
-=======
->>>>>>> 2525f756 (update fees / refactor code)
-export function handleDeposit(event: Deposit): void {
-  const vault = getOrCreateVault(event.address, event);
-  if (!vault) {
-    return;
-  }
-
-  const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
-  createDeposit(event, depositedAmount, vault.id);
-
-  updateVaultAndSnapshots(vault, event.block);
-  updateProtocolUsage(event, true, false);
-}
-
-export function handleWithdraw(event: Withdraw): void {
-  const vault = getOrCreateVault(event.address, event);
-  if (!vault) {
-    return;
-  }
-
-  const withdrawnAmount = event.params.tvl.minus(vault.inputTokenBalance);
-  createWithdraw(event, withdrawnAmount, vault.id);
-  updateVaultAndSnapshots(vault, event.block);
-  updateProtocolRevenueFromWithdraw(event, vault, withdrawnAmount);
-}
+//   const withdrawnAmount = event.params.tvl.minus(vault.inputTokenBalance);
+//   createWithdraw(event, withdrawnAmount, vault.id);
+// }
 
 // StratHarvest (includes tvl in params)
 export function handleStratHarvestWithAmount(event: StratHarvest): void {
   updateRevenueFromHarvest(event, event.address);
-
-  const vault = getOrCreateVault(event.address, event);
-  if (!vault) {
-    log.warning("[handleStratHarvestWithAmount] Vault not found: {}", [
-      event.address.toHexString(),
-    ]);
-    return;
-  }
-  updateVaultAndSnapshots(vault, event.block);
 }
 
 // StratHarvest1 (just messge sender)
 export function handleStratHarvest(event: StratHarvest1): void {
   updateRevenueFromHarvest(event, event.address);
-
-  const vault = getOrCreateVault(event.address, event);
-  if (!vault) {
-    log.warning("[handleStratHarvest] Vault not found: {}", [
-      event.address.toHexString(),
-    ]);
-    return;
-  }
-  updateVaultAndSnapshots(vault, event.block);
 }
 
 // StratHarvest2 (harvester and timestamp)
 export function handleStratHarvestWithTimestamp(event: StratHarvest2): void {
   updateRevenueFromHarvest(event, event.address);
+}
+
+export function handleTransfer(event: Transfer): void {
+  // exit if not a deposit or withdraw
+  // We can tell because the tokens are not sent to a 0 address
+  if (
+    event.params.to.toHexString() != ZERO_ADDRESS &&
+    event.params.from.toHexString() != ZERO_ADDRESS
+  ) {
+    return;
+  }
 
   const vault = getOrCreateVault(event.address, event);
   if (!vault) {
-    log.warning("[handleStratHarvestWithTimestamp] Vault not found: {}", [
+    log.warning("[handleTransfer] Vault not found: {}", [
       event.address.toHexString(),
     ]);
     return;
   }
-  updateVaultAndSnapshots(vault, event.block);
+
+  // check if a deposit
+  // from address is null
+  if (event.params.from.toHexString() == ZERO_ADDRESS) {
+    // to get the deposited amount from the shares:
+    // amount = (balance() * shares) / totalSupply()
+  }
+
+  // check if a withdraw
+  // to address is null
+  if (event.params.to.toHexString() == ZERO_ADDRESS) {
+    // to get the withdrawn amount from the shares:
+    //
+    // calculate withdrawal fee if we need to pull inputTokens
+    // from the strategy contract (use the )
+    // TODO: calc withdrawal fee
+  }
 }
 
 /////////////////
@@ -223,7 +193,7 @@ function updateRevenueFromHarvest(
   const strategyContract = BeefyStrategy.bind(strategyAddress);
   if (vault._strategyOutputToken) {
     const strategyOutputTokenContract = ERC20.bind(
-      Address.fromString(vault._strategyOutputToken)
+      Address.fromString(vault._strategyOutputToken!)
     );
 
     const tryBalance =
@@ -309,4 +279,7 @@ function updateRevenueFromHarvest(
       vaultDailySnapshot.dailyTotalRevenueUSD.plus(totalRevenueDelta);
     vaultDailySnapshot.save();
   }
+
+  // udpate vault values and snapshots
+  updateVaultAndSnapshots(vault, event);
 }

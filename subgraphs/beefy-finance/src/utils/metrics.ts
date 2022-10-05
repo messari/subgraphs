@@ -1,39 +1,12 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   ActiveUser,
-  FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
   YieldAggregator,
 } from "../../generated/schema";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  BIGINT_ONE,
-} from "../prices/common/constants";
-import { getOrCreateFinancials } from "./getters";
+import { BIGINT_ZERO, BIGINT_ONE } from "../prices/common/constants";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./time";
-
-export function updateFinancialSnapshotRevenue(
-  newProtocolSideRevenueUSD: BigDecimal,
-  newSupplySideRevenueUSD: BigDecimal,
-  newTotalRevenueUSD: BigDecimal,
-  event: ethereum.Event
-): void {
-  const financialDailySnapshot = getOrCreateFinancials(event);
-
-  financialDailySnapshot.dailyProtocolSideRevenueUSD =
-    financialDailySnapshot.dailyProtocolSideRevenueUSD.plus(
-      newProtocolSideRevenueUSD
-    );
-  financialDailySnapshot.dailySupplySideRevenueUSD =
-    financialDailySnapshot.dailySupplySideRevenueUSD.plus(
-      newSupplySideRevenueUSD
-    );
-  financialDailySnapshot.dailyTotalRevenueUSD =
-    financialDailySnapshot.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
-  financialDailySnapshot.save();
-}
 
 export function getProtocolHourlyId(
   block: ethereum.Block,
@@ -150,78 +123,6 @@ export function updateUsageMetricsHourlySnapshot(
   return protocolHourlySnapshot;
 }
 
-export function updateDailyFinancialSnapshot(
-  block: ethereum.Block,
-  protocol: YieldAggregator
-): FinancialsDailySnapshot {
-  const id = getDaysSinceEpoch(block.timestamp.toI32()).toString();
-  let dailyFinancialSnapshot = FinancialsDailySnapshot.load(id);
-  if (!dailyFinancialSnapshot) {
-    dailyFinancialSnapshot = createDailyFinancialSnapshot(block, protocol);
-  }
-
-  dailyFinancialSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
-  dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-  dailyFinancialSnapshot.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD;
-
-  const previousSnapshot = findPreviousFinancialSnapshot(block);
-  if (previousSnapshot) {
-    dailyFinancialSnapshot.dailySupplySideRevenueUSD =
-      protocol.cumulativeSupplySideRevenueUSD.minus(
-        previousSnapshot.cumulativeSupplySideRevenueUSD
-      );
-    dailyFinancialSnapshot.dailyProtocolSideRevenueUSD =
-      protocol.cumulativeProtocolSideRevenueUSD.minus(
-        previousSnapshot.cumulativeProtocolSideRevenueUSD
-      );
-    dailyFinancialSnapshot.dailyTotalRevenueUSD =
-      protocol.cumulativeTotalRevenueUSD.minus(
-        previousSnapshot.cumulativeTotalRevenueUSD
-      );
-  } else {
-    dailyFinancialSnapshot.dailySupplySideRevenueUSD =
-      protocol.cumulativeSupplySideRevenueUSD;
-    dailyFinancialSnapshot.dailyProtocolSideRevenueUSD =
-      protocol.cumulativeProtocolSideRevenueUSD;
-    dailyFinancialSnapshot.dailyTotalRevenueUSD =
-      protocol.cumulativeTotalRevenueUSD;
-  }
-
-  dailyFinancialSnapshot.blockNumber = block.number;
-  dailyFinancialSnapshot.timestamp = block.timestamp;
-
-  dailyFinancialSnapshot.save();
-  return dailyFinancialSnapshot;
-}
-
-export function createDailyFinancialSnapshot(
-  block: ethereum.Block,
-  protocol: YieldAggregator
-): FinancialsDailySnapshot {
-  const id = getDaysSinceEpoch(block.timestamp.toI32()).toString();
-  const dailyFinancialSnapshot = new FinancialsDailySnapshot(id);
-  dailyFinancialSnapshot.protocol = protocol.id;
-  dailyFinancialSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-
-  dailyFinancialSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  dailyFinancialSnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-
-  dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  dailyFinancialSnapshot.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-
-  dailyFinancialSnapshot.blockNumber = block.number;
-  dailyFinancialSnapshot.timestamp = block.timestamp;
-
-  dailyFinancialSnapshot.save();
-  return dailyFinancialSnapshot;
-}
-
 function isNewDailyActiveUser(user: Address, block: ethereum.Block): BigInt {
   const id =
     "daily-" +
@@ -250,16 +151,4 @@ function isNewHourlyActiveUser(user: Address, block: ethereum.Block): BigInt {
   } else {
     return BIGINT_ZERO;
   }
-}
-
-function findPreviousFinancialSnapshot(
-  block: ethereum.Block
-): FinancialsDailySnapshot | null {
-  let day = getDaysSinceEpoch(block.timestamp.toI32()) - 1;
-  let previousSnapshot = FinancialsDailySnapshot.load(day.toString());
-  while (!previousSnapshot && day > 0) {
-    day--;
-    previousSnapshot = FinancialsDailySnapshot.load(day.toString());
-  }
-  return previousSnapshot;
 }

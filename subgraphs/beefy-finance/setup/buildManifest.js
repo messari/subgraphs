@@ -106,6 +106,9 @@ async function main(network) {
     }
   }
 
+  // add BeefyVault as a template to the end of the manifest
+  manifest["templates"].push(createVaultTemplate(network));
+
   const templateLocation = `./protocols/beefy-finance/config/templates/beefy.${coloquialNetworkName}.template.yaml`;
   await writeYamlFile(templateLocation, manifest);
   console.log(
@@ -135,6 +138,7 @@ function createManifestHeader() {
       file: "./schema.graphql",
     },
     dataSources: [],
+    templates: [],
   };
 }
 
@@ -230,14 +234,6 @@ function createNewDataSource(
       ],
       eventHandlers: [
         {
-          event: "Deposit(uint256)",
-          handler: "handleDeposit",
-        },
-        {
-          event: "Withdraw(uint256)",
-          handler: "handleWithdraw",
-        },
-        {
           event: "StratHarvest(indexed address,uint256,uint256)",
           handler: "handleStratHarvestWithAmount",
         },
@@ -255,6 +251,102 @@ function createNewDataSource(
   };
 
   return dataSource;
+}
+
+function createVaultTemplate(network) {
+  let template = {
+    kind: "ethereum/contract",
+    name: "BeefyVault",
+    network: network,
+    source: {
+      abi: "BeefyVault",
+    },
+    mapping: {
+      kind: "ethereum/events",
+      apiVersion: "0.0.6",
+      language: "wasm/assemblyscript",
+      entities: [],
+      abis: [
+        {
+          name: "BeefyStrategy",
+          file: "./abis/BeefyStrategy.json",
+        },
+        {
+          name: "BeefyVault",
+          file: "./abis/BeefyVault.json",
+        },
+        {
+          name: "ChainlinkOracle",
+          file: "./abis/Chainlink.json",
+        },
+        {
+          name: "ERC20",
+          file: "./abis/ERC20.json",
+        },
+        {
+          name: "CurveRegistry",
+          file: "./abis/Prices/Curve/Registry.json",
+        },
+        {
+          name: "CurvePoolRegistry",
+          file: "./abis/Prices/Curve/PoolRegistry.json",
+        },
+        {
+          name: "CalculationsCurve",
+          file: "./abis/Prices/Calculations/Curve.json",
+        },
+        {
+          name: "YearnLensContract",
+          file: "./abis/Prices/YearnLens.json",
+        },
+        {
+          name: "ChainLinkContract",
+          file: "./abis/Prices/ChainLink.json",
+        },
+        {
+          name: "UniswapRouter",
+          file: "./abis/Prices/Uniswap/Router.json",
+        },
+        {
+          name: "UniswapFeeRouter",
+          file: "./abis/Prices/Uniswap/FeeRouter.json",
+        },
+        {
+          name: "UniswapFactory",
+          file: "./abis/Prices/Uniswap/Factory.json",
+        },
+        {
+          name: "UniswapPair",
+          file: "./abis/Prices/Uniswap/Pair.json",
+        },
+        {
+          name: "SushiSwapRouter",
+          file: "./abis/Prices/SushiSwap/Router.json",
+        },
+        {
+          name: "SushiSwapFactory",
+          file: "./abis/Prices/SushiSwap/Factory.json",
+        },
+        {
+          name: "SushiSwapPair",
+          file: "./abis/Prices/SushiSwap/Pair.json",
+        },
+        {
+          name: "CalculationsSushiSwap",
+          file: "./abis/Prices/Calculations/SushiSwap.json",
+        },
+      ],
+      eventHandlers: [
+        {
+          event: "Transfer(indexed address,indexed address,uint256)",
+          handler: "handleTransfer",
+        },
+      ],
+      file: "./src/mappings/vault.ts",
+    },
+  };
+
+  return template;
 }
 
 // call main (starter function) using the network as an argument

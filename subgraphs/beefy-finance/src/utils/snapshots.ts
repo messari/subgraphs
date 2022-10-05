@@ -6,51 +6,32 @@ import {
   VaultHourlySnapshot,
 } from "../../generated/schema";
 import { BIGDECIMAL_ZERO } from "../prices/common/constants";
-import { getOrCreateVaultDailySnapshot } from "./getters";
+import {
+  getOrCreateFinancials,
+  getOrCreateVaultDailySnapshot,
+  getOrCreateVaultHourlySnapshot,
+  getOrCreateYieldAggregator,
+  getVaultDailyId,
+} from "./getters";
+import { updateProtocolTVL } from "../mappings/protocol";
 
-export function updateVaultDailySnapshot(
-  block: ethereum.Block,
+export function updateVaultSnapshots(
+  event: ethereum.Event,
   vault: Vault
-): VaultDailySnapshot {
-  const id = getVaultDailyId(block, vault.id);
-  let vaultDailySnapshot = getOrCreateVaultDailySnapshot(vault.id);
-  vaultDailySnapshot.inputTokenBalance = vault.inputTokenBalance;
-  if (vault.outputTokenSupply) {
-    vaultDailySnapshot.outputTokenSupply = vault.outputTokenSupply;
-  }
-  if (vault.pricePerShare) {
-    vaultDailySnapshot.pricePerShare = vault.pricePerShare;
-  }
+): void {
+  const vaultDailySnapshot = getOrCreateVaultDailySnapshot(vault.id, event);
   vaultDailySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultDailySnapshot.inputTokenBalance = vault.inputTokenBalance;
+  vaultDailySnapshot.outputTokenSupply = vault.outputTokenSupply;
   vaultDailySnapshot.outputTokenPriceUSD = vault.outputTokenPriceUSD;
-
-  vaultDailySnapshot.blockNumber = block.number;
-  vaultDailySnapshot.timestamp = block.timestamp;
+  vaultDailySnapshot.pricePerShare = vault.pricePerShare;
   vaultDailySnapshot.save();
-  return vaultDailySnapshot;
-}
 
-export function updateVaultHourlySnapshot(
-  block: ethereum.Block,
-  vault: Vault
-): VaultHourlySnapshot {
-  const id = getVaultHourlyId(block, vault.id);
-  let vaultHourlySnapshot = VaultHourlySnapshot.load(id);
-  if (vaultHourlySnapshot == null) {
-    vaultHourlySnapshot = new VaultHourlySnapshot(id);
-    vaultHourlySnapshot.protocol = vault.protocol;
-    vaultHourlySnapshot.vault = vault.id;
-  }
+  const vaultHourlySnapshot = getOrCreateVaultHourlySnapshot(vault.id, event);
   vaultHourlySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshot.inputTokenBalance = vault.inputTokenBalance;
-  if (vault.outputTokenSupply) {
-    vaultHourlySnapshot.outputTokenSupply = vault.outputTokenSupply;
-  }
-  if (vault.pricePerShare) {
-    vaultHourlySnapshot.pricePerShare = vault.pricePerShare;
-  }
-  vaultHourlySnapshot.blockNumber = block.number;
-  vaultHourlySnapshot.timestamp = block.timestamp;
+  vaultHourlySnapshot.outputTokenSupply = vault.outputTokenSupply;
+  vaultHourlySnapshot.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  vaultHourlySnapshot.pricePerShare = vault.pricePerShare;
   vaultHourlySnapshot.save();
-  return vaultHourlySnapshot;
 }

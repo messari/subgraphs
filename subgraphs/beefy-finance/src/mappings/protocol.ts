@@ -1,32 +1,15 @@
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { User, Vault } from "../../generated/schema";
 import {
-  Address,
-  BigDecimal,
-  BigInt,
-  dataSource,
-  ethereum,
-} from "@graphprotocol/graph-ts";
-import {
-  BeefyStrategy,
-  ChargedFees,
-  Withdraw,
-} from "../../generated/Standard/BeefyStrategy";
-import { User, Vault, VaultFee, YieldAggregator } from "../../generated/schema";
-import {
-  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_ONE,
-  BIGINT_TEN,
   BIGINT_ZERO,
-  WHITELIST_TOKENS_MAP,
 } from "../prices/common/constants";
 import {
   getOrCreateYieldAggregator,
-  getOrCreateToken,
-  getFees,
+  getOrCreateFinancials,
 } from "../utils/getters";
 import {
-  updateDailyFinancialSnapshot,
-  updateFinancialSnapshotRevenue,
   updateUsageMetricsDailySnapshot,
   updateUsageMetricsHourlySnapshot,
 } from "../utils/metrics";
@@ -37,6 +20,7 @@ export function updateProtocolRevenue(
   newTotalRevenueUSD: BigDecimal,
   event: ethereum.Event
 ): void {
+  // update protocol cumulatives
   const protocol = getOrCreateYieldAggregator();
   protocol.cumulativeProtocolSideRevenueUSD =
     protocol.cumulativeProtocolSideRevenueUSD.plus(newProtocolSideRevenueUSD);
@@ -46,12 +30,27 @@ export function updateProtocolRevenue(
     protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
   protocol.save();
 
-  updateFinancialSnapshotRevenue(
-    newProtocolSideRevenueUSD,
-    newSupplySideRevenueUSD,
-    newTotalRevenueUSD,
-    event
-  );
+  // update snapshot cumulatives and dailys
+  const financialDailySnapshot = getOrCreateFinancials(event);
+
+  financialDailySnapshot.dailyProtocolSideRevenueUSD =
+    financialDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+      newProtocolSideRevenueUSD
+    );
+  financialDailySnapshot.dailySupplySideRevenueUSD =
+    financialDailySnapshot.dailySupplySideRevenueUSD.plus(
+      newSupplySideRevenueUSD
+    );
+  financialDailySnapshot.dailyTotalRevenueUSD =
+    financialDailySnapshot.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+
+  financialDailySnapshot.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financialDailySnapshot.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialDailySnapshot.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
+  financialDailySnapshot.save();
 }
 
 export function updateProtocolUsage(
@@ -60,7 +59,6 @@ export function updateProtocolUsage(
   withdraw: boolean
 ): void {
   const protocol = getOrCreateYieldAggregator();
-  protocol.totalValueLockedUSD = getTvlUsd(protocol);
   protocol.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers.plus(
     isNewUser(event.transaction.from)
   );
@@ -70,45 +68,10 @@ export function updateProtocolUsage(
   updateUsageMetricsHourlySnapshot(event, protocol, deposit, withdraw);
 }
 
-export function updateProtocolRevenueFromWithdraw(
-  event: Withdraw,
-  vault: Vault,
-  withdrawnAmount: BigInt
-): void {
-  updateProtocolUsage(event, false, true);
+// updates the protocol tvl after a vault's tvl has been updated
+export function updateProtocolTVL(): BigDecimal {
   const protocol = getOrCreateYieldAggregator();
-  const token = getOrCreateToken(
-    Address.fromString(vault.inputToken),
-    event.block
-  );
-  const fees = getFees(
-    vault.id,
-    BeefyStrategy.bind(Address.fromString(vault._strategyAddress))
-  );
-  vault.fees = fees;
-  vault.save();
-  let fee: VaultFee | null;
-  for (let i = 0; i < fees.length; i++) {
-    fee = VaultFee.load(fees[i]);
-    if (fee && fee.feeType == "WITHDRAWAL_FEE") {
-      const revenue = withdrawnAmount
-        .toBigDecimal()
-        .times(fee.feePercentage)
-        .div(BIGDECIMAL_HUNDRED)
-        .times(token.lastPriceUSD)
-        .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
-      protocol.cumulativeProtocolSideRevenueUSD =
-        protocol.cumulativeProtocolSideRevenueUSD.plus(revenue);
-      protocol.cumulativeTotalRevenueUSD =
-        protocol.cumulativeTotalRevenueUSD.plus(revenue);
-      protocol.save();
-      break;
-    }
-  }
-  updateDailyFinancialSnapshot(event.block, protocol);
-}
 
-export function getTvlUsd(protocol: YieldAggregator): BigDecimal {
   let tvlUsd = BIGDECIMAL_ZERO;
   if (protocol._vaults) {
     for (let i = 0; i < protocol._vaults.length; i++) {
@@ -118,6 +81,10 @@ export function getTvlUsd(protocol: YieldAggregator): BigDecimal {
       }
     }
   }
+
+  protocol.totalValueLockedUSD = tvlUsd;
+  protocol.save();
+
   return tvlUsd;
 }
 
