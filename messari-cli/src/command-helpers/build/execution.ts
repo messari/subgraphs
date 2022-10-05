@@ -132,7 +132,7 @@ export class Executor {
         return this.executeNextScript()
       }
 
-      if (!this.isHTTPError(stderr) || !this.shouldRetry) {
+      if (!this.isHTTPError(stderr) || !this.shouldRetry()) {
         // append logs to `result` and continue with the next deployment
         return this.handleFailure(stdout, stderr, error)
       }
