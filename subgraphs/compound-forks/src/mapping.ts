@@ -462,7 +462,13 @@ export function _handleMint(
   deposit.amountUSD = depositUSD;
   deposit.save();
 
-  updateMarketDeposit(market, underlyingToken, outputTokenSupplyResult);
+  updateMarketDeposit(
+    comptrollerAddr,
+    market,
+    underlyingToken,
+    outputTokenSupplyResult,
+    event
+  );
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(depositUSD);
   market.save();
 
@@ -565,7 +571,13 @@ export function _handleRedeem(
   );
   withdraw.save();
 
-  updateMarketDeposit(market, underlyingToken, outputTokenSupplyResult);
+  updateMarketDeposit(
+    comptrollerAddr,
+    market,
+    underlyingToken,
+    outputTokenSupplyResult,
+    event
+  );
 
   updateMarketSnapshots(
     market,
@@ -703,6 +715,14 @@ export function _handleBorrow(
     EventType.Borrow,
     true
   );
+
+  updateProtocol(comptrollerAddr);
+
+  snapshotFinancials(
+    comptrollerAddr,
+    event.block.number,
+    event.block.timestamp
+  );
 }
 
 export function _handleRepayBorrow(
@@ -819,6 +839,14 @@ export function _handleRepayBorrow(
     payer.toHexString(),
     EventType.Repay,
     true
+  );
+
+  updateProtocol(comptrollerAddr);
+
+  snapshotFinancials(
+    comptrollerAddr,
+    event.block.number,
+    event.block.timestamp
   );
 }
 
@@ -1035,30 +1063,6 @@ export function _handleAccrueInterest(
     log.warning("[handleAccrueInterest] Market not found: {}", [marketID]);
     return;
   }
-
-  // creates and initializes market snapshots
-
-  // those were called in updateMarket()
-  // TODO: remove before merge after review
-  /*
-  //
-  // daily snapshot
-  //
-  getOrCreateMarketDailySnapshot(
-    market,
-    event.block.timestamp,
-    event.block.number
-  );
-
-  //
-  // hourly snapshot
-  //
-  getOrCreateMarketHourlySnapshot(
-    market,
-    event.block.timestamp,
-    event.block.number
-  );
-  */
 
   updateMarket(
     updateMarketData,
@@ -1693,9 +1697,11 @@ export function updateMarket(
 }
 
 export function updateMarketDeposit(
+  comptrollerAddr: Address,
   market: Market,
   underlyingToken: Token,
-  totalSupplyResult: ethereum.CallResult<BigInt>
+  totalSupplyResult: ethereum.CallResult<BigInt>,
+  event: ethereum.Event
 ): void {
   if (totalSupplyResult.reverted) {
     log.warning("[updateMarket] Failed to get totalSupply of Market {}", [
@@ -1737,6 +1743,14 @@ export function updateMarketDeposit(
   market.totalValueLockedUSD = underlyingSupplyUSD;
   market.totalDepositBalanceUSD = underlyingSupplyUSD;
   market.save();
+
+  updateProtocol(comptrollerAddr);
+
+  snapshotFinancials(
+    comptrollerAddr,
+    event.block.number,
+    event.block.timestamp
+  );
 }
 
 export function updateProtocol(comptrollerAddr: Address): void {
