@@ -1,92 +1,146 @@
 const { exec } = require('child_process')
 const fs = require('fs')
 
-/**
- * @param {string[]} array - Protocol that is being deployed
- * @param {string} callback
- */
-export async function executeDeployment(deployment, callback) {
-  let logs = ''
-  let results = 'RESULTS:\n'
-  let deploymentIndex = 0
-  let scriptIndex = 0
-  let httpCounter = 0
-  const allDeployments = Array.from(deployment.scripts.keys())
+export class Executor {
+  logs: string
+  results: string
+  deploymentIndex: number
+  scriptIndex: number
+  httpCounter: number
+  httpCounterLimit: number
+  scripts: Map<string, string[]>
+  scriptKeys: string[]
+  deploy: boolean
+  log: boolean
 
-  function next() {
-    if (deploymentIndex < allDeployments.length) {
-      exec(
-        deployment.scripts.get(allDeployments[deploymentIndex])[scriptIndex],
-        (error, stdout, stderr) => {
-          logs = `${logs}stdout: ${stdout}`
-          logs = `${logs}stderr: ${stderr}`
+  constructor(scripts: Map<string, string[]>, deploy: boolean, log: boolean) {
+    this.logs = ''
+    this.results = 'RESULTS:\n'
+    this.deploymentIndex = 0
+    this.scriptIndex = 0
+    this.httpCounter = 0
+    this.httpCounterLimit = 3
+    this.scripts = scripts
+    this.scriptKeys = Array.from(this.scripts.keys())
+    this.deploy = deploy
+    this.log = log
+  }
 
-          scriptIndex += 1
+  isHTTPError(stderr): boolean {
+    return stderr.includes('Error: HTTP Error')
+  }
 
-          if (stderr.includes('HTTP error')) {
-            if (httpCounter >= 2) {
-              deploymentIndex += 1
-              scriptIndex = 0
-            }
-            httpCounter += 1
-          }
+  shouldRetry(): boolean {
+    if (this.httpCounter < this.httpCounterLimit) {
+      return true
+    }
 
-          if (error !== null) {
-            if (
-              stderr.includes('HTTP error deploying the subgraph') &&
-              httpCounter < 3
-            ) {
-              httpCounter += 1
-              console.log(
-                `HTTP error on deployment ${httpCounter.toString()} for ${
-                  allDeployments[deploymentIndex]
-                }. Trying Again...`
-              )
-            } else {
-              logs = `${logs}Exec error: ${error}`
-              if (deployment.deploy === false) {
-                results += `Build Failed: ${allDeployments[deploymentIndex]}\n`
-              } else {
-                results += `Deployment Failed: ${allDeployments[deploymentIndex]}\n`
-              }
-              logs = `${logs}error: ${error}`
-              deploymentIndex += 1
-              scriptIndex = 0
-              httpCounter = 0
-            }
-          } else if (
-            scriptIndex ===
-            deployment.scripts.get(allDeployments[deploymentIndex]).length
-          ) {
-            if (deployment.deploy === false) {
-              results += `Build Successful: ${allDeployments[deploymentIndex]}\n`
-            } else {
-              results += `Deployment Successful: ${allDeployments[deploymentIndex]}\n`
-            }
-            deploymentIndex += 1
-            scriptIndex = 0
-            httpCounter = 1
-          }
+    this.httpCounter += 1
+    return false
+  }
 
-          // do the next iteration
-          next()
-        }
-      )
-    } else {
-      // all done here
-      fs.writeFile('results.txt', logs.replace(/\u00[^m]*?m/g, ''), (err) => {
-        if (err) throw new Error(err)
-      })
-
-      // Print the logs if printlogs is 't' or 'true'
-      if (deployment.printlogs) {
-        console.log(logs)
-      }
-      console.log(`\n${results}END\n\n`)
-      callback(results)
+  appendLogs(stdout, stderr, error) {
+    this.logs = `${this.logs}stdout: ${stdout}stderr: ${stderr}`
+    if (error) {
+      this.logs = `${this.logs}error: ${error}`
     }
   }
 
-  // start the first iteration
-  next()
+  appendResult(error) {
+    if (error) {
+      if (this.deploy === false) {
+        this.results += `Build Failed: ${
+          this.scriptKeys[this.deploymentIndex]
+        }\n`
+      } else {
+        this.results += `Deployment Failed: ${
+          this.scriptKeys[this.deploymentIndex]
+        }\n`
+      }
+
+      return
+    }
+
+    if (this.deploy === false) {
+      this.results += `Build Succesful: ${
+        this.scriptKeys[this.deploymentIndex]
+      }\n`
+    } else {
+      this.results += `Deployment Succesful: ${
+        this.scriptKeys[this.deploymentIndex]
+      }\n`
+    }
+  }
+
+  printOutput() {
+    fs.writeFile(
+      'results.txt',
+      this.logs.replace(/\u00[^m]*?m/g, ''),
+      (err) => {
+        if (err) throw new Error(err)
+      }
+    )
+
+    // Print the logs if printlogs is 't' or 'true'
+    if (this.log) {
+      console.log(this.logs)
+    }
+    console.log(`\n${this.results}END\n\n`)
+  }
+
+  handleSuccess(stdout, stderr, error) {
+    this.appendLogs(stdout, stderr, error)
+    this.httpCounter = 0
+    this.scriptIndex += 1
+
+    if (
+      this.scriptIndex ===
+      this.scripts.get(this.scriptKeys[this.deploymentIndex]).length
+    ) {
+      this.appendResult(error)
+      this.deploymentIndex += 1
+      this.scriptIndex = 0
+      return
+    }
+  }
+
+  handleFailure(stdout, stderr, error) {
+    this.appendLogs(stdout, stderr, error)
+    this.appendResult(error)
+    this.deploymentIndex += 1
+    this.scriptIndex = 0
+    this.httpCounter = 0
+    return this.executeNextScript()
+  }
+
+  async execute() {
+    this.executeNextScript()
+  }
+
+  executeNextScript() {
+    if (this.deploymentIndex >= this.scriptKeys.length) {
+      return this.printOutput()
+    }
+
+    let script = this.scripts.get(this.scriptKeys[this.deploymentIndex])[
+      this.scriptIndex
+    ]
+    exec(script, (error, stdout, stderr) => {
+      if (!error) {
+        // increase counters and continue
+        this.handleSuccess(stdout, stderr, null)
+        return this.executeNextScript()
+      }
+
+      if (!this.isHTTPError(stderr) || !this.shouldRetry) {
+        // append logs to `result` and continue with the next deployment
+        return this.handleFailure(stdout, stderr, error)
+      }
+
+      // here we know it is an http error. We can retry or skip it
+      // Increse http counter and retry
+      this.httpCounter += 1
+      return this.executeNextScript()
+    })
+  }
 }

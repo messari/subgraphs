@@ -8,8 +8,8 @@ import {
 
 import { validateDeploymentJson } from '../../../deployment/validation/validateDeploymentJson'
 import { getScopeAlias, getServiceAlias } from '../command-helpers/build/alias'
-import { executeDeployment } from '../command-helpers/build/execution'
 import { isValidVersion } from '../command-helpers/build/checkVersion'
+import { Executor as ExecutorClass } from '../command-helpers/build/execution'
 
 const HELP: string = `
 ${chalk.bold('messari build')} ${chalk.bold('[<deployment-id>]')} [options]
@@ -187,6 +187,12 @@ module.exports = {
       return
     }
     scriptGenerator.prepare()
-    executeDeployment(scriptGenerator, () => {})
+
+    let Executor = new ExecutorClass(
+      scriptGenerator.scripts,
+      args.deploy,
+      args.log
+    )
+    Executor.execute()
   },
 }
