@@ -24,6 +24,7 @@ import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
 import { getUsdPricePerToken } from "../prices";
 import {
   BIGDECIMAL_HUNDRED,
+  Network,
   ProtocolType,
   PROTOCOL_ID,
   PROTOCOL_METHODOLOGY_VERSION,
@@ -33,6 +34,7 @@ import {
   PROTOCOL_SUBGRAPH_VERSION,
   SECONDS_PER_DAY,
   VaultFeeType,
+  WAVAX_ADDRESS,
 } from "./constants";
 import { BeefyVault } from "../../generated/templates";
 import { BeefyVault as BeefyVaultContract } from "../../generated/Standard/BeefyVault";
@@ -85,22 +87,31 @@ export function getOrCreateVault(
     const vaultContract = BeefyVaultContract.bind(tryVaultAddress.value);
 
     // create native token
-    const tryNativeToken = strategyContract.try_native();
+    let tryNativeToken = strategyContract.try_native();
     if (tryNativeToken.reverted) {
-      log.warning("Failed to get native token from strategy {}", [
-        strategyAddress.toHexString(),
-      ]);
-      return null;
+      if (dataSource.network() == Network.AVALANCHE.toLowerCase()) {
+        tryNativeToken = ethereum.CallResult.fromValue(
+          Address.fromString(WAVAX_ADDRESS)
+        );
+      } else {
+        log.warning("Failed to get native token from strategy {}", [
+          strategyAddress.toHexString(),
+        ]);
+        return null;
+      }
     }
     const nativeToken = getOrCreateToken(tryNativeToken.value, event.block);
 
     // create input token
-    const tryInputToken = vaultContract.try_want();
+    let tryInputToken = vaultContract.try_want();
     if (tryInputToken.reverted) {
-      log.warning("Failed to get input token from vault {}", [
-        tryVaultAddress.value.toHexString(),
-      ]);
-      return null;
+      tryInputToken = vaultContract.try_token();
+      if (tryInputToken.reverted) {
+        log.warning("Failed to get input token from vault {}", [
+          tryVaultAddress.value.toHexString(),
+        ]);
+        return null;
+      }
     }
     const inputToken = getOrCreateToken(tryInputToken.value, event.block);
 

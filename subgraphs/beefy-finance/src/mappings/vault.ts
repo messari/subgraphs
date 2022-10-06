@@ -200,6 +200,7 @@ export function handleTransfer(event: Transfer): void {
 
   // handle withdraw
   if (event.params.to.toHexString() == ZERO_ADDRESS) {
+    // TODO: withdraw fee
     createWithdraw(
       event,
       event.params.from.toHexString(),
