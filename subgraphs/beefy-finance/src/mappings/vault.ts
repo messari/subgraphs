@@ -284,8 +284,8 @@ function updateRevenueFromHarvest(
     const supplySideRevenueDelta = tryNativeTokenBalance.value
       .toBigDecimal()
       .div(exponentToBigDecimal(nativeToken.decimals))
-      .times(nativeToken.lastPriceUSD!)
-      .minus(performanceFeeDelta);
+      .minus(performanceFeeDelta)
+      .times(nativeToken.lastPriceUSD!);
     const totalRevenueDelta = protocolSideRevenueDelta.plus(
       supplySideRevenueDelta
     );
