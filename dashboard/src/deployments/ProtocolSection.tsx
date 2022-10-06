@@ -256,6 +256,10 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                             window.location.href = `https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview`;
                             return;
                         }
+                        if (decenObject?.fatalError) {
+                            window.location.href = "https://okgraph.xyz/?q=" + depo?.decentralizedNetworkId;
+                            return;
+                        }
                         navigate(`subgraph?endpoint=${endpointURL}&tab=protocol`)
                     }} key={subgraphName + depo.hostedServiceId + "DepInDevRow-DECEN"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell
@@ -266,7 +270,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                                 {chainLabel}
                             </span>
                             <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "10px" }}>
-                                <Tooltip title="This deployment is hosted on the decentralized network" placement="top" ><span style={{ padding: "2px 6px", borderRadius: "50%", backgroundColor: "rgb(102,86,248)", cursor: "default", fontWeight: "800" }}>D</span></Tooltip>
+                                <Tooltip title="This deployment is hosted on the decentralized network" placement="top" ><span style={{ padding: "4px 6px 2px 7px", borderRadius: "50%", backgroundColor: "rgb(102,86,248)", cursor: "default", fontWeight: "800" }}>D</span></Tooltip>
                             </span>
                             {curationElement}
                         </TableCell>
@@ -527,7 +531,6 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
             }
             return <span key={subgraphName + "-protocol-schemaVerRow-" + idx} style={{ color: "#FFA500" }}>{x}</span>;
         })
-
         schemaCell = <span>{schemaColored}</span>;
     }
 
@@ -535,7 +538,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
     if (hasDecentralizedDepo) {
         decenDepoElement = (
             <span style={{ display: "inline-flex", alignItems: "center", padding: "0px 10px", fontSize: "10px" }}>
-                <Tooltip title="This protocol has deployments hosted on the decentralized network" placement="top" ><span style={{ padding: "2px 6px", borderRadius: "50%", backgroundColor: "rgb(102,86,248)", cursor: "default", fontWeight: "800" }}>D</span></Tooltip>
+                <Tooltip title="This protocol has deployments hosted on the decentralized network" placement="top" ><span style={{ padding: "4px 6px 2px 7px", borderRadius: "50%", backgroundColor: "rgb(102,86,248)", cursor: "default", fontWeight: "800" }}>D</span></Tooltip>
             </span>
         );
     }
