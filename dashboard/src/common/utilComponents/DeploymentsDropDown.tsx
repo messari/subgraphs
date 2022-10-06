@@ -75,7 +75,6 @@ export const DeploymentsDropDown = ({
       ]);
     }
   }
-
   return (
     <>
       <Typography variant="h6">Select a protocol to compare data between Defi Llama and Messari subgraphs</Typography>

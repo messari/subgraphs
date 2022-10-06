@@ -183,22 +183,16 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         <Typography variant="h3" align="center" sx={{ my: 5 }}>
           Deployed Subgraphs
         </Typography>
-        <div style={{ display: "flex", width: "55%", marginLeft: "23%" }}>
-          <div style={{ width: "100%", textAlign: "center", marginTop: "0", borderRight: "#6656F8 2px solid" }}>
-            <span className="Menu-Options" onClick={() => navigate("/comparison")}>
-              DefiLlama Comparison
-            </span>
-          </div>
-          <div style={{ width: "100%", textAlign: "center", marginTop: "0", borderLeft: "#6656F8 2px solid", borderRight: "#6656F8 2px solid", paddingLeft: "16px" }}>
-            <span className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
-              {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
-            </span>
-          </div>
-          <div style={{ width: "100%", textAlign: "center", marginTop: "0", borderLeft: "#6656F8 2px solid" }}>
-            <span className="Menu-Options" onClick={() => navigate("protocols-list")}>
-              Protocols To Develop
-            </span>
-          </div>
+        <div style={{ width: "100%", textAlign: "center" }}>
+          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("/comparison")}>
+            DefiLlama Comparison
+          </span>
+          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderLeft: "#6656F8 2px solid", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
+            {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
+          </span>
+          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("protocols-list")}>
+            Protocols To Develop
+          </span>
         </div>
         {devCountTable}
         <DeploymentsTable
