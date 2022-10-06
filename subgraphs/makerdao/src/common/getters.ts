@@ -670,38 +670,3 @@ export function getSnapshotRates(rates: string[], timeSuffix: string): string[] 
   }
   return snapshotRates;
 }
-
-/*
-export function getPositionIDForAccount(
-  accountAddress: string,
-  market: string,
-  side: string,
-  open: u32 = 2, // 0 - false, 1 - true, 2 - all/any
-): string[] {
-  let account = getOrCreateAccount(accountAddress);
-  let resultPositionIDs: string[] = [];
-  let positionIDs = account._positionIDList!;
-  for (let i = 0; i < positionIDs.length; i++) {
-    let positionID = positionIDs[i];
-    let position = Position.load(positionID)!;
-    if (position.market.toLowerCase() == market.toLowerCase() && position.side == side) {
-      switch (open) {
-        case 1:
-          if (position.balance.gt(BIGINT_ZERO)) {
-            resultPositionIDs.push(positionID);
-          }
-          break;
-        case 0:
-          if (position.balance == BIGINT_ZERO) {
-            resultPositionIDs.push(positionID);
-          }
-          break;
-        default:
-          resultPositionIDs.push(positionID);
-      }
-    }
-  }
-
-  return resultPositionIDs;
-}
-*/

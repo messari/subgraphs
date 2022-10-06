@@ -162,8 +162,7 @@ export function handleVatRely(event: VatNoteEvent): void {
     decimals = 18;
   }
 
-  log.info("[handleVatRely]ilk = {}/{}, market = {}, token = {}, name = {}, symbol = {}, decimals = {}", [
-    ilk.toString(),
+  log.info("[handleVatRely]ilk={}, market={}, token={}, name={}, symbol={}, decimals={}", [
     ilk.toString(),
     marketID, //join (market address)
     tokenId, //gem (token address)
@@ -220,6 +219,7 @@ export function handleVatSlip(event: VatNoteEvent): void {
     deltaCollateralUSD.toString(),
   ]);
 
+  // those are handled in handleVatFrob
   //createTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
   //updatePosition(event, usr, ilk, deltaCollateral, BIGINT_ZERO);
   updateMarket(event, market, deltaCollateral, deltaCollateralUSD);
@@ -1022,8 +1022,8 @@ export function handleClipYankBid(event: ClipYankEvent): void {
   ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
   liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.liquidator, liquidate.amount, debtRepaid);
-  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD, liquidator, liquidatee);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
@@ -1041,7 +1041,7 @@ export function handleSpotFileMat(event: SpotNoteEvent): void {
     }
     let market = getMarketFromIlk(ilk);
     if (market == null) {
-      log.warning("[handleSpotFileMat]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toString()]);
+      log.warning("[handleSpotFileMat]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
       return;
     }
 
@@ -1096,7 +1096,7 @@ export function handleSpotPoke(event: PokeEvent): void {
   }
   let market = getMarketFromIlk(ilk);
   if (market == null) {
-    log.warning("[handleSpotPoke]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toString()]);
+    log.warning("[handleSpotPoke]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
     return;
   }
 
@@ -1129,7 +1129,7 @@ export function handleJugFileDuty(event: JugNoteEvent): void {
   if (what == "duty") {
     let market = getMarketFromIlk(ilk);
     if (market == null) {
-      log.error("[handleJugFileDuty]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toString()]);
+      log.error("[handleJugFileDuty]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
       return;
     }
 

@@ -48,8 +48,6 @@ import {
   INT_ONE,
   PositionSide,
   EventType,
-  BIGINT_TWELVE,
-  BIGINT_THOUSAND,
   BIGINT_NEG_HUNDRED,
 } from "./constants";
 import { createEventID } from "../utils/strings";
@@ -122,19 +120,16 @@ export function updateProtocol(
     );
     switch (protocolSideRevenueType) {
       case ProtocolSideRevenueType.STABILITYFEE:
-        protocol._cumulativeProtocolSideStabilityFeeRevenue = protocol._cumulativeProtocolSideStabilityFeeRevenue!.plus(
-          newProtocolSideRevenueUSD,
-        );
+        protocol._cumulativeProtocolSideStabilityFeeRevenue =
+          protocol._cumulativeProtocolSideStabilityFeeRevenue!.plus(newProtocolSideRevenueUSD);
         break;
       case ProtocolSideRevenueType.LIQUIDATION:
-        protocol._cumulativeProtocolSideLiquidationRevenue = protocol._cumulativeProtocolSideLiquidationRevenue!.plus(
-          newProtocolSideRevenueUSD,
-        );
+        protocol._cumulativeProtocolSideLiquidationRevenue =
+          protocol._cumulativeProtocolSideLiquidationRevenue!.plus(newProtocolSideRevenueUSD);
         break;
       case ProtocolSideRevenueType.PSM:
-        protocol._cumulativeProtocolSidePSMRevenue = protocol._cumulativeProtocolSidePSMRevenue!.plus(
-          newProtocolSideRevenueUSD,
-        );
+        protocol._cumulativeProtocolSidePSMRevenue =
+          protocol._cumulativeProtocolSidePSMRevenue!.plus(newProtocolSideRevenueUSD);
         break;
     }
   }
@@ -313,12 +308,10 @@ export function snapshotMarket(
   }
 
   if (newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
-    marketHourlySnapshot.hourlySupplySideRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
-      newSupplySideRevenueUSD,
-    );
-    marketDailySnapshot.dailySupplySideRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
-      newSupplySideRevenueUSD,
-    );
+    marketHourlySnapshot.hourlySupplySideRevenueUSD =
+      marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
+    marketDailySnapshot.dailySupplySideRevenueUSD =
+      marketDailySnapshot.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   }
 
   if (newTotalRevenueUSD.gt(BIGDECIMAL_ZERO) || newSupplySideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
@@ -393,19 +386,16 @@ export function updateFinancialsSnapshot(
     );
     switch (protocolSideRevenueType) {
       case ProtocolSideRevenueType.STABILITYFEE:
-        financials._dailyProtocolSideStabilityFeeRevenue = financials._dailyProtocolSideStabilityFeeRevenue!.plus(
-          newProtocolSideRevenueUSD,
-        );
+        financials._dailyProtocolSideStabilityFeeRevenue =
+          financials._dailyProtocolSideStabilityFeeRevenue!.plus(newProtocolSideRevenueUSD);
         break;
       case ProtocolSideRevenueType.LIQUIDATION:
-        financials._dailyProtocolSideLiquidationRevenue = financials._dailyProtocolSideLiquidationRevenue!.plus(
-          newProtocolSideRevenueUSD,
-        );
+        financials._dailyProtocolSideLiquidationRevenue =
+          financials._dailyProtocolSideLiquidationRevenue!.plus(newProtocolSideRevenueUSD);
         break;
       case ProtocolSideRevenueType.PSM:
-        financials._dailyProtocolSidePSMRevenue = financials._dailyProtocolSidePSMRevenue!.plus(
-          newProtocolSideRevenueUSD,
-        );
+        financials._dailyProtocolSidePSMRevenue =
+          financials._dailyProtocolSidePSMRevenue!.plus(newProtocolSideRevenueUSD);
         break;
     }
   }
@@ -854,7 +844,7 @@ export function updateUsageMetrics(
     let accountID = users[i];
     let account = Account.load(accountID);
     if (account == null) {
-      let account = getOrCreateAccount(accountID);
+      account = getOrCreateAccount(accountID);
       account.save();
 
       protocol.cumulativeUniqueUsers += 1;
@@ -862,10 +852,7 @@ export function updateUsageMetrics(
       usageDailySnapshot.cumulativeUniqueUsers += 1;
     }
 
-    let hourlyActiveAcctountID = "hourly-"
-      .concat(accountID)
-      .concat("-")
-      .concat(hours);
+    let hourlyActiveAcctountID = "hourly-".concat(accountID).concat("-").concat(hours);
     let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAcctountID);
     if (hourlyActiveAccount == null) {
       hourlyActiveAccount = new ActiveAccount(hourlyActiveAcctountID);
@@ -874,10 +861,7 @@ export function updateUsageMetrics(
       usageHourlySnapshot.hourlyActiveUsers += 1;
     }
 
-    let dailyActiveAcctountID = "daily-"
-      .concat(accountID)
-      .concat("-")
-      .concat(days);
+    let dailyActiveAcctountID = "daily-".concat(accountID).concat("-").concat(days);
     let dailyActiveAccount = ActiveAccount.load(dailyActiveAcctountID);
     if (dailyActiveAccount == null) {
       dailyActiveAccount = new ActiveAccount(dailyActiveAcctountID);
@@ -899,10 +883,7 @@ export function updateUsageMetrics(
     depositAccount!.depositCount += INT_ONE;
     depositAccount!.save();
 
-    let dailyDepositorAcctountID = "daily-depositor-"
-      .concat(users[1])
-      .concat("-")
-      .concat(days);
+    let dailyDepositorAcctountID = "daily-depositor-".concat(users[1]).concat("-").concat(days);
     let dailyDepositorAccount = ActiveAccount.load(dailyDepositorAcctountID);
     if (dailyDepositorAccount == null) {
       dailyDepositorAccount = new ActiveAccount(dailyDepositorAcctountID);
@@ -932,10 +913,7 @@ export function updateUsageMetrics(
     borrowAccount!.borrowCount += INT_ONE;
     borrowAccount!.save();
 
-    let dailyBorrowerAcctountID = "daily-borrow-"
-      .concat(users[2])
-      .concat("-")
-      .concat(days);
+    let dailyBorrowerAcctountID = "daily-borrow-".concat(users[2]).concat("-").concat(days);
     let dailyBorrowerAccount = ActiveAccount.load(dailyBorrowerAcctountID);
     if (dailyBorrowerAccount == null) {
       dailyBorrowerAccount = new ActiveAccount(dailyBorrowerAcctountID);
@@ -971,10 +949,7 @@ export function updateUsageMetrics(
       liquidatorAccount.liquidateCount += INT_ONE;
       liquidatorAccount.save();
 
-      let dailyLiquidatorAcctountID = "daily-liquidate"
-        .concat(liquidator)
-        .concat("-")
-        .concat(days);
+      let dailyLiquidatorAcctountID = "daily-liquidate".concat(liquidator).concat("-").concat(days);
       let dailyLiquidatorAccount = ActiveAccount.load(dailyLiquidatorAcctountID);
       if (dailyLiquidatorAccount == null) {
         dailyLiquidatorAccount = new ActiveAccount(dailyLiquidatorAcctountID);
@@ -998,10 +973,7 @@ export function updateUsageMetrics(
       liquidateeAccount.liquidationCount += INT_ONE;
       liquidateeAccount.save();
 
-      let dailyLiquidateeAcctountID = "daily-liquidatee-"
-        .concat(liquidatee)
-        .concat("-")
-        .concat(days);
+      let dailyLiquidateeAcctountID = "daily-liquidatee-".concat(liquidatee).concat("-").concat(days);
       let dailyLiquidateeAccount = ActiveAccount.load(dailyLiquidateeAcctountID);
       if (dailyLiquidateeAccount == null) {
         dailyLiquidateeAccount = new ActiveAccount(dailyLiquidateeAcctountID);
