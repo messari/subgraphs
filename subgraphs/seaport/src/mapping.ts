@@ -27,7 +27,6 @@ import {
   MANTISSA_FACTOR,
   max,
   min,
-  Network,
   NftStandard,
   SaleStrategy,
   SeaportItemType,
@@ -198,7 +197,9 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   //
   // update marketplace
   //
-  let marketplace = getOrCreateMarketplace(NetworkConfigs.getMarketplaceAddress());
+  let marketplace = getOrCreateMarketplace(
+    NetworkConfigs.getMarketplaceAddress()
+  );
   marketplace.tradeCount += 1;
   marketplace.cumulativeTradeVolumeETH =
     marketplace.cumulativeTradeVolumeETH.plus(volumeETH);
@@ -345,7 +346,9 @@ function getOrCreateCollection(collectionID: string): Collection {
     collection.sellerCount = 0;
     collection.save();
 
-    let marketplace = getOrCreateMarketplace(NetworkConfigs.getMarketplaceAddress());
+    let marketplace = getOrCreateMarketplace(
+      NetworkConfigs.getMarketplaceAddress()
+    );
     marketplace.collectionCount += 1;
     marketplace.save();
   }

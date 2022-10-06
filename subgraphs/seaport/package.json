@@ -1,6 +1,6 @@
 {
   "name": "seaport",
-  "version": "1.0.0",
+  "license": "UNLICENSED",
   "scripts": {
     "format": "npx prettier --write .",
     "codegen": "graph codegen",
@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "0.33.0",
+    "mustache": "^4.2.0",
     "prettier": "^2.6.2"
   }
 }
