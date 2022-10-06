@@ -1,0 +1,27 @@
+{
+  "network": "mainnet",
+  "protocolName": "Synthetix",
+  "protocolSlug": "synthetix",
+  "defaultNetwork": "Network.MAINNET",
+  "issuers": [
+    {
+      "address": "0xC011A72400E58ecD99Ee497CF89E3775d4bd732F",
+      "startBlock": 6834810
+    },
+    {
+      "address": "0x0DecF74C966438C3b4578b46Dcc64C907141f670",
+      "startBlock": 11656233
+    },
+    {
+      "address": "0x8D1201b074EeF198D5e6957F4574e2e4FC5Ba9Cf",
+      "startBlock": 15359452
+    }
+  ],
+
+  "collateralManagerAddress": "",
+  "collateralManagerStartBlock": "",
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}

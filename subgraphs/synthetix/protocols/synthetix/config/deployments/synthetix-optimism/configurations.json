@@ -1,0 +1,19 @@
+{
+  "network": "optimism",
+  "protocolName": "Synthetix",
+  "protocolSlug": "synthetix",
+  "defaultNetwork": "Network.Optimism",
+
+  "issuerAddress": "0xadaD43Be81E2206f6D1aF4299cA2a029e16af7AB",
+  "issuerStartBlock": 4552462,
+
+  "stakingRewardsAddress": "",
+  "stakingRewardsStartBlock": "",
+
+  "collateralManagerAddress": "",
+  "collateralManagerStartBlock": "",
+
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
+}

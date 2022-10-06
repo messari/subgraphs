@@ -4812,5 +4812,56 @@
         }
       }
     }
+  },
+  "synthetix": {
+    "schema": "lending",
+    "base": "synthetix",
+    "protocol": "synthetix",
+    "deployments": {
+      "synthetix-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "2.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "synthetix-ethereum",
+            "query-id": "synthetix-ethereum"
+          }
+        },
+        "files": {
+          "template": "synthetix.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      },
+      "synthetix-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "2.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "synthetix-optimism",
+            "query-id": "synthetix-optimism"
+          }
+        },
+        "files": {
+          "template": "synthetix.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        }
+      }
+    }
   }
 }

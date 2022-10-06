@@ -1,0 +1,283 @@
+specVersion: 0.0.5
+repository: https://github.com/messari/subgraphs
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{subgraphId}}
+  block: {{graftStartBlock}}
+{{/graftEnabled}}
+schema:
+  file: ./schema.graphql
+dataSources:
+{{#issuers}}
+  - kind: ethereum/contract
+    name: Issuer
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: Issuer
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - LendingProtocol
+        - Pool
+      abis:
+        - name: Issuer
+          file: ./abis/synthetix/Issuer.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: SynthAdded(bytes32,address)
+          handler: handleSynthAdded
+        - event: SynthRemoved(bytes32,address)
+          handler: handleSynthRemoved
+      file: ./src/mappings/issuerMappings.ts
+{{/issuers}}
+
+  # - kind: ethereum/contract
+  #   name: StakingRewards
+  #   network: {{network}}
+  #   source:
+  #     address: "{{stakingRewardsAddress}}"
+  #     abi: StakingRewards
+  #     startBlock: {{stakingRewardsStartBlock}}
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.7
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - LendingProtocol
+  #       - Pool
+  #     abis:
+  #       - name: StakingRewards
+  #         file: ./abis/synthetix/StakingRewards.json
+
+  #       ###########################################
+  #       ############## Price Oracle ###############
+  #       ###########################################
+  #       # ERC20
+  #       - name: _ERC20
+  #         file: ./abis/Prices/ERC20.json
+  #       # Curve Contracts
+  #       - name: CurveRegistry
+  #         file: ./abis/Prices/Curve/Registry.json
+  #       - name: CurvePoolRegistry
+  #         file: ./abis/Prices/Curve/PoolRegistry.json
+  #       - name: CalculationsCurve
+  #         file: ./abis/Prices/Calculations/Curve.json
+  #       # YearnLens Contracts
+  #       - name: YearnLensContract
+  #         file: ./abis/Prices/YearnLens.json
+  #       # ChainLink Contracts
+  #       - name: ChainLinkContract
+  #         file: ./abis/Prices/ChainLink.json
+  #       # 1Inch Contracts
+  #       - name: OneInchOracleContract
+  #         file: ./abis/Prices/1Inch/Oracle.json
+  #       # Aave Contracts
+  #       - name: AaveOracleContract
+  #         file: ./abis/Prices/Aave/Oracle.json
+  #       # Uniswap Contracts
+  #       - name: UniswapRouter
+  #         file: ./abis/Prices/Uniswap/Router.json
+  #       - name: UniswapFactory
+  #         file: ./abis/Prices/Uniswap/Factory.json
+  #       - name: UniswapPair
+  #         file: ./abis/Prices/Uniswap/Pair.json
+  #       # SushiSwap Contracts
+  #       - name: SushiSwapRouter
+  #         file: ./abis/Prices/SushiSwap/Router.json
+  #       - name: SushiSwapFactory
+  #         file: ./abis/Prices/SushiSwap/Factory.json
+  #       - name: SushiSwapPair
+  #         file: ./abis/Prices/SushiSwap/Pair.json
+  #       - name: CalculationsSushiSwap
+  #         file: ./abis/Prices/Calculations/SushiSwap.json
+  #     eventHandlers:
+  #       - event: Staked(indexed address,unit256)
+  #         handler: handleStaked
+  #       - event: Withdrawn(indexed address,unit256)
+  #         handler: handleWithdrawn
+  #     file: ./src/mappings/stakingRewardsMappings.ts
+
+  # - kind: ethereum/contract
+  #   name: CollateralManager
+  #   network: {{network}}
+  #   source:
+  #     address: "{{collateralManagerAddress}}"
+  #     abi: CollateralManager
+  #     startBlock: {{collateralManagerStartBlock}}
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.7
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - DexAmmProtocol
+  #     abis:
+  #       - name: CollateralManager
+  #         file: ./abis/synthetix/CollateralManager.json
+
+  #       ###########################################
+  #       ############## Price Oracle ###############
+  #       ###########################################
+  #       # ERC20
+  #       - name: _ERC20
+  #         file: ./abis/Prices/ERC20.json
+  #       # Curve Contracts
+  #       - name: CurveRegistry
+  #         file: ./abis/Prices/Curve/Registry.json
+  #       - name: CurvePoolRegistry
+  #         file: ./abis/Prices/Curve/PoolRegistry.json
+  #       - name: CalculationsCurve
+  #         file: ./abis/Prices/Calculations/Curve.json
+  #       # YearnLens Contracts
+  #       - name: YearnLensContract
+  #         file: ./abis/Prices/YearnLens.json
+  #       # ChainLink Contracts
+  #       - name: ChainLinkContract
+  #         file: ./abis/Prices/ChainLink.json
+  #       # 1Inch Contracts
+  #       - name: OneInchOracleContract
+  #         file: ./abis/Prices/1Inch/Oracle.json
+  #       # Aave Contracts
+  #       - name: AaveOracleContract
+  #         file: ./abis/Prices/Aave/Oracle.json
+  #       # Uniswap Contracts
+  #       - name: UniswapRouter
+  #         file: ./abis/Prices/Uniswap/Router.json
+  #       - name: UniswapFactory
+  #         file: ./abis/Prices/Uniswap/Factory.json
+  #       - name: UniswapPair
+  #         file: ./abis/Prices/Uniswap/Pair.json
+  #       # SushiSwap Contracts
+  #       - name: SushiSwapRouter
+  #         file: ./abis/Prices/SushiSwap/Router.json
+  #       - name: SushiSwapFactory
+  #         file: ./abis/Prices/SushiSwap/Factory.json
+  #       - name: SushiSwapPair
+  #         file: ./abis/Prices/SushiSwap/Pair.json
+  #       - name: CalculationsSushiSwap
+  #         file: ./abis/Prices/Calculations/SushiSwap.json
+  #     eventHandlers:
+  #       - event: CollateralAdded(address collateral)
+  #         handler: handleCollateralAdded
+  #       - event: CollateralRemoved(address collateral)
+  #         handler: handleCollateralRemoved
+  #       - event: SynthAdded(bytes32 synth)
+  #         handler: handleSynthAdded
+  #       - event: SynthRemoved(bytes32 synth)
+  #         handler: handleSynthRemoved
+  #       - event: ShortableSynthAdded(bytes32 synth)
+  #         handler: handleShortableSynthAdded
+  #       - event: ShortableSynthRemoved(bytes32 synth)
+  #         handler: handleShortableSynthRemoved
+  #     file: ./src/mappings/collateralManagerMappings.ts
+
+templates:
+  - kind: ethereum/contract
+    name: MultiCollateralSynth
+    network: {{network}}
+    source:
+      abi: MultiCollateralSynth
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Market
+        - LiquidityPoolFee
+      abis:
+        - name: MultiCollateralSynth
+          file: ./abis/synthetix/MultiCollateralSynth.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Issued(indexed address,uint256)
+          handler: handleIssued
+        - event: Burned(indexed address,uint256)
+          handler: handleBurned
+      file: ./src/mappings/synthMappings.ts
