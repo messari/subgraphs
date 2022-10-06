@@ -318,7 +318,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Bastion Protocol",
     "bastion-protocol",
     "2.0.1",
-    "1.1.4",
+    "1.1.5",
     "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),
@@ -371,9 +371,12 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
     if (!token) {
       let BSTNContract = ERC20.bind(REWARD_TOKENS[INT_ZERO]);
       token = new Token(REWARD_TOKENS[INT_ZERO].toHexString());
-      token.name = getOrElse<string>(BSTNContract.try_name(), "unknown");
-      token.symbol = getOrElse<string>(BSTNContract.try_symbol(), "unknown");
-      token.decimals = getOrElse<i32>(BSTNContract.try_decimals(), 0);
+      token.name = getOrElse<string>(
+        BSTNContract.try_name(),
+        "Bastion Protocol"
+      );
+      token.symbol = getOrElse<string>(BSTNContract.try_symbol(), "BSTN");
+      token.decimals = getOrElse<i32>(BSTNContract.try_decimals(), 18);
     }
     token.lastPriceUSD = getBastionPrice();
     token.lastPriceBlockNumber = blockNumber;
@@ -420,13 +423,15 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   if (borrowRewardSpeed && token) {
     let priceUSD = token.lastPriceUSD ? token.lastPriceUSD : BIGDECIMAL_ZERO;
     rewardTokens.push(borrowRewardToken!.id);
-    rewardEmissions.push(borrowRewardSpeed);
+    let dailyBorrowRewards = borrowRewardSpeed.times(
+      BigInt.fromI32(SECONDS_PER_DAY)
+    );
+    rewardEmissions.push(dailyBorrowRewards);
     rewardEmissionsUSD.push(
-      borrowRewardSpeed
+      dailyBorrowRewards
         .toBigDecimal()
         .div(exponentToBigDecimal(token.decimals))
         .times(priceUSD!)
-        .times(BigDecimal.fromString(SECONDS_PER_DAY.toString()))
     );
   }
 
@@ -451,9 +456,12 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
     if (!token) {
       let BSTNContract = ERC20.bind(REWARD_TOKENS[INT_ZERO]);
       token = new Token(REWARD_TOKENS[INT_ZERO].toHexString());
-      token.name = getOrElse<string>(BSTNContract.try_name(), "unknown");
-      token.symbol = getOrElse<string>(BSTNContract.try_symbol(), "unknown");
-      token.decimals = getOrElse<i32>(BSTNContract.try_decimals(), 0);
+      token.name = getOrElse<string>(
+        BSTNContract.try_name(),
+        "Bastion Protocol"
+      );
+      token.symbol = getOrElse<string>(BSTNContract.try_symbol(), "BSTN");
+      token.decimals = getOrElse<i32>(BSTNContract.try_decimals(), 18);
     }
     token.lastPriceUSD = getBastionPrice();
     token.lastPriceBlockNumber = blockNumber;
@@ -498,13 +506,15 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
   if (supplyRewardSpeed && token) {
     let priceUSD = token.lastPriceUSD ? token.lastPriceUSD : BIGDECIMAL_ZERO;
     rewardTokens.push(supplyRewardToken!.id);
-    rewardEmissions.push(supplyRewardSpeed);
+    let dailySupplyRewards = supplyRewardSpeed.times(
+      BigInt.fromI32(SECONDS_PER_DAY)
+    );
+    rewardEmissions.push(dailySupplyRewards);
     rewardEmissionsUSD.push(
       supplyRewardSpeed
         .toBigDecimal()
         .div(exponentToBigDecimal(token.decimals))
         .times(priceUSD!)
-        .times(BigDecimal.fromString(SECONDS_PER_DAY.toString()))
     );
   }
 

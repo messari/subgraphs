@@ -171,10 +171,7 @@ export function createDeposit(
     .times(token0.lastPriceUSD!)
     .plus(amount1Converted.times(token1.lastPriceUSD!));
 
-  // reset tvl aggregates until new amounts calculated
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    pool.totalValueLockedUSD
-  );
+  let oldPoolTVL = pool.totalValueLockedUSD;
 
   // Update pool balances adjusted for decimals and not adjusted
   let poolInputTokenBalances: BigInt[] = [
@@ -195,9 +192,9 @@ export function createDeposit(
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
   // Add pool value back to protocol total value locked
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    pool.totalValueLockedUSD
-  );
+  // reset aggregates with new amounts
+  let delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
   let deposit = new Deposit(
     event.transaction.hash
@@ -227,13 +224,15 @@ export function createDeposit(
   protocol.save();
 }
 
-// Create a deposit from a Burn event from a particular pool contract.
+// Create a deposit from a Burn event or Collect event from a particular pool contract.
 // Also, updated token balances and total value locked.
 export function createWithdraw(
   event: ethereum.Event,
   owner: Address,
+  recipient: Address,
   amount0: BigInt,
-  amount1: BigInt
+  amount1: BigInt,
+  isCollect: boolean
 ): void {
   let poolAddress = event.address.toHexString();
 
@@ -249,15 +248,13 @@ export function createWithdraw(
   let amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
   let amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
 
-  // Get the value in USD of the deposit
+  // Get the value in USD of the withdrawal (or collection)
   let amountUSD = amount0Converted
     .times(token0.lastPriceUSD!)
     .plus(amount1Converted.times(token1.lastPriceUSD!));
 
   // reset tvl aggregates until new amounts calculated
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    pool.totalValueLockedUSD
-  );
+  let oldPoolTVL = pool.totalValueLockedUSD;
 
   // Update pool balances adjusted for decimals and not adjusted
   let poolInputTokenBalances: BigInt[] = [
@@ -278,9 +275,8 @@ export function createWithdraw(
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
   // reset aggregates with new amounts
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    pool.totalValueLockedUSD
-  );
+  let delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
   let withdrawal = new Withdraw(
     event.transaction.hash
@@ -292,7 +288,7 @@ export function createWithdraw(
   withdrawal.hash = event.transaction.hash.toHexString();
   withdrawal.logIndex = event.logIndex.toI32();
   withdrawal.protocol = protocol.id;
-  withdrawal.to = owner.toHexString();
+  withdrawal.to = recipient.toHexString();
   withdrawal.from = pool.id;
   withdrawal.blockNumber = event.block.number;
   withdrawal.timestamp = event.block.timestamp;
@@ -300,6 +296,7 @@ export function createWithdraw(
   withdrawal.inputTokenAmounts = [amount0, amount1];
   withdrawal.pool = pool.id;
   withdrawal.amountUSD = amountUSD;
+  withdrawal.isCollect = isCollect;
 
   withdrawal.save();
   pool.save();
@@ -378,9 +375,7 @@ export function createSwapHandleVolumeAndFees(
   token0.lastPriceBlockNumber = event.block.number;
   token1.lastPriceBlockNumber = event.block.number;
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    pool.totalValueLockedUSD
-  );
+  let oldPoolTVL = pool.totalValueLockedUSD;
 
   /**
    * Things afffected by new USD rates
@@ -390,9 +385,9 @@ export function createSwapHandleVolumeAndFees(
     .times(token0.lastPriceUSD!)
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    pool.totalValueLockedUSD
-  );
+  // reset aggregates with new amounts
+  let delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
   // create Swap event
   let swap = new Swap(
