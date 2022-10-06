@@ -4,16 +4,19 @@
     "mustache": "^4.2.0"
   },
   "devDependencies": {
+    "@graphprotocol/graph-ts": "^0.28.0",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",
     "eslint": "^8.23.1",
+    "eslint-config-prettier": "^8.5.0",
+    "folderslint": "^1.2.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
-    "folderslint": "^1.2.0"
+    "typescript": "^4.8.4"
   },
   "lint-staged": {
-    "*.ts": "eslint --cache --fix",
+    "subgraphs/**/*.ts": "npm run lint",
     "*.{ts,css,md}": "prettier --write"
   },
   "scripts": {
@@ -21,6 +24,7 @@
     "prettier-check": "prettier --loglevel silent --write --check \"**/*.{md,jsx,tsx,ts,json,html,css,js}\"",
     "lint:fix": "npx eslint --fix --max-warnings 0",
     "lint": "npx eslint",
+    "lint:subgraphs": "npx eslint -c subgraphs/.eslintrc.json",
     "prepare": "husky install",
     "folderslint": "cd subgraphs && folderslint"
   }
