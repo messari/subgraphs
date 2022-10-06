@@ -115,8 +115,7 @@ export async function resolveQueriesToAttempt(queriesToAttempt) {
     }
     await sleep(5000);
     if (newQueriesArray.length > 0) {
-        resolveQueriesToAttempt(newQueriesArray);
-        return;
+        return resolveQueriesToAttempt(newQueriesArray);
     }
     return;
-}  
+}
