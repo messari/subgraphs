@@ -219,9 +219,8 @@ type YieldAggregator implements Protocol @entity {
 
   ##### Vaults #####
 
-  # TODO: remove comment when relation is implemented
-  # " All vaults that belong to this protocol "
-  # vaults: [Vault!]! @derivedFrom(field: "protocol")
+  " All vaults that belong to this protocol "
+  vaults: [Vault!]! @derivedFrom(field: "protocol")
 }
 
 ###############################
