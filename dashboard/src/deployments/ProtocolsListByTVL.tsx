@@ -4,6 +4,7 @@ import { formatIntToFixed2 } from "../utils";
 import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 import { useNavigate } from "react-router";
 import { NetworkLogo, NetworkLogos, networkMapping } from "../common/NetworkLogo";
+import { ProtocolTypeDropDown } from "../common/utilComponents/ProtocolTypeDropDown";
 
 interface ProtocolsListByTVLProps {
     protocolsToQuery: { [x: string]: any };
@@ -17,7 +18,7 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
     ChartJS.register(PointElement);
 
     const [defiLlamaProtocols, setDefiLlamaProtocols] = useState<any[]>([]);
-
+    const [currentProtocolType, setProtocolType] = useState<string>("");
     const fetchDefiLlamaProtocols = () => {
         fetch("https://api.llama.fi/protocols", {
             headers: {
@@ -50,10 +51,10 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
         "yield": "Vaults",
         "yield aggregator": "Vaults",
         "reserve currency": "CDP",
+        "cdp": "CDP",
         "lending": "Lending",
         "dexes": "Exchanges",
         "nft lending": "NFT Lending",
-        "cdp": "CDP",
         "nft marketplace": "NFT Marketplace"
     }
 
@@ -62,23 +63,25 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
 
     Object.keys(protocolsToQuery).forEach(slug => {
         if (slug.includes('-finance')) {
-            protocolSlugs.push(slug.split('-finance')[0])
+            protocolSlugs.push(slug.split('-finance')[0]);
         } else {
             protocolSlugs.push(slug + '-finance');
         }
         if (slug.includes('-v2')) {
-            protocolSlugs.push(slug.split('-v2')[0])
+            protocolSlugs.push(slug.split('-v2')[0]);
         }
         if (slug.includes('-v3')) {
-            protocolSlugs.push(slug.split('-v3')[0])
+            protocolSlugs.push(slug.split('-v3')[0]);
         }
     })
+
+    const protocolTypeList: string[] = [];
 
     // Filter defi llama protocols for supported chains, supported schema types, and protocols already accounted for
     const protocolsToDevelop = defiLlamaProtocols.filter(x => {
         let onSupportedChain = false;
-        x.chains.forEach((x: any) => {
-            if (!!Object.keys(NetworkLogos).includes(x.toLowerCase())) {
+        x.chains.forEach((chain: any) => {
+            if (!!Object.keys(NetworkLogos).includes(chain.toLowerCase())) {
                 onSupportedChain = true;
             }
         })
@@ -88,7 +91,15 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
             slugNotUsed = true;
         }
 
-        return slugNotUsed && onSupportedChain && supportedCategory
+        let isCurrentProtocolType = categoryTypesSupported[x?.category?.toLowerCase()] === currentProtocolType;
+        if (currentProtocolType === "") {
+            isCurrentProtocolType = true;
+        }
+        if (!protocolTypeList.includes(x?.category?.toLowerCase()) && supportedCategory) {
+            protocolTypeList.push(x?.category?.toLowerCase());
+        }
+
+        return slugNotUsed && onSupportedChain && supportedCategory && isCurrentProtocolType;
     }).sort((a, b) => b.tvl - a.tvl);
 
     const defiLlamaTableRows: any[] = protocolsToDevelop.map((protocol) => {
@@ -150,17 +161,20 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
 
     return (
         <>
-            <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => navigate("/")}>
-                Back To Deployments List
-            </Button>
+            <div style={{ display: "flex", justifyContent: "space-between", margin: "40px 16px" }}>
+                <Button variant="contained" color="primary" onClick={() => navigate("/")}>
+                    Back To Deployments List
+                </Button>
+                <ProtocolTypeDropDown protocolTypeList={Object.values(categoryTypesSupported).filter((x, i, a) => a.indexOf(x) == i)} setProtocolType={(x: string) => setProtocolType(x)} currentProtocolType={currentProtocolType} />
+            </div>
             <TableContainer sx={{ my: 4 }} key={"TableContainer-DefiLlama"}>
                 <div>
                     <Typography
                         key={"typography-DefiLlama"}
                         variant="h3"
-                        align="center"
+                        align="left"
                         fontWeight={500}
-                        fontSize={36}
+                        fontSize={38}
                         sx={{ padding: "6px", my: 2 }}
                     >
                         Protocols To Develop
