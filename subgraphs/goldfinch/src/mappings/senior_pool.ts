@@ -1,6 +1,6 @@
-import {Address} from "@graphprotocol/graph-ts"
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
-  SeniorPool,
+  SeniorPool as SeniorPoolContract,
   DepositMade,
   InterestCollected,
   InvestmentMadeInJunior,
@@ -9,70 +9,354 @@ import {
   PrincipalWrittenDown,
   ReserveFundsCollected,
   WithdrawalMade,
-} from "../../generated/SeniorPool/SeniorPool"
-import {CONFIG_KEYS_ADDRESSES} from "../constants"
-import {createTransactionFromEvent} from "../entities/helpers"
-import {updatePoolInvestments, updatePoolStatus} from "../entities/senior_pool"
-import {handleDeposit} from "../entities/user"
-import {getAddressFromConfig} from "../utils"
+} from "../../generated/templates/SeniorPool/SeniorPool";
+import { Fidu as FiduContract } from "../../generated/templates/SeniorPool/Fidu";
 
-// Helper function to extract the StakingRewards address from the config on Senior Pool
-function getStakingRewardsAddressFromSeniorPoolAddress(seniorPoolAddress: Address): Address {
-  const seniorPoolContract = SeniorPool.bind(seniorPoolAddress)
-  return getAddressFromConfig(seniorPoolContract, CONFIG_KEYS_ADDRESSES.StakingRewards)
-}
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_ZERO,
+  INT_ONE,
+  INT_ZERO,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+  TransactionType,
+  USDC_ADDRESS,
+  USDC_DECIMALS,
+} from "../common/constants";
+import { createTransactionFromEvent } from "../entities/helpers";
+import {
+  updatePoolInvestments,
+  updatePoolStatus,
+} from "../entities/senior_pool";
+import { handleDeposit } from "../entities/user";
+import { bigIntToBDUseDecimals } from "../common/utils";
+import {
+  getOrCreateAccount,
+  getOrCreateMarket,
+  getOrCreateProtocol,
+  getOrCreateUsageMetricsDailySnapshot,
+  getOrCreateUsageMetricsHourlySnapshot,
+} from "../common/getters";
+import {
+  Account,
+  ActiveAccount,
+  Deposit,
+  Token,
+  Withdraw,
+} from "../../generated/schema";
+import {
+  createTransaction,
+  snapshotFinancials,
+  snapshotMarket,
+  updateRevenues,
+  updateUsageMetrics,
+} from "../common/helpers";
 
 export function handleDepositMade(event: DepositMade): void {
-  updatePoolStatus(event.address)
-  handleDeposit(event)
+  const capitalProvider = event.params.capitalProvider.toHexString();
+  const amount = event.params.amount;
+  const amountUSD = amount.divDecimal(USDC_DECIMALS);
+  const protocol = getOrCreateProtocol();
+  const market = getOrCreateMarket(event.address.toHexString(), event);
+  const inputToken = Token.load(market.inputToken)!;
+  const outputToken = Token.load(market.outputToken!)!;
 
-  const stakingRewardsAddress = getStakingRewardsAddressFromSeniorPoolAddress(event.address)
+  // USDC
+  market.inputTokenBalance = market.inputTokenBalance.plus(event.params.amount);
+  market.inputTokenPriceUSD = bigIntToBDUseDecimals(
+    market.inputTokenBalance,
+    inputToken.decimals
+  );
+  market.inputTokenPriceUSD = BIGDECIMAL_ONE;
+  const seniorPoolContract = SeniorPoolContract.bind(event.address);
+  const fiduContract = FiduContract.bind(
+    Address.fromString(market.outputToken!)
+  );
+  market.outputTokenSupply = fiduContract.totalSupply();
+  market.outputTokenPriceUSD = bigIntToBDUseDecimals(
+    seniorPoolContract.sharePrice(),
+    outputToken.decimals
+  );
+  market.exchangeRate = bigIntToBDUseDecimals(
+    event.params.amount,
+    inputToken.decimals
+  ).div(bigIntToBDUseDecimals(event.params.shares, outputToken.decimals));
 
+  market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(amountUSD);
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+  market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
+  market.save();
+
+  protocol.totalDepositBalanceUSD =
+    protocol.totalDepositBalanceUSD.plus(amountUSD);
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
+  protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(amountUSD);
+  protocol.save();
+
+  snapshotMarket(market, amountUSD, event, TransactionType.DEPOSIT);
+  snapshotFinancials(protocol, amountUSD, event, TransactionType.DEPOSIT);
+
+  //TODO updatePosition
+  createTransaction(
+    TransactionType.DEPOSIT,
+    market,
+    capitalProvider,
+    "",
+    amount,
+    amountUSD,
+    event
+  );
+
+  // ORIGINAL CODE BELOW
+  /*
+  const rewardTokenAddr = getStakingRewardsAddressFromSeniorPoolAddress(
+    event.address
+  );
+  */
+
+  const rewardTokenAddress = Address.fromString(market.rewardTokens![0]);
+  updatePoolStatus(event.address);
+  handleDeposit(event);
   // Purposefully ignore deposits from StakingRewards contract because those will get captured as DepositAndStake events instead
-  if (!event.params.capitalProvider.equals(stakingRewardsAddress)) {
-    const transaction = createTransactionFromEvent(event, "SENIOR_POOL_DEPOSIT", event.params.capitalProvider)
-    transaction.amount = event.params.amount
-    transaction.amountToken = "USDC"
-    transaction.save()
+  if (!event.params.capitalProvider.equals(rewardTokenAddress)) {
+    createTransactionFromEvent(
+      event,
+      "SENIOR_POOL_DEPOSIT",
+      event.params.capitalProvider,
+      event.params.amount
+    );
   }
-}
-
-export function handleInterestCollected(event: InterestCollected): void {
-  updatePoolStatus(event.address)
-}
-
-export function handleInvestmentMadeInJunior(event: InvestmentMadeInJunior): void {
-  updatePoolStatus(event.address)
-  updatePoolInvestments(event.address, event.params.tranchedPool)
-}
-
-export function handleInvestmentMadeInSenior(event: InvestmentMadeInSenior): void {
-  updatePoolStatus(event.address)
-  updatePoolInvestments(event.address, event.params.tranchedPool)
-}
-
-export function handlePrincipalCollected(event: PrincipalCollected): void {
-  updatePoolStatus(event.address)
-}
-
-export function handlePrincipalWrittenDown(event: PrincipalWrittenDown): void {
-  updatePoolStatus(event.address)
-}
-
-export function handleReserveFundsCollected(event: ReserveFundsCollected): void {
-  updatePoolStatus(event.address)
 }
 
 export function handleWithdrawalMade(event: WithdrawalMade): void {
-  updatePoolStatus(event.address)
+  const capitalProvider = event.params.capitalProvider.toHexString();
+  const amount = event.params.userAmount.plus(event.params.reserveAmount);
+  const amountUSD = amount.divDecimal(USDC_DECIMALS);
 
-  const stakingRewardsAddress = getStakingRewardsAddressFromSeniorPoolAddress(event.address)
+  const protocol = getOrCreateProtocol();
+  const market = getOrCreateMarket(event.address.toHexString(), event);
+  const outputToken = Token.load(market.outputToken!)!;
 
+  // USDC
+  market.totalDepositBalanceUSD =
+    market.totalDepositBalanceUSD.minus(amountUSD);
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+  market.inputTokenBalance = market.inputTokenBalance.minus(amount);
+  market.inputTokenPriceUSD = BIGDECIMAL_ONE;
+
+  const seniorPoolContract = SeniorPoolContract.bind(event.address);
+  const fiduContract = FiduContract.bind(
+    Address.fromString(market.outputToken!)
+  );
+  market.outputTokenSupply = fiduContract.totalSupply();
+  market.outputTokenPriceUSD = bigIntToBDUseDecimals(
+    seniorPoolContract.sharePrice(),
+    outputToken.decimals
+  );
+
+  protocol.totalDepositBalanceUSD =
+    protocol.totalDepositBalanceUSD.minus(amountUSD);
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
+
+  //TODO updatePosition
+  createTransaction(
+    TransactionType.WITHDRAW,
+    market,
+    capitalProvider,
+    "",
+    amount,
+    amountUSD,
+    event
+  );
+
+  market.save();
+  protocol.save();
+
+  snapshotMarket(market, amountUSD, event, TransactionType.WITHDRAW);
+  snapshotFinancials(protocol, amountUSD, event, TransactionType.WITHDRAW);
+  updateUsageMetrics(
+    protocol,
+    capitalProvider,
+    event,
+    TransactionType.WITHDRAW
+  );
+
+  // ORIGINAL CODE BELOW
+  /*
+  const stakingRewardsAddress = getStakingRewardsAddressFromSeniorPoolAddress(
+    event.address
+  );
+  */
+
+  const rewardTokenAddress = Address.fromString(market.rewardTokens![0]);
+  updatePoolStatus(event.address);
   // Purposefully ignore withdrawals made by StakingRewards contract because those will be captured as UnstakeAndWithdraw
-  if (!event.params.capitalProvider.equals(stakingRewardsAddress)) {
-    const transaction = createTransactionFromEvent(event, "SENIOR_POOL_WITHDRAWAL", event.params.capitalProvider)
-    transaction.amount = event.params.userAmount
-    transaction.amountToken = "USDC"
-    transaction.save()
+  if (!event.params.capitalProvider.equals(rewardTokenAddress)) {
+    createTransactionFromEvent(
+      event,
+      "SENIOR_POOL_WITHDRAWAL",
+      event.params.capitalProvider,
+      event.params.userAmount
+    );
   }
 }
+// this event is never emitted in the current version
+export function handleInvestmentMadeInJunior(
+  event: InvestmentMadeInJunior
+): void {
+  updatePoolStatus(event.address);
+  updatePoolInvestments(event.address, event.params.tranchedPool);
+}
+
+export function handleInvestmentMadeInSenior(
+  event: InvestmentMadeInSenior
+): void {
+  const newBorrowUSD = event.params.amount.divDecimal(USDC_DECIMALS);
+  const market = getOrCreateMarket(event.address.toHexString(), event);
+  market.totalBorrowBalanceUSD =
+    market.totalBorrowBalanceUSD.plus(newBorrowUSD);
+  market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(newBorrowUSD);
+  market.save();
+
+  snapshotMarket(market, newBorrowUSD, event, null);
+  // not updating protocol as it is updated when a borrower draws down
+  // the creditline
+  /*
+  const protocol = getOrCreateProtocol();
+  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(newBorrowUSD)
+  protocol.cumulativeBorrowUSD =
+    protocol.cumulativeBorrowUSD.plus(newBorrowUSD);
+  protocol.save();
+  */
+
+  // not updating usage metrics as this is not of the transaction type of interest
+
+  // ORIGINAL CODE
+  updatePoolStatus(event.address);
+  updatePoolInvestments(event.address, event.params.tranchedPool);
+}
+
+export function handleInterestCollected(event: InterestCollected): void {
+  // this is the interest for the supply side; protocol side is
+  // handled in handleReserveFundsCollected
+  const protocol = getOrCreateProtocol();
+  const market = getOrCreateMarket(event.address.toHexString(), event);
+  const outputToken = Token.load(market.outputToken!)!;
+  const newSupplySideRevUSD = event.params.amount.divDecimal(USDC_DECIMALS);
+
+  const seniorPoolContract = SeniorPoolContract.bind(event.address);
+  outputToken.lastPriceUSD = bigIntToBDUseDecimals(
+    seniorPoolContract.sharePrice(),
+    outputToken.decimals
+  );
+  market.outputTokenPriceUSD = outputToken.lastPriceUSD;
+  market.save();
+  outputToken.save();
+
+  // depending on whether the interest is from compound or from a tranched pool
+  // if it is from compound, update protocol level revenue
+  // if it is a tranched pool, the interest revenue has been accounted there
+  let updateProtocol = false;
+  if (event.params.payer == event.address) {
+    // interest from compound sweep, new revenue not having been accounted
+    updateProtocol = true;
+  }
+  updateRevenues(
+    protocol,
+    market,
+    newSupplySideRevUSD,
+    BIGDECIMAL_ZERO,
+    event,
+    updateProtocol
+  );
+
+  // ORIGINAL CODE
+  updatePoolStatus(event.address);
+}
+
+export function handlePrincipalCollected(event: PrincipalCollected): void {
+  const deltaBorrowUSD = event.params.amount.divDecimal(USDC_DECIMALS);
+  const market = getOrCreateMarket(event.address.toHexString(), event);
+  market.totalBorrowBalanceUSD =
+    market.totalBorrowBalanceUSD.minus(deltaBorrowUSD);
+  market.save();
+
+  const protocol = getOrCreateProtocol();
+  protocol.totalBorrowBalanceUSD =
+    protocol.totalBorrowBalanceUSD.minus(deltaBorrowUSD);
+  protocol.save();
+
+  snapshotMarket(market, deltaBorrowUSD, event, null);
+  snapshotFinancials(protocol, deltaBorrowUSD, event, null);
+
+  // ORIGINAL CODE
+  updatePoolStatus(event.address);
+}
+
+export function handlePrincipalWrittenDown(event: PrincipalWrittenDown): void {
+  // writing down amount can be positive (recovering of previous writing down) or negative
+  const amountUSD = event.params.amount.divDecimal(USDC_DECIMALS);
+  const market = getOrCreateMarket(event.address.toHexString(), event);
+  const outputToken = Token.load(market.outputToken!)!;
+  market.inputTokenBalance = market.inputTokenBalance.plus(event.params.amount);
+  market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(amountUSD);
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+  market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(amountUSD);
+
+  const seniorPoolContract = SeniorPoolContract.bind(event.address);
+  outputToken.lastPriceUSD = bigIntToBDUseDecimals(
+    seniorPoolContract.sharePrice(),
+    outputToken.decimals
+  );
+  market.outputTokenPriceUSD = outputToken.lastPriceUSD;
+  market.save();
+  outputToken.save();
+  market.save();
+
+  const protocol = getOrCreateProtocol();
+  protocol.totalDepositBalanceUSD =
+    protocol.totalDepositBalanceUSD.plus(amountUSD);
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
+  protocol.totalBorrowBalanceUSD =
+    protocol.totalBorrowBalanceUSD.plus(amountUSD);
+  protocol.save();
+
+  // TODO: update supplySideRevenue?
+  snapshotMarket(market, amountUSD, event, null, false);
+  snapshotFinancials(protocol, amountUSD, event, null);
+
+  //
+  updatePoolStatus(event.address);
+}
+
+export function handleReserveFundsCollected(
+  event: ReserveFundsCollected
+): void {
+  const protocol = getOrCreateProtocol();
+  const market = getOrCreateMarket(event.address.toHexString(), event);
+  const newProtocolSideRevenueUSD =
+    event.params.amount.divDecimal(USDC_DECIMALS);
+  updateRevenues(
+    protocol,
+    market,
+    BIGDECIMAL_ZERO,
+    newProtocolSideRevenueUSD,
+    event,
+    true
+  );
+
+  //
+  updatePoolStatus(event.address);
+}
+
+/*
+// Helper function to extract the StakingRewards address from the config on Senior Pool
+function getStakingRewardsAddressFromSeniorPoolAddress(
+  seniorPoolAddress: Address
+): Address {
+  const seniorPoolContract = SeniorPoolContract.bind(seniorPoolAddress);
+  return getAddressFromConfig(
+    seniorPoolContract,
+    CONFIG_KEYS_ADDRESSES.StakingRewards
+  );
+} */
