@@ -26,7 +26,7 @@ export const ProtocolTypeDropDown = ({
           setProtocolType(targEle.innerText);
         }}
         renderInput={(params) => (
-          <ComboBoxInput label="Protocol Type Selection" params={params} setTextInput={(x) => setProtocolType(x)} />
+          <ComboBoxInput label="Protocol Type Selection" params={params} setTextInput={(x: string) => console.log(x)} />
         )}
       />
     </>

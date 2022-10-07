@@ -36,9 +36,10 @@ export const networkMapping: { [x: string]: string } = {
 interface NetworkLogoProps {
   network: string;
   size: number;
+  tooltip: string;
 }
 
-export const NetworkLogo = ({ network, size }: NetworkLogoProps) => {
+export const NetworkLogo = ({ network, size, tooltip }: NetworkLogoProps) => {
   let src = NetworkLogos[network];
   let opacity = 1;
   if (!src) {
@@ -48,5 +49,5 @@ export const NetworkLogo = ({ network, size }: NetworkLogoProps) => {
     src = NetworkLogos.ethereum;
     opacity = 0;
   }
-  return <Tooltip title={network} placement="top"><Avatar sx={{ height: size, width: size, opacity }} src={src} /></Tooltip >;
+  return <Tooltip title={tooltip} placement="bottom"><Avatar sx={{ height: size, width: size, opacity }} src={src} /></Tooltip >;
 };
