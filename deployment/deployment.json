@@ -1170,6 +1170,10 @@
           "hosted-service": {
             "slug": "cream-finance-ethereum",
             "query-id": "cream-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "cream-finance-ethereum",
+            "query-id": "9NjYuG2BFU1BPacNdKymd9eNdfVCaJM6LhsgD8zSQgDK"
           }
         }
       },
@@ -1510,6 +1514,10 @@
           "hosted-service": {
             "slug": "rari-fuse-ethereum",
             "query-id": "rari-fuse-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "rari-fuse-ethereum",
+            "query-id": "9YiJM9oHy25estSJjB1Z71Hdz5C814R3vDoS2ezpN27C"
           }
         }
       }
@@ -1973,6 +1981,10 @@
           "hosted-service": {
             "slug": "truefi-ethereum",
             "query-id": "truefi-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "truefi-ethereum",
+            "query-id": "EfbqRompqd9DVYJHgNqnB9Ni2kiWCBfVagWxcBQ7EUCz"
           }
         }
       }
@@ -3146,6 +3158,10 @@
           "hosted-service": {
             "slug": "rari-vaults-ethereum",
             "query-id": "rari-vaults-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "rari-vaults-ethereum",
+            "query-id": "Duw2tSACo9uRGFctAGsCc9pF7ZGMyqpjkAHPwm49dZe6"
           }
         }
       }
