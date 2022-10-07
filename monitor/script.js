@@ -60,7 +60,7 @@ async function executionFlow() {
     });
   });
 
-  await getAllThreadsToClear(Date.now(), process.env.CHANNEL_ID);
+  await getAllThreadsToClear(Date.now() - (86400000 * 7), process.env.CHANNEL_ID);
 
   const indexStatusFlowObject = await indexStatusFlow(deployments);
   deployments = indexStatusFlowObject.deployments;
