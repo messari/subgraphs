@@ -49,5 +49,5 @@ export const NetworkLogo = ({ network, size, tooltip }: NetworkLogoProps) => {
     src = NetworkLogos.ethereum;
     opacity = 0;
   }
-  return <Tooltip title={tooltip} placement="bottom"><Avatar sx={{ height: size, width: size, opacity }} src={src} /></Tooltip >;
+  return <Tooltip style={{ whiteSpace: "pre-wrap" }} title={tooltip} placement="bottom"><Avatar sx={{ height: size, width: size, opacity }} src={src} /></Tooltip >;
 };

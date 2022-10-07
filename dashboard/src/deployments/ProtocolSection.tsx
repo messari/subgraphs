@@ -507,7 +507,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                         if (syncedDecen) {
                             indexedDecen = formatIntToFixed2(100);
                         }
-                        return <a key={"CellNetwork-" + x.chain + x.hostedServiceId} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo tooltip={indexedDecen + '%'} size={30} network={x.chain} /></a>
+                        return <a key={"CellNetwork-" + x.chain + x.hostedServiceId} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo tooltip={`${x.chain} (${indexedDecen}%)`} size={30} network={x.chain} /></a>
                     })
                     }
                 </TableCell>
@@ -610,7 +610,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                             if (!!x?.indexStatus?.fatalError) {
                                 borderColor = "#B8301C";
                             }
-                            return <a key={subgraphName + x.hostedServiceId + 'Logo'} style={{ height: "100%", border: borderColor + " 4px solid", borderRadius: "50%" }} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo tooltip={indexedDecen + '%'} size={28} network={x.chain} /></a>
+                            return <a key={subgraphName + x.hostedServiceId + 'Logo'} style={{ height: "100%", border: borderColor + " 4px solid", borderRadius: "50%" }} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo tooltip={`${x.chain} (${indexedDecen}%)`} size={28} network={x.chain} /></a>
                         })}
                     </>
                 </Tooltip>
