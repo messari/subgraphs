@@ -4558,7 +4558,7 @@
     "base": "seaport",
     "protocol": "seaport",
     "deployments": {
-      "seaport-ethereum": {
+      "opensea-seaport-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
