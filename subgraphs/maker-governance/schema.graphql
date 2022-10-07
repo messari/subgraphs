@@ -90,12 +90,21 @@ enum SpellState {
   SCHEDULED
   CAST
 }
+type DelegateAdmin @entity {
+  "A delegate admin is an address controls a Vote Delegate contract"
+  id: String!
+  "Vote delegate contract that delegate admin controls"
+  voteDelegate: Delegate
+}
 
 type Delegate @entity {
   "A Delegate is any address that has been delegated with voting tokens by a token holder, id is the blockchain address of said delegate"
   id: String!
   "Is a vote delegate contract"
   isVoteDelegate: Boolean
+
+  "Delegate admin is the address that controls a Vote Delegate contract"
+  delegateAdmin: DelegateAdmin
 
   "Delegate voting power expressed in the smallest unit of the token"
   votingPowerRaw: BigInt!

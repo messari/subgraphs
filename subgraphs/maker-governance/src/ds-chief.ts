@@ -1,7 +1,13 @@
 import { BigInt, Bytes, Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { LogNote, Etch } from "../generated/DSChief/DSChief";
 import { VoteDelegate } from "../generated/DSChief/VoteDelegate";
-import { Slate, Spell, Vote, Delegate } from "../generated/schema";
+import {
+  Slate,
+  Spell,
+  Vote,
+  Delegate,
+  DelegateAdmin,
+} from "../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ONE,
@@ -38,13 +44,18 @@ export function handleLock(event: LogNote): void {
 
     // Check if vote delegate contract by calling chief()
     let voteDelegate = VoteDelegate.bind(sender);
-    let res = voteDelegate.try_chief();
+    let res = voteDelegate.try_delegate();
     // will revert if not a contract
     if (!res.reverted) {
-      delegate.isVoteDelegate = true;
+      // Save delegate admin to identify proxy votes later
+      let delegateAdmin = new DelegateAdmin(res.value.toHexString());
+      delegateAdmin.voteDelegate = delegate.id;
+      delegateAdmin.save();
+
       // Track this new vote delegate contract
       VoteDelegateTemplate.create(sender);
 
+      delegate.isVoteDelegate = true;
       newDelegateCount = 1;
     }
   }
@@ -86,9 +97,23 @@ export function handleVote(event: LogNote): void {
 
 export function handleEtch(event: Etch): void {
   let sender = event.transaction.from.toHexString();
-  // Check if txn is coming from a vote delegate contract, if so treat it as sender
+  // Check if txn is not directly to Chief, it's either to vote delegate or multi-sig + delegate
   if (event.transaction.to && event.transaction.to != event.address) {
-    sender = event.transaction.to!.toHexString();
+    let fromAdmin = DelegateAdmin.load(sender);
+    if (!fromAdmin) {
+      let toAdmin = DelegateAdmin.load(event.transaction.to!.toHexString());
+      if (!toAdmin) {
+        log.error("Etch not trigger by a delegate admin. TxnHash: {}", [
+          event.transaction.hash.toHexString(),
+        ]);
+      } else {
+        // Txn sent via a proxy/multi-sig to vote delegate
+        sender = toAdmin.voteDelegate!;
+      }
+    } else {
+      // Txn sent to vote delegate
+      sender = fromAdmin.voteDelegate!;
+    }
   }
   let slateID = event.params.slate;
   _handleSlateVote(sender, slateID, event);
