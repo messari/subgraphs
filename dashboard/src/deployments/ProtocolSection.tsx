@@ -96,7 +96,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
-                                <NetworkLogo key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
+                                <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
@@ -156,7 +156,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
-                                <NetworkLogo key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
+                                <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.chain + 'Logo-PENDING'} size={30} network={depo.chain} />
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
@@ -278,7 +278,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
-                            <NetworkLogo key={subgraphName + depo.chain + 'Logo-DECEN'} size={30} network={depo.chain} />
+                            <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.chain + 'Logo-DECEN'} size={30} network={depo.chain} />
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                             {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
@@ -373,7 +373,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
-                            <NetworkLogo key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
+                            <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                             {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
@@ -434,7 +434,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0 16px 0 30px", textAlign: "right", display: "flex" }}>
-                            <NetworkLogo key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
+                            <NetworkLogo tooltip={depo.chain} key={subgraphName + depo.hostedServiceId + 'Logo'} size={30} network={depo.chain} />
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                             {depo?.status === "prod" ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
@@ -491,7 +491,25 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right", display: "flex" }}>
-                    {protocol.networks.map((x: { [x: string]: any }) => <a key={"CellNetwork-" + x.chain + x.hostedServiceId} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo size={30} network={x.chain} /></a>)}
+                    {protocol.networks.map((x: { [x: string]: any }) => {
+                        const decenObject = x?.indexStatus;
+                        let syncedDecen = decenObject?.synced ?? {};
+                        let statusDecenDataOnChain: { [x: string]: any } = {};
+                        if (decenObject?.chains?.length > 0) {
+                            statusDecenDataOnChain = decenObject?.chains[0];
+                        }
+
+                        let indexedDecen = formatIntToFixed2(toPercent(
+                            statusDecenDataOnChain?.latestBlock?.number - statusDecenDataOnChain?.earliestBlock?.number || 0,
+                            statusDecenDataOnChain?.chainHeadBlock?.number - statusDecenDataOnChain?.earliestBlock?.number,
+                        ));
+
+                        if (syncedDecen) {
+                            indexedDecen = formatIntToFixed2(100);
+                        }
+                        return <a key={"CellNetwork-" + x.chain + x.hostedServiceId} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo tooltip={indexedDecen + '%'} size={30} network={x.chain} /></a>
+                    })
+                    }
                 </TableCell>
                 <TableCell sx={{ padding: "0", paddingRight: "16px", textAlign: "right" }}>
                     {protocol?.status ? <img src="https://images.emojiterra.com/twitter/v13.1/512px/2705.png" height="24px" width="24px" /> : <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f6e0.png" height="24px" width="24px" />}
@@ -570,6 +588,21 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 <Tooltip title="Click To View All Deployments On This Protocol" placement="top" >
                     <>
                         {protocol.networks.map((x: { [x: string]: any }) => {
+                            const decenObject = x?.indexStatus;
+                            let syncedDecen = decenObject?.synced ?? {};
+                            let statusDecenDataOnChain: { [x: string]: any } = {};
+                            if (decenObject?.chains?.length > 0) {
+                                statusDecenDataOnChain = decenObject?.chains[0];
+                            }
+
+                            let indexedDecen = formatIntToFixed2(toPercent(
+                                statusDecenDataOnChain?.latestBlock?.number - statusDecenDataOnChain?.earliestBlock?.number || 0,
+                                statusDecenDataOnChain?.chainHeadBlock?.number - statusDecenDataOnChain?.earliestBlock?.number,
+                            ));
+
+                            if (syncedDecen) {
+                                indexedDecen = formatIntToFixed2(100);
+                            }
                             let borderColor = "#EFCB68";
                             if (!!x?.indexStatus?.synced) {
                                 borderColor = "#58BC82";
@@ -577,7 +610,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                             if (!!x?.indexStatus?.fatalError) {
                                 borderColor = "#B8301C";
                             }
-                            return <a key={subgraphName + x.hostedServiceId + 'Logo'} style={{ height: "100%", border: borderColor + " 4px solid", borderRadius: "50%" }} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo size={28} network={x.chain} /></a>
+                            return <a key={subgraphName + x.hostedServiceId + 'Logo'} style={{ height: "100%", border: borderColor + " 4px solid", borderRadius: "50%" }} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo tooltip={indexedDecen + '%'} size={28} network={x.chain} /></a>
                         })}
                     </>
                 </Tooltip>
