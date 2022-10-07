@@ -90,6 +90,7 @@ export class PangolinAvalancheConfigurations implements Configurations {
       "0xc7198437980c041c805a1edcba50c1ce5db95118", // USDT.e
       "0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7", // USDT
       "0xde3a24028580884448a5397872046a019649b084", // USDT old
+      "0xba7deebbfc5fa1100fb055a87773e1e99cd3507a", // DAI
     ];
   }
   getStableOraclePools(): string[] {
@@ -97,6 +98,7 @@ export class PangolinAvalancheConfigurations implements Configurations {
       "0xe3ba3d5e3f98eeff5e9eddd5bd20e476202770da", // USDt/wAVAX
       "0x0e0100ab771e9288e0aa97e11557e6654c3a9665", // USDC/wAVAX
       "0xbd918ed441767fe7924e99f6a0e0b568ac1970d9", // USDC.e/wAVAX
+      "0x17a2e8275792b4616befb02eb9ae699aa0dcb94b", // DAI/wAVAX
     ];
   }
 
