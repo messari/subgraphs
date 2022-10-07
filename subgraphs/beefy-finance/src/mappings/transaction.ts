@@ -1,6 +1,9 @@
-import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Deposit, Withdraw } from "../../generated/schema";
-import { PROTOCOL_ID } from "../utils/constants";
+import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Deposit, Vault, VaultFee, Withdraw } from "../../generated/schema";
+import { BIGDECIMAL_ZERO, PROTOCOL_ID } from "../utils/constants";
+import { getFees, getOrCreateVaultDailySnapshot } from "../utils/getters";
+import { updateProtocolRevenue } from "./protocol";
+import { updateVaultAndSnapshots } from "./vault";
 
 export function createDeposit(
   event: ethereum.Event,
@@ -24,7 +27,6 @@ export function createDeposit(
   deposit.asset = assetAddress;
   deposit.amount = amount;
   deposit.amountUSD = amountUSD;
-
   deposit.vault = vaultId;
 
   deposit.save();
@@ -52,8 +54,36 @@ export function createWithdraw(
   withdraw.asset = assetAddress;
   withdraw.amount = amount;
   withdraw.amountUSD = amountUSD;
-
   withdraw.vault = vaultId;
 
   withdraw.save();
+
+  // calculate withdrawal fee if there is one
+  const vault = Vault.load(vaultId);
+  if (!vault) {
+    log.warning("[createWithdraw] vault not found: {}", [vaultId]);
+    return;
+  }
+
+  if (vault.fees.length == 2) {
+    const withdrawalFee = VaultFee.load(vault.fees[1]); // withdraw fee always at index 1 (if exists)
+    if (!withdrawalFee) {
+      log.warning("[createWithdraw] withdrawalFee not found: {}", [
+        vault.fees[1],
+      ]);
+      return;
+    }
+    const feeUSD = amountUSD.times(withdrawalFee.feePercentage);
+
+    updateProtocolRevenue(feeUSD, BIGDECIMAL_ZERO, feeUSD, event);
+
+    // update vault.dailyTotalRevenueUSD
+    const vaultDailySnapshot = getOrCreateVaultDailySnapshot(vault.id, event);
+    vaultDailySnapshot.dailyTotalRevenueUSD =
+      vaultDailySnapshot.dailyTotalRevenueUSD.plus(feeUSD);
+    vaultDailySnapshot.save();
+
+    // udpate vault values and snapshots
+    updateVaultAndSnapshots(vault, event);
+  }
 }
