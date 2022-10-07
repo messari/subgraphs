@@ -2611,8 +2611,8 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.1",
-          "methodology": "1.1.0"
+          "subgraph": "1.2.0",
+          "methodology": "1.0.1"
         },
         "files": {
           "template": "makerdao.template.yaml"
