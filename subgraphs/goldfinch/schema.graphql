@@ -1,0 +1,306 @@
+"""
+Notes
+- address are mapped as IDs
+- We are using reverse lookups to create virtual fields:
+  https://thegraph.com/docs/developer/create-subgraph-hosted#reverse-lookups
+"""
+type SeniorPool @entity {
+  id: ID!
+  latestPoolStatus: SeniorPoolStatus!
+  investmentsMade: [TranchedPool!]!
+}
+
+enum StakedPositionType {
+  Fidu
+  CurveLP
+}
+
+type SeniorPoolStakedPosition @entity {
+  id: ID!
+  user: User!
+  initialAmount: BigInt!
+  amount: BigInt!
+  positionType: StakedPositionType!
+  """
+  endTime has to be queried via RPC on client due to a complication: calling positions() on the StakingRewards contract is difficult due to its signature changing over time.
+  """
+  startTime: BigInt!
+  totalRewardsClaimed: BigInt!
+}
+
+type SeniorPoolStatus @entity {
+  """
+  This entity is a singleton, so the id is always "1"
+  """
+  id: ID!
+  rawBalance: BigInt!
+  compoundBalance: BigInt!
+  balance: BigInt!
+  """
+  The actual amount of USDC associated with the Senior Pool contract, can also be thought of as the Senior Pool's liquidity in USDC
+  """
+  usdcBalance: BigInt!
+  sharePrice: BigInt!
+  totalShares: BigInt!
+  totalPoolAssets: BigInt!
+  totalPoolAssetsUsdc: BigInt!
+  totalLoansOutstanding: BigInt!
+  cumulativeWritedowns: BigInt!
+  tranchedPools: [TranchedPool!]!
+  cumulativeDrawdowns: BigInt! # TODO requries tranched pool data
+  estimatedTotalInterest: BigDecimal!
+  estimatedApy: BigDecimal!
+  estimatedApyFromGfiRaw: BigDecimal!
+  defaultRate: BigInt! # TODO requires cumulativeDrawdowns
+  remainingCapacity: BigInt # TODO requires goldfinchConfig.totalFundsLimit
+}
+
+type User @entity {
+  id: ID!
+  seniorPoolStakedPositions: [SeniorPoolStakedPosition!]! @derivedFrom(field: "user")
+
+  tranchedPoolTokens: [TranchedPoolToken!]!
+  zaps: [Zap!]! @derivedFrom(field: "user")
+
+  isNonUsIndividual: Boolean!
+  isUsAccreditedIndividual: Boolean!
+  isUsNonAccreditedIndividual: Boolean!
+  isUsEntity: Boolean!
+  isNonUsEntity: Boolean!
+  isGoListed: Boolean!
+
+  transactions: [Transaction!]! @derivedFrom(field: "user")
+
+  communityRewardsTokens: [CommunityRewardsToken!]! @derivedFrom(field: "user")
+}
+
+type SeniorTrancheInfo @entity {
+  id: ID!
+  trancheId: BigInt!
+  tranchedPool: TranchedPool!
+  lockedUntil: BigInt!
+  principalDeposited: BigInt!
+  principalSharePrice: BigInt!
+  interestSharePrice: BigInt!
+}
+
+type JuniorTrancheInfo @entity {
+  id: ID!
+  trancheId: BigInt!
+  tranchedPool: TranchedPool!
+  lockedUntil: BigInt!
+  principalDeposited: BigInt!
+  principalSharePrice: BigInt!
+  interestSharePrice: BigInt!
+}
+
+type CreditLine @entity {
+  id: ID!
+  borrower: Bytes!
+  tranchedPool: TranchedPool! @derivedFrom(field: "creditLine")
+  limit: BigInt!
+  maxLimit: BigInt!
+  interestApr: BigInt!
+  balance: BigInt!
+  interestAccruedAsOf: BigInt!
+  paymentPeriodInDays: BigInt!
+  termInDays: BigInt!
+  nextDueTime: BigInt!
+  interestOwed: BigInt!
+  termEndTime: BigInt!
+  termStartTime: BigInt!
+  lastFullPaymentTime: BigInt!
+  version: TranchedPoolCreditLineVersion!
+  lateFeeApr: BigDecimal!
+  interestAprDecimal: BigDecimal!
+  isEligibleForRewards: Boolean!
+}
+
+enum TranchedPoolCreditLineVersion {
+  BEFORE_V2_2
+  V2_2
+}
+
+enum UidType {
+  NON_US_INDIVIDUAL
+  US_ACCREDITED_INDIVIDUAL
+  US_NON_ACCREDITED_INDIVIDUAL
+  US_ENTITY
+  NON_US_ENTITY
+}
+
+type TranchedPool @entity {
+  id: ID!
+  estimatedJuniorApy: BigDecimal!
+  estimatedJuniorApyFromGfiRaw: BigDecimal!
+  estimatedTotalAssets: BigInt!
+  estimatedLeverageRatio: BigInt
+  remainingCapacity: BigInt!
+  """
+  Note that this is just an estimate based on the fixed leverage ratio. If leverage ratio was not fixed, it would be much harder to estimate the remaining junior capacity
+  """
+  remainingJuniorCapacity: BigInt!
+  creditLine: CreditLine!
+  isPaused: Boolean!
+  """
+  Set to true for tranched pools that were created before the advent of junior/senior tranches. These pools have junior investment only, and they are considered legacy
+  """
+  isV1StyleDeal: Boolean!
+  juniorFeePercent: BigInt!
+  reserveFeePercent: BigInt!
+  totalDeposited: BigInt!
+  juniorDeposited: BigInt!
+  totalDeployed: BigInt!
+  fundableAt: BigInt!
+  """
+  This number is only becomes non-zero after the senior pool invests in a pool, which happens after the junior portion is locked
+  """
+  estimatedSeniorPoolContribution: BigInt!
+  backers: [User!]!
+  numBackers: Int!
+  tokens: [TranchedPoolToken!]!
+  seniorTranches: [SeniorTrancheInfo!]! @derivedFrom(field: "tranchedPool")
+  juniorTranches: [JuniorTrancheInfo!]! @derivedFrom(field: "tranchedPool")
+  version: TranchedPoolCreditLineVersion!
+  createdAt: BigInt!
+  allowedUidTypes: [UidType!]!
+
+  transactions: [Transaction!]! @derivedFrom(field: "tranchedPool")
+
+  principalAmountRepaid: BigInt!
+  interestAmountRepaid: BigInt!
+  """
+  The amount of interest determined to be owed to this pool, calculated at the very beginning
+  """
+  initialInterestOwed: BigInt!
+}
+
+type TranchedPoolToken @entity {
+  id: ID! # Set to tokenId
+  mintedAt: BigInt!
+  user: User!
+  tranchedPool: TranchedPool!
+  tranche: BigInt!
+  principalAmount: BigInt!
+  principalRedeemed: BigInt!
+  interestRedeemed: BigInt!
+  interestRedeemable: BigInt!
+  principalRedeemable: BigInt!
+
+  rewardsClaimable: BigInt!
+  rewardsClaimed: BigInt!
+
+  """
+  Refers to the rewards that are received from LP rewards matching
+  """
+  stakingRewardsClaimable: BigInt!
+  """
+  Refers to the rewards that are received from LP rewards matching
+  """
+  stakingRewardsClaimed: BigInt!
+}
+
+type StakingRewardsData @entity {
+  id: ID! # Set to "1" because this is a singleton
+  """
+  The earn rate is a measure per second
+  """
+  currentEarnRatePerToken: BigInt!
+}
+
+type BackerRewardsData @entity {
+  id: ID! # Set to "1" because this is a singleton
+  contractAddress: String!
+  totalRewards: BigInt!
+  totalRewardPercentOfTotalGFI: BigDecimal!
+  """
+  Note that this value is measured in GFI, not dollars
+  """
+  maxInterestDollarsEligible: BigInt!
+}
+
+enum TransactionCategory {
+  SENIOR_POOL_DEPOSIT
+  SENIOR_POOL_DEPOSIT_AND_STAKE
+  SENIOR_POOL_STAKE
+  SENIOR_POOL_WITHDRAWAL
+  SENIOR_POOL_UNSTAKE_AND_WITHDRAWAL
+  # NOTE: We do not need to define a `SENIOR_POOL_UNSTAKE_AND_WITHDRAWAL_MULTIPLE` transaction
+  # category, because UnstakedAndWithdrew and UnstakedAndWithdrewMultiple events are emitted by
+  # the StakingRewards contract mutually exclusively, so for indexing them in the subgraph, we
+  # can combine both of them into the same category.
+  SENIOR_POOL_UNSTAKE
+  # NOTE: We do not define a `SENIOR_POOL_UNSTAKE_MULTIPLE` transaction category for two reasons:
+  # (1) `Unstaked` and `UnstakedMultiple` events are not emitted mutually exclusively by the StakingRewards
+  # contract; on the contrary, for every `UnstakedMultiple` event, a corresponding set of `Unstaked`
+  # events are emitted whose params collectively comprise the same data as the `UnstakedMultiple` event.
+  # So we don't need to index `UnstakedMultiple` events for the sake of obtaining any unique data. And
+  # doing so would only create a need for the consumer of the subgraph to de-duplicate between an
+  # `UnstakedMultiple` event and its corresponding set of `Unstaked` events.
+  # (2) The positions unstaked in an `UnstakedMultiple` event can be of different types (e.g. FIDU
+  # and Curve LP), so their respective amounts are not necessarily commensurable, so summing
+  # them to a total amount would be inappropriate. Our `Transaction` schema currently supports
+  # only a single `amount` value for the transaction, so it "wants" us to do such summing. But we
+  # cannot.
+  SENIOR_POOL_REDEMPTION
+  TRANCHED_POOL_DEPOSIT
+  TRANCHED_POOL_WITHDRAWAL
+  TRANCHED_POOL_REPAYMENT
+  TRANCHED_POOL_DRAWDOWN
+  UID_MINTED
+}
+
+enum SupportedCrypto {
+  USDC
+  GFI
+  FIDU
+  CURVE_LP
+}
+
+type Transaction @entity(immutable: true) {
+  """
+  This is a concatenation of transaction hash with log index. One transaction can result in more than one of this entity.
+  """
+  id: Bytes!
+  transactionHash: Bytes!
+  category: TransactionCategory!
+  user: User!
+  timestamp: Int!
+  blockNumber: Int!
+  amount: BigInt!
+  amountToken: SupportedCrypto!
+  tranchedPool: TranchedPool
+}
+
+type Zap @entity {
+  """
+  Note that the ID of a Zap is the same as the ID of the (tranched) pool token it's tied to. Makes it easy to find a Zap corresponding to a pool token.
+  """
+  id: ID!
+  amount: BigInt!
+  user: User!
+  seniorPoolStakedPosition: SeniorPoolStakedPosition!
+  poolToken: TranchedPoolToken!
+  tranchedPool: TranchedPool!
+}
+
+enum CommunityRewardsTokenSource {
+  MERKLE_DISTRIBUTOR
+  BACKER_MERKLE_DISTRIBUTOR
+}
+
+type CommunityRewardsToken @entity {
+  id: ID!
+  source: CommunityRewardsTokenSource!
+  index: Int!
+  user: User!
+  totalGranted: BigInt!
+  totalClaimed: BigInt!
+  cliffLength: BigInt!
+  vestingLength: BigInt!
+  vestingInterval: BigInt!
+  grantedAt: BigInt!
+  revokedAt: BigInt!
+  startTime: BigInt!
+  endTime: BigInt!
+}

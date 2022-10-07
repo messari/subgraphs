@@ -1,6 +1,6 @@
 # Maple Finance Subgraph
 
-## Calculation Methodology v1.0.0
+## Calculation Methodology v1.1.0
 
 Below, the methodologies for key fields in the protocol are surfaced for convenience.
 
@@ -14,7 +14,7 @@ Total amount on the supply side that is earning interest
 
 Sum across all Markets:
 
-`Total Deposit Balance USD + Total Stake Balance USD + Total Unclaimed Supplier Interest USD`
+`Total Deposit Balance USD`
 
 This does not include accrued staking rewards.
 

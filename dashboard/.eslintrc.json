@@ -3,7 +3,10 @@
         "browser": true,
         "es2021": true
     },
-    "extends": "airbnb",
+    "extends": [
+        "react-app",
+        "react-app/jest"
+    ],
     "overrides": [],
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -17,6 +20,6 @@
         "react"
     ],
     "rules": {
-        "emitWarning": true
+        "emitWarning": 0
     }
 }

@@ -1,16 +1,16 @@
 import axios from "axios";
-import { constructEmbedMsg, errorNotification, getDiscordMessages } from "./messageDiscord.js";
+import { constructEmbedMsg, errorNotification, getAllThreadsToClear, getDiscordMessages, sendMessageToAggThread } from "./messageDiscord.js";
 import 'dotenv/config'
 import { protocolLevel } from "./protocolLevel.js";
 import { errorsObj, protocolErrors } from "./errorSchemas.js";
 import { pullMessagesByThread, resolveQueriesToAttempt, resolveThreadCreation } from "./resolutions.js";
 import { generateEndpoints, indexStatusFlow } from "./indexingStatus.js";
 
-const dayMs = 3600000 * 24;
+const hourMs = 3600000;
 
 try {
   executionFlow();
-  setInterval(executionFlow, dayMs);
+  setInterval(executionFlow, hourMs);
 } catch (err) {
   errorNotification("ERROR LOCATION 21 " + err.message + ' MAIN LOGIC script.js');
 }
@@ -33,10 +33,15 @@ async function executionFlow() {
   Object.entries(subgraphEndpoints).forEach(([protocolType, protocolsOnType]) => {
     Object.entries(protocolsOnType).forEach(([protocolName, protocolObj]) => {
       Object.entries(protocolObj).forEach(([network, deploymentString]) => {
+        const status = Object.values(data[protocolName]?.deployments)?.find(x => x.network === network)?.status || 'dev';
         const nameStr =
           deploymentString.split("name/")[1];
         const deploymentsKey = nameStr.split("/")[1];
+        if (!deploymentsKey) {
+          return;
+        }
         deployments[deploymentsKey] = {
+          status: status,
           protocolName: protocolName,
           indexingError: null,
           indexedPercentage: 0,
@@ -54,6 +59,8 @@ async function executionFlow() {
       });
     });
   });
+
+  await getAllThreadsToClear(Date.now() - (86400000 * 7), process.env.CHANNEL_ID);
 
   const indexStatusFlowObject = await indexStatusFlow(deployments);
   deployments = indexStatusFlowObject.deployments;
@@ -109,8 +116,10 @@ async function executionFlow() {
     }
     const embeddedMessages = constructEmbedMsg(protocolName, deploymentSet, protocolIssuesOnThread, indexDeploymentIssues);
     return { message: embeddedMessages, protocolName: protocolName, channel: channelId };
-  })
+  });
   if (messagesToPost.length > 0) {
+    const aggThreadId = currentDiscordMessages.find(x => x.content.includes('Production Ready Subgraph Indexing Failures'))?.id || "";
+    await sendMessageToAggThread(aggThreadId);
     messagesToPost = messagesToPost.filter((msg, idx) => {
       if (!msg?.channel && !!msg) {
         messagesToPost[idx].channel = protocolNameToChannelMapping[msg?.protocolName];

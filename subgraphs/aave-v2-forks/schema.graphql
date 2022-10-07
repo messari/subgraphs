@@ -674,6 +674,9 @@ type Market @entity {
 
   " The state of the protocol prior to being paused (isActive / canUseAsCollateral / canBorrowFrom) "
   prePauseState: [Boolean!]!
+
+  " Aux: Timestamp of the last time rewards were calculated for this market. "
+  lastRewardsUpdated: BigInt
 }
 
 #################################
