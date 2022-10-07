@@ -1,7 +1,7 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Deposit, Vault, VaultFee, Withdraw } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, PROTOCOL_ID } from "../utils/constants";
-import { getFees, getOrCreateVaultDailySnapshot } from "../utils/getters";
+import { getOrCreateVaultDailySnapshot } from "../utils/getters";
 import { updateProtocolRevenue } from "./protocol";
 import { updateVaultAndSnapshots } from "./vault";
 
