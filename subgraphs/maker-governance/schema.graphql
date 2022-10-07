@@ -123,6 +123,9 @@ type Delegate @entity {
   votes: [Vote!]! @derivedFrom(field: "voter")
   "Number of spells voted on"
   numberVotes: Int!
+
+  "Poll votes associated to this spell"
+  poleVotes: [PollVote!]! @derivedFrom(field: "voter")
 }
 type Delegation @entity {
   "delegate-delegator"
@@ -152,3 +155,39 @@ type Vote @entity {
   "Transaction hash of the vote"
   txnHash: String!
 }
+
+# Polling Entities
+type PollVote @entity {
+  "Voter ID + Poll ID"
+  id: String!
+  "Voting weight expressed in the vote"
+  choice: BigInt!
+  "Delegate that emitted the vote"
+  voter: Delegate!
+  "Poll that is being voted on"
+  poll: Poll!
+
+  "Block number vote is cast in"
+  block: BigInt!
+  "Timestamp of block vote was cast in"
+  blockTime: BigInt!
+  "Transaction hash of the vote"
+  txnHash: String!
+}
+
+type Poll @entity {
+  "Poll's id"
+  id: String!
+  "Poll votes associated to this spell"
+  polevotes: [PollVote!]! @derivedFrom(field: "poll")
+}
+
+# type PollVoter @entity {
+#   "Address of PollVoter"
+#   id: String!
+
+#   delegate: Delegate
+
+#   "Poll votes associated to this spell"
+#   polevotes: [PollVote!]! @derivedFrom(field: "pollvoter")
+# }
