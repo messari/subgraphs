@@ -1,5 +1,5 @@
 import { log } from "@graphprotocol/graph-ts";
-import { SeaportMainnetConfigurations } from "../../protocols/seaport/config/deployments/opensea-seaport-ethereum/configurations";
+import { SeaportEthereumConfigurations } from "../../protocols/seaport/config/deployments/opensea-seaport-ethereum/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 
@@ -9,14 +9,14 @@ import { Deploy } from "./deploy";
 export function getNetworkConfigurations(deploy: i32): Configurations {
   switch (deploy) {
     case Deploy.OPENSEA_SEAPORT_ETHEREUM: {
-      return new SeaportMainnetConfigurations();
+      return new SeaportEthereumConfigurations();
     }
     default: {
       log.critical(
         "No configurations found for deployment protocol/network",
         []
       );
-      return new SeaportMainnetConfigurations();
+      return new SeaportEthereumConfigurations();
     }
   }
 }

@@ -8,7 +8,7 @@ import {
 } from "../../../src/constants";
 import { Configurations } from "../../../../../configurations/configurations/interface";
 
-export class OpenSeaV2Configurations implements Configurations {
+export class OpenSeaV2EthereumConfigurations implements Configurations {
   getNetwork(): string {
     return Network.MAINNET;
   }

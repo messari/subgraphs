@@ -8,7 +8,7 @@ import {
 } from "../../../src/constants";
 import { Configurations } from "../../../../../configurations/configurations/interface";
 
-export class X2Y2Configurations implements Configurations {
+export class X2Y2EthereumConfigurations implements Configurations {
   getNetwork(): string {
     return Network.MAINNET;
   }

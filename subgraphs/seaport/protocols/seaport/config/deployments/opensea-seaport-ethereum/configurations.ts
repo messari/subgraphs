@@ -8,7 +8,7 @@ import {
 } from "../../../src/constants";
 import { Configurations } from "../../../../../configurations/configurations/interface";
 
-export class SeaportMainnetConfigurations implements Configurations {
+export class SeaportEthereumConfigurations implements Configurations {
   getNetwork(): string {
     return Network.MAINNET;
   }

@@ -1,5 +1,5 @@
 import { log } from "@graphprotocol/graph-ts";
-import { X2Y2Configurations } from "../../protocols/x2y2/config/deployments/x2y2-ethereum/configurations";
+import { X2Y2EthereumConfigurations } from "../../protocols/x2y2/config/deployments/x2y2-ethereum/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 
@@ -9,14 +9,14 @@ import { Deploy } from "./deploy";
 export function getNetworkConfigurations(deploy: i32): Configurations {
   switch (deploy) {
     case Deploy.X2Y2_ETHEREUM: {
-      return new X2Y2Configurations();
+      return new X2Y2EthereumConfigurations();
     }
     default: {
       log.critical(
         "No configurations found for deployment protocol/network",
         []
       );
-      return new X2Y2Configurations();
+      return new X2Y2EthereumConfigurations();
     }
   }
 }
