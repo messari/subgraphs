@@ -30,7 +30,7 @@
     "@typescript-eslint/no-namespace": "off",
 
     // We want to make sure to correct for this. It can be difficult to debug when errors arise from this assertion.
-    "@typescript-eslint/no-non-null-assertion": "error",
+    "@typescript-eslint/no-non-null-assertion": "off",
 
     // Enforce for cleanliness
     "@typescript-eslint/no-unused-vars": "error",
