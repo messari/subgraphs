@@ -30,7 +30,7 @@ export function getTokenPriceFromOneInch(
     return new CustomPriceType();
   }
 
-  let tokenPrice: BigDecimal = utils
+  const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       oneInchOracleContract.try_getRate(
         tokenAddr,
@@ -41,7 +41,7 @@ export function getTokenPriceFromOneInch(
     )
     .toBigDecimal();
 
-  let tokenDecimals = utils.getTokenDecimals(tokenAddr);
+  const tokenDecimals = utils.getTokenDecimals(tokenAddr);
 
   return CustomPriceType.initialize(
     tokenPrice.times(

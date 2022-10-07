@@ -23,12 +23,12 @@ export function getTokenPriceFromAaveOracle(
   ) {
     return new CustomPriceType();
   }
-  
+
   if (!aaveOracleContract) {
     return new CustomPriceType();
   }
 
-  let tokenPrice: BigDecimal = utils
+  const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       aaveOracleContract.try_getAssetPrice(tokenAddr),
       constants.BIGINT_ZERO
