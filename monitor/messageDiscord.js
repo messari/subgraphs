@@ -48,7 +48,6 @@ export async function fetchMessages(before, channelId = process.env.CHANNEL_ID) 
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",
     }
-
     try {
         const data = await axios.get(baseURL, { "headers": { ...headers } });
         return data.data;
@@ -66,6 +65,7 @@ export async function getChannel(channelId = process.env.CHANNEL_ID) {
 
     try {
         const data = await axios.get(baseURL, { "headers": { ...headers } });
+        return data.data;
     } catch (err) {
         errorNotification("ERROR LOCATION 9 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
@@ -159,6 +159,11 @@ export async function clearThread(deleteMsgsFromBeforeTS, channelId = process.en
         const postJSON = JSON.stringify({ "messages": messages });
         await axios.post(baseURL + "/messages/bulk-delete", postJSON, { "headers": { ...headers } });
     } catch (err) {
+        if (err?.response?.data?.message?.includes("Thread is archived")) {
+            console.log('unarchive thread', channelId);
+            await unarchiveThread(channelId);
+            return await clearThread(deleteMsgsFromBeforeTS, channelId);
+        }
         if (err.response.status === 400 && messages.length === 1) {
             deleteSingleMessage(messages[0], channelId);
         }
@@ -176,6 +181,11 @@ export async function deleteSingleMessage(messageId, channelId = process.env.CHA
         await axios.delete(baseURL, { "headers": { ...headers } });
         return;
     } catch (err) {
+        if (err?.response?.data?.message?.includes("Thread is archived")) {
+            console.log('unarchive thread', channelId);
+            await unarchiveThread(channelId);
+            return await deleteSingleMessage(messageId, channelId);
+        }
         errorNotification("ERROR LOCATION 22 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
@@ -184,7 +194,7 @@ export async function deleteSingleMessage(messageId, channelId = process.env.CHA
 
 let colorIndex = 0;
 export async function sendDiscordMessage(messageObjects, protocolName, channelId = process.env.CHANNEL_ID) {
-    if (!Object.keys(messageObjects)?.length > 0 || !messageObjects) {
+    if (messageObjects?.length === 0 || !messageObjects) {
         return null;
     }
     const baseURL = "https://discordapp.com/api/channels/" + channelId + "/messages";
@@ -209,7 +219,7 @@ export async function sendDiscordMessage(messageObjects, protocolName, channelId
     const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on ${protocolName}**\n`, "embeds": messageObjects });
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
-        return null;
+        return data;
     } catch (err) {
         if (err.response.status === 429) {
             return messageObjects;
@@ -220,14 +230,17 @@ export async function sendDiscordMessage(messageObjects, protocolName, channelId
     }
 }
 
-export async function startProtocolThread(protocolName, base, channelId = process.env.CHANNEL_ID) {
+export async function startProtocolThread(subject, base, channelId = process.env.CHANNEL_ID) {
     let baseURL = "https://discordapp.com/api/channels/" + channelId + "/messages";
     const headers = {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",
     }
 
-    let postJSON = JSON.stringify({ "content": protocolName + ' (Base: ' + base + ')' });
+    let postJSON = JSON.stringify({ "content": subject + ' (Base: ' + base + ')' });
+    if (base === '') {
+        postJSON = JSON.stringify({ "content": subject });
+    }
     let msgId = ""
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
@@ -238,16 +251,38 @@ export async function startProtocolThread(protocolName, base, channelId = proces
 
     baseURL = "https://discordapp.com/api/channels/" + channelId + "/messages/" + msgId + "/threads";
 
-    postJSON = JSON.stringify({ "name": protocolName + ' ISSUES' });
+    postJSON = JSON.stringify({ "name": subject + ' ISSUES' });
+    if (base === '') {
+        postJSON = JSON.stringify({ "name": subject });
+    }
 
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
-        return { channel: data.data.id, protocolName: protocolName };
+        return { channel: data.data.id, protocolName: subject };
     } catch (err) {
         if (!!msgId) {
             deleteSingleMessage(msgId, channelId);
         }
         errorNotification("ERROR LOCATION 14 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
+    }
+}
+
+export async function unarchiveThread(channelId = process.env.CHANNEL_ID) {
+    // This function sends a message to an archived thread, thereby unarchiving it, then deleting this message
+    let baseURL = "https://discordapp.com/api/channels/" + channelId + "/messages";
+    const headers = {
+        "Authorization": "Bot " + process.env.BOT_TOKEN,
+        "Content-Type": "application/json",
+    };
+
+    let postJSON = JSON.stringify({ "content": 'UNARCHIVE THREAD' });
+    let msgId = "";
+    try {
+        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        msgId = data.data.id;
+        await deleteSingleMessage(msgId, channelId);
+    } catch (err) {
+        errorNotification("ERROR LOCATION 25 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
@@ -334,6 +369,10 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             indexingErrorEmbed.fields[0].value += labelValue;
             indexingErrorEmbed.fields[1].value += failureBlock;
             embedObjects.unshift(indexingErrorEmbed);
+            if (deploymentsOnProtocol[0]?.status === 'prod') {
+                indexingErrorEmbed.title += ' ' + protocol;
+                aggThreadMsgObjects.push(indexingErrorEmbed);
+            }
         }
 
         if (embedObjects.length > 0) {
@@ -342,5 +381,31 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         return null;
     } catch (err) {
         errorNotification("ERROR LOCATION 15 " + err.message);
+    }
+}
+
+let aggThreadMsgObjects = [];
+export async function sendMessageToAggThread(aggThreadId, channelId = process.env.CHANNEL_ID) {
+    if (aggThreadMsgObjects.length === 0 || !aggThreadId) {
+        return;
+    }
+
+    const baseURL = "https://discordapp.com/api/channels/" + aggThreadId + "/messages";
+    const headers = {
+        "Authorization": "Bot " + process.env.BOT_TOKEN,
+        "Content-Type": "application/json",
+    };
+
+    const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on prod subgraphs**\n`, "embeds": aggThreadMsgObjects });
+    try {
+        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        return data;
+    } catch (err) {
+        if (err.response.status === 429) {
+            return aggThreadMsgObjects;
+        } else {
+            errorNotification("ERROR LOCATION 26 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
+            return null;
+        }
     }
 }
