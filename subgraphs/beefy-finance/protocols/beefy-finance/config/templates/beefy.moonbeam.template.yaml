@@ -8,7 +8,7 @@ dataSources:
     source:
       address: '0x0000000000000000000000000000000000000000'
       abi: BeefyStrategy
-      startBlock: 0
+      startBlock: 1974928
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -50,26 +50,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: moonbeam-bifi-maxi
+    name: stellaswap-poop-wglmr
     network: moonbeam
     source:
-      address: '0xb25eB9105549627050AAB3A1c909fBD454014beA'
+      address: '0xF240A0d2d3e677BE04c96Aa3b9C49Bd891780d2b'
       abi: BeefyStrategy
-      startBlock: 397730
+      startBlock: 1845952
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -111,26 +105,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-dualETH
+    name: stellaswap-wglmr-xcintr
     network: moonbeam
     source:
-      address: '0x4467f78F9054570d3eC811a2FDA5186b6D24b252'
+      address: '0x5b5649268c1FA6f11aE5CC10F4cf0B217DC0520B'
       abi: BeefyStrategy
-      startBlock: 1121193
+      startBlock: 1819135
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -172,26 +160,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-weth-wglmr
+    name: stellaswap-wglmr-xcibtc
     network: moonbeam
     source:
-      address: '0xBe206bDFCd4c080a24b0E6b34A95AFbB4d9917F4'
+      address: '0x92F44893D5f22bDc8540CEb83B0b3E3112951bEe'
       abi: BeefyStrategy
-      startBlock: 1100353
+      startBlock: 1818814
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -233,26 +215,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-usdcmad-wglmr
+    name: stellaswap-wglmr-xcausd
     network: moonbeam
     source:
-      address: '0x7B717b445Ff27d5769E6a314235bC8D617dc80b9'
+      address: '0x1941C538baAec67Fa0BFBE12ce04AA037f17F4F4'
       abi: BeefyStrategy
-      startBlock: 1099728
+      startBlock: 1818228
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -294,26 +270,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-stella-usdc
+    name: stellaswap-frax-wglmr
     network: moonbeam
     source:
-      address: '0x7db7110476595EEF90ecEDfAe5104CbBf1aFaD5F'
+      address: '0xA1b1239524780bfBA78f53D29C73Ddc1F57b1Ab1'
       abi: BeefyStrategy
-      startBlock: 609582
+      startBlock: 1735342
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -355,26 +325,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-stella-wglmr
+    name: stellaswap-wglmr-mai
     network: moonbeam
     source:
-      address: '0xD297558f78b3f7ED075405e4D15aDd2b5BF762f1'
+      address: '0x34bE7AE886BdaeBf61c3B8BC3AA93b7a4aF3F99f'
       abi: BeefyStrategy
-      startBlock: 608959
+      startBlock: 1735342
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -416,26 +380,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stella-xstella
+    name: curve-moonbeam-f-stdot
     network: moonbeam
     source:
-      address: '0x319DED38E2a647F41405eC694f703688388d0915'
+      address: '0xb18398ad9735fea37C97dcba50C0Bb947Dc0eeBD'
       abi: BeefyStrategy
-      startBlock: 958182
+      startBlock: 1712053
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -477,26 +435,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-wglmr-xcdot
+    name: stellaswap-ldo-wglmr
     network: moonbeam
     source:
-      address: '0xF49c523F08B4e7c8E51a44088ea2a5e6b5f397D9'
+      address: '0x3b8cc0191FdCb6B022ecCeFeeF1EC8a66bF721Ff'
       abi: BeefyStrategy
-      startBlock: 957905
+      startBlock: 1707803
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -538,26 +490,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-atom-wglmr
+    name: beamswap-4pool
     network: moonbeam
     source:
-      address: '0xFa5C2c0E5c3DF0500B380E751B118CDc548e588f'
+      address: '0xa3aBB8BCc6ffEa82d3a0a8f800050F684Db27Db8'
       abi: BeefyStrategy
-      startBlock: 811081
+      startBlock: 1479501
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -599,26 +545,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-atom-usdc
+    name: beamswap-3pool
     network: moonbeam
     source:
-      address: '0xCc1f8CAB2230cf85A62c2B7159b26246291E0964'
+      address: '0x2E9706501ced79C0F34400E728d69C4A2E1496B3'
       abi: BeefyStrategy
-      startBlock: 811096
+      startBlock: 1479418
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -660,26 +600,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-usdc-ftm
+    name: stellaswap-well-wglmr
     network: moonbeam
     source:
-      address: '0xBA061Ff2009905Cb45bABeb3eB7CFb8f97873555'
+      address: '0xaE862EdbC1CB9c039155017A080AD35E8eeb3ac5'
       abi: BeefyStrategy
-      startBlock: 721531
+      startBlock: 1336901
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -721,26 +655,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-wglmr-ftm
+    name: stellaswap-mai4pool
     network: moonbeam
     source:
-      address: '0xe9A624096E3dc62d897EE9E9A20c2aF1c364452D'
+      address: '0x0B5aF419FA313D012431BFE3B25aBB6B0aD04680'
       abi: BeefyStrategy
-      startBlock: 721545
+      startBlock: 1284649
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -782,26 +710,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-avax-wglmr
+    name: stellaswap-base4pool
     network: moonbeam
     source:
-      address: '0xAe6b83c138f84fa9E90CDbCDD105021173c8E579'
+      address: '0x7FB212238880Ad71DEb615F46DeF191E80e0C532'
       abi: BeefyStrategy
-      startBlock: 721553
+      startBlock: 1208665
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -843,26 +765,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-matic-wglmr
+    name: stellaswap-wbtc-wglmr
     network: moonbeam
     source:
-      address: '0x7783d23C0880B553f97f084008b8ab7eE445701F'
+      address: '0x3CFe04A49a4A52F5ec1904a9e6fDB7fF6E1195B1'
       abi: BeefyStrategy
-      startBlock: 721560
+      startBlock: 1163035
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -904,26 +820,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-luna-wglmr-eol
+    name: beamswap-wglmr-xcdot
     network: moonbeam
     source:
-      address: '0x8F8d1dE7f7E2B8C32BABFa1CE21613e8EcB49593'
+      address: '0x37e7C9c63b814BbC5e30B46e8d5Ea2530064CbeF'
       abi: BeefyStrategy
-      startBlock: 721567
+      startBlock: 1189158
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -965,26 +875,20 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
-    name: stellaswap-axlust-wglmr-eol
+    name: beamswap-usdcmad-wglmr
     network: moonbeam
     source:
-      address: '0x8a86D4Bd8A0c151b219F0Df68d577dD060b9d189'
+      address: '0x860Aae950eE05c230f806099E314ecB919EDbf57'
       abi: BeefyStrategy
-      startBlock: 658261
+      startBlock: 1189210
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1026,872 +930,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: stellaswap-dai-usdc
-    network: moonbeam
-    source:
-      address: '0x46B75692C835f93C98800624329E987C0e1BA595'
-      abi: BeefyStrategy
-      startBlock: 658273
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: stellaswap-usdc-eth
-    network: moonbeam
-    source:
-      address: '0x79F26046D122d2F26B1D37237D5C056fB580447A'
-      abi: BeefyStrategy
-      startBlock: 658293
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: stellaswap-wglmr-eth
-    network: moonbeam
-    source:
-      address: '0xA27BF4d56870A37e37a687B8ab3740d8487Ee2C6'
-      abi: BeefyStrategy
-      startBlock: 658301
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: stellaswap-usdc-wglmr
-    network: moonbeam
-    source:
-      address: '0x037c541320141f5afcBd60F44780f1D5b9B057fC'
-      abi: BeefyStrategy
-      startBlock: 609280
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: stellaswap-usdc-usdt
-    network: moonbeam
-    source:
-      address: '0xC828EEF847Ea094465F7787CfA554f5d96e154d0'
-      abi: BeefyStrategy
-      startBlock: 622875
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: stellaswap-usdc-bnb
-    network: moonbeam
-    source:
-      address: '0x1d9119f32bebD2CD6850625176156384d0EF9F96'
-      abi: BeefyStrategy
-      startBlock: 623018
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: stellaswap-busd-wglmr
-    network: moonbeam
-    source:
-      address: '0x4C185A2b9214BC827129a4935Af49AA7071f9032'
-      abi: BeefyStrategy
-      startBlock: 623072
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: stellaswap-ape-wglmr-eol
-    network: moonbeam
-    source:
-      address: '0x3a5252cED60Dc299f4Cc037cF4a6DCD90609D7F7'
-      abi: BeefyStrategy
-      startBlock: 709853
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: solarflare-ust-wglmr-eol
-    network: moonbeam
-    source:
-      address: '0xF22DaE9c59044a1f37F7a73669506aF0790226bb'
-      abi: BeefyStrategy
-      startBlock: 658261
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: solarflare-luna-flare-eol
-    network: moonbeam
-    source:
-      address: '0xC0F7A280cD4EFa87d0Ae50f89D1111daf0Eee2F1'
-      abi: BeefyStrategy
-      startBlock: 533854
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: solarflare-wglmr-flare
-    network: moonbeam
-    source:
-      address: '0xecCb80E860561Ca9Ffb183A557F32CC90B05d3c3'
-      abi: BeefyStrategy
-      startBlock: 533482
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: solarflare-usdc-wglmr
-    network: moonbeam
-    source:
-      address: '0xaB4105375FbE5F502B0da986F46ADf7a21762e52'
-      abi: BeefyStrategy
-      startBlock: 533712
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: beamswap-bifi-wglmr
-    network: moonbeam
-    source:
-      address: '0x1EA73427874dccB2E01C53e25a21e92adA3Dc65b'
-      abi: BeefyStrategy
-      startBlock: 397983
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: beamswap-usdc-ftm
-    network: moonbeam
-    source:
-      address: '0x1Dd0D6508fF1Fc1a2433b4D37d7efb5680c6455E'
-      abi: BeefyStrategy
-      startBlock: 397968
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: beamswap-usdc-wglmr
@@ -1941,18 +985,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: beamswap-dai-usdc
@@ -2002,18 +1040,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: beamswap-wglmr-glint
@@ -2063,18 +1095,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: beamswap-busd-bnb
@@ -2124,18 +1150,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: beamswap-usdc-busd
@@ -2185,18 +1205,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: beamswap-usdc-eth
@@ -2246,18 +1260,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: beamswap-usdc-usdt
@@ -2307,16 +1315,1710 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: moonbeam-bifi-maxi
+    network: moonbeam
+    source:
+      address: '0xb25eB9105549627050AAB3A1c909fBD454014beA'
+      abi: BeefyStrategy
+      startBlock: 397730
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
           handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: beamswap-bifi-wglmr
+    network: moonbeam
+    source:
+      address: '0x1EA73427874dccB2E01C53e25a21e92adA3Dc65b'
+      abi: BeefyStrategy
+      startBlock: 397983
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: beamswap-usdc-ftm
+    network: moonbeam
+    source:
+      address: '0x1Dd0D6508fF1Fc1a2433b4D37d7efb5680c6455E'
+      abi: BeefyStrategy
+      startBlock: 397968
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: solarflare-wglmr-flare
+    network: moonbeam
+    source:
+      address: '0xecCb80E860561Ca9Ffb183A557F32CC90B05d3c3'
+      abi: BeefyStrategy
+      startBlock: 533482
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: solarflare-usdc-wglmr
+    network: moonbeam
+    source:
+      address: '0xaB4105375FbE5F502B0da986F46ADf7a21762e52'
+      abi: BeefyStrategy
+      startBlock: 533712
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-stella-wglmr
+    network: moonbeam
+    source:
+      address: '0xD297558f78b3f7ED075405e4D15aDd2b5BF762f1'
+      abi: BeefyStrategy
+      startBlock: 608959
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-stella-usdc
+    network: moonbeam
+    source:
+      address: '0x7db7110476595EEF90ecEDfAe5104CbBf1aFaD5F'
+      abi: BeefyStrategy
+      startBlock: 609582
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-usdc-wglmr
+    network: moonbeam
+    source:
+      address: '0x037c541320141f5afcBd60F44780f1D5b9B057fC'
+      abi: BeefyStrategy
+      startBlock: 609280
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-usdc-usdt
+    network: moonbeam
+    source:
+      address: '0xC828EEF847Ea094465F7787CfA554f5d96e154d0'
+      abi: BeefyStrategy
+      startBlock: 622875
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-usdc-bnb
+    network: moonbeam
+    source:
+      address: '0x1d9119f32bebD2CD6850625176156384d0EF9F96'
+      abi: BeefyStrategy
+      startBlock: 623018
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-busd-wglmr
+    network: moonbeam
+    source:
+      address: '0x4C185A2b9214BC827129a4935Af49AA7071f9032'
+      abi: BeefyStrategy
+      startBlock: 623072
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-dai-usdc
+    network: moonbeam
+    source:
+      address: '0x46B75692C835f93C98800624329E987C0e1BA595'
+      abi: BeefyStrategy
+      startBlock: 658273
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-usdc-eth
+    network: moonbeam
+    source:
+      address: '0x79F26046D122d2F26B1D37237D5C056fB580447A'
+      abi: BeefyStrategy
+      startBlock: 658293
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-wglmr-eth
+    network: moonbeam
+    source:
+      address: '0xA27BF4d56870A37e37a687B8ab3740d8487Ee2C6'
+      abi: BeefyStrategy
+      startBlock: 658301
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-usdc-ftm
+    network: moonbeam
+    source:
+      address: '0xBA061Ff2009905Cb45bABeb3eB7CFb8f97873555'
+      abi: BeefyStrategy
+      startBlock: 721531
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-wglmr-ftm
+    network: moonbeam
+    source:
+      address: '0xe9A624096E3dc62d897EE9E9A20c2aF1c364452D'
+      abi: BeefyStrategy
+      startBlock: 721545
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-avax-wglmr
+    network: moonbeam
+    source:
+      address: '0xAe6b83c138f84fa9E90CDbCDD105021173c8E579'
+      abi: BeefyStrategy
+      startBlock: 721553
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-matic-wglmr
+    network: moonbeam
+    source:
+      address: '0x7783d23C0880B553f97f084008b8ab7eE445701F'
+      abi: BeefyStrategy
+      startBlock: 721560
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-atom-wglmr
+    network: moonbeam
+    source:
+      address: '0xFa5C2c0E5c3DF0500B380E751B118CDc548e588f'
+      abi: BeefyStrategy
+      startBlock: 811081
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-atom-usdc
+    network: moonbeam
+    source:
+      address: '0xCc1f8CAB2230cf85A62c2B7159b26246291E0964'
+      abi: BeefyStrategy
+      startBlock: 811096
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-ape-wglmr-eol
+    network: moonbeam
+    source:
+      address: '0x3a5252cED60Dc299f4Cc037cF4a6DCD90609D7F7'
+      abi: BeefyStrategy
+      startBlock: 709853
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stella-xstella
+    network: moonbeam
+    source:
+      address: '0x319DED38E2a647F41405eC694f703688388d0915'
+      abi: BeefyStrategy
+      startBlock: 958182
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-wglmr-xcdot
+    network: moonbeam
+    source:
+      address: '0xF49c523F08B4e7c8E51a44088ea2a5e6b5f397D9'
+      abi: BeefyStrategy
+      startBlock: 957905
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-luna-wglmr-eol
+    network: moonbeam
+    source:
+      address: '0x8F8d1dE7f7E2B8C32BABFa1CE21613e8EcB49593'
+      abi: BeefyStrategy
+      startBlock: 721567
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-axlust-wglmr-eol
+    network: moonbeam
+    source:
+      address: '0x8a86D4Bd8A0c151b219F0Df68d577dD060b9d189'
+      abi: BeefyStrategy
+      startBlock: 658261
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: solarflare-ust-wglmr-eol
+    network: moonbeam
+    source:
+      address: '0xF22DaE9c59044a1f37F7a73669506aF0790226bb'
+      abi: BeefyStrategy
+      startBlock: 658261
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: solarflare-luna-flare-eol
+    network: moonbeam
+    source:
+      address: '0xC0F7A280cD4EFa87d0Ae50f89D1111daf0Eee2F1'
+      abi: BeefyStrategy
+      startBlock: 533854
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-weth-wglmr
+    network: moonbeam
+    source:
+      address: '0xBe206bDFCd4c080a24b0E6b34A95AFbB4d9917F4'
+      abi: BeefyStrategy
+      startBlock: 1100353
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-usdcmad-wglmr
+    network: moonbeam
+    source:
+      address: '0x7B717b445Ff27d5769E6a314235bC8D617dc80b9'
+      abi: BeefyStrategy
+      startBlock: 1099728
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: stellaswap-dualETH
+    network: moonbeam
+    source:
+      address: '0x4467f78F9054570d3eC811a2FDA5186b6D24b252'
+      abi: BeefyStrategy
+      startBlock: 1121193
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+templates:
+  - kind: ethereum/contract
+    name: BeefyVault
+    network: moonbeam
+    source:
+      abi: BeefyVault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
       file: ./src/mappings/vault.ts

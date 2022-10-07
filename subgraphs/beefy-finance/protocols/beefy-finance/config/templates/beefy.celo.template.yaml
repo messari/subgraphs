@@ -8,7 +8,7 @@ dataSources:
     source:
       address: '0x0000000000000000000000000000000000000000'
       abi: BeefyStrategy
-      startBlock: 0
+      startBlock: 15366989
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -50,18 +50,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: celo-bifi-maxi
@@ -111,79 +105,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
-      file: ./src/mappings/vault.ts
-  - kind: ethereum/contract
-    name: sushi-celo-celo-mobi-eol
-    network: celo
-    source:
-      address: '0x3094Ab4Af54f5208B867125B5CCeCc94Bc17cbB6'
-      abi: BeefyStrategy
-      startBlock: 10710833
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: BeefyStrategy
-          file: ./abis/BeefyStrategy.json
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ChainlinkOracle
-          file: ./abis/Chainlink.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFeeRouter
-          file: ./abis/Prices/Uniswap/FeeRouter.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
-      eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvestWithAmount
-        - event: StratHarvest(indexed address)
-          handler: handleStratHarvest
-        - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-celo-weth-usdt
@@ -233,18 +160,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-celo-weth-daiv2
@@ -294,18 +215,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-celo-cusd-usdc
@@ -355,18 +270,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-celo-wethv2-celo
@@ -416,18 +325,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-celo-wethv2-cusd
@@ -477,18 +380,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-celo-cusd-ceurv2
@@ -538,18 +435,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-celo-celo-weth-eol
@@ -599,18 +490,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-celo-cusd-dai-eol
@@ -660,18 +545,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-celo-ceur-weth-eol
@@ -721,18 +600,12 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
-          handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+          handler: handleStratHarvestWithTimestamp
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
     name: sushi-celo-cusd-ceur-eol
@@ -782,16 +655,115 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: Deposit(uint256)
-          handler: handleDeposit
-        - event: Withdraw(uint256)
-          handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvestWithAmount
         - event: StratHarvest(indexed address)
           handler: handleStratHarvest
         - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+  - kind: ethereum/contract
+    name: sushi-celo-celo-mobi-eol
+    network: celo
+    source:
+      address: '0x3094Ab4Af54f5208B867125B5CCeCc94Bc17cbB6'
+      abi: BeefyStrategy
+      startBlock: 10710833
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
           handler: handleStratHarvest
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+        - event: StratHarvest(indexed address,indexed uint256)
+          handler: handleStratHarvestWithTimestamp
+      file: ./src/mappings/vault.ts
+templates:
+  - kind: ethereum/contract
+    name: BeefyVault
+    network: celo
+    source:
+      abi: BeefyVault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: BeefyStrategy
+          file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
       file: ./src/mappings/vault.ts
