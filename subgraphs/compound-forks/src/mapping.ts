@@ -115,12 +115,12 @@ export function _handleNewCollateralFactor(
   marketID: string,
   newCollateralFactorMantissa: BigInt
 ): void {
-  let market = Market.load(marketID);
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[handleNewCollateralFactor] Market not found: {}", [marketID]);
     return;
   }
-  let collateralFactor = newCollateralFactorMantissa
+  const collateralFactor = newCollateralFactorMantissa
     .toBigDecimal()
     .div(mantissaFactorBD)
     .times(BIGDECIMAL_HUNDRED);
@@ -142,7 +142,7 @@ export function _handleNewLiquidationIncentive(
   protocol: LendingProtocol,
   newLiquidationIncentiveMantissa: BigInt
 ): void {
-  let liquidationIncentive = newLiquidationIncentiveMantissa
+  const liquidationIncentive = newLiquidationIncentiveMantissa
     .toBigDecimal()
     .div(mantissaFactorBD)
     .minus(BIGDECIMAL_ONE)
@@ -151,7 +151,7 @@ export function _handleNewLiquidationIncentive(
   protocol.save();
 
   for (let i = 0; i < protocol._marketIDs.length; i++) {
-    let market = Market.load(protocol._marketIDs[i]);
+    const market = Market.load(protocol._marketIDs[i]);
     if (!market) {
       log.warning("[handleNewLiquidationIncentive] Market not found: {}", [
         protocol._marketIDs[i],
@@ -177,7 +177,7 @@ export function _handleActionPaused(
   action: string,
   pauseState: boolean
 ): void {
-  let market = Market.load(marketID);
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[handleActionPaused] Market not found: {}", [marketID]);
     return;
@@ -198,7 +198,7 @@ export function _handleMarketEntered(
   borrowerID: string,
   entered: boolean // true = entered, false = exited
 ): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[handleMint] protocol not found: {}", [
       comptrollerAddr.toHexString(),
@@ -206,7 +206,7 @@ export function _handleMarketEntered(
     return;
   }
 
-  let market = Market.load(marketID);
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[_handleMarketEntered] market {} not found", [marketID]);
     return;
@@ -220,11 +220,11 @@ export function _handleMarketEntered(
     protocol.save();
   }
 
-  let enabledCollaterals = account._enabledCollaterals;
+  const enabledCollaterals = account._enabledCollaterals;
   if (entered) {
     enabledCollaterals.push(marketID);
   } else {
-    let index = enabledCollaterals.indexOf(marketID);
+    const index = enabledCollaterals.indexOf(marketID);
     if (index >= 0) {
       // drop 1 element at given index
       enabledCollaterals.splice(index, 1);
@@ -234,17 +234,17 @@ export function _handleMarketEntered(
   account.save();
 
   // update lender position isCollateral if exists
-  let counterID = borrowerID
+  const counterID = borrowerID
     .concat("-")
     .concat(marketID)
     .concat("-")
     .concat(PositionSide.LENDER);
-  let positionCounter = _PositionCounter.load(counterID);
+  const positionCounter = _PositionCounter.load(counterID);
   if (positionCounter) {
-    let positionID = positionCounter.id
+    const positionID = positionCounter.id
       .concat("-")
       .concat(positionCounter.nextCount.toString());
-    let position = Position.load(positionID);
+    const position = Position.load(positionID);
     if (position) {
       position.isCollateral =
         account._enabledCollaterals.indexOf(marketID) >= 0;
@@ -257,7 +257,7 @@ export function _handleMarketListed(
   marketListedData: MarketListedData,
   event: ethereum.Event
 ): void {
-  let cTokenAddr = marketListedData.cToken.address;
+  const cTokenAddr = marketListedData.cToken.address;
   let cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
@@ -276,7 +276,9 @@ export function _handleMarketListed(
   //
   // create underlying token
   //
-  let underlyingToken = new Token(marketListedData.token.address.toHexString());
+  const underlyingToken = new Token(
+    marketListedData.token.address.toHexString()
+  );
   underlyingToken.name = marketListedData.token.name;
   underlyingToken.symbol = marketListedData.token.symbol;
   underlyingToken.decimals = marketListedData.token.decimals;
@@ -285,13 +287,13 @@ export function _handleMarketListed(
   //
   // create market
   //
-  let market = new Market(cTokenAddr.toHexString());
+  const market = new Market(cTokenAddr.toHexString());
   market.name = cToken.name;
   market.protocol = marketListedData.protocol.id;
   market.inputToken = underlyingToken.id;
   market.outputToken = cToken.id;
 
-  let supplyInterestRate = new InterestRate(
+  const supplyInterestRate = new InterestRate(
     InterestRateSide.LENDER.concat("-")
       .concat(InterestRateType.VARIABLE)
       .concat("-")
@@ -301,7 +303,7 @@ export function _handleMarketListed(
   supplyInterestRate.type = InterestRateType.VARIABLE;
   supplyInterestRate.rate = BIGDECIMAL_ZERO;
   supplyInterestRate.save();
-  let borrowInterestRate = new InterestRate(
+  const borrowInterestRate = new InterestRate(
     InterestRateSide.BORROWER.concat("-")
       .concat(InterestRateType.VARIABLE)
       .concat("-")
@@ -353,7 +355,7 @@ export function _handleMarketListed(
   //
   // update protocol
   //
-  let marketIDs = marketListedData.protocol._marketIDs;
+  const marketIDs = marketListedData.protocol._marketIDs;
   marketIDs.push(market.id);
   marketListedData.protocol._marketIDs = marketIDs;
   marketListedData.protocol.totalPoolCount++;
@@ -371,20 +373,20 @@ export function _handleMint(
   underlyingBalanceResult: ethereum.CallResult<BigInt>,
   event: ethereum.Event
 ): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[handleMint] protocol not found: {}", [
       comptrollerAddr.toHexString(),
     ]);
     return;
   }
-  let marketID = event.address.toHexString();
-  let market = Market.load(marketID);
+  const marketID = event.address.toHexString();
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[handleMint] Market not found: {}", [marketID]);
     return;
   }
-  let underlyingToken = Token.load(market.inputToken);
+  const underlyingToken = Token.load(market.inputToken);
   if (!underlyingToken) {
     log.warning("[handleMint] Failed to load underlying token: {}", [
       market.inputToken,
@@ -409,7 +411,7 @@ export function _handleMint(
   //
   // track unique depositors
   //
-  let depositorActorID = "depositor".concat("-").concat(account.id);
+  const depositorActorID = "depositor".concat("-").concat(account.id);
   let depositorActor = _ActorAccount.load(depositorActorID);
   if (!depositorActor) {
     depositorActor = new _ActorAccount(depositorActorID);
@@ -422,7 +424,7 @@ export function _handleMint(
   //
   // update position
   //
-  let positionID = addPosition(
+  const positionID = addPosition(
     protocol,
     market,
     account,
@@ -435,11 +437,11 @@ export function _handleMint(
   //
   // create deposit
   //
-  let depositID = event.transaction.hash
+  const depositID = event.transaction.hash
     .toHexString()
     .concat("-")
     .concat(event.transactionLogIndex.toString());
-  let deposit = new Deposit(depositID);
+  const deposit = new Deposit(depositID);
   deposit.hash = event.transaction.hash.toHexString();
   deposit.nonce = event.transaction.nonce;
   deposit.logIndex = event.transactionLogIndex.toI32();
@@ -450,7 +452,7 @@ export function _handleMint(
   deposit.position = positionID;
   deposit.asset = market.inputToken;
   deposit.amount = mintAmount;
-  let depositUSD = market.inputTokenPriceUSD.times(
+  const depositUSD = market.inputTokenPriceUSD.times(
     mintAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
@@ -486,20 +488,20 @@ export function _handleRedeem(
   underlyingBalanceResult: ethereum.CallResult<BigInt>,
   event: ethereum.Event
 ): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[handleRedeem] protocol not found: {}", [
       comptrollerAddr.toHexString(),
     ]);
     return;
   }
-  let marketID = event.address.toHexString();
-  let market = Market.load(marketID);
+  const marketID = event.address.toHexString();
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[handleRedeem] Market not found: {}", [marketID]);
     return;
   }
-  let underlyingToken = Token.load(market.inputToken);
+  const underlyingToken = Token.load(market.inputToken);
   if (!underlyingToken) {
     log.warning("[handleRedeem] Failed to load underlying token: {}", [
       market.inputToken,
@@ -521,7 +523,7 @@ export function _handleRedeem(
   account.withdrawCount += 1;
   account.save();
 
-  let positionID = subtractPosition(
+  const positionID = subtractPosition(
     protocol,
     market,
     account,
@@ -537,11 +539,11 @@ export function _handleRedeem(
     return;
   }
 
-  let withdrawID = event.transaction.hash
+  const withdrawID = event.transaction.hash
     .toHexString()
     .concat("-")
     .concat(event.transactionLogIndex.toString());
-  let withdraw = new Withdraw(withdrawID);
+  const withdraw = new Withdraw(withdrawID);
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.nonce = event.transaction.nonce;
   withdraw.logIndex = event.transactionLogIndex.toI32();
@@ -584,20 +586,20 @@ export function _handleBorrow(
   borrowBalanceResult: ethereum.CallResult<BigInt>,
   event: ethereum.Event
 ): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[handleBorrow] protocol not found: {}", [
       comptrollerAddr.toHexString(),
     ]);
     return;
   }
-  let marketID = event.address.toHexString();
-  let market = Market.load(marketID);
+  const marketID = event.address.toHexString();
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[handleBorrow] Market not found: {}", [marketID]);
     return;
   }
-  let underlyingToken = Token.load(market.inputToken);
+  const underlyingToken = Token.load(market.inputToken);
   if (!underlyingToken) {
     log.warning("[handleBorrow] Failed to load underlying token: {}", [
       market.inputToken,
@@ -622,7 +624,7 @@ export function _handleBorrow(
   //
   // track unique borrowers
   //
-  let borrowerActorID = "borrower".concat("-").concat(account.id);
+  const borrowerActorID = "borrower".concat("-").concat(account.id);
   let borrowerActor = _ActorAccount.load(borrowerActorID);
   if (!borrowerActor) {
     borrowerActor = new _ActorAccount(borrowerActorID);
@@ -635,7 +637,7 @@ export function _handleBorrow(
   //
   // update position
   //
-  let positionID = addPosition(
+  const positionID = addPosition(
     protocol,
     market,
     account,
@@ -645,11 +647,11 @@ export function _handleBorrow(
     event
   );
 
-  let borrowID = event.transaction.hash
+  const borrowID = event.transaction.hash
     .toHexString()
     .concat("-")
     .concat(event.transactionLogIndex.toString());
-  let borrow = new Borrow(borrowID);
+  const borrow = new Borrow(borrowID);
   borrow.hash = event.transaction.hash.toHexString();
   borrow.nonce = event.transaction.nonce;
   borrow.logIndex = event.transactionLogIndex.toI32();
@@ -660,7 +662,7 @@ export function _handleBorrow(
   borrow.position = positionID;
   borrow.asset = market.inputToken;
   borrow.amount = borrowAmount;
-  let borrowUSD = market.inputTokenPriceUSD.times(
+  const borrowUSD = market.inputTokenPriceUSD.times(
     borrowAmount
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
@@ -697,20 +699,20 @@ export function _handleRepayBorrow(
   borrowBalanceResult: ethereum.CallResult<BigInt>,
   event: ethereum.Event
 ): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[handleRepayBorrow] protocol not found: {}", [
       comptrollerAddr.toHexString(),
     ]);
     return;
   }
-  let marketID = event.address.toHexString();
-  let market = Market.load(marketID);
+  const marketID = event.address.toHexString();
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[handleRepayBorrow] Market not found: {}", [marketID]);
     return;
   }
-  let underlyingToken = Token.load(market.inputToken);
+  const underlyingToken = Token.load(market.inputToken);
   if (!underlyingToken) {
     log.warning("[handleRepayBorrow] Failed to load underlying token: {}", [
       market.inputToken,
@@ -741,7 +743,7 @@ export function _handleRepayBorrow(
     protocol.save();
   }
 
-  let positionID = subtractPosition(
+  const positionID = subtractPosition(
     protocol,
     market,
     borrowerAccount,
@@ -757,11 +759,11 @@ export function _handleRepayBorrow(
     return;
   }
 
-  let repayID = event.transaction.hash
+  const repayID = event.transaction.hash
     .toHexString()
     .concat("-")
     .concat(event.transactionLogIndex.toString());
-  let repay = new Repay(repayID);
+  const repay = new Repay(repayID);
   repay.hash = event.transaction.hash.toHexString();
   repay.nonce = event.transaction.nonce;
   repay.logIndex = event.transactionLogIndex.toI32();
@@ -806,15 +808,15 @@ export function _handleLiquidateBorrow(
   repayAmount: BigInt,
   event: ethereum.Event
 ): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[handleLiquidateBorrow] protocol not found: {}", [
       comptrollerAddr.toHexString(),
     ]);
     return;
   }
-  let repayTokenMarketID = event.address.toHexString();
-  let repayTokenMarket = Market.load(repayTokenMarketID);
+  const repayTokenMarketID = event.address.toHexString();
+  const repayTokenMarket = Market.load(repayTokenMarketID);
   if (!repayTokenMarket) {
     log.warning("[handleLiquidateBorrow] Repay Token Market not found: {}", [
       repayTokenMarketID,
@@ -828,7 +830,7 @@ export function _handleLiquidateBorrow(
     );
     return;
   }
-  let repayToken = Token.load(repayTokenMarket.inputToken);
+  const repayToken = Token.load(repayTokenMarket.inputToken);
   if (!repayToken) {
     log.warning("[handleLiquidateBorrow] Failed to load repay token: {}", [
       repayTokenMarket.inputToken,
@@ -836,8 +838,8 @@ export function _handleLiquidateBorrow(
     return;
   }
 
-  let liquidatedCTokenMarketID = cTokenCollateral.toHexString();
-  let liquidatedCTokenMarket = Market.load(liquidatedCTokenMarketID);
+  const liquidatedCTokenMarketID = cTokenCollateral.toHexString();
+  const liquidatedCTokenMarket = Market.load(liquidatedCTokenMarketID);
   if (!liquidatedCTokenMarket) {
     log.warning(
       "[handleLiquidateBorrow] Liquidated CToken Market not found: {}",
@@ -845,7 +847,7 @@ export function _handleLiquidateBorrow(
     );
     return;
   }
-  let liquidatedCTokenID = liquidatedCTokenMarket.outputToken;
+  const liquidatedCTokenID = liquidatedCTokenMarket.outputToken;
   if (!liquidatedCTokenID) {
     log.warning(
       "[handleLiquidateBorrow] Liquidated CToken Market {} has no output token",
@@ -854,7 +856,7 @@ export function _handleLiquidateBorrow(
     return;
   }
   // compiler is too silly to figure out this is not null, so add a !
-  let liquidatedCToken = Token.load(liquidatedCTokenID!);
+  const liquidatedCToken = Token.load(liquidatedCTokenID!);
   if (!liquidatedCToken) {
     log.warning(
       "[handleLiquidateBorrow] Failed to load liquidated cToken: {}",
@@ -867,7 +869,7 @@ export function _handleLiquidateBorrow(
   // create account
   // update protocol
   //
-  let liquidatorAccountID = liquidator.toHexString();
+  const liquidatorAccountID = liquidator.toHexString();
   let liquidatorAccount = Account.load(liquidatorAccountID);
   if (!liquidatorAccount) {
     liquidatorAccount = createAccount(liquidatorAccountID);
@@ -876,7 +878,9 @@ export function _handleLiquidateBorrow(
     protocol.cumulativeUniqueUsers++;
     protocol.save();
   }
-  let liquidatorActorID = "liquidator".concat("-").concat(liquidatorAccountID);
+  const liquidatorActorID = "liquidator"
+    .concat("-")
+    .concat(liquidatorAccountID);
   let liquidatorActor = _ActorAccount.load(liquidatorActorID);
   if (!liquidatorActor) {
     liquidatorActor = new _ActorAccount(liquidatorActorID);
@@ -886,7 +890,7 @@ export function _handleLiquidateBorrow(
     protocol.save();
   }
 
-  let liquidateeAccountID = borrower.toHexString();
+  const liquidateeAccountID = borrower.toHexString();
   let liquidateeAccount = Account.load(liquidateeAccountID);
   if (!liquidateeAccount) {
     liquidateeAccount = createAccount(liquidateeAccountID);
@@ -895,7 +899,9 @@ export function _handleLiquidateBorrow(
     protocol.cumulativeUniqueUsers++;
     protocol.save();
   }
-  let liquidateeActorID = "liquidatee".concat("-").concat(liquidateeAccountID);
+  const liquidateeActorID = "liquidatee"
+    .concat("-")
+    .concat(liquidateeAccountID);
   let liquidateeActor = _ActorAccount.load(liquidateeActorID);
   if (!liquidateeActor) {
     liquidateeActor = new _ActorAccount(liquidateeActorID);
@@ -917,11 +923,11 @@ export function _handleLiquidateBorrow(
   //
   // liquidate event
   //
-  let liquidateID = event.transaction.hash
+  const liquidateID = event.transaction.hash
     .toHexString()
     .concat("-")
     .concat(event.transactionLogIndex.toString());
-  let liquidate = new Liquidate(liquidateID);
+  const liquidate = new Liquidate(liquidateID);
   liquidate.hash = event.transaction.hash.toHexString();
   liquidate.nonce = event.transaction.nonce;
   liquidate.logIndex = event.transactionLogIndex.toI32();
@@ -930,7 +936,7 @@ export function _handleLiquidateBorrow(
   // Not much to do other than associating with the borrower position
   // Because compound liquidate() emits both RepayBorrow and Liquidate
   // All logic should be handled on RepayBorrow already
-  let positionId = whichPosition(borrower, repayTokenMarketID);
+  const positionId = whichPosition(borrower, repayTokenMarketID);
   if (!positionId) {
     log.warning(
       "[_liquidateBorrow] cannot find associated position for liquidation {}",
@@ -944,11 +950,11 @@ export function _handleLiquidateBorrow(
   liquidate.market = liquidatedCTokenID!;
   liquidate.asset = repayTokenMarketID;
   liquidate.amount = seizeTokens;
-  let gainUSD = seizeTokens
+  const gainUSD = seizeTokens
     .toBigDecimal()
     .div(exponentToBigDecimal(liquidatedCToken.decimals))
     .times(liquidatedCTokenMarket.outputTokenPriceUSD);
-  let lossUSD = repayAmount
+  const lossUSD = repayAmount
     .toBigDecimal()
     .div(exponentToBigDecimal(repayToken.decimals))
     .times(repayTokenMarket.inputTokenPriceUSD);
@@ -1000,8 +1006,8 @@ export function _handleAccrueInterest(
   updateMarketPrices: boolean,
   event: ethereum.Event
 ): void {
-  let marketID = event.address.toHexString();
-  let market = Market.load(marketID);
+  const marketID = event.address.toHexString();
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[handleAccrueInterest] Market not found: {}", [marketID]);
     return;
@@ -1050,12 +1056,12 @@ export function _handleNewReserveFactor(
   marketID: string,
   newReserveFactorMantissa: BigInt
 ): void {
-  let market = Market.load(marketID);
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
     return;
   }
-  let reserveFactor = newReserveFactorMantissa
+  const reserveFactor = newReserveFactorMantissa
     .toBigDecimal()
     .div(mantissaFactorBD);
   market._reserveFactor = reserveFactor;
@@ -1069,14 +1075,14 @@ export function _handleTransfer(
   from: Address,
   comptrollerAddr: Address
 ): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[_handleTransfer] protocol not found: {}", [
       comptrollerAddr.toHexString(),
     ]);
     return;
   }
-  let market = Market.load(marketID);
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[_handleTransfer] market not found: {}", [
       event.address.toHexString(),
@@ -1121,7 +1127,7 @@ export function _handleTransfer(
     }
   }
 
-  let cTokenContract = CToken.bind(Address.fromString(marketID));
+  const cTokenContract = CToken.bind(Address.fromString(marketID));
   // update balance from sender
   if (fromAccount) {
     subtractPosition(
@@ -1164,7 +1170,7 @@ export function snapshotFinancials(
   blockNumber: BigInt,
   blockTimestamp: BigInt
 ): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.error(
       "[snapshotFinancials] Protocol not found, this SHOULD NOT happen",
@@ -1172,8 +1178,8 @@ export function snapshotFinancials(
     );
     return;
   }
-  let snapshotID = (blockTimestamp.toI32() / SECONDS_PER_DAY).toString();
-  let snapshot = new FinancialsDailySnapshot(snapshotID);
+  const snapshotID = (blockTimestamp.toI32() / SECONDS_PER_DAY).toString();
+  const snapshot = new FinancialsDailySnapshot(snapshotID);
 
   snapshot.protocol = protocol.id;
   snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
@@ -1198,7 +1204,7 @@ export function snapshotFinancials(
   let dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
 
   for (let i = 0; i < protocol._marketIDs.length; i++) {
-    let market = Market.load(protocol._marketIDs[i]);
+    const market = Market.load(protocol._marketIDs[i]);
     if (!market) {
       log.warning("[snapshotFinancials] Market not found: {}", [
         protocol._marketIDs[i],
@@ -1207,11 +1213,11 @@ export function snapshotFinancials(
       continue;
     }
 
-    let marketDailySnapshotID = getMarketDailySnapshotID(
+    const marketDailySnapshotID = getMarketDailySnapshotID(
       market.id,
       blockTimestamp.toI32()
     );
-    let marketDailySnapshot = MarketDailySnapshot.load(marketDailySnapshotID);
+    const marketDailySnapshot = MarketDailySnapshot.load(marketDailySnapshotID);
     if (!marketDailySnapshot) {
       // this is okay - no MarketDailySnapshot means no transactions in that market during that day
       log.info(
@@ -1267,7 +1273,7 @@ function snapshotUsage(
   eventType: EventType,
   newTxn: bool
 ): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.error("[snapshotUsage] Protocol not found, this SHOULD NOT happen", []);
     return;
@@ -1276,7 +1282,7 @@ function snapshotUsage(
   //
   // daily snapshot
   //
-  let dailySnapshotID = (blockTimestamp.toI32() / SECONDS_PER_DAY).toString();
+  const dailySnapshotID = (blockTimestamp.toI32() / SECONDS_PER_DAY).toString();
   let dailySnapshot = UsageMetricsDailySnapshot.load(dailySnapshotID);
   if (!dailySnapshot) {
     dailySnapshot = new UsageMetricsDailySnapshot(dailySnapshotID);
@@ -1300,7 +1306,7 @@ function snapshotUsage(
     dailySnapshot.blockNumber = blockNumber;
     dailySnapshot.timestamp = blockTimestamp;
   }
-  let dailyAccountID = ActivityType.DAILY.concat("-")
+  const dailyAccountID = ActivityType.DAILY.concat("-")
     .concat(accountID)
     .concat("-")
     .concat(dailySnapshotID);
@@ -1312,14 +1318,14 @@ function snapshotUsage(
     dailySnapshot.dailyActiveUsers += 1;
   }
 
-  let dailyActorAccountID = ActivityType.DAILY.concat("-")
+  const dailyActorAccountID = ActivityType.DAILY.concat("-")
     .concat(eventType.toString())
     .concat("-")
     .concat(accountID)
     .concat("-")
     .concat(dailySnapshotID);
   let dailyActiveActorAccount = ActiveAccount.load(dailyActorAccountID);
-  let newDAU = dailyActiveActorAccount == null;
+  const newDAU = dailyActiveActorAccount == null;
   if (newDAU) {
     dailyActiveActorAccount = new ActiveAccount(dailyActorAccountID);
     dailyActiveActorAccount.save();
@@ -1375,7 +1381,9 @@ function snapshotUsage(
   //
   // hourly snapshot
   //
-  let hourlySnapshotID = (blockTimestamp.toI32() / SECONDS_PER_HOUR).toString();
+  const hourlySnapshotID = (
+    blockTimestamp.toI32() / SECONDS_PER_HOUR
+  ).toString();
   let hourlySnapshot = UsageMetricsHourlySnapshot.load(hourlySnapshotID);
   if (!hourlySnapshot) {
     hourlySnapshot = new UsageMetricsHourlySnapshot(hourlySnapshotID);
@@ -1391,7 +1399,7 @@ function snapshotUsage(
     hourlySnapshot.blockNumber = blockNumber;
     hourlySnapshot.timestamp = blockTimestamp;
   }
-  let hourlyAccountID = ActivityType.HOURLY.concat("-")
+  const hourlyAccountID = ActivityType.HOURLY.concat("-")
     .concat(accountID)
     .concat("-")
     .concat(hourlySnapshotID);
@@ -1437,7 +1445,7 @@ function updateMarketSnapshots(
   amountUSD: BigDecimal,
   eventType: EventType
 ): void {
-  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
     market,
     timestamp,
     blockNumber
@@ -1468,7 +1476,7 @@ function updateMarketSnapshots(
   }
   marketHourlySnapshot.save();
 
-  let marketDailySnapshot = getOrCreateMarketDailySnapshot(
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(
     market,
     timestamp,
     blockNumber
@@ -1511,13 +1519,13 @@ export function updateMarket(
   updateMarketPrices: boolean,
   comptrollerAddress: Address
 ): void {
-  let market = Market.load(marketID);
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[updateMarket] Market not found: {}", [marketID]);
     return;
   }
 
-  let underlyingToken = Token.load(market.inputToken);
+  const underlyingToken = Token.load(market.inputToken);
   if (!underlyingToken) {
     log.warning("[updateMarket] Underlying token not found: {}", [
       market.inputToken,
@@ -1530,7 +1538,7 @@ export function updateMarket(
   }
 
   // update this market's price no matter what
-  let underlyingTokenPriceUSD = getTokenPriceUSD(
+  const underlyingTokenPriceUSD = getTokenPriceUSD(
     updateMarketData.getUnderlyingPriceResult,
     underlyingToken.decimals
   );
@@ -1552,7 +1560,7 @@ export function updateMarket(
   // get correct outputTokenDecimals for generic exchangeRate calculation
   let outputTokenDecimals = cTokenDecimals;
   if (market.outputToken) {
-    let outputToken = Token.load(market.outputToken!);
+    const outputToken = Token.load(market.outputToken!);
     if (!outputToken) {
       log.warning("[updateMarket] Output token not found: {}", [
         market.outputToken!,
@@ -1569,13 +1577,14 @@ export function updateMarket(
     );
   } else {
     // Formula: check out "Interpreting Exchange Rates" in https://compound.finance/docs#protocol-math
-    let oneCTokenInUnderlying = updateMarketData.exchangeRateStoredResult.value
-      .toBigDecimal()
-      .div(
-        exponentToBigDecimal(
-          mantissaFactor + underlyingToken.decimals - outputTokenDecimals
-        )
-      );
+    const oneCTokenInUnderlying =
+      updateMarketData.exchangeRateStoredResult.value
+        .toBigDecimal()
+        .div(
+          exponentToBigDecimal(
+            mantissaFactor + underlyingToken.decimals - outputTokenDecimals
+          )
+        );
     market.exchangeRate = oneCTokenInUnderlying;
     market.outputTokenPriceUSD = oneCTokenInUnderlying.times(
       underlyingTokenPriceUSD
@@ -1586,10 +1595,10 @@ export function updateMarket(
     // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
     if (underlyingToken.decimals > outputTokenDecimals) {
       // we want to multiply out the difference to expand BD
-      let mantissaFactorBD = exponentToBigDecimal(
+      const mantissaFactorBD = exponentToBigDecimal(
         underlyingToken.decimals - outputTokenDecimals
       );
-      let inputTokenBalanceBD = market.outputTokenSupply
+      const inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
         .times(market.exchangeRate!)
         .times(mantissaFactorBD)
@@ -1599,10 +1608,10 @@ export function updateMarket(
       );
     } else {
       // we want to divide back the difference to decrease the BD
-      let mantissaFactorBD = exponentToBigDecimal(
+      const mantissaFactorBD = exponentToBigDecimal(
         outputTokenDecimals - underlyingToken.decimals
       );
-      let inputTokenBalanceBD = market.outputTokenSupply
+      const inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
         .times(market.exchangeRate!)
         .div(mantissaFactorBD)
@@ -1613,7 +1622,7 @@ export function updateMarket(
     }
   }
 
-  let underlyingSupplyUSD = market.inputTokenBalance
+  const underlyingSupplyUSD = market.inputTokenBalance
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
@@ -1654,14 +1663,14 @@ export function updateMarket(
     );
   }
 
-  let interestAccumulatedUSD = interestAccumulatedMantissa
+  const interestAccumulatedUSD = interestAccumulatedMantissa
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
-  let protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
+  const protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
     market._reserveFactor
   );
-  let supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
+  const supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
     protocolSideRevenueUSDDelta
   );
 
@@ -1675,7 +1684,7 @@ export function updateMarket(
   market.save();
 
   // update daily fields in marketDailySnapshot
-  let dailySnapshot = getOrCreateMarketDailySnapshot(
+  const dailySnapshot = getOrCreateMarketDailySnapshot(
     market,
     blockTimestamp,
     blockNumber
@@ -1690,7 +1699,7 @@ export function updateMarket(
   dailySnapshot.save();
 
   // update hourly fields in marketHourlySnapshot
-  let hourlySnapshot = getOrCreateMarketHourlySnapshot(
+  const hourlySnapshot = getOrCreateMarketHourlySnapshot(
     market,
     blockTimestamp,
     blockNumber
@@ -1707,7 +1716,7 @@ export function updateMarket(
 }
 
 export function updateProtocol(comptrollerAddr: Address): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.error(
       "[updateProtocol] Protocol not found, this SHOULD NOT happen",
@@ -1727,7 +1736,7 @@ export function updateProtocol(comptrollerAddr: Address): void {
   let cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
 
   for (let i = 0; i < protocol._marketIDs.length; i++) {
-    let market = Market.load(protocol._marketIDs[i]);
+    const market = Market.load(protocol._marketIDs[i]);
     if (!market) {
       log.warning("[updateProtocol] Market not found: {}", [
         protocol._marketIDs[i],
@@ -1841,7 +1850,7 @@ export function _getOrCreateProtocol(
 }
 
 function createAccount(accountID: string): Account {
-  let account = new Account(accountID);
+  const account = new Account(accountID);
   account.positionCount = 0;
   account.openPositionCount = 0;
   account.closedPositionCount = 0;
@@ -1879,7 +1888,7 @@ function setInterestRate(
   rate: BigDecimal,
   isSupply: boolean
 ): void {
-  let market = Market.load(marketID);
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[setInterestRate] Market not found: {}", [marketID]);
     return;
@@ -1890,16 +1899,16 @@ function setInterestRate(
     ]);
     return;
   }
-  let supplyInterestRateID = market.rates[0];
-  let borrowInterestRateID = market.rates[1];
-  let supplyInterestRate = InterestRate.load(supplyInterestRateID);
+  const supplyInterestRateID = market.rates[0];
+  const borrowInterestRateID = market.rates[1];
+  const supplyInterestRate = InterestRate.load(supplyInterestRateID);
   if (!supplyInterestRate) {
     log.warning("[setInterestRate] Supply interest rate not found: {}", [
       supplyInterestRateID,
     ]);
     return;
   }
-  let borrowInterestRate = InterestRate.load(borrowInterestRateID);
+  const borrowInterestRate = InterestRate.load(borrowInterestRateID);
   if (!borrowInterestRate) {
     log.warning("[setInterestRate] Borrow interest rate not found: {}", [
       borrowInterestRateID,
@@ -1922,7 +1931,10 @@ export function getOrCreateMarketDailySnapshot(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): MarketDailySnapshot {
-  let snapshotID = getMarketDailySnapshotID(market.id, blockTimestamp.toI32());
+  const snapshotID = getMarketDailySnapshotID(
+    market.id,
+    blockTimestamp.toI32()
+  );
   let snapshot = MarketDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketDailySnapshot(snapshotID);
@@ -1975,7 +1987,10 @@ export function getOrCreateMarketHourlySnapshot(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): MarketHourlySnapshot {
-  let snapshotID = getMarketHourlySnapshotID(market.id, blockTimestamp.toI32());
+  const snapshotID = getMarketHourlySnapshotID(
+    market.id,
+    blockTimestamp.toI32()
+  );
   let snapshot = MarketHourlySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketHourlySnapshot(snapshotID);
@@ -2027,8 +2042,8 @@ export function getTokenPriceUSD(
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
   underlyingDecimals: i32
 ): BigDecimal {
-  let mantissaDecimalFactor = 18 - underlyingDecimals + 18;
-  let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
+  const mantissaDecimalFactor = 18 - underlyingDecimals + 18;
+  const bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
   return getOrElse<BigInt>(getUnderlyingPriceResult, BIGINT_ZERO)
     .toBigDecimal()
     .div(bdFactor);
@@ -2059,7 +2074,7 @@ function addPosition(
   eventType: EventType,
   event: ethereum.Event
 ): string {
-  let counterID = account.id
+  const counterID = account.id
     .concat("-")
     .concat(market.id)
     .concat("-")
@@ -2070,12 +2085,12 @@ function addPosition(
     positionCounter.nextCount = 0;
     positionCounter.save();
   }
-  let positionID = positionCounter.id
+  const positionID = positionCounter.id
     .concat("-")
     .concat(positionCounter.nextCount.toString());
 
   let position = Position.load(positionID);
-  let openPosition = position == null;
+  const openPosition = position == null;
   if (openPosition) {
     position = new Position(positionID);
     position.account = account.id;
@@ -2163,22 +2178,22 @@ function subtractPosition(
   eventType: EventType,
   event: ethereum.Event
 ): string | null {
-  let counterID = account.id
+  const counterID = account.id
     .concat("-")
     .concat(market.id)
     .concat("-")
     .concat(side);
-  let positionCounter = _PositionCounter.load(counterID);
+  const positionCounter = _PositionCounter.load(counterID);
   if (!positionCounter) {
     log.warning("[subtractPosition] position counter {} not found", [
       counterID,
     ]);
     return null;
   }
-  let positionID = positionCounter.id
+  const positionID = positionCounter.id
     .concat("-")
     .concat(positionCounter.nextCount.toString());
-  let position = Position.load(positionID);
+  const position = Position.load(positionID);
   if (!position) {
     log.warning("[subtractPosition] position {} not found", [positionID]);
     return null;
@@ -2199,7 +2214,7 @@ function subtractPosition(
   }
   position.save();
 
-  let closePosition = position.balance == BIGINT_ZERO;
+  const closePosition = position.balance == BIGINT_ZERO;
   if (closePosition) {
     //
     // update position counter
@@ -2270,9 +2285,9 @@ export function getOrElse<T>(
 // create seperate InterestRate Entities for each market snapshot
 // this is needed to prevent snapshot rates from being pointers to the current rate
 function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
-  let snapshotRates: string[] = [];
+  const snapshotRates: string[] = [];
   for (let i = 0; i < rates.length; i++) {
-    let rate = InterestRate.load(rates[i]);
+    const rate = InterestRate.load(rates[i]);
     if (!rate) {
       log.warning("[getSnapshotRates] rate {} not found, should not happen", [
         rates[i],
@@ -2281,8 +2296,8 @@ function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
     }
 
     // create new snapshot rate
-    let snapshotRateId = rates[i].concat("-").concat(timeSuffix);
-    let snapshotRate = new InterestRate(snapshotRateId);
+    const snapshotRateId = rates[i].concat("-").concat(timeSuffix);
+    const snapshotRate = new InterestRate(snapshotRateId);
     snapshotRate.side = rate.side;
     snapshotRate.type = rate.type;
     snapshotRate.rate = rate.rate;
@@ -2293,7 +2308,7 @@ function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
 }
 
 function snapshotPosition(position: Position, event: ethereum.Event): void {
-  let snapshot = new PositionSnapshot(
+  const snapshot = new PositionSnapshot(
     position.id
       .concat("-")
       .concat(event.transaction.hash.toHexString())
@@ -2318,27 +2333,29 @@ export function updateAllMarketPrices(
   comptrollerAddr: Address,
   blockNumber: BigInt
 ): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.warning("[updateAllMarketPrices] protocol not found: {}", [
       comptrollerAddr.toHexString(),
     ]);
     return;
   }
-  let priceOracle = PriceOracle.bind(Address.fromString(protocol._priceOracle));
+  const priceOracle = PriceOracle.bind(
+    Address.fromString(protocol._priceOracle)
+  );
 
   for (let i = 0; i < protocol._marketIDs.length; i++) {
-    let market = Market.load(protocol._marketIDs[i]);
+    const market = Market.load(protocol._marketIDs[i]);
     if (!market) {
       break;
     }
-    let underlyingToken = Token.load(market.inputToken);
+    const underlyingToken = Token.load(market.inputToken);
     if (!underlyingToken) {
       break;
     }
 
     // update market price
-    let underlyingTokenPriceUSD = getTokenPriceUSD(
+    const underlyingTokenPriceUSD = getTokenPriceUSD(
       priceOracle.try_getUnderlyingPrice(Address.fromString(market.id)),
       underlyingToken.decimals
     );
@@ -2371,13 +2388,13 @@ export function updateAllMarketPrices(
 // This function finds the position modified by a liquidateBorrow()
 function whichPosition(account: Address, market: string): string | null {
   // check if position has been created
-  let counterID = account
+  const counterID = account
     .toHexString()
     .concat("-")
     .concat(market)
     .concat("-")
     .concat(PositionSide.BORROWER);
-  let positionCounter = _PositionCounter.load(counterID);
+  const positionCounter = _PositionCounter.load(counterID);
   if (!positionCounter) {
     log.warning("[whichPosition] position counter {} not found", [counterID]);
     return null;
