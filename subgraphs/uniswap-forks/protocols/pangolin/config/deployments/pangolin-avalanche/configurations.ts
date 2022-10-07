@@ -99,6 +99,7 @@ export class PangolinAvalancheConfigurations implements Configurations {
       "0x0e0100ab771e9288e0aa97e11557e6654c3a9665", // USDC/wAVAX
       "0xbd918ed441767fe7924e99f6a0e0b568ac1970d9", // USDC.e/wAVAX
       "0x17a2e8275792b4616befb02eb9ae699aa0dcb94b", // DAI/wAVAX
+      "0x9ee0a4e21bd333a6bb2ab298194320b8daa26516", // USDT old/WAVAX
     ];
   }
 
