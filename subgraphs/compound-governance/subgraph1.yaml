@@ -1,0 +1,28 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: GovernorBravoDelegate
+    network: mainnet
+    source:
+      address: "0xc0da02939e1441f497fd74f78ce7decb17b66529"
+      abi: GovernorBravoDelegate
+      startBlock: 12006099
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: GovernorBravoDelegate
+          file: ./abis/GovernorBravoDelegate.json
+      eventHandlers:
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+      file: ./src/governor-bravo-delegate.ts
