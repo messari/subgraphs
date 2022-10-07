@@ -1,6 +1,5 @@
 import {
   Address,
-  BigDecimal,
   BigInt,
   Bytes,
   ethereum,
@@ -12,37 +11,23 @@ import {
   BIGINT_ZERO,
   GOVERNANCE_NAME,
   ProposalState,
-  VoteChoice,
   ZERO_ADDRESS,
 } from "./constants";
 import {
   GovernorBravoDelegate,
-  NewAdmin,
-  NewImplementation,
-  NewPendingAdmin,
-  ProposalCanceled,
   ProposalCreated,
-  ProposalExecuted,
-  ProposalQueued,
-  ProposalThresholdSet,
-  VoteCast,
-  VotingDelaySet,
-  VotingPeriodSet
 } from "../generated/GovernorBravoDelegate/GovernorBravoDelegate"
 import {
   Delegate,
   Governance,
   Proposal,
-  TokenHolder,
-  Vote,
-  TokenDailySnapshot,
-  VoteDailySnapshot,
 } from "../generated/schema"
 
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
   let quorumVotes = GovernorBravoDelegate.bind(event.address).quorumVotes();
 
+  log.debug("id: {}, txnHash: {}", [event.params.id.toString(), event.transaction.hash.toHexString()])
   // FIXME: Prefer to use a single object arg for params
   // e.g.  { proposalId: event.params.proposalId, proposer: event.params.proposer, ...}
   // but graph wasm compilation breaks for unknown reasons
