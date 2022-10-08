@@ -1,0 +1,30 @@
+{
+  "network": "ethereum",
+  "status": "prod",
+  "versions": {
+    "schema": "2.0.1",
+    "subgraph": "1.7.4",
+    "methodology": "1.0.0"
+  },
+  "files": {
+    "template": "compound-v2.template.yaml"
+  },
+  "options": {
+    "prepare:yaml": true,
+    "prepare:constants": false
+  },
+  "services": {
+    "hosted-service": {
+      "slug": "compound-v2-ethereum",
+      "query-id": "compound-v2-ethereum"
+    },
+    "decentralized-network": {
+      "slug": "compound-v2-ethereum",
+      "query-id": "6tGbL7WBx287EZwGUvvcQdL6m67JGMJrma3JSTtt5SV7"
+    }
+  },
+  "protocol": "compound-v2",
+  "base": "compound-forks",
+  "schema": "lending",
+  "deployment": "compound-v2-ethereum"
+}
