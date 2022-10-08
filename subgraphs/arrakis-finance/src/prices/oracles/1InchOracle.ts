@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { OneInchOracleContract } from "../../../../../generated/templates/CToken/OneInchOracleContract";
+import { OneInchOracleContract } from "../../../generated/templates/ArrakisVault/OneInchOracleContract";
 
 export function getOneInchOracleContract(
   network: string

@@ -77,14 +77,14 @@ import {
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
-  let protocol = getOrCreateProtocol();
-  let newPriceOracle = event.params.newPriceOracle;
+  const protocol = getOrCreateProtocol();
+  const newPriceOracle = event.params.newPriceOracle;
   _handleNewPriceOracle(protocol, newPriceOracle);
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
-  let marketID = event.address.toHexString();
-  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
+  const marketID = event.address.toHexString();
+  const newReserveFactorMantissa = event.params.newReserveFactorMantissa;
   _handleNewReserveFactor(marketID, newReserveFactorMantissa);
 }
 
@@ -109,22 +109,22 @@ export function handleMarketExited(event: MarketExited): void {
 export function handleMarketListed(event: MarketListed): void {
   CTokenTemplate.create(event.params.cToken);
 
-  let cTokenAddr = event.params.cToken;
-  let cToken = Token.load(cTokenAddr.toHexString());
+  const cTokenAddr = event.params.cToken;
+  const cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
   }
   // this is a new cToken, a new underlying token, and a new market
 
-  let protocol = getOrCreateProtocol();
-  let cTokenContract = CToken.bind(event.params.cToken);
+  const protocol = getOrCreateProtocol();
+  const cTokenContract = CToken.bind(event.params.cToken);
 
-  let cTokenReserveFactorMantissa = getOrElse<BigInt>(
+  const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
   if (cTokenAddr == nativeCToken.address) {
-    let marketListedData = new MarketListedData(
+    const marketListedData = new MarketListedData(
       protocol,
       nativeToken,
       nativeCToken,
@@ -134,7 +134,7 @@ export function handleMarketListed(event: MarketListed): void {
     return;
   }
 
-  let underlyingTokenAddrResult = cTokenContract.try_underlying();
+  const underlyingTokenAddrResult = cTokenContract.try_underlying();
   if (underlyingTokenAddrResult.reverted) {
     log.warning(
       "[handleMarketListed] could not fetch underlying token of cToken: {}",
@@ -142,8 +142,8 @@ export function handleMarketListed(event: MarketListed): void {
     );
     return;
   }
-  let underlyingTokenAddr = underlyingTokenAddrResult.value;
-  let underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
+  const underlyingTokenAddr = underlyingTokenAddrResult.value;
+  const underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
   _handleMarketListed(
     new MarketListedData(
       protocol,
@@ -166,31 +166,31 @@ export function handleMarketListed(event: MarketListed): void {
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  let marketID = event.params.cToken.toHexString();
-  let collateralFactorMantissa = event.params.newCollateralFactorMantissa;
+  const marketID = event.params.cToken.toHexString();
+  const collateralFactorMantissa = event.params.newCollateralFactorMantissa;
   _handleNewCollateralFactor(marketID, collateralFactorMantissa);
 }
 
 export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
-  let protocol = getOrCreateProtocol();
-  let newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
+  const protocol = getOrCreateProtocol();
+  const newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
   _handleNewLiquidationIncentive(protocol, newLiquidationIncentive);
 }
 
 export function handleActionPaused(event: ActionPaused1): void {
-  let marketID = event.params.cToken.toHexString();
-  let action = event.params.action;
-  let pauseState = event.params.pauseState;
+  const marketID = event.params.cToken.toHexString();
+  const action = event.params.action;
+  const pauseState = event.params.pauseState;
   _handleActionPaused(marketID, action, pauseState);
 }
 
 export function handleMint(event: Mint): void {
-  let minter = event.params.minter;
-  let mintAmount = event.params.mintAmount;
-  let contract = CToken.bind(event.address);
-  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+  const minter = event.params.minter;
+  const mintAmount = event.params.mintAmount;
+  const contract = CToken.bind(event.address);
+  const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
   _handleMint(
@@ -203,10 +203,10 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleRedeem(event: Redeem): void {
-  let redeemer = event.params.redeemer;
-  let redeemAmount = event.params.redeemAmount;
-  let contract = CToken.bind(event.address);
-  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+  const redeemer = event.params.redeemer;
+  const redeemAmount = event.params.redeemAmount;
+  const contract = CToken.bind(event.address);
+  const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.redeemer
   );
   _handleRedeem(
@@ -219,10 +219,10 @@ export function handleRedeem(event: Redeem): void {
 }
 
 export function handleBorrow(event: BorrowEvent): void {
-  let borrower = event.params.borrower;
-  let borrowAmount = event.params.borrowAmount;
-  let contract = CToken.bind(event.address);
-  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+  const borrower = event.params.borrower;
+  const borrowAmount = event.params.borrowAmount;
+  const contract = CToken.bind(event.address);
+  const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
   _handleBorrow(
@@ -235,11 +235,11 @@ export function handleBorrow(event: BorrowEvent): void {
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
-  let borrower = event.params.borrower;
-  let payer = event.params.payer;
-  let repayAmount = event.params.repayAmount;
-  let contract = CToken.bind(event.address);
-  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+  const borrower = event.params.borrower;
+  const payer = event.params.payer;
+  const repayAmount = event.params.repayAmount;
+  const contract = CToken.bind(event.address);
+  const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
   _handleRepayBorrow(
@@ -253,11 +253,11 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  let cTokenCollateral = event.params.cTokenCollateral;
-  let liquidator = event.params.liquidator;
-  let borrower = event.params.borrower;
-  let seizeTokens = event.params.seizeTokens;
-  let repayAmount = event.params.repayAmount;
+  const cTokenCollateral = event.params.cTokenCollateral;
+  const liquidator = event.params.liquidator;
+  const borrower = event.params.borrower;
+  const seizeTokens = event.params.seizeTokens;
+  const repayAmount = event.params.repayAmount;
   _handleLiquidateBorrow(
     comptrollerAddr,
     cTokenCollateral,
@@ -270,16 +270,16 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 }
 
 export function handleAccrueInterest(event: AccrueInterest): void {
-  let marketAddress = event.address;
-  let cTokenContract = CToken.bind(marketAddress);
-  let protocol = getOrCreateProtocol();
-  let oracleContract = PriceOracle.bind(
+  const marketAddress = event.address;
+  const cTokenContract = CToken.bind(marketAddress);
+  const protocol = getOrCreateProtocol();
+  const oracleContract = PriceOracle.bind(
     Address.fromString(protocol._priceOracle)
   );
-  let blocksPerDay = BigInt.fromString(
+  const blocksPerDay = BigInt.fromString(
     getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString()
   ).toI32();
-  let updateMarketData = new UpdateMarketData(
+  const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
@@ -287,11 +287,11 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     oracleContract.try_getUnderlyingPrice(marketAddress),
     blocksPerDay * DAYS_PER_YEAR
   );
-  let interestAccumulated = event.params.interestAccumulated;
-  let totalBorrows = event.params.totalBorrows;
+  const interestAccumulated = event.params.interestAccumulated;
+  const totalBorrows = event.params.totalBorrows;
 
-  let marketID = marketAddress.toHexString();
-  let market = Market.load(marketID);
+  const marketID = marketAddress.toHexString();
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[handleAccrueInterest] Market not found: {}", [marketID]);
     return;
@@ -319,8 +319,8 @@ export function handleTransfer(event: Transfer): void {
 }
 
 function getOrCreateProtocol(): LendingProtocol {
-  let comptroller = Comptroller.bind(comptrollerAddr);
-  let protocolData = new ProtocolData(
+  const comptroller = Comptroller.bind(comptrollerAddr);
+  const protocolData = new ProtocolData(
     comptrollerAddr,
     "Tectonic",
     "tectonic",
@@ -348,7 +348,7 @@ function updateTONICRewards(
     // get or create Tonic token
     let TonicToken = Token.load(TONICAddress);
     if (!TonicToken) {
-      let tokenContract = ERC20.bind(Address.fromString(TONICAddress));
+      const tokenContract = ERC20.bind(Address.fromString(TONICAddress));
       TonicToken = new Token(TONICAddress);
       TonicToken.name = getOrElse(tokenContract.try_name(), "unkown");
       TonicToken.symbol = getOrElse(tokenContract.try_symbol(), "unkown");
@@ -356,7 +356,7 @@ function updateTONICRewards(
       TonicToken.save();
     }
 
-    let borrowID = RewardTokenType.BORROW.concat("-").concat(TONICAddress);
+    const borrowID = RewardTokenType.BORROW.concat("-").concat(TONICAddress);
     rewardTokenBorrow = RewardToken.load(borrowID);
     if (!rewardTokenBorrow) {
       rewardTokenBorrow = new RewardToken(borrowID);
@@ -364,7 +364,7 @@ function updateTONICRewards(
       rewardTokenBorrow.type = RewardTokenType.BORROW;
       rewardTokenBorrow.save();
     }
-    let depositID = RewardTokenType.DEPOSIT.concat("-").concat(TONICAddress);
+    const depositID = RewardTokenType.DEPOSIT.concat("-").concat(TONICAddress);
     rewardTokenDeposit = RewardToken.load(depositID);
     if (!rewardTokenDeposit) {
       rewardTokenDeposit = new RewardToken(depositID);
@@ -379,15 +379,15 @@ function updateTONICRewards(
 
   // get TONIC distribution/block
   // let rewardDecimals = Token.load(TONICAddress)!.decimals;
-  let rewardDecimals = 18; // TONIC 18 decimals
-  let troller = Core.bind(comptrollerAddr);
+  const rewardDecimals = 18; // TONIC 18 decimals
+  const troller = Core.bind(comptrollerAddr);
 
   let TonicPriceUSD = BIGDECIMAL_ZERO;
   let supplyTonicPerDay = BIGINT_ZERO;
   let borrowTonicPerDay = BIGINT_ZERO;
 
   // Tonic speeds are the same for supply/borrow side
-  let tryTonicSpeed = troller.try_tonicSpeeds(event.address);
+  const tryTonicSpeed = troller.try_tonicSpeeds(event.address);
   supplyTonicPerDay = tryTonicSpeed.reverted
     ? BIGINT_ZERO
     : BigInt.fromString(
@@ -403,10 +403,10 @@ function updateTONICRewards(
   borrowTonicPerDay = supplyTonicPerDay;
 
   if (event.block.number.gt(BigInt.fromI32(1337194))) {
-    let oracleContract = PriceOracle.bind(
+    const oracleContract = PriceOracle.bind(
       Address.fromString(protocol._priceOracle)
     );
-    let price = oracleContract.try_getUnderlyingPrice(
+    const price = oracleContract.try_getUnderlyingPrice(
       Address.fromString(tTONICAddress)
     );
     if (price.reverted) {
@@ -418,11 +418,11 @@ function updateTONICRewards(
     }
   }
 
-  let borrowTonicPerDayUSD = borrowTonicPerDay
+  const borrowTonicPerDayUSD = borrowTonicPerDay
     .toBigDecimal()
     .div(exponentToBigDecimal(rewardDecimals))
     .times(TonicPriceUSD);
-  let supplyTonicPerDayUSD = supplyTonicPerDay
+  const supplyTonicPerDayUSD = supplyTonicPerDay
     .toBigDecimal()
     .div(exponentToBigDecimal(rewardDecimals))
     .times(TonicPriceUSD);

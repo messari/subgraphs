@@ -98,10 +98,10 @@ import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
 ///////////////////////////////
 
 export function handleMint(event: Mint): void {
-  let minter = event.params.minter;
-  let mintAmount = event.params.mintAmount;
-  let contract = CTokenContract.bind(event.address);
-  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+  const minter = event.params.minter;
+  const mintAmount = event.params.mintAmount;
+  const contract = CTokenContract.bind(event.address);
+  const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
   _handleMint(
@@ -114,10 +114,10 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleRedeem(event: Redeem): void {
-  let redeemer = event.params.redeemer;
-  let redeemAmount = event.params.redeemAmount;
-  let contract = CTokenContract.bind(event.address);
-  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+  const redeemer = event.params.redeemer;
+  const redeemAmount = event.params.redeemAmount;
+  const contract = CTokenContract.bind(event.address);
+  const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.redeemer
   );
   _handleRedeem(
@@ -130,10 +130,10 @@ export function handleRedeem(event: Redeem): void {
 }
 
 export function handleBorrow(event: Borrow): void {
-  let borrower = event.params.borrower;
-  let borrowAmount = event.params.borrowAmount;
-  let contract = CTokenContract.bind(event.address);
-  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+  const borrower = event.params.borrower;
+  const borrowAmount = event.params.borrowAmount;
+  const contract = CTokenContract.bind(event.address);
+  const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
   _handleBorrow(
@@ -146,11 +146,11 @@ export function handleBorrow(event: Borrow): void {
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
-  let payer = event.params.payer;
-  let borrower = event.params.borrower;
-  let repayAmount = event.params.repayAmount;
-  let contract = CTokenContract.bind(event.address);
-  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+  const payer = event.params.payer;
+  const borrower = event.params.borrower;
+  const repayAmount = event.params.repayAmount;
+  const contract = CTokenContract.bind(event.address);
+  const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
   _handleRepayBorrow(
@@ -164,11 +164,11 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  let cTokenCollateral = event.params.cTokenCollateral;
-  let liquidator = event.params.liquidator;
-  let borrower = event.params.borrower;
-  let seizeTokens = event.params.seizeTokens;
-  let repayAmount = event.params.repayAmount;
+  const cTokenCollateral = event.params.cTokenCollateral;
+  const liquidator = event.params.liquidator;
+  const borrower = event.params.borrower;
+  const seizeTokens = event.params.seizeTokens;
+  const repayAmount = event.params.repayAmount;
   _handleLiquidateBorrow(
     comptrollerAddr,
     cTokenCollateral,
@@ -181,8 +181,8 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
-  let marketID = event.address.toHexString();
-  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
+  const marketID = event.address.toHexString();
+  const newReserveFactorMantissa = event.params.newReserveFactorMantissa;
   _handleNewReserveFactor(marketID, newReserveFactorMantissa);
 }
 
@@ -223,16 +223,16 @@ export function handleMarketListed(event: MarketListed): void {
     CTokenOld.create(event.params.cToken);
   }
   CToken.create(event.params.cToken);
-  let cTokenAddr = event.params.cToken;
-  let cToken = Token.load(cTokenAddr.toHexString());
+  const cTokenAddr = event.params.cToken;
+  const cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
   }
   // this is a new cToken, a new underlying token, and a new market
 
-  let protocol = getOrCreateProtocol();
-  let cTokenContract = CTokenContract.bind(event.params.cToken);
-  let cTokenReserveFactorMantissa = getOrElse<BigInt>(
+  const protocol = getOrCreateProtocol();
+  const cTokenContract = CTokenContract.bind(event.params.cToken);
+  const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
@@ -250,7 +250,7 @@ export function handleMarketListed(event: MarketListed): void {
     underlyingDecimals = ETH_DECIMALS;
   } else {
     // grab token normally
-    let underlyingTokenAddrResult = cTokenContract.try_underlying();
+    const underlyingTokenAddrResult = cTokenContract.try_underlying();
     if (underlyingTokenAddrResult.reverted) {
       log.warning(
         "[handleMarketListed] could not fetch underlying token of cToken: {}",
@@ -305,29 +305,29 @@ export function handleMarketExited(event: MarketExited): void {
 }
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
-  let protocol = getOrCreateProtocol();
-  let newPriceOracle = event.params.newPriceOracle;
+  const protocol = getOrCreateProtocol();
+  const newPriceOracle = event.params.newPriceOracle;
   _handleNewPriceOracle(protocol, newPriceOracle);
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  let marketID = event.params.cToken.toHexString();
-  let collateralFactorMantissa = event.params.newCollateralFactorMantissa;
+  const marketID = event.params.cToken.toHexString();
+  const collateralFactorMantissa = event.params.newCollateralFactorMantissa;
   _handleNewCollateralFactor(marketID, collateralFactorMantissa);
 }
 
 export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
-  let protocol = getOrCreateProtocol();
-  let newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
+  const protocol = getOrCreateProtocol();
+  const newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
   _handleNewLiquidationIncentive(protocol, newLiquidationIncentive);
 }
 
 export function handleActionPaused(event: ActionPaused1): void {
-  let marketID = event.params.cToken.toHexString();
-  let action = event.params.action;
-  let pauseState = event.params.pauseState;
+  const marketID = event.params.cToken.toHexString();
+  const action = event.params.action;
+  const pauseState = event.params.pauseState;
   _handleActionPaused(marketID, action, pauseState);
 }
 
@@ -336,8 +336,8 @@ export function handleActionPaused(event: ActionPaused1): void {
 /////////////////
 
 function getOrCreateProtocol(): LendingProtocol {
-  let comptroller = Comptroller.bind(comptrollerAddr);
-  let protocolData = new ProtocolData(
+  const comptroller = Comptroller.bind(comptrollerAddr);
+  const protocolData = new ProtocolData(
     comptrollerAddr,
     PROTOCOL_NAME,
     PROTOCOL_SLUG,
@@ -358,10 +358,10 @@ function handleAccrueInterest(
   interestAccumulated: BigInt,
   totalBorrows: BigInt
 ): void {
-  let marketAddress = event.address;
-  let cTokenContract = CTokenContract.bind(marketAddress);
-  let protocol = getOrCreateProtocol();
-  let oracleContract = PriceOracle2.bind(
+  const marketAddress = event.address;
+  const cTokenContract = CTokenContract.bind(marketAddress);
+  const protocol = getOrCreateProtocol();
+  const oracleContract = PriceOracle2.bind(
     Address.fromString(protocol._priceOracle)
   );
 
@@ -372,11 +372,11 @@ function handleAccrueInterest(
     BIGDECIMAL_ZERO,
     RewardIntervalType.BLOCK
   );
-  let blocksPerDay = BigInt.fromString(
+  const blocksPerDay = BigInt.fromString(
     getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString()
   ).toI32();
 
-  let updateMarketData = new UpdateMarketData(
+  const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
@@ -389,8 +389,8 @@ function handleAccrueInterest(
   // Replacing _handleAccrueInterest() to properly derive asset price
   //
 
-  let marketID = event.address.toHexString();
-  let market = Market.load(marketID);
+  const marketID = event.address.toHexString();
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[handleAccrueInterest] Market not found: {}", [marketID]);
     return;
@@ -450,13 +450,13 @@ function updateMarket(
   updateMarketPrices: boolean,
   comptrollerAddress: Address
 ): void {
-  let market = Market.load(marketID);
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[updateMarket] Market not found: {}", [marketID]);
     return;
   }
 
-  let underlyingToken = Token.load(market.inputToken);
+  const underlyingToken = Token.load(market.inputToken);
   if (!underlyingToken) {
     log.warning("[updateMarket] Underlying token not found: {}", [
       market.inputToken,
@@ -469,7 +469,10 @@ function updateMarket(
   }
 
   // compound v2 specific price calculation (see ./prices.ts)
-  let underlyingTokenPriceUSD = getUSDPriceOfToken(market, blockNumber.toI32());
+  const underlyingTokenPriceUSD = getUSDPriceOfToken(
+    market,
+    blockNumber.toI32()
+  );
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
   underlyingToken.lastPriceBlockNumber = blockNumber;
@@ -488,7 +491,7 @@ function updateMarket(
   // get correct outputTokenDecimals for generic exchangeRate calculation
   let outputTokenDecimals = cTokenDecimals;
   if (market.outputToken) {
-    let outputToken = Token.load(market.outputToken!);
+    const outputToken = Token.load(market.outputToken!);
     if (!outputToken) {
       log.warning("[updateMarket] Output token not found: {}", [
         market.outputToken!,
@@ -505,13 +508,14 @@ function updateMarket(
     );
   } else {
     // Formula: check out "Interpreting Exchange Rates" in https://compound.finance/docs#protocol-math
-    let oneCTokenInUnderlying = updateMarketData.exchangeRateStoredResult.value
-      .toBigDecimal()
-      .div(
-        exponentToBigDecimal(
-          mantissaFactor + underlyingToken.decimals - outputTokenDecimals
-        )
-      );
+    const oneCTokenInUnderlying =
+      updateMarketData.exchangeRateStoredResult.value
+        .toBigDecimal()
+        .div(
+          exponentToBigDecimal(
+            mantissaFactor + underlyingToken.decimals - outputTokenDecimals
+          )
+        );
     market.exchangeRate = oneCTokenInUnderlying;
     market.outputTokenPriceUSD = oneCTokenInUnderlying.times(
       underlyingTokenPriceUSD
@@ -522,10 +526,10 @@ function updateMarket(
     // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
     if (underlyingToken.decimals > outputTokenDecimals) {
       // we want to multiply out the difference to expand BD
-      let mantissaFactorBD = exponentToBigDecimal(
+      const mantissaFactorBD = exponentToBigDecimal(
         underlyingToken.decimals - outputTokenDecimals
       );
-      let inputTokenBalanceBD = market.outputTokenSupply
+      const inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
         .times(market.exchangeRate!)
         .times(mantissaFactorBD)
@@ -535,10 +539,10 @@ function updateMarket(
       );
     } else {
       // we want to divide back the difference to decrease the BD
-      let mantissaFactorBD = exponentToBigDecimal(
+      const mantissaFactorBD = exponentToBigDecimal(
         outputTokenDecimals - underlyingToken.decimals
       );
-      let inputTokenBalanceBD = market.outputTokenSupply
+      const inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
         .times(market.exchangeRate!)
         .div(mantissaFactorBD)
@@ -549,7 +553,7 @@ function updateMarket(
     }
   }
 
-  let underlyingSupplyUSD = market.inputTokenBalance
+  const underlyingSupplyUSD = market.inputTokenBalance
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
@@ -590,14 +594,14 @@ function updateMarket(
     );
   }
 
-  let interestAccumulatedUSD = interestAccumulatedMantissa
+  const interestAccumulatedUSD = interestAccumulatedMantissa
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
-  let protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
+  const protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
     market._reserveFactor
   );
-  let supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
+  const supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
     protocolSideRevenueUSDDelta
   );
 
@@ -611,7 +615,7 @@ function updateMarket(
   market.save();
 
   // update daily fields in marketDailySnapshot
-  let dailySnapshot = getOrCreateMarketDailySnapshot(
+  const dailySnapshot = getOrCreateMarketDailySnapshot(
     market,
     blockTimestamp,
     blockNumber
@@ -626,7 +630,7 @@ function updateMarket(
   dailySnapshot.save();
 
   // update hourly fields in marketHourlySnapshot
-  let hourlySnapshot = getOrCreateMarketHourlySnapshot(
+  const hourlySnapshot = getOrCreateMarketHourlySnapshot(
     market,
     blockTimestamp,
     blockNumber
@@ -643,7 +647,7 @@ function updateMarket(
 }
 
 export function updateProtocol(comptrollerAddr: Address): void {
-  let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
+  const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.error(
       "[updateProtocol] Protocol not found, this SHOULD NOT happen",
@@ -663,7 +667,7 @@ export function updateProtocol(comptrollerAddr: Address): void {
   let cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
 
   for (let i = 0; i < protocol._marketIDs.length; i++) {
-    let market = Market.load(protocol._marketIDs[i]);
+    const market = Market.load(protocol._marketIDs[i]);
     if (!market) {
       log.warning("[updateProtocol] Market not found: {}", [
         protocol._marketIDs[i],
@@ -719,7 +723,7 @@ function updateRewards(event: ethereum.Event, market: Market): void {
       // get or create COMP token
       let compToken = Token.load(COMP_ADDRESS);
       if (!compToken) {
-        let tokenContract = ERC20.bind(Address.fromString(COMP_ADDRESS));
+        const tokenContract = ERC20.bind(Address.fromString(COMP_ADDRESS));
         compToken = new Token(COMP_ADDRESS);
         compToken.name = getOrElse(tokenContract.try_name(), "unkown");
         compToken.symbol = getOrElse(tokenContract.try_symbol(), "unkown");
@@ -727,7 +731,7 @@ function updateRewards(event: ethereum.Event, market: Market): void {
         compToken.save();
       }
 
-      let borrowID = RewardTokenType.BORROW.concat("-").concat(COMP_ADDRESS);
+      const borrowID = RewardTokenType.BORROW.concat("-").concat(COMP_ADDRESS);
       rewardTokenBorrow = RewardToken.load(borrowID);
       if (!rewardTokenBorrow) {
         rewardTokenBorrow = new RewardToken(borrowID);
@@ -735,7 +739,8 @@ function updateRewards(event: ethereum.Event, market: Market): void {
         rewardTokenBorrow.type = RewardTokenType.BORROW;
         rewardTokenBorrow.save();
       }
-      let depositID = RewardTokenType.DEPOSIT.concat("-").concat(COMP_ADDRESS);
+      const depositID =
+        RewardTokenType.DEPOSIT.concat("-").concat(COMP_ADDRESS);
       rewardTokenDeposit = RewardToken.load(depositID);
       if (!rewardTokenDeposit) {
         rewardTokenDeposit = new RewardToken(depositID);
@@ -748,9 +753,9 @@ function updateRewards(event: ethereum.Event, market: Market): void {
     }
 
     // get COMP distribution/block
-    let rewardDecimals = Token.load(COMP_ADDRESS)!.decimals; // COMP is already made from cCOMP market
-    let troller = Comptroller.bind(Address.fromString(COMPTROLLER_ADDRESS));
-    let blocksPerDay = BigInt.fromString(
+    const rewardDecimals = Token.load(COMP_ADDRESS)!.decimals; // COMP is already made from cCOMP market
+    const troller = Comptroller.bind(Address.fromString(COMPTROLLER_ADDRESS));
+    const blocksPerDay = BigInt.fromString(
       getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString()
     );
 
@@ -761,8 +766,8 @@ function updateRewards(event: ethereum.Event, market: Market): void {
     // See proposal 62: https://compound.finance/governance/proposals/62
     if (event.block.number.toI32() > 13322798) {
       // comp speeds can be different for supply/borrow side
-      let tryBorrowSpeed = troller.try_compBorrowSpeeds(event.address);
-      let trySupplySpeed = troller.try_compSupplySpeeds(event.address);
+      const tryBorrowSpeed = troller.try_compBorrowSpeeds(event.address);
+      const trySupplySpeed = troller.try_compSupplySpeeds(event.address);
       borrowCompPerDay = tryBorrowSpeed.reverted
         ? BIGINT_ZERO
         : tryBorrowSpeed.value.times(blocksPerDay);
@@ -771,7 +776,7 @@ function updateRewards(event: ethereum.Event, market: Market): void {
         : trySupplySpeed.value.times(blocksPerDay);
     } else {
       // comp speeds are the same for supply/borrow side
-      let tryCompSpeed = troller.try_compSpeeds(event.address);
+      const tryCompSpeed = troller.try_compSpeeds(event.address);
       supplyCompPerDay = tryCompSpeed.reverted
         ? BIGINT_ZERO
         : tryCompSpeed.value.times(blocksPerDay);
@@ -781,7 +786,7 @@ function updateRewards(event: ethereum.Event, market: Market): void {
     // get COMP price
     // cCOMP was made at this block height 10960099
     if (event.block.number.toI32() > 10960099) {
-      let compMarket = Market.load(CCOMP_ADDRESS);
+      const compMarket = Market.load(CCOMP_ADDRESS);
       if (!compMarket) {
         log.warning("[updateRewards] Market not found: {}", [CCOMP_ADDRESS]);
         return;
@@ -790,15 +795,15 @@ function updateRewards(event: ethereum.Event, market: Market): void {
       compPriceUSD = compMarket.inputTokenPriceUSD;
     } else {
       // try to get COMP price between blocks 10271924 - 10960099 using price oracle library
-      let customPrice = getUsdPricePerToken(Address.fromString(COMP_ADDRESS));
+      const customPrice = getUsdPricePerToken(Address.fromString(COMP_ADDRESS));
       compPriceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
     }
 
-    let borrowCompPerDayUSD = borrowCompPerDay
+    const borrowCompPerDayUSD = borrowCompPerDay
       .toBigDecimal()
       .div(exponentToBigDecimal(rewardDecimals))
       .times(compPriceUSD);
-    let supplyCompPerDayUSD = supplyCompPerDay
+    const supplyCompPerDayUSD = supplyCompPerDay
       .toBigDecimal()
       .div(exponentToBigDecimal(rewardDecimals))
       .times(compPriceUSD);
