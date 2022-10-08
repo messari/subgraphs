@@ -1,6 +1,13 @@
 specVersion: 0.0.5
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+features:
+  - grafting
+graft:
+  base: {{subgraphId}}
+  block: {{graftStartBlock}}
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum
     name: Controller

@@ -46,7 +46,7 @@ export function handleWithdraw(call: WithdrawCall): void {
   const vaultAddress = call.to;
   const sharesBurnt = call.inputs._shares;
 
-  Withdraw(vaultAddress, sharesBurnt, call.transaction, call.block);
+  Withdraw(vaultAddress, null, sharesBurnt, call.transaction, call.block);
 
   updateFinancials(call.block);
   updateUsageMetrics(call.block, call.from);
@@ -57,8 +57,15 @@ export function handleWithdrawEvent(event: WithdrawEvent): void {
   const vaultAddress = event.address;
   const depositor = event.params._depositor;
   const sharesBurnt = event.params._amount;
+  const withdrawAmount = event.params._amount;
 
-  Withdraw(vaultAddress, sharesBurnt, event.transaction, event.block);
+  Withdraw(
+    vaultAddress,
+    withdrawAmount,
+    sharesBurnt,
+    event.transaction,
+    event.block
+  );
 
   updateFinancials(event.block);
   updateUsageMetrics(event.block, depositor);

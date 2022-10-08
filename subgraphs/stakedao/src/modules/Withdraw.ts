@@ -79,6 +79,7 @@ export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
 
 export function Withdraw(
   vaultAddress: Address,
+  withdrawAmount: BigInt | null,
   sharesBurnt: BigInt,
   transaction: ethereum.Transaction,
   block: ethereum.Block
@@ -89,7 +90,6 @@ export function Withdraw(
   const strategyAddress = Address.fromString(vault._strategy);
   const strategyContract = StrategyContract.bind(strategyAddress);
 
-  let withdrawAmount: BigInt;
   if (vaultAddress.equals(constants.ANGLE_USDC_VAULT_ADDRESS)) {
     const stableMasterContract = StableMasterContract.bind(
       constants.STABLE_MASTER_ADDRESS
@@ -105,12 +105,18 @@ export function Withdraw(
       .times(constants.BASE_PARAMS.minus(slpDataSlippage))
       .times(sanRate)
       .div(constants.BASE_TOKENS.times(constants.BASE_PARAMS));
-  } else {
+  }
+
+  if (!withdrawAmount) {
     // calculate withdraw amount as per the withdraw function in vault
     // contract address
-    withdrawAmount = vault.inputTokenBalance
-      .times(sharesBurnt)
-      .div(vault.outputTokenSupply!);
+    if (vault.outputTokenSupply!.notEqual(constants.BIGINT_ZERO)) {
+      withdrawAmount = vault.inputTokenBalance
+        .times(sharesBurnt)
+        .div(vault.outputTokenSupply!);
+    } else {
+      withdrawAmount = sharesBurnt;
+    }
   }
 
   vault.inputTokenBalance = utils.readValue(
