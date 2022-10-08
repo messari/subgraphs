@@ -318,7 +318,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Bastion Protocol",
     "bastion-protocol",
     "2.0.1",
-    "1.1.5",
+    "1.1.6",
     "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),
@@ -369,14 +369,10 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
     // load BSTN token
     token = Token.load(REWARD_TOKENS[INT_ZERO].toHexString());
     if (!token) {
-      const BSTNContract = ERC20.bind(REWARD_TOKENS[INT_ZERO]);
       token = new Token(REWARD_TOKENS[INT_ZERO].toHexString());
-      token.name = getOrElse<string>(
-        BSTNContract.try_name(),
-        "Bastion Protocol"
-      );
-      token.symbol = getOrElse<string>(BSTNContract.try_symbol(), "BSTN");
-      token.decimals = getOrElse<i32>(BSTNContract.try_decimals(), 18);
+      token.name = "Bastion Protocol";
+      token.symbol = "BSTN";
+      token.decimals = 18;
     }
     token.lastPriceUSD = getBastionPrice();
     token.lastPriceBlockNumber = blockNumber;
@@ -454,14 +450,10 @@ function updateRewards(marketAddress: Address, blockNumber: BigInt): void {
     // load BSTN token
     token = Token.load(REWARD_TOKENS[INT_ZERO].toHexString());
     if (!token) {
-      const BSTNContract = ERC20.bind(REWARD_TOKENS[INT_ZERO]);
       token = new Token(REWARD_TOKENS[INT_ZERO].toHexString());
-      token.name = getOrElse<string>(
-        BSTNContract.try_name(),
-        "Bastion Protocol"
-      );
-      token.symbol = getOrElse<string>(BSTNContract.try_symbol(), "BSTN");
-      token.decimals = getOrElse<i32>(BSTNContract.try_decimals(), 18);
+      token.name = "Bastion Protocol";
+      token.symbol = "BSTN";
+      token.decimals = 18;
     }
     token.lastPriceUSD = getBastionPrice();
     token.lastPriceBlockNumber = blockNumber;
