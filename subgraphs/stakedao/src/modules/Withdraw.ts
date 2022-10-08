@@ -1,5 +1,4 @@
 import {
-  Token,
   Vault as VaultStore,
   Withdraw as WithdrawTransaction,
 } from "../../generated/schema";
@@ -11,27 +10,26 @@ import {
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
+  getOrCreateVault,
   getOrCreateYieldAggregator,
+  getOrCreateTokenFromString,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
-  getOrCreateFinancialDailySnapshots,
 } from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import { getPriceOfOutputTokens } from "./Price";
+import { updateRevenueSnapshots } from "./Revenue";
 import { Vault as VaultContract } from "../../generated/Controller/Vault";
 import { Strategy as StrategyContract } from "../../generated/controller/Strategy";
 import { StableMaster as StableMasterContract } from "../../generated/controller/StableMaster";
 
 export function createWithdrawTransaction(
-  to: Address,
-  vaultAddress: Address,
-  transaction: ethereum.Transaction,
-  block: ethereum.Block,
-  assetId: string,
+  vault: VaultStore,
   amount: BigInt,
-  amountUSD: BigDecimal
+  amountUSD: BigDecimal,
+  transaction: ethereum.Transaction,
+  block: ethereum.Block
 ): WithdrawTransaction {
   let withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
 
@@ -40,16 +38,17 @@ export function createWithdrawTransaction(
   if (!withdrawTransaction) {
     withdrawTransaction = new WithdrawTransaction(withdrawTransactionId);
 
-    withdrawTransaction.vault = vaultAddress.toHexString();
-    withdrawTransaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    withdrawTransaction.vault = vault.id;
+    withdrawTransaction.protocol = constants.PROTOCOL_ID;
 
-    withdrawTransaction.to = to.toHexString();
+    withdrawTransaction.to = constants.NULL.TYPE_STRING;
+    if (transaction.to) withdrawTransaction.to = transaction.to!.toHexString();
     withdrawTransaction.from = transaction.from.toHexString();
 
     withdrawTransaction.hash = transaction.hash.toHexString();
     withdrawTransaction.logIndex = transaction.index.toI32();
 
-    withdrawTransaction.asset = assetId;
+    withdrawTransaction.asset = vault.inputToken;
     withdrawTransaction.amount = amount;
     withdrawTransaction.amountUSD = amountUSD;
 
@@ -62,16 +61,30 @@ export function createWithdrawTransaction(
   return withdrawTransaction;
 }
 
-export function _Withdraw(
-  to: Address,
-  transaction: ethereum.Transaction,
-  block: ethereum.Block,
-  vault: VaultStore,
-  sharesBurnt: BigInt
-): void {
+export function UpdateMetricsAfterWithdraw(block: ethereum.Block): void {
   const protocol = getOrCreateYieldAggregator();
-  const vaultAddress = Address.fromString(vault.id);
-  const vaultContract = VaultContract.bind(vaultAddress);
+
+  // Update hourly and daily deposit transaction count
+  const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
+  const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
+
+  metricsDailySnapshot.dailyWithdrawCount += 1;
+  metricsHourlySnapshot.hourlyWithdrawCount += 1;
+
+  metricsDailySnapshot.save();
+  metricsHourlySnapshot.save();
+
+  protocol.save();
+}
+
+export function Withdraw(
+  vaultAddress: Address,
+  sharesBurnt: BigInt,
+  transaction: ethereum.Transaction,
+  block: ethereum.Block
+): void {
+  const vault = getOrCreateVault(vaultAddress, block);
+  let vaultContract = VaultContract.bind(vaultAddress);
 
   const strategyAddress = Address.fromString(vault._strategy);
   const strategyContract = StrategyContract.bind(strategyAddress);
@@ -93,20 +106,12 @@ export function _Withdraw(
       .times(sanRate)
       .div(constants.BASE_TOKENS.times(constants.BASE_PARAMS));
   } else {
-    
     // calculate withdraw amount as per the withdraw function in vault
     // contract address
     withdrawAmount = vault.inputTokenBalance
       .times(sharesBurnt)
       .div(vault.outputTokenSupply!);
   }
-
-  let inputToken = Token.load(vault.inputToken);
-  let inputTokenAddress = Address.fromString(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(
-    inputToken!.decimals as u8
-  ).toBigDecimal();
 
   vault.inputTokenBalance = utils.readValue(
     vaultContract.try_balance(),
@@ -122,113 +127,70 @@ export function _Withdraw(
       strategyContract.try_withdrawalFee(),
       constants.BIGINT_ZERO
     )
-    .toBigDecimal()
-    .div(constants.DENOMINATOR);
+    .divDecimal(constants.DENOMINATOR);
+
+  let inputToken = getOrCreateTokenFromString(vault.inputToken, block);
+  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+    inputToken.decimals as u8
+  ).toBigDecimal();
 
   const protocolSideWithdrawalAmount = withdrawAmount
-    .toBigDecimal()
-    .times(withdrawalFees)
-    .div(inputTokenDecimals);
+    .divDecimal(inputTokenDecimals)
+    .times(withdrawalFees);
 
   const supplySideWithdrawalAmount = withdrawAmount
-    .toBigDecimal()
-    .div(inputTokenDecimals)
+    .divDecimal(inputTokenDecimals)
     .minus(protocolSideWithdrawalAmount);
 
-  let withdrawAmountUSD = supplySideWithdrawalAmount
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+  let withdrawAmountUSD = supplySideWithdrawalAmount.times(
+    inputToken.lastPriceUSD!
+  );
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
-    .toBigDecimal()
-    .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .divDecimal(inputTokenDecimals)
+    .times(inputToken.lastPriceUSD!);
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
-    inputTokenAddress,
+    Address.fromString(vault.inputToken),
     inputTokenDecimals
   );
 
-  vault.pricePerShare = utils
-    .readValue<BigInt>(
-      vaultContract.try_getPricePerFullShare(),
-      constants.BIGINT_ZERO
-    )
-    .toBigDecimal();
+  vault.pricePerShare = utils.getPricePerFullShare(vaultAddress);
+
+  vault.save();
 
   const protocolSideWithdrawalAmountUSD = protocolSideWithdrawalAmount
     .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputToken.lastPriceUSD!);
 
-  // Update hourly and daily withdraw transaction count
-  const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
-  const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
-
-  metricsDailySnapshot.dailyWithdrawCount += 1;
-  metricsHourlySnapshot.hourlyWithdrawCount += 1;
-
-  metricsDailySnapshot.save();
-  metricsHourlySnapshot.save();
-  protocol.save();
-  vault.save();
-
-  utils.updateProtocolTotalValueLockedUSD();
-
-  createWithdrawTransaction(
-    to,
-    vaultAddress,
-    transaction,
-    block,
-    vault.inputToken,
-    withdrawAmount,
-    withdrawAmountUSD
+  updateRevenueSnapshots(
+    vault,
+    constants.BIGDECIMAL_ZERO,
+    protocolSideWithdrawalAmountUSD,
+    block
   );
 
-  updateFinancialsAfterWithdrawal(block, protocolSideWithdrawalAmountUSD);
+  createWithdrawTransaction(
+    vault,
+    withdrawAmount,
+    withdrawAmountUSD,
+    transaction,
+    block
+  );
+
+  utils.updateProtocolTotalValueLockedUSD();
+  UpdateMetricsAfterWithdraw(block);
 
   log.warning(
-    "[Withdrawn] TxHash: {}, vaultAddress: {}, withdrawAmount: {}, sharesBurnt: {}, supplySideWithdrawAmount: {}, protocolSideWithdrawAmount: {}",
+    "[Withdrawn] vaultAddress: {}, withdrawAmount: {}, sharesBurnt: {}, supplySideWithdrawAmount: {}, protocolSideWithdrawAmount: {}, TxHash: {}",
     [
-      transaction.hash.toHexString(),
       vault.id,
       withdrawAmount.toString(),
       sharesBurnt.toString(),
       supplySideWithdrawalAmount.toString(),
       protocolSideWithdrawalAmount.toString(),
+      transaction.hash.toHexString(),
     ]
   );
-}
-
-export function updateFinancialsAfterWithdrawal(
-  block: ethereum.Block,
-  protocolSideRevenueUSD: BigDecimal
-): void {
-  const financialMetrics = getOrCreateFinancialDailySnapshots(block);
-  const protocol = getOrCreateYieldAggregator();
-
-  // TotalRevenueUSD Metrics
-  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  financialMetrics.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD;
-
-  // ProtocolSideRevenueUSD Metrics
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    protocolSideRevenueUSD
-  );
-  financialMetrics.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-
-  financialMetrics.save();
-  protocol.save();
 }

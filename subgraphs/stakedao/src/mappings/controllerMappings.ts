@@ -13,8 +13,6 @@ export function handleSetVault(call: SetVaultCall): void {
   const vaultAddress = call.inputs._vault;
   const inputTokenAddress = call.inputs._token;
 
-  if (vaultAddress.equals(constants.OBSCELETE_FRAX_VAULT_ADDRESS)) return;
-
   const vault = getOrCreateVault(vaultAddress, call.block);
   const strategyAddress = utils.getStrategyFromController(
     controllerAddress,
@@ -48,11 +46,7 @@ export function handleSetStrategy(call: SetStrategyCall): void {
     inputTokenAddress
   );
 
-  if (
-    vaultAddress.equals(constants.NULL.TYPE_ADDRESS) ||
-    vaultAddress.equals(constants.OBSCELETE_FRAX_VAULT_ADDRESS)
-  )
-    return;
+  if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
   const context = new DataSourceContext();
   context.setString("vaultAddress", vaultAddress.toHexString());

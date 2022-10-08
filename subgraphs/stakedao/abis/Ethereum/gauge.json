@@ -7,6 +7,15 @@
     "type": "constructor"
   },
   {
+    "name": "RewardDataUpdate",
+    "inputs": [
+      { "name": "_token", "type": "address", "indexed": true },
+      { "name": "_amount", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -416,5 +425,52 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "working_supply",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "gas": 3408
+  },
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "vault",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address" }],
+    "gas": 3738
+  },
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "reward_count",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256" }],
+    "gas": 3468
+  },
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "reward_tokens",
+    "inputs": [{ "name": "arg0", "type": "uint256" }],
+    "outputs": [{ "name": "", "type": "address" }],
+    "gas": 3543
+  },
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "reward_data",
+    "inputs": [{ "name": "arg0", "type": "address" }],
+    "outputs": [
+      { "name": "token", "type": "address" },
+      { "name": "distributor", "type": "address" },
+      { "name": "period_finish", "type": "uint256" },
+      { "name": "rate", "type": "uint256" },
+      { "name": "last_update", "type": "uint256" },
+      { "name": "integral", "type": "uint256" }
+    ],
+    "gas": 14973
   }
 ]

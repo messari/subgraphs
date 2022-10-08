@@ -1,0 +1,31 @@
+{
+  "network": "mainnet",
+  "controllerV1": "0x29D3782825432255041Db2EAfCB7174f5273f08A",
+  "controllerV1StartBlock": 11692633,
+
+  "controllerV2": "0x408179Cd13C805Ca4EdED1e3D2718bC7302116AE",
+  "controllerV2StartBlock": 12722464,
+
+  "liquidityLockers": [
+    {
+      "name": "curveStrategy",
+      "address": "0x20F1d4Fed24073a9b9d388AfA2735Ac91f079ED6",
+      "startBlock": "14831393"
+    },
+    {
+      "name": "angleStrategy",
+      "address": "0x22635427C72e8b0028FeAE1B5e1957508d9D7CAF",
+      "startBlock": "14742353"
+    },
+    {
+      "name": "balancerStrategy",
+      "address": "0x873b031Ea6E4236E44d933Aae5a66AF6d4DA419d",
+      "startBlock": "14975141"
+    },
+    {
+      "name": "fraxStrategy",
+      "address": "0xf285Dec3217E779353350443fC276c07D05917c3",
+      "startBlock": "15390294"
+    }
+  ]
+}

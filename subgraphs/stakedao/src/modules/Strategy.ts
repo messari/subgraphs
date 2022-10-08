@@ -1,8 +1,10 @@
+import {
+  getOrCreateVault,
+  getOrCreateTokenFromString,
+} from "../common/initializers";
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
-import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
 import { log, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 
 export function Harvested(
@@ -14,10 +16,9 @@ export function Harvested(
 ): void {
   const vault = getOrCreateVault(vaultAddress, block);
 
-  let inputTokenAddress = Address.fromString(vault.inputToken);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputToken = getOrCreateTokenFromString(vault.inputToken, block);
   let inputTokenDecimals = constants.BIGINT_TEN.pow(
-    getOrCreateToken(inputTokenAddress).decimals as u8
+    inputToken.decimals as u8
   ).toBigDecimal();
 
   let vaultFees = utils.getVaultFees(vaultAddress, strategyAddress);
@@ -27,14 +28,12 @@ export function Harvested(
   );
   let supplySideWantEarnedUSD = supplySideWantEarned
     .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputToken.lastPriceUSD!);
 
   let protocolSideWantEarned = wantEarned.times(vaultFees.getPerformanceFees);
   let protocolSideWantEarnedUSD = protocolSideWantEarned
     .div(inputTokenDecimals)
-    .times(inputTokenPrice.usdPrice)
-    .div(inputTokenPrice.decimalsBaseTen);
+    .times(inputToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
     vault,

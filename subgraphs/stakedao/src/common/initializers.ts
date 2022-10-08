@@ -13,6 +13,7 @@ import {
 } from "../../generated/schema";
 import * as utils from "./utils";
 import { Versions } from "../versions";
+import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import { Vault as VaultTemplate } from "../../generated/templates";
 import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
@@ -53,24 +54,24 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
     protocol._vaultIds = [];
+    protocol.save();
   }
 
   protocol.schemaVersion = Versions.getSchemaVersion();
   protocol.subgraphVersion = Versions.getSubgraphVersion();
   protocol.methodologyVersion = Versions.getMethodologyVersion();
 
-    protocol.save();
-  }
-
   return protocol;
 }
 
-export function getOrCreateToken(address: Address): Token {
-  const tokenId = address.toHexString();
-  let token = Token.load(tokenId);
+export function getOrCreateToken(
+  address: Address,
+  block: ethereum.Block
+): Token {
+  let token = Token.load(address.toHexString());
 
   if (!token) {
-    token = new Token(tokenId);
+    token = new Token(address.toHexString());
 
     const contract = ERC20Contract.bind(address);
     token.name = utils.readValue<string>(contract.try_name(), "");
@@ -82,17 +83,41 @@ export function getOrCreateToken(address: Address): Token {
     token.save();
   }
 
+  if (
+    !token.lastPriceUSD ||
+    !token.lastPriceBlockNumber ||
+    block.number
+      .minus(token.lastPriceBlockNumber!)
+      .gt(constants.PRICE_CACHING_BLOCKS)
+  ) {
+    let tokenPrice = getUsdPricePerToken(address);
+    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceBlockNumber = block.number;
+
+    token.save();
+  }
+
   return token;
 }
 
-export function getOrCreateRewardToken(address: Address): RewardToken {
+export function getOrCreateTokenFromString(
+  tokenAddress: string,
+  block: ethereum.Block
+): Token {
+  return getOrCreateToken(Address.fromString(tokenAddress), block);
+}
+
+export function getOrCreateRewardToken(
+  address: Address,
+  block: ethereum.Block
+): RewardToken {
   const rewardTokenId = address.toHexString();
   let rewardToken = RewardToken.load(rewardTokenId);
 
   if (!rewardToken) {
     rewardToken = new RewardToken(rewardTokenId);
 
-    const token = getOrCreateToken(address);
+    const token = getOrCreateToken(address, block);
     rewardToken.token = token.id;
     rewardToken.type = constants.RewardTokenType.DEPOSIT;
 
@@ -307,19 +332,14 @@ export function getOrCreateVault(
       constants.BIGINT_ZERO
     );
 
-    vault.pricePerShare = utils
-      .readValue<BigInt>(
-        vaultContract.try_getPricePerFullShare(),
-        constants.BIGINT_ZERO
-      )
-      .toBigDecimal();
+    vault.pricePerShare = constants.BIGDECIMAL_ZERO;
 
     const inputTokenAddress = utils.getInputTokenFromVault(vaultAddress);
-    const inputToken = getOrCreateToken(inputTokenAddress);
+    const inputToken = getOrCreateToken(inputTokenAddress, block);
     vault.inputToken = inputToken.id;
     vault.inputTokenBalance = constants.BIGINT_ZERO;
 
-    const outputToken = getOrCreateToken(vaultAddress);
+    const outputToken = getOrCreateToken(vaultAddress, block);
     vault.outputToken = outputToken.id;
     vault.outputTokenSupply = constants.BIGINT_ZERO;
     vault.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
