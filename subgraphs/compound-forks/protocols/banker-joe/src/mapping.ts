@@ -201,7 +201,7 @@ export function handleRedeem(event: Redeem): void {
 export function handleBorrow(event: BorrowEvent): void {
   const borrower = event.params.borrower;
   const borrowAmount = event.params.borrowAmount;
-  cosnt totalBorrows = event.params.totalBorrows;
+  const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower

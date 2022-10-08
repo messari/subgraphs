@@ -689,7 +689,7 @@ export function _handleBorrow(
   borrow.amountUSD = borrowUSD;
   borrow.save();
 
-  let underlyingTokenPriceUSD = market.inputTokenPriceUSD;
+  const underlyingTokenPriceUSD = market.inputTokenPriceUSD;
   market._borrowBalance = totalBorrows;
   market.totalBorrowBalanceUSD = totalBorrows
     .toBigDecimal()
@@ -816,7 +816,7 @@ export function _handleRepayBorrow(
   );
   repay.save();
 
-  let underlyingTokenPriceUSD = market.inputTokenPriceUSD;
+  const underlyingTokenPriceUSD = market.inputTokenPriceUSD;
   market._borrowBalance = totalBorrows;
   market.totalBorrowBalanceUSD = totalBorrows
     .toBigDecimal()
@@ -1714,7 +1714,7 @@ export function updateMarketDeposit(
   // get correct outputTokenDecimals for generic exchangeRate calculation
   let outputTokenDecimals = cTokenDecimals;
   if (market.outputToken) {
-    let outputToken = Token.load(market.outputToken!);
+    const outputToken = Token.load(market.outputToken!);
     if (!outputToken) {
       log.warning("[updateMarket] Output token not found: {}", [
         market.outputToken!,
@@ -1724,19 +1724,19 @@ export function updateMarketDeposit(
     }
   }
 
-  let underlyingTokenPriceUSD = market.inputTokenPriceUSD;
+  const underlyingTokenPriceUSD = market.inputTokenPriceUSD;
 
   // calculate inputTokenBalance only if exchangeRate is updated properly
   // mantissaFactor = (inputTokenDecimals - outputTokenDecimals)  (Note: can be negative)
   // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
-  let inputTokenBalanceBD = BDChangeDecimals(
+  const inputTokenBalanceBD = BDChangeDecimals(
     market.outputTokenSupply.toBigDecimal().times(market.exchangeRate!),
     outputTokenDecimals,
     underlyingToken.decimals
   ).truncate(0);
   market.inputTokenBalance = BigInt.fromString(inputTokenBalanceBD.toString());
 
-  let underlyingSupplyUSD = market.inputTokenBalance
+  const underlyingSupplyUSD = market.inputTokenBalance
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);

@@ -137,11 +137,11 @@ export function BDChangeDecimals(
 ): BigDecimal {
   if (to > from) {
     // increase number of decimals
-    let diffMagnitude = exponentToBigDecimal(to - from);
+    const diffMagnitude = exponentToBigDecimal(to - from);
     return x.times(diffMagnitude);
   } else if (to < from) {
     // decrease number of decimals
-    let diffMagnitude = exponentToBigDecimal(from - to);
+    const diffMagnitude = exponentToBigDecimal(from - to);
     return x.div(diffMagnitude);
   } else {
     return x;
