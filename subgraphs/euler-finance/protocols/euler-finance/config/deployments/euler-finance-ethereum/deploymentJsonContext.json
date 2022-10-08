@@ -1,0 +1,30 @@
+{
+  "network": "ethereum",
+  "status": "prod",
+  "versions": {
+    "schema": "1.3.0",
+    "subgraph": "1.1.3",
+    "methodology": "1.0.0"
+  },
+  "files": {
+    "template": "euler.template.yaml"
+  },
+  "options": {
+    "prepare:yaml": true,
+    "prepare:constants": false
+  },
+  "services": {
+    "hosted-service": {
+      "slug": "euler-finance-ethereum",
+      "query-id": "euler-finance-ethereum"
+    },
+    "decentralized-network": {
+      "slug": "euler-finance-ethereum",
+      "query-id": "8cLf29KxAedWLVaEqjV8qKomdwwXQxjptBZFrqWNH5u2"
+    }
+  },
+  "protocol": "euler-finance",
+  "base": "euler-finance",
+  "schema": "lending",
+  "deployment": "euler-finance-ethereum"
+}

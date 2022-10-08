@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   LendingProtocol,
@@ -297,9 +297,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol = new LendingProtocol(EULER_ADDRESS);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.POOLED;
@@ -317,8 +314,13 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.mintedTokens = [];
     protocol.mintedTokenSupplies = [];
     protocol.totalPoolCount = INT_ZERO;
-    protocol.save();
   }
+
+  // ensure to update versions (if grafting)
+  protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
+  protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
+  protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
+  protocol.save();
   return protocol as LendingProtocol;
 }
 
@@ -339,15 +341,14 @@ export function getOrCreateDeposit(event: ethereum.Event): Deposit {
 }
 
 export function getOrCreateWithdraw(event: ethereum.Event): Withdraw {
-  const hash = event.transaction.hash.toHexString();
-  const logIndex = event.logIndex;
-  const id = `${hash}-${logIndex}`;
+  const id = event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString();
+  log.warning("WITHDRAW: {}", [id]);
   let entity = Withdraw.load(id);
   if (!entity) {
     entity = new Withdraw(id);
     entity.protocol = EULER_ADDRESS;
-    entity.hash = hash;
-    entity.logIndex = logIndex.toI32();
+    entity.hash = event.transaction.hash.toHexString();
+    entity.logIndex = event.transactionLogIndex.toI32();
     entity.timestamp = event.block.timestamp;
     entity.blockNumber = event.block.number;
   }

@@ -1,4 +1,4 @@
-abis
-build
-generated
-node_modules
+**/generated
+**/build
+**/templates
+schema.graphql
