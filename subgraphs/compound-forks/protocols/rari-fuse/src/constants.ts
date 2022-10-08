@@ -22,7 +22,7 @@ export class NetworkSpecificConstant {
 }
 
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
-  let network = dataSource.network();
+  const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
       "0x835482fe0532f169024d5e9410199369aad5c77e",

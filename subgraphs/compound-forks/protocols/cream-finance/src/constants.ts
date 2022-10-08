@@ -36,7 +36,7 @@ export const BNB_USD_CHAINLINK_ORACLE =
 export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
-  let network = dataSource.network();
+  const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
       Address.fromString("0x3d5BC3c8d13dcB8bF317092d84783c2697AE9258"),
