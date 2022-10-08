@@ -45,6 +45,8 @@ export function createLiquidityPool(
   token0Address: string,
   token1Address: string
 ): void {
+  log.info(" -------> inside createLP", []);
+
   let protocol = getOrCreateDex();
 
   // create the tokens and tokentracker
@@ -150,6 +152,7 @@ export function createDeposit(
   amount0: BigInt,
   amount1: BigInt
 ): void {
+  log.info(" -------> inside createDeposit", []);
   let poolAddress = event.address.toHexString();
 
   let pool = getLiquidityPool(poolAddress);
@@ -186,6 +189,8 @@ export function createDeposit(
     poolAmounts.inputTokenBalances[1].plus(amount1Converted),
   ];
   poolAmounts.inputTokenBalances = poolAmountsInputTokenBalances;
+
+  //  TODO: pool output tokens missing
 
   // Get the total value locked in USD
   pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
@@ -233,6 +238,8 @@ export function createWithdraw(
   amount0: BigInt,
   amount1: BigInt
 ): void {
+  log.info(" -------> inside createWithdraw", []);
+
   let poolAddress = event.address.toHexString();
 
   let pool = getLiquidityPool(poolAddress);
@@ -269,6 +276,8 @@ export function createWithdraw(
     poolAmounts.inputTokenBalances[1].minus(amount1Converted),
   ];
   poolAmounts.inputTokenBalances = poolAmountsInputTokenBalances;
+
+  //  TODO: pool output tokens missing
 
   // Get the total value locked in USD
   pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
@@ -316,6 +325,8 @@ export function createSwapHandleVolumeAndFees(
   recipient: Address,
   sender: Address
 ): void {
+  log.info(" -------> inside createSwapHandleVolumeAndFees", []);
+
   log.info(
     "sender: {}, to: {}, amount0In: {}, amount0Out: {}, amount1In: {}, amount1Out: {}",
     [

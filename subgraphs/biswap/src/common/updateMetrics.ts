@@ -1,6 +1,5 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigDecimal, ethereum, BigInt, Address } from "@graphprotocol/graph-ts";
-import { BiswapPair } from "../../generated/BiswapPair/BiswapPair";
 import {
   Account,
   Token,
