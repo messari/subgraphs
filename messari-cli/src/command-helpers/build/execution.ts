@@ -1,3 +1,6 @@
+import { MESSARI_REPO_PATH } from '../../../bin/env'
+import { Deployment } from './scriptGenerator'
+
 const { exec } = require('child_process')
 const fs = require('fs')
 
@@ -8,20 +11,19 @@ export class Executor {
   scriptIndex: number
   httpCounter: number
   httpCounterLimit: number
-  scripts: Map<string, string[]>
+  deployments: Deployment[]
   scriptKeys: string[]
   deploy: boolean
   log: boolean
 
-  constructor(scripts: Map<string, string[]>, deploy: boolean, log: boolean) {
+  constructor(deployments: Deployment[], deploy: boolean, log: boolean) {
     this.logs = ''
     this.results = 'RESULTS:\n'
     this.deploymentIndex = 0
     this.scriptIndex = 0
     this.httpCounter = 0
     this.httpCounterLimit = 3
-    this.scripts = scripts
-    this.scriptKeys = Array.from(this.scripts.keys())
+    this.deployments = deployments
     this.deploy = deploy
     this.log = log
   }
@@ -50,11 +52,11 @@ export class Executor {
     if (error) {
       if (this.deploy === false) {
         this.results += `Build Failed: ${
-          this.scriptKeys[this.deploymentIndex]
+          this.deployments[this.deploymentIndex].location
         }\n`
       } else {
         this.results += `Deployment Failed: ${
-          this.scriptKeys[this.deploymentIndex]
+          this.deployments[this.deploymentIndex].location
         }\n`
       }
 
@@ -63,11 +65,11 @@ export class Executor {
 
     if (this.deploy === false) {
       this.results += `Build Succesful: ${
-        this.scriptKeys[this.deploymentIndex]
+        this.deployments[this.deploymentIndex].location
       }\n`
     } else {
       this.results += `Deployment Succesful: ${
-        this.scriptKeys[this.deploymentIndex]
+        this.deployments[this.deploymentIndex].location
       }\n`
     }
   }
@@ -94,8 +96,7 @@ export class Executor {
     this.scriptIndex += 1
 
     if (
-      this.scriptIndex ===
-      this.scripts.get(this.scriptKeys[this.deploymentIndex]).length
+      this.scriptIndex === this.deployments[this.deploymentIndex].scripts.length
     ) {
       this.appendResult(error)
       this.deploymentIndex += 1
@@ -118,13 +119,21 @@ export class Executor {
   }
 
   executeNextScript() {
-    if (this.deploymentIndex >= this.scriptKeys.length) {
+    if (this.deploymentIndex >= this.deployments.length) {
       return this.printOutput()
     }
 
-    let script = this.scripts.get(this.scriptKeys[this.deploymentIndex])[
-      this.scriptIndex
-    ]
+    if (this.scriptIndex == 0) {
+      process.chdir(
+        `${MESSARI_REPO_PATH}/subgraphs/${
+          this.deployments[this.deploymentIndex].base
+        }`
+      )
+    }
+
+    let script =
+      this.deployments[this.deploymentIndex].scripts[this.scriptIndex]
+
     exec(script, (error, stdout, stderr) => {
       if (!error) {
         // increase counters and continue
