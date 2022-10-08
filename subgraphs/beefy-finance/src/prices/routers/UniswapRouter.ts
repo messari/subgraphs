@@ -6,7 +6,7 @@ import {
   UniswapPair__getReservesResult,
 } from "../../../generated/Standard/UniswapPair";
 import { UniswapFeeRouter as UniswapFeeRouterContract } from "../../../generated/Standard/UniswapFeeRouter";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/Standard/UniswapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
@@ -164,6 +164,8 @@ export function getLpTokenPriceUsdc(
     constants.BIGINT_ZERO
   );
   if (totalSupply == constants.BIGINT_ZERO || totalLiquidity.reverted) {
+    log.warning("getLpTokenPriceUsdc: totalSupply is 0", []);
+
     return new CustomPriceType();
   }
 
@@ -223,8 +225,13 @@ export function getLpTokenTotalLiquidityUsdc(
     return new CustomPriceType();
   }
 
-  const reserve0 = reserves.value0;
-  const reserve1 = reserves.value1;
+  log.warning("token0Price: {} token1Price: {}", [
+    token0Price.usdPrice.toString(),
+    token1Price.usdPrice.toString(),
+  ]);
+
+  let reserve0 = reserves.value0;
+  let reserve1 = reserves.value1;
 
   if (
     reserve0.notEqual(constants.BIGINT_ZERO) ||

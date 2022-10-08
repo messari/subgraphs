@@ -35,6 +35,8 @@ import {
   SECONDS_PER_DAY,
   VaultFeeType,
   WAVAX_ADDRESS,
+  WBNB_ADDRESS,
+  WMATIC_ADDRESS,
 } from "./constants";
 import { BeefyVault } from "../../generated/templates";
 import { BeefyVault as BeefyVaultContract } from "../../generated/Standard/BeefyVault";
@@ -82,7 +84,7 @@ export function getOrCreateVault(
   }
 
   const vaultId = tryVaultAddress.value.toHexString();
-  let vault = Vault.load(vaultId);
+  const vault = Vault.load(vaultId);
   if (!vault) {
     const vaultContract = BeefyVaultContract.bind(tryVaultAddress.value);
 
@@ -92,6 +94,14 @@ export function getOrCreateVault(
       if (dataSource.network() == Network.AVALANCHE.toLowerCase()) {
         tryNativeToken = ethereum.CallResult.fromValue(
           Address.fromString(WAVAX_ADDRESS)
+        );
+      } else if (dataSource.network() == Network.MATIC.toLowerCase()) {
+        tryNativeToken = ethereum.CallResult.fromValue(
+          Address.fromString(WMATIC_ADDRESS)
+        );
+      } else if (dataSource.network() == Network.BSC.toLowerCase()) {
+        tryNativeToken = ethereum.CallResult.fromValue(
+          Address.fromString(WBNB_ADDRESS)
         );
       } else {
         log.warning("Failed to get native token from strategy {}", [

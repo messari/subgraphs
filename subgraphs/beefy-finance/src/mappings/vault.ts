@@ -233,8 +233,11 @@ function updateRevenueFromHarvest(
 ): void {
   const vault = getOrCreateVault(strategyAddress, event);
   if (!vault) {
-    log.warning("Vault not found for strategy {}", [
+    const strategyContract = BeefyStrategy.bind(strategyAddress);
+    const tryVault = strategyContract.try_vault();
+    log.warning("Vault not found for strategy {} and vault: {}", [
       strategyAddress.toHexString(),
+      tryVault.value.toHexString(),
     ]);
     return;
   }

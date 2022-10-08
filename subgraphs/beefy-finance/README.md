@@ -115,3 +115,6 @@ This is simple, but manual. Generally templates are small, so you can just manua
 - Some vaults do not emit all the needed events for a complete tracking of all the metrics, so some old data may be missing
 - The main issue with Beefy Finance is that there is no registry or factory contract to emit events and store the addresses of the vaults / strategies. This requires a lot of overhead on our part to support and is described in greater detail under ##Deployment
 - Skipping BIFI staking reward pools, as those seem out of scope of a yield aggregator.
+- The 'Avalanche" deployment is not able to get price before 12/15/2021
+- Strategy protocol fees are hardcoded into the contracts (not in a variable). It is normally 4.5%, but sometimes is more or less (within about 2%). In an effort to not check and hardcode 600+ vaults we are using 4.5%.
+- Some vault's inputToken is not correct. In general the inputToken is either the return value of the read calls want() or token(). However, there are unique cases where the inputToken is found using a unique contract call to a specific vault. Without going through 600+ vaults we will have some discrepency in these one off cases.
