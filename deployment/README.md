@@ -21,7 +21,7 @@ WARN:
 
 **Deploy a single deployment ID to Hosted Service:**
 
-`npm run build --id=euler-finance-ethereum --service=h --target=dmelotik --deploy=t`
+`npm run build --id=uniswap-v2-ethereum --service=h --target=steegecs --deploy=t`
 
 **Deploy a single deployment ID to Subgraph Studio:**
 
