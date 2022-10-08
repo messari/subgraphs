@@ -94,8 +94,8 @@ class RewardTokenEmission {
 }
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
-  let protocol = getOrCreateProtocol();
-  let newPriceOracle = event.params.newPriceOracle;
+  const protocol = getOrCreateProtocol();
+  const newPriceOracle = event.params.newPriceOracle;
   _handleNewPriceOracle(protocol, newPriceOracle);
 }
 
@@ -120,21 +120,21 @@ export function handleMarketExited(event: MarketExited): void {
 export function handleMarketListed(event: MarketListed): void {
   CTokenTemplate.create(event.params.qiToken);
 
-  let cTokenAddr = event.params.qiToken;
-  let cToken = Token.load(cTokenAddr.toHexString());
+  const cTokenAddr = event.params.qiToken;
+  const cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
   }
   // this is a new cToken, a new underlying token, and a new market
 
-  let protocol = getOrCreateProtocol();
-  let cTokenContract = CToken.bind(event.params.qiToken);
-  let cTokenReserveFactorMantissa = getOrElse<BigInt>(
+  const protocol = getOrCreateProtocol();
+  const cTokenContract = CToken.bind(event.params.qiToken);
+  const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
   if (cTokenAddr == nativeCToken.address) {
-    let marketListedData = new MarketListedData(
+    const marketListedData = new MarketListedData(
       protocol,
       nativeToken,
       nativeCToken,
@@ -145,7 +145,7 @@ export function handleMarketListed(event: MarketListed): void {
     return;
   }
 
-  let underlyingTokenAddrResult = cTokenContract.try_underlying();
+  const underlyingTokenAddrResult = cTokenContract.try_underlying();
   if (underlyingTokenAddrResult.reverted) {
     log.warning(
       "[handleMarketListed] could not fetch underlying token of cToken: {}",
@@ -153,8 +153,8 @@ export function handleMarketListed(event: MarketListed): void {
     );
     return;
   }
-  let underlyingTokenAddr = underlyingTokenAddrResult.value;
-  let underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
+  const underlyingTokenAddr = underlyingTokenAddrResult.value;
+  const underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
   _handleMarketListed(
     new MarketListedData(
       protocol,
@@ -178,37 +178,37 @@ export function handleMarketListed(event: MarketListed): void {
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  let marketID = event.params.qiToken.toHexString();
-  let collateralFactorMantissa = event.params.newCollateralFactorMantissa;
+  const marketID = event.params.qiToken.toHexString();
+  const collateralFactorMantissa = event.params.newCollateralFactorMantissa;
   _handleNewCollateralFactor(marketID, collateralFactorMantissa);
 }
 
 export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
-  let protocol = getOrCreateProtocol();
-  let newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
+  const protocol = getOrCreateProtocol();
+  const newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
   _handleNewLiquidationIncentive(protocol, newLiquidationIncentive);
 }
 
 export function handleActionPaused(event: ActionPaused1): void {
-  let marketID = event.params.qiToken.toHexString();
-  let action = event.params.action;
-  let pauseState = event.params.pauseState;
+  const marketID = event.params.qiToken.toHexString();
+  const action = event.params.action;
+  const pauseState = event.params.pauseState;
   _handleActionPaused(marketID, action, pauseState);
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
-  let marketID = event.address.toHexString();
-  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
+  const marketID = event.address.toHexString();
+  const newReserveFactorMantissa = event.params.newReserveFactorMantissa;
   _handleNewReserveFactor(marketID, newReserveFactorMantissa);
 }
 
 export function handleMint(event: Mint): void {
-  let minter = event.params.minter;
-  let mintAmount = event.params.mintAmount;
-  let contract = CToken.bind(event.address);
-  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+  const minter = event.params.minter;
+  const mintAmount = event.params.mintAmount;
+  const contract = CToken.bind(event.address);
+  const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
   _handleMint(
@@ -221,10 +221,10 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleRedeem(event: Redeem): void {
-  let redeemer = event.params.redeemer;
-  let redeemAmount = event.params.redeemAmount;
-  let contract = CToken.bind(event.address);
-  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+  const redeemer = event.params.redeemer;
+  const redeemAmount = event.params.redeemAmount;
+  const contract = CToken.bind(event.address);
+  const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.redeemer
   );
   _handleRedeem(
@@ -237,10 +237,10 @@ export function handleRedeem(event: Redeem): void {
 }
 
 export function handleBorrow(event: BorrowEvent): void {
-  let borrower = event.params.borrower;
-  let borrowAmount = event.params.borrowAmount;
-  let contract = CToken.bind(event.address);
-  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+  const borrower = event.params.borrower;
+  const borrowAmount = event.params.borrowAmount;
+  const contract = CToken.bind(event.address);
+  const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
   _handleBorrow(
@@ -253,11 +253,11 @@ export function handleBorrow(event: BorrowEvent): void {
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
-  let borrower = event.params.borrower;
-  let payer = event.params.payer;
-  let repayAmount = event.params.repayAmount;
-  let contract = CToken.bind(event.address);
-  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+  const borrower = event.params.borrower;
+  const payer = event.params.payer;
+  const repayAmount = event.params.repayAmount;
+  const contract = CToken.bind(event.address);
+  const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
   _handleRepayBorrow(
@@ -271,11 +271,11 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  let cTokenCollateral = event.params.qiTokenCollateral;
-  let liquidator = event.params.liquidator;
-  let borrower = event.params.borrower;
-  let seizeTokens = event.params.seizeTokens;
-  let repayAmount = event.params.repayAmount;
+  const cTokenCollateral = event.params.qiTokenCollateral;
+  const liquidator = event.params.liquidator;
+  const borrower = event.params.borrower;
+  const seizeTokens = event.params.seizeTokens;
+  const repayAmount = event.params.repayAmount;
   _handleLiquidateBorrow(
     comptrollerAddr,
     cTokenCollateral,
@@ -288,15 +288,15 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 }
 
 export function handleAccrueInterest(event: AccrueInterest): void {
-  let marketAddress = event.address;
+  const marketAddress = event.address;
   setMarketRewards(marketAddress, event.block.number.toI32());
 
-  let cTokenContract = CToken.bind(marketAddress);
-  let protocol = getOrCreateProtocol();
-  let oracleContract = PriceOracle.bind(
+  const cTokenContract = CToken.bind(marketAddress);
+  const protocol = getOrCreateProtocol();
+  const oracleContract = PriceOracle.bind(
     Address.fromString(protocol._priceOracle)
   );
-  let updateMarketData = new UpdateMarketData(
+  const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerTimestamp(),
@@ -305,8 +305,8 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     SECONDS_PER_YEAR
   );
 
-  let interestAccumulated = event.params.interestAccumulated;
-  let totalBorrows = event.params.totalBorrows;
+  const interestAccumulated = event.params.interestAccumulated;
+  const totalBorrows = event.params.totalBorrows;
   _handleAccrueInterest(
     updateMarketData,
     comptrollerAddr,
@@ -328,8 +328,8 @@ export function handleTransfer(event: Transfer): void {
 }
 
 function getOrCreateProtocol(): LendingProtocol {
-  let comptroller = Comptroller.bind(comptrollerAddr);
-  let protocolData = new ProtocolData(
+  const comptroller = Comptroller.bind(comptrollerAddr);
+  const protocolData = new ProtocolData(
     comptrollerAddr,
     "BENQI",
     "benqi",
@@ -346,7 +346,7 @@ function getOrCreateProtocol(): LendingProtocol {
 
 // rewardTokens = [QI-supply, AVAX-supply, QI-borrow, AVAX-borrow]
 function initMarketRewards(marketID: string): void {
-  let market = Market.load(marketID);
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[initMarketRewards] market not found: {}", [marketID]);
     return;
@@ -439,14 +439,14 @@ function initMarketRewards(marketID: string): void {
 }
 
 function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
-  let marketID = marketAddress.toHexString();
-  let market = Market.load(marketID);
+  const marketID = marketAddress.toHexString();
+  const market = Market.load(marketID);
   if (!market) {
     log.warning("[setMarketRewards] Market not found: {}", [marketID]);
     return;
   }
 
-  let AVAXMarket = Market.load(qiAVAXAddr.toHexString());
+  const AVAXMarket = Market.load(qiAVAXAddr.toHexString());
   if (!AVAXMarket) {
     log.warning("[setMarketRewards] qiAVAX market not found: {}", [
       qiAVAXAddr.toHexString(),
@@ -455,9 +455,9 @@ function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
   }
 
   let QiPriceUSD = BIGDECIMAL_ZERO;
-  let AVAXPriceUSD = AVAXMarket.inputTokenPriceUSD;
+  const AVAXPriceUSD = AVAXMarket.inputTokenPriceUSD;
   if (blockNumber >= TraderJoeQiWavaxPairStartBlock) {
-    let oneQiInAVAX = getOneQiInAVAX();
+    const oneQiInAVAX = getOneQiInAVAX();
     QiPriceUSD = AVAXPriceUSD.times(oneQiInAVAX);
   }
 
@@ -469,7 +469,7 @@ function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
   // In Comptroller, 0 = Qi, 1 = AVAX
   if (blockNumber < 14000970) {
     // before 0xb8b3dc402f7e5BfB2883D9Ab1641CEC95D88702D gets deployed
-    let oldComptroller = OldComptroller.bind(oldComptrollerAddr);
+    const oldComptroller = OldComptroller.bind(oldComptrollerAddr);
     supplyQiEmission = getRewardTokenEmission(
       oldComptroller.try_rewardSpeeds(0, marketAddress),
       18,
@@ -491,7 +491,7 @@ function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
       AVAXPriceUSD
     );
   } else {
-    let comptroller = Comptroller.bind(comptrollerAddr);
+    const comptroller = Comptroller.bind(comptrollerAddr);
     supplyQiEmission = getRewardTokenEmission(
       comptroller.try_supplyRewardSpeeds(0, marketAddress),
       18,
@@ -538,11 +538,11 @@ function getRewardTokenEmission(
     log.warning("[getRewardTokenEmission] result reverted", []);
     return new RewardTokenEmission(BIGINT_ZERO, BIGDECIMAL_ZERO);
   }
-  let rewardAmountPerSecond = rewardSpeedsResult.value;
-  let rewardAmount = rewardAmountPerSecond.times(
+  const rewardAmountPerSecond = rewardSpeedsResult.value;
+  const rewardAmount = rewardAmountPerSecond.times(
     BigInt.fromI32(SECONDS_PER_DAY)
   );
-  let rewardUSD = rewardAmount
+  const rewardUSD = rewardAmount
     .toBigDecimal()
     .div(exponentToBigDecimal(tokenDecimals))
     .times(tokenPriceUSD);
@@ -551,13 +551,13 @@ function getRewardTokenEmission(
 
 // Fetch Qi vs AVAX price from Trader Joe
 function getOneQiInAVAX(): BigDecimal {
-  let joePairContract = JoePair.bind(TraderJoeQiWavaxPairAddr);
-  let getReservesResult = joePairContract.try_getReserves();
+  const joePairContract = JoePair.bind(TraderJoeQiWavaxPairAddr);
+  const getReservesResult = joePairContract.try_getReserves();
   if (getReservesResult.reverted) {
     log.warning("[getOneQiInAVAX] result reverted", []);
     return BIGDECIMAL_ZERO;
   }
-  let QiReserve = getReservesResult.value.value0;
-  let WAVAXReserve = getReservesResult.value.value1;
+  const QiReserve = getReservesResult.value.value0;
+  const WAVAXReserve = getReservesResult.value.value1;
   return WAVAXReserve.toBigDecimal().div(QiReserve.toBigDecimal());
 }
