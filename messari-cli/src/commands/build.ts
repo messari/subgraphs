@@ -17,12 +17,12 @@ ${chalk.bold('messari build')} ${chalk.bold('[<deployment-id>]')} [options]
 
 Options:
 
-        --scope          Scope of the build/deployment < single | protocol | base >
     -s, --service        Service to deploy to < hosted-service | subgraph-studio | cronos-portal>
     -v, --version        Specify the version of the subgraph deployment - Only relevant for subgraph studio testing deployments < e.g. 1.0.0 >
     -t, --token          API token to use for the deployment
     -r, --target         Target account for the deployment (i.e. messari)
         --slug <slug>    The slug to use for the deployment {optional - replace deployment.json slug}
+        --base           Specifies that you want the build/deploy command to apply to all protocols in a subgraph folder {default: false}
     -d, --deploy         Deploy the build to the specified service {default: false}
     -l, --log            Print results to the console {default: false}
     -h, --help           Show usage information {default: false}
