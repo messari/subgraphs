@@ -24,6 +24,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 - Implement the mappings, deploy and test your data using either Hosted Service or The Graph Studio.
 - For metrics calculation (e.g. revenue, fees, TVL), please refer to the `README.md` in the protocol's subgraph folder for methodology. There is also a broader explanation of how different fields are defined in the schema in `docs/Schema.md`. Feel free to reach out to me if anything isn't clear.
 - We've built a handy debugging/validation dashboard for you to quickly visualize the data in your subgraph. It's deployed to [subgraphs.xyz](https://subgraphs.xyz/) and the source code is under `dashboard` if you want to spin it up locally.
+- There is also a cli-tool called `messari-cli`. It utilized The Graph CLI and exploits the standard directory structure to template and prepare subgraph deployments for you with simple commands. You can learn more about installing and using the CLI by looking at the README.md within the `messari-cli/docs` folder.
 - Verify your subgraph against other sources and include specific links to these sources in the README. Below are some common sources:
   - Project's official analytics dashboard
   - [DeFi Llama](https://defillama.com/) (for TVL)
