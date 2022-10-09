@@ -11,13 +11,24 @@ dataSources:
       startBlock: 7664646
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
+      file: ./src/mappings/Biswap.ts
       entities:
         - PairCreated
+        - Token
+        - DexAmmProtocol
+        - Protocol
+        - LiquidityPool
+        - _LiquidityPoolAmount        
       abis:
+        ###########################################
+        ################# biswap ##################
+        ###########################################
         - name: BiswapFactory
           file: ./abis/BiswapFactory.json
+        - name: BiswapPair
+          file: ./abis/BiswapPair.json
         - name: BiswapERC20
           file: ./abis/BiswapERC20.json
         ###########################################
@@ -64,27 +75,81 @@ dataSources:
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      file: ./src/mappings/Biswap.ts
-  - kind: ethereum
-    name: BiswapPair
+templates:
+  - name: BiswapPair
+    kind: ethereum/contract
     network: bsc
     source:
-      address: "0x41e31a5aca4a38d1693cc7d21fac6961c91a390c"
       abi: BiswapPair
-      startBlock: 7664646
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
+      file: ./src/mappings/Biswap.ts
       entities:
-        - Burn
-        - Mint
+        - LiqudityPool
+        - Token
+        - Deposit
+        - Withdraw
         - Swap
+        - LiquidityPool
+        - DexAmmProtocol
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - PoolDailySnapshot
+        - Account
+        - ActiveAccount
+        - _LiquidityPoolAmount        
+        - _HelperStore
       abis:
+        ###########################################
+        ################# biswap ##################
+        ###########################################
         - name: BiswapPair
           file: ./abis/BiswapPair.json
         - name: BiswapERC20
           file: ./abis/BiswapERC20.json
+        ###########################################
+        ############## price oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # 1inch Oracle Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1inch/Oracle.json
+        # Aave Oracle Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: Burn(indexed address,uint256,uint256,indexed address)
           handler: handleBurn
@@ -92,4 +157,3 @@ dataSources:
           handler: handleMint
         - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleSwap
-      file: ./src/mappings/Biswap.ts
