@@ -378,7 +378,7 @@ type FinancialsDailySnapshot @entity {
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -588,7 +588,7 @@ type MarketDailySnapshot @entity {
 
   " The pool this snapshot belongs to "
   market: Market!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -684,7 +684,7 @@ type MarketHourlySnapshot @entity {
 
   " The pool this snapshot belongs to "
   market: Market!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -1081,4 +1081,17 @@ type _ProtocolUtility @entity {
 
   " Active markets on the protocol. "
   markets: [Market!]!
+}
+
+type _AssetStatus @entity {
+  "address of underlying asset"
+  id: ID!
+  "last totalBorrows"
+  totalBorrows: BigInt!
+  "last reserveBalance"
+  reserveBalance: BigInt!
+  "interestAccumulator"
+  interestAccumulator: BigInt
+  "last timestamp"
+  timestamp: BigInt
 }

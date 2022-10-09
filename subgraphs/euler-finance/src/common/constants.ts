@@ -7,7 +7,7 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 export const PROTOCOL_NAME = "Euler";
 export const PROTOCOL_SLUG = "euler";
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.2";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.3";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -176,3 +176,8 @@ export const EXEC_START_BLOCK_NUMBER = BigInt.fromI32(13711556);
 export const UNISWAP_Q192 = BigDecimal.fromString(BigInt.fromI32(2).pow(192).toString());
 export const DECIMAL_PRECISION = BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal();
 export const INTEREST_RATE_PRECISION = BigDecimal.fromString("1e25");
+export const INTERNAL_DEBT_PRECISION = BigDecimal.fromString("1e9");
+export const MODULEID__EXEC = BigInt.fromI32(5);
+export const MODULEID__RISK_MANAGER = BigInt.fromI32(1000000);
+export const MODULEID__MARKETS = BigInt.fromI32(2);
+export const INITIAL_INTEREST_ACCUMULATOR = BigInt.fromI32(10).pow(27);
