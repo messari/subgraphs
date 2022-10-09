@@ -1,49 +1,50 @@
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import ProtocolSection from "./ProtocolSection";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { NewClient, schemaMapping } from "../utils";
 
 interface DeploymentsTable {
     protocolsToQuery: { [x: string]: any };
     getData: any;
-    decenDeposToSubgraphIds: { [x: string]: string };
+    decenDeposToSubgraphIds: { [x: string]: any };
+    indexingStatusLoaded: any;
+    indexingStatusLoadedPending: any;
+    indexingStatusError: any;
+    indexingStatusErrorPending: any;
 }
 
-function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds }: DeploymentsTable) {
+function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, indexingStatusLoaded, indexingStatusLoadedPending, indexingStatusError, indexingStatusErrorPending }: DeploymentsTable) {
     const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
-
+    const [tableExpanded, setTableExpanded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
     if (Object.keys(protocolsToQuery).length === 0) {
         getData();
         return null;
     }
-    const columnLabels: string[] = [
-        "Name",
-        "",
-        "Network",
-        "Indexed %",
-        "Start Block",
-        "Current Block",
-        "Chain Head",
-        "Schema",
-        "Subgraph",
-        "Entity Count",
-    ];
+    const columnLabels: any = {
+        "Name": "300px",
+        "": "45px",
+        "Network": "420px",
+        "Status": "40px",
+        "Indexed %": "auto",
+        "Start Block": "auto",
+        "Current Block": "auto",
+        "Chain Head": "auto",
+        "Schema": "auto",
+        "Subgraph": "auto",
+        "Entity Count": "auto",
+    };
 
     const tableHead = (
         <TableHead sx={{ height: "20px" }}>
             <TableRow sx={{ height: "20px" }}>
-                {columnLabels.map((x, idx) => {
+                {Object.keys(columnLabels).map((x, idx) => {
                     let textAlign = "left";
                     let paddingLeft = "0px";
-                    let minWidth = "auto"
-                    let maxWidth = "auto";
+                    let minWidth = columnLabels[x];
+                    let maxWidth = columnLabels[x];
                     if (idx > 2) {
                         textAlign = "right";
                         paddingLeft = "16px";
-                    }
-                    if (idx === 0) {
-                        minWidth = "300px";
-                        maxWidth = "300px";
                     }
                     return (
                         <TableCell sx={{ paddingLeft, minWidth, maxWidth }} key={"column" + x}>
@@ -82,7 +83,7 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds }
                 if (!!deploymentData["services"]["cronos-portal"]) {
                     hostedServiceId = deploymentData["services"]["cronos-portal"]["slug"];
                 }
-                deposToPass[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId, decentralizedNetworkId });
+                deposToPass[protocol.schema][protocolName].networks.push({ deploymentName: depoKey, chain: deploymentData.network, indexStatus: deploymentData?.indexStatus, pendingIndexStatus: deploymentData?.pendingIndexStatus, status: deploymentData?.status, versions: deploymentData?.versions, hostedServiceId, decentralizedNetworkId });
                 if (!deposToPass[protocol.schema][protocolName]?.methodologyVersions?.includes(deploymentData?.versions?.methodology)) {
                     deposToPass[protocol.schema][protocolName]?.methodologyVersions?.push(deploymentData?.versions?.methodology);
                 }
@@ -97,33 +98,64 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds }
                 }
             }
         });
-
     });
 
     return (
         <>
             {Object.entries(deposToPass).sort().map(([schemaType, subgraph]) => {
+                let validationSupported = true;
                 if (!Object.keys(schemaMapping).includes(schemaType)) {
-                    return null;
+                    validationSupported = false;
                 } else {
                     schemaType = schemaMapping[schemaType];
                 }
+                const isLoaded = indexingStatusLoaded[schemaType];
+                const isLoadedPending = indexingStatusLoadedPending[schemaType];
+                const indexQueryError = indexingStatusError[schemaType];
+                const indexQueryErrorPending = indexingStatusErrorPending[schemaType];
                 const tableRows = Object.keys(subgraph).sort().map((subgraphName) => {
                     const protocol = subgraph[subgraphName];
-                    return (<ProtocolSection key={"ProtocolSection-" + subgraphName.toUpperCase()} subgraphName={subgraphName} protocol={protocol} clientIndexing={clientIndexing} decenDeposToSubgraphIds={decenDeposToSubgraphIds} />);
+                    return (
+                        <ProtocolSection
+                            key={"ProtocolSection-" + subgraphName.toUpperCase() + '-' + schemaType}
+                            subgraphName={subgraphName}
+                            protocol={protocol}
+                            clientIndexing={clientIndexing}
+                            decenDeposToSubgraphIds={decenDeposToSubgraphIds}
+                            tableExpanded={tableExpanded[schemaType]}
+                            validationSupported={validationSupported}
+                            isLoaded={isLoaded}
+                            isLoadedPending={isLoadedPending}
+                            indexQueryError={indexQueryError}
+                            indexQueryErrorPending={indexQueryErrorPending}
+                        />);
                 });
                 return (
-                    <TableContainer key={"TableContainer-" + schemaType.toUpperCase()}>
-                        <Typography
-                            key={"typography-" + schemaType}
-                            variant="h4"
-                            align="left"
-                            fontWeight={500}
-                            fontSize={28}
-                            sx={{ padding: "6px", my: 2 }}
-                        >
-                            {schemaType.toUpperCase()}
-                        </Typography>
+                    <TableContainer sx={{ my: 8 }} key={"TableContainer-" + schemaType.toUpperCase()}>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography
+                                key={"typography-Title-" + schemaType}
+                                variant="h4"
+                                align="left"
+                                fontWeight={500}
+                                fontSize={28}
+                                sx={{ padding: "6px", my: 2 }}
+                            >
+                                {schemaType.toUpperCase()}
+                            </Typography>
+                            <Typography
+                                key={"typography-toggle-" + schemaType}
+                                variant="h4"
+                                align="left"
+                                fontWeight={500}
+                                fontSize={18}
+                                sx={{ padding: "6px", my: 2 }}
+                            >
+                                <span style={{ color: "white", cursor: "pointer", margin: "4px" }} onClick={() => setTableExpanded({ ...tableExpanded, [schemaType]: !tableExpanded[schemaType] })}>
+                                    <u>{tableExpanded[schemaType] ? "Collapse" : "Expand"} Table</u>
+                                </span>
+                            </Typography>
+                        </div>
                         <Table stickyHeader>
                             {tableHead}
                             <TableBody>{tableRows}</TableBody>

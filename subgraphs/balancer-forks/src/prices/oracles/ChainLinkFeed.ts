@@ -1,19 +1,21 @@
+import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { Address } from "@graphprotocol/graph-ts";
 import { CustomPriceType } from "../common/types";
 import { ChainLinkContract } from "../../../generated/Vault/ChainLinkContract";
 
-export function getChainLinkContract(network: string): ChainLinkContract {
-  return ChainLinkContract.bind(
-    constants.CHAIN_LINK_CONTRACT_ADDRESS.get(network)
-  );
+export function getChainLinkContract(): ChainLinkContract | null {
+  let config = utils.getConfig();
+  if (!config || utils.isNullAddress(config.chainLink())) return null;
+
+  return ChainLinkContract.bind(config.chainLink());
 }
 
-export function getTokenPriceFromChainLink(
+export function getTokenPriceUSDC(
   tokenAddr: Address,
   network: string
 ): CustomPriceType {
-  const chainLinkContract = getChainLinkContract(network);
+  const chainLinkContract = getChainLinkContract();
 
   if (!chainLinkContract) {
     return new CustomPriceType();

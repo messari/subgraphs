@@ -1,7 +1,7 @@
 import { AutocompleteRenderInputParams, TextField } from "@mui/material";
 
 interface ComboBoxInputProps {
-  setTextInput: React.Dispatch<React.SetStateAction<string>>;
+  setTextInput: any;
   params: AutocompleteRenderInputParams;
   label: string;
 }

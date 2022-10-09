@@ -5,22 +5,20 @@
     "*/generated/**",
     "*/build/**",
     "*/node_modules/**",
-
     "### generic subgraph structure ###",
     "*/abis/**",
     "*/protocols/*/config/deployments/*",
     "*/protocols/*/config/templates/",
     "*/protocols/*/src/**",
     "*/src/**",
-
-    "### uniswap forks structure ###",
-    "uniswap-forks/configurations/*",
-
+    "*/deploymentJsonContext.ts",
+    "*/configurations/*",
     "### specific outliers ###",
     "uniswap-v3/configurations/*",
     "maple-finance/validation/**",
     "maple-finance/docs/**",
     "beefy-finance/setup/**",
+    "the-graph/config/**",
     "compound-forks/queries/**",
     "erc20/data/**",
     "erc20/configurations/*",
@@ -29,5 +27,5 @@
     "opensea/**",
     "x2y2/**",
     "seaport/**"
-   ]
+  ]
 }

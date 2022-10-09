@@ -1,6 +1,6 @@
-import { Avatar } from "@mui/material";
+import { Avatar, Tooltip } from "@mui/material";
 
-const NetworkLogos: Record<string, string> = {
+export const NetworkLogos: Record<string, string> = {
   arbitrum: "https://directus.messari.io/assets/2801f8f2-d651-45b7-919c-92273691be3d",
   aurora: "https://directus.messari.io/assets/1ac00a2c-4086-45e1-bf17-82ed73c2b2fc",
   avalanche: "https://directus.messari.io/assets/53c3c5e5-af1d-4fdf-868d-c0dfd221a1d5",
@@ -27,17 +27,27 @@ const NetworkLogos: Record<string, string> = {
   "graph": "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566"
 };
 
+export const networkMapping: { [x: string]: string } = {
+  "mainnet": "ethereum",
+  "binance": "bsc",
+  "xdai": "celo"
+}
+
 interface NetworkLogoProps {
   network: string;
   size: number;
+  tooltip: string;
 }
 
-export const NetworkLogo = ({ network, size }: NetworkLogoProps) => {
+export const NetworkLogo = ({ network, size, tooltip }: NetworkLogoProps) => {
   let src = NetworkLogos[network];
   let opacity = 1;
+  if (!src) {
+    src = NetworkLogos[networkMapping[network]];
+  }
   if (!src) {
     src = NetworkLogos.ethereum;
     opacity = 0;
   }
-  return <Avatar sx={{ height: size, width: size, opacity }} src={src} />;
+  return <Tooltip style={{ whiteSpace: "pre-wrap" }} title={tooltip} placement="bottom"><Avatar sx={{ height: size, width: size, opacity }} src={src} /></Tooltip >;
 };

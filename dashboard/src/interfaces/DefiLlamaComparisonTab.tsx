@@ -74,26 +74,42 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   Object.values(deploymentJSON).forEach((protocolsOnType: { [x: string]: any }) => {
     Object.entries(protocolsOnType).forEach(([protocolName, deploymentOnNetwork]) => {
       protocolName = protocolName.toLowerCase();
-      const protocolNameVersionRemoved = protocolName.split("-v")[0];
       deploymentNameToUrlMapping[protocolName] = {
         slug: "",
         defiLlamaNetworks: [],
         subgraphNetworks: deploymentOnNetwork,
       };
-      deploymentNameToUrlMapping[protocolNameVersionRemoved] = {
-        slug: "",
-        defiLlamaNetworks: [],
-        subgraphNetworks: deploymentOnNetwork,
-      };
+      if (protocolName.includes('-v')) {
+        const protocolNameVersionRemoved = protocolName.split("-v")[0];
+        deploymentNameToUrlMapping[protocolNameVersionRemoved] = {
+          slug: "",
+          defiLlamaNetworks: [],
+          subgraphNetworks: deploymentOnNetwork,
+        };
+      }
+      if (protocolName.includes('-finance')) {
+        deploymentNameToUrlMapping[protocolName.split('-finance')[0]] = {
+          slug: "",
+          defiLlamaNetworks: [],
+          subgraphNetworks: deploymentOnNetwork,
+        };
+      } else {
+        deploymentNameToUrlMapping[protocolName + '-finance'] = {
+          slug: "",
+          defiLlamaNetworks: [],
+          subgraphNetworks: deploymentOnNetwork,
+        };
+      }
     });
   });
 
   if (defiLlamaProtocols.length > 0) {
     defiLlamaProtocols.forEach((protocol) => {
       const currentName = protocol.name.toLowerCase().split(" ").join("-");
-      if (deploymentNameToUrlMapping[currentName]?.slug === "") {
-        deploymentNameToUrlMapping[currentName].slug = protocol.slug;
-        deploymentNameToUrlMapping[currentName].defiLlamaNetworks = Object.keys(protocol.chainTvls).map((x) =>
+      if (Object.keys(deploymentNameToUrlMapping).includes(currentName) || Object.keys(deploymentNameToUrlMapping).includes(currentName.split('-')[0])) {
+        const key = Object.keys(deploymentNameToUrlMapping).includes(currentName) ? currentName : currentName.split('-')[0];
+        deploymentNameToUrlMapping[key].slug = protocol.slug;
+        deploymentNameToUrlMapping[key].defiLlamaNetworks = Object.keys(protocol.chainTvls).map((x) =>
           x.toLowerCase(),
         );
       }
@@ -324,10 +340,9 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
       </div>
     )
   }
-
   return (
     <>
-      <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => navigate("/")}>
+      <Button variant="contained" color="primary" sx={{ my: 4, mx: 2 }} onClick={() => navigate("/")}>
         Back To Deployments List
       </Button>
       <DeploymentsDropDown

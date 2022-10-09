@@ -122,7 +122,7 @@ export const cTokenDecimalsBD = exponentToBigDecimal(cTokenDecimals);
 // n => 10^n
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
   let result = BIGINT_ONE;
-  let ten = BigInt.fromI32(10);
+  const ten = BigInt.fromI32(10);
   for (let i = 0; i < decimals; i++) {
     result = result.times(ten);
   }

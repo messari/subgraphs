@@ -15,10 +15,10 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return new CustomPriceType();
   }
 
-  let network = dataSource.network();
+  const network = dataSource.network();
 
   // 1. Yearn Lens Oracle
-  let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
+  const yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
   if (!yearnLensPrice.reverted) {
     log.warning("[YearnLensOracle] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -28,7 +28,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 2. ChainLink Feed Registry
-  let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);
+  const chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);
   if (!chainLinkPrice.reverted) {
     log.warning("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -38,7 +38,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 3. CalculationsCurve
-  let calculationsCurvePrice = getTokenPriceFromCalculationCurve(
+  const calculationsCurvePrice = getTokenPriceFromCalculationCurve(
     tokenAddr,
     network
   );
@@ -53,7 +53,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 4. CalculationsSushiSwap
-  let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(
+  const calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(
     tokenAddr,
     network
   );
@@ -68,7 +68,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 5. Curve Router
-  let curvePrice = getCurvePriceUsdc(tokenAddr, network);
+  const curvePrice = getCurvePriceUsdc(tokenAddr, network);
   if (!curvePrice.reverted) {
     log.warning("[CurveRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -78,7 +78,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 6. Uniswap Router
-  let uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
+  const uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
   if (!uniswapPrice.reverted) {
     log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -88,7 +88,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 7. SushiSwap Router
-  let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
+  const sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
   if (!sushiswapPrice.reverted) {
     log.warning("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -108,7 +108,7 @@ export function getUsdPrice(
   tokenAddr: Address,
   amount: BigDecimal
 ): BigDecimal {
-  let tokenPrice = getUsdPricePerToken(tokenAddr);
+  const tokenPrice = getUsdPricePerToken(tokenAddr);
 
   if (!tokenPrice.reverted) {
     return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);

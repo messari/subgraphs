@@ -1,6 +1,6 @@
 # Maple Finance Subgraph
 
-## Calculation Methodology v1.0.0
+## Calculation Methodology v1.1.0
 
 Below, the methodologies for key fields in the protocol are surfaced for convenience.
 

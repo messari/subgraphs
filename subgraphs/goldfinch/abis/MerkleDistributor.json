@@ -1,0 +1,231 @@
+{
+  "address": "0x0f306E3f6b2d5ae820d33C284659B29847972d9A",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "communityRewards_",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "merkleRoot_",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "vestingLength",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "cliffLength",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "vestingInterval",
+          "type": "uint256"
+        }
+      ],
+      "name": "GrantAccepted",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "vestingLength",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "cliffLength",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "vestingInterval",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "merkleProof",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "acceptGrant",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "communityRewards",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "isGrantAccepted",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "merkleRoot",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xe86b2b9d67d8d506d244e92f2ae69c09b901173dcd7339dd1b2a1c396921c68e",
+  "receipt": {
+    "to": null,
+    "from": "0xFc3d271123a4c14FDB9E99fF70ff69370317B977",
+    "contractAddress": "0x0f306E3f6b2d5ae820d33C284659B29847972d9A",
+    "transactionIndex": 225,
+    "gasUsed": "338958",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xbe088b5241b5f1385aabc4eb4e275a75637d017fc3dd35c8067c65e2c343635e",
+    "transactionHash": "0xe86b2b9d67d8d506d244e92f2ae69c09b901173dcd7339dd1b2a1c396921c68e",
+    "logs": [],
+    "blockNumber": 13941117,
+    "cumulativeGasUsed": "21237246",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x0Cd73c18C085dEB287257ED2307eC713e9Af3460",
+    "0x926446af7200bedeab4755e62ef8d73ac9409bde8e84d5e64a4677690cc9d9c5"
+  ],
+  "solcInputHash": "ccc98fd8226eea26f3f19fdeeee195a9",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.12+commit.27d51765\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"communityRewards_\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"merkleRoot_\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"vestingLength\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"cliffLength\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"vestingInterval\",\"type\":\"uint256\"}],\"name\":\"GrantAccepted\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"vestingLength\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"cliffLength\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"vestingInterval\",\"type\":\"uint256\"},{\"internalType\":\"bytes32[]\",\"name\":\"merkleProof\",\"type\":\"bytes32[]\"}],\"name\":\"acceptGrant\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"communityRewards\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"isGrantAccepted\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"merkleRoot\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"events\":{\"GrantAccepted(uint256,uint256,address,uint256,uint256,uint256,uint256)\":{\"notice\":\"This event is triggered whenever a call to #acceptGrant succeeds.\"}},\"kind\":\"user\",\"methods\":{\"acceptGrant(uint256,uint256,uint256,uint256,uint256,bytes32[])\":{\"notice\":\"Causes the sender to accept the grant consisting of the given details. Reverts if the inputs (which includes who the sender is) are invalid.\"},\"communityRewards()\":{\"notice\":\"Returns the address of the CommunityRewards contract whose grants are distributed by this contract.\"},\"isGrantAccepted(uint256)\":{\"notice\":\"Returns true if the index has been marked accepted.\"},\"merkleRoot()\":{\"notice\":\"Returns the merkle root of the merkle tree containing grant details available to accept.\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/rewards/MerkleDistributor.sol\":\"MerkleDistributor\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts-ethereum-package/contracts/introspection/IERC165.sol\":{\"content\":\"pragma solidity ^0.6.0;\\n\\n/**\\n * @dev Interface of the ERC165 standard, as defined in the\\n * https://eips.ethereum.org/EIPS/eip-165[EIP].\\n *\\n * Implementers can declare support of contract interfaces, which can then be\\n * queried by others ({ERC165Checker}).\\n *\\n * For an implementation, see {ERC165}.\\n */\\ninterface IERC165 {\\n    /**\\n     * @dev Returns true if this contract implements the interface defined by\\n     * `interfaceId`. See the corresponding\\n     * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section]\\n     * to learn more about how these ids are created.\\n     *\\n     * This function call must use less than 30 000 gas.\\n     */\\n    function supportsInterface(bytes4 interfaceId) external view returns (bool);\\n}\\n\",\"keccak256\":\"0x9175561c374ec1fc33045e5dfdde2057e63e00debf432875f9e1e3395d99c149\"},\"@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol\":{\"content\":\"pragma solidity ^0.6.0;\\n\\n/**\\n * @dev Interface of the ERC20 standard as defined in the EIP.\\n */\\ninterface IERC20 {\\n    /**\\n     * @dev Returns the amount of tokens in existence.\\n     */\\n    function totalSupply() external view returns (uint256);\\n\\n    /**\\n     * @dev Returns the amount of tokens owned by `account`.\\n     */\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Moves `amount` tokens from the caller's account to `recipient`.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transfer(address recipient, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Returns the remaining number of tokens that `spender` will be\\n     * allowed to spend on behalf of `owner` through {transferFrom}. This is\\n     * zero by default.\\n     *\\n     * This value changes when {approve} or {transferFrom} are called.\\n     */\\n    function allowance(address owner, address spender) external view returns (uint256);\\n\\n    /**\\n     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * IMPORTANT: Beware that changing an allowance with this method brings the risk\\n     * that someone may use both the old and the new allowance by unfortunate\\n     * transaction ordering. One possible solution to mitigate this race\\n     * condition is to first reduce the spender's allowance to 0 and set the\\n     * desired value afterwards:\\n     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\\n     *\\n     * Emits an {Approval} event.\\n     */\\n    function approve(address spender, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Moves `amount` tokens from `sender` to `recipient` using the\\n     * allowance mechanism. `amount` is then deducted from the caller's\\n     * allowance.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Emitted when `value` tokens are moved from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Note that `value` may be zero.\\n     */\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n\\n    /**\\n     * @dev Emitted when the allowance of a `spender` for an `owner` is set by\\n     * a call to {approve}. `value` is the new allowance.\\n     */\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n}\\n\",\"keccak256\":\"0x6cc1cb934a3ac2137a7dcaed018af9e235392236ceecfd3687259702b9c767ad\"},\"@openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721.sol\":{\"content\":\"pragma solidity ^0.6.2;\\n\\nimport \\\"../../introspection/IERC165.sol\\\";\\n\\n/**\\n * @dev Required interface of an ERC721 compliant contract.\\n */\\ninterface IERC721 is IERC165 {\\n    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);\\n    event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);\\n    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);\\n\\n    /**\\n     * @dev Returns the number of NFTs in ``owner``'s account.\\n     */\\n    function balanceOf(address owner) external view returns (uint256 balance);\\n\\n    /**\\n     * @dev Returns the owner of the NFT specified by `tokenId`.\\n     */\\n    function ownerOf(uint256 tokenId) external view returns (address owner);\\n\\n    /**\\n     * @dev Transfers a specific NFT (`tokenId`) from one account (`from`) to\\n     * another (`to`).\\n     *\\n     *\\n     *\\n     * Requirements:\\n     * - `from`, `to` cannot be zero.\\n     * - `tokenId` must be owned by `from`.\\n     * - If the caller is not `from`, it must be have been allowed to move this\\n     * NFT by either {approve} or {setApprovalForAll}.\\n     */\\n    function safeTransferFrom(address from, address to, uint256 tokenId) external;\\n    /**\\n     * @dev Transfers a specific NFT (`tokenId`) from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Requirements:\\n     * - If the caller is not `from`, it must be approved to move this NFT by\\n     * either {approve} or {setApprovalForAll}.\\n     */\\n    function transferFrom(address from, address to, uint256 tokenId) external;\\n    function approve(address to, uint256 tokenId) external;\\n    function getApproved(uint256 tokenId) external view returns (address operator);\\n\\n    function setApprovalForAll(address operator, bool _approved) external;\\n    function isApprovedForAll(address owner, address operator) external view returns (bool);\\n\\n\\n    function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data) external;\\n}\\n\",\"keccak256\":\"0x734b5bedb78074a59bca6aff9e5a1801c9c7e9c5314daf32e14857161fb36932\"},\"@openzeppelin/contracts/cryptography/MerkleProof.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity >=0.6.0 <0.8.0;\\n\\n/**\\n * @dev These functions deal with verification of Merkle trees (hash trees),\\n */\\nlibrary MerkleProof {\\n    /**\\n     * @dev Returns true if a `leaf` can be proved to be a part of a Merkle tree\\n     * defined by `root`. For this, a `proof` must be provided, containing\\n     * sibling hashes on the branch from the leaf to the root of the tree. Each\\n     * pair of leaves and each pair of pre-images are assumed to be sorted.\\n     */\\n    function verify(bytes32[] memory proof, bytes32 root, bytes32 leaf) internal pure returns (bool) {\\n        bytes32 computedHash = leaf;\\n\\n        for (uint256 i = 0; i < proof.length; i++) {\\n            bytes32 proofElement = proof[i];\\n\\n            if (computedHash <= proofElement) {\\n                // Hash(current computed hash + current element of the proof)\\n                computedHash = keccak256(abi.encodePacked(computedHash, proofElement));\\n            } else {\\n                // Hash(current element of the proof + current computed hash)\\n                computedHash = keccak256(abi.encodePacked(proofElement, computedHash));\\n            }\\n        }\\n\\n        // Check if the computed hash (root) is equal to the provided root\\n        return computedHash == root;\\n    }\\n}\\n\",\"keccak256\":\"0x782ac63a026ef1d6ab242478016bf7006074726786de9a94bc6c0c33a87dd40d\",\"license\":\"MIT\"},\"contracts/interfaces/ICommunityRewards.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity 0.6.12;\\npragma experimental ABIEncoderV2;\\n\\nimport \\\"@openzeppelin/contracts-ethereum-package/contracts/token/ERC721/IERC721.sol\\\";\\n\\nimport \\\"../interfaces/IERC20withDec.sol\\\";\\n\\ninterface ICommunityRewards is IERC721 {\\n  function rewardsToken() external view returns (IERC20withDec);\\n\\n  function claimableRewards(uint256 tokenId) external view returns (uint256 rewards);\\n\\n  function totalVestedAt(\\n    uint256 start,\\n    uint256 end,\\n    uint256 granted,\\n    uint256 cliffLength,\\n    uint256 vestingInterval,\\n    uint256 revokedAt,\\n    uint256 time\\n  ) external pure returns (uint256 rewards);\\n\\n  function grant(\\n    address recipient,\\n    uint256 amount,\\n    uint256 vestingLength,\\n    uint256 cliffLength,\\n    uint256 vestingInterval\\n  ) external returns (uint256 tokenId);\\n\\n  function loadRewards(uint256 rewards) external;\\n\\n  function revokeGrant(uint256 tokenId) external;\\n\\n  function getReward(uint256 tokenId) external;\\n\\n  event RewardAdded(uint256 reward);\\n  event Granted(\\n    address indexed user,\\n    uint256 indexed tokenId,\\n    uint256 amount,\\n    uint256 vestingLength,\\n    uint256 cliffLength,\\n    uint256 vestingInterval\\n  );\\n  event GrantRevoked(uint256 indexed tokenId, uint256 totalUnvested);\\n  event RewardPaid(address indexed user, uint256 indexed tokenId, uint256 reward);\\n}\\n\",\"keccak256\":\"0x7d07ce1bcc4070cc65cf7334dd7c89fcb66c7f5c968aef3d512defad91c8fe5a\",\"license\":\"MIT\"},\"contracts/interfaces/IERC20withDec.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.6.12;\\npragma experimental ABIEncoderV2;\\n\\nimport \\\"@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol\\\";\\n\\n/*\\nOnly addition is the `decimals` function, which we need, and which both our Fidu and USDC use, along with most ERC20's.\\n*/\\n\\n/**\\n * @dev Interface of the ERC20 standard as defined in the EIP.\\n */\\ninterface IERC20withDec is IERC20 {\\n  /**\\n   * @dev Returns the number of decimals used for the token\\n   */\\n  function decimals() external view returns (uint8);\\n}\\n\",\"keccak256\":\"0x7b5fb02e023b6006a5199992f242caf23f64240c91e625f1390d6ca421b59531\",\"license\":\"MIT\"},\"contracts/interfaces/IMerkleDistributor.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0-only\\n// solhint-disable-next-line max-line-length\\n// Adapted from https://github.com/Uniswap/merkle-distributor/blob/c3255bfa2b684594ecd562cacd7664b0f18330bf/contracts/interfaces/IMerkleDistributor.sol.\\npragma solidity 0.6.12;\\n\\n/// @notice Enables the granting of a CommunityRewards grant, if the grant details exist in this\\n/// contract's Merkle root.\\ninterface IMerkleDistributor {\\n  /// @notice Returns the address of the CommunityRewards contract whose grants are distributed by this contract.\\n  function communityRewards() external view returns (address);\\n\\n  /// @notice Returns the merkle root of the merkle tree containing grant details available to accept.\\n  function merkleRoot() external view returns (bytes32);\\n\\n  /// @notice Returns true if the index has been marked accepted.\\n  function isGrantAccepted(uint256 index) external view returns (bool);\\n\\n  /// @notice Causes the sender to accept the grant consisting of the given details. Reverts if\\n  /// the inputs (which includes who the sender is) are invalid.\\n  function acceptGrant(\\n    uint256 index,\\n    uint256 amount,\\n    uint256 vestingLength,\\n    uint256 cliffLength,\\n    uint256 vestingInterval,\\n    bytes32[] calldata merkleProof\\n  ) external;\\n\\n  /// @notice This event is triggered whenever a call to #acceptGrant succeeds.\\n  event GrantAccepted(\\n    uint256 indexed tokenId,\\n    uint256 indexed index,\\n    address indexed account,\\n    uint256 amount,\\n    uint256 vestingLength,\\n    uint256 cliffLength,\\n    uint256 vestingInterval\\n  );\\n}\\n\",\"keccak256\":\"0x6cf43adfa51a463875cbe55bec1f898d7cd47cfcc2204c4461030a8aeee5dcb9\",\"license\":\"GPL-3.0-only\"},\"contracts/rewards/MerkleDistributor.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0-only\\n// solhint-disable-next-line max-line-length\\n// Adapted from https://github.com/Uniswap/merkle-distributor/blob/c3255bfa2b684594ecd562cacd7664b0f18330bf/contracts/MerkleDistributor.sol.\\npragma solidity 0.6.12;\\n\\nimport \\\"@openzeppelin/contracts/cryptography/MerkleProof.sol\\\";\\n\\nimport \\\"../interfaces/ICommunityRewards.sol\\\";\\nimport \\\"../interfaces/IMerkleDistributor.sol\\\";\\n\\ncontract MerkleDistributor is IMerkleDistributor {\\n  address public immutable override communityRewards;\\n  bytes32 public immutable override merkleRoot;\\n\\n  // @dev This is a packed array of booleans.\\n  mapping(uint256 => uint256) private acceptedBitMap;\\n\\n  constructor(address communityRewards_, bytes32 merkleRoot_) public {\\n    require(communityRewards_ != address(0), \\\"Cannot use the null address\\\");\\n    require(merkleRoot_ != 0, \\\"Invalid merkle root provided\\\");\\n    communityRewards = communityRewards_;\\n    merkleRoot = merkleRoot_;\\n  }\\n\\n  function isGrantAccepted(uint256 index) public view override returns (bool) {\\n    uint256 acceptedWordIndex = index / 256;\\n    uint256 acceptedBitIndex = index % 256;\\n    uint256 acceptedWord = acceptedBitMap[acceptedWordIndex];\\n    uint256 mask = (1 << acceptedBitIndex);\\n    return acceptedWord & mask == mask;\\n  }\\n\\n  function _setGrantAccepted(uint256 index) private {\\n    uint256 acceptedWordIndex = index / 256;\\n    uint256 acceptedBitIndex = index % 256;\\n    acceptedBitMap[acceptedWordIndex] = acceptedBitMap[acceptedWordIndex] | (1 << acceptedBitIndex);\\n  }\\n\\n  function acceptGrant(\\n    uint256 index,\\n    uint256 amount,\\n    uint256 vestingLength,\\n    uint256 cliffLength,\\n    uint256 vestingInterval,\\n    bytes32[] calldata merkleProof\\n  ) external override {\\n    require(!isGrantAccepted(index), \\\"Grant already accepted\\\");\\n\\n    // Verify the merkle proof.\\n    //\\n    /// @dev Per the Warning in\\n    /// https://github.com/ethereum/solidity/blob/v0.6.12/docs/abi-spec.rst#non-standard-packed-mode,\\n    /// it is important that no more than one of the arguments to `abi.encodePacked()` here be a\\n    /// dynamic type (see definition in\\n    /// https://github.com/ethereum/solidity/blob/v0.6.12/docs/abi-spec.rst#formal-specification-of-the-encoding).\\n    bytes32 node = keccak256(abi.encodePacked(index, msg.sender, amount, vestingLength, cliffLength, vestingInterval));\\n    require(MerkleProof.verify(merkleProof, merkleRoot, node), \\\"Invalid proof\\\");\\n\\n    // Mark it accepted and perform the granting.\\n    _setGrantAccepted(index);\\n    uint256 tokenId = ICommunityRewards(communityRewards).grant(\\n      msg.sender,\\n      amount,\\n      vestingLength,\\n      cliffLength,\\n      vestingInterval\\n    );\\n\\n    emit GrantAccepted(tokenId, index, msg.sender, amount, vestingLength, cliffLength, vestingInterval);\\n  }\\n}\\n\",\"keccak256\":\"0x25885985dc3b901140005cdb5aed2645a27d32a765de589812397f15bb47b0c4\",\"license\":\"GPL-3.0-only\"}},\"version\":1}",
+  "bytecode": "0x60c060405234801561001057600080fd5b5060405161064c38038061064c8339818101604052604081101561003357600080fd5b5080516020909101516001600160a01b038216610097576040805162461bcd60e51b815260206004820152601b60248201527f43616e6e6f742075736520746865206e756c6c20616464726573730000000000604482015290519081900360640190fd5b806100e9576040805162461bcd60e51b815260206004820152601c60248201527f496e76616c6964206d65726b6c6520726f6f742070726f766964656400000000604482015290519081900360640190fd5b606082901b6001600160601b03191660805260a08190526001600160a01b0390911690610519610133600039806101775280610290525080610153528061034452506105196000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c8063193ce1e4146100515780632eb4a7ab1461007557806338dcb4f01461008f578063f67000d1146100c0575b600080fd5b610059610151565b604080516001600160a01b039092168252519081900360200190f35b61007d610175565b60408051918252519081900360200190f35b6100ac600480360360208110156100a557600080fd5b5035610199565b604080519115158252519081900360200190f35b61014f600480360360c08110156100d657600080fd5b8135916020810135916040820135916060810135916080820135919081019060c0810160a082013564010000000081111561011057600080fd5b82018360208201111561012257600080fd5b8035906020019184602083028401116401000000008311171561014457600080fd5b5090925090506101bf565b005b7f000000000000000000000000000000000000000000000000000000000000000081565b7f000000000000000000000000000000000000000000000000000000000000000081565b6101008104600090815260208190526040902054600160ff9092169190911b9081161490565b6101c887610199565b15610213576040805162461bcd60e51b815260206004820152601660248201527511dc985b9d08185b1c9958591e481858d8d95c1d195960521b604482015290519081900360640190fd5b6040805160208082018a90523360601b8284015260548201899052607482018890526094820187905260b48083018790528351808403909101815260d4830180855281519183019190912060f49286028085018401909552858252936102bb939192879287928392909101908490808284376000920191909152507f000000000000000000000000000000000000000000000000000000000000000092508591506104139050565b6102fc576040805162461bcd60e51b815260206004820152600d60248201526c24b73b30b634b210383937b7b360991b604482015290519081900360640190fd5b610305886104bc565b60408051630633936560e21b81523360048201526024810189905260448101889052606481018790526084810186905290516000916001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016916318ce4d949160a48082019260209290919082900301818787803b15801561038c57600080fd5b505af11580156103a0573d6000803e3d6000fd5b505050506040513d60208110156103b657600080fd5b5051604080518a8152602081018a905280820189905260608101889052905191925033918b9184917f862fb6a8214c1a74401b07287b99c56ae4b4c6070977d74ab79744bb5bac24fa9181900360800190a4505050505050505050565b600081815b85518110156104b157600086828151811061042f57fe5b6020026020010151905080831161047657828160405160200180838152602001828152602001925050506040516020818303038152906040528051906020012092506104a8565b808360405160200180838152602001828152602001925050506040516020818303038152906040528051906020012092505b50600101610418565b509092149392505050565b610100810460009081526020819052604090208054600160ff9093169290921b909117905556fea2646970667358221220bc2179087000f9decb0361cc44302daef3ccb9d27cd4920ec2cf8ec0a5ff142164736f6c634300060c0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c8063193ce1e4146100515780632eb4a7ab1461007557806338dcb4f01461008f578063f67000d1146100c0575b600080fd5b610059610151565b604080516001600160a01b039092168252519081900360200190f35b61007d610175565b60408051918252519081900360200190f35b6100ac600480360360208110156100a557600080fd5b5035610199565b604080519115158252519081900360200190f35b61014f600480360360c08110156100d657600080fd5b8135916020810135916040820135916060810135916080820135919081019060c0810160a082013564010000000081111561011057600080fd5b82018360208201111561012257600080fd5b8035906020019184602083028401116401000000008311171561014457600080fd5b5090925090506101bf565b005b7f000000000000000000000000000000000000000000000000000000000000000081565b7f000000000000000000000000000000000000000000000000000000000000000081565b6101008104600090815260208190526040902054600160ff9092169190911b9081161490565b6101c887610199565b15610213576040805162461bcd60e51b815260206004820152601660248201527511dc985b9d08185b1c9958591e481858d8d95c1d195960521b604482015290519081900360640190fd5b6040805160208082018a90523360601b8284015260548201899052607482018890526094820187905260b48083018790528351808403909101815260d4830180855281519183019190912060f49286028085018401909552858252936102bb939192879287928392909101908490808284376000920191909152507f000000000000000000000000000000000000000000000000000000000000000092508591506104139050565b6102fc576040805162461bcd60e51b815260206004820152600d60248201526c24b73b30b634b210383937b7b360991b604482015290519081900360640190fd5b610305886104bc565b60408051630633936560e21b81523360048201526024810189905260448101889052606481018790526084810186905290516000916001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016916318ce4d949160a48082019260209290919082900301818787803b15801561038c57600080fd5b505af11580156103a0573d6000803e3d6000fd5b505050506040513d60208110156103b657600080fd5b5051604080518a8152602081018a905280820189905260608101889052905191925033918b9184917f862fb6a8214c1a74401b07287b99c56ae4b4c6070977d74ab79744bb5bac24fa9181900360800190a4505050505050505050565b600081815b85518110156104b157600086828151811061042f57fe5b6020026020010151905080831161047657828160405160200180838152602001828152602001925050506040516020818303038152906040528051906020012092506104a8565b808360405160200180838152602001828152602001925050506040516020818303038152906040528051906020012092505b50600101610418565b509092149392505050565b610100810460009081526020819052604090208054600160ff9093169290921b909117905556fea2646970667358221220bc2179087000f9decb0361cc44302daef3ccb9d27cd4920ec2cf8ec0a5ff142164736f6c634300060c0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "events": {
+      "GrantAccepted(uint256,uint256,address,uint256,uint256,uint256,uint256)": {
+        "notice": "This event is triggered whenever a call to #acceptGrant succeeds."
+      }
+    },
+    "kind": "user",
+    "methods": {
+      "acceptGrant(uint256,uint256,uint256,uint256,uint256,bytes32[])": {
+        "notice": "Causes the sender to accept the grant consisting of the given details. Reverts if the inputs (which includes who the sender is) are invalid."
+      },
+      "communityRewards()": {
+        "notice": "Returns the address of the CommunityRewards contract whose grants are distributed by this contract."
+      },
+      "isGrantAccepted(uint256)": {
+        "notice": "Returns true if the index has been marked accepted."
+      },
+      "merkleRoot()": {
+        "notice": "Returns the merkle root of the merkle tree containing grant details available to accept."
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 29686,
+        "contract": "contracts/rewards/MerkleDistributor.sol:MerkleDistributor",
+        "label": "acceptedBitMap",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_uint256,t_uint256)"
+      }
+    ],
+    "types": {
+      "t_mapping(t_uint256,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}
