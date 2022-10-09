@@ -29,6 +29,7 @@ import {
 } from "../generated/schema";
 import {
   ActivityType,
+  BDChangeDecimals,
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -370,6 +371,7 @@ export function _handleMint(
   comptrollerAddr: Address,
   minter: Address,
   mintAmount: BigInt,
+  outputTokenSupplyResult: ethereum.CallResult<BigInt>,
   underlyingBalanceResult: ethereum.CallResult<BigInt>,
   event: ethereum.Event
 ): void {
@@ -460,6 +462,13 @@ export function _handleMint(
   deposit.amountUSD = depositUSD;
   deposit.save();
 
+  updateMarketDeposit(
+    comptrollerAddr,
+    market,
+    underlyingToken,
+    outputTokenSupplyResult,
+    event
+  );
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(depositUSD);
   market.save();
 
@@ -485,6 +494,7 @@ export function _handleRedeem(
   comptrollerAddr: Address,
   redeemer: Address,
   redeemAmount: BigInt,
+  outputTokenSupplyResult: ethereum.CallResult<BigInt>,
   underlyingBalanceResult: ethereum.CallResult<BigInt>,
   event: ethereum.Event
 ): void {
@@ -561,6 +571,14 @@ export function _handleRedeem(
   );
   withdraw.save();
 
+  updateMarketDeposit(
+    comptrollerAddr,
+    market,
+    underlyingToken,
+    outputTokenSupplyResult,
+    event
+  );
+
   updateMarketSnapshots(
     market,
     event.block.timestamp,
@@ -584,6 +602,7 @@ export function _handleBorrow(
   borrower: Address,
   borrowAmount: BigInt,
   borrowBalanceResult: ethereum.CallResult<BigInt>,
+  totalBorrows: BigInt,
   event: ethereum.Event
 ): void {
   const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
@@ -670,6 +689,13 @@ export function _handleBorrow(
   borrow.amountUSD = borrowUSD;
   borrow.save();
 
+  const underlyingTokenPriceUSD = market.inputTokenPriceUSD;
+  market._borrowBalance = totalBorrows;
+  market.totalBorrowBalanceUSD = totalBorrows
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
+
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(borrowUSD);
   market.save();
 
@@ -689,6 +715,14 @@ export function _handleBorrow(
     EventType.Borrow,
     true
   );
+
+  updateProtocol(comptrollerAddr);
+
+  snapshotFinancials(
+    comptrollerAddr,
+    event.block.number,
+    event.block.timestamp
+  );
 }
 
 export function _handleRepayBorrow(
@@ -697,6 +731,7 @@ export function _handleRepayBorrow(
   payer: Address,
   repayAmount: BigInt,
   borrowBalanceResult: ethereum.CallResult<BigInt>,
+  totalBorrows: BigInt,
   event: ethereum.Event
 ): void {
   const protocol = LendingProtocol.load(comptrollerAddr.toHexString());
@@ -781,6 +816,14 @@ export function _handleRepayBorrow(
   );
   repay.save();
 
+  const underlyingTokenPriceUSD = market.inputTokenPriceUSD;
+  market._borrowBalance = totalBorrows;
+  market.totalBorrowBalanceUSD = totalBorrows
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
+  market.save();
+
   updateMarketSnapshots(
     market,
     event.block.timestamp,
@@ -796,6 +839,14 @@ export function _handleRepayBorrow(
     payer.toHexString(),
     EventType.Repay,
     true
+  );
+
+  updateProtocol(comptrollerAddr);
+
+  snapshotFinancials(
+    comptrollerAddr,
+    event.block.number,
+    event.block.timestamp
   );
 }
 
@@ -1013,26 +1064,6 @@ export function _handleAccrueInterest(
     return;
   }
 
-  // creates and initializes market snapshots
-
-  //
-  // daily snapshot
-  //
-  getOrCreateMarketDailySnapshot(
-    market,
-    event.block.timestamp,
-    event.block.number
-  );
-
-  //
-  // hourly snapshot
-  //
-  getOrCreateMarketHourlySnapshot(
-    market,
-    event.block.timestamp,
-    event.block.number
-  );
-
   updateMarket(
     updateMarketData,
     marketID,
@@ -1043,6 +1074,7 @@ export function _handleAccrueInterest(
     updateMarketPrices,
     comptrollerAddr
   );
+
   updateProtocol(comptrollerAddr);
 
   snapshotFinancials(
@@ -1550,14 +1582,6 @@ export function updateMarket(
 
   market.inputTokenPriceUSD = underlyingTokenPriceUSD;
 
-  if (updateMarketData.totalSupplyResult.reverted) {
-    log.warning("[updateMarket] Failed to get totalSupply of Market {}", [
-      marketID,
-    ]);
-  } else {
-    market.outputTokenSupply = updateMarketData.totalSupplyResult.value;
-  }
-
   // get correct outputTokenDecimals for generic exchangeRate calculation
   let outputTokenDecimals = cTokenDecimals;
   if (market.outputToken) {
@@ -1590,51 +1614,7 @@ export function updateMarket(
     market.outputTokenPriceUSD = oneCTokenInUnderlying.times(
       underlyingTokenPriceUSD
     );
-
-    // calculate inputTokenBalance only if exchangeRate is updated properly
-    // mantissaFactor = (inputTokenDecimals - outputTokenDecimals)  (Note: can be negative)
-    // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
-    if (underlyingToken.decimals > outputTokenDecimals) {
-      // we want to multiply out the difference to expand BD
-      const mantissaFactorBD = exponentToBigDecimal(
-        underlyingToken.decimals - outputTokenDecimals
-      );
-      const inputTokenBalanceBD = market.outputTokenSupply
-        .toBigDecimal()
-        .times(market.exchangeRate!)
-        .times(mantissaFactorBD)
-        .truncate(0);
-      market.inputTokenBalance = BigInt.fromString(
-        inputTokenBalanceBD.toString()
-      );
-    } else {
-      // we want to divide back the difference to decrease the BD
-      const mantissaFactorBD = exponentToBigDecimal(
-        outputTokenDecimals - underlyingToken.decimals
-      );
-      const inputTokenBalanceBD = market.outputTokenSupply
-        .toBigDecimal()
-        .times(market.exchangeRate!)
-        .div(mantissaFactorBD)
-        .truncate(0);
-      market.inputTokenBalance = BigInt.fromString(
-        inputTokenBalanceBD.toString()
-      );
-    }
   }
-
-  const underlyingSupplyUSD = market.inputTokenBalance
-    .toBigDecimal()
-    .div(exponentToBigDecimal(underlyingToken.decimals))
-    .times(underlyingTokenPriceUSD);
-  market.totalValueLockedUSD = underlyingSupplyUSD;
-  market.totalDepositBalanceUSD = underlyingSupplyUSD;
-
-  market._borrowBalance = newTotalBorrow;
-  market.totalBorrowBalanceUSD = newTotalBorrow
-    .toBigDecimal()
-    .div(exponentToBigDecimal(underlyingToken.decimals))
-    .times(underlyingTokenPriceUSD);
 
   if (updateMarketData.supplyRateResult.reverted) {
     log.warning("[updateMarket] Failed to get supplyRate of Market {}", [
@@ -1711,9 +1691,67 @@ export function updateMarket(
     hourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
       protocolSideRevenueUSDDelta
     );
+
   hourlySnapshot.hourlySupplySideRevenueUSD =
     hourlySnapshot.hourlySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
   hourlySnapshot.save();
+}
+
+export function updateMarketDeposit(
+  comptrollerAddr: Address,
+  market: Market,
+  underlyingToken: Token,
+  totalSupplyResult: ethereum.CallResult<BigInt>,
+  event: ethereum.Event
+): void {
+  if (totalSupplyResult.reverted) {
+    log.warning("[updateMarket] Failed to get totalSupply of Market {}", [
+      market.id,
+    ]);
+  } else {
+    market.outputTokenSupply = totalSupplyResult.value;
+  }
+
+  // get correct outputTokenDecimals for generic exchangeRate calculation
+  let outputTokenDecimals = cTokenDecimals;
+  if (market.outputToken) {
+    const outputToken = Token.load(market.outputToken!);
+    if (!outputToken) {
+      log.warning("[updateMarket] Output token not found: {}", [
+        market.outputToken!,
+      ]);
+    } else {
+      outputTokenDecimals = outputToken.decimals;
+    }
+  }
+
+  const underlyingTokenPriceUSD = market.inputTokenPriceUSD;
+
+  // calculate inputTokenBalance only if exchangeRate is updated properly
+  // mantissaFactor = (inputTokenDecimals - outputTokenDecimals)  (Note: can be negative)
+  // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
+  const inputTokenBalanceBD = BDChangeDecimals(
+    market.outputTokenSupply.toBigDecimal().times(market.exchangeRate!),
+    outputTokenDecimals,
+    underlyingToken.decimals
+  ).truncate(0);
+  market.inputTokenBalance = BigInt.fromString(inputTokenBalanceBD.toString());
+
+  const underlyingSupplyUSD = market.inputTokenBalance
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
+  market.totalValueLockedUSD = underlyingSupplyUSD;
+  market.totalDepositBalanceUSD = underlyingSupplyUSD;
+  market.save();
+
+  updateProtocol(comptrollerAddr);
+
+  snapshotFinancials(
+    comptrollerAddr,
+    event.block.number,
+    event.block.timestamp
+  );
 }
 
 export function updateProtocol(comptrollerAddr: Address): void {

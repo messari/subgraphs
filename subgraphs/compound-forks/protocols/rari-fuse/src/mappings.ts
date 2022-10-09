@@ -384,6 +384,7 @@ export function handleMint(event: Mint): void {
   const mintAmount = event.params.mintAmount;
   const factoryContract = Address.fromString(FACTORY_CONTRACT);
   const contract = CToken.bind(event.address);
+  const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
@@ -391,6 +392,7 @@ export function handleMint(event: Mint): void {
     factoryContract,
     minter,
     mintAmount,
+    outputTokenSupplyResult,
     balanceOfUnderlyingResult,
     event
   );
@@ -401,6 +403,7 @@ export function handleRedeem(event: Redeem): void {
   const redeemAmount = event.params.redeemAmount;
   const factoryContract = Address.fromString(FACTORY_CONTRACT);
   const contract = CToken.bind(event.address);
+  const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.redeemer
   );
@@ -408,6 +411,7 @@ export function handleRedeem(event: Redeem): void {
     factoryContract,
     redeemer,
     redeemAmount,
+    outputTokenSupplyResult,
     balanceOfUnderlyingResult,
     event
   );
@@ -416,6 +420,7 @@ export function handleRedeem(event: Redeem): void {
 export function handleBorrow(event: Borrow): void {
   const borrower = event.params.borrower;
   const borrowAmount = event.params.borrowAmount;
+  const totalBorrows = event.params.totalBorrows;
   const factoryContract = Address.fromString(FACTORY_CONTRACT);
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
@@ -426,6 +431,7 @@ export function handleBorrow(event: Borrow): void {
     borrower,
     borrowAmount,
     borrowBalanceStoredResult,
+    totalBorrows,
     event
   );
 }
@@ -434,6 +440,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const borrower = event.params.borrower;
   const payer = event.params.payer;
   const repayAmount = event.params.repayAmount;
+  const totalBorrows = event.params.totalBorrows;
   const factoryContract = Address.fromString(FACTORY_CONTRACT);
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
@@ -445,6 +452,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     payer,
     repayAmount,
     borrowBalanceStoredResult,
+    totalBorrows,
     event
   );
 }
