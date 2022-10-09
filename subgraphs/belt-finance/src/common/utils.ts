@@ -40,6 +40,13 @@ export function getTokenDecimals(tokenAddr: Address): BigDecimal {
   return constants.BIGINT_TEN.pow(decimals.toI32() as u8).toBigDecimal();
 }
 
+export function isVaultRegistered(vaultAddress: Address): boolean {
+  const vault = VaultStore.load(vaultAddress.toHexString());
+
+  if (!vault) return false;
+  return true;
+}
+
 export function isBuyBackTransactionPresent(
   transaction: ethereum.Transaction
 ): boolean {

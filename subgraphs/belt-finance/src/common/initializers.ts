@@ -355,9 +355,9 @@ export function getOrCreateVault(
     vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
-    let vaultStrategies = utils.getVaultStrategies(vaultAddress);
-
     vault.fees = utils.getVaultFees(vaultAddress);
+
+    let vaultStrategies = utils.getVaultStrategies(vaultAddress);
 
     for (let idx = 0; idx < vaultStrategies.length; idx++) {
       let context = new DataSourceContext();
@@ -377,6 +377,30 @@ export function getOrCreateVault(
       vault.name!,
       inputToken.id,
     ]);
+  }
+
+  // MultiStrategyVault has a function through which the underlying token can be updated so we check
+  // for new updated strategies after a fixed interval (as BSC does not support call handlers).
+  if (
+    !vault.lastStrategiesBlockNumber ||
+    block.number
+      .minus(vault.lastStrategiesBlockNumber!)
+      .gt(constants.STRATEGIES_CACHING_BLOCKS)
+  ) {
+    let vaultStrategies = utils.getVaultStrategies(vaultAddress);
+
+    for (let idx = 0; idx < vaultStrategies.length; idx++) {
+      let context = new DataSourceContext();
+      context.setString("vaultAddress", vaultAddress.toHexString());
+
+      let underlyingStrategy = utils.getUnderlyingStrategy(
+        vaultStrategies.at(idx)
+      );
+      StrategyTemplate.createWithContext(underlyingStrategy, context);
+    }
+
+    vault.lastStrategiesBlockNumber = block.number;
+    vault.save();
   }
 
   return vault;

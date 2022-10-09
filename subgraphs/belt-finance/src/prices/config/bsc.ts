@@ -49,7 +49,7 @@ UNISWAP_ROUTER_ADDRESS.set(
 );
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F") // Pancakeswap v1 Router
+  Address.fromString("0x3a6d8cA21D1CF76F653A67577FA0D27453350dD8") // Pancakeswap v1 Router
 );
 
 export const UNISWAP_PATH_OVERRIDE = new TypedMap<Address, Address[]>();

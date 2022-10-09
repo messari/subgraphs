@@ -375,6 +375,9 @@ type Vault @entity {
   " Creation block number "
   createdBlockNumber: BigInt!
 
+  " Last strategies block number "
+  lastStrategiesBlockNumber: BigInt
+
   ##### Quantitative Data #####
 
   " Current TVL (Total Value Locked) of this pool in USD "
