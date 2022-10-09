@@ -11,8 +11,6 @@ import {
   Token,
   Position,
   PositionSnapshot,
-  _Urn,
-  _PositionCounter,
 } from "../../generated/schema";
 import {
   getOrCreateMarketHourlySnapshot,
@@ -22,13 +20,11 @@ import {
   getOrCreateUsageMetricsHourlySnapshot,
   getOrCreateUsageMetricsDailySnapshot,
   getSnapshotRates,
-  getOrCreatePositionCounter,
   getOrCreateAccount,
   getOrCreateMarket,
   getOrCreatePosition,
   getMarketAddressFromIlk,
   getMarketFromIlk,
-  getOwnerAddressFromUrn,
   getOpenPosition,
   getOwnerAddress,
 } from "./getters";
@@ -40,14 +36,9 @@ import {
   BIGINT_NEG_ONE,
   BIGDECIMAL_NEG_ONE,
   DAI_ADDRESS,
-  VAT_ADDRESS,
-  WAD,
-  RAD,
   ProtocolSideRevenueType,
-  INT_ZERO,
   INT_ONE,
   PositionSide,
-  EventType,
   BIGINT_NEG_HUNDRED,
 } from "./constants";
 import { createEventID } from "../utils/strings";
@@ -63,7 +54,7 @@ export function updateProtocol(
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   protocolSideRevenueType: u32 = 0,
 ): void {
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
 
   // update Deposit
   if (deltaCollateralUSD.gt(BIGDECIMAL_ZERO)) {
@@ -75,8 +66,8 @@ export function updateProtocol(
   let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
   let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
   for (let i: i32 = 0; i < protocol.marketIDList.length; i++) {
-    let marketID = protocol.marketIDList[i];
-    let market = Market.load(marketID);
+    const marketID = protocol.marketIDList[i];
+    const market = Market.load(marketID);
     totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(market!.totalBorrowBalanceUSD);
     totalDepositBalanceUSD = totalDepositBalanceUSD.plus(market!.totalDepositBalanceUSD);
   }
@@ -113,7 +104,7 @@ export function updateProtocol(
     protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   }
 
-  let newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
+  const newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
   if (newProtocolSideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(
       protocol.cumulativeSupplySideRevenueUSD,
@@ -135,7 +126,7 @@ export function updateProtocol(
   }
 
   // update mintedTokenSupplies
-  let daiContract = DAI.bind(Address.fromString(DAI_ADDRESS));
+  const daiContract = DAI.bind(Address.fromString(DAI_ADDRESS));
   protocol.mintedTokens = [DAI_ADDRESS];
   protocol.mintedTokenSupplies = [daiContract.totalSupply()];
 
@@ -152,7 +143,7 @@ export function updateMarket(
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
 ): void {
-  let token = getOrCreateToken(market.inputToken);
+  const token = getOrCreateToken(market.inputToken);
 
   if (deltaCollateral != BIGINT_ZERO) {
     // deltaCollateral can be positive or negative
@@ -227,18 +218,18 @@ export function snapshotMarket(
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
 ): void {
-  let marketID = market.id;
-  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, marketID);
-  let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, marketID);
+  const marketID = market.id;
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, marketID);
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, marketID);
   if (marketHourlySnapshot == null || marketDailySnapshot == null) {
     log.error("[snapshotMarket]Failed to get marketsnapshot for {}", [marketID]);
     return;
   }
-  let hours = (event.block.timestamp.toI32() / SECONDS_PER_HOUR).toString();
-  let hourlySnapshotRates = getSnapshotRates(market.rates, hours);
+  const hours = (event.block.timestamp.toI32() / SECONDS_PER_HOUR).toString();
+  const hourlySnapshotRates = getSnapshotRates(market.rates, hours);
 
-  let days = (event.block.timestamp.toI32() / SECONDS_PER_DAY).toString();
-  let dailySnapshotRates = getSnapshotRates(market.rates, days);
+  const days = (event.block.timestamp.toI32() / SECONDS_PER_DAY).toString();
+  const dailySnapshotRates = getSnapshotRates(market.rates, days);
 
   marketHourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketHourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
@@ -335,8 +326,8 @@ export function updateFinancialsSnapshot(
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   protocolSideRevenueType: u32 = 0,
 ): void {
-  let protocol = getOrCreateLendingProtocol();
-  let financials = getOrCreateFinancials(event);
+  const protocol = getOrCreateLendingProtocol();
+  const financials = getOrCreateFinancials(event);
 
   financials.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financials.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
@@ -379,7 +370,7 @@ export function updateFinancialsSnapshot(
     financials.dailySupplySideRevenueUSD = financials.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   }
 
-  let newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
+  const newProtocolSideRevenueUSD = newTotalRevenueUSD.minus(newSupplySideRevenueUSD);
   if (newProtocolSideRevenueUSD.gt(BIGDECIMAL_ZERO)) {
     financials.dailyProtocolSideRevenueUSD = financials.dailyTotalRevenueUSD.minus(
       financials.dailySupplySideRevenueUSD,
@@ -414,19 +405,18 @@ export function updatePosition(
   deltaCollateral: BigInt = BIGINT_ZERO,
   deltaDebt: BigInt = BIGINT_ZERO,
 ): void {
-  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
-  let accountAddress = getOwnerAddress(urn);
-  let eventID = createEventID(event); // deposit, withdraw, borrow, repay, liquidate
+  const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  const accountAddress = getOwnerAddress(urn);
+  const eventID = createEventID(event); // deposit, withdraw, borrow, repay, liquidate
 
-  let protocol = getOrCreateLendingProtocol();
-  let market = getOrCreateMarket(marketID);
-  let account = getOrCreateAccount(accountAddress);
+  const protocol = getOrCreateLendingProtocol();
+  const market = getOrCreateMarket(marketID);
+  const account = getOrCreateAccount(accountAddress);
 
   //let lenderPosition: Position | null = null;
   //let borrowerPosition: Position | null = null;
 
   if (deltaCollateral.notEqual(BIGINT_ZERO)) {
-    let lenderCounter = getOrCreatePositionCounter(urn, ilk, PositionSide.LENDER);
     let lenderPosition = getOpenPosition(urn, ilk, PositionSide.LENDER);
 
     if (lenderPosition == null) {
@@ -461,7 +451,7 @@ export function updatePosition(
       lenderPosition.depositCount += INT_ONE;
 
       // link event to position (createTransactions needs to be called first)
-      let deposit = Deposit.load(eventID)!;
+      const deposit = Deposit.load(eventID)!;
       deposit.position = lenderPosition.id;
       deposit.save();
     } else if (deltaCollateral.lt(BIGINT_ZERO)) {
@@ -487,7 +477,7 @@ export function updatePosition(
       }
 
       // link event to position (createTransactions needs to be called first)
-      let withdraw = Withdraw.load(eventID)!;
+      const withdraw = Withdraw.load(eventID)!;
       withdraw.position = lenderPosition.id;
       withdraw.save();
     }
@@ -503,7 +493,6 @@ export function updatePosition(
   }
 
   if (deltaDebt.notEqual(BIGINT_ZERO)) {
-    let borrowerCounter = getOrCreatePositionCounter(urn, ilk, PositionSide.BORROWER);
     let borrowerPosition = getOpenPosition(urn, ilk, PositionSide.BORROWER);
     if (borrowerPosition == null) {
       // new borrower position
@@ -551,7 +540,7 @@ export function updatePosition(
       account.borrowCount += INT_ONE;
 
       // link event to position (createTransactions needs to be called first)
-      let borrow = Borrow.load(eventID)!;
+      const borrow = Borrow.load(eventID)!;
       borrow.position = borrowerPosition.id;
       borrow.save();
     } else if (deltaDebt.lt(BIGINT_ZERO)) {
@@ -576,7 +565,7 @@ export function updatePosition(
         account.repayCount += INT_ONE;
       }
 
-      let repay = Repay.load(eventID)!;
+      const repay = Repay.load(eventID)!;
       repay.position = borrowerPosition.id;
       repay.save();
     }
@@ -607,14 +596,14 @@ export function transferPosition(
   dstAccountAddress: string | null = null,
   transferAmount: BigInt | null = null, // suport partial transfer of a position
 ): void {
-  let protocol = getOrCreateLendingProtocol();
-  let market: Market = getMarketFromIlk(ilk)!;
+  const protocol = getOrCreateLendingProtocol();
+  const market: Market = getMarketFromIlk(ilk)!;
   if (srcAccountAddress == null) {
     srcAccountAddress = getOwnerAddress(srcUrn).toLowerCase();
   }
-  let srcAccount = getOrCreateAccount(srcAccountAddress!);
+  const srcAccount = getOrCreateAccount(srcAccountAddress!);
 
-  let srcPosition = getOpenPosition(srcUrn, ilk, side);
+  const srcPosition = getOpenPosition(srcUrn, ilk, side);
   if (srcPosition == null) {
     log.warning("[transferPosition]No open position found for source: urn {}/ilk {}/side {}; no transfer", [
       srcUrn,
@@ -625,7 +614,7 @@ export function transferPosition(
   }
 
   if (!transferAmount || transferAmount > srcPosition.balance) {
-    let transferAmountStr = transferAmount ? transferAmount.toString() : "null";
+    const transferAmountStr = transferAmount ? transferAmount.toString() : "null";
     log.warning("[transferPosition]transferAmount {} > src position balance {} for {}", [
       transferAmountStr,
       srcPosition.balance.toString(),
@@ -660,7 +649,7 @@ export function transferPosition(
   if (dstAccountAddress == null) {
     dstAccountAddress = getOwnerAddress(dstUrn).toLowerCase();
   }
-  let dstAccount = getOrCreateAccount(dstAccountAddress!);
+  const dstAccount = getOrCreateAccount(dstAccountAddress!);
 
   // transfer srcUrn to dstUrn
   // or partial transfer of a position (amount < position.balance)
@@ -708,17 +697,17 @@ export function liquidatePosition(
   collateral: BigInt, // net collateral liquidated
   debt: BigInt, // debt repaid
 ): void {
-  let protocol = getOrCreateLendingProtocol();
-  let market: Market = getMarketFromIlk(ilk)!;
-  let accountAddress = getOwnerAddress(urn);
-  let account = getOrCreateAccount(accountAddress);
+  const protocol = getOrCreateLendingProtocol();
+  const market: Market = getMarketFromIlk(ilk)!;
+  const accountAddress = getOwnerAddress(urn);
+  const account = getOrCreateAccount(accountAddress);
   account.liquidateCount += INT_ONE;
 
-  let liquidator = getOrCreateAccount(liquidatorAddress);
+  const liquidator = getOrCreateAccount(liquidatorAddress);
   liquidator.liquidationCount += INT_ONE;
   liquidator.save();
 
-  let liquidate = Liquidate.load(createEventID(event))!;
+  const liquidate = Liquidate.load(createEventID(event))!;
 
   log.info("[liquidatePosition]urn={}, ilk={}, collateral={}, debt={}", [
     urn,
@@ -726,8 +715,8 @@ export function liquidatePosition(
     collateral.toString(),
     debt.toString(),
   ]);
-  let borrowerPosition = getOpenPosition(urn, ilk, PositionSide.BORROWER)!;
-  let lenderPosition = getOpenPosition(urn, ilk, PositionSide.LENDER)!;
+  const borrowerPosition = getOpenPosition(urn, ilk, PositionSide.BORROWER)!;
+  const lenderPosition = getOpenPosition(urn, ilk, PositionSide.LENDER)!;
   if (debt > borrowerPosition.balance) {
     //this can happen because of rounding
     log.warning("[liquidatePosition]debt repaid {} > borrowing balance {}", [
@@ -799,8 +788,8 @@ export function liquidatePosition(
 }
 
 export function snapshotPosition(event: ethereum.Event, position: Position): void {
-  let txHash: string = event.transaction.hash.toHexString();
-  let snapshotID = `${position.id}-${txHash}-${event.logIndex.toString()}`;
+  const txHash: string = event.transaction.hash.toHexString();
+  const snapshotID = `${position.id}-${txHash}-${event.logIndex.toString()}`;
   let snapshot = PositionSnapshot.load(snapshotID);
   if (snapshot == null) {
     // this should always be the case with schema v2.0.1
@@ -832,16 +821,16 @@ export function updateUsageMetrics(
   liquidator: string | null = null,
   liquidatee: string | null = null,
 ): void {
-  let protocol = getOrCreateLendingProtocol();
-  let usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
-  let usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
+  const protocol = getOrCreateLendingProtocol();
+  const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
+  const usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
 
-  let hours: string = (event.block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
-  let days: string = (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  const hours: string = (event.block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
+  const days: string = (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
 
   // userU, userV, userW may be the same, they may not
   for (let i: i32 = 0; i < users.length; i++) {
-    let accountID = users[i];
+    const accountID = users[i];
     let account = Account.load(accountID);
     if (account == null) {
       account = getOrCreateAccount(accountID);
@@ -852,7 +841,7 @@ export function updateUsageMetrics(
       usageDailySnapshot.cumulativeUniqueUsers += 1;
     }
 
-    let hourlyActiveAcctountID = "hourly-".concat(accountID).concat("-").concat(hours);
+    const hourlyActiveAcctountID = "hourly-".concat(accountID).concat("-").concat(hours);
     let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAcctountID);
     if (hourlyActiveAccount == null) {
       hourlyActiveAccount = new ActiveAccount(hourlyActiveAcctountID);
@@ -861,7 +850,7 @@ export function updateUsageMetrics(
       usageHourlySnapshot.hourlyActiveUsers += 1;
     }
 
-    let dailyActiveAcctountID = "daily-".concat(accountID).concat("-").concat(days);
+    const dailyActiveAcctountID = "daily-".concat(accountID).concat("-").concat(days);
     let dailyActiveAccount = ActiveAccount.load(dailyActiveAcctountID);
     if (dailyActiveAccount == null) {
       dailyActiveAccount = new ActiveAccount(dailyActiveAcctountID);
@@ -874,7 +863,7 @@ export function updateUsageMetrics(
   if (deltaCollateralUSD.gt(BIGDECIMAL_ZERO)) {
     usageHourlySnapshot.hourlyDepositCount += 1;
     usageDailySnapshot.dailyDepositCount += 1;
-    let depositAccount = Account.load(users[1]); // user v
+    const depositAccount = Account.load(users[1]); // user v
     if (depositAccount!.depositCount == 0) {
       // a new depositor
       protocol.cumulativeUniqueDepositors += 1;
@@ -883,7 +872,7 @@ export function updateUsageMetrics(
     depositAccount!.depositCount += INT_ONE;
     depositAccount!.save();
 
-    let dailyDepositorAcctountID = "daily-depositor-".concat(users[1]).concat("-").concat(days);
+    const dailyDepositorAcctountID = "daily-depositor-".concat(users[1]).concat("-").concat(days);
     let dailyDepositorAccount = ActiveAccount.load(dailyDepositorAcctountID);
     if (dailyDepositorAccount == null) {
       dailyDepositorAccount = new ActiveAccount(dailyDepositorAcctountID);
@@ -895,7 +884,7 @@ export function updateUsageMetrics(
     usageHourlySnapshot.hourlyWithdrawCount += 1;
     usageDailySnapshot.dailyWithdrawCount += 1;
 
-    let withdrawAccount = Account.load(users[1]);
+    const withdrawAccount = Account.load(users[1]);
     withdrawAccount!.withdrawCount += INT_ONE;
     withdrawAccount!.save();
   }
@@ -904,7 +893,7 @@ export function updateUsageMetrics(
     usageHourlySnapshot.hourlyBorrowCount += 1;
     usageDailySnapshot.dailyBorrowCount += 1;
 
-    let borrowAccount = Account.load(users[2]); // user w
+    const borrowAccount = Account.load(users[2]); // user w
     if (borrowAccount!.borrowCount == 0) {
       // a new borrower
       protocol.cumulativeUniqueBorrowers += 1;
@@ -913,7 +902,7 @@ export function updateUsageMetrics(
     borrowAccount!.borrowCount += INT_ONE;
     borrowAccount!.save();
 
-    let dailyBorrowerAcctountID = "daily-borrow-".concat(users[2]).concat("-").concat(days);
+    const dailyBorrowerAcctountID = "daily-borrow-".concat(users[2]).concat("-").concat(days);
     let dailyBorrowerAccount = ActiveAccount.load(dailyBorrowerAcctountID);
     if (dailyBorrowerAccount == null) {
       dailyBorrowerAccount = new ActiveAccount(dailyBorrowerAcctountID);
@@ -925,7 +914,7 @@ export function updateUsageMetrics(
     usageHourlySnapshot.hourlyRepayCount += 1;
     usageDailySnapshot.dailyRepayCount += 1;
 
-    let repayAccount = Account.load(users[1]);
+    const repayAccount = Account.load(users[1]);
     repayAccount!.repayCount += INT_ONE;
     repayAccount!.save();
   }
@@ -949,7 +938,7 @@ export function updateUsageMetrics(
       liquidatorAccount.liquidateCount += INT_ONE;
       liquidatorAccount.save();
 
-      let dailyLiquidatorAcctountID = "daily-liquidate".concat(liquidator).concat("-").concat(days);
+      const dailyLiquidatorAcctountID = "daily-liquidate".concat(liquidator).concat("-").concat(days);
       let dailyLiquidatorAccount = ActiveAccount.load(dailyLiquidatorAcctountID);
       if (dailyLiquidatorAccount == null) {
         dailyLiquidatorAccount = new ActiveAccount(dailyLiquidatorAcctountID);
@@ -973,7 +962,7 @@ export function updateUsageMetrics(
       liquidateeAccount.liquidationCount += INT_ONE;
       liquidateeAccount.save();
 
-      let dailyLiquidateeAcctountID = "daily-liquidatee-".concat(liquidatee).concat("-").concat(days);
+      const dailyLiquidateeAcctountID = "daily-liquidatee-".concat(liquidatee).concat("-").concat(days);
       let dailyLiquidateeAccount = ActiveAccount.load(dailyLiquidateeAcctountID);
       if (dailyLiquidateeAccount == null) {
         dailyLiquidateeAccount = new ActiveAccount(dailyLiquidateeAcctountID);
@@ -1008,12 +997,11 @@ export function createTransactions(
   //liquidateAmt: BigInt = BIGINT_ZERO,
   //liquidateUSD: BigDecimal = BIGDECIMAL_ZERO,
 ): void {
-  let protocol = getOrCreateLendingProtocol();
-  let transactionID = createEventID(event);
+  const transactionID = createEventID(event);
 
   if (deltaCollateral.gt(BIGINT_ZERO)) {
     // deposit
-    let deposit = new Deposit(transactionID);
+    const deposit = new Deposit(transactionID);
     deposit.hash = event.transaction.hash.toHexString();
     deposit.logIndex = event.logIndex.toI32();
     deposit.nonce = event.transaction.nonce;
@@ -1028,7 +1016,7 @@ export function createTransactions(
     deposit.save();
   } else if (deltaCollateral.lt(BIGINT_ZERO)) {
     //withdraw
-    let withdraw = new Withdraw(transactionID);
+    const withdraw = new Withdraw(transactionID);
     withdraw.hash = event.transaction.hash.toHexString();
     withdraw.logIndex = event.logIndex.toI32();
     withdraw.nonce = event.transaction.nonce;
@@ -1045,7 +1033,7 @@ export function createTransactions(
 
   if (deltaDebt.gt(BIGINT_ZERO)) {
     // borrow
-    let borrow = new Borrow(transactionID);
+    const borrow = new Borrow(transactionID);
     borrow.hash = event.transaction.hash.toHexString();
     borrow.logIndex = event.logIndex.toI32();
     borrow.nonce = event.transaction.nonce;
@@ -1060,7 +1048,7 @@ export function createTransactions(
     borrow.save();
   } else if (deltaDebt.lt(BIGINT_ZERO)) {
     // repay
-    let repay = new Repay(transactionID);
+    const repay = new Repay(transactionID);
     repay.hash = event.transaction.hash.toHexString();
     repay.logIndex = event.logIndex.toI32();
     repay.nonce = event.transaction.nonce;
@@ -1080,8 +1068,8 @@ export function createTransactions(
 
 export function updatePriceForMarket(marketID: string, event: ethereum.Event): void {
   // Price is updated for market marketID
-  let market = getOrCreateMarket(marketID);
-  let token = Token.load(market.inputToken);
+  const market = getOrCreateMarket(marketID);
+  const token = Token.load(market.inputToken);
   market.inputTokenPriceUSD = token!.lastPriceUSD!;
   market.totalDepositBalanceUSD = bigIntToBDUseDecimals(market.inputTokenBalance, token!.decimals).times(
     market.inputTokenPriceUSD,
@@ -1090,12 +1078,12 @@ export function updatePriceForMarket(marketID: string, event: ethereum.Event): v
   market.save();
 
   // iterate to update protocol level totalDepositBalanceUSD
-  let protocol = getOrCreateLendingProtocol();
-  let marketIDList = protocol.marketIDList;
+  const protocol = getOrCreateLendingProtocol();
+  const marketIDList = protocol.marketIDList;
   let protocolTotalDepositBalanceUSD = BIGDECIMAL_ZERO;
   for (let i: i32 = 0; i < marketIDList.length; i++) {
-    let marketAddress = marketIDList[i];
-    let market = getOrCreateMarket(marketAddress);
+    const marketAddress = marketIDList[i];
+    const market = getOrCreateMarket(marketAddress);
     if (market == null) {
       log.warning("[updatePriceForMarket]market {} doesn't exist", [marketAddress]);
       continue;
@@ -1117,7 +1105,7 @@ export function updateRevenue(
   newSupplySideRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   protocolSideRevenueType: u32 = 0,
 ): void {
-  let market = getOrCreateMarket(marketID);
+  const market = getOrCreateMarket(marketID);
   if (market) {
     updateMarket(
       event,

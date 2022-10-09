@@ -30,12 +30,14 @@ import {
   DAI_ADDRESS,
   SECONDS_PER_HOUR,
   Network,
+  PROTOCOL_SCHEMA_VERSION,
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   BIGINT_ZERO,
   BIGINT_ONE_RAY,
   INT_ZERO,
-  INT_ONE,
   PositionSide,
 } from "./constants";
 
@@ -63,11 +65,11 @@ export function getOrCreateToken(
 
 export function getOrCreateUsageMetricsHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsHourlySnapshot.load(id.toString());
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
   if (usageMetrics == null) {
     usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
     usageMetrics.protocol = protocol.id;
@@ -88,11 +90,11 @@ export function getOrCreateUsageMetricsHourlySnapshot(event: ethereum.Event): Us
 
 export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
 
   if (usageMetrics == null) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
@@ -122,10 +124,10 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
 }
 
 export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot {
-  let hours: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
-  let snapshotID = marketAddress.concat("-").concat(hours.toString());
+  const hours: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const snapshotID = marketAddress.concat("-").concat(hours.toString());
   let marketMetrics = MarketHourlySnapshot.load(snapshotID);
-  let market = getOrCreateMarket(marketAddress);
+  const market = getOrCreateMarket(marketAddress);
 
   if (marketMetrics == null) {
     marketMetrics = new MarketHourlySnapshot(snapshotID);
@@ -168,10 +170,10 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAdd
 }
 
 export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot {
-  let days: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let snapshotID = marketAddress.concat("-").concat(days.toString());
+  const days: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const snapshotID = marketAddress.concat("-").concat(days.toString());
   let marketMetrics = MarketDailySnapshot.load(snapshotID);
-  let market = getOrCreateMarket(marketAddress);
+  const market = getOrCreateMarket(marketAddress);
 
   if (marketMetrics == null) {
     marketMetrics = new MarketDailySnapshot(snapshotID);
@@ -215,10 +217,10 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddr
 
 export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
   if (financialMetrics == null) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = getOrCreateLendingProtocol().id;
@@ -316,7 +318,7 @@ export function getOrCreateMarket(
     if (marketID == ZERO_ADDRESS) {
       log.warning("[getOrCreateMarket]Creating a new Market with marketID={}", [marketID]);
     }
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
     market = new Market(marketID);
     market.name = name;
     market.inputToken = inputToken;
@@ -357,7 +359,7 @@ export function getOrCreateMarket(
 
     market.save();
 
-    let marketIDList = protocol.marketIDList;
+    const marketIDList = protocol.marketIDList;
     marketIDList.push(marketID);
     protocol.marketIDList = marketIDList;
     protocol.save();
@@ -377,7 +379,7 @@ export function getOrCreateIlk(ilk: Bytes, marketID: string = ZERO_ADDRESS): _Il
 }
 
 export function getOrCreateInterestRate(marketAddress: string, side: string, type: string): InterestRate {
-  let interestRateID = side + "-" + type + "-" + marketAddress;
+  const interestRateID = side + "-" + type + "-" + marketAddress;
   let interestRate = InterestRate.load(interestRateID);
   if (interestRate) {
     return interestRate;
@@ -393,7 +395,7 @@ export function getOrCreateInterestRate(marketAddress: string, side: string, typ
 }
 
 export function getLiquidateEvent(LiquidateID: string): Liquidate | null {
-  let liquidate = Liquidate.load(LiquidateID);
+  const liquidate = Liquidate.load(LiquidateID);
   if (liquidate == null) {
     log.error("[getLiquidateEvent]Liquidate entity with id {} does not exist", [LiquidateID]);
     return null;
@@ -470,12 +472,12 @@ export function getOrCreatePosition(
   side: string,
   newPosition: bool = false,
 ): Position {
-  let _is_urn = getOwnerAddressFromUrn(address) == null ? false : true;
-  let _is_proxy = getOwnerAddressFromProxy(address) == null ? false : true;
-  let accountAddress = getOwnerAddress(address);
-  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
-  let positionPrefix = `${address}-${marketID}-${side}`;
-  let counterEnity = getOrCreatePositionCounter(address, ilk, side);
+  const _is_urn = getOwnerAddressFromUrn(address) == null ? false : true;
+  const _is_proxy = getOwnerAddressFromProxy(address) == null ? false : true;
+  const accountAddress = getOwnerAddress(address);
+  const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  const positionPrefix = `${address}-${marketID}-${side}`;
+  const counterEnity = getOrCreatePositionCounter(address, ilk, side);
   let counter = counterEnity.nextCount;
   let positionID = `${positionPrefix}-${counter}`;
   let position = Position.load(positionID);
@@ -529,16 +531,16 @@ export function getOrCreatePosition(
 export function getOpenPosition(urn: string, ilk: Bytes, side: string): Position | null {
   //let accountAddress = getOwnerAddress(urn);
   //assert(accountAddress != urn, `urn ${urn} is not an Urn handler address`);
-  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
-  let nextCounter = getNextPositionCounter(urn, ilk, side);
+  const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  const nextCounter = getNextPositionCounter(urn, ilk, side);
   log.info("[getOpenPosition]Finding open position for urn {}/ilk {}/side {}", [urn, ilk.toString(), side]);
   for (let counter = nextCounter; counter >= 0; counter--) {
-    let positionID = `${urn}-${marketID}-${side}-${counter}`;
-    let position = Position.load(positionID);
+    const positionID = `${urn}-${marketID}-${side}-${counter}`;
+    const position = Position.load(positionID);
     if (position) {
-      let hashClosed = position.hashClosed != null ? position.hashClosed! : "null";
-      let balance = position.balance.toString();
-      let account = position.account;
+      const hashClosed = position.hashClosed != null ? position.hashClosed! : "null";
+      const balance = position.balance.toString();
+      const account = position.account;
       // position is open
       if (position.hashClosed == null) {
         log.info(
@@ -588,8 +590,8 @@ export function getOpenPositionForAccount(accountAddress: string, ilk: Bytes, si
 */
 
 export function getOrCreatePositionCounter(urn: string, ilk: Bytes, side: string): _PositionCounter {
-  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
-  let ID = `${urn}-${marketID}-${side}`;
+  const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  const ID = `${urn}-${marketID}-${side}`;
   let counterEnity = _PositionCounter.load(ID);
   if (!counterEnity) {
     counterEnity = new _PositionCounter(ID);
@@ -603,12 +605,12 @@ export function getOrCreatePositionCounter(urn: string, ilk: Bytes, side: string
 ///////// Helpers /////////
 ///////////////////////////
 export function getNextPositionCounter(urn: string, ilk: Bytes, side: string): i32 {
-  let counterEnity = getOrCreatePositionCounter(urn, ilk, side);
+  const counterEnity = getOrCreatePositionCounter(urn, ilk, side);
   return counterEnity.nextCount;
 }
 
 export function getMarketAddressFromIlk(ilk: Bytes): Address | null {
-  let _ilk = getOrCreateIlk(ilk);
+  const _ilk = getOrCreateIlk(ilk);
   if (_ilk) return Address.fromString(_ilk.marketAddress);
 
   log.warning("[getMarketAddressFromIlk]MarketAddress for ilk {} not found", [ilk.toString()]);
@@ -624,7 +626,7 @@ export function getMarketFromIlk(ilk: Bytes): Market | null {
 }
 
 export function getOwnerAddressFromUrn(urn: string): string | null {
-  let _urn = _Urn.load(urn);
+  const _urn = _Urn.load(urn);
   if (_urn) {
     return _urn.ownerAddress;
   }
@@ -632,7 +634,7 @@ export function getOwnerAddressFromUrn(urn: string): string | null {
 }
 
 export function getOwnerAddressFromProxy(proxy: string): string | null {
-  let _proxy = _Proxy.load(proxy);
+  const _proxy = _Proxy.load(proxy);
   if (_proxy) {
     return _proxy.ownerAddress;
   }
@@ -650,17 +652,17 @@ export function getOwnerAddress(address: string): string {
 
 // this is needed to prevent snapshot rates from being pointers to the current rate
 export function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
-  let snapshotRates: string[] = [];
+  const snapshotRates: string[] = [];
   for (let i = 0; i < rates.length; i++) {
-    let rate = InterestRate.load(rates[i]);
+    const rate = InterestRate.load(rates[i]);
     if (!rate) {
       log.warning("[getSnapshotRates] rate {} not found, should not happen", [rates[i]]);
       continue;
     }
 
     // create new snapshot rate
-    let snapshotRateId = rates[i].concat("-").concat(timeSuffix);
-    let snapshotRate = new InterestRate(snapshotRateId);
+    const snapshotRateId = rates[i].concat("-").concat(timeSuffix);
+    const snapshotRate = new InterestRate(snapshotRateId);
     snapshotRate.side = rate.side;
     snapshotRate.type = rate.type;
     snapshotRate.rate = rate.rate;

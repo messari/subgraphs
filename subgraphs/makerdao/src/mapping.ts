@@ -1,52 +1,27 @@
-import { BigInt, Address, Bytes, ByteArray, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../generated/Vat/ERC20";
 import { GemJoin } from "../generated/Vat/GemJoin";
 import { Vat, LogNote as VatNoteEvent } from "../generated/Vat/Vat";
-import { CatV1, Bite as BiteEvent, LogNote as CatNoteEvent } from "../generated/CatV1/CatV1";
-import { Dog, Bark as BarkEvent, File2 as DogFileChopEvent } from "../generated/Dog/Dog";
+import { Bite as BiteEvent, LogNote as CatNoteEvent } from "../generated/CatV1/CatV1";
+import { Bark as BarkEvent, File2 as DogFileChopEvent } from "../generated/Dog/Dog";
 import { Flip, Clip } from "../generated/templates";
 import { LogNote as FlipNoteEvent, Flip as FlipContract } from "../generated/templates/Flip/Flip";
 import { Take as TakeEvent, Yank as ClipYankEvent, Clip as ClipContract } from "../generated/templates/Clip/Clip";
-import { Spot, Poke as PokeEvent, LogNote as SpotNoteEvent } from "../generated/Spot/Spot";
+import { Poke as PokeEvent, LogNote as SpotNoteEvent } from "../generated/Spot/Spot";
 import { Jug, LogNote as JugNoteEvent } from "../generated/Jug/Jug";
 import { Pot, LogNote as PotNoteEvent } from "../generated/Pot/Pot";
 import { CdpManager, NewCdp, LogNote as CdpNoteEvent } from "../generated/CdpManager/CdpManager";
 import { Created } from "../generated/DSProxyFactory/DSProxyFactory";
 import { BuyGem, SellGem, PSM } from "../generated/PSM-USDC-A/PSM";
-import {
-  getOrCreatePosition,
-  getOrCreateAccount,
-  getOpenPosition,
-  getOwnerAddress,
-  getOrCreatePositionCounter,
-} from "./common/getters";
-import {
-  Token,
-  _Ilk,
-  Liquidate,
-  _FlipBidsStore,
-  _ClipTakeStore,
-  _Chi,
-  _Urn,
-  _Proxy,
-  _PositionCounter,
-  Position,
-  Market,
-  _Cdpi,
-} from "../generated/schema";
+import { getOwnerAddress, getOrCreatePositionCounter } from "./common/getters";
+import { _FlipBidsStore, _ClipTakeStore, _Urn, _Proxy, Position, Market, _Cdpi } from "../generated/schema";
 import {
   bigIntToBDUseDecimals,
   bigDecimalExponential,
-  powerBigDecimal,
   BigDecimalTruncateToBigInt,
   bigIntChangeDecimals,
 } from "./utils/numbers";
-import {
-  getOrCreateChi,
-  getOrCreateInterestRate,
-  getOwnerAddressFromUrn,
-  getOwnerAddressFromProxy,
-} from "./common/getters";
+import { getOrCreateChi, getOrCreateInterestRate } from "./common/getters";
 import {
   bytes32ToAddress,
   extractCallData,
@@ -70,17 +45,10 @@ import {
   SECONDS_PER_YEAR_BIGDECIMAL,
   VOW_ADDRESS,
   DAI_ADDRESS,
-  BIGINT_ONE_RAY,
-  BIGDECIMAL_ONE_RAY,
-  BIGDECIMAL_ONE_WAD,
-  VAT_ADDRESS,
-  INT_ZERO,
-  INT_ONE,
   ProtocolSideRevenueType,
   BIGDECIMAL_NEG_ONE,
   BIGINT_NEG_ONE,
   PositionSide,
-  VAT_ADDRESS,
   INT_ZERO,
   INT_ONE,
 } from "./common/constants";
@@ -93,7 +61,6 @@ import {
   updateRevenue,
   updateMarket,
   snapshotMarket,
-  snapshotPosition,
   transferPosition,
   liquidatePosition,
   updatePosition,
@@ -111,13 +78,13 @@ import { createEventID } from "./utils/strings";
 
 // Authorizating Vat (CDP engine)
 export function handleVatRely(event: VatNoteEvent): void {
-  let someAddress = bytes32ToAddress(event.params.arg1);
+  const someAddress = bytes32ToAddress(event.params.arg1);
   log.debug("[handleVatRely]Input address = {}", [someAddress.toHexString()]);
 
   // We don't know whether the address passed in is a valid 'market' (gemjoin) address
-  let marketContract = GemJoin.bind(someAddress);
-  let ilkCall = marketContract.try_ilk(); // collateral type
-  let gemCall = marketContract.try_gem(); // get market collateral token, referred to as 'gem'
+  const marketContract = GemJoin.bind(someAddress);
+  const ilkCall = marketContract.try_ilk(); // collateral type
+  const gemCall = marketContract.try_gem(); // get market collateral token, referred to as 'gem'
   if (ilkCall.reverted || gemCall.reverted) {
     log.debug("[handleVatRely]Address {} is not a market", [someAddress.toHexString()]);
     log.debug("[handleVatRely]ilkCall.revert = {} gemCall.reverted = {} at tx hash {}", [
@@ -128,27 +95,27 @@ export function handleVatRely(event: VatNoteEvent): void {
 
     return;
   }
-  let ilk = ilkCall.value;
-  let marketID = someAddress.toHexString();
+  const ilk = ilkCall.value;
+  const marketID = someAddress.toHexString();
 
-  let tokenId = gemCall.value.toHexString();
+  const tokenId = gemCall.value.toHexString();
   let tokenName = "unknown";
   let tokenSymbol = "unknown";
   let decimals = 18;
-  let erc20Contract = ERC20.bind(gemCall.value);
-  let tokenNameCall = erc20Contract.try_name();
+  const erc20Contract = ERC20.bind(gemCall.value);
+  const tokenNameCall = erc20Contract.try_name();
   if (tokenNameCall.reverted) {
     log.warning("[handleVatRely]Failed to get name for token {}", [tokenId]);
   } else {
     tokenName = tokenNameCall.value;
   }
-  let tokenSymbolCall = erc20Contract.try_symbol();
+  const tokenSymbolCall = erc20Contract.try_symbol();
   if (tokenSymbolCall.reverted) {
     log.warning("[handleVatRely]Failed to get symbol for token {}", [tokenId]);
   } else {
     tokenSymbol = tokenSymbolCall.value;
   }
-  let tokenDecimalsCall = erc20Contract.try_decimals();
+  const tokenDecimalsCall = erc20Contract.try_decimals();
   if (tokenDecimalsCall.reverted) {
     log.warning("[handleVatRely]Failed to get decimals for token {}", [tokenId]);
   } else {
@@ -177,17 +144,18 @@ export function handleVatRely(event: VatNoteEvent): void {
   // for protocol.mintedTokens
   getOrCreateToken(DAI_ADDRESS, "Dai Stablecoin", "DAI", 18);
 
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
   protocol.totalPoolCount += 1;
   protocol.marketIDList.push(marketID);
   protocol.save();
 }
 
 export function handleVatCage(event: VatNoteEvent): void {
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
+  log.info("[handleVatCage]All markets paused with tx {}", [event.transaction.hash.toHexString()]);
   // Vat.cage pauses all markets
   for (let i: i32 = 0; i < protocol.marketIDList.length; i++) {
-    let market = getOrCreateMarket(protocol.marketIDList[i]);
+    const market = getOrCreateMarket(protocol.marketIDList[i]);
     market.isActive = false;
     market.canBorrowFrom = false;
     market.save();
@@ -196,19 +164,19 @@ export function handleVatCage(event: VatNoteEvent): void {
 
 // Deposit/Withdraw
 export function handleVatSlip(event: VatNoteEvent): void {
-  let ilk = event.params.arg1;
+  const ilk = event.params.arg1;
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
   }
-  let usr = bytes32ToAddressHexString(event.params.arg2);
-  let owner = getOwnerAddress(usr);
-  let wad = bytesToSignedBigInt(event.params.arg3);
+  const usr = bytes32ToAddressHexString(event.params.arg2);
+  const owner = getOwnerAddress(usr);
+  const wad = bytesToSignedBigInt(event.params.arg3);
 
-  let market: Market = getMarketFromIlk(ilk)!;
-  let token = getOrCreateToken(market.inputToken);
-  let deltaCollateral = bigIntChangeDecimals(wad, WAD, token.decimals);
-  let deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
+  const market: Market = getMarketFromIlk(ilk)!;
+  const token = getOrCreateToken(market.inputToken);
+  const deltaCollateral = bigIntChangeDecimals(wad, WAD, token.decimals);
+  const deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
   log.info("[handleVatSlip]ilk/market: {}/{}, token={}, usr={}, owner={}, deltaCollateral={}, deltaCollateralUSD={}", [
     ilk.toString(),
     market.id,
@@ -231,7 +199,7 @@ export function handleVatSlip(event: VatNoteEvent): void {
 
 // Borrow/Repay
 export function handleVatFrob(event: VatNoteEvent): void {
-  let ilk = event.params.arg1;
+  const ilk = event.params.arg1;
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
@@ -242,9 +210,9 @@ export function handleVatFrob(event: VatNoteEvent): void {
   // 4th arg w: start = 4 (signature) + 3 * 32, end = start + 32
   let w = bytes32ToAddressHexString(extractCallData(event.params.data, 100, 132));
   // 5th arg dink: start = 4 (signature) + 4 * 32, end = start + 32
-  let dink = bytesToSignedBigInt(extractCallData(event.params.data, 132, 164)); // change to collateral
+  const dink = bytesToSignedBigInt(extractCallData(event.params.data, 132, 164)); // change to collateral
   // 6th arg dart: start = 4 (signature) + 4 * 32, end = start + 32
-  let dart = bytesToSignedBigInt(extractCallData(event.params.data, 164, 196)); // change to debt
+  const dart = bytesToSignedBigInt(extractCallData(event.params.data, 164, 196)); // change to debt
 
   log.info("[handleVatFrob]block#={}, ilk={}, u={}, v={}, w={}, dink={}, dart={}", [
     event.block.number.toString(),
@@ -266,15 +234,15 @@ export function handleVatFrob(event: VatNoteEvent): void {
   }
   */
 
-  let market = getMarketFromIlk(ilk);
+  const market = getMarketFromIlk(ilk);
   if (market == null) {
     log.warning("[handleVatFrob]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
     return;
   }
 
-  let token = getOrCreateToken(market.inputToken);
-  let deltaCollateral = bigIntChangeDecimals(dink, WAD, token.decimals);
-  let deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
+  const token = getOrCreateToken(market.inputToken);
+  const deltaCollateral = bigIntChangeDecimals(dink, WAD, token.decimals);
+  const deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
 
   /*
   if (deltaCollateral.gt(BIGINT_ZERO)) {
@@ -291,7 +259,7 @@ export function handleVatFrob(event: VatNoteEvent): void {
   }
   */
 
-  let urn = u;
+  const urn = u;
 
   // translate possible UrnHandler/DSProxy address to its owner address
   u = getOwnerAddress(u);
@@ -300,7 +268,7 @@ export function handleVatFrob(event: VatNoteEvent): void {
 
   market.inputTokenPriceUSD = token.lastPriceUSD!;
   // change in borrowing amount
-  let deltaDebtUSD = bigIntToBDUseDecimals(dart, WAD); //in DAI
+  const deltaDebtUSD = bigIntToBDUseDecimals(dart, WAD); //in DAI
   // alternatively, use dai mapping on chain and include stablity fees
   //let vatContract = Vat.bind(Address.fromString(VAT_ADDRESS));
   //let dtab = dart.times(vatContract.ilks(ilk).getRate());
@@ -324,20 +292,20 @@ export function handleVatFrob(event: VatNoteEvent): void {
 // function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
 // needed for position transfer
 export function handleVatFork(event: VatNoteEvent): void {
-  let ilk = event.params.arg1;
-  let src = bytes32ToAddress(event.params.arg2).toHexString();
-  let dst = bytes32ToAddress(event.params.arg3).toHexString();
+  const ilk = event.params.arg1;
+  const src = bytes32ToAddress(event.params.arg2).toHexString();
+  const dst = bytes32ToAddress(event.params.arg3).toHexString();
 
   // fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
   // 4th arg dink: start = 4 (signature) + 3 * 32, end = start + 32
-  let dink = bytesToSignedBigInt(extractCallData(event.params.data, 100, 132)); // change to collateral
+  const dink = bytesToSignedBigInt(extractCallData(event.params.data, 100, 132)); // change to collateral
   // 5th arg dart: start = 4 (signature) + 4 * 32, end = start + 32
-  let dart = bytesToSignedBigInt(extractCallData(event.params.data, 132, 164)); // change to debt
+  const dart = bytesToSignedBigInt(extractCallData(event.params.data, 132, 164)); // change to debt
 
-  let market: Market = getMarketFromIlk(ilk)!;
-  let token = getOrCreateToken(market.inputToken);
-  let collateralTransferAmount = bigIntChangeDecimals(dink, WAD, token.decimals);
-  let debtTransferAmount = dart;
+  const market: Market = getMarketFromIlk(ilk)!;
+  const token = getOrCreateToken(market.inputToken);
+  const collateralTransferAmount = bigIntChangeDecimals(dink, WAD, token.decimals);
+  const debtTransferAmount = dart;
 
   log.info("[handleVatFork]ilk={}, src={}, dst={}, dink={}, dart={}", [
     ilk.toString(),
@@ -371,23 +339,23 @@ export function handleVatFork(event: VatNoteEvent): void {
 
 // update total revenue (stability fee)
 export function handleVatFold(event: VatNoteEvent): void {
-  let ilk = event.params.arg1;
+  const ilk = event.params.arg1;
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
   }
-  let vow = bytes32ToAddress(event.params.arg2).toHexString();
-  let rate = bytesToSignedBigInt(event.params.arg3);
-  let vatContract = Vat.bind(event.address);
-  let ilkOnChain = vatContract.ilks(ilk);
-  let revenue = ilkOnChain.getArt().times(rate);
-  let newTotalRevenueUSD = bigIntToBDUseDecimals(revenue, RAD);
+  const vow = bytes32ToAddress(event.params.arg2).toHexString();
+  const rate = bytesToSignedBigInt(event.params.arg3);
+  const vatContract = Vat.bind(event.address);
+  const ilkOnChain = vatContract.ilks(ilk);
+  const revenue = ilkOnChain.getArt().times(rate);
+  const newTotalRevenueUSD = bigIntToBDUseDecimals(revenue, RAD);
   if (vow.toLowerCase() != VOW_ADDRESS.toLowerCase()) {
     log.warning("[handleVatFold]Stability fee unexpectedly credited to a non-Vow address {}", [vow]);
   }
-  let marketAddress = getMarketAddressFromIlk(ilk);
+  const marketAddress = getMarketAddressFromIlk(ilk);
   if (marketAddress) {
-    let marketID = marketAddress.toHexString();
+    const marketID = marketAddress.toHexString();
     log.info("[handleVatFold]total revenue accrued from Market {}/{} = ${}", [
       ilk.toString(),
       marketID,
@@ -403,40 +371,21 @@ export function handleVatFold(event: VatNoteEvent): void {
   }
 }
 
-export function handleVatDebtSettlement(event: VatNoteEvent): void {
-  // settle or issue unbacked debt (e.g. credit dai saving interest)
-  // update totalBorrowBalanceUSD when event emitted
-  // protocol wide, not market specific, so protocol level number totalBorrowBalanceUSD may be
-  // higher than sum across markets
-  // Turn this on if it is neccessary to include those debts
-  /*
-  let protocol = getOrCreateLendingProtocol();
-  let vatContract = Vat.bind(event.address);
-  let debtCall = vatContract.try_debt();
-  if (debtCall.reverted) {
-    log.warning("[handleVatDebtSettlement]Failed to call Vat.debt; not updating protocol.totalBorrowBalanceUSD", []);
-  } else {
-    protocol.totalBorrowBalanceUSD = bigIntToBDUseDecimals(debtCall.value, RAD);
-  }
-  protocol.save();
-  */
-}
-
 // old liquidation
 export function handleCatBite(event: BiteEvent): void {
-  let ilk = event.params.ilk; //market
-  let urn = event.params.urn.toHexString(); //liquidatee
+  const ilk = event.params.ilk; //market
+  const urn = event.params.urn.toHexString(); //liquidatee
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
   }
-  let flip = event.params.flip; //auction contract
-  let id = event.params.id; //auction id
-  let lot = event.params.ink;
-  let art = event.params.art;
-  let tab = event.params.tab;
+  const flip = event.params.flip; //auction contract
+  const id = event.params.id; //auction id
+  const lot = event.params.ink;
+  const art = event.params.art;
+  const tab = event.params.tab;
 
-  let market = getMarketFromIlk(ilk)!;
+  const market = getMarketFromIlk(ilk)!;
   //let LiquidateID = event.transaction.hash
   //  .toHexString()
   //  .concat("-")
@@ -446,16 +395,16 @@ export function handleCatBite(event: BiteEvent): void {
   // remove borrowed amount from borrowed balance
   // collateral/tvl update is taken care of when it exits vat
   // via the slip() function/event
-  let deltaDebtUSD = bigIntToBDUseDecimals(art, WAD).times(BIGDECIMAL_NEG_ONE);
+  const deltaDebtUSD = bigIntToBDUseDecimals(art, WAD).times(BIGDECIMAL_NEG_ONE);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
 
-  let liquidationRevenueUSD = bigIntToBDUseDecimals(tab, RAD).times(
+  const liquidationRevenueUSD = bigIntToBDUseDecimals(tab, RAD).times(
     market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
   );
 
   updateRevenue(event, market.id, liquidationRevenueUSD, BIGDECIMAL_ZERO, ProtocolSideRevenueType.LIQUIDATION);
 
-  let storeID = flip.toHexString().concat("-").concat(id.toString());
+  const storeID = flip.toHexString().concat("-").concat(id.toString());
 
   log.info("[handleCatBite]storeID={}, ilk={}, urn={}: lot={}, art={}, tab={}, liquidation revenue=${}", [
     storeID,
@@ -467,9 +416,9 @@ export function handleCatBite(event: BiteEvent): void {
     liquidationRevenueUSD.toString(),
   ]);
 
-  let liquidatee = getOwnerAddress(urn);
+  const liquidatee = getOwnerAddress(urn);
   //let debt = bigIntChangeDecimals(tab, RAD, WAD);
-  let flipBidsStore = new _FlipBidsStore(storeID);
+  const flipBidsStore = new _FlipBidsStore(storeID);
   flipBidsStore.round = INT_ZERO;
   flipBidsStore.urn = urn;
   flipBidsStore.liquidatee = liquidatee;
@@ -490,22 +439,22 @@ export function handleCatBite(event: BiteEvent): void {
 // Update liquidate penalty for the Cat contract
 // Works for both Cat V1 and V2
 export function handleCatFile(event: CatNoteEvent): void {
-  let ilk = event.params.arg1;
+  const ilk = event.params.arg1;
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
   }
-  let what = event.params.arg2.toString();
+  const what = event.params.arg2.toString();
   // 3rd arg: start = 4 + 2 * 32, end = start + 32
-  let chop = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
+  const chop = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
 
   if (what == "chop") {
-    let market = getMarketFromIlk(ilk);
+    const market = getMarketFromIlk(ilk);
     if (market == null) {
       log.warning("[handleFileDog]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
       return;
     }
-    let liquidationPenalty = bigIntToBDUseDecimals(chop, RAY).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
+    const liquidationPenalty = bigIntToBDUseDecimals(chop, RAY).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
     if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
       market.liquidationPenalty = liquidationPenalty;
       market.save();
@@ -521,28 +470,28 @@ export function handleCatFile(event: CatNoteEvent): void {
 
 // New liquidation
 export function handleDogBark(event: BarkEvent): void {
-  let ilk = event.params.ilk; //market
+  const ilk = event.params.ilk; //market
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
   }
-  let urn = event.params.urn; //liquidatee
-  let clip = event.params.clip; //auction contract
-  let id = event.params.id; //auction id
-  let lot = event.params.ink;
-  let art = event.params.art;
-  let due = event.params.due; //including interest, but not penalty
+  const urn = event.params.urn; //liquidatee
+  const clip = event.params.clip; //auction contract
+  const id = event.params.id; //auction id
+  const lot = event.params.ink;
+  const art = event.params.art;
+  const due = event.params.due; //including interest, but not penalty
 
-  let market = getMarketFromIlk(ilk)!;
-  let storeID = clip.toHexString().concat("-").concat(id.toString());
+  const market = getMarketFromIlk(ilk)!;
+  const storeID = clip.toHexString().concat("-").concat(id.toString());
 
   // remove borrowed amount from borrowed balance
   // collateral/tvl update is taken care of when it exits vat
   // via the slip() function/event
-  let deltaDebtUSD = bigIntToBDUseDecimals(art, WAD).times(BIGDECIMAL_NEG_ONE);
+  const deltaDebtUSD = bigIntToBDUseDecimals(art, WAD).times(BIGDECIMAL_NEG_ONE);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
 
-  let liquidationRevenueUSD = bigIntToBDUseDecimals(due, RAD).times(
+  const liquidationRevenueUSD = bigIntToBDUseDecimals(due, RAD).times(
     market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
   );
 
@@ -559,7 +508,7 @@ export function handleDogBark(event: BarkEvent): void {
   ]);
 
   //let debt = bigIntChangeDecimals(due, RAD, WAD);
-  let clipTakeStore = new _ClipTakeStore(storeID);
+  const clipTakeStore = new _ClipTakeStore(storeID);
   clipTakeStore.slice = INT_ZERO;
   clipTakeStore.ilk = ilk.toHexString();
   clipTakeStore.market = market.id;
@@ -575,20 +524,20 @@ export function handleDogBark(event: BarkEvent): void {
 
 // Update liquidate penalty for the Dog contract
 export function handleDogFile(event: DogFileChopEvent): void {
-  let ilk = event.params.ilk;
+  const ilk = event.params.ilk;
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
   }
-  let what = event.params.what.toString();
+  const what = event.params.what.toString();
   if (what == "chop") {
-    let market = getMarketFromIlk(ilk);
+    const market = getMarketFromIlk(ilk);
     if (market == null) {
       log.warning("[handleFileDog]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
       return;
     }
-    let chop = event.params.data;
-    let liquidationPenalty = bigIntToBDUseDecimals(chop, RAY).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
+    const chop = event.params.data;
+    const liquidationPenalty = bigIntToBDUseDecimals(chop, RAY).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
     if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
       market.liquidationPenalty = liquidationPenalty;
       market.save();
@@ -604,24 +553,24 @@ export function handleDogFile(event: DogFileChopEvent): void {
 
 // Auction of collateral used by Cat (liquidation)
 export function handleFlipBids(event: FlipNoteEvent): void {
-  let id = bytesToUnsignedBigInt(event.params.arg1); //
+  const id = bytesToUnsignedBigInt(event.params.arg1); //
   //let lot = bytesToUnsignedBigInt(event.params.arg2); // uint256 lot
   // 3rd arg start = 4 + 2 * 32, end = start+32
   //let bid = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
-  let flipContract = FlipContract.bind(event.address);
-  let ilk = flipContract.ilk();
-  let bids = flipContract.bids(id);
-  let bid = bids.getBid();
-  let lot = bids.getLot();
-  let tab = bids.getTab();
-  let bidder = bids.getGuy().toHexString();
+  const flipContract = FlipContract.bind(event.address);
+  const ilk = flipContract.ilk();
+  const bids = flipContract.bids(id);
+  const bid = bids.getBid();
+  const lot = bids.getLot();
+  const tab = bids.getTab();
+  const bidder = bids.getGuy().toHexString();
 
-  let storeID = event.address //flip contract
+  const storeID = event.address //flip contract
     .toHexString()
     .concat("-")
     .concat(id.toString());
 
-  let flipBidsStore = _FlipBidsStore.load(storeID)!;
+  const flipBidsStore = _FlipBidsStore.load(storeID)!;
   // let liquidateID = liquidateStore.liquidate;
   log.info(
     "[handleFlipBids] storeID={}, flip.id={}, ilk={}, round #{} store status: lot={}, tab={}, bid={}, bidder={}",
@@ -668,9 +617,9 @@ export function handleFlipBids(event: FlipNoteEvent): void {
   }
   flipBidsStore.round += INT_ONE;
 
-  let market = getMarketFromIlk(ilk)!;
-  let token = getOrCreateToken(market.inputToken);
-  let value = bigIntToBDUseDecimals(flipBidsStore.lot, token.decimals).times(market.inputTokenPriceUSD);
+  const market = getMarketFromIlk(ilk)!;
+  const token = getOrCreateToken(market.inputToken);
+  const value = bigIntToBDUseDecimals(flipBidsStore.lot, token.decimals).times(market.inputTokenPriceUSD);
   log.info(
     "[handleFlipBids]storeID={}, flip.id={}, ilk={} round #{} winning bid: lot={}, price={}, value (lot*price)={}, tab={}, bid={}, bidder={}",
     [
@@ -691,17 +640,17 @@ export function handleFlipBids(event: FlipNoteEvent): void {
 
 // handle flip.deal and flip.yank
 export function handleFlipEndAuction(event: FlipNoteEvent): void {
-  let id = bytesToUnsignedBigInt(event.params.arg1); //
+  const id = bytesToUnsignedBigInt(event.params.arg1); //
   //log.debug("[handleFlipEndAuction] id={}, event address={}", [id.toString(), event.address.toHexString()]);
   //let flipContract = FlipContract.bind(event.address);
   //let ilk = flipContract.ilk();
   //log.debug("[handleFlipEndAuction] id={}, ilk={}/{}", [id.toString(), ilk.toString(), ilk.toHexString()]);
-  let storeID = event.address //flip contract
+  const storeID = event.address //flip contract
     .toHexString()
     .concat("-")
     .concat(id.toString());
 
-  let flipBidsStore = _FlipBidsStore.load(storeID)!;
+  const flipBidsStore = _FlipBidsStore.load(storeID)!;
   log.info("[handleFlipEndAuction]storeID={}, flip.id={} store status: lot={}, tab={}, bid={}, bidder={}", [
     flipBidsStore.id, //storeID
     id.toString(),
@@ -711,17 +660,17 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
     flipBidsStore.bidder,
   ]);
 
-  let marketID = flipBidsStore.market;
-  let market = getOrCreateMarket(marketID);
-  let token = getOrCreateToken(market.inputToken);
+  const marketID = flipBidsStore.market;
+  const market = getOrCreateMarket(marketID);
+  const token = getOrCreateToken(market.inputToken);
 
-  let amount = bigIntChangeDecimals(flipBidsStore.lot, WAD, token.decimals);
-  let amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
+  const amount = bigIntChangeDecimals(flipBidsStore.lot, WAD, token.decimals);
+  const amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
   // bid is in DAI, assumed to priced at $1
-  let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(flipBidsStore.bid, RAD));
+  const profitUSD = amountUSD.minus(bigIntToBDUseDecimals(flipBidsStore.bid, RAD));
 
-  let liquidateID = createEventID(event);
-  let liquidate = getOrCreateLiquidate(
+  const liquidateID = createEventID(event);
+  const liquidate = getOrCreateLiquidate(
     liquidateID,
     event,
     market,
@@ -769,17 +718,17 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
   flipBidsStore.save();
 
   // update positions
-  let ilk = Bytes.fromHexString(flipBidsStore.ilk);
+  const ilk = Bytes.fromHexString(flipBidsStore.ilk);
   // TODO: debugging
-  let urn = flipBidsStore.urn;
-  let sides = [PositionSide.LENDER, PositionSide.BORROWER];
+  const urn = flipBidsStore.urn;
+  const sides = [PositionSide.LENDER, PositionSide.BORROWER];
   log.info("[]txhash={}", [event.transaction.hash.toHexString()]);
   for (let si = 0; si <= 1; si++) {
-    let side = sides[si];
-    let counterEnity = getOrCreatePositionCounter(urn, ilk, side);
+    const side = sides[si];
+    const counterEnity = getOrCreatePositionCounter(urn, ilk, side);
     for (let counter = counterEnity.nextCount; counter >= 0; counter--) {
-      let positionID = `${urn}-${marketID}-${side}-${counter}`;
-      let position = Position.load(positionID);
+      const positionID = `${urn}-${marketID}-${side}-${counter}`;
+      const position = Position.load(positionID);
       if (position) {
         log.info("[handleFlipEndAuction]{}: balance={}, account={}, hashClosed={}", [
           positionID,
@@ -803,33 +752,33 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
 
 // Auction used by Dog (new liquidation contract)
 export function handleClipTakeBid(event: TakeEvent): void {
-  let id = event.params.id;
+  const id = event.params.id;
   let liquidatee = event.params.usr.toHexString();
-  let max = event.params.max;
-  let lot = event.params.lot;
-  let price = event.params.price;
-  let tab = event.params.tab;
-  let owe = event.params.owe;
+  const max = event.params.max;
+  const lot = event.params.lot;
+  const price = event.params.price;
+  const tab = event.params.tab;
+  const owe = event.params.owe;
 
-  let clipContract = ClipContract.bind(event.address);
-  let ilk = clipContract.ilk();
+  const clipContract = ClipContract.bind(event.address);
+  const ilk = clipContract.ilk();
 
-  let liquidator = event.transaction.from.toHexString();
+  const liquidator = event.transaction.from.toHexString();
   // translate possible proxy/urn handler address to owner address
   liquidatee = getOwnerAddress(liquidatee);
 
-  let storeID = event.address //clip contract
+  const storeID = event.address //clip contract
     .toHexString()
     .concat("-")
     .concat(id.toString());
   //let liquidateStore = getOrCreateLiquidateStore(storeID);
-  let clipTakeStore = _ClipTakeStore.load(storeID)!;
+  const clipTakeStore = _ClipTakeStore.load(storeID)!;
   clipTakeStore.slice += INT_ONE;
-  let marketID = clipTakeStore.market;
-  let market = getOrCreateMarket(marketID);
-  let token = getOrCreateToken(market.inputToken);
+  const marketID = clipTakeStore.market;
+  const market = getOrCreateMarket(marketID);
+  const token = getOrCreateToken(market.inputToken);
 
-  let value = bigIntToBDUseDecimals(lot, token.decimals).times(token.lastPriceUSD!);
+  const value = bigIntToBDUseDecimals(lot, token.decimals).times(token.lastPriceUSD!);
   log.info(
     "[handleClipTakeBid]block#={}, storeID={}, clip.id={}, slice #{} event params: max={}, lot={}, price={}, value(lot*price)={}, art={}, tab={}, owe={}, liquidatee={}, liquidator={}",
     [
@@ -849,15 +798,15 @@ export function handleClipTakeBid(event: TakeEvent): void {
     ],
   );
 
-  let deltaLot = clipTakeStore.lot.minus(lot);
-  let deltaTab = clipTakeStore.tab.minus(tab);
-  let amount = bigIntChangeDecimals(deltaLot, WAD, token.decimals);
-  let amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
+  const deltaLot = clipTakeStore.lot.minus(lot);
+  const deltaTab = clipTakeStore.tab.minus(tab);
+  const amount = bigIntChangeDecimals(deltaLot, WAD, token.decimals);
+  const amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
   //let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(deltaTab, WAD));
-  let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(owe, RAD));
+  const profitUSD = amountUSD.minus(bigIntToBDUseDecimals(owe, RAD));
 
-  let liquidateID = createEventID(event);
-  let liquidate = getOrCreateLiquidate(
+  const liquidateID = createEventID(event);
+  const liquidate = getOrCreateLiquidate(
     liquidateID,
     event,
     market,
@@ -929,7 +878,7 @@ export function handleClipTakeBid(event: TakeEvent): void {
     token.lastPriceUSD!.toString(),
   ]);
 
-  let debtRepaid = BigDecimalTruncateToBigInt(
+  const debtRepaid = BigDecimalTruncateToBigInt(
     clipTakeStore.art.times(deltaTab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
   ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
@@ -952,24 +901,24 @@ export function handleClipTakeBid(event: TakeEvent): void {
 
 // cancel auction
 export function handleClipYankBid(event: ClipYankEvent): void {
-  let id = event.params.id;
-  let clipContract = ClipContract.bind(event.address);
-  let ilk = clipContract.ilk();
-  let sales = clipContract.sales(id);
-  let lot = sales.getLot();
-  let tab = sales.getTab();
+  const id = event.params.id;
+  const clipContract = ClipContract.bind(event.address);
+  const ilk = clipContract.ilk();
+  const sales = clipContract.sales(id);
+  const lot = sales.getLot();
+  const tab = sales.getTab();
   let liquidatee = sales.getUsr().toHexString();
 
-  let liquidator = event.transaction.from.toHexString();
+  const liquidator = event.transaction.from.toHexString();
   // translate possible proxy/urn handler address to owner address
   liquidatee = getOwnerAddress(liquidatee);
 
-  let storeID = event.address //clip contract
+  const storeID = event.address //clip contract
     .toHexString()
     .concat("-")
     .concat(id.toString());
   //let liquidateStore = getOrCreateLiquidateStore(storeID);
-  let clipTakeStore = _ClipTakeStore.load(storeID)!;
+  const clipTakeStore = _ClipTakeStore.load(storeID)!;
 
   //let storeID = event.address //clip contract
   //  .toHexString()
@@ -979,15 +928,15 @@ export function handleClipYankBid(event: ClipYankEvent): void {
   //let clipTakeStore = _ClipTakeStore.load(storeID)!
 
   //let liquidateID = liquidateStore.liquidate;
-  let market = getMarketFromIlk(ilk)!;
-  let token = getOrCreateToken(market.inputToken);
+  const market = getMarketFromIlk(ilk)!;
+  const token = getOrCreateToken(market.inputToken);
 
-  let liquidateID = createEventID(event);
+  const liquidateID = createEventID(event);
   // convert collateral to its native amount from WAD
-  let amount = bigIntChangeDecimals(lot, WAD, token.decimals);
-  let amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
-  let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(tab, RAD));
-  let liquidate = getOrCreateLiquidate(
+  const amount = bigIntChangeDecimals(lot, WAD, token.decimals);
+  const amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
+  const profitUSD = amountUSD.minus(bigIntToBDUseDecimals(tab, RAD));
+  const liquidate = getOrCreateLiquidate(
     liquidateID,
     event,
     market,
@@ -1017,7 +966,7 @@ export function handleClipYankBid(event: ClipYankEvent): void {
   //liquidate._finalized = true;
   liquidate.save();
 
-  let debtRepaid = BigDecimalTruncateToBigInt(
+  const debtRepaid = BigDecimalTruncateToBigInt(
     clipTakeStore.art.times(tab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
   ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
@@ -1030,27 +979,27 @@ export function handleClipYankBid(event: ClipYankEvent): void {
 
 // Setting mat & par in the Spot contract
 export function handleSpotFileMat(event: SpotNoteEvent): void {
-  let what = event.params.arg2.toString();
+  const what = event.params.arg2.toString();
   if (what == "mat") {
-    let ilk = event.params.arg1;
+    const ilk = event.params.arg1;
     if (ilk.toString() == "TELEPORT-FW-A") {
       log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [
         ilk.toString(),
       ]);
       return;
     }
-    let market = getMarketFromIlk(ilk);
+    const market = getMarketFromIlk(ilk);
     if (market == null) {
       log.warning("[handleSpotFileMat]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
       return;
     }
 
     // 3rd arg: start = 4 + 2 * 32, end = start + 32
-    let mat = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
+    const mat = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
     log.info("[handleSpotFileMat]ilk={}, market={}, mat={}", [ilk.toString(), market.id, mat.toString()]);
 
-    let protocol = getOrCreateLendingProtocol();
-    let par = protocol._par!;
+    const protocol = getOrCreateLendingProtocol();
+    const par = protocol._par!;
     market._mat = mat;
     if (mat != BIGINT_ZERO) {
       // mat for the SAI market is 0 and can not be used as deonimnator
@@ -1064,17 +1013,17 @@ export function handleSpotFileMat(event: SpotNoteEvent): void {
 }
 
 export function handleSpotFilePar(event: SpotNoteEvent): void {
-  let what = event.params.arg1.toString();
+  const what = event.params.arg1.toString();
   if (what == "par") {
-    let par = bytesToUnsignedBigInt(event.params.arg2);
+    const par = bytesToUnsignedBigInt(event.params.arg2);
     log.info("[handleSpotFilePar]par={}", [par.toString()]);
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
     protocol._par = par;
     protocol.save();
 
     for (let i: i32 = 0; i <= protocol.marketIDList.length; i++) {
-      let market = getOrCreateMarket(protocol.marketIDList[i]);
-      let mat = market._mat;
+      const market = getOrCreateMarket(protocol.marketIDList[i]);
+      const mat = market._mat;
       if (mat != BIGINT_ZERO) {
         // mat is 0 for the SAI market
         market.maximumLTV = BIGDECIMAL_ONE_HUNDRED.div(bigIntToBDUseDecimals(mat, RAY)).div(
@@ -1089,23 +1038,23 @@ export function handleSpotFilePar(event: SpotNoteEvent): void {
 
 // update token price for ilk market
 export function handleSpotPoke(event: PokeEvent): void {
-  let ilk = event.params.ilk;
+  const ilk = event.params.ilk;
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
   }
-  let market = getMarketFromIlk(ilk);
+  const market = getMarketFromIlk(ilk);
   if (market == null) {
     log.warning("[handleSpotPoke]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
     return;
   }
 
-  let tokenPriceUSD = bigIntToBDUseDecimals(bytesToUnsignedBigInt(event.params.val), WAD);
+  const tokenPriceUSD = bigIntToBDUseDecimals(bytesToUnsignedBigInt(event.params.val), WAD);
   market.inputTokenPriceUSD = tokenPriceUSD;
   market.save();
 
-  let tokenID = market.inputToken;
-  let token = getOrCreateToken(tokenID);
+  const tokenID = market.inputToken;
+  const token = getOrCreateToken(tokenID);
   token.lastPriceUSD = tokenPriceUSD;
   token.lastPriceBlockNumber = event.block.number;
   token.save();
@@ -1120,23 +1069,23 @@ export function handleSpotPoke(event: PokeEvent): void {
 }
 
 export function handleJugFileDuty(event: JugNoteEvent): void {
-  let ilk = event.params.arg1;
+  const ilk = event.params.arg1;
   if (ilk.toString() == "TELEPORT-FW-A") {
     log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
     return;
   }
-  let what = event.params.arg2.toString();
+  const what = event.params.arg2.toString();
   if (what == "duty") {
-    let market = getMarketFromIlk(ilk);
+    const market = getMarketFromIlk(ilk);
     if (market == null) {
       log.error("[handleJugFileDuty]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
       return;
     }
 
-    let jugContract = Jug.bind(event.address);
-    let base = jugContract.base();
-    let duty = jugContract.ilks(ilk).value0;
-    let rate = bigIntToBDUseDecimals(base.plus(duty), RAY).minus(BIGDECIMAL_ONE);
+    const jugContract = Jug.bind(event.address);
+    const base = jugContract.base();
+    const duty = jugContract.ilks(ilk).value0;
+    const rate = bigIntToBDUseDecimals(base.plus(duty), RAY).minus(BIGDECIMAL_ONE);
     let rateAnnualized = BIGDECIMAL_ZERO;
     if (rate.gt(BIGDECIMAL_ZERO)) {
       rateAnnualized = bigDecimalExponential(rate, SECONDS_PER_YEAR_BIGDECIMAL).times(BIGDECIMAL_ONE_HUNDRED);
@@ -1148,8 +1097,8 @@ export function handleJugFileDuty(event: JugNoteEvent): void {
       rateAnnualized.toString(),
     ]);
 
-    let interestRateID = InterestRateSide.BORROW + "-" + InterestRateType.STABLE + "-" + market.id;
-    let interestRate = getOrCreateInterestRate(market.id, InterestRateSide.BORROW, InterestRateType.STABLE);
+    const interestRateID = InterestRateSide.BORROW + "-" + InterestRateType.STABLE + "-" + market.id;
+    const interestRate = getOrCreateInterestRate(market.id, InterestRateSide.BORROW, InterestRateType.STABLE);
     interestRate.rate = rateAnnualized;
     interestRate.save();
 
@@ -1163,10 +1112,10 @@ export function handlePotFileVow(event: PotNoteEvent): void {
   // Add a "Market" entity for Pot
   // It is not an actual market, but the schema expects supply side
   // revenue accrued to a market.
-  let what = event.params.arg1.toString();
+  const what = event.params.arg1.toString();
   if (what == "vow") {
     //let bytes32ToAddressHexString(event.params.arg2)
-    let market = getOrCreateMarket(
+    const market = getOrCreateMarket(
       event.address.toHexString(),
       "MCD POT",
       DAI_ADDRESS,
@@ -1179,36 +1128,36 @@ export function handlePotFileVow(event: PotNoteEvent): void {
     ]);
   }
 
-  let potContract = Pot.bind(event.address);
-  let chiValue = potContract.chi();
-  let rhoValue = potContract.rho();
-  let _chiID = event.address.toHexString();
+  const potContract = Pot.bind(event.address);
+  const chiValue = potContract.chi();
+  const rhoValue = potContract.rho();
+  const _chiID = event.address.toHexString();
   log.info("[handlePotFileVow] Save values for dsr calculation: chi={}, rho={}", [
     chiValue.toString(),
     rhoValue.toString(),
   ]);
-  let _chi = getOrCreateChi(_chiID);
+  const _chi = getOrCreateChi(_chiID);
   _chi.chi = chiValue;
   _chi.rho = rhoValue;
   _chi.save();
 }
 
 export function handlePotFileDsr(event: PotNoteEvent): void {
-  let what = event.params.arg1.toString();
+  const what = event.params.arg1.toString();
   if (what == "dsr") {
-    let dsr = bytesToUnsignedBigInt(event.params.arg2);
+    const dsr = bytesToUnsignedBigInt(event.params.arg2);
 
     // Since DAI saving is not linked to a real market, it is
     // assigned to the artificial "MCD POT" market
-    let market = getOrCreateMarket(event.address.toHexString());
-    let rate = bigIntToBDUseDecimals(dsr, RAY).minus(BIGDECIMAL_ONE);
+    const market = getOrCreateMarket(event.address.toHexString());
+    const rate = bigIntToBDUseDecimals(dsr, RAY).minus(BIGDECIMAL_ONE);
     let rateAnnualized = BIGDECIMAL_ZERO;
     if (rate.gt(BIGDECIMAL_ZERO)) {
       rateAnnualized = bigDecimalExponential(rate, SECONDS_PER_YEAR_BIGDECIMAL).times(BIGDECIMAL_ONE_HUNDRED);
     }
 
-    let interestRateID = `${InterestRateSide.LENDER}-${InterestRateType.STABLE}-${event.address.toHexString()}`;
-    let interestRate = getOrCreateInterestRate(market.id, InterestRateSide.LENDER, InterestRateType.STABLE);
+    const interestRateID = `${InterestRateSide.LENDER}-${InterestRateType.STABLE}-${event.address.toHexString()}`;
+    const interestRate = getOrCreateInterestRate(market.id, InterestRateSide.LENDER, InterestRateType.STABLE);
     interestRate.rate = rateAnnualized;
     interestRate.save();
 
@@ -1226,17 +1175,17 @@ export function handlePotFileDsr(event: PotNoteEvent): void {
 }
 
 export function handlePotDrip(event: PotNoteEvent): void {
-  let potContract = Pot.bind(event.address);
-  let now = event.block.timestamp;
-  let chiValueOnChain = potContract.chi();
-  let Pie = potContract.Pie();
+  const potContract = Pot.bind(event.address);
+  const now = event.block.timestamp;
+  const chiValueOnChain = potContract.chi();
+  const Pie = potContract.Pie();
 
-  let evtAddress = event.address.toHexString();
-  let _chi = getOrCreateChi(evtAddress);
-  let chiValuePrev = _chi.chi;
+  const evtAddress = event.address.toHexString();
+  const _chi = getOrCreateChi(evtAddress);
+  const chiValuePrev = _chi.chi;
 
-  let chiValueDiff = chiValueOnChain.minus(chiValuePrev);
-  let newSupplySideRevenue = bigIntToBDUseDecimals(Pie, WAD).times(bigIntToBDUseDecimals(chiValueDiff, RAY));
+  const chiValueDiff = chiValueOnChain.minus(chiValuePrev);
+  const newSupplySideRevenue = bigIntToBDUseDecimals(Pie, WAD).times(bigIntToBDUseDecimals(chiValueDiff, RAY));
 
   // dsr all goes to supply side, so totalrevenue = supplyside revenue in this call
   updateRevenue(event, evtAddress, newSupplySideRevenue, newSupplySideRevenue);
@@ -1257,18 +1206,18 @@ export function handlePotDrip(event: PotNoteEvent): void {
 
 // Store cdpi, UrnHandler, and owner address
 export function handleNewCdp(event: NewCdp): void {
-  let cdpi = event.params.cdp;
-  let owner = event.params.own.toHexString().toLowerCase();
-  let contract = CdpManager.bind(event.address);
-  let urnhandlerAddress = contract.urns(cdpi).toHexString();
-  let ilk = contract.ilks(cdpi);
-  let _cdpi = new _Cdpi(cdpi.toString());
+  const cdpi = event.params.cdp;
+  const owner = event.params.own.toHexString().toLowerCase();
+  const contract = CdpManager.bind(event.address);
+  const urnhandlerAddress = contract.urns(cdpi).toHexString();
+  const ilk = contract.ilks(cdpi);
+  const _cdpi = new _Cdpi(cdpi.toString());
   _cdpi.urn = urnhandlerAddress.toString();
   _cdpi.ilk = ilk.toHexString();
   _cdpi.ownerAddress = owner;
   _cdpi.save();
 
-  let _urn = new _Urn(urnhandlerAddress);
+  const _urn = new _Urn(urnhandlerAddress);
   _urn.ownerAddress = owner;
   _urn.cdpi = cdpi;
   _urn.save();
@@ -1284,23 +1233,23 @@ export function handleNewCdp(event: NewCdp): void {
 // Give a CDP position to a new owner
 export function handleCdpGive(event: CdpNoteEvent): void {
   // update mapping between urnhandler and owner
-  let cdpi = bytesToUnsignedBigInt(event.params.arg1);
-  let dstAccountAddress = bytes32ToAddressHexString(event.params.arg2);
+  const cdpi = bytesToUnsignedBigInt(event.params.arg1);
+  const dstAccountAddress = bytes32ToAddressHexString(event.params.arg2);
   //let contract = CdpManager.bind(event.address);
   //let srcUrnAddress = contract
   //  .urns(cdpi)
   //  .toHexString()
   //  .toLowerCase();
   //let ilk = contract.ilks(cdpi);
-  let _cdpi = _Cdpi.load(cdpi.toString())!;
-  let srcUrn = _cdpi.urn;
-  let ilk = _cdpi.ilk;
+  const _cdpi = _Cdpi.load(cdpi.toString())!;
+  const srcUrn = _cdpi.urn;
+  const ilk = _cdpi.ilk;
   //let srcAccountAddressC = _cdpi.ownerAddress;
   _cdpi.ownerAddress = dstAccountAddress;
   _cdpi.save();
 
-  let _urn = _Urn.load(srcUrn)!;
-  let srcAccountAddress = _urn.ownerAddress;
+  const _urn = _Urn.load(srcUrn)!;
+  const srcAccountAddress = _urn.ownerAddress;
   // since it is a transfer of cdp position, the urn record should already exist
   _urn.ownerAddress = dstAccountAddress;
   _urn.save();
@@ -1313,7 +1262,7 @@ export function handleCdpGive(event: CdpNoteEvent): void {
     srcAccountAddress,
   ]);
 
-  let ilkBytes = Bytes.fromHexString(ilk);
+  const ilkBytes = Bytes.fromHexString(ilk);
   transferPosition(event, ilkBytes, srcUrn, srcUrn, PositionSide.LENDER, srcAccountAddress, dstAccountAddress);
   transferPosition(event, ilkBytes, srcUrn, srcUrn, PositionSide.BORROWER, srcAccountAddress, dstAccountAddress);
 }
@@ -1321,18 +1270,18 @@ export function handleCdpGive(event: CdpNoteEvent): void {
 // Move a position from cdpSrc urn to the cdpDst urn
 // If the two positions are not the same ower, close existing position and open new position
 export function handleCdpShift(event: CdpNoteEvent): void {
-  let srcCdp = bytesToUnsignedBigInt(event.params.arg1);
-  let dstCdp = bytesToUnsignedBigInt(event.params.arg2);
+  const srcCdp = bytesToUnsignedBigInt(event.params.arg1);
+  const dstCdp = bytesToUnsignedBigInt(event.params.arg2);
 
-  let srcCdpi = _Cdpi.load(srcCdp.toString());
-  let srcIlk = Bytes.fromHexString(srcCdpi!.ilk);
-  let srcUrnAddress = srcCdpi!.urn;
+  const srcCdpi = _Cdpi.load(srcCdp.toString());
+  const srcIlk = Bytes.fromHexString(srcCdpi!.ilk);
+  const srcUrnAddress = srcCdpi!.urn;
   //let srcAccountAddress = srcCdpi!.ownerAddress;
 
-  let dstCdpi = _Cdpi.load(dstCdp.toString());
+  const dstCdpi = _Cdpi.load(dstCdp.toString());
   // this should be the same as srcIlk
-  let dstIlk = Bytes.fromHexString(dstCdpi!.ilk);
-  let dstUrnAddress = dstCdpi!.urn;
+  const dstIlk = Bytes.fromHexString(dstCdpi!.ilk);
+  const dstUrnAddress = dstCdpi!.urn;
   //let dstAccountAddress = dstCdpi!.ownerAddress;
 
   log.info("[handleCdpShift]cdpi {}/urn {}/ilk {} -> cdpi {}/urn {}/ilk {}", [
@@ -1350,12 +1299,12 @@ export function handleCdpShift(event: CdpNoteEvent): void {
 
 // Import a position from src urn to the urn owned by cdp
 export function handleCdpEnter(event: CdpNoteEvent): void {
-  let src = bytes32ToAddress(event.params.arg1).toHexString();
-  let cdpi = bytesToUnsignedBigInt(event.params.arg2);
+  const src = bytes32ToAddress(event.params.arg1).toHexString();
+  const cdpi = bytesToUnsignedBigInt(event.params.arg2);
 
-  let _cdpi = _Cdpi.load(cdpi.toString());
-  let dst = _cdpi!.urn;
-  let ilk = Bytes.fromHexString(_cdpi!.ilk);
+  const _cdpi = _Cdpi.load(cdpi.toString());
+  const dst = _cdpi!.urn;
+  const ilk = Bytes.fromHexString(_cdpi!.ilk);
 
   transferPosition(event, ilk, src, dst, PositionSide.LENDER);
   transferPosition(event, ilk, src, dst, PositionSide.BORROWER);
@@ -1363,12 +1312,12 @@ export function handleCdpEnter(event: CdpNoteEvent): void {
 
 // Quit the Cdp system, migrating the cdp (ink, art) to a dst urn
 export function handleCdpQuit(event: CdpNoteEvent): void {
-  let cdpi = bytesToUnsignedBigInt(event.params.arg1);
-  let dst = bytes32ToAddress(event.params.arg2).toHexString();
+  const cdpi = bytesToUnsignedBigInt(event.params.arg1);
+  const dst = bytes32ToAddress(event.params.arg2).toHexString();
 
-  let _cdpi = _Cdpi.load(cdpi.toString());
-  let src = _cdpi!.urn;
-  let ilk = Bytes.fromHexString(_cdpi!.ilk);
+  const _cdpi = _Cdpi.load(cdpi.toString());
+  const src = _cdpi!.urn;
+  const ilk = Bytes.fromHexString(_cdpi!.ilk);
 
   transferPosition(event, ilk, src, dst, PositionSide.LENDER);
   transferPosition(event, ilk, src, dst, PositionSide.BORROWER);
@@ -1376,20 +1325,20 @@ export function handleCdpQuit(event: CdpNoteEvent): void {
 
 // Transfer cdp collateral from the cdp address to a dst address
 export function handleCdpFlux(event: CdpNoteEvent): void {
-  let cdpi = bytesToUnsignedBigInt(event.params.arg1);
-  let dst = bytes32ToAddress(event.params.arg2).toHexString();
+  const cdpi = bytesToUnsignedBigInt(event.params.arg1);
+  const dst = bytes32ToAddress(event.params.arg2).toHexString();
   // 3rd arg: start = 4 + 2 * 32, end = start + 32
-  let wad = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
+  const wad = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
   if (wad == BIGINT_ZERO) {
     log.info("[handleCdpFlux]wad = 0, skip transferring position", []);
     return;
   }
-  let _cdpi = _Cdpi.load(cdpi.toString());
-  let src = _cdpi!.urn;
-  let ilk = Bytes.fromHexString(_cdpi!.ilk);
-  let market: Market = getMarketFromIlk(ilk)!;
-  let token = getOrCreateToken(market.inputToken);
-  let transferAmount = bigIntChangeDecimals(wad, WAD, token.decimals);
+  const _cdpi = _Cdpi.load(cdpi.toString());
+  const src = _cdpi!.urn;
+  const ilk = Bytes.fromHexString(_cdpi!.ilk);
+  const market: Market = getMarketFromIlk(ilk)!;
+  const token = getOrCreateToken(market.inputToken);
+  const transferAmount = bigIntChangeDecimals(wad, WAD, token.decimals);
 
   log.info("[handleCdpFlux]transfer {} collateral from src {} to dst {} for ilk {}", [
     wad.toString(),
@@ -1402,19 +1351,19 @@ export function handleCdpFlux(event: CdpNoteEvent): void {
 
 // Transfer DAI from the cdp address to a dst address
 export function handleCdpMove(event: CdpNoteEvent): void {
-  let cdpi = bytesToUnsignedBigInt(event.params.arg1);
-  let dst = bytes32ToAddress(event.params.arg2).toHexString();
+  const cdpi = bytesToUnsignedBigInt(event.params.arg1);
+  const dst = bytes32ToAddress(event.params.arg2).toHexString();
   // 3rd arg: start = 4 + 2 * 32, end = start + 32
-  let rad = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
+  const rad = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
   if (rad == BIGINT_ZERO) {
     log.info("[handleCdpMove]wad = 0, skip transferring position", []);
     return;
   }
-  let transferAmount = bigIntChangeDecimals(rad, RAD, WAD);
+  const transferAmount = bigIntChangeDecimals(rad, RAD, WAD);
 
-  let _cdpi = _Cdpi.load(cdpi.toString());
-  let src = _cdpi!.urn;
-  let ilk = Bytes.fromHexString(_cdpi!.ilk);
+  const _cdpi = _Cdpi.load(cdpi.toString());
+  const src = _cdpi!.urn;
+  const ilk = Bytes.fromHexString(_cdpi!.ilk);
 
   log.info("[handleCdpMove]transfer {} DAI from src {} to dst {} for ilk {}", [
     transferAmount.toString(),
@@ -1428,30 +1377,30 @@ export function handleCdpMove(event: CdpNoteEvent): void {
 
 // Store proxy address and owner address
 export function handleCreateProxy(event: Created): void {
-  let proxy = event.params.proxy;
-  let owner = event.params.owner;
+  const proxy = event.params.proxy;
+  const owner = event.params.owner;
 
-  let _proxy = new _Proxy(proxy.toHexString());
+  const _proxy = new _Proxy(proxy.toHexString());
   _proxy.ownerAddress = owner.toHexString().toLowerCase();
   _proxy.save();
 }
 
 export function handleBuyGem(event: BuyGem): void {
-  let fee = event.params.fee;
-  let feeUSD = bigIntToBDUseDecimals(fee, WAD);
+  const fee = event.params.fee;
+  const feeUSD = bigIntToBDUseDecimals(fee, WAD);
   _handleSwapFee(event, feeUSD);
 }
 
 export function handleSellGem(event: SellGem): void {
-  let fee = event.params.fee;
-  let feeUSD = bigIntToBDUseDecimals(fee, WAD);
+  const fee = event.params.fee;
+  const feeUSD = bigIntToBDUseDecimals(fee, WAD);
   _handleSwapFee(event, feeUSD);
 }
 
 function _handleSwapFee(event: ethereum.Event, feeUSD: BigDecimal): void {
-  let contract = PSM.bind(event.address);
-  let ilk = contract.ilk();
-  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
+  const contract = PSM.bind(event.address);
+  const ilk = contract.ilk();
+  const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
   log.info("[handleSwapFee]Swap fee revenue {} collected from market {}", [feeUSD.toString(), marketID]);
   updateRevenue(event, marketID, feeUSD, BIGDECIMAL_ZERO, ProtocolSideRevenueType.PSM);
 }
