@@ -2,9 +2,7 @@
 import { BigDecimal, ethereum, BigInt, Address } from "@graphprotocol/graph-ts";
 import {
   Account,
-  Token,
   ActiveAccount,
-  _HelperStore,
   DexAmmProtocol,
   LiquidityPool,
 } from "../../generated/schema";
@@ -29,7 +27,7 @@ import {
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
-import { percToDec } from "./utils/utils";
+import { percToDec } from "./utils";
 
 // Update FinancialsDailySnapshots entity with blocknumber, timestamp, total value locked, and volume
 export function updateFinancials(event: ethereum.Event): void {
@@ -145,32 +143,6 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetricsHourly.save();
 }
 
-// TODO: not needed, delete
-// These whiteslists are used to track what pools the tokens are a part of. Used in price calculations.
-// export function updateTokenWhitelists(
-//   token0: Token,
-//   token1: Token,
-//   poolAddress: string
-// ): void {
-//   let tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
-//   let tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
-
-//   // update white listed pools
-//   if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist0.id)) {
-//     let newPools = tokenWhitelist1.whitelistPools;
-//     newPools.push(poolAddress);
-//     tokenWhitelist1.whitelistPools = newPools;
-//     tokenWhitelist1.save();
-//   }
-
-//   if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist1.id)) {
-//     let newPools = tokenWhitelist0.whitelistPools;
-//     newPools.push(poolAddress);
-//     tokenWhitelist0.whitelistPools = newPools;
-//     tokenWhitelist0.save();
-//   }
-// }
-
 // Update the volume and accrued fees for all relavant entities
 export function updateVolumeAndFees(
   event: ethereum.Event,
@@ -185,6 +157,7 @@ export function updateVolumeAndFees(
   let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
   let supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
   let protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
+  let tradingFee = getLiquidityPoolFee(pool.fees[INT_TWO]);
 
   // Update volume occurred during swaps
 
@@ -260,13 +233,18 @@ export function updateVolumeAndFees(
     trackedAmountUSD[INT_TWO]
   );
 
+  // Fee Amounts
+  let tradingFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
+    percToDec(tradingFee.feePercentage!)
+  );
   let supplyFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
     percToDec(supplyFee.feePercentage!)
   );
   let protocolFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
     percToDec(protocolFee.feePercentage!)
   );
-  let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
+  // TODO: keep/remove
+  // let protocolFeeAmountUSD = tradingFeeAmountUSD.minus(supplyFeeAmountUSD);
 
   // Update fees collected during swaps
   // Protocol revenues

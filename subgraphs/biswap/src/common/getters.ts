@@ -1,22 +1,14 @@
 // import { log } from '@graphprotocol/graph-ts'
-import {
-  Address,
-  BigDecimal,
-  Bytes,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 import { BiswapERC20 } from "../../generated/BiswapFactory/BiswapERC20";
 import {
   DexAmmProtocol,
   LiquidityPool,
-  _HelperStore,
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
   _LiquidityPoolAmount,
   LiquidityPoolFee,
   Token,
-  _TokenWhitelist,
   LiquidityPoolHourlySnapshot,
   LiquidityPoolDailySnapshot,
   UsageMetricsHourlySnapshot,
@@ -26,8 +18,6 @@ import {
   INT_ZERO,
   BIGDECIMAL_ZERO,
   ProtocolType,
-  HelperStoreType,
-  DEFAULT_DECIMALS,
   SECONDS_PER_DAY,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
@@ -57,84 +47,85 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
 
-    // TODO: not needed at this time
-    protocol._poolIDs = [];
-    // protocol._defaultTradingFeeRate = BIGDECIMAL_ZERO;
-    // protocol._networkFeeRate = BIGDECIMAL_ZERO;
-    // protocol._withdrawalFeeRate = BIGDECIMAL_ZERO;
-
     protocol.save();
   }
   return protocol;
+}
+
+export function getOrCreateLPToken(
+  pairTokenAddress: string,
+  token0: Token,
+  token1: Token
+): Token {
+  let token = Token.load(pairTokenAddress);
+  let tokenAddress = Address.fromString(pairTokenAddress);
+
+  if (token === null) {
+    token = new Token(pairTokenAddress);
+    token.symbol = token0.name + " / " + token1.name;
+    token.name = token0.name + " / " + token1.name + " LP";
+    token.decimals = _fetchTokenDecimals(tokenAddress) as i32;
+    token.save();
+  }
+  return token;
 }
 
 export function getOrCreateToken(
   event: ethereum.Event,
   address: string
 ): Token {
+  let token = Token.load(address);
   let tokenAddress = Address.fromString(address);
-  let token = Token.load(tokenAddress.toHexString());
-  if (token != null) {
-    log.warning("[handlePairCreated] pool token {} already exists", [address]);
-    return token;
+
+  if (!token) {
+    token = new Token(address);
+
+    token.name = _fetchTokenName(tokenAddress);
+    token.symbol = _fetchTokenSymbol(tokenAddress);
+    token.decimals = _fetchTokenDecimals(tokenAddress) as i32;
   }
 
-  token = new Token(address);
-  let token0Contract = BiswapERC20.bind(Address.fromString(address));
-
-  let tokenNameResult = token0Contract.try_name();
-  if (tokenNameResult.reverted) {
-    log.warning("[handlePairCreated] try_name on {} reverted", [token.id]);
-    token.name = "unknown name";
-  } else {
-    token.name = tokenNameResult.value;
-  }
-
-  let tokenSymbolResult = token0Contract.try_symbol();
-  if (tokenSymbolResult.reverted) {
-    log.warning("[handlePairCreated] try_symbol on {} reverted", [token.id]);
-    token.symbol = "unknown symbol";
-  } else {
-    token.symbol = tokenSymbolResult.value;
-  }
-
-  let tokenDecimalsResult = token0Contract.try_decimals();
-  if (tokenDecimalsResult.reverted) {
-    log.warning("[handlePairCreated] try_decimals on {} reverted", [token.id]);
-    token.decimals = 0;
-  } else {
-    token.decimals = tokenDecimalsResult.value;
-  }
-
-  const tokenPrice = getUsdPricePerToken(Address.fromString(address));
-  if (tokenPrice.reverted) {
+  const price = getUsdPricePerToken(tokenAddress);
+  if (price.reverted) {
     token.lastPriceUSD = BIGDECIMAL_ZERO;
   } else {
-    token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+    token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
   }
   token.lastPriceBlockNumber = event.block.number;
-
   token.save();
-  return token as Token;
+
+  return token;
 }
 
-// TODO: remove, not used
-// export function getOrCreateLPToken(
-//   tokenAddress: string,
-//   token0: Token,
-//   token1: Token
-// ): Token {
-//   let token = Token.load(tokenAddress);
-//   // fetch info if null
-//   if (token === null) {
-//     token = new Token(tokenAddress);
-//     token.symbol = token0.name + "/" + token1.name;
-//     token.name = token0.name + "/" + token1.name + " LP";
-//     token.decimals = DEFAULT_DECIMALS;
-//     token.save();
-//   }
-//   return token;
-// }
+function _fetchTokenName(tokenAddress: Address): string {
+  const tokenContract = BiswapERC20.bind(tokenAddress);
+  const call = tokenContract.try_name();
+  if (call.reverted) {
+    return tokenAddress.toHexString();
+  } else {
+    return call.value;
+  }
+}
+
+function _fetchTokenSymbol(tokenAddress: Address): string {
+  const tokenContract = BiswapERC20.bind(tokenAddress);
+  const call = tokenContract.try_symbol();
+  if (call.reverted) {
+    return " ";
+  } else {
+    return call.value;
+  }
+}
+
+function _fetchTokenDecimals(tokenAddress: Address): number {
+  const tokenContract = BiswapERC20.bind(tokenAddress);
+  const call = tokenContract.try_decimals();
+  if (call.reverted) {
+    return 0;
+  } else {
+    return call.value;
+  }
+}
 
 export function getLiquidityPool(poolAddress: string): LiquidityPool {
   return LiquidityPool.load(poolAddress)!;
@@ -150,25 +141,6 @@ export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
   return LiquidityPoolFee.load(id)!;
 }
 
-export function getFeeTier(event: ethereum.Event): _HelperStore {
-  return _HelperStore.load(event.address.toHexString().concat("-FeeTier"))!;
-}
-
-export function getOrCreateTokenWhitelist(
-  tokenAddress: string
-): _TokenWhitelist {
-  let tokenTracker = _TokenWhitelist.load(tokenAddress);
-  // fetch info if null
-  if (!tokenTracker) {
-    tokenTracker = new _TokenWhitelist(tokenAddress);
-
-    tokenTracker.whitelistPools = [];
-    tokenTracker.save();
-  }
-
-  return tokenTracker;
-}
-
 export function getOrCreateUsageMetricDailySnapshot(
   event: ethereum.Event
 ): UsageMetricsDailySnapshot {
@@ -180,7 +152,6 @@ export function getOrCreateUsageMetricDailySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(dayId);
-    // usageMetrics.protocol = NetworkConfigs.getFactoryAddress();
     usageMetrics.protocol = BISWAP_FACTORY_ADDR;
 
     usageMetrics.dailyActiveUsers = INT_ZERO;
@@ -210,7 +181,6 @@ export function getOrCreateUsageMetricHourlySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(hourId);
-    // usageMetrics.protocol = NetworkConfigs.getFactoryAddress();
     usageMetrics.protocol = BISWAP_FACTORY_ADDR;
 
     usageMetrics.hourlyActiveUsers = INT_ZERO;
@@ -242,7 +212,6 @@ export function getOrCreateLiquidityPoolDailySnapshot(
     poolMetrics = new LiquidityPoolDailySnapshot(
       event.address.toHexString().concat("-").concat(dayId)
     );
-    // poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
     poolMetrics.protocol = BISWAP_FACTORY_ADDR;
     poolMetrics.pool = event.address.toHexString();
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -283,7 +252,6 @@ export function getOrCreateLiquidityPoolHourlySnapshot(
     poolMetrics = new LiquidityPoolHourlySnapshot(
       event.address.toHexString().concat("-").concat(hourId)
     );
-    // poolMetrics.protocol = NetworkConfigs.getFactoryAddress();
     poolMetrics.protocol = BISWAP_FACTORY_ADDR;
     poolMetrics.pool = event.address.toHexString();
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -321,7 +289,6 @@ export function getOrCreateFinancialsDailySnapshot(
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id);
-    // financialMetrics.protocol = NetworkConfigs.getFactoryAddress();
     financialMetrics.protocol = BISWAP_FACTORY_ADDR;
 
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -341,24 +308,4 @@ export function getOrCreateFinancialsDailySnapshot(
     financialMetrics.save();
   }
   return financialMetrics;
-}
-
-export function getOrCreateUsersHelper(): _HelperStore {
-  let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS);
-  if (uniqueUsersTotal === null) {
-    uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS);
-    uniqueUsersTotal.valueDecimal = BIGDECIMAL_ZERO;
-    uniqueUsersTotal.save();
-  }
-  return uniqueUsersTotal;
-}
-
-export function getTradingFee(poolAddress: string): BigDecimal {
-  let feeId = "trading-fee-" + poolAddress;
-  let fee = LiquidityPoolFee.load(feeId);
-  if (fee === null) {
-    log.warning("LiquidityPoolFee not found for pool: " + poolAddress, []);
-    return BIGDECIMAL_ZERO;
-  }
-  return fee.feePercentage!;
 }

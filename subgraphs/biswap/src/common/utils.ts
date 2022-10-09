@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { LiquidityPool } from "../../../generated/schema";
+import { LiquidityPool } from "../../generated/schema";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
@@ -11,8 +11,8 @@ import {
   BIGINT_ZERO,
   BIGINT_ONE,
   BIGINT_TEN,
-} from "../constants";
-import { getLiquidityPoolFee } from "../getters";
+} from "./constants";
+import { getLiquidityPoolFee } from "./getters";
 
 export function percToDec(percentage: BigDecimal): BigDecimal {
   return percentage.div(BIGDECIMAL_HUNDRED);

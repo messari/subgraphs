@@ -68,18 +68,6 @@ export function exponentToBigInt(n: i32): BigInt {
   return BigInt.fromI32(10).pow(n as u8);
 }
 
-export namespace HelperStoreType {
-  export const NATIVE_TOKEN = "NATIVE_TOKEN";
-  export const USERS = "USERS";
-  // Pool addresses are also stored in the HelperStore
-}
-
-export namespace FeeSwitch {
-  export const ON = "ON";
-  export const OFF = "OFF";
-  // Pool addresses are also stored in the HelperStore
-}
-
 export namespace RewardIntervalType {
   export const BLOCK = "BLOCK";
   export const TIMESTAMP = "TIMESTAMP";
@@ -136,13 +124,12 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 
 // Fees
 // TODO: verify why dev fee and swap fee are both set to 1
-// https://bscscan.com/address/0x151f05a1dbdde68e7a607fb2076cf110ec7290de#readContract
+// eg BiswapPair - https://bscscan.com/address/0x151f05a1dbdde68e7a607fb2076cf110ec7290de#readContract
 export const BISWAP_TRADING_FEE = BigDecimal.fromString("0.2");
 export const BISWAP_LP_FEE = BigDecimal.fromString("0.15");
 export const BISWAP_PROTOCOL_FEE = BigDecimal.fromString("0");
 
-export const MOST_RECENT_TRANSACTION = "MOST_RECENT_TRANSACTION";
-
+// Contract Addresses
 export const BISWAP_FACTORY_ADDR = "0x858e3312ed3a876947ea49d572a7c42de08af7ee";
 export const BISWAP_ROUTER_ADDR = "0x3a6d8cA21D1CF76F653A67577FA0D27453350dD8";
 export const BISWAP_MASTERCHEF_ADDR =

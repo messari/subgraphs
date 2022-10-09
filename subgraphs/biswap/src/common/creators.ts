@@ -1,15 +1,8 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   LiquidityPool,
   LiquidityPoolFee,
-  RewardToken,
   Swap,
   Withdraw,
   _HelperStore,
@@ -28,16 +21,16 @@ import {
   INT_ONE,
   INT_ZERO,
   LiquidityPoolFeeType,
-  RewardTokenType,
 } from "./constants";
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
   getOrCreateDex,
+  getOrCreateLPToken,
   getOrCreateToken,
 } from "./getters";
 import { updateVolumeAndFees } from "./updateMetrics";
-import { convertFeeToPercent, convertTokenToDecimal } from "./utils/utils";
+import { convertFeeToPercent, convertTokenToDecimal } from "./utils";
 
 export function createLiquidityPool(
   event: ethereum.Event,
@@ -45,28 +38,17 @@ export function createLiquidityPool(
   token0Address: string,
   token1Address: string
 ): void {
-  log.info(" -------> inside createLP", []);
-
   let protocol = getOrCreateDex();
 
   // create the tokens and tokentracker
   let token0 = getOrCreateToken(event, token0Address);
   let token1 = getOrCreateToken(event, token1Address);
-  let poolToken = getOrCreateToken(event, poolAddress);
-  let rewardToken = new RewardToken(
-    RewardTokenType.DEPOSIT.concat("-").concat(poolToken.id)
-  );
-  rewardToken.token = poolToken.id;
-  rewardToken.type = RewardTokenType.DEPOSIT;
-  rewardToken.save();
-
-  // updateTokenWhitelists(token0, token1, poolAddress);
+  let poolToken = getOrCreateLPToken(poolAddress, token0, token1);
 
   let pool = new LiquidityPool(poolAddress);
   let poolAmounts = new _LiquidityPoolAmount(poolAddress);
 
   pool.protocol = protocol.id;
-  // TODO: should we use pool token name and symbol?
   pool.name = protocol.name
     .concat(" - ")
     .concat(token0.name)
@@ -75,7 +57,7 @@ export function createLiquidityPool(
   pool.symbol = token0.name + " / " + token1.name;
   pool.inputTokens = [token0.id, token1.id];
   pool.outputToken = poolToken.id;
-  pool.rewardTokens = [rewardToken.id];
+  pool.rewardTokens = [];
 
   pool.fees = createPoolFees(poolAddress);
   pool.isSingleSided = false;
@@ -100,10 +82,6 @@ export function createLiquidityPool(
   protocol.totalPoolCount = protocol.totalPoolCount + INT_ONE;
   protocol.save();
 
-  // TODO: not required
-  // Create and track the newly created pool contract based on the template specified in the subgraph.yaml file.
-  //   PoolTemplate.create(Address.fromString(poolAddress));
-
   pool.save();
   token0.save();
   token1.save();
@@ -111,7 +89,7 @@ export function createLiquidityPool(
   poolDeposits.save();
 }
 
-// create pool fee entities based on the fee structure received from pairCreated event.
+// Biswap uses fixed fees
 export function createPoolFees(poolAddressString: string): string[] {
   // LP Fee
   let poolLpFee = new LiquidityPoolFee("lp-fee-" + poolAddressString);
@@ -152,7 +130,6 @@ export function createDeposit(
   amount0: BigInt,
   amount1: BigInt
 ): void {
-  log.info(" -------> inside createDeposit", []);
   let poolAddress = event.address.toHexString();
 
   let pool = getLiquidityPool(poolAddress);
@@ -190,8 +167,6 @@ export function createDeposit(
   ];
   poolAmounts.inputTokenBalances = poolAmountsInputTokenBalances;
 
-  //  TODO: pool output tokens missing
-
   // Get the total value locked in USD
   pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
     .times(token0.lastPriceUSD!)
@@ -218,6 +193,7 @@ export function createDeposit(
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
   deposit.inputTokenAmounts = [amount0, amount1];
+  deposit.outputToken = pool.outputToken;
   deposit.pool = pool.id;
   deposit.amountUSD = amountUSD;
 
@@ -238,8 +214,6 @@ export function createWithdraw(
   amount0: BigInt,
   amount1: BigInt
 ): void {
-  log.info(" -------> inside createWithdraw", []);
-
   let poolAddress = event.address.toHexString();
 
   let pool = getLiquidityPool(poolAddress);
@@ -277,8 +251,6 @@ export function createWithdraw(
   ];
   poolAmounts.inputTokenBalances = poolAmountsInputTokenBalances;
 
-  //  TODO: pool output tokens missing
-
   // Get the total value locked in USD
   pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
     .times(token0.lastPriceUSD!)
@@ -305,6 +277,7 @@ export function createWithdraw(
   withdrawal.timestamp = event.block.timestamp;
   withdrawal.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
   withdrawal.inputTokenAmounts = [amount0, amount1];
+  withdrawal.outputToken = pool.outputToken;
   withdrawal.pool = pool.id;
   withdrawal.amountUSD = amountUSD;
 
@@ -325,20 +298,6 @@ export function createSwapHandleVolumeAndFees(
   recipient: Address,
   sender: Address
 ): void {
-  log.info(" -------> inside createSwapHandleVolumeAndFees", []);
-
-  log.info(
-    "sender: {}, to: {}, amount0In: {}, amount0Out: {}, amount1In: {}, amount1Out: {}",
-    [
-      sender.toHexString(),
-      recipient.toHexString(),
-      amount0In.toString(),
-      amount0Out.toString(),
-      amount1In.toString(),
-      amount1Out.toString(),
-    ]
-  );
-
   let amount0 =
     amount0In > BIGINT_ZERO ? amount0In : amount0Out.times(BIGINT_NEG_ONE);
   let amount1 =
@@ -357,7 +316,7 @@ export function createSwapHandleVolumeAndFees(
   let amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
   let amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
 
-  // need absolute amounts for volume
+  // Need absolute amounts for volume
   let amount0Abs = amount0Converted;
   if (amount0Converted.lt(BIGDECIMAL_ZERO)) {
     amount0Abs = amount0Converted.times(BIGDECIMAL_NEG_ONE);
@@ -390,10 +349,7 @@ export function createSwapHandleVolumeAndFees(
     pool.totalValueLockedUSD
   );
 
-  /**
-   * Things afffected by new USD rates
-   */
-  // Get the total value locked in USD
+  // Update TVL based on latest price
   pool.totalValueLockedUSD = poolAmounts.inputTokenBalances[0]
     .times(token0.lastPriceUSD!)
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
@@ -428,7 +384,6 @@ export function createSwapHandleVolumeAndFees(
   swap.amountOutUSD = amount1 > BIGINT_ZERO ? amount0USD : amount1USD;
   swap.pool = pool.id;
 
-  // TODO: getTrackedVolume
   let trackedAmountUSD = [
     amount0USD,
     amount1USD,

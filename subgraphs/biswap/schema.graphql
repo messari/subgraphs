@@ -248,18 +248,6 @@ type DexAmmProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
-
-  " Liquidity pool IDs "
-  _poolIDs: [ID!]!
-
-#   " Default trading fee rate (0-1) that applies at the protocol level "
-#   _defaultTradingFeeRate: BigDecimal!
-# 
-#   " Netfork fee rate (0-1) that applies at the protocol level. It goes to protocol fee "
-#   _networkFeeRate: BigDecimal!
-# 
-#   " Withdrawal fee rate (0-1) that applies at the protocol level. Occurs whenver user withdraws. It goes to protocol fee "
-#   _withdrawalFeeRate: BigDecimal!
 }
 
 ###############################
@@ -823,21 +811,10 @@ type _LiquidityPoolAmount @entity {
   tokenPrices: [BigDecimal!]!
 }
 
-"  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "
+"  Used to keep track of the pool deposit count "
 type _HelperStore @entity {
   id: ID!
 
-  " price of ETH/TVL in USD "
-  valueDecimal: BigDecimal
-
-  " # of deposits, # of unique users "
+  " # of deposits "
   valueInt: Int
-}
-
-" This is used to keep tract of the derived price of tokens in ethereum and the whitelisted pools to which it belongs"
-type _TokenWhitelist @entity {
-  " Token Address "
-  id: ID!
-  " pools token is in that are white listed for USD pricing "
-  whitelistPools: [LiquidityPool!]!
 }
