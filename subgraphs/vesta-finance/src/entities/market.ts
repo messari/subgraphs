@@ -279,7 +279,8 @@ export function addMarketVolume(
       market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
       dailySnapshot.dailyDepositUSD =
         dailySnapshot.dailyDepositUSD.plus(amountUSD);
-      hourlySnapshot.hourlyDepositUSD.plus(amountUSD);
+      hourlySnapshot.hourlyDepositUSD =
+        hourlySnapshot.hourlyDepositUSD.plus(amountUSD);
       addProtocolVolume(event, amountUSD, EventType.Deposit);
       break;
     case EventType.Borrow:
