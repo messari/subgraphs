@@ -37,6 +37,8 @@ dataSources:
           file: ./abis/EulerGeneralView.json
         - name: Exec
           file: ./abis/Exec.json
+        - name: Markets
+          file: ./abis/Markets.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20SymbolBytes

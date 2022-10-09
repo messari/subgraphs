@@ -1,13 +1,17 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Exec } from "../../generated/euler/Exec";
 import { BIGINT_ZERO, EXEC_PROXY_ADDRESS, UNISWAP_Q192, USDC_WETH_03_ADDRESS } from "./constants";
 import { UniswapV3Pool } from "../../generated/euler/UniswapV3Pool";
 
-export function getUnderlyingPrice(underlyingAddress: Address): BigInt {
+export function getUnderlyingPrice(underlyingAddress: Address, event: ethereum.Event): BigInt {
   const exec = Exec.bind(Address.fromString(EXEC_PROXY_ADDRESS));
   const getPriceResult = exec.try_getPrice(underlyingAddress);
 
   if (getPriceResult.reverted) {
+    log.warning("[getUnderlyingPrice]reverted for underlying {} at block {}", [
+      underlyingAddress.toHexString(),
+      event.block.number.toString(),
+    ]);
     return BIGINT_ZERO;
   }
 

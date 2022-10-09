@@ -128,7 +128,13 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_THREE = BigInt.fromI32(3);
+export const BIGINT_FOUR = BigInt.fromI32(4);
+export const BIGINT_SIX = BigInt.fromI32(6);
+export const BIGINT_TWELVE = BigInt.fromI32(12);
+export const BIGINT_TWENTY_FOUR = BigInt.fromI32(24);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
+export const BIGINT_ONE_HUNDRED_TWENTY = BigInt.fromI32(120);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromI32(10).pow(18);
 export const BIGINT_MAX = BigInt.fromString(
@@ -144,6 +150,13 @@ export const INT_FOUR = 4 as i32;
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_THREE = new BigDecimal(BIGINT_THREE);
+export const BIGDECIMAL_FOUR = new BigDecimal(BIGINT_FOUR);
+export const BIGDECIMAL_SIX = new BigDecimal(BIGINT_SIX);
+export const BIGDECIMAL_TWELVE = new BigDecimal(BIGINT_TWELVE);
+export const BIGDECIMAL_TWENTY_FOUR = new BigDecimal(BIGINT_TWENTY_FOUR);
+export const BIGDECIMAL_ONE_HUNDRED_TWENTY = new BigDecimal(BIGINT_ONE_HUNDRED_TWENTY);
+export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -172,7 +185,16 @@ export const USDC_SYMBOL = "USDC";
 
 export const CONFIG_FACTOR_SCALE = BigDecimal.fromString("4e9");
 export const RESERVE_FEE_SCALE = BigDecimal.fromString("4e9");
+export const DEFAULT_RESERVE_FEE = BigDecimal.fromString("0.23").times(RESERVE_FEE_SCALE);
+export const INITIAL_RESERVES = BigInt.fromI32(1e6 as i32);
 export const EXEC_START_BLOCK_NUMBER = BigInt.fromI32(13711556);
 export const UNISWAP_Q192 = BigDecimal.fromString(BigInt.fromI32(2).pow(192).toString());
+
 export const DECIMAL_PRECISION = BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal();
 export const INTEREST_RATE_PRECISION = BigDecimal.fromString("1e25");
+export const INTEREST_RATE_DECIMALS = BigDecimal.fromString("1e27");
+export const INTERNAL_DEBT_PRECISION = BigDecimal.fromString("1e9");
+export const MODULEID__EXEC = BigInt.fromI32(5);
+export const MODULEID__RISK_MANAGER = BigInt.fromI32(1000000);
+export const MODULEID__MARKETS = BigInt.fromI32(2);
+export const INITIAL_INTEREST_ACCUMULATOR = BigInt.fromI32(10).pow(27);
