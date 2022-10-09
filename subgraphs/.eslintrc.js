@@ -1,28 +1,28 @@
-{
-  "env": {
-    "browser": true,
-    "es2021": true
+module.exports = {
+  env: {
+    browser: true,
+    es2021: true,
   },
-  "extends": [
+  extends: [
     // Using the recommended typescript configurations
     "plugin:@typescript-eslint/recommended",
 
     // Prettier - last to override all other formatting rules
-    "prettier"
+    "prettier",
   ],
-  "parser": "@typescript-eslint/parser",
-  "overrides": [
+  parser: "@typescript-eslint/parser",
+  overrides: [
     {
-      "files": ["*.ts", "*.tsx"]
-    }
+      files: ["*.ts", "*.tsx"],
+    },
   ],
-  "parserOptions": {
-    "ecmaVersion": "latest",
-    "project": "./tsconfig.json",
-    "tsconfigRootDir": "subgraphs"
+  parserOptions: {
+    ecmaVersion: "latest",
+    project: "./tsconfig.json",
+    tsconfigRootDir: __dirname,
   },
-  "plugins": ["@typescript-eslint"],
-  "rules": {
+  plugins: ["@typescript-eslint"],
+  rules: {
     // Give the power to the people! We decided to leave this decision up to the dev.
     "@typescript-eslint/no-inferrable-types": "off",
 
@@ -38,12 +38,12 @@
     "@typescript-eslint/ban-types": [
       "error",
       {
-        "types": {
+        types: {
           // un-ban BigInt - It must be getting confused with the native bigInt type
-          "BigInt": false
+          BigInt: false,
         },
-        "extendDefaults": true
-      }
-    ]
-  }
-}
+        extendDefaults: true,
+      },
+    ],
+  },
+};
