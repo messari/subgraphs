@@ -56,3 +56,8 @@ No rewards for LPs on deposit. LPs need to stake and achieve set trading volumes
 * https://biswap.gitbook.io/biswap/general-information
 * https://biswap.gitbook.io/biswap/general-information/biswap-smart-contracts
 * https://biswap.gitbook.io/biswap/core-products/exchange/transaction-fee-mining
+
+## Notes
+
+* Staking rewards/revenue are not included as part of the methodology. They would be classified as Yield related activity (vs DEX AMM activity).
+* Trans-fee-mining rewards are not removed from revenue calculations because they are funded through funds reserved for transaction fee mining.
