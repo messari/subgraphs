@@ -1,0 +1,10 @@
+{
+  "network": "avalanche",
+  "vault": [
+    {
+      "name": "vault",
+      "address": "0x489ee077994B6658eAfA855C308275EAd8097C4A",
+      "startBlock": 8351228
+    }
+  ]
+}
