@@ -137,6 +137,8 @@ function queryEulerGeneralView(
   const eulerGeneralView = getEulerViewContract(block);
   const result = eulerGeneralView.try_doQuery(queryParametersTuple);
 
+  log.warning("Query Euler General View result: {}", [result.reverted.toString()]);
+
   if (result.reverted) {
     return null;
   }
@@ -159,14 +161,20 @@ function updateProtocolAndMarkets(block: ethereum.Block): void {
     return;
   }
 
+  log.warning("updateProtocolAndMarkets() calling syncWithEulerGeneralView()", []);
+
   let eulerViewQueryResult = queryEulerGeneralView(markets, block);
   if (!eulerViewQueryResult) {
     return;
   }
+
+  log.warning("updateProtocolAndMarkets() syncWithEulerGeneralView() called", []);
 
   // update block number
   protocolUtility.lastBlockNumber = blockNumber;
   protocolUtility.save();
 
   syncWithEulerGeneralView(eulerViewQueryResult, block);
+
+  log.warning("updateProtocolAndMarkets() syncWithEulerGeneralView() finished", []);
 }
