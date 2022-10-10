@@ -24,7 +24,7 @@
     "prettier-check": "prettier --loglevel silent --write --check \"**/*.{md,jsx,tsx,ts,json,html,css,js}\"",
     "lint:fix": "npx eslint --fix --max-warnings 0",
     "lint": "npx eslint",
-    "lint:subgraphs": "npx eslint -c subgraphs/.eslintrc.json",
+    "lint:subgraphs": "npx eslint -c subgraphs/.eslintrc.js",
     "prepare": "husky install",
     "folderslint": "cd subgraphs && folderslint"
   }
