@@ -47,11 +47,8 @@ export class BiswapBscConfigurations implements Configurations {
   getTradeFee(): BigDecimal {
     return BigDecimal.fromString("0.2");
   }
-  // TODO: Tarun: setting this to 0.05 temporarily.
-  // should this be treated as protocol income? protocol uses/distributes this amount for burning and incentivizing (biswap team, biswap earn)
-  // should this be 0? if yes, then we need to override updateVolumeAndFees (updateMetrics file) or fix tradingFeeAmountUSD calculation there (ln 343).
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0");
+    return BigDecimal.fromString("0.05");
   }
   getLPFeeToOn(): BigDecimal {
     return BigDecimal.fromString("0.15");
@@ -59,7 +56,6 @@ export class BiswapBscConfigurations implements Configurations {
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
-  // TODO: Tarun: why is the LPFeeToOff 0.2? setting it to 0 for off
   getLPFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
@@ -72,7 +68,6 @@ export class BiswapBscConfigurations implements Configurations {
   getRewardTokenRate(): BigInt {
     return BIGINT_ZERO;
   }
-  // TODO: Tarun: what is reference token?
   getReferenceToken(): string {
     return "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c";
   }
@@ -93,7 +88,6 @@ export class BiswapBscConfigurations implements Configurations {
       "0x965F527D9159dCe6288a2219DB51fc6Eef120dD1", // BSW
     ];
   }
-  // TODO: Tarun: These addresses are from ETH (not BSC). Is this intentional? Assuming for pulling price from ETH network if BSC network gives inaccurate results?
   getStableCoins(): string[] {
     return [
       "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
@@ -104,7 +98,6 @@ export class BiswapBscConfigurations implements Configurations {
       "0x4dd28568d05f09b02220b09c2cb307bfd837cb95",
     ];
   }
-  // TODO: Tarun: Can we reuse stable oracle pools in Biswap?
   getStableOraclePools(): string[] {
     return [
       "0x51e6d27fa57373d8d4c256231241053a70cb1d93", // BUSD/WBNB created block 4857769

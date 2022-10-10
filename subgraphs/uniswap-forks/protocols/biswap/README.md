@@ -20,17 +20,7 @@ Sum across all Pools: `Pool Swap Trading Volume * Trading Fee (0.2%)`
 
 ### Protocol-Side Revenue USD
 
-Portion of the Total Revenue allocated to the Protocol
-* Should trading fees allocated to Biswap Team (0.02%) be considered protocol revenue?
-* Should trading fees allocated to Biswap Earn (0.02%) be considered protocol revenue?
-* Should trading fees allocated to BSW Token Burn (0.01%) be considered protocol revenue?
-
-Sum across all Pools: `Pool Swap Trading Volume * Protocol Fee`
-
-Protocol Fee is set to  0 with the assumption that fees allocated towards Biswap Earn, Biswap Team, BSW Token Burn don't count towards protocol revenue.
-
-
-https://biswap.gitbook.io/biswap/core-products/exchange
+Sum across all Pools: `Pool Swap Trading Volume * Protocol Fee (0.05%)`
 
 ### Supply-Side Revenue USD
 

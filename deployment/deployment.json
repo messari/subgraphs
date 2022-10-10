@@ -1162,7 +1162,7 @@
     "base": "uniswap-forks",
     "protocol": "biswap",
     "deployments": {
-      "biswap-bsc-uniswap-fork": {
+      "biswap-bsc": {
         "network": "bsc",
         "status": "dev",
         "versions": {
@@ -1179,8 +1179,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "biswap-bsc-uniswap-fork",
-            "query-id": "biswap-bsc-uniswap-fork"
+            "slug": "biswap-bsc",
+            "query-id": "biswap"
           }
         }
       }

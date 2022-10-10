@@ -15,12 +15,12 @@
   },
   "services": {
     "hosted-service": {
-      "slug": "biswap-bsc-uniswap-fork",
-      "query-id": "biswap-bsc-uniswap-fork"
+      "slug": "biswap-bsc",
+      "query-id": "biswap-bsc"
     }
   },
   "protocol": "biswap",
   "base": "uniswap-forks",
   "schema": "dex-amm",
-  "deployment": "biswap-bsc-uniswap-fork"
+  "deployment": "biswap-bsc"
 }
