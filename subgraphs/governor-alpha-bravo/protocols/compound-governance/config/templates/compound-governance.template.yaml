@@ -69,4 +69,3 @@ dataSources:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./protocols/compound-governance/src/comp.ts
- No newline at end of file
