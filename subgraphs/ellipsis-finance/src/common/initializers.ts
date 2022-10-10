@@ -34,12 +34,11 @@ export function getOrCreateLiquidityPool(
     liquidityPool.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     liquidityPool.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
     liquidityPool.cumulativeVolumeUSD = constants.BIGDECIMAL_ZERO;
-    
+
     if (!registryAddress.equals(constants.ADDRESS_ZERO)) {
       liquidityPool._registry = registryAddress.toHexString();
-      liquidityPool.save();
     }
-    let lpToken = utils.getLpTokenFromPool(address, block);
+    let lpToken = utils.getLpTokenFromPool(address, block,registryAddress);
 
     let lpTokenContract = LPTokenContract.bind(Address.fromString(lpToken.id));
 
@@ -53,7 +52,7 @@ export function getOrCreateLiquidityPool(
     );
 
     liquidityPool.inputTokens = utils.getPoolCoins(address, block);
-    liquidityPool._underlyingTokens = utils.getPoolUnderlyingCoins(address);
+    liquidityPool._underlyingTokens = utils.getPoolUnderlyingCoins(address,registryAddress);
 
     liquidityPool.inputTokenBalances = utils.getPoolBalances(
       address,

@@ -1,10 +1,10 @@
 specVersion: 0.0.5
 {{#graftEnabled}}
+features:
+  - grafting
 graft:
   base: {{subgraphId}}
   block: {{graftStartBlock}}
-features:
-  - grafting
 {{/graftEnabled}}
 schema:
   file: ./schema.graphql
@@ -419,7 +419,7 @@ dataSources:
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchange
         - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
-          handler: handleTokenExchange
+          handler: handleTokenExchangeWithUintSoldId
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
       file: ./src/mappings/pool.ts
@@ -496,13 +496,15 @@ templates:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity
         - event: AddLiquidity(indexed address,uint256[2],uint256,uint256)
-          handler: handleAddLiquidity
+          handler: handleAddLiquidityWithSingleFee
         - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
           handler: handleAddLiquidity
         - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
           handler: handleRemoveLiquidity
         - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
           handler: handleRemoveLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256)
+          handler: handleRemoveLiquidityWithoutFee
         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleRemoveLiquidityImbalance
         - event: RemoveLiquidityImbalance(indexed address,uint256[3],uint256[3],uint256,uint256)
@@ -511,10 +513,12 @@ templates:
           handler: handleRemoveLiquidityOne
           receipt: true
         - event: RemoveLiquidityOne(indexed address,uint256,uint256)
-          handler: handleRemoveLiquidityOne
+          handler: handleRemoveLiquidityOneWithoutTokenSupply
           receipt: true
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchange
+        - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleTokenExchangeWithUintSoldId
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
       file: ./src/mappings/pool.ts

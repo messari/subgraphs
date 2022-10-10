@@ -88,7 +88,7 @@ export function handleStakingV2(
   let poolInfoCall = stakingContractV2.try_poolInfo(lpTokenAddress);
   if (poolInfoCall.reverted)  return; 
     let rewardsPerSecond = BigDecimal.fromString(
-      poolInfoCall.value.getRewardsPerSecond() .toString()
+      poolInfoCall.value.getRewardsPerSecond().toString()
     );
     let rewardTokensPerDay = getRewardsPerDay(
       block.timestamp,
@@ -113,6 +113,7 @@ export function updateRewardTokenEmissions(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   getOrCreateRewardToken(rewardTokenAddress, block);
+  
   const rewardToken = getOrCreateToken(rewardTokenAddress, block);
   if (!pool.rewardTokens) {
     pool.rewardTokens = [];

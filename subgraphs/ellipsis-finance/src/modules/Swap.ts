@@ -99,7 +99,7 @@ export function Swap(
   block: ethereum.Block,
   underlying: boolean = false
 ): void {
-  const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
+  let pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
 
   let tokenIn: string;
   let tokenOut: string;
@@ -108,8 +108,16 @@ export function Swap(
     tokenIn = pool.inputTokens[sold_id.toI32()];
     tokenOut = pool.inputTokens[bought_id.toI32()];
   } else {
-    let underlyingCoins = utils.getPoolUnderlyingCoins(liquidityPoolAddress);
+    log.warning("[Swap] before getunderlyingcoins {}", [""]);
 
+    let underlyingCoins = utils.getPoolUnderlyingCoins(
+      liquidityPoolAddress,
+      pool._registry
+        ? Address.fromString(pool._registry!)
+        : constants.ADDRESS_ZERO
+    );
+log.warning("[Swap] after getunderlyingcoins coins {}", [""]);
+    
     if (underlyingCoins.length == 0) return;
 
     tokenIn = underlyingCoins[sold_id.toI32()];

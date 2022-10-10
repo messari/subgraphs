@@ -44,13 +44,11 @@
       "name": "3EPS",
       "address": "0x160CAed03795365F3A589f10C379FfA7d75d4E76",
       "startBlock": 5936381
-
     },
     {
       "name": "btcEPS",
       "address": "0x2477fB288c5b4118315714ad3c7Fd7CC69b00bf9",
       "startBlock": 6570997
-
     },
     {
       "name": "anyBTC",
@@ -90,6 +88,6 @@
   ],
 
   "graftEnabled": false,
-  "subgraphId": "QmeR9B1t5Eap5dqPkh2W4oSLxdRhBr7R6kYgaGeLMShDVs",
-  "graftStartBlock": 15020708
+  "subgraphId": "QmNas2UFGrzSLxPsgHXXnqUR1VpEvoDzgLMd1JdpgqvPWQ",
+  "graftStartBlock": 16805370
 }

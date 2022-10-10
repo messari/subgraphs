@@ -515,5 +515,12 @@
     "inputs": [{ "name": "arg0", "type": "address" }],
     "outputs": [{ "name": "", "type": "address" }],
     "gas": 4058
+  },
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "get_token",
+    "inputs": [{ "name": "_pool", "type": "address" }],
+    "outputs": [{ "name": "", "type": "address" }]
   }
 ]

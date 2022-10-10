@@ -34,7 +34,8 @@ export function readValue<T>(
 
 export function getLpTokenFromPool(
   poolAddress: Address,
-  block: ethereum.Block
+  block: ethereum.Block,
+  newRegistryAddress: Address = constants.ADDRESS_ZERO
 ): Token {
   let lpTokenAddress = constants.ADDRESS_ZERO;
 
@@ -83,20 +84,24 @@ export function getLpTokenFromPool(
   if (lpTokenAddress.notEqual(constants.NULL.TYPE_ADDRESS))
     return getOrCreateToken(lpTokenAddress, block);
 
-  let newRegistryAddress = getOrCreateLiquidityPool(
-    poolAddress,
-    block
-  )._registry;
-  let newFactoryContract = FactoryContract.bind(
-    Address.fromString(newRegistryAddress!)
-  );
-  lpTokenAddress = readValue<Address>(
-    newFactoryContract.try_get_lp_token(poolAddress),
-    constants.NULL.TYPE_ADDRESS
-  );
-  if (lpTokenAddress.notEqual(constants.NULL.TYPE_ADDRESS))
-    return getOrCreateToken(lpTokenAddress, block);
-
+  if (!newRegistryAddress.equals(constants.ADDRESS_ZERO)) {
+    let newFactoryContract = FactoryContract.bind(newRegistryAddress);
+    lpTokenAddress = readValue<Address>(
+      newFactoryContract.try_get_lp_token(poolAddress),
+      constants.NULL.TYPE_ADDRESS
+    );
+    if (lpTokenAddress.notEqual(constants.NULL.TYPE_ADDRESS))
+      return getOrCreateToken(lpTokenAddress, block);
+  }
+  if (!newRegistryAddress.equals(constants.ADDRESS_ZERO)) {
+    let newFactoryContract = FactoryContract.bind(newRegistryAddress);
+    lpTokenAddress = readValue<Address>(
+      newFactoryContract.try_get_token(poolAddress),
+      constants.NULL.TYPE_ADDRESS
+    );
+    if (lpTokenAddress.notEqual(constants.NULL.TYPE_ADDRESS))
+      return getOrCreateToken(lpTokenAddress, block);
+  }
   return getOrCreateToken(poolAddress, block);
 }
 
@@ -319,7 +324,10 @@ export function getOutputTokenPriceUSD(
 
   return outputTokenPriceUSD;
 }
-export function getPoolUnderlyingCoins(poolAddress: Address): string[] {
+export function getPoolUnderlyingCoins(
+  poolAddress: Address,
+  newRegistryAddress: Address = constants.ADDRESS_ZERO
+): string[] {
   let coins: string[] = [];
   const registryContract = RegistryContract.bind(constants.REGISTRY_ADDRESS);
 
@@ -327,6 +335,9 @@ export function getPoolUnderlyingCoins(poolAddress: Address): string[] {
     registryContract.try_get_underlying_coins(poolAddress),
     []
   );
+  log.warning("[getUnderlyingcoins] coins from registry length {}", [
+    underlyingCoins.length.toString(),
+  ]);
 
   if (underlyingCoins.length != 0) {
     for (let i = 0; i < underlyingCoins.length; i++) {
@@ -342,11 +353,60 @@ export function getPoolUnderlyingCoins(poolAddress: Address): string[] {
     factoryContract.try_get_underlying_coins(poolAddress),
     []
   );
-  for (let i = 0; i < underlyingCoins.length; i++) {
-    if (!underlyingCoins[i].equals(constants.ADDRESS_ZERO)) {
-      coins.push(underlyingCoins[i].toHexString());
+  log.warning("[getUnderlyingcoins] coins from factory length {}", [
+    underlyingCoins.length.toString(),
+  ]);
+
+  if (underlyingCoins.length != 0) {
+    for (let i = 0; i < underlyingCoins.length; i++) {
+      if (!underlyingCoins[i].equals(constants.ADDRESS_ZERO)) {
+        coins.push(underlyingCoins[i].toHexString());
+      }
+    }
+    return coins;
+  }
+  if (newRegistryAddress.notEqual(constants.ADDRESS_ZERO)) {
+    const factoryContract = FactoryContract.bind(newRegistryAddress);
+
+    underlyingCoins = readValue<Address[]>(
+      factoryContract.try_get_underlying_coins(poolAddress),
+      []
+    );
+    log.warning("[getUnderlyingcoins] coins from new registry length {}", [
+      underlyingCoins.length.toString(),
+    ]);
+
+    if (underlyingCoins.length != 0) {
+      for (let i = 0; i < underlyingCoins.length; i++) {
+        if (!underlyingCoins[i].equals(constants.ADDRESS_ZERO)) {
+          coins.push(underlyingCoins[i].toHexString());
+        }
+      }
+      return coins;
     }
   }
+  if (newRegistryAddress.notEqual(constants.ADDRESS_ZERO)) {
+    let registryContract = FactoryContract.bind(newRegistryAddress);
+
+    underlyingCoins = readValue<Address[]>(
+      registryContract.try_get_underlying_coins(poolAddress),
+      []
+    );
+    log.warning("[getUnderlyingcoins] coins from new factory length {}", [
+      underlyingCoins.length.toString(),
+    ]);
+
+    if (underlyingCoins.length != 0) {
+      for (let i = 0; i < underlyingCoins.length; i++) {
+        if (!underlyingCoins[i].equals(constants.ADDRESS_ZERO)) {
+          coins.push(underlyingCoins[i].toHexString());
+        }
+      }
+      return coins;
+    }
+  }
+
+  
   return coins;
 }
 
