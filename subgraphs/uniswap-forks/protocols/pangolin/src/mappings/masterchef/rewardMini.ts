@@ -8,11 +8,7 @@ import {
   Withdraw,
   MiniChefV2,
 } from "../../../../../generated/MiniChef/MiniChefV2";
-import {
-  _HelperStore,
-  _MasterChef,
-  _MasterChefStakingPool,
-} from "../../../../../generated/schema";
+import { _MasterChefStakingPool } from "../../../../../generated/schema";
 import {
   createMasterChefStakingPool,
   getOrCreateMasterChef,
@@ -50,16 +46,16 @@ export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
 
 // Handle the addition of a new pool to the MasterChef. New staking pool.
 export function handlePoolAdded(event: PoolAdded): void {
-  let miniChefPool = createMasterChefStakingPool(
+  const miniChefPool = createMasterChefStakingPool(
     event,
     MasterChef.MINICHEF,
     event.params.pid,
     event.params.lpToken
   );
-  let masterchef = getOrCreateMasterChef(event, MasterChef.MINICHEF);
+  const masterchef = getOrCreateMasterChef(event, MasterChef.MINICHEF);
   if (masterchef.lastUpdatedRewardRate == BIGINT_ZERO) {
     masterchef.lastUpdatedRewardRate = event.block.number;
-    let miniChefV2Contract = MiniChefV2.bind(event.address);
+    const miniChefV2Contract = MiniChefV2.bind(event.address);
     masterchef.adjustedRewardTokenRate = miniChefV2Contract.rewardPerSecond();
     masterchef.save();
   }
@@ -75,7 +71,7 @@ export function handlePoolAdded(event: PoolAdded): void {
 
 // Update the allocation points of the pool.
 export function handlePoolSet(event: PoolSet): void {
-  let miniChefPool = _MasterChefStakingPool.load(
+  const miniChefPool = _MasterChefStakingPool.load(
     MasterChef.MINICHEF + "-" + event.params.pid.toString()
   )!;
   updateMasterChefTotalAllocation(
@@ -90,7 +86,7 @@ export function handlePoolSet(event: PoolSet): void {
 
 // Update the total emissions rate of rewards for the masterchef contract.
 export function handleLogRewardPerSecond(event: LogRewardPerSecond): void {
-  let miniChefPool = getOrCreateMasterChef(event, MasterChef.MINICHEF);
+  const miniChefPool = getOrCreateMasterChef(event, MasterChef.MINICHEF);
   miniChefPool.rewardTokenRate = event.params.rewardPerSecond;
   miniChefPool.adjustedRewardTokenRate = event.params.rewardPerSecond;
   miniChefPool.save();
