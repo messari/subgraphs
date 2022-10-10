@@ -197,7 +197,7 @@ export class ScriptGenerator {
       `mustache protocols/${deploymentData.protocol}/config/deployments/${deploymentData.deployment}/configurations.json protocols/${deploymentData.protocol}/config/templates/${deploymentData.files.template} > subgraph.yaml`
     )
     scripts.push(
-      `mustache protocols/${deploymentData.protocol}/config/deployments/${deploymentData.deployment}/deploymentJsonContext.json ../../deployment/context/template.mustache > deploymentJsonContext.ts`
+      `mustache protocols/${deploymentData.protocol}/config/deployments/${deploymentData.deployment}/deploymentJsonContext.json ../../deployment/context/template.mustache > src/deploymentJsonContext.ts`
     )
 
     if (deploymentData.options['prepare:constants'] === true) {
