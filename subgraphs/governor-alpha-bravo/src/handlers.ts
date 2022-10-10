@@ -197,6 +197,23 @@ export function _handleProposalCreated(
   proposal.targets = addressesToStrings(targets);
   proposal.values = values;
   proposal.signatures = signatures;
+
+  // HACK: Graph Node's underlying db has a row size limit that is exceeded in rare cases e.g. https://etherscan.io/tx/0x90b8e1bf9fa358973d731eff243563710323ccc5d45776cebdf3528ab500b8ee/advanced
+  // to avoid breaking the subgraph we want to replace such calldata with zero value
+  let totalSize = 0;
+  for (let i = 0; i < calldatas.length; i++) {
+    totalSize = totalSize + calldatas[i].byteLength;
+    if (totalSize > 4800) {
+      log.error("Calldata index {}, value {}, size {}, totalSize {}", [
+        i.toString(),
+        calldatas[i].toHexString(),
+        calldatas[i].byteLength.toString(),
+        totalSize.toString(),
+      ]);
+      calldatas[i] = Bytes.fromHexString("0x00");
+    }
+  }
+
   proposal.calldatas = calldatas;
   proposal.creationBlock = event.block.number;
   proposal.creationTime = event.block.timestamp;
