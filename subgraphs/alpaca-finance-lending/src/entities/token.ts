@@ -3,7 +3,6 @@ import { RewardToken, Token } from "../../generated/schema";
 import { IERC20Detailed } from "../../generated/ibUSDT/IERC20Detailed";
 import { IERC20DetailedBytes } from "../../generated/ibUSDT/IERC20DetailedBytes";
 import { prefixID } from "../utils/strings";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../utils/constants";
 
 export const UNKNOWN_TOKEN_VALUE = "unknown";
 
@@ -19,8 +18,6 @@ export function getOrCreateToken(
     token.symbol = fetchTokenSymbol(contract);
     token.decimals = contract.decimals();
     token.underlyingAsset = underlyingAsset;
-    token.lastPriceUSD = BIGDECIMAL_ZERO;
-    token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
   return token;
