@@ -6,13 +6,14 @@ import {
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
+  getOrCreateToken,
   getOrCreateVaultFee,
   getOrCreateYieldAggregator,
 } from "./initializers";
 import { PoolFeesType } from "./types";
 import * as constants from "./constants";
 import { ERC20 } from "../../generated/templates/Strategy/ERC20";
-import { Vault as VaultStore, VaultFee } from "../../generated/schema";
+import { Token, Vault as VaultStore, VaultFee } from "../../generated/schema";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 import { Strategy as StrategyContract } from "../../generated/templates/Strategy/Strategy";
 import { Controller as ControllerContract } from "../../generated/templates/Strategy/Controller";
@@ -33,6 +34,45 @@ export function getTokenDecimals(tokenAddr: Address): BigDecimal {
   let decimals = readValue<i32>(token.try_decimals(), 18);
 
   return constants.BIGINT_TEN.pow(decimals as u8).toBigDecimal();
+}
+
+export function getStrategyWantToken(
+  strategyAddress: Address,
+  block: ethereum.Block
+): Token {
+  const strategyContract = StrategyContract.bind(strategyAddress);
+  const wantTokenAddress = readValue<Address>(
+    strategyContract.try_want(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  return getOrCreateToken(wantTokenAddress, block);
+}
+
+export function getStrategyFarmToken(
+  strategyAddress: Address,
+  block: ethereum.Block
+): Token {
+  const strategyContract = StrategyContract.bind(strategyAddress);
+  const farmTokenAddress = readValue<Address>(
+    strategyContract.try_farm(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  return getOrCreateToken(farmTokenAddress, block);
+}
+
+export function getStrategyXSushiToken(
+  strategyAddress: Address,
+  block: ethereum.Block
+): Token {
+  const strategyContract = StrategyContract.bind(strategyAddress);
+  const farmTokenAddress = readValue<Address>(
+    strategyContract.try_xsushi(),
+    constants.NULL.TYPE_ADDRESS
+  );
+
+  return getOrCreateToken(farmTokenAddress, block);
 }
 
 export function getVaultStrategy(

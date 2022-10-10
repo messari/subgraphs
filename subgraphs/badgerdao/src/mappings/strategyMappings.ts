@@ -7,17 +7,17 @@ import {
   Harvest,
   FarmHarvest,
   HarvestState,
-  CurveHarvest,
   TreeDistribution,
   PerformanceFeeStrategist,
   PerformanceFeeGovernance,
+  HarvestState1 as DiggHarvestState,
 } from "../../generated/templates/Strategy/Strategy";
 import * as utils from "../common/utils";
+import { log } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
-import { Address, log } from "@graphprotocol/graph-ts";
+import { updateRewardTokenInfo } from "../modules/Rewards";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
-import { Strategy as StrategyContract } from "../../generated/templates/Strategy/Strategy";
 
 export function handleHarvest(event: Harvest): void {
   const strategyAddress = event.address;
@@ -28,18 +28,13 @@ export function handleHarvest(event: Harvest): void {
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  const strategyContract = StrategyContract.bind(strategyAddress);
-  const wantTokenAddress = utils.readValue<Address>(
-    strategyContract.try_want(),
-    constants.NULL.TYPE_ADDRESS
-  );
-
-  const wantToken = getOrCreateToken(wantTokenAddress, event.block);
+  let wantToken = utils.getStrategyWantToken(strategyAddress, event.block);
+  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+    wantToken.decimals as u8
+  ).toBigDecimal();
 
   const supplySideRevenueUSD = harvestedAmount
-    .divDecimal(
-      constants.BIGINT_TEN.pow(wantToken.decimals as u8).toBigDecimal()
-    )
+    .divDecimal(wantTokenDecimals)
     .times(wantToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -54,7 +49,7 @@ export function handleHarvest(event: Harvest): void {
     [
       vaultAddress.toHexString(),
       strategyAddress.toHexString(),
-      wantTokenAddress.toHexString(),
+      wantToken.id,
       harvestedAmount.toString(),
       supplySideRevenueUSD.toString(),
       event.transaction.hash.toHexString(),
@@ -71,25 +66,18 @@ export function handleFarmHarvest(event: FarmHarvest): void {
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  const strategyContract = StrategyContract.bind(strategyAddress);
+  let rewardToken = utils.getStrategyFarmToken(strategyAddress, event.block);
+  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+    rewardToken.decimals as u8
+  ).toBigDecimal();
 
-  const rewardTokenAddress = utils.readValue<Address>(
-    strategyContract.try_farm(),
-    constants.NULL.TYPE_ADDRESS
-  );
-  const rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
+  const supplySideRevenueUSD = rewardTokenEmissionAmount
+    .divDecimal(rewardTokenDecimals)
+    .times(rewardToken.lastPriceUSD!);
 
   const protocolSideRevenueUSD = feesToStrategist
     .plus(feesToGovernance)
-    .divDecimal(
-      constants.BIGINT_TEN.pow(rewardToken.decimals as u8).toBigDecimal()
-    )
-    .times(rewardToken.lastPriceUSD!);
-
-  const supplySideRevenueUSD = rewardTokenEmissionAmount
-    .divDecimal(
-      constants.BIGINT_TEN.pow(rewardToken.decimals as u8).toBigDecimal()
-    )
+    .divDecimal(rewardTokenDecimals)
     .times(rewardToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -99,13 +87,58 @@ export function handleFarmHarvest(event: FarmHarvest): void {
     event.block
   );
 
+  updateRewardTokenInfo(
+    vaultAddress,
+    rewardToken,
+    rewardTokenEmissionAmount,
+    event.params.blockNumber,
+    event.params.timestamp,
+    event.block
+  );
+
   log.warning(
-    "[FarmHarvest] Vault: {}, Strategy: {}, supplySideRevenueUSD: {}, protocolSideRevenueUSD: {}, TxnHash: {}",
+    "[FarmHarvest] Vault: {}, Strategy: {}, FarmToken: {}, supplySideRevenueUSD: {}, protocolSideRevenueUSD: {}, TxnHash: {}",
     [
       vaultAddress.toHexString(),
       strategyAddress.toHexString(),
+      rewardToken.id,
       supplySideRevenueUSD.toString(),
       protocolSideRevenueUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+}
+
+export function handleDiggHarvest(event: DiggHarvestState): void {
+  const strategyAddress = event.address;
+  const harvestedAmount = event.params.diggIncrease;
+
+  const vaultAddress = utils.getVaultAddressFromContext();
+  const vault = getOrCreateVault(vaultAddress, event.block);
+
+  let rewardToken = getOrCreateToken(constants.DIGG_TOKEN_ADDRESS, event.block);
+  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+    rewardToken.decimals as u8
+  ).toBigDecimal();
+
+  const supplySideRevenueUSD = harvestedAmount
+    .divDecimal(rewardTokenDecimals)
+    .times(rewardToken.lastPriceUSD!);
+
+  updateRevenueSnapshots(
+    vault,
+    supplySideRevenueUSD,
+    constants.BIGDECIMAL_ZERO,
+    event.block
+  );
+
+  log.warning(
+    "[DiggHarvestState] Vault: {}, Strategy: {}, FarmToken: {}, supplySideRevenueUSD: {}, TxnHash: {}",
+    [
+      vaultAddress.toHexString(),
+      strategyAddress.toHexString(),
+      rewardToken.id,
+      supplySideRevenueUSD.toString(),
       event.transaction.hash.toHexString(),
     ]
   );
@@ -120,24 +153,18 @@ export function handleHarvestState(event: HarvestState): void {
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  const strategyContract = StrategyContract.bind(strategyAddress);
-  const rewardTokenAddress = utils.readValue<Address>(
-    strategyContract.try_xsushi(),
-    constants.NULL.TYPE_ADDRESS
-  );
-  const rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
+  let rewardToken = utils.getStrategyXSushiToken(strategyAddress, event.block);
+  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+    rewardToken.decimals as u8
+  ).toBigDecimal();
+
+  const supplySideRevenueUSD = rewardTokenEmissionAmount
+    .divDecimal(rewardTokenDecimals)
+    .times(rewardToken.lastPriceUSD!);
 
   const protocolSideRevenueUSD = feesToStrategist
     .plus(feesToGovernance)
-    .divDecimal(
-      constants.BIGINT_TEN.pow(rewardToken.decimals as u8).toBigDecimal()
-    )
-    .times(rewardToken.lastPriceUSD!);
-
-  const supplySideRevenueUSD = rewardTokenEmissionAmount
-    .divDecimal(
-      constants.BIGINT_TEN.pow(rewardToken.decimals as u8).toBigDecimal()
-    )
+    .divDecimal(rewardTokenDecimals)
     .times(rewardToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -147,52 +174,22 @@ export function handleHarvestState(event: HarvestState): void {
     event.block
   );
 
-  log.warning(
-    "[HarvestState] Vault: {}, Strategy: {}, supplySideRevenueUSD: {}, protocolSideRevenueUSD: {}, TxnHash: {}",
-    [
-      vaultAddress.toHexString(),
-      strategyAddress.toHexString(),
-      supplySideRevenueUSD.toString(),
-      protocolSideRevenueUSD.toString(),
-      event.transaction.hash.toHexString(),
-    ]
-  );
-}
-
-export function handleCurveHarvest(event: CurveHarvest): void {
-  const strategyAddress = event.address;
-  const feesToStrategist = event.params.strategistPerformanceFee;
-  const feesToGovernance = event.params.governancePerformanceFee;
-
-  const vaultAddress = utils.getVaultAddressFromContext();
-  const vault = getOrCreateVault(vaultAddress, event.block);
-
-  const strategyContract = StrategyContract.bind(strategyAddress);
-  const wantTokenAddress = utils.readValue<Address>(
-    strategyContract.try_want(),
-    constants.NULL.TYPE_ADDRESS
-  );
-  const wantToken = getOrCreateToken(wantTokenAddress, event.block);
-
-  const protocolSideRevenueUSD = feesToStrategist
-    .plus(feesToGovernance)
-    .divDecimal(
-      constants.BIGINT_TEN.pow(wantToken.decimals as u8).toBigDecimal()
-    )
-    .times(wantToken.lastPriceUSD!);
-
-  updateRevenueSnapshots(
-    vault,
-    constants.BIGDECIMAL_ZERO,
-    protocolSideRevenueUSD,
+  updateRewardTokenInfo(
+    vaultAddress,
+    rewardToken,
+    rewardTokenEmissionAmount,
+    event.params.blockNumber,
+    event.params.timestamp,
     event.block
   );
 
   log.warning(
-    "[CurveHarvest] Vault: {}, Strategy: {}, protocolSideRevenueUSD: {}, TxnHash: {}",
+    "[HarvestState] Vault: {}, Strategy: {}, XSushiToken: {}, supplySideRevenueUSD: {}, protocolSideRevenueUSD: {}, TxnHash: {}",
     [
       vaultAddress.toHexString(),
       strategyAddress.toHexString(),
+      rewardToken.id,
+      supplySideRevenueUSD.toString(),
       protocolSideRevenueUSD.toString(),
       event.transaction.hash.toHexString(),
     ]
@@ -222,19 +219,21 @@ export function handleSetWithdrawalFee(event: SetWithdrawalFee): void {
 export function handlePerformanceFeeGovernance(
   event: PerformanceFeeGovernance
 ): void {
-  const amount = event.params.amount;
   const tokenAddress = event.params.token;
+  const performanceFeeAmount = event.params.amount;
 
-  if (amount.equals(constants.BIGINT_ZERO)) return;
+  if (performanceFeeAmount.equals(constants.BIGINT_ZERO)) return;
 
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  const wantToken = getOrCreateToken(tokenAddress, event.block);
-  const protocolSideRevenueUSD = amount
-    .divDecimal(
-      constants.BIGINT_TEN.pow(wantToken.decimals as u8).toBigDecimal()
-    )
+  let wantToken = getOrCreateToken(tokenAddress, event.block);
+  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+    wantToken.decimals as u8
+  ).toBigDecimal();
+
+  const protocolSideRevenueUSD = performanceFeeAmount
+    .divDecimal(wantTokenDecimals)
     .times(wantToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -249,7 +248,7 @@ export function handlePerformanceFeeGovernance(
     [
       vaultAddress.toHexString(),
       tokenAddress.toHexString(),
-      amount.toHexString(),
+      performanceFeeAmount.toString(),
       protocolSideRevenueUSD.toString(),
       event.transaction.hash.toHexString(),
     ]
@@ -281,19 +280,21 @@ export function handleSetPerformanceFeeGovernance(
 export function handlePerformanceFeeStrategist(
   event: PerformanceFeeStrategist
 ): void {
-  const amount = event.params.amount;
   const tokenAddress = event.params.token;
+  const performanceFeeAmount = event.params.amount;
 
-  if (amount.equals(constants.BIGINT_ZERO)) return;
+  if (performanceFeeAmount.equals(constants.BIGINT_ZERO)) return;
 
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  const wantToken = getOrCreateToken(tokenAddress, event.block);
-  const protocolSideRevenueUSD = amount
-    .divDecimal(
-      constants.BIGINT_TEN.pow(wantToken.decimals as u8).toBigDecimal()
-    )
+  let wantToken = getOrCreateToken(tokenAddress, event.block);
+  let wantTokenDecimals = constants.BIGINT_TEN.pow(
+    wantToken.decimals as u8
+  ).toBigDecimal();
+
+  const protocolSideRevenueUSD = performanceFeeAmount
+    .divDecimal(wantTokenDecimals)
     .times(wantToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
@@ -308,7 +309,7 @@ export function handlePerformanceFeeStrategist(
     [
       vaultAddress.toHexString(),
       tokenAddress.toHexString(),
-      amount.toHexString(),
+      performanceFeeAmount.toString(),
       protocolSideRevenueUSD.toString(),
       event.transaction.hash.toHexString(),
     ]
@@ -339,25 +340,34 @@ export function handleSetPerformanceFeeStrategist(
 
 export function handleTreeDistribution(event: TreeDistribution): void {
   const strategyAddress = event.address;
-  const timestamp = event.params.timestamp;
-  const rewardAmount = event.params.amount;
   const rewardTokenAddress = event.params.token;
+  const rewardTokenEmissionAmount = event.params.amount;
 
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
-  const rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
+  let rewardToken = getOrCreateToken(rewardTokenAddress, event.block);
+  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+    rewardToken.decimals as u8
+  ).toBigDecimal();
 
-  const supplySideRevenueUSD = rewardAmount
-    .divDecimal(
-      constants.BIGINT_TEN.pow(rewardToken.decimals as u8).toBigDecimal()
-    )
+  const supplySideRevenueUSD = rewardTokenEmissionAmount
+    .divDecimal(rewardTokenDecimals)
     .times(rewardToken.lastPriceUSD!);
 
   updateRevenueSnapshots(
     vault,
     supplySideRevenueUSD,
     constants.BIGDECIMAL_ZERO,
+    event.block
+  );
+
+  updateRewardTokenInfo(
+    vaultAddress,
+    rewardToken,
+    rewardTokenEmissionAmount,
+    event.params.blockNumber,
+    event.params.timestamp,
     event.block
   );
 

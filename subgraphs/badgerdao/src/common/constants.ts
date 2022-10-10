@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 // The network names corresponding to the Network enum in the schema.
@@ -49,9 +48,17 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
+export namespace RewardIntervalType {
+  export const BLOCK = "BLOCK";
+  export const TIMESTAMP = "TIMESTAMP";
+}
+
 export namespace Protocol {
   export const NAME = "Badger DAO";
   export const SLUG = "badger-dao";
+  export const SCHEMA_VERSION = "1.3.0";
+  export const SUBGRAPH_VERSION = "1.1.0";
+  export const METHODOLOGY_VERSION = "1.0.0";
 }
 
 export namespace NULL {
@@ -76,7 +83,12 @@ export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 export const MAX_BPS = BigDecimal.fromString("10000");
 export const ETH_AVERAGE_BLOCK_PER_HOUR = BigInt.fromI32(3756);
 
-export const PROTOCOL_ID = "0x63cF44B2548e4493Fd099222A1eC79F3344D9682";
+export const PROTOCOL_ID = "0x63cf44b2548e4493fd099222a1ec79f3344d9682";
+
 export const BDIGG_VAULT_ADDRESS = Address.fromString(
   "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a"
+);
+
+export const DIGG_TOKEN_ADDRESS = Address.fromString(
+  "0x798D1bE841a82a273720CE31c822C61a67a601C3"
 );
