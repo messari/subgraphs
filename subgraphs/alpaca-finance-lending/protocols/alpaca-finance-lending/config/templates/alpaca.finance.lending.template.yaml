@@ -1,0 +1,683 @@
+# prettier-ignore
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+# These valuts are not generated in a factory mode, so I have to list them here one by one.
+  - kind: ethereum
+    name: ibWBNB
+    network: bsc
+    source:
+      address: "0xd7D069493685A581d27824Fc46EdA46B7EfC0063"
+      abi: Vault
+      startBlock: 5213456
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ConfigurableInterestVaultConfig
+          file: ./abis/ConfigurableInterestVaultConfig.json
+        - name: FairLaunch
+          file: ./abis/FairLaunch.json
+        - name: SimplePriceOracle
+          file: ./abis/SimplePriceOracle.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: AddDebt(indexed uint256,uint256)
+          handler: handleAddDebt
+        - event: RemoveDebt(indexed uint256,uint256)
+          handler: handleRemoveDebt
+        - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: handleKill
+      file: ./src/mappings/Vault.ts
+  - kind: ethereum
+    name: ibBUSD
+    network: bsc
+    source:
+      address: "0x7C9e73d4C71dae564d41F78d56439bB4ba87592f"
+      abi: Vault
+      startBlock: 5213616
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ConfigurableInterestVaultConfig
+          file: ./abis/ConfigurableInterestVaultConfig.json
+        - name: FairLaunch
+          file: ./abis/FairLaunch.json
+        - name: SimplePriceOracle
+          file: ./abis/SimplePriceOracle.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: AddDebt(indexed uint256,uint256)
+          handler: handleAddDebt
+        - event: RemoveDebt(indexed uint256,uint256)
+          handler: handleRemoveDebt
+        - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: handleKill
+      file: ./src/mappings/Vault.ts
+  - kind: ethereum
+    name: ibETH
+    network: bsc
+    source:
+      address: "0xbfF4a34A4644a113E8200D7F1D79b3555f723AfE"
+      abi: Vault
+      startBlock: 6322674
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ConfigurableInterestVaultConfig
+          file: ./abis/ConfigurableInterestVaultConfig.json
+        - name: FairLaunch
+          file: ./abis/FairLaunch.json
+        - name: SimplePriceOracle
+          file: ./abis/SimplePriceOracle.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: AddDebt(indexed uint256,uint256)
+          handler: handleAddDebt
+        - event: RemoveDebt(indexed uint256,uint256)
+          handler: handleRemoveDebt
+        - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: handleKill
+      file: ./src/mappings/Vault.ts
+  - kind: ethereum
+    name: ibALPACA
+    network: bsc
+    source:
+      address: "0xf1bE8ecC990cBcb90e166b71E368299f0116d421"
+      abi: Vault
+      startBlock: 6865780
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ConfigurableInterestVaultConfig
+          file: ./abis/ConfigurableInterestVaultConfig.json
+        - name: SimplePriceOracle
+          file: ./abis/SimplePriceOracle.json
+        - name: FairLaunch
+          file: ./abis/FairLaunch.json
+        - name: SimplePriceOracle
+          file: ./abis/SimplePriceOracle.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: AddDebt(indexed uint256,uint256)
+          handler: handleAddDebt
+        - event: RemoveDebt(indexed uint256,uint256)
+          handler: handleRemoveDebt
+        - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: handleKill
+      file: ./src/mappings/Vault.ts
+  - kind: ethereum
+    name: ibUSDT
+    network: bsc
+    source:
+      address: "0x158Da805682BdC8ee32d52833aD41E74bb951E59"
+      abi: Vault
+      startBlock: 7732507
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ConfigurableInterestVaultConfig
+          file: ./abis/ConfigurableInterestVaultConfig.json
+        - name: FairLaunch
+          file: ./abis/FairLaunch.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: AddDebt(indexed uint256,uint256)
+          handler: handleAddDebt
+        - event: RemoveDebt(indexed uint256,uint256)
+          handler: handleRemoveDebt
+        - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: handleKill
+      file: ./src/mappings/Vault.ts
+  - kind: ethereum
+    name: ibBTCB
+    network: bsc
+    source:
+      address: "0x08FC9Ba2cAc74742177e0afC3dC8Aed6961c24e7"
+      abi: Vault
+      startBlock: 7771427
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ConfigurableInterestVaultConfig
+          file: ./abis/ConfigurableInterestVaultConfig.json
+        - name: FairLaunch
+          file: ./abis/FairLaunch.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: AddDebt(indexed uint256,uint256)
+          handler: handleAddDebt
+        - event: RemoveDebt(indexed uint256,uint256)
+          handler: handleRemoveDebt
+        - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: handleKill
+      file: ./src/mappings/Vault.ts
+  - kind: ethereum
+    name: ibTUSD
+    network: bsc
+    source:
+      address: "0x3282d2a151ca00BfE7ed17Aa16E42880248CD3Cd"
+      abi: Vault
+      startBlock: 8494541
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ConfigurableInterestVaultConfig
+          file: ./abis/ConfigurableInterestVaultConfig.json
+        - name: FairLaunch
+          file: ./abis/FairLaunch.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: AddDebt(indexed uint256,uint256)
+          handler: handleAddDebt
+        - event: RemoveDebt(indexed uint256,uint256)
+          handler: handleRemoveDebt
+        - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: handleKill
+      file: ./src/mappings/Vault.ts
+  - kind: ethereum
+    name: ibUSDC
+    network: bsc
+    source:
+      address: "0x800933D685E7Dc753758cEb77C8bd34aBF1E26d7"
+      abi: Vault
+      startBlock: 14151376
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ConfigurableInterestVaultConfig
+          file: ./abis/ConfigurableInterestVaultConfig.json
+        - name: FairLaunch
+          file: ./abis/FairLaunch.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: AddDebt(indexed uint256,uint256)
+          handler: handleAddDebt
+        - event: RemoveDebt(indexed uint256,uint256)
+          handler: handleRemoveDebt
+        - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: handleKill
+      file: ./src/mappings/Vault.ts
+  - kind: ethereum
+    name: ibCAKE
+    network: bsc
+    source:
+      address: "0xfF693450dDa65df7DD6F45B4472655A986b147Eb"
+      abi: Vault
+      startBlock: 17870362
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ConfigurableInterestVaultConfig
+          file: ./abis/ConfigurableInterestVaultConfig.json
+        - name: FairLaunch
+          file: ./abis/FairLaunch.json
+        - name: IERC20Detailed
+          file: ./abis/IERC20Detailed.json
+        - name: IERC20DetailedBytes
+          file: ./abis/IERC20DetailedBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: AddDebt(indexed uint256,uint256)
+          handler: handleAddDebt
+        - event: RemoveDebt(indexed uint256,uint256)
+          handler: handleRemoveDebt
+        - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: handleKill
+      file: ./src/mappings/Vault.ts
