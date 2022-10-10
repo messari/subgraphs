@@ -1,6 +1,11 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Deposit, Vault, VaultFee, Withdraw } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, PROTOCOL_ID } from "../utils/constants";
+import {
+  BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ZERO,
+  exponentToBigDecimal,
+  PROTOCOL_ID,
+} from "../utils/constants";
 import { getOrCreateVaultDailySnapshot } from "../utils/getters";
 import { updateProtocolRevenue } from "./protocol";
 import { updateVaultAndSnapshots } from "./vault";
@@ -73,7 +78,9 @@ export function createWithdraw(
       ]);
       return;
     }
-    const feeUSD = amountUSD.times(withdrawalFee.feePercentage);
+    const normalizedWithdrawalFee =
+      withdrawalFee.feePercentage.div(BIGDECIMAL_HUNDRED);
+    const feeUSD = amountUSD.times(normalizedWithdrawalFee);
 
     updateProtocolRevenue(feeUSD, BIGDECIMAL_ZERO, feeUSD, event);
 
