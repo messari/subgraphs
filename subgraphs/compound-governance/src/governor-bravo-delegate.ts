@@ -87,6 +87,16 @@ function _handleProposalCreated(
   proposal.targets = addressesToStrings(targets);
   proposal.values = values;
   proposal.signatures = signatures;
+
+  let totalSize = 0
+  for (let i = 0; i < calldatas.length; i++) {
+    totalSize = totalSize + calldatas[i].byteLength
+    if (totalSize > 4800) {//4864
+      log.error("Calldata index {}, value {}, size {}, totalSize {}", [i.toString(), calldatas[i].toHexString(), calldatas[i].byteLength.toString(), totalSize.toString()])
+      calldatas[i] = Bytes.fromHexString("0x00")
+    }
+  }
+
   proposal.calldatas = calldatas; // THIS LARGE BYTES[] EXCEEDS GRAPH'S ROW SIZE
   proposal.creationBlock = event.block.number;
   proposal.creationTime = event.block.timestamp;
