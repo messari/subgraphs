@@ -129,6 +129,25 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
   return result.toBigDecimal();
 }
 
+//change number of decimals for BigDecimal
+export function BDChangeDecimals(
+  x: BigDecimal,
+  from: i32,
+  to: i32
+): BigDecimal {
+  if (to > from) {
+    // increase number of decimals
+    const diffMagnitude = exponentToBigDecimal(to - from);
+    return x.times(diffMagnitude);
+  } else if (to < from) {
+    // decrease number of decimals
+    const diffMagnitude = exponentToBigDecimal(from - to);
+    return x.div(diffMagnitude);
+  } else {
+    return x;
+  }
+}
+
 /////////////////////////////
 /////     Addresses     /////
 /////////////////////////////

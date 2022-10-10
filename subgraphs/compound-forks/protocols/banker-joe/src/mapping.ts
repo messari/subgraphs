@@ -166,6 +166,7 @@ export function handleMint(event: Mint): void {
   const minter = event.params.minter;
   const mintAmount = event.params.mintAmount;
   const contract = CToken.bind(event.address);
+  const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
@@ -173,6 +174,7 @@ export function handleMint(event: Mint): void {
     comptrollerAddr,
     minter,
     mintAmount,
+    outputTokenSupplyResult,
     balanceOfUnderlyingResult,
     event
   );
@@ -182,6 +184,7 @@ export function handleRedeem(event: Redeem): void {
   const redeemer = event.params.redeemer;
   const redeemAmount = event.params.redeemAmount;
   const contract = CToken.bind(event.address);
+  const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.redeemer
   );
@@ -189,6 +192,7 @@ export function handleRedeem(event: Redeem): void {
     comptrollerAddr,
     redeemer,
     redeemAmount,
+    outputTokenSupplyResult,
     balanceOfUnderlyingResult,
     event
   );
@@ -197,6 +201,7 @@ export function handleRedeem(event: Redeem): void {
 export function handleBorrow(event: BorrowEvent): void {
   const borrower = event.params.borrower;
   const borrowAmount = event.params.borrowAmount;
+  const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
@@ -206,6 +211,7 @@ export function handleBorrow(event: BorrowEvent): void {
     borrower,
     borrowAmount,
     borrowBalanceStoredResult,
+    totalBorrows,
     event
   );
 }
@@ -214,6 +220,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const borrower = event.params.borrower;
   const payer = event.params.payer;
   const repayAmount = event.params.repayAmount;
+  const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
@@ -224,6 +231,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     payer,
     repayAmount,
     borrowBalanceStoredResult,
+    totalBorrows,
     event
   );
 }
@@ -314,7 +322,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Banker Joe",
     "banker-joe",
     "2.0.1",
-    "1.1.5",
+    "1.1.6",
     "1.0.0",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),

@@ -177,11 +177,21 @@ export class ScriptGenerator {
 
     const location = this.getLocation(deploymentData.protocol, deploymentData)
 
-    scripts.push('rm -rf build')
-    scripts.push('rm -rf generated')
-    scripts.push('rm -rf results.txt')
-    scripts.push('rm -rf configurations/configure.ts')
-    scripts.push('rm -rf subgraph.yaml')
+    if (process.platform == 'win32') {
+      scripts.push('IF EXIST build(rmdir /s /q build)')
+      scripts.push('IF EXIST generated(rmdir /s /q generated)')
+      scripts.push('IF EXIST results.txt(del results.txt)')
+      scripts.push(
+        'IF EXIST configurations/configure.ts(del configurations/configure.ts)'
+      )
+      scripts.push('IF EXIST subgraph.yaml(del subgraph.yaml)')
+    } else {
+      scripts.push('rm -rf build')
+      scripts.push('rm -rf generated')
+      scripts.push('rm -rf results.txt')
+      scripts.push('rm -rf configurations/configure.ts')
+      scripts.push('rm -rf subgraph.yaml')
+    }
 
     scripts.push(
       `mustache protocols/${deploymentData.protocol}/config/deployments/${deploymentData.deployment}/configurations.json protocols/${deploymentData.protocol}/config/templates/${deploymentData.files.template} > subgraph.yaml`

@@ -157,9 +157,16 @@ export function handleMarketAdded(event: MarketAdded): void {
       underlyingSymbol = "DF";
       underlyingDecimals = 18;
     } else if (underlyingTokenAddr.toHexString() == ZERO_ADDRESS) {
-      underlyingName = "Ether";
-      underlyingSymbol = "ETH";
-      underlyingDecimals = 18;
+      // this is eth on ethereum
+      if (constant.network == Network.MAINNET) {
+        underlyingName = "Ether";
+        underlyingSymbol = "ETH";
+        underlyingDecimals = 18;
+      } else if (constant.network == Network.BSC) {
+        underlyingName = "BNB";
+        underlyingSymbol = "BNB";
+        underlyingDecimals = 18;
+      }
     } else {
       const underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
       underlyingName = getOrElse<string>(
@@ -314,6 +321,7 @@ export function handleMint(event: Mint): void {
   const minter = event.params.sender;
   const mintAmount = event.params.mintAmount;
   const contract = CToken.bind(event.address);
+  const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.sender
   );
@@ -321,6 +329,7 @@ export function handleMint(event: Mint): void {
     comptrollerAddr,
     minter,
     mintAmount,
+    outputTokenSupplyResult,
     balanceOfUnderlyingResult,
     event
   );
@@ -330,6 +339,7 @@ export function handleRedeem(event: Redeem): void {
   const redeemer = event.params.recipient;
   const redeemAmount = event.params.redeemUnderlyingAmount;
   const contract = CToken.bind(event.address);
+  const outputTokenSupplyResult = contract.try_totalSupply();
   const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.recipient
   );
@@ -337,6 +347,7 @@ export function handleRedeem(event: Redeem): void {
     comptrollerAddr,
     redeemer,
     redeemAmount,
+    outputTokenSupplyResult,
     balanceOfUnderlyingResult,
     event
   );
@@ -345,6 +356,7 @@ export function handleRedeem(event: Redeem): void {
 export function handleBorrow(event: BorrowEvent): void {
   const borrower = event.params.borrower;
   const borrowAmount = event.params.borrowAmount;
+  const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
@@ -354,6 +366,7 @@ export function handleBorrow(event: BorrowEvent): void {
     borrower,
     borrowAmount,
     borrowBalanceStoredResult,
+    totalBorrows,
     event
   );
 }
@@ -362,6 +375,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   const borrower = event.params.borrower;
   const payer = event.params.payer;
   const repayAmount = event.params.repayAmount;
+  const totalBorrows = event.params.totalBorrows;
   const contract = CToken.bind(event.address);
   const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
@@ -372,6 +386,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     payer,
     repayAmount,
     borrowBalanceStoredResult,
+    totalBorrows,
     event
   );
 }
@@ -597,34 +612,48 @@ export function handleStablecoinTransfer(event: StablecoinTransfer): void {
 
   const contract = stablecoin.bind(event.address);
   const supply = contract.totalSupply();
+  let token = Token.load(tokenId);
+  if (token == null) {
+    token = new Token(tokenId);
+    token.name = contract.name();
+    token.symbol = contract.symbol();
+    token.decimals = contract.decimals();
+    token.save();
+  }
+
   // since mintedTokens will be sorted by address, we need to make sure
   // mintedTokenSupplies is sorted in the same order
-  if (protocol.mintedTokens == null || protocol.mintedTokens!.length == 0) {
+  let mintedTokens = protocol.mintedTokens;
+  let mintedTokenSupplies = protocol.mintedTokenSupplies;
+  if (mintedTokens == null || mintedTokens.length == 0) {
     protocol.mintedTokens = [tokenId];
     protocol.mintedTokenSupplies = [supply];
   } else {
-    const tokenIndex = protocol.mintedTokens!.indexOf(tokenId);
-    if (tokenIndex > 0) {
+    const tokenIndex = mintedTokens.indexOf(tokenId);
+    if (tokenIndex >= 0) {
       // token already in protocol.mintedTokens
-      protocol.mintedTokenSupplies![tokenIndex] = supply;
+      mintedTokenSupplies![tokenIndex] = supply;
+      protocol.mintedTokenSupplies = mintedTokenSupplies;
     } else {
-      if (tokenId < protocol.mintedTokens![0]) {
+      if (tokenId < mintedTokens[0]) {
         // insert as the first token into mintedTokens
-        protocol.mintedTokens = [tokenId].concat(protocol.mintedTokens!);
-        protocol.mintedTokenSupplies = [supply].concat(
-          protocol.mintedTokenSupplies!
-        );
+        protocol.mintedTokens = [tokenId].concat(mintedTokens);
+        protocol.mintedTokenSupplies = [supply].concat(mintedTokenSupplies!);
       } else {
         // insert as the last token into mintedTokens
-        protocol.mintedTokens!.push(tokenId);
-        protocol.mintedTokenSupplies!.push(supply);
+        mintedTokens = mintedTokens.concat([tokenId]);
+        mintedTokenSupplies = mintedTokenSupplies!.concat([supply]);
+        protocol.mintedTokens = mintedTokens;
+        protocol.mintedTokenSupplies = mintedTokenSupplies;
       }
     }
   }
 
   protocol.save();
+
   const blockTimeStamp = event.block.timestamp;
   const snapshotID = (blockTimeStamp.toI32() / SECONDS_PER_DAY).toString();
+
   let snapshot = FinancialsDailySnapshot.load(snapshotID);
   if (snapshot == null) {
     snapshotFinancials(comptrollerAddr, event.block.number, blockTimeStamp);
@@ -654,7 +683,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "dForce v2",
     "dforce-v2",
     "2.0.1",
-    "1.1.5",
+    "1.2.1",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
