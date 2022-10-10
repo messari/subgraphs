@@ -371,10 +371,9 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
             embedObjects.unshift(indexingErrorEmbed);
             if (deploymentsOnProtocol[0]?.status === 'prod') {
                 indexingErrorEmbed.title += ' ' + protocol;
-                aggThreadMsgObjects.push(indexingErrorEmbed);
+                aggThreadMsgObjects.push({ embeds: indexingErrorEmbed.fields, protocol: protocol });
             }
         }
-
         if (embedObjects.length > 0) {
             return embedObjects;
         }
@@ -390,18 +389,59 @@ export async function sendMessageToAggThread(aggThreadId, channelId = process.en
         return;
     }
 
+    const aggThreadMsgObjectsToSend = [];
+    const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
+    const currentThreadMessages = await fetchMessages("", aggThreadId);
+
+    aggThreadMsgObjects.forEach(aggThread => {
+        const indexingErrorEmbed = {
+            title: "Indexing Errors " + aggThread.protocol,
+            description: 'These subgraphs encountered a fatal error in indexing',
+            fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Failed At Block', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
+            footer: { text: monitorVersion }
+        };
+        const msg = currentThreadMessages.find(x => {
+            return !!x.embeds.find(embed => embed.title.toUpperCase().includes(aggThread.protocol)) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS);
+        })
+        let embedToAdd = false
+        if (!!msg) {
+            const existingEmbed = msg.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
+            const aggThreadNetworkStringsArr = aggThread.embeds[0].value.split('\n').join('-----').split('-----');
+            const aggThreadBlockValueArr = aggThread.embeds[1].value.split('\n').join('-----').split('-----');
+            const existingMessageNetworkStringsArr = existingEmbed.embeds[0].value.fields.split('\n').join('-----').split('-----');
+            const existingMessageBlockValueArr = existingEmbed.embeds[1].value.fields.split('\n').join('-----').split('-----');
+            aggThreadNetworkStringsArr.forEach(networkLine, networkIdx => {
+                const existingMessageIndex = existingMessageNetworkStringsArr.indexOf(networkLine);
+                if (!(existingMessageIndex >= 0 && aggThreadBlockValueArr[networkIdx] === existingMessageBlockValueArr[existingMessageIndex])) {
+                    indexingErrorEmbed.fields[0].value += networkLine;
+                    indexingErrorEmbed.fields[1].value += aggThreadBlockValueArr[networkIdx];
+                    embedToAdd = true;
+                }
+            });
+        } else {
+            indexingErrorEmbed.fields[0].value += aggThread.embeds[0].value;
+            indexingErrorEmbed.fields[1].value += aggThread.embeds[1].value;
+            embedToAdd = true;
+        }
+
+        if (!!embedToAdd) {
+            indexingErrorEmbed.color = colorsArray[Math.floor(Math.random() * 8)];
+            aggThreadMsgObjectsToSend.unshift(indexingErrorEmbed);
+        }
+    })
+
     const baseURL = "https://discordapp.com/api/channels/" + aggThreadId + "/messages";
     const headers = {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",
     };
 
-    const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on prod subgraphs**\n`, "embeds": aggThreadMsgObjects });
+    const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on prod subgraphs**\n`, "embeds": aggThreadMsgObjectsToSend });
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return data;
     } catch (err) {
-        if (err.response.status === 429) {
+        if (err?.response?.status === 429) {
             return aggThreadMsgObjects;
         } else {
             errorNotification("ERROR LOCATION 26 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
