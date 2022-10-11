@@ -24,6 +24,7 @@ import {
   Vote,
   TokenDailySnapshot,
   VoteDailySnapshot,
+  DelegateChange,
 } from "../generated/schema";
 
 export const SECONDS_PER_DAY = 60 * 60 * 24;
@@ -77,22 +78,30 @@ export function getGovernance(): Governance {
   return governance;
 }
 
+export function getDelegateChange(
+  blockTimestamp: BigInt,
+  logIndex: BigInt
+): DelegateChange {
+  const delegateChangeId = `${blockTimestamp.toI64()}-${logIndex}`;
+
+  const delegateChange = new DelegateChange(delegateChangeId);
+  delegateChange.blockTimestamp = blockTimestamp;
+  delegateChange.logIndex = logIndex;
+
+  return delegateChange;
+}
+
 export function getDelegateVotingPowerChange(
-  blockTimestamp: BigInt
+  blockTimestamp: BigInt,
+  logIndex: BigInt
 ): DelegateVotingPowerChange {
-  const delegateVotingPwerChangeId = (
-    blockTimestamp.toI64() / SECONDS_PER_DAY
-  ).toString();
-  let delegateVPChange = DelegateVotingPowerChange.load(
+  const delegateVotingPwerChangeId = `${blockTimestamp.toI64()}-${logIndex}`;
+
+  const delegateVPChange = new DelegateVotingPowerChange(
     delegateVotingPwerChangeId
   );
-
-  if (!delegateVPChange) {
-    delegateVPChange = new DelegateVotingPowerChange(
-      delegateVotingPwerChangeId
-    );
-    delegateVPChange.blockTimestamp = blockTimestamp;
-  }
+  delegateVPChange.blockTimestamp = blockTimestamp;
+  delegateVPChange.logIndex = logIndex;
 
   return delegateVPChange;
 }

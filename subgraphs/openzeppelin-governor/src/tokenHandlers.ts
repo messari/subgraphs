@@ -1,6 +1,7 @@
 import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 import {
+  getDelegateChange,
   getDelegateVotingPowerChange,
   getGovernance,
   getOrCreateDelegate,
@@ -12,11 +13,16 @@ import {
 export function _handleDelegateChanged(
   delegator: string,
   fromDelegate: string,
-  toDelegate: string
+  toDelegate: string,
+  event: ethereum.Event
 ): void {
   const tokenHolder = getOrCreateTokenHolder(delegator);
   const previousDelegate = getOrCreateDelegate(fromDelegate);
   const newDelegate = getOrCreateDelegate(toDelegate);
+  const delegateChanged = getDelegateChange(
+    event.block.timestamp,
+    event.logIndex
+  );
 
   tokenHolder.delegate = newDelegate.id;
   tokenHolder.save();
@@ -28,13 +34,18 @@ export function _handleDelegateChanged(
   newDelegate.tokenHoldersRepresentedAmount =
     newDelegate.tokenHoldersRepresentedAmount + 1;
   newDelegate.save();
+
+  delegateChanged.delegate = toDelegate;
+  delegateChanged.delegator = fromDelegate;
+  delegateChanged.governanceFrameworkId = event.address.toHexString();
+  delegateChanged.txnHash = event.transaction.hash.toHexString();
 }
 
 export function _handleDelegateVotesChanged(
   delegateAddress: string,
   previousBalance: BigInt,
   newBalance: BigInt,
-  timestamp: BigInt
+  event: ethereum.Event
 ): void {
   const votesDifference = newBalance.minus(previousBalance);
 
@@ -44,10 +55,16 @@ export function _handleDelegateVotesChanged(
   delegate.save();
 
   // Create DelegateVotingPowerChange
-  const delegateVPChange = getDelegateVotingPowerChange(timestamp);
+  const delegateVPChange = getDelegateVotingPowerChange(
+    event.block.timestamp,
+    event.logIndex
+  );
   delegateVPChange.previousBalance = previousBalance;
   delegateVPChange.newBalance = newBalance;
   delegateVPChange.delegate = delegateAddress;
+  delegateVPChange.governanceFrameworkId = event.address.toHexString();
+  delegateVPChange.txnHash = event.transaction.hash.toHexString();
+  delegateVPChange.logIndex = event.logIndex;
   delegateVPChange.save();
 
   // Update governance delegate count

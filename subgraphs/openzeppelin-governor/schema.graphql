@@ -1,6 +1,25 @@
+type DelegateChange @entity {
+  "Unique entity used to keep track of voting power delta"
+  id: ID!
+  "Governance frameworkId"
+  governanceFrameworkId: String
+  "Token address for delegate"
+  delegator: String!
+  "Token address for delegate"
+  delegate: String!
+  "Block time change happened"
+  blockTimestamp: BigInt!
+  "Transaction hash of the delegate change event"
+  txnHash: String!
+  "Log index for delegate change"
+  logIndex: BigInt!
+}
+
 type DelegateVotingPowerChange @entity {
   "Unique entity used to keep track of voting power delta"
   id: ID!
+  "Governance frameworkId"
+  governanceFrameworkId: String
   "Token address for delegate"
   delegate: String!
   "Previous voting power of delegate"
@@ -9,6 +28,10 @@ type DelegateVotingPowerChange @entity {
   newBalance: BigInt!
   "Block time change happened"
   blockTimestamp: BigInt!
+  "Transaction hash of the voting power change"
+  txnHash: String!
+  "Log index for delegate voting power change"
+  logIndex: BigInt!
 }
 
 type Governance @entity {
