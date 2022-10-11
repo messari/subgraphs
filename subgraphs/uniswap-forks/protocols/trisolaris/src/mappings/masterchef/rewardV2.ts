@@ -41,7 +41,7 @@ export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
 
 // Handle the addition of a new pool to the MasterChef. New staking pool.
 export function handleLogPoolAddition(event: LogPoolAddition): void {
-  let masterChefPool = createMasterChefStakingPool(
+  const masterChefPool = createMasterChefStakingPool(
     event,
     MasterChef.MASTERCHEFV2,
     event.params.pid,
@@ -59,7 +59,7 @@ export function handleLogPoolAddition(event: LogPoolAddition): void {
 
 // Update the allocation points of the pool.
 export function handleLogSetPool(event: LogSetPool): void {
-  let masterChefPool = _MasterChefStakingPool.load(
+  const masterChefPool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV2 + "-" + event.params.pid.toString()
   )!;
   updateMasterChefTotalAllocation(
