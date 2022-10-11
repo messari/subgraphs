@@ -22,12 +22,12 @@ export function calculateFee(
   pool: LiquidityPool,
   trackedAmountUSD: BigDecimal
 ): BigDecimal[] {
-  let tradingFee = getLiquidityPoolFee(pool.fees[0]);
-  let protocolFee = getLiquidityPoolFee(pool.fees[1]);
-  let tradingFeeAmount = trackedAmountUSD.times(
+  const tradingFee = getLiquidityPoolFee(pool.fees[0]);
+  const protocolFee = getLiquidityPoolFee(pool.fees[1]);
+  const tradingFeeAmount = trackedAmountUSD.times(
     percToDec(tradingFee.feePercentage)
   );
-  let protocolFeeAmount = trackedAmountUSD.times(
+  const protocolFeeAmount = trackedAmountUSD.times(
     percToDec(protocolFee.feePercentage)
   );
 
