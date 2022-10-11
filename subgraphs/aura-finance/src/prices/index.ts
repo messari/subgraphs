@@ -19,6 +19,13 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 
   let network = dataSource.network();
 
+  if (constants.MAI_STABLECOIN_MAP.get(network)! == tokenAddr) {
+    return CustomPriceType.initialize(
+      constants.BIGDECIMAL_USD_PRICE,
+      constants.DEFAULT_USDC_DECIMALS
+    );
+  }
+
   // 1. Yearn Lens Oracle
   let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
   if (!yearnLensPrice.reverted) {

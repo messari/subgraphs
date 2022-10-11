@@ -326,11 +326,11 @@ export function getOrCreateFeeType(
 
   if (!fees) {
     fees = new VaultFee(feeId);
-    fees.feeType = feeType;
-    fees.feePercentage = feePercentage;
-
-    fees.save();
   }
+  fees.feeType = feeType;
+  fees.feePercentage = feePercentage;
+
+  fees.save();
 
   return fees;
 }

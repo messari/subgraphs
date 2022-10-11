@@ -129,4 +129,5 @@ export const BAL_TOKEN_ADDR = Address.fromString(
 export const INACURATE_PRICEFEED_TOKENS = [
   Address.fromString("0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB"), // COW
   Address.fromString("0x798d1be841a82a273720ce31c822c61a67a601c3"), // DIGG
+  Address.fromString("0x6f80310CA7F2C654691D1383149Fa1A57d8AB1f8"), // SILO
 ];

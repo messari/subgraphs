@@ -18,6 +18,7 @@ export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000");
 
 export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
@@ -130,11 +131,8 @@ CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
 ///////////////////////////// SUSHISWAP CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const SUSHISWAP_DEFAULT_RESERVE_CALL = new SushiSwapPair__getReservesResult(
-  BIGINT_ZERO,
-  BIGINT_ZERO,
-  BIGINT_ZERO
-);
+export const SUSHISWAP_DEFAULT_RESERVE_CALL =
+  new SushiSwapPair__getReservesResult(BIGINT_ZERO, BIGINT_ZERO, BIGINT_ZERO);
 
 export const SUSHISWAP_CALCULATIONS_ADDRESS_MAP = new TypedMap<
   string,
@@ -427,3 +425,6 @@ WHITELIST_TOKENS_MAP.set(
 );
 WHITELIST_TOKENS_MAP.set(POLYGON.NETWORK_STRING, POLYGON.WHITELIST_TOKENS);
 WHITELIST_TOKENS_MAP.set(OPTIMISM.NETWORK_STRING, OPTIMISM.WHITELIST_TOKENS);
+
+export const MAI_STABLECOIN_MAP = new TypedMap<string, Address>();
+MAI_STABLECOIN_MAP.set(MAINNET.NETWORK_STRING, MAINNET.MAI_STABLECOIN);

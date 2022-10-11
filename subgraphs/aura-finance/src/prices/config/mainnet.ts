@@ -123,3 +123,7 @@ WHITELIST_TOKENS.set(
   "LINK",
   Address.fromString("0x514910771AF9Ca656af840dff83E8264EcF986CA")
 );
+
+export const MAI_STABLECOIN = Address.fromString(
+  "0x8D6CeBD76f18E1558D4DB88138e2DeFB3909fAD6"
+);

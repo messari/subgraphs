@@ -285,6 +285,8 @@ export function getAuraMintAmount(
   rewardTokenAddr: Address,
   rewardRate: BigInt
 ): BigDecimal {
+  // https://github.com/aurafinance/aura-contracts/blob/9fadc49b63f329333701bba28de801109dd5c44d/contracts/core/Aura.sol#L82
+
   const rewardTokenContract = AuraToken.bind(rewardTokenAddr);
 
   const totalSupply = readValue<BigInt>(
@@ -316,7 +318,12 @@ export function getAuraMintAmount(
   if (remainingCliff > BIGDECIMAL_ZERO) {
     auraMintAmount = rewardRate
       .toBigDecimal()
-      .times(remainingCliff)
+      .times(
+        remainingCliff
+          .times(BigInt.fromI32(5).toBigDecimal())
+          .div(BigInt.fromI32(2).toBigDecimal())
+          .plus(BigInt.fromI32(700).toBigDecimal())
+      )
       .div(totalCliffs);
 
     const remainingSupply = initMint.plus(maxSupply).minus(totalSupply);
