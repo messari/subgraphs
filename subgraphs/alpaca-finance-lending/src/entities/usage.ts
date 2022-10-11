@@ -82,9 +82,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   const usageMetricsHourlySnapshot =
     getOrCreateUsageMetricsHourlySnapshot(event);
 
-  let accountId = from.toHexString();
+  const accountId = from.toHexString();
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = `daily-${accountId}-${day}`;
+  const dailyActiveAccountId = `daily-${accountId}-${day}`;
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -92,7 +92,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     usageMetricsDailySnapshot.dailyActiveUsers += 1;
   }
   // Combine the id, user address and hour to generate a unique user id for the hour
-  let hourlyActiveAccountId = `hourly-${accountId}-${hour}`;
+  const hourlyActiveAccountId = `hourly-${accountId}-${hour}`;
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -111,7 +111,7 @@ function isUniqueDailyUser(
   const timestamp = event.block.timestamp.toI64();
   const day = `${timestamp / SECONDS_PER_DAY}`;
   // Combine the id, user address, and action to generate a unique user id for the day
-  let dailyActionActiveAccountId = `daily-${action}-${account.id}-${day}`;
+  const dailyActionActiveAccountId = `daily-${action}-${account.id}-${day}`;
   let dailyActionActiveAccount = ActiveAccount.load(dailyActionActiveAccountId);
   if (!dailyActionActiveAccount) {
     dailyActionActiveAccount = new ActiveAccount(dailyActionActiveAccountId);

@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { RewardToken, Token } from "../../generated/schema";
 import { IERC20Detailed } from "../../generated/ibUSDT/IERC20Detailed";
 import { IERC20DetailedBytes } from "../../generated/ibUSDT/IERC20DetailedBytes";
@@ -55,17 +55,17 @@ function fetchTokenName(contract: IERC20Detailed): string {
 }
 
 function fetchTokenSymbol(contract: IERC20Detailed): string {
-  let contractSymbolBytes = IERC20DetailedBytes.bind(contract._address);
+  const contractSymbolBytes = IERC20DetailedBytes.bind(contract._address);
 
   // try types string and bytes32 for symbol
   let symbolValue = UNKNOWN_TOKEN_VALUE;
-  let symbolResult = contract.try_symbol();
+  const symbolResult = contract.try_symbol();
   if (!symbolResult.reverted) {
     return symbolResult.value;
   }
 
   // non-standard ERC20 implementation
-  let symbolResultBytes = contractSymbolBytes.try_symbol();
+  const symbolResultBytes = contractSymbolBytes.try_symbol();
   if (!symbolResultBytes.reverted) {
     // for broken pairs that have no symbol function exposed
     if (!isNullEthValue(symbolResultBytes.value.toHexString())) {

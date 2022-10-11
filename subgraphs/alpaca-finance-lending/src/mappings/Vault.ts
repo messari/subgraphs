@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Vault, Work, Kill, Transfer } from "../../generated/ibALPACA/Vault";
 import { ConfigurableInterestVaultConfig } from "../../generated/ibALPACA/ConfigurableInterestVaultConfig";
 import { FairLaunch } from "../../generated/ibALPACA/FairLaunch";
@@ -266,7 +266,7 @@ export function updateInterest(event: ethereum.Event, market: Market): void {
   // Compute interest rate once per day. Otherwise, it will greatly slow down the indexing.
   const day: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   const id = `${market.id}-${day}`;
-  let marketSnapshot = MarketDailySnapshot.load(id);
+  const marketSnapshot = MarketDailySnapshot.load(id);
   if (marketSnapshot != null) {
     return;
   }

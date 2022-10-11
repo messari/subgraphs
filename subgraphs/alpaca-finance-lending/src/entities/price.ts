@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
 import { SimplePriceOracle } from "../../generated/ibALPACA/SimplePriceOracle";
 import { getTokenById } from "./token";
@@ -70,7 +70,7 @@ export function getTokenPrice(token: Token, blockNumber: BigInt): BigDecimal {
     }
   } else {
     // Use external oracle to get price.
-    let customPrice = getUsdPricePerToken(Address.fromString(token.id));
+    const customPrice = getUsdPricePerToken(Address.fromString(token.id));
     priceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
   }
 

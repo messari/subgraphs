@@ -70,7 +70,7 @@ export function createMarket(
 ): Market {
   const id = ibToken.toHexString();
   const interestBearingToken = getOrCreateToken(ibToken, reserve.toHexString());
-  let market = new Market(id);
+  const market = new Market(id);
   market.protocol = getOrCreateLendingProtocol().id;
   market.name = interestBearingToken.name;
   market.isActive = true;
@@ -223,9 +223,9 @@ export function getOrCreateMarketHourlySnapshot(
 // create seperate InterestRate Entities for each market snapshot
 // this is needed to prevent snapshot rates from being pointers to the current rate
 function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
-  let snapshotRates: string[] = [];
+  const snapshotRates: string[] = [];
   for (let i = 0; i < rates.length; i++) {
-    let rate = InterestRate.load(rates[i]);
+    const rate = InterestRate.load(rates[i]);
     if (!rate) {
       log.warning("[getSnapshotRates] rate {} not found, should not happen", [
         rates[i],
@@ -234,8 +234,8 @@ function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
     }
 
     // create new snapshot rate
-    let snapshotRateId = rates[i].concat("-").concat(timeSuffix);
-    let snapshotRate = new InterestRate(snapshotRateId);
+    const snapshotRateId = rates[i].concat("-").concat(timeSuffix);
+    const snapshotRate = new InterestRate(snapshotRateId);
     snapshotRate.side = rate.side;
     snapshotRate.type = rate.type;
     snapshotRate.rate = rate.rate;
@@ -305,7 +305,7 @@ export function changeMarketBorrowBalance(
   market: Market,
   balanceChange: BigInt
 ): void {
-  let changeUSD = amountInUSD(
+  const changeUSD = amountInUSD(
     balanceChange,
     getTokenById(market.inputToken),
     event.block.number
@@ -444,9 +444,9 @@ function sortRewardTokens(market: Market): void {
     return;
   }
 
-  let tokens = market.rewardTokens;
-  let emissions = market.rewardTokenEmissionsAmount;
-  let emissionsUSD = market.rewardTokenEmissionsUSD;
+  const tokens = market.rewardTokens;
+  const emissions = market.rewardTokenEmissionsAmount;
+  const emissionsUSD = market.rewardTokenEmissionsUSD;
   multiArraySort(tokens!, emissions!, emissionsUSD!);
 
   market.rewardTokens = tokens;
@@ -464,7 +464,7 @@ function multiArraySort(
     return;
   }
 
-  let sorter: Array<Array<string>> = [];
+  const sorter: Array<Array<string>> = [];
   for (let i = 0; i < ref.length; i++) {
     sorter[i] = [ref[i], arr1[i].toString(), arr2[i].toString()];
   }
@@ -542,7 +542,7 @@ export function closeMarketPosition(market: Market): void {
 }
 
 function updateMarketTVL(event: ethereum.Event, market: Market): void {
-  let inputTokenPriceUSD = market.inputTokenPriceUSD;
+  const inputTokenPriceUSD = market.inputTokenPriceUSD;
   let totalValueLockedUSD: BigDecimal = BIGDECIMAL_NEGATIVE_ONE;
   const inputToken = getTokenById(market.inputToken);
   const outputToken = getTokenById(market.outputToken!);

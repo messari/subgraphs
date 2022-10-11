@@ -1,9 +1,4 @@
-import {
-  BigDecimal,
-  BigInt,
-  dataSource,
-  ethereum,
-} from "@graphprotocol/graph-ts";
+import { BigDecimal, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import {
   FinancialsDailySnapshot,
   LendingProtocol,
