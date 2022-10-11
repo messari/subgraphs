@@ -23,7 +23,8 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
   _handleDelegateVotesChanged(
     event.params.delegate.toHexString(),
     event.params.previousBalance,
-    event.params.newBalance
+    event.params.newBalance,
+    event.block.timestamp
   );
 }
 

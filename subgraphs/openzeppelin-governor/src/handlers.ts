@@ -18,6 +18,7 @@ import {
 import {
   Delegate,
   Governance,
+  DelegateVotingPowerChange,
   Proposal,
   TokenHolder,
   Vote,
@@ -74,6 +75,26 @@ export function getGovernance(): Governance {
   }
 
   return governance;
+}
+
+export function getDelegateVotingPowerChange(
+  blockTimestamp: BigInt
+): DelegateVotingPowerChange {
+  const delegateVotingPwerChangeId = (
+    blockTimestamp.toI64() / SECONDS_PER_DAY
+  ).toString();
+  let delegateVPChange = DelegateVotingPowerChange.load(
+    delegateVotingPwerChangeId
+  );
+
+  if (!delegateVPChange) {
+    delegateVPChange = new DelegateVotingPowerChange(
+      delegateVotingPwerChangeId
+    );
+    delegateVPChange.blockTimestamp = blockTimestamp;
+  }
+
+  return delegateVPChange;
 }
 
 export function getProposal(id: string): Proposal {

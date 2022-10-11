@@ -1,3 +1,16 @@
+type DelegateVotingPowerChange @entity {
+  "Unique entity used to keep track of voting power delta"
+  id: ID!
+  "Token address for delegate"
+  delegate: String!
+  "Previous voting power of delegate"
+  previousBalance: BigInt!
+  "New voting power of delegate"
+  newBalance: BigInt!
+  "Block time change happened"
+  blockTimestamp: BigInt!
+}
+
 type Governance @entity {
   "Unique entity used to keep track of common aggregated data"
   id: ID!
