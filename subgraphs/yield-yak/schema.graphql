@@ -1,6 +1,74 @@
-type ExampleEntity @entity {
+interface Event {
+  " { Transaction hash }-{ Log index } "
   id: ID!
-  count: BigInt!
-  rewardToken: Bytes! # address
-  swapPair: Bytes! # address
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Address that received tokens "
+  to: String!
+
+  " Address that sent tokens "
+  from: String!
+
+  blockNumber: BigInt!
+
+  timestamp: BigInt!
+}
+
+type Deposit implements Event @entity {
+  " { Transaction hash }-{ Log index } "
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Market that tokens are deposited into "
+  to: String!
+
+  " Address that deposited tokens "
+  from: String!
+
+  blockNumber: BigInt!
+
+  timestamp: BigInt!
+
+  " Amount of token deposited in native units "
+  amount: BigInt!
+
+  " Amount of token deposited in USD "
+  amountUSD: BigDecimal!
+}
+
+type Withdraw implements Event @entity {
+  " { Transaction hash }-{ Log index }"
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Address that received tokens "
+  to: String!
+
+  " Market that tokens are withdrawn from "
+  from: String!
+
+  blockNumber: BigInt!
+
+  timestamp: BigInt!
+
+  " Amount of token withdrawn in native units "
+  amount: BigInt!
+
+  " Amount of token withdrawn in USD "
+  amountUSD: BigDecimal!
 }
