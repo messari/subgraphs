@@ -13,7 +13,7 @@ import {
   RewardToken,
 } from "../../generated/schema";
 import { Vault } from "../../generated/ibALPACA/Vault";
-import { updateRewardTokens } from "../mappings/Vault";
+import { updateRewardTokens } from "../mappings/vault";
 import { amountInUSD, getTokenPrice } from "./price";
 import {
   addProtocolVolume,

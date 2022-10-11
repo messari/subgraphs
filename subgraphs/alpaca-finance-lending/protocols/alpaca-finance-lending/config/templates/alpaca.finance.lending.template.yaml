@@ -4,7 +4,7 @@ repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-# These valuts are not generated in a factory mode, so I have to list them here one by one.
+#These valuts are not generated in a factory mode, so I have to list them here one by one.
   - kind: ethereum
     name: ibWBNB
     network: bsc
@@ -80,7 +80,7 @@ dataSources:
           handler: handleRemoveDebt
         - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
           handler: handleKill
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
   - kind: ethereum
     name: ibBUSD
     network: bsc
@@ -156,7 +156,7 @@ dataSources:
           handler: handleRemoveDebt
         - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
           handler: handleKill
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
   - kind: ethereum
     name: ibETH
     network: bsc
@@ -232,7 +232,7 @@ dataSources:
           handler: handleRemoveDebt
         - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
           handler: handleKill
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
   - kind: ethereum
     name: ibALPACA
     network: bsc
@@ -310,7 +310,7 @@ dataSources:
           handler: handleRemoveDebt
         - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
           handler: handleKill
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
   - kind: ethereum
     name: ibUSDT
     network: bsc
@@ -384,7 +384,7 @@ dataSources:
           handler: handleRemoveDebt
         - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
           handler: handleKill
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
   - kind: ethereum
     name: ibBTCB
     network: bsc
@@ -458,7 +458,7 @@ dataSources:
           handler: handleRemoveDebt
         - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
           handler: handleKill
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
   - kind: ethereum
     name: ibTUSD
     network: bsc
@@ -532,7 +532,7 @@ dataSources:
           handler: handleRemoveDebt
         - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
           handler: handleKill
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
   - kind: ethereum
     name: ibUSDC
     network: bsc
@@ -606,7 +606,7 @@ dataSources:
           handler: handleRemoveDebt
         - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
           handler: handleKill
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
   - kind: ethereum
     name: ibCAKE
     network: bsc
@@ -680,4 +680,4 @@ dataSources:
           handler: handleRemoveDebt
         - event: Kill(indexed uint256,indexed address,address,uint256,uint256,uint256,uint256)
           handler: handleKill
-      file: ./src/mappings/Vault.ts
+      file: ./src/mappings/vault.ts
