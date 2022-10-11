@@ -392,7 +392,6 @@ export async function sendMessageToAggThread(aggThreadId, channelId = process.en
     const aggThreadMsgObjectsToSend = [];
     const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
     const currentThreadMessages = await fetchMessages("", aggThreadId);
-
     aggThreadMsgObjects.forEach(aggThread => {
         const indexingErrorEmbed = {
             title: "Indexing Errors " + aggThread.protocol,
@@ -439,6 +438,7 @@ export async function sendMessageToAggThread(aggThreadId, channelId = process.en
     const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on prod subgraphs**\n`, "embeds": aggThreadMsgObjectsToSend });
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        aggThreadMsgObjects = [];
         return data;
     } catch (err) {
         if (err?.response?.status === 429) {
