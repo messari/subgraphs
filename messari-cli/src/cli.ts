@@ -1,3 +1,5 @@
+import { MESSARI_REPO_PATH } from '../bin/env'
+
 const { build } = require('gluegun')
 
 /**
@@ -14,6 +16,8 @@ async function run(argv) {
     .version() // provides default for version, v, --version, -v
     .defaultCommand()
     .create()
+
+  console.log(MESSARI_REPO_PATH)
 
   // and run it
   const toolbox = await cli.run(argv)
