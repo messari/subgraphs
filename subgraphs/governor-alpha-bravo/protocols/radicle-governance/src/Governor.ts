@@ -112,7 +112,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     let contract = Governor.bind(Address.fromString(contractAddress));
 
     governanceFramework.name = contract.NAME();
-    governanceFramework.type = GovernanceFrameworkType.GOVERNOR_BRAVO;
+    governanceFramework.type = GovernanceFrameworkType.GOVERNOR_ALPHA;
     governanceFramework.version = NA;
 
     governanceFramework.contractAddress = contractAddress;
