@@ -11,7 +11,7 @@ function slugToTitle(slug: string): string {
 export const deploymentJsonContext: DeploymentJsonContextInterface = {
   protocolSlug: "apeswap",
   protocolName: slugToTitle("apeswap"),
-  network: "bsc",
+  network: "polygon",
   schemaVersion: "1.3.0",
   subgraphVersion: "1.1.7",
   methodologyVersion: "1.0.0",
