@@ -170,6 +170,8 @@ templates:
           handler: handleDiggHarvest
         - event: HarvestState(uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleHarvestState
+        - event: CurveHarvest(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleCurveHarvest
 
         - event: SetWithdrawalFee(uint256)
           handler: handleSetWithdrawalFee

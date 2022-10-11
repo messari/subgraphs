@@ -7,6 +7,7 @@ import {
   Harvest,
   FarmHarvest,
   HarvestState,
+  CurveHarvest,
   TreeDistribution,
   PerformanceFeeStrategist,
   PerformanceFeeGovernance,
@@ -189,6 +190,49 @@ export function handleHarvestState(event: HarvestState): void {
       vaultAddress.toHexString(),
       strategyAddress.toHexString(),
       rewardToken.id,
+      supplySideRevenueUSD.toString(),
+      protocolSideRevenueUSD.toString(),
+      event.transaction.hash.toHexString(),
+    ]
+  );
+}
+
+export function handleCurveHarvest(event: CurveHarvest): void {
+  const strategyAddress = event.address;
+  const feesToStrategist = event.params.strategistPerformanceFee;
+  const feesToGovernance = event.params.governancePerformanceFee;
+  const rewardTokenEmissionAmount = event.params.crvHarvested;
+
+  const vaultAddress = utils.getVaultAddressFromContext();
+  const vault = getOrCreateVault(vaultAddress, event.block);
+
+  let wantToken = getOrCreateToken(constants.CRV_DAO_TOKEN, event.block);
+  let rewardTokenDecimals = constants.BIGINT_TEN.pow(
+    wantToken.decimals as u8
+  ).toBigDecimal();
+
+  const supplySideRevenueUSD = rewardTokenEmissionAmount
+    .divDecimal(rewardTokenDecimals)
+    .times(wantToken.lastPriceUSD!);
+
+  const protocolSideRevenueUSD = feesToStrategist
+    .plus(feesToGovernance)
+    .divDecimal(rewardTokenDecimals)
+    .times(wantToken.lastPriceUSD!);
+
+  updateRevenueSnapshots(
+    vault,
+    supplySideRevenueUSD,
+    protocolSideRevenueUSD,
+    event.block
+  );
+
+  log.warning(
+    "[CurveHarvest] Vault: {}, Strategy: {}, XSushiToken: {}, supplySideRevenueUSD: {}, protocolSideRevenueUSD: {}, TxnHash: {}",
+    [
+      vaultAddress.toHexString(),
+      strategyAddress.toHexString(),
+      wantToken.id,
       supplySideRevenueUSD.toString(),
       protocolSideRevenueUSD.toString(),
       event.transaction.hash.toHexString(),
