@@ -1,0 +1,6 @@
+type ExampleEntity @entity {
+  id: ID!
+  count: BigInt!
+  rewardToken: Bytes! # address
+  swapPair: Bytes! # address
+}
