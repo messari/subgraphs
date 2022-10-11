@@ -78,7 +78,7 @@ export function getGovernance(): Governance {
   return governance;
 }
 
-export function getDelegateChange(
+export function createDelegateChange(
   blockTimestamp: BigInt,
   logIndex: BigInt
 ): DelegateChange {
@@ -91,7 +91,7 @@ export function getDelegateChange(
   return delegateChange;
 }
 
-export function getDelegateVotingPowerChange(
+export function createDelegateVotingPowerChange(
   blockTimestamp: BigInt,
   logIndex: BigInt
 ): DelegateVotingPowerChange {

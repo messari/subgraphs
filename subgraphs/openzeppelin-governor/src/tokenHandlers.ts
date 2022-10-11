@@ -1,8 +1,8 @@
 import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 import {
-  getDelegateChange,
-  getDelegateVotingPowerChange,
+  createDelegateChange,
+  createDelegateVotingPowerChange,
   getGovernance,
   getOrCreateDelegate,
   getOrCreateTokenDailySnapshot,
@@ -19,7 +19,7 @@ export function _handleDelegateChanged(
   const tokenHolder = getOrCreateTokenHolder(delegator);
   const previousDelegate = getOrCreateDelegate(fromDelegate);
   const newDelegate = getOrCreateDelegate(toDelegate);
-  const delegateChanged = getDelegateChange(
+  const delegateChanged = createDelegateChange(
     event.block.timestamp,
     event.logIndex
   );
@@ -55,7 +55,7 @@ export function _handleDelegateVotesChanged(
   delegate.save();
 
   // Create DelegateVotingPowerChange
-  const delegateVPChange = getDelegateVotingPowerChange(
+  const delegateVPChange = createDelegateVotingPowerChange(
     event.block.timestamp,
     event.logIndex
   );
