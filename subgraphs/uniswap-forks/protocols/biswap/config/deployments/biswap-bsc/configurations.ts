@@ -63,7 +63,7 @@ export class BiswapBscConfigurations implements Configurations {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.BLOCK;
+    return RewardIntervalType.NONE;
   }
   getRewardTokenRate(): BigInt {
     return BIGINT_ZERO;

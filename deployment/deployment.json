@@ -1180,7 +1180,7 @@
         "services": {
           "hosted-service": {
             "slug": "biswap-bsc",
-            "query-id": "biswap"
+            "query-id": "biswap-bsc"
           }
         }
       }
