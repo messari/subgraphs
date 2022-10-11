@@ -1,10 +1,11 @@
 import * as fs from 'fs'
+import { MESSARI_REPO_PATH } from '../../../bin/env'
 
 export interface ScriptGeneratorArgs {
   token: string
   service: string
   id: string
-  scope: string
+  base: boolean
   target: string
   slug: string
   deploy: boolean
@@ -12,7 +13,7 @@ export interface ScriptGeneratorArgs {
   version: string
 }
 
-interface DeploymentData {
+interface DeploymentJsonData {
   protocol: string
   deployment: string
   base: string
@@ -22,6 +23,12 @@ interface DeploymentData {
   versions: Map<string, string>
   files: Map<string, string>
   options: Map<string, string>
+}
+
+export interface Deployment {
+  location: string
+  base: string
+  scripts: string[]
 }
 
 export class ScriptGenerator {
@@ -37,8 +44,8 @@ export class ScriptGenerator {
   // deployment id the specifies a single or multiple deployments.
   id: string
 
-  // Specifies if you are deploying a single subgraph, all subgraphs for a protocol, or all subgraphs for all protocols for a fork
-  scope: string
+  // Specifies if you are deploying a all subgraphs for a subgraph directory (directory name that can contain multiple protocols is referred to as `base`)
+  base: boolean
 
   // The account target for the deployment (i.e. messari).
   target: string
@@ -56,13 +63,13 @@ export class ScriptGenerator {
   version: string
 
   // An object the contains all deployment configurations from the deployment.json
-  allDeployments: Map<string, Object>
+  allDeploymentConfigurations: Map<string, Object>
 
   // An object that contains all deployment configurations that you are deploying with.
-  deployments: Map<string, Object>
+  stagedDeploymentConfigurations: Map<string, Object>
 
-  // Contains all scripts for deployment all subgraphs specified in the command line.
-  scripts: Map<string, string[]>
+  // This contains a list of objects with information necessary to build and deploy a subgraph.
+  deployments: Deployment[]
 
   constructor(
     depoymentJsonData: Map<string, Object>,
@@ -73,98 +80,99 @@ export class ScriptGenerator {
     this.token = args.token
     this.service = args.service
     this.id = args.id
-    this.scope = args.scope
+    this.base = args.base
     this.target = args.target
     this.slug = args.slug
     this.deploy = args.deploy
     this.printlogs = args.log
     this.version = args.version
-    this.allDeployments = new Map<string, Object[]>()
-    this.deployments = new Map<string, Object[]>()
-    this.scripts = new Map<string, string[]>()
+    this.allDeploymentConfigurations = new Map<string, Object[]>()
+    this.stagedDeploymentConfigurations = new Map<string, Object[]>()
+    this.deployments = []
   }
 
   prepare() {
-    this.flattenDeploymentData()
-    this.checkAndStageDeploymentData()
+    this.flattenDeploymentJsonData()
+    this.checkAndStageDeploymentJsonData()
     this.prepareScripts()
   }
 
-  flattenDeploymentData() {
+  flattenDeploymentJsonData() {
     const allDeployments = new Map<string, Object[]>()
 
     for (const protocol of Object.keys(this.data)) {
       const deployments: Map<string, any> = this.data[protocol].deployments
-      for (const [deployment, deploymentData] of Object.entries(deployments)) {
-        deploymentData.protocol = this.data[protocol].protocol
-        deploymentData.base = this.data[protocol].base
-        deploymentData.schema = this.data[protocol].schema
-        deploymentData.deployment = deployment
+      for (const [deployment, deploymentJsonData] of Object.entries(
+        deployments
+      )) {
+        deploymentJsonData.protocol = this.data[protocol].protocol
+        deploymentJsonData.base = this.data[protocol].base
+        deploymentJsonData.schema = this.data[protocol].schema
+        deploymentJsonData.deployment = deployment
 
-        allDeployments[deployment] = deploymentData
+        allDeployments[deployment] = deploymentJsonData
       }
     }
 
-    this.allDeployments = allDeployments
+    this.allDeploymentConfigurations = allDeployments
 
     // Add 10 to all deployments
   }
 
   // Checks if you are wanting to deploy a single subgraph, all subgraphs for a protocol, or all subgraphs for all protocols for a fork
-  checkAndStageDeploymentData() {
-    // Grabs specific deployment information for a single deployment id.
-    if (this.scope === 'single') {
-      if (this.allDeployments[this.id]) {
-        this.deployments[this.id] = this.allDeployments[this.id]
-      } else {
-        throw new Error(`No deployment found for: ${this.id}`)
-      }
-    }
+  checkAndStageDeploymentJsonData() {
+    // Grabs all deployments for a specific base if specified in the flag.
+    //console.log("hi")
 
-    // Grabs all deployments for a specific protocol.
-    if (this.scope === 'protocol') {
-      for (const [deployment, deploymentData] of Object.entries(
-        this.allDeployments
+    if (this.base) {
+      for (const [deployment, deploymentJsonData] of Object.entries(
+        this.allDeploymentConfigurations
       )) {
-        if (deploymentData.protocol === this.id) {
-          this.deployments[deployment] = deploymentData
+        if (deploymentJsonData.base === this.id) {
+          this.stagedDeploymentConfigurations[deployment] = deploymentJsonData
         }
       }
 
-      if (Object.keys(this.deployments).length === 0) {
-        throw new Error(
-          `Please specifiy valid protocol or add this protocol in deployment.json for protocol: ${this.id}`
-        )
-      }
-    }
-
-    // Grabs all deployments for a specific  base.
-    if (this.scope === 'base') {
-      for (const [deployment, deploymentData] of Object.values(
-        this.allDeployments
-      )) {
-        if (deploymentData.base === this.id) {
-          this.deployments[deployment] = deploymentData
-        }
-      }
-
-      if (Object.keys(this.deployments).length === 0) {
+      if (Object.keys(this.stagedDeploymentConfigurations).length === 0) {
         throw new Error(
           `Please specifiy valid base or add this base in deployment.json for base: ${this.id}`
         )
       }
+      return
+    }
+
+    // Grabs specific deployment information for a single deployment-id if it exist.
+    if (this.allDeploymentConfigurations[this.id]) {
+      this.stagedDeploymentConfigurations[this.id] =
+        this.allDeploymentConfigurations[this.id]
+      return
+    }
+
+    // Grabs all deployments for a specific protocol if it exists.
+    for (const [deployment, deploymentJsonData] of Object.entries(
+      this.allDeploymentConfigurations
+    )) {
+      if (deploymentJsonData.protocol === this.id) {
+        this.stagedDeploymentConfigurations[deployment] = deploymentJsonData
+      }
+    }
+
+    if (Object.keys(this.stagedDeploymentConfigurations).length == 0) {
+      throw new Error(`No deployment-id or protocol found for: ${this.id}`)
     }
   }
 
   // Checks if you are wanting to deploy a single network, all deployments for a protocol, or all protocols and networks for a fork
   prepareScripts() {
-    for (const deploymentData of Object.values(this.deployments)) {
+    for (const deploymentJsonData of Object.values(
+      this.stagedDeploymentConfigurations
+    )) {
       if (
         this.deploy === false ||
-        deploymentData['services'][this.getService()]['slug']
+        deploymentJsonData['services'][this.getService()]['slug']
       ) {
-        this.writeDeploymentJsonContext(deploymentData)
-        this.generateScripts(deploymentData)
+        this.writeDeploymentJsonContext(deploymentJsonData)
+        this.generateScripts(deploymentJsonData)
       }
     }
   }
@@ -172,70 +180,79 @@ export class ScriptGenerator {
   generateContext() {}
 
   // Generates scripts necessary for deployment.
-  generateScripts(deploymentData) {
-    const scripts: string[] = []
+  generateScripts(deploymentJsonData) {
+    const location = this.getLocation(
+      deploymentJsonData.protocol,
+      deploymentJsonData
+    )
 
-    const location = this.getLocation(deploymentData.protocol, deploymentData)
+    const deployment: Deployment = {
+      location: location,
+      base: deploymentJsonData.base,
+      scripts: [],
+    }
 
     if (process.platform == 'win32') {
-      scripts.push('IF EXIST build(rmdir /s /q build)')
-      scripts.push('IF EXIST generated(rmdir /s /q generated)')
-      scripts.push('IF EXIST results.txt(del results.txt)')
-      scripts.push(
+      deployment.scripts.push('IF EXIST build(rmdir /s /q build)')
+      deployment.scripts.push('IF EXIST generated(rmdir /s /q generated)')
+      deployment.scripts.push('IF EXIST results.txt(del results.txt)')
+      deployment.scripts.push(
         'IF EXIST configurations/configure.ts(del configurations/configure.ts)'
       )
-      scripts.push('IF EXIST subgraph.yaml(del subgraph.yaml)')
+      deployment.scripts.push('IF EXIST subgraph.yaml(del subgraph.yaml)')
     } else {
-      scripts.push('rm -rf build')
-      scripts.push('rm -rf generated')
-      scripts.push('rm -rf results.txt')
-      scripts.push('rm -rf configurations/configure.ts')
-      scripts.push('rm -rf subgraph.yaml')
+      deployment.scripts.push('rm -rf build')
+      deployment.scripts.push('rm -rf generated')
+      deployment.scripts.push('rm -rf results.txt')
+      deployment.scripts.push('rm -rf configurations/configure.ts')
+      deployment.scripts.push('rm -rf subgraph.yaml')
     }
 
-    scripts.push(
-      `mustache protocols/${deploymentData.protocol}/config/deployments/${deploymentData.deployment}/configurations.json protocols/${deploymentData.protocol}/config/templates/${deploymentData.files.template} > subgraph.yaml`
+    deployment.scripts.push(
+      `mustache protocols/${deploymentJsonData.protocol}/config/deployments/${deploymentJsonData.deployment}/configurations.json protocols/${deploymentJsonData.protocol}/config/templates/${deploymentJsonData.files.template} > subgraph.yaml`
     )
-    scripts.push(
-      `mustache protocols/${deploymentData.protocol}/config/deployments/${deploymentData.deployment}/deploymentJsonContext.json ../../deployment/context/template.mustache > src/deploymentJsonContext.ts`
+    deployment.scripts.push(
+      `mustache protocols/${deploymentJsonData.protocol}/config/deployments/${deploymentJsonData.deployment}/deploymentJsonContext.json ../../deployment/context/template.mustache > deploymentJsonContext.ts`
     )
 
-    if (deploymentData.options['prepare:constants'] === true) {
-      scripts.push(
-        `npm run prepare:constants --PROTOCOL=${deploymentData.protocol} --id=${deploymentData.deployment}`
+    if (deploymentJsonData.options['prepare:constants'] === true) {
+      deployment.scripts.push(
+        `npm run prepare:constants --PROTOCOL=${deploymentJsonData.protocol} --id=${deploymentJsonData.deployment}`
       )
     }
-    scripts.push('graph codegen')
+    deployment.scripts.push('graph codegen')
 
     // We don't want to deploy if we are building or just testing.
     if (this.deploy === true) {
-      scripts.push(this.getDeploymentScript(location, deploymentData))
+      deployment.scripts.push(
+        this.getDeploymentScript(location, deploymentJsonData)
+      )
     } else {
-      scripts.push('graph build')
+      deployment.scripts.push('graph build')
     }
 
-    this.scripts.set(location, scripts)
+    this.deployments.push(deployment)
   }
 
-  writeDeploymentJsonContext(deploymentData: DeploymentData) {
+  writeDeploymentJsonContext(deploymentJsonData: DeploymentJsonData) {
     fs.writeFileSync(
-      `./protocols/${deploymentData.protocol}/config/deployments/${deploymentData.deployment}/deploymentJsonContext.json`,
-      JSON.stringify(deploymentData, null, 2)
+      `${MESSARI_REPO_PATH}/subgraphs/${deploymentJsonData.base}/protocols/${deploymentJsonData.protocol}/config/deployments/${deploymentJsonData.deployment}/deploymentJsonContext.json`,
+      JSON.stringify(deploymentJsonData, null, 2)
     )
   }
 
   // Grabs the location of deployment.
-  getLocation(protocol, deploymentData) {
+  getLocation(protocol, deploymentJsonData) {
     // Check if build first since you may not have a service and target prepared for build.
     if (this.deploy === false) {
-      return `${protocol}-${deploymentData.network}`
+      return `${protocol}-${deploymentJsonData.network}`
     }
 
     let location = ''
     if (this.slug) {
       location = this.slug
     } else {
-      location = deploymentData['services'][this.getService()]['slug']
+      location = deploymentJsonData['services'][this.getService()]['slug']
     }
 
     if (this.service === 'subgraph-studio') {
@@ -254,13 +271,13 @@ export class ScriptGenerator {
   }
 
   // Get the deployment script with the proper endpoint, version, and authorization token.
-  getDeploymentScript(location, deploymentData) {
+  getDeploymentScript(location, deploymentJsonData) {
     let deploymentScript = ''
 
     // Set variables for deployment
     let version = this.version
     if (!version) {
-      version = deploymentData.versions.subgraph
+      version = deploymentJsonData.versions.subgraph
     }
 
     switch (this.service) {
