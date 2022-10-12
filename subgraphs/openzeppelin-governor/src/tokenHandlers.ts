@@ -19,10 +19,6 @@ export function _handleDelegateChanged(
   const tokenHolder = getOrCreateTokenHolder(delegator);
   const previousDelegate = getOrCreateDelegate(fromDelegate);
   const newDelegate = getOrCreateDelegate(toDelegate);
-  const delegateChanged = createDelegateChange(
-    event.block.timestamp,
-    event.logIndex
-  );
 
   tokenHolder.delegate = newDelegate.id;
   tokenHolder.save();
@@ -35,10 +31,13 @@ export function _handleDelegateChanged(
     newDelegate.tokenHoldersRepresentedAmount + 1;
   newDelegate.save();
 
-  delegateChanged.delegate = toDelegate;
-  delegateChanged.delegator = fromDelegate;
-  delegateChanged.governanceFrameworkId = event.address.toHexString();
-  delegateChanged.txnHash = event.transaction.hash.toHexString();
+  const delegateChanged = createDelegateChange({
+    event,
+    delegator,
+    fromDelegate,
+    toDelegate,
+  });
+
   delegateChanged.save();
 }
 
@@ -56,16 +55,13 @@ export function _handleDelegateVotesChanged(
   delegate.save();
 
   // Create DelegateVotingPowerChange
-  const delegateVPChange = createDelegateVotingPowerChange(
-    event.block.timestamp,
-    event.logIndex
-  );
-  delegateVPChange.previousBalance = previousBalance;
-  delegateVPChange.newBalance = newBalance;
-  delegateVPChange.delegate = delegateAddress;
-  delegateVPChange.governanceFrameworkId = event.address.toHexString();
-  delegateVPChange.txnHash = event.transaction.hash.toHexString();
-  delegateVPChange.logIndex = event.logIndex;
+  const delegateVPChange = createDelegateVotingPowerChange({
+    event,
+    previousBalance,
+    newBalance,
+    delegate: delegateAddress,
+  });
+
   delegateVPChange.save();
 
   // Update governance delegate count
