@@ -2,8 +2,8 @@
 
 ## Configuration
 
-- In `subgraph.yaml`, add the following code inside the `abis` section of the `datasources` which is going to fetch prices of token using the `Price Oracle`.
-  **NOTE**: Include the following code in each of the datasources, that is dependent on the `Price Oracle` and update imports in each file inside oracle folder.
+In `subgraph.yaml`, add the following code snippet inside the `abis` section of the `datasources` which is going to fetch prices of token using the `Price Oracle`.
+  **NOTE**: Include the following code snippet in each of the datasources, that is dependent on the `Price Oracle` and update imports in each file inside oracle folder.
 
 ```
 ###########################################
@@ -22,6 +22,12 @@
 # YearnLens Contracts
 - name: YearnLensContract
   file: ./abis/Prices/YearnLens.json
+# Aave Oracle Contract
+- name: AaveOracleContract
+  file: ./abis/Prices/AaveOracle.json
+# SushiSwap Contracts
+- name: CalculationsSushiSwap
+  file: ./abis/Prices/Calculations/SushiSwap.json
 # ChainLink Contracts
 - name: ChainLinkContract
   file: ./abis/Prices/ChainLink.json
@@ -32,33 +38,6 @@
   file: ./abis/Prices/Uniswap/Factory.json
 - name: UniswapPair
   file: ./abis/Prices/Uniswap/Pair.json
-# SushiSwap Contracts
-- name: SushiSwapRouter
-  file: ./abis/Prices/SushiSwap/Router.json
-- name: SushiSwapFactory
-  file: ./abis/Prices/SushiSwap/Factory.json
-- name: SushiSwapPair
-  file: ./abis/Prices/SushiSwap/Pair.json
-- name: CalculationsSushiSwap
-  file: ./abis/Prices/Calculations/SushiSwap.json
-```
-
-### Uniswap - Overriding router path
-
-The default behaviour when querying the Uniswap router for non-native token (e.g. ETH on mainnet, MATIC on polygon) prices is to derive the price via two jumps using the native token.
-
-As an example, to get the price of WBTC in USDC on ethereum mainnet, the path used would be WBTC -> WETH -> USDC, deriving the prices from the WBTC/WETH pool and the WETH/USDC pool.
-There may be cases where the price queried with this method is inaccurate due to low liquidity of the intermediate pools, in this case, it is possible to override the router path for tokens on specific networks.
-This is done by adding a new entry to '`UNISWAP_PATH_OVERRIDE` in the `./config/<network>.ts` file.
-
-For example, on polygon there is insufficient liquidity in WBTC/WMATIC at the time of writing. we have overrided the router PATH for WBTC on polygon so that the WBTC/USDC pool is used instead:
-```
-QUICKSWAP_PATH_OVERRIDE.set(
-  Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // Token to override (WBTC)
-  [
-    Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6"),  // WBTC
-    Address.fromString("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"),  // USDC
-  ]
 ```
 
 ## Usage
@@ -101,7 +80,6 @@ let tokenPrice = getUsdPrice(tokenAddr, amount);
 ## Folder Structure
 
 ```
-
 Prices
 ├── calculations
 │   ├── CalculationsCurve.ts
@@ -110,24 +88,35 @@ Prices
 │   ├── types.ts
 │   ├── constants.ts
 │   └── utils.ts
+├── config
+│   ├── arbitrum.ts
+│   ├── aurora.ts
+│   ├── avalanche.ts
+│   ├── fantom.ts
+│   ├── gnosis.ts
+│   ├── harmony.ts
+│   ├── mainnet.ts
+│   ├── moonbeam.ts
+│   ├── optimism.ts
+│   └── polygon.ts
 ├── oracles
+│   ├── AaveOracle.ts
 │   ├── ChainLinkFeed.ts
 │   └── YearnLensOracle.ts
 ├── routers
 │   ├── CurveRouter.ts
-│   ├── SushiSwapRouter.ts
-│   └── UniswapRouter.ts
+│   └── UniswapForksRouter.ts
 │── README.md
 └── index.ts
 ```
 
 ## Development Status
 
-### Mainnet
-
 🔨 = In progress.  
 🛠 = Feature complete. Additional testing required.
 `MultiCall` = If the method uses more than two `JSON RPC Call`.
+
+### Mainnet
 
 | Method                                                                               |      Type      | StartBlock | MultiCall | Status |
 | ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |

@@ -1,8 +1,8 @@
 import * as constants from "../common/constants";
 import { Configurations } from "../common/types";
-import { BigInt, Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-export const NETWORK_STRING = "matic";
+export const NETWORK_STRING = "aurora";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////
@@ -10,11 +10,8 @@ export const NETWORK_STRING = "matic";
 
 export const YEARN_LENS_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
 export const CHAIN_LINK_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
+export const AAVE_ORACLE_CONTRACT_ADDRESS = constants.NULL.TYPE_ADDRESS;
 export const SUSHISWAP_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
-
-export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
-  "0xb023e699F5a33916Ea823A16485e259257cA8Bd1"
-);
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
@@ -23,8 +20,7 @@ export const AAVE_ORACLE_CONTRACT_ADDRESS = Address.fromString(
 export const CURVE_CALCULATIONS_ADDRESS = constants.NULL.TYPE_ADDRESS;
 
 export const CURVE_REGISTRY_ADDRESSES: Address[] = [
-  Address.fromString("0x094d12e5b541784701FD8d65F11fc0598FBC6332"),
-  Address.fromString("0x47bB542B9dE58b970bA50c9dae444DDB4c16751a"),
+  Address.fromString("0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858"),
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -32,8 +28,7 @@ export const CURVE_REGISTRY_ADDRESSES: Address[] = [
 ///////////////////////////////////////////////////////////////////////////
 
 export const UNISWAP_FORKS_ROUTER_ADDRESSES: Address[] = [
-  Address.fromString("0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff"), // QuickSwap
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506"), // SushiSwap
+  Address.fromString("0x2CB45Edb4517d5947aFdE3BEAbF95A582506858B"), // TriSolaris
 ];
 
 ///////////////////////////////////////////////////////////////////////////
@@ -58,13 +53,13 @@ export const HARDCODED_STABLES: Address[] = [];
 export const USDC_TOKEN_DECIMALS = BigInt.fromI32(6);
 
 export const ETH_ADDRESS = Address.fromString(
-  "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619"
+  "0x8bec47865ade3b172a928df8f990bc7f2a3b9f79" // Aurora
 );
 export const WETH_ADDRESS = Address.fromString(
-  "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"
+  "0xc9bdeed33cd01541e1eed10f90519d2c06fe3feb" // WETH
 );
 export const USDC_ADDRESS = Address.fromString(
-  "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+  "0xb12bfca5a55806aaf64e99521918a4bf0fc40802"
 );
 
 export class config implements Configurations {
