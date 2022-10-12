@@ -81,13 +81,13 @@ export function handleEtherDeposit(event: EtherDeposited): void {
 /** handleEtherWithdrawn tracks ether withdrawn into rocketpool, which represents the TVL of the ETH staked in the pool. */
 
 export function handleEtherWithdrawn(event: EtherWithdrawn): void {
-  updateUsageMetrics(event.block, event.transaction.from);
-  updateProtocolAndPoolTvl(
-    event.block,
-    BIGINT_NEGATIVE_ONE.times(event.params.amount),
-    BIGINT_ZERO
-  );
-  updateSnapshotsTvl(event.block);
+  // updateUsageMetrics(event.block, event.transaction.from);
+  // updateProtocolAndPoolTvl(
+  //   event.block,
+  //   BIGINT_NEGATIVE_ONE.times(event.params.amount),
+  //   BIGINT_ZERO
+  // );
+  // updateSnapshotsTvl(event.block);
 }
 
 /** Can potentially use minipool created/destroyed to track this instead */
@@ -116,42 +116,41 @@ export function handleMinipoolEnqueued(event: MinipoolEnqueued): void {
  * in which case the TVL is unchanged, or has been removed prematurely by the Node Manager.
  * In this scenario, the value is subtracted from the TVL of the network.*/
 export function handleMinipoolDequeued(event: MinipoolDequeued): void {
-  const deposit_address = getStorageAddress(NODEDEPOSIT_ENCODE);
-
-  if (event.transaction.to != deposit_address) {
-    updateMinipoolTvlandRevenue(
-      event.block,
-      event.transaction.value.times(BIGINT_NEGATIVE_ONE),
-      BIGINT_ZERO,
-      BIGINT_ZERO,
-      event.params.minipool.toHexString()
-    );
-    updateUsageMetrics(event.block, event.transaction.from);
-    updateProtocolAndPoolTvl(
-      event.block,
-      BIGINT_NEGATIVE_ONE.times(event.transaction.value),
-      BIGINT_ZERO
-    );
-    updateSnapshotsTvl(event.block);
-  }
+  // const deposit_address = getStorageAddress(NODEDEPOSIT_ENCODE);
+  // if (event.transaction.to != deposit_address) {
+  //   updateMinipoolTvlandRevenue(
+  //     event.block,
+  //     event.transaction.value.times(BIGINT_NEGATIVE_ONE),
+  //     BIGINT_ZERO,
+  //     BIGINT_ZERO,
+  //     event.params.minipool.toHexString()
+  //   );
+  //   updateUsageMetrics(event.block, event.transaction.from);
+  //   updateProtocolAndPoolTvl(
+  //     event.block,
+  //     BIGINT_NEGATIVE_ONE.times(event.transaction.value),
+  //     BIGINT_ZERO
+  //   );
+  //   updateSnapshotsTvl(event.block);
+  // }
 }
 
 /** handleMinipoolRemoved represents a Minipool being dissolved by a Node Manager. The value of the transaction is subtracted from the TVL of the network.*/
 export function handleMinipoolRemoved(event: MinipoolRemoved): void {
-  updateMinipoolTvlandRevenue(
-    event.block,
-    event.transaction.value.times(BIGINT_NEGATIVE_ONE),
-    BIGINT_ZERO,
-    BIGINT_ZERO,
-    event.params.minipool.toHexString()
-  );
-  updateUsageMetrics(event.block, event.transaction.from);
-  updateProtocolAndPoolTvl(
-    event.block,
-    BIGINT_NEGATIVE_ONE.times(event.transaction.value),
-    BIGINT_ZERO
-  );
-  updateSnapshotsTvl(event.block);
+  // updateMinipoolTvlandRevenue(
+  //   event.block,
+  //   event.transaction.value.times(BIGINT_NEGATIVE_ONE),
+  //   BIGINT_ZERO,
+  //   BIGINT_ZERO,
+  //   event.params.minipool.toHexString()
+  // );
+  // updateUsageMetrics(event.block, event.transaction.from);
+  // updateProtocolAndPoolTvl(
+  //   event.block,
+  //   BIGINT_NEGATIVE_ONE.times(event.transaction.value),
+  //   BIGINT_ZERO
+  // );
+  // updateSnapshotsTvl(event.block);
 }
 
 // Handle RPL staked, withdrawn, slashed
@@ -164,13 +163,13 @@ export function handleRPLStaked(event: RPLStaked): void {
 }
 
 export function handleRPLWithdrawn(event: RPLWithdrawn): void {
-  updateUsageMetrics(event.block, event.params.to);
-  updateProtocolAndPoolTvl(
-    event.block,
-    BIGINT_ZERO,
-    event.params.amount.times(BIGINT_NEGATIVE_ONE)
-  );
-  updateSnapshotsTvl(event.block);
+  // updateUsageMetrics(event.block, event.params.to);
+  // updateProtocolAndPoolTvl(
+  //   event.block,
+  //   BIGINT_ZERO,
+  //   event.params.amount.times(BIGINT_NEGATIVE_ONE)
+  // );
+  // updateSnapshotsTvl(event.block);
 }
 
 export function handleRPLSlashed(event: RPLSlashed): void {
@@ -212,7 +211,7 @@ export function handleBalanceUpdate(event: BalancesUpdated): void {
   const BeaconChainRewardEth = event.params.totalEth
     .minus(event.params.stakingEth)
     .div(ONE_ETH_IN_WEI);
-  log.warning("[handleBalanceUpdate] Reward eth found: {}", [
+  log.error("[handleBalanceUpdate] Reward eth found: {}", [
     BeaconChainRewardEth.toString(),
   ]);
 
@@ -233,10 +232,10 @@ export function handleBalanceUpdate(event: BalancesUpdated): void {
   let pool = getOrCreatePool(event.block.number, event.block.timestamp);
   const pools = pool.miniPools;
   if (pools) {
-    var counter: i32;
+    var counter: i32 = 0;
     var cumrevCounter: BigDecimal = BIGDECIMAL_ZERO;
     var cumprotocolrevCounter: BigDecimal = BIGDECIMAL_ZERO;
-    for (counter = 0; counter < pools.length; counter++) {
+    while (counter < pools.length) {
       updateMinipoolTvlandRevenue(
         event.block,
         BIGINT_ZERO,
@@ -254,7 +253,12 @@ export function handleBalanceUpdate(event: BalancesUpdated): void {
       cumprotocolrevCounter = cumprotocolrevCounter.plus(
         minipool.cumulativeProtocolSideRevenueUSD
       );
+      counter = counter + 1;
     }
+    log.error("[handleBalanceUpdate] cumrev: {}", [cumrevCounter.toString()]);
+    log.error("[handleBalanceUpdate] protocolrev: {}", [
+      cumprotocolrevCounter.toString(),
+    ]);
     pool.cumulativeTotalRevenueUSD = cumrevCounter;
     pool.cumulativeProtocolSideRevenueUSD = cumprotocolrevCounter;
     pool.save();
