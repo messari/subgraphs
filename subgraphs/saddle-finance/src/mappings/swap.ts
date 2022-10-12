@@ -112,7 +112,9 @@ export function handleTokenSwapUnderlying(event: TokenSwapUnderlying): void {
     return;
   }
   const tokenIn = getOrCreateTokenFromString(pool._inputTokensOrdered[soldId]);
-  const tokenOut = getOrCreateTokenFromString(pool._inputTokensOrdered[boughtId]);
+  const tokenOut = getOrCreateTokenFromString(
+    pool._inputTokensOrdered[boughtId]
+  );
   createSwap(
     pool,
     event,

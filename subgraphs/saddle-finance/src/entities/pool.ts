@@ -70,7 +70,12 @@ function createPoolFromAddress(address: Address): LiquidityPool {
     prefixID(dataSource.network(), address.toHexString())
   );
 
-  return createPool(address, poolData.createdBlockNumber, poolData.createdTimestamp, null);
+  return createPool(
+    address,
+    poolData.createdBlockNumber,
+    poolData.createdTimestamp,
+    null
+  );
 }
 
 // createPoolFromEvent will create a pool from a PairCreated event, and subscribe to events from it.
@@ -85,14 +90,21 @@ export function createPoolFromFactoryEvent(event: NewSwapPool): void {
     return;
   }
 
-
-  createPool(poolAddr, event.block.number, event.block.timestamp, event.params.pooledTokens)
+  createPool(
+    poolAddr,
+    event.block.number,
+    event.block.timestamp,
+    event.params.pooledTokens
+  );
   SwapTemplate.create(poolAddr);
 }
 
 // createPoolFromRegistryEvent will create a pool if doesn't exist already when added to the pool registry.
 // This should catch pools deployed manually and not via a deployer.
-export function createPoolFromRegistryEvent(address: Address, block: ethereum.Block): void {
+export function createPoolFromRegistryEvent(
+  address: Address,
+  block: ethereum.Block
+): void {
   if (BROKEN_POOLS.has(address.toHexString())) {
     return;
   }
@@ -107,9 +119,9 @@ export function createPoolFromRegistryEvent(address: Address, block: ethereum.Bl
 }
 
 function createPool(
-  swapAddress: Address, 
+  swapAddress: Address,
   blockNum: BigInt,
-  timestamp: BigInt, 
+  timestamp: BigInt,
   pooledTokens: Address[] | null
 ): LiquidityPool {
   const address = swapAddress;
@@ -449,9 +461,9 @@ function getBasePool(contract: Swap): string | null {
 }
 
 function getOrCreateInputTokens(pooledTokens: Address[]): string[] {
-  let tokens = pooledTokens.map<Token>((t) => getOrCreateToken(t));
+  const tokens = pooledTokens.map<Token>((t) => getOrCreateToken(t));
   let tokenIds = tokens.map<string>((t) => t.id);
-  let basePoolId = tokens[tokens.length - 1]._pool;
+  const basePoolId = tokens[tokens.length - 1]._pool;
   if (basePoolId) {
     tokenIds.pop();
     const basePool = getOrCreatePool(Address.fromString(basePoolId));
@@ -473,9 +485,9 @@ function updateOutputTokenPriceAndTVL(
     pool.outputTokenSupply!,
     getTokenDecimals(pool.outputToken!)
   );
-  pool.outputTokenPriceUSD = totalValueLocked.equals(BIGDECIMAL_ZERO) ?
-    BIGDECIMAL_ZERO : 
-    totalValueLocked.div(outputTokenAmount); // avoid div by 0 when pool is empty
+  pool.outputTokenPriceUSD = totalValueLocked.equals(BIGDECIMAL_ZERO)
+    ? BIGDECIMAL_ZERO
+    : totalValueLocked.div(outputTokenAmount); // avoid div by 0 when pool is empty
   updateProtocolTVL(event, totalValueLocked.minus(pool.totalValueLockedUSD));
   pool.totalValueLockedUSD = totalValueLocked;
 }
@@ -501,7 +513,7 @@ function setInputTokenBalancesAndWeights(
         bpBalances.push(BIGINT_ZERO);
         continue;
       }
-      
+
       bpBalances.push(balance.times(lpTokenBalance).div(totalLPTokenSupply));
     }
 
@@ -509,18 +521,22 @@ function setInputTokenBalancesAndWeights(
     // base reference. Balances fetched from the contract will follow the order of `_inputTokensSorted`.
     // BasePool balances are already sorted, but they need to match `_inputTokensOrdered` in order to sort
     // them together with the rest.
-    bpBalances = sortValuesByTokenOrder(basePool.inputTokens, basePool._inputTokensOrdered, bpBalances);
+    bpBalances = sortValuesByTokenOrder(
+      basePool.inputTokens,
+      basePool._inputTokensOrdered,
+      bpBalances
+    );
   }
 
   const balances = getBalances(
     contract,
-    pool.inputTokens.length - bpBalances.length,
+    pool.inputTokens.length - bpBalances.length
   ).concat(bpBalances);
 
   pool.inputTokenBalances = sortValuesByTokenOrder(
     pool._inputTokensOrdered,
     pool.inputTokens,
-    balances,
+    balances
   );
   pool.inputTokenWeights = getBalanceWeights(
     pool.inputTokenBalances,
@@ -581,7 +597,7 @@ export function sortValuesByTokenOrder<T>(
   if (intersection.length != len || valuesToSort.length != len) {
     // reference and target should contain the same elements, just ordered differently.
     log.error(
-      "Failed to sort array via reference. Both arrays should have the same values. Ref: {}, target: {}", 
+      "Failed to sort array via reference. Both arrays should have the same values. Ref: {}, target: {}",
       [referenceOrder.toString(), targetOrder.toString()]
     );
     log.critical("", []);
@@ -593,13 +609,13 @@ export function sortValuesByTokenOrder<T>(
     const val = valuesToSort[i];
     const ref = referenceOrder[i];
 
-    const targetIndex = targetOrder.indexOf(ref)
+    const targetIndex = targetOrder.indexOf(ref);
     ordered[targetIndex] = val;
   }
   return ordered;
 }
 
-// arrayIntersection will return an array with the common items 
+// arrayIntersection will return an array with the common items
 // between two arrays.
 function arrayIntersection<T>(arr1: Array<T>, arr2: Array<T>): Array<T> {
   let len = arr1.length;

@@ -137,7 +137,11 @@ function getInputTokenAmounts(
   pool: LiquidityPool
 ): BigInt[] {
   if (!pool._basePool) {
-    return sortValuesByTokenOrder(pool._inputTokensOrdered, pool.inputTokens, tokenAmounts);
+    return sortValuesByTokenOrder(
+      pool._inputTokensOrdered,
+      pool.inputTokens,
+      tokenAmounts
+    );
   }
   const lpTokenBalance = tokenAmounts.pop();
   const basePool = getOrCreatePool(Address.fromString(pool._basePool!));
@@ -150,12 +154,16 @@ function getInputTokenAmounts(
   }
 
   // sort BP token amounts as in the contract
-  bpTokenAmounts = sortValuesByTokenOrder(basePool.inputTokens, basePool._inputTokensOrdered, bpTokenAmounts);
+  bpTokenAmounts = sortValuesByTokenOrder(
+    basePool.inputTokens,
+    basePool._inputTokensOrdered,
+    bpTokenAmounts
+  );
 
   // sort all token amounts together.
   return sortValuesByTokenOrder(
     pool._inputTokensOrdered,
     pool.inputTokens,
-    tokenAmounts.concat(bpTokenAmounts),
+    tokenAmounts.concat(bpTokenAmounts)
   );
 }
