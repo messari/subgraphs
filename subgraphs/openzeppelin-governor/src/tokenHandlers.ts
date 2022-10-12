@@ -31,12 +31,12 @@ export function _handleDelegateChanged(
     newDelegate.tokenHoldersRepresentedAmount + 1;
   newDelegate.save();
 
-  const delegateChanged = createDelegateChange({
+  const delegateChanged = createDelegateChange(
     event,
-    delegator,
-    fromDelegate,
     toDelegate,
-  });
+    fromDelegate,
+    delegator
+  );
 
   delegateChanged.save();
 }
@@ -55,13 +55,12 @@ export function _handleDelegateVotesChanged(
   delegate.save();
 
   // Create DelegateVotingPowerChange
-  const delegateVPChange = createDelegateVotingPowerChange({
+  const delegateVPChange = createDelegateVotingPowerChange(
     event,
     previousBalance,
     newBalance,
-    delegate: delegateAddress,
-  });
-
+    delegateAddress
+  );
   delegateVPChange.save();
 
   // Update governance delegate count

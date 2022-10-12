@@ -78,55 +78,37 @@ export function getGovernance(): Governance {
   return governance;
 }
 
-export function createDelegateChange({
-  event: {
-    logIndex,
-    transaction: { hash },
-    address,
-    block: { timestamp: blockTimestamp, number: blockNumber },
-  },
-  delegator,
-  fromDelegate,
-  toDelegate,
-}: {
-  event: ethereum.Event;
-  toDelegate: string;
-  fromDelegate: string;
-  delegator: string;
-}): DelegateChange {
-  const delegateChangeId = `${blockTimestamp.toI64()}-${logIndex}`;
+export function createDelegateChange(
+  event: ethereum.Event,
+  toDelegate: string,
+  fromDelegate: string,
+  delegator: string
+): DelegateChange {
+  const delegateChangeId = `${event.block.timestamp.toI64()}-${event.logIndex}`;
 
   const delegateChange = new DelegateChange(delegateChangeId);
 
   delegateChange.delegate = toDelegate;
   delegateChange.delegator = delegator;
   delegateChange.previousDelegate = fromDelegate;
-  delegateChange.tokenAddress = address.toHexString();
-  delegateChange.txnHash = hash.toHexString();
-  delegateChange.blockNumber = blockNumber;
-  delegateChange.blockTimestamp = blockTimestamp;
-  delegateChange.logIndex = logIndex;
+  delegateChange.tokenAddress = event.address.toHexString();
+  delegateChange.txnHash = event.transaction.hash.toHexString();
+  delegateChange.blockNumber = event.block.number;
+  delegateChange.blockTimestamp = event.block.timestamp;
+  delegateChange.logIndex = event.logIndex;
 
   return delegateChange;
 }
 
-export function createDelegateVotingPowerChange({
-  event: {
-    logIndex,
-    transaction: { hash },
-    address,
-    block: { timestamp: blockTimestamp, number: blockNumber },
-  },
-  previousBalance,
-  newBalance,
-  delegate: delegateAddress,
-}: {
-  event: ethereum.Event;
-  previousBalance: BigInt;
-  newBalance: BigInt;
-  delegate: string;
-}): DelegateVotingPowerChange {
-  const delegateVotingPwerChangeId = `${blockTimestamp.toI64()}-${logIndex}`;
+export function createDelegateVotingPowerChange(
+  event: ethereum.Event,
+  previousBalance: BigInt,
+  newBalance: BigInt,
+  delegate: string
+): DelegateVotingPowerChange {
+  const delegateVotingPwerChangeId = `${event.block.timestamp.toI64()}-${
+    event.logIndex
+  }`;
 
   const delegateVPChange = new DelegateVotingPowerChange(
     delegateVotingPwerChangeId
@@ -134,13 +116,13 @@ export function createDelegateVotingPowerChange({
 
   delegateVPChange.previousBalance = previousBalance;
   delegateVPChange.newBalance = newBalance;
-  delegateVPChange.delegate = delegateAddress;
-  delegateVPChange.tokenAddress = address.toHexString();
-  delegateVPChange.txnHash = hash.toHexString();
-  delegateVPChange.logIndex = logIndex;
-  delegateVPChange.blockTimestamp = blockTimestamp;
-  delegateVPChange.logIndex = logIndex;
-  delegateVPChange.blockNumber = blockNumber;
+  delegateVPChange.delegate = delegate;
+  delegateVPChange.tokenAddress = event.address.toHexString();
+  delegateVPChange.txnHash = event.transaction.hash.toHexString();
+  delegateVPChange.logIndex = event.logIndex;
+  delegateVPChange.blockTimestamp = event.block.number;
+  delegateVPChange.logIndex = event.logIndex;
+  delegateVPChange.blockNumber = event.block.number;
 
   return delegateVPChange;
 }
