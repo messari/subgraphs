@@ -471,7 +471,7 @@ type Market @entity {
   # and inputToken balances are used to calculate returns
   inputTokens: [Token!]! # Tokens that need to be deposited to take a position in protocol
   outputToken: Token # Token that is minted to track ownership of position in protocol
-  rewardTokens: [Token!] # Aditional tokens that are given as reward for position in a protocol
+  rewardTokens: [RewardToken!] # Aditional tokens that are given as reward for position in a protocol
   inputTokenTotalBalances: [String!]! # Total balance of this market contract of all input tokens in TokenBalance string format
   outputTokenTotalSupply: BigInt! # Total supply of output token
   blockNumber: BigInt!
