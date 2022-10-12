@@ -5,7 +5,7 @@ import { CustomPriceType } from "../common/types";
 import { ChainLinkContract } from "../../../generated/UniswapV2Factory/ChainLinkContract";
 
 export function getChainLinkContract(): ChainLinkContract | null {
-  let config = utils.getConfig();
+  const config = utils.getConfig();
   if (!config || utils.isNullAddress(config.chainLink())) return null;
 
   return ChainLinkContract.bind(config.chainLink());
@@ -18,13 +18,13 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
     return new CustomPriceType();
   }
 
-  let result = chainLinkContract.try_latestRoundData(
+  const result = chainLinkContract.try_latestRoundData(
     tokenAddr,
     constants.CHAIN_LINK_USD_ADDRESS
   );
 
   if (!result.reverted) {
-    let decimals = chainLinkContract.try_decimals(
+    const decimals = chainLinkContract.try_decimals(
       tokenAddr,
       constants.CHAIN_LINK_USD_ADDRESS
     );

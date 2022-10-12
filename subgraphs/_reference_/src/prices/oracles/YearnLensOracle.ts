@@ -13,7 +13,7 @@ export function getYearnLensContract(
 }
 
 export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
-  let config = utils.getConfig();
+  const config = utils.getConfig();
 
   if (!config || config.yearnLensBlacklist().includes(tokenAddr))
     return new CustomPriceType();
@@ -21,7 +21,7 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
   const yearnLensContract = getYearnLensContract(config.yearnLens());
   if (!yearnLensContract) return new CustomPriceType();
 
-  let tokenPrice: BigDecimal = utils
+  const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       yearnLensContract.try_getPriceUsdcRecommended(tokenAddr),
       constants.BIGINT_ZERO
