@@ -6,7 +6,6 @@ import {
   RemoveLiquidityImbalance,
   RemoveLiquidityOne,
   TokenSwap,
-  InitializeCall,
   Swap,
   TokenSwapUnderlying,
 } from "../../generated/templates/Swap/Swap";
