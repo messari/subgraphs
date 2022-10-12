@@ -438,3 +438,124 @@ type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
+
+# Positional data entities
+
+enum PositionType {
+  INVESTMENT
+  DEBT
+}
+
+enum TransactionType {
+  INVEST
+  REDEEM
+  BORROW
+  REPAY
+  TRANSFER_IN
+  TRANSFER_OUT
+}
+
+type Account @entity {
+  id: ID! # {accountAddress}
+  positions: [Position!]! @derivedFrom(field: "account")
+}
+
+type Market @entity {
+  id: ID! # {protocol pair/pool/vault address}
+  account: Account!
+  protocolName: ProtocolName!
+  protocolType: ProtocolType!
+  # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
+  # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
+  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null
+  # and inputToken balances are used to calculate returns
+  inputTokens: [Token!]! # Tokens that need to be deposited to take a position in protocol
+  outputToken: Token # Token that is minted to track ownership of position in protocol
+  rewardTokens: [Token!] # Aditional tokens that are given as reward for position in a protocol
+  inputTokenTotalBalances: [String!]! # Total balance of this market contract of all input tokens in TokenBalance string format
+  outputTokenTotalSupply: BigInt! # Total supply of output token
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  positions: [Position!]! @derivedFrom(field: "market")
+  history: [MarketSnapshot!]! @derivedFrom(field: "market")
+}
+
+# Created after every update (transaction) on the Market
+type MarketSnapshot @entity {
+  id: ID! # {trasactionHash}{logIndex}
+  market: Market!
+  inputTokenBalances: [String!]! # TokenBalance string format
+  outputTokenTotalSupply: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: String!
+  transactionIndexInBlock: BigInt!
+  logIndex: BigInt!
+}
+
+type Transaction @entity {
+  id: ID! # {account}{transactionHash}{logIndex}
+  transactionHash: Bytes!
+  market: Market!
+  marketSnapshot: MarketSnapshot!
+  # A transaction.from is always transaction origin because outside EVM transaction.origin and msg.sender are same
+  from: Account!
+  to: Account
+  # token amounts will always be positive here, Their credit or debit status will change based on transaction type
+  transactionType: TransactionType!
+  inputTokenAmounts: [String!]!
+  outputTokenAmount: BigInt!
+  rewardTokenAmounts: [String!]!
+  transferredFrom: String
+  transferredTo: String
+  gasUsed: BigInt!
+  gasPrice: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionIndexInBlock: BigInt!
+}
+
+# String format for a TokenBalance
+# tokenAddress|accountAddress|tokenAmountBigInt
+
+# It is required because we want to keep track of closed positions as well
+# We can not use same ID for a user's new position after existing one has been closed
+# To be able to fetch current open position for a user + market + position type we need
+# ID to be dependent on only these three things. There three things will be same for all positions
+# of a specific user in specfic market therefore we need this AccountPosition entity
+type AccountPosition @entity {
+  id: ID! # {userAddress}{marketAddress}{positionType}
+  positionCounter: BigInt!
+  positions: [Position!]! @derivedFrom(field: "accountPosition")
+}
+
+# We can not keep balances and roi updated all the time.
+# We can update these only when the account of the position makes some changes in the position
+# at others time when market variables are changing because of other's actions then we won't update these
+type Position @entity {
+  id: ID! # {accountPositionId}{autoIncrement}
+  accountPosition: AccountPosition!
+  account: Account!
+  accountAddress: String!
+  market: Market!
+  marketAddress: String!
+  positionType: PositionType!
+  outputTokenBalance: BigInt!
+  inputTokenBalances: [String!]! # TokenBalance string format
+  rewardTokenBalances: [String!]! # TokenBalance string format
+  closed: Boolean!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  historyCounter: BigInt!
+  history: [PositionSnapshot!]! @derivedFrom(field: "position")
+}
+
+# Created after every update (transaction) to Position
+type PositionSnapshot @entity {
+  id: ID! # {positionId}{autoIncrement}
+  position: Position!
+  transaction: Transaction!
+  outputTokenBalance: BigInt!
+  inputTokenBalances: [String!]! # TokenBalance string format
+  rewardTokenBalances: [String!]! # TokenBalance string format
+}
