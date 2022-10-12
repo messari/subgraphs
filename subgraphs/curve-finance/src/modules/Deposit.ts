@@ -19,8 +19,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 
 export function createDepositTransaction(
-  liquidityPool: LiquidityPoolStore,
-  inputTokens: string[],
+  pool: LiquidityPoolStore,
   inputTokenAmounts: BigInt[],
   outputTokenMintedAmount: BigInt,
   amountUSD: BigDecimal,
@@ -38,19 +37,20 @@ export function createDepositTransaction(
   if (!depositTransaction) {
     depositTransaction = new DepositTransaction(transactionId);
 
-    depositTransaction.pool = liquidityPool.id;
+    depositTransaction.pool = pool.id;
     depositTransaction.protocol = getOrCreateDexAmmProtocol().id;
 
-    depositTransaction.to = liquidityPool.id;
+    depositTransaction.to = pool.id;
     depositTransaction.from = provider.toHexString();
 
     depositTransaction.hash = transaction.hash.toHexString();
     depositTransaction.logIndex = transaction.index.toI32();
 
-    depositTransaction.inputTokens = inputTokens;
+    depositTransaction.inputTokens = pool._inputTokensOrdered
+    ;
     depositTransaction.inputTokenAmounts = inputTokenAmounts;
 
-    depositTransaction.outputToken = liquidityPool.outputToken;
+    depositTransaction.outputToken = pool.outputToken;
     depositTransaction.outputTokenAmount = outputTokenMintedAmount;
 
     depositTransaction.amountUSD = amountUSD;
@@ -90,7 +90,6 @@ export function Deposit(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  let inputTokens: string[] = [];
   let inputTokenAmounts: BigInt[] = [];
   let depositAmountUSD = constants.BIGDECIMAL_ZERO;
   let outputTokenMintedAmount = totalSupplyAfterDeposit.minus(
@@ -99,18 +98,18 @@ export function Deposit(
 
   for (let idx = 0; idx < depositedCoinAmounts.length; idx++) {
     let inputToken = utils.getOrCreateTokenFromString(
-      pool.inputTokens[idx],
+      pool._inputTokensOrdered[idx],
       block
     );
 
-    inputTokenAmounts.push(depositedCoinAmounts[idx]);
-    inputTokens.push(inputToken.id);
+    let inputTokenDecimals = constants.BIGINT_TEN.pow(
+      inputToken.decimals as u8
+    ).toBigDecimal();
 
+    inputTokenAmounts.push(depositedCoinAmounts[idx]);
     depositAmountUSD = depositAmountUSD.plus(
       depositedCoinAmounts[idx]
-        .divDecimal(
-          constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-        )
+        .divDecimal(inputTokenDecimals)
         .times(inputToken.lastPriceUSD!)
     );
   }
@@ -139,7 +138,6 @@ export function Deposit(
 
   createDepositTransaction(
     pool,
-    inputTokens,
     inputTokenAmounts,
     outputTokenMintedAmount,
     depositAmountUSD,

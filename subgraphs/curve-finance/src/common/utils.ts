@@ -115,10 +115,10 @@ export function getLpTokenFromRegistry(
 export function getPoolFromCoins(
   registryAddress: Address,
   coins: Address[]
-): Address {
+): Address | null {
   const registryContract = RegistryContract.bind(registryAddress);
 
-  if (coins.length < 2) return constants.NULL.TYPE_ADDRESS;
+  if (coins.length < 2) return null;
 
   for (let idx = 0; idx <= 8; idx++) {
     let poolAddress = readValue<Address>(
@@ -130,10 +130,13 @@ export function getPoolFromCoins(
       constants.NULL.TYPE_ADDRESS
     );
 
+    if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return null;
+    if (isPoolRegistered(poolAddress)) continue;
+
     return poolAddress;
   }
 
-  return constants.NULL.TYPE_ADDRESS;
+  return null;
 }
 
 export function getPoolCoins(
@@ -287,19 +290,18 @@ export function getPoolFees(poolAddress: Address): PoolFeesType {
 
 export function getPoolFromLpToken(lpToken: Address): Address {
   const lpTokenStore = getOrCreateLpToken(lpToken);
-  let poolAddress = Address.fromString(lpTokenStore.poolAddress);
-  const registryAddress = Address.fromString(lpTokenStore.registryAddress);
 
+  let poolAddress = Address.fromString(lpTokenStore.poolAddress);
   if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return poolAddress;
 
-  if (registryAddress.equals(constants.NULL.TYPE_ADDRESS))
-    return constants.NULL.TYPE_ADDRESS;
+  const registryAddress = Address.fromString(lpTokenStore.registryAddress);
+  if (registryAddress.equals(constants.NULL.TYPE_ADDRESS)) return lpToken;
 
   let registryContract = RegistryContract.bind(registryAddress);
 
   poolAddress = readValue<Address>(
     registryContract.try_get_pool_from_lp_token(lpToken),
-    constants.NULL.TYPE_ADDRESS
+    lpToken
   );
 
   return poolAddress;

@@ -105,8 +105,8 @@ export function Swap(
   let tokenOut: string;
 
   if (!underlying) {
-    tokenIn = pool.inputTokens[sold_id.toI32()];
-    tokenOut = pool.inputTokens[bought_id.toI32()];
+    tokenIn = pool._inputTokensOrdered[sold_id.toI32()];
+    tokenOut = pool._inputTokensOrdered[bought_id.toI32()];
   } else {
     let underlyingCoins = utils.getPoolUnderlyingCoinsFromRegistry(
       liquidityPoolAddress,
@@ -120,7 +120,7 @@ export function Swap(
 
     if (bought_id.toI32() == 0) {
       // Exception: https://etherscan.io/address/0x06cb22615ba53e60d67bf6c341a0fd5e718e1655#code#L750
-      tokenIn = pool.inputTokens.at(-1);
+      tokenIn = pool._inputTokensOrdered.at(-1);
     }
   }
 

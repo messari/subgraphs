@@ -282,7 +282,7 @@ export function getOrCreateLiquidityPoolDailySnapshots(
     ).fill(constants.BIGDECIMAL_ZERO);
 
     poolSnapshots.totalValueLockedUSD = pool.totalValueLockedUSD;
-  
+
     poolSnapshots.inputTokenBalances = pool.inputTokenBalances;
     poolSnapshots.inputTokenWeights = pool.inputTokenWeights;
 
@@ -435,7 +435,9 @@ export function getOrCreateLiquidityPool(
     pool.symbol = lpToken.symbol;
     pool.protocol = constants.PROTOCOL_ID.toHexString();
 
-    pool.inputTokens = utils.getPoolCoins(poolAddress, block);
+    pool._inputTokensOrdered = utils.getPoolCoins(poolAddress, block);
+    pool.inputTokens = pool._inputTokensOrdered.sort();
+
     pool.inputTokenBalances = utils.getPoolBalances(
       poolAddress,
       pool.inputTokens

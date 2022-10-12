@@ -120,8 +120,7 @@ export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
   const registryAddress = event.address;
 
   const poolAddress = utils.getPoolFromCoins(registryAddress, coins);
-  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
-  if (utils.isPoolRegistered(poolAddress)) return;
+  if (!poolAddress) return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   pool._registryAddress = registryAddress.toHexString();
@@ -144,13 +143,13 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
   const basePoolAddress = event.params.base_pool;
   const basePool = getOrCreateLiquidityPool(basePoolAddress, event.block);
 
-  let basePoolCoins = basePool.inputTokens.map<Address>((x) =>
+  let basePoolCoins = basePool._inputTokensOrdered.map<Address>((x) =>
     Address.fromString(x)
   );
   let poolCoins = [event.params.coin].concat(basePoolCoins);
 
   const poolAddress = utils.getPoolFromCoins(registryAddress, poolCoins);
-  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+  if (!poolAddress) return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   pool._registryAddress = registryAddress.toHexString();
@@ -175,7 +174,7 @@ export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
   const registryAddress = event.address;
 
   const poolAddress = utils.getPoolFromCoins(registryAddress, poolCoins);
-  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
+  if (!poolAddress) return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
 

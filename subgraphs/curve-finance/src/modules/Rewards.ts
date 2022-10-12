@@ -264,10 +264,10 @@ export function updateRewardTokenEmissions(
   let rewardTokens = pool.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
-    pool.rewardTokens = rewardTokens;
+    pool.rewardTokens = rewardTokens.sort();
   }
 
-  const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
+  const rewardTokenIndex = pool.rewardTokens!.indexOf(rewardToken.id);
 
   if (!pool.rewardTokenEmissionsAmount) {
     pool.rewardTokenEmissionsAmount = [];

@@ -51,7 +51,7 @@ export function createWithdrawTransaction(
     withdrawTransaction.hash = event.transaction.hash.toHexString();
     withdrawTransaction.logIndex = event.logIndex.toI32();
 
-    withdrawTransaction.inputTokens = pool.inputTokens;
+    withdrawTransaction.inputTokens = pool._inputTokensOrdered;
     withdrawTransaction.inputTokenAmounts = inputTokenAmounts;
 
     withdrawTransaction.outputToken = pool.outputToken;
@@ -169,29 +169,28 @@ export function Withdraw(
     withdrawnTokenAmounts = getWithdrawnTokenAmounts(
       poolAddress,
       provider,
-      pool.inputTokens,
+      pool._inputTokensOrdered,
       event
     );
   }
 
-  let inputTokens: string[] = [];
   let inputTokenAmounts: BigInt[] = [];
   let withdrawAmountUSD = constants.BIGDECIMAL_ZERO;
 
   for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
     let inputToken = utils.getOrCreateTokenFromString(
-      pool.inputTokens[idx],
+      pool._inputTokensOrdered[idx],
       block
     );
 
-    inputTokenAmounts.push(withdrawnTokenAmounts[idx]);
-    inputTokens.push(inputToken.id);
+    let inputTokenDecimals = constants.BIGINT_TEN.pow(
+      inputToken.decimals as u8
+    ).toBigDecimal();
 
+    inputTokenAmounts.push(withdrawnTokenAmounts[idx]);
     withdrawAmountUSD = withdrawAmountUSD.plus(
       withdrawnTokenAmounts[idx]
-        .divDecimal(
-          constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
-        )
+        .divDecimal(inputTokenDecimals)
         .times(inputToken.lastPriceUSD!)
     );
   }

@@ -125,7 +125,7 @@ export const NUMBER_OF_WEEKS_DENOMINATOR = BigInt.fromI32(604800);
 export const DEFAULT_POOL_FEE = BigInt.fromString("4000000");
 export const DEFAULT_ADMIN_FEE = BigInt.fromString("5000000000");
 
-export const PRICE_CACHING_BLOCKS = BigInt.fromI32(1000);
+export const PRICE_CACHING_BLOCKS = BigInt.fromI32(36000);
 
 // Missing Name and Symbol for the ETH token
 export const ETH_ADDRESS = Address.fromString(
