@@ -3,7 +3,6 @@ import {
   BigDecimal,
   BigInt,
   Wrapped,
-  log,
 } from "@graphprotocol/graph-ts";
 
 import { FEE_DENOMINATOR } from "../common/constants";
@@ -112,7 +111,7 @@ export class PoolTokensType {
   }
 
   get getInputTokens(): string[] {
-    let inputTokens: string[] = [];
+    const inputTokens: string[] = [];
 
     for (let idx = 0; idx < this._tokens.length; idx++) {
       if (this._tokens.at(idx) == this._poolAddress) {
@@ -127,7 +126,7 @@ export class PoolTokensType {
     return inputTokens;
   }
   get getBalances(): BigInt[] {
-    let balances: BigInt[] = [];
+    const balances: BigInt[] = [];
 
     for (let idx = 0; idx < this._tokens.length; idx++) {
       if (idx == this._popIndex) {

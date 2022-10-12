@@ -10,7 +10,6 @@ import { readValue } from "./utils/ethereum";
 import { PoolTokensType } from "./types";
 import { DEFAULT_DECIMALS } from "../prices/common/constants";
 
-import { _RewardPool } from "../../generated/schema";
 import { BalancerVault } from "../../generated/Booster/BalancerVault";
 import { WeightedPool } from "../../generated/Booster/WeightedPool";
 import { StablePool } from "../../generated/Booster/StablePool";
@@ -46,9 +45,9 @@ export function getPoolTokensInfo(poolAddress: Address): PoolTokensType {
   }
 
   if (!(balancerVault == Address.fromString(ZERO_ADDRESS))) {
-    let balancerVaultContract = BalancerVault.bind(balancerVault);
+    const balancerVaultContract = BalancerVault.bind(balancerVault);
 
-    let result = balancerVaultContract.try_getPoolTokens(balancerPool);
+    const result = balancerVaultContract.try_getPoolTokens(balancerPool);
 
     if (result.reverted) return new PoolTokensType(poolAddress, supply);
 
@@ -64,9 +63,9 @@ export function getPoolTokensInfo(poolAddress: Address): PoolTokensType {
 }
 
 export function isBPT(tokenAddress: Address): boolean {
-  let poolContract = WeightedPool.bind(tokenAddress);
+  const poolContract = WeightedPool.bind(tokenAddress);
 
-  let balancerPool = poolContract.try_getPoolId();
+  const balancerPool = poolContract.try_getPoolId();
   if (!balancerPool.reverted) {
     return true;
   }
@@ -80,9 +79,9 @@ export function getPoolTokenWeightsForDynamicWeightPools(
 ): BigDecimal[] {
   const poolContract = WeightedPool.bind(poolAddress);
 
-  let scales = readValue<BigInt[]>(poolContract.try_getScalingFactors(), []);
+  const scales = readValue<BigInt[]>(poolContract.try_getScalingFactors(), []);
 
-  let inputTokenScales: BigInt[] = [];
+  const inputTokenScales: BigInt[] = [];
   for (let idx = 0; idx < scales.length; idx++) {
     if (idx == popIndex) {
       continue;
@@ -91,11 +90,11 @@ export function getPoolTokenWeightsForDynamicWeightPools(
     inputTokenScales.push(scales.at(idx));
   }
 
-  let totalScale = inputTokenScales
+  const totalScale = inputTokenScales
     .reduce<BigInt>((sum, current) => sum.plus(current), BIGINT_ZERO)
     .toBigDecimal();
 
-  let inputTokenWeights: BigDecimal[] = [];
+  const inputTokenWeights: BigDecimal[] = [];
   for (let idx = 0; idx < inputTokenScales.length; idx++) {
     inputTokenWeights.push(
       inputTokenScales
@@ -114,12 +113,12 @@ export function getPoolTokenWeightsForNormalizedPools(
 ): BigDecimal[] {
   const poolContract = WeightedPool.bind(poolAddress);
 
-  let weights = readValue<BigInt[]>(
+  const weights = readValue<BigInt[]>(
     poolContract.try_getNormalizedWeights(),
     []
   );
 
-  let inputTokenWeights: BigDecimal[] = [];
+  const inputTokenWeights: BigDecimal[] = [];
   for (let idx = 0; idx < weights.length; idx++) {
     if (idx == popIndex) {
       continue;

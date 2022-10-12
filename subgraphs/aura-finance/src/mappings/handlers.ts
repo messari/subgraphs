@@ -1,4 +1,4 @@
-import { dataSource, BigInt, log } from "@graphprotocol/graph-ts";
+import { dataSource, BigInt } from "@graphprotocol/graph-ts";
 
 import {
   createPoolAdd,

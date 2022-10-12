@@ -214,14 +214,14 @@ export function getOrCreateBalancerPoolToken(
   }
 
   if (knownPriceForAtleastOnePoolToken) {
-    let knownPricePoolToken = tokens[knownPricePoolTokenIndex];
+    const knownPricePoolToken = tokens[knownPricePoolTokenIndex];
 
     let poolTVL = BIGDECIMAL_ZERO;
     for (let idx = 0; idx < tokens.length; idx++) {
       if (
         tokens[idx].lastPriceUSD == BIGDECIMAL_ZERO
       ) {
-        let unknownPricePoolToken = tokens[idx];
+        const unknownPricePoolToken = tokens[idx];
 
         const weights = getPoolTokenWeights(poolAddress, popIndex);
 
