@@ -31,11 +31,11 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
 
   const [showSubgraphCountTable, setShowSubgraphCountTable] = useState<boolean>(false);
 
-  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
-  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
+  const [indexingStatusLoaded, setIndexingStatusLoaded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusLoadedPending, setIndexingStatusLoadedPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
 
-  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
-  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false });
+  const [indexingStatusError, setIndexingStatusError] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
+  const [indexingStatusErrorPending, setIndexingStatusErrorPending] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
 
   const [indexingStatus, setIndexingStatus] = useState<any>(false);
   const [pendingIndexingStatus, setPendingIndexingStatus] = useState<any>(false);
@@ -69,9 +69,9 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
           name = name.join("-");
           const network = sub.currentVersion.subgraphDeployment.network.id;
           const deploymentId = sub.currentVersion.subgraphDeployment.ipfsHash;
-          const curatorSignals = sub.currentVersion.subgraphDeployment.curatorSignals;
+          const signalledTokens = sub.currentVersion.subgraphDeployment.signalledTokens;
           const subgraphId = sub.id;
-          decenDepos[name] = { network, deploymentId, subgraphId, curatorSignals };
+          decenDepos[name] = { network, deploymentId, subgraphId, signalledTokens };
         } catch (err) {
           return;
         }
@@ -95,11 +95,9 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         if (networkStr === "matic") {
           networkStr = "polygon";
         }
-        let subgraphIdToMap = "";
-        let signalCount = 0;
-        decentralizedDeployments[x]?.curatorSignals?.forEach((signalObj: any) => signalCount += signalObj?.signal);
-        if (signalCount > 0) {
-          subgraphIdToMap = decentralizedDeployments[x]?.subgraphId;
+        let subgraphIdToMap = { id: "", signal: 0 };
+        if (decentralizedDeployments[x]?.signalledTokens > 0) {
+          subgraphIdToMap = { id: decentralizedDeployments[x]?.subgraphId, signal: decentralizedDeployments[x]?.signalledTokens };
         }
         decenDeposToSubgraphIds[x + "-" + networkStr] = subgraphIdToMap;
       }
@@ -132,15 +130,21 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
 
   if (!!indexingStatus) {
     Object.keys(indexingStatus).forEach((depo: string) => {
-      const deploymentStr = depo.split("_").join("-");
+      let deploymentStr = depo.split("_").join("-");
       if (protocolsToQuery[aliasToProtocol[depo]]) {
         if (!!protocolsToQuery[aliasToProtocol[depo]].deployments[deploymentStr]) {
           protocolsToQuery[aliasToProtocol[depo]].deployments[deploymentStr].indexStatus = indexingStatus[depo];
         } else {
+          if (depo.includes('erc') || depo.includes('governance')) {
+            deploymentStr += '-ethereum';
+          }
           const network = deploymentStr.split("-").pop() || "";
           const depoKey = (Object.keys(protocolsToQuery[aliasToProtocol[depo]].deployments).find((x: any) => {
             return protocolsToQuery[aliasToProtocol[depo]].deployments[x].network === network
           }) || "");
+          if (!protocolsToQuery[aliasToProtocol[depo]].deployments[depoKey]) {
+            return;
+          }
           protocolsToQuery[aliasToProtocol[depo]].deployments[depoKey].indexStatus = indexingStatus[depo];
         }
       }
@@ -176,20 +180,19 @@ function DeploymentsPage({ protocolsToQuery, getData, subgraphCounts, indexingSt
         >
           Load Subgraph
         </SearchInput>
-        <Typography variant="h3" align="center" sx={{ my: 6 }}>
+        <Typography variant="h3" align="center" sx={{ my: 5 }}>
           Deployed Subgraphs
         </Typography>
-        <div style={{ display: "flex", width: "60%", marginLeft: "20%" }}>
-          <div style={{ width: "100%", textAlign: "center", marginTop: "10px", borderRight: "#6656F8 2px solid" }}>
-            <span className="Menu-Options" onClick={() => navigate("/comparison")}>
-              DefiLlama Comparison
-            </span>
-          </div>
-          <div style={{ width: "100%", textAlign: "center", marginTop: "10px", borderLeft: "#6656F8 2px solid" }}>
-            <span className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
-              {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
-            </span>
-          </div>
+        <div style={{ width: "100%", textAlign: "center" }}>
+          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("/comparison")}>
+            DefiLlama Comparison
+          </span>
+          <span style={{ width: "0", flex: "1 1 0", textAlign: "center", marginTop: "0", borderLeft: "#6656F8 2px solid", borderRight: "#6656F8 2px solid", padding: "0 30px" }} className="Menu-Options" onClick={() => setShowSubgraphCountTable(!showSubgraphCountTable)}>
+            {showSubgraphCountTable ? "Hide" : "Show"} Subgraph Count Table
+          </span>
+          <span style={{ padding: "0 30px" }} className="Menu-Options" onClick={() => navigate("protocols-list")}>
+            Protocols To Develop
+          </span>
         </div>
         {devCountTable}
         <DeploymentsTable

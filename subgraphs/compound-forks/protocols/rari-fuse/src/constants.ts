@@ -22,7 +22,7 @@ export class NetworkSpecificConstant {
 }
 
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
-  let network = dataSource.network();
+  const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
       "0x835482fe0532f169024d5e9410199369aad5c77e",
@@ -75,6 +75,6 @@ export const BLOCKLIST_MARKETS = [
 
 export const PROTOCOL_NAME = "Rari Fuse";
 export const PROTOCOL_SLUG = "rari-fuse";
-export const SUBGRAPH_VERSION = "1.1.6";
+export const SUBGRAPH_VERSION = "1.1.7";
 export const SCHEMA_VERSION = "2.0.1";
 export const METHODOLOGY_VERSION = "1.0.0";

@@ -4,29 +4,25 @@ import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { AaveOracleContract } from "../../../generated/Vault/AaveOracleContract";
 
-export function getAaveOracleContract(network: string): AaveOracleContract {
-  return AaveOracleContract.bind(
-    constants.AAVE_ORACLE_CONTRACT_ADDRESS.get(network)
-  );
+export function getAaveOracleContract(
+  contractAddress: Address
+): AaveOracleContract | null {
+  if (utils.isNullAddress(contractAddress)) return null;
+
+  return AaveOracleContract.bind(contractAddress);
 }
 
-export function getTokenPriceFromAaveOracle(
+export function getTokenPriceUSDC(
   tokenAddr: Address,
   network: string
 ): CustomPriceType {
-  const aaveOracleContract = getAaveOracleContract(network);
+  let config = utils.getConfig();
 
-  if (
-    constants.AAVE_ORACLE_CONTRACT_ADDRESS.get(network).equals(
-      constants.ZERO_ADDRESS
-    )
-  ) {
+  if (!config || config.aaveOracleBlacklist().includes(tokenAddr))
     return new CustomPriceType();
-  }
 
-  if (!aaveOracleContract) {
-    return new CustomPriceType();
-  }
+  const aaveOracleContract = getAaveOracleContract(config.aaveOracle());
+  if (!aaveOracleContract) return new CustomPriceType();
 
   let tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
@@ -37,6 +33,6 @@ export function getTokenPriceFromAaveOracle(
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.USDC_DECIMALS_MAP.get(network)!.toI32() as u8
+    constants.DEFAULT_USDC_DECIMALS
   );
 }

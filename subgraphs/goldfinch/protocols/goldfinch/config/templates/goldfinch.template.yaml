@@ -1,0 +1,356 @@
+specVersion: 0.0.4
+# Had to be disabled because it's not supported on the Decentralized Network
+# features:
+#   - nonFatalErrors
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: SeniorPool
+    network: mainnet
+    source:
+      address: "0x8481a6EbAf5c7DABc3F7e09e44A89531fd31F822"
+      abi: SeniorPool
+      startBlock: 13096000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/senior_pool.ts
+      entities:
+        - SeniorPool
+        - User
+        - SeniorPoolStatus
+        - CapitalProviderStatus
+      abis:
+        - name: SeniorPool
+          file: ./abis/SeniorPool.json
+        - name: Fidu
+          file: ./abis/Fidu.json
+        - name: USDC
+          file: ./abis/USDC.json
+        - name: GoldfinchConfig
+          file: ./abis/GoldfinchConfig.json
+      eventHandlers:
+        - event: DepositMade(indexed address,uint256,uint256)
+          handler: handleDepositMade
+        - event: InterestCollected(indexed address,uint256)
+          handler: handleInterestCollected
+        - event: InvestmentMadeInJunior(indexed address,uint256)
+          handler: handleInvestmentMadeInJunior
+        - event: InvestmentMadeInSenior(indexed address,uint256)
+          handler: handleInvestmentMadeInSenior
+        - event: PrincipalCollected(indexed address,uint256)
+          handler: handlePrincipalCollected
+        - event: PrincipalWrittenDown(indexed address,int256)
+          handler: handlePrincipalWrittenDown
+        - event: ReserveFundsCollected(indexed address,uint256)
+          handler: handleReserveFundsCollected
+        - event: WithdrawalMade(indexed address,uint256,uint256)
+          handler: handleWithdrawalMade
+
+  - kind: ethereum/contract
+    name: GoldfinchFactory
+    network: mainnet
+    source:
+      address: "0xd20508E1E971b80EE172c73517905bfFfcBD87f9"
+      abi: GoldfinchFactory
+      startBlock: 11370655
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/goldfinch_factory.ts
+      entities:
+        - TranchedPool
+      abis:
+        - name: TranchedPool
+          file: ./abis/TranchedPool.json
+        - name: GoldfinchFactory
+          file: ./abis/GoldfinchFactory.json
+        - name: CreditLine
+          file: ./abis/CreditLine.json
+        - name: GoldfinchConfig
+          file: ./abis/GoldfinchConfig.json
+        - name: SeniorPool
+          file: ./abis/SeniorPool.json
+        - name: FixedLeverageRatioStrategy
+          file: ./abis/FixedLeverageRatioStrategy.json
+      eventHandlers:
+        - event: PoolCreated(indexed address,indexed address)
+          handler: handlePoolCreated
+
+  - kind: ethereum/contract
+    name: PoolTokens
+    network: mainnet
+    source:
+      address: "0x57686612C601Cb5213b01AA8e80AfEb24BBd01df"
+      abi: PoolTokens
+      startBlock: 13097225
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - TranchedPool
+        - PoolTokens
+      abis:
+        - name: PoolTokens
+          file: ./abis/PoolTokens.json
+        - name: TranchedPool
+          file: ./abis/TranchedPool.json
+        - name: GoldfinchConfig
+          file: ./abis/GoldfinchConfig.json
+        - name: SeniorPool
+          file: ./abis/SeniorPool.json
+        - name: CreditLine
+          file: ./abis/CreditLine.json
+      eventHandlers:
+        - event: TokenBurned(indexed address,indexed address,indexed uint256)
+          handler: handleTokenBurned
+        - event: TokenMinted(indexed address,indexed address,indexed uint256,uint256,uint256)
+          handler: handleTokenMinted
+        - event: TokenRedeemed(indexed address,indexed address,indexed uint256,uint256,uint256,uint256)
+          handler: handleTokenRedeemed
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: TokenPrincipalWithdrawn(indexed address,indexed address,indexed uint256,uint256,uint256)
+          handler: handleTokenPrincipalWithdrawn
+      file: ./src/mappings/pool_tokens.ts
+
+  - kind: ethereum/contract
+    name: StakingRewards
+    network: mainnet
+    source:
+      address: "0xFD6FF39DA508d281C2d255e9bBBfAb34B6be60c3"
+      abi: StakingRewards
+      startBlock: 13941096
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - StakingRewards
+      abis:
+        - name: StakingRewards
+          file: ./abis/StakingRewards.json
+      eventHandlers:
+        - event: RewardAdded(uint256)
+          handler: handleRewardAdded
+        - event: Staked(indexed address,indexed uint256,uint256,uint256,uint256)
+          handler: handleStaked
+        - event: Staked(indexed address,indexed uint256,uint256,uint8,uint256)
+          handler: handleStaked1
+        - event: Unstaked(indexed address,indexed uint256,uint256)
+          handler: handleUnstaked
+        - event: Unstaked(indexed address,indexed uint256,uint256,uint8)
+          handler: handleUnstaked1
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: DepositedAndStaked(indexed address,uint256,indexed uint256,uint256,uint256,uint256)
+          handler: handleDepositedAndStaked
+        - event: DepositedAndStaked(indexed address,uint256,indexed uint256,uint256)
+          handler: handleDepositedAndStaked1
+        - event: UnstakedAndWithdrew(indexed address,uint256,indexed uint256,uint256)
+          handler: handleUnstakedAndWithdrew
+        - event: UnstakedAndWithdrewMultiple(indexed address,uint256,uint256[],uint256[])
+          handler: handleUnstakedAndWithdrewMultiple
+        - event: RewardPaid(indexed address,indexed uint256,uint256)
+          handler: handleRewardPaid
+      file: ./src/mappings/staking_rewards.ts
+
+  - kind: ethereum/contract
+    name: BackerRewards
+    network: mainnet
+    source:
+      address: "0x384860F14B39CcD9C89A73519c70cD5f5394D0a6"
+      abi: BackerRewards
+      startBlock: 13942222
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - BackerRewards
+      abis:
+        - name: BackerRewards
+          file: ./abis/BackerRewards.json
+      eventHandlers:
+        - event: BackerRewardsSetTotalRewards(indexed address,uint256,uint256)
+          handler: handleSetTotalRewards
+        - event: BackerRewardsSetMaxInterestDollarsEligible(indexed address,uint256)
+          handler: handleSetMaxInterestDollarsEligible
+        - event: BackerRewardsClaimed(indexed address,indexed uint256,uint256)
+          handler: handleBackerRewardsClaimed
+        - event: BackerRewardsClaimed(indexed address,indexed uint256,uint256,uint256)
+          handler: handleBackerRewardsClaimed1
+      file: ./src/mappings/backer_rewards.ts
+
+  - kind: ethereum/contract
+    name: UniqueIdentity
+    network: mainnet
+    source:
+      address: "0xba0439088dc1e75F58e0A7C107627942C15cbb41"
+      abi: UniqueIdentity
+      startBlock: 13494815
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - User
+      abis:
+        - name: UniqueIdentity
+          file: ./abis/UniqueIdentity.json
+      eventHandlers:
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingle
+      file: ./src/mappings/unique_identity.ts
+
+  - kind: ethereum/contract
+    name: GoldfinchConfig
+    network: mainnet
+    source:
+      address: "0x4eb844Ff521B4A964011ac8ecd42d500725C95CC"
+      abi: GoldfinchConfig
+      startBlock: 13096701
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - User
+      abis:
+        - name: GoldfinchConfig
+          file: ./abis/GoldfinchConfig.json
+      eventHandlers:
+        - event: GoListed(indexed address)
+          handler: handleGoListed
+        - event: NoListed(indexed address)
+          handler: handleNoListed
+      file: ./src/mappings/goldfinch_config.ts
+
+  - kind: ethereum/contract
+    name: CommunityRewards
+    network: mainnet
+    source:
+      address: "0x0Cd73c18C085dEB287257ED2307eC713e9Af3460"
+      abi: CommunityRewards
+      startBlock: 13941109
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - CommunityRewardsToken
+        - User
+      abis:
+        - name: CommunityRewards
+          file: ./abis/CommunityRewards.json
+      eventHandlers:
+        - event: Granted(indexed address,indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleGranted
+        - event: RewardPaid(indexed address,indexed uint256,uint256)
+          handler: handleRewardPaid
+        - event: GrantRevoked(indexed uint256,uint256)
+          handler: handleGrantRevoked
+      file: ./src/mappings/community_rewards.ts
+
+  - kind: ethereum/contract
+    name: MerkleDistributor
+    network: mainnet
+    source:
+      address: "0x0f306E3f6b2d5ae820d33C284659B29847972d9A"
+      abi: MerkleDistributor
+      startBlock: 13941117
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - CommunityRewardsToken
+      abis:
+        - name: MerkleDistributor
+          file: ./abis/MerkleDistributor.json
+      eventHandlers:
+        - event: GrantAccepted(indexed uint256,indexed uint256,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleGrantAccepted
+      file: ./src/mappings/merkle_distributor.ts
+
+  - kind: ethereum/contract
+    name: BackerMerkleDistributor
+    network: mainnet
+    source:
+      address: "0xC442b55A082f7D5F8d8DcDA3d0efF50f47dD0F82"
+      abi: BackerMerkleDistributor
+      startBlock: 14129983
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - CommunityRewardsToken
+      abis:
+        - name: BackerMerkleDistributor
+          file: ./abis/BackerMerkleDistributor.json
+      eventHandlers:
+        - event: GrantAccepted(indexed uint256,indexed uint256,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleGrantAccepted
+      file: ./src/mappings/backer_merkle_distributor.ts
+
+templates:
+  - name: TranchedPool
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: TranchedPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/tranched_pool.ts
+      entities:
+        - User
+        - TranchedPool
+        - TranchedPoolToken
+        - Transaction
+        - Zap
+      abis:
+        - name: TranchedPool
+          file: ./abis/TranchedPool.json
+        - name: CreditLine
+          file: ./abis/CreditLine.json
+        - name: PoolTokens
+          file: ./abis/PoolTokens.json
+        - name: GoldfinchConfig
+          file: ./abis/GoldfinchConfig.json
+        - name: SeniorPool
+          file: ./abis/SeniorPool.json
+        - name: FixedLeverageRatioStrategy
+          file: ./abis/FixedLeverageRatioStrategy.json
+        - name: BackerRewards
+          file: ./abis/BackerRewards.json
+        - name: Zapper
+          file: ./abis/Zapper.json
+      eventHandlers:
+        - event: CreditLineMigrated(indexed address,indexed address)
+          handler: handleCreditLineMigrated
+        - event: DepositMade(indexed address,indexed uint256,indexed uint256,uint256)
+          handler: handleDepositMade
+        - event: DrawdownsPaused(indexed address)
+          handler: handleDrawdownsPaused
+        - event: DrawdownsUnpaused(indexed address)
+          handler: handleDrawdownsUnpaused
+        - event: WithdrawalMade(indexed address,indexed uint256,indexed uint256,uint256,uint256)
+          handler: handleWithdrawalMade
+        - event: TrancheLocked(indexed address,uint256,uint256)
+          handler: handleTrancheLocked
+        - event: SliceCreated(indexed address,uint256)
+          handler: handleSliceCreated
+        - event: EmergencyShutdown(indexed address)
+          handler: handleEmergencyShutdown
+        - event: DrawdownMade(indexed address,uint256)
+          handler: handleDrawdownMade
+        - event: PaymentApplied(indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handlePaymentApplied

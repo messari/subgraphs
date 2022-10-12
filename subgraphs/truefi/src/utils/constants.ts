@@ -13,7 +13,7 @@ export const PROTOCOL_ID = "TrueFi";
 export const PROTOCOL_NAME = "TrueFi";
 export const PROTOCOL_SLUG = "truefi";
 export const PROTOCOL_SCHEMA_VERSION = "2.0.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.1";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.2";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////

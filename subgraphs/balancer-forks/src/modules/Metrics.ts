@@ -236,13 +236,11 @@ export function updateProtocolRevenue(
   const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
   const poolFees = utils.getPoolFees(liquidityPoolAddress);
 
-  let supplySideRevenueUSD = poolFees.getTradingFees
-    .times(volumeUSD)
-    .times(constants.BIGDECIMAL_ONE.minus(poolFees.getProtocolFees));
+  let supplySideRevenueUSD = volumeUSD.times(
+    poolFees.getTradingFees.minus(poolFees.getProtocolFees)
+  );
 
-  let protocolSideRevenueUSD = poolFees.getTradingFees
-    .times(volumeUSD)
-    .times(poolFees.getProtocolFees);
+  let protocolSideRevenueUSD = volumeUSD.times(poolFees.getProtocolFees);
 
   updateRevenueSnapshots(
     pool,

@@ -6,7 +6,7 @@ import { NewClient, schemaMapping } from "../utils";
 interface DeploymentsTable {
     protocolsToQuery: { [x: string]: any };
     getData: any;
-    decenDeposToSubgraphIds: { [x: string]: string };
+    decenDeposToSubgraphIds: { [x: string]: any };
     indexingStatusLoaded: any;
     indexingStatusLoadedPending: any;
     indexingStatusError: any;
@@ -15,40 +15,36 @@ interface DeploymentsTable {
 
 function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, indexingStatusLoaded, indexingStatusLoadedPending, indexingStatusError, indexingStatusErrorPending }: DeploymentsTable) {
     const clientIndexing = useMemo(() => NewClient("https://api.thegraph.com/index-node/graphql"), []);
-    const [tableExpanded, setTableExpanded] = useState<any>({ lending: true, exchanges: true, vaults: true, generic: true });
+    const [tableExpanded, setTableExpanded] = useState<any>({ lending: false, exchanges: false, vaults: false, generic: false, erc20: false, erc721: false, governance: false, network: false, ["nft-marketplace"]: false });
     if (Object.keys(protocolsToQuery).length === 0) {
         getData();
         return null;
     }
-    const columnLabels: string[] = [
-        "Name",
-        "",
-        "Network",
-        "Status",
-        "Indexed %",
-        "Start Block",
-        "Current Block",
-        "Chain Head",
-        "Schema",
-        "Subgraph",
-        "Entity Count",
-    ];
+    const columnLabels: any = {
+        "Name": "300px",
+        "": "45px",
+        "Network": "420px",
+        "Status": "40px",
+        "Indexed %": "auto",
+        "Start Block": "auto",
+        "Current Block": "auto",
+        "Chain Head": "auto",
+        "Schema": "auto",
+        "Subgraph": "auto",
+        "Entity Count": "auto",
+    };
 
     const tableHead = (
         <TableHead sx={{ height: "20px" }}>
             <TableRow sx={{ height: "20px" }}>
-                {columnLabels.map((x, idx) => {
+                {Object.keys(columnLabels).map((x, idx) => {
                     let textAlign = "left";
                     let paddingLeft = "0px";
-                    let minWidth = "auto"
-                    let maxWidth = "auto";
+                    let minWidth = columnLabels[x];
+                    let maxWidth = columnLabels[x];
                     if (idx > 2) {
                         textAlign = "right";
                         paddingLeft = "16px";
-                    }
-                    if (idx === 0) {
-                        minWidth = "300px";
-                        maxWidth = "300px";
                     }
                     return (
                         <TableCell sx={{ paddingLeft, minWidth, maxWidth }} key={"column" + x}>
@@ -107,8 +103,9 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, 
     return (
         <>
             {Object.entries(deposToPass).sort().map(([schemaType, subgraph]) => {
+                let validationSupported = true;
                 if (!Object.keys(schemaMapping).includes(schemaType)) {
-                    return null;
+                    validationSupported = false;
                 } else {
                     schemaType = schemaMapping[schemaType];
                 }
@@ -120,12 +117,13 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, 
                     const protocol = subgraph[subgraphName];
                     return (
                         <ProtocolSection
-                            key={"ProtocolSection-" + subgraphName.toUpperCase()}
+                            key={"ProtocolSection-" + subgraphName.toUpperCase() + '-' + schemaType}
                             subgraphName={subgraphName}
                             protocol={protocol}
                             clientIndexing={clientIndexing}
                             decenDeposToSubgraphIds={decenDeposToSubgraphIds}
                             tableExpanded={tableExpanded[schemaType]}
+                            validationSupported={validationSupported}
                             isLoaded={isLoaded}
                             isLoadedPending={isLoadedPending}
                             indexQueryError={indexQueryError}
@@ -136,7 +134,7 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, 
                     <TableContainer sx={{ my: 8 }} key={"TableContainer-" + schemaType.toUpperCase()}>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                             <Typography
-                                key={"typography-" + schemaType}
+                                key={"typography-Title-" + schemaType}
                                 variant="h4"
                                 align="left"
                                 fontWeight={500}
@@ -146,7 +144,7 @@ function DeploymentsTable({ protocolsToQuery, getData, decenDeposToSubgraphIds, 
                                 {schemaType.toUpperCase()}
                             </Typography>
                             <Typography
-                                key={"typography-" + schemaType}
+                                key={"typography-toggle-" + schemaType}
                                 variant="h4"
                                 align="left"
                                 fontWeight={500}

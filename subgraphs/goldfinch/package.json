@@ -1,26 +1,15 @@
 {
-  "name": "@goldfinch-eng/subgraph",
+  "name": "inverse-finance",
+  "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
-    "build": "graph codegen && graph build",
-    "test": "graph test",
-    "deploy-prod": "graph codegen && graph deploy --product hosted-service goldfinch-eng/goldfinch-v2",
-    "create-local": "graph create --node http://localhost:8020/ goldfinch-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ goldfinch-subgraph",
-    "deploy-local": "graph codegen && graph deploy --node http://localhost:8020 --ipfs http://localhost:5002 --version-label v0.0.1 goldfinch-subgraph subgraph-local.yaml",
-    "predeploy-local": "ts-node ./scripts/setup-subgraph-manifest-local.ts",
-    "start-local": "docker compose --env-file .env.local-subgraph up -d",
-    "stop-local": "docker compose --env-file .env.local-subgraph down -v && rm -rf data"
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.template.ts > configurations/configure.ts",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_target}",
+    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs}"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.33.0",
+    "@graphprotocol/graph-cli": "^0.30.1",
     "@graphprotocol/graph-ts": "^0.27.0"
-  },
-  "devDependencies": {
-    "@types/js-yaml": "^3.12.7",
-    "@types/node": "^18.7.7",
-    "js-yaml": "^3.14.1",
-    "matchstick-as": "^0.2.2",
-    "ts-node": "^10.2.1"
   }
 }

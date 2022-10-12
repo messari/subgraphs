@@ -7,7 +7,7 @@ import { DashboardHeader } from "./graphs/DashboardHeader";
 import { useState } from "react";
 import DefiLlamaComparsionTab from "./interfaces/DefiLlamaComparisonTab";
 import { schemaMapping } from "./utils";
-import DeploymentsInDevelopment from "./deployments/DeploymentsInDevelopment";
+import ProtocolsListByTVL from "./deployments/ProtocolsListByTVL";
 
 function App() {
   console.log('RUNNING VERSION ' + dashboardVersion);
@@ -178,7 +178,6 @@ function App() {
     }
     indexingStatusQueries[protocolType] = { fullCurrentQueryArray, fullPendingQueryArray };
   })
-
   return (
     <div>
       <DashboardVersion />
@@ -189,8 +188,8 @@ function App() {
             path="comparison"
             element={<DefiLlamaComparsionTab deploymentJSON={subgraphEndpoints} getData={() => getDeployments()} />}
           />
-          <Route path="development-status" element={<DeploymentsInDevelopment protocolsToQuery={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route path="subgraph" element={<ProtocolDashboard />} />
+          <Route path="protocols-list" element={<ProtocolsListByTVL protocolsToQuery={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route
             path="*"
             element={
