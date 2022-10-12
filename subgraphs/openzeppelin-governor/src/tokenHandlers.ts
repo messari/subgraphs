@@ -39,6 +39,7 @@ export function _handleDelegateChanged(
   delegateChanged.delegator = fromDelegate;
   delegateChanged.governanceFrameworkId = event.address.toHexString();
   delegateChanged.txnHash = event.transaction.hash.toHexString();
+  delegateChanged.save();
 }
 
 export function _handleDelegateVotesChanged(
