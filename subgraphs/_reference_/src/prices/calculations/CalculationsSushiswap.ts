@@ -13,7 +13,7 @@ export function getSushiSwapContract(
 }
 
 export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
-  let config = utils.getConfig();
+  const config = utils.getConfig();
 
   if (!config || config.sushiCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
@@ -23,7 +23,7 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
     return new CustomPriceType();
   }
 
-  let tokenPrice: BigDecimal = utils
+  const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       curveContract.try_getPriceUsdc(tokenAddr),
       constants.BIGINT_ZERO

@@ -2,7 +2,7 @@ import * as constants from "../common/constants";
 import { Configurations } from "../common/types";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
-export const NETWORK_STRING: String = "xdai";
+export const NETWORK_STRING: string = "xdai";
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////// CALCULATIONS/ORACLE CONTRACT ////////////////////////

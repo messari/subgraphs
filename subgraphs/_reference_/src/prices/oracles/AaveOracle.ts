@@ -13,7 +13,7 @@ export function getAaveOracleContract(
 }
 
 export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
-  let config = utils.getConfig();
+  const config = utils.getConfig();
 
   if (!config || config.aaveOracleBlacklist().includes(tokenAddr))
     return new CustomPriceType();
@@ -21,7 +21,7 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
   const aaveOracleContract = getAaveOracleContract(config.aaveOracle());
   if (!aaveOracleContract) return new CustomPriceType();
 
-  let tokenPrice: BigDecimal = utils
+  const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       aaveOracleContract.try_getAssetPrice(tokenAddr),
       constants.BIGINT_ZERO

@@ -13,7 +13,7 @@ export function getCalculationsCurveContract(
 }
 
 export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
-  let config = utils.getConfig();
+  const config = utils.getConfig();
 
   if (!config || config.curveCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
@@ -23,7 +23,7 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
   );
   if (!calculationCurveContract) return new CustomPriceType();
 
-  let tokenPrice: BigDecimal = utils
+  const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       calculationCurveContract.try_getCurvePriceUsdc(tokenAddr),
       constants.BIGINT_ZERO
