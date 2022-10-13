@@ -53,15 +53,11 @@ export function getPriceFromRouter(
   let numberOfJumps: BigInt;
 
   // Convert ETH address to WETH
-  if (token0Address == ethAddress) {
-    token0Address = wethAddress;
-  }
-  if (token1Address == ethAddress) {
-    token1Address = wethAddress;
-  }
+  if (token0Address == ethAddress) token0Address = wethAddress;
+  if (token1Address == ethAddress) token1Address = wethAddress;
 
   const inputTokenIsWeth: bool =
-    token0Address == wethAddress || token1Address == wethAddress;
+    token0Address.equals(wethAddress) || token1Address.equals(wethAddress);
 
   if (inputTokenIsWeth) {
     // Path = [token0, weth] or [weth, token1]
@@ -79,7 +75,7 @@ export function getPriceFromRouter(
   }
 
   const token0Decimals = utils.getTokenDecimals(token0Address);
-  const amountIn = BigInt.fromI32(10).pow(token0Decimals.toI32() as u8);
+  const amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
   const routerAddresses = config.uniswapForks();
 
@@ -111,8 +107,9 @@ export function getPriceFromRouter(
 export function getLpTokenPriceUsdc(tokenAddress: Address): CustomPriceType {
   const uniSwapPair = UniswapPairContract.bind(tokenAddress);
 
-  const totalLiquidity: CustomPriceType =
-    getLpTokenTotalLiquidityUsdc(tokenAddress);
+  const totalLiquidity: CustomPriceType = getLpTokenTotalLiquidityUsdc(
+    tokenAddress
+  );
   const totalSupply = utils.readValue<BigInt>(
     uniSwapPair.try_totalSupply(),
     constants.BIGINT_ZERO
