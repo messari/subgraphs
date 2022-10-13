@@ -16,11 +16,6 @@ There are couple things you can do to significantly improve your indexing speed:
 
 - When fetching a protocol entity, it important that that the versions get updated at regular intervals such as at the time of fetching the protocol entity (Recommended). The 3 versions that should be updated are subgraph version, schema version, and methodology version. If the version is not updated, the subgraph will not be able to fetch the latest version of the protocol entity in cases where indexing is rebooted using the grafting feature.
 
-### Forks and Multichain
-
-- You should put fork/network-specific configs in the `config` folder of each subgraph.
-- Each `config` folder will contain `json` files with the fork/network-specific config. Then use `mustache` in combination with node scripts to deploy all networks and forks of a single subgraph.
-
 ## Common Issues
 
 ### Proxy
