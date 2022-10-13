@@ -92,6 +92,7 @@ Prices
 │   ├── arbitrum.ts
 │   ├── aurora.ts
 │   ├── avalanche.ts
+│   ├── bsc.ts
 │   ├── fantom.ts
 │   ├── gnosis.ts
 │   ├── harmony.ts
@@ -131,10 +132,6 @@ Prices
 
 ### Fantom
 
-🔨 = In progress.  
-🛠 = Feature complete. Additional testing required.
-`MultiCall` = If the method uses more than two `JSON RPC Call`.
-
 | Method                                                                               |      Type      | StartBlock | MultiCall | Status |
 | ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |
 | [Curve](https://ftmscan.com/address/0x0b53e9df372e72d8fdcdbedfbb56059957a37128)     | `Calculations` | `27067399` |    ❎     |   🛠    |
@@ -146,10 +143,6 @@ Prices
 
 ### Arbitrum-One
 
-🔨 = In progress.  
-🛠 = Feature complete. Additional testing required.
-`MultiCall` = If the method uses more than two `JSON RPC Call`.
-
 | Method                                                                               |      Type      | StartBlock | MultiCall | Status |
 | ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |
 | [Curve](https://arbiscan.io/address/0x26f698491daf32771217abc1356dae48c7230c75)     | `Calculations` | `5287603` |    ❎     |   🛠    |
@@ -159,10 +152,6 @@ Prices
 
 
 ### Polygon
-
-🔨 = In progress.  
-🛠 = Feature complete. Additional testing required.
-`MultiCall` = If the method uses more than two `JSON RPC Call`.
 
 | Method                                                                               |      Type      | StartBlock | MultiCall | Status |
 | ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |

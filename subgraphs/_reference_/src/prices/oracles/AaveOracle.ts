@@ -30,6 +30,6 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
 
   return CustomPriceType.initialize(
     tokenPrice,
-    constants.DEFAULT_USDC_DECIMALS
+    config.usdcTokenDecimals().toI32() as u8
   );
 }
