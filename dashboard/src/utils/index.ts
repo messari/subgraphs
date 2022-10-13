@@ -98,3 +98,10 @@ export const formatIntToFixed2 = (val: number): string => {
   }
   return returnStr;
 };
+
+export const schemaMapping: { [x: string]: any } = {
+  "dex-amm": "exchanges",
+  "yield-aggregator": "vaults",
+  "lending": "lending",
+  "generic": "generic"
+}

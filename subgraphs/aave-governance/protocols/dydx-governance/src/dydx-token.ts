@@ -24,7 +24,8 @@ export function handleDelegatedPowerChanged(
   _handleDelegatedPowerChanged(
     event.params.delegationType,
     event.params.user.toHexString(),
-    event.params.amount
+    event.params.amount,
+    false
   );
 }
 
@@ -33,6 +34,7 @@ export function handleTransfer(event: Transfer): void {
   _handleTransfer(
     event.params.from.toHexString(),
     event.params.to.toHexString(),
-    event.params.value
+    event.params.value,
+    event
   );
 }

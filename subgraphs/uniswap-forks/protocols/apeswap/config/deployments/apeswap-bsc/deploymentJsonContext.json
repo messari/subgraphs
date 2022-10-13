@@ -1,0 +1,26 @@
+{
+  "network": "bsc",
+  "status": "prod",
+  "versions": {
+    "schema": "1.3.0",
+    "subgraph": "1.1.7",
+    "methodology": "1.0.0"
+  },
+  "files": {
+    "template": "apeswap.bsc.template.yaml"
+  },
+  "options": {
+    "prepare:yaml": true,
+    "prepare:constants": true
+  },
+  "services": {
+    "hosted-service": {
+      "slug": "apeswap-bsc",
+      "query-id": "apeswap-bsc"
+    }
+  },
+  "protocol": "apeswap",
+  "base": "uniswap-forks",
+  "schema": "dex-amm",
+  "deployment": "apeswap-bsc"
+}

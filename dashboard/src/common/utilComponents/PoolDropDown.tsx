@@ -20,17 +20,17 @@ interface PoolDropDownProps {
   setIssues: React.Dispatch<
     React.SetStateAction<{ message: string; type: string; level: string; fieldName: string }[]>
   >;
-  markets: { [x: string]: any }[];
+  pools: { [x: string]: any }[];
 }
 
-export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDropDownProps) => {
+export const PoolDropDown = ({ poolId, setPoolId, setIssues, pools }: PoolDropDownProps) => {
   const navigate = useNavigate();
   // Create the array of pool selections in the drop down
-  const options = markets.map((market: any) => {
+  const options = pools.map((market: any) => {
     return market.id + " / " + market.name;
   });
   // Get the array entry for the current selected pool
-  const pool = markets.find((m: any) => m.id === poolId) || { name: "Selected Pool" };
+  const pool = pools.find((m: any) => m.id === poolId) || { name: "Selected Pool" };
   let inputTextValue = "Select a pool";
   if (poolId) {
     inputTextValue = poolId + " / " + pool.name;

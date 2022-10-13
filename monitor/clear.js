@@ -1,4 +1,4 @@
-import { clearChannel } from "./messageDiscord.js";
+import { clearAllThreads, clearChannel, deleteSingleMessage, getAllThreadsToClear, getChannel } from "./messageDiscord.js";
 import 'dotenv/config'
 
-clearChannel();
+getAllThreadsToClear(Date.now(), process.env.CHANNEL_ID);

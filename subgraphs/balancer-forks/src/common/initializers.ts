@@ -150,7 +150,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
     !token.lastPriceBlockNumber ||
     blockNumber
       .minus(token.lastPriceBlockNumber!)
-      .gt(constants.ETH_AVERAGE_BLOCK_PER_HOUR)
+      .gt(constants.PRICE_CACHING_BLOCKS)
   ) {
     let tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
@@ -396,7 +396,10 @@ export function getOrCreateLiquidityPool(
     const inputTokensInfo = utils.getPoolTokensInfo(poolId);
     pool.inputTokens = inputTokensInfo.getInputTokens;
     pool.inputTokenBalances = inputTokensInfo.getBalances;
-    pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
+    pool.inputTokenWeights = utils.getPoolTokenWeights(
+      poolAddress,
+      pool.inputTokens
+    );
 
     pool.outputToken = getOrCreateToken(poolAddress, block.number).id;
     pool.outputTokenSupply = constants.BIGINT_ZERO;

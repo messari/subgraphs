@@ -23,9 +23,13 @@ import {
   Delegate,
   Governance,
   Proposal,
+  TokenDailySnapshot,
   TokenHolder,
   Vote,
+  VoteDailySnapshot,
 } from "../generated/schema";
+
+export const SECONDS_PER_DAY = 60 * 60 * 24;
 
 export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
   return value.divDecimal(
@@ -55,6 +59,7 @@ export function getGovernance(): Governance {
 
   if (!governance) {
     governance = new Governance(GOVERNANCE_TYPE);
+    governance.totalTokenSupply = BIGINT_ZERO;
     governance.proposals = BIGINT_ZERO;
     governance.currentTokenHolders = BIGINT_ZERO;
     governance.totalTokenHolders = BIGINT_ZERO;
@@ -62,6 +67,15 @@ export function getGovernance(): Governance {
     governance.totalDelegates = BIGINT_ZERO;
     governance.delegatedVotesRaw = BIGINT_ZERO;
     governance.delegatedVotes = BIGDECIMAL_ZERO;
+
+    governance.totalStakedTokenSupply = BIGINT_ZERO;
+    governance.currentStakedTokenHolders = BIGINT_ZERO;
+    governance.totalStakedTokenHolders = BIGINT_ZERO;
+    governance.currentStakedTokenDelegates = BIGINT_ZERO;
+    governance.totalStakedTokenDelegates = BIGINT_ZERO;
+    governance.delegatedStakedTokenVotesRaw = BIGINT_ZERO;
+    governance.delegatedStakedTokenVotes = BIGDECIMAL_ZERO;
+
     governance.proposalsQueued = BIGINT_ZERO;
     governance.proposalsExecuted = BIGINT_ZERO;
     governance.proposalsCanceled = BIGINT_ZERO;
@@ -70,41 +84,28 @@ export function getGovernance(): Governance {
   return governance;
 }
 
-export function getOrCreateProposal(
-  id: string,
-  createIfNotFound: boolean = true,
-  save: boolean = false
-): Proposal {
+export function getProposal(id: string): Proposal {
   let proposal = Proposal.load(id);
-
-  if (!proposal && createIfNotFound) {
+  if (!proposal) {
     proposal = new Proposal(id);
     proposal.tokenHoldersAtStart = BIGINT_ZERO;
     proposal.delegatesAtStart = BIGINT_ZERO;
-    if (save) {
-      proposal.save();
-    }
   }
 
   return proposal as Proposal;
 }
 
-export function getOrCreateDelegate(
-  address: string,
-  createIfNotFound: boolean = true,
-  save: boolean = true
-): Delegate {
+export function getOrCreateDelegate(address: string): Delegate {
   let delegate = Delegate.load(address);
-
-  if (!delegate && createIfNotFound) {
+  if (!delegate) {
     delegate = new Delegate(address);
     delegate.delegatedVotesRaw = BIGINT_ZERO;
     delegate.delegatedVotes = BIGDECIMAL_ZERO;
+    delegate.delegatedStakedTokenVotesRaw = BIGINT_ZERO;
+    delegate.delegatedStakedTokenVotes = BIGDECIMAL_ZERO;
     delegate.tokenHoldersRepresentedAmount = 0;
     delegate.numberVotes = 0;
-    if (save) {
-      delegate.save();
-    }
+    delegate.save();
 
     if (address != ZERO_ADDRESS) {
       let governance = getGovernance();
@@ -116,22 +117,19 @@ export function getOrCreateDelegate(
   return delegate as Delegate;
 }
 
-export function getOrCreateTokenHolder(
-  address: string,
-  createIfNotFound: boolean = true,
-  save: boolean = true
-): TokenHolder {
+export function getOrCreateTokenHolder(address: string): TokenHolder {
   let tokenHolder = TokenHolder.load(address);
-
-  if (!tokenHolder && createIfNotFound) {
+  if (!tokenHolder) {
     tokenHolder = new TokenHolder(address);
     tokenHolder.tokenBalanceRaw = BIGINT_ZERO;
     tokenHolder.tokenBalance = BIGDECIMAL_ZERO;
     tokenHolder.totalTokensHeldRaw = BIGINT_ZERO;
     tokenHolder.totalTokensHeld = BIGDECIMAL_ZERO;
-    if (save) {
-      tokenHolder.save();
-    }
+    tokenHolder.stakedTokenBalanceRaw = BIGINT_ZERO;
+    tokenHolder.stakedTokenBalance = BIGDECIMAL_ZERO;
+    tokenHolder.totalStakedTokensHeldRaw = BIGINT_ZERO;
+    tokenHolder.totalStakedTokensHeld = BIGDECIMAL_ZERO;
+    tokenHolder.save();
 
     if (address != ZERO_ADDRESS) {
       let governance = getGovernance();
@@ -142,6 +140,32 @@ export function getOrCreateTokenHolder(
   }
 
   return tokenHolder as TokenHolder;
+}
+export function getOrCreateTokenDailySnapshot(
+  block: ethereum.Block
+): TokenDailySnapshot {
+  let snapshotId = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  let previousSnapshot = TokenDailySnapshot.load(snapshotId);
+
+  if (previousSnapshot != null) {
+    return previousSnapshot as TokenDailySnapshot;
+  }
+  let snapshot = new TokenDailySnapshot(snapshotId);
+  return snapshot;
+}
+export function getOrCreateVoteDailySnapshot(
+  proposal: Proposal,
+  block: ethereum.Block
+): VoteDailySnapshot {
+  let snapshotId =
+    proposal.id + "-" + (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  let previousSnapshot = VoteDailySnapshot.load(snapshotId);
+
+  if (previousSnapshot != null) {
+    return previousSnapshot as VoteDailySnapshot;
+  }
+  let snapshot = new VoteDailySnapshot(snapshotId);
+  return snapshot;
 }
 
 export function _handleProposalCreated(
@@ -158,7 +182,7 @@ export function _handleProposalCreated(
   quorum: BigInt,
   event: ethereum.Event
 ): void {
-  let proposal = getOrCreateProposal(proposalId);
+  let proposal = getProposal(proposalId);
   let proposer = getOrCreateDelegate(proposerAddr);
 
   // Checking if the proposer was a delegate already accounted for, if not we should log an error
@@ -175,6 +199,7 @@ export function _handleProposalCreated(
   proposal.txnHash = event.transaction.hash.toHexString();
   proposal.executor = executorAddr;
   proposal.proposer = proposer.id;
+  proposal.txnHash = event.transaction.hash.toHexString();
   proposal.quorumVotes = BIGINT_ZERO;
   proposal.againstDelegateVotes = BIGINT_ZERO;
   proposal.forDelegateVotes = BIGINT_ZERO;
@@ -237,8 +262,9 @@ export function _handleProposalCanceled(
   proposalId: string,
   event: ethereum.Event
 ): void {
-  let proposal = getOrCreateProposal(proposalId);
+  let proposal = getProposal(proposalId);
   proposal.state = ProposalState.CANCELED;
+  proposal.cancellationTxnHash = event.transaction.hash.toHexString();
   proposal.cancellationBlock = event.block.number;
   proposal.cancellationTime = event.block.timestamp;
   proposal.save();
@@ -254,8 +280,9 @@ export function _handleProposalExecuted(
   event: ethereum.Event
 ): void {
   // Update proposal status + execution metadata
-  let proposal = getOrCreateProposal(proposalId);
+  let proposal = getProposal(proposalId);
   proposal.state = ProposalState.EXECUTED;
+  proposal.executionTxnHash = event.transaction.hash.toHexString();
   proposal.executionBlock = event.block.number;
   proposal.executionTime = event.block.timestamp;
   proposal.save();
@@ -267,10 +294,17 @@ export function _handleProposalExecuted(
   governance.save();
 }
 
-export function _handleProposalQueued(proposalId: string, eta: BigInt): void {
+export function _handleProposalQueued(
+  proposalId: string,
+  eta: BigInt,
+  event: ethereum.Event
+): void {
   // Update proposal status + execution metadata
-  let proposal = getOrCreateProposal(proposalId.toString());
+  let proposal = getProposal(proposalId.toString());
   proposal.state = ProposalState.QUEUED;
+  proposal.queueTxnHash = event.transaction.hash.toHexString();
+  proposal.queueBlock = event.block.number;
+  proposal.queueTime = event.block.timestamp;
   proposal.executionETA = eta;
   proposal.save();
 
@@ -325,4 +359,15 @@ export function _handleVoteEmitted(
   let voter = getOrCreateDelegate(voterAddress);
   voter.numberVotes = voter.numberVotes + 1;
   voter.save();
+
+  // Take snapshot
+  let dailySnapshot = getOrCreateVoteDailySnapshot(proposal, event.block);
+  dailySnapshot.proposal = proposal.id;
+  dailySnapshot.forWeightedVotes = proposal.forWeightedVotes;
+  dailySnapshot.againstWeightedVotes = proposal.againstWeightedVotes;
+  dailySnapshot.abstainWeightedVotes = proposal.abstainWeightedVotes;
+  dailySnapshot.totalWeightedVotes = proposal.totalWeightedVotes;
+  dailySnapshot.blockNumber = event.block.number;
+  dailySnapshot.timestamp = event.block.timestamp;
+  dailySnapshot.save();
 }
