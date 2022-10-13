@@ -1,6 +1,8 @@
 import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 import {
+  createDelegateChange,
+  createDelegateVotingPowerChange,
   getGovernance,
   getOrCreateDelegate,
   getOrCreateTokenDailySnapshot,
@@ -11,7 +13,8 @@ import {
 export function _handleDelegateChanged(
   delegator: string,
   fromDelegate: string,
-  toDelegate: string
+  toDelegate: string,
+  event: ethereum.Event
 ): void {
   let tokenHolder = getOrCreateTokenHolder(delegator);
   let previousDelegate = getOrCreateDelegate(fromDelegate);
@@ -27,12 +30,21 @@ export function _handleDelegateChanged(
   newDelegate.tokenHoldersRepresentedAmount =
     newDelegate.tokenHoldersRepresentedAmount + 1;
   newDelegate.save();
+
+  const delegateChanged = createDelegateChange(
+    event,
+    toDelegate,
+    fromDelegate,
+    delegator
+  );
+  delegateChanged.save();
 }
 
 export function _handleDelegateVotesChanged(
   delegateAddress: string,
   previousBalance: BigInt,
-  newBalance: BigInt
+  newBalance: BigInt,
+  event: ethereum.Event
 ): void {
   let votesDifference = newBalance.minus(previousBalance);
 
@@ -40,6 +52,15 @@ export function _handleDelegateVotesChanged(
   delegate.delegatedVotesRaw = newBalance;
   delegate.delegatedVotes = toDecimal(newBalance);
   delegate.save();
+
+  // Create DelegateVotingPowerChange
+  const delegateVPChange = createDelegateVotingPowerChange(
+    event,
+    previousBalance,
+    newBalance,
+    delegateAddress
+  );
+  delegateVPChange.save();
 
   // Update governance delegate count
   let governance = getGovernance();
