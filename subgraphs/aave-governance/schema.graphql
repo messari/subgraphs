@@ -1,3 +1,45 @@
+type DelegateChange @entity(immutable: true) {
+  "Unique entity used to keep track of delegate changes"
+  id: ID!
+  "Token addresss"
+  tokenAddress: String
+  "Token address for delegator"
+  delegator: String!
+  "Token address for delegate"
+  delegate: String!
+  "Token address for previous delegate"
+  previousDelegate: String!
+  "Block time change happened"
+  blockTimestamp: BigInt!
+  "Transaction hash of the delegate change event"
+  txnHash: String!
+  "Log index for delegate change"
+  logIndex: BigInt!
+  "Block number of event"
+  blockNumber: BigInt!
+}
+
+type DelegateVotingPowerChange @entity(immutable: true) {
+  "Unique entity used to keep track of voting power delta"
+  id: ID!
+  "Token addresss"
+  tokenAddress: String
+  "Token address for delegate"
+  delegate: String!
+  "Previous voting power of delegate"
+  previousBalance: BigInt!
+  "New voting power of delegate"
+  newBalance: BigInt!
+  "Block time change happened"
+  blockTimestamp: BigInt!
+  "Transaction hash of the voting power change"
+  txnHash: String!
+  "Log index for delegate voting power change"
+  logIndex: BigInt!
+  "Block number of event"
+  blockNumber: BigInt!
+}
+
 type Governance @entity {
   "Unique entity used to keep track of common aggregated data"
   id: ID!
