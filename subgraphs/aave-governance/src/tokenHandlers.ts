@@ -1,6 +1,8 @@
 import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 import {
+  createDelegateChange,
+  createDelegateVotingPowerChange,
   getGovernance,
   getOrCreateDelegate,
   getOrCreateTokenDailySnapshot,
@@ -12,7 +14,8 @@ import { DelegationType } from "./constants";
 export function _handleDelegateChanged(
   delegationType: i32,
   delegator: string,
-  toDelegate: string
+  toDelegate: string,
+  event: ethereum.Event
 ): void {
   if (delegationType == DelegationType.VOTING_POWER) {
     let tokenHolder = getOrCreateTokenHolder(delegator);
@@ -24,6 +27,14 @@ export function _handleDelegateChanged(
       previousDelegate.tokenHoldersRepresentedAmount =
         previousDelegate.tokenHoldersRepresentedAmount - 1;
       previousDelegate.save();
+
+      const delegateChanged = createDelegateChange(
+        event,
+        toDelegate,
+        tokenHolder.delegate!,
+        delegator
+      );
+      delegateChanged.save();
     }
 
     newDelegate.tokenHoldersRepresentedAmount =
@@ -40,15 +51,17 @@ export function _handleDelegatedPowerChanged(
   delegationType: i32,
   delegateAddress: string,
   newBalance: BigInt,
+  event: ethereum.Event,
   isStakedToken: boolean
 ): void {
   if (delegationType == DelegationType.VOTING_POWER) {
     let governance = getGovernance();
     let delegate = getOrCreateDelegate(delegateAddress);
 
+    let previousBalance: BigInt;
     // Update delegate and vote counts based on token / staked token
     if (!isStakedToken) {
-      let previousBalance = delegate.delegatedVotesRaw;
+      previousBalance = delegate.delegatedVotesRaw;
       let votesDifference = newBalance.minus(previousBalance);
       delegate.delegatedVotesRaw = newBalance;
       delegate.delegatedVotes = toDecimal(newBalance);
@@ -65,7 +78,7 @@ export function _handleDelegatedPowerChanged(
         governance.delegatedVotesRaw.plus(votesDifference);
       governance.delegatedVotes = toDecimal(governance.delegatedVotesRaw);
     } else {
-      let previousBalance = delegate.delegatedStakedTokenVotesRaw;
+      previousBalance = delegate.delegatedStakedTokenVotesRaw;
       let votesDifference = newBalance.minus(previousBalance);
       delegate.delegatedStakedTokenVotesRaw = newBalance;
       delegate.delegatedStakedTokenVotes = toDecimal(newBalance);
@@ -84,6 +97,15 @@ export function _handleDelegatedPowerChanged(
         governance.delegatedStakedTokenVotesRaw
       );
     }
+
+    // Create DelegateVotingPowerChange
+    const delegateVPChange = createDelegateVotingPowerChange(
+      event,
+      previousBalance,
+      newBalance,
+      delegateAddress
+    );
+    delegateVPChange.save();
 
     delegate.save();
     governance.save();
