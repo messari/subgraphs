@@ -119,8 +119,7 @@ export function createDelegateVotingPowerChange(
   delegateVPChange.delegate = delegate;
   delegateVPChange.tokenAddress = event.address.toHexString();
   delegateVPChange.txnHash = event.transaction.hash.toHexString();
-  delegateVPChange.logIndex = event.logIndex;
-  delegateVPChange.blockTimestamp = event.block.number;
+  delegateVPChange.blockTimestamp = event.block.timestamp;
   delegateVPChange.logIndex = event.logIndex;
   delegateVPChange.blockNumber = event.block.number;
 
