@@ -14,7 +14,7 @@ export function createMasterChefStakingPool(
   pid: BigInt,
   poolAddress: Address
 ): _MasterChefStakingPool {
-  let masterChefPool = new _MasterChefStakingPool(
+  const masterChefPool = new _MasterChefStakingPool(
     masterChefType + "-" + pid.toString()
   );
 
@@ -24,7 +24,7 @@ export function createMasterChefStakingPool(
   masterChefPool.lastRewardBlock = event.block.number;
   log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
-  let pool = LiquidityPool.load(masterChefPool.poolAddress!);
+  const pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (pool) {
     pool.rewardTokens = [getOrCreateToken(NetworkConfigs.getRewardToken()).id];
     pool.save();
@@ -99,7 +99,7 @@ export function updateMasterChefTotalAllocation(
   newPoolAlloc: BigInt,
   masterChefType: string
 ): void {
-  let masterChef = getOrCreateMasterChef(event, masterChefType);
+  const masterChef = getOrCreateMasterChef(event, masterChefType);
   masterChef.totalAllocPoint = masterChef.totalAllocPoint.plus(
     newPoolAlloc.minus(oldPoolAlloc)
   );

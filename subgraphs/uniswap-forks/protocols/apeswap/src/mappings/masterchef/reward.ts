@@ -1,11 +1,9 @@
-// import { log } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   Withdraw,
   EmergencyWithdraw,
 } from "../../../../../generated/MasterChef/MasterChefApeswap";
-import { _HelperStore } from "../../../../../generated/schema";
-import { BIGINT_NEG_ONE, UsageType } from "../../../../../src/common/constants";
+import { BIGINT_NEG_ONE } from "../../../../../src/common/constants";
 import { handleReward } from "../../common/handlers/handleReward";
 
 // A deposit or stake for the pool specific MasterChef.
