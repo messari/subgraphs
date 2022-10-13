@@ -19,7 +19,7 @@ import { sortValuesByTokenOrder } from "./pool";
 
 export function createDeposit(
   event: ethereum.Event,
-  inputTokenAmounts: BigInt[], // these come sorted as in the contract, with might not match pool.inputTokens positions.
+  inputTokenAmounts: BigInt[], // these come sorted as in the contract, which might not match pool.inputTokens positions.
   totalOutputTokenAmount: BigInt,
   provider: Address
 ): void {
@@ -53,7 +53,7 @@ export function createDeposit(
 
 export function createWithdraw(
   event: ethereum.Event,
-  inputTokenAmounts: BigInt[], // these come sorted as in the contract, with might not match pool.inputTokens positions.
+  inputTokenAmounts: BigInt[], // these come sorted as in the contract, which might not match pool.inputTokens positions.
   totalOutputTokenAmount: BigInt,
   provider: Address
 ): void {
