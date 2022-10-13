@@ -10,6 +10,7 @@ import { validateDeploymentJson } from '../../../deployment/validation/validateD
 import { getScopeAlias, getServiceAlias } from '../command-helpers/build/alias'
 import { isValidVersion } from '../command-helpers/build/checkVersion'
 import { Executor as ExecutorClass } from '../command-helpers/build/execution'
+import { MESSARI_REPO_PATH } from '../../bin/env'
 
 const HELP: string = `
 
@@ -25,12 +26,12 @@ ${chalk.bold(
 
 Options:
 
-        --scope          Scope of the build/deployment < single | protocol | base >
     -s, --service        Service to deploy to < hosted-service | subgraph-studio | cronos-portal >
     -v, --version        Specify the version of the subgraph deployment - Only relevant for subgraph studio testing deployments < e.g. 1.0.0 >
     -t, --token          API token to use for the deployment
     -r, --target         Target account for the deployment on the service - This is like your Github account for the hosted-service (i.e. messari)
-        --slug <slug>    The slug to use for the deployment {optional - replaces slug specified for the service in deployment.json}
+        --slug <slug>    The slug to use for the deployment {optional - replace deployment.json slug}
+        --base           Specifies that you want the build/deploy command to apply to all protocols in a subgraph folder {default: false}
     -d, --deploy         Deploy the build to the specified service {default: false}
     -l, --log            Print results to the console {default: false}
     -h, --help           Show usage information {default: false}
@@ -59,6 +60,7 @@ module.exports = {
       service,
       d,
       deploy,
+      base,
       slug,
       t,
       token,
@@ -71,6 +73,7 @@ module.exports = {
     target = r || target
     service = getServiceAlias(s || service)
     deploy = (d || deploy) === undefined ? false : true
+    base = base === undefined ? false : true
     token = t || token
     version = v || version
     help = (h || help) === undefined ? false : true
@@ -82,7 +85,7 @@ module.exports = {
     }
 
     // Check if the deployment.json file exists
-    if (!fs.existsSync('../../deployment/deployment.json')) {
+    if (!fs.existsSync(`${MESSARI_REPO_PATH}/deployment/deployment.json`)) {
       info(
         'deployment.json file not found - Please move to subgraph directory at <messari-repo>/subgraphs/subgraphs/**'
       )
@@ -91,7 +94,7 @@ module.exports = {
 
     // Read the deployment.json file
     const deploymentJSONData = JSON.parse(
-      fs.readFileSync('../../deployment/deployment.json', 'utf8')
+      fs.readFileSync(`${MESSARI_REPO_PATH}/deployment/deployment.json`, 'utf8')
     )
 
     // Check if deployment.json data is valid
@@ -100,13 +103,6 @@ module.exports = {
     } catch (e) {
       info(e.message)
       return
-    }
-
-    const askScope = {
-      type: 'select',
-      name: 'scope',
-      message: 'Choose a scope:',
-      choices: ['single', 'protocol', 'base'],
     }
 
     const askId = {
@@ -129,10 +125,6 @@ module.exports = {
       name: 'target',
       message: 'Target to deploy to:',
       skip: !deploy,
-    }
-
-    if (!['single', 'protocol', 'base'].includes(scope)) {
-      scope = (await toolbox.prompt.ask(askScope)).scope
     }
 
     if (id === undefined) {
@@ -176,7 +168,7 @@ module.exports = {
 
     const args: ScriptGeneratorArgs = {
       id,
-      scope,
+      base,
       target,
       service,
       deploy,
@@ -195,10 +187,9 @@ module.exports = {
       info(e.message)
       return
     }
-    scriptGenerator.prepare()
 
     let Executor = new ExecutorClass(
-      scriptGenerator.scripts,
+      scriptGenerator.deployments,
       args.deploy,
       args.log
     )
