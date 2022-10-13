@@ -2,7 +2,7 @@ import {
   DelegateChanged,
   DelegateVotesChanged,
   Transfer,
-} from "../../../generated/Comp/Comp";
+} from "../../../generated/Uni/Uni";
 import {
   _handleDelegateChanged,
   _handleDelegateVotesChanged,
