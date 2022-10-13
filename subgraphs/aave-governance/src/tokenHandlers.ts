@@ -18,12 +18,12 @@ export function _handleDelegateChanged(
   event: ethereum.Event
 ): void {
   if (delegationType == DelegationType.VOTING_POWER) {
-    let tokenHolder = getOrCreateTokenHolder(delegator);
-    let newDelegate = getOrCreateDelegate(toDelegate);
+    const tokenHolder = getOrCreateTokenHolder(delegator);
+    const newDelegate = getOrCreateDelegate(toDelegate);
 
     // Get previous delegate from the tokenholder
     if (tokenHolder.delegate !== null) {
-      let previousDelegate = getOrCreateDelegate(tokenHolder.delegate!); // ! needed for asm even though its typed as non-null
+      const previousDelegate = getOrCreateDelegate(tokenHolder.delegate!); // ! needed for asm even though its typed as non-null
       previousDelegate.tokenHoldersRepresentedAmount =
         previousDelegate.tokenHoldersRepresentedAmount - 1;
       previousDelegate.save();
@@ -55,14 +55,14 @@ export function _handleDelegatedPowerChanged(
   isStakedToken: boolean
 ): void {
   if (delegationType == DelegationType.VOTING_POWER) {
-    let governance = getGovernance();
-    let delegate = getOrCreateDelegate(delegateAddress);
+    const governance = getGovernance();
+    const delegate = getOrCreateDelegate(delegateAddress);
 
     let previousBalance: BigInt;
     // Update delegate and vote counts based on token / staked token
     if (!isStakedToken) {
       previousBalance = delegate.delegatedVotesRaw;
-      let votesDifference = newBalance.minus(previousBalance);
+      const votesDifference = newBalance.minus(previousBalance);
       delegate.delegatedVotesRaw = newBalance;
       delegate.delegatedVotes = toDecimal(newBalance);
 
@@ -79,7 +79,7 @@ export function _handleDelegatedPowerChanged(
       governance.delegatedVotes = toDecimal(governance.delegatedVotesRaw);
     } else {
       previousBalance = delegate.delegatedStakedTokenVotesRaw;
-      let votesDifference = newBalance.minus(previousBalance);
+      const votesDifference = newBalance.minus(previousBalance);
       delegate.delegatedStakedTokenVotesRaw = newBalance;
       delegate.delegatedStakedTokenVotes = toDecimal(newBalance);
 
@@ -118,15 +118,15 @@ export function _handleTransfer(
   value: BigInt,
   event: ethereum.Event
 ): void {
-  let fromHolder = getOrCreateTokenHolder(from);
-  let toHolder = getOrCreateTokenHolder(to);
-  let governance = getGovernance();
+  const fromHolder = getOrCreateTokenHolder(from);
+  const toHolder = getOrCreateTokenHolder(to);
+  const governance = getGovernance();
 
-  let isBurn = to == ZERO_ADDRESS;
-  let isMint = from == ZERO_ADDRESS;
+  const isBurn = to == ZERO_ADDRESS;
+  const isMint = from == ZERO_ADDRESS;
 
   if (!isMint) {
-    let fromHolderPreviousBalance = fromHolder.tokenBalanceRaw;
+    const fromHolderPreviousBalance = fromHolder.tokenBalanceRaw;
     fromHolder.tokenBalanceRaw = fromHolder.tokenBalanceRaw.minus(value);
     fromHolder.tokenBalance = toDecimal(fromHolder.tokenBalanceRaw);
 
@@ -149,7 +149,7 @@ export function _handleTransfer(
   }
 
   // Increment to holder balance and total tokens ever held
-  let toHolderPreviousBalance = toHolder.tokenBalanceRaw;
+  const toHolderPreviousBalance = toHolder.tokenBalanceRaw;
   toHolder.tokenBalanceRaw = toHolder.tokenBalanceRaw.plus(value);
   toHolder.tokenBalance = toDecimal(toHolder.tokenBalanceRaw);
   toHolder.totalTokensHeldRaw = toHolder.totalTokensHeldRaw.plus(value);
@@ -175,7 +175,7 @@ export function _handleTransfer(
   }
 
   // Take snapshot
-  let dailySnapshot = getOrCreateTokenDailySnapshot(event.block);
+  const dailySnapshot = getOrCreateTokenDailySnapshot(event.block);
   dailySnapshot.totalSupply = governance.totalTokenSupply;
   dailySnapshot.tokenHolders = governance.currentTokenHolders;
   dailySnapshot.stakedTokenHolders = governance.currentStakedTokenHolders;
@@ -192,15 +192,15 @@ export function _handleStakedTokenTransfer(
   value: BigInt,
   event: ethereum.Event
 ): void {
-  let fromHolder = getOrCreateTokenHolder(from);
-  let toHolder = getOrCreateTokenHolder(to);
-  let governance = getGovernance();
+  const fromHolder = getOrCreateTokenHolder(from);
+  const toHolder = getOrCreateTokenHolder(to);
+  const governance = getGovernance();
 
-  let isBurn = to == ZERO_ADDRESS;
-  let isMint = from == ZERO_ADDRESS;
+  const isBurn = to == ZERO_ADDRESS;
+  const isMint = from == ZERO_ADDRESS;
 
   if (!isMint) {
-    let fromHolderPreviousBalance = fromHolder.stakedTokenBalanceRaw;
+    const fromHolderPreviousBalance = fromHolder.stakedTokenBalanceRaw;
     fromHolder.stakedTokenBalanceRaw =
       fromHolder.stakedTokenBalanceRaw.minus(value);
     fromHolder.stakedTokenBalance = toDecimal(fromHolder.stakedTokenBalanceRaw);
@@ -224,7 +224,7 @@ export function _handleStakedTokenTransfer(
   }
 
   // Increment to holder balance and total tokens ever held
-  let toHolderPreviousBalance = toHolder.stakedTokenBalanceRaw;
+  const toHolderPreviousBalance = toHolder.stakedTokenBalanceRaw;
   toHolder.stakedTokenBalanceRaw = toHolder.stakedTokenBalanceRaw.plus(value);
   toHolder.stakedTokenBalance = toDecimal(toHolder.stakedTokenBalanceRaw);
   toHolder.totalStakedTokensHeldRaw =
@@ -253,7 +253,7 @@ export function _handleStakedTokenTransfer(
   }
 
   // Take snapshot
-  let dailySnapshot = getOrCreateTokenDailySnapshot(event.block);
+  const dailySnapshot = getOrCreateTokenDailySnapshot(event.block);
   dailySnapshot.totalSupply = governance.totalTokenSupply;
   dailySnapshot.tokenHolders = governance.currentTokenHolders;
   dailySnapshot.stakedTokenHolders = governance.currentStakedTokenHolders;
