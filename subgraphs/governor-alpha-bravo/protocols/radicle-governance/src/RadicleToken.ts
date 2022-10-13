@@ -2,7 +2,7 @@ import {
   DelegateChanged,
   DelegateVotesChanged,
   Transfer,
-} from "../../../generated/Comp/Comp";
+} from "../../../generated/RadicleToken/RadicleToken";
 import {
   _handleDelegateChanged,
   _handleDelegateVotesChanged,
