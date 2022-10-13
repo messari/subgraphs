@@ -2825,7 +2825,7 @@
     "base": "aave-v2-forks",
     "protocol": "radiant-capital",
     "deployments": {
-      "radiant-arbitrum": {
+      "radiant-capital-arbitrum": {
         "network": "arbitrum",
         "status": "prod",
         "versions": {

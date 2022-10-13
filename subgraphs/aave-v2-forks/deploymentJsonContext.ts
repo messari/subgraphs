@@ -9,11 +9,11 @@ function slugToTitle(slug: string): string {
 }
 
 export const deploymentJsonContext: DeploymentJsonContextInterface = {
-  protocolSlug: "aave-amm",
-  protocolName: slugToTitle("aave-amm"),
-  network: "ethereum",
+  protocolSlug: "radiant-capital",
+  protocolName: slugToTitle("radiant-capital"),
+  network: "arbitrum",
   schemaVersion: "2.0.1",
-  subgraphVersion: "1.2.15",
+  subgraphVersion: "1.0.1",
   methodologyVersion: "1.0.0",
 };
 
