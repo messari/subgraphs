@@ -467,7 +467,7 @@ type LiquidityPool @entity {
   swaps: [Swap!]! @derivedFrom(field: "pool")
 
   " Helper field to save pools underlying tokens"
-  _underlyingTokens: [Token!] 
+  _underlyingTokens: [Token!]
 
   "Registry of the pool"
   _registry: String
@@ -808,7 +808,6 @@ type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
-
 
 type _CircularBuffer @entity {
   " 'CIRCULAR_BUFFER' "

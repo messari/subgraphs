@@ -425,7 +425,6 @@ WHITELIST_TOKENS_MAP.set(
 WHITELIST_TOKENS_MAP.set(POLYGON.NETWORK_STRING, POLYGON.WHITELIST_TOKENS);
 WHITELIST_TOKENS_MAP.set(OPTIMISM.NETWORK_STRING, OPTIMISM.WHITELIST_TOKENS);
 
-
 export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0x1075bea848451a13fd6f696b5d0fda52743e6439"), // aETHb
   Address.fromString("0x18b497f4d5f84958b3ba7911401e145397d73604"), // deusdc-3ep
@@ -464,6 +463,5 @@ export const HARDCODED_STABLES: Address[] = [
   Address.fromString("0xe04fe47516c4ebd56bc6291b15d46a47535e736b"), // Duet USD
   Address.fromString("0xe1c7c46b666506c6690dce134fcba3f09456e4a9"), // Ellipsis valBUSD/valUSDC/valUSDT
   Address.fromString("0xe68b79e51bf826534ff37aa9cee71a3842ee9c70"), // CZUSD
-
 ];
-export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000")
+export const BIGDECIMAL_USD_PRICE = BigDecimal.fromString("1000000");

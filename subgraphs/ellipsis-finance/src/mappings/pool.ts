@@ -26,7 +26,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
   const provider = event.params.provider;
   const tokenAmounts = event.params.token_amounts;
   const totalSupply = event.params.token_supply;
-  
+
   Deposit(
     liquidityPoolAddress,
     tokenAmounts,
@@ -194,13 +194,15 @@ export function handleTokenExchange(event: TokenExchange): void {
     event.transaction,
     event.block
   );
-  
+
   updateUsageMetrics(event.block, buyer);
   updatePoolSnapshots(liquidityPoolAddress, event.block);
   updateFinancials(event.block);
 }
 
-export function handleTokenExchangeWithUintSoldId(event: TokenExchaneWithUintSoldId): void {
+export function handleTokenExchangeWithUintSoldId(
+  event: TokenExchaneWithUintSoldId
+): void {
   const buyer = event.params.buyer;
   const liquidityPoolAddress = event.address;
 

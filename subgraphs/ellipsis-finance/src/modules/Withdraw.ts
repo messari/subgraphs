@@ -29,7 +29,7 @@ export function createWithdrawTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): WithdrawTransaction {
-  let withdrawTransactionId = "withdraw-"
+  const withdrawTransactionId = "withdraw-"
     .concat(transaction.hash.toHexString())
     .concat("-")
     .concat(transaction.index.toString());
@@ -89,28 +89,28 @@ function getInputToken(
   provider: Address,
   amount: BigInt
 ): Address {
-  let receipt = event.receipt;
+  const receipt = event.receipt;
   if (!receipt) return constants.NULL.TYPE_ADDRESS;
 
-  let logs = event.receipt!.logs;
+  const logs = event.receipt!.logs;
   if (!logs) return constants.NULL.TYPE_ADDRESS;
 
   for (let i = 0; i < logs.length; ++i) {
-    let log = logs.at(i);
-    let topic_signature = log.topics.at(0);
+    const log = logs.at(i);
+    const topic_signature = log.topics.at(0);
     if (
       crypto
         .keccak256(ByteArray.fromUTF8("Transfer(address,address,uint256)"))
         .equals(topic_signature)
     ) {
-      let _from = ethereum.decode("address", log.topics.at(1))!.toAddress();
-      let _to = ethereum.decode("address", log.topics.at(2))!.toAddress();
+      const _from = ethereum.decode("address", log.topics.at(1))!.toAddress();
+      const _to = ethereum.decode("address", log.topics.at(2))!.toAddress();
 
       if (_from == poolAddress && _to == provider) {
-        let data = ethereum.decode("uint256", log.data);
+        const data = ethereum.decode("uint256", log.data);
 
         if (data && data.toBigInt().equals(amount)) {
-          let inputToken = log.address;
+          const inputToken = log.address;
 
           return inputToken;
         }
@@ -128,14 +128,14 @@ export function getWithdrawnTokenAmounts(
   inputTokenAmount: BigInt,
   event: ethereum.Event
 ): BigInt[] {
-  let inputToken = getInputToken(
+  const inputToken = getInputToken(
     event,
     liquidityPoolAddress,
     provider,
     inputTokenAmount
   );
 
-  let withdrawnTokenAmounts = new Array<BigInt>();
+  const withdrawnTokenAmounts = new Array<BigInt>();
 
   for (let idx = 0; idx < inputTokens.length; idx++) {
     if (inputTokens[idx] == inputToken.toHexString()) {
@@ -189,12 +189,12 @@ export function Withdraw(
     );
   }
 
-  let inputTokens: string[] = [];
-  let inputTokenAmounts: BigInt[] = [];
+  const inputTokens: string[] = [];
+  const inputTokenAmounts: BigInt[] = [];
   let withdrawAmountUSD = constants.BIGDECIMAL_ZERO;
 
   for (let idx = 0; idx < withdrawnTokenAmounts.length; idx++) {
-    let inputToken = utils.getOrCreateTokenFromString(
+    const inputToken = utils.getOrCreateTokenFromString(
       pool.inputTokens[idx],
       block
     );
@@ -227,7 +227,7 @@ export function Withdraw(
     block
   );
   pool.outputTokenSupply = tokenSupplyAfterWithdrawal;
-  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD2(poolAddress,block);
+  pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD2(poolAddress, block);
   pool.save();
 
   createWithdrawTransaction(

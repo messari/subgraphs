@@ -16,22 +16,19 @@ import { getRewardsPerDay } from "../common/rewards";
 import { Staking as StakingContract } from "../../generated/Staking/Staking";
 import { StakingV2 as StakingContractV2 } from "../../generated/StakingV2/StakingV2";
 
-export function handleStakingV1(
-  poolId: BigInt,
-  block: ethereum.Block,
-): void {
-  let stakingContract = StakingContract.bind(
+export function handleStakingV1(poolId: BigInt, block: ethereum.Block): void {
+  const stakingContract = StakingContract.bind(
     Address.fromString(constants.STAKING_V1)
   );
-  let poolInfoCall = stakingContract.try_poolInfo(poolId);
+  const poolInfoCall = stakingContract.try_poolInfo(poolId);
   if (poolInfoCall.reverted) {
     return;
   }
 
-  let allocPoint = poolInfoCall.value.getAllocPoint();
-  let lpTokenAddress = poolInfoCall.value.getLpToken();
+  const allocPoint = poolInfoCall.value.getAllocPoint();
+  const lpTokenAddress = poolInfoCall.value.getLpToken();
 
-  let poolAddress = utils.getMinterFromLpToken(lpTokenAddress);
+  const poolAddress = utils.getMinterFromLpToken(lpTokenAddress);
 
   if (poolAddress == constants.ADDRESS_ZERO) {
     log.error("pool address not found for lpToken: {}", [
@@ -41,21 +38,23 @@ export function handleStakingV1(
     return;
   }
 
-  let totalAllocPoint = utils.readValue<BigInt>(
-    stakingContract.try_totalAllocPoint(),
-    constants.BIGINT_ZERO
-  ).toBigDecimal();
+  const totalAllocPoint = utils
+    .readValue<BigInt>(
+      stakingContract.try_totalAllocPoint(),
+      constants.BIGINT_ZERO
+    )
+    .toBigDecimal();
   if (totalAllocPoint.equals(constants.BIGDECIMAL_ZERO)) return;
 
-  let contractRewardsPerSecond = utils.readValue<BigInt>(
+  const contractRewardsPerSecond = utils.readValue<BigInt>(
     stakingContract.try_rewardsPerSecond(),
     constants.BIGINT_ZERO
   );
 
-  let rewardsPerSecond = allocPoint
+  const rewardsPerSecond = allocPoint
     .times(contractRewardsPerSecond)
     .divDecimal(totalAllocPoint);
-  let rewardTokensPerDay = getRewardsPerDay(
+  const rewardTokensPerDay = getRewardsPerDay(
     block.timestamp,
     block.number,
     rewardsPerSecond,
@@ -74,35 +73,35 @@ export function handleStakingV2(
   lpTokenAddress: Address,
   block: ethereum.Block
 ): void {
-  let poolAddress = utils.getMinterFromLpToken(lpTokenAddress);
+  const poolAddress = utils.getMinterFromLpToken(lpTokenAddress);
   if (poolAddress == constants.ADDRESS_ZERO) {
     return;
   }
 
-  let stakingContractV2 = StakingContractV2.bind(
+  const stakingContractV2 = StakingContractV2.bind(
     Address.fromString(constants.STAKING_V2)
   );
-  let pool = getOrCreateLiquidityPool(poolAddress, block);
+  const pool = getOrCreateLiquidityPool(poolAddress, block);
 
   log.warning("[handleStakingV2] Pool Id{}", [pool.id]);
-  let poolInfoCall = stakingContractV2.try_poolInfo(lpTokenAddress);
-  if (poolInfoCall.reverted)  return; 
-    let rewardsPerSecond = BigDecimal.fromString(
-      poolInfoCall.value.getRewardsPerSecond().toString()
-    );
-    let rewardTokensPerDay = getRewardsPerDay(
-      block.timestamp,
-      block.number,
-      rewardsPerSecond,
-      constants.RewardIntervalType.TIMESTAMP
-    );
+  const poolInfoCall = stakingContractV2.try_poolInfo(lpTokenAddress);
+  if (poolInfoCall.reverted) return;
+  const rewardsPerSecond = BigDecimal.fromString(
+    poolInfoCall.value.getRewardsPerSecond().toString()
+  );
+  const rewardTokensPerDay = getRewardsPerDay(
+    block.timestamp,
+    block.number,
+    rewardsPerSecond,
+    constants.RewardIntervalType.TIMESTAMP
+  );
 
-    updateRewardTokenEmissions(
-      constants.EPX_ADDRESS,
-      poolAddress,
-      BigInt.fromString(rewardTokensPerDay.truncate(0).toString()),
-      block
-    );
+  updateRewardTokenEmissions(
+    constants.EPX_ADDRESS,
+    poolAddress,
+    BigInt.fromString(rewardTokensPerDay.truncate(0).toString()),
+    block
+  );
 }
 
 export function updateRewardTokenEmissions(
@@ -113,13 +112,13 @@ export function updateRewardTokenEmissions(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
   getOrCreateRewardToken(rewardTokenAddress, block);
-  
+
   const rewardToken = getOrCreateToken(rewardTokenAddress, block);
   if (!pool.rewardTokens) {
     pool.rewardTokens = [];
   }
 
-  let rewardTokens = pool.rewardTokens!;
+  const rewardTokens = pool.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
     pool.rewardTokens = rewardTokens;
@@ -130,12 +129,12 @@ export function updateRewardTokenEmissions(
   if (!pool.rewardTokenEmissionsAmount) {
     pool.rewardTokenEmissionsAmount = [];
   }
-  let rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount!;
+  const rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount!;
 
   if (!pool.rewardTokenEmissionsUSD) {
     pool.rewardTokenEmissionsUSD = [];
   }
-  let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
+  const rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD!;
 
   const token = getOrCreateToken(rewardTokenAddress, block);
 

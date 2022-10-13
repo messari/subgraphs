@@ -11,31 +11,31 @@ import {
 import { handleStakingV1, handleStakingV2 } from "../modules/Rewards";
 
 export function handleDeposit(event: Deposit): void {
-  let poolId = event.params.pid;
+  const poolId = event.params.pid;
   handleStakingV1(poolId, event.block);
 }
 export function handleWithdraw(event: Withdraw): void {
-  let poolId = event.params.pid;
+  const poolId = event.params.pid;
 
   handleStakingV1(poolId, event.block);
 }
 export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
-  let poolId = event.params.pid;
+  const poolId = event.params.pid;
 
   handleStakingV1(poolId, event.block);
 }
 export function handleDepositV2(event: DepositV2): void {
-  let token = event.params.token;
+  const token = event.params.token;
 
   handleStakingV2(token, event.block);
 }
 export function handleWithdrawV2(event: WithdrawV2): void {
-  let token = event.params.token;
+  const token = event.params.token;
 
   handleStakingV2(token, event.block);
 }
 export function handleEmergencyWithdrawV2(event: EmergencyWithdrawV2): void {
-  let token = event.params.token;
+  const token = event.params.token;
 
   handleStakingV2(token, event.block);
 }

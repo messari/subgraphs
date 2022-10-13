@@ -36,7 +36,7 @@ export function createSwapTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): SwapTransaction {
-  let transactionId = "swap-"
+  const transactionId = "swap-"
     .concat(transaction.hash.toHexString())
     .concat("-")
     .concat(transaction.index.toString());
@@ -99,7 +99,7 @@ export function Swap(
   block: ethereum.Block,
   underlying: boolean = false
 ): void {
-  let pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
+  const pool = getOrCreateLiquidityPool(liquidityPoolAddress, block);
 
   let tokenIn: string;
   let tokenOut: string;
@@ -110,28 +110,28 @@ export function Swap(
   } else {
     log.warning("[Swap] before getunderlyingcoins {}", [""]);
 
-    let underlyingCoins = utils.getPoolUnderlyingCoins(
+    const underlyingCoins = utils.getPoolUnderlyingCoins(
       liquidityPoolAddress,
       pool._registry
         ? Address.fromString(pool._registry!)
         : constants.ADDRESS_ZERO
     );
-log.warning("[Swap] after getunderlyingcoins coins {}", [""]);
-    
+    log.warning("[Swap] after getunderlyingcoins coins {}", [""]);
+
     if (underlyingCoins.length == 0) return;
 
     tokenIn = underlyingCoins[sold_id.toI32()];
     tokenOut = underlyingCoins[bought_id.toI32()];
   }
 
-  let tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);
+  const tokenInStore = utils.getOrCreateTokenFromString(tokenIn, block);
   const amountInUSD = amountIn
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenInStore.decimals as u8).toBigDecimal()
     )
     .times(tokenInStore.lastPriceUSD!);
 
-  let tokenOutStore = utils.getOrCreateTokenFromString(tokenOut, block);
+  const tokenOutStore = utils.getOrCreateTokenFromString(tokenOut, block);
   const amountOutUSD = amountOut
     .divDecimal(
       constants.BIGINT_TEN.pow(tokenOutStore.decimals as u8).toBigDecimal()

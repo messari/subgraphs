@@ -29,7 +29,7 @@ export function createDepositTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): DepositTransaction {
-  let transactionId = "deposit-"
+  const transactionId = "deposit-"
     .concat(transaction.hash.toHexString())
     .concat("-")
     .concat(transaction.index.toString());
@@ -92,16 +92,16 @@ export function Deposit(
 ): void {
   const pool = getOrCreateLiquidityPool(poolAddress, block);
 
-  let inputTokens: string[] = [];
-  let inputTokenAmounts: BigInt[] = [];
+  const inputTokens: string[] = [];
+  const inputTokenAmounts: BigInt[] = [];
   let depositAmountUSD = constants.BIGDECIMAL_ZERO;
-  let outputTokenMintedAmount = totalSupplyAfterDeposit.minus(
+  const outputTokenMintedAmount = totalSupplyAfterDeposit.minus(
     pool.outputTokenSupply!
   );
 
   for (let idx = 0; idx < depositedCoinAmounts.length; idx++) {
-    let inputToken = getOrCreateToken(
-    Address.fromString( pool.inputTokens[idx]),
+    const inputToken = getOrCreateToken(
+      Address.fromString(pool.inputTokens[idx]),
       block
     );
 
@@ -121,11 +121,10 @@ export function Deposit(
     poolAddress,
     pool.inputTokens
   );
-    
-    
+
   pool.totalValueLockedUSD = utils.getPoolTVL(
-  pool.inputTokens,
-      pool.inputTokenBalances ,
+    pool.inputTokens,
+    pool.inputTokenBalances,
     block
   );
   pool.inputTokenWeights = utils.getPoolTokenWeights(
@@ -135,9 +134,9 @@ export function Deposit(
     block
   );
   pool.outputTokenSupply = totalSupplyAfterDeposit;
-  
+
   pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD2(poolAddress, block);
-  
+
   pool.save();
 
   createDepositTransaction(

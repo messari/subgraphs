@@ -9,12 +9,19 @@ import {
 import { SushiSwapRouter as SushiSwapRouterContract } from "../../../generated/Factory/SushiSwapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
-  if (tokenAddress.equals(constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!)) {
+  if (
+    tokenAddress.equals(
+      constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!
+    )
+  ) {
     return false;
   }
 
   const lpToken = SushiSwapPairContract.bind(tokenAddress);
-  let isFactoryAvailable = utils.readValue(lpToken.try_factory(), constants.ZERO_ADDRESS);
+  const isFactoryAvailable = utils.readValue(
+    lpToken.try_factory(),
+    constants.ZERO_ADDRESS
+  );
 
   if (isFactoryAvailable.toHex() == constants.ZERO_ADDRESS_STRING) {
     return false;
@@ -23,20 +30,34 @@ export function isLpToken(tokenAddress: Address, network: string): bool {
   return true;
 }
 
-export function getPriceUsdc(tokenAddress: Address, network: string): CustomPriceType {
+export function getPriceUsdc(
+  tokenAddress: Address,
+  network: string
+): CustomPriceType {
   if (isLpToken(tokenAddress, network)) {
     return getLpTokenPriceUsdc(tokenAddress, network);
   }
   return getPriceFromRouterUsdc(tokenAddress, network);
 }
 
-export function getPriceFromRouterUsdc(tokenAddress: Address, network: string): CustomPriceType {
-  return getPriceFromRouter(tokenAddress, constants.WHITELIST_TOKENS_MAP.get(network)!.get("USDC")!, network);
+export function getPriceFromRouterUsdc(
+  tokenAddress: Address,
+  network: string
+): CustomPriceType {
+  return getPriceFromRouter(
+    tokenAddress,
+    constants.WHITELIST_TOKENS_MAP.get(network)!.get("USDC")!,
+    network
+  );
 }
 
-export function getPriceFromRouter(token0Address: Address, token1Address: Address, network: string): CustomPriceType {
-  let wethAddress = constants.SUSHISWAP_WETH_ADDRESS.get(network)!;
-  let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
+export function getPriceFromRouter(
+  token0Address: Address,
+  token1Address: Address,
+  network: string
+): CustomPriceType {
+  const wethAddress = constants.SUSHISWAP_WETH_ADDRESS.get(network)!;
+  const ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
 
   // Convert ETH address to WETH
   if (token0Address == ethAddress) {
@@ -46,9 +67,10 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
     token1Address = wethAddress;
   }
 
-  let path: Address[] = [];
+  const path: Address[] = [];
   let numberOfJumps: BigInt;
-  let inputTokenIsWeth: bool = token0Address == wethAddress || token1Address == wethAddress;
+  const inputTokenIsWeth: bool =
+    token0Address == wethAddress || token1Address == wethAddress;
 
   if (inputTokenIsWeth) {
     // Path = [token0, weth] or [weth, token1]
@@ -65,13 +87,13 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
     path.push(token1Address);
   }
 
-  let token0Decimals = utils.getTokenDecimals(token0Address);
-  let amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
+  const token0Decimals = utils.getTokenDecimals(token0Address);
+  const amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
   const routerAddresses = constants.SUSHISWAP_ROUTER_ADDRESS_MAP.get(network)!;
 
-  let routerAddressV1 = routerAddresses.get("routerV1");
-  let routerAddressV2 = routerAddresses.get("routerV2");
+  const routerAddressV1 = routerAddresses.get("routerV1");
+  const routerAddressV2 = routerAddresses.get("routerV2");
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
 
@@ -87,44 +109,71 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
       }
     }
 
-    let amountOut = amountOutArray.value[amountOutArray.value.length - 1];
-    let feeBips = BigInt.fromI32(30); // .3% per swap fees
+    const amountOut = amountOutArray.value[amountOutArray.value.length - 1];
+    const feeBips = BigInt.fromI32(30); // .3% per swap fees
 
-    let amountOutBigDecimal = amountOut
+    const amountOutBigDecimal = amountOut
       .times(constants.BIGINT_TEN_THOUSAND)
       .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
       .toBigDecimal();
 
-    return CustomPriceType.initialize(amountOutBigDecimal, constants.DEFAULT_USDC_DECIMALS);
+    return CustomPriceType.initialize(
+      amountOutBigDecimal,
+      constants.DEFAULT_USDC_DECIMALS
+    );
   }
 
   return new CustomPriceType();
 }
 
-export function getLpTokenPriceUsdc(tokenAddress: Address, network: string): CustomPriceType {
+export function getLpTokenPriceUsdc(
+  tokenAddress: Address,
+  network: string
+): CustomPriceType {
   const sushiswapPair = SushiSwapPairContract.bind(tokenAddress);
 
-  let totalLiquidity: CustomPriceType = getLpTokenTotalLiquidityUsdc(tokenAddress, network);
+  const totalLiquidity: CustomPriceType = getLpTokenTotalLiquidityUsdc(
+    tokenAddress,
+    network
+  );
 
-  let totalSupply = utils.readValue<BigInt>(sushiswapPair.try_totalSupply(), constants.BIGINT_ZERO);
+  const totalSupply = utils.readValue<BigInt>(
+    sushiswapPair.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
   if (totalSupply == constants.BIGINT_ZERO) {
     return new CustomPriceType();
   }
 
-  let pairDecimals = utils.readValue<i32>(sushiswapPair.try_decimals(), constants.DEFAULT_DECIMALS.toI32() as u8);
+  const pairDecimals = utils.readValue<i32>(
+    sushiswapPair.try_decimals(),
+    constants.DEFAULT_DECIMALS.toI32() as u8
+  );
 
-  let pricePerLpTokenUsdc = totalLiquidity.usdPrice
+  const pricePerLpTokenUsdc = totalLiquidity.usdPrice
     .times(constants.BIGINT_TEN.pow(pairDecimals as u8).toBigDecimal())
     .div(totalSupply.toBigDecimal());
 
-  return CustomPriceType.initialize(pricePerLpTokenUsdc, constants.DEFAULT_USDC_DECIMALS);
+  return CustomPriceType.initialize(
+    pricePerLpTokenUsdc,
+    constants.DEFAULT_USDC_DECIMALS
+  );
 }
 
-export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: string): CustomPriceType {
+export function getLpTokenTotalLiquidityUsdc(
+  tokenAddress: Address,
+  network: string
+): CustomPriceType {
   const sushiSwapPair = SushiSwapPairContract.bind(tokenAddress);
 
-  let token0Address = utils.readValue<Address>(sushiSwapPair.try_token0(), constants.ZERO_ADDRESS);
-  let token1Address = utils.readValue<Address>(sushiSwapPair.try_token1(), constants.ZERO_ADDRESS);
+  const token0Address = utils.readValue<Address>(
+    sushiSwapPair.try_token0(),
+    constants.ZERO_ADDRESS
+  );
+  const token1Address = utils.readValue<Address>(
+    sushiSwapPair.try_token1(),
+    constants.ZERO_ADDRESS
+  );
 
   if (
     token0Address.toHex() == constants.ZERO_ADDRESS_STRING ||
@@ -133,38 +182,44 @@ export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: str
     return new CustomPriceType();
   }
 
-  let token0Decimals = utils.getTokenDecimals(token0Address);
-  let token1Decimals = utils.getTokenDecimals(token1Address);
+  const token0Decimals = utils.getTokenDecimals(token0Address);
+  const token1Decimals = utils.getTokenDecimals(token1Address);
 
-  let reserves = utils.readValue<SushiSwapPair__getReservesResult>(
+  const reserves = utils.readValue<SushiSwapPair__getReservesResult>(
     sushiSwapPair.try_getReserves(),
-    constants.SUSHISWAP_DEFAULT_RESERVE_CALL,
+    constants.SUSHISWAP_DEFAULT_RESERVE_CALL
   );
 
-  let token0Price = getPriceUsdc(token0Address, network);
-  let token1Price = getPriceUsdc(token1Address, network);
+  const token0Price = getPriceUsdc(token0Address, network);
+  const token1Price = getPriceUsdc(token1Address, network);
 
   if (token0Price.reverted || token1Price.reverted) {
     return new CustomPriceType();
   }
 
-  let reserve0 = reserves.value0;
-  let reserve1 = reserves.value1;
+  const reserve0 = reserves.value0;
+  const reserve1 = reserves.value1;
 
-  if (reserve0.notEqual(constants.BIGINT_ZERO) || reserve1.notEqual(constants.BIGINT_ZERO)) {
-    let liquidity0 = reserve0
+  if (
+    reserve0.notEqual(constants.BIGINT_ZERO) ||
+    reserve1.notEqual(constants.BIGINT_ZERO)
+  ) {
+    const liquidity0 = reserve0
       .div(constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8))
       .toBigDecimal()
       .times(token0Price.usdPrice);
 
-    let liquidity1 = reserve1
+    const liquidity1 = reserve1
       .div(constants.BIGINT_TEN.pow(token1Decimals.toI32() as u8))
       .toBigDecimal()
       .times(token1Price.usdPrice);
 
-    let totalLiquidity = liquidity0.plus(liquidity1);
+    const totalLiquidity = liquidity0.plus(liquidity1);
 
-    return CustomPriceType.initialize(totalLiquidity, constants.DEFAULT_USDC_DECIMALS);
+    return CustomPriceType.initialize(
+      totalLiquidity,
+      constants.DEFAULT_USDC_DECIMALS
+    );
   }
   return new CustomPriceType();
 }

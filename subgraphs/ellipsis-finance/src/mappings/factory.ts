@@ -6,12 +6,12 @@ import {
 } from "../../generated/Factory/Factory";
 import * as utils from "../common/utils";
 import { log } from "@graphprotocol/graph-ts";
-import { PoolTemplate } from "../../generated/templates";
+
 import { getOrCreateLiquidityPool } from "../common/initializers";
 
 export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
-  let registryAddress = event.address;
-  let poolAddress = event.params.pool;
+  const registryAddress = event.address;
+  const poolAddress = event.params.pool;
 
   if (utils.checkIfPoolExists(poolAddress)) return;
   getOrCreateLiquidityPool(poolAddress, event.block, registryAddress);
@@ -27,13 +27,12 @@ export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
 }
 
 export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
-  let registryAddress = event.address;
-  let poolAddress = event.params.pool;
+  const registryAddress = event.address;
+  const poolAddress = event.params.pool;
 
   if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block,registryAddress);
+  getOrCreateLiquidityPool(poolAddress, event.block, registryAddress);
 
-  
   log.warning("[MetaPoolDeployed] PoolAddress: {}, Registry: {}, TxnHash: {}", [
     poolAddress.toHexString(),
     registryAddress.toHexString(),
@@ -42,11 +41,11 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
 }
 
 export function handleBasePoolAdded(event: BasePoolAdded): void {
-  let registryAddress = event.address;
-  let poolAddress = event.params.base_pool;
+  const registryAddress = event.address;
+  const poolAddress = event.params.base_pool;
 
   if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block,registryAddress);
+  getOrCreateLiquidityPool(poolAddress, event.block, registryAddress);
 
   log.warning("[BasePoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
     poolAddress.toHexString(),
@@ -56,11 +55,11 @@ export function handleBasePoolAdded(event: BasePoolAdded): void {
 }
 
 export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
-  let registryAddress = event.address;
-  let poolAddress = event.params.pool;
+  const registryAddress = event.address;
+  const poolAddress = event.params.pool;
 
   if (utils.checkIfPoolExists(poolAddress)) return;
-  getOrCreateLiquidityPool(poolAddress, event.block,registryAddress);
+  getOrCreateLiquidityPool(poolAddress, event.block, registryAddress);
 
   log.warning("[MetaPoolDeployed] PoolAddress: {}, Registry: {}, TxnHash: {}", [
     poolAddress.toHexString(),
