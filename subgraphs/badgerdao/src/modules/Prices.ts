@@ -2,7 +2,6 @@ import {
   BigInt,
   Address,
   BigDecimal,
-  dataSource,
 } from "@graphprotocol/graph-ts";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
@@ -11,7 +10,6 @@ import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault
 
 
 export function getPriceOfOutputTokens(vaultAddress: Address, amount: BigInt): BigDecimal {
-  const network = dataSource.network();
   const vaultContract = VaultContract.bind(vaultAddress);
 
   let pricePerShare = utils.readValue<BigInt>(
@@ -24,7 +22,7 @@ export function getPriceOfOutputTokens(vaultAddress: Address, amount: BigInt): B
     constants.NULL.TYPE_ADDRESS
   );
 
-  let virtualPrice = getPriceUsdcRecommended(tokenAddress, network);
+  let virtualPrice = getPriceUsdcRecommended(tokenAddress);
   let vaultTokenDecimals = utils.getTokenDecimals(vaultAddress);
 
   let price = pricePerShare

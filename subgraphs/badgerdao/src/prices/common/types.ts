@@ -1,5 +1,5 @@
 import * as constants from "./constants";
-import { BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export class Wrapped<T> {
   inner: T;
@@ -20,7 +20,7 @@ export class CustomPriceType {
   }
 
   static initialize(_usdPrice: BigDecimal, _decimals: i32 = 0): CustomPriceType {
-    let result = new CustomPriceType();
+    const result = new CustomPriceType();
     result._usdPrice = new Wrapped(_usdPrice);
     result._decimals = new Wrapped(_decimals as u8);
 
@@ -42,4 +42,30 @@ export class CustomPriceType {
   get decimalsBaseTen(): BigDecimal {
     return constants.BIGINT_TEN.pow(this.decimals as u8).toBigDecimal();
   }
+}
+
+export interface Configurations {
+  yearnLens(): Address;
+  chainLink(): Address;
+  yearnLensBlacklist(): Address[];
+
+  aaveOracle(): Address;
+  aaveOracleBlacklist(): Address[];
+
+  curveCalculations(): Address;
+  curveCalculationsBlacklist(): Address[];
+
+  sushiCalculations(): Address;
+  sushiCalculationsBlacklist(): Address[];
+
+  uniswapForks(): Address[];
+  curveRegistry(): Address[];
+
+  hardcodedStables(): Address[];
+
+  ethAddress(): Address;
+  wethAddress(): Address;
+  usdcAddress(): Address;
+
+  usdcTokenDecimals(): BigInt;
 }
