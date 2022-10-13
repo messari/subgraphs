@@ -47,16 +47,16 @@ export function createLiquidityPool(
   token1Address: string,
   fees: i32
 ): void {
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // create the tokens and tokentracker
-  let token0 = getOrCreateToken(token0Address);
-  let token1 = getOrCreateToken(token1Address);
+  const token0 = getOrCreateToken(token0Address);
+  const token1 = getOrCreateToken(token1Address);
 
   updateTokenWhitelists(token0, token1, poolAddress);
 
-  let pool = new LiquidityPool(poolAddress);
-  let poolAmounts = new _LiquidityPoolAmount(poolAddress);
+  const pool = new LiquidityPool(poolAddress);
+  const poolAmounts = new _LiquidityPoolAmount(poolAddress);
 
   pool.protocol = protocol.id;
   pool.name =
@@ -87,7 +87,7 @@ export function createLiquidityPool(
   poolAmounts.tokenPrices = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   // Used to track the number of deposits in a liquidity pool
-  let poolDeposits = new _HelperStore(poolAddress);
+  const poolDeposits = new _HelperStore(poolAddress);
   poolDeposits.valueInt = INT_ZERO;
 
   protocol.totalPoolCount = protocol.totalPoolCount + INT_ONE;
@@ -114,19 +114,21 @@ export function createLiquidityPool(
 // create pool fee entities based on the fee structure received from pairCreated event.
 export function createPoolFees(poolAddressString: string, fee: i64): string[] {
   // LP Fee
-  let poolLpFee = new LiquidityPoolFee("lp-fee-" + poolAddressString);
+  const poolLpFee = new LiquidityPoolFee("lp-fee-" + poolAddressString);
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
   poolLpFee.feePercentage = convertFeeToPercent(fee);
 
   // Protocol Fee
-  let poolProtocolFee = new LiquidityPoolFee(
+  const poolProtocolFee = new LiquidityPoolFee(
     "protocol-fee-" + poolAddressString
   );
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
   poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF;
 
   // Trading Fee
-  let poolTradingFee = new LiquidityPoolFee("trading-fee-" + poolAddressString);
+  const poolTradingFee = new LiquidityPoolFee(
+    "trading-fee-" + poolAddressString
+  );
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
   poolTradingFee.feePercentage = convertFeeToPercent(fee);
 
@@ -139,7 +141,7 @@ export function createPoolFees(poolAddressString: string, fee: i64): string[] {
 
 // Update store that tracks the deposit count per pool
 function incrementDepositHelper(poolAddress: string): void {
-  let poolDeposits = _HelperStore.load(poolAddress)!;
+  const poolDeposits = _HelperStore.load(poolAddress)!;
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE;
   poolDeposits.save();
 }
@@ -152,35 +154,35 @@ export function createDeposit(
   amount0: BigInt,
   amount1: BigInt
 ): void {
-  let poolAddress = event.address.toHexString();
+  const poolAddress = event.address.toHexString();
 
-  let pool = getLiquidityPool(poolAddress);
-  let poolAmounts = getLiquidityPoolAmounts(poolAddress);
+  const pool = getLiquidityPool(poolAddress);
+  const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
-  let token0 = getOrCreateToken(pool.inputTokens[0]);
-  let token1 = getOrCreateToken(pool.inputTokens[1]);
+  const token0 = getOrCreateToken(pool.inputTokens[0]);
+  const token1 = getOrCreateToken(pool.inputTokens[1]);
 
   // Convert tokens according to decimals
-  let amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
-  let amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
+  const amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
+  const amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
 
   // Get the value in USD of the deposit
-  let amountUSD = amount0Converted
+  const amountUSD = amount0Converted
     .times(token0.lastPriceUSD!)
     .plus(amount1Converted.times(token1.lastPriceUSD!));
 
-  let oldPoolTVL = pool.totalValueLockedUSD;
+  const oldPoolTVL = pool.totalValueLockedUSD;
 
   // Update pool balances adjusted for decimals and not adjusted
-  let poolInputTokenBalances: BigInt[] = [
+  const poolInputTokenBalances: BigInt[] = [
     pool.inputTokenBalances[0].plus(amount0),
     pool.inputTokenBalances[1].plus(amount1),
   ];
   pool.inputTokenBalances = poolInputTokenBalances;
 
-  let poolAmountsInputTokenBalances: BigDecimal[] = [
+  const poolAmountsInputTokenBalances: BigDecimal[] = [
     poolAmounts.inputTokenBalances[0].plus(amount0Converted),
     poolAmounts.inputTokenBalances[1].plus(amount1Converted),
   ];
@@ -193,10 +195,10 @@ export function createDeposit(
 
   // Add pool value back to protocol total value locked
   // reset aggregates with new amounts
-  let delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  const delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
-  let deposit = new Deposit(
+  const deposit = new Deposit(
     event.transaction.hash
       .toHexString()
       .concat("-")
@@ -234,36 +236,36 @@ export function createWithdraw(
   amount1: BigInt,
   isCollect: boolean
 ): void {
-  let poolAddress = event.address.toHexString();
+  const poolAddress = event.address.toHexString();
 
-  let pool = getLiquidityPool(poolAddress);
-  let poolAmounts = getLiquidityPoolAmounts(poolAddress);
+  const pool = getLiquidityPool(poolAddress);
+  const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
-  let token0 = getOrCreateToken(pool.inputTokens[0]);
-  let token1 = getOrCreateToken(pool.inputTokens[1]);
+  const token0 = getOrCreateToken(pool.inputTokens[0]);
+  const token1 = getOrCreateToken(pool.inputTokens[1]);
 
   // Convert tokens according to decimals
-  let amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
-  let amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
+  const amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
+  const amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
 
   // Get the value in USD of the withdrawal (or collection)
-  let amountUSD = amount0Converted
+  const amountUSD = amount0Converted
     .times(token0.lastPriceUSD!)
     .plus(amount1Converted.times(token1.lastPriceUSD!));
 
   // reset tvl aggregates until new amounts calculated
-  let oldPoolTVL = pool.totalValueLockedUSD;
+  const oldPoolTVL = pool.totalValueLockedUSD;
 
   // Update pool balances adjusted for decimals and not adjusted
-  let poolInputTokenBalances: BigInt[] = [
+  const poolInputTokenBalances: BigInt[] = [
     pool.inputTokenBalances[0].minus(amount0),
     pool.inputTokenBalances[1].minus(amount1),
   ];
   pool.inputTokenBalances = poolInputTokenBalances;
 
-  let poolAmountsInputTokenBalances: BigDecimal[] = [
+  const poolAmountsInputTokenBalances: BigDecimal[] = [
     poolAmounts.inputTokenBalances[0].minus(amount0Converted),
     poolAmounts.inputTokenBalances[1].minus(amount1Converted),
   ];
@@ -275,10 +277,10 @@ export function createWithdraw(
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
   // reset aggregates with new amounts
-  let delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  const delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
-  let withdrawal = new Withdraw(
+  const withdrawal = new Withdraw(
     event.transaction.hash
       .toHexString()
       .concat("-")
@@ -314,23 +316,23 @@ export function createSwapHandleVolumeAndFees(
   sender: Address,
   sqrtPriceX96: BigInt
 ): void {
-  let poolAddress = event.address.toHexString();
-  let protocol = getOrCreateDex();
+  const poolAddress = event.address.toHexString();
+  const protocol = getOrCreateDex();
 
-  let pool = getLiquidityPool(poolAddress);
-  let poolAmounts = getLiquidityPoolAmounts(poolAddress);
+  const pool = getLiquidityPool(poolAddress);
+  const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
   // hot fix for bad pricing
   if (pool.id == "0x9663f2ca0454accad3e094448ea6f77443880454") {
     return;
   }
 
-  let token0 = getOrCreateToken(pool.inputTokens[0]);
-  let token1 = getOrCreateToken(pool.inputTokens[1]);
+  const token0 = getOrCreateToken(pool.inputTokens[0]);
+  const token1 = getOrCreateToken(pool.inputTokens[1]);
 
   // Convert tokens according to decimals
-  let amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
-  let amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
+  const amount0Converted = convertTokenToDecimal(amount0, token0.decimals);
+  const amount1Converted = convertTokenToDecimal(amount1, token1.decimals);
 
   // need absolute amounts for volume
   let amount0Abs = amount0Converted;
@@ -342,24 +344,24 @@ export function createSwapHandleVolumeAndFees(
     amount1Abs = amount1Converted.times(BIGDECIMAL_NEG_ONE);
   }
 
-  let amount0USD = amount0Abs.times(token0.lastPriceUSD!);
-  let amount1USD = amount1Abs.times(token1.lastPriceUSD!);
+  const amount0USD = amount0Abs.times(token0.lastPriceUSD!);
+  const amount1USD = amount1Abs.times(token1.lastPriceUSD!);
 
   // Update the pool with the new active liquidity, price, and tick.
-  let poolInputTokenBalances: BigInt[] = [
+  const poolInputTokenBalances: BigInt[] = [
     pool.inputTokenBalances[0].plus(amount0),
     pool.inputTokenBalances[1].plus(amount1),
   ];
   pool.inputTokenBalances = poolInputTokenBalances;
 
-  let poolAmountsInputTokenBalances: BigDecimal[] = [
+  const poolAmountsInputTokenBalances: BigDecimal[] = [
     poolAmounts.inputTokenBalances[0].plus(amount0Converted),
     poolAmounts.inputTokenBalances[1].plus(amount1Converted),
   ];
   poolAmounts.inputTokenBalances = poolAmountsInputTokenBalances;
 
   // update USD pricing
-  let nativeToken = updateNativeTokenPriceInUSD();
+  const nativeToken = updateNativeTokenPriceInUSD();
   nativeToken.save();
 
   poolAmounts.tokenPrices = sqrtPriceX96ToTokenPrices(
@@ -375,7 +377,7 @@ export function createSwapHandleVolumeAndFees(
   token0.lastPriceBlockNumber = event.block.number;
   token1.lastPriceBlockNumber = event.block.number;
 
-  let oldPoolTVL = pool.totalValueLockedUSD;
+  const oldPoolTVL = pool.totalValueLockedUSD;
 
   /**
    * Things afffected by new USD rates
@@ -386,11 +388,11 @@ export function createSwapHandleVolumeAndFees(
     .plus(poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!));
 
   // reset aggregates with new amounts
-  let delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
+  const delta = pool.totalValueLockedUSD.minus(oldPoolTVL);
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(delta);
 
   // create Swap event
-  let swap = new Swap(
+  const swap = new Swap(
     event.transaction.hash
       .toHexString()
       .concat("-")
@@ -416,7 +418,7 @@ export function createSwapHandleVolumeAndFees(
   swap.pool = pool.id;
 
   // get amount that should be tracked only - div 2 because cant count both input and output as volume
-  let trackedAmountUSD = getTrackedVolumeUSD(
+  const trackedAmountUSD = getTrackedVolumeUSD(
     poolAmounts,
     amount0USD,
     token0,
