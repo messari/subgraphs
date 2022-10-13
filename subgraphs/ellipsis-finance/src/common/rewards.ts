@@ -7,7 +7,7 @@
 
 import * as constants from "./constants";
 import { _CircularBuffer } from "../../generated/schema";
-import {  BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WINDOW_SIZE_SECONDS, TIMESTAMP_STORAGE_INTERVALS, and BUFFER_SIZE can be modified. These are just recommended values - 'somewhat' arbitrary. //

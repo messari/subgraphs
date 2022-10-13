@@ -40,7 +40,9 @@ export function getOrCreateLiquidityPool(
     }
     const lpToken = utils.getLpTokenFromPool(address, block, registryAddress);
 
-    const lpTokenContract = LPTokenContract.bind(Address.fromString(lpToken.id));
+    const lpTokenContract = LPTokenContract.bind(
+      Address.fromString(lpToken.id)
+    );
 
     liquidityPool.name = utils.readValue<string>(
       lpTokenContract.try_name(),

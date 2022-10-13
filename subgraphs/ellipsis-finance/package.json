@@ -14,12 +14,12 @@
   "dependencies": {
     "@graphprotocol/graph-cli": "0.32.0",
     "@graphprotocol/graph-ts": "0.27.0",
-    "@typescript-eslint/eslint-plugin": "^5.40.0",
     "mustache": "^4.2.0",
     "prettier": "^2.6.2"
   },
   "devDependencies": {
     "@typescript-eslint/parser": "^5.38.0",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
     "eslint": "^8.23.1",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",

@@ -1,5 +1,5 @@
 import * as utils from "../common/utils";
-import {  log } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts";
 import { PoolAdded } from "../../generated/Registry/Registry";
 import { getOrCreateLiquidityPool } from "../common/initializers";
 
