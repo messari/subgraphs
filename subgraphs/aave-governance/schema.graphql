@@ -1,13 +1,13 @@
 type DelegateChange @entity(immutable: true) {
   "Unique entity used to keep track of delegate changes"
   id: ID!
-  "Token addresss"
-  tokenAddress: String
-  "Token address for delegator"
+  "Token address"
+  tokenAddress: String!
+  "Address for delegator"
   delegator: String!
-  "Token address for delegate"
+  "Address for delegate"
   delegate: String!
-  "Token address for previous delegate"
+  "Address for previous delegate"
   previousDelegate: String!
   "Block time change happened"
   blockTimestamp: BigInt!
@@ -23,8 +23,8 @@ type DelegateVotingPowerChange @entity(immutable: true) {
   "Unique entity used to keep track of voting power delta"
   id: ID!
   "Token addresss"
-  tokenAddress: String
-  "Token address for delegate"
+  tokenAddress: String!
+  "Address for delegate"
   delegate: String!
   "Previous voting power of delegate"
   previousBalance: BigInt!
