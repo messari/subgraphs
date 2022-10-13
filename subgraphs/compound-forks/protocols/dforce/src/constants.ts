@@ -50,7 +50,7 @@ export class NetworkSpecificConstant {
 const ARBITRUM_ONE = "ARBITRUM-ONE";
 
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
-  let network = dataSource.network();
+  const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
       Address.fromString("0x8B53Ab2c0Df3230EA327017C91Eb909f815Ad113"),
@@ -136,7 +136,7 @@ export function prefixID(
 //convert BigDecimal to BigInt by truncating the decimal places
 export function BigDecimalTruncateToBigInt(x: BigDecimal): BigInt {
   //let intStr = x.toString().split(".")[0];
-  let intStr = x.truncate(0).toString();
+  const intStr = x.truncate(0).toString();
   return BigInt.fromString(intStr);
 }
 

@@ -48,14 +48,9 @@ export async function fetchMessages(before, channelId = process.env.CHANNEL_ID) 
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",
     }
-
     try {
         const data = await axios.get(baseURL, { "headers": { ...headers } });
-        const timeAgo = new Date(Date.now() - ((86400000 * 7)));
-        const previousWeekMessages = data.data.filter(obj => {
-            return moment(new Date(obj.timestamp)).isSameOrAfter(timeAgo);
-        });
-        return previousWeekMessages;
+        return data.data;
     } catch (err) {
         errorNotification("ERROR LOCATION 8 " + err?.message + ' URL: ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
@@ -70,6 +65,7 @@ export async function getChannel(channelId = process.env.CHANNEL_ID) {
 
     try {
         const data = await axios.get(baseURL, { "headers": { ...headers } });
+        return data.data;
     } catch (err) {
         errorNotification("ERROR LOCATION 9 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
@@ -116,6 +112,65 @@ export async function clearMessages(channelId = process.env.CHANNEL_ID) {
     }
 }
 
+export async function getAllThreadsToClear(deleteMsgsFromBeforeTS, channelId = process.env.CHANNEL_ID) {
+    const msgs = await getDiscordMessages([], channelId);
+    await clearAllThreads(msgs, deleteMsgsFromBeforeTS);
+}
+
+export async function clearAllThreads(msgs, deleteMsgsFromBeforeTS) {
+    // Take the first 5 queries to attempt
+    let useMsgs = msgs.slice(0, 5);
+    const newMsgsArray = [...msgs.slice(5)];
+    try {
+        await Promise.allSettled(useMsgs.map(msg => clearThread(deleteMsgsFromBeforeTS, msg.id)));
+    } catch (err) {
+        errorNotification("ERROR LOCATION 23 " + err.message);
+    }
+    await sleep(5000);
+    if (newMsgsArray.length > 0) {
+        clearAllThreads(newMsgsArray, deleteMsgsFromBeforeTS);
+        return;
+    }
+    return;
+}
+
+export async function clearThread(deleteMsgsFromBeforeTS, channelId = process.env.CHANNEL_ID) {
+    // This function is called to clear all the messages within a provided thread(channel)
+    // Delete all messages (except fr head message) older than 7d
+    let messages = []
+    try {
+        const msgs = await getDiscordMessages([], channelId);
+        const baseURL = "https://discordapp.com/api/channels/" + channelId;
+        const headers = {
+            "Authorization": "Bot " + process.env.BOT_TOKEN,
+            "Content-Type": "application/json",
+        }
+
+        const timeAgo = new Date(deleteMsgsFromBeforeTS)
+        messages = msgs.filter(x => moment(new Date(x.timestamp)).isSameOrBefore(timeAgo)).map(x => x.id).slice(0, 100)
+        messages.pop();
+        if (messages.length === 1) {
+            deleteSingleMessage(messages[0], channelId);
+            return;
+        }
+        if (messages.length === 0) {
+            return;
+        }
+        const postJSON = JSON.stringify({ "messages": messages });
+        await axios.post(baseURL + "/messages/bulk-delete", postJSON, { "headers": { ...headers } });
+    } catch (err) {
+        if (err?.response?.data?.message?.includes("Thread is archived")) {
+            console.log('unarchive thread', channelId);
+            await unarchiveThread(channelId);
+            return await clearThread(deleteMsgsFromBeforeTS, channelId);
+        }
+        if (err.response.status === 400 && messages.length === 1) {
+            deleteSingleMessage(messages[0], channelId);
+        }
+        errorNotification("ERROR LOCATION 24 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
+    }
+}
+
 export async function deleteSingleMessage(messageId, channelId = process.env.CHANNEL_ID) {
     try {
         const headers = {
@@ -126,6 +181,11 @@ export async function deleteSingleMessage(messageId, channelId = process.env.CHA
         await axios.delete(baseURL, { "headers": { ...headers } });
         return;
     } catch (err) {
+        if (err?.response?.data?.message?.includes("Thread is archived")) {
+            console.log('unarchive thread', channelId);
+            await unarchiveThread(channelId);
+            return await deleteSingleMessage(messageId, channelId);
+        }
         errorNotification("ERROR LOCATION 22 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
@@ -134,7 +194,7 @@ export async function deleteSingleMessage(messageId, channelId = process.env.CHA
 
 let colorIndex = 0;
 export async function sendDiscordMessage(messageObjects, protocolName, channelId = process.env.CHANNEL_ID) {
-    if (!Object.keys(messageObjects)?.length > 0 || !messageObjects) {
+    if (messageObjects?.length === 0 || !messageObjects) {
         return null;
     }
     const baseURL = "https://discordapp.com/api/channels/" + channelId + "/messages";
@@ -159,7 +219,7 @@ export async function sendDiscordMessage(messageObjects, protocolName, channelId
     const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on ${protocolName}**\n`, "embeds": messageObjects });
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
-        return null;
+        return data;
     } catch (err) {
         if (err.response.status === 429) {
             return messageObjects;
@@ -170,14 +230,17 @@ export async function sendDiscordMessage(messageObjects, protocolName, channelId
     }
 }
 
-export async function startProtocolThread(protocolName, base, channelId = process.env.CHANNEL_ID) {
+export async function startProtocolThread(subject, base, channelId = process.env.CHANNEL_ID) {
     let baseURL = "https://discordapp.com/api/channels/" + channelId + "/messages";
     const headers = {
         "Authorization": "Bot " + process.env.BOT_TOKEN,
         "Content-Type": "application/json",
     }
 
-    let postJSON = JSON.stringify({ "content": protocolName + ' (Base: ' + base + ')' });
+    let postJSON = JSON.stringify({ "content": subject + ' (Base: ' + base + ')' });
+    if (base === '') {
+        postJSON = JSON.stringify({ "content": subject });
+    }
     let msgId = ""
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
@@ -188,16 +251,38 @@ export async function startProtocolThread(protocolName, base, channelId = proces
 
     baseURL = "https://discordapp.com/api/channels/" + channelId + "/messages/" + msgId + "/threads";
 
-    postJSON = JSON.stringify({ "name": protocolName + ' ISSUES' });
+    postJSON = JSON.stringify({ "name": subject + ' ISSUES' });
+    if (base === '') {
+        postJSON = JSON.stringify({ "name": subject });
+    }
 
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
-        return { channel: data.data.id, protocolName: protocolName };
+        return { channel: data.data.id, protocolName: subject };
     } catch (err) {
         if (!!msgId) {
             deleteSingleMessage(msgId, channelId);
         }
         errorNotification("ERROR LOCATION 14 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
+    }
+}
+
+export async function unarchiveThread(channelId = process.env.CHANNEL_ID) {
+    // This function sends a message to an archived thread, thereby unarchiving it, then deleting this message
+    let baseURL = "https://discordapp.com/api/channels/" + channelId + "/messages";
+    const headers = {
+        "Authorization": "Bot " + process.env.BOT_TOKEN,
+        "Content-Type": "application/json",
+    };
+
+    let postJSON = JSON.stringify({ "content": 'UNARCHIVE THREAD' });
+    let msgId = "";
+    try {
+        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        msgId = data.data.id;
+        await deleteSingleMessage(msgId, channelId);
+    } catch (err) {
+        errorNotification("ERROR LOCATION 25 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
     }
 }
 
@@ -207,7 +292,7 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         const indexingErrorEmbed = {
             title: "Indexing Errors",
             description: 'These subgraphs encountered a fatal error in indexing',
-            fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Indexed %', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
+            fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Failed At Block', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
             footer: { text: monitorVersion }
         };
 
@@ -231,11 +316,20 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
                 fields: [],
                 footer: { text: monitorVersion }
             };
-            if (!!depo.indexingError && !indexDeploymentIssues.includes(networkString)) {
-                indexingErrorEmbed.color = placeholderColor;
-                indexErrorEmbedDepos[networkString] = depo?.indexedPercentage;
+            if (!!depo.indexingError) {
+                const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
+                let issueHasBeenAlerted = false;
                 if (!!depo.pending) {
-                    indexErrorPendingHash[networkString] = depo?.hash;
+                    issueHasBeenAlerted = (indexDeploymentIssues.find(x => x.chain.includes(networkString.split(' ')[0] + "-PENDING") && x.indexed.includes(depo?.indexingError?.toString()) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS)) || false);
+                } else {
+                    issueHasBeenAlerted = (indexDeploymentIssues.find(x => x.chain.includes(networkString) && x.indexed.includes(depo?.indexingError?.toString()) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS)) || false);
+                }
+                if (!issueHasBeenAlerted) {
+                    indexingErrorEmbed.color = placeholderColor;
+                    indexErrorEmbedDepos[networkString] = depo?.indexingError;
+                    if (!!depo.pending) {
+                        indexErrorPendingHash[networkString] = depo?.hash;
+                    }
                 }
             }
             let errorsOnDeployment = false;
@@ -261,26 +355,97 @@ export function constructEmbedMsg(protocol, deploymentsOnProtocol, issuesOnThrea
         });
         if (Object.keys(indexErrorEmbedDepos)?.length > 0) {
             let labelValue = "";
-            let percentageValue = "";
+            let failureBlock = "";
 
             Object.keys(indexErrorEmbedDepos)?.forEach(networkString => {
                 if (networkString.includes(' (PENDING')) {
-                    labelValue += `[${networkString.split(' ')[0]}-PENDING](https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]})\n\n`;
+                    labelValue += `\n[${networkString.split(' ')[0]}-PENDING](https://okgraph.xyz/?q=${indexErrorPendingHash[networkString]})\n`;
 
                 } else {
-                    labelValue += `[${networkString}](https://okgraph.xyz/?q=messari%2F${protocol}-${networkString})\n\n`;
+                    labelValue += `\n[${networkString}](https://okgraph.xyz/?q=messari%2F${protocol}-${networkString})\n`;
                 }
-                percentageValue += indexErrorEmbedDepos[networkString] + '%\n\n';
+                failureBlock += '\n' + indexErrorEmbedDepos[networkString] + '\n';
             })
-            indexingErrorEmbed.fields.push({ name: '\u200b', value: labelValue, inline: true }, { name: '\u200b', value: percentageValue, inline: true }, { name: '\u200b', value: '\u200b', inline: false });
+            indexingErrorEmbed.fields[0].value += labelValue;
+            indexingErrorEmbed.fields[1].value += failureBlock;
             embedObjects.unshift(indexingErrorEmbed);
+            if (deploymentsOnProtocol[0]?.status === 'prod') {
+                indexingErrorEmbed.title += ' ' + protocol;
+                aggThreadMsgObjects.push({ embeds: indexingErrorEmbed.fields, protocol: protocol });
+            }
         }
-
         if (embedObjects.length > 0) {
             return embedObjects;
         }
         return null;
     } catch (err) {
         errorNotification("ERROR LOCATION 15 " + err.message);
+    }
+}
+
+let aggThreadMsgObjects = [];
+export async function sendMessageToAggThread(aggThreadId, channelId = process.env.CHANNEL_ID) {
+    if (aggThreadMsgObjects.length === 0 || !aggThreadId) {
+        return;
+    }
+
+    const aggThreadMsgObjectsToSend = [];
+    const messagesAfterTS = new Date(Date.now() - ((86400000 * 1)));
+    const currentThreadMessages = await fetchMessages("", aggThreadId);
+    aggThreadMsgObjects.forEach(aggThread => {
+        const indexingErrorEmbed = {
+            title: "Indexing Errors " + aggThread.protocol,
+            description: 'These subgraphs encountered a fatal error in indexing',
+            fields: [{ name: 'Chain', value: '\u200b', inline: true }, { name: 'Failed At Block', value: '\u200b', inline: true }, { name: '\u200b', value: '\u200b', inline: false }],
+            footer: { text: monitorVersion }
+        };
+        const msg = currentThreadMessages.find(x => {
+            return !!x.embeds.find(embed => embed.title.toUpperCase().includes(aggThread.protocol)) && moment(new Date(x.timestamp)).isSameOrAfter(messagesAfterTS);
+        })
+        let embedToAdd = false
+        if (!!msg) {
+            const existingEmbed = msg.embeds.find(x => x.title.toUpperCase().includes("INDEXING ERRORS"));
+            const aggThreadNetworkStringsArr = aggThread.embeds[0].value.split('\n').join('-----').split('-----');
+            const aggThreadBlockValueArr = aggThread.embeds[1].value.split('\n').join('-----').split('-----');
+            const existingMessageNetworkStringsArr = existingEmbed.embeds[0].value.fields.split('\n').join('-----').split('-----');
+            const existingMessageBlockValueArr = existingEmbed.embeds[1].value.fields.split('\n').join('-----').split('-----');
+            aggThreadNetworkStringsArr.forEach(networkLine, networkIdx => {
+                const existingMessageIndex = existingMessageNetworkStringsArr.indexOf(networkLine);
+                if (!(existingMessageIndex >= 0 && aggThreadBlockValueArr[networkIdx] === existingMessageBlockValueArr[existingMessageIndex])) {
+                    indexingErrorEmbed.fields[0].value += networkLine;
+                    indexingErrorEmbed.fields[1].value += aggThreadBlockValueArr[networkIdx];
+                    embedToAdd = true;
+                }
+            });
+        } else {
+            indexingErrorEmbed.fields[0].value += aggThread.embeds[0].value;
+            indexingErrorEmbed.fields[1].value += aggThread.embeds[1].value;
+            embedToAdd = true;
+        }
+
+        if (!!embedToAdd) {
+            indexingErrorEmbed.color = colorsArray[Math.floor(Math.random() * 8)];
+            aggThreadMsgObjectsToSend.unshift(indexingErrorEmbed);
+        }
+    })
+
+    const baseURL = "https://discordapp.com/api/channels/" + aggThreadId + "/messages";
+    const headers = {
+        "Authorization": "Bot " + process.env.BOT_TOKEN,
+        "Content-Type": "application/json",
+    };
+
+    const postJSON = JSON.stringify({ "content": `**Subgraph Bot Monitor - Errors detected on prod subgraphs**\n`, "embeds": aggThreadMsgObjectsToSend });
+    try {
+        const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
+        aggThreadMsgObjects = [];
+        return data;
+    } catch (err) {
+        if (err?.response?.status === 429) {
+            return aggThreadMsgObjects;
+        } else {
+            errorNotification("ERROR LOCATION 26 " + err?.message + ' ' + err?.response?.config?.url + ' ' + err?.response?.config?.data + ' ' + err?.response?.data?.message, channelId);
+            return null;
+        }
     }
 }

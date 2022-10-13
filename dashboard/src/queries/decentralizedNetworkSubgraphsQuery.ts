@@ -10,15 +10,12 @@ export const decentralizedNetworkSubgraphsQuery = gql`
       id
       currentVersion {
         subgraphDeployment {
-          schema
           originalName
           ipfsHash
           network {
             id
           }
-          curatorSignals {
-            signal
-          }
+          signalledTokens
         }
       }
       displayName

@@ -1,11 +1,5 @@
 // import { log } from '@graphprotocol/graph-ts'
-import {
-  Address,
-  BigDecimal,
-  Bytes,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import {
@@ -68,11 +62,11 @@ export function getOrCreateToken(address: string): Token {
   let token = Token.load(address);
   if (!token) {
     token = new Token(address);
-    let erc20Contract = ERC20.bind(Address.fromString(address));
-    let decimals = erc20Contract.try_decimals();
+    const erc20Contract = ERC20.bind(Address.fromString(address));
+    const decimals = erc20Contract.try_decimals();
     // Using try_cause some values might be missing
-    let name = erc20Contract.try_name();
-    let symbol = erc20Contract.try_symbol();
+    const name = erc20Contract.try_name();
+    const symbol = erc20Contract.try_symbol();
     // TODO: add overrides for name and symbol
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
     token.name = name.reverted ? "" : name.value;
@@ -181,8 +175,8 @@ export function getOrCreateUsageMetricDailySnapshot(
   event: ethereum.Event
 ): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
-  let id = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let dayId = id.toString();
+  const id = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const dayId = id.toString();
   // Create unique id for the day
   let usageMetrics = UsageMetricsDailySnapshot.load(dayId);
 
@@ -209,8 +203,8 @@ export function getOrCreateUsageMetricHourlySnapshot(
   event: ethereum.Event
 ): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
-  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
-  let hourId = hour.toString();
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const hourId = hour.toString();
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsHourlySnapshot.load(hourId);
@@ -238,8 +232,8 @@ export function getOrCreateUsageMetricHourlySnapshot(
 export function getOrCreateLiquidityPoolDailySnapshot(
   event: ethereum.Event
 ): LiquidityPoolDailySnapshot {
-  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let dayId = day.toString();
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const dayId = day.toString();
   let poolMetrics = LiquidityPoolDailySnapshot.load(
     event.address.toHexString().concat("-").concat(dayId)
   );
@@ -277,9 +271,9 @@ export function getOrCreateLiquidityPoolDailySnapshot(
 export function getOrCreateLiquidityPoolHourlySnapshot(
   event: ethereum.Event
 ): LiquidityPoolHourlySnapshot {
-  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-  let hourId = hour.toString();
+  const hourId = hour.toString();
   let poolMetrics = LiquidityPoolHourlySnapshot.load(
     event.address.toHexString().concat("-").concat(hourId)
   );
@@ -318,8 +312,8 @@ export function getOrCreateFinancialsDailySnapshot(
   event: ethereum.Event
 ): FinancialsDailySnapshot {
   // Number of days since Unix epoch
-  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let id = dayID.toString();
+  const dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const id = dayID.toString();
 
   let financialMetrics = FinancialsDailySnapshot.load(id);
 
@@ -357,8 +351,8 @@ export function getOrCreateUsersHelper(): _HelperStore {
 }
 
 export function getTradingFee(poolAddress: string): BigDecimal {
-  let feeId = "trading-fee-" + poolAddress;
-  let fee = LiquidityPoolFee.load(feeId);
+  const feeId = "trading-fee-" + poolAddress;
+  const fee = LiquidityPoolFee.load(feeId);
   if (fee === null) {
     log.warning("LiquidityPoolFee not found for pool: " + poolAddress, []);
     return BIGDECIMAL_ZERO;

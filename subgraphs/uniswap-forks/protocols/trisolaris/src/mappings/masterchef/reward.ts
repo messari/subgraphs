@@ -1,31 +1,31 @@
 // import { log } from "@graphprotocol/graph-ts";
 import {
-  Deposit as DepositEvent,
-  Withdraw as WithdrawEvent,
+  Deposit,
+  Withdraw,
   EmergencyWithdraw,
-} from "../../../../../generated/MasterChefV2/MasterChefV2Trisolaris";
-import { _HelperStore } from "../../../../../generated/schema";
-import { UsageType } from "../../../../../src/common/constants";
+} from "../../../../../generated/MasterChef/MasterChefTrisolaris";
+import { BIGINT_NEG_ONE } from "../../../../../src/common/constants";
 import { handleReward } from "../../common/handlers/handleReward";
 
-export function handleDeposit(event: DepositEvent): void {
-  handleReward(event, event.params.pid, event.params.amount, UsageType.DEPOSIT);
+// A deposit or stake for the pool specific MasterChef.
+export function handleDeposit(event: Deposit): void {
+  handleReward(event, event.params.pid, event.params.amount);
 }
 
-export function handleWithdraw(event: WithdrawEvent): void {
+// A withdraw or unstaking for the pool specific MasterChef.
+export function handleWithdraw(event: Withdraw): void {
   handleReward(
     event,
     event.params.pid,
-    event.params.amount,
-    UsageType.WITHDRAW
+    event.params.amount.times(BIGINT_NEG_ONE)
   );
 }
 
+// A withdraw or unstaking for the pool specific MasterChef.
 export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
   handleReward(
     event,
     event.params.pid,
-    event.params.amount,
-    UsageType.WITHDRAW
+    event.params.amount.times(BIGINT_NEG_ONE)
   );
 }
