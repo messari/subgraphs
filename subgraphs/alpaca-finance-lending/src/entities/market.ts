@@ -362,6 +362,10 @@ export function addMarketSupplySideRevenue(
   market: Market,
   revenueAmountUSD: BigDecimal
 ): void {
+  if (revenueAmountUSD.le(BIGDECIMAL_ZERO)) {
+    return;
+  }
+
   market.cumulativeSupplySideRevenueUSD =
     market.cumulativeSupplySideRevenueUSD.plus(revenueAmountUSD);
   market.cumulativeTotalRevenueUSD =
@@ -387,6 +391,10 @@ export function addMarketProtocolSideRevenue(
   market: Market,
   revenueAmountUSD: BigDecimal
 ): void {
+  if (revenueAmountUSD.le(BIGDECIMAL_ZERO)) {
+    return;
+  }
+
   market.cumulativeProtocolSideRevenueUSD =
     market.cumulativeProtocolSideRevenueUSD.plus(revenueAmountUSD);
   market.cumulativeTotalRevenueUSD =

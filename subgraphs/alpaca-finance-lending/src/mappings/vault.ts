@@ -1,4 +1,4 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { Vault, Work, Kill, Transfer } from "../../generated/ibALPACA/Vault";
 import { ConfigurableInterestVaultConfig } from "../../generated/ibALPACA/ConfigurableInterestVaultConfig";
 import { FairLaunch } from "../../generated/ibALPACA/FairLaunch";
@@ -42,7 +42,7 @@ import {
   BIGINT_HUNDRED,
   BIGINT_TEN_TO_EIGHTEENTH,
 } from "../utils/constants";
-import { bigDecimalToBigInt, bigIntToBigDecimal } from "../utils/numbers";
+import { bigIntToBigDecimal } from "../utils/numbers";
 
 export function handleTransfer(event: Transfer): void {
   if (event.params.value.equals(BIGINT_ZERO)) {
@@ -108,6 +108,10 @@ function handleMint(event: Transfer): void {
   const contract = Vault.bind(event.address);
   const tryTokenResult = contract.try_token();
   if (tryTokenResult.reverted) {
+    log.warning(
+      "[handleMint] could not get token info from vault contract",
+      []
+    );
     return;
   }
   const market = getOrCreateMarket(event, tryTokenResult.value, event.address);
@@ -232,21 +236,7 @@ export function handleRemoveDebt(event: Work): void {
 export function handleKill(event: Kill): void {
   const market = getMarket(event.address);
   updateInterest(event, market);
-  const vaultContract = Vault.bind(event.address);
-  const tryConfig = vaultContract.try_config();
-  let protocolSideProfitRatio = BIGDECIMAL_ONE;
-  if (!tryConfig.reverted) {
-    const configContract = ConfigurableInterestVaultConfig.bind(
-      tryConfig.value
-    );
-    const tryGetKillBps = configContract.try_getKillBps();
-    const tryGetKillTreasuryBps = configContract.try_getKillTreasuryBps();
-    if (!tryGetKillBps.reverted && !tryGetKillTreasuryBps.reverted) {
-      protocolSideProfitRatio = tryGetKillTreasuryBps.value.divDecimal(
-        tryGetKillTreasuryBps.value.plus(tryGetKillBps.value).toBigDecimal()
-      );
-    }
-  }
+
   createLiquidate(
     event,
     market,
@@ -254,9 +244,7 @@ export function handleKill(event: Kill): void {
     event.params.posVal,
     Address.fromString(market.inputToken),
     event.params.prize,
-    bigDecimalToBigInt(
-      event.params.prize.toBigDecimal().times(protocolSideProfitRatio)
-    ),
+    event.params.prize,
     event.params.killer,
     event.params.owner
   );
@@ -274,6 +262,7 @@ export function updateInterest(event: ethereum.Event, market: Market): void {
   const vaultContract = Vault.bind(event.address);
   const tryReservePool = vaultContract.try_reservePool();
   if (tryReservePool.reverted) {
+    log.warning("[updateInterest] could not fetch reservePool", []);
     return;
   }
 
@@ -281,55 +270,55 @@ export function updateInterest(event: ethereum.Event, market: Market): void {
   const tryVaultDebtVal = vaultContract.try_vaultDebtVal();
   const tryConfig = vaultContract.try_config();
   if (
-    !tryTotalToken.reverted &&
-    !tryVaultDebtVal.reverted &&
-    !tryConfig.reverted
+    tryTotalToken.reverted ||
+    tryVaultDebtVal.reverted ||
+    tryConfig.reverted
   ) {
-    const poolTokenAmount = tryTotalToken.value
-      .plus(tryReservePool.value)
-      .minus(tryVaultDebtVal.value);
-
-    const configContract = ConfigurableInterestVaultConfig.bind(
-      tryConfig.value
-    );
-    const tryGetInterestRate = configContract.try_getInterestRate(
-      tryVaultDebtVal.value,
-      poolTokenAmount
-    );
-
-    if (
-      !tryGetInterestRate.reverted &&
-      !tryVaultDebtVal.value.equals(BIGINT_ZERO) &&
-      !market.inputTokenBalance.equals(BIGINT_ZERO)
-    ) {
-      const ratePerSec = tryGetInterestRate.value;
-      const borrowerAPY = bigIntToBigDecimal(
-        ratePerSec.times(SECONDS_PER_YEAR)
-      ).times(BIGDECIMAL_HUNDRED);
-      const lenderAPY = borrowerAPY
-        .times(
-          BIGDECIMAL_ONE.minus(PROTOCOL_LENDING_FEE.div(BIGDECIMAL_HUNDRED))
-        )
-        .times(tryVaultDebtVal.value.toBigDecimal())
-        .div(market.inputTokenBalance.toBigDecimal());
-      updateMarketRates(event, market, borrowerAPY, lenderAPY);
-
-      const dailyInterest = ratePerSec
-        .times(tryVaultDebtVal.value)
-        .times(BIGINT_SECONDS_PER_DAY)
-        .div(BIGINT_TEN_TO_EIGHTEENTH);
-      const protocolSideProfitUSD = amountInUSD(
-        dailyInterest.times(BIGINT_PROTOCOL_LENDING_FEE).div(BIGINT_HUNDRED),
-        getOrCreateToken(Address.fromString(market.inputToken)),
-        event.block.number
-      );
-      const supplySideProfitUSD = protocolSideProfitUSD
-        .div(PROTOCOL_LENDING_FEE)
-        .times(BIGDECIMAL_HUNDRED.minus(PROTOCOL_LENDING_FEE));
-      addMarketProtocolSideRevenue(event, market, protocolSideProfitUSD);
-      addMarketSupplySideRevenue(event, market, supplySideProfitUSD);
-    }
+    log.warning("[updateInterest] failed on vault contract call", []);
+    return;
   }
+
+  const poolTokenAmount = tryTotalToken.value
+    .plus(tryReservePool.value)
+    .minus(tryVaultDebtVal.value);
+  const configContract = ConfigurableInterestVaultConfig.bind(tryConfig.value);
+  const tryGetInterestRate = configContract.try_getInterestRate(
+    tryVaultDebtVal.value,
+    poolTokenAmount
+  );
+  if (
+    tryGetInterestRate.reverted ||
+    tryVaultDebtVal.value.equals(BIGINT_ZERO) ||
+    market.inputTokenBalance.equals(BIGINT_ZERO)
+  ) {
+    log.warning("[updateInterest] could not update interest rate", []);
+    return;
+  }
+
+  const ratePerSec = tryGetInterestRate.value;
+  const borrowerAPY = bigIntToBigDecimal(
+    ratePerSec.times(SECONDS_PER_YEAR)
+  ).times(BIGDECIMAL_HUNDRED);
+  const lenderAPY = borrowerAPY
+    .times(BIGDECIMAL_ONE.minus(PROTOCOL_LENDING_FEE.div(BIGDECIMAL_HUNDRED)))
+    .times(tryVaultDebtVal.value.toBigDecimal())
+    .div(market.inputTokenBalance.toBigDecimal());
+  updateMarketRates(event, market, borrowerAPY, lenderAPY);
+
+  const dailyInterest = ratePerSec
+    .times(tryVaultDebtVal.value)
+    .times(BIGINT_SECONDS_PER_DAY)
+    .div(BIGINT_TEN_TO_EIGHTEENTH);
+  const protocolSideProfitUSD = amountInUSD(
+    dailyInterest.times(BIGINT_PROTOCOL_LENDING_FEE).div(BIGINT_HUNDRED),
+    getOrCreateToken(Address.fromString(market.inputToken)),
+    event.block.number
+  );
+  const supplySideProfitUSD = protocolSideProfitUSD
+    .div(PROTOCOL_LENDING_FEE)
+    .times(BIGDECIMAL_HUNDRED.minus(PROTOCOL_LENDING_FEE));
+  addMarketProtocolSideRevenue(event, market, protocolSideProfitUSD);
+  addMarketSupplySideRevenue(event, market, supplySideProfitUSD);
 }
 
 export function updateRewardTokens(
