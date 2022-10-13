@@ -70,7 +70,11 @@ function createPoolFromAddress(address: Address): LiquidityPool {
     prefixID(dataSource.network(), address.toHexString())
   );
 
-  return createPool(address, poolData.createdBlockNumber, poolData.createdTimestamp, null);
+  const pool = createPool(address, poolData.createdBlockNumber, poolData.createdTimestamp, null);
+  if (!pool) {
+    log.critical("unable to create pool from address", [])
+  }
+  return pool!
 }
 
 // createPoolFromEvent will create a pool from a PairCreated event, and subscribe to events from it.
@@ -86,8 +90,9 @@ export function createPoolFromFactoryEvent(event: NewSwapPool): void {
   }
 
 
-  createPool(poolAddr, event.block.number, event.block.timestamp, event.params.pooledTokens)
-  SwapTemplate.create(poolAddr);
+  if (createPool(poolAddr, event.block.number, event.block.timestamp, event.params.pooledTokens)) {
+    SwapTemplate.create(poolAddr);
+  }
 }
 
 // createPoolFromRegistryEvent will create a pool if doesn't exist already when added to the pool registry.
@@ -102,8 +107,9 @@ export function createPoolFromRegistryEvent(address: Address, block: ethereum.Bl
     return;
   }
 
-  createPool(address, block.number, block.timestamp, null);
-  SwapTemplate.create(address);
+  if (createPool(address, block.number, block.timestamp, null)) {
+    SwapTemplate.create(address);
+  }
 }
 
 function createPool(
@@ -111,7 +117,7 @@ function createPool(
   blockNum: BigInt,
   timestamp: BigInt, 
   pooledTokens: Address[] | null
-): LiquidityPool {
+): LiquidityPool | null {
   const address = swapAddress;
   const addressString = address.toHexString();
 
@@ -126,6 +132,7 @@ function createPool(
         lpTokenAddress.toHexString(),
         address.toHexString(),
       ]);
+      return null
     }
   }
 
