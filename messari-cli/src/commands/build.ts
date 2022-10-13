@@ -13,14 +13,23 @@ import { Executor as ExecutorClass } from '../command-helpers/build/execution'
 import { MESSARI_REPO_PATH } from '../../bin/env'
 
 const HELP: string = `
-${chalk.bold('messari build')} ${chalk.bold('[<deployment-id>]')} [options]
+
+${chalk.bold('How to use this command (Template):')}
+
+  messari build [<deployment-id>] [options]
+
+${chalk.bold(
+  'Passing arguments to bypass prompts or augment command (Example):'
+)}
+
+  messari build uniswap-v2-ethereum -d --scope single -s subgraphs-studio --service subgraphs-studio -r messari
 
 Options:
 
-    -s, --service        Service to deploy to < hosted-service | subgraph-studio | cronos-portal>
+    -s, --service        Service to deploy to < hosted-service | subgraph-studio | cronos-portal >
     -v, --version        Specify the version of the subgraph deployment - Only relevant for subgraph studio testing deployments < e.g. 1.0.0 >
     -t, --token          API token to use for the deployment
-    -r, --target         Target account for the deployment (i.e. messari)
+    -r, --target         Target account for the deployment on the service - This is like your Github account for the hosted-service (i.e. messari)
         --slug <slug>    The slug to use for the deployment {optional - replace deployment.json slug}
         --base           Specifies that you want the build/deploy command to apply to all protocols in a subgraph folder {default: false}
     -d, --deploy         Deploy the build to the specified service {default: false}
