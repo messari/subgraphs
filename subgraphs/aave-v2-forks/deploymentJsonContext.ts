@@ -9,11 +9,11 @@ function slugToTitle(slug: string): string {
 }
 
 export const deploymentJsonContext: DeploymentJsonContextInterface = {
-  protocolSlug: "apeswap",
-  protocolName: slugToTitle("apeswap"),
-  network: "bsc",
-  schemaVersion: "1.3.0",
-  subgraphVersion: "1.1.7",
+  protocolSlug: "radiant-capital",
+  protocolName: slugToTitle("radiant-capital"),
+  network: "arbitrum",
+  schemaVersion: "2.0.1",
+  subgraphVersion: "1.0.1",
   methodologyVersion: "1.0.0",
 };
 

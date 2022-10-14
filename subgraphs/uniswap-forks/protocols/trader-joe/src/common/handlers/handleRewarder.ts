@@ -3,10 +3,8 @@ import { ethereum } from "@graphprotocol/graph-ts";
 import { Rewarder } from "../../../../../generated/MasterChefV2/Rewarder";
 import { TokenABI as ERC20 } from "../../../../../generated/templates/Pair/TokenABI";
 import {
-  _MasterChefAddressToPid,
   _MasterChefRewarder,
   _MasterChefStakingPool,
-  _RewarderProbe,
   LiquidityPool,
   _MasterChef,
 } from "../../../../../generated/schema";
@@ -78,7 +76,7 @@ function removeRewarder(sPool: _MasterChefStakingPool): void {
 // addRewarder adds a rewarder to a given staking pool and updates the pool
 // reward token and emission values.
 function addRewarder(addr: Address, sPool: _MasterChefStakingPool): void {
-  let rewarder = getOrCreateRewarder(addr, sPool);
+  const rewarder = getOrCreateRewarder(addr, sPool);
   sPool.rewarder = rewarder.id;
 }
 
@@ -96,10 +94,10 @@ export function getPoolRewardsWithBonus(
     return null;
   }
 
-  let rewarderAddr = Address.fromString(sPool.rewarder!);
-  let rewarder = getOrCreateRewarder(rewarderAddr, sPool);
+  const rewarderAddr = Address.fromString(sPool.rewarder!);
+  const rewarder = getOrCreateRewarder(rewarderAddr, sPool);
 
-  let calc = new RewarderCalculator(mc, rewarder);
+  const calc = new RewarderCalculator(mc, rewarder);
   calc.calculateRewarderRate(event, user, isDeposit);
 
   return buildRewards(
@@ -124,7 +122,7 @@ function rewarderHasFunds(
     return rewarder.hasFunds;
   }
 
-  let bal = fetchRewarderBalance(rewarder);
+  const bal = fetchRewarderBalance(rewarder);
   if (!bal) {
     log.error("unable to fetch rewarder balance: {}", [rewarder.id]);
     return true;
@@ -146,12 +144,12 @@ function buildRewards(
   rewarder: _MasterChefRewarder,
   rewarderHasFunds: boolean
 ): PoolRewardData {
-  let rewardToken = getOrCreateRewardToken(NetworkConfigs.getRewardToken());
-  let bonusToken = getOrCreateRewardToken(rewarder.rewardToken);
+  const rewardToken = getOrCreateRewardToken(NetworkConfigs.getRewardToken());
+  const bonusToken = getOrCreateRewardToken(rewarder.rewardToken);
 
-  let bonus = calculateBonusRewardAmounts(event, rewarder, rewarderHasFunds);
+  const bonus = calculateBonusRewardAmounts(event, rewarder, rewarderHasFunds);
 
-  let rewards: RewardObj[] = [];
+  const rewards: RewardObj[] = [];
   rewards.push({
     tokenId: rewardToken.id,
     amount: pool.rewardTokenEmissionsAmount![0], // position 0 because it is the only token at the moment.
@@ -170,7 +168,7 @@ function buildRewards(
     return 1;
   }); // need to sort for the order to match with rewardAmounts when querying. -> https://discord.com/channels/953684103012683796/953685205531631637/974188732154544178
 
-  let pr: PoolRewardData = <PoolRewardData>{
+  const pr: PoolRewardData = <PoolRewardData>{
     tokens: [],
     amounts: [],
     amountsUSD: [],
@@ -197,19 +195,19 @@ function calculateBonusRewardAmounts(
     };
   }
 
-  let bonusRewards = getRewardsPerDay(
+  const bonusRewards = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
     BigDecimal.fromString(rewarder.tokenPerSec.toString()),
     RewardIntervalType.TIMESTAMP
   );
 
-  let bonusToken = getOrCreateToken(rewarder.rewardToken);
+  const bonusToken = getOrCreateToken(rewarder.rewardToken);
 
-  let bonusAmount = BigInt.fromString(
+  const bonusAmount = BigInt.fromString(
     roundToWholeNumber(bonusRewards).toString()
   );
-  let bonusAmountUSD = convertTokenToDecimal(
+  const bonusAmountUSD = convertTokenToDecimal(
     bonusAmount,
     bonusToken.decimals
   ).times(bonusToken.lastPriceUSD!);
@@ -233,8 +231,8 @@ function getOrCreateRewarder(
       );
     }
 
-    let c = Rewarder.bind(addr);
-    let token = getOrCreateRewardToken(c.rewardToken().toHexString());
+    const c = Rewarder.bind(addr);
+    const token = getOrCreateRewardToken(c.rewardToken().toHexString());
 
     rewarder = new _MasterChefRewarder(addr.toHexString());
     rewarder.pool = pool!.id;
@@ -245,13 +243,13 @@ function getOrCreateRewarder(
     rewarder.tokenPerSec = BIGINT_ZERO;
     rewarder.rateCalculatedAt = BIGINT_ZERO;
 
-    let tokenPerSec = RewarderCalculator.attemptToRetrieveRewardRate(c);
+    const tokenPerSec = RewarderCalculator.attemptToRetrieveRewardRate(c);
     if (tokenPerSec) {
       rewarder.canRetrieveRate = true;
       rewarder.tokenPerSec = tokenPerSec;
     }
 
-    let balance = fetchRewarderBalance(rewarder);
+    const balance = fetchRewarderBalance(rewarder);
     if (balance && balance.equals(BIGINT_ZERO)) {
       rewarder.hasFunds = false;
     }
@@ -262,15 +260,15 @@ function getOrCreateRewarder(
 }
 
 function fetchRewarderBalance(rewarder: _MasterChefRewarder): BigInt | null {
-  let rewarderAddr = Address.fromString(rewarder.id);
-  let c = Rewarder.bind(rewarderAddr);
-  let tokenCall = c.try_rewardToken();
+  const rewarderAddr = Address.fromString(rewarder.id);
+  const c = Rewarder.bind(rewarderAddr);
+  const tokenCall = c.try_rewardToken();
   if (tokenCall.reverted) {
     return null;
   }
 
-  let token = ERC20.bind(tokenCall.value);
-  let call = token.try_balanceOf(rewarderAddr);
+  const token = ERC20.bind(tokenCall.value);
+  const call = token.try_balanceOf(rewarderAddr);
   if (call.reverted) {
     return null;
   }

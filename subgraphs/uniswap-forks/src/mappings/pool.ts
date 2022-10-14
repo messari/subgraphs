@@ -1,5 +1,3 @@
-import { log } from "@graphprotocol/graph-ts";
-import { _HelperStore } from "../../generated/schema";
 import {
   Mint,
   Burn,
@@ -36,7 +34,7 @@ import { getLiquidityPool } from "../common/getters";
 // The transfers are either occur as a part of the Mint or Burn event process.
 // The tokens being transferred in these events are the LP tokens from the liquidity pool that emitted this event.
 export function handleTransfer(event: Transfer): void {
-  let pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(event.address.toHexString());
 
   // ignore initial transfers for first adds
   if (

@@ -22,6 +22,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   plugins: ["@typescript-eslint"],
+  ignorePatterns: ["**/build", "**/generated"],
   rules: {
     // Give the power to the people! We decided to leave this decision up to the dev.
     "@typescript-eslint/no-inferrable-types": "off",

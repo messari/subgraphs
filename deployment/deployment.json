@@ -130,11 +130,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.14",
+          "subgraph": "1.2.15",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "aave.v2.template.yaml"
+          "template": "aave.arc.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -159,11 +159,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.14",
+          "subgraph": "1.2.15",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "aave.v2.template.yaml"
+          "template": "aave.amm.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -188,11 +188,11 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.14",
+          "subgraph": "1.2.15",
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "aave.v2.template.yaml"
+          "template": "aave.rwa.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -2825,7 +2825,7 @@
     "base": "aave-v2-forks",
     "protocol": "radiant-capital",
     "deployments": {
-      "radiant-arbitrum": {
+      "radiant-capital-arbitrum": {
         "network": "arbitrum",
         "status": "prod",
         "versions": {

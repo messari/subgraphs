@@ -85,6 +85,10 @@ export class TrisolarisAuroraConfigurations implements Configurations {
       "0xc42c30ac6cc15fac9bd938618bcaa1a1fae8501d", // wNEAR
       "0xb12bfca5a55806aaf64e99521918a4bf0fc40802", // USDC
       "0x4988a896b1227218e4a686fde5eabdcabd91571f", // USDT
+      "0xfa94348467f64d5a457f75f8bc40495d33c65abb", // TRI
+      "0x8bec47865ade3b172a928df8f990bc7f2a3b9f79", // Aurora
+      "0xa69d9ba086d41425f35988613c156db9a88a1a96", // USP
+      "0xf4eb217ba2454613b15dbdea6e5f22276410e89e", // wBTC
     ]);
   }
   getStableCoins(): string[] {

@@ -1,5 +1,4 @@
-import { Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../../configurations/configure";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   LiquidityPool,
   _HelperStore,
@@ -7,19 +6,12 @@ import {
 } from "../../../generated/schema";
 import {
   BIGDECIMAL_FIFTY,
-  BIGDECIMAL_ONE,
-  BIGDECIMAL_TWO,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ONE,
   INT_ZERO,
 } from "../constants";
-import {
-  getOrCreateDex,
-  getOrCreateLPToken,
-  getOrCreateToken,
-  getTradingFee,
-} from "../getters";
+import { getOrCreateDex, getOrCreateToken, getTradingFee } from "../getters";
 import { updateTokenWhitelists } from "../updateMetrics";
 import { Pool as PoolTemplate } from "../../../generated/templates";
 import { Pool } from "../../../generated/Factory/Pool";
@@ -33,25 +25,24 @@ import { POOL_MAPPINGS } from "./poolMappings";
  * before regenesis.
  */
 export function populateEmptyPools(event: ethereum.Event): void {
-  let protocol = getOrCreateDex();
-  let length = POOL_MAPPINGS.length;
+  const protocol = getOrCreateDex();
+  const length = POOL_MAPPINGS.length;
 
   for (let i = 0; i < length; ++i) {
-    let poolMapping = POOL_MAPPINGS[i];
-    let poolAddress = poolMapping[1].toHexString();
-    let token0Address = poolMapping[2].toHexString();
-    let token1Address = poolMapping[3].toHexString();
+    const poolMapping = POOL_MAPPINGS[i];
+    const poolAddress = poolMapping[1].toHexString();
+    const token0Address = poolMapping[2].toHexString();
+    const token1Address = poolMapping[3].toHexString();
 
     // create the tokens and tokentracker
-    let token0 = getOrCreateToken(token0Address);
-    let token1 = getOrCreateToken(token1Address);
-    let LPtoken = getOrCreateLPToken(poolAddress, token0, token1);
+    const token0 = getOrCreateToken(token0Address);
+    const token1 = getOrCreateToken(token1Address);
 
     updateTokenWhitelists(token0, token1, poolAddress);
 
-    let poolContract = Pool.bind(Address.fromString(poolAddress));
-    let pool = new LiquidityPool(poolAddress);
-    let poolAmounts = new _LiquidityPoolAmount(poolAddress);
+    const poolContract = Pool.bind(Address.fromString(poolAddress));
+    const pool = new LiquidityPool(poolAddress);
+    const poolAmounts = new _LiquidityPoolAmount(poolAddress);
 
     pool.protocol = protocol.id;
     pool.name =
@@ -82,20 +73,20 @@ export function populateEmptyPools(event: ethereum.Event): void {
     poolAmounts.tokenPrices = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
     // populate the TVL by call contract balanceOf
-    let token0Contract = ERC20.bind(
+    const token0Contract = ERC20.bind(
       Address.fromString(pool.inputTokens[INT_ZERO])
     );
-    let tvlToken0Raw = token0Contract.balanceOf(Address.fromString(pool.id));
-    let tvlToken0Adjusted = convertTokenToDecimal(
+    const tvlToken0Raw = token0Contract.balanceOf(Address.fromString(pool.id));
+    const tvlToken0Adjusted = convertTokenToDecimal(
       tvlToken0Raw,
       token0.decimals
     );
 
-    let token1Contract = ERC20.bind(
+    const token1Contract = ERC20.bind(
       Address.fromString(pool.inputTokens[INT_ONE])
     );
-    let tvlToken1Raw = token1Contract.balanceOf(Address.fromString(pool.id));
-    let tvlToken1Adjusted = convertTokenToDecimal(
+    const tvlToken1Raw = token1Contract.balanceOf(Address.fromString(pool.id));
+    const tvlToken1Adjusted = convertTokenToDecimal(
       tvlToken1Raw,
       token1.decimals
     );
@@ -104,7 +95,7 @@ export function populateEmptyPools(event: ethereum.Event): void {
     poolAmounts.inputTokenBalances = [tvlToken0Adjusted, tvlToken1Adjusted];
 
     // Used to track the number of deposits in a liquidity pool
-    let poolDeposits = new _HelperStore(poolAddress);
+    const poolDeposits = new _HelperStore(poolAddress);
     poolDeposits.valueInt = INT_ZERO;
 
     protocol.totalPoolCount = protocol.totalPoolCount + INT_ONE;
