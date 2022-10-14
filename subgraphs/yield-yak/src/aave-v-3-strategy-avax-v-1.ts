@@ -1,6 +1,6 @@
 import { BigInt } from "@graphprotocol/graph-ts"
 import {
-  YakStrategyV2,
+  AaveV3StrategyAvaxV1,
   AddReward,
   AllowDepositor,
   Approval,
@@ -19,7 +19,7 @@ import {
   UpdateMinTokensToReinvest,
   UpdateReinvestReward,
   Withdraw
-} from "../generated/YakStrategyV2/YakStrategyV2"
+} from "../generated/AaveV3StrategyAvaxV1/AaveV3StrategyAvaxV1"
 import { ExampleEntity } from "../generated/schema"
 
 export function handleAddReward(event: AddReward): void {

@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ yield-yak-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ yield-yak-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ yield-yak-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 yield-yak-subgraph",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ messari/yield-yak-subgraph",
+    "create-local": "graph create --node http://localhost:8020/ messari/yield-yak-subgraph",
+    "remove-local": "graph remove --node http://localhost:8020/ messari/yield-yak-subgraph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 messari/yield-yak-subgraph",
     "test": "graph test"
   },
   "dependencies": {
