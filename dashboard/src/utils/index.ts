@@ -1,16 +1,11 @@
 import moment from "moment";
 import {
   ApolloClient,
-  ApolloError,
-  gql,
   HttpLink,
   InMemoryCache,
-  LazyQueryResult,
   NormalizedCacheObject,
-  QueryTuple,
-  useLazyQuery,
 } from "@apollo/client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export const toDate = (timestamp: number, hour: boolean = false) => {
   let formatString = "YYYY-MM-DD";
@@ -104,4 +99,36 @@ export const schemaMapping: { [x: string]: any } = {
   "yield-aggregator": "vaults",
   "lending": "lending",
   "generic": "generic"
+}
+
+export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
+  const arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+  let CSV = '';
+  if (ShowLabel) {
+    let row = "";
+    for (let index in arrData[0]) {
+      row += index + ',';
+    }
+    row = row.slice(0, -1);
+    CSV += row + '\r\n';
+  }
+
+  for (let i = 0; i < arrData.length; i++) {
+    let row = "";
+    for (let index in arrData[i]) {
+      row += '"' + arrData[i][index] + '",';
+    }
+    row.slice(0, row.length - 1);
+    CSV += row + '\r\n';
+  }
+
+  if (CSV === '') {
+    return;
+  }
+
+  const csv = CSV;
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const csvUrl = window.webkitURL.createObjectURL(blob);
+  const filename = (ReportTitle || 'UserExport') + '.csv';
+  return { csvUrl, filename };
 }
