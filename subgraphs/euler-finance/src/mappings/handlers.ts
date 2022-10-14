@@ -16,7 +16,6 @@ import {
   EulerGeneralView__doQueryInputQStruct,
   EulerGeneralView__doQueryResultRStruct,
 } from "../../generated/euler/EulerGeneralView";
-import { RiskManager } from "../../generated/euler/RiskManager";
 import {
   getOrCreateLendingProtocol,
   getOrCreateMarket,
@@ -30,13 +29,9 @@ import {
   TransactionType,
   EULER_GENERAL_VIEW_V2_ADDRESS,
   VIEW_V2_START_BLOCK_NUMBER,
-  INTERNAL_DEBT_PRECISION,
-  MODULEID__EXEC,
-  MODULEID__RISK_MANAGER,
   BIGINT_ZERO,
   DECIMAL_PRECISION,
   INITIAL_INTEREST_ACCUMULATOR,
-  BIGDECIMAL_ONE,
   USDC_ERC20_ADDRESS,
   RESERVE_FEE_SCALE,
   MODULEID__MARKETS,
@@ -60,7 +55,6 @@ import {
   updateSnapshotRevenues,
 } from "./helpers";
 import { _AssetStatus } from "../../generated/schema";
-import { Exec } from "../../generated/euler/Exec";
 
 export function handleAssetStatus(event: AssetStatus): void {
   updateAsset(event);
