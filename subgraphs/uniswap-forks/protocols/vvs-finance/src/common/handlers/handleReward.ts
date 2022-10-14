@@ -1,11 +1,7 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { Craftsman } from "../../../../../generated/Craftsman/Craftsman";
-import {
-  LiquidityPool,
-  _HelperStore,
-  _MasterChefStakingPool,
-} from "../../../../../generated/schema";
+import { LiquidityPool } from "../../../../../generated/schema";
 import {
   BIGINT_ONE,
   INT_ZERO,
@@ -34,17 +30,17 @@ export function handleReward(
   pid: BigInt,
   amount: BigInt
 ): void {
-  let poolContract = Craftsman.bind(event.address);
-  let masterChefPool = getOrCreateMasterChefStakingPool(
+  const poolContract = Craftsman.bind(event.address);
+  const masterChefPool = getOrCreateMasterChefStakingPool(
     event,
     MasterChef.MASTERCHEF,
     pid
   );
-  let masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
+  const masterChef = getOrCreateMasterChef(event, MasterChef.MASTERCHEF);
 
   // Check if the liquidity pool address is available. Try to get it if not or return if the contract call was reverted
   if (!masterChefPool.poolAddress) {
-    let getPoolInfo = poolContract.try_poolInfo(pid);
+    const getPoolInfo = poolContract.try_poolInfo(pid);
     if (!getPoolInfo.reverted) {
       masterChefPool.poolAddress = getPoolInfo.value.value0.toHexString();
     }
@@ -60,12 +56,12 @@ export function handleReward(
   }
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(masterChefPool.poolAddress!);
+  const pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (!pool) {
     return;
   }
 
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
   pool.rewardTokens = [
     getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
   ];
@@ -87,14 +83,14 @@ export function handleReward(
   }
 
   // Get necessary values from the master chef contract to calculate rewards
-  let getPoolInfo = poolContract.try_poolInfo(pid);
+  const getPoolInfo = poolContract.try_poolInfo(pid);
   if (!getPoolInfo.reverted) {
-    let poolInfo = getPoolInfo.value;
+    const poolInfo = getPoolInfo.value;
     masterChefPool.poolAllocPoint = poolInfo.value1;
   }
 
   // Get the bonus multiplier if it is applicable
-  let getMuliplier = poolContract.try_getMultiplier(
+  const getMuliplier = poolContract.try_getMultiplier(
     event.block.number.minus(BIGINT_ONE),
     event.block.number
   );
@@ -103,13 +99,13 @@ export function handleReward(
   }
 
   // Get the total allocation for all pools
-  let getTotalAlloc = poolContract.try_totalAllocPoint();
+  const getTotalAlloc = poolContract.try_totalAllocPoint();
   if (!getTotalAlloc.reverted) {
     masterChef.totalAllocPoint = getTotalAlloc.value;
   }
 
   // Actual total VVS given out per block to users
-  let getRewardTokenPerBlock = poolContract.try_vvsPerBlock();
+  const getRewardTokenPerBlock = poolContract.try_vvsPerBlock();
   if (!getRewardTokenPerBlock.reverted) {
     masterChef.adjustedRewardTokenRate = getRewardTokenPerBlock.value;
     masterChef.lastUpdatedRewardRate = event.block.number;
@@ -117,14 +113,14 @@ export function handleReward(
 
   // Calculate Reward Emission per Block to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block
-  let poolRewardTokenRate = masterChefPool.multiplier
+  const poolRewardTokenRate = masterChefPool.multiplier
     .times(masterChef.adjustedRewardTokenRate)
     .times(masterChefPool.poolAllocPoint)
     .div(masterChef.totalAllocPoint);
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let rewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
-  let rewardTokenPerDay = getRewardsPerDay(
+  const rewardTokenRateBigDecimal = new BigDecimal(poolRewardTokenRate);
+  const rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
     rewardTokenRateBigDecimal,

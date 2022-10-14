@@ -6,7 +6,6 @@ import {
   LiquidityPool,
   Token,
   _HelperStore,
-  _TokenWhitelist,
 } from "../../generated/schema";
 import {
   getLiquidityPool,
@@ -42,9 +41,9 @@ import { NetworkConfigs } from "../../configurations/configure";
 // Update FinancialsDailySnapshots entity
 // Updated on Swap, Burn, and Mint events.
 export function updateFinancials(event: ethereum.Event): void {
-  let financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
+  const financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetricsDaily.blockNumber = event.block.number;
@@ -62,12 +61,12 @@ export function updateUsageMetrics(
   fromAddress: Address,
   usageType: string
 ): void {
-  let from = fromAddress.toHexString();
+  const from = fromAddress.toHexString();
 
-  let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
-  let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
+  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
+  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetricsDaily.blockNumber = event.block.number;
@@ -90,14 +89,14 @@ export function updateUsageMetrics(
   }
 
   // Number of days since Unix epoch
-  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-  let dayId = day.toString();
-  let hourId = hour.toString();
+  const dayId = day.toString();
+  const hourId = hour.toString();
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = from.concat("-").concat(dayId);
+  const dailyActiveAccountId = from.concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -105,7 +104,7 @@ export function updateUsageMetrics(
     dailyActiveAccount.save();
   }
 
-  let hourlyActiveAccountId = from.concat("-").concat(hourId);
+  const hourlyActiveAccountId = from.concat("-").concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -131,10 +130,10 @@ export function updateUsageMetrics(
 // Updated on Swap, Burn, and Mint events.
 export function updatePoolMetrics(event: ethereum.Event): void {
   // get or create pool metrics
-  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
-  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
+  const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
+  const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
 
-  let pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(event.address.toHexString());
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -149,8 +148,10 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetricsDaily.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
   poolMetricsDaily.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
   poolMetricsDaily.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
-  poolMetricsDaily.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
-  poolMetricsDaily.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+  poolMetricsDaily.cumulativeSupplySideRevenueUSD =
+    pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsDaily.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD;
 
   poolMetricsHourly.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetricsHourly.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
@@ -160,12 +161,15 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetricsHourly.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsHourly.blockNumber = event.block.number;
   poolMetricsHourly.timestamp = event.block.timestamp;
-  poolMetricsHourly.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+  poolMetricsHourly.rewardTokenEmissionsAmount =
+    pool.rewardTokenEmissionsAmount;
   poolMetricsHourly.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
   poolMetricsHourly.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
   poolMetricsHourly.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
-  poolMetricsHourly.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
-  poolMetricsHourly.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+  poolMetricsHourly.cumulativeSupplySideRevenueUSD =
+    pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsHourly.cumulativeProtocolSideRevenueUSD =
+    pool.cumulativeProtocolSideRevenueUSD;
 
   poolMetricsDaily.save();
   poolMetricsHourly.save();
@@ -178,19 +182,19 @@ export function updateTokenWhitelists(
   token1: Token,
   poolAddress: string
 ): void {
-  let tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
-  let tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
+  const tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
+  const tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
 
   // update white listed pools
   if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist0.id)) {
-    let newPools = tokenWhitelist1.whitelistPools;
+    const newPools = tokenWhitelist1.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist1.whitelistPools = newPools;
     tokenWhitelist1.save();
   }
 
   if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist1.id)) {
-    let newPools = tokenWhitelist0.whitelistPools;
+    const newPools = tokenWhitelist0.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist0.whitelistPools = newPools;
     tokenWhitelist0.save();
@@ -203,14 +207,14 @@ export function updateInputTokenBalances(
   reserve0: BigInt,
   reserve1: BigInt
 ): void {
-  let pool = getLiquidityPool(poolAddress);
-  let poolAmounts = getLiquidityPoolAmounts(poolAddress);
+  const pool = getLiquidityPool(poolAddress);
+  const poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  let token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
-  let token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
+  const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
+  const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
 
-  let tokenDecimal0 = convertTokenToDecimal(reserve0, token0.decimals);
-  let tokenDecimal1 = convertTokenToDecimal(reserve1, token1.decimals);
+  const tokenDecimal0 = convertTokenToDecimal(reserve0, token0.decimals);
+  const tokenDecimal1 = convertTokenToDecimal(reserve1, token1.decimals);
 
   poolAmounts.inputTokenBalances = [tokenDecimal0, tokenDecimal1];
   pool.inputTokenBalances = [reserve0, reserve1];
@@ -221,14 +225,14 @@ export function updateInputTokenBalances(
 
 // Update tvl an token prices in the Sync event.
 export function updateTvlAndTokenPrices(poolAddress: string): void {
-  let pool = getLiquidityPool(poolAddress);
+  const pool = getLiquidityPool(poolAddress);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
-  let token0 = getOrCreateToken(pool.inputTokens[0]);
-  let token1 = getOrCreateToken(pool.inputTokens[1]);
+  const token0 = getOrCreateToken(pool.inputTokens[0]);
+  const token1 = getOrCreateToken(pool.inputTokens[1]);
 
-  let nativeToken = updateNativeTokenPriceInUSD();
+  const nativeToken = updateNativeTokenPriceInUSD();
 
   token0.lastPriceUSD = findUSDPricePerToken(token0, nativeToken);
   token1.lastPriceUSD = findUSDPricePerToken(token1, nativeToken);
@@ -238,17 +242,17 @@ export function updateTvlAndTokenPrices(poolAddress: string): void {
     pool.totalValueLockedUSD
   );
 
-  let inputToken0 = convertTokenToDecimal(
+  const inputToken0 = convertTokenToDecimal(
     pool.inputTokenBalances[0],
     token0.decimals
   );
-  let inputToken1 = convertTokenToDecimal(
+  const inputToken1 = convertTokenToDecimal(
     pool.inputTokenBalances[1],
     token1.decimals
   );
 
   // Get new tvl
-  let newTvl = token0
+  const newTvl = token0
     .lastPriceUSD!.times(inputToken0)
     .plus(token1.lastPriceUSD!.times(inputToken1));
 
@@ -256,7 +260,7 @@ export function updateTvlAndTokenPrices(poolAddress: string): void {
   pool.totalValueLockedUSD = newTvl;
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(newTvl);
 
-  let outputTokenSupply = convertTokenToDecimal(
+  const outputTokenSupply = convertTokenToDecimal(
     pool.outputTokenSupply!,
     DEFAULT_DECIMALS
   );
@@ -285,11 +289,11 @@ export function updateVolumeAndFees(
   token0Amount: BigInt,
   token1Amount: BigInt
 ): void {
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
-  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
-  let supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
-  let protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
+  const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+  const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
+  const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
+  const supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
+  const protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
 
   // Update volume occurred during swaps
   poolMetricsDaily.dailyVolumeByTokenUSD = [
@@ -334,13 +338,13 @@ export function updateVolumeAndFees(
     trackedAmountUSD[INT_TWO]
   );
 
-  let supplyFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
+  const supplyFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
     percToDec(supplyFee.feePercentage!)
   );
-  let protocolFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
+  const protocolFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
     percToDec(protocolFee.feePercentage!)
   );
-  let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
+  const tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
 
   // Update fees collected during swaps
   // Protocol
@@ -382,8 +386,7 @@ export function updateVolumeAndFees(
   poolMetricsDaily.dailyProtocolSideRevenueUSD =
     poolMetricsDaily.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
-  poolMetricsDaily.cumulativeTotalRevenueUSD =
-    pool.cumulativeTotalRevenueUSD;
+  poolMetricsDaily.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
   poolMetricsDaily.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
   poolMetricsDaily.cumulativeProtocolSideRevenueUSD =
@@ -397,8 +400,7 @@ export function updateVolumeAndFees(
   poolMetricsHourly.hourlyProtocolSideRevenueUSD =
     poolMetricsHourly.hourlyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
-  poolMetricsHourly.cumulativeTotalRevenueUSD =
-    pool.cumulativeTotalRevenueUSD;
+  poolMetricsHourly.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
   poolMetricsHourly.cumulativeSupplySideRevenueUSD =
     pool.cumulativeSupplySideRevenueUSD;
   poolMetricsHourly.cumulativeProtocolSideRevenueUSD =
@@ -413,7 +415,7 @@ export function updateVolumeAndFees(
 
 // Update store that tracks the deposit count per pool
 export function updateDepositHelper(poolAddress: Address): void {
-  let poolDeposits = _HelperStore.load(poolAddress.toHexString())!;
+  const poolDeposits = _HelperStore.load(poolAddress.toHexString())!;
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE;
   poolDeposits.save();
 }
