@@ -17,12 +17,12 @@ export const TableChart = ({ identifier, datasetLabel, dataTable }: TableChartPr
   function clickHandler() {
     try {
       const link = document.createElement('a');
-      const field = datasetLabel.split("-")[1];
+      const field = datasetLabel.split("-")[1] || datasetLabel;
       let freq = datasetLabel.split("-")[0]?.toUpperCase()?.includes("HOURLY") ? "hourly-" : "";
       if (datasetLabel.split("-")[0]?.toUpperCase()?.includes("DAILY")) {
         freq = "daily-";
       }
-      if (field.toUpperCase().includes("DAILY") || field.toUpperCase().includes("HOURLY")) {
+      if (field?.toUpperCase()?.includes("DAILY") || field?.toUpperCase()?.includes("HOURLY")) {
         freq = "";
       }
       link.download = identifier + '-' + freq + field + "-" + moment.utc(Date.now()).format("MMDDYY") + ".csv";
