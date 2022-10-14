@@ -168,3 +168,4 @@ export const BIGINT_PROTOCOL_LENDING_FEE = BigInt.fromI32(19);
 export const PROTOCOL_LENDING_FEE = new BigDecimal(BIGINT_PROTOCOL_LENDING_FEE);
 export const PRICE_LIB_START_BLOCK_BSC = BigInt.fromI32(6810080);
 export const BLOCKS_PER_HOUR_BSC = BigInt.fromI32(1200);
+export const LIQUIDATION_PROTOCOL_SIDE_RATIO = BigDecimal.fromString("0.8");

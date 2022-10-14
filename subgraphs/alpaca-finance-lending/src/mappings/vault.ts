@@ -41,8 +41,9 @@ import {
   BIGINT_PROTOCOL_LENDING_FEE,
   BIGINT_HUNDRED,
   BIGINT_TEN_TO_EIGHTEENTH,
+  LIQUIDATION_PROTOCOL_SIDE_RATIO,
 } from "../utils/constants";
-import { bigIntToBigDecimal } from "../utils/numbers";
+import { bigDecimalToBigInt, bigIntToBigDecimal } from "../utils/numbers";
 
 export function handleTransfer(event: Transfer): void {
   if (event.params.value.equals(BIGINT_ZERO)) {
@@ -237,6 +238,24 @@ export function handleKill(event: Kill): void {
   const market = getMarket(event.address);
   updateInterest(event, market);
 
+  let protocolSideProfitRatio = LIQUIDATION_PROTOCOL_SIDE_RATIO;
+  const vaultContract = Vault.bind(event.address);
+  const tryConfig = vaultContract.try_config();
+  if (tryConfig.reverted) {
+    log.warning("[handleKill] could not fetch config contract address", []);
+    return;
+  }
+  const configContract = ConfigurableInterestVaultConfig.bind(tryConfig.value);
+  const tryGetKillBps = configContract.try_getKillBps();
+  const tryGetKillTreasuryBps = configContract.try_getKillTreasuryBps();
+  if (tryGetKillBps.reverted || tryGetKillTreasuryBps.reverted) {
+    log.warning("[handleKill] could not fetch liquidation config data", []);
+    return;
+  }
+  protocolSideProfitRatio = tryGetKillTreasuryBps.value.divDecimal(
+    tryGetKillTreasuryBps.value.plus(tryGetKillBps.value).toBigDecimal()
+  );
+
   createLiquidate(
     event,
     market,
@@ -244,7 +263,9 @@ export function handleKill(event: Kill): void {
     event.params.posVal,
     Address.fromString(market.inputToken),
     event.params.prize,
-    event.params.prize,
+    bigDecimalToBigInt(
+      event.params.prize.toBigDecimal().times(protocolSideProfitRatio)
+    ),
     event.params.killer,
     event.params.owner
   );
