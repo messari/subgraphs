@@ -230,7 +230,7 @@ function ProtocolTabEntity({
             const req =
               "!" ===
               entitiesData[entityName][entityField].split("")[
-                entitiesData[entityName][entityField].split("").length - 1
+              entitiesData[entityName][entityField].split("").length - 1
               ];
             if (req) {
               list[entityName][entityField] = "MISSING AND REQUIRED";
@@ -362,10 +362,10 @@ function ProtocolTabEntity({
                 </Box>
                 <Grid container justifyContent="space-between">
                   <Grid key={label + "1"} item xs={7.5}>
-                    <Chart datasetLabel={label} dataChart={dataFields[field]} />
+                    <Chart identifier={protocolTableData?.slug} datasetLabel={label} dataChart={dataFields[field]} />
                   </Grid>
                   <Grid key={label + "2"} item xs={4}>
-                    <TableChart datasetLabel={label} dataTable={dataFields[field]} />
+                    <TableChart identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} />
                   </Grid>
                 </Grid>
               </div>

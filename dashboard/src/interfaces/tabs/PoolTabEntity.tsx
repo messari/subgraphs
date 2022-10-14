@@ -6,7 +6,6 @@ import { convertTokenDecimals, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
 import { useEffect } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
-import moment from "moment";
 
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
@@ -549,7 +548,7 @@ function PoolTabEntity({
       } else {
         const table = (
           <Grid key={elementId + "Table"} item xs={4}>
-            <TableChart datasetLabel="rewardAPR" dataTable={tableVals} />
+            <TableChart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataTable={tableVals} />
           </Grid>
         );
         rewardAPRElement = (
@@ -561,7 +560,7 @@ function PoolTabEntity({
             </Box>
             <Grid container justifyContent="space-between">
               <Grid key={elementId + "Chart"} item xs={7.5}>
-                <Chart datasetLabel="rewardAPR" dataChart={rewardChart} />
+                <Chart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} />
               </Grid>
               {table}
             </Grid>
@@ -598,7 +597,7 @@ function PoolTabEntity({
       });
       const table = (
         <Grid key={elementId + "Table"} item xs={4}>
-          <TableChart datasetLabel="RATES" dataTable={tableVals} />
+          <TableChart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} />
         </Grid>
       );
       ratesElement = (
@@ -610,7 +609,7 @@ function PoolTabEntity({
           </Box>
           <Grid container justifyContent="space-between">
             <Grid key={elementId + "Chart"} item xs={7.5}>
-              <Chart datasetLabel="RATES" dataChart={ratesChart} />
+              <Chart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataChart={ratesChart} />
             </Grid>
             {table}
           </Grid>
@@ -908,10 +907,10 @@ function PoolTabEntity({
               </Box>
               <Grid container justifyContent="space-between">
                 <Grid key={elementId + "1"} item xs={7.5}>
-                  <Chart datasetLabel={label} dataChart={dataFields[field]} />
+                  <Chart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataChart={dataFields[field]} />
                 </Grid>
                 <Grid key={elementId + "2"} item xs={4}>
-                  <TableChart datasetLabel={label} dataTable={dataFields[field]} />
+                  <TableChart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} />
                 </Grid>
               </Grid>
             </div>
