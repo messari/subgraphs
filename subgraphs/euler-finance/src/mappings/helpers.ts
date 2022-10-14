@@ -446,22 +446,6 @@ export function syncWithEulerGeneralView(
     */
 
     market.save();
-    log.info(
-      "[syncWithEulerGeneralView]blk={},market={},prev tvl={},tvl={},protocl tvl={},prev borrowBal={},borrowBal={},protocol borrowBal={},prev DepositBal={},DepositBal={},protocol DepositBal={}",
-      [
-        event.transaction.hash.toHexString(),
-        market.id,
-        prevMarketTotalValueLockedUSD.toString(),
-        market.totalValueLockedUSD.toString(),
-        protocol.totalValueLockedUSD.toString(),
-        prevMarketTotalBorrowBalanceUSD.toString(),
-        market.totalBorrowBalanceUSD.toString(),
-        protocol.totalBorrowBalanceUSD.toString(),
-        prevMarketTotalDepositBalanceUSD.toString(),
-        market.totalDepositBalanceUSD.toString(),
-        protocol.totalDepositBalanceUSD.toString(),
-      ],
-    );
 
     //update TVL, borrow balance, and deposit balance
     protocol.totalValueLockedUSD = protocol.totalValueLockedUSD

@@ -71,7 +71,7 @@ export function handleAssetStatus(event: AssetStatus): void {
   const totalBorrows = event.params.totalBorrows;
   const reserveBalance = event.params.reserveBalance;
   const interestAccumulator = event.params.interestAccumulator;
-  const interstRate = event.params.interestRate;
+  //const interstRate = event.params.interestRate;
   const timestamp = event.params.timestamp;
 
   const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
@@ -79,32 +79,7 @@ export function handleAssetStatus(event: AssetStatus): void {
   const marketsContract = Markets.bind(marketsProxyAddress);
   const reserveFee = marketsContract.reserveFee(underlying);
 
-  // update price
-  const execProxyAddress = eulerContract.moduleIdToProxy(MODULEID__EXEC);
-  log.info("[handleAssetStatus]execProxyAddress={}", [execProxyAddress.toHexString()]);
-  const execProxyContract = Exec.bind(execProxyAddress);
-  let underlyingPriceUSD: BigDecimal;
-  if (marketId.toLowerCase() == USDC_ERC20_ADDRESS) {
-    underlyingPriceUSD = BIGDECIMAL_ONE;
-  } else {
-    // price in WETH
-    const underlyingPriceWETH = execProxyContract.getPriceFull(underlying).getCurrPrice();
-    // this is the inversion of WETH price in USD
-    const USDCPriceWETH = execProxyContract.getPriceFull(Address.fromString(USDC_ERC20_ADDRESS)).getCurrPrice();
-    underlyingPriceUSD = underlyingPriceWETH.divDecimal(DECIMAL_PRECISION).div(USDCPriceWETH.toBigDecimal());
-  }
-
   const token = getOrCreateToken(underlying);
-  token.lastPriceUSD = underlyingPriceUSD;
-  token.lastPriceBlockNumber = event.block.number;
-  token.save();
-
-  log.info("[handleAssetStatus]tx={},token={},currPrice={}", [
-    event.transaction.hash.toHexString(),
-    token.name,
-    underlyingPriceUSD.toString(),
-  ]);
-
   const assetStatus = getOrCreateAssetStatus(marketId);
 
   assert(
@@ -117,7 +92,6 @@ export function handleAssetStatus(event: AssetStatus): void {
     `event reserveBalance ${reserveBalance} < assetStatus.reserveBalance`,
   );
 
-  //const tokenPrecision = new BigDecimal(BigInt.fromI32(10).pow(<u8>token.decimals));
   log.info("[handleAssetStatus]underlying={},blk={},tx={},token.id={},token.lastPriceUSD={}", [
     marketId,
     block.number.toString(),
@@ -135,21 +109,14 @@ export function handleAssetStatus(event: AssetStatus): void {
   const deltaTotalRevenue = deltaProtocolSideRevenue.times(RESERVE_FEE_SCALE).div(reserveFee.toBigDecimal());
   const deltaSupplySideRevenue = deltaTotalRevenue.minus(deltaProtocolSideRevenue);
 
-  log.info(
-    "[handleAssetStatus]totalBorrows={},prev totalBorrows={},totalRev={},reserveBalance={},prev reserveBal={},protocolSideRev={},price={}",
-    [
-      //block.number.toString(),
-      //event.transaction.hash.toHexString(),
-      totalBorrows.toString(),
-      assetStatus.totalBorrows.toString(),
-      deltaTotalRevenue.toString(),
-      reserveBalance.toString(),
-      assetStatus.reserveBalance.toString(),
-      deltaProtocolSideRevenue.toString(),
-      token.lastPriceUSD!.toString(),
-      //tokenPrecision.toString(),
-    ],
-  );
+  log.info("[handleAssetStatus]tx={},market={},price={},protocolSideRev={},supplySideRev={},totalRev={}", [
+    event.transaction.hash.toHexString(),
+    marketId,
+    token.lastPriceUSD!.toString(),
+    deltaProtocolSideRevenue.toString(),
+    deltaSupplySideRevenue.toString(),
+    deltaTotalRevenue.toString(),
+  ]);
 
   const protocol = getOrCreateLendingProtocol();
   // update protocol revenue
