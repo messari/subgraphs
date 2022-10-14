@@ -53,6 +53,7 @@ export function getDelegate(address: string): Delegate {
     delegate.tokenHoldersRepresented = 0;
     delegate.currentSpells = [];
     delegate.numberVotes = 0;
+    delegate.numberPoleVotes = 0;
   }
   return delegate;
 }

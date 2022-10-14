@@ -1,25 +1,15 @@
-import { Delegate, Delegation, Poll, PollVote } from "../generated/schema";
+import { Poll, PollVote } from "../generated/schema";
 import { Voted } from "../generated/PollingEmitter/PollingEmitter";
-import { getDelegate, getGovernanceFramework } from "./helpers";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, CHIEF } from "./constants";
+import { getDelegate } from "./helpers";
 
 export function handlePollVote(event: Voted): void {
   let voter = event.params.voter.toHexString();
   let pollId = event.params.pollId.toString();
   let optionId = event.params.optionId;
 
-  let delegate = Delegate.load(voter);
-  if (!delegate) {
-    delegate = new Delegate(voter);
-    delegate.isVoteDelegate = false;
-    delegate.votingPowerRaw = BIGINT_ZERO;
-    delegate.votingPower = BIGDECIMAL_ZERO;
-    delegate.delegations = [];
-    delegate.tokenHoldersRepresented = 0;
-    delegate.currentSpells = [];
-    delegate.numberVotes = 0;
-    delegate.save();
-  }
+  let delegate = getDelegate(voter);
+  delegate.numberPoleVotes = delegate.numberPoleVotes + 1;
+  delegate.save();
 
   let poll = Poll.load(pollId);
   if (!poll) {

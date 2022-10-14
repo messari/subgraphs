@@ -41,6 +41,7 @@ export function handleLock(event: LogNote): void {
     delegate.tokenHoldersRepresented = 0;
     delegate.currentSpells = [];
     delegate.numberVotes = 0;
+    delegate.numberPoleVotes = 0;
 
     // Check if vote delegate contract by calling chief()
     let voteDelegate = VoteDelegate.bind(sender);
