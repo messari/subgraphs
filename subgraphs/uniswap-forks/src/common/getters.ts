@@ -17,6 +17,7 @@ import {
   LiquidityPoolHourlySnapshot,
   UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
+import { Versions } from "../versions";
 import {
   BIGDECIMAL_ZERO,
   INT_ZERO,
@@ -28,16 +29,13 @@ import {
   SECONDS_PER_HOUR,
 } from "./constants";
 
-export function getOrCreateDex(): DexAmmProtocol {
+export function getOrCreateProtocol(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.getFactoryAddress());
 
   if (!protocol) {
     protocol = new DexAmmProtocol(NetworkConfigs.getFactoryAddress());
     protocol.name = NetworkConfigs.getProtocolName();
     protocol.slug = NetworkConfigs.getProtocolSlug();
-    protocol.schemaVersion = NetworkConfigs.getSchemaVersion();
-    protocol.subgraphVersion = NetworkConfigs.getSubgraphVersion();
-    protocol.methodologyVersion = NetworkConfigs.getMethodologyVersion();
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -50,6 +48,12 @@ export function getOrCreateDex(): DexAmmProtocol {
 
     protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+  protocol.save();
+
   return protocol;
 }
 
@@ -116,7 +120,7 @@ export function getOrCreateUsageMetricDailySnapshot(
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
 
-    const protocol = getOrCreateDex();
+    const protocol = getOrCreateProtocol();
     usageMetrics.totalPoolCount = protocol.totalPoolCount;
 
     usageMetrics.save();
