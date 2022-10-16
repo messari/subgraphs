@@ -3,40 +3,18 @@ import MomentAdapter from "@material-ui/pickers/adapter/moment";
 import { Box, Button, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
-import { JSONToCSVConvertor, toDate, toUnitsSinceEpoch } from "../../../src/utils/index";
+import { downloadCSV, toDate, toUnitsSinceEpoch } from "../../../src/utils/index";
 import { percentageFieldList } from "../../constants";
 import moment, { Moment } from "moment";
 
 interface TableChartProps {
-  identifier: string;
   datasetLabel: string;
   dataTable: any;
+  jpegDownloadHandler: any;
 }
 
-export const TableChart = ({ identifier, datasetLabel, dataTable }: TableChartProps) => {
-  function clickHandler() {
-    try {
-      const link = document.createElement('a');
-      const field = datasetLabel.split("-")[1] || datasetLabel;
-      let freq = datasetLabel.split("-")[0]?.toUpperCase()?.includes("HOURLY") ? "hourly-" : "";
-      if (datasetLabel.split("-")[0]?.toUpperCase()?.includes("DAILY")) {
-        freq = "daily-";
-      }
-      if (field?.toUpperCase()?.includes("DAILY") || field?.toUpperCase()?.includes("HOURLY")) {
-        freq = "";
-      }
-      link.download = identifier + '-' + freq + field + "-" + moment.utc(Date.now()).format("MMDDYY") + ".csv";
-      const csvEle = JSONToCSVConvertor(dataTable.map((x: any) => ({ [field]: x.value, date: moment.utc(x.date).format("MM-DD-YYYY") })), datasetLabel + '-csv', datasetLabel)
-      if (!csvEle?.csvUrl) {
-        throw new Error("csv File not constructed");
-      } else {
-        link.href = csvEle?.csvUrl;
-        link.click();
-      }
-    } catch (err) {
-      return;
-    }
-  }
+export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: TableChartProps) => {
+  const field = datasetLabel.split("-")[1] || datasetLabel;
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDateString, toggleDateString] = useState(true);
   const [dates, setDates] = useState<any>([]);
@@ -136,13 +114,14 @@ export const TableChart = ({ identifier, datasetLabel, dataTable }: TableChartPr
             </Box>
           )}
 
-          <Button onClick={() => setShowDatePicker((prev) => !prev)}>
-            {showDatePicker ? "Hide" : "Show"} Date Filter
+          <Button className="Hover-Underline" onClick={() => setShowDatePicker((prev) => !prev)}>
+            Date Filter
           </Button>
-          <Button onClick={() => toggleDateString(!showDateString)}>
-            {showDateString ? `Show ${hourly ? "hours" : "days"} since epoch` : "Show Date MM/DD/YYYY"}
+          <Button className="Hover-Underline" onClick={() => downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel)}>Save CSV</Button>
+          {jpegDownloadHandler ? <Button className="Hover-Underline" onClick={() => jpegDownloadHandler()}>Save Chart</Button> : null}
+          <Button className="Hover-Underline" onClick={() => toggleDateString(!showDateString)}>
+            {showDateString ? `${hourly ? "hours" : "days"} since epoch` : "Date MM/DD/YYYY"}
           </Button>
-          <Button onClick={() => clickHandler()}>Download CSV</Button>
         </Box>
         <DataGrid
           sx={{ textOverflow: "clip" }}

@@ -132,3 +132,28 @@ export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel
   const filename = (ReportTitle || 'UserExport') + '.csv';
   return { csvUrl, filename };
 }
+
+export function downloadCSV(data: any[], label: string, identifier: string) {
+  try {
+    const link = document.createElement('a');
+    const field = label.split("-")[1] || label;
+    let freq = label.split("-")[0]?.toUpperCase()?.includes("HOURLY") ? "hourly-" : "";
+    if (label.split("-")[0]?.toUpperCase()?.includes("DAILY")) {
+      freq = "daily-";
+    }
+    if (field?.toUpperCase()?.includes("DAILY") || field?.toUpperCase()?.includes("HOURLY")) {
+      freq = "";
+    }
+    link.download = identifier + '-' + freq + field + "-" + moment.utc(Date.now()).format("MMDDYY") + ".csv";
+    const csvEle = JSONToCSVConvertor(data, label + '-csv', label);
+    if (!csvEle?.csvUrl) {
+      throw new Error("csv File not constructed");
+    } else {
+      link.href = csvEle?.csvUrl;
+      link.click();
+    }
+  } catch (err) {
+    console.log(err)
+    return;
+  }
+}

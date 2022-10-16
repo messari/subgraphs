@@ -1,11 +1,11 @@
-import { Box, CircularProgress, Grid, Typography } from "@mui/material";
-import { Chart } from "../../common/chartComponents/Chart";
-import { TableChart } from "../../common/chartComponents/TableChart";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { negativeFieldList } from "../../constants";
-import { convertTokenDecimals } from "../../utils";
-import { useEffect } from "react";
+import { convertTokenDecimals, downloadCSV } from "../../utils";
+import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import { BigNumber } from "bignumber.js";
+import { ChartContainer } from "../../common/chartComponents/ChartContainer";
+import moment from "moment";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
@@ -34,11 +34,19 @@ function ProtocolTabEntity({
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   const list: { [x: string]: any } = {};
 
+  const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
+
   useEffect(() => {
     const issuesToSet = { ...issuesProps };
     issuesToSet[entityName] = issues;
     setIssues(issuesToSet);
   });
+
+  useEffect(() => {
+    if (!!downloadAllCharts) {
+      triggerDownloadAllCharts(false);
+    }
+  }, [downloadAllCharts])
 
   if (!currentTimeseriesLoading && currentEntityData) {
     try {
@@ -241,17 +249,29 @@ function ProtocolTabEntity({
         }
       }
 
+      const mappedCurrentEntityData = currentEntityData.map((instance: any, idx: number) => {
+        let instanceToSave: any = {};
+        instanceToSave.date = moment.utc(Number(instance.timestamp) * 1000).format("YYYY-MM-DD");
+        instanceToSave = { ...instanceToSave, ...instance };
+        delete instanceToSave.__typename;
+        return instanceToSave;
+      }).sort((a: any, b: any) => (Number(a.timestamp) - Number(b.timestamp)));
+
       // For each entity field/key in the dataFields object, create a chart and tableChart component
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
       return (
         <Grid key={entityName}>
-          <Box my={3}>
+          <Box sx={{ marginTop: "24px" }}>
             <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
               <Typography variant="h4" id={entityName}>
                 {entityName}
               </Typography>
             </CopyLinkToClipboard>
           </Box>
+          <div>
+            <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download All Snapshots as csv</div>
+            <div style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Chart Images</div>
+          </div>
           {Object.keys(dataFields).map((field: string) => {
             // The following checks if the field is required or can be null
             const fieldName = field.split(" [")[0];
@@ -360,14 +380,7 @@ function ProtocolTabEntity({
                     <Typography variant="h6">{field}</Typography>
                   </CopyLinkToClipboard>
                 </Box>
-                <Grid container justifyContent="space-between">
-                  <Grid key={label + "1"} item xs={7.5}>
-                    <Chart identifier={protocolTableData?.slug} datasetLabel={label} dataChart={dataFields[field]} />
-                  </Grid>
-                  <Grid key={label + "2"} item xs={4}>
-                    <TableChart identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} />
-                  </Grid>
-                </Grid>
+                <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataFields[field]} />
               </div>
             );
           })}
