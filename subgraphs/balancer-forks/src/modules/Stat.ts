@@ -31,7 +31,7 @@ export function updateStat(
   amountToken: BigInt,
   amountUSD: BigDecimal
 ): void {
-  let count = stat.count.plus(constants.BIGINT_ONE).toBigDecimal();
+  const count = stat.count.plus(constants.BIGINT_ONE).toBigDecimal();
 
   // Update Max
   if (amountToken > stat.maxAmount) {
@@ -45,8 +45,8 @@ export function updateStat(
     stat.minUSD = amountUSD;
   }
 
-  let X_amt = amountToken.toBigDecimal();
-  let X_usd = amountUSD;
+  const X_amt = amountToken.toBigDecimal();
+  const X_usd = amountUSD;
 
   if (count == constants.BIGDECIMAL_ONE) {
     stat.S_amt = constants.BIGDECIMAL_ZERO;
@@ -56,16 +56,16 @@ export function updateStat(
     stat.meanUSD = amountUSD;
     stat.varUSD = constants.BIGDECIMAL_ZERO;
   } else {
-    let M_amt = stat.meanAmount.toBigDecimal();
-    let M_usd = stat.meanUSD;
+    const M_amt = stat.meanAmount.toBigDecimal();
+    const M_usd = stat.meanUSD;
 
-    let newM_amt = M_amt.plus(X_amt.minus(M_amt).div(count));
-    let newS_amt = stat.S_amt!.plus(
+    const newM_amt = M_amt.plus(X_amt.minus(M_amt).div(count));
+    const newS_amt = stat.S_amt!.plus(
       X_amt.minus(M_amt).times(X_amt.minus(newM_amt))
     );
 
-    let newM_usd = M_usd.plus(X_usd.minus(M_usd).div(count));
-    let newS_usd = stat.S_usd!.plus(
+    const newM_usd = M_usd.plus(X_usd.minus(M_usd).div(count));
+    const newS_usd = stat.S_usd!.plus(
       X_usd.minus(M_usd).times(X_usd.minus(newM_usd))
     );
 

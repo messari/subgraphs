@@ -1,12 +1,10 @@
 import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   Account,
-  Deposit,
   LiquidityPool,
   Position,
   PositionSnapshot,
   UniqueAccount,
-  Withdraw,
   _PositionCounter,
 } from "../../generated/schema";
 
@@ -15,14 +13,13 @@ import {
   getOrCreateLiquidityPool,
   getOrCreateDexAmmProtocol,
 } from "../common/initializers";
-import { addToArrayAtIndex } from "../common/utils";
 
 export function getOrCreateAccount(
   accountId: string,
   isTrader: boolean = false
 ): Account {
   let account = Account.load(accountId);
-  let protocol = getOrCreateDexAmmProtocol();
+  const protocol = getOrCreateDexAmmProtocol();
 
   if (!account) {
     account = new Account(accountId);
@@ -69,7 +66,7 @@ export function getOrCreatePosition(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): Position {
-  let positionIdPrefix = `${accountId}-${poolId}`;
+  const positionIdPrefix = `${accountId}-${poolId}`;
 
   let positionCounter = _PositionCounter.load(positionIdPrefix);
   if (!positionCounter) {
@@ -77,7 +74,7 @@ export function getOrCreatePosition(
     positionCounter.nextCount = 0;
     positionCounter.save();
   }
-  let positionId = `${positionIdPrefix}-${positionCounter.nextCount.toString()}`;
+  const positionId = `${positionIdPrefix}-${positionCounter.nextCount.toString()}`;
   let position = Position.load(positionId);
 
   if (position) {
@@ -86,18 +83,18 @@ export function getOrCreatePosition(
 
   position = new Position(positionId);
 
-  let account = getOrCreateAccount(accountId);
+  const account = getOrCreateAccount(accountId);
   account.positionCount += 1;
   account.openPositionCount += 1;
   account.save();
 
-  let pool = getOrCreateLiquidityPool(Address.fromString(poolId), block);
+  const pool = getOrCreateLiquidityPool(Address.fromString(poolId), block);
 
   pool.positionCount += 1;
   pool.openPositionCount += 1;
   pool.save();
 
-  let protocol = getOrCreateDexAmmProtocol();
+  const protocol = getOrCreateDexAmmProtocol();
   protocol.openPositionCount += 1;
   protocol.cumulativePositionCount += 1;
   protocol.save();
@@ -126,8 +123,8 @@ export function updatePositions(
   transactionLogIndex: BigInt
 ): void {
   //  position is the current open position or a newly create open position
-  let account = getOrCreateAccount(accountId.toHexString());
-  let position = getOrCreatePosition(pool.id, account.id, transaction, block);
+  const account = getOrCreateAccount(accountId.toHexString());
+  const position = getOrCreatePosition(pool.id, account.id, transaction, block);
   let closePositionToggle = false;
 
   if (eventType == constants.UsageType.DEPOSIT) {
@@ -165,9 +162,9 @@ export function takePositionSnapshot(
   block: ethereum.Block,
   transactionLogIndex: BigInt
 ): void {
-  let hash = transaction.hash.toHexString();
-  let txLogIndex = transactionLogIndex.toI32();
-  let snapshot = new PositionSnapshot(`${position.id}-${hash}-${txLogIndex}`);
+  const hash = transaction.hash.toHexString();
+  const txLogIndex = transactionLogIndex.toI32();
+  const snapshot = new PositionSnapshot(`${position.id}-${hash}-${txLogIndex}`);
 
   snapshot.position = position.id;
   snapshot.hash = hash;
@@ -190,8 +187,8 @@ export function closePosition(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
-  let positionIdPrefix = `${account.id}-${pool.id}`;
-  let positionCounter = _PositionCounter.load(positionIdPrefix)!;
+  const positionIdPrefix = `${account.id}-${pool.id}`;
+  const positionCounter = _PositionCounter.load(positionIdPrefix)!;
   positionCounter.nextCount += 1;
   positionCounter.save();
 
@@ -203,7 +200,7 @@ export function closePosition(
   pool.closedPositionCount += 1;
   pool.save();
 
-  let protocol = getOrCreateDexAmmProtocol();
+  const protocol = getOrCreateDexAmmProtocol();
   protocol.openPositionCount -= 1;
   protocol.save();
 
