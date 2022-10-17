@@ -20,14 +20,11 @@ import {
 import {
   Borrow,
   Deposit,
-  LendingPool,
   LiquidationCall,
-  Paused,
   Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
-  Unpaused,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
 import { AToken } from "../../../generated/LendingPool/AToken";
@@ -73,7 +70,7 @@ import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleG
 import { Transfer } from "../../../generated/templates/AToken/AToken";
 
 function getProtocolData(): ProtocolData {
-  let constants = getNetworkSpecificConstant();
+  const constants = getNetworkSpecificConstant();
   return new ProtocolData(
     constants.protocolAddress.toHexString(),
     Protocol.NAME,
@@ -156,11 +153,11 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
-  let protocolData = getProtocolData();
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const protocolData = getProtocolData();
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   // update rewards if there is an incentive controller
-  let market = Market.load(event.params.reserve.toHexString());
+  const market = Market.load(event.params.reserve.toHexString());
   if (!market) {
     log.warning("[handleReserveDataUpdated] Market not found", [
       event.params.reserve.toHexString(),
@@ -169,8 +166,8 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   }
 
   // Get UWU rewards for the given pool
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  let tryIncentiveController = aTokenContract.try_getIncentivesController();
+  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  const tryIncentiveController = aTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
     let rewardTokens: string[] = [];
     let rewardEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
@@ -240,7 +237,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     market.save();
   }
 
-  let assetPriceUSD = getAssetPriceInUSDC(
+  const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromString(market.inputToken),
     Address.fromString(protocol.priceOracle)
   );
@@ -279,11 +276,11 @@ export function handleReserveUsedAsCollateralDisabled(
   );
 }
 
-export function handlePaused(event: Paused): void {
+export function handlePaused(): void {
   _handlePaused(getProtocolData());
 }
 
-export function handleUnpaused(event: Unpaused): void {
+export function handleUnpaused(): void {
   _handleUnpaused(getProtocolData());
 }
 
@@ -355,7 +352,7 @@ function getAssetPriceInUSDC(
   tokenAddress: Address,
   priceOracle: Address
 ): BigDecimal {
-  let oracle = IPriceOracleGetter.bind(priceOracle);
+  const oracle = IPriceOracleGetter.bind(priceOracle);
   let oracleResult = readValue<BigInt>(
     oracle.try_getAssetPrice(tokenAddress),
     BIGINT_ZERO
@@ -363,9 +360,9 @@ function getAssetPriceInUSDC(
 
   // if the result is zero or less, try the fallback oracle
   if (!oracleResult.gt(BIGINT_ZERO)) {
-    let tryFallback = oracle.try_getFallbackOracle();
+    const tryFallback = oracle.try_getFallbackOracle();
     if (tryFallback) {
-      let fallbackOracle = IPriceOracleGetter.bind(tryFallback.value);
+      const fallbackOracle = IPriceOracleGetter.bind(tryFallback.value);
       oracleResult = readValue<BigInt>(
         fallbackOracle.try_getAssetPrice(tokenAddress),
         BIGINT_ZERO
