@@ -6,10 +6,7 @@ import {
   LogSetPool,
   LogBananaPerSecond,
 } from "../../../../../generated/MiniChefV2/MiniChefV2Apeswap";
-import {
-  _HelperStore,
-  _MasterChefStakingPool,
-} from "../../../../../generated/schema";
+import { _MasterChefStakingPool } from "../../../../../generated/schema";
 import {
   BIGINT_NEG_ONE,
   MasterChef,
@@ -46,7 +43,7 @@ export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
 
 // Handle the addition of a new pool to the MasterChef. New staking pool.
 export function handleLogPoolAddition(event: LogPoolAddition): void {
-  let miniChefPool = createMasterChefStakingPool(
+  const miniChefPool = createMasterChefStakingPool(
     event,
     MasterChef.MINICHEF,
     event.params.pid,
@@ -64,7 +61,7 @@ export function handleLogPoolAddition(event: LogPoolAddition): void {
 
 // Update the allocation points of the pool.
 export function handleLogSetPool(event: LogSetPool): void {
-  let miniChefPool = _MasterChefStakingPool.load(
+  const miniChefPool = _MasterChefStakingPool.load(
     MasterChef.MINICHEF + "-" + event.params.pid.toString()
   )!;
   updateMasterChefTotalAllocation(
@@ -79,7 +76,7 @@ export function handleLogSetPool(event: LogSetPool): void {
 
 // Update the total emissions rate of rewards for the masterchef contract.
 export function handleLogBananaPerSecond(event: LogBananaPerSecond): void {
-  let miniChefPool = getOrCreateMasterChef(event, MasterChef.MINICHEF);
+  const miniChefPool = getOrCreateMasterChef(event, MasterChef.MINICHEF);
   miniChefPool.rewardTokenRate = event.params.bananaPerSecond;
   miniChefPool.adjustedRewardTokenRate = event.params.bananaPerSecond;
   miniChefPool.save();

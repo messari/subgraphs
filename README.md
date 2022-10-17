@@ -65,4 +65,4 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 
 ## Development Status
 
-We've moved development status [here](https://subgraphs.messari.io/development-status).
+We've moved development status [here](https://subgraphs.messari.io/).

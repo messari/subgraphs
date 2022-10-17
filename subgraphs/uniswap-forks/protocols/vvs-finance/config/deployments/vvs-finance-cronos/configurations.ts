@@ -16,7 +16,6 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
-import { toLowerCaseList } from "../../../../../src/common/utils/utils";
 
 export class VSSFinanceCronosConfigurations implements Configurations {
   getNetwork(): string {

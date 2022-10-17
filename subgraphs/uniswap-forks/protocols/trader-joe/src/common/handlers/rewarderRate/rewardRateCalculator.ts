@@ -16,7 +16,6 @@ import { Rewarder } from "../../../../../../generated/MasterChefV2/Rewarder";
 import {
   BIGINT_ZERO,
   BIGINT_ONE,
-  BIGINT_TEN,
   BIGINT_HUNDRED,
   ZERO_ADDRESS,
   BIGDECIMAL_TEN,
@@ -39,7 +38,7 @@ export class RewarderCalculator {
   }
 
   public static attemptToRetrieveRewardRate(contract: Rewarder): BigInt | null {
-    let tokenPerSecCall = contract.try_tokenPerSec();
+    const tokenPerSecCall = contract.try_tokenPerSec();
     if (tokenPerSecCall.reverted) {
       return null;
     }
@@ -95,7 +94,7 @@ export class RewarderCalculator {
   }
 
   private updateRewarderRateFromContract(): void {
-    let rate = RewarderCalculator.attemptToRetrieveRewardRate(this.contract);
+    const rate = RewarderCalculator.attemptToRetrieveRewardRate(this.contract);
     if (!rate) {
       log.error("rewarder rate is retrievable but failed to retrieve: {}", [
         this.rewarder.id,
@@ -117,7 +116,7 @@ export class RewarderCalculator {
     }
 
     for (let i = 0; i < this.rewarder._probes!.length; i++) {
-      let probe = _RewarderProbe.load(this.rewarder._probes![i])!;
+      const probe = _RewarderProbe.load(this.rewarder._probes![i])!;
       if (event.block.number.minus(probe.blockNum).gt(calculationInterval)) {
         return true;
       }
@@ -170,8 +169,8 @@ export class RewarderCalculator {
       probes.push(probe.id);
     }
 
-    let pending = this.contract.pendingTokens(user);
-    let totalLPStaked = this.currentStakedLPForRewarderPool();
+    const pending = this.contract.pendingTokens(user);
+    const totalLPStaked = this.currentStakedLPForRewarderPool();
 
     probe.user = user.toHexString();
     probe.pending = pending;
@@ -185,26 +184,26 @@ export class RewarderCalculator {
   }
 
   private currentStakedLPForRewarderPool(): BigInt {
-    let sPool = _MasterChefStakingPool.load(this.rewarder.pool);
-    let pool = LiquidityPool.load(sPool!.poolAddress!);
+    const sPool = _MasterChefStakingPool.load(this.rewarder.pool);
+    const pool = LiquidityPool.load(sPool!.poolAddress!);
     return pool!.stakedOutputTokenAmount!;
   }
 
   // computeRate will go over all probes from a fiven rewarder and attempt to calculate the
   // reward rate.
   private computeRate(event: ethereum.Event): void {
-    let sPool = _MasterChefStakingPool.load(this.rewarder.pool)!;
-    let currentStakedLP = this.currentStakedLPForRewarderPool();
+    const sPool = _MasterChefStakingPool.load(this.rewarder.pool)!;
+    const currentStakedLP = this.currentStakedLPForRewarderPool();
 
     let sum = BIGINT_ZERO;
     let validProbes = BIGINT_ZERO;
     for (let i = 0; i < this.rewarder._probes!.length; i++) {
-      let probe = _RewarderProbe.load(this.rewarder._probes![i])!;
+      const probe = _RewarderProbe.load(this.rewarder._probes![i])!;
       if (event.block.number == probe.blockNum) {
         continue; // was added right now, so won't have accrued rewards
       }
 
-      let changePercentage = currentStakedLP
+      const changePercentage = currentStakedLP
         .minus(probe.lpStaked)
         .toBigDecimal()
         .div(BigDecimal.fromString(currentStakedLP.toString()))
@@ -217,19 +216,22 @@ export class RewarderCalculator {
         continue;
       }
 
-      let newPending = this.contract.pendingTokens(
+      const newPending = this.contract.pendingTokens(
         Address.fromString(probe.user)
       );
-      let pendingDelta = newPending.minus(probe.pending);
-      let userLP = this.getUserStakedLP(sPool, Address.fromString(probe.user));
-      let elapsed = event.block.timestamp.minus(probe.timestamp);
+      const pendingDelta = newPending.minus(probe.pending);
+      const userLP = this.getUserStakedLP(
+        sPool,
+        Address.fromString(probe.user)
+      );
+      const elapsed = event.block.timestamp.minus(probe.timestamp);
 
-      let denom = userLP.times(elapsed);
+      const denom = userLP.times(elapsed);
       if (denom.equals(BIGINT_ZERO)) {
         continue;
       }
 
-      let rate = pendingDelta.times(currentStakedLP).div(denom);
+      const rate = pendingDelta.times(currentStakedLP).div(denom);
       sum = sum.plus(rate);
       validProbes = validProbes.plus(BIGINT_ONE);
     }
@@ -243,7 +245,7 @@ export class RewarderCalculator {
       return;
     }
 
-    let averageRate = sum.div(validProbes);
+    const averageRate = sum.div(validProbes);
     this.rewarder.tokenPerSec = averageRate;
     this.rewarder._rewardRateCalculationInProgress = false;
     this.rewarder._probes = [];
@@ -252,13 +254,13 @@ export class RewarderCalculator {
   }
 
   private removeUserProbes(user: Address): void {
-    let probes = this.rewarder._probes;
+    const probes = this.rewarder._probes;
     if (!probes) {
       return;
     }
 
     for (let i = 0; i < probes.length; i++) {
-      let probe = _RewarderProbe.load(probes[i])!;
+      const probe = _RewarderProbe.load(probes[i])!;
       if (probe.user == user.toHexString()) {
         this.resetProbe(probe);
         return;
@@ -275,13 +277,13 @@ export class RewarderCalculator {
     sPool: _MasterChefStakingPool,
     user: Address
   ): BigInt {
-    let pid = sPool.id.split("-")[1];
+    const pid = sPool.id.split("-")[1];
     if (!pid) {
       return BIGINT_ZERO;
     }
 
-    let c = MasterChefV2TraderJoe.bind(Address.fromString(this.mc.address!)); // v2 and v3 have the same definition for this method.
-    let call = c.try_userInfo(BigInt.fromString(pid), user);
+    const c = MasterChefV2TraderJoe.bind(Address.fromString(this.mc.address!)); // v2 and v3 have the same definition for this method.
+    const call = c.try_userInfo(BigInt.fromString(pid), user);
     if (call.reverted) {
       log.error("unable to get user staked lp: {}", [user.toHexString()]);
       return BIGINT_ZERO;

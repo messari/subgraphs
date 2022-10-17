@@ -3,7 +3,6 @@ import { BigInt, Address, store, ethereum } from "@graphprotocol/graph-ts";
 import {
   Account,
   _HelperStore,
-  _TokenWhitelist,
   _LiquidityPoolAmount,
   LiquidityPool,
   LiquidityPoolFee,
@@ -43,11 +42,13 @@ import { getTrackedVolumeUSD } from "../price/price";
  * Specified in the typescript configuration file.
  */
 export function createPoolFees(poolAddress: string): string[] {
-  let poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
-  let poolProtocolFee = new LiquidityPoolFee(
+  const poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
+  const poolProtocolFee = new LiquidityPoolFee(
     poolAddress.concat("-protocol-fee")
   );
-  let poolTradingFee = new LiquidityPoolFee(poolAddress.concat("-trading-fee"));
+  const poolTradingFee = new LiquidityPoolFee(
+    poolAddress.concat("-trading-fee")
+  );
 
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
@@ -77,17 +78,17 @@ export function createLiquidityPool(
   token0Address: string,
   token1Address: string
 ): void {
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // create the tokens and tokentracker
-  let token0 = getOrCreateToken(token0Address);
-  let token1 = getOrCreateToken(token1Address);
-  let LPtoken = getOrCreateLPToken(poolAddress, token0, token1);
+  const token0 = getOrCreateToken(token0Address);
+  const token1 = getOrCreateToken(token1Address);
+  const LPtoken = getOrCreateLPToken(poolAddress, token0, token1);
 
   updateTokenWhitelists(token0, token1, poolAddress);
 
-  let pool = new LiquidityPool(poolAddress);
-  let poolAmounts = new _LiquidityPoolAmount(poolAddress);
+  const pool = new LiquidityPool(poolAddress);
+  const poolAmounts = new _LiquidityPoolAmount(poolAddress);
 
   pool.protocol = protocol.id;
   pool.name = protocol.name + " " + LPtoken.symbol;
@@ -112,7 +113,7 @@ export function createLiquidityPool(
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   // Used to track the number of deposits in a liquidity pool
-  let poolDeposits = new _HelperStore(poolAddress);
+  const poolDeposits = new _HelperStore(poolAddress);
   poolDeposits.valueInt = INT_ZERO;
 
   // update number of pools
@@ -148,20 +149,20 @@ export function createDeposit(
   amount0: BigInt,
   amount1: BigInt
 ): void {
-  let transfer = getOrCreateTransfer(event);
+  const transfer = getOrCreateTransfer(event);
 
-  let pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(event.address.toHexString());
 
-  let token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
-  let token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
+  const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
+  const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
 
   // update exchange info (except balances, sync will cover that)
-  let token0Amount = convertTokenToDecimal(amount0, token0.decimals);
-  let token1Amount = convertTokenToDecimal(amount1, token1.decimals);
+  const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
+  const token1Amount = convertTokenToDecimal(amount1, token1.decimals);
 
-  let logIndexI32 = event.logIndex.toI32();
-  let transactionHash = event.transaction.hash.toHexString();
-  let deposit = new Deposit(
+  const logIndexI32 = event.logIndex.toI32();
+  const transactionHash = event.transaction.hash.toHexString();
+  const deposit = new Deposit(
     transactionHash.concat("-").concat(event.logIndex.toString())
   );
 
@@ -192,20 +193,20 @@ export function createWithdraw(
   amount0: BigInt,
   amount1: BigInt
 ): void {
-  let transfer = getOrCreateTransfer(event);
+  const transfer = getOrCreateTransfer(event);
 
-  let pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(event.address.toHexString());
 
-  let token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
-  let token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
+  const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
+  const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
 
   // update exchange info (except balances, sync will cover that)
-  let token0Amount = convertTokenToDecimal(amount0, token0.decimals);
-  let token1Amount = convertTokenToDecimal(amount1, token1.decimals);
+  const token0Amount = convertTokenToDecimal(amount0, token0.decimals);
+  const token1Amount = convertTokenToDecimal(amount1, token1.decimals);
 
-  let logIndexI32 = event.logIndex.toI32();
-  let transactionHash = event.transaction.hash.toHexString();
-  let withdrawal = new Withdraw(
+  const logIndexI32 = event.logIndex.toI32();
+  const transactionHash = event.transaction.hash.toHexString();
+  const withdrawal = new Withdraw(
     transactionHash.concat("-").concat(event.logIndex.toString())
   );
 
@@ -243,35 +244,35 @@ export function createSwapHandleVolumeAndFees(
   amount0Out: BigInt,
   amount1Out: BigInt
 ): void {
-  let protocol = getOrCreateDex();
-  let pool = getLiquidityPool(event.address.toHexString());
-  let poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
+  const protocol = getOrCreateDex();
+  const pool = getLiquidityPool(event.address.toHexString());
+  const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
-  let token0 = getOrCreateToken(pool.inputTokens[0]);
-  let token1 = getOrCreateToken(pool.inputTokens[1]);
+  const token0 = getOrCreateToken(pool.inputTokens[0]);
+  const token1 = getOrCreateToken(pool.inputTokens[1]);
 
   // totals for volume updates
-  let amount0Total = amount0Out.plus(amount0In);
-  let amount1Total = amount1Out.plus(amount1In);
+  const amount0Total = amount0Out.plus(amount0In);
+  const amount1Total = amount1Out.plus(amount1In);
 
-  let amount0TotalConverted = convertTokenToDecimal(
+  const amount0TotalConverted = convertTokenToDecimal(
     amount0Total,
     token0.decimals
   );
-  let amount1TotalConverted = convertTokenToDecimal(
+  const amount1TotalConverted = convertTokenToDecimal(
     amount1Total,
     token1.decimals
   );
 
-  let token0USD = token0.lastPriceUSD!.times(amount0TotalConverted);
-  let token1USD = token1.lastPriceUSD!.times(amount1TotalConverted);
+  const token0USD = token0.lastPriceUSD!.times(amount0TotalConverted);
+  const token1USD = token1.lastPriceUSD!.times(amount1TotalConverted);
 
   // /// get total amounts of derived USD for tracking
   // let derivedAmountUSD = token1USD.plus(token0USD).div(BIGDECIMAL_TWO)
 
-  let logIndexI32 = event.logIndex.toI32();
-  let transactionHash = event.transaction.hash.toHexString();
-  let swap = new SwapEvent(
+  const logIndexI32 = event.logIndex.toI32();
+  const transactionHash = event.transaction.hash.toHexString();
+  const swap = new SwapEvent(
     transactionHash.concat("-").concat(event.logIndex.toString())
   );
 
@@ -294,7 +295,7 @@ export function createSwapHandleVolumeAndFees(
   swap.save();
 
   // only accounts for volume through white listed tokens
-  let trackedAmountUSD = getTrackedVolumeUSD(
+  const trackedAmountUSD = getTrackedVolumeUSD(
     poolAmounts,
     amount0TotalConverted,
     token0,

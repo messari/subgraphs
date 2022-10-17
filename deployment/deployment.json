@@ -2509,7 +2509,7 @@
     "deployments": {
       "gamma-strategies-arbitrum": {
         "network": "arbitrum",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.2",
@@ -2557,7 +2557,7 @@
       },
       "gamma-strategies-optimism": {
         "network": "optimism",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.1.2",
@@ -3453,10 +3453,6 @@
           "hosted-service": {
             "slug": "sushiswap-arbitrum",
             "query-id": "sushiswap-arbitrum"
-          },
-          "decentralized-network": {
-            "slug": "sushiswap-arbitrum",
-            "query-id": "7h1x51fyT5KigAhXd8sdE3kzzxQDJxxz1y66LTFiC3mS"
           }
         }
       },
@@ -3589,6 +3585,10 @@
           "hosted-service": {
             "slug": "sushiswap-ethereum",
             "query-id": "sushiswap-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "sushiswap-ethereum",
+            "query-id": "7h1x51fyT5KigAhXd8sdE3kzzxQDJxxz1y66LTFiC3mS"
           }
         }
       },

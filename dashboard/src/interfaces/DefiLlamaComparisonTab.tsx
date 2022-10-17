@@ -289,7 +289,7 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
         </Box>
         <Grid container justifyContent="space-between">
           <Grid key={elementId} item xs={7.5}>
-            <Chart datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} />
+            <Chart identifier={""} datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} />
           </Grid>
           <Grid key={elementId + "2"} item xs={4}>
             <ComparisonTable

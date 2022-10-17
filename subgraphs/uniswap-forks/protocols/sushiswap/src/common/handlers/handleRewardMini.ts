@@ -2,7 +2,6 @@ import { ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import {
   LiquidityPool,
-  _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
@@ -23,32 +22,32 @@ export function updateMasterChef(
   pid: BigInt,
   amount: BigInt
 ): void {
-  let miniChefV2Pool = _MasterChefStakingPool.load(
+  const miniChefV2Pool = _MasterChefStakingPool.load(
     MasterChef.MINICHEF + "-" + pid.toString()
   )!;
-  let miniChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
+  const miniChefV2 = getOrCreateMasterChef(event, MasterChef.MINICHEF);
 
-  let pool = LiquidityPool.load(miniChefV2Pool.poolAddress!);
+  const pool = LiquidityPool.load(miniChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }
 
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
   pool.rewardTokens = [
     getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
   ];
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
-  let rewardAmountPerInterval = miniChefV2.adjustedRewardTokenRate
+  const rewardAmountPerInterval = miniChefV2.adjustedRewardTokenRate
     .times(miniChefV2Pool.poolAllocPoint)
     .div(miniChefV2.totalAllocPoint);
-  let rewardAmountPerIntervalBigDecimal = new BigDecimal(
+  const rewardAmountPerIntervalBigDecimal = new BigDecimal(
     rewardAmountPerInterval
   );
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let rewardTokenPerDay = getRewardsPerDay(
+  const rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
     rewardAmountPerIntervalBigDecimal,
