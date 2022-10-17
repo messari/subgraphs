@@ -1,11 +1,11 @@
-import { Box, Grid, Typography } from "@mui/material";
-import { Chart } from "../../common/chartComponents/Chart";
-import { TableChart } from "../../common/chartComponents/TableChart";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
-import { convertTokenDecimals, toDate } from "../../utils";
+import { convertTokenDecimals, downloadCSV, JSONToCSVConvertor, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
+import { ChartContainer } from "../../common/chartComponents/ChartContainer";
+import moment from "moment";
 
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
@@ -72,8 +72,14 @@ function PoolTabEntity({
   const poolKeyPlural = PoolNames[data.protocols[0].type];
 
   const excludedEntities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "usageMetricsHourlySnapshots"];
-
   const list: { [x: string]: any } = {};
+  const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!!downloadAllCharts) {
+      triggerDownloadAllCharts(false);
+    }
+  }, [downloadAllCharts])
 
   useEffect(() => {
     const issuesToSet = { ...issuesProps };
@@ -546,11 +552,6 @@ function PoolTabEntity({
       if (tableVals.length === 0) {
         rewardAPRElement = null;
       } else {
-        const table = (
-          <Grid key={elementId + "Table"} item xs={4}>
-            <TableChart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataTable={tableVals} />
-          </Grid>
-        );
         rewardAPRElement = (
           <div id={elementId}>
             <Box mt={3} mb={1}>
@@ -558,12 +559,8 @@ function PoolTabEntity({
                 <Typography variant="h6">{elementId}</Typography>
               </CopyLinkToClipboard>
             </Box>
-            <Grid container justifyContent="space-between">
-              <Grid key={elementId + "Chart"} item xs={7.5}>
-                <Chart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} />
-              </Grid>
-              {table}
-            </Grid>
+            <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} />
+
           </div>
         );
       }
@@ -595,11 +592,6 @@ function PoolTabEntity({
           delete ratesChart[rate];
         }
       });
-      const table = (
-        <Grid key={elementId + "Table"} item xs={4}>
-          <TableChart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} />
-        </Grid>
-      );
       ratesElement = (
         <div key={elementId} id={elementId}>
           <Box mt={3} mb={1}>
@@ -607,12 +599,7 @@ function PoolTabEntity({
               <Typography variant="h6">{elementId}</Typography>
             </CopyLinkToClipboard>
           </Box>
-          <Grid container justifyContent="space-between">
-            <Grid key={elementId + "Chart"} item xs={7.5}>
-              <Chart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataChart={ratesChart} />
-            </Grid>
-            {table}
-          </Grid>
+          <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} />
         </div>
       );
     }
@@ -735,13 +722,26 @@ function PoolTabEntity({
         }
       }
     });
+
+    const mappedCurrentEntityData = currentEntityData.map((instance: any, idx: number) => {
+      let instanceToSave: any = {};
+      instanceToSave.date = moment.utc(Number(instance.timestamp) * 1000).format("YYYY-MM-DD");
+      instanceToSave = { ...instanceToSave, ...instance };
+      delete instanceToSave.__typename;
+      return instanceToSave;
+    }).sort((a: any, b: any) => (Number(a.timestamp) - Number(b.timestamp)));
+
     return (
       <Grid key={entityName}>
-        <Box my={3}>
+        <Box sx={{ marginTop: "24px" }}>
           <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
             <Typography variant="h4">{entityName}</Typography>
           </CopyLinkToClipboard>
         </Box>
+        <div>
+          <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
+          <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Charts</div>
+        </div>
         {Object.keys(dataFields).map((field: string) => {
           const fieldName = field.split(" [")[0];
           let label = entityName + "-" + field;
@@ -905,14 +905,7 @@ function PoolTabEntity({
                   <Typography variant="h6">{label}</Typography>
                 </CopyLinkToClipboard>
               </Box>
-              <Grid container justifyContent="space-between">
-                <Grid key={elementId + "1"} item xs={7.5}>
-                  <Chart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataChart={dataFields[field]} />
-                </Grid>
-                <Grid key={elementId + "2"} item xs={4}>
-                  <TableChart identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} />
-                </Grid>
-              </Grid>
+              <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataFields[field]} />
             </div>
           );
         })}
