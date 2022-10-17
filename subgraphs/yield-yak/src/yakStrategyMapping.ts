@@ -18,7 +18,7 @@ import {
   Withdraw
 } from "../generated/YakStrategyV2/YakStrategyV2"
 import { Deposit } from "../generated/schema";
-import { defineProtocol, defineInputToken } from "./utils/initial";
+import { defineProtocol, defineInputToken, defineVault } from "./utils/initial";
 import { ZERO_BIGDECIMAL } from "./utils/constants";
 import { calculatePriceInUSD } from "./helpers/calculators";
 
@@ -56,18 +56,18 @@ export function handleDeposit(event: DepositEvent): void {
     deposit.amountUSD = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), event.transaction.value);
   }
 
-  updateDailyOrHourlyEntities(event.address, event.block.timestamp, event.block.number);
+  // updateDailyOrHourlyEntities(event.address, event.block.timestamp, event.block.number);
 
-  let usageMetricsDailySnapshotEntity = defineUsageMetricsDailySnapshotEntity(event.block.timestamp,event.block.number,event.address);
-  usageMetricsDailySnapshotEntity.dailyDepositCount = usageMetricsDailySnapshotEntity.dailyDepositCount + 1;
-  usageMetricsDailySnapshotEntity.save();
+  // let usageMetricsDailySnapshotEntity = defineUsageMetricsDailySnapshotEntity(event.block.timestamp,event.block.number,event.address);
+  // usageMetricsDailySnapshotEntity.dailyDepositCount = usageMetricsDailySnapshotEntity.dailyDepositCount + 1;
+  // usageMetricsDailySnapshotEntity.save();
 
   let vault = defineVault(contractAddress, event.block.timestamp, event.block.number);
   deposit.vault = vault.id;
 
-  let usageMetricsHourlySnapshotEntity = defineUsageMetricsHourlySnapshot(event.block.timestamp,event.block.number,event.address);
-  usageMetricsHourlySnapshotEntity.hourlyDepositCount = usageMetricsHourlySnapshotEntity.hourlyDepositCount + 1;
-  usageMetricsHourlySnapshotEntity.save();
+  // let usageMetricsHourlySnapshotEntity = defineUsageMetricsHourlySnapshot(event.block.timestamp,event.block.number,event.address);
+  // usageMetricsHourlySnapshotEntity.hourlyDepositCount = usageMetricsHourlySnapshotEntity.hourlyDepositCount + 1;
+  // usageMetricsHourlySnapshotEntity.save();
 
   deposit.save();
 }

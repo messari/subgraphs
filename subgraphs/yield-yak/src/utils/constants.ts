@@ -4,6 +4,7 @@ export const DEFUALT_DECIMALS: BigInt = BigInt.fromString("0");
 export const DEFUALT_AMOUNT: BigInt = BigInt.fromString("1000000000000000000")
 
 export const ZERO_BIGDECIMAL: BigDecimal = BigDecimal.fromString("0");
+export let ZERO_BIGINT: BigInt = BigInt.fromString("0");
 
 export const ZERO_ADDRESS: Address =  Address.fromString("0x0000000000000000000000000000000000000000");
 export const YAK_STRATEGY_MANAGER_ADDRESS: Address =  Address.fromString("0x302404cb8F34713A8B8DBF9b4989A41252332068");

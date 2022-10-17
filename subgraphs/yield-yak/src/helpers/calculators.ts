@@ -1,14 +1,16 @@
 import { Address, BigInt, BigDecimal, bigInt, log } from '@graphprotocol/graph-ts'
-import { USDC_ADDRESS, YAK_ROUTER_ADDRESS, ZERO_BIGDECIMAL } from '../utils/constants';
+import { DEFUALT_AMOUNT, USDC_ADDRESS, WAVAX_CONTRACT_ADDRESS, YAK_ROUTER_ADDRESS, ZERO_ADDRESS, ZERO_BIGDECIMAL } from '../utils/constants';
+import { YakRouter } from '../../generated/YakRouter/YakRouter';
+import { convertBINumToDesiredDecimals } from './converters';
+import { YakStrategyV2 } from '../../generated/YakStrategyV2/YakStrategyV2';
 
 export function calculatePriceInUSD(tokenAddress: Address, amount: BigInt): BigDecimal {
-    let avaxAddress: Address = Address.fromString("0x0000000000000000000000000000000000000000");
-    let tokenPriceInUSDWithDecimal: BigDecimal;
+    let avaxAddress = ZERO_ADDRESS;
     if (tokenAddress == avaxAddress) {
-      tokenAddress = Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7");
+      tokenAddress = WAVAX_CONTRACT_ADDRESS;
     }
   
-    tokenPriceInUSDWithDecimal = pathFinder("2", amount, tokenAddress)
+    let tokenPriceInUSDWithDecimal = pathFinder("2", amount, tokenAddress)
     if (tokenPriceInUSDWithDecimal == ZERO_BIGDECIMAL) {
       log.debug('Cant find 2 lenght path,searching 3 length path for {}', [tokenAddress.toHexString()]);
       tokenPriceInUSDWithDecimal = pathFinder("3", amount, tokenAddress)
@@ -23,13 +25,13 @@ export function calculatePriceInUSD(tokenAddress: Address, amount: BigInt): BigD
   export function pathFinder(pathLenght: string, amount: BigInt, tokenAddress: Address): BigDecimal {
     const usdcAddress = USDC_ADDRESS;
     const yakRouterAddress = YAK_ROUTER_ADDRESS;
-    let yakRouter = YakR.bind(yakRouterAddress);
+    let yakRouter = YakRouter.bind(yakRouterAddress);
     let tokenPriceInUSDWithDecimal: BigDecimal;
     if (yakRouter.try_findBestPath(amount, tokenAddress, usdcAddress, BigInt.fromString(pathLenght)).reverted) {
       log.info('findBestPath reverted {}', [yakRouter.try_findBestPath(amount, tokenAddress, usdcAddress, BigInt.fromString(pathLenght)).reverted.toString()]);
       tokenPriceInUSDWithDecimal = ZERO_BIGDECIMAL;
     } else {
-      let tokenPriceInUSDStructure: YakRouter__findBestPathResultValue0Struct = yakRouter.findBestPath(amount, tokenAddress, usdcAddress, bigInt.fromString(pathLenght));
+      const tokenPriceInUSDStructure = yakRouter.findBestPath(amount, tokenAddress, usdcAddress, bigInt.fromString(pathLenght));
       if (tokenPriceInUSDStructure.amounts.length == 0) {
         tokenPriceInUSDWithDecimal = ZERO_BIGDECIMAL;
         log.info('Rout Cant find a best route {}', [tokenPriceInUSDStructure.amounts.length.toString()])
@@ -42,5 +44,25 @@ export function calculatePriceInUSD(tokenAddress: Address, amount: BigInt): BigD
         }
       }
     }
+    
     return tokenPriceInUSDWithDecimal
+  }
+
+  export function calculateOutputTokenPriceInUSD(contractAddress: Address): BigDecimal {
+    let dexStrategyV4Contract = YakStrategyV2.bind(contractAddress);
+    let OutputTokenPriceInUSD: BigDecimal;
+    if (dexStrategyV4Contract.try_depositToken().reverted || dexStrategyV4Contract.try_getSharesForDepositTokens(DEFUALT_AMOUNT).reverted) {
+      OutputTokenPriceInUSD = ZERO_BIGDECIMAL;
+      return OutputTokenPriceInUSD;
+    } else {
+      let depositTokenPrice: BigDecimal = calculatePriceInUSD(dexStrategyV4Contract.depositToken(), DEFUALT_AMOUNT);
+      let getSharesForDepositToken: BigInt = dexStrategyV4Contract.getSharesForDepositTokens(DEFUALT_AMOUNT);
+      let getSharesForDepositTokenInDecimal: BigDecimal = convertBINumToDesiredDecimals(getSharesForDepositToken, 18);
+      if (getSharesForDepositTokenInDecimal != ZERO_BIGDECIMAL) {
+        OutputTokenPriceInUSD = depositTokenPrice.div(getSharesForDepositTokenInDecimal);
+      } else {
+        OutputTokenPriceInUSD = ZERO_BIGDECIMAL;
+      }
+    }
+    return OutputTokenPriceInUSD;
   }
