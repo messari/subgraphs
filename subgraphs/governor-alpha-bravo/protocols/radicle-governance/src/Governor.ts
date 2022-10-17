@@ -31,7 +31,7 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
-  let quorumVotes = getQuorumFromContract(event.address);
+  const quorumVotes = getQuorumFromContract(event.address);
 
   // FIXME: Prefer to use a single object arg for params
   // e.g.  { proposalId: event.params.proposalId, proposer: event.params.proposer, ...}
@@ -65,20 +65,20 @@ function getLatestProposalValues(
   proposalId: string,
   contractAddress: Address
 ): Proposal {
-  let proposal = getProposal(proposalId);
+  const proposal = getProposal(proposalId);
 
   // On first vote, set state and quorum values
   if (proposal.state == ProposalState.PENDING) {
-    let contract = Governor.bind(contractAddress);
+    const contract = Governor.bind(contractAddress);
     proposal.state = ProposalState.ACTIVE;
-    let res = contract.try_quorumVotes();
+    const res = contract.try_quorumVotes();
     if (!res.reverted) {
       proposal.quorumVotes = res.value;
     } else {
       proposal.quorumVotes = BIGINT_ONE;
     }
 
-    let governance = getGovernance();
+    const governance = getGovernance();
     proposal.tokenHoldersAtStart = governance.currentTokenHolders;
     proposal.delegatesAtStart = governance.currentDelegates;
   }
@@ -86,12 +86,12 @@ function getLatestProposalValues(
 }
 // VoteCast(account, proposalId, support, weight, reason);
 export function handleVoteCast(event: VoteCast): void {
-  let proposal = getLatestProposalValues(
+  const proposal = getLatestProposalValues(
     event.params.proposalId.toString(),
     event.address
   );
 
-  let support = event.params.support ? 1 : 0;
+  const support = event.params.support ? 1 : 0;
   // Proposal will be updated as part of handler
   _handleVoteCast(
     proposal,
@@ -109,7 +109,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
-    let contract = Governor.bind(Address.fromString(contractAddress));
+    const contract = Governor.bind(Address.fromString(contractAddress));
 
     governanceFramework.name = contract.NAME();
     governanceFramework.type = GovernanceFrameworkType.GOVERNOR_ALPHA;
@@ -129,11 +129,11 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 }
 
 function getQuorumFromContract(contractAddress: Address): BigInt {
-  let contract = Governor.bind(contractAddress);
-  let quorumVotes = contract.quorumVotes();
+  const contract = Governor.bind(contractAddress);
+  const quorumVotes = contract.quorumVotes();
 
   // Update quorum at the contract level as well
-  let governanceFramework = getGovernanceFramework(
+  const governanceFramework = getGovernanceFramework(
     contractAddress.toHexString()
   );
   governanceFramework.quorumVotes = quorumVotes;

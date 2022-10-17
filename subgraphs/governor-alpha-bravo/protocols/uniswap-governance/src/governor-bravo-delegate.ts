@@ -34,7 +34,7 @@ export function handleProposalCanceled(event: ProposalCanceled): void {
 
 // ProposalCreated(proposalId, proposer, targets, values, signatures, calldatas, startBlock, endBlock, description)
 export function handleProposalCreated(event: ProposalCreated): void {
-  let quorumVotes = getQuorumFromContract(event.address);
+  const quorumVotes = getQuorumFromContract(event.address);
 
   // FIXME: Prefer to use a single object arg for params
   // e.g.  { proposalId: event.params.proposalId, proposer: event.params.proposer, ...}
@@ -66,7 +66,9 @@ export function handleProposalQueued(event: ProposalQueued): void {
 
 // ProposalThresholdSet(oldProposalThreshold,newProposalThreshold)
 export function handleProposalThresholdSet(event: ProposalThresholdSet): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
   governanceFramework.proposalThreshold = event.params.newProposalThreshold;
   governanceFramework.save();
 }
@@ -75,20 +77,20 @@ function getLatestProposalValues(
   proposalId: string,
   contractAddress: Address
 ): Proposal {
-  let proposal = getProposal(proposalId);
+  const proposal = getProposal(proposalId);
 
   // On first vote, set state and quorum values
   if (proposal.state == ProposalState.PENDING) {
-    let contract = GovernorBravoDelegate.bind(contractAddress);
+    const contract = GovernorBravoDelegate.bind(contractAddress);
     proposal.state = ProposalState.ACTIVE;
-    let res = contract.try_quorumVotes();
+    const res = contract.try_quorumVotes();
     if (!res.reverted) {
       proposal.quorumVotes = res.value;
     } else {
       proposal.quorumVotes = BIGINT_ONE;
     }
 
-    let governance = getGovernance();
+    const governance = getGovernance();
     proposal.tokenHoldersAtStart = governance.currentTokenHolders;
     proposal.delegatesAtStart = governance.currentDelegates;
   }
@@ -96,7 +98,7 @@ function getLatestProposalValues(
 }
 // VoteCast(account, proposalId, support, weight, reason);
 export function handleVoteCast(event: VoteCast): void {
-  let proposal = getLatestProposalValues(
+  const proposal = getLatestProposalValues(
     event.params.proposalId.toString(),
     event.address
   );
@@ -114,14 +116,18 @@ export function handleVoteCast(event: VoteCast): void {
 
 // VotingDelaySet(oldVotingDelay,newVotingDelay)
 export function handleVotingDelaySet(event: VotingDelaySet): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
   governanceFramework.votingDelay = event.params.newVotingDelay;
   governanceFramework.save();
 }
 
 // VotingDelaySet(oldVotingPeriod,newVotingPeriod)
 export function handleVotingPeriodSet(event: VotingPeriodSet): void {
-  let governanceFramework = getGovernanceFramework(event.address.toHexString());
+  const governanceFramework = getGovernanceFramework(
+    event.address.toHexString()
+  );
   governanceFramework.votingPeriod = event.params.newVotingPeriod;
   governanceFramework.save();
 }
@@ -132,7 +138,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 
   if (!governanceFramework) {
     governanceFramework = new GovernanceFramework(contractAddress);
-    let contract = GovernorBravoDelegate.bind(
+    const contract = GovernorBravoDelegate.bind(
       Address.fromString(contractAddress)
     );
 
@@ -154,11 +160,11 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
 }
 
 function getQuorumFromContract(contractAddress: Address): BigInt {
-  let contract = GovernorBravoDelegate.bind(contractAddress);
-  let quorumVotes = contract.quorumVotes();
+  const contract = GovernorBravoDelegate.bind(contractAddress);
+  const quorumVotes = contract.quorumVotes();
 
   // Update quorum at the contract level as well
-  let governanceFramework = getGovernanceFramework(
+  const governanceFramework = getGovernanceFramework(
     contractAddress.toHexString()
   );
   governanceFramework.quorumVotes = quorumVotes;
