@@ -55,6 +55,8 @@ type Spell @entity {
   description: String!
   "State of the spell"
   state: SpellState!
+  "Governance Framework that spell is part of"
+  governanceFramework: GovernanceFramework!
 
   "Block number spell was created in"
   creationBlock: BigInt!

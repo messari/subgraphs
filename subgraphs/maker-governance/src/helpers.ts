@@ -105,6 +105,7 @@ export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
       if (!dsDescription.reverted) {
         spell.description = dsDescription.value;
       }
+      spell.governanceFramework = event.address.toHexString();
       spell.totalVotes = BIGINT_ZERO;
       spell.totalWeightedVotes = BIGINT_ZERO;
       spell.save();
