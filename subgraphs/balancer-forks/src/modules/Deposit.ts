@@ -131,7 +131,7 @@ export function Deposit(
     block
   );
   let inputTokenWeights =
-    utils.getPoolTokenWeightsForDynamicWeightPools(poolAddress);
+    utils.getPoolTokenWeightsForDynamicWeightPools(poolAddress, pool.inputTokens);
 
   if (inputTokenWeights.length > 0) {
     pool.inputTokenWeights = inputTokenWeights;

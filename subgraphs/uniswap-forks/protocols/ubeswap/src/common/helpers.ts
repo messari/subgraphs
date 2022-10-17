@@ -37,14 +37,14 @@ export function getOrCreateMasterChefStakingPool(
 
   // Create entity to track masterchef pool mappings
   if (!masterChefPool) {
-    let poolManager = PoolManager.bind(event.address);
-    let poolInfo = poolManager.try_pools(poolAddress);
+    const poolManager = PoolManager.bind(event.address);
+    const poolInfo = poolManager.try_pools(poolAddress);
 
     // If the staking pool is found, create a map between the staking pool address and the pid.
     // This is used to find the staking pool pid given its address.
     // Also, generate a template here to track the staking pool events.
     if (!poolInfo.reverted) {
-      let pidAddressMap = new _MasterChefAddressToPid(
+      const pidAddressMap = new _MasterChefAddressToPid(
         poolInfo.value.value2.toHexString()
       );
 
@@ -73,7 +73,7 @@ export function getOrCreateMasterChefStakingPool(
     log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
     // Add a reward token to the liquidity pool since it now has an associated staking pool.
-    let pool = LiquidityPool.load(masterChefPool.poolAddress!);
+    const pool = LiquidityPool.load(masterChefPool.poolAddress!);
     if (pool) {
       pool.rewardTokens = [
         getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
@@ -109,13 +109,13 @@ export function getOrCreateMasterChef(
 // Update the masterchef contract with the latest reward token rate.
 export function updateRewardEmissions(event: ethereum.Event): void {
   // Process to load in liquidity pool data.
-  let masterChefAddressPidMap = _MasterChefAddressToPid.load(
+  const masterChefAddressPidMap = _MasterChefAddressToPid.load(
     event.address.toHexString()
   )!;
-  let masterChefPool = _MasterChefStakingPool.load(
+  const masterChefPool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEF + "-" + masterChefAddressPidMap.pid.toString()
   )!;
-  let pool = getLiquidityPool(masterChefPool.poolAddress!);
+  const pool = getLiquidityPool(masterChefPool.poolAddress!);
 
   // Return if you have calculated rewards recently - Performance Boost
   if (
@@ -127,18 +127,18 @@ export function updateRewardEmissions(event: ethereum.Event): void {
     return;
   }
 
-  let poolManager = PoolManager.bind(Address.fromString(POOL_MANAGER));
+  const poolManager = PoolManager.bind(Address.fromString(POOL_MANAGER));
 
   // Get the reward period and the expected rewards for this particular pool for this period.
-  let period = poolManager.currentPeriod();
-  let poolRewardForPeriod = poolManager.computeAmountForPool(
+  const period = poolManager.currentPeriod();
+  const poolRewardForPeriod = poolManager.computeAmountForPool(
     Address.fromString(pool.id),
     period.value0
   );
 
   // Divide the rewards for this period by 7 because each period lasts one week.
-  let poolRewardDailyAverage = poolRewardForPeriod.div(ONE_WEEK_IN_DAYS);
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const poolRewardDailyAverage = poolRewardForPeriod.div(ONE_WEEK_IN_DAYS);
+  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
 
   // Update the emissions amount in quantity and USD value.
   pool.rewardTokenEmissionsAmount = [poolRewardDailyAverage];
@@ -159,13 +159,13 @@ export function updateStakedAmount(
   event: ethereum.Event,
   amount: BigInt
 ): void {
-  let masterChefAddressPidMap = _MasterChefAddressToPid.load(
+  const masterChefAddressPidMap = _MasterChefAddressToPid.load(
     event.address.toHexString()
   )!;
-  let masterChefPool = _MasterChefStakingPool.load(
+  const masterChefPool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEF + "-" + masterChefAddressPidMap.pid.toString()
   )!;
-  let pool = getLiquidityPool(masterChefPool.poolAddress!);
+  const pool = getLiquidityPool(masterChefPool.poolAddress!);
 
   pool.stakedOutputTokenAmount = !pool.stakedOutputTokenAmount
     ? amount

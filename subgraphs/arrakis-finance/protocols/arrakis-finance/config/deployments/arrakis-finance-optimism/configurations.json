@@ -1,9 +1,10 @@
 {
-    "network": "mainnet",
-    "factory": [
-        {
-            "address": "0x2845c6929d621e32B7596520C8a1E5a37e616F09",
-            "startBlock": 2146721
-        }
-    ]
+  "network": "optimism",
+  "factory": [
+    {
+      "address": "0x2845c6929d621e32B7596520C8a1E5a37e616F09",
+      "startBlock": 2146721
+    }
+  ],
+  "hasLiquidityGauge": false
 }

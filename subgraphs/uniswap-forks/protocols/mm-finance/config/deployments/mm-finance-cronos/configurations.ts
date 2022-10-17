@@ -3,7 +3,6 @@ import { Factory } from "../../../../../generated/Factory/Factory";
 import {
   BIGINT_ZERO,
   FeeSwitch,
-  MINIMUM_LIQUIDITY_ONE_HUNDRED_THOUSAND,
   MINIMUM_LIQUIDITY_ONE_THOUSAND,
   Network,
   PROTOCOL_SCHEMA_VERSION,

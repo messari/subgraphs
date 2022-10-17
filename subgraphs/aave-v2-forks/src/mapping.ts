@@ -1051,7 +1051,10 @@ export function _handleTransfer(
   protocolData: ProtocolData
 ): void {
   let protocol = getOrCreateLendingProtocol(protocolData);
-  let market = getMarketByOutputToken(event.address.toHexString(), protocolData);
+  let market = getMarketByOutputToken(
+    event.address.toHexString(),
+    protocolData
+  );
   if (!market) {
     log.warning("[_handleTransfer] market not found: {}", [
       event.address.toHexString(),

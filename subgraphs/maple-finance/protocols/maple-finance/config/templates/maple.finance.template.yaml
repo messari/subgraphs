@@ -480,7 +480,7 @@ templates:
           kind: ethereum/events
           apiVersion: 0.0.5
           language: wasm/assemblyscript
-          file: ./src/mappings/LoanV2.ts
+          file: ./src/mappings/loanV2.ts
           entities:
               - _Loan
               - Borrow
@@ -564,7 +564,7 @@ templates:
           kind: ethereum/events
           apiVersion: 0.0.5
           language: wasm/assemblyscript
-          file: ./src/mappings/LoanV3.ts
+          file: ./src/mappings/loanV3.ts
           entities:
               - _Loan
               - Borrow

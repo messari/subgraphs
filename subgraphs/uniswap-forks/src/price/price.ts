@@ -25,10 +25,10 @@ import { NetworkConfigs } from "../../configurations/configure";
 export function updateNativeTokenPriceInUSD(): Token {
   let nativeAmount = BIGDECIMAL_ZERO;
   let stableAmount = BIGDECIMAL_ZERO;
-  let nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
+  const nativeToken = getOrCreateToken(NetworkConfigs.getReferenceToken());
   // fetch average price of NATIVE_TOKEN_ADDRESS from STABLE_ORACLES
   for (let i = 0; i < NetworkConfigs.getStableOraclePools().length; i++) {
-    let pool = _LiquidityPoolAmount.load(
+    const pool = _LiquidityPoolAmount.load(
       NetworkConfigs.getStableOraclePools()[i]
     );
     if (!pool) continue;
@@ -59,8 +59,8 @@ export function findUSDPricePerToken(
   if (token.id == NetworkConfigs.getReferenceToken()) {
     return nativeToken.lastPriceUSD!;
   }
-  let tokenWhitelist = getOrCreateTokenWhitelist(token.id);
-  let whiteList = tokenWhitelist.whitelistPools;
+  const tokenWhitelist = getOrCreateTokenWhitelist(token.id);
+  const whiteList = tokenWhitelist.whitelistPools;
   // for now just take USD from pool with greatest TVL
   // need to update this to actually detect best rate based on liquidity distribution
   let largestLiquidityWhitelistTokens = BIGDECIMAL_ZERO;
@@ -74,9 +74,9 @@ export function findUSDPricePerToken(
     priceSoFar = BIGDECIMAL_ZERO;
   } else {
     for (let i = 0; i < whiteList.length; ++i) {
-      let poolAddress = whiteList[i];
-      let poolAmounts = getLiquidityPoolAmounts(poolAddress);
-      let pool = getLiquidityPool(poolAddress);
+      const poolAddress = whiteList[i];
+      const poolAmounts = getLiquidityPoolAmounts(poolAddress);
+      const pool = getLiquidityPool(poolAddress);
 
       if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
         if (
@@ -86,9 +86,9 @@ export function findUSDPricePerToken(
           )
         ) {
           // whitelist token is token1
-          let whitelistToken = getOrCreateToken(pool.inputTokens[1]);
+          const whitelistToken = getOrCreateToken(pool.inputTokens[1]);
           // get the derived NativeToken in pool
-          let whitelistTokenLocked = poolAmounts.inputTokenBalances[1].times(
+          const whitelistTokenLocked = poolAmounts.inputTokenBalances[1].times(
             whitelistToken.lastPriceUSD!
           );
           if (whitelistTokenLocked.gt(largestLiquidityWhitelistTokens)) {
@@ -106,9 +106,9 @@ export function findUSDPricePerToken(
             NetworkConfigs.getMinimumLiquidityThresholdTrackPrice()
           )
         ) {
-          let whitelistToken = getOrCreateToken(pool.inputTokens[0]);
+          const whitelistToken = getOrCreateToken(pool.inputTokens[0]);
           // get the derived nativeToken in pool
-          let whitelistTokenLocked = poolAmounts.inputTokenBalances[0].times(
+          const whitelistTokenLocked = poolAmounts.inputTokenBalances[0].times(
             whitelistToken.lastPriceUSD!
           );
           if (whitelistTokenLocked.gt(largestLiquidityWhitelistTokens)) {
@@ -141,23 +141,23 @@ export function getTrackedVolumeUSD(
   tokenAmount1: BigDecimal,
   token1: Token
 ): BigDecimal[] {
-  let price0USD = token0.lastPriceUSD!;
-  let price1USD = token1.lastPriceUSD!;
+  const price0USD = token0.lastPriceUSD!;
+  const price1USD = token1.lastPriceUSD!;
 
   // dont count tracked volume on these pairs - usually rebass tokens
   if (NetworkConfigs.getUntrackedPairs().includes(pool.id)) {
     return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
   }
 
-  let poolDeposits = _HelperStore.load(pool.id);
+  const poolDeposits = _HelperStore.load(pool.id);
   if (poolDeposits == null)
     return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   // if less than 5 LPs, require high minimum reserve amount amount or return 0
   // Updated from original subgraph. Number of deposits may not equal number of liquidity providers
   if (poolDeposits.valueInt < 5) {
-    let reserve0USD = pool.inputTokenBalances[0].times(price0USD);
-    let reserve1USD = pool.inputTokenBalances[1].times(price1USD);
+    const reserve0USD = pool.inputTokenBalances[0].times(price0USD);
+    const reserve1USD = pool.inputTokenBalances[1].times(price1USD);
     if (
       NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
       NetworkConfigs.getWhitelistTokens().includes(token1.id)
@@ -201,8 +201,8 @@ export function getTrackedVolumeUSD(
     NetworkConfigs.getWhitelistTokens().includes(token0.id) &&
     NetworkConfigs.getWhitelistTokens().includes(token1.id)
   ) {
-    let token0ValueUSD = tokenAmount0.times(price0USD);
-    let token1ValueUSD = tokenAmount1.times(price1USD);
+    const token0ValueUSD = tokenAmount0.times(price0USD);
+    const token1ValueUSD = tokenAmount1.times(price1USD);
 
     return [
       token0ValueUSD,

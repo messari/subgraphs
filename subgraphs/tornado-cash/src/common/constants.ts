@@ -5,9 +5,9 @@ import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 ////////////////////
 
 export const PROTOCOL_NAME = "Tornado Cash Classic";
-export const PROTOCOL_SLUG = "tornado-cash";
+export const PROTOCOL_SLUG = "tornado-cash-classic";
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.1";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////

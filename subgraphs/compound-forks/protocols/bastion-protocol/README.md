@@ -65,6 +65,11 @@ Not applicable to Compound v2
 - Bastion Protocol's USDT price oracle was artificially high for a period of two minutes resulting in a lot of liquidations. Our subgraph captures this behavior, but please note that the prices seem inflated due to the price oracle. We are not overriding the price it is returning.
   - Bastion's statement: https://bastionprotocol.medium.com/usdt-liquidation-incident-report-a33af2ab1de2
 
+### Notes
+
+- Bastion Protocol token is not a typical ERC20 contract format, so we must manually code in the token metadata for BSTN.
+- Rewards are returned in rewards/second on the contract-level.
+
 ## Reference and Useful Links
 
 Protocol: https://app.bastionprotocol.com/

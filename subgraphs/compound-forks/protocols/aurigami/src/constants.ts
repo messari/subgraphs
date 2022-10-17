@@ -6,7 +6,7 @@ import { TokenData } from "../../../src/mapping";
 /////     Addresses      /////
 //////////////////////////////
 
-export let comptrollerAddr = Address.fromString(
+export const comptrollerAddr = Address.fromString(
   "0x817af6cfAF35BdC1A634d6cC94eE9e4c68369Aeb"
 );
 
