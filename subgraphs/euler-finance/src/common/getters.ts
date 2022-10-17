@@ -297,9 +297,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol = new LendingProtocol(EULER_ADDRESS);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.POOLED;
@@ -317,8 +314,12 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.mintedTokens = [];
     protocol.mintedTokenSupplies = [];
     protocol.totalPoolCount = INT_ZERO;
-    protocol.save();
   }
+  // ensure to update versions with grafting
+  protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
+  protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
+  protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
+  protocol.save();
   return protocol as LendingProtocol;
 }
 
