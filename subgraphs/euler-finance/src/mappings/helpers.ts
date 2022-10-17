@@ -43,7 +43,6 @@ import {
 } from "../common/constants";
 import { getEthPriceUsd, getUnderlyingPrice } from "../common/pricing";
 import { amountToUsd } from "../common/conversions";
-import { updateMarketDailyMetrics, updateMarketHourlyMetrics } from "../common/metrics";
 import { getAssetTotalSupply } from "../common/tokens";
 
 export function updateAsset(event: AssetStatus): void {
