@@ -1,15 +1,12 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  dataSource,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { PriceOracleUpdated } from "../../../generated/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 import {
   getNetworkSpecificConstant,
   Protocol,
   UWU_DECIMALS,
+  UWU_TOKEN_ADDRESS,
+  UWU_WETH_LP,
+  WETH_TOKEN_ADDRESS,
 } from "./constants";
 import {
   BorrowingDisabledOnReserve,
@@ -23,6 +20,7 @@ import {
 import {
   Borrow,
   Deposit,
+  LendingPool,
   LiquidationCall,
   Paused,
   Repay,
@@ -63,16 +61,14 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  equalsIgnoreCase,
   exponentToBigDecimal,
-  Network,
   readValue,
   RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
-import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
-import { StakedAave } from "../../../generated/LendingPool/StakedAave";
+import { ChefIncentivesController } from "../../../generated/LendingPool/ChefIncentivesController";
+import { SushiSwapLP } from "../../../generated/LendingPool/SushiSwapLP";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
 import { Transfer } from "../../../generated/templates/AToken/AToken";
 
@@ -172,100 +168,76 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     return;
   }
 
-  //
-  // Reward rate (rewards/second) in a market comes from try_assets(to)
-  // Supply side the to address is the aToken
-  // Borrow side the to address is the variableDebtToken
-
-  // TODO: redo rewards for uwu lend
-
+  // Get UWU rewards for the given pool
   let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   let tryIncentiveController = aTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
-    let incentiveControllerContract = AaveIncentivesController.bind(
+    let rewardTokens: string[] = [];
+    let rewardEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+    let rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+
+    const incentiveControllerContract = ChefIncentivesController.bind(
       tryIncentiveController.value
     );
-    let tryBorrowRewards = incentiveControllerContract.try_assets(
-      Address.fromString(market.vToken!)
+    const tryPoolInfo = incentiveControllerContract.try_poolInfo(
+      Address.fromString(market.inputToken)
     );
-    let trySupplyRewards = incentiveControllerContract.try_assets(
-      Address.fromString(market.outputToken!)
-    );
-    let tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
+    const tryAllocPoints = incentiveControllerContract.try_totalAllocPoint();
+    const tryRewardsPerSecond =
+      incentiveControllerContract.try_rewardsPerSecond();
 
-    if (!tryRewardAsset.reverted) {
-      // get reward tokens
-      let borrowRewardToken = getOrCreateRewardToken(
-        tryRewardAsset.value,
-        RewardTokenType.BORROW
+    if (
+      !tryPoolInfo.reverted &&
+      !tryAllocPoints.reverted &&
+      !tryRewardsPerSecond.reverted
+    ) {
+      // create reward toke if it does not exist
+      if (market.rewardTokens == null || market.rewardTokens!.length != 2) {
+        const depositRewardToken = getOrCreateRewardToken(
+          Address.fromString(UWU_TOKEN_ADDRESS),
+          RewardTokenType.DEPOSIT
+        );
+        const borrowRewardToken = getOrCreateRewardToken(
+          Address.fromString(UWU_TOKEN_ADDRESS),
+          RewardTokenType.BORROW
+        );
+        rewardTokens = [borrowRewardToken.id, depositRewardToken.id]; // borrow first bc alphabetized
+      }
+
+      const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
+      const poolAllocPoints = tryPoolInfo.value.value1;
+
+      // calculate rewards per pool
+      // rewards = rewardsPerSecond * poolAllocPoints / totalAllocPoints
+      // TODO: figure out how much goes to deposit vs borrow
+      const uwuPerPoolPerDay = tryRewardsPerSecond.value
+        .times(BigInt.fromI32(SECONDS_PER_DAY))
+        .toBigDecimal()
+        .div(exponentToBigDecimal(uwuToken.decimals))
+        .times(
+          poolAllocPoints
+            .toBigDecimal()
+            .div(tryAllocPoints.value.toBigDecimal())
+        );
+      const uwuPerPoolBI = BigInt.fromString(
+        uwuPerPoolPerDay
+          .times(exponentToBigDecimal(uwuToken.decimals))
+          .truncate(0)
+          .toString()
       );
-      let depositRewardToken = getOrCreateRewardToken(
-        tryRewardAsset.value,
-        RewardTokenType.DEPOSIT
-      );
 
-      // always ordered [borrow, deposit/supply]
-      let rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
-      let rewardEmissions = [BIGINT_ZERO, BIGINT_ZERO];
-      let rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-      let rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
-
-      // get reward token price
-      // get price of reward token (if stkAAVE it is tied to the price of AAVE)
-      let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
-      if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
-        // get staked token if possible to grab price of staked token
-        let stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
-        let tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
-        if (!tryStakedToken.reverted) {
-          rewardTokenPriceUSD = getAssetPriceInUSDC(
-            tryStakedToken.value,
-            Address.fromString(protocol.priceOracle)
-          );
-        }
-      }
-
-      // if reward token price was not found then use old method
-      if (rewardTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
-        rewardTokenPriceUSD = getAssetPriceInUSDC(
-          tryRewardAsset.value,
-          Address.fromString(protocol.priceOracle)
-        );
-      }
-
-      // we check borrow first since it will show up first in graphql ordering
-      // see explanation in docs/Mapping.md#Array Sorting When Querying
-      if (!tryBorrowRewards.reverted) {
-        // update borrow rewards
-        let borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
-          BigInt.fromI32(SECONDS_PER_DAY)
-        );
-        rewardEmissions[0] = borrowRewardsPerDay;
-        let borrowRewardsPerDayUSD = borrowRewardsPerDay
-          .toBigDecimal()
-          .div(exponentToBigDecimal(rewardDecimals))
-          .times(rewardTokenPriceUSD);
-        rewardEmissionsUSD[0] = borrowRewardsPerDayUSD;
-      }
-
-      if (!trySupplyRewards.reverted) {
-        // update deposit rewards
-        let supplyRewardsPerDay = trySupplyRewards.value.value0.times(
-          BigInt.fromI32(SECONDS_PER_DAY)
-        );
-        rewardEmissions[1] = supplyRewardsPerDay;
-        let supplyRewardsPerDayUSD = supplyRewardsPerDay
-          .toBigDecimal()
-          .div(exponentToBigDecimal(rewardDecimals))
-          .times(rewardTokenPriceUSD);
-        rewardEmissionsUSD[1] = supplyRewardsPerDayUSD;
-      }
-
-      market.rewardTokens = rewardTokens;
-      market.rewardTokenEmissionsAmount = rewardEmissions;
-      market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
-      market.save();
+      const uwuPriceUSD = getUwuPriceUSD();
+      rewardEmissionsAmount = [uwuPerPoolBI, uwuPerPoolBI];
+      rewardEmissionsUSD = [
+        uwuPerPoolPerDay.times(uwuPriceUSD),
+        uwuPerPoolPerDay.times(uwuPriceUSD),
+      ];
     }
+
+    market.rewardTokens = rewardTokens;
+    market.rewardTokenEmissionsAmount = rewardEmissionsAmount;
+    market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+    market.save();
   }
 
   let assetPriceUSD = getAssetPriceInUSDC(
@@ -368,7 +340,7 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 }
 
 //////////////////////
-//// AToken Event ////
+//// UToken Event ////
 //////////////////////
 
 export function handleTransfer(event: Transfer): void {
@@ -402,4 +374,38 @@ function getAssetPriceInUSDC(
   }
 
   return oracleResult.toBigDecimal().div(exponentToBigDecimal(UWU_DECIMALS));
+}
+
+//
+// get UWU price based off WETH price
+function getUwuPriceUSD(): BigDecimal {
+  const sushiContract = SushiSwapLP.bind(Address.fromString(UWU_WETH_LP));
+  const tryReserves = sushiContract.try_getReserves();
+  if (tryReserves.reverted) {
+    log.warning("[getUwuPriceUSD] failed to get reserves for UWU-WETH LP", []);
+    return BIGDECIMAL_ZERO;
+  }
+
+  const uwuReserveBalance = tryReserves.value.value0;
+  const wethReserveBalance = tryReserves.value.value1;
+
+  if (
+    uwuReserveBalance.equals(BIGINT_ZERO) ||
+    wethReserveBalance.equals(BIGINT_ZERO)
+  ) {
+    log.warning("[getUwuPriceUSD] UWU or WETH reserve balance is zero", []);
+    return BIGDECIMAL_ZERO;
+  }
+
+  // get WETH price in USD
+  const protocol = getOrCreateLendingProtocol(getProtocolData());
+  const wethPriceUSD = getAssetPriceInUSDC(
+    Address.fromString(WETH_TOKEN_ADDRESS),
+    Address.fromString(protocol.priceOracle)
+  );
+
+  const uwuPriceUSD = wethPriceUSD.div(
+    uwuReserveBalance.toBigDecimal().div(wethReserveBalance.toBigDecimal())
+  );
+  return uwuPriceUSD;
 }

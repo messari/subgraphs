@@ -91,10 +91,10 @@ dataSources:
         - Borrow
         - Liquidate
       abis:
-        - name: AaveIncentivesController
-          file: ./abis/aave-v2/AaveIncentivesController.json
-        - name: StakedAave
-          file: ./abis/aave-v2/StakedAave.json
+        - name: ChefIncentivesController
+          file: ./abis/uwu-lend/ChefIncentivesController.json
+        - name: SushiSwapLP
+          file: ./abis/uwu-lend/SushiSwapLP.json
         - name: AToken
           file: ./abis/aave-v2/AToken.json
         - name: VariableDebtToken

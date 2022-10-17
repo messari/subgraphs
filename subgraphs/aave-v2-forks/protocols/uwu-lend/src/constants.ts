@@ -13,6 +13,9 @@ export namespace Protocol {
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 export const UWU_DECIMALS = 8;
+export const UWU_TOKEN_ADDRESS = "0x55C08ca52497e2f1534B59E2917BF524D4765257";
+export const WETH_TOKEN_ADDRESS = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+export const UWU_WETH_LP = "0x3E04863DBa602713Bb5d0edbf7DB7C3A9A2B6027"; // Sushiswap LP
 
 ////////////////////////////
 ///// Network Specific /////
