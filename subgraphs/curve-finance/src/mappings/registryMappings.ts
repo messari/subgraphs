@@ -14,7 +14,6 @@ import {
   LiquidityGaugeDeployed as LiquidityGaugeDeployedWithToken,
 } from "../../generated/templates/PoolTemplate/Registry";
 import * as utils from "../common/utils";
-import * as constants from "../common/constants";
 import { Address, log } from "@graphprotocol/graph-ts";
 import { PoolTemplate } from "../../generated/templates";
 
@@ -140,15 +139,18 @@ export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
 
 export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
   const registryAddress = event.address;
+  const inputCoinAddress = event.params.coin;
   const basePoolAddress = event.params.base_pool;
+
   const basePool = getOrCreateLiquidityPool(basePoolAddress, event.block);
 
   let basePoolCoins = basePool._inputTokensOrdered.map<Address>((x) =>
     Address.fromString(x)
   );
-  let poolCoins = [event.params.coin].concat(basePoolCoins);
 
+  let poolCoins = [basePoolCoins[0], inputCoinAddress];
   const poolAddress = utils.getPoolFromCoins(registryAddress, poolCoins);
+
   if (!poolAddress) return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);

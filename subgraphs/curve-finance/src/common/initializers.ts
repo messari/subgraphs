@@ -438,10 +438,7 @@ export function getOrCreateLiquidityPool(
     pool._inputTokensOrdered = utils.getPoolCoins(poolAddress, block);
     pool.inputTokens = pool._inputTokensOrdered.sort();
 
-    pool.inputTokenBalances = utils.getPoolBalances(
-      poolAddress,
-      pool.inputTokens
-    );
+    pool.inputTokenBalances = utils.getPoolBalances(pool);
     pool.inputTokenWeights = utils.getPoolTokenWeights(
       pool.inputTokens,
       pool.inputTokenBalances,

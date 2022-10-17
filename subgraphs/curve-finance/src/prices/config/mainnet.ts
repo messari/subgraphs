@@ -29,7 +29,6 @@ export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
 
 export const CURVE_REGISTRY_ADDRESSES: Address[] = [
   Address.fromString("0x7D86446dDb609eD0F5f8684AcF30380a356b2B4c"),
-  Address.fromString("0x8F942C20D02bEfc377D41445793068908E2250D0"),
 ];
 
 ///////////////////////////////////////////////////////////////////////////

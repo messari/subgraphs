@@ -64,6 +64,20 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   );
 }
 
+export function sortByInputTokenOrder<T>(
+  pool: LiquidityPool,
+  arr: Array<T>
+): Array<T> {
+  const ordered = new Array<T>(arr.length);
+
+  for (let i = 0; i < arr.length; i++) {
+    const newIndex = pool.inputTokens.indexOf(pool._inputTokensOrdered[i]);
+    ordered[newIndex] = arr[i];
+  }
+
+  return ordered;
+}
+
 export function isPoolRegistered(poolAddress: Address): boolean {
   const pool = LiquidityPool.load(poolAddress.toHexString());
 
@@ -186,14 +200,11 @@ export function getPoolUnderlyingCoinsFromRegistry(
   return underlyingCoins;
 }
 
-export function getPoolBalances(
-  poolAddress: Address,
-  inputTokens: string[]
-): BigInt[] {
-  const curvePool = PoolContract.bind(poolAddress);
+export function getPoolBalances(pool: LiquidityPool): BigInt[] {
+  const curvePool = PoolContract.bind(Address.fromString(pool.id));
 
   let inputTokenBalances: BigInt[] = [];
-  for (let idx = 0; idx < inputTokens.length; idx++) {
+  for (let idx = 0; idx < pool.inputTokens.length; idx++) {
     let balance = readValue<BigInt>(
       curvePool.try_balances(BigInt.fromI32(idx)),
       constants.BIGINT_ZERO
@@ -209,7 +220,7 @@ export function getPoolBalances(
     inputTokenBalances.push(balance);
   }
 
-  return inputTokenBalances;
+  return sortByInputTokenOrder(pool, inputTokenBalances);
 }
 
 export function getPoolTokenWeights(
@@ -292,7 +303,7 @@ export function getPoolFromLpToken(lpToken: Address): Address {
   const lpTokenStore = getOrCreateLpToken(lpToken);
 
   let poolAddress = Address.fromString(lpTokenStore.poolAddress);
-  if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return poolAddress;
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return poolAddress;
 
   const registryAddress = Address.fromString(lpTokenStore.registryAddress);
   if (registryAddress.equals(constants.NULL.TYPE_ADDRESS)) return lpToken;
