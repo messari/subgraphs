@@ -221,7 +221,7 @@ export function updateMarketSnapshots(
   marketDailySnapshot.save();
 
   // get and update market daily snapshot
-  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
     market,
     timestamp,
     blockNumber

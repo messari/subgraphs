@@ -7,7 +7,7 @@ export const INVALID_TOKEN_DECIMALS = 0;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
-  let contract = ERC20.bind(tokenAddress);
+  const contract = ERC20.bind(tokenAddress);
   let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);
 
   // try types string and bytes32 for symbol

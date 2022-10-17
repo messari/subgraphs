@@ -123,7 +123,7 @@ export function _handleCollateralConfigurationChanged(
   protocolData: ProtocolData
 ): void {
   // Adjust market LTV, liquidation, and collateral data when a reserve's collateral configuration has changed
-  let market = getOrCreateMarket(marketId, protocolData);
+  const market = getOrCreateMarket(marketId, protocolData);
 
   market.maximumLTV = maximumLTV.toBigDecimal().div(BIGDECIMAL_HUNDRED);
   market.liquidationThreshold = liquidationThreshold

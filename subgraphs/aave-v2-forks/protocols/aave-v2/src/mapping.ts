@@ -417,7 +417,7 @@ function getAssetPriceInUSDC(
 
   // Polygon Oracle returns price in ETH, must convert to USD with following method
   if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
-    let priceUSDCInEth = readValue<BigInt>(
+    const priceUSDCInEth = readValue<BigInt>(
       oracle.try_getAssetPrice(Address.fromString(USDC_POS_TOKEN_ADDRESS)),
       BIGINT_ZERO
     );
