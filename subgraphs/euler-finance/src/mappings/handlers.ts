@@ -1,4 +1,4 @@
-import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -46,7 +46,7 @@ export function handleAssetStatus(event: AssetStatus): void {
 }
 
 export function handleBorrow(event: Borrow): void {
-  let borrowUSD = createBorrow(event);
+  const borrowUSD = createBorrow(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.BORROW);
   updateFinancials(event.block, borrowUSD, TransactionType.BORROW);
@@ -56,7 +56,7 @@ export function handleBorrow(event: Borrow): void {
 }
 
 export function handleDeposit(event: Deposit): void {
-  let depositUSD = createDeposit(event);
+  const depositUSD = createDeposit(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.DEPOSIT);
   updateFinancials(event.block, depositUSD, TransactionType.DEPOSIT);
@@ -66,7 +66,7 @@ export function handleDeposit(event: Deposit): void {
 }
 
 export function handleRepay(event: Repay): void {
-  let repayUSD = createRepay(event);
+  const repayUSD = createRepay(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.REPAY);
   updateFinancials(event.block, repayUSD, TransactionType.REPAY);
@@ -76,7 +76,7 @@ export function handleRepay(event: Repay): void {
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  let withdrawUSD = createWithdraw(event);
+  const withdrawUSD = createWithdraw(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.WITHDRAW);
   updateFinancials(event.block, withdrawUSD, TransactionType.WITHDRAW);
@@ -86,7 +86,7 @@ export function handleWithdraw(event: Withdraw): void {
 }
 
 export function handleLiquidation(event: Liquidation): void {
-  let liquidateUSD = createLiquidation(event);
+  const liquidateUSD = createLiquidation(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
   updateFinancials(event.block, liquidateUSD, TransactionType.LIQUIDATE);
@@ -146,9 +146,9 @@ function queryEulerGeneralView(
 
 // initiates market / protocol updates in syncWithEulerGeneralView()
 function updateProtocolAndMarkets(block: ethereum.Block): void {
-  let blockNumber = block.number.toI32();
-  let protocolUtility = getOrCreateProtocolUtility(blockNumber);
-  let markets = protocolUtility.markets;
+  const blockNumber = block.number.toI32();
+  const protocolUtility = getOrCreateProtocolUtility(blockNumber);
+  const markets = protocolUtility.markets;
 
   if (protocolUtility.lastBlockNumber >= blockNumber - 120) {
     // Do this update every 120 blocks
@@ -157,7 +157,7 @@ function updateProtocolAndMarkets(block: ethereum.Block): void {
     return;
   }
 
-  let eulerViewQueryResult = queryEulerGeneralView(markets, block);
+  const eulerViewQueryResult = queryEulerGeneralView(markets, block);
   if (!eulerViewQueryResult) {
     return;
   }

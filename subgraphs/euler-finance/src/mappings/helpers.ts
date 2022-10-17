@@ -48,8 +48,8 @@ import { getAssetTotalSupply } from "../common/tokens";
 
 export function updateAsset(event: AssetStatus): void {
   const tokenAddress = event.params.underlying.toHexString();
-  let marketUtility = getOrCreateMarketUtility(tokenAddress);
-  let token = getOrCreateToken(event.params.underlying);
+  const marketUtility = getOrCreateMarketUtility(tokenAddress);
+  const token = getOrCreateToken(event.params.underlying);
   let twapPriceWETH = BIGINT_ZERO;
 
   if (event.block.number.gt(EXEC_START_BLOCK_NUMBER)) {
@@ -188,7 +188,7 @@ export function createLiquidation(event: Liquidation): BigDecimal {
   const seizedTokenId = event.params.collateral.toHexString();
 
   // repay token market
-  let market = getOrCreateMarket(collateralTokenId);
+  const market = getOrCreateMarket(collateralTokenId);
 
   liquidation.market = collateralTokenId;
   liquidation.asset = seizedTokenId;
@@ -242,7 +242,7 @@ export function updateLendingFactors(event: GovSetAssetConfig): void {
    * maximumLTV = collateralFactor
    * liquidationThreshold = borrowFactor
    */
-  let market = getOrCreateMarket(marketUtility.id);
+  const market = getOrCreateMarket(marketUtility.id);
   market.maximumLTV = marketUtility.collateralFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE);
   market.liquidationThreshold = marketUtility.borrowFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE);
   market.save();
@@ -447,9 +447,9 @@ function updateSnapshotRevenues(
   protocolSideRevenueDelta: BigDecimal,
   totalRevenueDelta: BigDecimal,
 ): void {
-  let marketDailySnapshot = getOrCreateMarketDailySnapshot(block, marketId);
-  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(block, marketId);
-  let financialSnapshot = getOrCreateFinancials(block.timestamp, block.number);
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(block, marketId);
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(block, marketId);
+  const financialSnapshot = getOrCreateFinancials(block.timestamp, block.number);
 
   // update daily snapshot
   marketDailySnapshot.dailySupplySideRevenueUSD =
