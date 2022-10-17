@@ -7,16 +7,14 @@ import {
   Liquidation,
   MarketActivated,
   Repay,
-  Withdraw
-} from "../../generated/euler/Euler"
+  Withdraw,
+} from "../../generated/euler/Euler";
 import {
   EulerGeneralView,
   EulerGeneralView__doQueryInputQStruct,
-  EulerGeneralView__doQueryResultRStruct
+  EulerGeneralView__doQueryResultRStruct,
 } from "../../generated/euler/EulerGeneralView";
-import {
-  getOrCreateProtocolUtility,
-} from "../common/getters";
+import { getOrCreateProtocolUtility } from "../common/getters";
 import {
   EULER_ADDRESS,
   EULER_GENERAL_VIEW_ADDRESS,
@@ -25,7 +23,12 @@ import {
   EULER_GENERAL_VIEW_V2_ADDRESS,
   VIEW_V2_START_BLOCK_NUMBER,
 } from "../common/constants";
-import { updateFinancials, updateMarketDailyMetrics, updateMarketHourlyMetrics, updateUsageMetrics } from "../common/metrics";
+import {
+  updateFinancials,
+  updateMarketDailyMetrics,
+  updateMarketHourlyMetrics,
+  updateUsageMetrics,
+} from "../common/metrics";
 import {
   createBorrow,
   createDeposit,
@@ -93,7 +96,7 @@ export function handleLiquidation(event: Liquidation): void {
 }
 
 export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
- updateLendingFactors(event);
+  updateLendingFactors(event);
 }
 
 export function handleMarketActivated(event: MarketActivated): void {
@@ -101,20 +104,23 @@ export function handleMarketActivated(event: MarketActivated): void {
 }
 
 function getEulerViewContract(block: ethereum.Block): EulerGeneralView {
- const viewAddress = block.number.gt(VIEW_V2_START_BLOCK_NUMBER)
-   ? EULER_GENERAL_VIEW_V2_ADDRESS
-   : EULER_GENERAL_VIEW_ADDRESS;
+  const viewAddress = block.number.gt(VIEW_V2_START_BLOCK_NUMBER)
+    ? EULER_GENERAL_VIEW_V2_ADDRESS
+    : EULER_GENERAL_VIEW_ADDRESS;
   return EulerGeneralView.bind(Address.fromString(viewAddress));
 }
 
 /**
  * Query Euler General View contract in order to get markets current status.
- * 
+ *
  * @param marketIds List of markets to query
  * @param block current block
  * @returns query resul or null if nothing could be queried.
  */
-function queryEulerGeneralView(marketIds: string[], block: ethereum.Block): EulerGeneralView__doQueryResultRStruct | null {
+function queryEulerGeneralView(
+  marketIds: string[],
+  block: ethereum.Block,
+): EulerGeneralView__doQueryResultRStruct | null {
   if (marketIds.length === 0) {
     return null; // No market is initialized, nothing to do.
   }
@@ -144,7 +150,7 @@ function updateProtocolAndMarkets(block: ethereum.Block): void {
   let protocolUtility = getOrCreateProtocolUtility(blockNumber);
   let markets = protocolUtility.markets;
 
-  if (protocolUtility.lastBlockNumber >= blockNumber - 120 ) {
+  if (protocolUtility.lastBlockNumber >= blockNumber - 120) {
     // Do this update every 120 blocks
     // this equates to about 30 minutes on ethereum mainnet
     // this is done since the following logic slows down the indexer

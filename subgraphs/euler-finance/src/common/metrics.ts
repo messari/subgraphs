@@ -9,15 +9,11 @@ import {
   getOrCreateUsageHourlySnapshot,
 } from "./getters";
 import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
-import { Account, ActiveAccount,  UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
+import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
 import { ActivityType, SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./constants";
 
 // updates a given FinancialDailySnapshot Entity
-export function updateFinancials(
-    block: ethereum.Block,
-    amountUSD: BigDecimal,
-    eventType: string
-  ): void {
+export function updateFinancials(block: ethereum.Block, amountUSD: BigDecimal, eventType: string): void {
   // number of days since unix epoch
   let financialMetrics = getOrCreateFinancials(block.timestamp, block.number);
   let protocol = getOrCreateLendingProtocol();
@@ -115,10 +111,10 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
 
 // update a given MarketDailySnapshot
 export function updateMarketDailyMetrics(
-  block: ethereum.Block, 
+  block: ethereum.Block,
   marketId: string,
   amountUSD: BigDecimal,
-  eventType: string | null = null
+  eventType: string | null = null,
 ): void {
   let marketMetrics = getOrCreateMarketDailySnapshot(block, marketId);
   let market = getOrCreateMarket(marketId);
@@ -147,7 +143,7 @@ export function updateMarketDailyMetrics(
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   // Note: daily tracking of deposit/borrow/liquidate in respective functions in helpers.ts
 
-  // add to daily amounts  
+  // add to daily amounts
   if (eventType != null) {
     if (eventType == TransactionType.DEPOSIT) {
       marketMetrics.dailyDepositUSD = marketMetrics.dailyDepositUSD.plus(amountUSD);
@@ -167,10 +163,10 @@ export function updateMarketDailyMetrics(
 
 // update a given MarketHourlySnapshot
 export function updateMarketHourlyMetrics(
-  block: ethereum.Block, 
+  block: ethereum.Block,
   marketId: string,
   amountUSD: BigDecimal,
-  eventType: string | null = null
+  eventType: string | null = null,
 ): void {
   let marketMetrics = getOrCreateMarketHourlySnapshot(block, marketId);
   let market = getOrCreateMarket(marketId);
