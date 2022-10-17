@@ -14,12 +14,10 @@ import {
   Borrow,
   Deposit,
   LiquidationCall,
-  Paused,
   Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
-  Unpaused,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
 import { RToken } from "../../../generated/LendingPool/RToken";
@@ -133,10 +131,10 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
-  let protocolData = getProtocolData();
+  const protocolData = getProtocolData();
 
   // update rewards if there is an incentive controller
-  let market = Market.load(event.params.reserve.toHexString());
+  const market = Market.load(event.params.reserve.toHexString());
   if (!market) {
     log.error("[handleReserveDataUpdated] Market not found", [
       event.params.reserve.toHexString(),
@@ -144,12 +142,12 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     return;
   }
 
-  let rTokenContract = RToken.bind(Address.fromString(market.outputToken!));
+  const rTokenContract = RToken.bind(Address.fromString(market.outputToken!));
 
   updateMarketRewards(event, market, rTokenContract);
 
   let assetPriceUSD = BIGDECIMAL_ZERO;
-  let tryPrice = rTokenContract.try_getAssetPrice();
+  const tryPrice = rTokenContract.try_getAssetPrice();
   if (tryPrice.reverted) {
     log.error(
       "[handleReserveDataUpdated] Token price not found in Market: {}",
@@ -195,11 +193,11 @@ export function handleReserveUsedAsCollateralDisabled(
   );
 }
 
-export function handlePaused(event: Paused): void {
+export function handlePaused(): void {
   _handlePaused(getProtocolData());
 }
 
-export function handleUnpaused(event: Unpaused): void {
+export function handleUnpaused(): void {
   _handleUnpaused(getProtocolData());
 }
 
