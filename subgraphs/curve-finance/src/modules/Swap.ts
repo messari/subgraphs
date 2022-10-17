@@ -153,10 +153,7 @@ export function Swap(
 
   const volumeUSD = utils.calculateAverage([amountInUSD, amountOutUSD]);
 
-  pool.inputTokenBalances = utils.getPoolBalances(
-    liquidityPoolAddress,
-    pool.inputTokens
-  );
+  pool.inputTokenBalances = utils.getPoolBalances(pool);
   pool.inputTokenWeights = utils.getPoolTokenWeights(
     pool.inputTokens,
     pool.inputTokenBalances,

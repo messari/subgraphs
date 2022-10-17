@@ -46,8 +46,7 @@ export function createDepositTransaction(
     depositTransaction.hash = transaction.hash.toHexString();
     depositTransaction.logIndex = transaction.index.toI32();
 
-    depositTransaction.inputTokens = pool._inputTokensOrdered
-    ;
+    depositTransaction.inputTokens = pool._inputTokensOrdered;
     depositTransaction.inputTokenAmounts = inputTokenAmounts;
 
     depositTransaction.outputToken = pool.outputToken;
@@ -114,10 +113,7 @@ export function Deposit(
     );
   }
 
-  pool.inputTokenBalances = utils.getPoolBalances(
-    poolAddress,
-    pool.inputTokens
-  );
+  pool.inputTokenBalances = utils.getPoolBalances(pool);
   pool.totalValueLockedUSD = utils.getPoolTVL(
     utils.getOrCreateTokenFromString(pool.outputToken!, block),
     totalSupplyAfterDeposit
