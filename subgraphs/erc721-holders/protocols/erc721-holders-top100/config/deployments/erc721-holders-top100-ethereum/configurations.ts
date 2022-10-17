@@ -8,6 +8,7 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_SUBGRAPH_VERSION,
 } from "../../../src/constants";
+import { top100 } from "../../../src/tokenList";
 import { Configurations } from "../../../../../configurations/configurations/interface";
 
 export class ERC721HoldersTop100Configurations implements Configurations {
@@ -28,5 +29,8 @@ export class ERC721HoldersTop100Configurations implements Configurations {
   }
   getMethodologyVersion(): string {
     return PROTOCOL_METHODOLOGY_VERSION;
+  }
+  getTokenList(): string[] {
+    return top100;
   }
 }

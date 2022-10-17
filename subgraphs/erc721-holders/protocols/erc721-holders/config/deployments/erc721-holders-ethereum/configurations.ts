@@ -29,4 +29,7 @@ export class ERC721HoldersConfigurations implements Configurations {
   getMethodologyVersion(): string {
     return PROTOCOL_METHODOLOGY_VERSION;
   }
+  getTokenList(): string[] {
+    return [];
+  }
 }

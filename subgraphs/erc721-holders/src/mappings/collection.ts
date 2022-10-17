@@ -1,4 +1,5 @@
 import { store, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { NetworkConfigs } from "../../configurations/configure";
 
 import {
   Transfer as TransferEvent,
@@ -59,6 +60,16 @@ export function handleTransfer(event: TransferEvent): void {
       collectionId,
       supportsERC721Metadata
     );
+  }
+
+  // ERC721 collection created via registry list (name/symbol field initialized null)
+  if (
+    NetworkConfigs.getTokenList().length > 0 &&
+    tokenCollection.name == null &&
+    tokenCollection.symbol == null &&
+    tokenCollection.transferCount.equals(BIGINT_ZERO)
+  ) {
+    tokenCollection = updateCollectionDetails(contract, tokenCollection);
   }
 
   // update metrics on the sender side
@@ -176,18 +187,18 @@ function isERC721Supported(contract: ERC721): boolean {
   return true;
 }
 
-function getOrCreateCollection(
+export function getOrCreateCollection(
   contract: ERC721,
-  CollectionAddress: string,
+  collectionAddress: string,
   supportsERC721Metadata: boolean
 ): Collection {
-  let previousTokenCollection = Collection.load(CollectionAddress);
+  let previousTokenCollection = Collection.load(collectionAddress);
 
   if (previousTokenCollection != null) {
     return previousTokenCollection as Collection;
   }
 
-  let tokenCollection = new Collection(CollectionAddress);
+  let tokenCollection = new Collection(collectionAddress);
   tokenCollection.supportsERC721Metadata = supportsERC721Metadata;
   tokenCollection.tokenCount = BIGINT_ZERO;
   tokenCollection.ownerCount = BIGINT_ZERO;
@@ -250,4 +261,22 @@ function createTransfer(event: TransferEvent): Transfer {
   transfer.timestamp = event.block.timestamp;
 
   return transfer;
+}
+
+function updateCollectionDetails(
+  contract: ERC721,
+  collection: Collection
+): Collection {
+  let name = contract.try_name();
+  if (!name.reverted) {
+    collection.name = normalize(name.value);
+  }
+  let symbol = contract.try_symbol();
+  if (!symbol.reverted) {
+    collection.symbol = normalize(symbol.value);
+  }
+  let supportsERC721Metadata = supportsInterface(contract, "5b5e139f");
+  collection.supportsERC721Metadata = supportsERC721Metadata;
+
+  return collection;
 }

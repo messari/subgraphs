@@ -7,4 +7,5 @@ export interface Configurations {
   getSchemaVersion(): string;
   getSubgraphVersion(): string;
   getMethodologyVersion(): string;
+  getTokenList(): string[];
 }
