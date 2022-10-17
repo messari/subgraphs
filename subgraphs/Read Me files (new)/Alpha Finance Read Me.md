@@ -34,7 +34,7 @@ Alpha Protocol Total Revenue USD  =
 
 It is also true that:
 
-Total Revenue USD = `Supply Side Revenue USD (aka revenue passed along)` +  `Protocol Revenue USD (aka the protocol’s share)`
+Total Revenue USD = `SupplySideRevenue (USD)` +  `ProtocolRevenue (USD)`
 
 ### Supply Side Revenue USD
 
