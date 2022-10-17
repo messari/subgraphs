@@ -30,7 +30,7 @@ The protocol does not use the Protocol Controlled Value (PCV). Implementing PCV 
 
 Alpha Protocol Total Revenue USD  = 
 
-`Revenue from Homora Leveraged and Regular Yield Farming Positions (yield farming rewards & trading fees) From DEXs` +` Revenue from Homora Pool Positions trading fees From DEXs` + `Borrowing Fees From Holders of Homora Leveraged YF and LP Positions` 
+`Revenue from Yield Farming Positions From DEXs` +` Revenue from trading fees From DEXs` + `Borrowing Fees YF and LP Positions` 
 
 It is also true that:
 
@@ -40,7 +40,7 @@ Total Revenue USD = `SupplySideRevenue (USD)` +  `ProtocolRevenue (USD)`
 
 Supply Side Revenue USD = 
 
-`Revenue for  Holders of Homora Leveraged Yield Farming Positions (yield farming rewards,  trading fees, ALPHA rewards) From DEXs` + `Revenue for Holders of Homora Non-Leveraged Yield Farming Positions (yield farming rewards,  trading fees) From DEXs` +` Revenue for Holders of Homora Leveraged Liquidity Pool Positions (trading fees, ALPHA rewards) From DEXs` + `% of Borrow Fees to Individual Lenders on Homora (90% on V1, 80% on V2)` + `% of Borrow Fees to Lending Protocol Partner: Cream/Iron Bank (90% on V1, 80% on V2)` + `% of Borrow Fees from Protocol Revenue converted to ALPHA and disbursed to Stakers` 
+`Revenue for  Holders of YF Positions ` + `Revenue for Holders of trading fees` + `% of Borrow Fees to Individual Lenders on Homora (90% on V1, 80% on V2)` + `% of Borrow Fees to Lending Protocol Partner: Cream/Iron Bank (90% on V1, 80% on V2)` + `% of Borrow Fees from Protocol Revenue converted to ALPHA and disbursed to Stakers` 
 
 
 ### Protocol Revenue USD
