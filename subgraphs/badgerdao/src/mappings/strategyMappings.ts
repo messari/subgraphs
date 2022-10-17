@@ -29,6 +29,8 @@ export function handleHarvest(event: Harvest): void {
   const vaultAddress = utils.getVaultAddressFromContext();
   const vault = getOrCreateVault(vaultAddress, event.block);
 
+  if (vaultAddress.equals(constants.BDIGG_VAULT_ADDRESS)) return;
+
   let wantToken = utils.getStrategyWantToken(strategyAddress, event.block);
   let wantTokenDecimals = constants.BIGINT_TEN.pow(
     wantToken.decimals as u8
