@@ -12,90 +12,38 @@
         "name": "_tokenDelegator",
         "type": "address"
       },
+      { "internalType": "address", "name": "_depositToken", "type": "address" },
       {
-        "components": [
-          { "internalType": "address", "name": "reward", "type": "address" },
-          { "internalType": "address", "name": "swapPair", "type": "address" }
-        ],
-        "internalType": "struct AaveV3StrategyAvaxV1.RewardSwapPairs[]",
-        "name": "_rewardSwapPairs",
-        "type": "tuple[]"
+        "internalType": "address",
+        "name": "_swapPairToken",
+        "type": "address"
       },
       { "internalType": "address", "name": "_avToken", "type": "address" },
       { "internalType": "address", "name": "_avDebtToken", "type": "address" },
       { "internalType": "address", "name": "_timelock", "type": "address" },
       {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "leverageLevel",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "safetyFactor",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "leverageBips",
-            "type": "uint256"
-          },
-          { "internalType": "uint256", "name": "minMinting", "type": "uint256" }
-        ],
-        "internalType": "struct AaveV3StrategyAvaxV1.LeverageSettings",
-        "name": "_leverageSettings",
-        "type": "tuple"
+        "internalType": "uint256",
+        "name": "_leverageLevel",
+        "type": "uint256"
       },
+      { "internalType": "uint256", "name": "_safetyFactor", "type": "uint256" },
+      { "internalType": "uint256", "name": "_leverageBips", "type": "uint256" },
+      { "internalType": "uint256", "name": "_minMinting", "type": "uint256" },
       {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "minTokensToReinvest",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "adminFeeBips",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "devFeeBips",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "reinvestRewardBips",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct AaveV3StrategyAvaxV1.StrategySettings",
-        "name": "_strategySettings",
-        "type": "tuple"
+        "internalType": "uint256",
+        "name": "_minTokensToReinvest",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "_adminFeeBips", "type": "uint256" },
+      { "internalType": "uint256", "name": "_devFeeBips", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "_reinvestRewardBips",
+        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "rewardToken",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "swapPair",
-        "type": "address"
-      }
-    ],
-    "name": "AddReward",
-    "type": "event"
   },
   {
     "anonymous": false,
@@ -235,19 +183,6 @@
       }
     ],
     "name": "RemoveDepositor",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "rewardToken",
-        "type": "address"
-      }
-    ],
-    "name": "RemoveReward",
     "type": "event"
   },
   {
@@ -473,16 +408,6 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_rewardToken", "type": "address" },
-      { "internalType": "address", "name": "_swapPair", "type": "address" }
-    ],
-    "name": "addReward",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
       { "internalType": "address", "name": "depositor", "type": "address" }
     ],
     "name": "allowDepositor",
@@ -541,36 +466,22 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "inputs": [
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
     "name": "deposit",
     "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "deposit",
-    "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "", "type": "address" },
-      { "internalType": "uint256", "name": "", "type": "uint256" }
+      { "internalType": "address", "name": "account", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
     "name": "depositFor",
     "outputs": [],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "account", "type": "address" }
-    ],
-    "name": "depositFor",
-    "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -584,15 +495,15 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "uint8", "name": "", "type": "uint8" },
-      { "internalType": "bytes32", "name": "", "type": "bytes32" },
-      { "internalType": "bytes32", "name": "", "type": "bytes32" }
+      { "internalType": "uint256", "name": "amount", "type": "uint256" },
+      { "internalType": "uint256", "name": "deadline", "type": "uint256" },
+      { "internalType": "uint8", "name": "v", "type": "uint8" },
+      { "internalType": "bytes32", "name": "r", "type": "bytes32" },
+      { "internalType": "bytes32", "name": "s", "type": "bytes32" }
     ],
     "name": "depositWithPermit",
     "outputs": [],
-    "stateMutability": "pure",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -644,27 +555,6 @@
       { "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
     "name": "getSharesForDepositTokens",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "leverageBips",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "leverageLevel",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "minMinting",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
@@ -748,15 +638,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_rewardToken", "type": "address" }
-    ],
-    "name": "removeReward",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "renounceOwnership",
     "outputs": [],
@@ -770,7 +651,7 @@
         "name": "minReturnAmountAccepted",
         "type": "uint256"
       },
-      { "internalType": "bool", "name": "", "type": "bool" }
+      { "internalType": "bool", "name": "disableDeposits", "type": "bool" }
     ],
     "name": "rescueDeployedFunds",
     "outputs": [],
@@ -789,20 +670,6 @@
   },
   {
     "inputs": [],
-    "name": "rewardCount",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "rewardSwapPairs",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "rewardToken",
     "outputs": [
       { "internalType": "contract IERC20", "name": "", "type": "address" }
@@ -812,23 +679,9 @@
   },
   {
     "inputs": [],
-    "name": "safetyFactor",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "setAllowances",
     "outputs": [],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "name": "supportedRewards",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -967,6 +820,5 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  },
-  { "stateMutability": "payable", "type": "receive" }
+  }
 ]

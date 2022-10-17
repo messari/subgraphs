@@ -207,10 +207,10 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@graphprotocol/graph-cli@0.34.0":
-  version "0.34.0"
-  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-cli/-/graph-cli-0.34.0.tgz#ddad8d6e0715492107c68efe29c328c429f3a858"
-  integrity sha512-tHmephhj5i6SQIyHNpF/dP9QEuVz4jdyg7CEfo0r3/3Wq/CC/turoVEZ2QK7h4sEg9dRJW/jampoD0BO7bVGWw==
+"@graphprotocol/graph-cli@0.35.0":
+  version "0.35.0"
+  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-cli/-/graph-cli-0.35.0.tgz#2f3c688f47ce763c2e8c6d8b86817fb21b3a367d"
+  integrity sha512-50tjeLZg3425fwueH8ORTZbPRSn4uICL0NK9XsJVriDPKCNnhyAIgJgOWaYyPAFgxR8LuyXYkoxIxZ5nduKbiw==
   dependencies:
     assemblyscript "0.19.10"
     binary-install-raw "0.0.13"
@@ -238,10 +238,10 @@
     which "2.0.2"
     yaml "1.9.2"
 
-"@graphprotocol/graph-ts@0.28.0":
-  version "0.28.0"
-  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-ts/-/graph-ts-0.28.0.tgz#4229ad10b9a956c76f126bb08a856c556eedef22"
-  integrity sha512-Qug3KpmqZ/KOg3FFBOtD74GAK/9AkR7lTxoEYMdx3jZ/+fi9oOSDod2vEkLOjUxsE7yZOseNqiXOxeU0XGqJWw==
+"@graphprotocol/graph-ts@0.28.1":
+  version "0.28.1"
+  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-ts/-/graph-ts-0.28.1.tgz#271affc77deb5a4a7c3f95d4b3b1daaa9818e51c"
+  integrity sha512-1wMLQ0cu84/6Ml3zcz9ya1zFzrDAzCj0dIGZ7Rz9upnRSXg5jjqU4DefO/OYrl2K2/OPso9hSAr6I4aue2pL1Q==
   dependencies:
     assemblyscript "0.19.10"
 
@@ -295,9 +295,9 @@
   integrity sha512-eHcVlLXP0c2FlMPm56ITode2AgLMSa6aJ05JTTbYbI+7EMkCEE5qk2E41d5g2lCVTqRe0GnnRFurmlCsDODrPw==
 
 "@types/node@*":
-  version "18.8.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.8.5.tgz#6a31f820c1077c3f8ce44f9e203e68a176e8f59e"
-  integrity sha512-Bq7G3AErwe5A/Zki5fdD3O6+0zDChhg671NfPjtIcbtzDNZTv4NPKMRFr7gtYPG7y+B8uTiNK4Ngd9T0FTar6Q==
+  version "18.11.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.0.tgz#f38c7139247a1d619f6cc6f27b072606af7c289d"
+  integrity sha512-IOXCvVRToe7e0ny7HpT/X9Rb2RYtElG1a+VshjwT00HxrM2dWBApHQoqsI6WiY7Q03vdf2bCrIGzVrkF/5t10w==
 
 "@types/node@^10.0.3":
   version "10.17.60"
