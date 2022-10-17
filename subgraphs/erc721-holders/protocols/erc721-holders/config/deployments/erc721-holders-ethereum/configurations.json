@@ -1,3 +1,5 @@
 {
-
+  "deployment": "ERC721_HOLDERS",
+  "network": "mainnet",
+  "startBlock": 5806610
 }

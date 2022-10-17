@@ -23,6 +23,7 @@ import {
   getOrCreateAccountBalance,
   updateAccountBalanceDailySnapshot,
 } from "./account";
+import { getOrCreateSubgraph } from "./subgraph";
 import { normalize, getOrCreateToken } from "./token";
 
 export function handleTransfer(event: TransferEvent): void {
@@ -70,17 +71,15 @@ export function handleTransfer(event: TransferEvent): void {
     let currentAccountBalanceId = from + "-" + collectionId;
     let currentAccountBalance = AccountBalance.load(currentAccountBalanceId);
     if (currentAccountBalance != null) {
-      currentAccountBalance.tokenCount = currentAccountBalance.tokenCount.minus(
-        BIGINT_ONE
-      );
+      currentAccountBalance.tokenCount =
+        currentAccountBalance.tokenCount.minus(BIGINT_ONE);
       currentAccountBalance.blockNumber = event.block.number;
       currentAccountBalance.timestamp = event.block.timestamp;
       currentAccountBalance.save();
 
       if (currentAccountBalance.tokenCount.equals(BIGINT_ZERO)) {
-        tokenCollection.ownerCount = tokenCollection.ownerCount.minus(
-          BIGINT_ONE
-        );
+        tokenCollection.ownerCount =
+          tokenCollection.ownerCount.minus(BIGINT_ONE);
       }
 
       // provide information about evolution of account balances
@@ -114,9 +113,8 @@ export function handleTransfer(event: TransferEvent): void {
     token.save();
 
     let newAccountBalance = getOrCreateAccountBalance(to, collectionId);
-    newAccountBalance.tokenCount = newAccountBalance.tokenCount.plus(
-      BIGINT_ONE
-    );
+    newAccountBalance.tokenCount =
+      newAccountBalance.tokenCount.plus(BIGINT_ONE);
     newAccountBalance.blockNumber = event.block.number;
     newAccountBalance.timestamp = event.block.timestamp;
     newAccountBalance.save();
@@ -130,9 +128,8 @@ export function handleTransfer(event: TransferEvent): void {
   }
 
   // update aggregate data for sender and receiver
-  tokenCollection.transferCount = tokenCollection.transferCount.plus(
-    BIGINT_ONE
-  );
+  tokenCollection.transferCount =
+    tokenCollection.transferCount.plus(BIGINT_ONE);
   tokenCollection.save();
 
   let dailySnapshot = getOrCreateCollectionDailySnapshot(
@@ -243,6 +240,7 @@ function createTransfer(event: TransferEvent): Transfer {
   );
   transfer.hash = event.transaction.hash.toHex();
   transfer.logIndex = event.logIndex.toI32();
+  transfer.subgraph = getOrCreateSubgraph().id;
   transfer.collection = event.address.toHex();
   transfer.nonce = event.transaction.nonce.toI32();
   transfer.tokenId = event.params.id;
