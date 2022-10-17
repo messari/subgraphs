@@ -32,7 +32,7 @@ cBridge does not have Protocol Controlled Value, so this is not applicable.
 Total revenue is a measure of the fees paid by the traders over a specific period. These trading fees, referred to as protocol fees, are different depending upon the type of bridging that is taking place either xAsset or xLiquidity. If it is xAsset (a canonical mapping bridge) then the protocol fee is 0% - .1% and if it is xLiquidity (a pool-based bridge) then the protocol fee is 0% - .5%
 
 
-Total Revenue = `Supply-Side Revenue` + `Protocol-Side Revenue` 
+Total Revenue = `SupplySideRevenue` + `ProtocolRevenue` 
 
 
 
