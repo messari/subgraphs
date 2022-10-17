@@ -89,8 +89,8 @@ export function getOrCreateLendingProtocol(
     lendingProtocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     lendingProtocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-    lendingProtocol.priceOracle = ZERO_ADDRESS;
-    lendingProtocol.marketIDs = [];
+    lendingProtocol._priceOracle = ZERO_ADDRESS;
+    lendingProtocol._marketIDs = [];
 
     lendingProtocol.save();
   }
@@ -585,7 +585,7 @@ export function addPosition(
     position.side = side;
     if (side == PositionSide.LENDER) {
       position.isCollateral =
-        account.enabledCollaterals.indexOf(market.id) >= 0;
+        account._enabledCollaterals.indexOf(market.id) >= 0;
     }
     position.balance = BIGINT_ZERO;
     position.depositCount = 0;
@@ -774,7 +774,7 @@ export function createAccount(accountID: string): Account {
   account.repayCount = 0;
   account.liquidateCount = 0;
   account.liquidationCount = 0;
-  account.enabledCollaterals = [];
+  account._enabledCollaterals = [];
   account.save();
   return account;
 }
@@ -973,7 +973,7 @@ export function getOrCreateMarket(
     protocol.totalPoolCount++;
     const markets = protocol.marketIDs;
     markets.push(marketId.toHexString());
-    protocol.marketIDs = markets;
+    protocol._marketIDs = markets;
     protocol.save();
 
     // create inputToken
@@ -1004,13 +1004,13 @@ export function getOrCreateMarket(
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.exchangeRate = BIGDECIMAL_ONE; // this is constant
-    market.reserveFactor = BIGDECIMAL_ZERO;
-    market.totalStableValueLocked = BIGINT_ZERO;
-    market.totalVariableValueLocked = BIGINT_ZERO;
+    market._reserveFactor = BIGDECIMAL_ZERO;
+    market._totalStableValueLocked = BIGINT_ZERO;
+    market._totalVariableValueLocked = BIGINT_ZERO;
     market.rewardTokens = []; // updated once used
     market.rewardTokenEmissionsAmount = [];
     market.rewardTokenEmissionsUSD = [];
-    market.liquidityIndex = BIGINT_ONE; // this is init to 1e27
+    market._liquidityIndex = BIGINT_ONE; // this is init to 1e27
     // these are set in reserveInitialized()
     market.createdTimestamp = BIGINT_ZERO;
     market.createdBlockNumber = BIGINT_ZERO;
@@ -1022,7 +1022,7 @@ export function getOrCreateMarket(
     market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.rates = []; // calculated in event ReserveDataUpdated
-    market.prePauseState = [true, true, true];
+    market._prePauseState = [true, true, true];
 
     market.save();
   }

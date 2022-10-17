@@ -196,10 +196,12 @@ interface Protocol {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -301,10 +303,12 @@ type LendingProtocol implements Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -316,11 +320,11 @@ type LendingProtocol implements Protocol @entity {
 
   ##### Add Ons #####
 
-   " String of the address of the current price oracle on the protocol "
-  priceOracle: String!
+  " String of the address of the current price oracle on the protocol "
+  _priceOracle: String!
 
   " A list of all markets in the snapshot "
-  marketIDs: [String!]!
+  _marketIDs: [String!]!
 }
 
 ###############################
@@ -545,7 +549,7 @@ type Market @entity {
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
-  
+
   ##### Quantitative Data #####
 
   " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
@@ -655,28 +659,28 @@ type Market @entity {
   ##### Add Ons #####
 
   " The reserve factor as a percentage "
-  reserveFactor: BigDecimal!
+  _reserveFactor: BigDecimal!
 
   " Total amount of tokens locked up in stable rate borrows "
-  totalStableValueLocked: BigInt!
+  _totalStableValueLocked: BigInt!
 
   " Total amount of tokens locked up in variable rate borrows "
-  totalVariableValueLocked: BigInt!
+  _totalVariableValueLocked: BigInt!
 
   " The variable debt token address correlated to the reserve asset "
-  vToken: Token
+  _vToken: Token
 
   " The stable debt token address correlated to the reserve asset "
-  sToken: Token
+  _sToken: Token
 
   " An aggregate metric of the average borrow rate across all borrows "
-  liquidityIndex: BigInt!
+  _liquidityIndex: BigInt!
 
   " The state of the protocol prior to being paused (isActive / canUseAsCollateral / canBorrowFrom) "
-  prePauseState: [Boolean!]!
+  _prePauseState: [Boolean!]!
 
   " Aux: Timestamp of the last time rewards were calculated for this market. "
-  lastRewardsUpdated: BigInt
+  _lastRewardsUpdated: BigInt
 }
 
 #################################
@@ -934,7 +938,7 @@ type Account @entity {
   ##### Add Ons #####
 
   " Markets that the account is using as collateral "
-  enabledCollaterals: [Market!]!
+  _enabledCollaterals: [Market!]!
 }
 
 type Position @entity {
@@ -1052,7 +1056,6 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-
 type Deposit @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!

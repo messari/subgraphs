@@ -104,9 +104,9 @@ export function _handleReserveInitialized(
   market.outputToken = outputTokenEntity.id;
   market.createdBlockNumber = event.block.number;
   market.createdTimestamp = event.block.timestamp;
-  market.vToken = variableDebtTokenEntity.id;
+  market._vToken = variableDebtTokenEntity.id;
   if (stableDebtToken != Address.fromString(ZERO_ADDRESS)) {
-    market.sToken = getOrCreateToken(stableDebtToken).id;
+    market._sToken = getOrCreateToken(stableDebtToken).id;
   }
 
   market.save();
@@ -150,9 +150,9 @@ export function _handleBorrowingEnabledOnReserve(
   const market = getOrCreateMarket(marketId, protocolData);
 
   market.canBorrowFrom = true;
-  market.prePauseState = [
-    market.prePauseState[0],
-    market.prePauseState[1],
+  market._prePauseState = [
+    market._prePauseState[0],
+    market._prePauseState[1],
     true,
   ];
   market.save();
@@ -165,9 +165,9 @@ export function _handleBorrowingDisabledOnReserve(
   const market = getOrCreateMarket(marketId, protocolData);
 
   market.canBorrowFrom = false;
-  market.prePauseState = [
-    market.prePauseState[0],
-    market.prePauseState[1],
+  market._prePauseState = [
+    market._prePauseState[0],
+    market._prePauseState[1],
     false,
   ];
   market.save();
@@ -180,10 +180,10 @@ export function _handleReserveActivated(
   const market = getOrCreateMarket(marketId, protocolData);
 
   market.isActive = true;
-  market.prePauseState = [
+  market._prePauseState = [
     true,
-    market.prePauseState[1],
-    market.prePauseState[2],
+    market._prePauseState[1],
+    market._prePauseState[2],
   ];
   market.save();
 }
@@ -195,10 +195,10 @@ export function _handleReserveDeactivated(
   const market = getOrCreateMarket(marketId, protocolData);
 
   market.isActive = false;
-  market.prePauseState = [
+  market._prePauseState = [
     false,
-    market.prePauseState[1],
-    market.prePauseState[2],
+    market._prePauseState[1],
+    market._prePauseState[2],
   ];
   market.save();
 }
@@ -210,7 +210,7 @@ export function _handleReserveFactorChanged(
 ): void {
   const market = getOrCreateMarket(marketId, protocolData);
 
-  market.reserveFactor = reserveFactor
+  market._reserveFactor = reserveFactor
     .toBigDecimal()
     .div(exponentToBigDecimal(INT_TWO));
   market.save();
@@ -236,7 +236,7 @@ export function _handleReserveUsedAsCollateralEnabled(
   }
   const markets = account.enabledCollaterals;
   markets.push(market.id);
-  account.enabledCollaterals = markets;
+  account._enabledCollaterals = markets;
   account.save();
 }
 
@@ -261,7 +261,7 @@ export function _handleReserveUsedAsCollateralDisabled(
     // drop 1 element at given index
     markets.splice(index, 1);
   }
-  account.enabledCollaterals = markets;
+  account._enabledCollaterals = markets;
   account.save();
 }
 
@@ -271,11 +271,11 @@ export function _handlePaused(protocolData: ProtocolData): void {
   for (let i = 0; i < protocol.marketIDs.length; i++) {
     const market = Market.load(protocol.marketIDs[i]);
     if (!market) {
-      log.warning("[Paused] Market not found: {}", [protocol.marketIDs[i]]);
+      log.warning("[Paused] Market not found: {}", [protocol._marketIDs[i]]);
       continue;
     }
 
-    market.prePauseState = [
+    market._prePauseState = [
       market.isActive,
       market.canUseAsCollateral,
       market.canBorrowFrom,
@@ -294,13 +294,13 @@ export function _handleUnpaused(protocolData: ProtocolData): void {
   for (let i = 0; i < protocol.marketIDs.length; i++) {
     const market = Market.load(protocol.marketIDs[i]);
     if (!market) {
-      log.warning("[Paused] Market not found: {}", [protocol.marketIDs[i]]);
+      log.warning("[Paused] Market not found: {}", [protocol._marketIDs[i]]);
       continue;
     }
 
-    market.isActive = market.prePauseState[0];
-    market.canUseAsCollateral = market.prePauseState[1];
-    market.canBorrowFrom = market.prePauseState[2];
+    market.isActive = market._prePauseState[0];
+    market.canUseAsCollateral = market._prePauseState[1];
+    market.canBorrowFrom = market._prePauseState[2];
 
     market.save();
   }
@@ -457,7 +457,7 @@ export function _handleReserveDataUpdated(
       .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
 
-  if (market.sToken) {
+  if (market._sToken) {
     // geist does not have stable borrow rates
     const sBorrowRate = createInterestRate(
       market.id,
