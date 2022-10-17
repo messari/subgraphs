@@ -1,9 +1,8 @@
-import { BigInt } from "@graphprotocol/graph-ts"
 import {
   YakStrategyV2,
   AllowDepositor,
   Approval,
-  Deposit,
+  Deposit as DepositEvent,
   DepositsEnabled,
   OwnershipTransferred,
   Recovered,
@@ -18,84 +17,64 @@ import {
   UpdateReinvestReward,
   Withdraw
 } from "../generated/YakStrategyV2/YakStrategyV2"
-import { ExampleEntity } from "../generated/schema"
+import { Deposit } from "../generated/schema";
+import { defineProtocol, defineInputToken } from "./utils/initial";
+import { ZERO_BIGDECIMAL } from "./utils/constants";
+import { calculatePriceInUSD } from "./helpers/calculators";
 
-export function handleAllowDepositor(event: AllowDepositor): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+export function handleDeposit(event: DepositEvent): void {
+  let transactionHash = event.transaction.hash;
+  let logIndex = event.logIndex;
+  let deposit = Deposit.load(transactionHash.toHexString().concat("-").concat(logIndex.toHexString()));
 
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
+  if (deposit == null) {
+    deposit = new Deposit(transactionHash.toHexString().concat("-").concat(logIndex.toHexString()));
   }
 
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
+  let contractAddress = event.address;
+  deposit.hash = event.transaction.hash.toHexString();
+  deposit.logIndex = event.logIndex.toI32();
+  deposit.to = event.address.toHexString();
+  deposit.from = event.transaction.from.toHexString();
+  deposit.blockNumber = event.block.number;
+  deposit.timestamp = event.block.timestamp;
+  deposit.amount = event.params.amount;
 
-  // Entity fields can be set based on event parameters
-  entity.account = event.params.account
+  let yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
 
-  // Entities can be written to the store with `.save()`
-  entity.save()
+  let protocol = defineProtocol(contractAddress);
+  deposit.protocol =  protocol.id;
 
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
+  if (yakStrategyV2Contract.try_depositToken().reverted) {
+    deposit.asset = "";
+    deposit.amountUSD = ZERO_BIGDECIMAL;
+  } else {
+    let inputTokenAddress = yakStrategyV2Contract.depositToken();
+    let inputToken = defineInputToken(inputTokenAddress, event.block.number);
 
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.ADMIN_FEE_BIPS(...)
-  // - contract.DEPOSITS_ENABLED(...)
-  // - contract.DEV_FEE_BIPS(...)
-  // - contract.DOMAIN_TYPEHASH(...)
-  // - contract.MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST(...)
-  // - contract.MIN_TOKENS_TO_REINVEST(...)
-  // - contract.PERMIT_TYPEHASH(...)
-  // - contract.REINVEST_REWARD_BIPS(...)
-  // - contract.VERSION_HASH(...)
-  // - contract.allowance(...)
-  // - contract.allowedDepositors(...)
-  // - contract.approve(...)
-  // - contract.balanceOf(...)
-  // - contract.checkReward(...)
-  // - contract.decimals(...)
-  // - contract.depositToken(...)
-  // - contract.devAddr(...)
-  // - contract.estimateDeployedBalance(...)
-  // - contract.estimateReinvestReward(...)
-  // - contract.getActualLeverage(...)
-  // - contract.getDepositTokensForShares(...)
-  // - contract.getDomainSeparator(...)
-  // - contract.getSharesForDepositTokens(...)
-  // - contract.name(...)
-  // - contract.nonces(...)
-  // - contract.numberOfAllowedDepositors(...)
-  // - contract.owner(...)
-  // - contract.rewardToken(...)
-  // - contract.symbol(...)
-  // - contract.totalDeposits(...)
-  // - contract.totalSupply(...)
-  // - contract.transfer(...)
-  // - contract.transferFrom(...)
+    deposit.asset = inputToken.id;
+    deposit.amountUSD = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), event.transaction.value);
+  }
+
+  updateDailyOrHourlyEntities(event.address, event.block.timestamp, event.block.number);
+
+  let usageMetricsDailySnapshotEntity = defineUsageMetricsDailySnapshotEntity(event.block.timestamp,event.block.number,event.address);
+  usageMetricsDailySnapshotEntity.dailyDepositCount = usageMetricsDailySnapshotEntity.dailyDepositCount + 1;
+  usageMetricsDailySnapshotEntity.save();
+
+  let vault = defineVault(contractAddress, event.block.timestamp, event.block.number);
+  deposit.vault = vault.id;
+
+  let usageMetricsHourlySnapshotEntity = defineUsageMetricsHourlySnapshot(event.block.timestamp,event.block.number,event.address);
+  usageMetricsHourlySnapshotEntity.hourlyDepositCount = usageMetricsHourlySnapshotEntity.hourlyDepositCount + 1;
+  usageMetricsHourlySnapshotEntity.save();
+
+  deposit.save();
 }
 
-export function handleApproval(event: Approval): void {}
+export function handleAllowDepositor(event: AllowDepositor): void {}
 
-export function handleDeposit(event: Deposit): void {}
+export function handleApproval(event: Approval): void {}
 
 export function handleDepositsEnabled(event: DepositsEnabled): void {}
 
