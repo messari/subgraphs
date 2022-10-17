@@ -56,7 +56,7 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 export function getOrCreateRewardToken(address: Address): RewardToken {
   let rewardToken = RewardToken.load(address.toHexString());
   if (rewardToken == null) {
-    let token = getOrCreateToken(address);
+    const token = getOrCreateToken(address);
     rewardToken = new RewardToken(address.toHexString());
     rewardToken.token = token.id;
     rewardToken.type = RewardTokenType.DEPOSIT;
@@ -73,7 +73,7 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
 
 export function getOrCreateFinancials(timestamp: BigInt, blockNumber: BigInt): FinancialsDailySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
+  const id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
 
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
@@ -107,7 +107,7 @@ export function getOrCreateFinancials(timestamp: BigInt, blockNumber: BigInt): F
 
 export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
@@ -135,7 +135,7 @@ export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetri
 
 export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
-  let hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsHourlySnapshot.load(hour.toString());
@@ -161,8 +161,8 @@ export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetr
 }
 
 export function getOrCreateMarketDailySnapshot(block: ethereum.Block, marketId: string): MarketDailySnapshot {
-  let id: i64 = block.timestamp.toI64() / SECONDS_PER_DAY;
-  let marketAddress = marketId;
+  const id: i64 = block.timestamp.toI64() / SECONDS_PER_DAY;
+  const marketAddress = marketId;
   let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
 
   if (!marketMetrics) {
@@ -204,9 +204,9 @@ export function getOrCreateMarketDailySnapshot(block: ethereum.Block, marketId: 
 }
 
 export function getOrCreateMarketHourlySnapshot(block: ethereum.Block, marketId: string): MarketHourlySnapshot {
-  let hour: i64 = block.timestamp.toI64() / SECONDS_PER_HOUR;
-  let marketAddress = marketId;
-  let id = marketAddress + "-" + hour.toString();
+  const hour: i64 = block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const marketAddress = marketId;
+  const id = marketAddress + "-" + hour.toString();
   let marketMetrics = MarketHourlySnapshot.load(id);
 
   if (!marketMetrics) {
@@ -254,7 +254,7 @@ export function getOrCreateMarketHourlySnapshot(block: ethereum.Block, marketId:
 export function getOrCreateMarket(id: string): Market {
   let market = Market.load(id);
   if (!market) {
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
 
     market = new Market(id);
     market.protocol = protocol.id;
@@ -403,7 +403,7 @@ export function getOrCreateLiquidate(event: ethereum.Event): Liquidate {
 }
 
 export function getOrCreateInterestRate(rateSide: string, rateType: string, marketId: string): InterestRate {
-  let id = rateSide + "-" + rateType + "-" + marketId;
+  const id = rateSide + "-" + rateType + "-" + marketId;
   let rate = InterestRate.load(id);
   if (rate == null) {
     rate = new InterestRate(id);
