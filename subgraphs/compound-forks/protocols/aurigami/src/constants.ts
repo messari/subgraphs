@@ -23,3 +23,10 @@ export const nativeCToken = new TokenData(
   "auETH",
   cTokenDecimals
 );
+
+export const BROKEN_PRICE_MARKETS = [
+  Address.fromString("0xc9011e629c9d0b8b1e4a2091e123fbb87b3a792c"), // auPLY market
+  Address.fromString("0x8888682e24dd4df7b7ff2b91fccb575737e433bf"), // auAURORA market
+  Address.fromString("0x6ea6c03061bddce23d4ec60b6e6e880c33d24dca"), // auTRI market
+  Address.fromString("0x5ccad065400341db391fd3a4b7f50087b678d7cc"), // auUSN market
+];

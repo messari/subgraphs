@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -53,7 +53,13 @@ import { CToken } from "../../../generated/Comptroller/CToken";
 import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
-import { comptrollerAddr, nativeCToken, nativeToken } from "./constants";
+import {
+  BROKEN_PRICE_MARKETS,
+  BROKEN_PRICE_TOKENS,
+  comptrollerAddr,
+  nativeCToken,
+  nativeToken,
+} from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
@@ -261,15 +267,12 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   const marketAddress = event.address;
   const cTokenContract = CToken.bind(marketAddress);
   const protocol = getOrCreateProtocol();
-  const oracleContract = PriceOracle.bind(
-    Address.fromString(protocol._priceOracle)
-  );
   const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerTimestamp(),
     cTokenContract.try_borrowRatePerTimestamp(),
-    oracleContract.try_getUnderlyingPrice(marketAddress),
+    getPrice(marketAddress, protocol._priceOracle),
     SECONDS_PER_YEAR
   );
 
@@ -309,4 +312,21 @@ function getOrCreateProtocol(): LendingProtocol {
     comptroller.try_oracle()
   );
   return _getOrCreateProtocol(protocolData);
+}
+
+/////////////////
+//// Helpers ////
+/////////////////
+
+function getPrice(
+  marketAddress: Address,
+  priceOracle: string
+): ethereum.CallResult<BigInt> {
+  if (BROKEN_PRICE_MARKETS.includes(marketAddress)) {
+    // TODO use new price lib to get aurora prices
+  }
+
+  // get the price normally
+  const oracleContract = PriceOracle.bind(Address.fromString(priceOracle));
+  return oracleContract.try_getUnderlyingPrice(marketAddress);
 }
