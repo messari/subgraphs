@@ -11,7 +11,7 @@ interface ChartProps {
 }
 
 export const Chart = ({ identifier, datasetLabel, dataChart }: ChartProps) => {
-  function clickHandler() {
+  function jpegDownloadHandler() {
     try {
       const link = document.createElement('a');
       const field = datasetLabel.split("-")[1] || datasetLabel;
@@ -65,7 +65,7 @@ export const Chart = ({ identifier, datasetLabel, dataChart }: ChartProps) => {
       datasets: datasets,
     };
     return (<>
-      <Button onClick={() => clickHandler()}>Download JPEG</Button>
+      <Button onClick={() => jpegDownloadHandler()}>Download JPEG</Button>
       <Box padding={2} sx={{ border: 1 }}>
         <Line
           data={chartData}

@@ -2,11 +2,7 @@
   "license": "MIT",
   "scripts": {
     "format": "npx prettier --write .",
-    "codegen": "graph codegen",
-    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
-    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.mustache > configurations/configure.ts",
-    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_target}",
-    "build": "node ../../deployment/deployment.js --deploy=${npm_config_deploy} --token=${npm_config_token} --service=${npm_config_service} --id=${npm_config_id} --span=${npm_config_span} --target=${npm_config_target} --slug=${npm_config_slug} --printlogs=${npm_config_printlogs}"
+    "codegen": "graph codegen"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",
@@ -14,7 +10,6 @@
     "npx": "^10.2.2"
   },
   "devDependencies": {
-    "mustache": "^3.1.0",
     "prettier": "^2.6.0"
   }
 }
