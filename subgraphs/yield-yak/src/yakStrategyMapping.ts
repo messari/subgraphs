@@ -1,26 +1,18 @@
 import {
   YakStrategyV2,
-  AllowDepositor,
-  Approval,
   Deposit as DepositEvent,
-  DepositsEnabled,
-  OwnershipTransferred,
   Recovered,
   Reinvest,
-  RemoveDepositor,
-  Transfer,
   UpdateAdminFee,
-  UpdateDevAddr,
   UpdateDevFee,
-  UpdateMaxTokensToDepositWithoutReinvest,
-  UpdateMinTokensToReinvest,
   UpdateReinvestReward,
   Withdraw
 } from "../generated/YakStrategyV2/YakStrategyV2"
 import { Deposit } from "../generated/schema";
-import { defineProtocol, defineInputToken, defineVault } from "./utils/initial";
+import { defineProtocol, defineInputToken, defineVault, defineUsageMetricsDailySnapshotEntity, defineUsageMetricsHourlySnapshot } from "./utils/initial";
 import { ZERO_BIGDECIMAL } from "./utils/constants";
 import { calculatePriceInUSD } from "./helpers/calculators";
+import { updateDailyOrHourlyEntities } from "./updateDailyOrHourlyEntities";
 
 export function handleDeposit(event: DepositEvent): void {
   let transactionHash = event.transaction.hash;
@@ -56,52 +48,26 @@ export function handleDeposit(event: DepositEvent): void {
     deposit.amountUSD = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), event.transaction.value);
   }
 
-  // updateDailyOrHourlyEntities(event.address, event.block.timestamp, event.block.number);
+  updateDailyOrHourlyEntities(event.address, event.block.timestamp, event.block.number);
 
-  // let usageMetricsDailySnapshotEntity = defineUsageMetricsDailySnapshotEntity(event.block.timestamp,event.block.number,event.address);
-  // usageMetricsDailySnapshotEntity.dailyDepositCount = usageMetricsDailySnapshotEntity.dailyDepositCount + 1;
-  // usageMetricsDailySnapshotEntity.save();
+  let usageMetricsDailySnapshotEntity = defineUsageMetricsDailySnapshotEntity(event.block.timestamp,event.block.number,event.address);
+  usageMetricsDailySnapshotEntity.dailyDepositCount = usageMetricsDailySnapshotEntity.dailyDepositCount + 1;
+  usageMetricsDailySnapshotEntity.save();
 
   let vault = defineVault(contractAddress, event.block.timestamp, event.block.number);
   deposit.vault = vault.id;
 
-  // let usageMetricsHourlySnapshotEntity = defineUsageMetricsHourlySnapshot(event.block.timestamp,event.block.number,event.address);
-  // usageMetricsHourlySnapshotEntity.hourlyDepositCount = usageMetricsHourlySnapshotEntity.hourlyDepositCount + 1;
-  // usageMetricsHourlySnapshotEntity.save();
+  let usageMetricsHourlySnapshotEntity = defineUsageMetricsHourlySnapshot(event.block.timestamp,event.block.number,event.address);
+  usageMetricsHourlySnapshotEntity.hourlyDepositCount = usageMetricsHourlySnapshotEntity.hourlyDepositCount + 1;
+  usageMetricsHourlySnapshotEntity.save();
 
   deposit.save();
 }
 
-export function handleAllowDepositor(event: AllowDepositor): void {}
-
-export function handleApproval(event: Approval): void {}
-
-export function handleDepositsEnabled(event: DepositsEnabled): void {}
-
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
-
-export function handleRecovered(event: Recovered): void {}
-
+export function handleWithdraw(event: Withdraw): void {}
 export function handleReinvest(event: Reinvest): void {}
-
-export function handleRemoveDepositor(event: RemoveDepositor): void {}
-
-export function handleTransfer(event: Transfer): void {}
-
+export function handleRecovered(event: Recovered): void {}
 export function handleUpdateAdminFee(event: UpdateAdminFee): void {}
-
-export function handleUpdateDevAddr(event: UpdateDevAddr): void {}
-
 export function handleUpdateDevFee(event: UpdateDevFee): void {}
-
-export function handleUpdateMaxTokensToDepositWithoutReinvest(
-  event: UpdateMaxTokensToDepositWithoutReinvest
-): void {}
-
-export function handleUpdateMinTokensToReinvest(
-  event: UpdateMinTokensToReinvest
-): void {}
-
 export function handleUpdateReinvestReward(event: UpdateReinvestReward): void {}
 
-export function handleWithdraw(event: Withdraw): void {}

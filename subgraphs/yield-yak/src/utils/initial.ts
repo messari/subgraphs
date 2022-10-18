@@ -1,8 +1,15 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
-import { YieldAggregator } from '../../generated/schema';
+import { Address, BigDecimal, BigInt, bigInt } from '@graphprotocol/graph-ts'
+import {
+   YieldAggregator, 
+   Account, 
+   ActiveAccount, 
+   VaultHourlySnapshot, 
+   UsageMetricsDailySnapshot, 
+   UsageMetricsHourlySnapshot,
+   FinancialsDailySnapshot } from '../../generated/schema';
 import { YakStrategyV2 } from '../../generated/YakStrategyV2/YakStrategyV2';
 import { DEFUALT_AMOUNT, DEFUALT_DECIMALS, YAK_STRATEGY_MANAGER_ADDRESS, ZERO_ADDRESS, ZERO_BIGDECIMAL, ZERO_BIGINT } from './constants';
-import { Token, Vault, VaultFee, RewardToken } from '../../generated/schema';
+import { Token, Vault, VaultFee, RewardToken, VaultDailySnapshot } from '../../generated/schema';
 import { WAVAX_CONTRACT_ADDRESS } from './constants';
 import { YakERC20 } from '../../generated/YakERC20/YakERC20';
 import { calculateOutputTokenPriceInUSD, calculatePriceInUSD } from '../helpers/calculators';
@@ -211,4 +218,161 @@ function defineFee(contractAddress:Address, feeType:string): VaultFee {
     fee.feeType = "PERFORMANCE_FEE";
     fee.save();
     return fee;
+}
+
+export function defineAccount(accountAddress: Address): BigInt {
+  let checker = ZERO_BIGINT;
+  let account = Account.load(accountAddress.toHexString());
+  if (account == null) {
+    account = new Account(accountAddress.toHexString());
+    checker = bigInt.fromString("1");
+  }
+  return checker;
+}
+
+
+export function defineActiveAccount(accountAddress: Address, 
+  timestamp: BigInt, 
+  check: string): BigInt {
+  let checker = ZERO_BIGINT;
+  let dailyActive = ZERO_BIGINT;
+  let hourlyActive = ZERO_BIGINT;
+  let daysFromStart = timestamp.toI32() / 24 / 60 / 60
+  let accountDaily = ActiveAccount.load(accountAddress.toHexString().concat("-").concat(daysFromStart.toString()));
+  if (accountDaily == null) {
+    accountDaily = new ActiveAccount(accountAddress.toHexString().concat("-").concat(daysFromStart.toString()));
+    dailyActive = bigInt.fromString("1");
+  }
+  let hourInDay = (timestamp.toI32() - daysFromStart * 24 * 60 * 60) / 60 / 60
+  let accountHourly = ActiveAccount.load(accountAddress.toHexString().concat("-").concat(daysFromStart.toString()).concat("-").concat(hourInDay.toString()));
+  if (accountHourly == null) {
+    accountHourly = new ActiveAccount(accountAddress.toHexString().concat("-").concat(daysFromStart.toString()).concat("-").concat(hourInDay.toString()));
+    hourlyActive = bigInt.fromString("1");
+  }
+  
+  if (check == "d" && dailyActive == bigInt.fromString("1")) {
+    checker = bigInt.fromString("1");
+  } else if (check == "h" && hourlyActive == bigInt.fromString("1")){
+    checker = bigInt.fromString("1");
+  }
+  return checker;
+}
+
+export function defineVaultDailySnapshot(
+  timestamp: BigInt,
+  blockNumber: BigInt,
+  contractAddress: Address,
+): VaultDailySnapshot {
+  let protocol = defineProtocol(contractAddress)
+  let daysFromStart = timestamp.toI32() / 24 / 60 / 60;
+  let vaultDailySnapshotEntity = VaultDailySnapshot.load(contractAddress.toHexString().concat("-").concat(daysFromStart.toString()));
+  if (vaultDailySnapshotEntity == null) {
+    vaultDailySnapshotEntity = new VaultDailySnapshot(contractAddress.toHexString().concat("-").concat(daysFromStart.toString()));
+    vaultDailySnapshotEntity.timestamp = timestamp;
+    vaultDailySnapshotEntity.blockNumber = blockNumber;
+    vaultDailySnapshotEntity.protocol = protocol.id;
+    let vault = defineVault(contractAddress, timestamp, blockNumber);
+    vaultDailySnapshotEntity.vault = vault.id;
+
+    let rewardTokenEmissionsAmountArr = new Array<BigInt>();
+    rewardTokenEmissionsAmountArr.push(ZERO_BIGINT);
+    vaultDailySnapshotEntity.rewardTokenEmissionsAmount = rewardTokenEmissionsAmountArr;
+    
+    let rewardTokenEmissionsUSDArr = new Array<BigDecimal>();
+    rewardTokenEmissionsUSDArr.push(ZERO_BIGDECIMAL);
+    vaultDailySnapshotEntity.rewardTokenEmissionsUSD = rewardTokenEmissionsUSDArr;
+
+  }
+  vaultDailySnapshotEntity.save();
+  return vaultDailySnapshotEntity;
+}
+
+export function defineVaultHourlySnapshot(
+  timestamp: BigInt,
+  blockNumber: BigInt,
+  contractAddress: Address,
+): VaultHourlySnapshot {
+  let protocol = defineProtocol(contractAddress)
+  let daysFromStart = timestamp.toI32() / 24 / 60 / 60
+  let hourInDay = (timestamp.toI32() - daysFromStart * 24 * 60 * 60) / 60 / 60;
+  let vaultHourlySnapshotEntity = VaultHourlySnapshot.load(contractAddress.toHexString().concat("-").concat(daysFromStart.toString()).concat("-").concat(hourInDay.toString()));
+  if (vaultHourlySnapshotEntity == null) {
+    vaultHourlySnapshotEntity = new VaultHourlySnapshot(contractAddress.toHexString().concat("-").concat(daysFromStart.toString()).concat("-").concat(hourInDay.toString()));
+    vaultHourlySnapshotEntity.timestamp = timestamp;
+    vaultHourlySnapshotEntity.blockNumber = blockNumber;
+    vaultHourlySnapshotEntity.protocol = protocol.id;
+    let vault = defineVault(contractAddress, timestamp, blockNumber);
+    vaultHourlySnapshotEntity.vault = vault.id;
+
+    let rewardTokenEmissionsAmountArr = new Array<BigInt>();
+    rewardTokenEmissionsAmountArr.push(ZERO_BIGINT);
+    vaultHourlySnapshotEntity.rewardTokenEmissionsAmount = rewardTokenEmissionsAmountArr;
+    
+    let rewardTokenEmissionsUSDArr = new Array<BigDecimal>();
+    rewardTokenEmissionsUSDArr.push(ZERO_BIGDECIMAL);
+    vaultHourlySnapshotEntity.rewardTokenEmissionsUSD = rewardTokenEmissionsUSDArr;
+
+  }
+  vaultHourlySnapshotEntity.save();
+  return vaultHourlySnapshotEntity;
+}
+
+export function defineUsageMetricsDailySnapshotEntity(
+  timestamp: BigInt,
+  blockNumber: BigInt,
+  contractAddress: Address,
+): UsageMetricsDailySnapshot {
+  let protocol = defineProtocol(contractAddress);
+  let daysFromStart = timestamp.toI32() / 24 / 60 / 60;
+  let usageMetricsDailySnapshotEntity = UsageMetricsDailySnapshot.load(daysFromStart.toString());
+  
+  if (usageMetricsDailySnapshotEntity == null) {
+    usageMetricsDailySnapshotEntity = new UsageMetricsDailySnapshot(daysFromStart.toString());
+    usageMetricsDailySnapshotEntity.timestamp = timestamp;
+    usageMetricsDailySnapshotEntity.blockNumber = blockNumber;
+    usageMetricsDailySnapshotEntity.protocol = protocol.id;
+  }
+
+  usageMetricsDailySnapshotEntity.save();
+  return usageMetricsDailySnapshotEntity;
+}
+
+export function  defineUsageMetricsHourlySnapshot(
+  timestamp: BigInt,
+  blockNumber: BigInt,
+  contractAddress: Address,
+): UsageMetricsHourlySnapshot {
+  let protocol = defineProtocol(contractAddress);
+  let daysFromStart = timestamp.toI32() / 24 / 60 / 60;
+  let hourInDay = (timestamp.toI32() - daysFromStart * 24 * 60 * 60) / 60 / 60;
+  let usageMetricsHourlySnapshotEntity = UsageMetricsHourlySnapshot.load(daysFromStart.toString().concat("-").concat(hourInDay.toString()));
+  if (usageMetricsHourlySnapshotEntity == null) {
+    usageMetricsHourlySnapshotEntity = new UsageMetricsHourlySnapshot(daysFromStart.toString().concat("-").concat(hourInDay.toString()));
+    usageMetricsHourlySnapshotEntity.timestamp = timestamp;
+    usageMetricsHourlySnapshotEntity.blockNumber = blockNumber;
+    usageMetricsHourlySnapshotEntity.protocol = protocol.id;
+  }
+  usageMetricsHourlySnapshotEntity.save();
+  return usageMetricsHourlySnapshotEntity;
+}
+
+export function defineFinancialsDailySnapshotEntity(
+  timestamp: BigInt,
+  blockNumber: BigInt,
+  contractAddress: Address,
+): FinancialsDailySnapshot {
+  let protocol = defineProtocol(contractAddress);
+  let daysFromStart = timestamp.toI32() / 24 / 60 / 60
+  let financialsDailySnapshotEntity = FinancialsDailySnapshot.load(daysFromStart.toString());
+  if (financialsDailySnapshotEntity == null) {
+    financialsDailySnapshotEntity = new FinancialsDailySnapshot(daysFromStart.toString());
+    financialsDailySnapshotEntity.timestamp = timestamp;
+    financialsDailySnapshotEntity.blockNumber = blockNumber;
+    financialsDailySnapshotEntity.protocol = protocol.id;
+    financialsDailySnapshotEntity.protocolControlledValueUSD = ZERO_BIGDECIMAL;
+  }
+
+
+  financialsDailySnapshotEntity.save();
+  return financialsDailySnapshotEntity;
 }

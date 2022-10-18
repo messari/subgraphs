@@ -1,5 +1,6 @@
 generated/
 subgraphs/**/.git/
+subgraphs/**/build/
 Reference/
 .vscode/
 subgraph.yaml
