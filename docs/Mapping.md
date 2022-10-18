@@ -120,6 +120,21 @@ If you're having issues with the subgraph sync failing and no error messages sho
 3. Replace the part where it says subgraphs: ["Qm..."] with your deployment id (you will see this in the studio)
 4. Run the query, you will see if your subgraph had any indexing errors!
 
+### Debugging sync failing due to "oneshot cancelled" error
+
+If you run into a subgraph sync fail with `Mapping terminated before handling trigger: oneshot canceled` or `Mapping terminated before passing in trigger: send failed because receiver is gone` message, usually the message is not helpful in pinning down the underlying cause. [Some discussion](https://discord.com/channels/438038660412342282/438070183794573313/1024382444197134447) on the graphprotocol discord server suggest a few possibilities include: trying to use foreach, not using a recent version of the graph-cli. It is a good idea to make sure those are not the case in your deployment.
+
+Beyond these two possible causes, these are the steps you can take to narrow down the cause:
+
+1. Find the tx hash that causes your subgraph to fail and the block number. They can be found in the error message.
+2. Check the tx hash on etherscan for events it emits and figure out the most likely handler function where your subgraph that fails.
+3. Add logs to the handler function where the error likely to happen, or you can go to the extreme of adding log to every line of code.
+4. Deploy your subgraph with grafting and check the log to see whether your guess of where your subgraph fails is correct (the deployment should fail in between two log messages). If it is not, go back step 2.
+5. If your log identifies a line in the code that fails, repeat step 3 on the function(s) called in the line if necessary
+6. After going through step 2-5 a few times, you should be able to narrow down to a possible cause of the error.
+
+As an example, the euler finance subgraph had a "oneshot cancelled" error for tx [0x102d9eb3d096d5cfc74ba56ea7c3b0ebfc30454d7f3d000fd42c1307f746c2cf](https://etherscan.io/tx/0x102d9eb3d096d5cfc74ba56ea7c3b0ebfc30454d7f3d000fd42c1307f746c2cf#eventlog) at block 15700199. After going through the process, it is clear that error happened within the loop `for (let i = 0; i < eulerViewMarkets.length; i += 1)` in function [`syncWithEulerGeneralView`](https://github.com/messari/subgraphs/blob/4d6c3432f946a57ecdc295ef0f357dc1ca8309a6/subgraphs/euler-finance/src/mappings/helpers.ts#L321) of `src/mappings/helpers.ts`. The first hypothesis was that the `eulerViewMarkets` array used in the loop is too big. An attempted fix is to save data in the array into an entity and load needed info from the entity inside the loop. It didn't fix the error. Going back to the logs, it appears the error always happened in the last few lines of the loop at different iterations. Another fix moved the last two lines of the loop elsewhere and [it worked](https://github.com/messari/subgraphs/pull/1213).
+
 ### Running Locally
 
 You can debug your subgraph by running `graph-node` locally. Here are some instructions to set it up:
