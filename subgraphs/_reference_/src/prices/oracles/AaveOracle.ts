@@ -28,8 +28,5 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
     )
     .toBigDecimal();
 
-  return CustomPriceType.initialize(
-    tokenPrice,
-    config.usdcTokenDecimals().toI32() as u8
-  );
+  return CustomPriceType.initialize(tokenPrice, constants.AAVE_ORACLE_DECIMALS);
 }
