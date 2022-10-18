@@ -9,18 +9,14 @@ import {
   getOrCreateUsageHourlySnapshot,
 } from "./getters";
 import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
-import { Account, ActiveAccount,  UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
+import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
 import { ActivityType, SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./constants";
 
 // updates a given FinancialDailySnapshot Entity
-export function updateFinancials(
-    block: ethereum.Block,
-    amountUSD: BigDecimal,
-    eventType: string
-  ): void {
+export function updateFinancials(block: ethereum.Block, amountUSD: BigDecimal, eventType: string): void {
   // number of days since unix epoch
-  let financialMetrics = getOrCreateFinancials(block.timestamp, block.number);
-  let protocol = getOrCreateLendingProtocol();
+  const financialMetrics = getOrCreateFinancials(block.timestamp, block.number);
+  const protocol = getOrCreateLendingProtocol();
 
   // update vars
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
@@ -59,10 +55,10 @@ export function updateFinancials(
 // update a given UsageMetricDailySnapshot
 export function updateUsageMetrics(event: ethereum.Event, from: Address, transaction: string): void {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let hour: i64 = (event.block.timestamp.toI64() - id * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
-  let dailyMetrics = getOrCreateUsageDailySnapshot(event);
-  let hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const hour: i64 = (event.block.timestamp.toI64() - id * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
+  const dailyMetrics = getOrCreateUsageDailySnapshot(event);
+  const hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
 
   // Update the block number and timestamp to that of the last transaction of that day
   dailyMetrics.blockNumber = event.block.number;
@@ -74,9 +70,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   hourlyMetrics.timestamp = event.block.timestamp;
   hourlyMetrics.hourlyTransactionCount += 1;
 
-  let accountId = from.toHexString();
+  const accountId = from.toHexString();
   let account = Account.load(accountId);
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
   dailyMetrics.totalPoolCount = protocol.totalPoolCount;
   if (!account) {
     account = new Account(accountId);
@@ -89,7 +85,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   dailyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = ActivityType.DAILY + "-" + from.toHexString() + "-" + id.toString();
+  const dailyActiveAccountId = ActivityType.DAILY + "-" + from.toHexString() + "-" + id.toString();
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -98,7 +94,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   }
 
   // create active account for hourlyMetrics
-  let hourlyActiveAccountId = ActivityType.HOURLY + "-" + from.toHexString() + "-" + hour.toString();
+  const hourlyActiveAccountId = ActivityType.HOURLY + "-" + from.toHexString() + "-" + hour.toString();
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -115,13 +111,13 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
 
 // update a given MarketDailySnapshot
 export function updateMarketDailyMetrics(
-  block: ethereum.Block, 
+  block: ethereum.Block,
   marketId: string,
   amountUSD: BigDecimal,
-  eventType: string | null = null
+  eventType: string | null = null,
 ): void {
-  let marketMetrics = getOrCreateMarketDailySnapshot(block, marketId);
-  let market = getOrCreateMarket(marketId);
+  const marketMetrics = getOrCreateMarketDailySnapshot(block, marketId);
+  const market = getOrCreateMarket(marketId);
 
   // update to latest block/timestamp
   marketMetrics.blockNumber = block.number;
@@ -147,7 +143,7 @@ export function updateMarketDailyMetrics(
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   // Note: daily tracking of deposit/borrow/liquidate in respective functions in helpers.ts
 
-  // add to daily amounts  
+  // add to daily amounts
   if (eventType != null) {
     if (eventType == TransactionType.DEPOSIT) {
       marketMetrics.dailyDepositUSD = marketMetrics.dailyDepositUSD.plus(amountUSD);
@@ -167,13 +163,13 @@ export function updateMarketDailyMetrics(
 
 // update a given MarketHourlySnapshot
 export function updateMarketHourlyMetrics(
-  block: ethereum.Block, 
+  block: ethereum.Block,
   marketId: string,
   amountUSD: BigDecimal,
-  eventType: string | null = null
+  eventType: string | null = null,
 ): void {
-  let marketMetrics = getOrCreateMarketHourlySnapshot(block, marketId);
-  let market = getOrCreateMarket(marketId);
+  const marketMetrics = getOrCreateMarketHourlySnapshot(block, marketId);
+  const market = getOrCreateMarket(marketId);
 
   // update to latest block/timestamp
   marketMetrics.blockNumber = block.number;

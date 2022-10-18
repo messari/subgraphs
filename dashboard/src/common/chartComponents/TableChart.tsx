@@ -3,16 +3,18 @@ import MomentAdapter from "@material-ui/pickers/adapter/moment";
 import { Box, Button, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
-import { toDate, toUnitsSinceEpoch } from "../../../src/utils/index";
+import { downloadCSV, toDate, toUnitsSinceEpoch } from "../../../src/utils/index";
 import { percentageFieldList } from "../../constants";
 import moment, { Moment } from "moment";
 
 interface TableChartProps {
   datasetLabel: string;
   dataTable: any;
+  jpegDownloadHandler: any;
 }
 
-export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
+export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: TableChartProps) => {
+  const field = datasetLabel.split("-")[1] || datasetLabel;
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDateString, toggleDateString] = useState(true);
   const [dates, setDates] = useState<any>([]);
@@ -112,12 +114,16 @@ export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
             </Box>
           )}
 
-          <Button onClick={() => setShowDatePicker((prev) => !prev)}>
-            {showDatePicker ? "Hide" : "Show"} Date Filter
+          <Button className="Hover-Underline" onClick={() => setShowDatePicker((prev) => !prev)}>
+            Date Filter
           </Button>
-          <Button onClick={() => toggleDateString(!showDateString)}>
-            {showDateString ? `Show ${hourly ? "hours" : "days"} since epoch` : "Show Date MM/DD/YYYY"}
+          <Button className="Hover-Underline" onClick={() => toggleDateString(!showDateString)}>
+            {showDateString ? `${hourly ? "hours" : "days"} since epoch` : "Date MM/DD/YYYY"}
           </Button>
+          <Button className="Hover-Underline" onClick={() => downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel)}>
+            Save CSV
+          </Button>
+          {jpegDownloadHandler ? <Button className="Hover-Underline" onClick={() => jpegDownloadHandler()}>Save Chart</Button> : null}
         </Box>
         <DataGrid
           sx={{ textOverflow: "clip" }}

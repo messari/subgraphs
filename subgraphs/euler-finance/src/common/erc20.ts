@@ -1,16 +1,16 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts';
-import { ERC20 } from '../../generated/euler/ERC20';
-import { ERC20SymbolBytes } from '../../generated/euler/ERC20SymbolBytes';
-import { ERC20NameBytes } from '../../generated/euler/ERC20NameBytes';
-import { isNullEthValue } from './conversions';
-import { StaticTokenDefinition } from './staticTokenDefinition';
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { ERC20 } from "../../generated/euler/ERC20";
+import { ERC20SymbolBytes } from "../../generated/euler/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/euler/ERC20NameBytes";
+import { isNullEthValue } from "./conversions";
+import { StaticTokenDefinition } from "./staticTokenDefinition";
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
   const contract = ERC20.bind(tokenAddress);
   const contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);
 
   // try types string and bytes32 for symbol
-  let symbolValue = 'unknown';
+  let symbolValue = "unknown";
   const symbolResult = contract.try_symbol();
 
   if (symbolResult.reverted) {
@@ -24,7 +24,7 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
         // try with the static definition
         const staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
 
-        if(staticTokenDefinition != null) {
+        if (staticTokenDefinition != null) {
           symbolValue = staticTokenDefinition.symbol;
         }
       }
@@ -41,7 +41,7 @@ export function fetchTokenName(tokenAddress: Address): string {
   const contractNameBytes = ERC20NameBytes.bind(tokenAddress);
 
   // try types string and bytes32 for name
-  let nameValue = 'unknown';
+  let nameValue = "unknown";
   const nameResult = contract.try_name();
 
   if (nameResult.reverted) {
@@ -54,7 +54,7 @@ export function fetchTokenName(tokenAddress: Address): string {
       } else {
         // try with the static definition
         const staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
-        if(staticTokenDefinition != null) {
+        if (staticTokenDefinition != null) {
           nameValue = staticTokenDefinition.name;
         }
       }
@@ -90,7 +90,7 @@ export function fetchTokenDecimals(tokenAddress: Address): BigInt {
     // try with the static definition
     const staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
 
-    if(staticTokenDefinition != null) {
+    if (staticTokenDefinition != null) {
       return staticTokenDefinition.decimals;
     }
   }
