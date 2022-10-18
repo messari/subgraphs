@@ -466,7 +466,7 @@ function PoolTabEntity({
 
       // Push the Reward APR fields to the bottom of the charts section
       if (field.toUpperCase().includes("REWARDAPR") && dataFields[field].length > 0) {
-        if ((field.toUpperCase() === "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length === 1) || (field.toUpperCase() !== "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length > 1)) {
+        if ((field.toUpperCase() === "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length === 1) || (field.toUpperCase() !== "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length > 0)) {
           rewardChart[field] = dataFields[field];
           delete dataFields[field];
         }
@@ -506,7 +506,6 @@ function PoolTabEntity({
     if (Object.keys(rewardChart).length > 0 && !dataFieldMetrics["rewardAPR"]?.invalidDataPlot) {
       const elementId = entityName + "-rewardAPR";
       const tableVals: { value: any; date: any }[] = [];
-      const firstKey = Object.keys(rewardChart)[0];
       const amountOfInstances = rewardChart[Object.keys(rewardChart)[0]].length;
       for (let x = 0; x < amountOfInstances; x++) {
         let date: number | null = null;
@@ -727,6 +726,66 @@ function PoolTabEntity({
       let instanceToSave: any = {};
       instanceToSave.date = moment.utc(Number(instance.timestamp) * 1000).format("YYYY-MM-DD");
       instanceToSave = { ...instanceToSave, ...instance };
+      if (!!instance.rates) {
+        instance.rates.forEach((rate: any, idx: number) => {
+          instanceToSave["rate [" + idx + "]"] = rate.rate;
+        })
+        delete instanceToSave.rates;
+      }
+
+      for (let tokenIdx = 0; tokenIdx < rewardTokensLength; tokenIdx++) {
+        const amt = instance?.rewardTokenEmissionsAmount?.[tokenIdx] || 0;
+        instanceToSave["rewardTokenEmissionsAmount [" + tokenIdx + "]"] = amt;
+        const amtUSD = instance?.rewardTokenEmissionsUSD?.[tokenIdx] || 0;
+        instanceToSave["rewardTokenEmissionsUSD [" + tokenIdx + "]"] = amtUSD;
+        if (Object.keys(rewardChart).length > 0) {
+          const amtAPR = rewardChart[Object.keys(rewardChart)?.[tokenIdx]]?.[idx]?.value || 0;
+          instanceToSave["rewardAPR [" + tokenIdx + "]"] = amtAPR;
+        }
+      }
+
+      for (let idx = 0; idx < inputTokensLength; idx++) {
+        if (!!instance.inputTokenBalances) {
+          const amt = instance?.inputTokenBalances?.[idx] || 0;
+          instanceToSave["inputTokenBalances [" + idx + "]"] = amt;
+        }
+        if (!!instance.inputTokenWeights) {
+          const amt = instance?.inputTokenWeights?.[idx] || 0;
+          instanceToSave["inputTokenWeights [" + idx + "]"] = amt;
+        }
+        if (!!instance.dailyVolumeByTokenAmount) {
+          const amt = instance?.dailyVolumeByTokenAmount?.[idx] || 0;
+          instanceToSave["dailyVolumeByTokenAmount [" + idx + "]"] = amt;
+        }
+        if (!!instance.dailyVolumeByTokenUSD) {
+          const amt = instance?.dailyVolumeByTokenUSD?.[idx] || 0;
+          instanceToSave["dailyVolumeByTokenUSD [" + idx + "]"] = amt;
+        }
+        if (!!instance.hourlyVolumeByTokenAmount) {
+          const amt = instance?.hourlyVolumeByTokenAmount?.[idx] || 0;
+          instanceToSave["hourlyVolumeByTokenAmount [" + idx + "]"] = amt;
+        }
+        if (!!instance.hourlyVolumeByTokenUSD) {
+          const amt = instance?.hourlyVolumeByTokenUSD?.[idx] || 0;
+          instanceToSave["hourlyVolumeByTokenUSD [" + idx + "]"] = amt;
+        }
+      }
+
+      if (!!dataFields.baseYield) {
+        instanceToSave.baseYield = dataFields.baseYield[idx]?.value;
+        if (!dataFields.baseYield[idx]?.value) {
+          instanceToSave.baseYield = 0;
+        }
+      }
+
+      delete instanceToSave.rewardTokenEmissionsAmount;
+      delete instanceToSave.rewardTokenEmissionsUSD;
+      delete instanceToSave.inputTokenBalances;
+      delete instanceToSave.inputTokenWeights;
+      delete instanceToSave.dailyVolumeByTokenAmount;
+      delete instanceToSave.dailyVolumeByTokenUSD;
+      delete instanceToSave.hourlyVolumeByTokenAmount;
+      delete instanceToSave.hourlyVolumeByTokenUSD;
       delete instanceToSave.__typename;
       return instanceToSave;
     }).sort((a: any, b: any) => (Number(a.timestamp) - Number(b.timestamp)));

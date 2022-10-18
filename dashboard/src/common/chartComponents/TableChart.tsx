@@ -117,11 +117,13 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
           <Button className="Hover-Underline" onClick={() => setShowDatePicker((prev) => !prev)}>
             Date Filter
           </Button>
-          <Button className="Hover-Underline" onClick={() => downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel)}>Save CSV</Button>
-          {jpegDownloadHandler ? <Button className="Hover-Underline" onClick={() => jpegDownloadHandler()}>Save Chart</Button> : null}
           <Button className="Hover-Underline" onClick={() => toggleDateString(!showDateString)}>
             {showDateString ? `${hourly ? "hours" : "days"} since epoch` : "Date MM/DD/YYYY"}
           </Button>
+          <Button className="Hover-Underline" onClick={() => downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel)}>
+            Save CSV
+          </Button>
+          {jpegDownloadHandler ? <Button className="Hover-Underline" onClick={() => jpegDownloadHandler()}>Save Chart</Button> : null}
         </Box>
         <DataGrid
           sx={{ textOverflow: "clip" }}
