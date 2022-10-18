@@ -21,10 +21,12 @@ import {
   Borrow,
   Deposit,
   LiquidationCall,
+  Paused,
   Repay,
   ReserveDataUpdated,
   ReserveUsedAsCollateralDisabled,
   ReserveUsedAsCollateralEnabled,
+  Unpaused,
   Withdraw,
 } from "../../../generated/LendingPool/LendingPool";
 import { AToken } from "../../../generated/LendingPool/AToken";
@@ -276,11 +278,11 @@ export function handleReserveUsedAsCollateralDisabled(
   );
 }
 
-export function handlePaused(): void {
+export function handlePaused(event: Paused): void {
   _handlePaused(getProtocolData());
 }
 
-export function handleUnpaused(): void {
+export function handleUnpaused(event: Unpaused): void {
   _handleUnpaused(getProtocolData());
 }
 
