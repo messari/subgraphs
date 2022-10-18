@@ -179,7 +179,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       tryIncentiveController.value
     );
     const tryPoolInfo = incentiveControllerContract.try_poolInfo(
-      Address.fromString(market.inputToken)
+      Address.fromString(market.outputToken!)
     );
     const tryAllocPoints = incentiveControllerContract.try_totalAllocPoint();
     const tryRewardsPerSecond =
@@ -205,6 +205,14 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
       const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
       const poolAllocPoints = tryPoolInfo.value.value1;
+
+      log.warning("1: {} 2: {} 3: {} 4: {} 5: {}", [
+        tryPoolInfo.value.value0.toString(),
+        tryPoolInfo.value.value1.toString(),
+        tryPoolInfo.value.value2.toString(),
+        tryPoolInfo.value.value3.toString(),
+        tryPoolInfo.value.value4.toString(),
+      ]);
 
       // calculate rewards per pool
       // rewards = rewardsPerSecond * poolAllocPoints / totalAllocPoints
