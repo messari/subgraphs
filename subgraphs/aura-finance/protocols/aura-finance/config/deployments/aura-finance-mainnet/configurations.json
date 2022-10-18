@@ -1,5 +1,0 @@
-{
-  "deployment": "AURAFINANCE_MAINNET",
-  "network": "mainnet",
-  "file": "./src/mappings/handlers.ts"
-}
