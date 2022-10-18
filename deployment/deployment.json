@@ -5811,5 +5811,34 @@
         }
       }
     }
+  },
+  "harvest-finance": {
+    "schema": "yield-aggregator",
+    "base": "harvest-finance",
+    "protocol": "harvest-finance",
+    "deployments": {
+      "harvest-finance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.0",
+          "subgraph": "0.0.1",
+          "methodology": "0.0.1"
+        },
+        "services": {
+          "decentralized-network": {
+            "slug": "harvest-finance-ethereum",
+            "query-id": "https://api.studio.thegraph.com/query/8290/harvest-finance/v0.0.30"
+          }
+        },
+        "files": {
+          "template": "subgraph.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        }
+      }
+    }
   }
 }
