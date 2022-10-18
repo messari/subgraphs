@@ -206,6 +206,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
       const poolAllocPoints = tryPoolInfo.value.value1;
 
+      // TODO: remove
       log.warning("1: {} 2: {} 3: {} 4: {} 5: {}", [
         tryPoolInfo.value.value0.toString(),
         tryPoolInfo.value.value1.toString(),
