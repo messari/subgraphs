@@ -463,7 +463,7 @@ type Account @entity {
 type Market @entity {
   id: ID! # {protocol pair/pool/vault address}
   account: Account!
-  protocolName: ProtocolName!
+  protocolName: String!
   protocolType: ProtocolType!
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens

@@ -37,6 +37,7 @@ import {
 } from "./updateMetrics";
 import { NetworkConfigs } from "../../configurations/configure";
 import { getTrackedVolumeUSD } from "../price/price";
+import { positionalPairCreated } from "./positional/uniswapV2Factory";
 
 /**
  * Create the fee for a pool depending on the the protocol and network specific fee structure.
@@ -128,6 +129,16 @@ export function createLiquidityPool(
   LPtoken.save();
   poolAmounts.save();
   poolDeposits.save();
+
+  // Execute positional pair craeted handler
+  positionalPairCreated(
+    event,
+    protocol.name,
+    poolAddress,
+    token0,
+    token1,
+    LPtoken
+  );
 }
 
 // Create Account entity for participating account

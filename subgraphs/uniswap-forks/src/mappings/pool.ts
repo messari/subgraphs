@@ -31,6 +31,7 @@ import {
   ZERO_ADDRESS,
 } from "../common/constants";
 import { getLiquidityPool } from "../common/getters";
+import { positionalHandleBurn, positionalHandleMint, positionalHandleSync, positionalHandleTransfer } from "../common/positional/uniswapV2Pair";
 
 // Handle transfers event.
 // The transfers are either occur as a part of the Mint or Burn event process.
@@ -74,6 +75,9 @@ export function handleTransfer(event: Transfer): void {
       event.params.from.toHexString()
     );
   }
+
+  // execute positional handlers
+  positionalHandleTransfer(event);
 }
 
 // Handle Sync event.
@@ -86,6 +90,9 @@ export function handleSync(event: Sync): void {
     event.params.reserve1
   );
   updateTvlAndTokenPrices(event.address.toHexString());
+
+  // execute positional handlers
+  positionalHandleSync(event);
 }
 
 // Handle a mint event emitted from a pool contract. Considered a deposit into the given liquidity pool.
@@ -94,6 +101,9 @@ export function handleMint(event: Mint): void {
   updateUsageMetrics(event, event.params.sender, UsageType.DEPOSIT);
   updateFinancials(event);
   updatePoolMetrics(event);
+
+  // execute positional handlers
+  positionalHandleMint(event);
 }
 
 // Handle a burn event emitted from a pool contract. Considered a withdraw into the given liquidity pool.
@@ -102,6 +112,9 @@ export function handleBurn(event: Burn): void {
   updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
   updateFinancials(event);
   updatePoolMetrics(event);
+
+  // execute positional handlers
+  positionalHandleBurn(event);
 }
 
 // Handle a swap event emitted from a pool contract.

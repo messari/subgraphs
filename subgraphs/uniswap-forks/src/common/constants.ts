@@ -181,3 +181,23 @@ export const MINIMUM_LIQUIDITY_FOUR_HUNDRED_THOUSAND = new BigDecimal(
 );
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+export namespace PositionType {
+  export const INVESTMENT = "INVESTMENT"
+  export const DEBT = "DEBT"
+}
+
+export namespace TransactionType {
+  export const INVEST = "INVEST"
+  export const REDEEM = "REDEEM"
+  export const BORROW = "BORROW"
+  export const REPAY = "REPAY"
+  export const TRANSFER_IN = "TRANSFER_IN"
+  export const TRANSFER_OUT = "TRANSFER_OUT"
+}
+
+export namespace TokenStandard {
+  export const ERC20 = "ERC20"
+  export const ERC721 = "ERC721"
+  export const ERC1155 = "ERC1155"
+}
