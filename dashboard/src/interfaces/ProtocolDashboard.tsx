@@ -121,11 +121,16 @@ function ProtocolDashboard() {
     protocolIdToUse = protocolIdString;
   }
   let protocolType = "N/A";
+  let entityError = null;
   if (protocolSchemaData?.protocols?.length > 0) {
     protocolType = protocolSchemaData?.protocols[0]?.type;
     if (protocolSchemaData.protocols[0]?.id && !protocolIdToUse) {
       protocolIdToUse = protocolSchemaData.protocols[0]?.id;
     }
+  } else {
+    entityError = new ApolloError({
+      errorMessage: `DEPLOYMENT ERROR - ${subgraphToQuery.url} does not have any "protocol" entities. Essential data that determines validation can not be pulled without this entity.`,
+    });
   }
 
   const [protocolId, setprotocolId] = useState<string>(protocolIdToUse);
@@ -350,9 +355,9 @@ function ProtocolDashboard() {
       if (protocolIdToUse || protocolSchemaData?.protocols[0]?.id) {
         getData();
         getProtocolTableData();
-        getPendingSubgraph();
       }
     }
+    getPendingSubgraph();
     getFailedIndexingStatus();
   }, [protocolSchemaData, getData, getProtocolTableData, getPendingSubgraph]);
 
@@ -841,7 +846,9 @@ function ProtocolDashboard() {
       });
     }
   }
-
+  if (!!entityError) {
+    errorDisplayProps = entityError;
+  }
   if (data) {
     errorDisplayProps = null;
   }

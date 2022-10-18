@@ -43,7 +43,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
             let pendingRow = null;
             if (!!depo?.pendingIndexStatus) {
                 const pendingObject = depo!.pendingIndexStatus;
-                let { syncedPending } = pendingObject ?? {};
+                let syncedPending = pendingObject?.synced ? pendingObject?.synced : {};
                 let statusPendingDataOnChain: { [x: string]: any } = {};
                 if (pendingObject?.chains?.length > 0) {
                     statusPendingDataOnChain = pendingObject?.chains[0];
@@ -59,7 +59,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                     statusPendingDataOnChain?.chainHeadBlock?.number - statusPendingDataOnChain?.earliestBlock?.number,
                 ));
 
-                if (syncedPending) {
+                if (syncedPending && !pendingObject?.fatalError && Number(indexedPending) > 99) {
                     highlightColor = "#58BC82";
                     indexedPending = formatIntToFixed2(100);
                 }
@@ -165,13 +165,13 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                                 {indexedPending ? indexedPending + "%" : "N/A"}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {Number(statusPendingDataOnChain?.earliestBlock?.number)?.toLocaleString()}
+                                {!!Number(statusPendingDataOnChain?.earliestBlock?.number) ? Number(statusPendingDataOnChain?.earliestBlock?.number)?.toLocaleString() : "N/A"}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {Number(statusPendingDataOnChain?.latestBlock?.number)?.toLocaleString()}
+                                {!!Number(statusPendingDataOnChain?.latestBlock?.number) ? Number(statusPendingDataOnChain?.latestBlock?.number)?.toLocaleString() : "N/A"}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                                {Number(statusPendingDataOnChain?.chainHeadBlock?.number)?.toLocaleString() || "?"}
+                                {!!Number(statusPendingDataOnChain?.chainHeadBlock?.number) ? Number(statusPendingDataOnChain?.chainHeadBlock?.number)?.toLocaleString() : "N/A"}
                             </TableCell>
                             <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                                 <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
@@ -212,7 +212,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                     statusDecenDataOnChain?.chainHeadBlock?.number - statusDecenDataOnChain?.earliestBlock?.number,
                 ));
 
-                if (syncedDecen) {
+                if (syncedDecen && !decenObject?.fatalError && Number(indexedDecen) > 99) {
                     highlightColor = "#58BC82";
                     indexedDecen = formatIntToFixed2(100);
                 }
@@ -287,13 +287,13 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                             {indexedDecen ? indexedDecen + "%" : "N/A"}
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                            {Number(statusDecenDataOnChain?.earliestBlock?.number)?.toLocaleString()}
+                            {!!Number(statusDecenDataOnChain?.earliestBlock?.number) ? Number(statusDecenDataOnChain?.earliestBlock?.number)?.toLocaleString() : "N/A"}
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                            {Number(statusDecenDataOnChain?.latestBlock?.number)?.toLocaleString()}
+                            {!!Number(statusDecenDataOnChain?.latestBlock?.number) ? Number(statusDecenDataOnChain?.latestBlock?.number)?.toLocaleString() : "N/A"}
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
-                            {Number(statusDecenDataOnChain?.chainHeadBlock?.number)?.toLocaleString() || "?"}
+                            {!!Number(statusDecenDataOnChain?.chainHeadBlock?.number) ? Number(statusDecenDataOnChain?.chainHeadBlock?.number)?.toLocaleString() : "N/A"}
                         </TableCell>
                         <TableCell sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingRight: "16px", textAlign: "right" }}>
                             <Typography variant="h5" sx={{ width: "100%" }} fontSize={14}>
@@ -329,7 +329,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                 statusDataOnChain?.latestBlock?.number - statusDataOnChain?.earliestBlock?.number || 0,
                 statusDataOnChain?.chainHeadBlock?.number - statusDataOnChain?.earliestBlock?.number,
             ));
-            if (synced) {
+            if (synced && !currentObject?.fatalError && Number(indexed) > 99) {
                 indexed = formatIntToFixed2(100);
                 highlightColor = "#58BC82";
             }
@@ -504,7 +504,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                             statusDecenDataOnChain?.chainHeadBlock?.number - statusDecenDataOnChain?.earliestBlock?.number,
                         ));
 
-                        if (syncedDecen) {
+                        if (syncedDecen && !decenObject?.fatalError && Number(indexedDecen) > 99) {
                             indexedDecen = formatIntToFixed2(100);
                         }
                         return <a key={"CellNetwork-" + x.chain + x.hostedServiceId} href={"https://thegraph.com/hosted-service/subgraph/messari/" + x.hostedServiceId} ><NetworkLogo tooltip={`${x.chain} (${indexedDecen}%)`} size={30} network={x.chain} /></a>
@@ -600,11 +600,11 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                                 statusDecenDataOnChain?.chainHeadBlock?.number - statusDecenDataOnChain?.earliestBlock?.number,
                             ));
 
-                            if (syncedDecen) {
+                            if (syncedDecen && !decenObject?.fatalError && Number(indexedDecen) > 99) {
                                 indexedDecen = formatIntToFixed2(100);
                             }
                             let borderColor = "#EFCB68";
-                            if (!!x?.indexStatus?.synced) {
+                            if (!!x?.indexStatus?.synced && !x?.indexStatus?.fatalError) {
                                 borderColor = "#58BC82";
                             }
                             if (!!x?.indexStatus?.fatalError) {
