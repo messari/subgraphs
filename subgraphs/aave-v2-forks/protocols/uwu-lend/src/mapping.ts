@@ -278,10 +278,12 @@ export function handleReserveUsedAsCollateralDisabled(
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handlePaused(event: Paused): void {
   _handlePaused(getProtocolData());
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handleUnpaused(event: Unpaused): void {
   _handleUnpaused(getProtocolData());
 }
