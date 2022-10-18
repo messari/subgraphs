@@ -4,6 +4,7 @@
   "scripts": {
     "format": "npx prettier --write .",
     "codegen": "graph codegen",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/deployments/${npm_config_id}/configurations.json configurations/configure.template.ts > configurations/configure.ts",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ mrbrianhobo/opensea-v2-wyvern"
   },
   "dependencies": {
