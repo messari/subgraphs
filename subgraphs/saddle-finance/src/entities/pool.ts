@@ -7,6 +7,7 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
+  _TokenPools,
   Deposit,
   LiquidityPool,
   LiquidityPoolDailySnapshot,
@@ -113,9 +114,9 @@ export function createPoolFromRegistryEvent(address: Address, block: ethereum.Bl
 }
 
 function createPool(
-  swapAddress: Address, 
+  swapAddress: Address,
   blockNum: BigInt,
-  timestamp: BigInt, 
+  timestamp: BigInt,
   pooledTokens: Address[] | null
 ): LiquidityPool | null {
   const address = swapAddress;
@@ -165,6 +166,7 @@ function createPool(
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.save();
   incrementProtocolTotalPoolCount();
+  registerPoolForTokens(pool);
   return pool;
 }
 
@@ -626,4 +628,30 @@ function arrayIntersection<T>(arr1: Array<T>, arr2: Array<T>): Array<T> {
     }
   }
   return intersection;
+}
+
+function getOrCreateTokenPools(token: Address): _TokenPools {
+  let pools = _TokenPools.load(token.toHexString());
+  if (pools) {
+    return pools;
+  }
+
+  pools = new _TokenPools(token.toHexString());
+  pools.pools = [];
+  pools.save();
+  return pools;
+}
+
+// registerPoolForTokens will keep track of the pool entity on an auxiliary entity
+// that is indexed by token address (so we can easily tell in which pools a token is traded).
+function registerPoolForTokens(pool: LiquidityPool): void {
+  for (let i = 0; i < pool.inputTokens.length; i++) {
+    const token = pool.inputTokens[i];
+    const pools = getOrCreateTokenPools(Address.fromString(token));
+    if (pools.pools.includes(pool.id)) {
+      continue;
+    }
+    pools.pools = pools.pools.concat([pool.id]);
+    pools.save();
+  }
 }
