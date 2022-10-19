@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { YakStrategyV2 } from "../generated/YakStrategyV2/YakStrategyV2";
 import { calculatePriceInUSD, calculateOutputTokenPriceInUSD } from "./helpers/calculators";
 import { convertBINumToDesiredDecimals } from "./helpers/converters";
@@ -28,45 +28,45 @@ export function updateDailyOrHourlyEntities(contractAddress: Address,
   }
 
   function protocolUpdater(contractAddress: Address): void {
-    let dexStrategyV4Contract = YakStrategyV2.bind(contractAddress);
-    let protocol = defineProtocol(contractAddress);
-    if (dexStrategyV4Contract.try_depositToken().reverted) {
+    const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+    const protocol = defineProtocol(contractAddress);
+    
+    if (yakStrategyV2Contract.try_depositToken().reverted) {
       protocol.totalValueLockedUSD = ZERO_BIGDECIMAL;
     } else {
-      protocol.totalValueLockedUSD = calculatePriceInUSD(dexStrategyV4Contract.depositToken(), DEFUALT_AMOUNT).times(convertBINumToDesiredDecimals(dexStrategyV4Contract.totalDeposits(), 18));
+      protocol.totalValueLockedUSD = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT).times(convertBINumToDesiredDecimals(yakStrategyV2Contract.totalDeposits(), 18));
     }
-    let isAccountUniqe = defineAccount(contractAddress);
+    const isAccountUniqe = defineAccount(contractAddress);
     protocol.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers + isAccountUniqe.toI32();
     protocol.save();
   }
 
-  function vaultUpdater(contractAddress: Address, 
-    timestamp: BigInt, 
-    blockNumber: BigInt): void {
-    let dexStrategyV4Contract = YakStrategyV2.bind(contractAddress);
-    let vault = defineVault(contractAddress, timestamp, blockNumber);
+  function vaultUpdater(contractAddress: Address, timestamp: BigInt, blockNumber: BigInt): void {
+    const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+    const vault = defineVault(contractAddress, timestamp, blockNumber);
   
-    if (dexStrategyV4Contract.try_totalSupply().reverted) {
+    if (yakStrategyV2Contract.try_totalSupply().reverted) {
       vault.outputTokenSupply = ZERO_BIGINT;
       vault.stakedOutputTokenAmount = ZERO_BIGINT;
     } else {
-      vault.outputTokenSupply = dexStrategyV4Contract.totalSupply();
-      vault.stakedOutputTokenAmount = dexStrategyV4Contract.totalSupply();
+      vault.outputTokenSupply = yakStrategyV2Contract.totalSupply();
+      vault.stakedOutputTokenAmount = yakStrategyV2Contract.totalSupply();
     }
-    if (dexStrategyV4Contract.try_totalDeposits().reverted) {
+    log.debug('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', [yakStrategyV2Contract.MIN_TOKENS_TO_REINVEST.toString()]);
+    if (yakStrategyV2Contract.try_totalDeposits().reverted) {
       vault.inputTokenBalance = ZERO_BIGINT;
     } else {
-      vault.inputTokenBalance = dexStrategyV4Contract.totalDeposits();
-      if (dexStrategyV4Contract.try_depositToken().reverted) {
+      vault.inputTokenBalance = yakStrategyV2Contract.totalDeposits();
+      if (yakStrategyV2Contract.try_depositToken().reverted) {
         vault.totalValueLockedUSD = ZERO_BIGDECIMAL;
       } else {
-        vault.totalValueLockedUSD = calculatePriceInUSD(dexStrategyV4Contract.depositToken(), DEFUALT_AMOUNT).times(convertBINumToDesiredDecimals(dexStrategyV4Contract.totalDeposits(), 18));
+        vault.totalValueLockedUSD = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT).times(convertBINumToDesiredDecimals(yakStrategyV2Contract.totalDeposits(), 18));
       }
     }
-    if (dexStrategyV4Contract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
+    if (yakStrategyV2Contract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
       vault.pricePerShare = ZERO_BIGDECIMAL;
     } else {
-      vault.pricePerShare = convertBINumToDesiredDecimals(dexStrategyV4Contract.getDepositTokensForShares(DEFUALT_AMOUNT), 18);
+      vault.pricePerShare = convertBINumToDesiredDecimals(yakStrategyV2Contract.getDepositTokensForShares(DEFUALT_AMOUNT), 18);
     }
     vault.outputTokenPriceUSD = calculateOutputTokenPriceInUSD(contractAddress);
   
@@ -76,35 +76,36 @@ export function updateDailyOrHourlyEntities(contractAddress: Address,
   function vaultDailySnapshotUpdater(contractAddress: Address, 
     timestamp: BigInt, 
     blockNumber: BigInt): void {
-    let dexStrategyV4Contract = YakStrategyV2.bind(contractAddress);
-    let vaultDailySnapshotEntity = defineVaultDailySnapshot(timestamp, blockNumber, contractAddress);
-    if (dexStrategyV4Contract.try_totalSupply().reverted) {
+    const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+    const vaultDailySnapshotEntity = defineVaultDailySnapshot(timestamp, blockNumber, contractAddress);
+    if (yakStrategyV2Contract.try_totalSupply().reverted) {
       vaultDailySnapshotEntity.outputTokenSupply = ZERO_BIGINT;
     } else {
-      vaultDailySnapshotEntity.outputTokenSupply = dexStrategyV4Contract.totalSupply();
+      vaultDailySnapshotEntity.outputTokenSupply = yakStrategyV2Contract.totalSupply();
     }
   
-    if (dexStrategyV4Contract.try_totalSupply().reverted) {
+    if (yakStrategyV2Contract.try_totalSupply().reverted) {
       vaultDailySnapshotEntity.outputTokenSupply = ZERO_BIGINT;
       vaultDailySnapshotEntity.stakedOutputTokenAmount = ZERO_BIGINT;
     } else {
-      vaultDailySnapshotEntity.outputTokenSupply = dexStrategyV4Contract.totalSupply();
-      vaultDailySnapshotEntity.stakedOutputTokenAmount = dexStrategyV4Contract.totalSupply();
+      vaultDailySnapshotEntity.outputTokenSupply = yakStrategyV2Contract.totalSupply();
+      vaultDailySnapshotEntity.stakedOutputTokenAmount = yakStrategyV2Contract.totalSupply();
     }
-    if (dexStrategyV4Contract.try_totalDeposits().reverted) {
+    log.debug('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', [yakStrategyV2Contract.MIN_TOKENS_TO_REINVEST.toString()]);
+    if (yakStrategyV2Contract.try_totalDeposits().reverted) {
       vaultDailySnapshotEntity.inputTokenBalance = ZERO_BIGINT;
     } else {
-      vaultDailySnapshotEntity.inputTokenBalance = dexStrategyV4Contract.totalDeposits()
-      if (dexStrategyV4Contract.try_depositToken().reverted) {
+      vaultDailySnapshotEntity.inputTokenBalance = yakStrategyV2Contract.totalDeposits()
+      if (yakStrategyV2Contract.try_depositToken().reverted) {
         vaultDailySnapshotEntity.totalValueLockedUSD = ZERO_BIGDECIMAL;
       } else {
-        vaultDailySnapshotEntity.totalValueLockedUSD = calculatePriceInUSD(dexStrategyV4Contract.depositToken(), DEFUALT_AMOUNT).times(convertBINumToDesiredDecimals(dexStrategyV4Contract.totalDeposits(), 18));
+        vaultDailySnapshotEntity.totalValueLockedUSD = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT).times(convertBINumToDesiredDecimals(yakStrategyV2Contract.totalDeposits(), 18));
       }
     }
-    if (dexStrategyV4Contract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
+    if (yakStrategyV2Contract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
       vaultDailySnapshotEntity.pricePerShare = ZERO_BIGDECIMAL;
     } else {
-      vaultDailySnapshotEntity.pricePerShare = convertBINumToDesiredDecimals(dexStrategyV4Contract.getDepositTokensForShares(DEFUALT_AMOUNT), 18);
+      vaultDailySnapshotEntity.pricePerShare = convertBINumToDesiredDecimals(yakStrategyV2Contract.getDepositTokensForShares(DEFUALT_AMOUNT), 18);
     }
     vaultDailySnapshotEntity.outputTokenPriceUSD = calculateOutputTokenPriceInUSD(contractAddress);
   
@@ -114,29 +115,31 @@ export function updateDailyOrHourlyEntities(contractAddress: Address,
   function vaultHourlySnapshotUpdater(contractAddress: Address,
     timestamp: BigInt, 
     blockNumber: BigInt): void {
-    let dexStrategyV4Contract = YakStrategyV2.bind(contractAddress);
-    let vaultHourlySnapshotEntity = defineVaultHourlySnapshot(timestamp, blockNumber, contractAddress);
-    if (dexStrategyV4Contract.try_totalSupply().reverted) {
+    const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+    const vaultHourlySnapshotEntity = defineVaultHourlySnapshot(timestamp, blockNumber, contractAddress);
+    if (yakStrategyV2Contract.try_totalSupply().reverted) {
       vaultHourlySnapshotEntity.outputTokenSupply = ZERO_BIGINT;
       vaultHourlySnapshotEntity.stakedOutputTokenAmount = ZERO_BIGINT;
     } else {
-      vaultHourlySnapshotEntity.outputTokenSupply = dexStrategyV4Contract.totalSupply();
-      vaultHourlySnapshotEntity.stakedOutputTokenAmount = dexStrategyV4Contract.totalSupply();
+      vaultHourlySnapshotEntity.outputTokenSupply = yakStrategyV2Contract.totalSupply();
+      vaultHourlySnapshotEntity.stakedOutputTokenAmount = yakStrategyV2Contract.totalSupply();
     }
-    if (dexStrategyV4Contract.try_totalDeposits().reverted) {
+
+    log.debug('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', [yakStrategyV2Contract.MIN_TOKENS_TO_REINVEST.toString()]);
+    if (yakStrategyV2Contract.try_totalDeposits().reverted) {
       vaultHourlySnapshotEntity.inputTokenBalance = ZERO_BIGINT;
     } else {
-      vaultHourlySnapshotEntity.inputTokenBalance = dexStrategyV4Contract.totalDeposits()
-      if (dexStrategyV4Contract.try_depositToken().reverted) {
+      vaultHourlySnapshotEntity.inputTokenBalance = yakStrategyV2Contract.totalDeposits()
+      if (yakStrategyV2Contract.try_depositToken().reverted) {
         vaultHourlySnapshotEntity.totalValueLockedUSD = ZERO_BIGDECIMAL;
       } else {
-        vaultHourlySnapshotEntity.totalValueLockedUSD = calculatePriceInUSD(dexStrategyV4Contract.depositToken(), DEFUALT_AMOUNT).times(convertBINumToDesiredDecimals(dexStrategyV4Contract.totalDeposits(), 18));
+        vaultHourlySnapshotEntity.totalValueLockedUSD = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT).times(convertBINumToDesiredDecimals(yakStrategyV2Contract.totalDeposits(), 18));
       }
     }
-    if (dexStrategyV4Contract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
+    if (yakStrategyV2Contract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
       vaultHourlySnapshotEntity.pricePerShare = ZERO_BIGDECIMAL;
     } else {
-      vaultHourlySnapshotEntity.pricePerShare = convertBINumToDesiredDecimals(dexStrategyV4Contract.getDepositTokensForShares(DEFUALT_AMOUNT), 18);
+      vaultHourlySnapshotEntity.pricePerShare = convertBINumToDesiredDecimals(yakStrategyV2Contract.getDepositTokensForShares(DEFUALT_AMOUNT), 18);
     }
     vaultHourlySnapshotEntity.outputTokenPriceUSD = calculateOutputTokenPriceInUSD(contractAddress);
   
@@ -146,9 +149,9 @@ export function updateDailyOrHourlyEntities(contractAddress: Address,
   function usageMetricsDailySnapshotUpdater(contractAddress: Address, 
     timestamp: BigInt, 
     blockNumber: BigInt): void {
-    let protocol = defineProtocol(contractAddress);
-    let isDailyAccountUniqe = defineActiveAccount(contractAddress, timestamp, "d");
-    let usageMetricsDailySnapshotEntity = defineUsageMetricsDailySnapshotEntity(timestamp, blockNumber, contractAddress);
+    const protocol = defineProtocol(contractAddress);
+    const isDailyAccountUniqe = defineActiveAccount(contractAddress, timestamp, "d");
+    const usageMetricsDailySnapshotEntity = defineUsageMetricsDailySnapshotEntity(timestamp, blockNumber, contractAddress);
     usageMetricsDailySnapshotEntity.dailyTransactionCount = usageMetricsDailySnapshotEntity.dailyTransactionCount + 1;
     usageMetricsDailySnapshotEntity.dailyActiveUsers = usageMetricsDailySnapshotEntity.dailyActiveUsers + isDailyAccountUniqe.toI32();
     usageMetricsDailySnapshotEntity.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
@@ -158,9 +161,9 @@ export function updateDailyOrHourlyEntities(contractAddress: Address,
   function usageMetricsHourlySnapshotUpdater(contractAddress: Address, 
     timestamp: BigInt, 
     blockNumber: BigInt): void {
-    let protocol = defineProtocol(contractAddress);
-    let isHourlyAccountUniqe = defineActiveAccount(contractAddress, timestamp, "h");
-    let usageMetricsHourlySnapshotEntity = defineUsageMetricsHourlySnapshot(timestamp, blockNumber, contractAddress);
+    const protocol = defineProtocol(contractAddress);
+    const isHourlyAccountUniqe = defineActiveAccount(contractAddress, timestamp, "h");
+    const usageMetricsHourlySnapshotEntity = defineUsageMetricsHourlySnapshot(timestamp, blockNumber, contractAddress);
     usageMetricsHourlySnapshotEntity.hourlyTransactionCount = usageMetricsHourlySnapshotEntity.hourlyTransactionCount + 1;
     usageMetricsHourlySnapshotEntity.hourlyActiveUsers = usageMetricsHourlySnapshotEntity.hourlyActiveUsers + isHourlyAccountUniqe.toI32();
     usageMetricsHourlySnapshotEntity.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
@@ -170,12 +173,12 @@ export function updateDailyOrHourlyEntities(contractAddress: Address,
   function financialsDailySnapshotUpdater(contractAddress: Address, 
     timestamp: BigInt, 
     blockNumber: BigInt): void {
-    let protocol = defineProtocol(contractAddress);
-    let dexStrategyV4Contract = YakStrategyV2.bind(contractAddress);
-    let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber, contractAddress);
+    const protocol = defineProtocol(contractAddress);
+    const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+    const financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber, contractAddress);
     financialsDailySnapshotEntity.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
     financialsDailySnapshotEntity.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
     financialsDailySnapshotEntity.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-    financialsDailySnapshotEntity.totalValueLockedUSD = calculatePriceInUSD (dexStrategyV4Contract.depositToken(), DEFUALT_AMOUNT).times(convertBINumToDesiredDecimals(dexStrategyV4Contract.totalDeposits(), 18));
+    financialsDailySnapshotEntity.totalValueLockedUSD = calculatePriceInUSD (yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT).times(convertBINumToDesiredDecimals(yakStrategyV2Contract.totalDeposits(), 18));
     financialsDailySnapshotEntity.save();
   }

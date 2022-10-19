@@ -1,11 +1,12 @@
-import { Address, BigInt, BigDecimal, bigInt, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt, BigDecimal, bigInt, log, bigDecimal } from '@graphprotocol/graph-ts'
 import { DEFUALT_AMOUNT, USDC_ADDRESS, WAVAX_CONTRACT_ADDRESS, YAK_ROUTER_ADDRESS, ZERO_ADDRESS, ZERO_BIGDECIMAL } from '../utils/constants';
 import { YakRouter } from '../../generated/YakRouter/YakRouter';
 import { convertBINumToDesiredDecimals } from './converters';
 import { YakStrategyV2 } from '../../generated/YakStrategyV2/YakStrategyV2';
+import { defineVault } from '../utils/initial';
 
 export function calculatePriceInUSD(tokenAddress: Address, amount: BigInt): BigDecimal {
-    let avaxAddress = ZERO_ADDRESS;
+    const avaxAddress = ZERO_ADDRESS;
     if (tokenAddress == avaxAddress) {
       tokenAddress = WAVAX_CONTRACT_ADDRESS;
     }
@@ -25,7 +26,7 @@ export function calculatePriceInUSD(tokenAddress: Address, amount: BigInt): BigD
   export function pathFinder(pathLenght: string, amount: BigInt, tokenAddress: Address): BigDecimal {
     const usdcAddress = USDC_ADDRESS;
     const yakRouterAddress = YAK_ROUTER_ADDRESS;
-    let yakRouter = YakRouter.bind(yakRouterAddress);
+    const yakRouter = YakRouter.bind(yakRouterAddress);
     let tokenPriceInUSDWithDecimal: BigDecimal;
     if (yakRouter.try_findBestPath(amount, tokenAddress, usdcAddress, BigInt.fromString(pathLenght)).reverted) {
       log.info('findBestPath reverted {}', [yakRouter.try_findBestPath(amount, tokenAddress, usdcAddress, BigInt.fromString(pathLenght)).reverted.toString()]);
@@ -49,20 +50,127 @@ export function calculatePriceInUSD(tokenAddress: Address, amount: BigInt): BigD
   }
 
   export function calculateOutputTokenPriceInUSD(contractAddress: Address): BigDecimal {
-    let dexStrategyV4Contract = YakStrategyV2.bind(contractAddress);
-    let OutputTokenPriceInUSD: BigDecimal;
-    if (dexStrategyV4Contract.try_depositToken().reverted || dexStrategyV4Contract.try_getSharesForDepositTokens(DEFUALT_AMOUNT).reverted) {
-      OutputTokenPriceInUSD = ZERO_BIGDECIMAL;
-      return OutputTokenPriceInUSD;
+    const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+    let outputTokenPriceInUSD: BigDecimal;
+    if (yakStrategyV2Contract.try_depositToken().reverted || yakStrategyV2Contract.try_getSharesForDepositTokens(DEFUALT_AMOUNT).reverted) {
+      outputTokenPriceInUSD = ZERO_BIGDECIMAL;
+      return outputTokenPriceInUSD;
     } else {
-      let depositTokenPrice: BigDecimal = calculatePriceInUSD(dexStrategyV4Contract.depositToken(), DEFUALT_AMOUNT);
-      let getSharesForDepositToken: BigInt = dexStrategyV4Contract.getSharesForDepositTokens(DEFUALT_AMOUNT);
-      let getSharesForDepositTokenInDecimal: BigDecimal = convertBINumToDesiredDecimals(getSharesForDepositToken, 18);
+      const depositTokenPrice: BigDecimal = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT);
+      const getSharesForDepositToken: BigInt = yakStrategyV2Contract.getSharesForDepositTokens(DEFUALT_AMOUNT);
+      const getSharesForDepositTokenInDecimal: BigDecimal = convertBINumToDesiredDecimals(getSharesForDepositToken, 18);
       if (getSharesForDepositTokenInDecimal != ZERO_BIGDECIMAL) {
-        OutputTokenPriceInUSD = depositTokenPrice.div(getSharesForDepositTokenInDecimal);
+        outputTokenPriceInUSD = depositTokenPrice.div(getSharesForDepositTokenInDecimal);
       } else {
-        OutputTokenPriceInUSD = ZERO_BIGDECIMAL;
+        outputTokenPriceInUSD = ZERO_BIGDECIMAL;
       }
     }
-    return OutputTokenPriceInUSD;
+    return outputTokenPriceInUSD;
   }
+
+  export function distributedRewardCalculator(contractAddress: Address, 
+    timestamp: BigInt, 
+    blockNumber: BigInt, 
+    newTotalSupply: BigInt): BigInt {
+    const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+    let depositTokenPrice: BigDecimal;
+    if (yakStrategyV2Contract.try_depositToken().reverted) {
+        depositTokenPrice = ZERO_BIGDECIMAL;
+    } else {
+        depositTokenPrice = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT);
+    }
+    const vault = defineVault(contractAddress, timestamp, blockNumber);
+    const beforeReinvestSupply = vault.outputTokenSupply;
+    const distributedReward: BigInt = newTotalSupply.minus(beforeReinvestSupply!);
+    return distributedReward;
+}
+
+export function distributedRewardInUSDCalculator(contractAddress: Address, 
+  timestamp: BigInt, 
+  blockNumber: BigInt, 
+  newTotalSupply: BigInt): BigDecimal {
+  const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+  let depositTokenPrice: BigDecimal;
+  if (yakStrategyV2Contract.try_depositToken().reverted) {
+      depositTokenPrice = ZERO_BIGDECIMAL;
+  } else {
+      depositTokenPrice = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT);
+  }
+  const distributedReward = distributedRewardCalculator(contractAddress, timestamp, blockNumber, newTotalSupply);
+  let allFees: BigDecimal;
+  if (yakStrategyV2Contract.try_DEV_FEE_BIPS().reverted || yakStrategyV2Contract.try_ADMIN_FEE_BIPS().reverted || yakStrategyV2Contract.try_REINVEST_REWARD_BIPS().reverted) {
+      allFees = ZERO_BIGDECIMAL;
+  } else {
+      allFees = (yakStrategyV2Contract.DEV_FEE_BIPS().plus(yakStrategyV2Contract.ADMIN_FEE_BIPS().plus(yakStrategyV2Contract.REINVEST_REWARD_BIPS()))).toBigDecimal().div(bigDecimal.fromString("1000"));
+  }
+  let allDistributedReward: BigDecimal;
+  if (allFees != ZERO_BIGDECIMAL) {
+      allDistributedReward = distributedReward.toBigDecimal().div(allFees);
+  } else {
+      allDistributedReward = ZERO_BIGDECIMAL;
+  }
+  const distributedRewardInUSD = depositTokenPrice.times(convertBINumToDesiredDecimals(distributedReward, 18));
+  return distributedRewardInUSD;
+}
+
+export function protocolRewardInUSDCalculator(contractAddress: Address, 
+  timestamp: BigInt, 
+  blockNumber: BigInt, 
+  newTotalSupply: BigInt): BigDecimal {
+  const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+  let depositTokenPrice: BigDecimal;
+  if (yakStrategyV2Contract.try_depositToken().reverted) {
+      depositTokenPrice = ZERO_BIGDECIMAL;
+  } else {
+      depositTokenPrice = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT);
+  }
+  const distributedReward = distributedRewardCalculator(contractAddress, timestamp, blockNumber, newTotalSupply);
+  let allFees: BigDecimal;
+  if (yakStrategyV2Contract.try_DEV_FEE_BIPS().reverted || yakStrategyV2Contract.try_ADMIN_FEE_BIPS().reverted || yakStrategyV2Contract.try_REINVEST_REWARD_BIPS().reverted) {
+      allFees = ZERO_BIGDECIMAL;
+  } else {
+      allFees = (yakStrategyV2Contract.DEV_FEE_BIPS().plus(yakStrategyV2Contract.ADMIN_FEE_BIPS().plus(yakStrategyV2Contract.REINVEST_REWARD_BIPS()))).toBigDecimal().div(bigDecimal.fromString("1000"));
+  }
+  let allDistributedReward: BigDecimal;
+  if (allFees != ZERO_BIGDECIMAL) {
+      allDistributedReward = distributedReward.toBigDecimal().div(allFees);
+  } else {
+      allDistributedReward = ZERO_BIGDECIMAL;
+  }
+  let protocolReward: BigDecimal
+  if (yakStrategyV2Contract.try_ADMIN_FEE_BIPS().reverted) {
+      protocolReward = ZERO_BIGDECIMAL;
+  } else {
+      protocolReward = allDistributedReward.times(yakStrategyV2Contract.ADMIN_FEE_BIPS().toBigDecimal()).div(bigDecimal.fromString("1000"));
+  }
+  const protocolRewardInUSD = depositTokenPrice.times(protocolReward);
+  return protocolRewardInUSD;
+}
+
+export function allDistributedRewardInUSDCalculator(contractAddress: Address, 
+  timestamp: BigInt, 
+  blockNumber: BigInt, 
+  newTotalSupply: BigInt): BigDecimal {
+  const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+  let depositTokenPrice: BigDecimal;
+  if (yakStrategyV2Contract.try_depositToken().reverted) {
+      depositTokenPrice = ZERO_BIGDECIMAL;
+  } else {
+      depositTokenPrice = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT);
+  }
+  const distributedReward = distributedRewardCalculator(contractAddress, timestamp, blockNumber, newTotalSupply);
+  let allFees: BigDecimal;
+  if (yakStrategyV2Contract.try_DEV_FEE_BIPS().reverted || yakStrategyV2Contract.try_ADMIN_FEE_BIPS().reverted || yakStrategyV2Contract.try_REINVEST_REWARD_BIPS().reverted) {
+      allFees = ZERO_BIGDECIMAL;
+  } else {
+      allFees = (yakStrategyV2Contract.DEV_FEE_BIPS().plus(yakStrategyV2Contract.ADMIN_FEE_BIPS().plus(yakStrategyV2Contract.REINVEST_REWARD_BIPS()))).toBigDecimal().div(bigDecimal.fromString("1000"));
+  }
+  let allDistributedReward: BigDecimal;
+  if (allFees != ZERO_BIGDECIMAL) {
+      allDistributedReward = distributedReward.toBigDecimal().div(allFees);
+  } else {
+      allDistributedReward = ZERO_BIGDECIMAL;
+  }
+  const allDistributedRewardInUSD = depositTokenPrice.times(allDistributedReward);
+  return allDistributedRewardInUSD;
+}

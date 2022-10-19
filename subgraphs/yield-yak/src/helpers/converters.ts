@@ -3,7 +3,7 @@ import { BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 // @ts-ignore
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
     let bd = BigDecimal.fromString("1");
-    let bd10 = BigDecimal.fromString("10");
+    const bd10 = BigDecimal.fromString("10");
 
     for (let i = 0; i < decimals; i++) {
       bd = bd.times(bd10);

@@ -5,6 +5,9 @@
     },
     "YakRouter": {
       "address": "0xC4729E56b831d74bBc18797e0e17A295fA77488c"
+    },
+    "Test": {
+      "address": "0x9cdBd99D1392489d472BD672b2023739667e7215"
     }
   }
 }

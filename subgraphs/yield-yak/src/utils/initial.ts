@@ -8,7 +8,7 @@ import {
    UsageMetricsHourlySnapshot,
    FinancialsDailySnapshot } from '../../generated/schema';
 import { YakStrategyV2 } from '../../generated/YakStrategyV2/YakStrategyV2';
-import { DEFUALT_AMOUNT, DEFUALT_DECIMALS, YAK_STRATEGY_MANAGER_ADDRESS, ZERO_ADDRESS, ZERO_BIGDECIMAL, ZERO_BIGINT } from './constants';
+import { DEFUALT_AMOUNT, DEFUALT_DECIMALS, ZERO_INT, YAK_STRATEGY_MANAGER_ADDRESS, ZERO_ADDRESS, ZERO_BIGDECIMAL, ZERO_BIGINT } from './constants';
 import { Token, Vault, VaultFee, RewardToken, VaultDailySnapshot } from '../../generated/schema';
 import { WAVAX_CONTRACT_ADDRESS } from './constants';
 import { YakERC20 } from '../../generated/YakERC20/YakERC20';
@@ -16,12 +16,12 @@ import { calculateOutputTokenPriceInUSD, calculatePriceInUSD } from '../helpers/
 import { convertBINumToDesiredDecimals } from '../helpers/converters';
 
 export function defineProtocol(contractAddress: Address): YieldAggregator {
-    let dexStrategyV4Contract = YakStrategyV2.bind(contractAddress);
+    const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
     let ownerAddress: Address;
-    if (dexStrategyV4Contract.try_owner().reverted) {
+    if (yakStrategyV2Contract.try_owner().reverted) {
       ownerAddress = YAK_STRATEGY_MANAGER_ADDRESS;
     } else {
-      ownerAddress = dexStrategyV4Contract.owner();
+      ownerAddress = yakStrategyV2Contract.owner();
     }
     let protocol = YieldAggregator.load(ownerAddress.toHexString());
     if (protocol == null) {
@@ -34,6 +34,12 @@ export function defineProtocol(contractAddress: Address): YieldAggregator {
       protocol.network = "AVALANCHE";
       protocol.type = "YIELD";
       protocol.protocolControlledValueUSD = ZERO_BIGDECIMAL;
+      protocol.totalValueLockedUSD = ZERO_BIGDECIMAL;
+      protocol.cumulativeSupplySideRevenueUSD = ZERO_BIGDECIMAL;
+      protocol.cumulativeProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
+      protocol.cumulativeTotalRevenueUSD = ZERO_BIGDECIMAL;
+      protocol.cumulativeUniqueUsers = ZERO_INT;
+      protocol.totalPoolCount = ZERO_INT;
     }
     protocol.save();
     return protocol;
@@ -44,7 +50,7 @@ export function defineInputToken(tokenAddress: Address, blockNumber: BigInt): To
     tokenAddress = WAVAX_CONTRACT_ADDRESS;
   }
 
-  let tokenContract = YakERC20.bind(tokenAddress);
+  const tokenContract = YakERC20.bind(tokenAddress);
   let token = Token.load(tokenAddress.toHexString());
   if (token == null) {
     token = new Token(tokenAddress.toHexString());
@@ -73,74 +79,81 @@ export function defineInputToken(tokenAddress: Address, blockNumber: BigInt): To
 }
 
 export function defineVault(contractAddress: Address, timestamp: BigInt, blockNumber: BigInt): Vault {
-  let dexStrategyV4Contract = YakStrategyV2.bind(contractAddress);
+  const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
   let vault = Vault.load(contractAddress.toHexString());
   if (vault == null) {
     vault = new Vault(contractAddress.toHexString());
 
-    let protocol = defineProtocol(contractAddress);
+    const protocol = defineProtocol(contractAddress);
     vault.protocol = protocol.id;
 
     vault.createdBlockNumber = blockNumber;
     vault.createdTimestamp = timestamp;
-    if (dexStrategyV4Contract.try_depositToken().reverted) {
-      let inputTokenAddress = ZERO_ADDRESS;
-      let inputToken = defineInputToken(inputTokenAddress, blockNumber);
+    if (yakStrategyV2Contract.try_depositToken().reverted) {
+      const inputTokenAddress = ZERO_ADDRESS;
+      const inputToken = defineInputToken(inputTokenAddress, blockNumber);
       vault.inputToken = inputToken.id;
     } else {
-      let inputTokenAddress = dexStrategyV4Contract.depositToken();
-      let inputToken = defineInputToken(inputTokenAddress, blockNumber);
+      const inputTokenAddress = yakStrategyV2Contract.depositToken();
+      const inputToken = defineInputToken(inputTokenAddress, blockNumber);
       vault.inputToken = inputToken.id;
     }
 
-    let outputToken = defineOutputToken(contractAddress, blockNumber);
+    const outputToken = defineOutputToken(contractAddress, blockNumber);
     vault.outputToken = outputToken.id;
 
     vault.rewardTokens = [];
     vault.rewardTokenEmissionsAmount = [];
     vault.rewardTokenEmissionsUSD = [];
     vault.fees = [];
+    vault.totalValueLockedUSD = ZERO_BIGDECIMAL;
+    vault.cumulativeSupplySideRevenueUSD = ZERO_BIGDECIMAL;
+    vault.cumulativeProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
+    vault.cumulativeTotalRevenueUSD = ZERO_BIGDECIMAL;
+    vault.inputTokenBalance = ZERO_BIGINT;
+    vault.rewardTokenEmissionsAmount = [];
+    vault.rewardTokenEmissionsAmount = [];
 
     let rewardTokenAddress: Address;
-    if (dexStrategyV4Contract.try_rewardToken().reverted) {
+    if (yakStrategyV2Contract.try_rewardToken().reverted) {
       rewardTokenAddress = ZERO_ADDRESS;
     } else {
-      rewardTokenAddress = dexStrategyV4Contract.rewardToken();
+      rewardTokenAddress = yakStrategyV2Contract.rewardToken();
     }
-    let rewardToken = defineRewardToken(rewardTokenAddress, blockNumber);
-    let rewardTokenArr = new Array<string>();
+    const rewardToken = defineRewardToken(rewardTokenAddress, blockNumber);
+    const rewardTokenArr = new Array<string>();
     rewardTokenArr.push(rewardToken.id);
     vault.rewardTokens = rewardTokenArr;
     
-    let rewardTokenEmissionsAmountArr = new Array<BigInt>();
+    const rewardTokenEmissionsAmountArr = new Array<BigInt>();
     rewardTokenEmissionsAmountArr.push(ZERO_BIGINT);
     vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmountArr;
     
-    let rewardTokenEmissionsUSDArr = new Array<BigDecimal>();
+    const rewardTokenEmissionsUSDArr = new Array<BigDecimal>();
     rewardTokenEmissionsUSDArr.push(ZERO_BIGDECIMAL);
     vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSDArr;
 
     vault.outputTokenSupply = ZERO_BIGINT;
 
-    if (dexStrategyV4Contract.try_MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST().reverted) {
+    if (yakStrategyV2Contract.try_MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST().reverted) {
       vault.depositLimit = ZERO_BIGINT;
     } else {
-      vault.depositLimit = dexStrategyV4Contract.MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST();
+      vault.depositLimit = yakStrategyV2Contract.MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST();
     }
 
-    if (dexStrategyV4Contract.try_name().reverted) {
+    if (yakStrategyV2Contract.try_name().reverted) {
       vault.name = "";
     } else {
-      vault.name = dexStrategyV4Contract.name();
+      vault.name = yakStrategyV2Contract.name();
     }
-    if (dexStrategyV4Contract.try_symbol().reverted) {
+    if (yakStrategyV2Contract.try_symbol().reverted) {
       vault.symbol = "";
     } else {
-      vault.symbol = dexStrategyV4Contract.symbol();
+      vault.symbol = yakStrategyV2Contract.symbol();
     }
-    let adminFee = defineFee(contractAddress, "-adminFee")
-    let developerFee = defineFee(contractAddress, "-developerFee")
-    let reinvestorFee = defineFee(contractAddress, "-reinvestorFee")
+    const adminFee = defineFee(contractAddress, "-adminFee")
+    const developerFee = defineFee(contractAddress, "-developerFee")
+    const reinvestorFee = defineFee(contractAddress, "-reinvestorFee")
     
     vault.fees.push(adminFee.id);
     vault.fees.push(developerFee.id);
@@ -164,7 +177,7 @@ function defineRewardToken(rewardTokenAddress: Address, blockNumber: BigInt): Re
 }
 
 function defineOutputToken(tokenAddress: Address, blockNumber: BigInt): Token {
-  let tokenContract = YakStrategyV2.bind(tokenAddress);
+  const tokenContract = YakStrategyV2.bind(tokenAddress);
   let token = Token.load(tokenAddress.toHexString());
   if (token == null) {
     token = new Token(tokenAddress.toHexString());
@@ -194,25 +207,25 @@ function defineOutputToken(tokenAddress: Address, blockNumber: BigInt): Token {
 }
 
 function defineFee(contractAddress:Address, feeType:string): VaultFee {
-  let dexStrategyV4Contract = YakStrategyV2.bind(contractAddress);
-  let fee = new VaultFee(contractAddress.toHexString().concat(feeType));
+  const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
+  const fee = new VaultFee(contractAddress.toHexString().concat(feeType));
   if (feeType == "-adminFee") {
-    if (dexStrategyV4Contract.try_ADMIN_FEE_BIPS().reverted) {
+    if (yakStrategyV2Contract.try_ADMIN_FEE_BIPS().reverted) {
       fee.feePercentage = ZERO_BIGDECIMAL;
     } else {
-      fee.feePercentage = convertBINumToDesiredDecimals(dexStrategyV4Contract.ADMIN_FEE_BIPS(), 4);
+      fee.feePercentage = convertBINumToDesiredDecimals(yakStrategyV2Contract.ADMIN_FEE_BIPS(), 4);
     }
   } else if(feeType == "-developerFee") {
-    if (dexStrategyV4Contract.try_DEV_FEE_BIPS().reverted) {
+    if (yakStrategyV2Contract.try_DEV_FEE_BIPS().reverted) {
       fee.feePercentage = ZERO_BIGDECIMAL;
     } else {
-      fee.feePercentage = convertBINumToDesiredDecimals(dexStrategyV4Contract.DEV_FEE_BIPS(), 4);
+      fee.feePercentage = convertBINumToDesiredDecimals(yakStrategyV2Contract.DEV_FEE_BIPS(), 4);
     }
   } else if(feeType == "-reinvestorFee") {
-    if (dexStrategyV4Contract.try_REINVEST_REWARD_BIPS().reverted) {
+    if (yakStrategyV2Contract.try_REINVEST_REWARD_BIPS().reverted) {
       fee.feePercentage = ZERO_BIGDECIMAL;
     } else {
-      fee.feePercentage = convertBINumToDesiredDecimals(dexStrategyV4Contract.REINVEST_REWARD_BIPS(), 4);
+      fee.feePercentage = convertBINumToDesiredDecimals(yakStrategyV2Contract.REINVEST_REWARD_BIPS(), 4);
     }
   }
     fee.feeType = "PERFORMANCE_FEE";
@@ -231,25 +244,32 @@ export function defineAccount(accountAddress: Address): BigInt {
 }
 
 
-export function defineActiveAccount(accountAddress: Address, 
+export function defineActiveAccount(
+  accountAddress: Address, 
   timestamp: BigInt, 
-  check: string): BigInt {
-  let checker = ZERO_BIGINT;
+  check: string
+  ): BigInt {
+  
   let dailyActive = ZERO_BIGINT;
-  let hourlyActive = ZERO_BIGINT;
-  let daysFromStart = timestamp.toI32() / 24 / 60 / 60
+  const daysFromStart = timestamp.toI32() / 24 / 60 / 60
   let accountDaily = ActiveAccount.load(accountAddress.toHexString().concat("-").concat(daysFromStart.toString()));
+
   if (accountDaily == null) {
     accountDaily = new ActiveAccount(accountAddress.toHexString().concat("-").concat(daysFromStart.toString()));
     dailyActive = bigInt.fromString("1");
   }
-  let hourInDay = (timestamp.toI32() - daysFromStart * 24 * 60 * 60) / 60 / 60
+  const hourInDay = (timestamp.toI32() - daysFromStart * 24 * 60 * 60) / 60 / 60
+  
+  let hourlyActive = ZERO_BIGINT;
   let accountHourly = ActiveAccount.load(accountAddress.toHexString().concat("-").concat(daysFromStart.toString()).concat("-").concat(hourInDay.toString()));
+ 
   if (accountHourly == null) {
     accountHourly = new ActiveAccount(accountAddress.toHexString().concat("-").concat(daysFromStart.toString()).concat("-").concat(hourInDay.toString()));
     hourlyActive = bigInt.fromString("1");
   }
   
+  let checker = ZERO_BIGINT;
+
   if (check == "d" && dailyActive == bigInt.fromString("1")) {
     checker = bigInt.fromString("1");
   } else if (check == "h" && hourlyActive == bigInt.fromString("1")){
@@ -263,22 +283,34 @@ export function defineVaultDailySnapshot(
   blockNumber: BigInt,
   contractAddress: Address,
 ): VaultDailySnapshot {
-  let protocol = defineProtocol(contractAddress)
-  let daysFromStart = timestamp.toI32() / 24 / 60 / 60;
+  const protocol = defineProtocol(contractAddress)
+  const daysFromStart = timestamp.toI32() / 24 / 60 / 60;
   let vaultDailySnapshotEntity = VaultDailySnapshot.load(contractAddress.toHexString().concat("-").concat(daysFromStart.toString()));
+  
   if (vaultDailySnapshotEntity == null) {
     vaultDailySnapshotEntity = new VaultDailySnapshot(contractAddress.toHexString().concat("-").concat(daysFromStart.toString()));
     vaultDailySnapshotEntity.timestamp = timestamp;
     vaultDailySnapshotEntity.blockNumber = blockNumber;
     vaultDailySnapshotEntity.protocol = protocol.id;
-    let vault = defineVault(contractAddress, timestamp, blockNumber);
+    vaultDailySnapshotEntity.totalValueLockedUSD = ZERO_BIGDECIMAL;
+    vaultDailySnapshotEntity.cumulativeSupplySideRevenueUSD = ZERO_BIGDECIMAL;
+    vaultDailySnapshotEntity.dailySupplySideRevenueUSD = ZERO_BIGDECIMAL;
+    vaultDailySnapshotEntity.cumulativeProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
+    vaultDailySnapshotEntity.dailyProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
+    vaultDailySnapshotEntity.cumulativeTotalRevenueUSD = ZERO_BIGDECIMAL;
+    vaultDailySnapshotEntity.dailyTotalRevenueUSD = ZERO_BIGDECIMAL;
+    vaultDailySnapshotEntity.inputTokenBalance = ZERO_BIGINT;
+    vaultDailySnapshotEntity.outputTokenSupply = ZERO_BIGINT;
+    vaultDailySnapshotEntity.dailyTotalRevenueUSD = ZERO_BIGDECIMAL;
+
+    const vault = defineVault(contractAddress, timestamp, blockNumber);
     vaultDailySnapshotEntity.vault = vault.id;
 
-    let rewardTokenEmissionsAmountArr = new Array<BigInt>();
+    const rewardTokenEmissionsAmountArr = new Array<BigInt>();
     rewardTokenEmissionsAmountArr.push(ZERO_BIGINT);
     vaultDailySnapshotEntity.rewardTokenEmissionsAmount = rewardTokenEmissionsAmountArr;
     
-    let rewardTokenEmissionsUSDArr = new Array<BigDecimal>();
+    const rewardTokenEmissionsUSDArr = new Array<BigDecimal>();
     rewardTokenEmissionsUSDArr.push(ZERO_BIGDECIMAL);
     vaultDailySnapshotEntity.rewardTokenEmissionsUSD = rewardTokenEmissionsUSDArr;
 
@@ -292,23 +324,34 @@ export function defineVaultHourlySnapshot(
   blockNumber: BigInt,
   contractAddress: Address,
 ): VaultHourlySnapshot {
-  let protocol = defineProtocol(contractAddress)
-  let daysFromStart = timestamp.toI32() / 24 / 60 / 60
-  let hourInDay = (timestamp.toI32() - daysFromStart * 24 * 60 * 60) / 60 / 60;
+  const protocol = defineProtocol(contractAddress)
+  const daysFromStart = timestamp.toI32() / 24 / 60 / 60
+  const hourInDay = (timestamp.toI32() - daysFromStart * 24 * 60 * 60) / 60 / 60;
   let vaultHourlySnapshotEntity = VaultHourlySnapshot.load(contractAddress.toHexString().concat("-").concat(daysFromStart.toString()).concat("-").concat(hourInDay.toString()));
+  
   if (vaultHourlySnapshotEntity == null) {
     vaultHourlySnapshotEntity = new VaultHourlySnapshot(contractAddress.toHexString().concat("-").concat(daysFromStart.toString()).concat("-").concat(hourInDay.toString()));
     vaultHourlySnapshotEntity.timestamp = timestamp;
     vaultHourlySnapshotEntity.blockNumber = blockNumber;
     vaultHourlySnapshotEntity.protocol = protocol.id;
-    let vault = defineVault(contractAddress, timestamp, blockNumber);
+    const vault = defineVault(contractAddress, timestamp, blockNumber);
     vaultHourlySnapshotEntity.vault = vault.id;
 
-    let rewardTokenEmissionsAmountArr = new Array<BigInt>();
+    vaultHourlySnapshotEntity.hourlySupplySideRevenueUSD = ZERO_BIGDECIMAL;
+    vaultHourlySnapshotEntity.hourlyProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
+    vaultHourlySnapshotEntity.hourlyTotalRevenueUSD = ZERO_BIGDECIMAL;
+    vaultHourlySnapshotEntity.totalValueLockedUSD = ZERO_BIGDECIMAL;
+    vaultHourlySnapshotEntity.cumulativeSupplySideRevenueUSD = ZERO_BIGDECIMAL;
+    vaultHourlySnapshotEntity.cumulativeProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
+    vaultHourlySnapshotEntity.cumulativeTotalRevenueUSD = ZERO_BIGDECIMAL;
+    vaultHourlySnapshotEntity.inputTokenBalance = ZERO_BIGINT;
+    vaultHourlySnapshotEntity.outputTokenSupply = ZERO_BIGINT;
+
+    const rewardTokenEmissionsAmountArr = new Array<BigInt>();
     rewardTokenEmissionsAmountArr.push(ZERO_BIGINT);
     vaultHourlySnapshotEntity.rewardTokenEmissionsAmount = rewardTokenEmissionsAmountArr;
     
-    let rewardTokenEmissionsUSDArr = new Array<BigDecimal>();
+    const rewardTokenEmissionsUSDArr = new Array<BigDecimal>();
     rewardTokenEmissionsUSDArr.push(ZERO_BIGDECIMAL);
     vaultHourlySnapshotEntity.rewardTokenEmissionsUSD = rewardTokenEmissionsUSDArr;
 
@@ -322,8 +365,8 @@ export function defineUsageMetricsDailySnapshotEntity(
   blockNumber: BigInt,
   contractAddress: Address,
 ): UsageMetricsDailySnapshot {
-  let protocol = defineProtocol(contractAddress);
-  let daysFromStart = timestamp.toI32() / 24 / 60 / 60;
+  const protocol = defineProtocol(contractAddress);
+  const daysFromStart = timestamp.toI32() / 24 / 60 / 60;
   let usageMetricsDailySnapshotEntity = UsageMetricsDailySnapshot.load(daysFromStart.toString());
   
   if (usageMetricsDailySnapshotEntity == null) {
@@ -331,6 +374,12 @@ export function defineUsageMetricsDailySnapshotEntity(
     usageMetricsDailySnapshotEntity.timestamp = timestamp;
     usageMetricsDailySnapshotEntity.blockNumber = blockNumber;
     usageMetricsDailySnapshotEntity.protocol = protocol.id;
+    usageMetricsDailySnapshotEntity.dailyActiveUsers = ZERO_INT;
+    usageMetricsDailySnapshotEntity.cumulativeUniqueUsers = ZERO_INT;
+    usageMetricsDailySnapshotEntity.dailyTransactionCount = ZERO_INT;
+    usageMetricsDailySnapshotEntity.dailyDepositCount = ZERO_INT;
+    usageMetricsDailySnapshotEntity.dailyWithdrawCount = ZERO_INT;
+    usageMetricsDailySnapshotEntity.totalPoolCount = ZERO_INT;
   }
 
   usageMetricsDailySnapshotEntity.save();
@@ -342,15 +391,20 @@ export function  defineUsageMetricsHourlySnapshot(
   blockNumber: BigInt,
   contractAddress: Address,
 ): UsageMetricsHourlySnapshot {
-  let protocol = defineProtocol(contractAddress);
-  let daysFromStart = timestamp.toI32() / 24 / 60 / 60;
-  let hourInDay = (timestamp.toI32() - daysFromStart * 24 * 60 * 60) / 60 / 60;
+  const protocol = defineProtocol(contractAddress);
+  const daysFromStart = timestamp.toI32() / 24 / 60 / 60;
+  const hourInDay = (timestamp.toI32() - daysFromStart * 24 * 60 * 60) / 60 / 60;
   let usageMetricsHourlySnapshotEntity = UsageMetricsHourlySnapshot.load(daysFromStart.toString().concat("-").concat(hourInDay.toString()));
   if (usageMetricsHourlySnapshotEntity == null) {
     usageMetricsHourlySnapshotEntity = new UsageMetricsHourlySnapshot(daysFromStart.toString().concat("-").concat(hourInDay.toString()));
     usageMetricsHourlySnapshotEntity.timestamp = timestamp;
     usageMetricsHourlySnapshotEntity.blockNumber = blockNumber;
     usageMetricsHourlySnapshotEntity.protocol = protocol.id;
+    usageMetricsHourlySnapshotEntity.hourlyActiveUsers = ZERO_INT;
+    usageMetricsHourlySnapshotEntity.cumulativeUniqueUsers = ZERO_INT;
+    usageMetricsHourlySnapshotEntity.hourlyTransactionCount = ZERO_INT;
+    usageMetricsHourlySnapshotEntity.hourlyDepositCount = ZERO_INT;
+    usageMetricsHourlySnapshotEntity.hourlyWithdrawCount = ZERO_INT;
   }
   usageMetricsHourlySnapshotEntity.save();
   return usageMetricsHourlySnapshotEntity;
@@ -361,15 +415,23 @@ export function defineFinancialsDailySnapshotEntity(
   blockNumber: BigInt,
   contractAddress: Address,
 ): FinancialsDailySnapshot {
-  let protocol = defineProtocol(contractAddress);
-  let daysFromStart = timestamp.toI32() / 24 / 60 / 60
+  const protocol = defineProtocol(contractAddress);
+  const daysFromStart = timestamp.toI32() / 24 / 60 / 60
   let financialsDailySnapshotEntity = FinancialsDailySnapshot.load(daysFromStart.toString());
+
   if (financialsDailySnapshotEntity == null) {
     financialsDailySnapshotEntity = new FinancialsDailySnapshot(daysFromStart.toString());
     financialsDailySnapshotEntity.timestamp = timestamp;
     financialsDailySnapshotEntity.blockNumber = blockNumber;
     financialsDailySnapshotEntity.protocol = protocol.id;
     financialsDailySnapshotEntity.protocolControlledValueUSD = ZERO_BIGDECIMAL;
+    financialsDailySnapshotEntity.totalValueLockedUSD = ZERO_BIGDECIMAL;
+    financialsDailySnapshotEntity.dailySupplySideRevenueUSD = ZERO_BIGDECIMAL;
+    financialsDailySnapshotEntity.cumulativeSupplySideRevenueUSD = ZERO_BIGDECIMAL;
+    financialsDailySnapshotEntity.dailyProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
+    financialsDailySnapshotEntity.cumulativeProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
+    financialsDailySnapshotEntity.dailyTotalRevenueUSD = ZERO_BIGDECIMAL;
+    financialsDailySnapshotEntity.cumulativeTotalRevenueUSD = ZERO_BIGDECIMAL;
   }
 
 
