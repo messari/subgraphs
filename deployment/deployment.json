@@ -4151,7 +4151,7 @@
       }
     }
   },
-  "ens-governance-governance": {
+  "ens-governance": {
     "schema": "governance",
     "base": "openzeppelin-governor",
     "protocol": "ens-governance",
@@ -4175,6 +4175,10 @@
           "hosted-service": {
             "slug": "ens-governance",
             "query-id": "ens-governance"
+          },
+          "decentralized-network": {
+            "slug": "ens-governance",
+            "query-id": "F7MznC87sv5y5jNUaBSrKFgCqTqP9Vgc11xcreZQpX7e"
           }
         }
       }
@@ -4204,6 +4208,10 @@
           "hosted-service": {
             "slug": "euler-governance",
             "query-id": "euler-governance"
+          },
+          "decentralized-network": {
+            "slug": "euler-governance",
+            "query-id": "4xyasjQeREe7PxnF6wVdobZvCw5mhoHZq3T7guRpuNPf"
           }
         }
       }
@@ -4262,6 +4270,10 @@
           "hosted-service": {
             "slug": "hop-governance",
             "query-id": "hop-governance"
+          },
+          "decentralized-network": {
+            "slug": "hop-governance",
+            "query-id": "zGuPrsVqtY5ehJDCmweb9ZnBrae3tSQWRux8Mz1M4Gn"
           }
         }
       }
@@ -4291,6 +4303,10 @@
           "hosted-service": {
             "slug": "silo-governance",
             "query-id": "silo-governance"
+          },
+          "decentralized-network": {
+            "slug": "silo-governance",
+            "query-id": "HnV3fhwsWfmQGdD2AeGzqvRVTDBqnMH74jCsDVq1DXYP"
           }
         }
       }
@@ -4320,6 +4336,10 @@
           "hosted-service": {
             "slug": "truefi-governance",
             "query-id": "truefi-governance"
+          },
+          "decentralized-network": {
+            "slug": "truefi-governance",
+            "query-id": "H36tAWQeYVioE4hHtaKJEMJMxwzVJWjfg2mimva2wcUj"
           }
         }
       }
@@ -4349,6 +4369,10 @@
           "hosted-service": {
             "slug": "unlock-governance",
             "query-id": "unlock-governance"
+          },
+          "decentralized-network": {
+            "slug": "unlock-governance",
+            "query-id": "Dpk4Gen22wxQ3Laojf7DR2me8wGzjaHwjsKAsLf2rCFV"
           }
         }
       }
