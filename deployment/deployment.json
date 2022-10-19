@@ -4325,6 +4325,64 @@
       }
     }
   },
+  "compound-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "compound-governance",
+    "deployments": {
+      "compound-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "compound-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "compound-governance",
+            "query-id": "compound-governance"
+          }
+        }
+      }
+    }
+  },
+  "uniswap-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "uniswap-governance",
+    "deployments": {
+      "uniswap-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswap-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-governance",
+            "query-id": "uniswap-governance"
+          }
+        }
+      }
+    }
+  },
   "vesper-finance": {
     "schema": "yield-aggregator",
     "base": "vesper-finance",
