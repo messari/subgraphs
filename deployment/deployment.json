@@ -1781,12 +1781,41 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
             "slug": "erc721-holders",
             "query-id": "erc721-holders"
+          }
+        }
+      }
+    }
+  },
+  "erc721-holders-top100": {
+    "schema": "erc721",
+    "base": "erc721-holders",
+    "protocol": "erc721-holders-top100",
+    "deployments": {
+      "erc721-holders-top100-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "erc721.holders.top100.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "erc721-holders-top-100",
+            "query-id": "erc721-holders-top-100"
           }
         }
       }
@@ -1810,12 +1839,41 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
             "slug": "erc721-metadata",
             "query-id": "erc721-metadata"
+          }
+        }
+      }
+    }
+  },
+  "erc721-metadata-top100": {
+    "schema": "erc721",
+    "base": "erc721-metadata",
+    "protocol": "erc721-metadata-top100",
+    "deployments": {
+      "erc721-metadata-top100-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "erc721.metadata.top100.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": true
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "erc721-metadata-top-100",
+            "query-id": "erc721-metadata-top-100"
           }
         }
       }
