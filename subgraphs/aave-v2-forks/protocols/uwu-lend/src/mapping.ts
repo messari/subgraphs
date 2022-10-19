@@ -206,18 +206,9 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       const uwuToken = getOrCreateToken(Address.fromString(UWU_TOKEN_ADDRESS));
       const poolAllocPoints = tryPoolInfo.value.value1;
 
-      // TODO: remove
-      log.warning("1: {} 2: {} 3: {} 4: {} 5: {}", [
-        tryPoolInfo.value.value0.toString(),
-        tryPoolInfo.value.value1.toString(),
-        tryPoolInfo.value.value2.toString(),
-        tryPoolInfo.value.value3.toString(),
-        tryPoolInfo.value.value4.toString(),
-      ]);
-
       // calculate rewards per pool
-      // rewards = rewardsPerSecond * poolAllocPoints / totalAllocPoints
-      // TODO: figure out how much goes to deposit vs borrow
+      // depositRewards = rewardsPerSecond * poolAllocPoints / totalAllocPoints
+      // TODO: figure out borrow rewards
       const uwuPerPoolPerDay = tryRewardsPerSecond.value
         .times(BigInt.fromI32(SECONDS_PER_DAY))
         .toBigDecimal()
