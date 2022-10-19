@@ -88,6 +88,7 @@ export function getPriceFromRouter(
 
     if (!amountOutArray.reverted) {
       amountOut = amountOutArray.value[amountOutArray.value.length - 1];
+      break;
     }
   }
 
@@ -95,8 +96,11 @@ export function getPriceFromRouter(
 
   const amountOutBigDecimal = amountOut
     .times(constants.BIGINT_TEN_THOUSAND)
-    .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
-    .toBigDecimal();
+    .divDecimal(
+      constants.BIGINT_TEN_THOUSAND.minus(
+        feeBips.times(numberOfJumps)
+      ).toBigDecimal()
+    );
 
   return CustomPriceType.initialize(
     amountOutBigDecimal,
@@ -107,9 +111,8 @@ export function getPriceFromRouter(
 export function getLpTokenPriceUsdc(tokenAddress: Address): CustomPriceType {
   const uniSwapPair = UniswapPairContract.bind(tokenAddress);
 
-  const totalLiquidity: CustomPriceType = getLpTokenTotalLiquidityUsdc(
-    tokenAddress
-  );
+  const totalLiquidity: CustomPriceType =
+    getLpTokenTotalLiquidityUsdc(tokenAddress);
   const totalSupply = utils.readValue<BigInt>(
     uniSwapPair.try_totalSupply(),
     constants.BIGINT_ZERO
