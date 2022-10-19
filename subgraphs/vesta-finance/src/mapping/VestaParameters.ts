@@ -14,7 +14,6 @@ import {
 import { bigIntToBigDecimal } from "../utils/numbers";
 import {
   BIGDECIMAL_HUNDRED,
-  BIGDECIMAL_ONE,
   BIGINT_ZERO,
 } from "../utils/constants";
 

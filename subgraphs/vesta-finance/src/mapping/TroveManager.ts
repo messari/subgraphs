@@ -84,7 +84,7 @@ export function handleTroveLiquidated(event: TroveLiquidated): void {
   const trove = getOrCreateTrove(event.params._borrower, event.params._asset);
   const asset = event.params._asset;
   const borrower = event.params._borrower;
-  let newCollateral = event.params._coll;
+  const newCollateral = event.params._coll;
   const newDebt = event.params._debt;
   // Gas compensation already subtracted, only when (MCR <= ICR < TCR & SP.VST >= trove.debt)
   if (trove.collateral.gt(newCollateral)) {

@@ -10,7 +10,7 @@ export function getStabilityPool(asset: Address): _StabilityPool | null {
 
 export function createStabilityPool(asset: Address): _StabilityPool {
   const id = asset.toHexString();
-  let stabilityPool = new _StabilityPool(id);
+  const stabilityPool = new _StabilityPool(id);
   stabilityPool.id = asset.toHexString();
   stabilityPool.totalValueLocked = BIGDECIMAL_ZERO;
   stabilityPool.save();

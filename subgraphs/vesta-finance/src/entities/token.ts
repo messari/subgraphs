@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { IERC20Detailed } from "../../generated/TroveManager/IERC20Detailed";
 import { IERC20DetailedBytes } from "../../generated/TroveManager/IERC20DetailedBytes";
 import { PriceFeedV1 } from "../../generated/templates/PriceFeedV1/PriceFeedV1";
@@ -114,17 +114,17 @@ function fetchTokenName(contract: IERC20Detailed): string {
 }
 
 function fetchTokenSymbol(contract: IERC20Detailed): string {
-  let contractSymbolBytes = IERC20DetailedBytes.bind(contract._address);
+  const contractSymbolBytes = IERC20DetailedBytes.bind(contract._address);
 
   // try types string and bytes32 for symbol
   let symbolValue = UNKNOWN_TOKEN_VALUE;
-  let trySymbolResult = contract.try_symbol();
+  const trySymbolResult = contract.try_symbol();
   if (!trySymbolResult.reverted) {
     return trySymbolResult.value;
   }
 
   // non-standard ERC20 implementation
-  let symbolResultBytes = contractSymbolBytes.try_symbol();
+  const symbolResultBytes = contractSymbolBytes.try_symbol();
   if (!symbolResultBytes.reverted) {
     // for broken pairs that have no symbol function exposed
     if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
@@ -137,7 +137,7 @@ function fetchTokenSymbol(contract: IERC20Detailed): string {
 
 function fetchTokenDecimals(contract: IERC20Detailed): i32 {
   let decimalValue = DEFAULT_DECIMALS;
-  let tryDecimalsResult = contract.try_decimals();
+  const tryDecimalsResult = contract.try_decimals();
   if (!tryDecimalsResult.reverted) {
     decimalValue = tryDecimalsResult.value;
   }
