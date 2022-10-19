@@ -156,6 +156,7 @@ export namespace metrics {
       usageMetrics.dailyTransactionCount = 0
       usageMetrics.dailyDepositCount = 0
       usageMetrics.dailyWithdrawCount = 0
+      usageMetrics.totalPoolCount = 0
 
       usageMetrics.blockNumber = block.number
       usageMetrics.timestamp = block.timestamp
