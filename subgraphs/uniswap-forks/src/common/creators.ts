@@ -22,7 +22,7 @@ import {
 } from "./constants";
 import {
   getLiquidityPool,
-  getOrCreateDex,
+  getOrCreateProtocol,
   getOrCreateTransfer,
   getOrCreateToken,
   getOrCreateLPToken,
@@ -78,7 +78,7 @@ export function createLiquidityPool(
   token0Address: string,
   token1Address: string
 ): void {
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
 
   // create the tokens and tokentracker
   const token0 = getOrCreateToken(token0Address);
@@ -244,7 +244,7 @@ export function createSwapHandleVolumeAndFees(
   amount0Out: BigInt,
   amount1Out: BigInt
 ): void {
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
   const pool = getLiquidityPool(event.address.toHexString());
   const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
