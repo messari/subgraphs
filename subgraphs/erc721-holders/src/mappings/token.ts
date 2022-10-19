@@ -1,5 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-import { ERC721 } from "../../generated/ERC721/ERC721";
+import { ERC721 } from "../../generated/ERC721Holders/ERC721";
 import { Token, Collection } from "../../generated/schema";
 
 export function normalize(strValue: string): string {

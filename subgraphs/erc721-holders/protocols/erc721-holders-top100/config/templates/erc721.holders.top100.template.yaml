@@ -4,7 +4,7 @@ schema:
 dataSources:
   # This approach uses a particular event emitted once very early to trigger the initial ERC721 token list.
   - kind: ethereum
-    name: TokenRegistry
+    name: ERC721Holders
     network: mainnet
     source:
       address: "0x7f751820be4b1e44464268c425af6095995e045a"

@@ -4,7 +4,7 @@ import { NetworkConfigs } from "../../configurations/configure";
 import {
   Transfer as TransferEvent,
   ERC721,
-} from "../../generated/ERC721/ERC721";
+} from "../../generated/ERC721Holders/ERC721";
 import {
   Collection,
   CollectionDailySnapshot,

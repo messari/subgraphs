@@ -1,7 +1,7 @@
 import { Address, log } from "@graphprotocol/graph-ts";
 
-import { Unknown as UnknownEvent } from "../../generated/TokenRegistry/TokenRegistry";
-import { ERC721 } from "../../generated/ERC721/ERC721";
+import { Unknown as UnknownEvent } from "../../generated/ERC721Holders/TokenRegistry";
+import { ERC721 } from "../../generated/ERC721Holders/ERC721";
 import { ERC721 as ERC721Template } from "../../generated/templates";
 import { Collection } from "../../generated/schema";
 
