@@ -19,7 +19,7 @@ import {
   NewReserveFactor,
   Transfer,
 } from "../../../generated/templates/CToken/CToken";
-import { LendingProtocol, Token } from "../../../generated/schema";
+import { LendingProtocol, Market, Token } from "../../../generated/schema";
 import {
   cTokenDecimals,
   Network,
@@ -60,6 +60,7 @@ import {
   nativeToken,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
+import { getUsdPricePerToken } from "./prices";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
@@ -322,7 +323,20 @@ function getPrice(
   priceOracle: string
 ): ethereum.CallResult<BigInt> {
   if (BROKEN_PRICE_MARKETS.includes(marketAddress)) {
-    // TODO use new price lib to get aurora prices
+    const market = Market.load(marketAddress.toHexString());
+    if (!market) {
+      log.warning("[getPrice] Market not found: {}", [
+        marketAddress.toHexString(),
+      ]);
+      return ethereum.CallResult.fromValue(BIGINT_ZERO);
+    }
+    const customPrice = getUsdPricePerToken(
+      Address.fromString(market.inputToken)
+    );
+
+    return ethereum.CallResult.fromValue(
+      BigInt.fromString(customPrice.usdPrice.truncate(0).toString())
+    );
   }
 
   // get the price normally
