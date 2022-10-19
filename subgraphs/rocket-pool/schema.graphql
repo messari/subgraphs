@@ -265,9 +265,6 @@ type Pool @entity {
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
-  " Minipools that exist or have existed in the pool. "
-  miniPools: [String!]
-
   " Creation timestamp "
   createdTimestamp: BigInt!
 
@@ -305,6 +302,17 @@ type Pool @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Minipools that exist or have existed in the pool. "
+  miniPools: [String!]
+
+  " Minipool comission rates at their initialization. "
+  miniPoolCommission: [BigDecimal!]
+
+  " Minipool amount slashed. "
+  miniPoolSlashAmount: BigInt!
+
+  miniPoolTotalValueLocked: BigInt!
 
   ##### Snapshots #####
 
