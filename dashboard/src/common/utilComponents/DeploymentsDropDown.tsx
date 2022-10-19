@@ -99,7 +99,7 @@ export const DeploymentsDropDown = ({
           // find the obj in selectionSet with the label = to selected input label, set the url value of that depo as the depo url
         }}
         renderInput={(params) => (
-          <ComboBoxInput label="Protocols List" params={params} setTextInput={(x) => setTextInput(x)} />
+          <ComboBoxInput label="Protocols List" params={params} setTextInput={(x: string) => setTextInput(x)} />
         )}
       />
     </>

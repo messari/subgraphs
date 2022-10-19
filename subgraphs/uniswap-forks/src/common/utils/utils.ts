@@ -40,7 +40,7 @@ export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
 
 // convert string array to byte array
 export function toBytesArray(arr: string[]): Bytes[] {
-  let byteArr = new Array<Bytes>(arr.length);
+  const byteArr = new Array<Bytes>(arr.length);
   for (let i = 0; i < arr.length; i++) {
     byteArr[i] = Bytes.fromHexString(arr[i]);
   }
@@ -60,7 +60,7 @@ export function toPercentage(n: BigDecimal): BigDecimal {
 
 // Convert a list of strings to lower case
 export function toLowerCaseList(list: string[]): string[] {
-  let lowerCaseList = new Array<string>(list.length);
+  const lowerCaseList = new Array<string>(list.length);
   for (let i = 0; i < list.length; i++) {
     lowerCaseList[i] = list[i].toLowerCase();
   }
