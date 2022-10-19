@@ -3,7 +3,9 @@ import { Pool } from "../../generated/schema";
 import { getOrCreateProtocol } from "./protocol";
 import { getOrCreateToken, getOrCreateRewardToken } from "./token";
 import {
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
+  BIGINT_ONE,
   BIGINT_ZERO,
   ETH_ADDRESS,
   RPL_ADDRESS,
@@ -53,6 +55,9 @@ export function getOrCreatePool(
     pool.rewardTokenEmissionsAmount = null;
     pool.rewardTokenEmissionsUSD = null;
     pool.miniPools = [];
+    pool.miniPoolCommission = [];
+    pool.miniPoolSlashAmount = BIGINT_ZERO;
+    pool.miniPoolTotalValueLocked = BIGINT_ZERO;
 
     pool.save();
 

@@ -1,9 +1,16 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigInt,
+  BigDecimal,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateProtocol } from "../entities/protocol";
 import { getOrCreatePool } from "../entities/pool";
 import {
   FinancialsDailySnapshot,
+  Minipool,
   PoolDailySnapshot,
   PoolHourlySnapshot,
 } from "../../generated/schema";
@@ -38,46 +45,53 @@ export function updateMinipoolTvlandRevenue(
   Minipool.inputTokenBalances = [
     Minipool.inputTokenBalances[0].plus(stakingAmount),
   ];
-  Minipool.totalValueLockedUSD = bigIntToBigDecimal(
-    Minipool.inputTokenBalances[0]
-  ).times(
+
+  Minipool.slashAmount = Minipool.slashAmount.plus(slashingAmount);
+
+  var computebalance: BigInt = BIGINT_ZERO;
+  let balance = Minipool.inputTokenBalances[0].minus(Minipool.slashAmount);
+  if (BigInt.compare(balance, BIGINT_ZERO) > 0) {
+    computebalance = balance;
+  }
+  Minipool.totalValueLockedUSD = bigIntToBigDecimal(computebalance).times(
     getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
       .lastPriceUSD!
   );
 
-  Minipool.slashAmount = Minipool.slashAmount.plus(slashingAmount);
+  pool.miniPoolTotalValueLocked = pool.miniPoolTotalValueLocked.plus(
+    Minipool.inputTokenBalances[0]
+  );
 
-  if (totalRewardEth > BIGINT_ZERO) {
-    log.warning(
-      "[updateMinipoolTvlandRevenue] TotalRewardEth nonzero, updating revenue",
-      [totalRewardEth.toString()]
-    );
-    log.error("[updateMinipoolTvlandRevenue] balance: {}", [
-      Minipool.inputTokenBalances[0].toString(),
-    ]);
-    log.error("[updateMinipoolTvlandRevenue] pool balance: {}", [
-      pool.inputTokenBalances[1].toString(),
-    ]);
-    let ratio = bigIntToBigDecimal(Minipool.inputTokenBalances[0]).div(
-      bigIntToBigDecimal(pool.inputTokenBalances[1])
-    );
+  let Comissions = pool.miniPoolCommission;
 
-    let miniPoolRewardEth = ratio.times(bigIntToBigDecimal(totalRewardEth));
-    log.error("[updateMinipoolTvlandRevenue] ratio: {}", [ratio.toString()]);
-    let miniPoolRewardUSD = miniPoolRewardEth.times(
-      getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
-        .lastPriceUSD!
-    );
-    log.error("[updateMinipoolTvlandRevenue] minipoolRewardUSD: {}", [
-      miniPoolRewardUSD.toString(),
-    ]);
-
-    Minipool.cumulativeTotalRevenueUSD = miniPoolRewardUSD;
-    Minipool.cumulativeProtocolSideRevenueUSD = miniPoolRewardUSD.times(
-      BIGDECIMAL_HALF.minus(BIGDECIMAL_HALF.times(Minipool.comissionRate))
-    );
+  if (Comissions) {
+    Comissions.push(Minipool.comissionRate);
   }
+  pool.miniPoolCommission = Comissions;
+  pool.miniPoolSlashAmount = pool.miniPoolSlashAmount.plus(slashingAmount);
+
   Minipool.save();
+  pool.save();
+}
+
+export function getEthAmountUSD(
+  amount: BigInt,
+  block: ethereum.Block
+): BigDecimal {
+  return bigIntToBigDecimal(amount).times(
+    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
+      .lastPriceUSD!
+  );
+}
+
+export function getEthAmountUSDDecimal(
+  amount: BigDecimal,
+  block: ethereum.Block
+): BigDecimal {
+  return amount.times(
+    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
+      .lastPriceUSD!
+  );
 }
 
 export function updateProtocolAndPoolTvl(
@@ -158,7 +172,7 @@ export function updateSnapshotsTvl(block: ethereum.Block): void {
 
 export function updateTotalRevenueMetrics(
   block: ethereum.Block,
-  stakingRewards: BigInt,
+  stakingRewards: BigDecimal,
   totalShares: BigInt // of rETH
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
@@ -175,14 +189,8 @@ export function updateTotalRevenueMetrics(
 
   // Staking Rewards
 
-  const stakingRewardsUSD = bigIntToBigDecimal(stakingRewards).times(
-    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
-      .lastPriceUSD!
-  );
-
   // Pool
-  pool.cumulativeTotalRevenueUSD =
-    pool.cumulativeTotalRevenueUSD.plus(stakingRewardsUSD);
+  pool.cumulativeTotalRevenueUSD = stakingRewards;
   pool.outputTokenSupply = totalShares;
   pool.outputTokenPriceUSD = getOrCreateToken(
     Address.fromString(PROTOCOL_ID),
@@ -193,8 +201,7 @@ export function updateTotalRevenueMetrics(
   // Pool Daily
   poolMetricsDailySnapshot.cumulativeTotalRevenueUSD =
     pool.cumulativeTotalRevenueUSD;
-  poolMetricsDailySnapshot.dailyTotalRevenueUSD =
-    poolMetricsDailySnapshot.dailyTotalRevenueUSD.plus(stakingRewardsUSD);
+  poolMetricsDailySnapshot.dailyTotalRevenueUSD = stakingRewards;
   poolMetricsDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
   poolMetricsDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsDailySnapshot.save();
@@ -202,8 +209,7 @@ export function updateTotalRevenueMetrics(
   // Pool Hourly
   poolMetricsHourlySnapshot.cumulativeTotalRevenueUSD =
     pool.cumulativeTotalRevenueUSD;
-  poolMetricsHourlySnapshot.hourlyTotalRevenueUSD =
-    poolMetricsHourlySnapshot.hourlyTotalRevenueUSD.plus(stakingRewardsUSD);
+  poolMetricsHourlySnapshot.hourlyTotalRevenueUSD = stakingRewards;
   poolMetricsHourlySnapshot.outputTokenSupply = pool.outputTokenSupply;
   poolMetricsHourlySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetricsHourlySnapshot.save();
@@ -221,7 +227,7 @@ export function updateTotalRevenueMetrics(
 
 export function updateProtocolSideRevenueMetrics(
   block: ethereum.Block,
-  amount: BigInt
+  amount: BigDecimal
 ): void {
   const pool = getOrCreatePool(block.number, block.timestamp);
   const protocol = getOrCreateProtocol();
@@ -236,28 +242,22 @@ export function updateProtocolSideRevenueMetrics(
   );
 
   // Staking rewards revenue is in ETH (rebased in stETH for user), price in ETH
-  const amountUSD = bigIntToBigDecimal(amount).times(
-    getOrCreateToken(Address.fromString(ETH_ADDRESS), block.number)
-      .lastPriceUSD!
-  );
+  const amountUSD = amount;
 
   // Pool
-  pool.cumulativeProtocolSideRevenueUSD =
-    pool.cumulativeProtocolSideRevenueUSD.plus(amountUSD);
+  pool.cumulativeProtocolSideRevenueUSD = amountUSD;
   pool.save();
 
   // Pool Daily
   poolMetricsDailySnapshot.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
-  poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD =
-    poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD.plus(amountUSD);
+  poolMetricsDailySnapshot.dailyProtocolSideRevenueUSD = amountUSD;
   poolMetricsDailySnapshot.save();
 
   // Pool Hourly
   poolMetricsHourlySnapshot.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
-  poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD =
-    poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(amountUSD);
+  poolMetricsHourlySnapshot.hourlyProtocolSideRevenueUSD = amountUSD;
   poolMetricsHourlySnapshot.save();
 
   // Protocol
@@ -268,8 +268,7 @@ export function updateProtocolSideRevenueMetrics(
   // Financial Daily
   financialMetrics.cumulativeProtocolSideRevenueUSD =
     pool.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.dailyProtocolSideRevenueUSD =
-    financialMetrics.dailyProtocolSideRevenueUSD.plus(amountUSD);
+  financialMetrics.dailyProtocolSideRevenueUSD = amountUSD;
   financialMetrics.save();
 }
 

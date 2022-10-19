@@ -113,11 +113,11 @@ function getRETHpriceUSD(
   let RETHratio = BIGDECIMAL_ZERO;
   let RETHpriceUSD = BIGDECIMAL_ZERO;
   if (rethCall.reverted) {
-    log.error("[getRETHpriceUSD] rethCall Reverted", []);
+    // log.error("[getRETHpriceUSD] rethCall Reverted", []);
   } else {
-    log.error("[getRETHpriceUSD] rethCall resolved to : {}", [
-      rethCall.value.toString(),
-    ]);
+    // log.error("[getRETHpriceUSD] rethCall resolved to : {}", [
+    //   rethCall.value.toString(),
+    // ]);
     RETHratio = bigIntToBigDecimal(rethCall.value.div(ONE_ETH_IN_WEI));
 
     if (RETHratio.notEqual(BIGDECIMAL_ZERO)) {
@@ -128,7 +128,7 @@ function getRETHpriceUSD(
         RETHpriceUSD = ethPriceUSD.div(RETHratio);
       }
     }
-    log.warning("[getRETHpriceUSD] RETH Ratio: {}", [RETHratio.toString()]);
+    // log.warning("[getRETHpriceUSD] RETH Ratio: {}", [RETHratio.toString()]);
   }
 
   return RETHpriceUSD;
