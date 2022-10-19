@@ -1,5 +1,6 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { prefixID } from "./strings";
+import { Versions } from "../versions";
 
 ////////////////////
 ///// Versions /////
@@ -7,9 +8,9 @@ import { prefixID } from "./strings";
 
 export const PROTOCOL_NAME = "Saddle Finance";
 export const PROTOCOL_SLUG = "saddle-finance";
-export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.3";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
+export const PROTOCOL_SCHEMA_VERSION = Versions.getSchemaVersion();
+export const PROTOCOL_SUBGRAPH_VERSION = Versions.getSubgraphVersion();
+export const PROTOCOL_METHODOLOGY_VERSION = Versions.getMethodologyVersion();
 
 ////////////////////////
 ///// Schema Enums /////
