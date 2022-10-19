@@ -8,7 +8,7 @@ import {
   log,
   TypedMap,
 } from "@graphprotocol/graph-ts";
-import { ERC721 } from "../../generated/ERC721/ERC721";
+import { ERC721 } from "../../generated/ERC721Metadata/ERC721";
 import { Token, Attribute, Collection } from "../../generated/schema";
 import {
   IPFS_PREFIX,

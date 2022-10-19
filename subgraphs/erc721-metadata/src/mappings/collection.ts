@@ -1,6 +1,6 @@
 import { Bytes } from "@graphprotocol/graph-ts";
 
-import { Transfer, ERC721 } from "../../generated/ERC721/ERC721";
+import { Transfer, ERC721 } from "../../generated/ERC721Metadata/ERC721";
 import { Token, Collection, NonERC721Collection } from "../../generated/schema";
 
 import { NetworkConfigs } from "../../configurations/configure";

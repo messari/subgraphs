@@ -6,7 +6,7 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: ERC721
+    name: ERC721Metadata
     network: mainnet
     source:
       abi: ERC721
