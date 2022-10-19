@@ -36,7 +36,7 @@ At this point you will just need to follow the "Reviewing" process until your PR
 
 ## Subgraph Directory Structure Guidelines
 
-All our subgraphs share the same build and deployment scripts. They are used during development, when deploying a subgraph, and during our CI validation pipelines. These scripts expect all subgraphs to follow a given directory structure. So for them to work without adding extra hassle, and to keep code itself organized in a consistent and predictable manner, we require all subgraphs to follow this structure. 
+All our subgraphs share the same build and deployment scripts. They are used during development, when deploying a subgraph, and during our CI validation pipelines. These scripts expect all subgraphs to follow a given directory structure. So for them to work without adding extra hassle, and to keep code itself organized in a consistent and predictable manner, we require all subgraphs to follow this structure.
 
 Our CI pipelines on PRs automatically validate that this structure is followed, to enforce it and make sure things don't break in case of error. To do so we are using [folderslint](). It is a simple tool that allows you to define some rules and then validates that they are met. The rules are very simple, it is a set of paths that are whitelisted. These are contained at `/subgraphs/.folderslintrc`.
 
@@ -64,22 +64,23 @@ subgraphs/
             (code common to all protocols in this subgraph)
 ```
 
-
 ## Rebasing
 
 ### Why rebase?
 
-Whenever there are merge conflicts you should rebase *instead* of merge. The reason for this is that it keeps a clean working history. 
+Whenever there are merge conflicts you should rebase _instead_ of merge. The reason for this is that it keeps a clean working history.
 
 How does this happen?
 
 The version of `master` you initially branched off is not the current version. New commits have been added, and some of them conflict with your changes. Answer: rebase.
 
-Sometimes you need to make a change based off a `feature-branch` that hasn't been merged into `master` yet. Once `feature-branch` is merged into `master` you want to rebase onto `master` to clean up the branch commit history. 
+Sometimes you need to make a change based off a `feature-branch` that hasn't been merged into `master` yet. Once `feature-branch` is merged into `master` you want to rebase onto `master` to clean up the branch commit history.
 
 ### How to rebase:
 
 There are multiple ways to do this. Most of the time you will rebase onto `master`, so you should make sure your `master` branch is up to date with the upstream `master` (ie, Messari's repo).
+
+> Note: you need to do this when you see "Resolve Conflicts" in your PR.
 
 Go into your feature-branch and make the following call.
 
@@ -211,6 +212,8 @@ git rebase upstream/master  # rebase the remote upstream/master onto forked/mast
 git push --force            # sync remote forked/master
 echo "upstream/master and forked/master are in sync"
 ```
+
+> This is not the command you should use when you want to rebase a feature branch. For that follow `### How to rebase:` above
 
 Now use `chmod` to build the executable:
 

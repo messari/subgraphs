@@ -7,7 +7,7 @@ import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 export const PROTOCOL_NAME = "Arrakis Finance";
 export const PROTOCOL_SLUG = "arrakis-finance";
 export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.1";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -173,7 +173,7 @@ REGISTRY_ADDRESS_MAP.set(
   Address.fromString("0x37265A834e95D11c36527451c7844eF346dC342a")
 );
 REGISTRY_ADDRESS_MAP.set(
-  "matic",
+  "optimism",
   Address.fromString("0x2845c6929d621e32B7596520C8a1E5a37e616F09")
 );
 
@@ -185,6 +185,8 @@ export namespace PriceSource {
   export const CURVE_ROUTER = "CURVE_ROUTER";
   export const UNISWAP_ROUTER = "UNISWAP_ROUTER";
   export const SUSHISWAP_ROUTER = "SUSHISWAP_ROUTER";
+  export const ONE_INCH = "ONE_INCH";
+  export const AAVE = "AAVE";
 }
 
 export const TOKEN_PRICE_SOURCE_SKIPS = new TypedMap<Address, Array<string>>();

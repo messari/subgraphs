@@ -35,6 +35,10 @@ code {
   text-decoration: underline;
 }
 
+.Hover-Underline:hover {
+  text-decoration: underline !important;
+}
+
 .rotated {
   transform: rotate(180deg);
 }

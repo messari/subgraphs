@@ -18,12 +18,12 @@ export function handleReward(
   tokenId: BigInt,
   usageType: string
 ): void {
-  let poolContract = HoneyFarm.bind(event.address);
-  let getDepositInfo = poolContract.try_depositInfo(tokenId);
+  const poolContract = HoneyFarm.bind(event.address);
+  const getDepositInfo = poolContract.try_depositInfo(tokenId);
   let lpTokenAddress = Address.zero();
   let amount = BIGINT_ZERO;
   if (!getDepositInfo.reverted) {
-    let depositInfo = getDepositInfo.value;
+    const depositInfo = getDepositInfo.value;
     lpTokenAddress = depositInfo.value5;
     amount = depositInfo.value0;
   }
@@ -34,7 +34,7 @@ export function handleReward(
   ]);
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(lpTokenAddress.toHexString());
+  const pool = LiquidityPool.load(lpTokenAddress.toHexString());
   if (!pool) {
     return;
   }
@@ -56,16 +56,16 @@ export function handleReward(
   }
 
   // Get necessary values from the HoneyFarm contract to calculate rewards
-  let getPoolInfo = poolContract.try_poolInfo(lpTokenAddress);
+  const getPoolInfo = poolContract.try_poolInfo(lpTokenAddress);
   let poolAllocPoint: BigInt = BIGINT_ZERO;
   let lastRewardTime: BigInt = BIGINT_ZERO;
   if (!getPoolInfo.reverted) {
-    let poolInfo = getPoolInfo.value;
+    const poolInfo = getPoolInfo.value;
     poolAllocPoint = poolInfo.value0;
     lastRewardTime = poolInfo.value1;
   }
 
-  let getTotalAllocPoint = poolContract.try_totalAllocationPoints();
+  const getTotalAllocPoint = poolContract.try_totalAllocationPoints();
   let totalAllocPoint: BigInt = BIGINT_ZERO;
   if (!getTotalAllocPoint.reverted) {
     totalAllocPoint = getTotalAllocPoint.value;
@@ -80,7 +80,7 @@ export function handleReward(
     ]
   );
 
-  let getDistribution = poolContract.try_getDistribution(
+  const getDistribution = poolContract.try_getDistribution(
     honeyFarmPool.valueBigInt!,
     event.block.timestamp
   );
@@ -101,11 +101,13 @@ export function handleReward(
   );
 
   // Calculate Reward Emission
-  let rewardTokenRate = distribution.times(poolAllocPoint).div(totalAllocPoint);
+  const rewardTokenRate = distribution
+    .times(poolAllocPoint)
+    .div(totalAllocPoint);
 
   // Get the estimated rewards emitted for the upcoming day for this pool
-  let rewardTokenRateBigDecimal = new BigDecimal(rewardTokenRate);
-  let rewardTokenPerDay = getRewardsPerDay(
+  const rewardTokenRateBigDecimal = new BigDecimal(rewardTokenRate);
+  const rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
     rewardTokenRateBigDecimal,
