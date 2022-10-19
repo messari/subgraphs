@@ -71,6 +71,9 @@ export namespace vaults {
     vault.pricePerShare = constants.BIG_DECIMAL_ZERO
     vault.stakedOutputTokenAmount = constants.BIG_INT_ZERO
     vault.protocol = ''
+    vault.cumulativeSupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO
+    vault.cumulativeProtocolSideRevenueUSD = constants.BIG_DECIMAL_ZERO
+    vault.cumulativeTotalRevenueUSD = constants.BIG_DECIMAL_ZERO
 
     return vault
   }

@@ -34,17 +34,14 @@ export namespace metrics {
       vaultSnapshots.outputTokenPriceUSD = constants.BIG_DECIMAL_ZERO
       vaultSnapshots.pricePerShare = constants.BIG_DECIMAL_ZERO
       vaultSnapshots.stakedOutputTokenAmount = constants.BIG_INT_ZERO
+      vaultSnapshots.dailySupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO
+      vaultSnapshots.cumulativeSupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO
+      vaultSnapshots.dailyProtocolSideRevenueUSD = constants.BIG_DECIMAL_ZERO
+      vaultSnapshots.cumulativeProtocolSideRevenueUSD =
+        constants.BIG_DECIMAL_ZERO
 
-      /* Version: 1.3.0
-            vaultSnapshots.dailySupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO;
-            vaultSnapshots.cumulativeSupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO;
-        
-            vaultSnapshots.dailyProtocolSideRevenueUSD = constants.BIG_DECIMAL_ZERO;
-            vaultSnapshots.cumulativeProtocolSideRevenueUSD = constants.BIG_DECIMAL_ZERO;
-        
-            vaultSnapshots.dailyTotalRevenueUSD = constants.BIG_DECIMAL_ZERO;
-            vaultSnapshots.cumulativeTotalRevenueUSD = constants.BIG_DECIMAL_ZERO;
-            */
+      vaultSnapshots.dailyTotalRevenueUSD = constants.BIG_DECIMAL_ZERO
+      vaultSnapshots.cumulativeTotalRevenueUSD = constants.BIG_DECIMAL_ZERO
 
       vaultSnapshots.blockNumber = block.number
       vaultSnapshots.timestamp = block.timestamp
@@ -75,16 +72,15 @@ export namespace metrics {
       vaultSnapshots.outputTokenPriceUSD = constants.BIG_DECIMAL_ZERO
       vaultSnapshots.pricePerShare = constants.BIG_DECIMAL_ZERO
 
-      /* Version: 1.3.0
-            vaultSnapshots.hourlySupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO;
-            vaultSnapshots.cumulativeSupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO;
-        
-            vaultSnapshots.hourlyProtocolSideRevenueUSD = constants.BIG_DECIMAL_ZERO;
-            vaultSnapshots.cumulativeProtocolSideRevenueUSD = constants.BIG_DECIMAL_ZERO;
-        
-            vaultSnapshots.hourlyTotalRevenueUSD = constants.BIG_DECIMAL_ZERO;
-            vaultSnapshots.cumulativeTotalRevenueUSD = constants.BIG_DECIMAL_ZERO;
-            */
+      vaultSnapshots.hourlySupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO
+      vaultSnapshots.cumulativeSupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO
+
+      vaultSnapshots.hourlyProtocolSideRevenueUSD = constants.BIG_DECIMAL_ZERO
+      vaultSnapshots.cumulativeProtocolSideRevenueUSD =
+        constants.BIG_DECIMAL_ZERO
+
+      vaultSnapshots.hourlyTotalRevenueUSD = constants.BIG_DECIMAL_ZERO
+      vaultSnapshots.cumulativeTotalRevenueUSD = constants.BIG_DECIMAL_ZERO
 
       vaultSnapshots.blockNumber = block.number
       vaultSnapshots.timestamp = block.timestamp
@@ -303,23 +299,20 @@ export namespace metrics {
     vaultDailySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD
     vaultHourlySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD
 
-    /* Version: 1.3.0
-            vaultDailySnapshots.cumulativeProtocolSideRevenueUSD =
-              vault.cumulativeProtocolSideRevenueUSD;
-            vaultHourlySnapshots.cumulativeProtocolSideRevenueUSD =
-              vault.cumulativeProtocolSideRevenueUSD;
-          
-            vaultDailySnapshots.cumulativeSupplySideRevenueUSD =
-              vault.cumulativeSupplySideRevenueUSD;
-            vaultHourlySnapshots.cumulativeSupplySideRevenueUSD =
-              vault.cumulativeSupplySideRevenueUSD;
-          
-            vaultDailySnapshots.cumulativeTotalRevenueUSD =
-              vault.cumulativeTotalRevenueUSD;
-            vaultHourlySnapshots.cumulativeTotalRevenueUSD =
-              vault.cumulativeTotalRevenueUSD;
-          
-            */
+    vaultDailySnapshots.cumulativeProtocolSideRevenueUSD =
+      vault.cumulativeProtocolSideRevenueUSD
+    vaultHourlySnapshots.cumulativeProtocolSideRevenueUSD =
+      vault.cumulativeProtocolSideRevenueUSD
+
+    vaultDailySnapshots.cumulativeSupplySideRevenueUSD =
+      vault.cumulativeSupplySideRevenueUSD
+    vaultHourlySnapshots.cumulativeSupplySideRevenueUSD =
+      vault.cumulativeSupplySideRevenueUSD
+
+    vaultDailySnapshots.cumulativeTotalRevenueUSD =
+      vault.cumulativeTotalRevenueUSD
+    vaultHourlySnapshots.cumulativeTotalRevenueUSD =
+      vault.cumulativeTotalRevenueUSD
 
     vaultDailySnapshots.blockNumber = block.number
     vaultHourlySnapshots.blockNumber = block.number
