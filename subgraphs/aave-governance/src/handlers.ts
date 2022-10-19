@@ -22,10 +22,16 @@ import {
 import {
   Delegate,
   Governance,
+  DelegateVotingPowerChange,
   Proposal,
+  TokenDailySnapshot,
   TokenHolder,
   Vote,
+  VoteDailySnapshot,
+  DelegateChange,
 } from "../generated/schema";
+
+export const SECONDS_PER_DAY = 60 * 60 * 24;
 
 export function toDecimal(value: BigInt, decimals: number = 18): BigDecimal {
   return value.divDecimal(
@@ -55,6 +61,7 @@ export function getGovernance(): Governance {
 
   if (!governance) {
     governance = new Governance(GOVERNANCE_TYPE);
+    governance.totalTokenSupply = BIGINT_ZERO;
     governance.proposals = BIGINT_ZERO;
     governance.currentTokenHolders = BIGINT_ZERO;
     governance.totalTokenHolders = BIGINT_ZERO;
@@ -62,6 +69,15 @@ export function getGovernance(): Governance {
     governance.totalDelegates = BIGINT_ZERO;
     governance.delegatedVotesRaw = BIGINT_ZERO;
     governance.delegatedVotes = BIGDECIMAL_ZERO;
+
+    governance.totalStakedTokenSupply = BIGINT_ZERO;
+    governance.currentStakedTokenHolders = BIGINT_ZERO;
+    governance.totalStakedTokenHolders = BIGINT_ZERO;
+    governance.currentStakedTokenDelegates = BIGINT_ZERO;
+    governance.totalStakedTokenDelegates = BIGINT_ZERO;
+    governance.delegatedStakedTokenVotesRaw = BIGINT_ZERO;
+    governance.delegatedStakedTokenVotes = BIGDECIMAL_ZERO;
+
     governance.proposalsQueued = BIGINT_ZERO;
     governance.proposalsExecuted = BIGINT_ZERO;
     governance.proposalsCanceled = BIGINT_ZERO;
@@ -70,44 +86,79 @@ export function getGovernance(): Governance {
   return governance;
 }
 
-export function getOrCreateProposal(
-  id: string,
-  createIfNotFound: boolean = true,
-  save: boolean = false
-): Proposal {
-  let proposal = Proposal.load(id);
+export function createDelegateChange(
+  event: ethereum.Event,
+  toDelegate: string,
+  fromDelegate: string,
+  delegator: string
+): DelegateChange {
+  const delegateChangeId = `${event.block.timestamp.toI64()}-${event.logIndex}`;
 
-  if (!proposal && createIfNotFound) {
+  const delegateChange = new DelegateChange(delegateChangeId);
+
+  delegateChange.delegate = toDelegate;
+  delegateChange.delegator = delegator;
+  delegateChange.previousDelegate = fromDelegate;
+  delegateChange.tokenAddress = event.address.toHexString();
+  delegateChange.txnHash = event.transaction.hash.toHexString();
+  delegateChange.blockNumber = event.block.number;
+  delegateChange.blockTimestamp = event.block.timestamp;
+  delegateChange.logIndex = event.logIndex;
+
+  return delegateChange;
+}
+
+export function createDelegateVotingPowerChange(
+  event: ethereum.Event,
+  previousBalance: BigInt,
+  newBalance: BigInt,
+  delegate: string
+): DelegateVotingPowerChange {
+  const delegateVotingPwerChangeId = `${event.block.timestamp.toI64()}-${
+    event.logIndex
+  }`;
+
+  const delegateVPChange = new DelegateVotingPowerChange(
+    delegateVotingPwerChangeId
+  );
+
+  delegateVPChange.previousBalance = previousBalance;
+  delegateVPChange.newBalance = newBalance;
+  delegateVPChange.delegate = delegate;
+  delegateVPChange.tokenAddress = event.address.toHexString();
+  delegateVPChange.txnHash = event.transaction.hash.toHexString();
+  delegateVPChange.blockTimestamp = event.block.timestamp;
+  delegateVPChange.logIndex = event.logIndex;
+  delegateVPChange.blockNumber = event.block.number;
+
+  return delegateVPChange;
+}
+
+export function getProposal(id: string): Proposal {
+  let proposal = Proposal.load(id);
+  if (!proposal) {
     proposal = new Proposal(id);
     proposal.tokenHoldersAtStart = BIGINT_ZERO;
     proposal.delegatesAtStart = BIGINT_ZERO;
-    if (save) {
-      proposal.save();
-    }
   }
 
   return proposal as Proposal;
 }
 
-export function getOrCreateDelegate(
-  address: string,
-  createIfNotFound: boolean = true,
-  save: boolean = true
-): Delegate {
+export function getOrCreateDelegate(address: string): Delegate {
   let delegate = Delegate.load(address);
-
-  if (!delegate && createIfNotFound) {
+  if (!delegate) {
     delegate = new Delegate(address);
     delegate.delegatedVotesRaw = BIGINT_ZERO;
     delegate.delegatedVotes = BIGDECIMAL_ZERO;
+    delegate.delegatedStakedTokenVotesRaw = BIGINT_ZERO;
+    delegate.delegatedStakedTokenVotes = BIGDECIMAL_ZERO;
     delegate.tokenHoldersRepresentedAmount = 0;
     delegate.numberVotes = 0;
-    if (save) {
-      delegate.save();
-    }
+    delegate.save();
 
     if (address != ZERO_ADDRESS) {
-      let governance = getGovernance();
+      const governance = getGovernance();
       governance.totalDelegates = governance.totalDelegates.plus(BIGINT_ONE);
       governance.save();
     }
@@ -116,25 +167,22 @@ export function getOrCreateDelegate(
   return delegate as Delegate;
 }
 
-export function getOrCreateTokenHolder(
-  address: string,
-  createIfNotFound: boolean = true,
-  save: boolean = true
-): TokenHolder {
+export function getOrCreateTokenHolder(address: string): TokenHolder {
   let tokenHolder = TokenHolder.load(address);
-
-  if (!tokenHolder && createIfNotFound) {
+  if (!tokenHolder) {
     tokenHolder = new TokenHolder(address);
     tokenHolder.tokenBalanceRaw = BIGINT_ZERO;
     tokenHolder.tokenBalance = BIGDECIMAL_ZERO;
     tokenHolder.totalTokensHeldRaw = BIGINT_ZERO;
     tokenHolder.totalTokensHeld = BIGDECIMAL_ZERO;
-    if (save) {
-      tokenHolder.save();
-    }
+    tokenHolder.stakedTokenBalanceRaw = BIGINT_ZERO;
+    tokenHolder.stakedTokenBalance = BIGDECIMAL_ZERO;
+    tokenHolder.totalStakedTokensHeldRaw = BIGINT_ZERO;
+    tokenHolder.totalStakedTokensHeld = BIGDECIMAL_ZERO;
+    tokenHolder.save();
 
     if (address != ZERO_ADDRESS) {
-      let governance = getGovernance();
+      const governance = getGovernance();
       governance.totalTokenHolders =
         governance.totalTokenHolders.plus(BIGINT_ONE);
       governance.save();
@@ -142,6 +190,32 @@ export function getOrCreateTokenHolder(
   }
 
   return tokenHolder as TokenHolder;
+}
+export function getOrCreateTokenDailySnapshot(
+  block: ethereum.Block
+): TokenDailySnapshot {
+  const snapshotId = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  const previousSnapshot = TokenDailySnapshot.load(snapshotId);
+
+  if (previousSnapshot != null) {
+    return previousSnapshot as TokenDailySnapshot;
+  }
+  const snapshot = new TokenDailySnapshot(snapshotId);
+  return snapshot;
+}
+export function getOrCreateVoteDailySnapshot(
+  proposal: Proposal,
+  block: ethereum.Block
+): VoteDailySnapshot {
+  const snapshotId =
+    proposal.id + "-" + (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  const previousSnapshot = VoteDailySnapshot.load(snapshotId);
+
+  if (previousSnapshot != null) {
+    return previousSnapshot as VoteDailySnapshot;
+  }
+  const snapshot = new VoteDailySnapshot(snapshotId);
+  return snapshot;
 }
 
 export function _handleProposalCreated(
@@ -158,7 +232,7 @@ export function _handleProposalCreated(
   quorum: BigInt,
   event: ethereum.Event
 ): void {
-  let proposal = getOrCreateProposal(proposalId);
+  const proposal = getProposal(proposalId);
   let proposer = getOrCreateDelegate(proposerAddr);
 
   // Checking if the proposer was a delegate already accounted for, if not we should log an error
@@ -175,6 +249,7 @@ export function _handleProposalCreated(
   proposal.txnHash = event.transaction.hash.toHexString();
   proposal.executor = executorAddr;
   proposal.proposer = proposer.id;
+  proposal.txnHash = event.transaction.hash.toHexString();
   proposal.quorumVotes = BIGINT_ZERO;
   proposal.againstDelegateVotes = BIGINT_ZERO;
   proposal.forDelegateVotes = BIGINT_ZERO;
@@ -196,14 +271,14 @@ export function _handleProposalCreated(
   // Get description from ipfs hash (from official Aave Governance Subgraph)
   // https://github.com/aave/governance-delegation-subgraph/blob/master/src/mapping/governance.ts#L33
   let description = "";
-  let hash = Bytes.fromHexString(
+  const hash = Bytes.fromHexString(
     "1220" + ipfsHash.toHexString().slice(2)
   ).toBase58();
-  let data = ipfs.cat(hash);
-  let proposalData = json.try_fromBytes(data as Bytes);
+  const data = ipfs.cat(hash);
+  const proposalData = json.try_fromBytes(data as Bytes);
   let descriptionJSON: JSONValue | null = null;
   if (proposalData.isOk && proposalData.value.kind == JSONValueKind.OBJECT) {
-    let jsonData = proposalData.value.toObject();
+    const jsonData = proposalData.value.toObject();
     descriptionJSON = jsonData.get("description");
     if (descriptionJSON) {
       description = descriptionJSON.toString();
@@ -218,7 +293,7 @@ export function _handleProposalCreated(
 
     // Set snapshot for quorum, tokenholders and delegates
     proposal.quorumVotes = quorum;
-    let governance = getGovernance();
+    const governance = getGovernance();
     proposal.tokenHoldersAtStart = governance.currentTokenHolders;
     proposal.delegatesAtStart = governance.currentDelegates;
   } else {
@@ -237,8 +312,9 @@ export function _handleProposalCanceled(
   proposalId: string,
   event: ethereum.Event
 ): void {
-  let proposal = getOrCreateProposal(proposalId);
+  const proposal = getProposal(proposalId);
   proposal.state = ProposalState.CANCELED;
+  proposal.cancellationTxnHash = event.transaction.hash.toHexString();
   proposal.cancellationBlock = event.block.number;
   proposal.cancellationTime = event.block.timestamp;
   proposal.save();
@@ -254,28 +330,36 @@ export function _handleProposalExecuted(
   event: ethereum.Event
 ): void {
   // Update proposal status + execution metadata
-  let proposal = getOrCreateProposal(proposalId);
+  const proposal = getProposal(proposalId);
   proposal.state = ProposalState.EXECUTED;
+  proposal.executionTxnHash = event.transaction.hash.toHexString();
   proposal.executionBlock = event.block.number;
   proposal.executionTime = event.block.timestamp;
   proposal.save();
 
   // Update governance proposal state counts
-  let governance = getGovernance();
+  const governance = getGovernance();
   governance.proposalsQueued = governance.proposalsQueued.minus(BIGINT_ONE);
   governance.proposalsExecuted = governance.proposalsExecuted.plus(BIGINT_ONE);
   governance.save();
 }
 
-export function _handleProposalQueued(proposalId: string, eta: BigInt): void {
+export function _handleProposalQueued(
+  proposalId: string,
+  eta: BigInt,
+  event: ethereum.Event
+): void {
   // Update proposal status + execution metadata
-  let proposal = getOrCreateProposal(proposalId.toString());
+  const proposal = getProposal(proposalId.toString());
   proposal.state = ProposalState.QUEUED;
+  proposal.queueTxnHash = event.transaction.hash.toHexString();
+  proposal.queueBlock = event.block.number;
+  proposal.queueTime = event.block.timestamp;
   proposal.executionETA = eta;
   proposal.save();
 
   // Update governance proposal state counts
-  let governance = getGovernance();
+  const governance = getGovernance();
   governance.proposalsQueued = governance.proposalsQueued.plus(BIGINT_ONE);
   governance.save();
 }
@@ -287,8 +371,8 @@ export function _handleVoteEmitted(
   support: boolean,
   event: ethereum.Event
 ): void {
-  let choice = getVoteChoiceByValue(support);
-  let voteId = voterAddress.concat("-").concat(proposal.id);
+  const choice = getVoteChoiceByValue(support);
+  const voteId = voterAddress.concat("-").concat(proposal.id);
 
   let vote = Vote.load(voteId);
   if (vote) {
@@ -322,7 +406,18 @@ export function _handleVoteEmitted(
   proposal.save();
 
   // Add 1 to participant's proposal voting count
-  let voter = getOrCreateDelegate(voterAddress);
+  const voter = getOrCreateDelegate(voterAddress);
   voter.numberVotes = voter.numberVotes + 1;
   voter.save();
+
+  // Take snapshot
+  const dailySnapshot = getOrCreateVoteDailySnapshot(proposal, event.block);
+  dailySnapshot.proposal = proposal.id;
+  dailySnapshot.forWeightedVotes = proposal.forWeightedVotes;
+  dailySnapshot.againstWeightedVotes = proposal.againstWeightedVotes;
+  dailySnapshot.abstainWeightedVotes = proposal.abstainWeightedVotes;
+  dailySnapshot.totalWeightedVotes = proposal.totalWeightedVotes;
+  dailySnapshot.blockNumber = event.block.number;
+  dailySnapshot.timestamp = event.block.timestamp;
+  dailySnapshot.save();
 }

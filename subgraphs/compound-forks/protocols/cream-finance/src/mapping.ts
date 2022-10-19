@@ -1,4 +1,10 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -17,9 +23,23 @@ import {
   LiquidateBorrow,
   AccrueInterest,
   NewReserveFactor,
+  Transfer,
 } from "../../../generated/templates/CToken/CToken";
-import { LendingProtocol, Token } from "../../../generated/schema";
-import { cTokenDecimals, BIGINT_ZERO } from "../../../src/constants";
+import {
+  FinancialsDailySnapshot,
+  LendingProtocol,
+  Market,
+  Token,
+} from "../../../generated/schema";
+import {
+  cTokenDecimals,
+  BIGINT_ZERO,
+  Network,
+  BIGDECIMAL_ZERO,
+  exponentToBigDecimal,
+  cTokenDecimalsBD,
+  SECONDS_PER_DAY,
+} from "../../../src/constants";
 import {
   ProtocolData,
   _getOrCreateProtocol,
@@ -40,30 +60,59 @@ import {
   getOrElse,
   _handleActionPaused,
   _handleMarketEntered,
+  getTokenPriceUSD,
+  _handleTransfer,
+  getOrCreateMarketDailySnapshot,
+  getOrCreateMarketHourlySnapshot,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
 import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
-import { getNetworkSpecificConstant } from "./constants";
+import {
+  BNB_USD_CHAINLINK_ORACLE,
+  equalsIgnoreCase,
+  ETH_ADDRESS,
+  ETH_CUTOFF_BLOCK,
+  getNetworkSpecificConstant,
+} from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
+import { getUsdPricePerToken } from "./prices";
+import { Oracle } from "../../../generated/templates/CToken/Oracle";
+
+// Global variables
+let isDeprecated = false;
 
 // Constant values
-let constant = getNetworkSpecificConstant();
-let comptrollerAddr = constant.comptrollerAddr;
-let network = constant.network;
-let unitPerYear = constant.unitPerYear;
-let nativeToken = constant.nativeToken;
-let nativeCToken = constant.nativeCToken;
+const constant = getNetworkSpecificConstant();
+const comptrollerAddr = constant.comptrollerAddr;
+const network = constant.network;
+const unitPerYear = constant.unitPerYear;
+const nativeToken = constant.nativeToken;
+const nativeCToken = constant.nativeCToken;
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
-  let protocol = getOrCreateProtocol();
-  let newPriceOracle = event.params.newPriceOracle;
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const protocol = getOrCreateProtocol();
+  const newPriceOracle = event.params.newPriceOracle;
   _handleNewPriceOracle(protocol, newPriceOracle);
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
   _handleMarketEntered(
     comptrollerAddr,
     event.params.cToken.toHexString(),
@@ -73,6 +122,13 @@ export function handleMarketEntered(event: MarketEntered): void {
 }
 
 export function handleMarketExited(event: MarketExited): void {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
   _handleMarketEntered(
     comptrollerAddr,
     event.params.cToken.toHexString(),
@@ -82,9 +138,16 @@ export function handleMarketExited(event: MarketExited): void {
 }
 
 export function handleMarketListed(event: MarketListed): void {
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
   CTokenTemplate.create(event.params.cToken);
 
-  let cTokenAddr = event.params.cToken;
+  const cTokenAddr = event.params.cToken;
   // cream finance emits a MarketListed event that lists an invalid CToken
   // hardcode to skip it otherwise it messes up ETH token
   if (
@@ -93,21 +156,21 @@ export function handleMarketListed(event: MarketListed): void {
   ) {
     return;
   }
-  let cToken = Token.load(cTokenAddr.toHexString());
+  const cToken = Token.load(cTokenAddr.toHexString());
   if (cToken != null) {
     return;
   }
   // this is a new cToken, a new underlying token, and a new market
 
-  let protocol = getOrCreateProtocol();
-  let cTokenContract = CToken.bind(event.params.cToken);
-  let cTokenReserveFactorMantissa = getOrElse<BigInt>(
+  const protocol = getOrCreateProtocol();
+  const cTokenContract = CToken.bind(event.params.cToken);
+  const cTokenReserveFactorMantissa = getOrElse<BigInt>(
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
   if (nativeToken && nativeCToken && cTokenAddr == nativeCToken!.address) {
     // compilor is too silly to figure out this is not-null, hence the !
-    let marketListedData = new MarketListedData(
+    const marketListedData = new MarketListedData(
       protocol,
       nativeToken!,
       nativeCToken!,
@@ -117,7 +180,7 @@ export function handleMarketListed(event: MarketListed): void {
     return;
   }
 
-  let underlyingTokenAddrResult = cTokenContract.try_underlying();
+  const underlyingTokenAddrResult = cTokenContract.try_underlying();
   if (underlyingTokenAddrResult.reverted) {
     log.warning(
       "[handleMarketListed] could not fetch underlying token of cToken: {}",
@@ -125,8 +188,8 @@ export function handleMarketListed(event: MarketListed): void {
     );
     return;
   }
-  let underlyingTokenAddr = underlyingTokenAddrResult.value;
-  let underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
+  const underlyingTokenAddr = underlyingTokenAddrResult.value;
+  const underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
   _handleMarketListed(
     new MarketListedData(
       protocol,
@@ -150,69 +213,123 @@ export function handleMarketListed(event: MarketListed): void {
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  let marketID = event.params.cToken.toHexString();
-  let collateralFactorMantissa = event.params.newCollateralFactorMantissa;
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const marketID = event.params.cToken.toHexString();
+  const collateralFactorMantissa = event.params.newCollateralFactorMantissa;
   _handleNewCollateralFactor(marketID, collateralFactorMantissa);
 }
 
 export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
-  let protocol = getOrCreateProtocol();
-  let newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const protocol = getOrCreateProtocol();
+  const newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
   _handleNewLiquidationIncentive(protocol, newLiquidationIncentive);
 }
 
 export function handleActionPaused(event: ActionPaused1): void {
-  let marketID = event.params.cToken.toHexString();
-  let action = event.params.action;
-  let pauseState = event.params.pauseState;
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const marketID = event.params.cToken.toHexString();
+  const action = event.params.action;
+  const pauseState = event.params.pauseState;
   _handleActionPaused(marketID, action, pauseState);
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
-  let marketID = event.address.toHexString();
-  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const marketID = event.address.toHexString();
+  const newReserveFactorMantissa = event.params.newReserveFactorMantissa;
   _handleNewReserveFactor(marketID, newReserveFactorMantissa);
 }
 
 export function handleMint(event: Mint): void {
-  let minter = event.params.minter;
-  let mintAmount = event.params.mintAmount;
-  let contract = CToken.bind(event.address);
-  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const minter = event.params.minter;
+  const mintAmount = event.params.mintAmount;
+  const contract = CToken.bind(event.address);
+  const outputTokenSupplyResult = contract.try_totalSupply();
+  const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.minter
   );
   _handleMint(
     comptrollerAddr,
     minter,
     mintAmount,
+    outputTokenSupplyResult,
     balanceOfUnderlyingResult,
     event
   );
 }
 
 export function handleRedeem(event: Redeem): void {
-  let redeemer = event.params.redeemer;
-  let redeemAmount = event.params.redeemAmount;
-  let contract = CToken.bind(event.address);
-  let balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const redeemer = event.params.redeemer;
+  const redeemAmount = event.params.redeemAmount;
+  const contract = CToken.bind(event.address);
+  const outputTokenSupplyResult = contract.try_totalSupply();
+  const balanceOfUnderlyingResult = contract.try_balanceOfUnderlying(
     event.params.redeemer
   );
   _handleRedeem(
     comptrollerAddr,
     redeemer,
     redeemAmount,
+    outputTokenSupplyResult,
     balanceOfUnderlyingResult,
     event
   );
 }
 
 export function handleBorrow(event: BorrowEvent): void {
-  let borrower = event.params.borrower;
-  let borrowAmount = event.params.borrowAmount;
-  let contract = CToken.bind(event.address);
-  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const borrower = event.params.borrower;
+  const borrowAmount = event.params.borrowAmount;
+  const totalBorrows = event.params.totalBorrows;
+  const contract = CToken.bind(event.address);
+  const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
   _handleBorrow(
@@ -220,16 +337,25 @@ export function handleBorrow(event: BorrowEvent): void {
     borrower,
     borrowAmount,
     borrowBalanceStoredResult,
+    totalBorrows,
     event
   );
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
-  let borrower = event.params.borrower;
-  let payer = event.params.payer;
-  let repayAmount = event.params.repayAmount;
-  let contract = CToken.bind(event.address);
-  let borrowBalanceStoredResult = contract.try_borrowBalanceStored(
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const borrower = event.params.borrower;
+  const payer = event.params.payer;
+  const repayAmount = event.params.repayAmount;
+  const totalBorrows = event.params.totalBorrows;
+  const contract = CToken.bind(event.address);
+  const borrowBalanceStoredResult = contract.try_borrowBalanceStored(
     event.params.borrower
   );
   _handleRepayBorrow(
@@ -238,16 +364,24 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     payer,
     repayAmount,
     borrowBalanceStoredResult,
+    totalBorrows,
     event
   );
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  let cTokenCollateral = event.params.cTokenCollateral;
-  let liquidator = event.params.liquidator;
-  let borrower = event.params.borrower;
-  let seizeTokens = event.params.seizeTokens;
-  let repayAmount = event.params.repayAmount;
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const cTokenCollateral = event.params.cTokenCollateral;
+  const liquidator = event.params.liquidator;
+  const borrower = event.params.borrower;
+  const seizeTokens = event.params.seizeTokens;
+  const repayAmount = event.params.repayAmount;
   _handleLiquidateBorrow(
     comptrollerAddr,
     cTokenCollateral,
@@ -260,22 +394,48 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 }
 
 export function handleAccrueInterest(event: AccrueInterest): void {
-  let marketAddress = event.address;
-  let cTokenContract = CToken.bind(marketAddress);
-  let protocol = getOrCreateProtocol();
-  let oracleContract = PriceOracle.bind(
+  if (
+    isDeprecated ||
+    deprecateSubgraph(event.block.number, event.block.timestamp)
+  ) {
+    return;
+  }
+
+  const marketAddress = event.address;
+  const market = Market.load(marketAddress.toHexString());
+  if (!market) {
+    log.warning("[handleAccrueInterest] market not found: {}", [
+      marketAddress.toHexString(),
+    ]);
+    return;
+  }
+  const underlyingToken = Token.load(market.inputToken);
+  if (!underlyingToken) {
+    log.warning(
+      "[handleAccrueInterest] input token: {} not found in market: {}",
+      [market.inputToken, market.id]
+    );
+    return;
+  }
+  const cTokenContract = CToken.bind(marketAddress);
+  const protocol = getOrCreateProtocol();
+  const oracleContract = PriceOracle.bind(
     Address.fromString(protocol._priceOracle)
   );
-  let updateMarketData = new UpdateMarketData(
+  const updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
-    oracleContract.try_getUnderlyingPrice(marketAddress),
+    getPriceUSD(
+      oracleContract.try_getUnderlyingPrice(marketAddress),
+      underlyingToken.decimals,
+      event.block.number.toI32()
+    ),
     unitPerYear
   );
-  let interestAccumulated = event.params.interestAccumulated;
-  let totalBorrows = event.params.totalBorrows;
+  const interestAccumulated = event.params.interestAccumulated;
+  const totalBorrows = event.params.totalBorrows;
   _handleAccrueInterest(
     updateMarketData,
     comptrollerAddr,
@@ -286,18 +446,228 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
 }
 
+export function handleTransfer(event: Transfer): void {
+  _handleTransfer(
+    event,
+    event.address.toHexString(),
+    event.params.to,
+    event.params.from,
+    comptrollerAddr
+  );
+}
+
 function getOrCreateProtocol(): LendingProtocol {
-  let comptroller = Comptroller.bind(comptrollerAddr);
-  let protocolData = new ProtocolData(
+  const comptroller = Comptroller.bind(comptrollerAddr);
+  const protocolData = new ProtocolData(
     comptrollerAddr,
     "CREAM Finance",
     "cream-finance",
     "2.0.1",
-    "1.1.3",
+    "1.1.6",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()
   );
   return _getOrCreateProtocol(protocolData);
+}
+
+// this function will get the USD price of any asset on CREAM BSC / ETH
+// CREAM's oracles are denoted in the network's native unit
+// So on ethereum we need to multiply tryUnderlyingPrice by the price of ETH
+function getPriceUSD(
+  tryUnderlyingPrice: ethereum.CallResult<BigInt>,
+  underlyingDecimals: i32,
+  blockNumber: i32
+): ethereum.CallResult<BigInt> {
+  if (tryUnderlyingPrice.reverted) {
+    return ethereum.CallResult.fromValue(BIGINT_ZERO);
+  }
+
+  if (equalsIgnoreCase(network, Network.MAINNET)) {
+    const customPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
+    const ethPriceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
+
+    const priceInETH = getTokenPriceUSD(tryUnderlyingPrice, underlyingDecimals);
+    const priceUSD = ethPriceUSD.times(priceInETH);
+
+    // put the price back into BigInt form with correct decimal offset
+    const mantissaDecimalFactor = 18 - underlyingDecimals + 18;
+    const bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
+    const returnValue = BigInt.fromString(
+      priceUSD.times(bdFactor).truncate(0).toString()
+    );
+    return ethereum.CallResult.fromValue(returnValue);
+  }
+  if (equalsIgnoreCase(network, Network.BSC)) {
+    let bnbPriceUSD: BigDecimal;
+    if (blockNumber <= 1881676) {
+      // cannot use Chainlink oracle
+      // using LP pair to derive price
+      // this is in effect for the first 2 months
+      bnbPriceUSD = BIGDECIMAL_ZERO; // TODO: find way to get bnb price on chain here
+    } else {
+      // use chainlink oracle BNB/USD starting on block 1881676
+      const chainlinkOracle = Oracle.bind(
+        Address.fromString(BNB_USD_CHAINLINK_ORACLE)
+      );
+      const tryPriceUSD = chainlinkOracle.try_latestAnswer();
+      bnbPriceUSD = tryPriceUSD.reverted
+        ? BIGDECIMAL_ZERO
+        : tryPriceUSD.value.toBigDecimal().div(cTokenDecimalsBD);
+    }
+
+    const priceInBNB = getTokenPriceUSD(tryUnderlyingPrice, underlyingDecimals);
+    const priceUSD = bnbPriceUSD.times(priceInBNB);
+
+    // put the price back into BigInt form with correct decimal offset
+    const mantissaDecimalFactor = 18 - underlyingDecimals + 18;
+    const bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
+    const returnValue = BigInt.fromString(
+      priceUSD.times(bdFactor).truncate(0).toString()
+    );
+    return ethereum.CallResult.fromValue(returnValue);
+  }
+
+  // Polygon / Arbitrum deployments return price like normal
+  return ethereum.CallResult.fromValue(tryUnderlyingPrice.value);
+}
+
+////////////////////////////
+//// Deprecate Subgraph ////
+////////////////////////////
+
+// this function will deprecate Ethereum subgraph after 10/17/2022
+// return false if not deprecated
+function deprecateSubgraph(blockNumber: BigInt, timestamp: BigInt): boolean {
+  if (
+    isDeprecated ||
+    !equalsIgnoreCase(network, Network.MAINNET) ||
+    blockNumber.toI32() < ETH_CUTOFF_BLOCK
+  ) {
+    // skip if already deprecated, not ethereum, or not past the CUTOFF block
+    return false;
+  }
+
+  const protocol = getOrCreateProtocol();
+
+  // deprecate markets first
+  deprecateMarkets(protocol._marketIDs, blockNumber, timestamp);
+
+  // finish off with the protocol
+  deprecateProtocol(protocol, timestamp);
+
+  isDeprecated = true;
+  return true;
+}
+
+function deprecateMarkets(
+  marketIDList: string[],
+  blockNumber: BigInt,
+  timestamp: BigInt
+): void {
+  for (let i = 0; i < marketIDList.length; i++) {
+    const market = Market.load(marketIDList[i]);
+    if (!market) {
+      continue;
+    }
+
+    // zero out the market fields that need to be zero'd out
+    market.isActive = false;
+    market.canUseAsCollateral = false;
+    market.canBorrowFrom = false;
+    market.rates = [];
+    market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    market.inputTokenBalance = BIGINT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.outputTokenSupply = BIGINT_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.exchangeRate = BIGDECIMAL_ZERO;
+    market.rewardTokenEmissionsAmount = [];
+    market.rewardTokenEmissionsUSD = [];
+    market._borrowBalance = BIGINT_ZERO;
+
+    market.save();
+
+    // clear out last marketDaily / hourly snapshot
+    clearMarketSnapshots(market, blockNumber, timestamp);
+  }
+}
+
+function deprecateProtocol(protocol: LendingProtocol, timestamp: BigInt): void {
+  protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+
+  protocol.save();
+
+  // clear out last financialsDailySnapshot
+  clearFinancialSnapshot(timestamp);
+}
+
+function clearFinancialSnapshot(timestamp: BigInt): void {
+  const financialsDailySnapshotID = (
+    timestamp.toI32() / SECONDS_PER_DAY
+  ).toString();
+  const financiasDailySnapshot = FinancialsDailySnapshot.load(
+    financialsDailySnapshotID
+  );
+  if (!financiasDailySnapshot) {
+    log.warning(
+      "[clearFinancialSnapshot] could not find FinancialsDailySnapshot with ID {}",
+      [financialsDailySnapshotID]
+    );
+    return;
+  }
+
+  financiasDailySnapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  financiasDailySnapshot.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  financiasDailySnapshot.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  financiasDailySnapshot.save();
+}
+
+function clearMarketSnapshots(
+  market: Market,
+  blockNumber: BigInt,
+  timestamp: BigInt
+): void {
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(
+    market,
+    timestamp,
+    blockNumber
+  );
+
+  // clear out aggregated fields
+  marketDailySnapshot.rates = [];
+  marketDailySnapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  marketDailySnapshot.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  marketDailySnapshot.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  marketDailySnapshot.inputTokenBalance = BIGINT_ZERO;
+  marketDailySnapshot.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+  marketDailySnapshot.outputTokenSupply = BIGINT_ZERO;
+  marketDailySnapshot.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  marketDailySnapshot.exchangeRate = BIGDECIMAL_ZERO;
+  marketDailySnapshot.rewardTokenEmissionsAmount = [];
+  marketDailySnapshot.rewardTokenEmissionsUSD = [];
+  marketDailySnapshot.save();
+
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
+    market,
+    timestamp,
+    blockNumber
+  );
+  marketHourlySnapshot.rates = [];
+  marketHourlySnapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.inputTokenBalance = BIGINT_ZERO;
+  marketHourlySnapshot.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.outputTokenSupply = BIGINT_ZERO;
+  marketHourlySnapshot.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.exchangeRate = BIGDECIMAL_ZERO;
+  marketHourlySnapshot.rewardTokenEmissionsAmount = [];
+  marketHourlySnapshot.rewardTokenEmissionsUSD = [];
+  marketHourlySnapshot.save();
 }

@@ -8,13 +8,14 @@ export namespace ProtocolType {
 export namespace Versions {
   export const Schema120 = "1.2.0";
   export const Schema130 = "1.3.0";
+  export const Schema200 = "2.0.0";
   export const Schema201 = "2.0.1";
 
   // Array to list out the different schema versions available
   export const SchemaVersions = [Schema120, Schema130, Schema201];
 }
 
-export const latestSchemaVersion = "1.3.0";
+export const latestSchemaVersions = ["1.3.0", "2.0.1"];
 export const SubgraphBaseUrl = "https://api.thegraph.com/subgraphs/name/";
 export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",

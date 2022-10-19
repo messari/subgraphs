@@ -112,7 +112,7 @@ function ProtocolDashboard() {
 
   // By default, set the schema version to the user selected. If user has not selected, go to the version on the protocol entity
   let schemaVersion = subgraphToQuery.version;
-  if (!schemaVersion && protocolSchemaData?.protocols[0]?.schemaVersion) {
+  if (protocolSchemaData?.protocols[0]?.schemaVersion) {
     schemaVersion = protocolSchemaData.protocols[0].schemaVersion;
   }
   let protocolIdString = searchParams.get("protocolId");
@@ -121,11 +121,16 @@ function ProtocolDashboard() {
     protocolIdToUse = protocolIdString;
   }
   let protocolType = "N/A";
+  let entityError = null;
   if (protocolSchemaData?.protocols?.length > 0) {
     protocolType = protocolSchemaData?.protocols[0]?.type;
     if (protocolSchemaData.protocols[0]?.id && !protocolIdToUse) {
       protocolIdToUse = protocolSchemaData.protocols[0]?.id;
     }
+  } else if (!protocolSchemaQueryLoading) {
+    entityError = new ApolloError({
+      errorMessage: `DEPLOYMENT ERROR - ${subgraphToQuery.url} does not have any "protocol" entities. Essential data that determines validation can not be pulled without this entity.`,
+    });
   }
 
   const [protocolId, setprotocolId] = useState<string>(protocolIdToUse);
@@ -238,7 +243,7 @@ function ProtocolDashboard() {
   `;
 
   const snapshotDailyVolumeQuery = gql`
-    ${getSnapshotDailyVolume(schemaVersion)}
+    ${getSnapshotDailyVolume(schemaVersion, protocolSchemaData?.protocols[0]?.type?.toUpperCase())}
   `;
 
   const [getPoolsSnapshotVolume, { data: snapshotVolume }] = useLazyQuery(snapshotDailyVolumeQuery, { client: client });
@@ -296,10 +301,6 @@ function ProtocolDashboard() {
     if (!isCurrentVersion) {
       deploymentVersionParam = "&version=pending";
     }
-    let nameParam = "";
-    if (subgraphName) {
-      nameParam = "&name=" + subgraphName;
-    }
     let protocolParam = "";
     if (protocolId) {
       protocolParam = `&protocolId=${protocolId}`;
@@ -350,9 +351,9 @@ function ProtocolDashboard() {
       if (protocolIdToUse || protocolSchemaData?.protocols[0]?.id) {
         getData();
         getProtocolTableData();
-        getPendingSubgraph();
       }
     }
+    getPendingSubgraph();
     getFailedIndexingStatus();
   }, [protocolSchemaData, getData, getProtocolTableData, getPendingSubgraph]);
 
@@ -429,7 +430,7 @@ function ProtocolDashboard() {
         variables["pool" + (idx + 1) + "Id"] = dataPools[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE") {
+      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC") {
         getPoolsSnapshotVolume({ variables });
       }
       if (dataPools[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools2) {
@@ -445,7 +446,7 @@ function ProtocolDashboard() {
         variables["pool" + (idx + 1) + "Id"] = dataPools2[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens2({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE") {
+      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC") {
         getPoolsSnapshotVolume2({ variables });
       }
       if (dataPools2[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools3) {
@@ -461,7 +462,7 @@ function ProtocolDashboard() {
         variables["pool" + (idx + 1) + "Id"] = dataPools3[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens3({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE") {
+      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC") {
         getPoolsSnapshotVolume3({ variables });
       }
       if (dataPools3[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools4) {
@@ -477,7 +478,7 @@ function ProtocolDashboard() {
         variables["pool" + (idx + 1) + "Id"] = dataPools4[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens4({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE") {
+      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC") {
         getPoolsSnapshotVolume4({ variables });
       }
       if (dataPools4[PoolNames[data?.protocols[0]?.type]]?.length === 10 && tabValue === "2" && !dataPools5) {
@@ -493,7 +494,7 @@ function ProtocolDashboard() {
         variables["pool" + (idx + 1) + "Id"] = dataPools5[PoolNames[data?.protocols[0]?.type]][idx]?.id || "";
       }
       getPoolOverviewTokens5({ variables });
-      if (data?.protocols[0]?.type === "EXCHANGE") {
+      if (data?.protocols[0]?.type === "EXCHANGE" || data?.protocols[0]?.type === "GENERIC") {
         getPoolsSnapshotVolume5({ variables });
       }
     }
@@ -841,11 +842,12 @@ function ProtocolDashboard() {
       });
     }
   }
-
+  if (!!entityError) {
+    errorDisplayProps = entityError;
+  }
   if (data) {
     errorDisplayProps = null;
   }
-
   return (
     <div className="ProtocolDashboard">
       <DashboardHeader

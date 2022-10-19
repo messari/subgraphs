@@ -1,11 +1,10 @@
-import { Box, Grid, Typography } from "@mui/material";
-import { Chart } from "../../common/chartComponents/Chart";
-import { TableChart } from "../../common/chartComponents/TableChart";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
-import { convertTokenDecimals, toDate } from "../../utils";
+import { convertTokenDecimals, downloadCSV, JSONToCSVConvertor, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
+import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
 
 function addDataPoint(
@@ -73,8 +72,14 @@ function PoolTabEntity({
   const poolKeyPlural = PoolNames[data.protocols[0].type];
 
   const excludedEntities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "usageMetricsHourlySnapshots"];
-
   const list: { [x: string]: any } = {};
+  const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!!downloadAllCharts) {
+      triggerDownloadAllCharts(false);
+    }
+  }, [downloadAllCharts])
 
   useEffect(() => {
     const issuesToSet = { ...issuesProps };
@@ -205,18 +210,6 @@ function PoolTabEntity({
             dataFields[fieldName] = returnedData.currentEntityField;
             dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
 
-            if (
-              (capsFieldName === "HOURLYLIQUIDATEUSD" || capsFieldName === "DAILYLIQUIDATEUSD") &&
-              Number(value) > Number(timeseriesInstance.totalValueLockedUSD) &&
-              issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "LIQ").length === 0
-            ) {
-              issues.push({
-                type: "LIQ",
-                message: timeseriesInstance.id,
-                level: "critical",
-                fieldName: entityName + "-" + fieldName,
-              });
-            }
           }
 
           if (fieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField) {
@@ -473,8 +466,10 @@ function PoolTabEntity({
 
       // Push the Reward APR fields to the bottom of the charts section
       if (field.toUpperCase().includes("REWARDAPR") && dataFields[field].length > 0) {
-        rewardChart[field] = dataFields[field];
-        delete dataFields[field];
+        if ((field.toUpperCase() === "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length === 1) || (field.toUpperCase() !== "REWARDAPR" && Object.keys(dataFields).filter(x => x.toUpperCase().includes("REWARDAPR")).length > 0)) {
+          rewardChart[field] = dataFields[field];
+          delete dataFields[field];
+        }
       }
 
       // separate all of the rates fields to the ratesChart object
@@ -511,7 +506,6 @@ function PoolTabEntity({
     if (Object.keys(rewardChart).length > 0 && !dataFieldMetrics["rewardAPR"]?.invalidDataPlot) {
       const elementId = entityName + "-rewardAPR";
       const tableVals: { value: any; date: any }[] = [];
-      const firstKey = Object.keys(rewardChart)[0];
       const amountOfInstances = rewardChart[Object.keys(rewardChart)[0]].length;
       for (let x = 0; x < amountOfInstances; x++) {
         let date: number | null = null;
@@ -557,11 +551,6 @@ function PoolTabEntity({
       if (tableVals.length === 0) {
         rewardAPRElement = null;
       } else {
-        const table = (
-          <Grid key={elementId + "Table"} item xs={4}>
-            <TableChart datasetLabel="rewardAPR" dataTable={tableVals} />
-          </Grid>
-        );
         rewardAPRElement = (
           <div id={elementId}>
             <Box mt={3} mb={1}>
@@ -569,12 +558,8 @@ function PoolTabEntity({
                 <Typography variant="h6">{elementId}</Typography>
               </CopyLinkToClipboard>
             </Box>
-            <Grid container justifyContent="space-between">
-              <Grid key={elementId + "Chart"} item xs={7.5}>
-                <Chart datasetLabel="rewardAPR" dataChart={rewardChart} />
-              </Grid>
-              {table}
-            </Grid>
+            <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} />
+
           </div>
         );
       }
@@ -606,11 +591,6 @@ function PoolTabEntity({
           delete ratesChart[rate];
         }
       });
-      const table = (
-        <Grid key={elementId + "Table"} item xs={4}>
-          <TableChart datasetLabel="RATES" dataTable={tableVals} />
-        </Grid>
-      );
       ratesElement = (
         <div key={elementId} id={elementId}>
           <Box mt={3} mb={1}>
@@ -618,12 +598,7 @@ function PoolTabEntity({
               <Typography variant="h6">{elementId}</Typography>
             </CopyLinkToClipboard>
           </Box>
-          <Grid container justifyContent="space-between">
-            <Grid key={elementId + "Chart"} item xs={7.5}>
-              <Chart datasetLabel="RATES" dataChart={ratesChart} />
-            </Grid>
-            {table}
-          </Grid>
+          <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} />
         </div>
       );
     }
@@ -746,13 +721,86 @@ function PoolTabEntity({
         }
       }
     });
+
+    const mappedCurrentEntityData = currentEntityData.map((instance: any, idx: number) => {
+      let instanceToSave: any = {};
+      instanceToSave.date = moment.utc(Number(instance.timestamp) * 1000).format("YYYY-MM-DD");
+      instanceToSave = { ...instanceToSave, ...instance };
+      if (!!instance.rates) {
+        instance.rates.forEach((rate: any, idx: number) => {
+          instanceToSave["rate [" + idx + "]"] = rate.rate;
+        })
+        delete instanceToSave.rates;
+      }
+
+      for (let tokenIdx = 0; tokenIdx < rewardTokensLength; tokenIdx++) {
+        const amt = instance?.rewardTokenEmissionsAmount?.[tokenIdx] || 0;
+        instanceToSave["rewardTokenEmissionsAmount [" + tokenIdx + "]"] = amt;
+        const amtUSD = instance?.rewardTokenEmissionsUSD?.[tokenIdx] || 0;
+        instanceToSave["rewardTokenEmissionsUSD [" + tokenIdx + "]"] = amtUSD;
+        if (Object.keys(rewardChart).length > 0) {
+          const amtAPR = rewardChart[Object.keys(rewardChart)?.[tokenIdx]]?.[idx]?.value || 0;
+          instanceToSave["rewardAPR [" + tokenIdx + "]"] = amtAPR;
+        }
+      }
+
+      for (let idx = 0; idx < inputTokensLength; idx++) {
+        if (!!instance.inputTokenBalances) {
+          const amt = instance?.inputTokenBalances?.[idx] || 0;
+          instanceToSave["inputTokenBalances [" + idx + "]"] = amt;
+        }
+        if (!!instance.inputTokenWeights) {
+          const amt = instance?.inputTokenWeights?.[idx] || 0;
+          instanceToSave["inputTokenWeights [" + idx + "]"] = amt;
+        }
+        if (!!instance.dailyVolumeByTokenAmount) {
+          const amt = instance?.dailyVolumeByTokenAmount?.[idx] || 0;
+          instanceToSave["dailyVolumeByTokenAmount [" + idx + "]"] = amt;
+        }
+        if (!!instance.dailyVolumeByTokenUSD) {
+          const amt = instance?.dailyVolumeByTokenUSD?.[idx] || 0;
+          instanceToSave["dailyVolumeByTokenUSD [" + idx + "]"] = amt;
+        }
+        if (!!instance.hourlyVolumeByTokenAmount) {
+          const amt = instance?.hourlyVolumeByTokenAmount?.[idx] || 0;
+          instanceToSave["hourlyVolumeByTokenAmount [" + idx + "]"] = amt;
+        }
+        if (!!instance.hourlyVolumeByTokenUSD) {
+          const amt = instance?.hourlyVolumeByTokenUSD?.[idx] || 0;
+          instanceToSave["hourlyVolumeByTokenUSD [" + idx + "]"] = amt;
+        }
+      }
+
+      if (!!dataFields.baseYield) {
+        instanceToSave.baseYield = dataFields.baseYield[idx]?.value;
+        if (!dataFields.baseYield[idx]?.value) {
+          instanceToSave.baseYield = 0;
+        }
+      }
+
+      delete instanceToSave.rewardTokenEmissionsAmount;
+      delete instanceToSave.rewardTokenEmissionsUSD;
+      delete instanceToSave.inputTokenBalances;
+      delete instanceToSave.inputTokenWeights;
+      delete instanceToSave.dailyVolumeByTokenAmount;
+      delete instanceToSave.dailyVolumeByTokenUSD;
+      delete instanceToSave.hourlyVolumeByTokenAmount;
+      delete instanceToSave.hourlyVolumeByTokenUSD;
+      delete instanceToSave.__typename;
+      return instanceToSave;
+    }).sort((a: any, b: any) => (Number(a.timestamp) - Number(b.timestamp)));
+
     return (
       <Grid key={entityName}>
-        <Box my={3}>
+        <Box sx={{ marginTop: "24px" }}>
           <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
             <Typography variant="h4">{entityName}</Typography>
           </CopyLinkToClipboard>
         </Box>
+        <div>
+          <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)} >Download Snapshots as csv</div>
+          <div style={{ width: "25%", display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }} className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root" onClick={() => triggerDownloadAllCharts(true)} >Download All Charts</div>
+        </div>
         {Object.keys(dataFields).map((field: string) => {
           const fieldName = field.split(" [")[0];
           let label = entityName + "-" + field;
@@ -916,14 +964,7 @@ function PoolTabEntity({
                   <Typography variant="h6">{label}</Typography>
                 </CopyLinkToClipboard>
               </Box>
-              <Grid container justifyContent="space-between">
-                <Grid key={elementId + "1"} item xs={7.5}>
-                  <Chart datasetLabel={label} dataChart={dataFields[field]} />
-                </Grid>
-                <Grid key={elementId + "2"} item xs={4}>
-                  <TableChart datasetLabel={label} dataTable={dataFields[field]} />
-                </Grid>
-              </Grid>
+              <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataFields[field]} />
             </div>
           );
         })}

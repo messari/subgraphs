@@ -1,0 +1,26 @@
+{
+  "network": "ethereum",
+  "status": "prod",
+  "versions": {
+    "schema": "1.0.0",
+    "subgraph": "1.0.0",
+    "methodology": "1.0.0"
+  },
+  "services": {
+    "hosted-service": {
+      "slug": "the-graph-ethereum",
+      "query-id": "the-graph-ethereum"
+    }
+  },
+  "files": {
+    "template": "the.graph.template.yaml"
+  },
+  "options": {
+    "prepare:yaml": true,
+    "prepare:constants": false
+  },
+  "protocol": "the-graph",
+  "base": "the-graph",
+  "schema": "generic",
+  "deployment": "the-graph-ethereum"
+}

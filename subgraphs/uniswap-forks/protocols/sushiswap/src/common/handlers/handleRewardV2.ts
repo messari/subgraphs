@@ -2,7 +2,6 @@ import { ethereum, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import {
   LiquidityPool,
-  _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import {
@@ -27,18 +26,18 @@ export function updateMasterChef(
   pid: BigInt,
   amount: BigInt
 ): void {
-  let masterChefV2Pool = _MasterChefStakingPool.load(
+  const masterChefV2Pool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV2 + "-" + pid.toString()
   )!;
-  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+  const masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
+  const pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }
 
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
   pool.rewardTokens = [
     getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
   ];
@@ -60,12 +59,12 @@ export function updateMasterChef(
     );
   }
 
-  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
+  const rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let rewardTokenPerDay = getRewardsPerDay(
+  const rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
     rewardAmountPerIntervalBigDecimal,

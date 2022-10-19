@@ -135,7 +135,10 @@ export function Withdraw(
     pool.inputTokenBalances,
     block
   );
-  pool.inputTokenWeights = utils.getPoolTokenWeights(poolAddress);
+  pool.inputTokenWeights = utils.getPoolTokenWeights(
+    poolAddress,
+    pool.inputTokens
+  );
   pool.outputTokenSupply = tokenSupplyAfterWithdrawal;
   pool.outputTokenPriceUSD = utils.getOutputTokenPriceUSD(poolAddress, block);
   pool.save();

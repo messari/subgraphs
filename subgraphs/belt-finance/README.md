@@ -16,7 +16,7 @@ Note that Belt applies a Withdrawal and Deposit Fees based on Strategy used at t
 
 Sum across all Vaults:
 
-`(Withdraw Amount * Vault Withdraw Fee) + (Deposit Amount * Vault Deposit Fee)`
+`(Withdraw Amount * Strategy Withdraw Fee) + (Deposit Amount * Strategy Deposit Fee) + Buyback Amount`
 
 ### Supply-Side Revenue USD
 
@@ -26,7 +26,7 @@ Note that this is the remaining Yield after Protocol Fees
 
 Sum across all Vaults
 
-`(Withdraw Amount - Withdraw Fee) + (Deposit Amount - Deposit Fee)`
+`Harvested Amount - (Buyback Amount)`
 
 ## Total Unique Users
 

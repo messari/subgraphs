@@ -67,6 +67,8 @@ import {
   INT_ZERO,
   INT_ONE,
   ProtocolSideRevenueType,
+  BIGDECIMAL_NEG_ONE,
+  BIGINT_NEG_ONE,
 } from "./common/constants";
 import {
   updateUsageMetrics,
@@ -178,6 +180,10 @@ export function handleVatCage(event: VatNoteEvent): void {
 // Deposit/Withdraw
 export function handleVatSlip(event: VatNoteEvent): void {
   let ilk = event.params.arg1;
+  if (ilk.toString() == "TELEPORT-FW-A") {
+    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    return;
+  }
   let usr = bytes32ToAddressHexString(event.params.arg2);
 
   let owner = getOwnerAddressFromCdp(usr);
@@ -207,6 +213,10 @@ export function handleVatSlip(event: VatNoteEvent): void {
 // Borrow/Repay
 export function handleVatFrob(event: VatNoteEvent): void {
   let ilk = event.params.arg1;
+  if (ilk.toString() == "TELEPORT-FW-A") {
+    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    return;
+  }
   let u = bytes32ToAddressHexString(event.params.arg2);
   let v = bytes32ToAddressHexString(event.params.arg3);
   // frob(bytes32 i, address u, address v, address w, int256 dink, int256 dart) call
@@ -272,6 +282,10 @@ export function handleVatFrob(event: VatNoteEvent): void {
 // update total revenue (stability fee)
 export function handleVatFold(event: VatNoteEvent): void {
   let ilk = event.params.arg1;
+  if (ilk.toString() == "TELEPORT-FW-A") {
+    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    return;
+  }
   let vow = bytes32ToAddress(event.params.arg2).toHexString();
   let rate = bytesToSignedBigInt(event.params.arg3);
   let vatContract = Vat.bind(event.address);
@@ -321,6 +335,10 @@ export function handleVatDebtSettlement(event: VatNoteEvent): void {
 // old liquidation
 export function handleCatBite(event: BiteEvent): void {
   let ilk = event.params.ilk; //market
+  if (ilk.toString() == "TELEPORT-FW-A") {
+    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    return;
+  }
   let urn = event.params.urn; //liquidatee
   let flip = event.params.flip; //auction contract
   let id = event.params.id; //auction id
@@ -335,16 +353,19 @@ export function handleCatBite(event: BiteEvent): void {
   //  .concat(event.logIndex.toString());
   //getOrCreateLiquidate(LiquidateID, event, market, urn.toHexString());
 
+  // remove borrowed amount from borrowed balance
+  // collateral/tvl update is taken care of when it exits vat
+  // via the slip() function/event
+  let deltaDebtUSD = bigIntToBDUseDecimals(art, WAD).times(BIGDECIMAL_NEG_ONE);
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
+
   let liquidationRevenueUSD = bigIntToBDUseDecimals(tab, RAD).times(
     market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
   );
 
   updateRevenue(event, market.id, liquidationRevenueUSD, BIGDECIMAL_ZERO, ProtocolSideRevenueType.LIQUIDATION);
 
-  let storeID = flip
-    .toHexString()
-    .concat("-")
-    .concat(id.toString());
+  let storeID = flip.toHexString().concat("-").concat(id.toString());
 
   log.info("[handleCatBite]storeID={}, ilk={}, urn={}: lot={}, art={}, tab={}, liquidation revenue=${}", [
     storeID,
@@ -363,7 +384,8 @@ export function handleCatBite(event: BiteEvent): void {
   flipBidsStore.round = INT_ZERO;
   flipBidsStore.liquidatee = liquidatee;
   flipBidsStore.lot = lot;
-  flipBidsStore.tab = tab; // not including liquidation penalty
+  flipBidsStore.art = art;
+  flipBidsStore.tab = tab; // including interest, but not liquidation penalty
   flipBidsStore.bid = BIGINT_ZERO;
   flipBidsStore.bidder = ZERO_ADDRESS;
   flipBidsStore.market = market.id;
@@ -378,6 +400,10 @@ export function handleCatBite(event: BiteEvent): void {
 // Works for both Cat V1 and V2
 export function handleCatFile(event: CatNoteEvent): void {
   let ilk = event.params.arg1;
+  if (ilk.toString() == "TELEPORT-FW-A") {
+    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    return;
+  }
   let what = event.params.arg2.toString();
   // 3rd arg: start = 4 + 2 * 32, end = start + 32
   let chop = bytesToUnsignedBigInt(extractCallData(event.params.data, 68, 100));
@@ -388,9 +414,7 @@ export function handleCatFile(event: CatNoteEvent): void {
       log.warning("[handleFileDog]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
       return;
     }
-    let liquidationPenalty = bigIntToBDUseDecimals(chop, RAY)
-      .minus(BIGDECIMAL_ONE)
-      .times(BIGDECIMAL_ONE_HUNDRED);
+    let liquidationPenalty = bigIntToBDUseDecimals(chop, RAY).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
     if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
       market.liquidationPenalty = liquidationPenalty;
       market.save();
@@ -407,18 +431,25 @@ export function handleCatFile(event: CatNoteEvent): void {
 // New liquidation
 export function handleDogBark(event: BarkEvent): void {
   let ilk = event.params.ilk; //market
+  if (ilk.toString() == "TELEPORT-FW-A") {
+    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    return;
+  }
   let urn = event.params.urn; //liquidatee
   let clip = event.params.clip; //auction contract
   let id = event.params.id; //auction id
   let lot = event.params.ink;
   let art = event.params.art;
-  let due = event.params.due;
+  let due = event.params.due; //including interest, but not penalty
 
   let market = getMarketFromIlk(ilk)!;
-  let storeID = clip
-    .toHexString()
-    .concat("-")
-    .concat(id.toString());
+  let storeID = clip.toHexString().concat("-").concat(id.toString());
+
+  // remove borrowed amount from borrowed balance
+  // collateral/tvl update is taken care of when it exits vat
+  // via the slip() function/event
+  let deltaDebtUSD = bigIntToBDUseDecimals(art, WAD).times(BIGDECIMAL_NEG_ONE);
+  updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
 
   let liquidationRevenueUSD = bigIntToBDUseDecimals(due, RAD).times(
     market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED),
@@ -441,7 +472,8 @@ export function handleDogBark(event: BarkEvent): void {
   clipTakeStore.slice = INT_ZERO;
   clipTakeStore.market = market.id;
   clipTakeStore.lot = lot;
-  clipTakeStore.tab = due; //not including penalty
+  clipTakeStore.art = art;
+  clipTakeStore.tab = due; // not including penalty
   clipTakeStore.save();
 
   Clip.create(clip);
@@ -450,6 +482,10 @@ export function handleDogBark(event: BarkEvent): void {
 // Update liquidate penalty for the Dog contract
 export function handleDogFile(event: DogFileChopEvent): void {
   let ilk = event.params.ilk;
+  if (ilk.toString() == "TELEPORT-FW-A") {
+    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    return;
+  }
   let what = event.params.what.toString();
   if (what == "chop") {
     let market = getMarketFromIlk(ilk);
@@ -458,9 +494,7 @@ export function handleDogFile(event: DogFileChopEvent): void {
       return;
     }
     let chop = event.params.data;
-    let liquidationPenalty = bigIntToBDUseDecimals(chop, RAY)
-      .minus(BIGDECIMAL_ONE)
-      .times(BIGDECIMAL_ONE_HUNDRED);
+    let liquidationPenalty = bigIntToBDUseDecimals(chop, RAY).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONE_HUNDRED);
     if (liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
       market.liquidationPenalty = liquidationPenalty;
       market.save();
@@ -589,6 +623,7 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
 
   let amount = bigIntChangeDecimals(flipBidsStore.lot, WAD, token.decimals);
   let amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
+  // bid is in DAI, assumed to priced at $1
   let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(flipBidsStore.bid, RAD));
 
   let liquidateID = createEventID(event);
@@ -639,8 +674,8 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
   flipBidsStore.ended = true;
   flipBidsStore.save();
 
-  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
@@ -673,8 +708,9 @@ export function handleClipTakeBid(event: TakeEvent): void {
 
   let value = bigIntToBDUseDecimals(lot, token.decimals).times(token.lastPriceUSD!);
   log.info(
-    "[handleClipTakeBid]storeID={}, clip.id={}, slice #{} event params: max={}, lot={}, price={}, value(lot*price)={}, tab={}, owe={}, liquidatee={}, liquidator={}",
+    "[handleClipTakeBid]block#={}, storeID={}, clip.id={}, slice #{} event params: max={}, lot={}, price={}, value(lot*price)={}, art={}, tab={}, owe={}, liquidatee={}, liquidator={}",
     [
+      event.block.number.toString(),
       storeID, //storeID
       id.toString(),
       clipTakeStore.slice.toString(),
@@ -682,6 +718,7 @@ export function handleClipTakeBid(event: TakeEvent): void {
       lot.toString(),
       price.toString(),
       value.toString(),
+      clipTakeStore.art.toString(),
       tab.toString(),
       owe.toString(),
       liquidatee,
@@ -772,9 +809,8 @@ export function handleClipTakeBid(event: TakeEvent): void {
 
   //liquidate._finalized = true;
   //liquidate.save();
-
-  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
@@ -793,6 +829,13 @@ export function handleClipYankBid(event: ClipYankEvent): void {
   // translate possible proxy/urn handler address to owner address
   liquidatee = getOwnerAddressFromCdp(liquidatee);
   liquidatee = getOwnerAddressFromProxy(liquidatee);
+
+  let storeID = event.address //clip contract
+    .toHexString()
+    .concat("-")
+    .concat(id.toString());
+  //let liquidateStore = getOrCreateLiquidateStore(storeID);
+  let clipTakeStore = _ClipTakeStore.load(storeID)!;
 
   //let storeID = event.address //clip contract
   //  .toHexString()
@@ -840,8 +883,8 @@ export function handleClipYankBid(event: ClipYankEvent): void {
   //liquidate._finalized = true;
   liquidate.save();
 
-  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
+  updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateUsageMetrics(event, [], BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateFinancialsSnapshot(event, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
 }
@@ -851,6 +894,12 @@ export function handleSpotFileMat(event: SpotNoteEvent): void {
   let what = event.params.arg2.toString();
   if (what == "mat") {
     let ilk = event.params.arg1;
+    if (ilk.toString() == "TELEPORT-FW-A") {
+      log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [
+        ilk.toString(),
+      ]);
+      return;
+    }
     let market = getMarketFromIlk(ilk);
     if (market == null) {
       log.warning("[handleSpotFileMat]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
@@ -902,6 +951,10 @@ export function handleSpotFilePar(event: SpotNoteEvent): void {
 // update token price for ilk market
 export function handleSpotPoke(event: PokeEvent): void {
   let ilk = event.params.ilk;
+  if (ilk.toString() == "TELEPORT-FW-A") {
+    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    return;
+  }
   let market = getMarketFromIlk(ilk);
   if (market == null) {
     log.warning("[handleSpotPoke]Failed to get Market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
@@ -929,6 +982,10 @@ export function handleSpotPoke(event: PokeEvent): void {
 
 export function handleJugFileDuty(event: JugNoteEvent): void {
   let ilk = event.params.arg1;
+  if (ilk.toString() == "TELEPORT-FW-A") {
+    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    return;
+  }
   let what = event.params.arg2.toString();
   if (what == "duty") {
     let market = getMarketFromIlk(ilk);

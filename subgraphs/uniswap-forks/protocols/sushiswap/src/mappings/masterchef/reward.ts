@@ -4,7 +4,6 @@ import {
   Withdraw,
   EmergencyWithdraw,
 } from "../../../../../generated/MasterChef/MasterChefSushiswap";
-import { _HelperStore } from "../../../../../generated/schema";
 import { BIGINT_NEG_ONE } from "../../../../../src/common/constants";
 import { handleReward } from "../../common/handlers/handleReward";
 

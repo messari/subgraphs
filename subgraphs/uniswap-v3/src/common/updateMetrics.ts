@@ -5,7 +5,6 @@ import {
   Account,
   Token,
   ActiveAccount,
-  _HelperStore,
   DexAmmProtocol,
   LiquidityPool,
 } from "../../generated/schema";
@@ -43,9 +42,9 @@ import { percToDec } from "./utils/utils";
 
 // Update FinancialsDailySnapshots entity with blocknumber, timestamp, total value locked, and volume
 export function updateFinancials(event: ethereum.Event): void {
-  let financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
+  const financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetricsDaily.blockNumber = event.block.number;
@@ -62,12 +61,12 @@ export function updateUsageMetrics(
   fromAddress: Address,
   usageType: string
 ): void {
-  let from = fromAddress.toHexString();
+  const from = fromAddress.toHexString();
 
-  let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
-  let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
+  const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
+  const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
 
-  let protocol = getOrCreateDex();
+  const protocol = getOrCreateDex();
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetricsDaily.blockNumber = event.block.number;
@@ -91,14 +90,14 @@ export function updateUsageMetrics(
   }
 
   // Number of days since Unix epoch
-  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  const day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  const hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-  let dayId = day.toString();
-  let hourId = hour.toString();
+  const dayId = day.toString();
+  const hourId = hour.toString();
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = from.concat("-").concat(dayId);
+  const dailyActiveAccountId = from.concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -106,7 +105,7 @@ export function updateUsageMetrics(
     dailyActiveAccount.save();
   }
 
-  let hourlyActiveAccountId = from.concat("-").concat(hourId);
+  const hourlyActiveAccountId = from.concat("-").concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -131,10 +130,10 @@ export function updateUsageMetrics(
 // Update UsagePoolDailySnapshot entity
 export function updatePoolMetrics(event: ethereum.Event): void {
   // get or create pool metrics
-  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
-  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
+  const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
+  const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
 
-  let pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(event.address.toHexString());
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetricsDaily.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -161,19 +160,19 @@ export function updateTokenWhitelists(
   token1: Token,
   poolAddress: string
 ): void {
-  let tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
-  let tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
+  const tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
+  const tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
 
   // update white listed pools
   if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist0.id)) {
-    let newPools = tokenWhitelist1.whitelistPools;
+    const newPools = tokenWhitelist1.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist1.whitelistPools = newPools;
     tokenWhitelist1.save();
   }
 
   if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist1.id)) {
-    let newPools = tokenWhitelist0.whitelistPools;
+    const newPools = tokenWhitelist0.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist0.whitelistPools = newPools;
     tokenWhitelist0.save();
@@ -184,15 +183,15 @@ export function updatePrices(
   event: ethereum.Event,
   sqrtPriceX96: BigInt
 ): void {
-  let pool = getLiquidityPool(event.address.toHexString());
-  let poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
+  const pool = getLiquidityPool(event.address.toHexString());
+  const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
   // Retrieve token Trackers
-  let token0 = getOrCreateToken(pool.inputTokens[0]);
-  let token1 = getOrCreateToken(pool.inputTokens[1]);
+  const token0 = getOrCreateToken(pool.inputTokens[0]);
+  const token1 = getOrCreateToken(pool.inputTokens[1]);
 
   // update native token price now that prices could have changed
-  let nativeToken = updateNativeTokenPriceInUSD();
+  const nativeToken = updateNativeTokenPriceInUSD();
 
   poolAmounts.tokenPrices = sqrtPriceX96ToTokenPrices(
     sqrtPriceX96,
@@ -222,11 +221,11 @@ export function updateVolumeAndFees(
   token0Amount: BigInt,
   token1Amount: BigInt
 ): void {
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
-  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
-  let supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
-  let protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
+  const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+  const poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
+  const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
+  const supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
+  const protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
 
   // Update volume occurred during swaps
 
@@ -302,13 +301,13 @@ export function updateVolumeAndFees(
     trackedAmountUSD[INT_TWO]
   );
 
-  let supplyFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
+  const supplyFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
     percToDec(supplyFee.feePercentage)
   );
-  let protocolFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
+  const protocolFeeAmountUSD = trackedAmountUSD[INT_TWO].times(
     percToDec(protocolFee.feePercentage)
   );
-  let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
+  const tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
 
   // Update fees collected during swaps
   // Protocol revenues
@@ -379,18 +378,18 @@ export function updateVolumeAndFees(
 
 // Updated protocol fees if specified by SetFeeProtocol event
 export function updateProtocolFees(event: ethereum.Event): void {
-  let poolContract = Pool.bind(event.address);
-  let pool = getLiquidityPool(event.address.toString());
+  const poolContract = Pool.bind(event.address);
+  const pool = getLiquidityPool(event.address.toString());
 
-  let tradingFee = getLiquidityPoolFee(pool.fees[0]);
-  let protocolFee = getLiquidityPoolFee(pool.fees[1]);
+  const tradingFee = getLiquidityPoolFee(pool.fees[0]);
+  const protocolFee = getLiquidityPoolFee(pool.fees[1]);
 
   // Get the total proportion of swap value collected as a fee
-  let totalPoolFee = tradingFee.feePercentage.plus(protocolFee.feePercentage);
+  const totalPoolFee = tradingFee.feePercentage.plus(protocolFee.feePercentage);
 
   // Value5 is the feeProtocol variabe in the slot0 struct of the pool contract
-  let feeProtocol = poolContract.slot0().value5;
-  let protocolFeeProportion = BIGDECIMAL_ONE.div(
+  const feeProtocol = poolContract.slot0().value5;
+  const protocolFeeProportion = BIGDECIMAL_ONE.div(
     BigDecimal.fromString(feeProtocol.toString())
   );
 

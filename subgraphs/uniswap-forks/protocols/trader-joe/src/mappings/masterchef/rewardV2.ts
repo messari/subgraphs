@@ -7,10 +7,7 @@ import {
   Set,
   UpdateEmissionRate,
 } from "../../../../../generated/MasterChefV2/MasterChefV2TraderJoe";
-import {
-  _HelperStore,
-  _MasterChefStakingPool,
-} from "../../../../../generated/schema";
+import { _MasterChefStakingPool } from "../../../../../generated/schema";
 import {
   BIGINT_NEG_ONE,
   MasterChef,
@@ -56,7 +53,7 @@ export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
 
 // Handle the addition of a new pool to the MasterChef. New staking pool.
 export function handleAdd(event: Add): void {
-  let masterChefV2Pool = createMasterChefStakingPool(
+  const masterChefV2Pool = createMasterChefStakingPool(
     event,
     MasterChef.MASTERCHEFV2,
     event.params.pid,
@@ -79,7 +76,7 @@ export function handleAdd(event: Add): void {
 
 // Update the allocation points of the pool.
 export function handleSet(event: Set): void {
-  let masterChefV2Pool = _MasterChefStakingPool.load(
+  const masterChefV2Pool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV2 + "-" + event.params.pid.toString()
   )!;
   updateMasterChefTotalAllocation(
@@ -99,8 +96,14 @@ export function handleSet(event: Set): void {
 
 // Update the total emissions rate of rewards for the masterchef contract.
 export function handleUpdateEmissionRate(event: UpdateEmissionRate): void {
-  let masterChefV2Pool = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
-  let masterChefV3Pool = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV3);
+  const masterChefV2Pool = getOrCreateMasterChef(
+    event,
+    MasterChef.MASTERCHEFV2
+  );
+  const masterChefV3Pool = getOrCreateMasterChef(
+    event,
+    MasterChef.MASTERCHEFV3
+  );
 
   log.warning("NEW REWARD RATE: " + event.params._joePerSec.toString(), []);
 

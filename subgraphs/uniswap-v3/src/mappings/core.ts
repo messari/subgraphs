@@ -1,9 +1,10 @@
-// import { log } from '@graphprotocol/graph-ts'
+// import { log } from "@graphprotocol/graph-ts";
 import {
   Burn as BurnEvent,
   Initialize,
   Mint as MintEvent,
   Swap as SwapEvent,
+  Collect as CollectEvent,
   SetFeeProtocol,
 } from "../../generated/templates/Pool/Pool";
 import { UsageType } from "../common/constants";
@@ -49,8 +50,10 @@ export function handleBurn(event: BurnEvent): void {
   createWithdraw(
     event,
     event.params.owner,
+    event.params.owner,
     event.params.amount0,
-    event.params.amount1
+    event.params.amount1,
+    false
   );
   updateUsageMetrics(event, event.params.owner, UsageType.WITHDRAW);
   updateFinancials(event);
@@ -64,10 +67,24 @@ export function handleSwap(event: SwapEvent): void {
     event.params.amount0,
     event.params.amount1,
     event.params.recipient,
-    event.params.sender,
+    event.transaction.from,
     event.params.sqrtPriceX96
   );
   updateFinancials(event);
   updatePoolMetrics(event);
-  updateUsageMetrics(event, event.params.sender, UsageType.SWAP);
+  updateUsageMetrics(event, event.transaction.from, UsageType.SWAP);
+}
+
+export function handleCollect(event: CollectEvent): void {
+  createWithdraw(
+    event,
+    event.params.owner,
+    event.params.recipient,
+    event.params.amount0,
+    event.params.amount1,
+    true
+  );
+  updateFinancials(event);
+  updatePoolMetrics(event);
+  updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
 }

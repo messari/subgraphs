@@ -22,7 +22,7 @@ export class NetworkSpecificConstant {
 }
 
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
-  let network = dataSource.network();
+  const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
       "0x835482fe0532f169024d5e9410199369aad5c77e",
@@ -55,6 +55,19 @@ export const ETH_SYMBOL = "ETH";
 export const SOHM_ADDRESS = "0x04f2694c8fcee23e8fd0dfea1d4f5bb8c352111f";
 export const GOHM_ADDRESS = "0x0ab87046fBb341D058F17CBC4c1133F25a20a52f";
 export const FMIM_ADDRESS = "0xd9444bab79720e8223b83e5d913d00c679b44b65";
+export const VESPER_V_DOLLAR_ADDRESS =
+  "0x2914e8c1c2c54e5335dc9554551438c59373e807";
+export const FLOAT_MARKET_ADDRESS =
+  "0x898beab27b8d44501de79b946f8d4c67918e1c47";
+export const FLOAT_ADDRESS = "0xb05097849bca421a3f51b249ba6cca4af4b97cb9";
+
+// blocklist markets
+// these pools have exotic tokens with low liquidity, and the prices are artificially inflated
+// removing so it does not convolute the data
+export const BLOCKLIST_MARKETS = [
+  "0xc0c997227922004da3a47185ac2be1d648db0062", // Stable Pool Party iStable Stablecoin
+  "0xc47560509492e787542203e44e7cd7abca477f8f", // testpool3 Lantern Adequate Monetary Product
+];
 
 ///////////////////////////
 //// Protocol Specific ////
@@ -62,6 +75,6 @@ export const FMIM_ADDRESS = "0xd9444bab79720e8223b83e5d913d00c679b44b65";
 
 export const PROTOCOL_NAME = "Rari Fuse";
 export const PROTOCOL_SLUG = "rari-fuse";
-export const SUBGRAPH_VERSION = "1.1.3";
+export const SUBGRAPH_VERSION = "1.1.7";
 export const SCHEMA_VERSION = "2.0.1";
 export const METHODOLOGY_VERSION = "1.0.0";
