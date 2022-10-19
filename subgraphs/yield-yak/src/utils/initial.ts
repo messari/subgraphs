@@ -374,12 +374,12 @@ export function defineUsageMetricsDailySnapshotEntity(
     usageMetricsDailySnapshotEntity.timestamp = timestamp;
     usageMetricsDailySnapshotEntity.blockNumber = blockNumber;
     usageMetricsDailySnapshotEntity.protocol = protocol.id;
+    usageMetricsDailySnapshotEntity.totalPoolCount = protocol.totalPoolCount;
     usageMetricsDailySnapshotEntity.dailyActiveUsers = ZERO_INT;
     usageMetricsDailySnapshotEntity.cumulativeUniqueUsers = ZERO_INT;
     usageMetricsDailySnapshotEntity.dailyTransactionCount = ZERO_INT;
     usageMetricsDailySnapshotEntity.dailyDepositCount = ZERO_INT;
     usageMetricsDailySnapshotEntity.dailyWithdrawCount = ZERO_INT;
-    usageMetricsDailySnapshotEntity.totalPoolCount = ZERO_INT;
   }
 
   usageMetricsDailySnapshotEntity.save();

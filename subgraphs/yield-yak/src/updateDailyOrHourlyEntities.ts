@@ -30,6 +30,7 @@ export function updateDailyOrHourlyEntities(contractAddress: Address,
   function protocolUpdater(contractAddress: Address): void {
     const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
     const protocol = defineProtocol(contractAddress);
+    protocol.totalPoolCount += 1;
     
     if (yakStrategyV2Contract.try_depositToken().reverted) {
       protocol.totalValueLockedUSD = ZERO_BIGDECIMAL;

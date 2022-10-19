@@ -14,7 +14,7 @@ import { ZERO_BIGDECIMAL } from "./utils/constants";
 import { calculatePriceInUSD } from "./helpers/calculators";
 import { updateDailyOrHourlyEntities } from "./updateDailyOrHourlyEntities";
 import { updateRewardParametersOfDailyOrHourlyEntities } from "./updateRewardParametersOfDailyOrHourlyEntities";
-
+import { feeUpdater } from "./FeeUpdater";
 
 export function handleDeposit(event: DepositEvent): void {
   let transactionHash = event.transaction.hash;
@@ -111,12 +111,23 @@ export function handleWithdraw(event: WithdrawEvent): void {
 }
 
 export function handleReinvest(event: Reinvest): void {
-  updateDailyOrHourlyEntities(event.address, event.block.timestamp, event.block.number)
-  updateRewardParametersOfDailyOrHourlyEntities(event.address, event.block.timestamp, event.block.number,event.params.newTotalSupply)
+  updateDailyOrHourlyEntities(event.address, event.block.timestamp, event.block.number);
+  updateRewardParametersOfDailyOrHourlyEntities(
+    event.address, 
+    event.block.timestamp, 
+    event.block.number, 
+    event.params.newTotalSupply)
 }
 
-export function handleRecovered(event: Recovered): void {}
-export function handleUpdateAdminFee(event: UpdateAdminFee): void {}
-export function handleUpdateDevFee(event: UpdateDevFee): void {}
-export function handleUpdateReinvestReward(event: UpdateReinvestReward): void {}
+export function handleUpdateAdminFee(event: UpdateAdminFee): void {
+  feeUpdater(event.address, event.params.newValue, "-adminFee");
+}
+
+export function handleUpdateDevFee(event: UpdateDevFee): void {
+  feeUpdater(event.address, event.params.newValue, "-developerFee");
+}
+
+export function handleUpdateReinvestReward(event: UpdateReinvestReward): void {
+  feeUpdater(event.address, event.params.newValue, "-reinvestorFee");
+}
 
