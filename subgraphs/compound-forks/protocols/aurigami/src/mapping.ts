@@ -55,7 +55,6 @@ import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import {
   BROKEN_PRICE_MARKETS,
-  BROKEN_PRICE_TOKENS,
   comptrollerAddr,
   nativeCToken,
   nativeToken,
