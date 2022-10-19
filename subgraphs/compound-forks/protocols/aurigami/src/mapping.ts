@@ -334,6 +334,12 @@ function getPrice(
       Address.fromString(market.inputToken)
     );
 
+    const token = Token.load(market.inputToken);
+    log.warning("PRICE of {} is ${}", [
+      token!.name,
+      customPrice.usdPrice.div(customPrice.decimalsBaseTen).toString(),
+    ]);
+
     return ethereum.CallResult.fromValue(
       BigInt.fromString(customPrice.usdPrice.truncate(0).toString())
     );
