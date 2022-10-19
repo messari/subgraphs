@@ -2008,7 +2008,7 @@
     "deployments": {
       "vesta-finance-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.0.0",
