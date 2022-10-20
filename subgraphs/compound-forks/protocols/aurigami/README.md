@@ -63,7 +63,10 @@ Not applicable to Aurigami
 ### Notes
 
 - The PLY, USN, AURORA, and TRI markets do not allow for borrows. For some reason the price oracle doesn't work with them. Instead we can derive price from another method.
-  - We call `getCash()` on the market to get the
+  - To get price we are using LP pools from Trisolaris
+  - The USN market will be missing price for the first month.
+  - PLY market will be missing price for the first 2 days.
+  - stNEAR is missing accurate pricing for the first 2 weeks.
 
 ## Reference and Useful Links
 
