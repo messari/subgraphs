@@ -14,18 +14,17 @@ import {
   BIGDECIMAL_MAX,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  EXCHANGE_ADDRESS,
   FEE_PERCENTAGE_FACTOR,
   MANTISSA_FACTOR,
   max,
   min,
-  Network,
   NftStandard,
   PROTOCOL_FEE_MANAGER,
   SaleStrategy,
   SECONDS_PER_DAY,
   X2Y2Op,
 } from "./helper";
+import { NetworkConfigs } from "../configurations/configure";
 
 class Token {
   constructor(
@@ -153,7 +152,9 @@ export function handleEvInventory(event: EvInventory): void {
   //
   // update marketplace
   //
-  let marketplace = getOrCreateMarketplace(EXCHANGE_ADDRESS.toHexString());
+  let marketplace = getOrCreateMarketplace(
+    NetworkConfigs.getMarketplaceAddress()
+  );
   marketplace.tradeCount += 1;
   marketplace.cumulativeTradeVolumeETH =
     marketplace.cumulativeTradeVolumeETH.plus(volumeETH);
@@ -301,7 +302,9 @@ function getOrCreateCollection(collectionID: string): Collection {
     collection.sellerCount = 0;
     collection.save();
 
-    let marketplace = getOrCreateMarketplace(EXCHANGE_ADDRESS.toHexString());
+    let marketplace = getOrCreateMarketplace(
+      NetworkConfigs.getMarketplaceAddress()
+    );
     marketplace.collectionCount += 1;
     marketplace.save();
   }
@@ -312,12 +315,12 @@ function getOrCreateMarketplace(marketplaceID: string): Marketplace {
   let marketplace = Marketplace.load(marketplaceID);
   if (!marketplace) {
     marketplace = new Marketplace(marketplaceID);
-    marketplace.name = "X2Y2";
-    marketplace.slug = "x2y2";
-    marketplace.network = Network.MAINNET;
-    marketplace.schemaVersion = "1.0.0";
-    marketplace.subgraphVersion = "1.0.0";
-    marketplace.methodologyVersion = "1.0.0";
+    marketplace.name = NetworkConfigs.getProtocolName();
+    marketplace.slug = NetworkConfigs.getProtocolSlug();
+    marketplace.network = NetworkConfigs.getNetwork();
+    marketplace.schemaVersion = NetworkConfigs.getSchemaVersion();
+    marketplace.subgraphVersion = NetworkConfigs.getSubgraphVersion();
+    marketplace.methodologyVersion = NetworkConfigs.getMethodologyVersion();
     marketplace.collectionCount = 0;
     marketplace.tradeCount = 0;
     marketplace.cumulativeTradeVolumeETH = BIGDECIMAL_ZERO;
@@ -365,7 +368,7 @@ function getOrCreateMarketplaceDailySnapshot(
   let snapshot = MarketplaceDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketplaceDailySnapshot(snapshotID);
-    snapshot.marketplace = EXCHANGE_ADDRESS.toHexString();
+    snapshot.marketplace = NetworkConfigs.getMarketplaceAddress();
     snapshot.blockNumber = BIGINT_ZERO;
     snapshot.timestamp = BIGINT_ZERO;
     snapshot.collectionCount = 0;

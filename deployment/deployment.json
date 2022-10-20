@@ -4758,7 +4758,7 @@
     "base": "seaport",
     "protocol": "seaport",
     "deployments": {
-      "seaport-ethereum": {
+      "opensea-seaport-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -4800,7 +4800,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
@@ -4829,7 +4829,7 @@
         },
         "options": {
           "prepare:yaml": true,
-          "prepare:constants": false
+          "prepare:constants": true
         },
         "services": {
           "hosted-service": {
