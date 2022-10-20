@@ -5,7 +5,7 @@ import {
 import {
   _handleDelegateChanged,
   _handleDelegateVotesChanged,
-  _handleTransfer,
+  // _handleTransfer,
 } from "../../../src/tokenHandlers";
 
 export function handleDelegateChanged(event: DelegateChanged): void {
