@@ -73,9 +73,9 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
 ///////////////////
 export function getOrCreateFinancials(timestamp: BigInt, blockNumber: BigInt): FinancialsDailySnapshot {
   // Number of days since Unix epoch
-  const id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
+  const days = (timestamp.toI64() / SECONDS_PER_DAY).toString();
 
-  let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+  let financialMetrics = FinancialsDailySnapshot.load(days);
 
   if (!financialMetrics) {
     const protocol = getOrCreateLendingProtocol();
@@ -171,8 +171,8 @@ export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetr
 
 export function getOrCreateMarketDailySnapshot(block: ethereum.Block, marketId: string): MarketDailySnapshot {
   const id: i64 = block.timestamp.toI64() / SECONDS_PER_DAY;
-  const marketAddress = marketId;
-  let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
+  const snapshotID = `${marketId}-${id.toString}`;
+  let marketMetrics = MarketDailySnapshot.load(snapshotID);
 
   if (!marketMetrics) {
     const market = getOrCreateMarket(marketId);

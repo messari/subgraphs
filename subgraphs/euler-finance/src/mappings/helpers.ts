@@ -389,12 +389,8 @@ export function syncWithEulerGeneralView(
   updateFinancials(event.block, BIGDECIMAL_ZERO, "NA");
 }
 
-export function updatePrices(
-  execProxyAddress: Address,
-  underlying: Address,
-  event: ethereum.Event,
-  exchangeRate: BigDecimal | null = null,
-): BigDecimal | null {
+export function updatePrices(execProxyAddress: Address, market: Market, event: ethereum.Event): BigDecimal | null {
+  const underlying = Address.fromString(market.inputToken);
   // update price
   const execProxyContract = Exec.bind(execProxyAddress);
   const blockNumber = event.block.number;
@@ -430,12 +426,11 @@ export function updatePrices(
   token.lastPriceBlockNumber = blockNumber;
   token.save();
 
-  const market = getOrCreateMarket(underlying.toHexString());
+  //const market = getOrCreateMarket(underlying.toHexString());
   market.inputTokenPriceUSD = underlyingPriceUSD;
-  if (!exchangeRate) {
-    exchangeRate = market.exchangeRate;
+  if (market.exchangeRate && market.exchangeRate!.gt(BIGDECIMAL_ZERO)) {
+    market.outputTokenPriceUSD = underlyingPriceUSD.div(market.exchangeRate!);
   }
-  market.outputTokenPriceUSD = underlyingPriceUSD.times(exchangeRate!);
   market.save();
 
   const eToken = getOrCreateToken(Address.fromString(market.outputToken!));
@@ -445,7 +440,7 @@ export function updatePrices(
 
   if (market._dToken && market._dTokenExchangeRate) {
     const dToken = getOrCreateToken(Address.fromString(market._dToken!));
-    dToken.lastPriceUSD = underlyingPriceUSD.times(market._dTokenExchangeRate!);
+    dToken.lastPriceUSD = underlyingPriceUSD.div(market._dTokenExchangeRate!);
     dToken.lastPriceBlockNumber = blockNumber;
     dToken.save();
   }

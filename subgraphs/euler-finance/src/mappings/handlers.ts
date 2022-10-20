@@ -59,15 +59,30 @@ export function handleAssetStatus(event: AssetStatus): void {
 
   const totalBorrowBalance = bigIntChangeDecimals(totalBorrows, DEFAULT_DECIMALS, token.decimals);
   const totalDepositBalance = bigIntChangeDecimals(poolSize.plus(totalBorrowBalance), DEFAULT_DECIMALS, token.decimals);
-  let exchangeRate = BIGDECIMAL_ZERO;
+  //let exchangeRate = BIGDECIMAL_ZERO;
   if (totalBalances.gt(BIGINT_ZERO)) {
-    exchangeRate = totalDepositBalance.toBigDecimal().div(totalBalances.toBigDecimal());
+    market.exchangeRate = bigIntToBDUseDecimals(totalDepositBalance, token.decimals).div(
+      bigIntToBDUseDecimals(totalBalances, DEFAULT_DECIMALS),
+    );
+  }
+
+  const dTokenAddress = Address.fromString(market._dToken!);
+  const dToken = ERC20.bind(dTokenAddress);
+  // these should always equal
+  // totalBorrows == dTokenTotalSupply
+  if (totalBorrows.gt(BIGINT_ZERO)) {
+    const dTokenTotalSupply = dToken.totalSupply();
+    if (dTokenTotalSupply.gt(BIGINT_ZERO)) {
+      market._dTokenExchangeRate = bigIntToBDUseDecimals(totalBorrowBalance, token.decimals).div(
+        bigIntToBDUseDecimals(dTokenTotalSupply, DEFAULT_DECIMALS),
+      );
+    }
   }
 
   const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
   const execProxyAddress = eulerContract.moduleIdToProxy(MODULEID__EXEC);
   //log.info("[handleAssetStatus]execProxyAddress={}", [execProxyAddress.toHexString()]);
-  let lastPriceUSD = updatePrices(execProxyAddress, underlying, event, exchangeRate);
+  let lastPriceUSD = updatePrices(execProxyAddress, market, event);
   if (!lastPriceUSD) {
     // use previous price if updatePrices reverted
     lastPriceUSD = token.lastPriceUSD;
@@ -88,7 +103,7 @@ export function handleAssetStatus(event: AssetStatus): void {
       totalBorrowBalanceUSD.toString(),
       totalDepositBalance.toString(),
       totalDepositBalanceUSD.toString(),
-      exchangeRate.toString(),
+      market.exchangeRate!.toString(),
       lastPriceUSD!.toString(),
     ],
   );
@@ -113,14 +128,19 @@ export function handleAssetStatus(event: AssetStatus): void {
     ],
   );
 
+  /*
+  market.inputTokenPriceUSD = lastPriceUSD!;
+  if (market.exchangeRate!.notEqual(BIGDECIMAL_ZERO)) {
+    market.outputTokenPriceUSD = market.inputTokenPriceUSD.div(market.exchangeRate);
+  }
+  */
   market.totalDepositBalanceUSD = totalDepositBalanceUSD;
   market.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
   market.totalValueLockedUSD = totalDepositBalanceUSD;
   market.inputTokenBalance = totalDepositBalance;
   market.outputTokenSupply = totalBalances;
-  market.exchangeRate = exchangeRate;
 
-  //verification
+  //verification //TODO: DELETE
   const eTokenAddress = Address.fromString(market.outputToken!);
   const eToken = ERC20.bind(eTokenAddress);
   const eTokenTotalSupply = eToken.totalSupply();
@@ -133,16 +153,7 @@ export function handleAssetStatus(event: AssetStatus): void {
       eTokenTotalSupply.toString(),
     ]);
   }
-  const dTokenAddress = Address.fromString(market._dToken!);
-  const dToken = ERC20.bind(dTokenAddress);
-  // these should always equal
-  // totalBorrows == dTokenTotalSupply
-  if (totalBorrows.gt(BIGINT_ZERO)) {
-    const dTokenTotalSupply = dToken.totalSupply();
-    if (dTokenTotalSupply.gt(BIGINT_ZERO)) {
-      market._dTokenExchangeRate = totalBorrowBalance.divDecimal(dTokenTotalSupply.toBigDecimal());
-    }
-  }
+
   market.save();
 
   if (interestRate.notEqual(assetStatus.interestRate)) {
@@ -153,7 +164,7 @@ export function handleAssetStatus(event: AssetStatus): void {
   //const marketsProxyAddress = eulerContract.moduleIdToProxy(MODULEID__MARKETS);
   //const marketsContract = Markets.bind(marketsProxyAddress);
   //const reserveFee = marketsContract.reserveFee(underlying);
-  updateRevenue(underlying, reserveBalance, exchangeRate, assetStatus, event);
+  updateRevenue(underlying, reserveBalance, market.exchangeRate!, assetStatus, event);
 
   updateFinancials(event.block, BIGDECIMAL_ZERO, null);
   updateMarketMetrics(event.block, marketId, BIGDECIMAL_ZERO, null);
@@ -172,7 +183,6 @@ export function handleBorrow(event: Borrow): void {
   const borrowUSD = createBorrow(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.BORROW);
-  updateProtocolAndMarkets(event.block);
   updateFinancials(event.block, borrowUSD, TransactionType.BORROW);
   updateMarketMetrics(event.block, marketId, borrowUSD, TransactionType.BORROW);
 }
@@ -181,7 +191,6 @@ export function handleDeposit(event: Deposit): void {
   const depositUSD = createDeposit(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.DEPOSIT);
-  updateProtocolAndMarkets(event.block);
   updateFinancials(event.block, depositUSD, TransactionType.DEPOSIT);
   updateMarketMetrics(event.block, marketId, depositUSD, TransactionType.DEPOSIT);
 }
@@ -190,7 +199,6 @@ export function handleRepay(event: Repay): void {
   const repayUSD = createRepay(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.REPAY);
-  updateProtocolAndMarkets(event.block);
   updateFinancials(event.block, repayUSD, TransactionType.REPAY);
   updateMarketMetrics(event.block, marketId, repayUSD, TransactionType.REPAY);
 }
@@ -199,7 +207,6 @@ export function handleWithdraw(event: Withdraw): void {
   const withdrawUSD = createWithdraw(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.WITHDRAW);
-  updateProtocolAndMarkets(event.block);
   updateFinancials(event.block, withdrawUSD, TransactionType.WITHDRAW);
   updateMarketMetrics(event.block, marketId, withdrawUSD, TransactionType.WITHDRAW);
 }
@@ -208,7 +215,6 @@ export function handleLiquidation(event: Liquidation): void {
   const liquidateUSD = createLiquidation(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
-  updateProtocolAndMarkets(event.block);
   updateFinancials(event.block, liquidateUSD, TransactionType.LIQUIDATE);
   updateMarketMetrics(event.block, marketId, liquidateUSD, TransactionType.LIQUIDATE);
 }
