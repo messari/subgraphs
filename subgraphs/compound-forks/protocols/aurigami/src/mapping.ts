@@ -1,4 +1,10 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -25,6 +31,7 @@ import {
   Network,
   BIGINT_ZERO,
   SECONDS_PER_YEAR,
+  exponentToBigDecimal,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -53,14 +60,24 @@ import { CToken } from "../../../generated/Comptroller/CToken";
 import { Comptroller } from "../../../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
+import { Pair } from "../../../generated/templates/CToken/Pair";
 import {
-  BROKEN_PRICE_MARKETS,
+  AURORA_ETH_LP,
+  AURORA_MARKET,
   comptrollerAddr,
+  ETH_MARKET,
   nativeCToken,
   nativeToken,
+  PLY_MARKET,
+  TRI_MARKET,
+  TRI_USDT_LP,
+  USDT_MARKET,
+  USN_MARKET,
+  WNEAR_MARKET,
+  WNEAR_PLY_LP,
+  WNEAR_USN_LP,
 } from "./constants";
 import { PriceOracle } from "../../../generated/templates/CToken/PriceOracle";
-import { getUsdPricePerToken } from "./prices";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   const protocol = getOrCreateProtocol();
@@ -283,7 +300,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     comptrollerAddr,
     interestAccumulated,
     totalBorrows,
-    true, // update all market prices on call
+    false, // do not update market prices since not all markets have proper price oracle
     event
   );
 }
@@ -322,30 +339,113 @@ function getPrice(
   marketAddress: Address,
   priceOracle: string
 ): ethereum.CallResult<BigInt> {
-  if (BROKEN_PRICE_MARKETS.includes(marketAddress)) {
-    const market = Market.load(marketAddress.toHexString());
-    if (!market) {
-      log.warning("[getPrice] Market not found: {}", [
-        marketAddress.toHexString(),
-      ]);
-      return ethereum.CallResult.fromValue(BIGINT_ZERO);
-    }
-    const customPrice = getUsdPricePerToken(
-      Address.fromString(market.inputToken)
+  //
+  //
+  // There are 4 markets where the price oracle does not work
+  // PLY, AURORA, TRI, USN
+  // Use Trisolaris LP pool pairs to derive price
+
+  if (marketAddress == PLY_MARKET) {
+    return getPriceFromLp(
+      priceOracle,
+      WNEAR_MARKET,
+      PLY_MARKET,
+      WNEAR_PLY_LP,
+      false
     );
-
-    const token = Token.load(market.inputToken);
-    log.warning("PRICE of {} is ${}", [
-      token!.name,
-      customPrice.usdPrice.div(customPrice.decimalsBaseTen).toString(),
-    ]);
-
-    return ethereum.CallResult.fromValue(
-      BigInt.fromString(customPrice.usdPrice.truncate(0).toString())
+  }
+  if (marketAddress == AURORA_MARKET) {
+    return getPriceFromLp(
+      priceOracle,
+      ETH_MARKET,
+      AURORA_MARKET,
+      AURORA_ETH_LP,
+      true
+    );
+  }
+  if (marketAddress == TRI_MARKET) {
+    return getPriceFromLp(
+      priceOracle,
+      USDT_MARKET,
+      TRI_MARKET,
+      TRI_USDT_LP,
+      true
+    );
+  }
+  if (marketAddress == USN_MARKET) {
+    return getPriceFromLp(
+      priceOracle,
+      WNEAR_MARKET,
+      USN_MARKET,
+      WNEAR_USN_LP,
+      false
     );
   }
 
   // get the price normally
   const oracleContract = PriceOracle.bind(Address.fromString(priceOracle));
   return oracleContract.try_getUnderlyingPrice(marketAddress);
+}
+
+//
+//
+// Gets the price of wantAddress.inputToken from an LP from Trisolaris
+function getPriceFromLp(
+  priceOracle: string, // aurigami price oracle
+  knownAddress: Address, // address of the market we know the price of
+  wantAddress: Address, // market address of token we want to price
+  lpAddress: Address, // address of LP token
+  whichPrice: boolean // true for token0 in LP, false for token1
+): ethereum.CallResult<BigInt> {
+  const oracleContract = PriceOracle.bind(Address.fromString(priceOracle));
+  const tryKnownPrice = oracleContract.try_getUnderlyingPrice(knownAddress);
+  if (tryKnownPrice.reverted) {
+    return ethereum.CallResult.fromValue(BIGINT_ZERO);
+  }
+  const knownMarket = Market.load(knownAddress.toHexString());
+  if (!knownMarket) {
+    return ethereum.CallResult.fromValue(BIGINT_ZERO);
+  }
+  const knownMarketDecimals = Token.load(knownMarket.inputToken)!.decimals;
+  const knownPriceUSD = tryKnownPrice.value
+    .toBigDecimal()
+    .div(exponentToBigDecimal(knownMarketDecimals));
+
+  const lpPair = Pair.bind(lpAddress);
+  const tryReserves = lpPair.try_getReserves();
+  if (tryReserves.reverted) {
+    return ethereum.CallResult.fromValue(BIGINT_ZERO);
+  }
+
+  const wantMarket = Market.load(wantAddress.toHexString());
+  if (!wantMarket) {
+    return ethereum.CallResult.fromValue(BIGINT_ZERO);
+  }
+  const wantMarketDecimals = Token.load(wantMarket.inputToken)!.decimals;
+
+  const reserveBalance0 = tryReserves.value.value0;
+  const reserveBalance1 = tryReserves.value.value1;
+
+  let priceBD: BigDecimal;
+  if (whichPrice) {
+    // price of reserve0 = price of reserve1 / (reserve0 / reserve1)
+    priceBD = knownPriceUSD.div(
+      reserveBalance0.toBigDecimal().div(reserveBalance1.toBigDecimal())
+    );
+  } else {
+    // price of reserve1 = price of reserve0 * (reserve0 / reserve1)
+    priceBD = knownPriceUSD.times(
+      reserveBalance0.toBigDecimal().div(reserveBalance1.toBigDecimal())
+    );
+  }
+
+  // convert back to BigInt
+  return ethereum.CallResult.fromValue(
+    BigInt.fromString(
+      priceBD
+        .times(exponentToBigDecimal(wantMarketDecimals))
+        .truncate(0)
+        .toString()
+    )
+  );
 }

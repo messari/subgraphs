@@ -73,39 +73,8 @@ templates:
           file: ./abis/ERC20.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
-
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # ERC20
-        - name: _ERC20
-          file: ./abis/prices-new/ERC20.json
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/prices-new/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/prices-new/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/prices-new/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/prices-new/YearnLens.json
-        # Aave Oracle Contract
-        - name: AaveOracleContract
-          file: ./abis/prices-new/AaveOracle.json
-        # SushiSwap Contracts
-        - name: CalculationsSushiSwap
-          file: ./abis/prices-new/Calculations/SushiSwap.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/prices-new/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/prices-new/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/prices-new/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/prices-new/Uniswap/Pair.json
+        - name: Pair
+          file: ./abis/aurigami/Pair.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
