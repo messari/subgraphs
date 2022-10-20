@@ -244,6 +244,10 @@ export function createSwapHandleVolumeAndFees(
   amount0Out: BigInt,
   amount1Out: BigInt
 ): void {
+  if (amount0In == BIGINT_ZERO && amount1In == BIGINT_ZERO) {
+    return;
+  }
+
   const protocol = getOrCreateProtocol();
   const pool = getLiquidityPool(event.address.toHexString());
   const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());

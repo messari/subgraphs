@@ -3,6 +3,7 @@ Reference/
 
 subgraph.yaml
 deploymentJsonContext.ts
+version.ts
 deploymentJsonContext.json
 **/configurations/configure.ts
 generated/
