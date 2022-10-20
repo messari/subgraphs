@@ -17,7 +17,10 @@ dataSources:
         - Slate
         - Spell
         - Delegate
+        - DelegateAdmin
         - Vote
+        - Poll
+        - PollVote
       abis:
         - name: DSChief
           file: ./abis/DSChief.json
@@ -42,6 +45,56 @@ dataSources:
           topic0: '0x3c278bd500000000000000000000000000000000000000000000000000000000' # lift(address)
           handler: handleLift
       file: ./src/ds-chief.ts
+  - kind: ethereum
+    name: PollingEmitter
+    network: mainnet
+    source:
+      address: "0xd3a9fe267852281a1e6307a1c37cdfd76d39b133"
+      abi: PollingEmitter
+      startBlock: 11327777
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Slate
+        - Spell
+        - Delegate
+        - DelegateAdmin
+        - Vote
+        - Poll
+        - PollVote
+      abis:
+        - name: PollingEmitter
+          file: ./abis/PollingEmitter.json
+      eventHandlers:
+        - event: Voted(indexed address,indexed uint256,indexed uint256)
+          handler: handlePollVote
+      file: ./src/polling-emitter.ts
+  # - kind: ethereum
+  #   name: DSToken
+  #   network:  mainnet
+  #   source:
+  #     address: "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"
+  #     abi: DSToken
+  #     startBlock: 4620855
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Slate
+  #       - Spell
+  #       - Delegate
+  #       - Vote
+  #       - Poll
+  #     abis:
+  #       - name: DSToken
+  #         file: ./abis/DSToken.json
+  #     eventHandlers:
+  #       - event: Transfer(indexed address,indexed address,uint256)
+  #         handler: handleTransfer
+  #     file: ./src/ds-token.ts
 templates:
   - kind: ethereum
     name: DSSpell
