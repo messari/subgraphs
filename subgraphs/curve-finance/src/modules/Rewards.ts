@@ -264,10 +264,12 @@ export function updateRewardTokenEmissions(
   let rewardTokens = pool.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
-    pool.rewardTokens = rewardTokens.sort();
+    rewardTokens = rewardTokens.sort()
+
+    pool.rewardTokens = rewardTokens;
   }
 
-  const rewardTokenIndex = pool.rewardTokens!.indexOf(rewardToken.id);
+  const rewardTokenIndex = rewardTokens!.indexOf(rewardToken.id);
 
   if (!pool.rewardTokenEmissionsAmount) {
     pool.rewardTokenEmissionsAmount = [];
@@ -283,8 +285,7 @@ export function updateRewardTokenEmissions(
 
   rewardTokenEmissionsAmount[rewardTokenIndex] = rewardTokenPerDay;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardTokenPerDay
-    .toBigDecimal()
-    .div(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
+    .divDecimal(constants.BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
     .times(token.lastPriceUSD!);
 
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;

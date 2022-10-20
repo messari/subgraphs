@@ -97,6 +97,7 @@ export function getPriceFromRouter(
 
     if (!amountOutArray.reverted) {
       amountOut = amountOutArray.value[amountOutArray.value.length - 1];
+      break;
     }
   }
 

@@ -17,6 +17,7 @@ export function handleNewGauge(event: NewGauge): void {
   if (lpToken.equals(constants.NULL.TYPE_ADDRESS)) return;
 
   let poolAddress = utils.getPoolFromLpToken(lpToken);
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS))  return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
@@ -43,6 +44,7 @@ export function handleDeployedGauge(event: DeployedGauge): void {
   const lpTokenAddress = event.params._lp_token;
 
   let poolAddress = utils.getPoolFromLpToken(lpTokenAddress);
+  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   const gauge = getOrCreateLiquidityGauge(gaugeAddress, poolAddress);
