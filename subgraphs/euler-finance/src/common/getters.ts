@@ -166,12 +166,18 @@ export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetr
     usageMetrics.save();
   }
 
-  return usageMetrics as UsageMetricsHourlySnapshot;
+  return usageMetrics;
 }
 
+/**
+ *
+ * @param block: ethereum.block
+ * @param marketId: id of market
+ * @returns MarketDailySnapshot
+ */
 export function getOrCreateMarketDailySnapshot(block: ethereum.Block, marketId: string): MarketDailySnapshot {
-  const id: i64 = block.timestamp.toI64() / SECONDS_PER_DAY;
-  const snapshotID = `${marketId}-${id.toString}`;
+  const days: i64 = block.timestamp.toI64() / SECONDS_PER_DAY;
+  const snapshotID = `${marketId}-${days.toString()}`;
   let marketMetrics = MarketDailySnapshot.load(snapshotID);
 
   if (!marketMetrics) {
@@ -181,17 +187,6 @@ export function getOrCreateMarketDailySnapshot(block: ethereum.Block, marketId: 
     marketMetrics.market = marketId;
     marketMetrics.blockNumber = block.timestamp;
     marketMetrics.timestamp = block.timestamp;
-    marketMetrics.rates = []; //rates snapshoted in updateInterestRates()
-    // daily revenue updated in updateRevenue
-    marketMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    marketMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    marketMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    // updated in updateMarketMetrics
-    marketMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
-    marketMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
-    marketMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
-    marketMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
-    marketMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
 
     // update other vars
     marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
@@ -210,6 +205,18 @@ export function getOrCreateMarketDailySnapshot(block: ethereum.Block, marketId: 
     marketMetrics.exchangeRate = market.exchangeRate;
     marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
     marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+    marketMetrics.rates = market.rates; //rates snapshoted in updateInterestRates()
+
+    // daily revenue updated in updateRevenue
+    marketMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    // updated in updateMarketSnapshots
+    marketMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyRepayUSD = BIGDECIMAL_ZERO;
 
     marketMetrics.save();
   }
@@ -217,9 +224,15 @@ export function getOrCreateMarketDailySnapshot(block: ethereum.Block, marketId: 
   return marketMetrics;
 }
 
+/**
+ *
+ * @param block: ethereum.block
+ * @param marketId: id of market
+ * @returns MarketHourlySnapshot
+ */
 export function getOrCreateMarketHourlySnapshot(block: ethereum.Block, marketId: string): MarketHourlySnapshot {
   const hours: i64 = block.timestamp.toI64() / SECONDS_PER_HOUR;
-  const snapshotID = marketId + "-" + hours.toString();
+  const snapshotID = `${marketId}- ${hours.toString()}`;
   let marketMetrics = MarketHourlySnapshot.load(snapshotID);
 
   if (!marketMetrics) {
@@ -229,17 +242,6 @@ export function getOrCreateMarketHourlySnapshot(block: ethereum.Block, marketId:
     marketMetrics.market = marketId;
     marketMetrics.blockNumber = block.timestamp;
     marketMetrics.timestamp = block.timestamp;
-    marketMetrics.rates = []; //rates snapshoted in updateInterestRates()
-    // daily revenue updated in updateRevenue
-    marketMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    marketMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    marketMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    // updated in updateMarketMetrics
-    marketMetrics.hourlyDepositUSD = BIGDECIMAL_ZERO;
-    marketMetrics.hourlyBorrowUSD = BIGDECIMAL_ZERO;
-    marketMetrics.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
-    marketMetrics.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
-    marketMetrics.hourlyRepayUSD = BIGDECIMAL_ZERO;
 
     // update other vars
     marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
@@ -258,7 +260,18 @@ export function getOrCreateMarketHourlySnapshot(block: ethereum.Block, marketId:
     marketMetrics.exchangeRate = market.exchangeRate;
     marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
     marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+    marketMetrics.rates = market.rates; //rates snapshoted in updateInterestRates()
 
+    // daily revenue updated in updateRevenue
+    marketMetrics.hourlySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    // updated in updateMarketSnapshots
+    marketMetrics.hourlyDepositUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyBorrowUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyWithdrawUSD = BIGDECIMAL_ZERO;
+    marketMetrics.hourlyRepayUSD = BIGDECIMAL_ZERO;
     marketMetrics.save();
   }
 
@@ -305,6 +318,10 @@ export function getOrCreateMarket(id: string): Market {
 
     // update protocol.totalPoolCount
     protocol.totalPoolCount += 1;
+    const marketIDs = protocol._marketIDs!;
+    marketIDs.push(market.id);
+    protocol._marketIDs = marketIDs;
+
     protocol.save();
   }
   return market;
@@ -334,6 +351,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.mintedTokens = [];
     protocol.mintedTokenSupplies = [];
     protocol.totalPoolCount = INT_ZERO;
+    protocol._marketIDs = [];
   }
   // ensure to update versions with grafting
   protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
@@ -440,35 +458,6 @@ export function getOrCreateInterestRate(rateSide: string, rateType: string, mark
 export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
   return (<i32>Math.floor(secondsSinceEpoch / SECONDS_PER_DAY)).toString();
 }
-
-export function getOrCreateMarketUtility(id: string): _MarketUtility {
-  let entity = _MarketUtility.load(id);
-  if (!entity) {
-    entity = new _MarketUtility(id);
-    entity.market = id;
-    entity.lastUpdateTimestamp = BIGINT_ZERO;
-    entity.twapPrice = BIGDECIMAL_ZERO;
-    entity.twap = BIGINT_ZERO;
-    entity.twapPeriod = BIGINT_ZERO;
-    entity.borrowFactor = BIGINT_ZERO;
-    entity.collateralFactor = BIGINT_ZERO;
-    entity.save();
-  }
-  return entity as _MarketUtility;
-}
-
-export function getOrCreateProtocolUtility(blockNumber: i32): _ProtocolUtility {
-  let protocol = _ProtocolUtility.load(EULER_ADDRESS);
-
-  if (!protocol) {
-    protocol = new _ProtocolUtility(EULER_ADDRESS);
-    protocol.lastBlockNumber = blockNumber;
-    protocol.markets = [];
-    protocol.save();
-  }
-  return protocol as _ProtocolUtility;
-}
-//TODO: DELTE till here
 
 export function getOrCreateAssetStatus(id: string): _AssetStatus {
   let assetStatus = _AssetStatus.load(id);

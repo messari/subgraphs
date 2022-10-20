@@ -25,7 +25,7 @@ import {
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
 } from "../common/constants";
-import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../common/metrics";
+import { snapshotFinancials, snapshotMarket, updateUsageMetrics } from "./helpers";
 import {
   createBorrow,
   createDeposit,
@@ -46,7 +46,6 @@ export function handleAssetStatus(event: AssetStatus): void {
 
   const underlying = event.params.underlying;
   const marketId = underlying.toHexString();
-  const market = getOrCreateMarket(marketId);
   //const block = event.block;
   const totalBorrows = event.params.totalBorrows; //== dToken totalSupply
   const totalBalances = event.params.totalBalances; //== eToken totalSupply
@@ -54,12 +53,13 @@ export function handleAssetStatus(event: AssetStatus): void {
   const poolSize = event.params.poolSize;
   const interestRate = event.params.interestRate;
 
+  const protocol = getOrCreateLendingProtocol();
+  const market = getOrCreateMarket(marketId);
   const assetStatus = getOrCreateAssetStatus(marketId);
   const token = Token.load(marketId)!;
 
   const totalBorrowBalance = bigIntChangeDecimals(totalBorrows, DEFAULT_DECIMALS, token.decimals);
   const totalDepositBalance = bigIntChangeDecimals(poolSize.plus(totalBorrowBalance), DEFAULT_DECIMALS, token.decimals);
-  //let exchangeRate = BIGDECIMAL_ZERO;
   if (totalBalances.gt(BIGINT_ZERO)) {
     market.exchangeRate = bigIntToBDUseDecimals(totalDepositBalance, token.decimals).div(
       bigIntToBDUseDecimals(totalBalances, DEFAULT_DECIMALS),
@@ -81,7 +81,6 @@ export function handleAssetStatus(event: AssetStatus): void {
 
   const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
   const execProxyAddress = eulerContract.moduleIdToProxy(MODULEID__EXEC);
-  //log.info("[handleAssetStatus]execProxyAddress={}", [execProxyAddress.toHexString()]);
   let lastPriceUSD = updatePrices(execProxyAddress, market, event);
   if (!lastPriceUSD) {
     // use previous price if updatePrices reverted
@@ -92,7 +91,7 @@ export function handleAssetStatus(event: AssetStatus): void {
   //updateFinancials(assetStatus, underlying, totalBalances, totalBorrows);
   const totalDepositBalanceUSD = bigIntToBDUseDecimals(totalDepositBalance, token.decimals).times(lastPriceUSD!);
   const totalBorrowBalanceUSD = bigIntToBDUseDecimals(totalBorrowBalance, token.decimals).times(lastPriceUSD!);
-  log.info(
+  log.debug(
     "[handleAssetStatus]market={}/{},block={},tx={},totalBorrowBalance={},totalBorrowBalanceUSD={},totalAssets={},totalDepositBalanceUSD={},exchangeRate={},lastPriceUSD={}",
     [
       market.name!,
@@ -107,16 +106,23 @@ export function handleAssetStatus(event: AssetStatus): void {
       lastPriceUSD!.toString(),
     ],
   );
+
   //let reserveBalanceUnderlying = reserveBalance.toBigDecimal().times(exchangeRate);
   const deltaTotalBorrowBalbUSD = totalBorrowBalanceUSD.minus(market.totalBorrowBalanceUSD);
   const deltaTotalDepositBalUSD = totalDepositBalanceUSD.minus(market.totalDepositBalanceUSD);
-  const protocol = getOrCreateLendingProtocol();
   protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(deltaTotalDepositBalUSD);
   protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(deltaTotalBorrowBalbUSD);
   protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
   protocol.save();
 
-  log.info(
+  market.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  market.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
+  market.totalValueLockedUSD = totalDepositBalanceUSD;
+  market.inputTokenBalance = totalDepositBalance;
+  market.outputTokenSupply = totalBalances;
+  market.save();
+
+  log.debug(
     "[handleAssetStatus]market={}/{},block={},tx={},deltaTotalBorrowBalanceUSD={},deltaTotalDepositBalanceUSD={}",
     [
       market.name!,
@@ -134,19 +140,11 @@ export function handleAssetStatus(event: AssetStatus): void {
     market.outputTokenPriceUSD = market.inputTokenPriceUSD.div(market.exchangeRate);
   }
   */
-  market.totalDepositBalanceUSD = totalDepositBalanceUSD;
-  market.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
-  market.totalValueLockedUSD = totalDepositBalanceUSD;
-  market.inputTokenBalance = totalDepositBalance;
-  market.outputTokenSupply = totalBalances;
 
   //verification //TODO: DELETE
   const eTokenAddress = Address.fromString(market.outputToken!);
   const eToken = ERC20.bind(eTokenAddress);
   const eTokenTotalSupply = eToken.totalSupply();
-  //TODO: assert
-  // these two are not the same, which to use for exchangeRate?
-  //assert(totalBalances == eTokenTotalSupply, `totalBalances=${totalBalances}, eTokenTotalSupply=${eTokenTotalSupply}`);
   if (totalBalances.notEqual(eTokenTotalSupply)) {
     log.warning("[logAssetStatus]totalBalances={},eTokenTotalSupply={}", [
       totalBalances.toString(),
@@ -154,26 +152,18 @@ export function handleAssetStatus(event: AssetStatus): void {
     ]);
   }
 
-  market.save();
-
   if (interestRate.notEqual(assetStatus.interestRate)) {
     // update interest rates if `interestRate` or `reserveFee` changed
     updateInterestRates(market, interestRate, assetStatus.reserveFee, totalBorrows, totalBalances, event);
   }
 
-  //const marketsProxyAddress = eulerContract.moduleIdToProxy(MODULEID__MARKETS);
-  //const marketsContract = Markets.bind(marketsProxyAddress);
-  //const reserveFee = marketsContract.reserveFee(underlying);
-  updateRevenue(underlying, reserveBalance, market.exchangeRate!, assetStatus, event);
-
-  updateFinancials(event.block, BIGDECIMAL_ZERO, null);
-  updateMarketMetrics(event.block, marketId, BIGDECIMAL_ZERO, null);
+  updateRevenue(reserveBalance, protocol, market, assetStatus, event);
+  snapshotMarket(event.block, marketId, BIGDECIMAL_ZERO, null);
+  snapshotFinancials(event.block, BIGDECIMAL_ZERO, null, protocol);
 
   assetStatus.totalBorrows = totalBorrows;
   assetStatus.totalBalances = totalBalances;
-  //assetStatus.reserveFee = reserveFee;
   assetStatus.reserveBalance = reserveBalance;
-  //assetStatus.interestAccumulator = event.params.interestAccumulator;
   assetStatus.interestRate = interestRate;
   assetStatus.timestamp = event.params.timestamp;
   assetStatus.save();
@@ -183,40 +173,40 @@ export function handleBorrow(event: Borrow): void {
   const borrowUSD = createBorrow(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.BORROW);
-  updateFinancials(event.block, borrowUSD, TransactionType.BORROW);
-  updateMarketMetrics(event.block, marketId, borrowUSD, TransactionType.BORROW);
+  snapshotMarket(event.block, marketId, borrowUSD, TransactionType.BORROW);
+  snapshotFinancials(event.block, borrowUSD, TransactionType.BORROW);
 }
 
 export function handleDeposit(event: Deposit): void {
   const depositUSD = createDeposit(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.DEPOSIT);
-  updateFinancials(event.block, depositUSD, TransactionType.DEPOSIT);
-  updateMarketMetrics(event.block, marketId, depositUSD, TransactionType.DEPOSIT);
+  snapshotMarket(event.block, marketId, depositUSD, TransactionType.DEPOSIT);
+  snapshotFinancials(event.block, depositUSD, TransactionType.DEPOSIT);
 }
 
 export function handleRepay(event: Repay): void {
   const repayUSD = createRepay(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.REPAY);
-  updateFinancials(event.block, repayUSD, TransactionType.REPAY);
-  updateMarketMetrics(event.block, marketId, repayUSD, TransactionType.REPAY);
+  snapshotMarket(event.block, marketId, repayUSD, TransactionType.REPAY);
+  snapshotFinancials(event.block, repayUSD, TransactionType.REPAY);
 }
 
 export function handleWithdraw(event: Withdraw): void {
   const withdrawUSD = createWithdraw(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.WITHDRAW);
-  updateFinancials(event.block, withdrawUSD, TransactionType.WITHDRAW);
-  updateMarketMetrics(event.block, marketId, withdrawUSD, TransactionType.WITHDRAW);
+  snapshotMarket(event.block, marketId, withdrawUSD, TransactionType.WITHDRAW);
+  snapshotFinancials(event.block, withdrawUSD, TransactionType.WITHDRAW);
 }
 
 export function handleLiquidation(event: Liquidation): void {
   const liquidateUSD = createLiquidation(event);
   const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
-  updateFinancials(event.block, liquidateUSD, TransactionType.LIQUIDATE);
-  updateMarketMetrics(event.block, marketId, liquidateUSD, TransactionType.LIQUIDATE);
+  snapshotMarket(event.block, marketId, liquidateUSD, TransactionType.LIQUIDATE);
+  snapshotFinancials(event.block, liquidateUSD, TransactionType.LIQUIDATE);
 }
 
 export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
@@ -291,5 +281,3 @@ export function handleGovSetReserveFee(event: GovSetReserveFee): void {
     event,
   );
 }
-
-//export function handleRequestDonate(event: RequestDonate): void {}
