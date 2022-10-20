@@ -23,7 +23,7 @@ export function getPriceOfOutputTokens(
   block: ethereum.Block
 ): BigDecimal {
   const vault = getOrCreateVault(vaultAddress, block);
-  const inputToken = getOrCreateTokenFromString(vault.inputToken!, block);
+  const inputToken = getOrCreateTokenFromString(vault.inputToken, block);
 
   const outputTokenPrice = vault
     .pricePerShare!.div(
