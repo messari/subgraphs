@@ -2,8 +2,7 @@
   "name": "seaport",
   "version": "1.0.0",
   "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph build"
+    "codegen": "graph codegen"
   },
   "dependencies": {
     "@graphprotocol/graph-ts": "0.27.0"

@@ -8,7 +8,7 @@ import {
 } from "../../../src/constants";
 import {
   getGovernance,
-  getOrCreateProposal,
+  getProposal,
   _handleProposalCanceled,
   _handleProposalCreated,
   _handleProposalExecuted,
@@ -61,11 +61,15 @@ export function handleProposalExecuted(event: ProposalExecuted): void {
 }
 
 export function handleProposalQueued(event: ProposalQueued): void {
-  _handleProposalQueued(event.params.id.toString(), event.params.executionTime);
+  _handleProposalQueued(
+    event.params.id.toString(),
+    event.params.executionTime,
+    event
+  );
 }
 
 export function handleVoteEmitted(event: VoteEmitted): void {
-  let proposal = getOrCreateProposal(event.params.id.toString());
+  let proposal = getProposal(event.params.id.toString());
 
   // if state is pending (i.e. the first vote), set state, quorum, delegates and tokenholders
   if (proposal.state == ProposalState.PENDING) {
@@ -139,5 +143,15 @@ function getQuorumFromContract(
   );
   // Get minimum voting power from Executor contract
   let executorContract = Executor.bind(executorAddress);
-  return executorContract.getMinimumVotingPowerNeeded(totalVotingSupply);
+  let quorumVotes =
+    executorContract.getMinimumVotingPowerNeeded(totalVotingSupply);
+
+  // Update quorum at the contract level as well
+  let governanceFramework = getGovernanceFramework(
+    contractAddress.toHexString()
+  );
+  governanceFramework.quorumVotes = quorumVotes;
+  governanceFramework.save();
+
+  return quorumVotes;
 }

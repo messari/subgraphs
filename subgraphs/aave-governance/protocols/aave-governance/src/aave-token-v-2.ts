@@ -14,7 +14,8 @@ export function handleDelegateChanged(event: DelegateChanged): void {
   _handleDelegateChanged(
     event.params.delegationType,
     event.params.delegator.toHexString(),
-    event.params.delegatee.toHexString()
+    event.params.delegatee.toHexString(),
+    event
   );
 }
 
@@ -24,7 +25,9 @@ export function handleDelegatedPowerChanged(
   _handleDelegatedPowerChanged(
     event.params.delegationType,
     event.params.user.toHexString(),
-    event.params.amount
+    event.params.amount,
+    event,
+    false
   );
 }
 
@@ -33,6 +36,7 @@ export function handleTransfer(event: Transfer): void {
   _handleTransfer(
     event.params.from.toHexString(),
     event.params.to.toHexString(),
-    event.params.value
+    event.params.value,
+    event
   );
 }

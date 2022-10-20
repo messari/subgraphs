@@ -24,3 +24,21 @@ code {
 .MuiDataGrid-virtualScroller {
   overflow-x: auto !important;
 }
+
+.Menu-Options {
+  color: #6656F8;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.Menu-Options:hover {
+  text-decoration: underline;
+}
+
+.Hover-Underline:hover {
+  text-decoration: underline !important;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}

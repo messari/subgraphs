@@ -3,7 +3,6 @@ import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefV3TraderJoe } from "../../../../../generated/MasterChefV3/MasterChefV3TraderJoe";
 import {
   LiquidityPool,
-  _HelperStore,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import {
@@ -30,26 +29,26 @@ export function updateMasterChef(
   amount: BigInt,
   user: Address // account depositing/withdrawing
 ): void {
-  let masterChefV3Pool = _MasterChefStakingPool.load(
+  const masterChefV3Pool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV3 + "-" + pid.toString()
   )!;
-  let masterchefV3Contract = MasterChefV3TraderJoe.bind(event.address);
-  let masterChefV3 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV3);
+  const masterchefV3Contract = MasterChefV3TraderJoe.bind(event.address);
+  const masterChefV3 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV3);
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(masterChefV3Pool.poolAddress!);
+  const pool = LiquidityPool.load(masterChefV3Pool.poolAddress!);
   if (!pool) {
     return;
   }
 
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
   pool.rewardTokens = [
     getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
   ];
 
   // Get the amount of Joe tokens emitted for all pools per second.
   if (masterChefV3.lastUpdatedRewardRate != event.block.number) {
-    let getJoePerSec = masterchefV3Contract.try_joePerSec();
+    const getJoePerSec = masterchefV3Contract.try_joePerSec();
     if (!getJoePerSec.reverted) {
       masterChefV3.adjustedRewardTokenRate = getJoePerSec.value;
     }
@@ -58,15 +57,15 @@ export function updateMasterChef(
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per second
-  let rewardAmountPerInterval = masterChefV3.adjustedRewardTokenRate
+  const rewardAmountPerInterval = masterChefV3.adjustedRewardTokenRate
     .times(masterChefV3Pool.poolAllocPoint)
     .div(masterChefV3.totalAllocPoint);
-  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
+  const rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let rewardTokenPerDay = getRewardsPerDay(
+  const rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
     rewardAmountPerIntervalBigDecimal,
@@ -89,7 +88,7 @@ export function updateMasterChef(
 
   masterChefV3Pool.lastRewardBlock = event.block.number;
 
-  let rewards = getPoolRewardsWithBonus(
+  const rewards = getPoolRewardsWithBonus(
     event,
     masterChefV3,
     masterChefV3Pool,

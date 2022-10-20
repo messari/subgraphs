@@ -1,0 +1,26 @@
+{
+  "network": "ethereum",
+  "status": "prod",
+  "versions": {
+    "schema": "2.0.1",
+    "subgraph": "1.2.14",
+    "methodology": "1.0.0"
+  },
+  "files": {
+    "template": "aave.arc.template.yaml"
+  },
+  "options": {
+    "prepare:yaml": true,
+    "prepare:constants": false
+  },
+  "services": {
+    "hosted-service": {
+      "slug": "aave-arc-ethereum",
+      "query-id": "aave-arc-ethereum"
+    }
+  },
+  "protocol": "aave-arc",
+  "base": "aave-v2-forks",
+  "schema": "lending",
+  "deployment": "aave-arc-ethereum"
+}

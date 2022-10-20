@@ -20,24 +20,24 @@ export function updateMasterChef(
   pid: BigInt,
   amount: BigInt
 ): void {
-  let masterChefV2Pool = _MasterChefStakingPool.load(
+  const masterChefV2Pool = _MasterChefStakingPool.load(
     MasterChef.MASTERCHEFV2 + "-" + pid.toString()
   )!;
-  let masterchefV2Contract = MasterChefV2Spookyswap.bind(event.address);
-  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+  const masterchefV2Contract = MasterChefV2Spookyswap.bind(event.address);
+  const masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
+  const pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }
 
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
   pool.rewardTokens = [rewardToken.id];
 
   // Get the amount of reward tokens emitted per block at this point in time.
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
-    let getSpookyPerBlock = masterchefV2Contract.try_booPerSecond();
+    const getSpookyPerBlock = masterchefV2Contract.try_booPerSecond();
     if (!getSpookyPerBlock.reverted) {
       masterChefV2.adjustedRewardTokenRate = getSpookyPerBlock.value;
     }
@@ -46,15 +46,15 @@ export function updateMasterChef(
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block.
-  let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
+  const rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
     .times(masterChefV2Pool.poolAllocPoint)
     .div(masterChefV2.totalAllocPoint);
-  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
+  const rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let rewardTokenPerDay = getRewardsPerDay(
+  const rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
     rewardAmountPerIntervalBigDecimal,

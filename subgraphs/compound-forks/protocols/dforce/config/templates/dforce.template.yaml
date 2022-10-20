@@ -139,6 +139,8 @@ templates:
           handler: handleUpdateInterest
         - event: NewReserveRatio(uint256,uint256)
           handler: handleNewReserveFactor
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
       file: ./protocols/dforce/src/mapping.ts
 
   - kind: ethereum/contract

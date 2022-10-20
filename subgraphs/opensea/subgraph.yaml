@@ -1,0 +1,27 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: OpenSeaV1
+    network: mainnet
+    source:
+      address: "0x7Be8076f4EA4A4AD08075C2508e481d6C946D12b"
+      abi: OpenSeaV1
+      startBlock: 5774644
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: OpenSeaV1
+          file: ./abis/OpenSeaV1.json
+        - name: ERC165
+          file: ./abis/ERC165.json
+        - name: NftMetadata
+          file: ./abis/NftMetadata.json
+      callHandlers:
+        - function: atomicMatch_(address[14],uint256[18],uint8[8],bytes,bytes,bytes,bytes,bytes,bytes,uint8[2],bytes32[5])
+          handler: handleMatch
+      file: ./src/mappings.ts

@@ -132,4 +132,6 @@ templates:
           handler: handleAccrueInterest
         - event: NewReserveFactor(uint256,uint256)
           handler: handleNewReserveFactor
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
       file: ./protocols/cream-finance/src/mapping.ts
