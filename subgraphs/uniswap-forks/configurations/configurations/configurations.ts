@@ -28,6 +28,7 @@ import { HoneyswapMaticConfigurations } from "../../protocols/honeyswap/config/d
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
+import { PangolinAvalancheConfigurations } from "../../protocols/pangolin/config/deployments/pangolin-avalanche/configurations";
 
 // This function is called to load in the proper configurations for a protocol/network deployment.
 // To add a new deployment, add a value to the `Deploy` namespace and add a new configuration class to the network specific typescript file in the `protocols` folder.
@@ -114,6 +115,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.MM_FINANCE_POLYGON: {
       return new MMFinanceMaticConfigurations();
+    }
+    case Deploy.PANGOLIN_AVALANCHE: {
+      return new PangolinAvalancheConfigurations();
     }
     default: {
       log.critical(

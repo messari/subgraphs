@@ -12,6 +12,7 @@
 - Uniswap V2 (Mainnet)
 - VVS (Cronos)
 - Honeyswap (Gnosis, Polygon)
+- Pangolin (Avalanche)
 
 ## Calculation Methodology v1.0.0
 
