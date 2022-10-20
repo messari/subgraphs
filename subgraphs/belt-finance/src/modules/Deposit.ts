@@ -29,7 +29,7 @@ export function createDepositTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): DepositTransaction {
-  let transactionId = "deposit-" + transaction.hash.toHexString();
+  const transactionId = "deposit-" + transaction.hash.toHexString();
 
   let depositTransaction = DepositTransaction.load(transactionId);
 
@@ -83,22 +83,22 @@ export function Deposit(
   block: ethereum.Block
 ): void {
   const vault = getOrCreateVault(vaultAddress, block);
-  let vaultContract = VaultContract.bind(vaultAddress);
+  const vaultContract = VaultContract.bind(vaultAddress);
 
-  let inputToken = getOrCreateTokenFromString(vault.inputToken, block);
+  const inputToken = getOrCreateTokenFromString(vault.inputToken, block);
 
-  let depositAmountUSD = depositAmount
+  const depositAmountUSD = depositAmount
     .divDecimal(
       constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
     )
     .times(inputToken.lastPriceUSD!);
 
-  let depositFeePercentage = utils.getStrategyWithdrawalFees(
+  const depositFeePercentage = utils.getStrategyWithdrawalFees(
     vaultAddress,
     strategyAddress
   );
 
-  let depositFeeUSD = depositAmountUSD
+  const depositFeeUSD = depositAmountUSD
     .times(depositFeePercentage.feePercentage!)
     .div(constants.BIGDECIMAL_HUNDRED);
 
@@ -118,8 +118,7 @@ export function Deposit(
     )
     .times(inputToken.lastPriceUSD!);
 
-  let pricePerShare = getPricePerShare(vaultAddress);
-  vault.pricePerShare = pricePerShare.toBigDecimal();
+  vault.pricePerShare = getPricePerShare(vaultAddress).toBigDecimal();
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(vaultAddress, block);
 
   vault.save();

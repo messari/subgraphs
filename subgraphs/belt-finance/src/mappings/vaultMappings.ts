@@ -64,7 +64,7 @@ export function handleStrategyAdded(event: StrategyAdded): void {
   vault.fees = utils.getVaultFees(vaultAddress);
   vault.save();
 
-  let context = new DataSourceContext();
+  const context = new DataSourceContext();
   context.setString("vaultAddress", vaultAddress.toHexString());
 
   StrategyTemplate.createWithContext(underlyingStrategy, context);

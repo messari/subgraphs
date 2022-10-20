@@ -19,6 +19,7 @@ import {
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { updateRevenueSnapshots } from "./Revenue";
+import { getPriceOfOutputTokens, getPricePerShare } from "./Prices";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
 
 export function createWithdrawTransaction(
@@ -28,7 +29,7 @@ export function createWithdrawTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): WithdrawTransaction {
-  let withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
+  const withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
 
   let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
@@ -82,22 +83,22 @@ export function Withdraw(
   block: ethereum.Block
 ): void {
   const vault = getOrCreateVault(vaultAddress, block);
-  let vaultContract = VaultContract.bind(vaultAddress);
+  const vaultContract = VaultContract.bind(vaultAddress);
 
-  let inputToken = getOrCreateTokenFromString(vault.inputToken, block);
+  const inputToken = getOrCreateTokenFromString(vault.inputToken, block);
 
-  let withdrawAmountUSD = withdrawAmount
+  const withdrawAmountUSD = withdrawAmount
     .divDecimal(
       constants.BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal()
     )
     .times(inputToken.lastPriceUSD!);
 
-  let withdrawFeePercentage = utils.getStrategyWithdrawalFees(
+  const withdrawFeePercentage = utils.getStrategyWithdrawalFees(
     vaultAddress,
     strategyAddress
   );
 
-  let withdrawalFeeUSD = withdrawAmountUSD
+  const withdrawalFeeUSD = withdrawAmountUSD
     .times(withdrawFeePercentage.feePercentage!)
     .div(constants.BIGDECIMAL_HUNDRED);
 
@@ -117,6 +118,8 @@ export function Withdraw(
     )
     .times(inputToken.lastPriceUSD!);
 
+  vault.pricePerShare = getPricePerShare(vaultAddress).toBigDecimal();
+  vault.outputTokenPriceUSD = getPriceOfOutputTokens(vaultAddress, block);
   vault.save();
 
   createWithdrawTransaction(

@@ -15,9 +15,9 @@ export function handleDeposit(event: Deposit): void {
   const poolInfo = masterBeltContract.try_poolInfo(pid);
   if (poolInfo.reverted) return;
 
-  let vaultAddress = poolInfo.value.getWant();
-  let allocPoint = poolInfo.value.getAllocPoint();
-  let strategyAddress = poolInfo.value.getStrat();
+  const vaultAddress = poolInfo.value.getWant();
+  const allocPoint = poolInfo.value.getAllocPoint();
+  const strategyAddress = poolInfo.value.getStrat();
 
   if (!utils.isVaultRegistered(vaultAddress)) return;
 
@@ -34,9 +34,9 @@ export function handleWithdraw(event: Withdraw): void {
   const poolInfo = masterBeltContract.try_poolInfo(pid);
   if (poolInfo.reverted) return;
 
-  let vaultAddress = poolInfo.value.getWant();
-  let allocPoint = poolInfo.value.getAllocPoint();
-  let strategyAddress = poolInfo.value.getStrat();
+  const vaultAddress = poolInfo.value.getWant();
+  const allocPoint = poolInfo.value.getAllocPoint();
+  const strategyAddress = poolInfo.value.getStrat();
 
   if (!utils.isVaultRegistered(vaultAddress)) return;
 

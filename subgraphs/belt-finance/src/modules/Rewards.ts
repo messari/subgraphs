@@ -17,7 +17,7 @@ export function updateStakedOutputTokenAmount(
   const vault = getOrCreateVault(vaultAddress, block);
   const strategyContract = StrategyContract.bind(strategyAddress);
 
-  let wantLockedTotal = utils.readValue<BigInt>(
+  const wantLockedTotal = utils.readValue<BigInt>(
     strategyContract.try_wantLockedTotal(),
     constants.BIGINT_ZERO
   );
@@ -32,16 +32,16 @@ export function updateBeltRewards(
   masterBeltAddress: Address,
   block: ethereum.Block
 ): void {
-  let masterBeltContract = MasterBeltContract.bind(masterBeltAddress);
+  const masterBeltContract = MasterBeltContract.bind(masterBeltAddress);
 
-  let beltPerBlock = utils
+  const beltPerBlock = utils
     .readValue<BigInt>(
       masterBeltContract.try_BELTPerBlock(),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
 
-  let totalAllocPoint = utils
+  const totalAllocPoint = utils
     .readValue<BigInt>(
       masterBeltContract.try_totalAllocPoint(),
       constants.BIGINT_ZERO
@@ -49,7 +49,7 @@ export function updateBeltRewards(
     .toBigDecimal();
 
   // Get the rewards per day for this gauge
-  let protocolTokenRewardEmissionsPerDay = beltPerBlock
+  const protocolTokenRewardEmissionsPerDay = beltPerBlock
     .times(allocPoint.toBigDecimal().div(totalAllocPoint))
     .times(constants.BIG_DECIMAL_SECONDS_PER_DAY.div(constants.BSC_BLOCK_RATE));
 
@@ -76,7 +76,7 @@ export function updateRewardTokenEmissions(
     vault.rewardTokens = [];
   }
 
-  let rewardTokens = vault.rewardTokens!;
+  const rewardTokens = vault.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
     vault.rewardTokens = rewardTokens;
@@ -87,12 +87,12 @@ export function updateRewardTokenEmissions(
   if (!vault.rewardTokenEmissionsAmount) {
     vault.rewardTokenEmissionsAmount = [];
   }
-  let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
+  const rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
 
   if (!vault.rewardTokenEmissionsUSD) {
     vault.rewardTokenEmissionsUSD = [];
   }
-  let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
+  const rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
 
   const token = getOrCreateToken(rewardTokenAddress, block);
 

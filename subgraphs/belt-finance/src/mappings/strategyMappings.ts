@@ -17,26 +17,26 @@ export function handleBuyback(event: Buyback): void {
   const harvestedAmount = event.params.earnedAmount;
   const harvestTokenAddress = event.params.earnedAddress;
 
-  let harvestedToken = getOrCreateToken(harvestTokenAddress, event.block);
+  const harvestedToken = getOrCreateToken(harvestTokenAddress, event.block);
 
-  let harvestedAmountUSD = harvestedAmount
+  const harvestedAmountUSD = harvestedAmount
     .divDecimal(
       constants.BIGINT_TEN.pow(harvestedToken.decimals as u8).toBigDecimal()
     )
     .times(harvestedToken.lastPriceUSD!);
 
-  let performanceFeesPercentage = utils.getStrategyPerformaceFees(
+  const performanceFeesPercentage = utils.getStrategyPerformaceFees(
     vaultAddress,
     strategyAddress
   );
 
-  let supplySideRevenueUSD = harvestedAmountUSD.times(
+  const supplySideRevenueUSD = harvestedAmountUSD.times(
     constants.BIGDECIMAL_ONE.minus(
       performanceFeesPercentage.feePercentage!.div(constants.BIGDECIMAL_HUNDRED)
     )
   );
 
-  let protocolSideRevenueUSD = harvestedAmountUSD.times(
+  const protocolSideRevenueUSD = harvestedAmountUSD.times(
     performanceFeesPercentage.feePercentage!.div(constants.BIGDECIMAL_HUNDRED)
   );
 

@@ -139,7 +139,7 @@ export function getOrCreateToken(
       .minus(token.lastPriceBlockNumber!)
       .gt(constants.PRICE_CACHING_BLOCKS)
   ) {
-    let tokenPrice = getUsdPricePerToken(address);
+    const tokenPrice = getUsdPricePerToken(address);
     token.lastPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
     token.lastPriceBlockNumber = block.number;
 
@@ -159,7 +159,7 @@ export function getOrCreateTokenFromString(
 export function getOrCreateFinancialDailySnapshots(
   block: ethereum.Block
 ): FinancialsDailySnapshot {
-  let id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
+  const id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
   if (!financialMetrics) {
@@ -188,7 +188,7 @@ export function getOrCreateFinancialDailySnapshots(
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let id: string = (
+  const id: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_DAY
   ).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
@@ -218,7 +218,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
 export function getOrCreateUsageMetricsHourlySnapshot(
   block: ethereum.Block
 ): UsageMetricsHourlySnapshot {
-  let metricsID: string = (
+  const metricsID: string = (
     block.timestamp.toI64() / constants.SECONDS_PER_HOUR
   ).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
@@ -246,7 +246,7 @@ export function getOrCreateVaultsDailySnapshots(
   vaultId: string,
   block: ethereum.Block
 ): VaultDailySnapshot {
-  let id: string = vaultId
+  const id: string = vaultId
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString());
   let vaultSnapshots = VaultDailySnapshot.load(id);
@@ -284,7 +284,7 @@ export function getOrCreateVaultsHourlySnapshots(
   vaultId: string,
   block: ethereum.Block
 ): VaultHourlySnapshot {
-  let id: string = vaultId
+  const id: string = vaultId
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString());
   let vaultSnapshots = VaultHourlySnapshot.load(id);
@@ -357,13 +357,13 @@ export function getOrCreateVault(
 
     vault.fees = utils.getVaultFees(vaultAddress);
 
-    let vaultStrategies = utils.getVaultStrategies(vaultAddress);
+    const vaultStrategies = utils.getVaultStrategies(vaultAddress);
 
     for (let idx = 0; idx < vaultStrategies.length; idx++) {
-      let context = new DataSourceContext();
+      const context = new DataSourceContext();
       context.setString("vaultAddress", vaultAddress.toHexString());
 
-      let underlyingStrategy = utils.getUnderlyingStrategy(
+      const underlyingStrategy = utils.getUnderlyingStrategy(
         vaultStrategies.at(idx)
       );
       StrategyTemplate.createWithContext(underlyingStrategy, context);
@@ -387,13 +387,13 @@ export function getOrCreateVault(
       .minus(vault.lastStrategiesBlockNumber!)
       .gt(constants.STRATEGIES_CACHING_BLOCKS)
   ) {
-    let vaultStrategies = utils.getVaultStrategies(vaultAddress);
+    const vaultStrategies = utils.getVaultStrategies(vaultAddress);
 
     for (let idx = 0; idx < vaultStrategies.length; idx++) {
-      let context = new DataSourceContext();
+      const context = new DataSourceContext();
       context.setString("vaultAddress", vaultAddress.toHexString());
 
-      let underlyingStrategy = utils.getUnderlyingStrategy(
+      const underlyingStrategy = utils.getUnderlyingStrategy(
         vaultStrategies.at(idx)
       );
       StrategyTemplate.createWithContext(underlyingStrategy, context);
