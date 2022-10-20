@@ -1,14 +1,15 @@
-specVersion: 0.0.4
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
     name: DSChief
-    network: mainnet
+    network: {{ network }}
     source:
-      address: "0x0a3f6849f78076aefadf113f5bed87720274ddc0"
+      address: "{{ governorContractAddress }}"
       abi: DSChief
-      startBlock: 11327777
+      startBlock: {{ governorContractStartBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -23,11 +24,11 @@ dataSources:
         - PollVote
       abis:
         - name: DSChief
-          file: ./abis/DSChief.json
+          file: ./abis/maker-governance/DSChief.json
         - name: DSSpell
-          file: ./abis/DSSpell.json
+          file: ./abis/maker-governance/DSSpell.json
         - name: VoteDelegate
-          file: ./abis/VoteDelegate.json
+          file: ./abis/maker-governance/VoteDelegate.json
       eventHandlers:
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,uint256,bytes)
           topic0: '0xdd46706400000000000000000000000000000000000000000000000000000000' # lock(uint)
@@ -44,7 +45,7 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,uint256,bytes)
           topic0: '0x3c278bd500000000000000000000000000000000000000000000000000000000' # lift(address)
           handler: handleLift
-      file: ./src/ds-chief.ts
+      file: ./protocols/maker-governance/src/ds-chief.ts
   - kind: ethereum
     name: PollingEmitter
     network: mainnet
@@ -66,18 +67,18 @@ dataSources:
         - PollVote
       abis:
         - name: PollingEmitter
-          file: ./abis/PollingEmitter.json
+          file: ./abis/maker-governance/PollingEmitter.json
       eventHandlers:
         - event: Voted(indexed address,indexed uint256,indexed uint256)
           handler: handlePollVote
-      file: ./src/polling-emitter.ts
+      file: ./protocols/maker-governance/src/polling-emitter.ts
   # - kind: ethereum
   #   name: DSToken
   #   network:  mainnet
   #   source:
-  #     address: "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2"
+  #     address: {{ tokenContractAddress }}
   #     abi: DSToken
-  #     startBlock: 4620855
+  #     startBlock: {{ tokenContractStartBlock }}
   #   mapping:
   #     kind: ethereum/events
   #     apiVersion: 0.0.6
@@ -112,15 +113,15 @@ templates:
         - Vote
       abis:
         - name: DSChief
-          file: ./abis/DSChief.json
+          file: ./abis/maker-governance/DSChief.json
         - name: DSSpell
-          file: ./abis/DSSpell.json
+          file: ./abis/maker-governance/DSSpell.json
       callHandlers:
         - function: schedule()
           handler: handleSchedule
         - function: cast()
           handler: handleCast
-      file: ./src/ds-spell.ts
+      file: ./protocols/maker-governance/src/ds-spell.ts
   - kind: ethereum
     name: VoteDelegate
     network: mainnet
@@ -137,12 +138,12 @@ templates:
         - Vote
       abis:
         - name: DSChief
-          file: ./abis/DSChief.json
+          file: ./abis/maker-governance/DSChief.json
         - name: VoteDelegate
-          file: ./abis/VoteDelegate.json
+          file: ./abis/maker-governance/VoteDelegate.json
       eventHandlers:
         - event: Lock(indexed address,uint256)
           handler: handleDelegateLock
         - event: Free(indexed address,uint256)
           handler: handleDelegateFree
-      file: ./src/vote-delegate.ts
+      file: ./protocols/maker-governance/src/vote-delegate.ts

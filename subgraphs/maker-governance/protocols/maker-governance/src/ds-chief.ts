@@ -1,19 +1,19 @@
 import { BigInt, Bytes, Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { LogNote, Etch } from "../generated/DSChief/DSChief";
-import { VoteDelegate } from "../generated/DSChief/VoteDelegate";
+import { LogNote, Etch } from "../../../generated/DSChief/DSChief";
+import { VoteDelegate } from "../../../generated/DSChief/VoteDelegate";
 import {
   Slate,
   Spell,
   Vote,
   Delegate,
   DelegateAdmin,
-} from "../generated/schema";
+} from "../../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ONE,
   BIGINT_ZERO,
   SpellState,
-} from "./constants";
+} from "../../../src/constants";
 import {
   addWeightToSpells,
   createSlate,
@@ -22,8 +22,8 @@ import {
   hexToNumberString,
   removeWeightFromSpells,
   toDecimal,
-} from "./helpers";
-import { VoteDelegate as VoteDelegateTemplate } from "../generated/templates";
+} from "../../../src/helpers";
+import { VoteDelegate as VoteDelegateTemplate } from "../../../generated/templates";
 
 export function handleLock(event: LogNote): void {
   let sender = event.params.guy; // guy is the sender

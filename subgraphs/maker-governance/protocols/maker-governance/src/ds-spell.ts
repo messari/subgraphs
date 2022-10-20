@@ -1,6 +1,6 @@
-import { Spell } from "../generated/schema";
-import { CastCall, ScheduleCall } from "../generated/DSChief/DSSpell";
-import { SpellState } from "./constants";
+import { Spell } from "../../../generated/schema";
+import { CastCall, ScheduleCall } from "../../../generated/DSChief/DSSpell";
+import { SpellState } from "../../../src/constants";
 
 export function handleSchedule(call: ScheduleCall): void {
   let spellID = call.to.toHexString(); // spell address is the spellID

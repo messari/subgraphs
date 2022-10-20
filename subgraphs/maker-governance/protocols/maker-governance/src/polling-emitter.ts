@@ -1,6 +1,6 @@
-import { Poll, PollVote } from "../generated/schema";
-import { Voted } from "../generated/PollingEmitter/PollingEmitter";
-import { getDelegate } from "./helpers";
+import { Poll, PollVote } from "../../../generated/schema";
+import { Voted } from "../../../generated/PollingEmitter/PollingEmitter";
+import { getDelegate } from "../../../src/helpers";
 
 export function handlePollVote(event: Voted): void {
   let voter = event.params.voter.toHexString();

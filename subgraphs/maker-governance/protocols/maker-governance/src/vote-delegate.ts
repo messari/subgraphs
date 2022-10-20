@@ -1,7 +1,7 @@
-import { Delegation } from "../generated/schema";
-import { Lock, Free } from "../generated/DSChief/VoteDelegate";
-import { getDelegate, getGovernanceFramework } from "./helpers";
-import { BIGINT_ZERO, CHIEF } from "./constants";
+import { Delegation } from "../../../generated/schema";
+import { Lock, Free } from "../../../generated/DSChief/VoteDelegate";
+import { getDelegate, getGovernanceFramework } from "../../../src/helpers";
+import { BIGINT_ZERO, CHIEF } from "../../../src/constants";
 
 export function handleDelegateLock(event: Lock): void {
   let sender = event.params.usr.toHexString();
