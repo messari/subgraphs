@@ -105,9 +105,26 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
         }
 
         return slugNotUsed && onSupportedChain && supportedCategory && isCurrentProtocolType;
-    }).sort((a, b) => b.tvl - a.tvl);
+    }).sort((a, b) => {
+        let aAddedTVL = 0;
+        Object.keys(a.chainTvls).forEach(x => {
+            aAddedTVL += a.chainTvls[x];
+        })
+
+        let bAddedTVL = 0;
+        Object.keys(b.chainTvls).forEach(x => {
+            bAddedTVL += b.chainTvls[x];
+        })
+
+        return bAddedTVL - aAddedTVL;
+    });
 
     const defiLlamaTableRows: any[] = protocolsToDevelop.map((protocol) => {
+        let tvl = 0
+        Object.keys(protocol.chainTvls).forEach(x => {
+            tvl += protocol.chainTvls[x];
+        })
+
         return <TableRow onClick={() => window.location.href = "https://defillama.com/protocol/" + protocol.slug} key={protocol.slug + "PROTOCOLLISTROW"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
             <TableCell
                 sx={{ padding: "0 0 0 6px", verticalAlign: "middle", height: "30px" }}
@@ -121,7 +138,7 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
                 })}
             </TableCell>
             <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right" }}>
-                ${formatIntToFixed2(protocol.tvl)}
+                ${formatIntToFixed2(tvl)}
             </TableCell>
             <TableCell sx={{ padding: "0", paddingRight: "6px", textAlign: "right" }}>
                 {categoryTypesSupported[protocol.category.toLowerCase()]}
@@ -132,7 +149,7 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
     const columnLabels: string[] = [
         "Name",
         "Chains",
-        "TVL",
+        "TVL (Sum Across Networks)",
         "Schema Type"
     ];
 

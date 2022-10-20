@@ -330,7 +330,7 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
 
     let borrowedTVL = null;
     if (borrowedDataset) {
-      borrowedTVL = <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => setIncludeBorrowedTVL(!includeBorrowedTVL)}>{includeBorrowedTVL ? "Disclude Borrowed TVL" : "Include Borrowed TVL"}</Button>
+      borrowedTVL = <Button variant="contained" color="primary" sx={{ my: 4, mx: 2 }} onClick={() => setIncludeBorrowedTVL(!includeBorrowedTVL)}>{includeBorrowedTVL ? "Disclude Borrowed TVL" : "Include Borrowed TVL"}</Button>
     }
 
     valueToggles = (
@@ -338,24 +338,27 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
         {stakedTVL}
         {borrowedTVL}
       </div>
-    )
+    );
   }
   return (
     <>
       <Button variant="contained" color="primary" sx={{ my: 4, mx: 2 }} onClick={() => navigate("/")}>
         Back To Deployments List
       </Button>
-      <DeploymentsDropDown
-        setDeploymentURL={(x) => setDeploymentURL(x)}
-        setDefiLlamaSlug={(x) => setDefiLlamaSlug(x)}
-        setIssues={(x: any) => setIssues(x)}
-        issuesProps={issues}
-        deploymentURL={deploymentURL}
-        deploymentJSON={deploymentNameToUrlMapping}
-      />
-      <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
-      {chart}
-      {valueToggles}
+      <div style={{ margin: "0px 16px" }}>
+        <DeploymentsDropDown
+          setDeploymentURL={(x) => setDeploymentURL(x)}
+          setDefiLlamaSlug={(x) => setDefiLlamaSlug(x)}
+          setIssues={(x: any) => setIssues(x)}
+          issuesProps={issues}
+          deploymentURL={deploymentURL}
+          deploymentJSON={deploymentNameToUrlMapping}
+        />
+        <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
+        {chart}
+        {valueToggles}
+
+      </div>
     </>
   );
 }
