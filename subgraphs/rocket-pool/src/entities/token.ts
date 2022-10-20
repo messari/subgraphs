@@ -103,37 +103,6 @@ function fetchTokenDecimals(tokenAddress: Address): number {
   }
 }
 
-function getRETHpriceUSD(
-  tokenAddress: Address,
-  blockNumber: BigInt
-): BigDecimal {
-  const RETHContract = RETH.bind(tokenAddress);
-
-  const rethCall = RETHContract.try_getExchangeRate();
-  let RETHratio = BIGDECIMAL_ZERO;
-  let RETHpriceUSD = BIGDECIMAL_ZERO;
-  if (rethCall.reverted) {
-    // log.error("[getRETHpriceUSD] rethCall Reverted", []);
-  } else {
-    // log.error("[getRETHpriceUSD] rethCall resolved to : {}", [
-    //   rethCall.value.toString(),
-    // ]);
-    RETHratio = bigIntToBigDecimal(rethCall.value.div(ONE_ETH_IN_WEI));
-
-    if (RETHratio.notEqual(BIGDECIMAL_ZERO)) {
-      let ETH = getOrCreateToken(Address.fromString(ETH_ADDRESS), blockNumber);
-      let ethPriceUSD = ETH.lastPriceUSD;
-
-      if (ethPriceUSD) {
-        RETHpriceUSD = ethPriceUSD.div(RETHratio);
-      }
-    }
-    // log.warning("[getRETHpriceUSD] RETH Ratio: {}", [RETHratio.toString()]);
-  }
-
-  return RETHpriceUSD;
-}
-
 export function getOrCreateRewardToken(
   address: Address,
   type: string,

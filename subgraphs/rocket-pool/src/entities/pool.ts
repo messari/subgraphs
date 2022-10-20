@@ -38,7 +38,11 @@ export function getOrCreatePool(
       blockNumber
     ).id;
     pool.rewardTokens = [
-      // getOrCreateRewardToken(Address.fromString(RPL_ADDRESS), 'staking', blockNumber).id,
+      getOrCreateRewardToken(
+        Address.fromString(RPL_ADDRESS),
+        "DEPOSIT",
+        blockNumber
+      ).id,
     ];
 
     // Quantitative Revenue Data
@@ -54,10 +58,10 @@ export function getOrCreatePool(
     pool.stakedOutputTokenAmount = null;
     pool.rewardTokenEmissionsAmount = null;
     pool.rewardTokenEmissionsUSD = null;
-    pool.miniPools = [];
-    pool.miniPoolCommission = [];
-    pool.miniPoolSlashAmount = BIGINT_ZERO;
-    pool.miniPoolTotalValueLocked = BIGINT_ZERO;
+    pool._miniPools = [];
+    pool._miniPoolCommission = [];
+    pool.cumulativeMinipoolSlashedAmount = BIGINT_ZERO;
+    pool._miniPoolTotalValueLocked = BIGINT_ZERO;
 
     pool.save();
 

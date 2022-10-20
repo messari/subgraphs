@@ -28,7 +28,7 @@ export function getOrCreateMinipool(
     minipool = new Minipool(miniPoolAddress);
 
     // Metadata
-    minipool.name = protocol.id;
+    minipool.name = protocol.id + "-" + miniPoolAddress;
     minipool.symbol = "MINIPOOL";
     minipool.protocol = protocol.id;
     minipool.createdTimestamp = blockTimestamp;
@@ -76,12 +76,12 @@ export function getOrCreateMinipool(
     protocol.totalPoolCount += 1;
     protocol.save();
 
-    let pools = pool.miniPools;
+    let pools = pool._miniPools;
 
     if (pools) {
       pools.push(miniPoolAddress);
     }
-    pool.miniPools = pools;
+    pool._miniPools = pools;
     pool.save();
   }
 

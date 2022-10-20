@@ -192,3 +192,5 @@ export const NODEDEPOSIT_ENCODE = Bytes.fromHexString(
 export const NETWORKBALANCES_ENCODE = Bytes.fromHexString(
   "0x7630e125f1c009e5fc974f6dae77c6d5b1802979b36e6d7145463c21782af01e"
 );
+
+export const DEFAULT_COMMISSION = BigDecimal.fromString("0.15");

@@ -304,15 +304,15 @@ type Pool @entity {
   rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Minipools that exist or have existed in the pool. "
-  miniPools: [String!]
+  _miniPools: [String!]
 
   " Minipool comission rates at their initialization. "
-  miniPoolCommission: [BigDecimal!]
+  _miniPoolCommission: [BigDecimal!]
 
   " Minipool amount slashed. "
-  miniPoolSlashAmount: BigInt!
+  cumulativeMinipoolSlashedAmount: BigInt!
 
-  miniPoolTotalValueLocked: BigInt!
+  _miniPoolTotalValueLocked: BigInt!
 
   ##### Snapshots #####
 
