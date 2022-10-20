@@ -28,7 +28,12 @@ const BackBanner = styled("div")`
   cursor: pointer;
 `;
 
-function ProtocolDashboard() {
+interface ProtocolProps {
+  protocolJSON: any;
+  getData: any;
+}
+
+function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
   const [searchParams] = useSearchParams();
   const subgraphParam = searchParams.get("endpoint") || "";
   const tabString = searchParams.get("tab") || "";
@@ -121,11 +126,16 @@ function ProtocolDashboard() {
     protocolIdToUse = protocolIdString;
   }
   let protocolType = "N/A";
+  let entityError = null;
   if (protocolSchemaData?.protocols?.length > 0) {
     protocolType = protocolSchemaData?.protocols[0]?.type;
     if (protocolSchemaData.protocols[0]?.id && !protocolIdToUse) {
       protocolIdToUse = protocolSchemaData.protocols[0]?.id;
     }
+  } else if (!protocolSchemaQueryLoading) {
+    entityError = new ApolloError({
+      errorMessage: `DEPLOYMENT ERROR - ${subgraphToQuery.url} does not have any "protocol" entities. Essential data that determines validation can not be pulled without this entity.`,
+    });
   }
 
   const [protocolId, setprotocolId] = useState<string>(protocolIdToUse);
@@ -150,7 +160,7 @@ function ProtocolDashboard() {
   const queryMain = gql`
     ${graphQuery}
   `;
-  const [getData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId, protocolId }, client });
+  const [getMainQueryData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId, protocolId }, client });
 
   const [
     getFinancialsData,
@@ -296,10 +306,6 @@ function ProtocolDashboard() {
     if (!isCurrentVersion) {
       deploymentVersionParam = "&version=pending";
     }
-    let nameParam = "";
-    if (subgraphName) {
-      nameParam = "&name=" + subgraphName;
-    }
     let protocolParam = "";
     if (protocolId) {
       protocolParam = `&protocolId=${protocolId}`;
@@ -328,6 +334,12 @@ function ProtocolDashboard() {
   };
 
   useEffect(() => {
+    if (Object.keys(protocolJSON).length === 0) {
+      getData();
+    }
+  })
+
+  useEffect(() => {
     if (
       pendingVersion?.indexingStatusForPendingVersion?.subgraph &&
       pendingVersion?.indexingStatusForPendingVersion?.health === "healthy"
@@ -348,13 +360,13 @@ function ProtocolDashboard() {
     // If the schema query request was successful, make the full data query
     if (protocolSchemaData?.protocols?.length > 0) {
       if (protocolIdToUse || protocolSchemaData?.protocols[0]?.id) {
-        getData();
+        getMainQueryData();
         getProtocolTableData();
-        getPendingSubgraph();
       }
     }
+    getPendingSubgraph();
     getFailedIndexingStatus();
-  }, [protocolSchemaData, getData, getProtocolTableData, getPendingSubgraph]);
+  }, [protocolSchemaData, getMainQueryData, getProtocolTableData, getPendingSubgraph]);
 
   useEffect(() => {
     if (protocolTableData && tabValue === "1") {
@@ -517,6 +529,14 @@ function ProtocolDashboard() {
       console.log("--------------------Error End---------------------------");
     }
   }, [error, protocolSchemaQueryError]);
+
+  let protocolKey = Object.keys(protocolJSON).find(x => subgraphName.includes(x))
+  let depoKey: any = "";
+  if (!!protocolKey) {
+    depoKey = Object.keys(protocolJSON[protocolKey].deployments).find(x => subgraphName.includes(x));
+  } else {
+    protocolKey = "";
+  }
 
   // errorRender is the element to be rendered to display the error
   let errorDisplayProps = null;
@@ -841,7 +861,9 @@ function ProtocolDashboard() {
       });
     }
   }
-
+  if (!!entityError) {
+    errorDisplayProps = entityError;
+  }
   if (data) {
     errorDisplayProps = null;
   }
@@ -852,6 +874,7 @@ function ProtocolDashboard() {
         protocolId={protocolId}
         subgraphToQueryURL={subgraphToQuery.url}
         schemaVersion={schemaVersion}
+        versionsJSON={protocolJSON?.[protocolKey]?.deployments[depoKey]?.versions || {}}
       />
       {toggleVersion}
       {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (

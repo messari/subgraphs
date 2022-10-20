@@ -1,6 +1,6 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, Tooltip } from "@mui/material";
 import moment from "moment";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { toDate } from "../../utils";
 import { TableChart } from "./TableChart";
@@ -15,6 +15,7 @@ interface ChartContainerProps {
 
 export const ChartContainer = ({ identifier, datasetLabel, dataChart, dataTable, downloadAllCharts }: ChartContainerProps) => {
     const chartRef = useRef<any>(null);
+    const [chartIsImage, setChartIsImage] = useState<boolean>(false);
     function jpegDownloadHandler() {
         try {
             const link = document.createElement('a');
@@ -75,51 +76,54 @@ export const ChartContainer = ({ identifier, datasetLabel, dataChart, dataTable,
             datasets: datasets,
         };
         chart = (<>
-            <Box padding={2} sx={{ border: 1 }}>
-                <Line
-                    data={chartData}
-                    ref={chartRef}
-                    options={{
-                        scales: {
-                            y: {
-                                grid: {
-                                    display: true,
-                                    color: "rgba(255, 255, 255, 0.1)",
+            <Tooltip placement="top" title={"Click on the chart to turn it into " + (chartIsImage ? " a dynamic chart that shows point plots on hover." : " a jpeg image that can be dragged and dropped into other tabs.")}>
+                <Box onClick={() => setChartIsImage(!chartIsImage)} padding={2} sx={{ border: 1 }}>
+                    {chartIsImage ? <img src={chartRef.current?.toBase64Image('image/jpeg', 1)} /> : <Line
+                        data={chartData}
+                        ref={chartRef}
+                        options={{
+                            scales: {
+                                y: {
+                                    grid: {
+                                        display: true,
+                                        color: "rgba(255, 255, 255, 0.1)",
+                                    },
+                                    ticks: {
+                                        color: "#fff",
+                                    },
                                 },
-                                ticks: {
-                                    color: "#fff",
+                                x: {
+                                    grid: {
+                                        display: false,
+                                    },
+                                    ticks: {
+                                        color: "#fff",
+                                    },
                                 },
                             },
-                            x: {
-                                grid: {
-                                    display: false,
-                                },
-                                ticks: {
-                                    color: "#fff",
+                            elements: {
+                                point: {
+                                    radius: 0,
                                 },
                             },
-                        },
-                        elements: {
-                            point: {
-                                radius: 0,
-                            },
-                        },
 
-                        plugins: {
-                            legend: {
-                                display: true,
-                                labels: {
-                                    color: "#fff",
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: "#fff",
+                                    },
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    position: "nearest",
                                 },
                             },
-                            tooltip: {
-                                enabled: true,
-                                position: "nearest",
-                            },
-                        },
-                    }}
-                />
-            </Box>
+                        }}
+                    />}
+                </Box>
+            </Tooltip>
+
         </>);
     }
 

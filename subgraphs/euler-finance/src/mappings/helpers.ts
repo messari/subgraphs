@@ -1,4 +1,4 @@
-import { Address, BigDecimal, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -43,7 +43,6 @@ import {
 } from "../common/constants";
 import { getEthPriceUsd, getUnderlyingPrice } from "../common/pricing";
 import { amountToUsd } from "../common/conversions";
-import { updateMarketDailyMetrics, updateMarketHourlyMetrics } from "../common/metrics";
 import { getAssetTotalSupply } from "../common/tokens";
 
 export function updateAsset(event: AssetStatus): void {
@@ -309,9 +308,11 @@ export function syncWithEulerGeneralView(
 
   // Using an indexed for loop because AssemblyScript does not support closures.
   // AS100: Not implemented: Closures
-  for (let i = 0; i < eulerViewMarkets.length; i += 1) {
+  const marketsCount = eulerViewMarkets.length;
+  for (let i = 0; i < marketsCount; i += 1) {
     const eulerViewMarket = eulerViewMarkets[i];
     const market = getOrCreateMarket(eulerViewMarket.underlying.toHexString());
+    log.info("[syncWithEulerGeneralView]{}/{},market={}", [i.toString(), marketsCount.toString(), market.id]);
     const marketUtility = getOrCreateMarketUtility(market.id);
     const lendingRate = getOrCreateInterestRate(InterestRateSide.LENDER, InterestRateType.VARIABLE, market.id);
     const borrowRate = getOrCreateInterestRate(InterestRateSide.BORROWER, InterestRateType.VARIABLE, market.id);
@@ -434,8 +435,7 @@ export function syncWithEulerGeneralView(
     marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
     marketUtility.save();
 
-    updateMarketDailyMetrics(block, market.id, BIGDECIMAL_ZERO);
-    updateMarketHourlyMetrics(block, market.id, BIGDECIMAL_ZERO);
+    //market daily/hourly snapshots are updated in the handler function after updateProtocolAndMarkets() call
   }
   protocol.save();
 }
