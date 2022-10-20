@@ -3,11 +3,11 @@ import { Voted } from "../../../generated/PollingEmitter/PollingEmitter";
 import { getDelegate } from "../../../src/helpers";
 
 export function handlePollVote(event: Voted): void {
-  let voter = event.params.voter.toHexString();
-  let pollId = event.params.pollId.toString();
-  let optionId = event.params.optionId;
+  const voter = event.params.voter.toHexString();
+  const pollId = event.params.pollId.toString();
+  const optionId = event.params.optionId;
 
-  let delegate = getDelegate(voter);
+  const delegate = getDelegate(voter);
   delegate.numberPoleVotes = delegate.numberPoleVotes + 1;
   delegate.save();
 
@@ -17,8 +17,8 @@ export function handlePollVote(event: Voted): void {
     poll.save();
   }
 
-  let voteId = voter.concat("-").concat(pollId);
-  let pollVote = new PollVote(voteId);
+  const voteId = voter.concat("-").concat(pollId);
+  const pollVote = new PollVote(voteId);
   pollVote.choice = optionId;
   pollVote.voter = voter;
   pollVote.poll = pollId;

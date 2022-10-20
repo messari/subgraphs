@@ -3,8 +3,8 @@ import { CastCall, ScheduleCall } from "../../../generated/DSChief/DSSpell";
 import { SpellState } from "../../../src/constants";
 
 export function handleSchedule(call: ScheduleCall): void {
-  let spellID = call.to.toHexString(); // spell address is the spellID
-  let spell = Spell.load(spellID);
+  const spellID = call.to.toHexString(); // spell address is the spellID
+  const spell = Spell.load(spellID);
   if (!spell) return;
   spell.state = SpellState.SCHEDULED;
   spell.scheduledTxnHash = call.transaction.hash.toHexString();
@@ -13,8 +13,8 @@ export function handleSchedule(call: ScheduleCall): void {
 }
 
 export function handleCast(call: CastCall): void {
-  let spellID = call.to.toHexString(); // spell address is the spellID
-  let spell = Spell.load(spellID);
+  const spellID = call.to.toHexString(); // spell address is the spellID
+  const spell = Spell.load(spellID);
   if (!spell) return;
   spell.state = SpellState.CAST;
   spell.castTxnHash = call.transaction.hash.toHexString();

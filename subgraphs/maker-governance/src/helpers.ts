@@ -22,8 +22,8 @@ export function hexToNumberString(hex: string): string {
     hex = hex.slice(2);
   }
   for (let i = 0; i < hex.length; i += 1) {
-    let character = hex.substr(hex.length - 1 - i, 1);
-    let digit = parseInt(character, 16) as u8;
+    const character = hex.substr(hex.length - 1 - i, 1);
+    const digit = parseInt(character, 16) as u8;
     if (digit) {
       hexNumber = hexNumber.plus(
         BigInt.fromI32(digit).times(BigInt.fromI32(16).pow(i as u8))
@@ -78,7 +78,7 @@ export function getGovernanceFramework(
 }
 
 export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
-  let slate = new Slate(slateID.toHexString());
+  const slate = new Slate(slateID.toHexString());
   slate.yays = [];
   slate.txnHash = event.transaction.hash.toHexString();
   slate.creationBlock = event.block.number;
@@ -86,12 +86,12 @@ export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
 
   let newSpellCount = 0;
   let i = 0;
-  let dsChief = DSChief.bind(event.address);
+  const dsChief = DSChief.bind(event.address);
   let slateResponse = dsChief.try_slates(slateID, BigInt.fromI32(i));
   while (!slateResponse.reverted) {
-    let spellAddress = slateResponse.value;
+    const spellAddress = slateResponse.value;
 
-    let spellID = spellAddress.toHexString();
+    const spellID = spellAddress.toHexString();
     let spell = Spell.load(spellID);
     if (!spell) {
       spell = new Spell(spellID);
@@ -100,8 +100,8 @@ export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
       spell.creationBlock = event.block.number;
       spell.creationTime = event.block.timestamp;
 
-      let dsSpell = DSSpell.bind(spellAddress);
-      let dsDescription = dsSpell.try_description();
+      const dsSpell = DSSpell.bind(spellAddress);
+      const dsDescription = dsSpell.try_description();
       if (!dsDescription.reverted) {
         spell.description = dsDescription.value;
       }
@@ -120,7 +120,7 @@ export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
     slateResponse = dsChief.try_slates(slateID, BigInt.fromI32(++i));
   }
   // Update framework spell count
-  let framework = getGovernanceFramework(event.address.toHexString());
+  const framework = getGovernanceFramework(event.address.toHexString());
   framework.spells = framework.spells + newSpellCount;
   framework.save();
 
@@ -130,7 +130,7 @@ export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
 
 export function addWeightToSpells(spellIDs: string[], weight: BigInt): void {
   for (let i = 0; i < spellIDs.length; i++) {
-    let spell = Spell.load(spellIDs[i]);
+    const spell = Spell.load(spellIDs[i]);
     if (spell) {
       spell.totalWeightedVotes = spell.totalWeightedVotes.plus(weight);
       spell.save();
@@ -142,7 +142,7 @@ export function removeWeightFromSpells(
   weight: BigInt
 ): void {
   for (let i = 0; i < spellIDs.length; i++) {
-    let spell = Spell.load(spellIDs[i]);
+    const spell = Spell.load(spellIDs[i]);
     if (spell) {
       spell.totalWeightedVotes = spell.totalWeightedVotes.minus(weight);
       spell.save();

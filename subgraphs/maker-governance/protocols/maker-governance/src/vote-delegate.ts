@@ -4,11 +4,11 @@ import { getDelegate, getGovernanceFramework } from "../../../src/helpers";
 import { BIGINT_ZERO, CHIEF } from "../../../src/constants";
 
 export function handleDelegateLock(event: Lock): void {
-  let sender = event.params.usr.toHexString();
-  let delegateAddress = event.address;
-  let delegate = getDelegate(delegateAddress.toHexString());
+  const sender = event.params.usr.toHexString();
+  const delegateAddress = event.address;
+  const delegate = getDelegate(delegateAddress.toHexString());
 
-  let delegationID = delegate.id + "-" + sender;
+  const delegationID = delegate.id + "-" + sender;
   let delegation = Delegation.load(delegationID);
   if (!delegation) {
     delegation = new Delegation(delegationID);
@@ -23,7 +23,7 @@ export function handleDelegateLock(event: Lock): void {
   delegation.save();
   delegate.save();
 
-  let framework = getGovernanceFramework(CHIEF);
+  const framework = getGovernanceFramework(CHIEF);
   framework.currentTokenDelegated = framework.currentTokenDelegated.plus(
     event.params.wad
   );
@@ -31,12 +31,12 @@ export function handleDelegateLock(event: Lock): void {
 }
 
 export function handleDelegateFree(event: Free): void {
-  let sender = event.params.usr.toHexString();
-  let delegateAddress = event.address;
-  let delegate = getDelegate(delegateAddress.toHexString());
+  const sender = event.params.usr.toHexString();
+  const delegateAddress = event.address;
+  const delegate = getDelegate(delegateAddress.toHexString());
 
-  let delegationID = delegate.id + "-" + sender;
-  let delegation = Delegation.load(delegationID);
+  const delegationID = delegate.id + "-" + sender;
+  const delegation = Delegation.load(delegationID);
   if (!delegation) return;
   delegation.amount = delegation.amount.minus(event.params.wad);
   if (delegation.amount.equals(BIGINT_ZERO)) {
@@ -45,7 +45,7 @@ export function handleDelegateFree(event: Free): void {
   delegation.save();
   delegate.save();
 
-  let framework = getGovernanceFramework(CHIEF);
+  const framework = getGovernanceFramework(CHIEF);
   framework.currentTokenDelegated = framework.currentTokenDelegated.minus(
     event.params.wad
   );
