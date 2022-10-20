@@ -38,6 +38,8 @@ dataSources:
           handler: handleTimelockChange
         - event: VoteCast(indexed address,uint256,uint8,uint256,string)
           handler: handleVoteCast
+        - event: VoteCastWithParams(indexed address,uint256,uint8,uint256,string,bytes)
+          handler: handleVoteCastWithParams
       file: ./protocols/rarible-governance/src/RariGovernor.ts
   - kind: ethereum/contract
     name: Staking
@@ -64,6 +66,7 @@ dataSources:
           handler: handleDelegateChanged
         - event: DelegateVotesChanged(indexed address,uint256,uint256)
           handler: handleDelegateVotesChanged
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
+        # Staking token is Non-ERC20 
+        # - event: Transfer(indexed address,indexed address,uint256)
+        #   handler: handleTransfer 
       file: ./protocols/rarible-governance/src/Staking.ts

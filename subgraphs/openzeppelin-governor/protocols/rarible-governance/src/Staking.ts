@@ -1,7 +1,6 @@
 import {
   DelegateChanged,
   DelegateVotesChanged,
-  Transfer,
 } from "../../../generated/Staking/Staking";
 import {
   _handleDelegateChanged,
@@ -30,11 +29,11 @@ export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
 }
 
 // // Transfer(indexed address,indexed address,uint256)
-export function handleTransfer(event: Transfer): void {
-  _handleTransfer(
-    event.params.from.toHexString(),
-    event.params.to.toHexString(),
-    event.params.value,
-    event
-  );
-}
+// export function handleTransfer(event: Transfer): void {
+//   _handleTransfer(
+//     event.params.from.toHexString(),
+//     event.params.to.toHexString(),
+//     event.params.value,
+//     event
+//   );
+// }

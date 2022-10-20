@@ -7,6 +7,7 @@ import {
   QuorumNumeratorUpdated,
   TimelockChange,
   VoteCast,
+  VoteCastWithParams,
 } from "../../../generated/RariGovernor/RariGovernor";
 import {
   _handleProposalCreated,
@@ -103,6 +104,23 @@ export function handleVoteCast(event: VoteCast): void {
   );
 
   // Proposal will be updated as part of handler
+  _handleVoteCast(
+    proposal,
+    event.params.voter.toHexString(),
+    event.params.weight,
+    event.params.reason,
+    event.params.support,
+    event
+  );
+}
+
+// Treat VoteCastWithParams same as VoteCast
+export function handleVoteCastWithParams(event: VoteCastWithParams): void {
+  let proposal = getLatestProposalValues(
+    event.params.proposalId.toString(),
+    event.address
+  );
+
   _handleVoteCast(
     proposal,
     event.params.voter.toHexString(),
