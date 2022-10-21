@@ -313,6 +313,7 @@ export function getOrCreateMarket(id: string): Market {
     market.createdTimestamp = BIGINT_ZERO;
     market.createdBlockNumber = BIGINT_ZERO;
     market.exchangeRate = BIGDECIMAL_ONE;
+    market._dTokenSupply = BIGINT_ZERO;
     market._dTokenExchangeRate = BIGDECIMAL_ONE;
     market.save();
 

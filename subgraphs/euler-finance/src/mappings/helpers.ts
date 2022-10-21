@@ -467,7 +467,7 @@ export function snapshotFinancials(
   const days = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
   log.debug("[snapshotFinancials]days {}: protocol.totalValueLocked={}", [
     days,
-    protocol.totalValueLockedUSD.toString(),
+    protocol!.totalValueLockedUSD.toString(),
   ]);
 }
 

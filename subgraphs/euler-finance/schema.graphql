@@ -580,6 +580,9 @@ type Market @entity {
   " dToken of the market (debt) "
   _dToken: Token
 
+  " dToken supply "
+  _dTokenSupply: BigInt
+
   " exchange rate of dToken (dToken to totalBorrowBalance)"
   _dTokenExchangeRate: BigDecimal
 }
