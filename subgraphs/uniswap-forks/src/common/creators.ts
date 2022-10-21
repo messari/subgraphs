@@ -256,7 +256,7 @@ export function createSwapHandleVolumeAndFees(
       "Two input tokens given in swap - Transaction: " +
         event.transaction.hash.toHexString() +
         " Log Index: " +
-        event.logIndex +
+        event.logIndex.toString() +
         " Token0: " +
         token0.id +
         " Token1: " +
