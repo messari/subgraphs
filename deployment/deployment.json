@@ -4407,6 +4407,64 @@
       }
     }
   },
+  "rarible-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "rarible-governance",
+    "deployments": {
+      "rarible-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "rarible-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "rarible-governance",
+            "query-id": "rarible-governance"
+          }
+        }
+      }
+    }
+  },
+  "ousd-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "ousd-governance",
+    "deployments": {
+      "ousd-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "ousd-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "ousd-governance",
+            "query-id": "ousd-governance"
+          }
+        }
+      }
+    }
+  },
   "compound-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
