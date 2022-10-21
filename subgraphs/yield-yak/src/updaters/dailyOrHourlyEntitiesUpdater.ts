@@ -30,6 +30,7 @@ function updateProtocol(contractAddress: Address): void {
   const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
   const protocol = initProtocol(contractAddress);
   protocol.totalPoolCount += 1;
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(protocol.cumulativeProtocolSideRevenueUSD);
 
   if (yakStrategyV2Contract.try_depositToken().reverted) {
     protocol.totalValueLockedUSD = ZERO_BIGDECIMAL;

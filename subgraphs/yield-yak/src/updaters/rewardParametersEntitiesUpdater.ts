@@ -110,14 +110,14 @@ function updateRewardForFinancialsDailySnapshot(
   protocolRewardInUSD: BigDecimal,
   allDistributedRewardInUSD: BigDecimal
 ): void {
-  const financialsDailySnapshotEntity = initFinancialsDailySnapshot(timestamp, blockNumber, contractAddress);
+  const financialsDailySnapshot = initFinancialsDailySnapshot(timestamp, blockNumber, contractAddress);
 
-  financialsDailySnapshotEntity.dailySupplySideRevenueUSD = financialsDailySnapshotEntity.dailySupplySideRevenueUSD.plus(distributedRewardInUSD);
-  financialsDailySnapshotEntity.cumulativeSupplySideRevenueUSD = financialsDailySnapshotEntity.cumulativeSupplySideRevenueUSD.plus(distributedRewardInUSD);
-  financialsDailySnapshotEntity.dailyProtocolSideRevenueUSD = financialsDailySnapshotEntity.dailyProtocolSideRevenueUSD.plus(protocolRewardInUSD);
-  financialsDailySnapshotEntity.cumulativeProtocolSideRevenueUSD = financialsDailySnapshotEntity.cumulativeProtocolSideRevenueUSD.plus(protocolRewardInUSD);
-  financialsDailySnapshotEntity.dailyTotalRevenueUSD = financialsDailySnapshotEntity.dailyTotalRevenueUSD.plus(allDistributedRewardInUSD);
-  financialsDailySnapshotEntity.cumulativeTotalRevenueUSD = financialsDailySnapshotEntity.cumulativeTotalRevenueUSD.plus(allDistributedRewardInUSD);
+  financialsDailySnapshot.dailySupplySideRevenueUSD = financialsDailySnapshot.dailySupplySideRevenueUSD.plus(distributedRewardInUSD);
+  financialsDailySnapshot.cumulativeSupplySideRevenueUSD = financialsDailySnapshot.cumulativeSupplySideRevenueUSD.plus(distributedRewardInUSD);
+  financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolRewardInUSD);
+  financialsDailySnapshot.cumulativeProtocolSideRevenueUSD = financialsDailySnapshot.cumulativeProtocolSideRevenueUSD.plus(protocolRewardInUSD);
+  financialsDailySnapshot.dailyTotalRevenueUSD = financialsDailySnapshot.dailyTotalRevenueUSD.plus(allDistributedRewardInUSD);
+  financialsDailySnapshot.cumulativeTotalRevenueUSD = financialsDailySnapshot.cumulativeTotalRevenueUSD.plus(allDistributedRewardInUSD);
 
-  financialsDailySnapshotEntity.save();
+  financialsDailySnapshot.save();
 }
