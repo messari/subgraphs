@@ -5,7 +5,6 @@ export const DEFUALT_AMOUNT: BigInt = BigInt.fromString("1000000000000000000")
 
 export const ZERO_BIGDECIMAL: BigDecimal = BigDecimal.fromString("0");
 export const ZERO_BIGINT: BigInt = BigInt.fromString("0");
-// @ts-ignore
 export const ZERO_INT: i32 = 0;
 
 export const ZERO_ADDRESS: Address =  Address.fromString("0x0000000000000000000000000000000000000000");
