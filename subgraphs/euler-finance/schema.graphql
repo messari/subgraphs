@@ -1067,4 +1067,10 @@ type _AssetStatus @entity {
   interestRate: BigInt!
   "last timestamp"
   timestamp: BigInt!
+  " address/id of eToken"
+  eToken: Token
+  " address/id of dToken"
+  dToken: Token
+  " address/id of pToken"
+  pToken: Token
 }

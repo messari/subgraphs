@@ -16,6 +16,7 @@ import {
   getSnapshotRates,
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
+  getOrCreateAssetStatus,
 } from "../common/getters";
 import {
   BIGDECIMAL_ONE,
@@ -41,13 +42,14 @@ import { ActivityType, SECONDS_PER_HOUR, TransactionType } from "../common/const
 
 export function createBorrow(event: Borrow): BigDecimal {
   const borrow = getOrCreateBorrow(event);
-  const marketId = event.params.underlying.toHexString();
-  const tokenId = event.params.underlying.toHexString();
+  const underlying = event.params.underlying.toHexString();
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
   const accountAddress = event.params.account.toHexString();
 
   const underlyingToken = getOrCreateToken(event.params.underlying);
   borrow.market = marketId;
-  borrow.asset = tokenId;
+  borrow.asset = underlying;
   borrow.from = marketId;
   borrow.to = accountAddress;
   borrow.amount = bigIntChangeDecimals(event.params.amount, DEFAULT_DECIMALS, underlyingToken.decimals);
@@ -55,7 +57,7 @@ export function createBorrow(event: Borrow): BigDecimal {
   // catch CRYPTEX outlier price at block 15358330
   // see transaction: https://etherscan.io/tx/0x77885d38a6c496fdc39675f57185ab8bb11e8d1f14eb9f4a536fc1c4d24d84d2
   if (
-    marketId.toLowerCase() == CRYPTEX_MARKET_ID.toLowerCase() &&
+    underlying.toLowerCase() == CRYPTEX_MARKET_ID.toLowerCase() &&
     event.block.number.equals(BigInt.fromI32(15358330))
   ) {
     // this is the price of CTX on August 17, 2022 at 11AM UTC-0
@@ -83,13 +85,14 @@ export function createBorrow(event: Borrow): BigDecimal {
 
 export function createDeposit(event: Deposit): BigDecimal {
   const deposit = getOrCreateDeposit(event);
-  const marketId = event.params.underlying.toHexString();
-  const tokenId = event.params.underlying.toHexString();
+  const underlying = event.params.underlying.toHexString();
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
   const accountAddress = event.params.account;
 
   const underlyingToken = getOrCreateToken(event.params.underlying);
   deposit.market = marketId;
-  deposit.asset = tokenId;
+  deposit.asset = underlying;
   deposit.from = accountAddress.toHexString();
   deposit.to = marketId;
   deposit.amount = bigIntChangeDecimals(event.params.amount, DEFAULT_DECIMALS, underlyingToken.decimals);
@@ -112,14 +115,15 @@ export function createDeposit(event: Deposit): BigDecimal {
 
 export function createRepay(event: Repay): BigDecimal {
   const repay = getOrCreateRepay(event);
-  const marketId = event.params.underlying.toHexString();
-  const market = getOrCreateMarket(marketId);
-  const tokenId = event.params.underlying.toHexString();
+  const underlying = event.params.underlying.toHexString();
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
   const accountAddress = event.params.account;
+  const market = getOrCreateMarket(marketId);
 
   const underlyingToken = getOrCreateToken(event.params.underlying);
   repay.market = marketId;
-  repay.asset = tokenId;
+  repay.asset = underlying;
   repay.from = accountAddress.toHexString();
   repay.to = marketId;
   repay.amount = bigIntChangeDecimals(event.params.amount, DEFAULT_DECIMALS, underlyingToken.decimals);
@@ -133,13 +137,14 @@ export function createRepay(event: Repay): BigDecimal {
 
 export function createWithdraw(event: Withdraw): BigDecimal {
   const withdraw = getOrCreateWithdraw(event);
-  const marketId = event.params.underlying.toHexString();
-  const tokenId = event.params.underlying.toHexString();
+  const underlying = event.params.underlying.toHexString();
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
   const accountAddress = event.params.account;
 
   const underlyingToken = getOrCreateToken(event.params.underlying);
   withdraw.market = marketId;
-  withdraw.asset = tokenId;
+  withdraw.asset = underlying;
   withdraw.from = marketId;
   withdraw.to = accountAddress.toHexString();
   withdraw.amount = bigIntChangeDecimals(event.params.amount, DEFAULT_DECIMALS, underlyingToken.decimals);
@@ -157,12 +162,14 @@ export function createLiquidation(event: Liquidation): BigDecimal {
   const underlyingTokenId = event.params.underlying.toHexString();
   const seizedTokenId = event.params.collateral.toHexString();
 
-  const underlyingToken = getOrCreateToken(Address.fromString(underlyingTokenId));
-  const seizedToken = getOrCreateToken(Address.fromString(seizedTokenId));
+  const underlyingToken = getOrCreateToken(event.params.underlying);
+  const seizedToken = getOrCreateToken(event.params.collateral);
 
   // repay token market
-  const market = getOrCreateMarket(underlyingTokenId);
-  const collateralMarket = getOrCreateMarket(seizedTokenId);
+  const underlyingAssetStatus = getOrCreateAssetStatus(underlyingTokenId);
+  const collateralAssetStatus = getOrCreateAssetStatus(seizedTokenId);
+  const market = getOrCreateMarket(underlyingAssetStatus.eToken!);
+  const collateralMarket = getOrCreateMarket(collateralAssetStatus.eToken!);
 
   liquidation.market = collateralMarket.id;
   liquidation.asset = underlyingTokenId;
@@ -170,7 +177,7 @@ export function createLiquidation(event: Liquidation): BigDecimal {
   liquidation.to = market.id; // Market that tokens are repaid to
   liquidation.liquidatee = event.params.violator.toHexString();
   // Amount of collateral liquidated in native units (schema definition)
-  // Amount is denominated in collateral //TODO: verify
+  // Amount is denominated in collateral
   liquidation.amount = bigIntChangeDecimals(event.params._yield, DEFAULT_DECIMALS, seizedToken.decimals);
   liquidation.amountUSD = bigIntToBDUseDecimals(liquidation.amount, seizedToken.decimals).times(
     seizedToken.lastPriceUSD!,
@@ -180,6 +187,8 @@ export function createLiquidation(event: Liquidation): BigDecimal {
     underlyingToken.lastPriceUSD!,
   );
   liquidation.profitUSD = liquidation.amountUSD.minus(repayUSD);
+  liquidation.save();
+
   log.info("[createLiquidation]seizedToken={}/{},amount={},price={},amountUSD={},blk={},tx={}", [
     seizedToken.name,
     seizedTokenId,
@@ -195,7 +204,6 @@ export function createLiquidation(event: Liquidation): BigDecimal {
   const protocol = getOrCreateLendingProtocol();
   protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidation.amountUSD);
   protocol.save();
-  liquidation.save();
 
   return liquidation.amountUSD;
 }
@@ -241,14 +249,14 @@ export function updatePrices(execProxyAddress: Address, market: Market, event: e
   eToken.lastPriceBlockNumber = blockNumber;
   eToken.save();
 
-  if (market._dToken && market._dTokenExchangeRate) {
+  if (market._dToken && market._dTokenExchangeRate!.gt(BIGDECIMAL_ZERO)) {
     const dToken = getOrCreateToken(Address.fromString(market._dToken!));
     dToken.lastPriceUSD = underlyingPriceUSD.div(market._dTokenExchangeRate!);
     dToken.lastPriceBlockNumber = blockNumber;
     dToken.save();
   }
 
-  log.info("[updatePrices]tx={},block={},token={}/{},currPriceUSD={}", [
+  log.debug("[updatePrices]tx={},block={},token={}/{},currPriceUSD={}", [
     event.transaction.hash.toHexString(),
     blockNumber.toString(),
     token.name,
@@ -273,12 +281,11 @@ export function updateInterestRates(
   const borrowAPY = bigDecimalExponential(borrowSPY.divDecimal(INTEREST_RATE_DECIMALS), SECONDS_PER_YEAR).minus(
     BIGDECIMAL_ONE,
   );
-  const supplyRevenueShare = BIGDECIMAL_ONE.minus(reserveFee.divDecimal(RESERVE_FEE_SCALE));
-  // TODO: verify totalBorrows and totalBalances are correct here
+  const supplySideShare = BIGDECIMAL_ONE.minus(reserveFee.divDecimal(RESERVE_FEE_SCALE));
   const supplySPY = interestRate
     .times(totalBorrows)
     .toBigDecimal()
-    .times(supplyRevenueShare)
+    .times(supplySideShare)
     .div(totalBalances.toBigDecimal());
   const supplyAPY = bigDecimalExponential(supplySPY.div(INTEREST_RATE_DECIMALS), SECONDS_PER_YEAR).minus(
     BIGDECIMAL_ONE,
@@ -475,7 +482,7 @@ export function snapshotFinancials(
 export function updateUsageMetrics(event: ethereum.Event, from: Address, transaction: string): void {
   // Number of days since Unix epoch
   const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  const hour: i64 = (event.block.timestamp.toI64() - id * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
+  const hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   const dailyMetrics = getOrCreateUsageDailySnapshot(event);
   const hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
 

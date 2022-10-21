@@ -42,18 +42,17 @@ import { GovConvertReserves, GovSetReserveFee } from "../../generated/euler/Exec
 import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
 
 export function handleAssetStatus(event: AssetStatus): void {
-  const underlying = event.params.underlying;
-  const marketId = underlying.toHexString();
-  //const block = event.block;
+  const underlying = event.params.underlying.toHexString();
   const totalBorrows = event.params.totalBorrows; //== dToken totalSupply
   const totalBalances = event.params.totalBalances; //== eToken totalSupply
   const reserveBalance = event.params.reserveBalance;
   const poolSize = event.params.poolSize;
   const interestRate = event.params.interestRate;
 
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
   const protocol = getOrCreateLendingProtocol();
   const market = getOrCreateMarket(marketId);
-  const assetStatus = getOrCreateAssetStatus(marketId);
   const token = Token.load(marketId)!;
 
   const totalBorrowBalance = bigIntChangeDecimals(totalBorrows, DEFAULT_DECIMALS, token.decimals);
@@ -80,7 +79,9 @@ export function handleAssetStatus(event: AssetStatus): void {
       );
     }
   }
+
   market.save();
+
   if (interestRate.notEqual(assetStatus.interestRate)) {
     // update interest rates if `interestRate` or `reserveFee` changed
     updateInterestRates(market, interestRate, assetStatus.reserveFee, totalBorrows, totalBalances, event);
@@ -123,12 +124,12 @@ export function handleAssetStatus(event: AssetStatus): void {
     log.debug(
       "[handleAssetStatus]market={}/{},block={},totalBorrowBalanceUSD={},totalDepositBalanceUSD={},exchangeRate={},PriceUSD={}",
       [
-        market.name!,
-        market.id,
+        mrkt.name!,
+        mrkt.id,
         event.block.number.toString(),
         mrkt.totalBorrowBalanceUSD.toString(),
         mrkt.totalDepositBalanceUSD.toString(),
-        market.exchangeRate!.toString(),
+        mrkt.exchangeRate!.toString(),
         underlyingPriceUSD.toString(),
       ],
     );
@@ -160,7 +161,9 @@ export function handleAssetStatus(event: AssetStatus): void {
 
 export function handleBorrow(event: Borrow): void {
   const borrowUSD = createBorrow(event);
-  const marketId = event.params.underlying.toHexString();
+  const underlying = event.params.underlying.toHexString();
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
   updateUsageMetrics(event, event.params.account, TransactionType.BORROW);
   snapshotMarket(event.block, marketId, borrowUSD, TransactionType.BORROW);
   snapshotFinancials(event.block, borrowUSD, TransactionType.BORROW);
@@ -168,7 +171,9 @@ export function handleBorrow(event: Borrow): void {
 
 export function handleDeposit(event: Deposit): void {
   const depositUSD = createDeposit(event);
-  const marketId = event.params.underlying.toHexString();
+  const underlying = event.params.underlying.toHexString();
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
   updateUsageMetrics(event, event.params.account, TransactionType.DEPOSIT);
   snapshotMarket(event.block, marketId, depositUSD, TransactionType.DEPOSIT);
   snapshotFinancials(event.block, depositUSD, TransactionType.DEPOSIT);
@@ -176,7 +181,9 @@ export function handleDeposit(event: Deposit): void {
 
 export function handleRepay(event: Repay): void {
   const repayUSD = createRepay(event);
-  const marketId = event.params.underlying.toHexString();
+  const underlying = event.params.underlying.toHexString();
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
   updateUsageMetrics(event, event.params.account, TransactionType.REPAY);
   snapshotMarket(event.block, marketId, repayUSD, TransactionType.REPAY);
   snapshotFinancials(event.block, repayUSD, TransactionType.REPAY);
@@ -184,7 +191,9 @@ export function handleRepay(event: Repay): void {
 
 export function handleWithdraw(event: Withdraw): void {
   const withdrawUSD = createWithdraw(event);
-  const marketId = event.params.underlying.toHexString();
+  const underlying = event.params.underlying.toHexString();
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
   updateUsageMetrics(event, event.params.account, TransactionType.WITHDRAW);
   snapshotMarket(event.block, marketId, withdrawUSD, TransactionType.WITHDRAW);
   snapshotFinancials(event.block, withdrawUSD, TransactionType.WITHDRAW);
@@ -192,7 +201,9 @@ export function handleWithdraw(event: Withdraw): void {
 
 export function handleLiquidation(event: Liquidation): void {
   const liquidateUSD = createLiquidation(event);
-  const marketId = event.params.underlying.toHexString();
+  const underlying = event.params.underlying.toHexString();
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const marketId = assetStatus.eToken!;
   updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
   snapshotMarket(event.block, marketId, liquidateUSD, TransactionType.LIQUIDATE);
   snapshotFinancials(event.block, liquidateUSD, TransactionType.LIQUIDATE);
@@ -212,7 +223,9 @@ export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
    * maximumLTV = collateralFactor
    * liquidationThreshold = borrowFactor
    */
-  const market = getOrCreateMarket(event.params.underlying.toHexString());
+  const underlying = event.params.underlying.toHexString();
+  const assetStatus = getOrCreateAssetStatus(underlying);
+  const market = getOrCreateMarket(assetStatus.eToken!);
   market.maximumLTV = event.params.newConfig.collateralFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE);
   market.liquidationThreshold = event.params.newConfig.borrowFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE);
   if (market.maximumLTV.gt(BIGDECIMAL_ZERO)) {
@@ -222,8 +235,11 @@ export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
 }
 
 export function handleMarketActivated(event: MarketActivated): void {
-  const market = getOrCreateMarket(event.params.underlying.toHexString());
+  const underlyingToken = getOrCreateToken(event.params.underlying);
+  const eToken = getOrCreateToken(event.params.eToken);
+  const dToken = getOrCreateToken(event.params.dToken);
 
+  const market = getOrCreateMarket(eToken.id);
   market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
 
@@ -235,17 +251,17 @@ export function handleMarketActivated(event: MarketActivated): void {
   market.canUseAsCollateral = false; //initial collateralFactor=0, reset in handleGovSetAssetConfig
   market.canBorrowFrom = true;
 
-  const underlyingToken = getOrCreateToken(event.params.underlying);
-  const eToken = getOrCreateToken(event.params.eToken);
-  const dToken = getOrCreateToken(event.params.dToken);
-
-  market.name = underlyingToken.symbol; //TODO -> eToken.name
+  market.name = eToken.name;
   market.inputToken = underlyingToken.id;
   market.outputToken = eToken.id;
   market._dToken = dToken.id;
   market.save();
 
   //TODO: pToken?
+  const assetStatus = getOrCreateAssetStatus(underlyingToken.id);
+  assetStatus.eToken = eToken.id;
+  assetStatus.dToken = dToken.id;
+  assetStatus.save();
 }
 
 export function handleGovConvertReserves(event: GovConvertReserves): void {
@@ -260,7 +276,7 @@ export function handleGovSetReserveFee(event: GovSetReserveFee): void {
   assetStatus.reserveFee = event.params.newReserveFee;
   assetStatus.save();
   //need to update supplier interest rate when reserve fee changes
-  const market = getOrCreateMarket(underlying);
+  const market = getOrCreateMarket(assetStatus.eToken!);
   updateInterestRates(
     market,
     assetStatus.interestRate,
