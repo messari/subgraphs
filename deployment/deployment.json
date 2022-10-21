@@ -4712,6 +4712,35 @@
       }
     }
   },
+  "ampleforth-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "ampleforth-governance",
+    "deployments": {
+      "ampleforth-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "ampleforth-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "ampleforth-governance",
+            "query-id": "ampleforth-governance"
+          }
+        }
+      }
+    }
+  },
   "radicle-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
