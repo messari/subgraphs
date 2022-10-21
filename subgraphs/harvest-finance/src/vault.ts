@@ -64,6 +64,7 @@ export function handleWithdraw(event: WithdrawEvent): void {
   metrics.updateFinancials(event.block)
   metrics.updateUsageMetrics(event.block, event.transaction.from)
   metrics.updateVaultSnapshots(vaultAddress, event.block)
+  metrics.updateMetricsAfterWithdraw(event.block)
 }
 
 export function handleDeposit(event: DepositEvent): void {
@@ -118,6 +119,7 @@ export function handleDeposit(event: DepositEvent): void {
   metrics.updateFinancials(event.block)
   metrics.updateUsageMetrics(event.block, event.transaction.from)
   metrics.updateVaultSnapshots(vaultAddress, event.block)
+  metrics.updateMetricsAfterDeposit(event.block)
 }
 
 function handleMint(event: TransferEvent): void {

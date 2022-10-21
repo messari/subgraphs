@@ -57,11 +57,14 @@ export namespace vaults {
   export function initialize(id: string): Vault {
     const vault = new Vault(id)
 
+    vault.protocol = ''
     vault.name = ''
     vault.symbol = ''
     vault.inputToken = ''
     vault.outputToken = ''
+    vault.rewardTokens = []
     vault.depositLimit = constants.BIG_INT_ZERO
+    vault.fees = []
     vault.createdTimestamp = constants.BIG_INT_ZERO
     vault.createdBlockNumber = constants.BIG_INT_ZERO
     vault.totalValueLockedUSD = constants.BIG_DECIMAL_ZERO
@@ -70,7 +73,8 @@ export namespace vaults {
     vault.outputTokenPriceUSD = constants.BIG_DECIMAL_ZERO
     vault.pricePerShare = constants.BIG_DECIMAL_ZERO
     vault.stakedOutputTokenAmount = constants.BIG_INT_ZERO
-    vault.protocol = ''
+    vault.rewardTokenEmissionsAmount = [constants.BIG_INT_ZERO]
+    vault.rewardTokenEmissionsUSD = [constants.BIG_DECIMAL_ZERO]
     vault.cumulativeSupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO
     vault.cumulativeProtocolSideRevenueUSD = constants.BIG_DECIMAL_ZERO
     vault.cumulativeTotalRevenueUSD = constants.BIG_DECIMAL_ZERO

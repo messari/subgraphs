@@ -1,6 +1,14 @@
-import { Address, ethereum, BigInt, BigDecimal } from '@graphprotocol/graph-ts'
+import {
+  Address,
+  ethereum,
+  BigInt,
+  BigDecimal,
+  Bytes,
+} from '@graphprotocol/graph-ts'
 import { createMockedFunction, newMockCall, assert } from 'matchstick-as'
 import { AddVaultAndStrategyCall } from '../generated/Controller/ControllerContract'
+import { constants } from '../src/utils/constants'
+import { toStringArray } from './utils/helpers'
 
 export function mockCall(
   vault: Address,
@@ -144,7 +152,8 @@ export function assertVault(
   createdBlockNumber: BigInt,
   totalValueLockedUSD: BigDecimal,
   inputTokenBalance: BigInt,
-  protocol: string
+  protocol: string,
+  fees: string
 ): void {
   assertERC20('Vault', address, name, symbol, null)
   assert.fieldEquals(
@@ -190,6 +199,15 @@ export function assertVault(
     inputTokenBalance.toString()
   )
   assert.fieldEquals('Vault', address.toHexString(), 'protocol', protocol)
+
+  let feesArray: string[] = []
+  feesArray.push(fees)
+  assert.fieldEquals(
+    'Vault',
+    address.toHexString(),
+    'fees',
+    toStringArray(feesArray)
+  )
 }
 
 export function assertProtocol(

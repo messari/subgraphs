@@ -3,6 +3,7 @@ import { afterEach, assert, clearStore, describe, test } from 'matchstick-as'
 import {
   assertDeposit,
   assertVaultDailySnapshot,
+  assertUsageMetricsDailySnapshot,
   assertWithdraw,
   createDepositEvent,
   createTransferEvent,
@@ -16,6 +17,7 @@ import { deposits } from '../src/utils/deposits'
 import { withdraws } from '../src/utils/withdraws'
 import { tokens } from '../src/utils/tokens'
 import { constants } from '../src/utils/constants'
+import { protocols } from '../src/utils/protocols'
 
 const vaultAddress = Address.fromString(
   '0x0000000000000000000000000000000000000001'
@@ -25,27 +27,28 @@ const inputTokenAddress = Address.fromString(
   '0x0000000000000000000000000000000000000002'
 )
 
+const protocolAddressString = '0x222412af183bceadefd72e4cb1b71f1889953b1c'
+
 function createVault(): Vault {
   const outputTokenAddress = Address.fromString(
     '0x0000000000000000000000000000000000000003'
   )
-  const protocolAddress = Address.fromString(
-    '0x0000000000000000000000000000000000000004'
-  )
 
   const vault = vaults.initialize(vaultAddress.toHexString())
+  const protocol = protocols.initialize(protocolAddressString)
 
   vault.name = 'FARM_USDC'
   vault.symbol = 'fUSDC'
   vault.inputToken = inputTokenAddress.toHexString()
   vault.outputToken = outputTokenAddress.toHexString()
-  vault.protocol = protocolAddress.toHexString()
+  vault.protocol = protocolAddressString
 
   const feeId = 'DEPOSIT-'.concat(vaultAddress.toHexString())
 
   vault.fees = [feeId]
 
   vault.save()
+  protocol.save()
 
   return vault
 }
@@ -148,34 +151,74 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromI32(100)
-      const event = createDepositEvent(amount, beneficiaryAddress)
-      event.address = Address.fromString(vault.id)
-      event.transaction.from = fromAddress
-      handleDeposit(event)
 
-      const vaultStore = Vault.load(vault.id)!
+      // 1st deposit
+      const event0 = createDepositEvent(amount, beneficiaryAddress)
+      event0.address = Address.fromString(vault.id)
+      event0.transaction.from = fromAddress
+      handleDeposit(event0)
 
-      // Review
-      const vaultDailySnapshotId = vaultAddress
+      const vaultStore0 = Vault.load(vault.id)!
+
+      // 1st Deposit Snapshot
+      const vaultDailySnapshotId0 = vaultAddress
         .toHexString()
         .concat('-')
         .concat(
-          (event.block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString()
+          (
+            event0.block.timestamp.toI64() / constants.SECONDS_PER_DAY
+          ).toString()
         )
 
-      assertVaultDailySnapshot(vaultDailySnapshotId, {
+      assertVaultDailySnapshot(vaultDailySnapshotId0, {
         protocol: constants.PROTOCOL_ID.toHexString(),
         vault: vaultAddress,
-        totalValueLockedUSD: vaultStore.totalValueLockedUSD,
-        inputTokenBalance: vaultStore.inputTokenBalance,
-        outputTokenSupply: vaultStore.outputTokenSupply!,
-        outputTokenPriceUSD: vaultStore.outputTokenPriceUSD!,
-        pricePerShare: vaultStore.pricePerShare!,
-        stakedOutputTokenAmount: vaultStore.stakedOutputTokenAmount!,
-        rewardTokenEmissionsAmount: vaultStore.rewardTokenEmissionsAmount,
-        rewardTokenEmissionsUSD: vaultStore.rewardTokenEmissionsUSD,
-        blockNumber: event.block.number,
-        timestamp: event.block.timestamp,
+        totalValueLockedUSD: vaultStore0.totalValueLockedUSD,
+        inputTokenBalance: vaultStore0.inputTokenBalance,
+        outputTokenSupply: vaultStore0.outputTokenSupply!,
+        outputTokenPriceUSD: vaultStore0.outputTokenPriceUSD!,
+        pricePerShare: vaultStore0.pricePerShare!,
+        stakedOutputTokenAmount: vaultStore0.stakedOutputTokenAmount!,
+        rewardTokenEmissionsAmount: vaultStore0.rewardTokenEmissionsAmount,
+        rewardTokenEmissionsUSD: vaultStore0.rewardTokenEmissionsUSD,
+        blockNumber: event0.block.number,
+        timestamp: event0.block.timestamp,
+      })
+
+      // 2nd deposit on different day. Should create new snapshot
+      const event1 = createDepositEvent(amount, beneficiaryAddress)
+      event1.address = Address.fromString(vault.id)
+      event1.transaction.from = fromAddress
+      event1.block.timestamp = event1.block.timestamp.plus(
+        BigInt.fromI32(constants.SECONDS_PER_DAY + constants.SECONDS_PER_HOUR) // 1 day + 1 hour
+      )
+      handleDeposit(event1)
+
+      const vaultStore1 = Vault.load(vault.id)!
+
+      // 2nd Deposit Snapshot
+      const vaultDailySnapshotId1 = vaultAddress
+        .toHexString()
+        .concat('-')
+        .concat(
+          (
+            event1.block.timestamp.toI64() / constants.SECONDS_PER_DAY
+          ).toString()
+        )
+
+      assertVaultDailySnapshot(vaultDailySnapshotId1, {
+        protocol: constants.PROTOCOL_ID.toHexString(),
+        vault: vaultAddress,
+        totalValueLockedUSD: vaultStore1.totalValueLockedUSD,
+        inputTokenBalance: vaultStore1.inputTokenBalance,
+        outputTokenSupply: vaultStore1.outputTokenSupply!,
+        outputTokenPriceUSD: vaultStore1.outputTokenPriceUSD!,
+        pricePerShare: vaultStore1.pricePerShare!,
+        stakedOutputTokenAmount: vaultStore1.stakedOutputTokenAmount!,
+        rewardTokenEmissionsAmount: vaultStore1.rewardTokenEmissionsAmount,
+        rewardTokenEmissionsUSD: vaultStore1.rewardTokenEmissionsUSD,
+        blockNumber: event1.block.number,
+        timestamp: event1.block.timestamp,
       })
     })
   })
@@ -267,6 +310,91 @@ describe('Vault', () => {
       assert.fieldEquals('Token', token.id, 'lastPriceUSD', '0.99975399')
       assert.fieldEquals('Vault', vault.id, 'totalValueLockedUSD', '59.9852394')
     })
+
+    test('updates VaultSnapshots', () => {
+      // Vault is created with 1000 inputTokenBalance
+      const vault = createVault()
+      vault.inputTokenBalance = BigInt.fromI32(1000)
+      vault.save()
+
+      const fromAddress = Address.fromString(
+        '0x0000000000000000000000000000000000000010'
+      )
+
+      const beneficiaryAddress = Address.fromString(
+        '0x0000000000000000000000000000000000000009'
+      )
+      const amount = BigInt.fromI32(100)
+
+      // 1st withdraw
+      const event0 = createWithdrawEvent(amount, beneficiaryAddress)
+      event0.address = Address.fromString(vault.id)
+      event0.transaction.from = fromAddress
+      handleWithdraw(event0)
+
+      const vaultStore0 = Vault.load(vault.id)!
+
+      // 1st Deposit Snapshot
+      const vaultDailySnapshotId0 = vaultAddress
+        .toHexString()
+        .concat('-')
+        .concat(
+          (
+            event0.block.timestamp.toI64() / constants.SECONDS_PER_DAY
+          ).toString()
+        )
+
+      assertVaultDailySnapshot(vaultDailySnapshotId0, {
+        protocol: constants.PROTOCOL_ID.toHexString(),
+        vault: vaultAddress,
+        totalValueLockedUSD: vaultStore0.totalValueLockedUSD,
+        inputTokenBalance: vaultStore0.inputTokenBalance,
+        outputTokenSupply: vaultStore0.outputTokenSupply!,
+        outputTokenPriceUSD: vaultStore0.outputTokenPriceUSD!,
+        pricePerShare: vaultStore0.pricePerShare!,
+        stakedOutputTokenAmount: vaultStore0.stakedOutputTokenAmount!,
+        rewardTokenEmissionsAmount: vaultStore0.rewardTokenEmissionsAmount,
+        rewardTokenEmissionsUSD: vaultStore0.rewardTokenEmissionsUSD,
+        blockNumber: event0.block.number,
+        timestamp: event0.block.timestamp,
+      })
+
+      // 2nd withdraw on different day. Should create new snapshot
+      const event1 = createWithdrawEvent(amount, beneficiaryAddress)
+      event1.address = Address.fromString(vault.id)
+      event1.transaction.from = fromAddress
+      event1.block.timestamp = event1.block.timestamp.plus(
+        BigInt.fromI32(constants.SECONDS_PER_DAY + constants.SECONDS_PER_HOUR) // 1 day + 1 hour
+      )
+      handleWithdraw(event1)
+
+      const vaultStore1 = Vault.load(vault.id)!
+
+      // 2nd Withdraw Snapshot
+      const vaultDailySnapshotId1 = vaultAddress
+        .toHexString()
+        .concat('-')
+        .concat(
+          (
+            event1.block.timestamp.toI64() / constants.SECONDS_PER_DAY
+          ).toString()
+        )
+
+      assertVaultDailySnapshot(vaultDailySnapshotId1, {
+        protocol: constants.PROTOCOL_ID.toHexString(),
+        vault: vaultAddress,
+        totalValueLockedUSD: vaultStore1.totalValueLockedUSD,
+        inputTokenBalance: vaultStore1.inputTokenBalance,
+        outputTokenSupply: vaultStore1.outputTokenSupply!,
+        outputTokenPriceUSD: vaultStore1.outputTokenPriceUSD!,
+        pricePerShare: vaultStore1.pricePerShare!,
+        stakedOutputTokenAmount: vaultStore1.stakedOutputTokenAmount!,
+        rewardTokenEmissionsAmount: vaultStore1.rewardTokenEmissionsAmount,
+        rewardTokenEmissionsUSD: vaultStore1.rewardTokenEmissionsUSD,
+        blockNumber: event1.block.number,
+        timestamp: event1.block.timestamp,
+      })
+    })
   })
 
   describe('handleTransfer', () => {
@@ -293,6 +421,128 @@ describe('Vault', () => {
           'outputTokenSupply',
           amount.toString()
         )
+      })
+    })
+  })
+  describe('usageMetrics', () => {
+    test('update usage metrics', () => {
+      const vault = createVault()
+
+      const fromAddress = Address.fromString(
+        '0x0000000000000000000000000000000000000010'
+      )
+
+      const fromAddress1 = Address.fromString(
+        '0x0000000000000000000000000000000000000110'
+      )
+
+      const beneficiaryAddress = Address.fromString(
+        '0x0000000000000000000000000000000000000009'
+      )
+      const amount = BigInt.fromI32(100)
+
+      let dailyTxCount = 0
+      let depositCount = 0
+      let withdrawCount = 0
+
+      // 1st deposit
+      const event0 = createDepositEvent(amount, beneficiaryAddress)
+      dailyTxCount++
+      depositCount++
+      event0.address = Address.fromString(vault.id)
+      event0.transaction.from = fromAddress
+      handleDeposit(event0)
+
+      const usageMetricDailySnapshotId0 = (
+        event0.block.timestamp.toI64() / constants.SECONDS_PER_DAY
+      ).toString()
+
+      assertUsageMetricsDailySnapshot(usageMetricDailySnapshotId0, {
+        protocol: protocolAddressString,
+        activeUsers: 1,
+        cumulativeUniqueUsers: 1,
+        transactionCount: dailyTxCount,
+        depositCount: depositCount,
+        withdrawCount: 0,
+        totalPoolCount: 0,
+        blockNumber: event0.block.number,
+        timestamp: event0.block.timestamp,
+      })
+
+      // 1st withdraw
+      const event1 = createWithdrawEvent(amount, beneficiaryAddress)
+      dailyTxCount++
+      withdrawCount++
+      event1.address = Address.fromString(vault.id)
+      event1.transaction.from = fromAddress
+      handleWithdraw(event1)
+
+      assertUsageMetricsDailySnapshot(usageMetricDailySnapshotId0, {
+        protocol: protocolAddressString,
+        activeUsers: 1,
+        cumulativeUniqueUsers: 1,
+        transactionCount: dailyTxCount,
+        depositCount: depositCount,
+        withdrawCount: withdrawCount,
+        totalPoolCount: 0,
+        blockNumber: event1.block.number,
+        timestamp: event1.block.timestamp,
+      })
+
+      //Reset daily counters
+      dailyTxCount = 0
+      depositCount = 0
+      withdrawCount = 0
+
+      // New Day
+      // 2nd deposit. Should create new snapshot
+      const event2 = createDepositEvent(amount, beneficiaryAddress)
+      dailyTxCount++
+      depositCount++
+      event2.address = Address.fromString(vault.id)
+      event2.transaction.from = fromAddress
+      event2.block.timestamp = event2.block.timestamp.plus(
+        BigInt.fromI32(constants.SECONDS_PER_DAY + constants.SECONDS_PER_HOUR) // 1 day + 1 hour
+      )
+      handleDeposit(event2)
+
+      const usageMetricDailySnapshotId1 = (
+        event2.block.timestamp.toI64() / constants.SECONDS_PER_DAY
+      ).toString()
+
+      assertUsageMetricsDailySnapshot(usageMetricDailySnapshotId1, {
+        protocol: protocolAddressString,
+        activeUsers: 1,
+        cumulativeUniqueUsers: 1,
+        transactionCount: dailyTxCount,
+        depositCount: depositCount,
+        withdrawCount: withdrawCount,
+        totalPoolCount: 0,
+        blockNumber: event2.block.number,
+        timestamp: event2.block.timestamp,
+      })
+
+      // 3rd deposit. Different user. Should increment active users
+      const event3 = createDepositEvent(amount, beneficiaryAddress)
+      dailyTxCount++
+      depositCount++
+      event3.address = Address.fromString(vault.id)
+      event3.transaction.from = fromAddress1
+      event3.block.timestamp = event3.block.timestamp.plus(
+        BigInt.fromI32(constants.SECONDS_PER_DAY + constants.SECONDS_PER_HOUR) // 1 day + 1 hour
+      )
+      handleDeposit(event3)
+
+      assertUsageMetricsDailySnapshot(usageMetricDailySnapshotId1, {
+        protocol: protocolAddressString,
+        activeUsers: 2,
+        cumulativeUniqueUsers: 2,
+        transactionCount: dailyTxCount,
+        depositCount: depositCount,
+        withdrawCount: withdrawCount,
+        totalPoolCount: 0,
+        blockNumber: event3.block.number,
+        timestamp: event3.block.timestamp,
       })
     })
   })

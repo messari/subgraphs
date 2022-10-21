@@ -299,3 +299,83 @@ export function assertVaultDailySnapshot(
     attributes.timestamp.toString()
   )
 }
+
+class AssertUsageMetricsSnapshotAttributes {
+  protocol: string
+  activeUsers: i32
+  cumulativeUniqueUsers: i32
+  transactionCount: i32
+  depositCount: i32
+  withdrawCount: i32
+  totalPoolCount: i32
+  blockNumber: BigInt
+  timestamp: BigInt
+}
+
+export function assertUsageMetricsDailySnapshot(
+  id: string,
+  attributes: AssertUsageMetricsSnapshotAttributes
+): void {
+  assert.fieldEquals(
+    'UsageMetricsDailySnapshot',
+    id,
+    'protocol',
+    attributes.protocol
+  )
+
+  assert.fieldEquals(
+    'UsageMetricsDailySnapshot',
+    id,
+    'dailyActiveUsers',
+    attributes.activeUsers.toString()
+  )
+
+  assert.fieldEquals(
+    'UsageMetricsDailySnapshot',
+    id,
+    'cumulativeUniqueUsers',
+    attributes.cumulativeUniqueUsers.toString()
+  )
+
+  assert.fieldEquals(
+    'UsageMetricsDailySnapshot',
+    id,
+    'dailyTransactionCount',
+    attributes.transactionCount.toString()
+  )
+
+  assert.fieldEquals(
+    'UsageMetricsDailySnapshot',
+    id,
+    'dailyDepositCount',
+    attributes.depositCount.toString()
+  )
+
+  assert.fieldEquals(
+    'UsageMetricsDailySnapshot',
+    id,
+    'dailyWithdrawCount',
+    attributes.withdrawCount.toString()
+  )
+
+  assert.fieldEquals(
+    'UsageMetricsDailySnapshot',
+    id,
+    'totalPoolCount',
+    attributes.totalPoolCount.toString()
+  )
+
+  assert.fieldEquals(
+    'UsageMetricsDailySnapshot',
+    id,
+    'blockNumber',
+    attributes.blockNumber.toString()
+  )
+
+  assert.fieldEquals(
+    'UsageMetricsDailySnapshot',
+    id,
+    'timestamp',
+    attributes.timestamp.toString()
+  )
+}

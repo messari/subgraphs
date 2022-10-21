@@ -87,7 +87,10 @@ describe('Controller', () => {
         call.block.number,
         BigDecimal.fromString('0'),
         BigInt.fromI32(0),
-        constants.CONTROLLER_ADDRESS.toHexString()
+        constants.CONTROLLER_ADDRESS.toHexString(),
+        constants.FEE_TYPE_PERFORMANCE.concat('-').concat(
+          vaultAddress.toHexString()
+        )
       )
 
       // Input Token Assertions

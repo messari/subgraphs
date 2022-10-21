@@ -39,6 +39,8 @@ export namespace metrics {
       vaultSnapshots.dailyProtocolSideRevenueUSD = constants.BIG_DECIMAL_ZERO
       vaultSnapshots.cumulativeProtocolSideRevenueUSD =
         constants.BIG_DECIMAL_ZERO
+      vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIG_INT_ZERO]
+      vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIG_DECIMAL_ZERO]
 
       vaultSnapshots.dailyTotalRevenueUSD = constants.BIG_DECIMAL_ZERO
       vaultSnapshots.cumulativeTotalRevenueUSD = constants.BIG_DECIMAL_ZERO
@@ -71,6 +73,9 @@ export namespace metrics {
       vaultSnapshots.outputTokenSupply = constants.BIG_INT_ZERO
       vaultSnapshots.outputTokenPriceUSD = constants.BIG_DECIMAL_ZERO
       vaultSnapshots.pricePerShare = constants.BIG_DECIMAL_ZERO
+      vaultSnapshots.stakedOutputTokenAmount = constants.BIG_INT_ZERO
+      vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIG_INT_ZERO]
+      vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIG_DECIMAL_ZERO]
 
       vaultSnapshots.hourlySupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO
       vaultSnapshots.cumulativeSupplySideRevenueUSD = constants.BIG_DECIMAL_ZERO
@@ -240,6 +245,30 @@ export namespace metrics {
     usageMetricsHourly.save()
   }
 
+  export function updateMetricsAfterDeposit(block: ethereum.Block): void {
+    // Update hourly and daily deposit transaction count
+    const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block)
+    const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block)
+
+    metricsDailySnapshot.dailyDepositCount += 1
+    metricsHourlySnapshot.hourlyDepositCount += 1
+
+    metricsDailySnapshot.save()
+    metricsHourlySnapshot.save()
+  }
+
+  export function updateMetricsAfterWithdraw(block: ethereum.Block): void {
+    // Update hourly and daily deposit transaction count
+    const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block)
+    const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block)
+
+    metricsDailySnapshot.dailyWithdrawCount += 1
+    metricsHourlySnapshot.hourlyWithdrawCount += 1
+
+    metricsDailySnapshot.save()
+    metricsHourlySnapshot.save()
+  }
+
   export function updateFinancials(block: ethereum.Block): void {
     const protocol = YieldAggregator.load(constants.PROTOCOL_ID.toHexString())
 
@@ -291,6 +320,9 @@ export namespace metrics {
 
     vaultDailySnapshots.pricePerShare = vault.pricePerShare
     vaultHourlySnapshots.pricePerShare = vault.pricePerShare
+
+    vaultDailySnapshots.stakedOutputTokenAmount = vault.stakedOutputTokenAmount
+    vaultHourlySnapshots.stakedOutputTokenAmount = vault.stakedOutputTokenAmount
 
     vaultDailySnapshots.rewardTokenEmissionsAmount =
       vault.rewardTokenEmissionsAmount
