@@ -374,14 +374,7 @@ function ProtocolTabEntity({
               );
             }
             return (
-              <div key={elementId} id={elementId}>
-                <Box mt={3} mb={1}>
-                  <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-                    <Typography variant="h6">{field}</Typography>
-                  </CopyLinkToClipboard>
-                </Box>
-                <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataFields[field]} />
-              </div>
+              <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataFields[field]} />
             );
           })}
         </Grid>

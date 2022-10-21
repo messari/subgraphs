@@ -1,5 +1,5 @@
 {
-  "name": "opensea-v2-wyvern",
+  "name": "opensea",
   "license": "UNLICENSED",
   "scripts": {
     "format": "npx prettier --write .",
@@ -8,7 +8,6 @@
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ mrbrianhobo/opensea-v2-wyvern"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.31.0",
     "@graphprotocol/graph-ts": "0.27.0"
   },
   "devDependencies": {

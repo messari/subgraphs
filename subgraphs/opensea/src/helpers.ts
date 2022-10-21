@@ -5,9 +5,9 @@ import {
   Bytes,
   log,
 } from "@graphprotocol/graph-ts";
-import { ERC165 } from "../generated/OpenSeaV2/ERC165";
-import { NftMetadata } from "../generated/OpenSeaV2/NftMetadata";
-import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
+import { ERC165 } from "../generated/OpenSea/ERC165";
+import { NftMetadata } from "../generated/OpenSea/NftMetadata";
+import { AtomicMatch_Call } from "../generated/OpenSea/OpenSea";
 import {
   Collection,
   CollectionDailySnapshot,

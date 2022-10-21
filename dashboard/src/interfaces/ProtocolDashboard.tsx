@@ -28,7 +28,12 @@ const BackBanner = styled("div")`
   cursor: pointer;
 `;
 
-function ProtocolDashboard() {
+interface ProtocolProps {
+  protocolJSON: any;
+  getData: any;
+}
+
+function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
   const [searchParams] = useSearchParams();
   const subgraphParam = searchParams.get("endpoint") || "";
   const tabString = searchParams.get("tab") || "";
@@ -155,7 +160,7 @@ function ProtocolDashboard() {
   const queryMain = gql`
     ${graphQuery}
   `;
-  const [getData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId, protocolId }, client });
+  const [getMainQueryData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId, protocolId }, client });
 
   const [
     getFinancialsData,
@@ -329,6 +334,12 @@ function ProtocolDashboard() {
   };
 
   useEffect(() => {
+    if (Object.keys(protocolJSON).length === 0) {
+      getData();
+    }
+  })
+
+  useEffect(() => {
     if (
       pendingVersion?.indexingStatusForPendingVersion?.subgraph &&
       pendingVersion?.indexingStatusForPendingVersion?.health === "healthy"
@@ -349,13 +360,13 @@ function ProtocolDashboard() {
     // If the schema query request was successful, make the full data query
     if (protocolSchemaData?.protocols?.length > 0) {
       if (protocolIdToUse || protocolSchemaData?.protocols[0]?.id) {
-        getData();
+        getMainQueryData();
         getProtocolTableData();
       }
     }
     getPendingSubgraph();
     getFailedIndexingStatus();
-  }, [protocolSchemaData, getData, getProtocolTableData, getPendingSubgraph]);
+  }, [protocolSchemaData, getMainQueryData, getProtocolTableData, getPendingSubgraph]);
 
   useEffect(() => {
     if (protocolTableData && tabValue === "1") {
@@ -518,6 +529,14 @@ function ProtocolDashboard() {
       console.log("--------------------Error End---------------------------");
     }
   }, [error, protocolSchemaQueryError]);
+
+  let protocolKey = Object.keys(protocolJSON).find(x => subgraphName.includes(x))
+  let depoKey: any = "";
+  if (!!protocolKey) {
+    depoKey = Object.keys(protocolJSON[protocolKey].deployments).find(x => subgraphName.includes(x));
+  } else {
+    protocolKey = "";
+  }
 
   // errorRender is the element to be rendered to display the error
   let errorDisplayProps = null;
@@ -855,6 +874,7 @@ function ProtocolDashboard() {
         protocolId={protocolId}
         subgraphToQueryURL={subgraphToQuery.url}
         schemaVersion={schemaVersion}
+        versionsJSON={protocolJSON?.[protocolKey]?.deployments[depoKey]?.versions || {}}
       />
       {toggleVersion}
       {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (

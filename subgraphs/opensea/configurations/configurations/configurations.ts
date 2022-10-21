@@ -1,6 +1,6 @@
 import { log } from "@graphprotocol/graph-ts";
-import { OpenSeaV1Configurations } from "../../protocols/opensea-v1/deployments/opensea-v1-ethereum/configurations";
-import { OpenSeaV2Configurations } from "../../protocols/opensea-v2/deployments/opensea-v2-ethereum/configurations";
+import { OpenSeaV1EthereumConfigurations } from "../../protocols/opensea-v1/config/deployments/opensea-v1-ethereum/configurations";
+import { OpenSeaV2EthereumConfigurations } from "../../protocols/opensea-v2/config/deployments/opensea-v2-ethereum/configurations";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 
@@ -10,17 +10,17 @@ import { Deploy } from "./deploy";
 export function getNetworkConfigurations(deploy: i32): Configurations {
   switch (deploy) {
     case Deploy.OPENSEA_V1_ETHEREUM: {
-      return new OpenSeaV1Configurations();
+      return new OpenSeaV1EthereumConfigurations();
     }
     case Deploy.OPENSEA_V2_ETHEREUM: {
-      return new OpenSeaV2Configurations();
+      return new OpenSeaV2EthereumConfigurations();
     }
     default: {
       log.critical(
         "No configurations found for deployment protocol/network",
         []
       );
-      return new OpenSeaV2Configurations();
+      return new OpenSeaV2EthereumConfigurations();
     }
   }
 }
