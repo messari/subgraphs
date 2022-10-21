@@ -1062,7 +1062,7 @@
     "deployments": {
       "bastion-protocol-aurora": {
         "network": "aurora",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.1.6",
