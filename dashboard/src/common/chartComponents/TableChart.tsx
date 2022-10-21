@@ -65,7 +65,7 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
       return {
         id: i,
         date: dateColumn,
-        value: isNaN(Number(val.value)) ? returnVal : Number(val.value),
+        value: isNaN(Number(val.value)) || returnVal.includes('%') ? returnVal : Number(val.value),
       };
     });
 
