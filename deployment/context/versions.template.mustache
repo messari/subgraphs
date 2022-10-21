@@ -1,0 +1,18 @@
+import { Versions as VersionsInterface } from "../../../deployment/context/interface";
+
+export class VersionsClass implements VersionsInterface {
+  getSchemaVersion(): string {
+    return "{{ versions.schema }}";;
+  }
+
+  getSubgraphVersion(): string {
+    return "{{ versions.subgraph }}";;
+  }
+
+  getMethodologyVersion(): string {
+    return "{{ versions.methodology }}";;
+  }
+}
+
+
+export const Versions = new VersionsClass();

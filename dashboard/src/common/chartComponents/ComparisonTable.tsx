@@ -8,9 +8,10 @@ interface ComparisonTableProps {
   dataTable: any;
   isMonthly: boolean;
   setIsMonthly: any;
+  jpegDownloadHandler: any;
 }
 
-export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonthly }: ComparisonTableProps) => {
+export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonthly, jpegDownloadHandler }: ComparisonTableProps) => {
   if (dataTable) {
     const columns = [
       {
@@ -80,6 +81,7 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
       <Box sx={{ height: "100%" }}>
         <Box>
           <Button onClick={() => setIsMonthly((prev: boolean) => !prev)}>View {isMonthly ? "daily" : "monthly"}</Button>
+          <Button onClick={() => jpegDownloadHandler()}>Save Chart</Button>
         </Box>
         <DataGrid
           sx={{ textOverflow: "clip" }}

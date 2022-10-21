@@ -1,0 +1,72 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: GovernorBravoDelegate
+    network: {{ network }}
+    source:
+      address: "{{ governorContractAddress }}"
+      abi: GovernorBravoDelegate
+      startBlock: {{ governorContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: GovernorBravoDelegate
+          file: ./abis/uniswap-governance/GovernorBravoDelegate.json
+      eventHandlers:
+        - event: ProposalCanceled(uint256)
+          handler: handleProposalCanceled
+        - event: ProposalCreated(uint256,address,address[],uint256[],string[],bytes[],uint256,uint256,string)
+          handler: handleProposalCreated
+        - event: ProposalExecuted(uint256)
+          handler: handleProposalExecuted
+        - event: ProposalQueued(uint256,uint256)
+          handler: handleProposalQueued
+        - event: ProposalThresholdSet(uint256,uint256)
+          handler: handleProposalThresholdSet
+        - event: VoteCast(indexed address,uint256,uint8,uint256,string)
+          handler: handleVoteCast
+        - event: VotingDelaySet(uint256,uint256)
+          handler: handleVotingDelaySet
+        - event: VotingPeriodSet(uint256,uint256)
+          handler: handleVotingPeriodSet
+      file: ./protocols/uniswap-governance/src/governor-bravo-delegate.ts
+  - kind: ethereum/contract
+    name: Uni
+    network:  {{ network }}
+    source:
+      address: "{{ tokenContractAddress }}"
+      abi: Uni
+      startBlock: {{ tokenContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Governance
+        - Proposal
+        - Vote
+        - TokenHolder
+        - Delegate
+      abis:
+        - name: Uni
+          file: ./abis/uniswap-governance/Uni.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./protocols/uniswap-governance/src/uni.ts
+      

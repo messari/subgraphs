@@ -1,7 +1,7 @@
 import { LocalizationProvider, PickersDay, StaticDatePicker } from "@mui/lab";
 import MomentAdapter from "@material-ui/pickers/adapter/moment";
 import { Box, Button, TextField } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridAlignment } from "@mui/x-data-grid";
 import { useState } from "react";
 import { downloadCSV, toDate, toUnitsSinceEpoch } from "../../../src/utils/index";
 import { percentageFieldList } from "../../constants";
@@ -38,6 +38,9 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
         field: "value",
         headerName: "Value",
         flex: 1,
+        type: isPercentageField ? "string" : "number",
+        headerAlign: "left" as GridAlignment,
+        align: "left" as GridAlignment,
       },
     ];
     let suffix = "";
@@ -51,7 +54,7 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
         : true,
     );
     const tableData = filteredData.map((val: any, i: any) => {
-      let returnVal = val.value.toLocaleString() + suffix;
+      let returnVal = Number(Number(val.value).toFixed(2)).toLocaleString() + suffix;
       if (isPercentageField && Array.isArray(val.value)) {
         returnVal = val.value.map((ele: string) => ele.toLocaleString() + "%").join(", ");
       }
@@ -62,7 +65,7 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
       return {
         id: i,
         date: dateColumn,
-        value: returnVal,
+        value: isNaN(Number(val.value)) || returnVal.includes('%') ? returnVal : Number(val.value),
       };
     });
 
@@ -117,11 +120,13 @@ export const TableChart = ({ datasetLabel, dataTable, jpegDownloadHandler }: Tab
           <Button className="Hover-Underline" onClick={() => setShowDatePicker((prev) => !prev)}>
             Date Filter
           </Button>
-          <Button className="Hover-Underline" onClick={() => downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel)}>Save CSV</Button>
-          {jpegDownloadHandler ? <Button className="Hover-Underline" onClick={() => jpegDownloadHandler()}>Save Chart</Button> : null}
           <Button className="Hover-Underline" onClick={() => toggleDateString(!showDateString)}>
             {showDateString ? `${hourly ? "hours" : "days"} since epoch` : "Date MM/DD/YYYY"}
           </Button>
+          <Button className="Hover-Underline" onClick={() => downloadCSV(dataTable.sort((a: any, b: any) => (Number(a.date) - Number(b.date))).map((x: any) => ({ date: moment.utc(x.date * 1000).format("YYYY-MM-DD"), [field]: x.value })), datasetLabel + '-csv', datasetLabel)}>
+            Save CSV
+          </Button>
+          {jpegDownloadHandler ? <Button className="Hover-Underline" onClick={() => jpegDownloadHandler()}>Save Chart</Button> : null}
         </Box>
         <DataGrid
           sx={{ textOverflow: "clip" }}

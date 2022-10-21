@@ -1,5 +1,7 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
+export const PROTOCOL_SCHEMA_VERSION = "1.0.0";
+
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
@@ -47,9 +49,6 @@ export const MANTISSA_FACTOR = BigInt.fromI32(10)
   .toBigDecimal();
 export const SECONDS_PER_DAY = 24 * 60 * 60;
 
-export const EXCHANGE_ADDRESS = Address.fromString(
-  "0x59728544b08ab483533076417fbbb2fd0b17ce3a"
-);
 export const WETH_ADDRESS = Address.fromString(
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 );
