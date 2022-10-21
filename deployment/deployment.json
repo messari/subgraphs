@@ -3827,10 +3827,10 @@
     "deployments": {
       "ubeswap-celo": {
         "network": "celo",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5074,7 +5074,7 @@
     "base": "aura-finance",
     "protocol": "aura-finance",
     "deployments": {
-      "aura-finance-mainnet": {
+      "aura-finance-ethereum": {
         "network": "ethereum",
         "status": "prod",
         "versions": {
@@ -5084,8 +5084,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "aura-finance-mainnet",
-            "query-id": "aura-finance-mainnet"
+            "slug": "aura-finance-ethereum",
+            "query-id": "aura-finance-ethereum"
           }
         },
         "files": {

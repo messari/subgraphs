@@ -22,9 +22,9 @@ ${chalk.bold(
   'Passing arguments to bypass prompts or augment command (Example):'
 )}
 
-  messari build uniswap-v2-ethereum -d --scope single -s subgraphs-studio --service subgraphs-studio -r messari
+  messari build uniswap-v2-ethereum -d single service subgraphs-studio -r messari
 
-Options:
+Options:\\
 
     -s, --service        Service to deploy to < hosted-service | subgraph-studio | cronos-portal >
     -v, --version        Specify the version of the subgraph deployment - Only relevant for subgraph studio testing deployments < e.g. 1.0.0 >
