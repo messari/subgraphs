@@ -33,6 +33,16 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 
 > For other contributing guidelines, please refer to [Contributing.md](./docs/Contributing.md)
 
+## Video Walkthrough Series of Subgraph Development Workflow for Messari
+
+[![Deployment.json Walkthrough](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://youtu.be/cgCNkRmM4NM)
+
+[![Standard Directory Structure Walkthrough](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://youtu.be/i3VAQYFMwEI)
+
+[![Messari Subgraph CLI Installation](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://youtu.be/_ofzQqilz3k)
+
+[![How to use Messari Subgraph CLI and Explanation](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://youtu.be/WYWa-3Vh5Jc)
+
 ## Resources
 
 ### Introductory
