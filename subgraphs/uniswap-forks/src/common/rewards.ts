@@ -102,16 +102,16 @@ export function getRewardsPerDay(
     return BIGDECIMAL_ZERO;
   }
 
-  let circularBuffer = getOrCreateCircularBuffer();
+  const circularBuffer = getOrCreateCircularBuffer();
 
   // Create entity for the current block
-  let currentTimestampI32 = currentTimestamp.toI32();
-  let currentBlockNumberI32 = currentBlockNumber.toI32();
+  const currentTimestampI32 = currentTimestamp.toI32();
+  const currentBlockNumberI32 = currentBlockNumber.toI32();
 
-  let blocks = circularBuffer.blocks;
+  const blocks = circularBuffer.blocks;
 
   // Interval between index and the index of the start of the window block
-  let windowWidth = abs(
+  const windowWidth = abs(
     circularBuffer.windowStartIndex - circularBuffer.nextIndex
   );
   if (windowWidth == INT_ZERO) {
@@ -163,7 +163,7 @@ export function getRewardsPerDay(
     circularBuffer.nextIndex += INT_TWO;
   }
   // The timestamp at the start of the window (default 24 hours in seconds).
-  let startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
+  const startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
 
   // Make sure to still have 2 blocks to calculate rate (This shouldn't happen past the beginning).
   while (true) {
@@ -184,7 +184,7 @@ export function getRewardsPerDay(
         break;
       }
     }
-    let windowIndexBlockTimestamp = blocks[circularBuffer.windowStartIndex];
+    const windowIndexBlockTimestamp = blocks[circularBuffer.windowStartIndex];
 
     // Shift the start of the window if the current timestamp moves out of desired rate window
     if (windowIndexBlockTimestamp < startTimestamp) {
@@ -199,13 +199,13 @@ export function getRewardsPerDay(
   }
 
   // Wideness of the window in seconds.
-  let windowSecondsCount = BigDecimal.fromString(
+  const windowSecondsCount = BigDecimal.fromString(
     (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString()
   );
 
   if (windowSecondsCount.notEqual(BIGDECIMAL_ZERO)) {
     // Wideness of the window in blocks.
-    let windowBlocksCount = BigDecimal.fromString(
+    const windowBlocksCount = BigDecimal.fromString(
       (
         currentBlockNumberI32 -
         blocks[circularBuffer.windowStartIndex + INT_ONE]
@@ -213,11 +213,11 @@ export function getRewardsPerDay(
     );
 
     // Estimate block speed for the window in seconds.
-    let unnormalizedBlockSpeed =
+    const unnormalizedBlockSpeed =
       WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
 
     // block speed converted to specified rate.
-    let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
+    const normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
       WINDOW_SIZE_SECONDS_BD
     ).times(unnormalizedBlockSpeed);
 
@@ -241,7 +241,7 @@ function getOrCreateCircularBuffer(): _CircularBuffer {
   if (!circularBuffer) {
     circularBuffer = new _CircularBuffer(CIRCULAR_BUFFER);
 
-    let blocks = new Array<i32>(BUFFER_SIZE);
+    const blocks = new Array<i32>(BUFFER_SIZE);
     for (let i = INT_ZERO; i < BUFFER_SIZE; i += INT_TWO) {
       blocks[i] = INT_NEGATIVE_ONE;
       blocks[i + INT_ONE] = INT_NEGATIVE_ONE;

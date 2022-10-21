@@ -10,7 +10,7 @@ export function handleTransferMint(
   value: BigInt,
   to: string
 ): void {
-  let transfer = getOrCreateTransfer(event);
+  const transfer = getOrCreateTransfer(event);
 
   // Tracks supply of minted LP tokens
   pool.outputTokenSupply = pool.outputTokenSupply!.plus(value);
@@ -45,7 +45,7 @@ export function handleTransferToPoolBurn(
   event: ethereum.Event,
   from: string
 ): void {
-  let transfer = getOrCreateTransfer(event);
+  const transfer = getOrCreateTransfer(event);
 
   transfer.type = TransferType.BURN;
   transfer.sender = from;
@@ -60,7 +60,7 @@ export function handleTransferBurn(
   value: BigInt,
   from: string
 ): void {
-  let transfer = getOrCreateTransfer(event);
+  const transfer = getOrCreateTransfer(event);
 
   // Tracks supply of minted LP tokens
   pool.outputTokenSupply = pool.outputTokenSupply!.minus(value);
