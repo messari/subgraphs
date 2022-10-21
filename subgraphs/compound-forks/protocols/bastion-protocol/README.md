@@ -69,6 +69,10 @@ Not applicable to Compound v2
 
 - Bastion Protocol token is not a typical ERC20 contract format, so we must manually code in the token metadata for BSTN.
 - Rewards are returned in rewards/second on the contract-level.
+- Bastion (likely the aurora RPC) is missing some transactions. This does not affect the TVL, borrows, or prices at all. This will affect some of the volume, usage, and transaction metrics. However it is small.
+  - This is a slow moving issue, so we think it is best to show move this to prod and then fix once we get traction on the issue.
+  - This was noticed since the liquidation volume was underreported for the day bastion had an outlier event.
+  - You can view more details about the issues described here: https://github.com/messari/subgraphs/issues/492
 
 ## Reference and Useful Links
 

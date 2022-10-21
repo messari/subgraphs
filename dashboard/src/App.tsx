@@ -188,13 +188,13 @@ function App() {
             path="comparison"
             element={<DefiLlamaComparsionTab deploymentJSON={subgraphEndpoints} getData={() => getDeployments()} />}
           />
-          <Route path="subgraph" element={<ProtocolDashboard />} />
+          <Route path="subgraph" element={<ProtocolDashboard protocolJSON={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route path="protocols-list" element={<ProtocolsListByTVL protocolsToQuery={protocolsToQuery} getData={() => getDeployments()} />} />
           <Route
             path="*"
             element={
               <>
-                <DashboardHeader protocolData={undefined} protocolId="" subgraphToQueryURL="" schemaVersion="" />
+                <DashboardHeader protocolData={undefined} versionsJSON={{}} protocolId="" subgraphToQueryURL="" schemaVersion="" />
                 <IssuesDisplay
                   oneLoaded={true}
                   allLoaded={true}

@@ -1,0 +1,6 @@
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.1";
+export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
+export const PROTOCOL_MARKETPLACE_NAME = "LooksRare";
+export const PROTOCOL_MARKETPLACE_SLUG = "looksrare";
+export const PROTOCOL_MARKETPLACE_ADDRESS =
+  "0x59728544b08ab483533076417fbbb2fd0b17ce3a";

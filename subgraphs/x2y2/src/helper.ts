@@ -1,5 +1,7 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
+export const PROTOCOL_SCHEMA_VERSION = "1.0.0";
+
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
@@ -56,9 +58,6 @@ export const BIGDECIMAL_HUNDRED = BigInt.fromI32(100).toBigDecimal();
 export const FEE_PERCENTAGE_FACTOR = BigInt.fromI32(1_000_000).toBigDecimal();
 export const SECONDS_PER_DAY = 24 * 60 * 60;
 
-export const EXCHANGE_ADDRESS = Address.fromString(
-  "0x74312363e45dcaba76c59ec49a7aa8a65a67eed3"
-);
 export const PROTOCOL_FEE_MANAGER = Address.fromString(
   "0xd823c605807cc5e6bd6fc0d7e4eea50d3e2d66cd"
 );
