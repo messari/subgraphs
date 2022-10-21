@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { BigInt, Address, store, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Address, store, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Account,
   _HelperStore,
@@ -250,6 +250,21 @@ export function createSwapHandleVolumeAndFees(
 
   const token0 = getOrCreateToken(pool.inputTokens[0]);
   const token1 = getOrCreateToken(pool.inputTokens[1]);
+
+  if (amount0In != BIGINT_ZERO && amount1In != BIGINT_ZERO) {
+    log.warning(
+      "Two input tokens given in swap - Transaction: " +
+        event.transaction.hash.toHexString() +
+        " Log Index: " +
+        event.logIndex.toString() +
+        " Token0: " +
+        token0.id +
+        " Token1: " +
+        token1.id,
+      []
+    );
+    return;
+  }
 
   // totals for volume updates
   const amount0Total = amount0Out.plus(amount0In);
