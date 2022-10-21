@@ -8,29 +8,12 @@ interface ChartProps {
   datasetLabel: string;
   dataChart: any;
   identifier: string;
+  chartRef: any;
+
 }
 
-export const Chart = ({ identifier, datasetLabel, dataChart }: ChartProps) => {
-  function jpegDownloadHandler() {
-    try {
-      const link = document.createElement('a');
-      const field = datasetLabel.split("-")[1] || datasetLabel;
-      let freq = datasetLabel.split("-")[0]?.toUpperCase()?.includes("HOURLY") ? "hourly-" : "";
-      if (datasetLabel.split("-")[0]?.toUpperCase()?.includes("DAILY")) {
-        freq = "daily-";
-      }
-      if (field?.toUpperCase()?.includes("DAILY") || field?.toUpperCase()?.includes("HOURLY")) {
-        freq = "";
-      }
-      link.download = identifier + '-' + freq + field + "-" + moment.utc(Date.now()).format("MMDDYY") + ".jpeg";
-      link.href = chartRef.current?.toBase64Image('image/jpeg', 1);
-      link.click();
-    } catch (err) {
-      return;
-    }
-  }
+export const Chart = ({ identifier, datasetLabel, dataChart, chartRef }: ChartProps) => {
 
-  const chartRef = useRef<any>(null);
   if (dataChart) {
     let labels: string[] = [];
     let datasets: { data: any; backgroundColor: string; borderColor: string; label: string }[] = [];
@@ -65,7 +48,6 @@ export const Chart = ({ identifier, datasetLabel, dataChart }: ChartProps) => {
       datasets: datasets,
     };
     return (<>
-      <Button onClick={() => jpegDownloadHandler()}>Download JPEG</Button>
       <Box padding={2} sx={{ border: 1 }}>
         <Line
           data={chartData}
