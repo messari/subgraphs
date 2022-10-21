@@ -6,29 +6,35 @@ import {
   MINIMUM_LIQUIDITY_FIVE_THOUSAND,
   MINIMUM_LIQUIDITY_TEN_THOUSAND,
   Network,
+  PROTOCOL_SCHEMA_VERSION,
   RewardIntervalType,
 } from "../../../../../src/common/constants";
 import { Configurations } from "../../../../../configurations/configurations/interface";
-import { deploymentJsonContext } from "../../../../../deploymentJsonContext";
+import {
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+} from "../../../src/common/constants";
 
 export class BiswapBscConfigurations implements Configurations {
   getNetwork(): string {
     return Network.BSC;
   }
   getSchemaVersion(): string {
-    return deploymentJsonContext.schemaVersion;
+    return PROTOCOL_SCHEMA_VERSION;
   }
   getSubgraphVersion(): string {
-    return deploymentJsonContext.subgraphVersion;
+    return PROTOCOL_SUBGRAPH_VERSION;
   }
   getMethodologyVersion(): string {
-    return deploymentJsonContext.methodologyVersion;
+    return PROTOCOL_METHODOLOGY_VERSION;
   }
   getProtocolName(): string {
-    return deploymentJsonContext.protocolName;
+    return PROTOCOL_NAME;
   }
   getProtocolSlug(): string {
-    return deploymentJsonContext.protocolSlug;
+    return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
     return "0x858e3312ed3a876947ea49d572a7c42de08af7ee";
