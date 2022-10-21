@@ -32,6 +32,7 @@ import {
   USDC_ERC20_ADDRESS,
   SECONDS_PER_DAY,
   DEFAULT_DECIMALS,
+  UNDERLYING_RESERVES_FEE,
 } from "../common/constants";
 import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
 import { LendingProtocol, Market, _AssetStatus } from "../../generated/schema";
@@ -645,4 +646,69 @@ function updateTransactionCount(
 
   hourlyUsage.save();
   dailyUsage.save();
+}
+
+export function rollbackRevenue(marketId: string, event: Liquidation, assetStatus: _AssetStatus): void {
+  // Roll back supply side & total revenue accounted from liquidation
+  // The handleAssetStatus works as if all reserveBalance increases are
+  // from interest and calculates total revenue & supply side revenue
+  // from reserve increases. But euler collect fees from liquidations too.
+  // These fees should be excluded in calculating total & supply side
+  // revenue. Here we roll back total and supply side revenue that have already
+  // been added because logAssetStatus is emitted before Liquidation in
+  // executeLiquidation().
+  const protocol = getOrCreateLendingProtocol();
+  const market = getOrCreateMarket(marketId);
+  const token = getOrCreateToken(event.params.underlying);
+  const repay = bigIntToBDUseDecimals(event.params.repay, DEFAULT_DECIMALS);
+  // Line 156 Liquidation.sol: repay * (1 + 0.02)
+  const desiredRepay = repay.times(BIGDECIMAL_ONE.plus(UNDERLYING_RESERVES_FEE.div(DECIMAL_PRECISION)));
+  const repayExtraUSD = desiredRepay.minus(repay).times(token.lastPriceUSD!);
+  const deltaTotalRevenueUSD = repayExtraUSD.times(RESERVE_FEE_SCALE).div(assetStatus.reserveFee.toBigDecimal());
+  const deltaSupplySideRevenue = deltaTotalRevenueUSD.minus(repayExtraUSD);
+
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenue);
+  protocol.save();
+
+  const financialsSnapshot = getOrCreateFinancials(event.block.timestamp, event.block.number);
+  financialsSnapshot.cumulativeTotalRevenueUSD =
+    financialsSnapshot.cumulativeTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+  financialsSnapshot.cumulativeSupplySideRevenueUSD =
+    financialsSnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenue);
+  if (financialsSnapshot.dailyTotalRevenueUSD.ge(deltaTotalRevenueUSD)) {
+    financialsSnapshot.dailyTotalRevenueUSD = financialsSnapshot.dailyTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+    financialsSnapshot.dailySupplySideRevenueUSD =
+      financialsSnapshot.dailySupplySideRevenueUSD.minus(deltaSupplySideRevenue);
+    financialsSnapshot.save();
+  }
+  financialsSnapshot.save();
+
+  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+  market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenue);
+  market.save();
+
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(event.block, marketId);
+  marketDailySnapshot.cumulativeTotalRevenueUSD =
+    marketDailySnapshot.cumulativeTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+  marketDailySnapshot.cumulativeSupplySideRevenueUSD =
+    marketDailySnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenue);
+  if (marketDailySnapshot.dailyTotalRevenueUSD.ge(deltaTotalRevenueUSD)) {
+    marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailyTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+    marketDailySnapshot.dailySupplySideRevenueUSD =
+      marketDailySnapshot.dailySupplySideRevenueUSD.minus(deltaSupplySideRevenue);
+    marketDailySnapshot.save();
+  }
+
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event.block, marketId);
+  marketHourlySnapshot.cumulativeTotalRevenueUSD =
+    marketHourlySnapshot.cumulativeTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+  marketHourlySnapshot.cumulativeSupplySideRevenueUSD =
+    marketHourlySnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenue);
+  if (marketHourlySnapshot.hourlyTotalRevenueUSD.ge(deltaTotalRevenueUSD)) {
+    marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlyTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+    marketHourlySnapshot.hourlySupplySideRevenueUSD =
+      marketHourlySnapshot.hourlySupplySideRevenueUSD.minus(deltaSupplySideRevenue);
+    marketHourlySnapshot.save();
+  }
 }

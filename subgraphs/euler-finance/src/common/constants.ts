@@ -183,14 +183,17 @@ export const USDC_SYMBOL = "USDC";
 ///// Euler Specific /////
 //////////////////////////
 
+export const DECIMAL_PRECISION = BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal();
 export const CONFIG_FACTOR_SCALE = BigDecimal.fromString("4e9");
 export const RESERVE_FEE_SCALE = BigDecimal.fromString("4e9");
 export const DEFAULT_RESERVE_FEE = BigDecimal.fromString("0.23").times(RESERVE_FEE_SCALE);
+// How much of a liquidation is credited to the underlying's reserves.
+export const UNDERLYING_RESERVES_FEE = BigDecimal.fromString("0.02").times(DECIMAL_PRECISION);
+
 export const INITIAL_RESERVES = BigInt.fromI32(1e6 as i32);
 export const EXEC_START_BLOCK_NUMBER = BigInt.fromI32(13711556);
 export const UNISWAP_Q192 = BigDecimal.fromString(BigInt.fromI32(2).pow(192).toString());
 
-export const DECIMAL_PRECISION = BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal();
 export const INTEREST_RATE_PRECISION = BigDecimal.fromString("1e25");
 export const INTEREST_RATE_DECIMALS = BigDecimal.fromString("1e27");
 export const INTERNAL_DEBT_PRECISION = BigDecimal.fromString("1e9");
