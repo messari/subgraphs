@@ -5074,7 +5074,7 @@
     "base": "aura-finance",
     "protocol": "aura-finance",
     "deployments": {
-      "aura-finance-mainnet": {
+      "aura-finance-ethereum": {
         "network": "ethereum",
         "status": "prod",
         "versions": {
@@ -5084,8 +5084,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "aura-finance-mainnet",
-            "query-id": "aura-finance-mainnet"
+            "slug": "aura-finance-ethereum",
+            "query-id": "aura-finance-ethereum"
           }
         },
         "files": {
