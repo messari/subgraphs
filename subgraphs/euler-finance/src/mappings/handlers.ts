@@ -1,4 +1,4 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -24,6 +24,8 @@ import {
   CONFIG_FACTOR_SCALE,
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
+  BIGINT_ONE_HUNDRED_TWENTY,
+  BIGINT_HUNDRED,
 } from "../common/constants";
 import { snapshotFinancials, snapshotMarket, updateUsageMetrics } from "./helpers";
 import {
@@ -53,7 +55,7 @@ export function handleAssetStatus(event: AssetStatus): void {
   const marketId = assetStatus.eToken!;
   const protocol = getOrCreateLendingProtocol();
   const market = getOrCreateMarket(marketId);
-  const token = Token.load(marketId)!;
+  const token = Token.load(underlying)!;
 
   const totalBorrowBalance = bigIntChangeDecimals(totalBorrows, DEFAULT_DECIMALS, token.decimals);
   const totalDepositBalance = bigIntChangeDecimals(poolSize.plus(totalBorrowBalance), DEFAULT_DECIMALS, token.decimals);
@@ -111,8 +113,14 @@ export function handleAssetStatus(event: AssetStatus): void {
     const mrktID = protocol._marketIDs![i];
     const mrkt = getOrCreateMarket(mrktID);
     const tkn = getOrCreateToken(Address.fromString(mrkt.inputToken));
-    let underlyingPriceUSD = updatePrices(execProxyAddress, mrkt, event);
-    if (!underlyingPriceUSD) underlyingPriceUSD = mrkt.inputTokenPriceUSD;
+    // update prices every 100 blocks (~20 min)
+    let underlyingPriceUSD: BigDecimal;
+    if (event.block.number.ge(tkn.lastPriceBlockNumber!.plus(BIGINT_HUNDRED))) {
+      const currPriceUSD = updatePrices(execProxyAddress, mrkt, event);
+      underlyingPriceUSD = currPriceUSD ? currPriceUSD : mrkt.inputTokenPriceUSD;
+    } else {
+      underlyingPriceUSD = mrkt.inputTokenPriceUSD;
+    }
     // mark-to-market
     mrkt.totalDepositBalanceUSD = bigIntToBDUseDecimals(mrkt.inputTokenBalance, tkn.decimals).times(underlyingPriceUSD);
     mrkt.totalBorrowBalanceUSD = bigIntToBDUseDecimals(mrkt._dTokenSupply!, DEFAULT_DECIMALS)
