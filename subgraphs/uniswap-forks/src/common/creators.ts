@@ -251,7 +251,7 @@ export function createSwapHandleVolumeAndFees(
   const token0 = getOrCreateToken(pool.inputTokens[0]);
   const token1 = getOrCreateToken(pool.inputTokens[1]);
 
-  if (amount0In == BIGINT_ZERO && amount1In == BIGINT_ZERO) {
+  if (amount0In != BIGINT_ZERO && amount1In != BIGINT_ZERO) {
     log.warning(
       "Two input tokens given in swap - Transaction: " +
         event.transaction.hash.toHexString() +
