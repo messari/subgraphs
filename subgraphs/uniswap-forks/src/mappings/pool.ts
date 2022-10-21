@@ -45,6 +45,8 @@ export function handleTransfer(event: Transfer): void {
     event.params.value.equals(BIGINT_THOUSAND) &&
     pool.outputTokenSupply == BIGINT_ZERO
   ) {
+    // Execute positional triggers to increment totalSupply
+    positionalHandleTransfer(event);
     return;
   }
   // mints
