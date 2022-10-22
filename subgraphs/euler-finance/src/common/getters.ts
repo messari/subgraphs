@@ -313,7 +313,7 @@ export function getOrCreateMarket(id: string): Market {
     market.createdTimestamp = BIGINT_ZERO;
     market.createdBlockNumber = BIGINT_ZERO;
     market.exchangeRate = BIGDECIMAL_ONE;
-    market._dTokenSupply = BIGINT_ZERO;
+    market._totalBorrowBalance = BIGINT_ZERO;
     market._dTokenExchangeRate = BIGDECIMAL_ONE;
     market.save();
 
@@ -353,6 +353,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.mintedTokenSupplies = [];
     protocol.totalPoolCount = INT_ZERO;
     protocol._marketIDs = [];
+    protocol._lastUpdateBlockNumber = BIGINT_ZERO;
   }
   // ensure to update versions with grafting
   protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;

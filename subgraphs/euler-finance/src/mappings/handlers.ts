@@ -64,8 +64,28 @@ export function handleAssetStatus(event: AssetStatus): void {
     );
   }
 
+  // tvl, totalDepositBalanceUSD and totalBorrowBalanceUSD may be updated again with new price
+  // in the loop below
+  const newTotalDepositBalanceUSD = bigIntToBDUseDecimals(totalDepositBalance, token.decimals).times(
+    token.lastPriceUSD!,
+  );
+  const newTotalBorrowBalanceUSD = bigIntToBDUseDecimals(totalBorrowBalance, token.decimals).times(token.lastPriceUSD!);
+  protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD
+    .plus(newTotalDepositBalanceUSD)
+    .minus(market.totalDepositBalanceUSD);
+  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD
+    .plus(newTotalBorrowBalanceUSD)
+    .minus(market.totalBorrowBalanceUSD);
+  protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
+  protocol.save();
+
+  market.totalDepositBalanceUSD = newTotalDepositBalanceUSD;
+  market.totalBorrowBalanceUSD = newTotalBorrowBalanceUSD;
+  market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+
   market.inputTokenBalance = totalDepositBalance;
   market.outputTokenSupply = totalBalances;
+  market._totalBorrowBalance = totalBorrowBalance;
 
   const dTokenAddress = Address.fromString(market._dToken!);
   const dToken = ERC20.bind(dTokenAddress);
@@ -74,13 +94,11 @@ export function handleAssetStatus(event: AssetStatus): void {
   if (totalBorrows.gt(BIGINT_ZERO)) {
     const dTokenTotalSupply = dToken.totalSupply();
     if (dTokenTotalSupply.gt(BIGINT_ZERO)) {
-      market._dTokenSupply = dTokenTotalSupply;
       market._dTokenExchangeRate = bigIntToBDUseDecimals(totalBorrowBalance, token.decimals).div(
         bigIntToBDUseDecimals(dTokenTotalSupply, DEFAULT_DECIMALS),
       );
     }
   }
-
   market.save();
 
   if (interestRate.notEqual(assetStatus.interestRate)) {
@@ -90,7 +108,7 @@ export function handleAssetStatus(event: AssetStatus): void {
   updateRevenue(reserveBalance, protocol, market, assetStatus, event);
   snapshotMarket(event.block, marketId, BIGDECIMAL_ZERO, null);
 
-  //verification only
+  //for verification only
   const eTokenAddress = Address.fromString(market.outputToken!);
   const eToken = ERC20.bind(eTokenAddress);
   const eTokenTotalSupply = eToken.totalSupply();
@@ -103,52 +121,51 @@ export function handleAssetStatus(event: AssetStatus): void {
     ]);
   }
 
-  // update tvl, totalDeposit, totalBorrow
-  const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
-  const execProxyAddress = eulerContract.moduleIdToProxy(MODULEID__EXEC);
-  let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-  let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-  for (let i = 0; i < protocol._marketIDs!.length; i++) {
-    const mrktID = protocol._marketIDs![i];
-    const mrkt = getOrCreateMarket(mrktID);
-    const tkn = getOrCreateToken(Address.fromString(mrkt.inputToken));
-    // update prices every 100 blocks (~20 min)
-    let underlyingPriceUSD: BigDecimal;
-    if (event.block.number.ge(tkn.lastPriceBlockNumber!.plus(BIGINT_HUNDRED))) {
+  // update prices, tvl, totalDepositBalanceUSD, totalBorrowBalanceUSD every 100 blocks (~20 min)
+  if (event.block.number.ge(protocol._lastUpdateBlockNumber!.plus(BIGINT_HUNDRED))) {
+    const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
+    const execProxyAddress = eulerContract.moduleIdToProxy(MODULEID__EXEC);
+    let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    for (let i = 0; i < protocol._marketIDs!.length; i++) {
+      const mrktID = protocol._marketIDs![i];
+      const mrkt = getOrCreateMarket(mrktID);
+      const tkn = getOrCreateToken(Address.fromString(mrkt.inputToken));
       const currPriceUSD = updatePrices(execProxyAddress, mrkt, event);
-      underlyingPriceUSD = currPriceUSD ? currPriceUSD : mrkt.inputTokenPriceUSD;
-    } else {
-      underlyingPriceUSD = mrkt.inputTokenPriceUSD;
+      const underlyingPriceUSD = currPriceUSD ? currPriceUSD : mrkt.inputTokenPriceUSD;
+      // mark-to-market
+      mrkt.totalDepositBalanceUSD = bigIntToBDUseDecimals(mrkt.inputTokenBalance, tkn.decimals).times(
+        underlyingPriceUSD,
+      );
+      mrkt.totalBorrowBalanceUSD = bigIntToBDUseDecimals(mrkt._totalBorrowBalance!, tkn.decimals).times(
+        underlyingPriceUSD,
+      );
+      mrkt.totalValueLockedUSD = mrkt.totalDepositBalanceUSD;
+      mrkt.save();
+
+      log.debug(
+        "[handleAssetStatus]market={}/{},block={},totalBorrowBalanceUSD={},totalDepositBalanceUSD={},exchangeRate={},PriceUSD={}",
+        [
+          mrkt.name!,
+          mrkt.id,
+          event.block.number.toString(),
+          mrkt.totalBorrowBalanceUSD.toString(),
+          mrkt.totalDepositBalanceUSD.toString(),
+          mrkt.exchangeRate!.toString(),
+          underlyingPriceUSD.toString(),
+        ],
+      );
+
+      totalDepositBalanceUSD = totalDepositBalanceUSD.plus(mrkt.totalDepositBalanceUSD);
+      totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(mrkt.totalBorrowBalanceUSD);
     }
-    // mark-to-market
-    mrkt.totalDepositBalanceUSD = bigIntToBDUseDecimals(mrkt.inputTokenBalance, tkn.decimals).times(underlyingPriceUSD);
-    mrkt.totalBorrowBalanceUSD = bigIntToBDUseDecimals(mrkt._dTokenSupply!, DEFAULT_DECIMALS)
-      .times(mrkt._dTokenExchangeRate!)
-      .times(underlyingPriceUSD);
-    mrkt.totalValueLockedUSD = mrkt.totalDepositBalanceUSD;
-    mrkt.save();
 
-    log.debug(
-      "[handleAssetStatus]market={}/{},block={},totalBorrowBalanceUSD={},totalDepositBalanceUSD={},exchangeRate={},PriceUSD={}",
-      [
-        mrkt.name!,
-        mrkt.id,
-        event.block.number.toString(),
-        mrkt.totalBorrowBalanceUSD.toString(),
-        mrkt.totalDepositBalanceUSD.toString(),
-        mrkt.exchangeRate!.toString(),
-        underlyingPriceUSD.toString(),
-      ],
-    );
-
-    totalDepositBalanceUSD = totalDepositBalanceUSD.plus(mrkt.totalDepositBalanceUSD);
-    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(mrkt.totalBorrowBalanceUSD);
+    protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
+    protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
+    protocol.totalValueLockedUSD = totalDepositBalanceUSD;
+    protocol._lastUpdateBlockNumber = event.block.number;
+    protocol.save();
   }
-
-  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
-  protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
-  protocol.totalValueLockedUSD = totalDepositBalanceUSD;
-  protocol.save();
 
   log.debug("[handleAssetStatus]block={},protocol.totalBorrowBalanceUSD={},protocol.totalDepositBalanceUSD={}", [
     event.block.number.toString(),
