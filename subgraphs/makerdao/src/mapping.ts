@@ -191,7 +191,7 @@ export function handleVatSlip(event: VatNoteEvent): void {
   //createTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
   //updatePosition(event, usr, ilk, deltaCollateral, BIGINT_ZERO);
   updateMarket(event, market, deltaCollateral, deltaCollateralUSD);
-  updateUsageMetrics(event, [owner, owner, owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
+  updateUsageMetrics(event, [owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
   updateProtocol(deltaCollateralUSD, BIGDECIMAL_ZERO);
   //this needs to after updateProtocol as it uses protocol to do the update
   updateFinancialsSnapshot(event, deltaCollateralUSD, BIGDECIMAL_ZERO);

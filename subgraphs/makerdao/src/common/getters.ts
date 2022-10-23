@@ -644,9 +644,10 @@ export function getOwnerAddressFromProxy(proxy: string): string | null {
 // get owner address from possible urn or proxy address
 // return itself if it is not an urn or proxy
 export function getOwnerAddress(address: string): string {
-  let owner = getOwnerAddressFromUrn(address);
-  owner = owner ? owner : getOwnerAddressFromProxy(address);
-  owner = owner ? owner : address;
+  const urnOwner = getOwnerAddressFromUrn(address);
+  let owner = urnOwner ? urnOwner : address;
+  const proxyOwner = getOwnerAddressFromProxy(owner);
+  owner = proxyOwner ? proxyOwner : owner;
   return owner;
 }
 

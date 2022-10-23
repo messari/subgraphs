@@ -834,7 +834,6 @@ export function updateUsageMetrics(
     let account = Account.load(accountID);
     if (account == null) {
       account = getOrCreateAccount(accountID);
-      account.save();
 
       protocol.cumulativeUniqueUsers += 1;
       usageHourlySnapshot.cumulativeUniqueUsers += 1;
