@@ -472,8 +472,12 @@ export function getOrCreatePosition(
   side: string,
   newPosition: bool = false,
 ): Position {
-  const _is_urn = getOwnerAddressFromUrn(address) == null ? false : true;
-  const _is_proxy = getOwnerAddressFromProxy(address) == null ? false : true;
+  const urnOwnerAddr = getOwnerAddressFromUrn(address);
+  const _is_urn = urnOwnerAddr == null ? false : true;
+  // urn owner may be a proxy
+  const proxyOwnerAddr = getOwnerAddressFromProxy(address);
+  const urnProxyOwnerAddr = urnOwnerAddr ? getOwnerAddressFromProxy(urnOwnerAddr) : null;
+  const _is_proxy = proxyOwnerAddr == null && urnProxyOwnerAddr == null ? false : true;
   const accountAddress = getOwnerAddress(address);
   const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
   const positionPrefix = `${address}-${marketID}-${side}`;
@@ -529,8 +533,6 @@ export function getOrCreatePosition(
 // find the open position for the matching urn/ilk/side combination
 // there should be only one or none
 export function getOpenPosition(urn: string, ilk: Bytes, side: string): Position | null {
-  //let accountAddress = getOwnerAddress(urn);
-  //assert(accountAddress != urn, `urn ${urn} is not an Urn handler address`);
   const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
   const nextCounter = getNextPositionCounter(urn, ilk, side);
   log.info("[getOpenPosition]Finding open position for urn {}/ilk {}/side {}", [urn, ilk.toString(), side]);
@@ -565,29 +567,6 @@ export function getOpenPosition(urn: string, ilk: Bytes, side: string): Position
 
   return null;
 }
-
-/*
-export function getOpenPositionForAccount(accountAddress: string, ilk: Bytes, side: string): Position[] | null {
-  let marketID = getMarketAddressFromIlk(ilk)!.toHexString();
-  let nextCounter = getNextPositionCounter(ilk, side, null, accountAddress);
-  let positions: Position[] = [];
-  for (let counter = 0; counter <= nextCounter; counter++) {
-    let positionID = `${accountAddress}-${marketID}-${side}-${counter}`;
-    let position = Position.load(positionID);
-    // position is open with match urn (an account may own multiple urns)
-    if (position != null && position!.hashClosed == null) {
-      positions.push(position);
-    }
-  }
-  log.warning("[getOpenPosition]Cannot find open position for owner {}/ilk {}/side {}", [
-    accountAddress,
-    ilk.toString(),
-    side,
-  ]);
-
-  return null;
-}
-*/
 
 export function getOrCreatePositionCounter(urn: string, ilk: Bytes, side: string): _PositionCounter {
   const marketID = getMarketAddressFromIlk(ilk)!.toHexString();
