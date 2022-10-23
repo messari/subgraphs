@@ -14,7 +14,7 @@ import { MESSARI_REPO_PATH } from '../../bin/env'
 
 const HELP: string = `
 
-${chalk.bold('How to use this command (Template):')}
+${chalk.bold('How to use this command (Teate):')}
 
   messari build [<deployment-id>] [options]
 

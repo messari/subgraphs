@@ -39,9 +39,9 @@ jobs:
       
       - name: Get changed files in the subgraphs folder
         id: changed-files-specific
-        uses: tj-actions/changed-files@v31
+        uses: Ana06/get-changed-files@v2.1.0
         with:
-          files: |
+          filter: |
             subgraphs/**/*.ts
             subgraphs/**/*.tsx
 
