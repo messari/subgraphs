@@ -191,7 +191,7 @@ export function handleVatSlip(event: VatNoteEvent): void {
   //createTransactions(event, market, owner, null, deltaCollateral, deltaCollateralUSD);
   //updatePosition(event, usr, ilk, deltaCollateral, BIGINT_ZERO);
   updateMarket(event, market, deltaCollateral, deltaCollateralUSD);
-  updateUsageMetrics(event, [owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
+  updateUsageMetrics(event, [owner, owner, owner], deltaCollateralUSD, BIGDECIMAL_ZERO);
   updateProtocol(deltaCollateralUSD, BIGDECIMAL_ZERO);
   //this needs to after updateProtocol as it uses protocol to do the update
   updateFinancialsSnapshot(event, deltaCollateralUSD, BIGDECIMAL_ZERO);
@@ -1001,7 +1001,9 @@ export function handleSpotPoke(event: PokeEvent): void {
 export function handleJugFileDuty(event: JugNoteEvent): void {
   const ilk = event.params.arg1;
   if (ilk.toString() == "TELEPORT-FW-A") {
-    log.info("[handleVatSlip] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [ilk.toString()]);
+    log.info("[handleJugFileDuty] Skip ilk={} (DAI Teleport: https://github.com/makerdao/dss-teleport)", [
+      ilk.toString(),
+    ]);
     return;
   }
   const what = event.params.arg2.toString();
