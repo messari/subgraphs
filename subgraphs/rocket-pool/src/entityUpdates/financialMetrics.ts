@@ -189,10 +189,11 @@ export function updateTotalRevenueMetrics(
     block.number
   ).lastPriceUSD!;
 
-  const currentEthAmount = bigIntToBigDecimal(pool.inputTokenBalances[1]);
+  const currentEthAmount = pool._beaconChainRewardEth;
 
   if (stakingRewards > currentEthAmount) {
     additionalRewards = stakingRewards.minus(currentEthAmount);
+    pool._beaconChainRewardEth = stakingRewards;
   }
 
   // Pool

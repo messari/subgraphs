@@ -314,6 +314,8 @@ type Pool @entity {
 
   _miniPoolTotalValueLocked: BigInt!
 
+  _beaconChainRewardEth: BigDecimal!
+
   ##### Snapshots #####
 
   " Pool daily snapshots "

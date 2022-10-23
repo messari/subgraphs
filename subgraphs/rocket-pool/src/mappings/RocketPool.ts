@@ -5,7 +5,7 @@ import {
   log,
   Bytes,
 } from "@graphprotocol/graph-ts";
-import { bigIntToBigDecimal } from "../utils/numbers";
+import { bigIntToBigDecimal, getMean } from "../utils/numbers";
 import {
   EtherDeposited,
   EtherWithdrawn,
@@ -156,16 +156,10 @@ export function handleBalanceUpdate(event: BalancesUpdated): void {
 
     let Comissions = pool._miniPoolCommission;
 
+    log.error("[handleBalanceUpdate] sum: {}", [Comissions!.toString()]);
+
     if (Comissions && Comissions.length > 0) {
-      let sum = Comissions.reduce(
-        (partialSum, a) => partialSum.plus(a),
-        BIGDECIMAL_ZERO
-      );
-      log.error("[handleBalanceUpdate] sum: {}", [sum.toString()]);
-      let len = bigIntToBigDecimal(
-        BigInt.fromString(Comissions.length.toString())
-      ).times(bigIntToBigDecimal(ONE_ETH_IN_WEI));
-      log.error("[handleBalanceUpdate] len: {}", [len.toString()]);
+      avg_ComissionRate = getMean(Comissions);
     }
     log.error("[handleBalanceUpdate] comission rate: {}", [
       avg_ComissionRate.toString(),

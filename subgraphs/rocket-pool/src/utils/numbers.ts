@@ -1,5 +1,10 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_ONE, BIGINT_TWO, BIGINT_ZERO } from "./constants";
+import {
+  BIGDECIMAL_ONE,
+  BIGINT_TWO,
+  BIGINT_ZERO,
+  BIGDECIMAL_ZERO,
+} from "./constants";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,
@@ -58,4 +63,12 @@ export function rayToWad(a: BigInt): BigInt {
 export function wadToRay(a: BigInt): BigInt {
   const result = a.times(BigInt.fromI32(10).pow(9));
   return result;
+}
+
+export function getMean(arr: BigDecimal[]): BigDecimal {
+  let sum = BIGDECIMAL_ZERO;
+  for (let i = 0; i < arr.length; i++) {
+    sum = sum.plus(arr[i]);
+  }
+  return sum.div(BigDecimal.fromString(arr.length.toString()));
 }
