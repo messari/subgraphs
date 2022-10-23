@@ -6,7 +6,7 @@ import {
   ScriptGenerator,
 } from '../command-helpers/build/scriptGenerator'
 
-import { validateDeploymentJson } from '../../../deployment/validation/validateDeploymentJson'
+import { validateDeploymentJson } from '../command-helpers/build/validateDeploymentJson'
 import { getScopeAlias, getServiceAlias } from '../command-helpers/build/alias'
 import { isValidVersion } from '../command-helpers/build/checkVersion'
 import { Executor as ExecutorClass } from '../command-helpers/build/execution'
