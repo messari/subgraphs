@@ -413,9 +413,6 @@ export function updatePosition(
   const market = getOrCreateMarket(marketID);
   const account = getOrCreateAccount(accountAddress);
 
-  //let lenderPosition: Position | null = null;
-  //let borrowerPosition: Position | null = null;
-
   if (deltaCollateral.notEqual(BIGINT_ZERO)) {
     let lenderPosition = getOpenPosition(urn, ilk, PositionSide.LENDER);
 
@@ -462,9 +459,6 @@ export function updatePosition(
         lenderPosition.blockNumberClosed = event.block.number;
         lenderPosition.timestampClosed = event.block.timestamp;
         lenderPosition.hashClosed = event.transaction.hash.toHexString();
-
-        //lenderCounter.nextCount += INT_ONE; //increase nextCount after closing a position
-        //lenderCounter.save();
 
         protocol.openPositionCount -= INT_ONE;
 
@@ -551,9 +545,6 @@ export function updatePosition(
         borrowerPosition.blockNumberClosed = event.block.number;
         borrowerPosition.timestampClosed = event.block.timestamp;
         borrowerPosition.hashClosed = event.transaction.hash.toHexString();
-
-        //borrowerCounter.nextCount += INT_ONE;
-        //borrowerCounter.save();
 
         protocol.openPositionCount -= INT_ONE;
 
@@ -642,9 +633,6 @@ export function transferPosition(
   }
   srcPosition.save();
   snapshotPosition(event, srcPosition);
-  //let srcCounter = getOrCreatePositionCounter(srcUrn, ilk, side);
-  //srcCounter.nextCount += INT_ONE;
-  //srcCounter.save();
 
   if (dstAccountAddress == null) {
     dstAccountAddress = getOwnerAddress(dstUrn).toLowerCase();
@@ -657,7 +645,6 @@ export function transferPosition(
   if (!dstPosition) {
     dstPosition = getOrCreatePosition(event, dstUrn, ilk, side, true);
   }
-  //let dstPosition = getOrCreatePosition(event, dstUrn, ilk, side, false, dstAccountAddress);
 
   dstPosition.balance = dstPosition.balance.plus(transferAmount);
   dstPosition.save();
@@ -745,9 +732,6 @@ export function liquidatePosition(
     market.borrowingPositionCount -= INT_ONE;
     account.openPositionCount -= INT_ONE;
     account.closedPositionCount += INT_ONE;
-    //let borrowCounter = getOrCreatePositionCounter(urn, ilk, PositionSide.BORROWER);
-    //borrowCounter.nextCount += INT_ONE;
-    //borrowCounter.save();
   }
   borrowerPosition.save();
   snapshotPosition(event, borrowerPosition);
@@ -771,9 +755,6 @@ export function liquidatePosition(
     market.lendingPositionCount -= INT_ONE;
     account.openPositionCount -= INT_ONE;
     account.closedPositionCount += INT_ONE;
-    //let lenderCounter = getOrCreatePositionCounter(urn, ilk, PositionSide.LENDER);
-    //lenderCounter.nextCount += INT_ONE;
-    //lenderCounter.save();
   }
   lenderPosition.save();
   snapshotPosition(event, lenderPosition);
@@ -993,8 +974,6 @@ export function createTransactions(
   deltaCollateralUSD: BigDecimal = BIGDECIMAL_ZERO,
   deltaDebt: BigInt = BIGINT_ZERO,
   deltaDebtUSD: BigDecimal = BIGDECIMAL_ZERO,
-  //liquidateAmt: BigInt = BIGINT_ZERO,
-  //liquidateUSD: BigDecimal = BIGDECIMAL_ZERO,
 ): void {
   const transactionID = createEventID(event);
 

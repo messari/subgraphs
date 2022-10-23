@@ -1,11 +1,14 @@
 specVersion: 0.0.4
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
 features:
   - grafting
 graft:
-  base: QmZAk62SejB8wvJ5b23ZzFBu594NAmDfPiWFLh4RaFUxpk
-  block: 15675181  
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   # Vault
   - name: Vat
@@ -51,20 +54,24 @@ dataSources:
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0x7608870300000000000000000000000000000000000000000000000000000000"
           handler: handleVatFrob
+        # function fork( bytes32 ilk, address src, address dst, int256 dink, int256 dart)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0x870c616d00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatFork
         ### Collect stability fee ###
         # function fold(bytes32 i, address u, int256 rate)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0xb65337df00000000000000000000000000000000000000000000000000000000"
           handler: handleVatFold
         ## bad debt settlement/issue
+        # function heal(uint256 rad)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: "0xf37ac61c00000000000000000000000000000000000000000000000000000000"
+          handler: handleVatDebtSettlement
         # function suck(address u, address v, uint256 rad)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: "0xf24e23eb00000000000000000000000000000000000000000000000000000000"
           handler: handleVatDebtSettlement
-        # function fork(bytes32,address,address,int256,int256)
-        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
-          topic0: "0x870c616d00000000000000000000000000000000000000000000000000000000"
-          handler: handleVatFork
 
   # Borrow rate
   - name: Jug
@@ -295,13 +302,7 @@ dataSources:
           topic0: "0x1b0dbf7200000000000000000000000000000000000000000000000000000000"
           handler: handleCdpQuit
         # Transfer cdp collateral from the cdp address to a dst address
-        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: "0x9bb8f83800000000000000000000000000000000000000000000000000000000"
-          handler: handleCdpFlux
-        # Transfer DAI from the cdp address to a dst address
-        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
-          topic0: "0xf9f30db600000000000000000000000000000000000000000000000000000000"
-          handler: handleCdpMove
+
 
   # User may interact w/ maker contracts via a DSProxy contract
   - name: DSProxyFactory

@@ -224,16 +224,6 @@ export function handleVatFrob(event: VatNoteEvent): void {
     dart.toString(),
   ]);
 
-  /*
-  if (dart == BIGINT_ZERO) {
-    log.info(
-      "[handleVatFrob]No borrowing/repaying in transaction {}, skipping (deposit/withdraw is handled in handleVatSlip)",
-      [event.transaction.hash.toHexString()],
-    );
-    return;
-  }
-  */
-
   const market = getMarketFromIlk(ilk);
   if (market == null) {
     log.warning("[handleVatFrob]Failed to get market for ilk {}/{}", [ilk.toString(), ilk.toHexString()]);
@@ -243,21 +233,6 @@ export function handleVatFrob(event: VatNoteEvent): void {
   const token = getOrCreateToken(market.inputToken);
   const deltaCollateral = bigIntChangeDecimals(dink, WAD, token.decimals);
   const deltaCollateralUSD = bigIntToBDUseDecimals(deltaCollateral, token.decimals).times(token.lastPriceUSD!);
-
-  /*
-  if (deltaCollateral.gt(BIGINT_ZERO)) {
-    updatePosition(event, u, ilk, deltaCollateral, BIGINT_ZERO);
-  }
-
-  // frob can be used to transfer collateral/debt
-  // when u != v, u != w
-  if (u.toLowerCase() != v.toLowerCase() && dink.notEqual(BIGINT_ZERO)) {
-    transferPosition(event, ilk, v, u, PositionSide.LENDER, null, null, deltaCollateral);
-  }
-  if (u.toLowerCase() != w.toLowerCase() && dart.notEqual(BIGINT_ZERO)) {
-    transferPosition(event, ilk, v, w, PositionSide.BORROWER, null, null, dart);
-  }
-  */
 
   const urn = u;
 
@@ -386,15 +361,7 @@ export function handleCatBite(event: BiteEvent): void {
   const tab = event.params.tab;
 
   const market = getMarketFromIlk(ilk)!;
-  //let LiquidateID = event.transaction.hash
-  //  .toHexString()
-  //  .concat("-")
-  //  .concat(event.logIndex.toString());
-  //getOrCreateLiquidate(LiquidateID, event, market, urn());
 
-  // remove borrowed amount from borrowed balance
-  // collateral/tvl update is taken care of when it exits vat
-  // via the slip() function/event
   const deltaDebtUSD = bigIntToBDUseDecimals(art, WAD).times(BIGDECIMAL_NEG_ONE);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, deltaDebtUSD);
 
@@ -417,7 +384,6 @@ export function handleCatBite(event: BiteEvent): void {
   ]);
 
   const liquidatee = getOwnerAddress(urn);
-  //let debt = bigIntChangeDecimals(tab, RAD, WAD);
   const flipBidsStore = new _FlipBidsStore(storeID);
   flipBidsStore.round = INT_ZERO;
   flipBidsStore.urn = urn;
@@ -641,10 +607,6 @@ export function handleFlipBids(event: FlipNoteEvent): void {
 // handle flip.deal and flip.yank
 export function handleFlipEndAuction(event: FlipNoteEvent): void {
   const id = bytesToUnsignedBigInt(event.params.arg1); //
-  //log.debug("[handleFlipEndAuction] id={}, event address={}", [id.toString(), event.address.toHexString()]);
-  //let flipContract = FlipContract.bind(event.address);
-  //let ilk = flipContract.ilk();
-  //log.debug("[handleFlipEndAuction] id={}, ilk={}/{}", [id.toString(), ilk.toString(), ilk.toHexString()]);
   const storeID = event.address //flip contract
     .toHexString()
     .concat("-")
@@ -719,7 +681,6 @@ export function handleFlipEndAuction(event: FlipNoteEvent): void {
 
   // update positions
   const ilk = Bytes.fromHexString(flipBidsStore.ilk);
-  // TODO: debugging
   const urn = flipBidsStore.urn;
   const sides = [PositionSide.LENDER, PositionSide.BORROWER];
   log.info("[]txhash={}", [event.transaction.hash.toHexString()]);
@@ -771,7 +732,6 @@ export function handleClipTakeBid(event: TakeEvent): void {
     .toHexString()
     .concat("-")
     .concat(id.toString());
-  //let liquidateStore = getOrCreateLiquidateStore(storeID);
   const clipTakeStore = _ClipTakeStore.load(storeID)!;
   clipTakeStore.slice += INT_ONE;
   const marketID = clipTakeStore.market;
@@ -802,7 +762,6 @@ export function handleClipTakeBid(event: TakeEvent): void {
   const deltaTab = clipTakeStore.tab.minus(tab);
   const amount = bigIntChangeDecimals(deltaLot, WAD, token.decimals);
   const amountUSD = bigIntToBDUseDecimals(amount, token.decimals).times(token.lastPriceUSD!);
-  //let profitUSD = amountUSD.minus(bigIntToBDUseDecimals(deltaTab, WAD));
   const profitUSD = amountUSD.minus(bigIntToBDUseDecimals(owe, RAD));
 
   const liquidateID = createEventID(event);
@@ -820,23 +779,6 @@ export function handleClipTakeBid(event: TakeEvent): void {
   clipTakeStore.lot = lot;
   clipTakeStore.tab = tab;
   clipTakeStore.save();
-
-  /*
-  if (
-    liquidateID.toLowerCase() != "0x63bc315387b2853768716e48cb5ea1b21a2a6cc583774f8a7a0646eb610325dc-192".toLowerCase()
-  ) {
-    return;
-  }
-
-
-  //let liquidate = getOrCreateLiquidate(liquidateID); // use the cat.bite event as ID
-  let liquidate = getOrCreateLiquidate(createEventID(event), event, market, liquidateStore.liquidatee, liquidator);
-  // convert collateral to its native amount from WAD
-  liquidate.amount = bigIntChangeDecimals(lot, WAD, token.decimals);
-  liquidate.amountUSD = bigIntToBDUseDecimals(liquidate.amount, token.decimals).times(token.lastPriceUSD!);
-  liquidate.profitUSD = liquidate.amountUSD.minus(bigIntToBDUseDecimals(owe, RAD));
-
-  */
 
   log.info(
     "[handleClipTakeBid]liquidateID={}, storeID={}, clip.id={}, slice #{} final: amount={}, amountUSD={}, profitUSD={}",
@@ -882,8 +824,6 @@ export function handleClipTakeBid(event: TakeEvent): void {
     clipTakeStore.art.times(deltaTab).divDecimal(clipTakeStore.tab0!.toBigDecimal()),
   ).plus(BIGINT_ONE); // plus 1 to avoid rounding down & not closing borrowing position
 
-  //liquidate._finalized = true;
-  //liquidate.save();
   liquidatePosition(event, clipTakeStore.urn!, ilk, liquidate.liquidator, liquidate.amount, debtRepaid);
   updateMarket(event, market, BIGINT_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
   updateProtocol(BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, liquidate.amountUSD);
@@ -917,17 +857,8 @@ export function handleClipYankBid(event: ClipYankEvent): void {
     .toHexString()
     .concat("-")
     .concat(id.toString());
-  //let liquidateStore = getOrCreateLiquidateStore(storeID);
   const clipTakeStore = _ClipTakeStore.load(storeID)!;
 
-  //let storeID = event.address //clip contract
-  //  .toHexString()
-  //  .concat("-")
-  //  .concat(id.toString());
-  //let liquidateStore = getOrCreateLiquidateStore(storeID);
-  //let clipTakeStore = _ClipTakeStore.load(storeID)!
-
-  //let liquidateID = liquidateStore.liquidate;
   const market = getMarketFromIlk(ilk)!;
   const token = getOrCreateToken(market.inputToken);
 
@@ -963,7 +894,6 @@ export function handleClipYankBid(event: ClipYankEvent): void {
       liquidate.profitUSD.toString(),
     ]);
   }
-  //liquidate._finalized = true;
   liquidate.save();
 
   const debtRepaid = BigDecimalTruncateToBigInt(
@@ -1114,7 +1044,6 @@ export function handlePotFileVow(event: PotNoteEvent): void {
   // revenue accrued to a market.
   const what = event.params.arg1.toString();
   if (what == "vow") {
-    //let bytes32ToAddressHexString(event.params.arg2)
     const market = getOrCreateMarket(
       event.address.toHexString(),
       "MCD POT",
@@ -1169,7 +1098,6 @@ export function handlePotFileDsr(event: PotNoteEvent): void {
       dsr.toString(),
       rate.toString(),
       rateAnnualized.toString(),
-      //chiValue.toString(),
     ]);
   }
 }
@@ -1235,16 +1163,9 @@ export function handleCdpGive(event: CdpNoteEvent): void {
   // update mapping between urnhandler and owner
   const cdpi = bytesToUnsignedBigInt(event.params.arg1);
   const dstAccountAddress = bytes32ToAddressHexString(event.params.arg2);
-  //let contract = CdpManager.bind(event.address);
-  //let srcUrnAddress = contract
-  //  .urns(cdpi)
-  //  .toHexString()
-  //  .toLowerCase();
-  //let ilk = contract.ilks(cdpi);
   const _cdpi = _Cdpi.load(cdpi.toString())!;
   const srcUrn = _cdpi.urn;
   const ilk = _cdpi.ilk;
-  //let srcAccountAddressC = _cdpi.ownerAddress;
   _cdpi.ownerAddress = dstAccountAddress;
   _cdpi.save();
 
@@ -1276,13 +1197,11 @@ export function handleCdpShift(event: CdpNoteEvent): void {
   const srcCdpi = _Cdpi.load(srcCdp.toString());
   const srcIlk = Bytes.fromHexString(srcCdpi!.ilk);
   const srcUrnAddress = srcCdpi!.urn;
-  //let srcAccountAddress = srcCdpi!.ownerAddress;
 
   const dstCdpi = _Cdpi.load(dstCdp.toString());
   // this should be the same as srcIlk
   const dstIlk = Bytes.fromHexString(dstCdpi!.ilk);
   const dstUrnAddress = dstCdpi!.urn;
-  //let dstAccountAddress = dstCdpi!.ownerAddress;
 
   log.info("[handleCdpShift]cdpi {}/urn {}/ilk {} -> cdpi {}/urn {}/ilk {}", [
     srcCdp.toString(),
