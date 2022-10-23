@@ -127,6 +127,7 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_THREE = BigInt.fromI32(3);
 export const BIGINT_FOUR = BigInt.fromI32(4);
@@ -189,6 +190,9 @@ export const RESERVE_FEE_SCALE = BigDecimal.fromString("4e9");
 export const DEFAULT_RESERVE_FEE = BigDecimal.fromString("0.23").times(RESERVE_FEE_SCALE);
 // How much of a liquidation is credited to the underlying's reserves.
 export const UNDERLYING_RESERVES_FEE = BigDecimal.fromString("0.02").times(DECIMAL_PRECISION);
+// if delta Reverse < delta totalBalances +/- RESERVE_PRECISION
+// consider them equal
+export const RESERVE_PRECISION = BigInt.fromI32(10).pow(9);
 
 export const INITIAL_RESERVES = BigInt.fromI32(1e6 as i32);
 export const EXEC_START_BLOCK_NUMBER = BigInt.fromI32(13711556);

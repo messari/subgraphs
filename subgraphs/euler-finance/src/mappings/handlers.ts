@@ -56,8 +56,9 @@ export function handleAssetStatus(event: AssetStatus): void {
   const market = getOrCreateMarket(marketId);
   const token = Token.load(underlying)!;
 
+  // totalBorrows is divided by INTERNAL_DEBT_PRECISION in logAssetStatus() (L346 BasicLogic.sol)
   const totalBorrowBalance = bigIntChangeDecimals(totalBorrows, DEFAULT_DECIMALS, token.decimals);
-  const totalDepositBalance = bigIntChangeDecimals(poolSize.plus(totalBorrowBalance), DEFAULT_DECIMALS, token.decimals);
+  const totalDepositBalance = bigIntChangeDecimals(poolSize.plus(totalBorrows), DEFAULT_DECIMALS, token.decimals);
   if (totalBalances.gt(BIGINT_ZERO)) {
     market.exchangeRate = bigIntToBDUseDecimals(totalDepositBalance, token.decimals).div(
       bigIntToBDUseDecimals(totalBalances, DEFAULT_DECIMALS),
@@ -105,7 +106,7 @@ export function handleAssetStatus(event: AssetStatus): void {
     // update interest rates if `interestRate` or `reserveFee` changed
     updateInterestRates(market, interestRate, assetStatus.reserveFee, totalBorrows, totalBalances, event);
   }
-  updateRevenue(reserveBalance, protocol, market, assetStatus, event);
+  updateRevenue(reserveBalance, totalBalances, totalBorrows, protocol, market, assetStatus, event);
   snapshotMarket(event.block, marketId, BIGDECIMAL_ZERO, null);
 
   //for verification only

@@ -75,3 +75,13 @@ export function bigIntToBDUseDecimals(quantity: BigInt, decimals: i32 = 18): Big
       .toBigDecimal(),
   );
 }
+
+// return true if |x1 - x2| < precision
+export function aboutEqual(x1: BigInt, x2: BigInt, preicision: BigInt): bool {
+  if (x1.ge(x2)) {
+    return x1.minus(x2).le(preicision);
+  } else {
+    return x2.minus(x1).le(preicision);
+  }
+  return false;
+}
