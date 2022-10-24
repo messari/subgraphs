@@ -40,10 +40,13 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 - `npm install -g messari-subgraph-cli`
 - `npm install -g mustache`
 
+**Deployment.json Walkthough:**
 [![Deployment.json Walkthrough](https://img.youtube.com/vi/cgCNkRmM4NM/0.jpg)](https://youtu.be/cgCNkRmM4NM)
 
+**Standard Directory Structure Walkthrough:**
 [![Standard Directory Structure Walkthrough](https://img.youtube.com/vi/i3VAQYFMwEI/0.jpg)](https://youtu.be/i3VAQYFMwEI)
 
+**How to use Messari Subgraph CLI and Explanation:**
 [![How to use Messari Subgraph CLI and Explanation](https://img.youtube.com/vi/WYWa-3Vh5Jc/0.jpg)](https://youtu.be/WYWa-3Vh5Jc)
 
 ## Resources
