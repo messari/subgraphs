@@ -11,9 +11,24 @@
       "startBlock": 11685571
     },
     {
-      "name": "wCUSDv1",
+      "name": "wCUSDv0",
       "address": "0x3F1d224557afA4365155ea77cE4BC32D5Dae2174",
       "startBlock": 13156995
+    },
+    {
+      "name": "wCUSDv1",
+      "address": "0x401AFbc31ad2A3Bc0eD8960d63eFcDEA749b4849",
+      "startBlock": 13157007
+    },
+    {
+      "name": "sUSDv1_0",
+      "address": "0xe280efe654328a3325fc5a9eab8e998d418c86fb",
+      "startBlock": 12912727
+    },
+    {
+      "name": "sUSDv1_1",
+      "address": "0x1e35ebf875f8a2185edf22da02e7dbca0f5558ab",
+      "startBlock": 12961609
     },
     {
       "name": "sUSDv1",
@@ -28,19 +43,26 @@
   ],
   "deployers": [
     {
-      "name": "tBTCv2Deployer",
-      "address": "0xF6C2e0aDc659007Ba7c48446F5A4e4E94dfe08b5",
-      "startBlock": 13130166
-    },
-    {
-      "name": "USDDeployer",
-      "address": "0x29FD31d37AB8D27f11EAB68F96424bf64231fFce",
+      "name": "Deployer 1",
+      "address": "0x29fd31d37ab8d27f11eab68f96424bf64231ffce",
       "startBlock": 12064255
     },
     {
-      "name": "alETHDeployer",
-      "address": "0x7003102c75587E8D29c56124060463Ef319407D0",
+      "name": "Deployer 2",
+      "address": "0x7003102c75587e8d29c56124060463ef319407d0",
       "startBlock": 12634667
+    },
+    {
+      "name": "Deployer 3",
+      "address": "0xf6c2e0adc659007ba7c48446f5a4e4e94dfe08b5",
+      "startBlock": 13130166
+    }
+  ],
+  "poolRegistries": [
+    {
+      "name": "Pool Registry",
+      "address": "0xfb4de84c4375d7c8577327153de88f58f69eec81",
+      "startBlock": 14416160
     }
   ]
 }
