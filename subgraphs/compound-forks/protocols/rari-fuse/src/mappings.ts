@@ -3,6 +3,7 @@ import {
   Address,
   BigDecimal,
   BigInt,
+  dataSource,
   ethereum,
   log,
 } from "@graphprotocol/graph-ts";
@@ -35,6 +36,7 @@ import {
 import { PoolRegistered } from "../../../generated/FusePoolDirectory/FusePoolDirectory";
 import {
   BLOCKLIST_MARKETS,
+  compareNormalizedString,
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
@@ -97,6 +99,7 @@ import {
   INT_TWO,
   mantissaFactor,
   mantissaFactorBD,
+  Network,
   RewardTokenType,
 } from "../../../src/constants";
 import {
@@ -510,9 +513,15 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     blocksPerDayBD.truncate(0).toString()
   );
   let blocksPerYear: i32;
-  if (blocksPerDayBI.isI32()) {
+  if (
+    blocksPerDayBI.isI32() &&
+    !compareNormalizedString(dataSource.network(), Network.ARBITRUM_ONE)
+  ) {
     blocksPerYear = blocksPerDayBI.toI32() * DAYS_PER_YEAR;
   } else {
+    // Arbitrum One block speed is the same as ethereum
+    // we do this b/c we cannot calculate the arbitrum block speed accurately
+    // Explanation: https://github.com/OffchainLabs/arbitrum/blob/master/docs/Time_in_Arbitrum.md#example
     blocksPerYear = ETHEREUM_BLOCKS_PER_YEAR;
   }
 
