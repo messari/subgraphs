@@ -108,7 +108,7 @@ export const AVALANCHE_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 2; // 2 = seconds pe
 export const FANTOM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 1; // 1 = seconds per block. This is NOT ideal since fantom has variable block time.
 export const BSC_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 3; // 3 = seconds per block
 export const MATIC_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 2; // 2 = seconds per block
-export const ARBITRUM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 1; // 1 = seconds per block. This is NOT ideal since fantom has variable block time.
+export const ARBITRUM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 1; // 1 = seconds per block.
 
 /////////////////////////////
 /////        Math       /////

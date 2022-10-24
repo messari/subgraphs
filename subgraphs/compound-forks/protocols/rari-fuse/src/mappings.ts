@@ -501,27 +501,26 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   }
   const oracleContract = PriceOracle.bind(Address.fromString(pool.priceOracle));
 
-  // get rolling blocks/day count
-  getRewardsPerDay(
-    event.block.timestamp,
-    event.block.number,
-    BIGDECIMAL_ZERO,
-    RewardIntervalType.BLOCK
-  );
-  const blocksPerDayBD = getOrCreateCircularBuffer().blocksPerDay;
-  const blocksPerDayBI = BigInt.fromString(
-    blocksPerDayBD.truncate(0).toString()
-  );
   let blocksPerYear: i32;
-  if (
-    blocksPerDayBI.isI32() &&
-    !compareNormalizedString(dataSource.network(), Network.ARBITRUM_ONE)
-  ) {
+  if (compareNormalizedString(dataSource.network(), Network.MAINNET)) {
+    // calculate blocks/yr on ethereum
+    // get rolling blocks/day count
+    getRewardsPerDay(
+      event.block.timestamp,
+      event.block.number,
+      BIGDECIMAL_ZERO,
+      RewardIntervalType.BLOCK
+    );
+    const blocksPerDayBD = getOrCreateCircularBuffer().blocksPerDay;
+    const blocksPerDayBI = BigInt.fromString(
+      blocksPerDayBD.truncate(0).toString()
+    );
+
     blocksPerYear = blocksPerDayBI.toI32() * DAYS_PER_YEAR;
   } else {
     // Arbitrum One block speed is the same as ethereum
     // we do this b/c we cannot calculate the arbitrum block speed accurately
-    // Explanation: https://github.com/OffchainLabs/arbitrum/blob/master/docs/Time_in_Arbitrum.md#example
+    // see discussion: https://github.com/messari/subgraphs/issues/939
     blocksPerYear = ETHEREUM_BLOCKS_PER_YEAR;
   }
 
