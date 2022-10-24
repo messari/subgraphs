@@ -1,3 +1,4 @@
+/* eslint-disable */
 const Web3 = require("web3");
 const writeYamlFile = require("write-yaml-file");
 const EthDater = require("ethereum-block-by-date");
