@@ -134,7 +134,7 @@ export function getOrCreateVault(
 
     // add vault to yield aggregator
     const yieldAggregator = getOrCreateYieldAggregator();
-    let vaults = yieldAggregator._vaults;
+    const vaults = yieldAggregator._vaults;
     vaults.push(tryVaultAddress.value.toHexString());
     yieldAggregator._vaults = vaults;
     yieldAggregator.save();
@@ -180,7 +180,7 @@ export function getFees(
   vaultId: string,
   strategyContract: BeefyStrategy
 ): string[] {
-  let fees: string[] = [];
+  const fees: string[] = [];
 
   // Always a 4.5% performance fee (calculated on harvest)
   // this way we know performance fee is always in position 0

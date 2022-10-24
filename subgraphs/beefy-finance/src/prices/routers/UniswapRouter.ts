@@ -230,8 +230,8 @@ export function getLpTokenTotalLiquidityUsdc(
     token1Price.usdPrice.toString(),
   ]);
 
-  let reserve0 = reserves.value0;
-  let reserve1 = reserves.value1;
+  const reserve0 = reserves.value0;
+  const reserve1 = reserves.value1;
 
   if (
     reserve0.notEqual(constants.BIGINT_ZERO) ||

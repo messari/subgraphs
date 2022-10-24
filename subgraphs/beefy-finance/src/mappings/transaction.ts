@@ -3,7 +3,6 @@ import { Deposit, Vault, VaultFee, Withdraw } from "../../generated/schema";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
-  exponentToBigDecimal,
   PROTOCOL_ID,
 } from "../utils/constants";
 import { getOrCreateVaultDailySnapshot } from "../utils/getters";
