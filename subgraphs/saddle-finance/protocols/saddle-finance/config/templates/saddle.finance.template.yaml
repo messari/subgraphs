@@ -64,7 +64,7 @@ dataSources:
         - event: NewSwapPool(indexed address,address,address[])
           handler: handleNewSwapPool
       file: ./src/mappings/swapDeployer.ts
-  {{ /deployers }}
+  {{/deployers}}
   {{#pools}}
   - kind: ethereum/contract
     name: {{ name }}
@@ -148,7 +148,7 @@ dataSources:
         - event: TokenSwapUnderlying(indexed address,uint256,uint256,uint128,uint128)
           handler: handleTokenSwapUnderlying
       file: ./src/mappings/swap.ts
-  {{ /pools }}
+  {{/pools}}
   {{#miniChef}}
   - kind: ethereum/contract
     name: MiniChefV2
@@ -219,7 +219,7 @@ dataSources:
         - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleWithdraw
       file: ./src/mappings/miniChef.ts
-  {{ /miniChef }}
+  {{/miniChef}}
   {{#poolRegistries}}
   - kind: ethereum/contract
     name: {{ name }}
@@ -282,7 +282,7 @@ dataSources:
         - event: UpdatePool(indexed address,uint256,(address,address,uint8,bytes32,address,address[],address[],address,address,bool,bool,bool))
           handler: handleUpdatePool
       file: ./src/mappings/poolRegistry.ts
-  {{ /poolRegistries }}
+  {{/poolRegistries}}
 templates:
   - kind: ethereum/contract
     name: Swap
