@@ -999,7 +999,7 @@ export function _handleLiquidateBorrow(
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
   liquidate.market = liquidatedCTokenID!;
-  liquidate.asset = repayTokenMarketID;
+  liquidate.asset = repayTokenMarket.inputToken;
   liquidate.amount = seizeTokens;
   const gainUSD = seizeTokens
     .toBigDecimal()
