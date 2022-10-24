@@ -2,6 +2,7 @@ import { BigDecimal, BigInt, Address } from '@graphprotocol/graph-ts'
 
 export namespace constants {
   export const BIG_INT_ZERO = BigInt.zero()
+  export const BIG_INT_TEN = BigInt.fromI32(10)
   export const BIG_DECIMAL_ZERO = BigDecimal.zero()
   export const SECONDS_PER_HOUR = 60 * 60
   export const SECONDS_PER_DAY = 60 * 60 * 24

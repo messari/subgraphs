@@ -15,6 +15,23 @@ export namespace tokens {
     }
   }
 
+  class Result<T> {
+    public value: T
+
+    constructor(value: T) {
+      this.value = value
+    }
+  }
+
+  export function extractDecimals(address: Address): Result<u8> | null {
+    const contract = ERC20Contract.bind(address)
+    const decimalsCall = contract.try_decimals()
+
+    if (decimalsCall.reverted) return null
+
+    return new Result(decimalsCall.value as u8)
+  }
+
   export function getData(address: Address): TokenData | null {
     const contract = ERC20Contract.bind(address)
     const nameCall = contract.try_name()

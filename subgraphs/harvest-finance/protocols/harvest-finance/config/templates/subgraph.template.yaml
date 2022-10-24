@@ -30,6 +30,8 @@ dataSources:
           file: ./abis/YearnLens.json
         - name: UniswapRouterContract
           file: ./abis/UniswapRouter.json
+        - name: UniswapPairContract
+          file: ./abis/UniswapV2Pair.json
       callHandlers:
         - function: addVaultAndStrategy(address,address)
           handler: handleAddVaultAndStrategy

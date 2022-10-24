@@ -1,4 +1,4 @@
-import { Address, ethereum } from '@graphprotocol/graph-ts'
+import { Address } from '@graphprotocol/graph-ts'
 import { constants } from './constants'
 import { tokens } from './tokens'
 import { RewardToken } from '../../generated/schema'

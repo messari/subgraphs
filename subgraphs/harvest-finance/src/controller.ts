@@ -3,8 +3,7 @@ import {
   SharePriceChangeLog,
 } from '../generated/Controller/ControllerContract'
 import { VaultContract } from '../generated/Controller/VaultContract'
-import { VaultFee } from '../generated/schema'
-import { BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
+import { BigInt, log } from '@graphprotocol/graph-ts'
 import { tokens } from './utils/tokens'
 import { vaults } from './utils/vaults'
 import { Vault as VaultTemplate } from '../generated/templates'

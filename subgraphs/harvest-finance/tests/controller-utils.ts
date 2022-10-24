@@ -1,14 +1,7 @@
-import {
-  Address,
-  ethereum,
-  BigInt,
-  BigDecimal,
-  Bytes,
-} from '@graphprotocol/graph-ts'
+import { Address, ethereum, BigInt, BigDecimal } from '@graphprotocol/graph-ts'
 import { createMockedFunction, newMockCall, assert } from 'matchstick-as'
 import { AddVaultAndStrategyCall } from '../generated/Controller/ControllerContract'
-import { constants } from '../src/utils/constants'
-import { toStringArray } from './utils/helpers'
+import { helpers } from './utils/helpers'
 
 export function mockCall(
   vault: Address,
@@ -96,6 +89,26 @@ export function mockUniswapRouter(
       ethereum.Value.fromAddressArray(path),
     ])
     .returns([ethereum.Value.fromUnsignedBigIntArray([amountIn, amountOut])])
+}
+
+export function mockUniswapRouter_factory(
+  contractAddress: Address,
+  address: Address = Address.zero(),
+  revert: bool = false
+): void {
+  if (revert) {
+    createMockedFunction(
+      contractAddress,
+      'factory',
+      'factory():(address)'
+    ).reverts()
+    return
+  }
+  createMockedFunction(
+    contractAddress,
+    'factory',
+    'factory():(address)'
+  ).returns([ethereum.Value.fromAddress(address)])
 }
 
 export function mockYearnLens(
@@ -206,7 +219,7 @@ export function assertVault(
     'Vault',
     address.toHexString(),
     'fees',
-    toStringArray(feesArray)
+    helpers.toStringArray(feesArray)
   )
 }
 
