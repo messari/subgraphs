@@ -3,7 +3,7 @@ repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  {{ #deployers }}
+  {{#deployers}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ chain }}
@@ -65,7 +65,7 @@ dataSources:
           handler: handleNewSwapPool
       file: ./src/mappings/swapDeployer.ts
   {{ /deployers }}
-  {{ #pools }}
+  {{#pools}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ chain }}
@@ -149,7 +149,7 @@ dataSources:
           handler: handleTokenSwapUnderlying
       file: ./src/mappings/swap.ts
   {{ /pools }}
-  {{ #miniChef }}
+  {{#miniChef}}
   - kind: ethereum/contract
     name: MiniChefV2
     network: {{ chain }}
@@ -220,7 +220,7 @@ dataSources:
           handler: handleWithdraw
       file: ./src/mappings/miniChef.ts
   {{ /miniChef }}
-  {{ #poolRegistries }}
+  {{#poolRegistries}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ chain }}
