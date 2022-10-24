@@ -6,7 +6,6 @@ import {
   RemoveLiquidityImbalance,
   RemoveLiquidityOne,
   TokenSwap,
-  InitializeCall,
   Swap,
   TokenSwapUnderlying,
 } from "../../generated/templates/Swap/Swap";
@@ -86,10 +85,10 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 export function handleTokenSwap(event: TokenSwap): void {
   const pool = getOrCreatePool(event.address);
   const tokenIn = getOrCreateTokenFromString(
-    pool.inputTokens[event.params.soldId.toI32()]
+    pool._inputTokensOrdered[event.params.soldId.toI32()]
   );
   const tokenOut = getOrCreateTokenFromString(
-    pool.inputTokens[event.params.boughtId.toI32()]
+    pool._inputTokensOrdered[event.params.boughtId.toI32()]
   );
   createSwap(
     pool,
@@ -112,8 +111,8 @@ export function handleTokenSwapUnderlying(event: TokenSwapUnderlying): void {
     // Swap is already handled in underlying pool
     return;
   }
-  const tokenIn = getOrCreateTokenFromString(pool.inputTokens[soldId]);
-  const tokenOut = getOrCreateTokenFromString(pool.inputTokens[boughtId]);
+  const tokenIn = getOrCreateTokenFromString(pool._inputTokensOrdered[soldId]);
+  const tokenOut = getOrCreateTokenFromString(pool._inputTokensOrdered[boughtId]);
   createSwap(
     pool,
     event,

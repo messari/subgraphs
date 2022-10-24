@@ -39,7 +39,7 @@ export class NetworkSpecificConstant {
 
 // TODO- figure out how to get different mainnet deployments to work (ie, arc, rwa, eth amm, eth)
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
-  let network = dataSource.network();
+  const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
       Address.fromString("0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"),

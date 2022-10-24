@@ -4,7 +4,7 @@ export const protocolErrorMessages = {
     cumulativeProtocolSideRevenueUSD: "This field on 'Protocol' entity has a value below $0 or above $100,000,000,000.",
     cumulativeTotalRevenueUSD: "'Protocol' entity has a cumulativeTotalRevenueUSD that is not within $1000 of the value of cumulativeProtocolSideRevenueUSD + cumulativeSupplySideRevenueUSD",
     cumulativeVolumeUSD: "This field on 'Protocol' entity has a negative value.",
-    cumulativeUniqueUsers: "This field on 'Protocol' entity has a value belo 0 or greater than 100,000,000.",
+    cumulativeUniqueUsers: "This field on 'Protocol' entity has a value below 0 or greater than 100,000,000.",
     totalPoolCount: "This field on 'Protocol' entity has less than 0 pools or more than 10,000 pools.",
     cumulativeUniqueDepositors: "'Protocol' entity has fewer cumulativeUniqueUsers than cumulativeUniqueDepositors.",
     cumulativeUniqueBorrowers: "This field on 'Protocol' entity has a fewer cumulativeUniqueUsers than cumulativeUniqueBorrowers.",
@@ -16,6 +16,9 @@ export const protocolErrorMessages = {
     cumulativeDepositUSD: "'Protocol' entity has a lower cumulativeDepositUSD than totalDepositBalanceUSD.",
     totalBorrowBalanceUSD: "'Protocol' entity has a lower totalDepositBalanceUSD than totalBorrowBalanceUSD.",
     cumulativeLiquidateUSD: "'Protocol' entity has a lower cumulativeBorrowUSD than cumulativeLiquidateUSD.",
+    protocolEntity: "'Protocol' entity has zero instances.",
+    relatedField: "This field on 'Protocol' entity is supposed to hold related instances of another entity, however no instances were successfully linked.",
+    queryError: "Querying the 'Protocol' entity returned error messages."
 };
 
 export const poolErrorMessages = {
@@ -51,6 +54,9 @@ export const protocolErrors = {
     cumulativeDepositUSD: [],
     totalBorrowBalanceUSD: [],
     cumulativeLiquidateUSD: [],
+    protocolEntity: [],
+    relatedField: [],
+    queryError: []
 };
 
 export const errorsObj = {

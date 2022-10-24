@@ -95,9 +95,9 @@ function ProtocolInfo({ protocolData, protocolId, subgraphToQueryURL, schemaVers
           {schemaVersion && (
             <Chip label={<span>Schema: {schemaVersion}{schemaAlert}</span>} />
           )}
-          {protocolSchemaData?.subgraphVersion && (
+          {protocolSchemaData?.subgraphVersion && !protocolSchemaData?.subgraphVersion.includes("N/A") ? (
             <Chip label={<span>Subgraph: {protocolSchemaData?.subgraphVersion}{subgraphAlert}</span>} />
-          )}
+          ) : null}
           {protocolSchemaData?.methodologyVersion && (
             <Chip label={<span>Methodology: {protocolSchemaData?.methodologyVersion}{methodologyAlert}</span>} />
           )}

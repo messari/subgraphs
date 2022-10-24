@@ -552,15 +552,7 @@ function PoolTabEntity({
         rewardAPRElement = null;
       } else {
         rewardAPRElement = (
-          <div id={elementId}>
-            <Box mt={3} mb={1}>
-              <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-                <Typography variant="h6">{elementId}</Typography>
-              </CopyLinkToClipboard>
-            </Box>
-            <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} />
-
-          </div>
+          <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} />
         );
       }
     }
@@ -592,14 +584,7 @@ function PoolTabEntity({
         }
       });
       ratesElement = (
-        <div key={elementId} id={elementId}>
-          <Box mt={3} mb={1}>
-            <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-              <Typography variant="h6">{elementId}</Typography>
-            </CopyLinkToClipboard>
-          </Box>
-          <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} />
-        </div>
+        <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} />
       );
     }
 
@@ -958,14 +943,7 @@ function PoolTabEntity({
             return null;
           }
           return (
-            <div key={elementId} id={linkToElementId}>
-              <Box mt={3} mb={1}>
-                <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
-                  <Typography variant="h6">{label}</Typography>
-                </CopyLinkToClipboard>
-              </Box>
-              <ChartContainer downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataFields[field]} />
-            </div>
+            <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataFields[field]} />
           );
         })}
         {ratesElement}
