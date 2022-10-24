@@ -71,7 +71,8 @@ describe('Controller', () => {
         BigDecimal.fromString('0'),
         BigDecimal.fromString('0'),
         BigDecimal.fromString('0'),
-        0
+        0,
+        1
       )
 
       // Vault Assertions

@@ -237,7 +237,8 @@ export function assertProtocol(
   cumulativeSupplySideRevenueUSD: BigDecimal,
   cumulativeProtocolSideRevenueUSD: BigDecimal,
   cumulativeTotalRevenueUSD: BigDecimal,
-  cumulativeUniqueUsers: i32
+  cumulativeUniqueUsers: i32,
+  totalPoolCount: i32
 ): void {
   assert.fieldEquals('YieldAggregator', address.toHexString(), 'name', name)
   assert.fieldEquals('YieldAggregator', address.toHexString(), 'slug', slug)
@@ -303,5 +304,12 @@ export function assertProtocol(
     address.toHexString(),
     'cumulativeUniqueUsers',
     cumulativeUniqueUsers.toString()
+  )
+
+  assert.fieldEquals(
+    'YieldAggregator',
+    address.toHexString(),
+    'totalPoolCount',
+    totalPoolCount.toString()
   )
 }

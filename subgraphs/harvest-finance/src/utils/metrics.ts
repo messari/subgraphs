@@ -241,6 +241,8 @@ export namespace metrics {
       usageMetricsHourly.hourlyActiveUsers += 1
     }
 
+    usageMetricsDaily.totalPoolCount = protocol.totalPoolCount
+
     usageMetricsDaily.save()
     usageMetricsHourly.save()
   }

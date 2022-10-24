@@ -81,6 +81,8 @@ export function handleAddVaultAndStrategy(call: AddVaultAndStrategyCall): void {
 
   const protocol = protocols.findOrInitialize(constants.CONTROLLER_ADDRESS)
 
+  protocol.totalPoolCount = protocol.totalPoolCount + 1
+
   protocol.save()
 
   vault.protocol = protocol.id

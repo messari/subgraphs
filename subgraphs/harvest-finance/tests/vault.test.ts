@@ -11,13 +11,14 @@ import {
 } from './vault-utils'
 import { handleDeposit, handleTransfer, handleWithdraw } from '../src/vault'
 import { Vault } from '../generated/schema'
-import { mockChainLink } from './controller-utils'
+import { assertProtocol, mockChainLink } from './controller-utils'
 import { vaults } from '../src/utils/vaults'
 import { deposits } from '../src/utils/deposits'
 import { withdraws } from '../src/utils/withdraws'
 import { tokens } from '../src/utils/tokens'
 import { constants } from '../src/utils/constants'
 import { protocols } from '../src/utils/protocols'
+import { handleAddVaultAndStrategy } from '../src/controller'
 
 const vaultAddress = Address.fromString(
   '0x0000000000000000000000000000000000000001'
@@ -36,6 +37,7 @@ function createVault(): Vault {
 
   const vault = vaults.initialize(vaultAddress.toHexString())
   const protocol = protocols.initialize(protocolAddressString)
+  protocol.totalPoolCount = protocol.totalPoolCount + 1
 
   vault.name = 'FARM_USDC'
   vault.symbol = 'fUSDC'
@@ -464,7 +466,7 @@ describe('Vault', () => {
         transactionCount: dailyTxCount,
         depositCount: depositCount,
         withdrawCount: 0,
-        totalPoolCount: 0,
+        totalPoolCount: 1,
         blockNumber: event0.block.number,
         timestamp: event0.block.timestamp,
       })
@@ -484,7 +486,7 @@ describe('Vault', () => {
         transactionCount: dailyTxCount,
         depositCount: depositCount,
         withdrawCount: withdrawCount,
-        totalPoolCount: 0,
+        totalPoolCount: 1,
         blockNumber: event1.block.number,
         timestamp: event1.block.timestamp,
       })
@@ -517,7 +519,7 @@ describe('Vault', () => {
         transactionCount: dailyTxCount,
         depositCount: depositCount,
         withdrawCount: withdrawCount,
-        totalPoolCount: 0,
+        totalPoolCount: 1,
         blockNumber: event2.block.number,
         timestamp: event2.block.timestamp,
       })
@@ -540,10 +542,29 @@ describe('Vault', () => {
         transactionCount: dailyTxCount,
         depositCount: depositCount,
         withdrawCount: withdrawCount,
-        totalPoolCount: 0,
+        totalPoolCount: 1,
         blockNumber: event3.block.number,
         timestamp: event3.block.timestamp,
       })
+
+      // Check derived fields are correct for yieldAggregator
+      assertProtocol(
+        constants.CONTROLLER_ADDRESS,
+        'Harvest Finance',
+        'harvest-finance',
+        '1.3.0',
+        '0.1.0',
+        '1.0.0',
+        'MAINNET',
+        'YIELD',
+        BigDecimal.fromString('0'),
+        BigDecimal.fromString('0'),
+        BigDecimal.fromString('0'),
+        BigDecimal.fromString('0'),
+        BigDecimal.fromString('0'),
+        2,
+        1
+      )
     })
   })
 })
