@@ -12,7 +12,7 @@ export function readValue<T>(
 export function getTokenDecimals(tokenAddr: Address): BigInt {
   const token = ERC20.bind(tokenAddr);
 
-  let decimals = token.try_decimals();
+  const decimals = token.try_decimals();
   if (decimals.reverted) {
     return constants.DEFAULT_DECIMALS;
   }

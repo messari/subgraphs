@@ -1,3 +1,4 @@
+/* eslint-disable */
 const oracles = require("../ChainLinkAddresses");
 const ethers = require("ethers");
 const chainLinkAbi = require("../../../../abis/Chainlink.json");

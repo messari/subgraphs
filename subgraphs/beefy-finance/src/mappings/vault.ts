@@ -128,7 +128,7 @@ export function getFees(
   vaultId: string,
   strategyContract: BeefyStrategy
 ): string[] {
-  let fees: string[] = [];
+  const fees: string[] = [];
   let call = strategyContract.try_STRATEGIST_FEE();
   if (!call.reverted) {
     const strategistFee = new VaultFee("STRATEGIST_FEE-" + vaultId);

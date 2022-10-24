@@ -4,7 +4,6 @@ import { ChainlinkOracle } from "../../../generated/Standard/ChainlinkOracle";
 import { polygonOracles as oracles } from "./oracles";
 import { ERC20 } from "../../../generated/Standard/ERC20";
 import { ZERO_ADDRESS } from "../common/constants";
-import { CHAIN_LINK_USD_ADDRESS } from "../common/constants";
 
 export function getChainLinkContract(asset: string): ChainlinkOracle {
   for (let i = 0; i < oracles.length; i++) {
@@ -26,7 +25,7 @@ export function getTokenPriceFromChainLink(
     return new CustomPriceType();
   }
 
-  let result = chainLinkContract.try_latestRoundData();
+  const result = chainLinkContract.try_latestRoundData();
 
   if (!result.reverted) {
     const decimals = tokenContract.decimals();
