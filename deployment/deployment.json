@@ -671,7 +671,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.arbitrum.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -693,7 +693,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.avalanche.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -715,7 +715,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.aurora.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -737,7 +737,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.celo.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -759,7 +759,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.fantom.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -781,7 +781,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.fuse.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -803,7 +803,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.harmony.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -825,7 +825,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.moonbeam.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -847,7 +847,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.moonriver.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -869,7 +869,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.polygon.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -891,7 +891,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "beefy.finance.template.yaml"
+          "template": "beefy.bsc.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -901,6 +901,50 @@
           "hosted-service": {
             "slug": "beefy-finance-bsc",
             "query-id": "beefy-finance-bsc"
+          }
+        }
+      },
+      "beefy-finance-optimism": {
+        "network": "optimism",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "beefy.optimism.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "beefy-finance-optimism",
+            "query-id": "beefy-finance-optimism"
+          }
+        }
+      },
+      "beefy-finance-cronos": {
+        "network": "cronos",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.0.2",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "beefy.cronos.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "cronos-portal": {
+            "slug": "beefy-finance-cronos",
+            "query-id": "beefy-finance-cronos"
           }
         }
       }
