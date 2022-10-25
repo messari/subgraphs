@@ -463,10 +463,11 @@ function getPriceFromLp(
   log.warning("{} costs ${}", [wantAddress.toHexString(), priceBD.toString()]);
 
   // convert back to BigInt
+  const reverseMantissaFactor = 18 - wantMarketDecimals + 18;
   return ethereum.CallResult.fromValue(
     BigInt.fromString(
       priceBD
-        .times(exponentToBigDecimal(wantMarketDecimals))
+        .times(exponentToBigDecimal(reverseMantissaFactor))
         .truncate(0)
         .toString()
     )
