@@ -1,6 +1,6 @@
 {
   "name": "messari-subgraph-cli",
-  "version": "0.1.38",
+  "version": "0.1.39",
   "description": "messari CLI",
   "types": "build/types/types.d.ts",
   "bin": {
