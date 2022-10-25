@@ -1411,7 +1411,6 @@ type Liquidate @entity(immutable: true) {
   profitUSD: BigDecimal!
 }
 
-# TODO
 type Flashloan @entity(immutable: true) {
   " { Transaction Count } e.g. the number of transaction in the protocol "
   id: ID!
@@ -1452,8 +1451,11 @@ type Flashloan @entity(immutable: true) {
   " Amount of asset borrowed in USD "
   amountUSD: BigDecimal!
 
-  " Amount of profit from flashloan in USD "
-  profitUSD: BigDecimal!
+  " Amount of asset taken by protocol as a fee in native units "
+  feeAmount: BigInt!
+
+  " Amount of asset taken by protocol as a fee in USD "
+  feeAmountUSD: BigDecimal!
 }
 
 # Helper entity for calculating daily/hourly active users
