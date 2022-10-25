@@ -33,9 +33,8 @@ import {
   SECONDS_PER_DAY,
   DEFAULT_DECIMALS,
   UNDERLYING_RESERVES_FEE,
-  RESERVE_PRECISION,
 } from "../common/constants";
-import { aboutEqual, bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
+import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
 import { LendingProtocol, Market, _AssetStatus } from "../../generated/schema";
 import { Exec } from "../../generated/euler/Exec";
 import { bigDecimalExponential } from "../common/conversions";
@@ -191,15 +190,6 @@ export function createLiquidation(event: Liquidation): BigDecimal {
   liquidation.profitUSD = liquidation.amountUSD.minus(repayUSD);
   liquidation.save();
 
-  log.info("[createLiquidation]seizedToken={}/{},amount={},price={},amountUSD={},blk={},tx={}", [
-    seizedToken.name,
-    seizedTokenId,
-    liquidation.amount.toString(),
-    seizedToken.lastPriceUSD!.toString(),
-    liquidation.amountUSD.toString(),
-    event.block.number.toString(),
-    event.transaction.hash.toHexString(),
-  ]);
   collateralMarket.cumulativeLiquidateUSD = collateralMarket.cumulativeLiquidateUSD.plus(liquidation.amountUSD);
   collateralMarket.save();
 
@@ -258,14 +248,6 @@ export function updatePrices(execProxyAddress: Address, market: Market, event: e
     dToken.save();
   }
 
-  log.debug("[updatePrices]tx={},block={},token={}/{},currPriceUSD={}", [
-    event.transaction.hash.toHexString(),
-    blockNumber.toString(),
-    token.name,
-    underlying.toHexString(),
-    underlyingPriceUSD.toString(),
-  ]);
-
   return underlyingPriceUSD;
 }
 
@@ -302,21 +284,6 @@ export function updateInterestRates(
   market.rates = [borrowerRate.id, lenderRate.id];
   market.save();
 
-  log.debug(
-    "[updateInterestRates]interest rates for market {} updated to [{}, {}] at block {}; inputs:interestRate={},reserveFee={},totalBorrows={},totalBalances={},tx={}",
-    [
-      market.id,
-      borrowerRate.rate.toString(),
-      lenderRate.rate.toString(),
-      event.block.number.toString(),
-      interestRate.toString(),
-      reserveFee.toString(),
-      totalBorrows.toString(),
-      totalBalances.toString(),
-      event.transaction.hash.toHexString(),
-    ],
-  );
-
   const marketDailySnapshot = getOrCreateMarketDailySnapshot(event.block, market.id);
   const days = (event.block.timestamp.toI32() / SECONDS_PER_DAY).toString();
   marketDailySnapshot.rates = getSnapshotRates(market.rates, days);
@@ -344,26 +311,7 @@ export function updateRevenue(
   const marketId = market.id;
   const underlying = Address.fromString(market.inputToken);
   const block = event.block;
-  const timestamp = event.block.timestamp;
   const token = getOrCreateToken(underlying);
-
-  if (assetStatus.timestamp && timestamp.lt(assetStatus.timestamp)) {
-    log.critical("[updateRevenue]event timestamp {} < assetStatus.timestamp {} at block {} for tx {}", [
-      timestamp.toString(),
-      assetStatus.timestamp.toString(),
-      event.block.number.toString(),
-      event.transaction.hash.toString(),
-    ]);
-  }
-
-  if (assetStatus.reserveBalance && reserveBalance.lt(assetStatus.reserveBalance)) {
-    log.critical("[updateRevenue]event reserveBalance {} < assetStatus.reserveBalance {} at block {} for tx {}", [
-      reserveBalance.toString(),
-      assetStatus.reserveBalance.toString(),
-      event.block.number.toString(),
-      event.transaction.hash.toString(),
-    ]);
-  }
 
   const deltaReserveBalance = reserveBalance.minus(assetStatus.reserveBalance);
 
@@ -393,23 +341,6 @@ export function updateRevenue(
   market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(deltaProtocolSideRevenue);
   market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(deltaTotalRevenue);
   market.save();
-
-  log.info(
-    "[updateRevenue]market={}/{},blk={},tx={},price={},dProtocolSideRev={},dSupplySideRev={},dTotalRev={};Inputs:reserveBalance={},assetStatus.reserverBalance={},reserveFee={}",
-    [
-      market.name!,
-      market.id,
-      event.block.number.toString(),
-      event.transaction.hash.toHexString(),
-      token.lastPriceUSD!.toString(),
-      deltaProtocolSideRevenue.toString(),
-      deltaSupplySideRevenue.toString(),
-      deltaTotalRevenue.toString(),
-      reserveBalance.toString(),
-      assetStatus.reserveBalance.toString(),
-      assetStatus.reserveFee.toString(),
-    ],
-  );
 
   const marketDailySnapshot = getOrCreateMarketDailySnapshot(block, marketId);
   const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(block, marketId);
@@ -486,10 +417,6 @@ export function snapshotFinancials(
 
   financialMetrics.save();
   const days = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
-  log.debug("[snapshotFinancials]days {}: protocol.totalValueLocked={}", [
-    days,
-    protocol!.totalValueLockedUSD.toString(),
-  ]);
 }
 
 // update a given UsageMetricDailySnapshot
@@ -559,8 +486,6 @@ export function snapshotMarket(
   const marketDailyMetrics = getOrCreateMarketDailySnapshot(block, marketId);
   const marketHourlyMetrics = getOrCreateMarketHourlySnapshot(block, marketId);
 
-  //if (block.timestamp.ge(marketDailyMetrics.timestamp)) {
-  //MarketDailySnapshot exists and is stale
   const market = getOrCreateMarket(marketId);
   marketDailyMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
   marketDailyMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
@@ -578,11 +503,7 @@ export function snapshotMarket(
   marketDailyMetrics.exchangeRate = market.exchangeRate;
   marketDailyMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   marketDailyMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-  //}
 
-  //if (block.timestamp.ge(marketHourlyMetrics.timestamp)) {
-  //MarketHourlySnapshot exists and is stale
-  //const market = getOrCreateMarket(marketId);
   marketHourlyMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
   marketHourlyMetrics.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD;
   marketHourlyMetrics.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD;
@@ -599,7 +520,6 @@ export function snapshotMarket(
   marketHourlyMetrics.exchangeRate = market.exchangeRate;
   marketHourlyMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   marketHourlyMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-  //}
 
   // update to latest block/timestamp
   marketDailyMetrics.blockNumber = block.number;
@@ -712,23 +632,14 @@ export function rollbackRevenue(marketId: string, event: Liquidation, assetStatu
       marketDailySnapshot.dailySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
     marketDailySnapshot.save();
   } else {
-    log.error(
-      "[rollbackRevenue]market={}/{},blk={},tx={},deltaTotalRevUSD={}>market.dailyTotalRevnueUSD={};Inputs:repay={},desiredrepay={},repayExtraUSD={},reserveFee={},deltaTotalRevenueUSD={},deltaSupplySideRevenue={}",
-      [
-        market.name!,
-        market.id,
-        event.block.number.toString(),
-        event.transaction.hash.toHexString(),
-        deltaTotalRevenueUSD.toString(),
-        marketDailySnapshot.dailyTotalRevenueUSD.toString(),
-        repay.toString(),
-        desiredRepay.toString(),
-        repayExtraUSD.toString(),
-        assetStatus.reserveFee.toString(),
-        deltaTotalRevenueUSD.toString(),
-        deltaSupplySideRevenueUSD.toString(),
-      ],
-    );
+    log.error("[rollbackRevenue]market={}/{},blk={},tx={},deltaTotalRevUSD={}>market.dailyTotalRevnueUSD={}", [
+      market.name!,
+      market.id,
+      event.block.number.toString(),
+      event.transaction.hash.toHexString(),
+      deltaTotalRevenueUSD.toString(),
+      marketDailySnapshot.dailyTotalRevenueUSD.toString(),
+    ]);
   }
 
   const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event.block, marketId);
@@ -741,5 +652,14 @@ export function rollbackRevenue(marketId: string, event: Liquidation, assetStatu
     marketHourlySnapshot.hourlySupplySideRevenueUSD =
       marketHourlySnapshot.hourlySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
     marketHourlySnapshot.save();
+  } else {
+    log.error("[rollbackRevenue]market={}/{},blk={},tx={},deltaTotalRevUSD={}>market.hourlyTotalRevnueUSD={}", [
+      market.name!,
+      market.id,
+      event.block.number.toString(),
+      event.transaction.hash.toHexString(),
+      deltaTotalRevenueUSD.toString(),
+      marketHourlySnapshot.hourlyTotalRevenueUSD.toString(),
+    ]);
   }
 }

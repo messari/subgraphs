@@ -1,4 +1,4 @@
-import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -24,7 +24,7 @@ import {
   CONFIG_FACTOR_SCALE,
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
-  BIGINT_HUNDRED,
+  BIGINT_SEVENTY_FIVE,
 } from "../common/constants";
 import { rollbackRevenue, snapshotFinancials, snapshotMarket, updateUsageMetrics } from "./helpers";
 import {
@@ -37,7 +37,7 @@ import {
   updatePrices,
   updateRevenue,
 } from "./helpers";
-import { Token } from "../../generated/schema";
+import { LendingProtocol, Market, Token } from "../../generated/schema";
 import { ERC20 } from "../../generated/euler/ERC20";
 import { GovConvertReserves, GovSetReserveFee } from "../../generated/euler/Exec";
 import { bigIntChangeDecimals, bigIntToBDUseDecimals } from "../common/conversions";
@@ -51,6 +51,13 @@ export function handleAssetStatus(event: AssetStatus): void {
   const interestRate = event.params.interestRate;
 
   const assetStatus = getOrCreateAssetStatus(underlying);
+  assetStatus.totalBorrows = totalBorrows;
+  assetStatus.totalBalances = totalBalances;
+  assetStatus.reserveBalance = reserveBalance;
+  assetStatus.interestRate = interestRate;
+  assetStatus.timestamp = event.params.timestamp;
+  assetStatus.save();
+
   const marketId = assetStatus.eToken!;
   const protocol = getOrCreateLendingProtocol();
   const market = getOrCreateMarket(marketId);
@@ -66,7 +73,64 @@ export function handleAssetStatus(event: AssetStatus): void {
   }
 
   // tvl, totalDepositBalanceUSD and totalBorrowBalanceUSD may be updated again with new price
-  // in the loop below
+  updateBalances(token, protocol, market, totalBalances, totalBorrows, totalDepositBalance, totalBorrowBalance);
+
+  if (interestRate.notEqual(assetStatus.interestRate)) {
+    // update interest rates if `interestRate` or `reserveFee` changed
+    updateInterestRates(market, interestRate, assetStatus.reserveFee, totalBorrows, totalBalances, event);
+  }
+  updateRevenue(reserveBalance, totalBalances, totalBorrows, protocol, market, assetStatus, event);
+  snapshotMarket(event.block, marketId, BIGDECIMAL_ZERO, null);
+
+  // update prices, tvl, totalDepositBalanceUSD, totalBorrowBalanceUSD every 75 blocks (~15 min)
+  updateProtocolTVL(event, protocol);
+
+  snapshotFinancials(event.block, BIGDECIMAL_ZERO, null, protocol);
+}
+
+function updateProtocolTVL(event: AssetStatus, protocol: LendingProtocol): void {
+  if (event.block.number.ge(protocol._lastUpdateBlockNumber!.plus(BIGINT_SEVENTY_FIVE))) {
+    const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
+    const execProxyAddress = eulerContract.moduleIdToProxy(MODULEID__EXEC);
+    let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    for (let i = 0; i < protocol._marketIDs!.length; i++) {
+      const mrktID = protocol._marketIDs![i];
+      const mrkt = getOrCreateMarket(mrktID);
+      const tkn = getOrCreateToken(Address.fromString(mrkt.inputToken));
+      const currPriceUSD = updatePrices(execProxyAddress, mrkt, event);
+      const underlyingPriceUSD = currPriceUSD ? currPriceUSD : mrkt.inputTokenPriceUSD;
+      // mark-to-market
+      mrkt.totalDepositBalanceUSD = bigIntToBDUseDecimals(mrkt.inputTokenBalance, tkn.decimals).times(
+        underlyingPriceUSD,
+      );
+      mrkt.totalBorrowBalanceUSD = bigIntToBDUseDecimals(mrkt._totalBorrowBalance!, tkn.decimals).times(
+        underlyingPriceUSD,
+      );
+      mrkt.totalValueLockedUSD = mrkt.totalDepositBalanceUSD;
+      mrkt.save();
+
+      totalDepositBalanceUSD = totalDepositBalanceUSD.plus(mrkt.totalDepositBalanceUSD);
+      totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(mrkt.totalBorrowBalanceUSD);
+    }
+
+    protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
+    protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
+    protocol.totalValueLockedUSD = totalDepositBalanceUSD;
+    protocol._lastUpdateBlockNumber = event.block.number;
+    protocol.save();
+  }
+}
+
+function updateBalances(
+  token: Token,
+  protocol: LendingProtocol,
+  market: Market,
+  totalBalances: BigInt,
+  totalBorrows: BigInt,
+  totalDepositBalance: BigInt,
+  totalBorrowBalance: BigInt,
+): void {
   const newTotalDepositBalanceUSD = bigIntToBDUseDecimals(totalDepositBalance, token.decimals).times(
     token.lastPriceUSD!,
   );
@@ -101,87 +165,6 @@ export function handleAssetStatus(event: AssetStatus): void {
     }
   }
   market.save();
-
-  if (interestRate.notEqual(assetStatus.interestRate)) {
-    // update interest rates if `interestRate` or `reserveFee` changed
-    updateInterestRates(market, interestRate, assetStatus.reserveFee, totalBorrows, totalBalances, event);
-  }
-  updateRevenue(reserveBalance, totalBalances, totalBorrows, protocol, market, assetStatus, event);
-  snapshotMarket(event.block, marketId, BIGDECIMAL_ZERO, null);
-
-  //for verification only
-  const eTokenAddress = Address.fromString(market.outputToken!);
-  const eToken = ERC20.bind(eTokenAddress);
-  const eTokenTotalSupply = eToken.totalSupply();
-  if (totalBalances.notEqual(eTokenTotalSupply)) {
-    log.warning("[logAssetStatus]market={}/{},totalBalances={},eTokenTotalSupply={}", [
-      market.name!,
-      market.id,
-      totalBalances.toString(),
-      eTokenTotalSupply.toString(),
-    ]);
-  }
-
-  // update prices, tvl, totalDepositBalanceUSD, totalBorrowBalanceUSD every 100 blocks (~20 min)
-  if (event.block.number.ge(protocol._lastUpdateBlockNumber!.plus(BIGINT_HUNDRED))) {
-    const eulerContract = Euler.bind(Address.fromString(EULER_ADDRESS));
-    const execProxyAddress = eulerContract.moduleIdToProxy(MODULEID__EXEC);
-    let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-    let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-    for (let i = 0; i < protocol._marketIDs!.length; i++) {
-      const mrktID = protocol._marketIDs![i];
-      const mrkt = getOrCreateMarket(mrktID);
-      const tkn = getOrCreateToken(Address.fromString(mrkt.inputToken));
-      const currPriceUSD = updatePrices(execProxyAddress, mrkt, event);
-      const underlyingPriceUSD = currPriceUSD ? currPriceUSD : mrkt.inputTokenPriceUSD;
-      // mark-to-market
-      mrkt.totalDepositBalanceUSD = bigIntToBDUseDecimals(mrkt.inputTokenBalance, tkn.decimals).times(
-        underlyingPriceUSD,
-      );
-      mrkt.totalBorrowBalanceUSD = bigIntToBDUseDecimals(mrkt._totalBorrowBalance!, tkn.decimals).times(
-        underlyingPriceUSD,
-      );
-      mrkt.totalValueLockedUSD = mrkt.totalDepositBalanceUSD;
-      mrkt.save();
-
-      log.debug(
-        "[handleAssetStatus]market={}/{},block={},totalBorrowBalanceUSD={},totalDepositBalanceUSD={},exchangeRate={},PriceUSD={}",
-        [
-          mrkt.name!,
-          mrkt.id,
-          event.block.number.toString(),
-          mrkt.totalBorrowBalanceUSD.toString(),
-          mrkt.totalDepositBalanceUSD.toString(),
-          mrkt.exchangeRate!.toString(),
-          underlyingPriceUSD.toString(),
-        ],
-      );
-
-      totalDepositBalanceUSD = totalDepositBalanceUSD.plus(mrkt.totalDepositBalanceUSD);
-      totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(mrkt.totalBorrowBalanceUSD);
-    }
-
-    protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
-    protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
-    protocol.totalValueLockedUSD = totalDepositBalanceUSD;
-    protocol._lastUpdateBlockNumber = event.block.number;
-    protocol.save();
-  }
-
-  log.debug("[handleAssetStatus]block={},protocol.totalBorrowBalanceUSD={},protocol.totalDepositBalanceUSD={}", [
-    event.block.number.toString(),
-    protocol.totalBorrowBalanceUSD.toString(),
-    protocol.totalDepositBalanceUSD.toString(),
-  ]);
-
-  snapshotFinancials(event.block, BIGDECIMAL_ZERO, null, protocol);
-
-  assetStatus.totalBorrows = totalBorrows;
-  assetStatus.totalBalances = totalBalances;
-  assetStatus.reserveBalance = reserveBalance;
-  assetStatus.interestRate = interestRate;
-  assetStatus.timestamp = event.params.timestamp;
-  assetStatus.save();
 }
 
 export function handleBorrow(event: Borrow): void {
@@ -285,7 +268,6 @@ export function handleMarketActivated(event: MarketActivated): void {
   market._dToken = dToken.id;
   market.save();
 
-  //TODO: pToken?
   const assetStatus = getOrCreateAssetStatus(underlyingToken.id);
   assetStatus.eToken = eToken.id;
   assetStatus.dToken = dToken.id;

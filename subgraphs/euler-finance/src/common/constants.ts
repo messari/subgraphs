@@ -134,6 +134,7 @@ export const BIGINT_FOUR = BigInt.fromI32(4);
 export const BIGINT_SIX = BigInt.fromI32(6);
 export const BIGINT_TWELVE = BigInt.fromI32(12);
 export const BIGINT_TWENTY_FOUR = BigInt.fromI32(24);
+export const BIGINT_SEVENTY_FIVE = BigInt.fromI32(75);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_ONE_HUNDRED_TWENTY = BigInt.fromI32(120);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);

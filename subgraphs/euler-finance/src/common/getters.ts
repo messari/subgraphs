@@ -456,11 +456,6 @@ export function getOrCreateInterestRate(rateSide: string, rateType: string, mark
   return rate;
 }
 
-//TODO: DELETE from here
-export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
-  return (<i32>Math.floor(secondsSinceEpoch / SECONDS_PER_DAY)).toString();
-}
-
 export function getOrCreateAssetStatus(id: string): _AssetStatus {
   let assetStatus = _AssetStatus.load(id);
   if (!assetStatus) {
