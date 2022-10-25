@@ -6,7 +6,7 @@ import {
   USDC_ADDRESS,
   YAK_ROUTER_ADDRESS
 } from "../helpers/constants";
-import { YakRouter } from '../../generated/YakRouter/YakRouter';
+import { YakRouter } from '../../generated/YakStrategyV2/YakRouter';
 import { convertBigIntToBigDecimal } from "../helpers/converters";
 
 export function calculatePriceInUSD(tokenAddress: Address, amount: BigInt): BigDecimal {
@@ -25,7 +25,7 @@ export function calculatePriceInUSD(tokenAddress: Address, amount: BigInt): BigD
   if (tokenPriceInUSDWithDecimal == ZERO_BIGDECIMAL) {
     tokenPriceInUSDWithDecimal = getPriceInUsd("4", amount, tokenAddress)
   }
-  
+
   return tokenPriceInUSDWithDecimal;
 }
 

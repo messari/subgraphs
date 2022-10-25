@@ -73,7 +73,12 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
 
     token.name = utils.readValue<string>(contract.try_name(), "");
     token.symbol = utils.readValue<string>(contract.try_symbol(), "");
-    token.decimals = utils.readValue<number>(contract.try_decimals(), DEFUALT_DECIMALS.toI32());
+
+    if (contract.try_decimals().reverted) {
+      token.decimals = DEFUALT_DECIMALS.toI32();
+    } else {
+      token.decimals = contract.decimals();
+    }
 
     token.lastPriceUSD = calculatePriceInUSD(address, DEFUALT_AMOUNT);
     token.lastPriceBlockNumber = blockNumber;
