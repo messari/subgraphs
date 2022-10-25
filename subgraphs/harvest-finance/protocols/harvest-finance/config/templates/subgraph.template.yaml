@@ -59,6 +59,8 @@ templates:
           file: ./abis/YearnLens.json
         - name: UniswapRouterContract
           file: ./abis/UniswapRouter.json
+        - name: UniswapPairContract
+          file: ./abis/UniswapV2Pair.json
       eventHandlers:
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit
