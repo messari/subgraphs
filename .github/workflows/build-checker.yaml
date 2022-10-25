@@ -48,10 +48,10 @@ jobs:
 
       - name: Echo file changes
         run: |
-          echo Changed files: "${{ steps.changed-files-specific.outputs.all }}"
+          echo Changed files: "${{ steps.changed-files-specific.outputs.added_modified }}"
       
       - name: Lint staged files
-        run: npm run lint:subgraphs ${{ steps.changed-files-specific.outputs.all }}
+        run: npm run lint:subgraphs ${{ steps.changed-files-specific.outputs.added_modified }}
 
   Build:
     runs-on: macos-latest
