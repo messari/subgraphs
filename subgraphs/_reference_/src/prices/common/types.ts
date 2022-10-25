@@ -19,7 +19,10 @@ export class CustomPriceType {
     this._decimals = new Wrapped(constants.BIGINT_ZERO.toI32() as u8);
   }
 
-  static initialize(_usdPrice: BigDecimal, _decimals: i32 = 0): CustomPriceType {
+  static initialize(
+    _usdPrice: BigDecimal,
+    _decimals: i32 = 0
+  ): CustomPriceType {
     const result = new CustomPriceType();
     result._usdPrice = new Wrapped(_usdPrice);
     result._decimals = new Wrapped(_decimals as u8);
@@ -32,19 +35,19 @@ export class CustomPriceType {
   }
 
   get usdPrice(): BigDecimal {
-    return changetype<Wrapped<BigDecimal>>(this._usdPrice).inner;
+    return changetype<Wrapped<BigDecimal>>(this._usdPrice).inner.div(
+      constants.BIGINT_TEN.pow(this.decimals as u8).toBigDecimal()
+    );
   }
 
   get decimals(): i32 {
     return changetype<Wrapped<i32>>(this._decimals).inner;
   }
-
-  get decimalsBaseTen(): BigDecimal {
-    return constants.BIGINT_TEN.pow(this.decimals as u8).toBigDecimal();
-  }
 }
 
 export interface Configurations {
+  network(): string;
+
   yearnLens(): Address;
   chainLink(): Address;
   yearnLensBlacklist(): Address[];

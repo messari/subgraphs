@@ -1,7 +1,5 @@
 import * as utils from "./common/utils";
 import * as constants from "./common/constants";
-import { CustomPriceType } from "./common/types";
-import { log, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import * as AaveOracle from "./oracles/AaveOracle";
 import * as CurveRouter from "./routers/CurveRouter";
 import * as ChainLinkFeed from "./oracles/ChainLinkFeed";
@@ -10,10 +8,20 @@ import * as UniswapForksRouter from "./routers/UniswapForksRouter";
 import * as CurveCalculations from "./calculations/CalculationsCurve";
 import * as SushiCalculations from "./calculations/CalculationsSushiswap";
 
-export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
-  const config = utils.getConfig();
+import { CustomPriceType } from "./common/types";
+import { log, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 
-  if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS) || !config) {
+export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
+  if (tokenAddr.equals(constants.NULL.TYPE_ADDRESS)) {
+    return new CustomPriceType();
+  }
+
+  const config = utils.getConfig();
+  if (config.network() == "default") {
+    log.warning("Failed to fetch price: network {} not implemented", [
+      dataSource.network(),
+    ]);
+
     return new CustomPriceType();
   }
 
@@ -29,7 +37,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!yearnLensPrice.reverted) {
     log.info("[YearnLensOracle] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      yearnLensPrice.usdPrice.div(yearnLensPrice.decimalsBaseTen).toString(),
+      yearnLensPrice.usdPrice.toString(),
     ]);
     return yearnLensPrice;
   }
@@ -39,7 +47,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!chainLinkPrice.reverted) {
     log.info("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      chainLinkPrice.usdPrice.div(chainLinkPrice.decimalsBaseTen).toString(),
+      chainLinkPrice.usdPrice.toString(),
     ]);
     return chainLinkPrice;
   }
@@ -49,9 +57,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!calculationsCurvePrice.reverted) {
     log.info("[CalculationsCurve] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsCurvePrice.usdPrice
-        .div(calculationsCurvePrice.decimalsBaseTen)
-        .toString(),
+      calculationsCurvePrice.usdPrice.toString(),
     ]);
     return calculationsCurvePrice;
   }
@@ -62,9 +68,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!calculationsSushiSwapPrice.reverted) {
     log.info("[CalculationsSushiSwap] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsSushiSwapPrice.usdPrice
-        .div(calculationsSushiSwapPrice.decimalsBaseTen)
-        .toString(),
+      calculationsSushiSwapPrice.usdPrice.toString(),
     ]);
     return calculationsSushiSwapPrice;
   }
@@ -74,7 +78,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!aaveOraclePrice.reverted) {
     log.info("[AaveOracle] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      aaveOraclePrice.usdPrice.div(aaveOraclePrice.decimalsBaseTen).toString(),
+      aaveOraclePrice.usdPrice.toString(),
     ]);
     return aaveOraclePrice;
   }
@@ -84,7 +88,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!curvePrice.reverted) {
     log.info("[CurveRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      curvePrice.usdPrice.div(curvePrice.decimalsBaseTen).toString(),
+      curvePrice.usdPrice.toString(),
     ]);
     return curvePrice;
   }
@@ -94,12 +98,13 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!uniswapPrice.reverted) {
     log.info("[UniswapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      uniswapPrice.usdPrice.div(uniswapPrice.decimalsBaseTen).toString(),
+      uniswapPrice.usdPrice.toString(),
     ]);
     return uniswapPrice;
   }
 
-  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
+  log.warning("[Oracle] Failed to Fetch Price, Name: {} Address: {}", [
+    utils.getTokenName(tokenAddr),
     tokenAddr.toHexString(),
   ]);
 
@@ -113,7 +118,7 @@ export function getUsdPrice(
   const tokenPrice = getUsdPricePerToken(tokenAddr);
 
   if (!tokenPrice.reverted) {
-    return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);
+    return tokenPrice.usdPrice.times(amount);
   }
 
   return constants.BIGDECIMAL_ZERO;

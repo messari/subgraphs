@@ -13,6 +13,8 @@ export const CHAIN_LINK_USD_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000348"
 );
 
+export const PRICE_LIB_VERSION = '1.1.0'
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);

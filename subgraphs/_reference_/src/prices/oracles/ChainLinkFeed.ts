@@ -30,7 +30,7 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
     );
 
     if (decimals.reverted) {
-      new CustomPriceType();
+      return new CustomPriceType();
     }
 
     return CustomPriceType.initialize(

@@ -18,14 +18,14 @@ export function getTokenPriceUSDC(tokenAddr: Address): CustomPriceType {
   if (!config || config.sushiCalculationsBlacklist().includes(tokenAddr))
     return new CustomPriceType();
 
-  const curveContract = getSushiSwapContract(config.sushiCalculations());
-  if (!curveContract) {
+  const sushiContract = getSushiSwapContract(config.sushiCalculations());
+  if (!sushiContract) {
     return new CustomPriceType();
   }
 
   const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
-      curveContract.try_getPriceUsdc(tokenAddr),
+      sushiContract.try_getPriceUsdc(tokenAddr),
       constants.BIGINT_ZERO
     )
     .toBigDecimal();

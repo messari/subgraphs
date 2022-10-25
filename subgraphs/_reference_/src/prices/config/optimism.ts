@@ -1,5 +1,4 @@
 import * as constants from "../common/constants";
-import { Configurations } from "../common/types";
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 export const NETWORK_STRING = "optimism";
@@ -69,61 +68,3 @@ export const WETH_ADDRESS = Address.fromString(
 export const USDC_ADDRESS = Address.fromString(
   "0x7f5c764cbc14f9669b88837ca1490cca17c31607"
 );
-
-export class config implements Configurations {
-  yearnLens(): Address {
-    return YEARN_LENS_CONTRACT_ADDRESS;
-  }
-  chainLink(): Address {
-    return CHAIN_LINK_CONTRACT_ADDRESS;
-  }
-  yearnLensBlacklist(): Address[] {
-    return YEARN_LENS_BLACKLIST;
-  }
-
-  aaveOracle(): Address {
-    return AAVE_ORACLE_CONTRACT_ADDRESS;
-  }
-  aaveOracleBlacklist(): Address[] {
-    return AAVE_ORACLE_BLACKLIST;
-  }
-
-  curveCalculations(): Address {
-    return CURVE_CALCULATIONS_ADDRESS;
-  }
-  curveCalculationsBlacklist(): Address[] {
-    return CURVE_CALCULATIONS_BLACKSLIST;
-  }
-
-  sushiCalculations(): Address {
-    return SUSHISWAP_CALCULATIONS_ADDRESS;
-  }
-  sushiCalculationsBlacklist(): Address[] {
-    return SUSHI_CALCULATIONS_BLACKSLIST;
-  }
-
-  uniswapForks(): Address[] {
-    return UNISWAP_FORKS_ROUTER_ADDRESSES;
-  }
-  curveRegistry(): Address[] {
-    return CURVE_REGISTRY_ADDRESSES;
-  }
-
-  hardcodedStables(): Address[] {
-    return HARDCODED_STABLES;
-  }
-
-  ethAddress(): Address {
-    return ETH_ADDRESS;
-  }
-  wethAddress(): Address {
-    return WETH_ADDRESS;
-  }
-  usdcAddress(): Address {
-    return USDC_ADDRESS;
-  }
-
-  usdcTokenDecimals(): BigInt {
-    return USDC_TOKEN_DECIMALS;
-  }
-}

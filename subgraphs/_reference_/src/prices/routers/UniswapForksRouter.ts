@@ -1,7 +1,7 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { UniswapPair as UniswapPairContract } from "../../../generated/UniswapV2Factory/UniswapPair";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/UniswapV2Factory/UniswapRouter";
 
@@ -88,6 +88,7 @@ export function getPriceFromRouter(
 
     if (!amountOutArray.reverted) {
       amountOut = amountOutArray.value[amountOutArray.value.length - 1];
+      break;
     }
   }
 
@@ -121,7 +122,12 @@ export function getLpTokenPriceUsdc(tokenAddress: Address): CustomPriceType {
   const pairDecimalsCall = uniSwapPair.try_decimals();
 
   if (pairDecimalsCall.reverted) {
-    pairDecimals = constants.DEFAULT_DECIMALS.toI32() as u8;
+    log.warning(
+      "[UniswapForksRouter] Failed to fetch pair decimals, tokenAddress: {}",
+      [tokenAddress.toHexString()]
+    );
+
+    return new CustomPriceType();
   } else {
     pairDecimals = pairDecimalsCall.value;
   }
