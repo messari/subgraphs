@@ -416,7 +416,6 @@ export function snapshotFinancials(
   }
 
   financialMetrics.save();
-  const days = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
 }
 
 // update a given UsageMetricDailySnapshot
