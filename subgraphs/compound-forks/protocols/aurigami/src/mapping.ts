@@ -400,10 +400,12 @@ function getPriceFromLp(
   const oracleContract = PriceOracle.bind(Address.fromString(priceOracle));
   const tryKnownPrice = oracleContract.try_getUnderlyingPrice(knownAddress);
   if (tryKnownPrice.reverted) {
+    log.warning("tryKnownPrice reverted", []);
     return ethereum.CallResult.fromValue(BIGINT_ZERO);
   }
   const knownMarket = Market.load(knownAddress.toHexString());
   if (!knownMarket) {
+    log.warning("knownMarket not found", []);
     return ethereum.CallResult.fromValue(BIGINT_ZERO);
   }
   const knownMarketDecimals = Token.load(knownMarket.inputToken)!.decimals;
@@ -414,30 +416,42 @@ function getPriceFromLp(
   const lpPair = Pair.bind(lpAddress);
   const tryReserves = lpPair.try_getReserves();
   if (tryReserves.reverted) {
+    log.warning("tryReserves reverted", []);
     return ethereum.CallResult.fromValue(BIGINT_ZERO);
   }
 
   const wantMarket = Market.load(wantAddress.toHexString());
   if (!wantMarket) {
+    log.warning("wantMarket not found", []);
     return ethereum.CallResult.fromValue(BIGINT_ZERO);
   }
   const wantMarketDecimals = Token.load(wantMarket.inputToken)!.decimals;
 
-  const reserveBalance0 = tryReserves.value.value0;
-  const reserveBalance1 = tryReserves.value.value1;
-
   let priceBD: BigDecimal;
   if (whichPrice) {
+    const reserveBalance0 = tryReserves.value.value0
+      .toBigDecimal()
+      .div(exponentToBigDecimal(wantMarketDecimals));
+    const reserveBalance1 = tryReserves.value.value1
+      .toBigDecimal()
+      .div(exponentToBigDecimal(knownMarketDecimals));
+
     // price of reserve0 = price of reserve1 / (reserve0 / reserve1)
-    priceBD = knownPriceUSD.div(
-      reserveBalance0.toBigDecimal().div(reserveBalance1.toBigDecimal())
-    );
+    priceBD = knownPriceUSD.div(reserveBalance0.div(reserveBalance1));
   } else {
+    const reserveBalance0 = tryReserves.value.value0
+      .toBigDecimal()
+      .div(exponentToBigDecimal(knownMarketDecimals));
+    const reserveBalance1 = tryReserves.value.value1
+      .toBigDecimal()
+      .div(exponentToBigDecimal(wantMarketDecimals));
+
     // price of reserve1 = price of reserve0 * (reserve0 / reserve1)
-    priceBD = knownPriceUSD.times(
-      reserveBalance0.toBigDecimal().div(reserveBalance1.toBigDecimal())
-    );
+    priceBD = knownPriceUSD.times(reserveBalance0.div(reserveBalance1));
   }
+
+  // TODO: remove
+  log.warning("{} costs ${}", [wantAddress.toHexString(), priceBD.toString()]);
 
   // convert back to BigInt
   return ethereum.CallResult.fromValue(
