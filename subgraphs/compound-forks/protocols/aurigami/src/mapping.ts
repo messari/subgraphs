@@ -55,6 +55,7 @@ import {
   _handleActionPaused,
   _handleMarketEntered,
   _handleTransfer,
+  getTokenPriceUSD,
 } from "../../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../../../generated/Comptroller/CToken";
@@ -393,26 +394,22 @@ function getPrice(
 // Gets the price of wantAddress.inputToken from an LP from Trisolaris
 function getPriceFromLp(
   priceOracle: string, // aurigami price oracle
-  knownAddress: Address, // address of the market we know the price of
+  knownMarketID: Address, // address of the market we know the price of
   wantAddress: Address, // market address of token we want to price
   lpAddress: Address, // address of LP token
   whichPrice: boolean // true for token0 in LP, false for token1
 ): ethereum.CallResult<BigInt> {
   const oracleContract = PriceOracle.bind(Address.fromString(priceOracle));
-  const tryKnownPrice = oracleContract.try_getUnderlyingPrice(knownAddress);
-  if (tryKnownPrice.reverted) {
-    log.warning("tryKnownPrice reverted", []);
-    return ethereum.CallResult.fromValue(BIGINT_ZERO);
-  }
-  const knownMarket = Market.load(knownAddress.toHexString());
+  const knownMarket = Market.load(knownMarketID.toHexString());
   if (!knownMarket) {
     log.warning("knownMarket not found", []);
     return ethereum.CallResult.fromValue(BIGINT_ZERO);
   }
   const knownMarketDecimals = Token.load(knownMarket.inputToken)!.decimals;
-  const knownPriceUSD = tryKnownPrice.value
-    .toBigDecimal()
-    .div(exponentToBigDecimal(knownMarketDecimals));
+  const knownPriceUSD = getTokenPriceUSD(
+    oracleContract.try_getUnderlyingPrice(knownMarketID),
+    knownMarketDecimals
+  );
 
   const lpPair = Pair.bind(lpAddress);
   const tryReserves = lpPair.try_getReserves();
