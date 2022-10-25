@@ -5828,7 +5828,7 @@
         "services": {
           "decentralized-network": {
             "slug": "harvest-finance-ethereum",
-            "query-id": "https://api.studio.thegraph.com/query/8290/harvest-finance/v0.0.30"
+            "query-id": "https://api.studio.thegraph.com/query/8290/harvest-finance/v0.0.36"
           }
         },
         "files": {
