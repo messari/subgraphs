@@ -41,6 +41,8 @@ export const USN_MARKET = Address.fromString(
 // Trisolaris LP Pools to get the price of the above tokens
 
 // PLY market / wNEAR/PLY LP > missing first 2 days
+// reserve0 -> PLY
+// reserve1 -> wNEAR
 export const WNEAR_PLY_LP = Address.fromString(
   "0x044b6b0cd3bb13d2b9057781df4459c66781dce7"
 );
@@ -51,6 +53,8 @@ export const AURORA_ETH_LP = Address.fromString(
 );
 
 // TRI market / TRI/USDT LP
+// reserve0 -> USDT.e
+// reserve1 -> TRI
 export const TRI_USDT_LP = Address.fromString(
   "0x61C9E05d1Cdb1b70856c7a2c53fA9c220830633c"
 );

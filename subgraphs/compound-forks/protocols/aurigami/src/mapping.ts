@@ -353,7 +353,7 @@ function getPrice(
       WNEAR_MARKET,
       PLY_MARKET,
       WNEAR_PLY_LP,
-      false
+      true
     );
   }
   if (marketAddress == AURORA_MARKET) {
@@ -371,7 +371,7 @@ function getPrice(
       USDT_MARKET,
       TRI_MARKET,
       TRI_USDT_LP,
-      true
+      false
     );
   }
   if (marketAddress == USN_MARKET) {
@@ -397,7 +397,7 @@ function getPriceFromLp(
   knownMarketID: Address, // address of the market we know the price of
   wantAddress: Address, // market address of token we want to price
   lpAddress: Address, // address of LP token
-  whichPrice: boolean // true for token0 in LP, false for token1
+  whichPrice: boolean // true to find token0 price in LP, false for token1
 ): ethereum.CallResult<BigInt> {
   const oracleContract = PriceOracle.bind(Address.fromString(priceOracle));
   const knownMarket = Market.load(knownMarketID.toHexString());
@@ -435,7 +435,7 @@ function getPriceFromLp(
       .div(exponentToBigDecimal(knownMarketDecimals));
 
     // price of reserve0 = price of reserve1 / (reserve0 / reserve1)
-    priceBD = knownPriceUSD.div(reserveBalance0.div(reserveBalance1));
+    priceBD = knownPriceUSD.div(reserveBalance1.div(reserveBalance0));
   } else {
     const reserveBalance0 = tryReserves.value.value0
       .toBigDecimal()
@@ -448,21 +448,16 @@ function getPriceFromLp(
     priceBD = knownPriceUSD.times(reserveBalance0.div(reserveBalance1));
   }
 
-  if (
-    priceBD.gt(BIGDECIMAL_HUNDRED) ||
-    priceBD.lt(BigDecimal.fromString(".0000001"))
-  ) {
-    log.warning(
-      "wtf, price is: ${} LP: {} reserve0: {} reserve1: {} known price: ${}",
-      [
-        priceBD.toString(),
-        lpAddress.toHexString(),
-        tryReserves.value.value0.toString(),
-        tryReserves.value.value1.toString(),
-        knownPriceUSD.toString(),
-      ]
-    );
-  }
+  log.warning(
+    "wtf, price is: ${} LP: {} reserve0: {} reserve1: {} known price: ${}",
+    [
+      priceBD.toString(),
+      lpAddress.toHexString(),
+      tryReserves.value.value0.toString(),
+      tryReserves.value.value1.toString(),
+      knownPriceUSD.toString(),
+    ]
+  );
 
   // TODO: remove
   log.warning("{} costs ${}", [wantAddress.toHexString(), priceBD.toString()]);
