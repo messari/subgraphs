@@ -9,6 +9,9 @@ import PoolOverviewTab from "./tabs/PoolOverviewTab";
 import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
 import { PoolName, ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 import PositionTab from "./tabs/PositionTab";
+import { NewClient } from "../utils";
+import { NormalizedCacheObject, ApolloClient } from "@apollo/client";
+import { DeploymentOverlayDropDown } from "../common/utilComponents/DeploymentOverlayDropDown";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -32,15 +35,20 @@ interface AllDataTabsProps {
   protocolTimeseriesData: any;
   protocolTimeseriesLoading: any;
   protocolTimeseriesError: any;
+  overlayProtocolTimeseriesData: any;
   protocolTableData: any;
   poolsListData: { [x: string]: any };
   poolListLoading: any;
   poolsListError: any;
   positionsQuery?: string;
+  overlayDeploymentClient: ApolloClient<NormalizedCacheObject>;
+  overlayDeploymentURL: string;
   handleTabChange: (event: any, newValue: string) => void;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
   setProtocolId: React.Dispatch<React.SetStateAction<string>>;
   paginate: React.Dispatch<React.SetStateAction<number>>;
+  setOverlayDeploymentClient: React.Dispatch<React.SetStateAction<ApolloClient<NormalizedCacheObject>>>;
+  setOverlayDeploymentURL: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // This component is for each individual subgraph
@@ -64,12 +72,17 @@ function AllDataTabs({
   poolListLoading,
   protocolTimeseriesLoading,
   protocolTimeseriesError,
+  overlayProtocolTimeseriesData,
   poolsListError,
   positionsQuery,
+  overlayDeploymentClient,
+  overlayDeploymentURL,
   handleTabChange,
   setPoolId,
   setProtocolId,
   paginate,
+  setOverlayDeploymentClient,
+  setOverlayDeploymentURL
 }: AllDataTabsProps) {
   let protocolDropDown = null;
   if (data.protocols.length > 1) {
@@ -117,13 +130,19 @@ function AllDataTabs({
   return (
     <>
       <TabContext value={tabValue}>
-        <StyledTabs value={tabValue} onChange={handleTabChange}>
-          <Tab label="Protocol" value="1" />
-          <Tab label="Pool Overview" value="2" />
-          <Tab label="Pool" value="3" />
-          {eventsTabButton}
-          {positionsQuery && <Tab label="Positions" value="5" />}
-        </StyledTabs>
+        <div style={{ display: "flex", backgroundColor: "#292f38", justifyContent: "space-between", alignItems: "center" }}>
+          <StyledTabs value={tabValue} onChange={handleTabChange}>
+            <Tab label="Protocol" value="1" />
+            <Tab label="Pool Overview" value="2" />
+            <Tab label="Pool" value="3" />
+            {eventsTabButton}
+            {positionsQuery && <Tab label="Positions" value="5" />}
+          </StyledTabs>
+          <DeploymentOverlayDropDown setDeploymentURL={(x: string) => {
+            setOverlayDeploymentClient(NewClient(x));
+            setOverlayDeploymentURL(x);
+          }} deploymentsList={[{ value: "", label: "UNSELECT" }, { value: subgraphToQueryURL, label: "TEST - " + subgraphToQueryURL }]} currentDeploymentURL={overlayDeploymentURL} />
+        </div>
         {protocolDropDown}
         <TabPanel value="1">
           {/* PROTOCOL TAB */}
@@ -135,6 +154,7 @@ function AllDataTabs({
             protocolTimeseriesData={protocolTimeseriesData}
             protocolTimeseriesLoading={protocolTimeseriesLoading}
             protocolTimeseriesError={protocolTimeseriesError}
+            overlayProtocolTimeseriesData={overlayProtocolTimeseriesData}
           />
         </TabPanel>
         <TabPanel value="2">
