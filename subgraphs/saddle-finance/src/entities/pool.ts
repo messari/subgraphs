@@ -71,11 +71,24 @@ function createPoolFromAddress(address: Address): LiquidityPool {
     prefixID(dataSource.network(), address.toHexString())
   );
 
+<<<<<<< HEAD
   const pool = createPool(address, poolData.createdBlockNumber, poolData.createdTimestamp, null);
   if (!pool) {
     log.critical("unable to create pool from address", [])
   }
   return pool!
+=======
+  const pool = createPool(
+    address,
+    poolData.createdBlockNumber,
+    poolData.createdTimestamp,
+    null
+  );
+  if (!pool) {
+    log.critical("unable to create pool from address", []);
+  }
+  return pool!;
+>>>>>>> 824f39ea (fix commits)
 }
 
 // createPoolFromEvent will create a pool from a PairCreated event, and subscribe to events from it.
@@ -90,15 +103,33 @@ export function createPoolFromFactoryEvent(event: NewSwapPool): void {
     return;
   }
 
+<<<<<<< HEAD
 
   if (createPool(poolAddr, event.block.number, event.block.timestamp, event.params.pooledTokens)) {
+=======
+  if (
+    createPool(
+      poolAddr,
+      event.block.number,
+      event.block.timestamp,
+      event.params.pooledTokens
+    )
+  ) {
+>>>>>>> 824f39ea (fix commits)
     SwapTemplate.create(poolAddr);
   }
 }
 
 // createPoolFromRegistryEvent will create a pool if doesn't exist already when added to the pool registry.
 // This should catch pools deployed manually and not via a deployer.
+<<<<<<< HEAD
 export function createPoolFromRegistryEvent(address: Address, block: ethereum.Block): void {
+=======
+export function createPoolFromRegistryEvent(
+  address: Address,
+  block: ethereum.Block
+): void {
+>>>>>>> 824f39ea (fix commits)
   if (BROKEN_POOLS.has(address.toHexString())) {
     return;
   }
@@ -133,7 +164,11 @@ function createPool(
         lpTokenAddress.toHexString(),
         address.toHexString(),
       ]);
+<<<<<<< HEAD
       return null
+=======
+      return null;
+>>>>>>> 824f39ea (fix commits)
     }
   }
 
@@ -482,9 +517,15 @@ function updateOutputTokenPriceAndTVL(
     pool.outputTokenSupply!,
     getTokenDecimals(pool.outputToken!)
   );
+<<<<<<< HEAD
   pool.outputTokenPriceUSD = totalValueLocked.equals(BIGDECIMAL_ZERO) ?
     BIGDECIMAL_ZERO : 
     totalValueLocked.div(outputTokenAmount); // avoid div by 0 when pool is empty
+=======
+  pool.outputTokenPriceUSD = totalValueLocked.equals(BIGDECIMAL_ZERO)
+    ? BIGDECIMAL_ZERO
+    : totalValueLocked.div(outputTokenAmount); // avoid div by 0 when pool is empty
+>>>>>>> 824f39ea (fix commits)
   updateProtocolTVL(event, totalValueLocked.minus(pool.totalValueLockedUSD));
   pool.totalValueLockedUSD = totalValueLocked;
 }
@@ -510,7 +551,11 @@ function setInputTokenBalancesAndWeights(
         bpBalances.push(BIGINT_ZERO);
         continue;
       }
+<<<<<<< HEAD
       
+=======
+
+>>>>>>> 824f39ea (fix commits)
       bpBalances.push(balance.times(lpTokenBalance).div(totalLPTokenSupply));
     }
 
@@ -518,18 +563,34 @@ function setInputTokenBalancesAndWeights(
     // base reference. Balances fetched from the contract will follow the order of `_inputTokensSorted`.
     // BasePool balances are already sorted, but they need to match `_inputTokensOrdered` in order to sort
     // them together with the rest.
+<<<<<<< HEAD
     bpBalances = sortValuesByTokenOrder(basePool.inputTokens, basePool._inputTokensOrdered, bpBalances);
+=======
+    bpBalances = sortValuesByTokenOrder(
+      basePool.inputTokens,
+      basePool._inputTokensOrdered,
+      bpBalances
+    );
+>>>>>>> 824f39ea (fix commits)
   }
 
   const balances = getBalances(
     contract,
+<<<<<<< HEAD
     pool.inputTokens.length - bpBalances.length,
+=======
+    pool.inputTokens.length - bpBalances.length
+>>>>>>> 824f39ea (fix commits)
   ).concat(bpBalances);
 
   pool.inputTokenBalances = sortValuesByTokenOrder(
     pool._inputTokensOrdered,
     pool.inputTokens,
+<<<<<<< HEAD
     balances,
+=======
+    balances
+>>>>>>> 824f39ea (fix commits)
   );
   pool.inputTokenWeights = getBalanceWeights(
     pool.inputTokenBalances,
@@ -590,7 +651,11 @@ export function sortValuesByTokenOrder<T>(
   if (intersection.length != len || valuesToSort.length != len) {
     // reference and target should contain the same elements, just ordered differently.
     log.error(
+<<<<<<< HEAD
       "Failed to sort array via reference. Both arrays should have the same values. Ref: {}, target: {}", 
+=======
+      "Failed to sort array via reference. Both arrays should have the same values. Ref: {}, target: {}",
+>>>>>>> 824f39ea (fix commits)
       [referenceOrder.toString(), targetOrder.toString()]
     );
     log.critical("", []);
@@ -602,13 +667,21 @@ export function sortValuesByTokenOrder<T>(
     const val = valuesToSort[i];
     const ref = referenceOrder[i];
 
+<<<<<<< HEAD
     const targetIndex = targetOrder.indexOf(ref)
+=======
+    const targetIndex = targetOrder.indexOf(ref);
+>>>>>>> 824f39ea (fix commits)
     ordered[targetIndex] = val;
   }
   return ordered;
 }
 
+<<<<<<< HEAD
 // arrayIntersection will return an array with the common items 
+=======
+// arrayIntersection will return an array with the common items
+>>>>>>> 824f39ea (fix commits)
 // between two arrays.
 function arrayIntersection<T>(arr1: Array<T>, arr2: Array<T>): Array<T> {
   let len = arr1.length;
@@ -654,4 +727,8 @@ function registerPoolForTokens(pool: LiquidityPool): void {
     pools.pools = pools.pools.concat([pool.id]);
     pools.save();
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 824f39ea (fix commits)

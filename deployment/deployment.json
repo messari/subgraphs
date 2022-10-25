@@ -1022,7 +1022,11 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
+<<<<<<< HEAD
           "subgraph": "1.1.6",
+=======
+          "subgraph": "1.1.7",
+>>>>>>> 824f39ea (fix commits)
           "methodology": "1.0.0"
         },
         "files": {
