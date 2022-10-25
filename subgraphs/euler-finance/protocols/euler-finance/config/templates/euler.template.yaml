@@ -14,7 +14,7 @@ dataSources:
     name: euler
     network: mainnet
     source:
-      address: {{ factoryContract }}
+      address: "{{ factoryContract }}"
       abi: Euler
       startBlock: {{ startBlock }} # this is when the first market was deployed
     mapping:
