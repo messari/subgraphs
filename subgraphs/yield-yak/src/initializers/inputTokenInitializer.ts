@@ -1,7 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
 import { ZERO_ADDRESS, WAVAX_CONTRACT_ADDRESS, DEFUALT_DECIMALS, DEFUALT_AMOUNT } from "../helpers/constants";
-import { YakERC20 } from "../../generated/YakERC20/YakERC20";
+import { YakERC20 } from "../../generated/YakStrategyV2/YakERC20";
 import { calculatePriceInUSD } from "../calculators/priceInUSDCalculator";
 
 export function initInputToken(tokenAddress: Address, blockNumber: BigInt): Token {

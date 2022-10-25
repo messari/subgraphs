@@ -30,8 +30,8 @@ export function initProtocol(contractAddress: Address): YieldAggregator {
     protocol.cumulativeTotalRevenueUSD = ZERO_BIGDECIMAL;
     protocol.cumulativeUniqueUsers = ZERO_INT;
     protocol.totalPoolCount = ZERO_INT;
+    protocol.vaults = [];
   }
 
-  protocol.save();
   return protocol;
 }
