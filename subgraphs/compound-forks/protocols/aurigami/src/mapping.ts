@@ -32,6 +32,7 @@ import {
   BIGINT_ZERO,
   SECONDS_PER_YEAR,
   exponentToBigDecimal,
+  BIGDECIMAL_HUNDRED,
 } from "../../../src/constants";
 import {
   ProtocolData,
@@ -448,6 +449,22 @@ function getPriceFromLp(
 
     // price of reserve1 = price of reserve0 * (reserve0 / reserve1)
     priceBD = knownPriceUSD.times(reserveBalance0.div(reserveBalance1));
+  }
+
+  if (
+    priceBD.gt(BIGDECIMAL_HUNDRED) ||
+    priceBD.lt(BigDecimal.fromString(".0000001"))
+  ) {
+    log.warning(
+      "wtf, price is: ${} LP: {} reserve0: {} reserve1: {} known price: ${}",
+      [
+        priceBD.toString(),
+        lpAddress.toHexString(),
+        tryReserves.value.value0.toString(),
+        tryReserves.value.value1.toString(),
+        knownPriceUSD.toString(),
+      ]
+    );
   }
 
   // TODO: remove
