@@ -4509,6 +4509,35 @@
       }
     }
   },
+  "threshold-governance": {
+    "schema": "governance",
+    "base": "openzeppelin-governor",
+    "protocol": "threshold-governance",
+    "deployments": {
+      "threshold-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "threshold-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "threshold-governance",
+            "query-id": "threshold-governance"
+          }
+        }
+      }
+    }
+  },
   "compound-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
