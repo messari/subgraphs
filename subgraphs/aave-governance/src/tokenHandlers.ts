@@ -17,7 +17,7 @@ export function _handleDelegateChanged(
   toDelegate: string,
   event: ethereum.Event
 ): void {
-  if (delegationType == DelegationType.VOinTING_POWER) {
+  if (delegationType == DelegationType.VOTING_POWER) {
     const tokenHolder = getOrCreateTokenHolder(delegator);
     const newDelegate = getOrCreateDelegate(toDelegate);
 
