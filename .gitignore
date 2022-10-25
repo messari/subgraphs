@@ -1,8 +1,7 @@
-generated/
-subgraphs/**/.git/
-subgraphs/**/build/
 Reference/
 .vscode/
+
+subgraphs/**/.git/
 
 subgraph.yaml
 deploymentJsonContext.ts
