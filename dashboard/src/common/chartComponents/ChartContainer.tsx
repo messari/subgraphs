@@ -40,6 +40,14 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
     }
 
     useEffect(() => {
+        if (typeof dataChart === "object") {
+            setChartIsImage(false);
+        } else {
+            setChartIsImage(true);
+        }
+    }, [dataChart])
+
+    useEffect(() => {
         if (!!downloadAllCharts) {
             jpegDownloadHandler();
         }

@@ -20,6 +20,7 @@ const StyledTabs = styled(Tabs)`
 
 interface AllDataTabsProps {
   data: any;
+  overlayData: any;
   entitiesData: { [x: string]: { [x: string]: string } };
   protocolFields: { [x: string]: string };
   tabValue: string;
@@ -32,6 +33,7 @@ interface AllDataTabsProps {
   skipAmt: number;
   poolOverviewRequest: { [x: string]: any };
   poolTimeseriesRequest: { [x: string]: any };
+  overlayPoolTimeseriesData: any;
   protocolTimeseriesData: any;
   protocolTimeseriesLoading: any;
   protocolTimeseriesError: any;
@@ -54,6 +56,7 @@ interface AllDataTabsProps {
 // This component is for each individual subgraph
 function AllDataTabs({
   data,
+  overlayData,
   entitiesData,
   protocolFields,
   tabValue,
@@ -67,6 +70,7 @@ function AllDataTabs({
   poolOverviewRequest,
   poolTimeseriesRequest,
   protocolTimeseriesData,
+  overlayPoolTimeseriesData,
   protocolTableData,
   poolsListData,
   poolListLoading,
@@ -141,7 +145,7 @@ function AllDataTabs({
           <DeploymentOverlayDropDown setDeploymentURL={(x: string) => {
             setOverlayDeploymentClient(NewClient(x));
             setOverlayDeploymentURL(x);
-          }} deploymentsList={[{ value: "", label: "UNSELECT" }, { value: subgraphToQueryURL, label: "TEST - " + subgraphToQueryURL }]} currentDeploymentURL={overlayDeploymentURL} />
+          }} deploymentsList={[{ value: "", label: "NO OVERLAY" }, { value: subgraphToQueryURL, label: "TEST - " + subgraphToQueryURL }]} currentDeploymentURL={overlayDeploymentURL} />
         </div>
         {protocolDropDown}
         <TabPanel value="1">
@@ -176,8 +180,10 @@ function AllDataTabs({
           {/* POOL TAB */}
           <PoolTab
             data={data}
+            overlayData={overlayData}
             entitiesData={entitiesData}
             poolTimeseriesData={poolTimeseriesRequest.poolTimeseriesData}
+            overlayPoolTimeseriesData={overlayPoolTimeseriesData}
             poolTimeseriesLoading={poolTimeseriesRequest.poolTimeseriesLoading}
             poolTimeseriesError={poolTimeseriesRequest.poolTimeseriesError}
             poolId={poolId}
