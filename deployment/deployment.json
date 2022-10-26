@@ -4596,6 +4596,35 @@
       }
     }
   },
+  "cryptex-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "cryptex-governance",
+    "deployments": {
+      "cryptex-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "cryptex-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "cryptex-governance",
+            "query-id": "cryptex-governance"
+          }
+        }
+      }
+    }
+  },
   "gitcoin-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
