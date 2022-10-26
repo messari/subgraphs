@@ -347,39 +347,23 @@ function getPrice(
   // Use Trisolaris LP pool pairs to derive price
 
   if (marketAddress == PLY_MARKET) {
-    return getPriceFromLp(
-      priceOracle,
-      WNEAR_MARKET,
-      PLY_MARKET,
-      WNEAR_PLY_LP,
-      true
+    return ethereum.CallResult.fromValue(
+      getPriceFromLp(priceOracle, WNEAR_MARKET, PLY_MARKET, WNEAR_PLY_LP)
     );
   }
   if (marketAddress == AURORA_MARKET) {
-    return getPriceFromLp(
-      priceOracle,
-      ETH_MARKET,
-      AURORA_MARKET,
-      AURORA_ETH_LP,
-      true
+    return ethereum.CallResult.fromValue(
+      getPriceFromLp(priceOracle, ETH_MARKET, AURORA_MARKET, AURORA_ETH_LP)
     );
   }
   if (marketAddress == TRI_MARKET) {
-    return getPriceFromLp(
-      priceOracle,
-      USDT_MARKET,
-      TRI_MARKET,
-      TRI_USDT_LP,
-      false
+    return ethereum.CallResult.fromValue(
+      getPriceFromLp(priceOracle, USDT_MARKET, TRI_MARKET, TRI_USDT_LP)
     );
   }
   if (marketAddress == USN_MARKET) {
-    return getPriceFromLp(
-      priceOracle,
-      WNEAR_MARKET,
-      USN_MARKET,
-      WNEAR_USN_LP,
-      true
+    return ethereum.CallResult.fromValue(
+      getPriceFromLp(priceOracle, WNEAR_MARKET, USN_MARKET, WNEAR_USN_LP)
     );
   }
 
@@ -395,14 +379,13 @@ function getPriceFromLp(
   priceOracle: string, // aurigami price oracle
   knownMarketID: Address, // address of the market we know the price of
   wantAddress: Address, // market address of token we want to price
-  lpAddress: Address, // address of LP token
-  whichPrice: boolean // true to find token0 price in LP, false for token1
-): ethereum.CallResult<BigInt> {
+  lpAddress: Address // address of LP token
+): BigInt {
   const oracleContract = PriceOracle.bind(Address.fromString(priceOracle));
   const knownMarket = Market.load(knownMarketID.toHexString());
   if (!knownMarket) {
     log.warning("knownMarket not found", []);
-    return ethereum.CallResult.fromValue(BIGINT_ZERO);
+    return BIGINT_ZERO;
   }
   const knownMarketDecimals = Token.load(knownMarket.inputToken)!.decimals;
   const knownPriceUSD = getTokenPriceUSD(
@@ -414,18 +397,32 @@ function getPriceFromLp(
   const tryReserves = lpPair.try_getReserves();
   if (tryReserves.reverted) {
     log.warning("tryReserves reverted", []);
-    return ethereum.CallResult.fromValue(BIGINT_ZERO);
+    return BIGINT_ZERO;
   }
 
   const wantMarket = Market.load(wantAddress.toHexString());
   if (!wantMarket) {
     log.warning("wantMarket not found", []);
-    return ethereum.CallResult.fromValue(BIGINT_ZERO);
+    return BIGINT_ZERO;
   }
   const wantMarketDecimals = Token.load(wantMarket.inputToken)!.decimals;
 
+  // decide which token we want to price
+  const tryToken0 = lpPair.try_token0();
+  if (tryToken0.reverted) {
+    log.warning("tryToken0 reverted", []);
+    return BIGINT_ZERO;
+  }
+  let findToken0Price = true;
+  if (
+    tryToken0.value.toHexString().toLowerCase() !=
+    wantMarket.inputToken.toLowerCase()
+  ) {
+    findToken0Price = false;
+  }
+
   let priceBD: BigDecimal;
-  if (whichPrice) {
+  if (findToken0Price) {
     const reserveBalance0 = tryReserves.value.value0
       .toBigDecimal()
       .div(exponentToBigDecimal(wantMarketDecimals));
@@ -449,12 +446,10 @@ function getPriceFromLp(
 
   // convert back to BigInt
   const reverseMantissaFactor = 18 - wantMarketDecimals + 18;
-  return ethereum.CallResult.fromValue(
-    BigInt.fromString(
-      priceBD
-        .times(exponentToBigDecimal(reverseMantissaFactor))
-        .truncate(0)
-        .toString()
-    )
+  return BigInt.fromString(
+    priceBD
+      .times(exponentToBigDecimal(reverseMantissaFactor))
+      .truncate(0)
+      .toString()
   );
 }
