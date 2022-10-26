@@ -675,8 +675,3 @@ type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
-
-type _BuyBack @entity {
-  " { Transaction Hash of BuyBack Event } "
-  id: ID!
-}

@@ -26464,53 +26464,6 @@ dataSources:
           handler: handleUpdateReinvestReward
       file: ./src/yakStrategyMapping.ts
   - kind: ethereum
-    name: x302404cb8F34713A8B8DBF9b4989A41252332068
-    network: avalanche
-    source:
-      address: "0x302404cb8F34713A8B8DBF9b4989A41252332068"
-      abi: YakStrategyV2
-      startBlock: 20000000
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - Token
-        - RewardToken
-        - VaultFee
-        - YieldAggregator
-        - UsageMetricsDailySnapshot
-        - UsageMetricsHourlySnapshot
-        - FinancialsDailySnapshot
-        - Vault
-        - VaultDailySnapshot
-        - VaultHourlySnapshot
-        - Deposit
-        - Withdraw
-        - Account
-        - ActiveAccount
-      abis:
-        - name: YakStrategyV2
-          file: ./abis/YakStrategyV2.json
-        - name: YakERC20
-          file: ./abis/YakERC20.json
-        - name: YakRouter
-          file: ./abis/YakRouter.json
-      eventHandlers:
-        - event: Deposit(indexed address,uint256)
-          handler: handleDeposit
-        - event: Withdraw(indexed address,uint256)
-          handler: handleWithdraw
-        - event: Reinvest(uint256,uint256)
-          handler: handleReinvest
-        - event: UpdateAdminFee(uint256,uint256)
-          handler: handleUpdateAdminFee
-        - event: UpdateDevFee(uint256,uint256)
-          handler: handleUpdateDevFee
-        - event: UpdateReinvestReward(uint256,uint256)
-          handler: handleUpdateReinvestReward
-      file: ./src/yakStrategyMapping.ts
-  - kind: ethereum
     name: xc31e24f8A25a1dCeCcfd791CA25b62dcFec5c8F7
     network: avalanche
     source:

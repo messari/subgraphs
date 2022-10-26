@@ -27,8 +27,8 @@ export function handleDeposit(event: DepositEvent): void {
     );
   }
 
-  updateFinancials(event.block);
-  updateUsageMetrics(event.block, event.transaction.from);
+  updateFinancials(event.block, contractAddress);
+  updateUsageMetrics(event.block, event.transaction.from, contractAddress);
   updateVaultSnapshots(contractAddress, event.block);
 }
 
@@ -49,8 +49,8 @@ export function handleWithdraw(event: WithdrawEvent): void {
     );
   }
 
-  updateFinancials(event.block);
-  updateUsageMetrics(event.block, event.transaction.from);
+  updateFinancials(event.block, contractAddress);
+  updateUsageMetrics(event.block, event.transaction.from, contractAddress);
   updateVaultSnapshots(contractAddress, event.block);
 }
 

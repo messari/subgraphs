@@ -7,6 +7,7 @@ export const ZERO_BIGDECIMAL: BigDecimal = BigDecimal.fromString("0");
 export const ZERO_BIGINT: BigInt = BigInt.fromString("0");
 export const ZERO_INT: i32 = 0;
 export const BIGINT_TEN = BigInt.fromI32(10);
+export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 
 export const ZERO_ADDRESS: Address = Address.fromString("0x0000000000000000000000000000000000000000");
 export const YAK_STRATEGY_MANAGER_ADDRESS: Address = Address.fromString("0x302404cb8F34713A8B8DBF9b4989A41252332068");

@@ -3,9 +3,9 @@ import { ethereum, Address } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY } from "../helpers/constants";
 import { ActiveAccount } from "../../generated/schema";
 
-export function updateFinancials(block: ethereum.Block): void {
-  const financialMetrics = getOrCreateFinancialDailySnapshots(block);
-  const protocol = getOrCreateYieldAggregator();
+export function updateFinancials(block: ethereum.Block, contractAddress: Address): void {
+  const financialMetrics = getOrCreateFinancialDailySnapshots(block, contractAddress);
+  const protocol = getOrCreateYieldAggregator(contractAddress);
 
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
@@ -17,12 +17,10 @@ export function updateFinancials(block: ethereum.Block): void {
   financialMetrics.save();
 }
 
-export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
-  const account = getOrCreateAccount(from.toHexString());
-
-  const protocol = getOrCreateYieldAggregator();
-  const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block);
-  const usageMetricsHourly = getOrCreateUsageMetricsHourlySnapshot(block);
+export function updateUsageMetrics(block: ethereum.Block, from: Address, contractAddress: Address): void {
+  const protocol = getOrCreateYieldAggregator(contractAddress);
+  const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block, contractAddress);
+  const usageMetricsHourly = getOrCreateUsageMetricsHourlySnapshot(block, contractAddress);
 
   usageMetricsDaily.blockNumber = block.number;
   usageMetricsHourly.blockNumber = block.number;
@@ -55,16 +53,18 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsHourly.save();
 }
 
-export function updateVaultSnapshots(vaultAddress: Address, block: ethereum.Block): void {
-  let vault = getOrCreateVault(vaultAddress, block);
+export function updateVaultSnapshots(contractAddress: Address, block: ethereum.Block): void {
+  let vault = getOrCreateVault(contractAddress, block);
 
   const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
-    vaultAddress.toHexString(),
-    block
+    contractAddress.toHexString(),
+    block,
+    contractAddress
   );
   const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    vaultAddress.toHexString(),
-    block
+    contractAddress.toHexString(),
+    block,
+    contractAddress
   );
 
   vaultDailySnapshots.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD;
