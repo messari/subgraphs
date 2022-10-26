@@ -1471,7 +1471,7 @@ type Repay @entity(immutable: true) {
 }
 
 type Liquidate @entity(immutable: true) {
-  " { Transaction Count } e.g. the number of transaction in the protocol "
+  " { Transaction Count }-{ Transaction hash }-{ Log index } "
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
