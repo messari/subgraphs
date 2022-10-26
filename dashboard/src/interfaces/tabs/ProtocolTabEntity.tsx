@@ -13,6 +13,7 @@ interface ProtocolTabEntityProps {
   protocolType: string;
   protocolTableData: { [x: string]: any };
   currentEntityData: any;
+  currentOverlayEntityData: any;
   currentTimeseriesLoading: any;
   currentTimeseriesError: any;
   issuesProps: { [x: string]: { message: string; type: string; level: string; fieldName: string }[] };
@@ -26,6 +27,7 @@ function ProtocolTabEntity({
   protocolType,
   protocolTableData,
   currentEntityData,
+  currentOverlayEntityData,
   currentTimeseriesLoading,
   currentTimeseriesError,
   issuesProps,
@@ -64,8 +66,12 @@ function ProtocolTabEntity({
       // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
       const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
       // For the current entity, loop through all instances of that entity
+      const overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+
+      const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
       for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[x - overlayDifference];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
@@ -75,6 +81,12 @@ function ProtocolTabEntity({
           }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
           const currentInstanceField = timeseriesInstance[fieldName];
+          let currentOverlayInstanceField: any = {};
+          if (overlayTimeseriesInstance) {
+            if (Object.keys(overlayTimeseriesInstance).includes(fieldName)) {
+              currentOverlayInstanceField = overlayTimeseriesInstance[fieldName];
+            }
+          }
           try {
             if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField)) {
               // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
@@ -199,6 +211,54 @@ function ProtocolTabEntity({
                     dataFieldMetrics[dataFieldKey].cumulative.hasLowered = timeseriesInstance.id;
                   }
                   dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
+                }
+              }
+            }
+
+            if (x < overlayDifference && currentOverlayEntityData.length > 0) {
+              overlayDataFields[fieldName] = [
+                { value: 0, date: Number(timeseriesInstance.timestamp) },
+                ...overlayDataFields[fieldName],
+              ];
+            } else if (overlayTimeseriesInstance) {
+              if (!isNaN(currentOverlayInstanceField) && !Array.isArray(currentOverlayInstanceField)) {
+                // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
+                // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
+                if (!overlayDataFields[fieldName]) {
+                  overlayDataFields[fieldName] = [
+                    { value: Number(currentOverlayInstanceField), date: Number(overlayTimeseriesInstance.timestamp) },
+                  ];
+                } else {
+                  overlayDataFields[fieldName].push({
+                    value: Number(currentOverlayInstanceField),
+                    date: Number(overlayTimeseriesInstance.timestamp),
+                  });
+                }
+
+              } else if (Array.isArray(currentOverlayInstanceField)) {
+                // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
+                // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
+                // currentOverlayInstanceField.forEach((val: string, arrayIndex: number) => {
+                for (let arrayIndex = 0; arrayIndex < currentOverlayInstanceField.length; arrayIndex++) {
+                  const val = currentOverlayInstanceField[arrayIndex];
+                  const dataFieldKey = fieldName + " [" + arrayIndex + "]";
+                  let value = Number(val);
+                  try {
+                    if (fieldName === "mintedTokenSupplies" && protocolTableData?.lendingType === "CDP") {
+                      if (protocolTableData?.mintedTokens.length > 0) {
+                        value = convertTokenDecimals(val, protocolTableData.mintedTokens[arrayIndex]?.decimals);
+                      }
+                    } else if (fieldName === "mintedTokenSupplies" && protocolTableData?.lendingType !== "CDP") {
+                      continue;
+                    }
+                  } catch (err) {
+                    console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
+                  }
+                  if (!overlayDataFields[dataFieldKey]) {
+                    overlayDataFields[dataFieldKey] = [{ value: value, date: Number(overlayTimeseriesInstance.timestamp) }];
+                  } else {
+                    overlayDataFields[dataFieldKey].push({ value: value, date: Number(overlayTimeseriesInstance.timestamp) });
+                  }
                 }
               }
             }
@@ -373,8 +433,12 @@ function ProtocolTabEntity({
                 </div>
               );
             }
+            let dataChartToPass: any = dataFields[field];
+            if (overlayDataFields[field]) {
+              dataChartToPass = { current: dataFields[field], overlay: overlayDataFields[field] };
+            }
             return (
-              <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataFields[field]} />
+              <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} />
             );
           })}
         </Grid>
