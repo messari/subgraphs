@@ -90,7 +90,7 @@ export function getUnderlyingStrategy(strategyAddress: Address): Address {
 
   const underlyingStrategyAddress = readValue<Address>(
     strategyContract.try_strategy(),
-    constants.NULL.TYPE_ADDRESS
+    strategyAddress
   );
 
   return underlyingStrategyAddress;
