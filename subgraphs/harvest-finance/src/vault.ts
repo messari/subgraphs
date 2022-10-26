@@ -10,6 +10,7 @@ import { prices } from './utils/prices'
 import { deposits } from './utils/deposits'
 import { withdraws } from './utils/withdraws'
 import { metrics } from './utils/metrics'
+import { decimals } from './utils'
 
 export function handleWithdraw(event: WithdrawEvent): void {
   const beneficiary = event.params.beneficiary
@@ -20,6 +21,17 @@ export function handleWithdraw(event: WithdrawEvent): void {
   const vault = Vault.load(vaultAddress.toHexString())
 
   if (!vault) return
+
+  const token = Token.load(vault.inputToken)
+
+  if (!token) return
+
+  const tokenPriceUSD = prices.getPricePerToken(
+    Address.fromString(vault.inputToken)
+  )
+
+  token.lastPriceUSD = tokenPriceUSD
+  token.lastPriceBlockNumber = event.block.number
 
   const id = withdraws.generateId(event.transaction.hash, event.logIndex)
 
@@ -36,29 +48,18 @@ export function handleWithdraw(event: WithdrawEvent): void {
   withdraw.amount = amount
   withdraw.vault = vault.id
 
-  withdraw.save()
-
   vault.inputTokenBalance = vault.inputTokenBalance.minus(amount)
 
-  const token = Token.load(vault.inputToken)
-  if (token) {
-    const tokenPriceUSD = prices.getPricePerToken(
-      Address.fromString(vault.inputToken)
-    )
+  vault.totalValueLockedUSD = decimals
+    .fromBigInt(vault.inputTokenBalance, token.decimals as u8)
+    .times(tokenPriceUSD)
 
-    token.lastPriceUSD = tokenPriceUSD
-    token.lastPriceBlockNumber = event.block.number
+  withdraw.amountUSD = decimals
+    .fromBigInt(amount, token.decimals as u8)
+    .times(tokenPriceUSD)
 
-    const inputTokenBase10 = BigInt.fromI32(10).pow(token.decimals as u8)
-
-    vault.totalValueLockedUSD = vault.inputTokenBalance
-      .div(inputTokenBase10)
-      .toBigDecimal()
-      .times(tokenPriceUSD)
-
-    token.save()
-  }
-
+  token.save()
+  withdraw.save()
   vault.save()
 
   metrics.updateFinancials(event.block)
@@ -76,6 +77,17 @@ export function handleDeposit(event: DepositEvent): void {
 
   if (!vault) return
 
+  const token = Token.load(vault.inputToken)
+
+  if (!token) return
+
+  const tokenPriceUSD = prices.getPricePerToken(
+    Address.fromString(vault.inputToken)
+  )
+
+  token.lastPriceUSD = tokenPriceUSD
+  token.lastPriceBlockNumber = event.block.number
+
   const id = deposits.generateId(event.transaction.hash, event.logIndex)
 
   const deposit = deposits.initialize(id)
@@ -90,30 +102,18 @@ export function handleDeposit(event: DepositEvent): void {
   deposit.amount = amount
   deposit.vault = vault.id
 
-  deposit.save()
-
   vault.inputTokenBalance = vault.inputTokenBalance.plus(amount)
 
-  // TODO: avoid duplicated code, move to a function or something
-  const token = Token.load(vault.inputToken)
-  if (token) {
-    const tokenPriceUSD = prices.getPricePerToken(
-      Address.fromString(vault.inputToken)
-    )
+  vault.totalValueLockedUSD = decimals
+    .fromBigInt(vault.inputTokenBalance, token.decimals as u8)
+    .times(tokenPriceUSD)
 
-    token.lastPriceUSD = tokenPriceUSD
-    token.lastPriceBlockNumber = event.block.number
+  deposit.amountUSD = decimals
+    .fromBigInt(amount, token.decimals as u8)
+    .times(tokenPriceUSD)
 
-    const inputTokenBase10 = BigInt.fromI32(10).pow(token.decimals as u8)
-
-    vault.totalValueLockedUSD = vault.inputTokenBalance
-      .div(inputTokenBase10)
-      .toBigDecimal()
-      .times(tokenPriceUSD)
-
-    token.save()
-  }
-
+  deposit.save()
+  token.save()
   vault.save()
 
   metrics.updateFinancials(event.block)

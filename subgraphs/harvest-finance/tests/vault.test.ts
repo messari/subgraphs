@@ -1,5 +1,12 @@
 import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
-import { afterEach, assert, clearStore, describe, test } from 'matchstick-as'
+import {
+  afterEach,
+  assert,
+  beforeEach,
+  clearStore,
+  describe,
+  test,
+} from 'matchstick-as'
 import {
   assertDeposit,
   assertVaultDailySnapshot,
@@ -10,7 +17,7 @@ import {
   createWithdrawEvent,
 } from './vault-utils'
 import { handleDeposit, handleTransfer, handleWithdraw } from '../src/vault'
-import { Vault } from '../generated/schema'
+import { Token, Vault } from '../generated/schema'
 import { assertProtocol, mockChainLink } from './controller-utils'
 import { vaults } from '../src/utils/vaults'
 import { deposits } from '../src/utils/deposits'
@@ -18,7 +25,6 @@ import { withdraws } from '../src/utils/withdraws'
 import { tokens } from '../src/utils/tokens'
 import { constants } from '../src/utils/constants'
 import { protocols } from '../src/utils/protocols'
-import { handleAddVaultAndStrategy } from '../src/controller'
 
 const vaultAddress = Address.fromString(
   '0x0000000000000000000000000000000000000001'
@@ -55,9 +61,30 @@ function createVault(): Vault {
   return vault
 }
 
+let token: Token
+
 describe('Vault', () => {
   afterEach(() => {
     clearStore()
+  })
+
+  beforeEach(() => {
+    mockChainLink(
+      constants.CHAIN_LINK_CONTRACT_ADDRESS,
+      inputTokenAddress,
+      constants.CHAIN_LINK_USD_ADDRESS,
+      BigInt.fromString('99975399'),
+      8
+    )
+  })
+
+  beforeEach(() => {
+    token = tokens.initialize(inputTokenAddress.toHexString())
+    token.symbol = 'tk1'
+    token.name = 'token 1'
+    token.decimals = 6
+    token.lastPriceUSD = BigDecimal.fromString('1')
+    token.save()
   })
 
   describe('handleDeposit', () => {
@@ -67,13 +94,18 @@ describe('Vault', () => {
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
-      const amount = BigInt.fromI32(100)
+      const amount = BigInt.fromString('100000000') // 100
       const event = createDepositEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
 
       handleDeposit(event)
 
-      assert.fieldEquals('Vault', vault.id, 'inputTokenBalance', '100')
+      assert.fieldEquals(
+        'Vault',
+        vault.id,
+        'inputTokenBalance',
+        amount.toString()
+      )
     })
 
     test('creates Deposit', () => {
@@ -86,7 +118,7 @@ describe('Vault', () => {
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
-      const amount = BigInt.fromI32(100)
+      const amount = BigInt.fromString('100000000') // 100
       const event = createDepositEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
       event.transaction.from = fromAddress
@@ -108,33 +140,19 @@ describe('Vault', () => {
         protocol: vault.protocol,
         blockNumber: BigInt.fromI32(1),
         timestamp: BigInt.fromI32(1),
-        amountUSD: BigDecimal.fromString('0'),
+        amountUSD: BigDecimal.fromString('99.975399'),
       })
     })
 
     test('updates Token.lastPriceUSD and Vault.totalValueLockedUSD ', () => {
-      const token = tokens.initialize(inputTokenAddress.toHexString())
-      token.symbol = 'tk1'
-      token.name = 'token 1'
-      token.decimals = 6
-      token.save()
-
       const vault = createVault()
 
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
-      const amount = BigInt.fromI32(100).times(BigInt.fromI32(10).pow(6))
+      const amount = BigInt.fromString('100000000') // 100
       const event = createDepositEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
-
-      mockChainLink(
-        constants.CHAIN_LINK_CONTRACT_ADDRESS,
-        inputTokenAddress,
-        constants.CHAIN_LINK_USD_ADDRESS,
-        BigInt.fromString('99975399'),
-        8
-      )
 
       handleDeposit(event)
 
@@ -152,7 +170,7 @@ describe('Vault', () => {
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
-      const amount = BigInt.fromI32(100)
+      const amount = BigInt.fromString('100000000') // 100
 
       // 1st deposit
       const event0 = createDepositEvent(amount, beneficiaryAddress)
@@ -228,19 +246,19 @@ describe('Vault', () => {
   describe('handleWithdraw', () => {
     test('decrements inputTokenBalance', () => {
       const vault = createVault()
-      vault.inputTokenBalance = BigInt.fromI32(100)
+      vault.inputTokenBalance = BigInt.fromString('1000000000') // 1000
       vault.save()
 
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
-      const amount = BigInt.fromI32(40)
+      const amount = BigInt.fromString('100000000') // 100
       const event = createWithdrawEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
 
       handleWithdraw(event)
 
-      assert.fieldEquals('Vault', vault.id, 'inputTokenBalance', '60')
+      assert.fieldEquals('Vault', vault.id, 'inputTokenBalance', '900000000') // 900
     })
 
     test('creates Withdraw', () => {
@@ -253,7 +271,7 @@ describe('Vault', () => {
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
-      const amount = BigInt.fromI32(100)
+      const amount = BigInt.fromString('100000000') // 100
       const event = createWithdrawEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
       event.transaction.from = fromAddress
@@ -275,42 +293,26 @@ describe('Vault', () => {
         protocol: vault.protocol,
         blockNumber: BigInt.fromI32(1),
         timestamp: BigInt.fromI32(1),
-        amountUSD: BigDecimal.fromString('0'),
+        amountUSD: BigDecimal.fromString('99.975399'),
       })
     })
 
     test('updates Token.lastPriceUSD and Vault.totalValueLockedUSD', () => {
-      const token = tokens.initialize(inputTokenAddress.toHexString())
-      token.symbol = 'tk1'
-      token.name = 'token 1'
-      token.decimals = 6
-      token.save()
-
       const vault = createVault()
-      vault.inputTokenBalance = BigInt.fromI32(100).times(
-        BigInt.fromI32(10).pow(6)
-      )
+      vault.inputTokenBalance = BigInt.fromString('1000000000') // 1000
       vault.save()
 
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
-      const amount = BigInt.fromI32(40).times(BigInt.fromI32(10).pow(6))
+      const amount = BigInt.fromString('400000000') // 400
       const event = createWithdrawEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
-
-      mockChainLink(
-        constants.CHAIN_LINK_CONTRACT_ADDRESS,
-        inputTokenAddress,
-        constants.CHAIN_LINK_USD_ADDRESS,
-        BigInt.fromString('99975399'),
-        8
-      )
 
       handleWithdraw(event)
 
       assert.fieldEquals('Token', token.id, 'lastPriceUSD', '0.99975399')
-      assert.fieldEquals('Vault', vault.id, 'totalValueLockedUSD', '59.9852394')
+      assert.fieldEquals('Vault', vault.id, 'totalValueLockedUSD', '599.852394')
     })
 
     test('updates VaultSnapshots', () => {
@@ -326,7 +328,7 @@ describe('Vault', () => {
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
-      const amount = BigInt.fromI32(100)
+      const amount = BigInt.fromString('100000000') // 100
 
       // 1st withdraw
       const event0 = createWithdrawEvent(amount, beneficiaryAddress)
@@ -409,7 +411,7 @@ describe('Vault', () => {
           '0x0000000000000000000000000000000000000001'
         )
 
-        const amount = BigInt.fromString('200')
+        const amount = BigInt.fromString('200000000') // 200
 
         const event = createTransferEvent(zeroAddress, toAddress, amount)
 
@@ -426,6 +428,7 @@ describe('Vault', () => {
       })
     })
   })
+
   describe('usageMetrics', () => {
     test('update usage metrics', () => {
       const vault = createVault()
@@ -441,7 +444,7 @@ describe('Vault', () => {
       const beneficiaryAddress = Address.fromString(
         '0x0000000000000000000000000000000000000009'
       )
-      const amount = BigInt.fromI32(100)
+      const amount = BigInt.fromString('100000000') // 100
 
       let dailyTxCount = 0
       let depositCount = 0
