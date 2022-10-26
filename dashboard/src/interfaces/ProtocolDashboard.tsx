@@ -157,17 +157,17 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
 
   useEffect(() => {
     // perform validations that the comparison is for same versions, same subgraph etc
-    if (!!overlaySchemaData?.protocols[0]) {
+    if (overlaySchemaData?.protocols[0]) {
       overlayProtocolType = overlaySchemaData.protocols[0].type;
       overlaySchemaVersion = overlaySchemaData?.protocols[0]?.schemaVersion;
       getOverlayMainQueryData();
     }
-    if (overlaySchemaVersion !== schemaVersion && overlayDeploymentURL) {
+    if (overlaySchemaVersion !== schemaVersion && !overlaySchemaQueryLoading && overlayDeploymentURL) {
       setOverlayError(new ApolloError({
         errorMessage: `OVERLAY ERROR - Current subgraph ${subgraphToQuery.url} has a schema version of ${schemaVersion} while the overlay subgraph ${overlayDeploymentURL} has a schema version of ${overlaySchemaVersion}. In order to do an overlay comparison, these versions have to match.`,
       }));
     }
-    if (overlayProtocolType !== protocolType && overlayDeploymentURL) {
+    if (overlayProtocolType !== protocolType && !overlaySchemaQueryLoading && overlayDeploymentURL) {
       setOverlayError(new ApolloError({
         errorMessage: `OVERLAY ERROR - Current subgraph ${subgraphToQuery.url} has a schema type of ${protocolType} while the overlay subgraph ${overlayDeploymentURL} has a schema type of ${overlayProtocolType}. In order to do an overlay comparison, these types have to match.`,
       }));
@@ -276,7 +276,7 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
     gql`
         ${financialsQuery}
       `,
-    { client },
+    { client: overlayDeploymentClient },
   );
   const [
     getOverlayDailyUsageData,
@@ -285,7 +285,7 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
     gql`
         ${dailyUsageQuery}
       `,
-    { client },
+    { client: overlayDeploymentClient },
   );
   const [
     getOverlayHourlyUsageData,
@@ -294,7 +294,7 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
     gql`
         ${hourlyUsageQuery}
       `,
-    { client },
+    { client: overlayDeploymentClient },
   );
 
   const [getOverlayProtocolTableData, { data: overlayProtocolTableData, loading: overlayProtocolTableLoading, error: overlayProtocolTableError }] =
@@ -302,7 +302,7 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
       gql`
           ${protocolTableQuery}
         `,
-      { client, variables: { protocolId: protocolIdToUse } },
+      { client: overlayDeploymentClient, variables: { protocolId: protocolIdToUse } },
     );
 
   const [
@@ -453,6 +453,14 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
     );
     setTabValue(newValue);
   };
+
+  useEffect(() => {
+    if (overlayPoolTimeseriesData && !overlayDailyUsageLoading && !overlayPoolTimeseriesData?.marketDailySnapshots?.length && !overlayPoolTimeseriesData?.marketHourlySnapshots?.length) {
+      setOverlayError(new ApolloError({
+        errorMessage: `OVERLAY ERROR - Current subgraph ${subgraphToQuery.url} has a pool with id ${poolId} while the overlay subgraph ${overlayDeploymentURL} does not. In order to do an overlay comparison, both of these subgraphs need the same pools.`,
+      }));
+    }
+  }, [overlayPoolTimeseriesData])
 
   useEffect(() => {
     if (Object.keys(protocolJSON).length === 0) {
@@ -720,7 +728,6 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
           copyElement.dailySupplySideRevenueUSD =
             snapshotVolume[x][snapshotVolume[x].length - 1]?.dailySupplySideRevenueUSD;
           copyElement.dailyVolumeUSD = snapshotVolume[x][snapshotVolume[x].length - 1]?.dailyVolumeUSD;
-
           poolArray.push(copyElement);
         });
       }
@@ -752,7 +759,6 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
           copyElement.dailySupplySideRevenueUSD =
             snapshotVolume2[x][snapshotVolume2[x].length - 1]?.dailySupplySideRevenueUSD;
           copyElement.dailyVolumeUSD = snapshotVolume2[x][snapshotVolume2[x].length - 1]?.dailyVolumeUSD;
-
           poolArray.push(copyElement);
         });
       }
@@ -784,7 +790,6 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
           copyElement.dailySupplySideRevenueUSD =
             snapshotVolume3[x][snapshotVolume3[x].length - 1]?.dailySupplySideRevenueUSD;
           copyElement.dailyVolumeUSD = snapshotVolume3[x][snapshotVolume3[x].length - 1]?.dailyVolumeUSD;
-
           poolArray.push(copyElement);
         });
       }
@@ -816,7 +821,6 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
           copyElement.dailySupplySideRevenueUSD =
             snapshotVolume4[x][snapshotVolume4[x].length - 1]?.dailySupplySideRevenueUSD;
           copyElement.dailyVolumeUSD = snapshotVolume4[x][snapshotVolume4[x].length - 1]?.dailyVolumeUSD;
-
           poolArray.push(copyElement);
         });
       }
@@ -848,7 +852,6 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
           copyElement.dailySupplySideRevenueUSD =
             snapshotVolume5[x][snapshotVolume5[x].length - 1]?.dailySupplySideRevenueUSD;
           copyElement.dailyVolumeUSD = snapshotVolume5[x][snapshotVolume5[x].length - 1]?.dailyVolumeUSD;
-
           poolArray.push(copyElement);
         });
       }
@@ -997,7 +1000,6 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
   }
 
   let overlayPoolDataToPass: { [x: string]: any } = {};
-
   if (overlayDeploymentURL && poolId) {
     if (typeof overlayPoolTimeseriesData === 'object') {
       Object.keys(overlayPoolTimeseriesData).forEach(x => overlayPoolDataToPass[x] = overlayPoolTimeseriesData[x]);

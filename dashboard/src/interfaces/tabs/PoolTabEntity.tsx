@@ -119,7 +119,8 @@ function PoolTabEntity({
 
     for (let x = currentEntityData.length - 1; x >= 0; x--) {
       const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-      const overlayTimeseriesInstance: { [x: string]: any } = overlayPoolTimeseriesData[x];
+      const overlayDifference = currentEntityData.length - overlayPoolTimeseriesData.length;
+      const overlayTimeseriesInstance: { [x: string]: any } = overlayPoolTimeseriesData[x - overlayDifference];
 
       // For exchange protocols, calculate the baseYield
       if (data.protocols[0].type === "EXCHANGE") {
@@ -141,7 +142,8 @@ function PoolTabEntity({
           dataFieldMetrics.baseYield.sum += value;
         }
       }
-      if (overlayData.protocols[0].type === "EXCHANGE" && overlayTimeseriesInstance) {
+
+      if (overlayData?.protocols[0]?.type === "EXCHANGE" && overlayTimeseriesInstance) {
         let value = 0;
         if (Object.keys(overlayData[poolKeySingular]?.fees)?.length > 0 && overlayTimeseriesInstance.totalValueLockedUSD) {
           const revenueUSD =
@@ -158,6 +160,7 @@ function PoolTabEntity({
           overlayDataFields.baseYield.push({ value, date: Number(overlayTimeseriesInstance.timestamp) });
         }
       }
+
       // Take the given timeseries instance and loop thru the fields of the instance (ie totalValueLockedUSD)
       let skip = false;
       for (let z = 0; z < Object.keys(timeseriesInstance).length; z++) {
@@ -198,7 +201,11 @@ function PoolTabEntity({
             );
             dataFields[fieldName] = returnedData.currentEntityField;
             dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
-            skip = true;
+            if (overlayTimeseriesInstance) {
+              skip = true;
+            } else {
+              continue;
+            }
           }
           if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField && !skip) {
             // Add the data to the array held on the dataField key of the fieldName
@@ -281,7 +288,11 @@ function PoolTabEntity({
                 }
               }
             });
-            skip = true;
+            if (overlayTimeseriesInstance) {
+              skip = true;
+            } else {
+              continue;
+            }
           } else if (Array.isArray(currentInstanceField) && !skip) {
             // If the instance field data is an array, extrapolate this array into multiple keys (one for each element of the array)
             currentInstanceField.forEach((val: any, arrayIndex: number) => {
@@ -448,6 +459,16 @@ function PoolTabEntity({
               fieldName: entityName + "-" + fieldName,
             });
           }
+        }
+        if (x < overlayDifference && overlayPoolTimeseriesData.length > 0) {
+          overlayDataFields[fieldName] = [
+            { value: 0, date: Number(timeseriesInstance.timestamp) },
+            ...overlayDataFields[fieldName],
+          ];
+          continue
+        }
+        if (!overlayTimeseriesInstance) {
+          continue;
         }
         value = currentOverlayInstanceField;
         try {

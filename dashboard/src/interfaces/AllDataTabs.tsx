@@ -145,7 +145,7 @@ function AllDataTabs({
           <DeploymentOverlayDropDown setDeploymentURL={(x: string) => {
             setOverlayDeploymentClient(NewClient(x));
             setOverlayDeploymentURL(x);
-          }} deploymentsList={[{ value: "", label: "NO OVERLAY" }, { value: subgraphToQueryURL, label: "TEST - " + subgraphToQueryURL }]} currentDeploymentURL={overlayDeploymentURL} />
+          }} deploymentsList={[{ value: "", label: "NO OVERLAY" }, { value: subgraphToQueryURL, label: subgraphToQueryURL }]} currentDeploymentURL={overlayDeploymentURL} />
         </div>
         {protocolDropDown}
         <TabPanel value="1">

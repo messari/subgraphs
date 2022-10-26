@@ -68,9 +68,10 @@ function ProtocolTabEntity({
       // For the current entity, loop through all instances of that entity
       const overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
 
+      const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
       for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
-        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[x];
+        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[x - overlayDifference];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
@@ -214,7 +215,12 @@ function ProtocolTabEntity({
               }
             }
 
-            if (overlayTimeseriesInstance) {
+            if (x < overlayDifference && currentOverlayEntityData.length > 0) {
+              overlayDataFields[fieldName] = [
+                { value: 0, date: Number(timeseriesInstance.timestamp) },
+                ...overlayDataFields[fieldName],
+              ];
+            } else if (overlayTimeseriesInstance) {
               if (!isNaN(currentOverlayInstanceField) && !Array.isArray(currentOverlayInstanceField)) {
                 // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
                 // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
