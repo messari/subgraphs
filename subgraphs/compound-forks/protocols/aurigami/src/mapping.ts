@@ -372,9 +372,6 @@ function getPrice(
   return oracleContract.try_getUnderlyingPrice(marketAddress);
 }
 
-//
-//
-// Gets the price of wantAddress.inputToken from an LP from Trisolaris
 function getPriceFromLp(
   priceOracle: string, // aurigami price oracle
   knownMarketID: Address, // address of the market we know the price of
