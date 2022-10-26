@@ -48,6 +48,8 @@ export const WNEAR_PLY_LP = Address.fromString(
 );
 
 // AURORA market / AURORA/ETH LP
+// reserve0 -> AURORA
+// reserve1 -> ETH
 export const AURORA_ETH_LP = Address.fromString(
   "0x5eeC60F348cB1D661E4A5122CF4638c7DB7A886e"
 );
@@ -60,6 +62,8 @@ export const TRI_USDT_LP = Address.fromString(
 );
 
 // USN market / wNEAR/USN LP > missing first month
+// reserve0 -> USN
+// reserve1 -> wNEAR
 export const WNEAR_USN_LP = Address.fromString(
   "0xA36DF7c571bEbA7B3fB89F25dFc990EAC75F525A"
 );
