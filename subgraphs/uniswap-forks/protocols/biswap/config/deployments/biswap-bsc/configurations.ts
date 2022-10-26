@@ -45,13 +45,13 @@ export class BiswapBscConfigurations implements Configurations {
     );
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("0.2");
+    return BigDecimal.fromString("0.1");
   }
   getProtocolFeeToOn(): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.15");
+    return BigDecimal.fromString("0.05");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
@@ -90,19 +90,16 @@ export class BiswapBscConfigurations implements Configurations {
   }
   getStableCoins(): string[] {
     return [
-      "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
-      "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
-      "0xdac17f958d2ee523a2206206994597c13d831ec7", // USDT
-      "0x0000000000085d4780b73119b644ae5ecd22b376", // TUSD
-      "0x956f47f50a910163d8bf957cf5846d573e7f87ca", // FEI
-      "0x4dd28568d05f09b02220b09c2cb307bfd837cb95",
+      "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d", // USDC
+      "0x55d398326f99059ff775485246999027b3197955", // USDT
+      "0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
     ];
   }
   getStableOraclePools(): string[] {
     return [
-      "0x51e6d27fa57373d8d4c256231241053a70cb1d93", // BUSD/WBNB created block 4857769
-      "0xf3010261b58b2874639ca2e860e9005e3be5de0b", // DAI/WBNB created block 481116
-      "0x20bcc3b8a0091ddac2d0bc30f68e6cbb97de59cd", // USDT/WBNB created block 648115
+      "0x06cd679121ec37b0a2fd673d4976b09d81791856", // USDC/WBNB
+      "0x8840c6252e2e86e545defb6da98b2a0e26d8c1ba", // USDT/WBNB
+      "0xacaac9311b0096e04dfe96b6d87dec867d3883dc", // BUSD/WBNB
     ];
   }
   getUntrackedPairs(): string[] {

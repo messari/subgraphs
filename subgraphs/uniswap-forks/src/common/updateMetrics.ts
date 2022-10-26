@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import {
   Account,
   ActiveAccount,
@@ -294,6 +300,15 @@ export function updateVolumeAndFees(
   const poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
   const supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
   const protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
+
+  log.error(
+    " ~~~> volume and fees --- trackedAmountUSD: {}, token0Amount: {}, token1Amount: {}",
+    [
+      trackedAmountUSD.toString(),
+      token0Amount.toString(),
+      token1Amount.toString(),
+    ]
+  );
 
   // Update volume occurred during swaps
   poolMetricsDaily.dailyVolumeByTokenUSD = [
