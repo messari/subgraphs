@@ -128,17 +128,6 @@ enum PositionSide {
   BORROWER
 }
 
-enum RevenueSource {
-  " Revenue that is generated from borrower's interest "
-  BORROW_INTEREST
-
-  " Revenue that is generated from liquidation fees "
-  LIQUIDATION_FEE
-
-  " Revenue that is generated from fees from flashloans "
-  FLASHLOAN_FEE
-}
-
 # Most markets only have a single interest rate given a specific type.
 # However, fixed term lending protocols can have multiple rates with
 # different duration/maturity per market. You can append a counter
@@ -192,6 +181,17 @@ type TokenBalances @entity {
   exchangeRates: [BigDecimal!]
 }
 
+enum RevenueSource {
+  " Revenue that is generated from borrower's interest "
+  BORROW_INTEREST
+
+  " Revenue that is generated from liquidation fees "
+  LIQUIDATION_FEE
+
+  " Revenue that is generated from fees from flashloans "
+  FLASHLOAN_FEE
+}
+
 # This entity offers a more nuanced view of revenue types
 # Use this to provide the sources of revenue and amounts of each
 type RevenueDetails @entity {
@@ -203,6 +203,48 @@ type RevenueDetails @entity {
 
   " The amount of revenue in USD (same order as sources) "
   amountsUSD: [BigDecimal!]!
+}
+
+enum OracleSource {
+  UNISWAP
+  BALANCER
+  CHAINLINK
+  YEARN
+  SUSHISWAP
+  CURVE
+  ## Can add more
+}
+
+# Most lending protocols get token prices through onchain oracles.
+# As oracles are a source of truth it is important to understand the details.
+# This entity will help track oracle-related data in a market
+type Oracle @entity {
+  " { Market ID } "
+  id: ID!
+
+  " The block this oracle was adopted for a market "
+  blockCreated: BigInt!
+
+  " The most recent block that the oracle was updated (Update when an oracle proxy updates the contract, this happens in compound for example) "
+  blockLU: BigInt!
+
+  " The timestamp this oracle was adopted for a market "
+  timestampCreated: BigInt!
+
+  " The most recent timestamp that the oracle was updated (Updated when the oracle address is updated) "
+  timestampLU: BigInt!
+
+  " Is the Oracle currently used as the source of truth for a market"
+  isActive: Boolean
+
+  " True if the oracle returns prices in USD (e.g. generally the other case is the network's native token) "
+  isUSD: Boolean
+
+  " The contract address of the oracle "
+  oracleAddress: String!
+
+  " The Protocol that is providing the oracle (nullable if non-standard source)"
+  oracleSource: OracleSource
 }
 
 #############################
@@ -671,8 +713,8 @@ type Market @entity {
   " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
   liquidationPenalty: BigDecimal!
 
-  " Address of the price oracle used in this market "
-  priceOracle: String
+  " Information about the price oracle used for to price this market "
+  oracle: Oracle!
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
