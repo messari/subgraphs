@@ -1,6 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts";
 import {
-  Burn as BurnEvent,
   Initialize,
   Mint as MintEvent,
   Swap as SwapEvent,
