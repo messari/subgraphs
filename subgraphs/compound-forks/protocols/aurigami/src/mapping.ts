@@ -380,7 +380,7 @@ function getPrice(
       WNEAR_MARKET,
       USN_MARKET,
       WNEAR_USN_LP,
-      false
+      true
     );
   }
 
@@ -435,7 +435,7 @@ function getPriceFromLp(
       .div(exponentToBigDecimal(knownMarketDecimals));
 
     // price of reserve0 = price of reserve1 / (reserve0 / reserve1)
-    priceBD = knownPriceUSD.div(reserveBalance1.div(reserveBalance0));
+    priceBD = knownPriceUSD.div(reserveBalance0.div(reserveBalance1));
   } else {
     const reserveBalance0 = tryReserves.value.value0
       .toBigDecimal()
