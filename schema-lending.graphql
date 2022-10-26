@@ -83,7 +83,9 @@ enum LendingType {
 
   " Pooled protocols pool all users assets into a single market "
   POOLED
+}
 
+enum PermissionType {
   " Protocols that only allow KYC'd users "
   WHITELIST_ONLY
 
@@ -245,7 +247,10 @@ type LendingProtocol implements Protocol @entity {
   type: ProtocolType!
 
   " The specific lending protocol type "
-  lendingType: [LendingType!]
+  lendingType: LendingType
+
+  " The specific permissions required to use the protocol "
+  PermissionType: PermissionType
 
   " Risk type of the lending protocol "
   riskType: RiskType
