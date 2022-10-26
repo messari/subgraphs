@@ -277,8 +277,10 @@ export class ScriptGenerator {
     // Set variables for deployment
     let version = this.version
     if (!version) {
-      version = deploymentJsonData.versions.subgraph
+      version = `${deploymentJsonData.versions.schema}_${deploymentJsonData.versions.subgraph}`
     }
+
+    console.log(version)
 
     switch (this.service) {
       case 'subgraph-studio':

@@ -6,9 +6,8 @@ import {
   ScriptGenerator,
 } from '../command-helpers/build/scriptGenerator'
 
-import { validateDeploymentJson } from '../../../deployment/validation/validateDeploymentJson'
+import { validateDeploymentJson } from '../command-helpers/build/validateDeploymentJson'
 import { getScopeAlias, getServiceAlias } from '../command-helpers/build/alias'
-import { isValidVersion } from '../command-helpers/build/checkVersion'
 import { Executor as ExecutorClass } from '../command-helpers/build/execution'
 import { MESSARI_REPO_PATH } from '../../bin/env'
 
@@ -109,7 +108,6 @@ module.exports = {
       type: 'input',
       name: 'id',
       message: 'Deployment id to use for the build/deployment',
-      skip: id !== undefined,
     }
 
     const askService = {
@@ -146,20 +144,6 @@ module.exports = {
       name: 'token',
       message: 'Please enter Cronos Portal API token:',
       skip: !deploy || !(service == 'cronos-portal') || token,
-    }
-
-    const askVersion = {
-      type: 'input',
-      name: 'version',
-      message: 'Please enter valid deploymemt version (e.g. 1.0.0):',
-      skip:
-        !deploy || !(service == 'subgraph-studio') || isValidVersion(version),
-    }
-
-    if (deploy === true && version !== undefined) {
-      while (!isValidVersion(version)) {
-        version = (await toolbox.prompt.ask(askVersion)).version
-      }
     }
 
     if (token === undefined && deploy && service == 'cronos-portal') {

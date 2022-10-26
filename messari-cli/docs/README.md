@@ -13,13 +13,8 @@ Check out the documentation at https://github.com/infinitered/gluegun/tree/maste
   - Description: Used for building and deploying subgraphs.
   - Installation Instructions:
 
-    - Navigate to the `messari-cli/` folder and run the following commands:
-
-      - `npm install -g ./`
-      - `npm install`
-      - `npm install -g mustache` - If not already installed
-
-    - This creates a local installation of this package from your copy of the Messari repo. Make sure that when using the CLI you are on an up-to-date git branch.
+    - `npm install -g messari-subgraph-cli`
+    - `npm install -g mustache` - If not already installed
 
   - Preparation:
 
@@ -27,7 +22,7 @@ Check out the documentation at https://github.com/infinitered/gluegun/tree/maste
     - Additionally, you must have an entry for the deployment you are trying to execute within the deployment.json file in the `**repo-root**/deployment/` folder.
 
   - Usage:
-    - This command must be run within a subgraph directory to build a subgraph at (**repo-root**/subgraphs/\*\*).
+    - This command can be run anywhere within your local copy of the Messari/Subgraphs repo.
     - Run `messari b` or `messari build` to be prompted for building a subgraph.
     - Run `messari b -d` to be prompted to build and then deploy subgraphs.
     - Run `messari b -h` to be shown a list of optional paramters you can use to bypass prompts or add extra detail about the build/deployment you would like to execute.
