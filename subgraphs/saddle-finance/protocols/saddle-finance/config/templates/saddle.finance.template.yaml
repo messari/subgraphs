@@ -3,7 +3,7 @@ repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  {{ #deployers }}
+  {{#deployers}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ chain }}
@@ -64,8 +64,8 @@ dataSources:
         - event: NewSwapPool(indexed address,address,address[])
           handler: handleNewSwapPool
       file: ./src/mappings/swapDeployer.ts
-  {{ /deployers }}
-  {{ #pools }}
+  {{/deployers}}
+  {{#pools}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ chain }}
@@ -148,8 +148,8 @@ dataSources:
         - event: TokenSwapUnderlying(indexed address,uint256,uint256,uint128,uint128)
           handler: handleTokenSwapUnderlying
       file: ./src/mappings/swap.ts
-  {{ /pools }}
-  {{ #miniChef }}
+  {{/pools}}
+  {{#miniChef}}
   - kind: ethereum/contract
     name: MiniChefV2
     network: {{ chain }}
@@ -219,7 +219,70 @@ dataSources:
         - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleWithdraw
       file: ./src/mappings/miniChef.ts
-  {{ /miniChef }}
+  {{/miniChef}}
+  {{#poolRegistries}}
+  - kind: ethereum/contract
+    name: {{ name }}
+    network: {{ chain }}
+    source:
+      address: "{{ address }}"
+      abi: PoolRegistry
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LiquidityPool
+      abis:
+        - name: PoolRegistry
+          file: ./abis/PoolRegistry.json
+        - name: Swap
+          file: ./abis/Swap.json
+        - name: SwapV1
+          file: ./abis/SwapV1.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        # Prices
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: AddPool(indexed address,uint256,(address,address,uint8,bytes32,address,address[],address[],address,address,bool,bool,bool))
+          handler: handleAddPool
+        - event: AddCommunityPool(indexed address,uint256,(address,address,uint8,bytes32,address,address[],address[],address,address,bool,bool,bool))
+          handler: handleAddCommunityPool
+        - event: UpdatePool(indexed address,uint256,(address,address,uint8,bytes32,address,address[],address[],address,address,bool,bool,bool))
+          handler: handleUpdatePool
+      file: ./src/mappings/poolRegistry.ts
+  {{/poolRegistries}}
 templates:
   - kind: ethereum/contract
     name: Swap

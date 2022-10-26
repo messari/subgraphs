@@ -1,5 +1,5 @@
 import { Address } from "@graphprotocol/graph-ts";
-import { ERC20 } from "../../generated/aave-aave-eol/ERC20";
+import { ERC20 } from "../../generated/Standard/ERC20";
 
 export function fetchTokenDecimals(tokenAddress: Address): number {
   const tokenContract = ERC20.bind(tokenAddress);

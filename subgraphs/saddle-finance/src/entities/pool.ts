@@ -7,6 +7,7 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
+  _TokenPools,
   Deposit,
   LiquidityPool,
   LiquidityPoolDailySnapshot,
@@ -17,6 +18,7 @@ import {
 } from "../../generated/schema";
 import { Swap } from "../../generated/templates/Swap/Swap";
 import { SwapV1 } from "../../generated/templates/Swap/SwapV1";
+import { Swap as SwapTemplate } from "../../generated/templates";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
@@ -56,19 +58,70 @@ import { SimpleRewarder } from "../../generated/templates/Swap/SimpleRewarder";
 export function getOrCreatePool(address: Address): LiquidityPool {
   let pool = LiquidityPool.load(address.toHexString());
   if (!pool) {
-    // Pool was not created through a SwapDeployer
+    // Pool was not created through a SwapDeployer nor Registry
     pool = createPoolFromAddress(address);
   }
   return pool;
 }
 
-export function createPoolFromEvent(event: NewSwapPool): boolean {
-  const address = event.params.swapAddress;
-  const addressString = address.toHexString();
-  // Don't track unused/broken pools
-  if (BROKEN_POOLS.has(addressString)) {
-    return false;
+// createPoolFromAddress will create a pool in the DB but won't subscribe to it via template
+// because it should already be in the yaml.
+function createPoolFromAddress(address: Address): LiquidityPool {
+  const poolData = POOL_DATA.get(
+    prefixID(dataSource.network(), address.toHexString())
+  );
+
+  const pool = createPool(address, poolData.createdBlockNumber, poolData.createdTimestamp, null);
+  if (!pool) {
+    log.critical("unable to create pool from address", [])
   }
+  return pool!
+}
+
+// createPoolFromEvent will create a pool from a PairCreated event, and subscribe to events from it.
+export function createPoolFromFactoryEvent(event: NewSwapPool): void {
+  const poolAddr = event.params.swapAddress;
+  if (BROKEN_POOLS.has(poolAddr.toHexString())) {
+    return;
+  }
+
+  const pool = LiquidityPool.load(poolAddr.toHexString());
+  if (pool) {
+    return;
+  }
+
+
+  if (createPool(poolAddr, event.block.number, event.block.timestamp, event.params.pooledTokens)) {
+    SwapTemplate.create(poolAddr);
+  }
+}
+
+// createPoolFromRegistryEvent will create a pool if doesn't exist already when added to the pool registry.
+// This should catch pools deployed manually and not via a deployer.
+export function createPoolFromRegistryEvent(address: Address, block: ethereum.Block): void {
+  if (BROKEN_POOLS.has(address.toHexString())) {
+    return;
+  }
+
+  const pool = LiquidityPool.load(address.toHexString());
+  if (pool) {
+    return;
+  }
+
+  if (createPool(address, block.number, block.timestamp, null)) {
+    SwapTemplate.create(address);
+  }
+}
+
+function createPool(
+  swapAddress: Address,
+  blockNum: BigInt,
+  timestamp: BigInt,
+  pooledTokens: Address[] | null
+): LiquidityPool | null {
+  const address = swapAddress;
+  const addressString = address.toHexString();
+
   const contract = Swap.bind(address);
   let lpTokenAddress = contract.swapStorage().value6;
   // Check if LP token exists
@@ -76,22 +129,27 @@ export function createPoolFromEvent(event: NewSwapPool): boolean {
     const v1contract = SwapV1.bind(address);
     lpTokenAddress = v1contract.swapStorage().value7;
     if (!checkValidToken(lpTokenAddress)) {
-      log.error("Invalid LP token address {} in pool {}", [
+      log.critical("Invalid LP token address {} in pool {}", [
         lpTokenAddress.toHexString(),
         address.toHexString(),
       ]);
-      return false;
+      return null
     }
   }
+
+  if (!pooledTokens) {
+    pooledTokens = fetchInputTokensFromContract(contract);
+  }
+
   const pool = new LiquidityPool(addressString);
   pool.protocol = getOrCreateProtocol().id;
-  pool._inputTokensOrdered = getOrCreateInputTokens(event.params.pooledTokens);
+  pool._inputTokensOrdered = getOrCreateInputTokens(pooledTokens);
   pool.inputTokens = pool._inputTokensOrdered.sort();
   const token = getOrCreateToken(lpTokenAddress, addressString);
   pool.outputToken = token.id;
   pool.outputTokenSupply = BIGINT_ZERO;
-  pool.createdTimestamp = event.block.timestamp;
-  pool.createdBlockNumber = event.block.number;
+  pool.createdTimestamp = timestamp;
+  pool.createdBlockNumber = blockNum;
   pool.name = token.name;
   pool.symbol = token.symbol;
   const tradingFee = contract.swapStorage().value4; // swapFee
@@ -108,7 +166,8 @@ export function createPoolFromEvent(event: NewSwapPool): boolean {
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.save();
   incrementProtocolTotalPoolCount();
-  return true;
+  registerPoolForTokens(pool);
+  return pool;
 }
 
 export function getOrCreatePoolDailySnapshot(
@@ -405,7 +464,7 @@ function getOrCreateInputTokens(pooledTokens: Address[]): string[] {
   if (basePoolId) {
     tokenIds.pop();
     const basePool = getOrCreatePool(Address.fromString(basePoolId));
-    tokenIds = tokenIds.concat(basePool.inputTokens);
+    tokenIds = tokenIds.concat(basePool._inputTokensOrdered);
   }
   return tokenIds;
 }
@@ -423,7 +482,9 @@ function updateOutputTokenPriceAndTVL(
     pool.outputTokenSupply!,
     getTokenDecimals(pool.outputToken!)
   );
-  pool.outputTokenPriceUSD = totalValueLocked.div(outputTokenAmount);
+  pool.outputTokenPriceUSD = totalValueLocked.equals(BIGDECIMAL_ZERO) ?
+    BIGDECIMAL_ZERO : 
+    totalValueLocked.div(outputTokenAmount); // avoid div by 0 when pool is empty
   updateProtocolTVL(event, totalValueLocked.minus(pool.totalValueLockedUSD));
   pool.totalValueLockedUSD = totalValueLocked;
 }
@@ -435,7 +496,8 @@ function setInputTokenBalancesAndWeights(
   if (contract == null) {
     contract = Swap.bind(Address.fromString(pool.id));
   }
-  let balances: BigInt[] = [];
+
+  let bpBalances: BigInt[] = [];
   if (pool._basePool) {
     const basePool = getOrCreatePool(Address.fromString(pool._basePool!));
     const lpTokenIndex = pool.inputTokens.length - basePool.inputTokens.length;
@@ -444,14 +506,31 @@ function setInputTokenBalancesAndWeights(
     // Calculate pool input token amounts based on LP token ratio
     for (let i = 0; i < basePool.inputTokenBalances.length; i++) {
       const balance = basePool.inputTokenBalances[i];
-      balances.push(balance.times(lpTokenBalance).div(totalLPTokenSupply));
+      if (totalLPTokenSupply.equals(BIGINT_ZERO)) {
+        bpBalances.push(BIGINT_ZERO);
+        continue;
+      }
+      
+      bpBalances.push(balance.times(lpTokenBalance).div(totalLPTokenSupply));
     }
+
+    // since we want balances to be properly sorted we need them to all have the same
+    // base reference. Balances fetched from the contract will follow the order of `_inputTokensSorted`.
+    // BasePool balances are already sorted, but they need to match `_inputTokensOrdered` in order to sort
+    // them together with the rest.
+    bpBalances = sortValuesByTokenOrder(basePool.inputTokens, basePool._inputTokensOrdered, bpBalances);
   }
-  balances = getBalances(
+
+  const balances = getBalances(
     contract,
-    pool.inputTokens.length - balances.length
-  ).concat(balances);
-  pool.inputTokenBalances = sortByInputTokenOrder(pool, balances);
+    pool.inputTokens.length - bpBalances.length,
+  ).concat(bpBalances);
+
+  pool.inputTokenBalances = sortValuesByTokenOrder(
+    pool._inputTokensOrdered,
+    pool.inputTokens,
+    balances,
+  );
   pool.inputTokenWeights = getBalanceWeights(
     pool.inputTokenBalances,
     pool.inputTokens
@@ -485,54 +564,7 @@ function getBalanceWeights(balances: BigInt[], tokens: string[]): BigDecimal[] {
   return weights;
 }
 
-function createPoolFromAddress(address: Address): LiquidityPool {
-  const poolData = POOL_DATA.get(
-    prefixID(dataSource.network(), address.toHexString())
-  );
-  const pool = new LiquidityPool(address.toHexString());
-  const contract = Swap.bind(address);
-  let lpTokenAddress = contract.swapStorage().value6;
-  // Check if LP token is valid
-  if (!checkValidToken(lpTokenAddress)) {
-    const v1contract = SwapV1.bind(address);
-    lpTokenAddress = v1contract.swapStorage().value7;
-    if (!checkValidToken(lpTokenAddress)) {
-      log.critical("Invalid LP token address {} in pool {}", [
-        lpTokenAddress.toHexString(),
-        address.toHexString(),
-      ]);
-    }
-  }
-
-  const protocol = getOrCreateProtocol();
-  pool.protocol = protocol.id;
-  pool._inputTokensOrdered = getOrCreateInputTokensFromContract(contract);
-  pool.inputTokens = pool._inputTokensOrdered.sort();
-  const token = getOrCreateToken(lpTokenAddress, address.toHexString());
-  pool.outputToken = token.id;
-  pool.outputTokenSupply = BIGINT_ZERO;
-  pool.createdTimestamp = poolData.createdTimestamp;
-  pool.createdBlockNumber = poolData.createdBlockNumber;
-  pool.name = token.name;
-  pool.symbol = token.symbol;
-  const tradingFee = contract.swapStorage().value4; // swapFee
-  const adminFee = contract.swapStorage().value5; // adminFee
-  pool.fees = createOrUpdateAllFees(address, tradingFee, adminFee);
-  pool._basePool = getBasePool(contract);
-  setInputTokenBalancesAndWeights(pool, contract);
-
-  pool.isSingleSided = false;
-  pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-  pool.save();
-  incrementProtocolTotalPoolCount();
-  return pool;
-}
-
-function getOrCreateInputTokensFromContract(contract: Swap): string[] {
+function fetchInputTokensFromContract(contract: Swap): Address[] {
   const tokens: Address[] = [];
   let i = 0;
   let call: ethereum.CallResult<Address>;
@@ -543,24 +575,83 @@ function getOrCreateInputTokensFromContract(contract: Swap): string[] {
     }
     i += 1;
   } while (!call.reverted);
-  return getOrCreateInputTokens(tokens);
+  return tokens;
 }
 
-function sortByInputTokenOrder<T>(
-  pool: LiquidityPool,
-  arr: Array<T>
+// sortValuesByTokenOrder will sort an array of values by performing the same
+// order changes that need to be done to referenceOrder to get targetOrder.
+export function sortValuesByTokenOrder<T>(
+  referenceOrder: string[],
+  targetOrder: string[],
+  valuesToSort: Array<T>
 ): Array<T> {
-  if (arr.length != pool.inputTokens.length) {
+  const len = referenceOrder.length;
+  const intersection = arrayIntersection(referenceOrder, targetOrder);
+  if (intersection.length != len || valuesToSort.length != len) {
+    // reference and target should contain the same elements, just ordered differently.
     log.error(
-      "Failed to sort array, expected array of length {}, received length {}",
-      [pool.inputTokens.length.toString(), arr.length.toString()]
+      "Failed to sort array via reference. Both arrays should have the same values. Ref: {}, target: {}", 
+      [referenceOrder.toString(), targetOrder.toString()]
     );
-    return arr;
+    log.critical("", []);
+    return valuesToSort;
   }
-  const ordered = new Array<T>(arr.length);
-  for (let i = 0; i < arr.length; i++) {
-    const newIndex = pool.inputTokens.indexOf(pool._inputTokensOrdered[i]);
-    ordered[newIndex] = arr[i];
+
+  const ordered = new Array<T>(len);
+  for (let i = 0; i < len; i++) {
+    const val = valuesToSort[i];
+    const ref = referenceOrder[i];
+
+    const targetIndex = targetOrder.indexOf(ref)
+    ordered[targetIndex] = val;
   }
   return ordered;
+}
+
+// arrayIntersection will return an array with the common items 
+// between two arrays.
+function arrayIntersection<T>(arr1: Array<T>, arr2: Array<T>): Array<T> {
+  let len = arr1.length;
+  let shorter = arr1;
+  let longer = arr2;
+  if (arr2.length < arr1.length) {
+    len = arr2.length;
+    longer = arr1;
+    shorter = arr2;
+  }
+
+  const intersection = new Array<T>();
+  for (let i = 0; i < len; i++) {
+    const val = shorter[i];
+    if (longer.indexOf(val) != -1) {
+      intersection.push(val);
+    }
+  }
+  return intersection;
+}
+
+function getOrCreateTokenPools(token: Address): _TokenPools {
+  let pools = _TokenPools.load(token.toHexString());
+  if (pools) {
+    return pools;
+  }
+
+  pools = new _TokenPools(token.toHexString());
+  pools.pools = [];
+  pools.save();
+  return pools;
+}
+
+// registerPoolForTokens will keep track of the pool entity on an auxiliary entity
+// that is indexed by token address (so we can easily tell in which pools a token is traded).
+function registerPoolForTokens(pool: LiquidityPool): void {
+  for (let i = 0; i < pool.inputTokens.length; i++) {
+    const token = pool.inputTokens[i];
+    const pools = getOrCreateTokenPools(Address.fromString(token));
+    if (pools.pools.includes(pool.id)) {
+      continue;
+    }
+    pools.pools = pools.pools.concat([pool.id]);
+    pools.save();
+  }
 }

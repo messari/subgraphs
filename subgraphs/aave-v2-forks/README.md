@@ -7,7 +7,8 @@
 Once everything is setup properly deploying is very easy.
 
 ```bash
-# This example will deploy all forks of aave-v2 on all networks to the hosted service under "dmelotik" in deploymentConfigurations.json
+# This example will deploy all forks of aave-v2 on all networks
+# to the hosted service under "dmelotik" in deploymentConfigurations.json
 npm run deploy --SUBGRAPH=aave-v2-forks --PROTOCOL=aave-v2 --LOCATION=dmelotik
 
 # This will do the same, but only deploying the ethereum subgraph

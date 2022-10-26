@@ -44,7 +44,7 @@ The directory structure for a given subgraph should be as follows (this might ev
 
 ```
 subgraphs/
-    someProtocolName/
+    someBaseName/
         abis/
             (no limitations on child directories here)
         protocols/
