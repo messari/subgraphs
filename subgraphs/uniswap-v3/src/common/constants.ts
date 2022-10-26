@@ -1,11 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
-////////////////////
-///// Versions /////
-////////////////////
-
-export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-
 ////////////////////////
 ///// Schema Enums /////
 ////////////////////////
