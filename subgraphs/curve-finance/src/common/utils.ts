@@ -64,11 +64,11 @@ export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   );
 }
 
-export function sortByInputTokenOrder<T>(
+export function sortByInputTokenOrder(
   pool: LiquidityPool,
-  arr: Array<T>
-): Array<T> {
-  const ordered = new Array<T>(arr.length);
+  arr: BigInt[]
+): BigInt[] {
+  const ordered = new Array<BigInt>(arr.length).fill(constants.BIGINT_ZERO);
 
   for (let i = 0; i < arr.length; i++) {
     const newIndex = pool.inputTokens.indexOf(pool._inputTokensOrdered[i]);
