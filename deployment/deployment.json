@@ -1563,7 +1563,7 @@
     "deployments": {
       "rari-fuse-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.1.7",
@@ -1585,7 +1585,7 @@
       },
       "rari-fuse-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.1.7",
