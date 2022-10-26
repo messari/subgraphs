@@ -1,20 +1,16 @@
 {
   "name": "beefy-finance",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "codegen": "graph codegen"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.29.2",
     "@graphprotocol/graph-ts": "0.26.0",
-    "@types/node": "^17.0.35",
-    "dotenv": "^16.0.1",
     "ethereum-block-by-date": "^1.4.5",
-    "ethers": "^5.6.8",
     "moment": "^2.29.3",
+    "prettier": "^2.7.1",
+    "web3": "^1.8.0",
     "write-yaml-file": "^4.2.0"
-  },
-  "devDependencies": {
-    "matchstick-as": "^0.5.0"
   }
 }

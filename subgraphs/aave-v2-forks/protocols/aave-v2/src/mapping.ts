@@ -79,15 +79,15 @@ import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleG
 import { Transfer } from "../../../generated/templates/AToken/AToken";
 
 function getProtocolData(): ProtocolData {
-  let letants = getNetworkSpecificConstant();
+  const constants = getNetworkSpecificConstant();
   return new ProtocolData(
-    letants.protocolAddress.toHexString(),
+    constants.protocolAddress.toHexString(),
     Protocol.NAME,
     Protocol.SLUG,
     Protocol.SCHEMA_VERSION,
     Protocol.SUBGRAPH_VERSION,
     Protocol.METHODOLOGY_VERSION,
-    letants.network
+    constants.network
   );
 }
 
@@ -162,11 +162,11 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
-  let protocolData = getProtocolData();
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const protocolData = getProtocolData();
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   // update rewards if there is an incentive controller
-  let market = Market.load(event.params.reserve.toHexString());
+  const market = Market.load(event.params.reserve.toHexString());
   if (!market) {
     log.warning("[handleReserveDataUpdated] Market not found", [
       event.params.reserve.toHexString(),
@@ -179,44 +179,44 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // Supply side the to address is the aToken
   // Borrow side the to address is the variableDebtToken
 
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  let tryIncentiveController = aTokenContract.try_getIncentivesController();
+  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  const tryIncentiveController = aTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
-    let incentiveControllerContract = AaveIncentivesController.bind(
+    const incentiveControllerContract = AaveIncentivesController.bind(
       tryIncentiveController.value
     );
-    let tryBorrowRewards = incentiveControllerContract.try_assets(
+    const tryBorrowRewards = incentiveControllerContract.try_assets(
       Address.fromString(market.vToken!)
     );
-    let trySupplyRewards = incentiveControllerContract.try_assets(
+    const trySupplyRewards = incentiveControllerContract.try_assets(
       Address.fromString(market.outputToken!)
     );
-    let tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
+    const tryRewardAsset = incentiveControllerContract.try_REWARD_TOKEN();
 
     if (!tryRewardAsset.reverted) {
       // get reward tokens
-      let borrowRewardToken = getOrCreateRewardToken(
+      const borrowRewardToken = getOrCreateRewardToken(
         tryRewardAsset.value,
         RewardTokenType.BORROW
       );
-      let depositRewardToken = getOrCreateRewardToken(
+      const depositRewardToken = getOrCreateRewardToken(
         tryRewardAsset.value,
         RewardTokenType.DEPOSIT
       );
 
       // always ordered [borrow, deposit/supply]
-      let rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
-      let rewardEmissions = [BIGINT_ZERO, BIGINT_ZERO];
-      let rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-      let rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
+      const rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
+      const rewardEmissions = [BIGINT_ZERO, BIGINT_ZERO];
+      const rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+      const rewardDecimals = getOrCreateToken(tryRewardAsset.value).decimals;
 
       // get reward token price
       // get price of reward token (if stkAAVE it is tied to the price of AAVE)
       let rewardTokenPriceUSD = BIGDECIMAL_ZERO;
       if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
         // get staked token if possible to grab price of staked token
-        let stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
-        let tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
+        const stakedTokenContract = StakedAave.bind(tryRewardAsset.value);
+        const tryStakedToken = stakedTokenContract.try_STAKED_TOKEN();
         if (!tryStakedToken.reverted) {
           rewardTokenPriceUSD = getAssetPriceInUSDC(
             tryStakedToken.value,
@@ -237,11 +237,11 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       // see explanation in docs/Mapping.md#Array Sorting When Querying
       if (!tryBorrowRewards.reverted) {
         // update borrow rewards
-        let borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
+        const borrowRewardsPerDay = tryBorrowRewards.value.value0.times(
           BigInt.fromI32(SECONDS_PER_DAY)
         );
         rewardEmissions[0] = borrowRewardsPerDay;
-        let borrowRewardsPerDayUSD = borrowRewardsPerDay
+        const borrowRewardsPerDayUSD = borrowRewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
           .times(rewardTokenPriceUSD);
@@ -250,11 +250,11 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
       if (!trySupplyRewards.reverted) {
         // update deposit rewards
-        let supplyRewardsPerDay = trySupplyRewards.value.value0.times(
+        const supplyRewardsPerDay = trySupplyRewards.value.value0.times(
           BigInt.fromI32(SECONDS_PER_DAY)
         );
         rewardEmissions[1] = supplyRewardsPerDay;
-        let supplyRewardsPerDayUSD = supplyRewardsPerDay
+        const supplyRewardsPerDayUSD = supplyRewardsPerDay
           .toBigDecimal()
           .div(exponentToBigDecimal(rewardDecimals))
           .times(rewardTokenPriceUSD);
@@ -268,7 +268,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
     }
   }
 
-  let assetPriceUSD = getAssetPriceInUSDC(
+  const assetPriceUSD = getAssetPriceInUSDC(
     Address.fromString(market.inputToken),
     Address.fromString(protocol.priceOracle)
   );
@@ -307,10 +307,12 @@ export function handleReserveUsedAsCollateralDisabled(
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handlePaused(event: Paused): void {
   _handlePaused(getProtocolData());
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handleUnpaused(event: Unpaused): void {
   _handleUnpaused(getProtocolData());
 }
@@ -383,7 +385,7 @@ function getAssetPriceInUSDC(
   tokenAddress: Address,
   priceOracle: Address
 ): BigDecimal {
-  let oracle = IPriceOracleGetter.bind(priceOracle);
+  const oracle = IPriceOracleGetter.bind(priceOracle);
   let oracleResult = readValue<BigInt>(
     oracle.try_getAssetPrice(tokenAddress),
     BIGINT_ZERO
@@ -391,9 +393,9 @@ function getAssetPriceInUSDC(
 
   // if the result is zero or less, try the fallback oracle
   if (!oracleResult.gt(BIGINT_ZERO)) {
-    let tryFallback = oracle.try_getFallbackOracle();
+    const tryFallback = oracle.try_getFallbackOracle();
     if (tryFallback) {
-      let fallbackOracle = IPriceOracleGetter.bind(tryFallback.value);
+      const fallbackOracle = IPriceOracleGetter.bind(tryFallback.value);
       oracleResult = readValue<BigInt>(
         fallbackOracle.try_getAssetPrice(tokenAddress),
         BIGINT_ZERO
@@ -403,7 +405,7 @@ function getAssetPriceInUSDC(
 
   // Mainnet Oracles return the price in eth, must convert to USD through the following method
   if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
-    let priceUSDCInEth = readValue<BigInt>(
+    const priceUSDCInEth = readValue<BigInt>(
       oracle.try_getAssetPrice(Address.fromString(USDC_TOKEN_ADDRESS)),
       BIGINT_ZERO
     );
@@ -417,7 +419,7 @@ function getAssetPriceInUSDC(
 
   // Polygon Oracle returns price in ETH, must convert to USD with following method
   if (equalsIgnoreCase(dataSource.network(), Network.MATIC)) {
-    let priceUSDCInEth = readValue<BigInt>(
+    const priceUSDCInEth = readValue<BigInt>(
       oracle.try_getAssetPrice(Address.fromString(USDC_POS_TOKEN_ADDRESS)),
       BIGINT_ZERO
     );
@@ -435,7 +437,7 @@ function getAssetPriceInUSDC(
   }
 
   // last resort, should not be touched
-  let inputToken = getOrCreateToken(tokenAddress);
+  const inputToken = getOrCreateToken(tokenAddress);
   return oracleResult
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals));

@@ -287,6 +287,12 @@ type LendingProtocol implements Protocol @entity {
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
+
+  "An array of all market ids for iterating"
+  _marketIDs: [String!]
+
+  " Last update block number "
+  _lastUpdateBlockNumber: BigInt
 }
 
 ###############################
@@ -378,7 +384,7 @@ type FinancialsDailySnapshot @entity {
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -573,6 +579,15 @@ type Market @entity {
 
   " All liquidations made to this market "
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
+
+  " dToken of the market (debt) "
+  _dToken: Token
+
+  " totalBorrowBalance in underlying token amount "
+  _totalBorrowBalance: BigInt
+
+  " exchange rate of dToken (dToken to totalBorrowBalance), used to calcuate price of dToken"
+  _dTokenExchangeRate: BigDecimal
 }
 
 #################################
@@ -588,7 +603,7 @@ type MarketDailySnapshot @entity {
 
   " The pool this snapshot belongs to "
   market: Market!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -684,7 +699,7 @@ type MarketHourlySnapshot @entity {
 
   " The pool this snapshot belongs to "
   market: Market!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -1038,47 +1053,27 @@ type ActiveAccount @entity {
 ##### Helper entities #####
 ##########################################
 
-type _MarketUtility @entity {
-  " { Address of underlying token (== market id) } "
+type _AssetStatus @entity {
+  "address of underlying asset"
   id: ID!
-
-  lastUpdateTimestamp: BigInt!
-
-  " Market which this configuration relates to"
-  market: Market!
-
-  " Time-weighted average price, in underlying"
-  twap: BigInt!
-
-  " Period on which time weighted average price is calculated, in seconds "
-  twapPeriod: BigInt!
-
-  " Time-weighted averege price, in USD"
-  twapPrice: BigDecimal!
-
-  " Borrow factor for max LTV and liquidation threshold calculation. Number between 0 and 1, scaled by 4e9."
-  borrowFactor: BigInt!
-
-  " Collateral factor for max LTV and liquidation threshold  calculation. Number between 0 and 1, scaled by 4e9. "
-  collateralFactor: BigInt!
-
-  " Euler Debt token for the market "
-  dToken: Token
-
-  " Euler Pool token for the market "
+  "previous totalBorrows"
+  totalBorrows: BigInt!
+  "previous totalBalances"
+  totalBalances: BigInt!
+  " previous reserveFee"
+  reserveFee: BigInt!
+  "previous reserveBalance"
+  reserveBalance: BigInt!
+  "previous interestAccumulator"
+  interestAccumulator: BigInt
+  "previous Borrow rate SPY"
+  interestRate: BigInt!
+  "last timestamp"
+  timestamp: BigInt!
+  " address/id of eToken"
   eToken: Token
-
-  " Underlying token for the market "
-  token: Token
-}
-
-type _ProtocolUtility @entity {
-  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: ID!
-
-  " last update block number "
-  lastBlockNumber: Int!
-
-  " Active markets on the protocol. "
-  markets: [Market!]!
+  " address/id of dToken"
+  dToken: Token
+  " address/id of pToken"
+  pToken: Token
 }
