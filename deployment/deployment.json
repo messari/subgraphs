@@ -1048,7 +1048,7 @@
     "deployments": {
       "banker-joe-avalanche": {
         "network": "avalanche",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.1.7",
@@ -1563,7 +1563,7 @@
     "deployments": {
       "rari-fuse-arbitrum": {
         "network": "arbitrum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.1.7",
@@ -1585,7 +1585,7 @@
       },
       "rari-fuse-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.1.7",
@@ -2681,7 +2681,7 @@
     "deployments": {
       "makerdao-ethereum": {
         "network": "ethereum",
-        "status": "dev",
+        "status": "prod",
         "versions": {
           "schema": "1.3.0",
           "subgraph": "1.2.0",
