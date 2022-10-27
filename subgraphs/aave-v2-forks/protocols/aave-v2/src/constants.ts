@@ -8,6 +8,7 @@ import { Network, ZERO_ADDRESS } from "../../../src/constants";
 export const USDC_TOKEN_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"; // ETH
 export const USDC_POS_TOKEN_ADDRESS =
   "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"; // Polygon
+export const ETH_PARASWAP_ROUTER = "0x135896de8421be2ec868e0b811006171d9df802a";
 
 /////////////////////////////
 ///// Protocol Specific /////
