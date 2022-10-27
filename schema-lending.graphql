@@ -822,7 +822,7 @@ type Market @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market "
-  tokenBalances: [TokenBalances!]
+  tokens: [TokenBalances!]
 
   " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
   variableBorrowedTokenBalance: BigInt
@@ -1078,8 +1078,8 @@ type MarketDailySnapshot @entity {
 
   ##### Token Balances #####
 
-  " Balances and relationships of all tokens within this market "
-  tokenBalances: [TokenBalances!]
+  " Balances and relationships of all tokens within this market (a list of input token structs) "
+  tokens: [TokenBalances!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -1166,7 +1166,7 @@ type MarketHourlySnapshot @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market "
-  tokenBalances: [TokenBalances!]
+  tokens: [TokenBalances!]
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
