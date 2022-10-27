@@ -87,10 +87,13 @@ enum LendingType {
 
 enum PermissionType {
   " Protocols that only allow KYC'd users "
-  WHITELIST_ONLY
+  PERMISSIONED
 
-  " Protocls that allow a mix of KYC'd and non-KYC'd users "
-  PARTIAL_WHITELIST
+  " Protocols that allow a mix of KYC'd and non-KYC'd users "
+  PARTIALLY_PERMISSIONED
+
+  " Protocols that do not KYC. Can be used by any account "
+  PERMISSIONLESS
 }
 
 enum RiskType {
