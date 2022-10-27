@@ -2,7 +2,7 @@ Reference/
 .vscode/
 
 subgraph.yaml
-version.ts
+versions.ts
 deploymentJsonContext.json
 **/configurations/configure.ts
 generated/
