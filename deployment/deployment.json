@@ -5126,5 +5126,15 @@
         }
       }
     }
+  },
+  "rocket-pool": {
+    "schema": "generic",
+    "base": "rocket-pool",
+    "protocol": "rocket-pool"
+  },
+  "deployments": {
+    "files": {
+      "template": "rocketpool.template.yaml"
+    }
   }
 }
