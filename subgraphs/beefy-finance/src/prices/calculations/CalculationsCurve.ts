@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/aave-aave-eol/CalculationsCurve";
+import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/Standard/CalculationsCurve";
 
 export function getCalculationsCurveContract(
   network: string
@@ -22,7 +22,7 @@ export function getTokenPriceFromCalculationCurve(
     return new CustomPriceType();
   }
 
-  let tokenPrice: BigDecimal = utils
+  const tokenPrice: BigDecimal = utils
     .readValue<BigInt>(
       calculationCurveContract.try_getCurvePriceUsdc(tokenAddr),
       constants.BIGINT_ZERO

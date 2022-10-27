@@ -61,9 +61,10 @@ export function updateUsageMetricsDailySnapshot(
     protocolDailySnapshot.timestamp = event.block.timestamp;
     protocolDailySnapshot.save();
   } else {
-    protocolDailySnapshot.dailyActiveUsers = protocolDailySnapshot.dailyActiveUsers.plus(
-      isNewDailyActiveUser(event.transaction.from, event.block)
-    );
+    protocolDailySnapshot.dailyActiveUsers =
+      protocolDailySnapshot.dailyActiveUsers.plus(
+        isNewDailyActiveUser(event.transaction.from, event.block)
+      );
     protocolDailySnapshot.cumulativeUniqueUsers =
       protocol.cumulativeUniqueUsers;
     protocolDailySnapshot.dailyTransactionCount =
@@ -113,9 +114,10 @@ export function updateUsageMetricsHourlySnapshot(
     protocolHourlySnapshot.timestamp = event.block.timestamp;
     protocolHourlySnapshot.save();
   } else {
-    protocolHourlySnapshot.hourlyActiveUsers = protocolHourlySnapshot.hourlyActiveUsers.plus(
-      isNewHourlyActiveUser(event.transaction.from, event.block)
-    );
+    protocolHourlySnapshot.hourlyActiveUsers =
+      protocolHourlySnapshot.hourlyActiveUsers.plus(
+        isNewHourlyActiveUser(event.transaction.from, event.block)
+      );
     protocolHourlySnapshot.cumulativeUniqueUsers =
       protocol.cumulativeUniqueUsers;
     protocolHourlySnapshot.hourlyTransactionCount =
@@ -159,15 +161,18 @@ export function updateDailyFinancialSnapshot(
 
   const previousSnapshot = findPreviousFinancialSnapshot(block);
   if (previousSnapshot) {
-    dailyFinancialSnapshot.dailySupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.minus(
-      previousSnapshot.cumulativeSupplySideRevenueUSD
-    );
-    dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.minus(
-      previousSnapshot.cumulativeProtocolSideRevenueUSD
-    );
-    dailyFinancialSnapshot.dailyTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(
-      previousSnapshot.cumulativeTotalRevenueUSD
-    );
+    dailyFinancialSnapshot.dailySupplySideRevenueUSD =
+      protocol.cumulativeSupplySideRevenueUSD.minus(
+        previousSnapshot.cumulativeSupplySideRevenueUSD
+      );
+    dailyFinancialSnapshot.dailyProtocolSideRevenueUSD =
+      protocol.cumulativeProtocolSideRevenueUSD.minus(
+        previousSnapshot.cumulativeProtocolSideRevenueUSD
+      );
+    dailyFinancialSnapshot.dailyTotalRevenueUSD =
+      protocol.cumulativeTotalRevenueUSD.minus(
+        previousSnapshot.cumulativeTotalRevenueUSD
+      );
   } else {
     dailyFinancialSnapshot.dailySupplySideRevenueUSD =
       protocol.cumulativeSupplySideRevenueUSD;

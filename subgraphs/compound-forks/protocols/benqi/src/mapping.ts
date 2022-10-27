@@ -342,7 +342,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "BENQI",
     "benqi",
     "2.0.1",
-    "1.1.5",
+    "1.1.6",
     "1.0.0",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),

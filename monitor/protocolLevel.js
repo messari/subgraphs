@@ -1,6 +1,6 @@
 import axios from "axios";
 import { errorNotification } from "./messageDiscord.js";
-import { formatIntToFixed2 } from "./util.js";
+import { formatIntToFixed2, ProtocolTypeEntityName } from "./util.js";
 
 export const protocolLevel = async (deployments, invalidDeployments) => {
     const endpointsList = [];
@@ -72,14 +72,25 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 queryToUse = `
                 query {
                     dexAmmProtocols {
+                        id
                         name
+                        slug
+                        schemaVersion
+                        subgraphVersion
+                        methodologyVersion
                         network
+                        type
                         cumulativeVolumeUSD
                         cumulativeUniqueUsers
                         totalValueLockedUSD
                         cumulativeSupplySideRevenueUSD
                         cumulativeProtocolSideRevenueUSD
                         cumulativeTotalRevenueUSD
+                        cumulativeUniqueLPs
+                        cumulativeUniqueTraders
+                        totalPoolCount
+                        openPositionCount
+                        cumulativePositionCount
                     }
                 }`;
             }
@@ -88,7 +99,9 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 queryToUse = `
                 query {
                     lendingProtocols {
+                        id
                         name
+                        slug
                         network
                         totalValueLockedUSD
                         cumulativeSupplySideRevenueUSD
@@ -113,7 +126,9 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 queryToUse = `
                 query {
                     lendingProtocols {
+                        id
                         name
+                        slug
                         network
                         totalValueLockedUSD
                         cumulativeSupplySideRevenueUSD
@@ -135,7 +150,9 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
                 queryToUse = `
                 query {
                     yieldAggregators {
+                        id
                         name
+                        slug
                         network
                         totalValueLockedUSD
                         cumulativeSupplySideRevenueUSD
@@ -353,4 +370,139 @@ export const protocolLevel = async (deployments, invalidDeployments) => {
         });
     });
     return deploymentsObjToReturn;
+}
+
+export const protocolDerivedFields = async (deployments, invalidDeployments) => {
+
+    // Loop deployments object and get protocol type and scema version for every deployment on every protocol
+    // Create queries for different schema types and versions
+    // Queries are only to take first result of derived fields on the main protocol entity
+
+    const derivedFieldQueries = {
+        "lendingProtocol": (depo) => `{
+            ${depo}: lendingProtocols {
+                dailyUsageMetrics (first: 1){
+                  id
+                }
+                hourlyUsageMetrics (first: 1){
+                  id
+                }
+                financialMetrics (first: 1){
+                  id
+                }
+                markets (first: 1){
+                  id
+                }
+            }
+        }`,
+        "dexAmmProtocol": (depo) => `{
+            ${depo}: dexAmmProtocols {
+                dailyUsageMetrics (first: 1){
+                  id
+                }
+                hourlyUsageMetrics (first: 1){
+                  id
+                }
+                financialMetrics (first: 1){
+                  id
+                }
+                pools (first: 1){
+                  id
+                }
+            }
+        }`,
+        "yieldAggregator": (depo) => `{
+            ${depo}: yieldAggregators {
+                dailyUsageMetrics (first: 1){
+                  id
+                }
+                hourlyUsageMetrics (first: 1){
+                  id
+                }
+                financialMetrics (first: 1){
+                  id
+                }
+                vaults (first: 1){
+                  id
+                }
+            }
+        }`,
+        "protocol": (depo) => `{
+            ${depo}: protocols {
+                dailyUsageMetrics (first: 1){
+                  id
+                }
+                hourlyUsageMetrics (first: 1){
+                  id
+                }
+                financialMetrics (first: 1){
+                  id
+                }
+                pools (first: 1){
+                  id
+                }
+            }
+        }`
+    };
+
+    const derivedFieldQueriesToMake = [];
+    Object.keys(deployments).forEach((key) => {
+        if (invalidDeployments.includes(key)) {
+            return;
+        }
+        const depo = deployments[key];
+        const queryKey = ProtocolTypeEntityName[depo.protocolType];
+        if (!queryKey) {
+            return;
+        }
+        const depoQuery = derivedFieldQueries[queryKey](key.split("-").join("_"));
+        derivedFieldQueriesToMake.push(
+            axios.post(
+                depo.url,
+                { query: depoQuery },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                }
+            )
+        );
+    });
+
+    const deploymentsToReturn = JSON.parse(JSON.stringify(deployments));
+
+    await Promise.allSettled(derivedFieldQueriesToMake)
+        .then(
+            (response) => (response.map(x => {
+                const returnedData = x?.value?.data?.data;
+                const returnedError = x?.value?.data?.errors;
+                const depoKey = Object.keys(deployments).find(depo => deployments[depo].url === x.value.config.url)
+                let alert = ``;
+
+                if (returnedData) {
+                    const key = Object.keys(returnedData)[0];
+                    if (returnedData[key]?.length === 0 || !returnedData[key]) {
+                        // alert for no protocol entity found
+                        deploymentsToReturn[depoKey].protocolErrors.protocolEntity.push('');
+                    } else {
+                        const emptyFields = Object.keys(returnedData[key][0]).filter(field => !returnedData[key][0][field] || returnedData[key][0][field]?.length === 0);
+                        if (emptyFields.length > 0) {
+                            deploymentsToReturn[depoKey].protocolErrors.relatedField.push(emptyFields.join(', '));
+                        }
+                    }
+                }
+
+                if (returnedError) {
+                    const alertArr = returnedError.filter(errObj => errObj.message !== "indexing_error").map(errObj => errObj.message);
+                    alert = alertArr.join(" --- ");
+                    deploymentsToReturn[depoKey].protocolErrors.queryError.push(alert);
+                    // Map through errors and save the messages to protocolDerivedFieldErrors on depo object
+                    // Maybe save the query to this object to help reproduceability
+                }
+
+            }))
+        )
+        .catch((err) => errorNotification("ERROR LOCATION 17 " + err.message));
+    return deploymentsToReturn;
 }

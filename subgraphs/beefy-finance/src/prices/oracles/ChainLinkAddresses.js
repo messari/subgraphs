@@ -1,4 +1,4 @@
-const { constants } = require("ethers");
+// chainlink price oracles for polygon
 
 const polygonChainLinkOracles = [
   "0x443c5116cdf663eb387e72c688d276e702135c87",

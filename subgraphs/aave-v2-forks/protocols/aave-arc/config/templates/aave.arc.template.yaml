@@ -29,7 +29,7 @@ dataSources:
       eventHandlers:
         - event: PriceOracleUpdated(indexed address)
           handler: handlePriceOracleUpdated
-      file: ./protocols/aave-v2/src/mapping.ts
+      file: ./protocols/aave-arc/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPoolConfigurator
     network: {{ network }}
@@ -71,7 +71,7 @@ dataSources:
           handler: handleReserveDeactivated
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
-      file: ./protocols/aave-v2/src/mapping.ts
+      file: ./protocols/aave-arc/src/mapping.ts
   - kind: ethereum/contract
     name: LendingPool
     network: {{ network }}
@@ -132,7 +132,7 @@ dataSources:
           handler: handlePaused
         - event: Unpaused()
           handler: handleUnpaused
-      file: ./protocols/aave-v2/src/mapping.ts
+      file: ./protocols/aave-arc/src/mapping.ts
 templates:
   - kind: ethereum/contract
     name: AToken
@@ -150,4 +150,4 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./protocols/aave-v2/src/mapping.ts
+      file: ./protocols/aave-arc/src/mapping.ts

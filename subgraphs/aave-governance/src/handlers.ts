@@ -389,6 +389,7 @@ export function _handleVoteEmitted(
   vote.blockTime = event.block.timestamp;
   vote.txnHash = event.transaction.hash.toHexString();
   vote.choice = choice;
+  vote.logIndex = event.logIndex;
   vote.save();
 
   // Increment respective vote choice counts
