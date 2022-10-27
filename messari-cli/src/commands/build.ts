@@ -6,9 +6,8 @@ import {
   ScriptGenerator,
 } from '../command-helpers/build/scriptGenerator'
 
-import { validateDeploymentJson } from '../../../deployment/validation/validateDeploymentJson'
+import { validateDeploymentJson } from '../command-helpers/build/validateDeploymentJson'
 import { getScopeAlias, getServiceAlias } from '../command-helpers/build/alias'
-import { isValidVersion } from '../command-helpers/build/checkVersion'
 import { Executor as ExecutorClass } from '../command-helpers/build/execution'
 import { MESSARI_REPO_PATH } from '../../bin/env'
 
@@ -22,9 +21,9 @@ ${chalk.bold(
   'Passing arguments to bypass prompts or augment command (Example):'
 )}
 
-  messari build uniswap-v2-ethereum -d --scope single -s subgraphs-studio --service subgraphs-studio -r messari
+  messari build uniswap-v2-ethereum -d single service subgraphs-studio -r messari
 
-Options:
+Options:\\
 
     -s, --service        Service to deploy to < hosted-service | subgraph-studio | cronos-portal >
     -v, --version        Specify the version of the subgraph deployment - Only relevant for subgraph studio testing deployments < e.g. 1.0.0 >
@@ -109,7 +108,6 @@ module.exports = {
       type: 'input',
       name: 'id',
       message: 'Deployment id to use for the build/deployment',
-      skip: id !== undefined,
     }
 
     const askService = {
@@ -146,20 +144,6 @@ module.exports = {
       name: 'token',
       message: 'Please enter Cronos Portal API token:',
       skip: !deploy || !(service == 'cronos-portal') || token,
-    }
-
-    const askVersion = {
-      type: 'input',
-      name: 'version',
-      message: 'Please enter valid deploymemt version (e.g. 1.0.0):',
-      skip:
-        !deploy || !(service == 'subgraph-studio') || isValidVersion(version),
-    }
-
-    if (deploy === true && version !== undefined) {
-      while (!isValidVersion(version)) {
-        version = (await toolbox.prompt.ask(askVersion)).version
-      }
     }
 
     if (token === undefined && deploy && service == 'cronos-portal') {

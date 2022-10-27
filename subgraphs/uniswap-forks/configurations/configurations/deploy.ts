@@ -29,4 +29,5 @@ export namespace Deploy {
   export const HONEYSWAP_POLYGON = 24;
   export const MM_FINANCE_CRONOS = 25;
   export const MM_FINANCE_POLYGON = 26;
+  export const PANGOLIN_AVALANCHE = 27;
 }

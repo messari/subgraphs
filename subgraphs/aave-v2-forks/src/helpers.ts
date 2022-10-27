@@ -118,9 +118,9 @@ export function getOrCreateRewardToken(
   address: Address,
   type: string
 ): RewardToken {
-  let token = getOrCreateToken(address);
+  const token = getOrCreateToken(address);
 
-  let rewardTokenId = `${token.id}-${type}`;
+  const rewardTokenId = `${token.id}-${type}`;
   let rewardToken = RewardToken.load(rewardTokenId);
   if (!rewardToken) {
     rewardToken = new RewardToken(rewardTokenId);
@@ -157,7 +157,7 @@ export function getAssetPriceInUSDC(
   tokenAddress: Address,
   priceOracle: Address
 ): BigDecimal {
-  let oracle = IPriceOracleGetter.bind(priceOracle);
+  const oracle = IPriceOracleGetter.bind(priceOracle);
   let oracleResult = readValue<BigInt>(
     oracle.try_getAssetPrice(tokenAddress),
     BIGINT_ZERO
@@ -165,9 +165,9 @@ export function getAssetPriceInUSDC(
 
   // if the result is zero or less, try the fallback oracle
   if (!oracleResult.gt(BIGINT_ZERO)) {
-    let tryFallback = oracle.try_getFallbackOracle();
+    const tryFallback = oracle.try_getFallbackOracle();
     if (tryFallback) {
-      let fallbackOracle = IPriceOracleGetter.bind(tryFallback.value);
+      const fallbackOracle = IPriceOracleGetter.bind(tryFallback.value);
       oracleResult = readValue<BigInt>(
         fallbackOracle.try_getAssetPrice(tokenAddress),
         BIGINT_ZERO
@@ -177,7 +177,7 @@ export function getAssetPriceInUSDC(
 
   // Mainnet Oracles return the price in eth, must convert to USD through the following method
   if (equalsIgnoreCase(dataSource.network(), Network.MAINNET)) {
-    let priceUSDCInEth = readValue<BigInt>(
+    const priceUSDCInEth = readValue<BigInt>(
       oracle.try_getAssetPrice(Address.fromString(USDC_TOKEN_ADDRESS)),
       BIGINT_ZERO
     );
@@ -186,7 +186,7 @@ export function getAssetPriceInUSDC(
   }
 
   // otherwise return the output of the price oracle
-  let inputToken = getOrCreateToken(tokenAddress);
+  const inputToken = getOrCreateToken(tokenAddress);
   return oracleResult
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals));
@@ -201,7 +201,7 @@ export function updateMarketSnapshots(
   newProtocolRevenue: BigDecimal
 ): void {
   // get and update market daily snapshot
-  let marketDailySnapshot = getOrCreateMarketDailySnapshot(
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(
     market,
     timestamp,
     blockNumber
@@ -221,7 +221,7 @@ export function updateMarketSnapshots(
   marketDailySnapshot.save();
 
   // get and update market daily snapshot
-  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
     market,
     timestamp,
     blockNumber
@@ -244,7 +244,9 @@ export function updateFinancials(
   newProtocolRevenue: BigDecimal,
   newSupplyRevenue: BigDecimal
 ): void {
-  let snapshotId = (event.block.timestamp.toI32() / SECONDS_PER_DAY).toString();
+  const snapshotId = (
+    event.block.timestamp.toI32() / SECONDS_PER_DAY
+  ).toString();
   let snapshot = FinancialsDailySnapshot.load(snapshotId);
 
   // create new snapshot if needed
@@ -295,7 +297,7 @@ export function snapshotUsage(
   //
   // daily snapshot
   //
-  let dailySnapshotID = (blockTimestamp.toI32() / SECONDS_PER_DAY).toString();
+  const dailySnapshotID = (blockTimestamp.toI32() / SECONDS_PER_DAY).toString();
   let dailySnapshot = UsageMetricsDailySnapshot.load(dailySnapshotID);
   if (!dailySnapshot) {
     dailySnapshot = new UsageMetricsDailySnapshot(dailySnapshotID);
@@ -316,7 +318,7 @@ export function snapshotUsage(
   //
   // Active users
   //
-  let dailyAccountID = ActivityType.DAILY.concat("-")
+  const dailyAccountID = ActivityType.DAILY.concat("-")
     .concat(accountID)
     .concat("-")
     .concat(dailySnapshotID);
@@ -331,14 +333,14 @@ export function snapshotUsage(
   //
   // Track users per event
   //
-  let dailyActorAccountID = ActivityType.DAILY.concat("-")
+  const dailyActorAccountID = ActivityType.DAILY.concat("-")
     .concat(eventType.toString())
     .concat("-")
     .concat(accountID)
     .concat("-")
     .concat(dailySnapshotID);
   let dailyActiveActorAccount = ActiveAccount.load(dailyActorAccountID);
-  let isNewActor = dailyActiveActorAccount == null;
+  const isNewActor = dailyActiveActorAccount == null;
   if (isNewActor) {
     dailyActiveActorAccount = new ActiveAccount(dailyActorAccountID);
     dailyActiveActorAccount.save();
@@ -396,7 +398,9 @@ export function snapshotUsage(
   //
   // hourly snapshot
   //
-  let hourlySnapshotID = (blockTimestamp.toI32() / SECONDS_PER_HOUR).toString();
+  const hourlySnapshotID = (
+    blockTimestamp.toI32() / SECONDS_PER_HOUR
+  ).toString();
   let hourlySnapshot = UsageMetricsHourlySnapshot.load(hourlySnapshotID);
   if (!hourlySnapshot) {
     hourlySnapshot = new UsageMetricsHourlySnapshot(hourlySnapshotID);
@@ -412,7 +416,7 @@ export function snapshotUsage(
     hourlySnapshot.blockNumber = blockNumber;
     hourlySnapshot.timestamp = blockTimestamp;
   }
-  let hourlyAccountID = ActivityType.HOURLY.concat("-")
+  const hourlyAccountID = ActivityType.HOURLY.concat("-")
     .concat(accountID)
     .concat("-")
     .concat(hourlySnapshotID);
@@ -460,17 +464,17 @@ export function updateSnapshots(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): void {
-  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
     market,
     blockTimestamp,
     blockNumber
   );
-  let marketDailySnapshot = getOrCreateMarketDailySnapshot(
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(
     market,
     blockTimestamp,
     blockNumber
   );
-  let financialSnapshot = FinancialsDailySnapshot.load(
+  const financialSnapshot = FinancialsDailySnapshot.load(
     (blockTimestamp.toI32() / SECONDS_PER_DAY).toString()
   );
   if (!financialSnapshot) {
@@ -554,7 +558,7 @@ export function addPosition(
   eventType: i32,
   event: ethereum.Event
 ): string {
-  let counterID = account.id
+  const counterID = account.id
     .concat("-")
     .concat(market.id)
     .concat("-")
@@ -565,12 +569,12 @@ export function addPosition(
     positionCounter.nextCount = 0;
     positionCounter.save();
   }
-  let positionID = positionCounter.id
+  const positionID = positionCounter.id
     .concat("-")
     .concat(positionCounter.nextCount.toString());
 
   let position = Position.load(positionID);
-  let openPosition = position == null;
+  const openPosition = position == null;
   if (openPosition) {
     position = new Position(positionID);
     position.account = account.id;
@@ -634,7 +638,7 @@ export function addPosition(
     protocol.cumulativePositionCount += 1;
     protocol.openPositionCount += 1;
     if (eventType == EventType.DEPOSIT) {
-      let depositorActorID = "depositor".concat("-").concat(account.id);
+      const depositorActorID = "depositor".concat("-").concat(account.id);
       let depositorActor = ActorAccount.load(depositorActorID);
       if (!depositorActor) {
         depositorActor = new ActorAccount(depositorActorID);
@@ -643,7 +647,7 @@ export function addPosition(
         protocol.cumulativeUniqueDepositors += 1;
       }
     } else if (eventType == EventType.BORROW) {
-      let borrowerActorID = "borrower".concat("-").concat(account.id);
+      const borrowerActorID = "borrower".concat("-").concat(account.id);
       let borrowerActor = ActorAccount.load(borrowerActorID);
       if (!borrowerActor) {
         borrowerActor = new ActorAccount(borrowerActorID);
@@ -672,22 +676,22 @@ export function subtractPosition(
   eventType: i32,
   event: ethereum.Event
 ): string | null {
-  let counterID = account.id
+  const counterID = account.id
     .concat("-")
     .concat(market.id)
     .concat("-")
     .concat(side);
-  let positionCounter = PositionCounter.load(counterID);
+  const positionCounter = PositionCounter.load(counterID);
   if (!positionCounter) {
     log.warning("[subtractPosition] position counter {} not found", [
       counterID,
     ]);
     return null;
   }
-  let positionID = positionCounter.id
+  const positionID = positionCounter.id
     .concat("-")
     .concat(positionCounter.nextCount.toString());
-  let position = Position.load(positionID);
+  const position = Position.load(positionID);
   if (!position) {
     log.warning("[subtractPosition] position {} not found", [positionID]);
     return null;
@@ -714,7 +718,7 @@ export function subtractPosition(
   account.save();
   position.save();
 
-  let closePosition = position.balance == BIGINT_ZERO;
+  const closePosition = position.balance == BIGINT_ZERO;
   if (closePosition) {
     //
     // update position counter
@@ -760,7 +764,7 @@ export function subtractPosition(
 }
 
 export function createAccount(accountID: string): Account {
-  let account = new Account(accountID);
+  const account = new Account(accountID);
   account.positionCount = 0;
   account.openPositionCount = 0;
   account.closedPositionCount = 0;
@@ -780,10 +784,10 @@ export function getMarketByOutputToken(
   outputTokenID: string,
   protocolData: ProtocolData
 ): Market | null {
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   for (let i = 0; i < protocol.marketIDs.length; i++) {
-    let market = Market.load(protocol.marketIDs[i]);
+    const market = Market.load(protocol.marketIDs[i]);
 
     if (!market) {
       continue;
@@ -807,7 +811,7 @@ function getOrCreateMarketDailySnapshot(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): MarketDailySnapshot {
-  let snapshotID = `${market.id}-${(
+  const snapshotID = `${market.id}-${(
     blockTimestamp.toI32() / SECONDS_PER_DAY
   ).toString()}`;
   let snapshot = MarketDailySnapshot.load(snapshotID);
@@ -862,7 +866,7 @@ export function getOrCreateMarketHourlySnapshot(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): MarketHourlySnapshot {
-  let snapshotID = `${market.id}-${(
+  const snapshotID = `${market.id}-${(
     blockTimestamp.toI32() / SECONDS_PER_HOUR
   ).toString()}`;
   let snapshot = MarketHourlySnapshot.load(snapshotID);
@@ -913,9 +917,9 @@ export function getOrCreateMarketHourlySnapshot(
 }
 
 function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
-  let snapshotRates: string[] = [];
+  const snapshotRates: string[] = [];
   for (let i = 0; i < rates.length; i++) {
-    let rate = InterestRate.load(rates[i]);
+    const rate = InterestRate.load(rates[i]);
     if (!rate) {
       log.warning("[getSnapshotRates] rate {} not found, should not happen", [
         rates[i],
@@ -924,8 +928,8 @@ function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
     }
 
     // create new snapshot rate
-    let snapshotRateId = rates[i].concat("-").concat(timeSuffix);
-    let snapshotRate = new InterestRate(snapshotRateId);
+    const snapshotRateId = rates[i].concat("-").concat(timeSuffix);
+    const snapshotRate = new InterestRate(snapshotRateId);
     snapshotRate.side = rate.side;
     snapshotRate.type = rate.type;
     snapshotRate.rate = rate.rate;
@@ -936,7 +940,7 @@ function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
 }
 
 function snapshotPosition(position: Position, event: ethereum.Event): void {
-  let snapshot = new PositionSnapshot(
+  const snapshot = new PositionSnapshot(
     position.id
       .concat("-")
       .concat(event.transaction.hash.toHexString())
@@ -965,15 +969,15 @@ export function getOrCreateMarket(
     ]);
 
     // get protocol
-    let protocol = getOrCreateLendingProtocol(protocolData);
+    const protocol = getOrCreateLendingProtocol(protocolData);
     protocol.totalPoolCount++;
-    let markets = protocol.marketIDs;
+    const markets = protocol.marketIDs;
     markets.push(marketId.toHexString());
     protocol.marketIDs = markets;
     protocol.save();
 
     // create inputToken
-    let inputToken = getOrCreateToken(marketId);
+    const inputToken = getOrCreateToken(marketId);
 
     // Create a new Market
     market = new Market(marketId.toHexString());
@@ -1035,8 +1039,8 @@ export function getBorrowBalance(
 
   // get account's balance of variable debt
   if (market.vToken) {
-    let vTokenContract = AToken.bind(Address.fromString(market.vToken!));
-    let tryVDebtTokenBalance = vTokenContract.try_balanceOf(account);
+    const vTokenContract = AToken.bind(Address.fromString(market.vToken!));
+    const tryVDebtTokenBalance = vTokenContract.try_balanceOf(account);
     vDebtTokenBalance = tryVDebtTokenBalance.reverted
       ? BIGINT_ZERO
       : tryVDebtTokenBalance.value;
@@ -1044,14 +1048,14 @@ export function getBorrowBalance(
 
   // get account's balance of stable debt
   if (market.sToken) {
-    let sTokenContract = AToken.bind(Address.fromString(market.sToken!));
-    let trySDebtTokenBalance = sTokenContract.try_balanceOf(account);
+    const sTokenContract = AToken.bind(Address.fromString(market.sToken!));
+    const trySDebtTokenBalance = sTokenContract.try_balanceOf(account);
     sDebtTokenBalance = trySDebtTokenBalance.reverted
       ? BIGINT_ZERO
       : trySDebtTokenBalance.value;
   }
 
-  let totalDebt = sDebtTokenBalance.plus(vDebtTokenBalance);
+  const totalDebt = sDebtTokenBalance.plus(vDebtTokenBalance);
 
   return ethereum.CallResult.fromValue(totalDebt);
 }

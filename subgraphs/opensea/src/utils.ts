@@ -5,7 +5,7 @@ import {
   Bytes,
   ethereum,
 } from "@graphprotocol/graph-ts";
-import { AtomicMatch_Call } from "../generated/OpenSeaV2/OpenSeaV2";
+import { AtomicMatch_Call } from "../generated/OpenSea/OpenSea";
 import {
   BIGINT_ONE,
   BIGINT_ZERO,

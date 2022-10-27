@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import IssuesDisplay from "./IssuesDisplay";
 import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
@@ -9,6 +9,7 @@ import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery } from "@apoll
 import { DeploymentsDropDown } from "../common/utilComponents/DeploymentsDropDown";
 import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 import { useNavigate } from "react-router";
+import moment from "moment";
 
 interface DefiLlamaComparsionTabProps {
   deploymentJSON: { [x: string]: any };
@@ -38,6 +39,18 @@ const lineupChartDatapoints = (compChart: any, stitchLeftIndex: number): any => 
 
 // This component is for each individual subgraph
 function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsionTabProps) {
+
+  function jpegDownloadHandler() {
+    try {
+      const fileName = defiLlamaSlug?.split(" (").join("-")?.split(")")?.join("-")?.split(" ")?.join("-") + moment.utc(Date.now()).format("MMDDYY") + ".jpeg";
+      const link = document.createElement('a');
+      link.download = fileName;
+      link.href = chartRef.current?.toBase64Image('image/jpeg', 1);
+      link.click();
+    } catch (err) {
+      return;
+    }
+  }
   const navigate = useNavigate();
 
   ChartJS.register(...registerables);
@@ -69,6 +82,8 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
     }
   }, []);
 
+
+  const chartRef = useRef<any>(null);
   const deploymentNameToUrlMapping: any = {};
 
   Object.values(deploymentJSON).forEach((protocolsOnType: { [x: string]: any }) => {
@@ -190,7 +205,7 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   let chart = null;
   let chartRenderCondition = (Object.keys(defiLlamaData).length > 0 &&
     financialsData?.financialsDailySnapshots &&
-    defiLlamaData.name.toLowerCase() === defiLlamaSlug?.split(" (")[0].toLowerCase());
+    defiLlamaData?.name?.toLowerCase() === defiLlamaSlug?.split(" (")[0]?.toLowerCase());
 
   let stakedDataset = "";
   let borrowedDataset = "";
@@ -289,7 +304,7 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
         </Box>
         <Grid container justifyContent="space-between">
           <Grid key={elementId} item xs={7.5}>
-            <Chart identifier={""} datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} />
+            <Chart identifier={""} datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} chartRef={chartRef} />
           </Grid>
           <Grid key={elementId + "2"} item xs={4}>
             <ComparisonTable
@@ -297,6 +312,7 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
               dataTable={compChart}
               isMonthly={isMonthly}
               setIsMonthly={(x: boolean) => setIsMonthly(x)}
+              jpegDownloadHandler={() => jpegDownloadHandler()}
             />
           </Grid>
         </Grid>
@@ -325,12 +341,12 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   if (chartRenderCondition) {
     let stakedTVL = null;
     if (stakedDataset) {
-      stakedTVL = <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => setIncludeStakedTVL(!includeStakedTVL)}>{includeStakedTVL ? "Disclude Staked TVL" : "Include Staked TVL"}</Button>
+      stakedTVL = <Button variant="contained" color="primary" sx={{ my: 4, marginRight: "16px" }} onClick={() => setIncludeStakedTVL(!includeStakedTVL)}>{includeStakedTVL ? "Disclude Staked TVL" : "Include Staked TVL"}</Button>
     }
 
     let borrowedTVL = null;
     if (borrowedDataset) {
-      borrowedTVL = <Button variant="contained" color="primary" sx={{ my: 4, mx: 2 }} onClick={() => setIncludeBorrowedTVL(!includeBorrowedTVL)}>{includeBorrowedTVL ? "Disclude Borrowed TVL" : "Include Borrowed TVL"}</Button>
+      borrowedTVL = <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => setIncludeBorrowedTVL(!includeBorrowedTVL)}>{includeBorrowedTVL ? "Disclude Borrowed TVL" : "Include Borrowed TVL"}</Button>
     }
 
     valueToggles = (

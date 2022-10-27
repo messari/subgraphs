@@ -150,10 +150,10 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
 /////////////////////////////////
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
-  let protocolData = getProtocolData();
+  const protocolData = getProtocolData();
 
   // update rewards if there is an incentive controller
-  let market = Market.load(event.params.reserve.toHexString());
+  const market = Market.load(event.params.reserve.toHexString());
   if (!market) {
     log.warning("[handleReserveDataUpdated] Market not found", [
       event.params.reserve.toHexString(),
@@ -168,17 +168,18 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // rewards per day = rewardsPerSecond * 60 * 60 * 24
   // Borrow rewards are 3x the rewards per day for deposits
 
-  let gTokenContract = GToken.bind(Address.fromString(market.outputToken!));
-  let tryIncentiveController = gTokenContract.try_getIncentivesController();
+  const gTokenContract = GToken.bind(Address.fromString(market.outputToken!));
+  const tryIncentiveController = gTokenContract.try_getIncentivesController();
   if (!tryIncentiveController.reverted) {
-    let incentiveControllerContract = ChefIncentivesController.bind(
+    const incentiveControllerContract = ChefIncentivesController.bind(
       tryIncentiveController.value
     );
-    let tryPoolInfo = incentiveControllerContract.try_poolInfo(
+    const tryPoolInfo = incentiveControllerContract.try_poolInfo(
       Address.fromString(market.outputToken!)
     );
-    let tryTotalAllocPoint = incentiveControllerContract.try_totalAllocPoint();
-    let tryTotalRewardsPerSecond =
+    const tryTotalAllocPoint =
+      incentiveControllerContract.try_totalAllocPoint();
+    const tryTotalRewardsPerSecond =
       incentiveControllerContract.try_rewardsPerSecond();
 
     if (
@@ -187,26 +188,26 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       !tryTotalRewardsPerSecond.reverted
     ) {
       // create reward tokens
-      let borrowRewardToken = getOrCreateRewardToken(
+      const borrowRewardToken = getOrCreateRewardToken(
         Address.fromString(REWARD_TOKEN_ADDRESS),
         RewardTokenType.BORROW
       );
-      let depositRewardToken = getOrCreateRewardToken(
+      const depositRewardToken = getOrCreateRewardToken(
         Address.fromString(REWARD_TOKEN_ADDRESS),
         RewardTokenType.DEPOSIT
       );
       market.rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
 
       // calculate rewards per day
-      let rewardsPerSecond = tryTotalRewardsPerSecond.value
+      const rewardsPerSecond = tryTotalRewardsPerSecond.value
         .times(tryPoolInfo.value.value1)
         .div(tryTotalAllocPoint.value);
-      let rewardsPerDay = rewardsPerSecond.times(
+      const rewardsPerDay = rewardsPerSecond.times(
         BigInt.fromI32(SECONDS_PER_DAY)
       );
 
-      let rewardTokenPriceUSD = getGeistPriceUSD();
-      let rewardsPerDayUSD = rewardsPerDay
+      const rewardTokenPriceUSD = getGeistPriceUSD();
+      const rewardsPerDayUSD = rewardsPerDay
         .toBigDecimal()
         .div(exponentToBigDecimal(DEFAULT_DECIMALS))
         .times(rewardTokenPriceUSD);
@@ -235,7 +236,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   ) {
     assetPriceUSD = getCRVPriceUSD();
   } else {
-    let tryPrice = gTokenContract.try_getAssetPrice();
+    const tryPrice = gTokenContract.try_getAssetPrice();
     if (tryPrice.reverted) {
       log.warning(
         "[handleReserveDataUpdated] Token price not found in Market: {}",
@@ -284,10 +285,12 @@ export function handleReserveUsedAsCollateralDisabled(
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handlePaused(event: Paused): void {
   _handlePaused(getProtocolData());
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function handleUnpaused(event: Unpaused): void {
   _handleUnpaused(getProtocolData());
 }
@@ -360,11 +363,11 @@ export function handleTransfer(event: Transfer): void {
 //
 // GEIST price is generated from FTM-GEIST reserve on SpookySwap
 function getGeistPriceUSD(): BigDecimal {
-  let geistFtmLP = SpookySwapOracle.bind(
+  const geistFtmLP = SpookySwapOracle.bind(
     Address.fromString(GEIST_FTM_LP_ADDRESS)
   );
 
-  let reserves = geistFtmLP.try_getReserves();
+  const reserves = geistFtmLP.try_getReserves();
 
   if (reserves.reverted) {
     log.error("[getGeistPriceUSD] Unable to get price for asset {}", [
@@ -372,16 +375,16 @@ function getGeistPriceUSD(): BigDecimal {
     ]);
     return BIGDECIMAL_ZERO;
   }
-  let reserveFTM = reserves.value.value0;
-  let reserveGEIST = reserves.value.value1;
+  const reserveFTM = reserves.value.value0;
+  const reserveGEIST = reserves.value.value1;
 
-  let priceGEISTinFTM = reserveFTM
+  const priceGEISTinFTM = reserveFTM
     .toBigDecimal()
     .div(reserveGEIST.toBigDecimal());
 
   // get FTM price
-  let gTokenContract = GToken.bind(Address.fromString(GFTM_ADDRESS));
-  let tryPrice = gTokenContract.try_getAssetPrice();
+  const gTokenContract = GToken.bind(Address.fromString(GFTM_ADDRESS));
+  const tryPrice = gTokenContract.try_getAssetPrice();
   return tryPrice.reverted
     ? BIGDECIMAL_ZERO
     : tryPrice.value
@@ -394,9 +397,11 @@ function getGeistPriceUSD(): BigDecimal {
 //
 // GEIST price is generated from CRV-FTM LP on SpookySwap
 function getCRVPriceUSD(): BigDecimal {
-  let crvFtmLP = SpookySwapOracle.bind(Address.fromString(CRV_FTM_LP_ADDRESS));
+  const crvFtmLP = SpookySwapOracle.bind(
+    Address.fromString(CRV_FTM_LP_ADDRESS)
+  );
 
-  let reserves = crvFtmLP.try_getReserves();
+  const reserves = crvFtmLP.try_getReserves();
 
   if (reserves.reverted) {
     log.error("[getCRVPriceUSD] Unable to get price for asset {}", [
@@ -404,14 +409,16 @@ function getCRVPriceUSD(): BigDecimal {
     ]);
     return BIGDECIMAL_ZERO;
   }
-  let reserveCRV = reserves.value.value0;
-  let reserveFTM = reserves.value.value1;
+  const reserveCRV = reserves.value.value0;
+  const reserveFTM = reserves.value.value1;
 
-  let priceCRVinFTM = reserveFTM.toBigDecimal().div(reserveCRV.toBigDecimal());
+  const priceCRVinFTM = reserveFTM
+    .toBigDecimal()
+    .div(reserveCRV.toBigDecimal());
 
   // get FTM price
-  let gTokenContract = GToken.bind(Address.fromString(GFTM_ADDRESS));
-  let tryPrice = gTokenContract.try_getAssetPrice();
+  const gTokenContract = GToken.bind(Address.fromString(GFTM_ADDRESS));
+  const tryPrice = gTokenContract.try_getAssetPrice();
 
   log.warning("crv price: ${}", [
     tryPrice.reverted
