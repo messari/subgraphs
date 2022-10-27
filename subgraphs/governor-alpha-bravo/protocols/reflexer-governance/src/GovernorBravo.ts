@@ -141,7 +141,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework = new GovernanceFramework(contractAddress);
     const contract = GovernorBravo.bind(Address.fromString(contractAddress));
 
-    governanceFramework.name = contract.name();
+    governanceFramework.name = "reflexer-governance";
     governanceFramework.type = GovernanceFrameworkType.GOVERNOR_BRAVO;
     governanceFramework.version = NA;
 

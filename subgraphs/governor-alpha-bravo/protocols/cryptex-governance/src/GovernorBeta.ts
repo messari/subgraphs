@@ -111,7 +111,7 @@ function getGovernanceFramework(contractAddress: string): GovernanceFramework {
     governanceFramework = new GovernanceFramework(contractAddress);
     const contract = GovernorBeta.bind(Address.fromString(contractAddress));
 
-    governanceFramework.name = contract.name();
+    governanceFramework.name = "cryptex-governance";
     governanceFramework.type = GovernanceFrameworkType.GOVERNOR_ALPHA;
     governanceFramework.version = NA;
 
