@@ -1,6 +1,14 @@
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 dataSources:
   - kind: ethereum/contract
     name: Comptroller
@@ -65,6 +73,8 @@ templates:
           file: ./abis/ERC20.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
+        - name: Pair
+          file: ./abis/aurigami/Pair.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
