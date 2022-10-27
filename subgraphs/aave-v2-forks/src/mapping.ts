@@ -1105,6 +1105,14 @@ export function _handleTransfer(
 
   // update balance from sender
   if (fromAccount) {
+    if (from == Address.fromString(ETH_PARASWAP_ROUTER)) {
+      log.warning("fromAccount: Transaction: {} balance: {} market: {}", [
+        event.transaction.hash.toHexString(),
+        aTokenContract.balanceOf(from).toString(),
+        market.id,
+      ]);
+    }
+
     subtractPosition(
       protocol,
       market,
@@ -1118,6 +1126,14 @@ export function _handleTransfer(
 
   // update balance from receiver
   if (toAccount) {
+    if (to == Address.fromString(ETH_PARASWAP_ROUTER)) {
+      log.warning("toAccount: Transaction: {} balance: {} market: {}", [
+        event.transaction.hash.toHexString(),
+        aTokenContract.balanceOf(to).toString(),
+        market.id,
+      ]);
+    }
+
     addPosition(
       protocol,
       market,
