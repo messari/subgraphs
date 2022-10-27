@@ -14,6 +14,7 @@ interface ProtocolTabProps {
   protocolTimeseriesData: any;
   protocolTimeseriesLoading: any;
   protocolTimeseriesError: any;
+  overlayProtocolTimeseriesData: any;
 }
 
 // This component is for each individual subgraph
@@ -25,6 +26,7 @@ function ProtocolTab({
   protocolTimeseriesData,
   protocolTimeseriesLoading,
   protocolTimeseriesError,
+  overlayProtocolTimeseriesData
 }: ProtocolTabProps) {
   const [issuesToDisplay, setIssuesToDisplay] = useState<
     { message: string; type: string; level: string; fieldName: string }[]
@@ -46,6 +48,7 @@ function ProtocolTab({
   if (protocolTimeseriesData) {
     protocolDataRender = Object.keys(protocolTimeseriesData).map((entityName: string) => {
       const currentEntityData = protocolTimeseriesData[entityName];
+      const currentOverlayEntityData = overlayProtocolTimeseriesData[entityName];
       if (!currentEntityData) return null;
 
       return (
@@ -54,6 +57,7 @@ function ProtocolTab({
           entityName={entityName}
           entitiesData={entitiesData}
           currentEntityData={currentEntityData}
+          currentOverlayEntityData={currentOverlayEntityData}
           currentTimeseriesLoading={protocolTimeseriesLoading[entityName]}
           currentTimeseriesError={protocolTimeseriesError[entityName]}
           protocolType={protocolType}

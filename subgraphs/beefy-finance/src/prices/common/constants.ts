@@ -16,8 +16,8 @@ import * as MOONRIVER from "../config/moonriver";
 import * as OASIS from "../config/oasis";
 
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
-import { UniswapPair__getReservesResult } from "../../../generated/aave-aave-eol/UniswapPair";
-import { SushiSwapPair__getReservesResult } from "../../../generated/aave-aave-eol/SushiSwapPair";
+import { UniswapPair__getReservesResult } from "../../../generated/Standard/UniswapPair";
+import { SushiSwapPair__getReservesResult } from "../../../generated/Standard/SushiSwapPair";
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// COMMON ////////////////////////////////
@@ -265,11 +265,8 @@ CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
 ///////////////////////////// SUSHISWAP CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-export const SUSHISWAP_DEFAULT_RESERVE_CALL = new SushiSwapPair__getReservesResult(
-  BIGINT_ZERO,
-  BIGINT_ZERO,
-  BIGINT_ZERO
-);
+export const SUSHISWAP_DEFAULT_RESERVE_CALL =
+  new SushiSwapPair__getReservesResult(BIGINT_ZERO, BIGINT_ZERO, BIGINT_ZERO);
 
 export const SUSHISWAP_CALCULATIONS_ADDRESS_MAP = new TypedMap<
   string,
