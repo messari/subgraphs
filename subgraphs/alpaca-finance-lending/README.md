@@ -59,7 +59,7 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Prepare
 
-`npm run prepare:yaml --TEMPLATE=alpaca.finance.lending.template.yaml --PROTOCOL=alpacaa-finance-lending --NETWORK=bsc`
+`npm run prepare:yaml --TEMPLATE=alpaca.finance.lending.template.yaml --PROTOCOL=alpaca-finance-lending --NETWORK=bsc`
 
 ## Smart Contracts Interactions
 

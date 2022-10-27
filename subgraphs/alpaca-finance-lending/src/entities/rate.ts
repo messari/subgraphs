@@ -2,44 +2,45 @@ import { BigDecimal } from "@graphprotocol/graph-ts";
 import { InterestRate } from "../../generated/schema";
 import { InterestRateSide, InterestRateType } from "../utils/constants";
 
-function createBorrowerVariableRate(
+function getOrCreateBorrowerVariableRate(
   marketId: string,
-  interestRate: BigDecimal,
-  timestamp: string
+  interestRate: BigDecimal
 ): InterestRate {
-  const rate = new InterestRate(
-    `${InterestRateSide.BORROWER}-${InterestRateType.VARIABLE}-${marketId}-${timestamp}`
-  );
-  rate.rate = interestRate;
-  rate.side = InterestRateSide.BORROWER;
-  rate.type = InterestRateType.VARIABLE;
-  rate.save();
+  const id = `${InterestRateSide.BORROWER}-${InterestRateType.VARIABLE}-${marketId}`;
+  let rate = InterestRate.load(id);
+  if (!rate) {
+    rate = new InterestRate(id);
+    rate.rate = interestRate;
+    rate.side = InterestRateSide.BORROWER;
+    rate.type = InterestRateType.VARIABLE;
+    rate.save();
+  }
   return rate;
 }
 
-function createLenderVariableRate(
+function getOrCreateLenderVariableRate(
   marketId: string,
-  interestRate: BigDecimal,
-  timestamp: string
+  interestRate: BigDecimal
 ): InterestRate {
-  const rate = new InterestRate(
-    `${InterestRateSide.LENDER}-${InterestRateType.VARIABLE}-${marketId}-${timestamp}`
-  );
-  rate.rate = interestRate;
-  rate.side = InterestRateSide.LENDER;
-  rate.type = InterestRateType.VARIABLE;
-  rate.save();
+  const id = `${InterestRateSide.LENDER}-${InterestRateType.VARIABLE}-${marketId}`;
+  let rate = InterestRate.load(id);
+  if (!rate) {
+    rate = new InterestRate(id);
+    rate.rate = interestRate;
+    rate.side = InterestRateSide.LENDER;
+    rate.type = InterestRateType.VARIABLE;
+    rate.save();
+  }
   return rate;
 }
 
-export function createInterestRates(
+export function getOrCreateInterestRates(
   marketId: string,
   borrowerInterestRate: BigDecimal,
-  lenderInterestRate: BigDecimal,
-  timestamp: string
+  lenderInterestRate: BigDecimal
 ): string[] {
   return [
-    createBorrowerVariableRate(marketId, borrowerInterestRate, timestamp).id,
-    createLenderVariableRate(marketId, lenderInterestRate, timestamp).id,
+    getOrCreateBorrowerVariableRate(marketId, borrowerInterestRate).id,
+    getOrCreateLenderVariableRate(marketId, lenderInterestRate).id,
   ];
 }

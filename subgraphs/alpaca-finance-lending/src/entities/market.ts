@@ -29,7 +29,7 @@ import {
 import { getOrCreateToken, getTokenById } from "./token";
 import { incrementProtocolTotalPoolCount } from "./usage";
 import { EventType } from "./event";
-import { createInterestRates } from "./rate";
+import { getOrCreateInterestRates } from "./rate";
 import {
   BIGDECIMAL_NEGATIVE_ONE,
   BIGDECIMAL_ONE,
@@ -312,6 +312,10 @@ export function changeMarketBorrowBalance(
   );
   market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(changeUSD);
   if (market.totalBorrowBalanceUSD.lt(BIGDECIMAL_ZERO)) {
+    log.warning(
+      "[changeMarketBorrowBalance] totalBorrowBalanceUSD {} is negative, should not happen",
+      [market.totalBorrowBalanceUSD.toString()]
+    );
     market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
   }
   market.save();
@@ -327,11 +331,10 @@ export function updateMarketRates(
   borrowerInterestRate: BigDecimal,
   lenderInterestRate: BigDecimal
 ): void {
-  const newRates = createInterestRates(
+  const newRates = getOrCreateInterestRates(
     market.id,
     borrowerInterestRate,
-    lenderInterestRate,
-    event.block.timestamp.toString()
+    lenderInterestRate
   );
   market.rates = newRates;
   market.save();
