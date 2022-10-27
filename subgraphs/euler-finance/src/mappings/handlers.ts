@@ -51,13 +51,6 @@ export function handleAssetStatus(event: AssetStatus): void {
   const interestRate = event.params.interestRate;
 
   const assetStatus = getOrCreateAssetStatus(underlying);
-  assetStatus.totalBorrows = totalBorrows;
-  assetStatus.totalBalances = totalBalances;
-  assetStatus.reserveBalance = reserveBalance;
-  assetStatus.interestRate = interestRate;
-  assetStatus.timestamp = event.params.timestamp;
-  assetStatus.save();
-
   const marketId = assetStatus.eToken!;
   const protocol = getOrCreateLendingProtocol();
   const market = getOrCreateMarket(marketId);
@@ -86,6 +79,13 @@ export function handleAssetStatus(event: AssetStatus): void {
   updateProtocolTVL(event, protocol);
 
   snapshotFinancials(event.block, BIGDECIMAL_ZERO, null, protocol);
+
+  assetStatus.totalBorrows = totalBorrows;
+  assetStatus.totalBalances = totalBalances;
+  assetStatus.reserveBalance = reserveBalance;
+  assetStatus.interestRate = interestRate;
+  assetStatus.timestamp = event.params.timestamp;
+  assetStatus.save();
 }
 
 function updateProtocolTVL(event: AssetStatus, protocol: LendingProtocol): void {
