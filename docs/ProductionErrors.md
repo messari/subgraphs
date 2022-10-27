@@ -39,6 +39,7 @@ In order to get notified of production errors (without the noise) follow these s
 
 You will need to use your subgraph debugging skills, but here are some tips to help!
 
+- Follow any advice in our [debugging docs](https://github.com/messari/subgraphs/blob/master/docs/Mapping.md#debugging).
 - Focus on only solving the issue causing the error.
   - If you find other things (nice job), those can be solved in a separate PR after the error is fixed.
 - Log in as many spots as possible to narrow down the issue (generally it will be isolated since the subgraph is QA'd)
