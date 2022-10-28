@@ -36,6 +36,66 @@ dataSources:
         - function: addVaultAndStrategy(address,address)
           handler: handleAddVaultAndStrategy
       file: ./src/controller.ts
+
+  - kind: ethereum
+    name: NotifyHelper
+    network: {{ network }}
+    source:
+      address: '0xe20c31e3d08027f5aface84a3a46b7b3b165053c'
+      startBlock: 11276997
+      abi: NotifyHelper
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - RewardToken
+        - Token
+      abis:
+        - name: VaultContract
+          file: ./abis/Vault.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: NotifyHelper
+          file: ./abis/NotifyHelper.json
+        - name: NoMintRewardPool
+          file: ./abis/NoMintRewardPool.json
+      callHandlers:
+        - function: notifyPools(uint256[],address[],uint256)
+          handler: handleNotifyPools
+        - function: notifyPoolsIncludingProfitShare(uint256[],address[],uint256,uint256,uint256)
+          handler: handleNotifyPoolsIncludingProfitShare
+      file: ./src/notifyHelper.ts
+
+  - kind: ethereum
+    name: MegaFactory
+    network: {{ network }}
+    source:
+      address: '0xe1ec9151eb8d9a3451b8f623ce8b62632a6d4f4d'
+      startBlock: 13658254
+      abi: MegaFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - RewardToken
+        - Token
+      abis:
+        - name: VaultContract
+          file: ./abis/Vault.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json
+        - name: MegaFactory
+          file: ./abis/MegaFactory.json
+        - name: PotPool
+          file: ./abis/PotPool.json
+      eventHandlers:
+        - event: DeploymentCompleted(string)
+          handler: handleDeploymentCompleted
+      file: ./src/megaFactory.ts
 templates:
   - kind: ethereum/contract
     name: Vault

@@ -36,7 +36,7 @@ const inputTokenAddress = Address.fromString(
 
 const protocolAddressString = '0x222412af183bceadefd72e4cb1b71f1889953b1c'
 
-function createVault(): Vault {
+export function createVault(): Vault {
   const outputTokenAddress = Address.fromString(
     '0x0000000000000000000000000000000000000003'
   )
