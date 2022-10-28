@@ -3,7 +3,8 @@ import moment from "moment";
 import { protocolErrorMessages } from './errorSchemas.js';
 import { resolveQueriesToAttempt } from './resolutions.js';
 import { monitorVersion, ProtocolTypeEntityName, sleep, colorsArray } from './util.js';
-
+import fs from 'fs';
+import path from 'path';
 // Error handling functions
 
 export async function errorNotification(error, channelId = process.env.CHANNEL_ID) {
@@ -221,6 +222,12 @@ export async function sendDiscordMessage(messageObjects, protocolName, channelId
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         return data;
+
+        // Code that saves the embed json rather than sending it, when testing/debugging main channel
+        // const nowDate = new Date().getMonth().toString() + '-' + new Date().getDate().toString() + '-' + new Date().getFullYear().toString();
+        // const jsonPath = path.join(process.cwd(), 'alerts_' + nowDate + '_' + protocolName + '.json');
+        // fs.writeFileSync(jsonPath, JSON.stringify(messageObjects, null, '\t'));
+        // return null;
     } catch (err) {
         if (err.response.status === 429) {
             return messageObjects;
@@ -242,7 +249,7 @@ export async function startProtocolThread(subject, base, channelId = process.env
     if (base === '') {
         postJSON = JSON.stringify({ "content": subject });
     }
-    let msgId = ""
+    let msgId = "";
     try {
         const data = await axios.post(baseURL, postJSON, { "headers": { ...headers } });
         msgId = data.data.id;
