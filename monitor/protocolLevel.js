@@ -484,7 +484,7 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
                     const key = Object.keys(returnedData)[0];
                     if (returnedData[key]?.length === 0 || !returnedData[key]) {
                         // alert for no protocol entity found
-                        deploymentsToReturn[depoKey].protocolErrors.protocolEntity.push('');
+                        deploymentsToReturn[depoKey].protocolErrors.protocolEntity.push(ProtocolTypeEntityName[deploymentsToReturn[depoKey].protocolType]);
                     } else {
                         const emptyFields = Object.keys(returnedData[key][0]).filter(field => !returnedData[key][0][field] || returnedData[key][0][field]?.length === 0);
                         if (emptyFields.length > 0) {
@@ -495,10 +495,12 @@ export const protocolDerivedFields = async (deployments, invalidDeployments) => 
 
                 if (returnedError) {
                     const alertArr = returnedError.filter(errObj => errObj.message !== "indexing_error").map(errObj => errObj.message);
-                    alert = alertArr.join(" --- ");
-                    deploymentsToReturn[depoKey].protocolErrors.queryError.push(alert);
-                    // Map through errors and save the messages to protocolDerivedFieldErrors on depo object
-                    // Maybe save the query to this object to help reproduceability
+                    if (alertArr.length > 0) {
+                        alert = alertArr.join(" --- ");
+                        deploymentsToReturn[depoKey].protocolErrors.queryError.push(alert);
+                        // Map through errors and save the messages to protocolDerivedFieldErrors on depo object
+                        // Maybe save the query to this object to help reproduceability
+                    }
                 }
 
             }))
