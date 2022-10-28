@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -216,8 +216,13 @@ export function handleLiquidation(event: Liquidation): void {
   snapshotMarket(event.block, marketId, liquidateUSD, TransactionType.LIQUIDATE);
   snapshotFinancials(event.block, liquidateUSD, TransactionType.LIQUIDATE);
 
+  log.debug("[handleLiquidation]tx={} is a liquidation, repay={}", [
+    event.transaction.hash.toHexString(),
+    event.params.repay.toString(),
+  ]);
+
   // Roll back supply side & total revenue calculated from liquidation fee
-  rollbackRevenue(marketId, event, assetStatus);
+  // rollbackRevenue(marketId, event, assetStatus);
 }
 
 export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
