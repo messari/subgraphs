@@ -599,37 +599,45 @@ export function rollbackRevenue(marketId: string, event: Liquidation, assetStatu
   const deltaTotalRevenueUSD = repayExtraUSD.times(RESERVE_FEE_SCALE).div(assetStatus.reserveFee.toBigDecimal());
   const deltaSupplySideRevenueUSD = deltaTotalRevenueUSD.minus(repayExtraUSD);
 
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(deltaTotalRevenueUSD);
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
+    protocol.cumulativeProtocolSideRevenueUSD,
+  );
   protocol.save();
 
   const financialsSnapshot = getOrCreateFinancials(event.block.timestamp, event.block.number);
-  financialsSnapshot.cumulativeTotalRevenueUSD =
-    financialsSnapshot.cumulativeTotalRevenueUSD.minus(deltaTotalRevenueUSD);
   financialsSnapshot.cumulativeSupplySideRevenueUSD =
     financialsSnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  if (financialsSnapshot.dailyTotalRevenueUSD.ge(deltaTotalRevenueUSD)) {
-    financialsSnapshot.dailyTotalRevenueUSD = financialsSnapshot.dailyTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+  financialsSnapshot.cumulativeTotalRevenueUSD = financialsSnapshot.cumulativeSupplySideRevenueUSD.plus(
+    financialsSnapshot.cumulativeProtocolSideRevenueUSD,
+  );
+  if (financialsSnapshot.dailySupplySideRevenueUSD.ge(deltaSupplySideRevenueUSD)) {
     financialsSnapshot.dailySupplySideRevenueUSD =
       financialsSnapshot.dailySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-    financialsSnapshot.save();
+    financialsSnapshot.dailyTotalRevenueUSD = financialsSnapshot.dailySupplySideRevenueUSD.minus(
+      financialsSnapshot.dailyProtocolSideRevenueUSD,
+    );
   }
   financialsSnapshot.save();
 
-  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.minus(deltaTotalRevenueUSD);
   market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
+  market.cumulativeTotalRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(
+    market.cumulativeProtocolSideRevenueUSD,
+  );
   market.save();
 
   const marketDailySnapshot = getOrCreateMarketDailySnapshot(event.block, marketId);
-  marketDailySnapshot.cumulativeTotalRevenueUSD =
-    marketDailySnapshot.cumulativeTotalRevenueUSD.minus(deltaTotalRevenueUSD);
   marketDailySnapshot.cumulativeSupplySideRevenueUSD =
     marketDailySnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  if (marketDailySnapshot.dailyTotalRevenueUSD.ge(deltaTotalRevenueUSD)) {
-    marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailyTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+  marketDailySnapshot.cumulativeTotalRevenueUSD = marketDailySnapshot.cumulativeSupplySideRevenueUSD.plus(
+    marketDailySnapshot.cumulativeProtocolSideRevenueUSD,
+  );
+  if (marketDailySnapshot.dailySupplySideRevenueUSD.ge(deltaSupplySideRevenueUSD)) {
     marketDailySnapshot.dailySupplySideRevenueUSD =
       marketDailySnapshot.dailySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-    marketDailySnapshot.save();
+    marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
+      marketDailySnapshot.dailyProtocolSideRevenueUSD,
+    );
   } else {
     log.error("[rollbackRevenue]market={}/{},blk={},tx={},deltaTotalRevUSD={}>market.dailyTotalRevnueUSD={}", [
       market.name!,
@@ -640,17 +648,20 @@ export function rollbackRevenue(marketId: string, event: Liquidation, assetStatu
       marketDailySnapshot.dailyTotalRevenueUSD.toString(),
     ]);
   }
+  marketDailySnapshot.save();
 
   const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event.block, marketId);
-  marketHourlySnapshot.cumulativeTotalRevenueUSD =
-    marketHourlySnapshot.cumulativeTotalRevenueUSD.minus(deltaTotalRevenueUSD);
   marketHourlySnapshot.cumulativeSupplySideRevenueUSD =
     marketHourlySnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  if (marketHourlySnapshot.hourlyTotalRevenueUSD.ge(deltaTotalRevenueUSD)) {
-    marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlyTotalRevenueUSD.minus(deltaTotalRevenueUSD);
+  marketHourlySnapshot.cumulativeTotalRevenueUSD = marketHourlySnapshot.cumulativeSupplySideRevenueUSD.plus(
+    marketHourlySnapshot.cumulativeProtocolSideRevenueUSD,
+  );
+  if (marketHourlySnapshot.hourlySupplySideRevenueUSD.ge(deltaSupplySideRevenueUSD)) {
     marketHourlySnapshot.hourlySupplySideRevenueUSD =
       marketHourlySnapshot.hourlySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-    marketHourlySnapshot.save();
+    marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
+      marketHourlySnapshot.hourlyProtocolSideRevenueUSD,
+    );
   } else {
     log.error("[rollbackRevenue]market={}/{},blk={},tx={},deltaTotalRevUSD={}>market.hourlyTotalRevnueUSD={}", [
       market.name!,
@@ -661,4 +672,5 @@ export function rollbackRevenue(marketId: string, event: Liquidation, assetStatu
       marketHourlySnapshot.hourlyTotalRevenueUSD.toString(),
     ]);
   }
+  marketHourlySnapshot.save();
 }
