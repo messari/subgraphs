@@ -643,9 +643,10 @@ export function _handleWithdraw(
     event
   );
   if (positionId === null) {
-    log.warning("[handleWithdraw] Position not found for account: {}", [
-      accountID.toHexString(),
-    ]);
+    log.warning(
+      "[handleWithdraw] Position not found for account: {} in transaction: {}",
+      [accountID.toHexString(), event.transaction.hash.toHexString()]
+    );
     return;
   }
 
@@ -820,9 +821,10 @@ export function _handleRepay(
     event
   );
   if (positionId === null) {
-    log.warning("[handleRepay] Position not found for account: {}", [
-      accountID.toHexString(),
-    ]);
+    log.warning(
+      "[handleRepay] Position not found for account: {} in transaction; {}",
+      [accountID.toHexString(), event.transaction.hash.toHexString()]
+    );
     return;
   }
 
@@ -951,9 +953,10 @@ export function _handleLiquidate(
     event
   );
   if (positionId === null) {
-    log.warning("[handleLiquidate] Position not found for account: {}", [
-      borrower.toHexString(),
-    ]);
+    log.warning(
+      "[handleLiquidate] Position not found for account: {} in transaction: {}",
+      [borrower.toHexString(), event.transaction.hash.toHexString()]
+    );
     return;
   }
 
@@ -1065,6 +1068,8 @@ export function _handleTransfer(
   // ie, a deposit, withdraw, borrow, repay, etc
   // we want to let that handler take care of position updates
   if (
+    to == Address.fromString(ZERO_ADDRESS) ||
+    from == Address.fromString(ZERO_ADDRESS) ||
     to.toHexString().toLowerCase() == market.outputToken!.toLowerCase() ||
     from.toHexString().toLowerCase() == market.outputToken!.toLowerCase()
   ) {
@@ -1074,41 +1079,33 @@ export function _handleTransfer(
   // grab accounts
   let toAccount = Account.load(to.toHexString());
   if (!toAccount) {
-    if (to == Address.fromString(ZERO_ADDRESS)) {
-      toAccount = null;
-    } else {
-      toAccount = createAccount(to.toHexString());
-      toAccount.save();
+    toAccount = createAccount(to.toHexString());
+    toAccount.save();
 
-      protocol.cumulativeUniqueUsers++;
-      protocol.save();
-    }
+    protocol.cumulativeUniqueUsers++;
+    protocol.save();
   }
 
   let fromAccount = Account.load(from.toHexString());
   if (!fromAccount) {
-    if (from == Address.fromString(ZERO_ADDRESS)) {
-      fromAccount = null;
-    } else {
-      fromAccount = createAccount(from.toHexString());
-      fromAccount.save();
+    fromAccount = createAccount(from.toHexString());
+    fromAccount.save();
 
-      protocol.cumulativeUniqueUsers++;
-      protocol.save();
-    }
+    protocol.cumulativeUniqueUsers++;
+    protocol.save();
   }
 
   const aTokenContract = AToken.bind(event.address);
 
   // update balance from sender
   if (fromAccount) {
-    if (from == Address.fromString(ETH_PARASWAP_ROUTER)) {
-      log.warning("fromAccount: Transaction: {} balance: {} market: {}", [
-        event.transaction.hash.toHexString(),
-        aTokenContract.balanceOf(from).toString(),
-        market.id,
-      ]);
-    }
+    // if (from == Address.fromString(ETH_PARASWAP_ROUTER)) {
+    // log.warning("fromAccount: Transaction: {} balance: {} market: {}", [
+    //   event.transaction.hash.toHexString(),
+    //   aTokenContract.balanceOf(from).toString(),
+    //   market.id,
+    // ]);
+    // }
 
     subtractPosition(
       protocol,
@@ -1123,13 +1120,13 @@ export function _handleTransfer(
 
   // update balance from receiver
   if (toAccount) {
-    if (to == Address.fromString(ETH_PARASWAP_ROUTER)) {
-      log.warning("toAccount: Transaction: {} balance: {} market: {}", [
-        event.transaction.hash.toHexString(),
-        aTokenContract.balanceOf(to).toString(),
-        market.id,
-      ]);
-    }
+    // if (to == Address.fromString(ETH_PARASWAP_ROUTER)) {
+    // log.warning("toAccount: Transaction: {} balance: {} market: {}", [
+    //   event.transaction.hash.toHexString(),
+    //   aTokenContract.balanceOf(to).toString(),
+    //   market.id,
+    // ]);
+    // }
 
     addPosition(
       protocol,
