@@ -575,15 +575,6 @@ export function addPosition(
     .concat("-")
     .concat(positionCounter.nextCount.toString());
 
-  // if (
-  //   Address.fromString(account.id) == Address.fromString(ETH_PARASWAP_ROUTER)
-  // ) {
-  // log.warning("[addPosition] position counter id {} and next count {}", [
-  //   positionCounter.id,
-  //   positionCounter.nextCount.toString(),
-  // ]);
-  // }
-
   let position = Position.load(positionID);
   const openPosition = position == null;
   if (openPosition) {
@@ -699,16 +690,6 @@ export function subtractPosition(
     ]);
     return null;
   }
-
-  // if (
-  //   Address.fromString(account.id) == Address.fromString(ETH_PARASWAP_ROUTER)
-  // ) {
-  // log.warning("[subtractPosition] position counter id {} and next count {}", [
-  //   positionCounter.id,
-  //   positionCounter.nextCount.toString(),
-  // ]);
-  // }
-
   const positionID = positionCounter.id
     .concat("-")
     .concat(positionCounter.nextCount.toString());

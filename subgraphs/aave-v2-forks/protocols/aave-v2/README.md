@@ -67,6 +67,8 @@ Not applicable to Aave
   - There are also similar features with swapAndRepay routers and swapAndLiquidate routers.
   - The logic in our subgraph accounts for all of the unique behaviour described above.
 - There is also a feature in Aave V2 to execute transactions on behalf of another account. We do account for this in the mappings. A position and transaction follow the controller of the collateral or debt.
+  - This does not affect any of the position data though.
+- There is also a feature in Aave V2 to execute transactions on behalf of another account. We do account for this in the mappings.
 
 ## Useful links and references
 
