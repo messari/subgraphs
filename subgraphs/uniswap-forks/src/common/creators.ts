@@ -41,7 +41,10 @@ import { getTrackedVolumeUSD } from "../price/price";
  * Create the fee for a pool depending on the the protocol and network specific fee structure.
  * Specified in the typescript configuration file.
  */
-export function createPoolFees(poolAddress: string): string[] {
+export function createPoolFees(
+  poolAddress: string,
+  blockNumber: BigInt
+): string[] {
   const poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
   const poolProtocolFee = new LiquidityPoolFee(
     poolAddress.concat("-protocol-fee")
@@ -55,8 +58,9 @@ export function createPoolFees(poolAddress: string): string[] {
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
 
   if (NetworkConfigs.getFeeOnOff() == FeeSwitch.ON) {
-    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn();
-    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOn();
+    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn(blockNumber);
+    poolProtocolFee.feePercentage =
+      NetworkConfigs.getProtocolFeeToOn(blockNumber);
   } else {
     poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOff();
     poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOff();
@@ -67,6 +71,13 @@ export function createPoolFees(poolAddress: string): string[] {
   poolLpFee.save();
   poolProtocolFee.save();
   poolTradingFee.save();
+
+  log.error("blockNumber: {}, lpFee - {} protocolFee - {} tradingFee - {}", [
+    blockNumber.toString(),
+    poolLpFee.feePercentage.toString(),
+    poolProtocolFee.feePercentage.toString(),
+    poolTradingFee.feePercentage.toString(),
+  ]);
 
   return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
@@ -95,7 +106,7 @@ export function createLiquidityPool(
   pool.symbol = LPtoken.symbol;
   pool.inputTokens = [token0.id, token1.id];
   pool.outputToken = LPtoken.id;
-  pool.fees = createPoolFees(poolAddress);
+  pool.fees = createPoolFees(poolAddress, event.block.number);
   pool.isSingleSided = false;
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;

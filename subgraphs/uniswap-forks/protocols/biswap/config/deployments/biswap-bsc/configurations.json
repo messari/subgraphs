@@ -3,7 +3,7 @@
   "network": "bsc",
   "factory": {
     "address": "0x858e3312ed3a876947ea49d572a7c42de08af7ee",
-    "startBlock": 7664646
+    "startBlock": 20488161
   },
   "graftEnabled": false,
   "subgraphId": "",

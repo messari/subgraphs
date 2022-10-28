@@ -44,14 +44,22 @@ export class BiswapBscConfigurations implements Configurations {
       Address.fromString("0x858e3312ed3a876947ea49d572a7c42de08af7ee")
     );
   }
-  getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("0.1");
+  getTradeFee(blockNumber: BigInt): BigDecimal {
+    if (blockNumber < BigInt.fromI32(20488163)) {
+      return BigDecimal.fromString("0.1");
+    } else {
+      return BigDecimal.fromString("0.2");
+    }
   }
-  getProtocolFeeToOn(): BigDecimal {
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.05");
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
+    if (blockNumber < BigInt.fromI32(20488163)) {
+      return BigDecimal.fromString("0.05");
+    } else {
+      return BigDecimal.fromString("0.15");
+    }
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
