@@ -27,8 +27,10 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIssue
                         if (!embedObjectOnChain) {
                             return;
                         }
-                        const fieldCells = embedObjectOnChain.fields.filter(cell => cell.name === "Field").map(x => x.value);
+                        let fieldCells = embedObjectOnChain.fields.filter(cell => cell.name === "Field").map(x => x.value);
                         if (fieldCells) {
+                            const existingFields = channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id][chainStr];
+                            fieldCells = [...existingFields, ...fieldCells.filter(x => !existingFields.includes(x))];
                             channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id][chainStr] = fieldCells;
                         }
                     });
