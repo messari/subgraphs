@@ -4538,6 +4538,35 @@
       }
     }
   },
+  "ampleforth-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "ampleforth-governance",
+    "deployments": {
+      "ampleforth-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "ampleforth-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "ampleforth-governance",
+            "query-id": "ampleforth-governance"
+          }
+        }
+      }
+    }
+  },
   "compound-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
@@ -4567,12 +4596,12 @@
       }
     }
   },
-  "uniswap-governance": {
+  "cryptex-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
-    "protocol": "uniswap-governance",
+    "protocol": "cryptex-governance",
     "deployments": {
-      "uniswap-governance-ethereum": {
+      "cryptex-governance-ethereum": {
         "network": "ethereum",
         "status": "dev",
         "versions": {
@@ -4581,7 +4610,7 @@
           "methodology": "1.0.0"
         },
         "files": {
-          "template": "uniswap-governance.template.yaml"
+          "template": "cryptex-governance.template.yaml"
         },
         "options": {
           "prepare:yaml": true,
@@ -4589,8 +4618,8 @@
         },
         "services": {
           "hosted-service": {
-            "slug": "uniswap-governance",
-            "query-id": "uniswap-governance"
+            "slug": "cryptex-governance",
+            "query-id": "cryptex-governance"
           }
         }
       }
@@ -4620,35 +4649,6 @@
           "hosted-service": {
             "slug": "gitcoin-governance",
             "query-id": "gitcoin-governance"
-          }
-        }
-      }
-    }
-  },
-  "pooltogether-governance": {
-    "schema": "governance",
-    "base": "governor-alpha-bravo",
-    "protocol": "pooltogether-governance",
-    "deployments": {
-      "pooltogether-governance-ethereum": {
-        "network": "ethereum",
-        "status": "dev",
-        "versions": {
-          "schema": "1.0.0",
-          "subgraph": "1.0.0",
-          "methodology": "1.0.0"
-        },
-        "files": {
-          "template": "pooltogether-governance.template.yaml"
-        },
-        "options": {
-          "prepare:yaml": true,
-          "prepare:constants": false
-        },
-        "services": {
-          "hosted-service": {
-            "slug": "pooltogether-governance",
-            "query-id": "pooltogether-governance"
           }
         }
       }
@@ -4712,6 +4712,35 @@
       }
     }
   },
+  "pooltogether-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "pooltogether-governance",
+    "deployments": {
+      "pooltogether-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "pooltogether-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "pooltogether-governance",
+            "query-id": "pooltogether-governance"
+          }
+        }
+      }
+    }
+  },
   "radicle-governance": {
     "schema": "governance",
     "base": "governor-alpha-bravo",
@@ -4736,6 +4765,93 @@
           "hosted-service": {
             "slug": "radicle-governance",
             "query-id": "radicle-governance"
+          }
+        }
+      }
+    }
+  },
+  "reflexer-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "reflexer-governance",
+    "deployments": {
+      "reflexer-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "reflexer-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "reflexer-governance",
+            "query-id": "reflexer-governance"
+          }
+        }
+      }
+    }
+  },
+  "uniswap-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "uniswap-governance",
+    "deployments": {
+      "uniswap-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "uniswap-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "uniswap-governance",
+            "query-id": "uniswap-governance"
+          }
+        }
+      }
+    }
+  },
+  "unslashed-governance": {
+    "schema": "governance",
+    "base": "governor-alpha-bravo",
+    "protocol": "unslashed-governance",
+    "deployments": {
+      "unslashed-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "unslashed-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "unslashed-governance",
+            "query-id": "unslashed-governance"
           }
         }
       }
