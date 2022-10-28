@@ -53,9 +53,7 @@ export function initOrUpdateCreditLine(
   creditLine.isEligibleForRewards =
     creditLine.termStartTime == BigInt.zero() ||
     creditLine.termStartTime >= BigInt.fromString(BACKER_REWARDS_EPOCH);
-  creditLine.lateFeeApr = contract
-    .lateFeeApr()
-    .divDecimal(FIDU_DECIMALS.toBigDecimal());
+  creditLine.lateFeeApr = contract.lateFeeApr().divDecimal(FIDU_DECIMALS);
 
   let maxLimit = creditLine.limit;
   if (timestamp && isAfterV2_2(timestamp)) {

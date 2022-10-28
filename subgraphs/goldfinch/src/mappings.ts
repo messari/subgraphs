@@ -5,6 +5,7 @@ import {
   GoldfinchFactory,
 } from "../generated/GoldfinchFactory/GoldfinchFactory";
 import { CreditLine as CreditLineContract } from "../generated/GoldfinchFactory/CreditLine";
+import { PoolTokens as PoolTokensContract } from "../generated/GoldfinchFactory/PoolTokens";
 import {
   GoldfinchConfig,
   GoListed,
@@ -97,6 +98,7 @@ export function handlePoolCreated(event: PoolCreated): void {
   // init TranchedPool tempate
   const poolAddress = event.params.pool;
   const protocol = getOrCreateProtocol();
+  const market = getOrCreateMarket(poolAddress.toHexString(), event);
   const borrowerAddr = event.params.borrower.toHexString();
   let account = Account.load(borrowerAddr);
   if (!account) {
@@ -118,16 +120,17 @@ export function handlePoolCreated(event: PoolCreated): void {
     RewardTokenType.DEPOSIT
   );
 
-  const market = getOrCreateMarket(poolAddress.toHexString(), event);
   market.rewardTokens = [rewardToken.id];
+
+  market._poolToken = configContract
+    .addresses(BigInt.fromI32(CONFIG_KEYS_ADDRESSES.PoolTokens))
+    .toHexString();
 
   // CreditLineCreated event is not avaiable in deployed smartcontract
   // Call the contract function instead
-  // TODO: tranchedPool Paused/Locked
   const poolContract = TranchedPool.bind(event.params.pool);
   const creditLineAddress = poolContract.creditLine();
   market._creditLine = creditLineAddress.toHexString();
-  // TODO: what is the best way to handle creditLine.setLimit() call?
   const creditLineContract = CreditLineContract.bind(creditLineAddress);
   if (creditLineContract.currentLimit().gt(BIGINT_ONE)) {
     market.isActive = true;

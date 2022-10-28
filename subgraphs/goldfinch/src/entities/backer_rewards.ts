@@ -26,7 +26,7 @@ export function updateBackerRewardsData(contractAddress: Address): void {
   backerRewards.totalRewardPercentOfTotalGFI = contract
     .totalRewardPercentOfTotalGFI()
     .toBigDecimal()
-    .div(GFI_DECIMALS.toBigDecimal())
+    .div(GFI_DECIMALS)
     .div(BigDecimal.fromString("100"));
   // Note that this is actually measured in GFI, not dollars
   backerRewards.maxInterestDollarsEligible =

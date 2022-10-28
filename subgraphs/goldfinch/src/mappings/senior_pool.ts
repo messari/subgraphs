@@ -16,6 +16,8 @@ import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  FIDU_ADDRESS,
+  PositionSide,
   TransactionType,
   USDC_DECIMALS,
 } from "../common/constants";
@@ -26,12 +28,17 @@ import {
 } from "../entities/senior_pool";
 import { handleDeposit } from "../entities/user";
 import { bigIntToBDUseDecimals } from "../common/utils";
-import { getOrCreateMarket, getOrCreateProtocol } from "../common/getters";
+import {
+  getOrCreateAccount,
+  getOrCreateMarket,
+  getOrCreateProtocol,
+} from "../common/getters";
 import { Token } from "../../generated/schema";
 import {
   createTransaction,
   snapshotFinancials,
   snapshotMarket,
+  updatePosition,
   updateRevenues,
   updateUsageMetrics,
 } from "../common/helpers";
@@ -42,6 +49,7 @@ export function handleDepositMade(event: DepositMade): void {
   const amountUSD = amount.divDecimal(USDC_DECIMALS);
   const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(event.address.toHexString(), event);
+  const account = getOrCreateAccount(capitalProvider);
   const inputToken = Token.load(market.inputToken)!;
   const outputToken = Token.load(market.outputToken!)!;
 
@@ -57,6 +65,7 @@ export function handleDepositMade(event: DepositMade): void {
     Address.fromString(market.outputToken!)
   );
   market.outputTokenSupply = fiduContract.totalSupply();
+  const accountBalance = fiduContract.balanceOf(event.params.capitalProvider);
   market.outputTokenPriceUSD = bigIntToBDUseDecimals(
     seniorPoolContract.sharePrice(),
     outputToken.decimals
@@ -85,13 +94,22 @@ export function handleDepositMade(event: DepositMade): void {
 
   snapshotMarket(market, amountUSD, event, TransactionType.DEPOSIT);
   snapshotFinancials(protocol, amountUSD, event, TransactionType.DEPOSIT);
+  updateUsageMetrics(protocol, capitalProvider, event, TransactionType.DEPOSIT);
 
-  //TODO updatePosition
+  const positionID = updatePosition(
+    protocol,
+    market,
+    account,
+    accountBalance,
+    PositionSide.LENDER,
+    TransactionType.DEPOSIT,
+    event
+  );
   createTransaction(
     TransactionType.DEPOSIT,
     market,
     capitalProvider,
-    "",
+    positionID,
     amount,
     amountUSD,
     event
@@ -125,6 +143,7 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
 
   const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(event.address.toHexString(), event);
+  const account = getOrCreateAccount(event.params.capitalProvider);
   const outputToken = Token.load(market.outputToken!)!;
 
   // USDC
@@ -138,6 +157,7 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
   const fiduContract = FiduContract.bind(
     Address.fromString(market.outputToken!)
   );
+  const accountBalance = fiduContract.balanceOf(event.params.capitalProvider);
   market.outputTokenSupply = fiduContract.totalSupply();
   market.outputTokenPriceUSD = bigIntToBDUseDecimals(
     seniorPoolContract.sharePrice(),
@@ -148,20 +168,6 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
     protocol.totalDepositBalanceUSD.minus(amountUSD);
   protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
 
-  //TODO updatePosition
-  createTransaction(
-    TransactionType.WITHDRAW,
-    market,
-    capitalProvider,
-    "",
-    amount,
-    amountUSD,
-    event
-  );
-
-  market.save();
-  protocol.save();
-
   snapshotMarket(market, amountUSD, event, TransactionType.WITHDRAW);
   snapshotFinancials(protocol, amountUSD, event, TransactionType.WITHDRAW);
   updateUsageMetrics(
@@ -170,6 +176,29 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
     event,
     TransactionType.WITHDRAW
   );
+
+  const positionID = updatePosition(
+    protocol,
+    market,
+    account,
+    accountBalance,
+    PositionSide.LENDER,
+    TransactionType.WITHDRAW,
+    event
+  );
+
+  createTransaction(
+    TransactionType.WITHDRAW,
+    market,
+    capitalProvider,
+    positionID,
+    amount,
+    amountUSD,
+    event
+  );
+
+  market.save();
+  protocol.save();
 
   // ORIGINAL CODE BELOW
   /*

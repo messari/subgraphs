@@ -3,10 +3,10 @@ import { SeniorPool, SeniorPoolStatus } from "../../generated/schema";
 import { SeniorPool as SeniorPoolContract } from "../../generated/SeniorPool/SeniorPool";
 import { Fidu as FiduContract } from "../../generated/SeniorPool/Fidu";
 import { USDC as UsdcContract } from "../../generated/SeniorPool/USDC";
-import { CONFIG_KEYS_ADDRESSES } from "../common/constants";
+import { CONFIG_KEYS_ADDRESSES, SECONDS_PER_YEAR } from "../common/constants";
 import { calculateEstimatedInterestForTranchedPool } from "./helpers";
 import { getStakingRewards } from "./staking_rewards";
-import { getAddressFromConfig } from "../common/utils";
+import { bigDecimalToBigInt, getAddressFromConfig } from "../common/utils";
 import {
   USDC_DECIMALS,
   GFI_DECIMALS,
@@ -56,15 +56,14 @@ export function getOrInitSeniorPoolStatus(): SeniorPoolStatus {
 export function updateEstimatedApyFromGfiRaw(): void {
   const stakingRewards = getStakingRewards();
   const seniorPoolStatus = getOrInitSeniorPoolStatus();
-
   if (seniorPoolStatus.sharePrice != BigInt.zero()) {
     seniorPoolStatus.estimatedApyFromGfiRaw =
       stakingRewards.currentEarnRatePerToken
-        .times(SECONDS_PER_YEAR)
+        .times(BigInt.fromI32(SECONDS_PER_YEAR))
         .toBigDecimal()
-        .times(FIDU_DECIMALS.toBigDecimal()) // This might be better thought of as the share-price mantissa, which happens to be the same as `FIDU_DECIMALS`.
+        .times(FIDU_DECIMALS) // This might be better thought of as the share-price mantissa, which happens to be the same as `FIDU_DECIMALS`.
         .div(seniorPoolStatus.sharePrice.toBigDecimal())
-        .div(GFI_DECIMALS.toBigDecimal());
+        .div(GFI_DECIMALS);
     seniorPoolStatus.save();
   }
 }
@@ -85,10 +84,13 @@ export function updatePoolStatus(seniorPoolAddress: Address): void {
   let totalLoansOutstanding = seniorPoolContract.totalLoansOutstanding();
   let totalSupply = fidu_contract.totalSupply();
   let totalPoolAssets = totalSupply.times(sharePrice);
-  let totalPoolAssetsUsdc = totalPoolAssets
-    .times(USDC_DECIMALS)
-    .div(FIDU_DECIMALS)
-    .div(FIDU_DECIMALS);
+  let totalPoolAssetsUsdc = bigDecimalToBigInt(
+    totalPoolAssets
+      .toBigDecimal()
+      .times(USDC_DECIMALS)
+      .div(FIDU_DECIMALS)
+      .div(FIDU_DECIMALS)
+  );
   let balance = seniorPoolContract
     .assets()
     .minus(seniorPoolContract.totalLoansOutstanding())

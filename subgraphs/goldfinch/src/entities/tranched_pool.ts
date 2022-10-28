@@ -335,9 +335,11 @@ export function initOrUpdateTranchedPool(
 export function getLeverageRatioFromConfig(
   goldfinchConfigContract: GoldfinchConfigContract
 ): BigInt {
-  return goldfinchConfigContract
-    .getNumber(BigInt.fromI32(CONFIG_KEYS_NUMBERS.LeverageRatio))
-    .div(FIDU_DECIMALS);
+  return bigDecimalToBigInt(
+    goldfinchConfigContract
+      .getNumber(BigInt.fromI32(CONFIG_KEYS_NUMBERS.LeverageRatio))
+      .divDecimal(FIDU_DECIMALS)
+  );
 }
 
 class Repayment {
@@ -437,7 +439,7 @@ export function calculateApyFromGfiForAllPools(now: BigInt): void {
     }
     tranchedPool.estimatedJuniorApyFromGfiRaw = gfiPerPrincipalDollar
       .get(tranchedPoolAddress)
-      .div(GFI_DECIMALS.toBigDecimal());
+      .div(GFI_DECIMALS);
     tranchedPool.save();
   }
 }
@@ -519,7 +521,9 @@ function estimateRewards(
     const repayment = repaymentSchedules[i];
     // Need to use big numbers to get decent accuracy during integer sqrt
     let newTotalInterest = oldTotalInterest.plus(
-      repayment.interestAmount.times(GFI_DECIMALS).div(USDC_DECIMALS)
+      bigDecimalToBigInt(
+        repayment.interestAmount.divDecimal(USDC_DECIMALS).times(GFI_DECIMALS)
+      )
     );
     if (newTotalInterest.gt(maxInterestDollarsEligible)) {
       newTotalInterest = maxInterestDollarsEligible;

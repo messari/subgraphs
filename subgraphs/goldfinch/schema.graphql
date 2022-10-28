@@ -651,6 +651,9 @@ type Market @entity {
   " All liquidations made to this market "
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
 
+  " Address of pool token "
+  _poolToken: String
+
   " Address of creditLine contract "
   _creditLine: String
 
@@ -1254,6 +1257,13 @@ type _PoolToken @entity {
   owner: String
   " principle amount "
   amount: BigInt
+}
+
+type _PositionCounter @entity {
+  " { Account address }-{ Market address }-{ Position Side } "
+  id: ID!
+  " Next count "
+  nextCount: Int!
 }
 
 ### Entity below are from goldfinch's official subgraph ###

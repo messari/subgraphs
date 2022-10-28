@@ -15,6 +15,7 @@ import {
   PaymentApplied,
   ReserveFundsCollected,
 } from "../../generated/templates/TranchedPool/TranchedPool";
+import { PoolTokens as PoolTokensContract } from "../../generated/templates/TranchedPool/PoolTokens";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
@@ -22,6 +23,7 @@ import {
   CONFIG_KEYS_ADDRESSES,
   InterestRateSide,
   InterestRateType,
+  PositionSide,
   SECONDS_PER_YEAR,
   TransactionType,
   USDC_DECIMALS,
@@ -39,15 +41,24 @@ import { getOrInitUser } from "../entities/user";
 import { createZapMaybe, deleteZapAfterUnzapMaybe } from "../entities/zapper";
 import { getAddressFromConfig } from "../common/utils";
 import {
+  getOrCreateAccount,
   getOrCreateMarket,
   getOrCreatePoolToken,
   getOrCreateProtocol,
 } from "../common/getters";
 import { CreditLine } from "../../generated/templates/TranchedPool/CreditLine";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
+import {
+  createTransaction,
   snapshotFinancials,
   snapshotMarket,
+  updatePosition,
   updateRevenues,
   updateUsageMetrics,
 } from "../common/helpers";
@@ -74,10 +85,12 @@ export function handleDepositMade(event: DepositMade): void {
   const owner = event.params.owner.toHexString();
 
   const market = getOrCreateMarket(marketID, event);
+  const account = getOrCreateAccount(owner);
   const creditLineContract = CreditLineContract.bind(
     Address.fromString(market._creditLine!)
   );
   market.inputTokenBalance = creditLineContract.balance();
+
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
   market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(amountUSD);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
@@ -98,6 +111,32 @@ export function handleDepositMade(event: DepositMade): void {
   snapshotMarket(market, amountUSD, event, TransactionType.DEPOSIT);
   snapshotFinancials(protocol, amountUSD, event, TransactionType.DEPOSIT);
   updateUsageMetrics(protocol, owner, event, TransactionType.DEPOSIT);
+
+  const poolTokensContract = PoolTokensContract.bind(
+    Address.fromString(market._poolToken!)
+  );
+  const accountBalance = poolTokensContract
+    .tokens(event.params.tokenId)
+    .getPrincipalAmount();
+  const positionID = updatePosition(
+    protocol,
+    market,
+    account,
+    accountBalance,
+    PositionSide.LENDER,
+    TransactionType.DEPOSIT,
+    event
+  );
+
+  createTransaction(
+    TransactionType.DEPOSIT,
+    market,
+    owner,
+    positionID,
+    amount,
+    amountUSD,
+    event
+  );
 
   // save a mapping of tokenID to market (tranched pool) id for backer emission reward
   const tokenId = event.params.tokenId.toHexString();
@@ -143,7 +182,10 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
     event.params.principalWithdrawn.divDecimal(USDC_DECIMALS);
   const owner = event.params.owner.toHexString();
 
+  const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(marketID, event);
+  const account = getOrCreateAccount(owner);
+
   const creditLineContract = CreditLineContract.bind(
     Address.fromString(market._creditLine!)
   );
@@ -153,7 +195,6 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
   market.save();
 
-  const protocol = getOrCreateProtocol();
   protocol.totalDepositBalanceUSD =
     protocol.totalDepositBalanceUSD.minus(principalAmountUSD);
   protocol.totalValueLockedUSD = protocol.totalDepositBalanceUSD;
@@ -167,6 +208,32 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
     TransactionType.WITHDRAW
   );
   updateUsageMetrics(protocol, owner, event, TransactionType.WITHDRAW);
+
+  const poolTokensContract = PoolTokensContract.bind(
+    Address.fromString(market._poolToken!)
+  );
+  const accountBalance = poolTokensContract
+    .tokens(event.params.tokenId)
+    .getPrincipalAmount();
+  const positionID = updatePosition(
+    protocol,
+    market,
+    account,
+    accountBalance,
+    PositionSide.LENDER,
+    TransactionType.WITHDRAW,
+    event
+  );
+
+  createTransaction(
+    TransactionType.WITHDRAW,
+    market,
+    owner,
+    positionID,
+    amount,
+    amountUSD,
+    event
+  );
 
   //
   initOrUpdateTranchedPool(event.address, event.block.timestamp);
@@ -234,12 +301,14 @@ export function handleDrawdownMade(event: DrawdownMade): void {
   const amountUSD = amount.divDecimal(USDC_DECIMALS);
   const borrower = event.params.borrower.toHexString();
 
+  const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(marketID, event);
+  const account = getOrCreateAccount(borrower);
+
   market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(amountUSD);
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
   market.save();
 
-  const protocol = getOrCreateProtocol();
   protocol.totalBorrowBalanceUSD =
     protocol.totalBorrowBalanceUSD.plus(amountUSD);
   protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(amountUSD);
@@ -248,6 +317,30 @@ export function handleDrawdownMade(event: DrawdownMade): void {
   snapshotMarket(market, amountUSD, event, TransactionType.BORROW);
   snapshotFinancials(protocol, amountUSD, event, TransactionType.BORROW);
   updateUsageMetrics(protocol, borrower, event, TransactionType.BORROW);
+
+  const creditLineContract = CreditLineContract.bind(
+    Address.fromString(market._creditLine!)
+  );
+  const accountBalance = creditLineContract.balance();
+  const positionID = updatePosition(
+    protocol,
+    market,
+    account,
+    accountBalance,
+    PositionSide.BORROWER,
+    TransactionType.BORROW,
+    event
+  );
+
+  createTransaction(
+    TransactionType.BORROW,
+    market,
+    borrower,
+    positionID,
+    amount,
+    amountUSD,
+    event
+  );
 
   //
   const tranchedPool = assert(TranchedPool.load(marketID));
@@ -279,13 +372,15 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   const market = getOrCreateMarket(marketID, event);
   if (market._borrower != payer) {
     // if payer != borrower, use borrower for position
+    log.error("[]payer {} != borrower {}", [payer, market._borrower]);
   }
+  const account = getOrCreateAccount(market._borrower!);
 
   market.totalBorrowBalanceUSD =
     market.totalBorrowBalanceUSD.minus(principleAmountUSD);
-  if (event.params.remainingAmount.equals(BIGINT_ZERO)) {
-    // close borrow position
-  }
+  protocol.totalBorrowBalanceUSD =
+    protocol.totalBorrowBalanceUSD.minus(principleAmountUSD);
+
   // scale interest rate to APR
   // since interest is not compounding, apply a linear scaler based on time
   const InterestRateScaler = BigInt.fromI32(SECONDS_PER_YEAR).divDecimal(
@@ -312,6 +407,9 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   market.rates = [borrowerInterestRate.id, lenderInterestRate.id];
   market._interestTimestamp = event.block.timestamp;
 
+  market.save();
+  protocol.save();
+
   updateRevenues(
     protocol,
     market,
@@ -334,6 +432,30 @@ export function handlePaymentApplied(event: PaymentApplied): void {
     TransactionType.REPAY
   );
   updateUsageMetrics(protocol, payer, event, TransactionType.REPAY);
+
+  const creditLineContract = CreditLineContract.bind(
+    Address.fromString(market._creditLine!)
+  );
+  const accountBalance = creditLineContract.balance();
+  const positionID = updatePosition(
+    protocol,
+    market,
+    account,
+    accountBalance,
+    PositionSide.BORROWER,
+    TransactionType.REPAY,
+    event
+  );
+
+  createTransaction(
+    TransactionType.REPAY,
+    market,
+    market._borrower!,
+    positionID,
+    amount,
+    principleAmountUSD,
+    event
+  );
 
   //
   getOrInitUser(event.params.payer); // ensures that a wallet making a payment is correctly considered a user

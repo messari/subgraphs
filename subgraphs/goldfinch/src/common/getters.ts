@@ -14,6 +14,8 @@ import {
   RewardToken,
   User,
   _PoolToken,
+  _PositionCounter,
+  Position,
 } from "../../generated/schema";
 import {
   Network,
@@ -36,6 +38,7 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   USDC_ADDRESS,
   GFI_ADDRESS,
+  INT_ONE,
 } from "./constants";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
 import { prefixID } from "./utils";
@@ -428,7 +431,6 @@ export function getOrCreateAccount(accountID: string): Account {
     account.positionCount = INT_ZERO;
     account.openPositionCount = INT_ZERO;
     account.closedPositionCount = INT_ZERO;
-    account._positionIDList = [];
     account.save();
   }
 
@@ -461,4 +463,99 @@ export function getSnapshotRates(
     snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
+}
+
+export function getOrCreatePositionCounter(
+  accountID: string,
+  marketID: string,
+  side: string
+): _PositionCounter {
+  const counterID = `${accountID}-${marketID}-${side}`;
+  let positionCounter = _PositionCounter.load(counterID);
+  if (!positionCounter) {
+    positionCounter = new _PositionCounter(counterID);
+    positionCounter.nextCount = INT_ZERO;
+    positionCounter.save();
+  }
+  return positionCounter;
+}
+
+///////////////////////////
+///////// Helpers /////////
+///////////////////////////
+export function getNextPositionCount(
+  accountID: string,
+  marketID: string,
+  side: string
+): i32 {
+  const positionCounter = getOrCreatePositionCounter(accountID, marketID, side);
+  return positionCounter.nextCount;
+}
+
+// find the open position for the matching urn/ilk/side combination
+// there should be only one or none
+export function getOpenPosition(
+  accountID: string,
+  marketID: string,
+  side: string
+): Position | null {
+  const positionCounter = getOrCreatePositionCounter(accountID, marketID, side);
+  log.info(
+    "[getOpenPosition]Finding open position for acount {}/market {}/side {}",
+    [accountID, marketID, side]
+  );
+  const nextCount = positionCounter.nextCount;
+  for (let counter = nextCount; counter >= 0; counter--) {
+    const positionID = `${positionCounter.id}-${counter}`;
+    const position = Position.load(positionID);
+    if (position) {
+      const hashClosed =
+        position.hashClosed != null ? position.hashClosed! : "null";
+      const balance = position.balance.toString();
+      const account = position.account;
+      // position is open
+      if (position.hashClosed == null) {
+        log.info(
+          "[getOpenPosition]found open position counter={}, position.id={}, account={}, balance={}, hashClosed={}",
+          [counter.toString(), positionID, account, balance, hashClosed]
+        );
+        return position;
+      }
+    }
+  }
+  log.info(
+    "[getOpenPosition]No open position found for account {}/market {}/side {}",
+    [accountID, marketID, side]
+  );
+
+  return null;
+}
+
+export function getNewPosition(
+  accountID: string,
+  marketID: string,
+  side: string,
+  event: ethereum.Event
+): Position {
+  const positionCounter = getOrCreatePositionCounter(accountID, marketID, side);
+  positionCounter.nextCount += INT_ONE;
+  positionCounter.save();
+
+  const positionID = `${positionCounter.id}-${positionCounter.nextCount}`;
+  const position = new Position(positionID);
+  position.account = accountID;
+  position.market = marketID;
+  position.side = side;
+  position.hashOpened = event.transaction.hash.toHexString();
+  position.blockNumberOpened = event.block.number;
+  position.timestampOpened = event.block.timestamp;
+  position.side = side;
+  position.isCollateral = false;
+  position.balance = BIGINT_ZERO;
+  position.depositCount = 0;
+  position.withdrawCount = 0;
+  position.borrowCount = 0;
+  position.repayCount = 0;
+  position.liquidationCount = 0;
+  return position;
 }

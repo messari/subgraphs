@@ -4,22 +4,8 @@ import {
   ethereum,
   BigInt,
   log,
-  Entity,
 } from "@graphprotocol/graph-ts";
-import {
-  getOrCreateToken,
-  getOrCreateMarket,
-  getOrCreateInterestRate,
-  getOrCreateLendingProtocol,
-  getOrCreateMarketDailySnapshot,
-  getOrCreateMarketHourlySnapshot,
-  getOrCreateFinancials,
-  getSnapshotRates,
-  getOrCreateUsageDailySnapshot,
-  getOrCreateUsageHourlySnapshot,
-  getOrCreateAccount,
-  getOrCreateFinancialsDailySnapshot,
-} from "./getters";
+import { getOrCreateToken, getOrCreateInterestRate } from "./getters";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -30,9 +16,14 @@ import {
   SECONDS_PER_DAY,
   INT_ZERO,
   INT_ONE,
+  BIGINT_ZERO,
 } from "./constants";
-import { bigIntToBDUseDecimals } from "./utils";
-import { LendingProtocol, Market } from "../../generated/schema";
+import {
+  LendingProtocol,
+  Market,
+  Position,
+  PositionSnapshot,
+} from "../../generated/schema";
 import {
   Account,
   ActiveAccount,
@@ -57,35 +48,69 @@ export function createTransaction(
   const hash = event.transaction.hash.toHexString();
   const logIndex = event.logIndex;
   const id = `${hash}-${logIndex}`;
-  let entity: Borrow | Deposit | Repay | Withdraw;
+  //NOT allowed: let entity: Borrow | Deposit | Repay | Withdraw;
   if (transactionType == TransactionType.BORROW) {
-    entity = new Borrow(id);
+    const entity = new Borrow(id);
+    entity.hash = hash;
+    entity.logIndex = logIndex.toI32();
+    entity.nonce = event.transaction.nonce;
+    entity.market = market.id;
+    entity.asset = market.inputToken;
+    entity.account = accountID;
+    entity.position = positionID;
+    entity.amount = amount;
+    entity.amountUSD = amountUSD;
+    entity.timestamp = event.block.timestamp;
+    entity.blockNumber = event.block.timestamp;
+    entity.save();
   } else if (transactionType == TransactionType.DEPOSIT) {
-    entity = new Deposit(id);
+    const entity = new Deposit(id);
+    entity.hash = hash;
+    entity.logIndex = logIndex.toI32();
+    entity.nonce = event.transaction.nonce;
+    entity.market = market.id;
+    entity.asset = market.inputToken;
+    entity.account = accountID;
+    entity.position = positionID;
+    entity.amount = amount;
+    entity.amountUSD = amountUSD;
+    entity.timestamp = event.block.timestamp;
+    entity.blockNumber = event.block.timestamp;
+    entity.save();
   } else if (transactionType == TransactionType.REPAY) {
-    entity = new Repay(id);
+    const entity = new Repay(id);
+    entity.hash = hash;
+    entity.logIndex = logIndex.toI32();
+    entity.nonce = event.transaction.nonce;
+    entity.market = market.id;
+    entity.asset = market.inputToken;
+    entity.account = accountID;
+    entity.position = positionID;
+    entity.amount = amount;
+    entity.amountUSD = amountUSD;
+    entity.timestamp = event.block.timestamp;
+    entity.blockNumber = event.block.timestamp;
+    entity.save();
   } else if (transactionType == TransactionType.WITHDRAW) {
-    entity = new Withdraw(id);
+    const entity = new Withdraw(id);
+    entity.hash = hash;
+    entity.logIndex = logIndex.toI32();
+    entity.nonce = event.transaction.nonce;
+    entity.market = market.id;
+    entity.asset = market.inputToken;
+    entity.account = accountID;
+    entity.position = positionID;
+    entity.amount = amount;
+    entity.amountUSD = amountUSD;
+    entity.timestamp = event.block.timestamp;
+    entity.blockNumber = event.block.timestamp;
+    entity.save();
   } else {
     log.error("[createTransaction]Unknown transaction type {}", [
       transactionType,
     ]);
     return;
   }
-
-  entity.hash = hash;
-  entity.logIndex = logIndex.toI32();
-  entity.nonce = event.transaction.nonce;
-  entity.market = market.id;
-  entity.asset = market.inputToken;
-  entity.account = accountID;
-  entity.position = positionID;
-  entity.amount = amount;
-  entity.amountUSD = amountUSD;
-  entity.timestamp = event.block.timestamp;
-  entity.blockNumber = event.block.timestamp;
-
-  entity.save();
 }
 
 export function updatePrices(
@@ -550,4 +575,95 @@ function updateTransactionCount(
 
   hourlyUsage.save();
   dailyUsage.save();
+}
+
+// A series of side effects on position added
+// They include:
+// * Create a new position when needed or reuse the exisitng position
+// * Update position related data in protocol, market, account
+// * Take position snapshot
+export function updatePosition(
+  protocol: LendingProtocol,
+  market: Market,
+  account: Account,
+  balance: BigInt, //new position balance
+  side: string,
+  transactionType: string,
+  event: ethereum.Event
+): string {
+  let openPosition = getOpenPosition(account.id, market.id, side);
+  if (!openPosition) {
+    openPosition = getNewPosition(account.id, market.id, side, event);
+    account.positionCount += INT_ONE;
+    account.openPositionCount += INT_ONE;
+    market.positionCount += INT_ONE;
+    market.openPositionCount += INT_ONE;
+    protocol.cumulativePositionCount += 1;
+    protocol.openPositionCount += 1;
+
+    if (transactionType == TransactionType.DEPOSIT) {
+      market.lendingPositionCount += INT_ONE;
+    } else if (transactionType == TransactionType.BORROW) {
+      market.borrowingPositionCount += INT_ONE;
+    }
+  }
+  openPosition.balance = balance;
+
+  if (openPosition.balance.equals(BIGINT_ZERO)) {
+    openPosition.hashClosed = event.transaction.hash.toHexString();
+    openPosition.timestampClosed = event.block.timestamp;
+    openPosition.blockNumberClosed = event.block.number;
+
+    account.closedPositionCount += INT_ONE;
+    market.closedPositionCount += INT_ONE;
+  }
+
+  switch (transactionType) {
+    case TransactionType.DEPOSIT:
+      openPosition.depositCount += INT_ONE;
+      break;
+    case TransactionType.WITHDRAW:
+      openPosition.withdrawCount += INT_ONE;
+      break;
+    case TransactionType.BORROW:
+      openPosition.borrowCount += INT_ONE;
+      break;
+    case TransactionType.REPAY:
+      openPosition.repayCount += INT_ONE;
+      break;
+  }
+  openPosition.save();
+  account.save();
+  market.save();
+  protocol.save();
+
+  // take position snapshot
+  snapshotPosition(openPosition, event);
+
+  return openPosition.id;
+}
+
+export function snapshotPosition(
+  position: Position,
+  event: ethereum.Event
+): void {
+  const txHash: string = event.transaction.hash.toHexString();
+  const snapshotID = `${position.id}-${txHash}-${event.logIndex.toString()}`;
+  let snapshot = PositionSnapshot.load(snapshotID);
+  if (snapshot == null) {
+    snapshot = new PositionSnapshot(snapshotID);
+    snapshot.hash = txHash;
+    snapshot.logIndex = event.logIndex.toI32();
+    snapshot.nonce = event.transaction.nonce;
+    snapshot.position = position.id;
+    snapshot.balance = position.balance;
+    snapshot.blockNumber = event.block.number;
+    snapshot.timestamp = event.block.timestamp;
+    snapshot.save();
+  } else {
+    log.error(
+      "[snapshotPosition]Position snapshot {} already exists for position {} at tx hash {}",
+      [snapshotID, position.id, txHash]
+    );
+  }
 }
