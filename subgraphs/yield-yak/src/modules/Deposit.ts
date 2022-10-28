@@ -1,24 +1,20 @@
 import { Address, ethereum, BigInt, BigDecimal, log, dataSource } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/schema";
-import { defineFee, getOrCreateUsageMetricsDailySnapshot, getOrCreateUsageMetricsHourlySnapshot, getOrCreateYieldAggregator } from "../common/initializers";
+import { getOrCreateUsageMetricsDailySnapshot, getOrCreateUsageMetricsHourlySnapshot, getOrCreateYieldAggregator } from "../common/initializers";
 import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
-import { DEFUALT_AMOUNT, BIGINT_TEN, ZERO_BIGINT, BIGDECIMAL_HUNDRED, ZERO_BIGDECIMAL } from "../helpers/constants";
+import { DEFUALT_AMOUNT, BIGINT_TEN, ZERO_BIGINT, ZERO_BIGDECIMAL } from "../helpers/constants";
 import * as utils from "../common/utils";
 import { Token } from "../../generated/schema";
 import { Deposit } from "../../generated/schema";
-import { updateRevenueSnapshots } from "./Revenue";
-import { getUsdPricePerToken } from "../Prices";
-import { getPriceOfOutputTokens } from "./Price";
 import { calculatePriceInUSD } from "../calculators/priceInUSDCalculator";
-import { convertBigIntToBigDecimal } from "../helpers/converters";
 import { calculateOutputTokenPriceInUSD } from "../calculators/outputTokenPriceInUSDCalculator";
+import { convertBigIntToBigDecimal } from "../helpers/converters";
 
 export function _Deposit(
   contractAddress: Address,
   transaction: ethereum.Transaction,
   block: ethereum.Block,
   vault: Vault,
-  amount: BigInt,
   depositAmount: BigInt
 ): void {
   const vaultAddress = Address.fromString(vault.id);
@@ -38,7 +34,7 @@ export function _Deposit(
 
   let inputToken = Token.load(vault.inputToken);
   let inputTokenAddress = Address.fromString(vault.inputToken);
-  let depositAmountUSD = calculatePriceInUSD(inputTokenAddress, amount);
+  let depositAmountUSD = calculatePriceInUSD(inputTokenAddress, depositAmount);
   let inputTokenDecimals = BIGINT_TEN.pow(
     inputToken!.decimals as u8
   ).toBigDecimal();
@@ -50,9 +46,18 @@ export function _Deposit(
     .readValue<BigInt>(strategyContract.try_getDepositTokensForShares(DEFUALT_AMOUNT), ZERO_BIGINT)
     .toBigDecimal();
 
+  // Update hourly and daily deposit transaction count
+  const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
+  const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
+
+  metricsDailySnapshot.dailyDepositCount += 1;
+  metricsHourlySnapshot.hourlyDepositCount += 1;
+
+  metricsDailySnapshot.save();
+  metricsHourlySnapshot.save();
   vault.save();
 
-  const depositFeePercentage = defineFee(contractAddress, "-developerFee");
+  utils.updateProtocolTotalValueLockedUSD();
 
   createDepositTransaction(
     contractAddress,
@@ -63,50 +68,7 @@ export function _Deposit(
     depositAmount,
     depositAmountUSD
   );
-
-  let depositFeeUSD = depositAmountUSD
-    .times(depositFeePercentage.feePercentage!)
-    .div(BIGDECIMAL_HUNDRED);
-
-  updateRevenueSnapshots(
-    vault,
-    ZERO_BIGDECIMAL,
-    depositFeeUSD,
-    block,
-    contractAddress
-  );
-
-  utils.updateProtocolTotalValueLockedUSD(contractAddress);
-
-  // Update hourly and daily deposit transaction count
-  const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block, contractAddress);
-  const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block, contractAddress);
-
-  metricsDailySnapshot.dailyDepositCount += 1;
-  metricsHourlySnapshot.hourlyDepositCount += 1;
-
-  metricsDailySnapshot.save();
-  metricsHourlySnapshot.save();
-  // updateFinancialsAfterDeposit(block, depositFeeUSD);
 }
-
-// export function updateFinancialsAfterDeposit(block: ethereum.Block, allDistributedRewardInUSD: BigDecimal): void {
-//   const financialMetrics = getOrCreateFinancialDailySnapshots(block);
-//   const protocol = getOrCreateYieldAggregator();
-
-//   // TotalRevenueUSD Metrics
-//   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(allDistributedRewardInUSD);
-//   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(allDistributedRewardInUSD);
-//   financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-
-//   // ProtocolSideRevenueUSD Metrics
-//   financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(allDistributedRewardInUSD);
-//   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(allDistributedRewardInUSD);
-//   financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-
-//   financialMetrics.save();
-//   protocol.save();
-// }
 
 export function createDepositTransaction(
   contractAddress: Address,
@@ -125,7 +87,7 @@ export function createDepositTransaction(
 
     depositTransaction.vault = vaultAddress.toHexString();
 
-    const protocol = getOrCreateYieldAggregator(contractAddress);
+    const protocol = getOrCreateYieldAggregator();
     depositTransaction.protocol = protocol.id;
 
     depositTransaction.to = contractAddress.toHexString();

@@ -1,26 +1,35 @@
-import { getOrCreateAccount, getOrCreateFinancialDailySnapshots, getOrCreateUsageMetricsDailySnapshot, getOrCreateUsageMetricsHourlySnapshot, getOrCreateVault, getOrCreateVaultsDailySnapshots, getOrCreateVaultsHourlySnapshots, getOrCreateYieldAggregator } from "../common/initializers";
+import {
+  getOrCreateAccount,
+  getOrCreateFinancialDailySnapshots, getOrCreateUsageMetricsDailySnapshot, getOrCreateUsageMetricsHourlySnapshot, getOrCreateVault, getOrCreateVaultsDailySnapshots, getOrCreateVaultsHourlySnapshots, getOrCreateYieldAggregator
+} from "../common/initializers";
 import { ethereum, Address } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY } from "../helpers/constants";
-import { ActiveAccount } from "../../generated/schema";
+import { ActiveAccount, Vault } from "../../generated/schema";
 
-export function updateFinancials(block: ethereum.Block, contractAddress: Address): void {
-  const financialMetrics = getOrCreateFinancialDailySnapshots(block, contractAddress);
-  const protocol = getOrCreateYieldAggregator(contractAddress);
+export function updateFinancials(block: ethereum.Block): void {
+  const financialMetrics = getOrCreateFinancialDailySnapshots(block);
+  const protocol = getOrCreateYieldAggregator();
 
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
+
   financialMetrics.blockNumber = block.number;
   financialMetrics.timestamp = block.timestamp;
 
   financialMetrics.save();
 }
 
-export function updateUsageMetrics(block: ethereum.Block, from: Address, contractAddress: Address): void {
-  const protocol = getOrCreateYieldAggregator(contractAddress);
-  const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block, contractAddress);
-  const usageMetricsHourly = getOrCreateUsageMetricsHourlySnapshot(block, contractAddress);
+export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
+  getOrCreateAccount(from.toHexString());
+
+  const protocol = getOrCreateYieldAggregator();
+  const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block);
+  const usageMetricsHourly = getOrCreateUsageMetricsHourlySnapshot(block);
 
   usageMetricsDaily.blockNumber = block.number;
   usageMetricsHourly.blockNumber = block.number;
@@ -34,7 +43,9 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address, contrac
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (block.timestamp.toI64() / SECONDS_PER_DAY)
+  let dailyActiveAccountId = (
+    block.timestamp.toI64() / SECONDS_PER_DAY
+  )
     .toString()
     .concat("-")
     .concat(from.toHexString());
@@ -54,27 +65,17 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address, contrac
 }
 
 export function updateVaultSnapshots(contractAddress: Address, block: ethereum.Block): void {
-  let vault = getOrCreateVault(contractAddress, block);
+  let vaultId = contractAddress.toHexString()
+  let vault = Vault.load(vaultId)!;
 
   const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
-    contractAddress.toHexString(),
-    block,
-    contractAddress
+    vaultId,
+    block
   );
   const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    contractAddress.toHexString(),
-    block,
-    contractAddress
+    vaultId,
+    block
   );
-
-  vaultDailySnapshots.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD;
-  vaultHourlySnapshots.cumulativeSupplySideRevenueUSD = vault.cumulativeSupplySideRevenueUSD;
-
-  vaultDailySnapshots.cumulativeProtocolSideRevenueUSD = vault.cumulativeProtocolSideRevenueUSD;
-  vaultHourlySnapshots.cumulativeProtocolSideRevenueUSD = vault.cumulativeProtocolSideRevenueUSD;
-
-  vaultDailySnapshots.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
-  vaultHourlySnapshots.cumulativeTotalRevenueUSD = vault.cumulativeTotalRevenueUSD;
 
   vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
@@ -90,6 +91,12 @@ export function updateVaultSnapshots(contractAddress: Address, block: ethereum.B
 
   vaultDailySnapshots.pricePerShare = vault.pricePerShare;
   vaultHourlySnapshots.pricePerShare = vault.pricePerShare;
+
+  vaultDailySnapshots.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  vaultHourlySnapshots.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+
+  vaultDailySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+  vaultHourlySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
 
   vaultDailySnapshots.blockNumber = block.number;
   vaultHourlySnapshots.blockNumber = block.number;

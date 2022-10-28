@@ -1,12 +1,11 @@
-import { Address, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
 import { DEFUALT_AMOUNT, ZERO_BIGDECIMAL } from "../helpers/constants";
 import { calculatePriceInUSD } from "./priceInUSDCalculator";
-import { initVault } from "../initializers/vaultInitializer";
+import { getOrCreateVault } from "../common/initializers";
 
 export function calculateDistributedReward(contractAddress: Address,
-  timestamp: BigInt,
-  blockNumber: BigInt,
+  block: ethereum.Block,
   newTotalSupply: BigInt
 ): BigInt {
   const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
@@ -18,8 +17,8 @@ export function calculateDistributedReward(contractAddress: Address,
     depositTokenPrice = calculatePriceInUSD(yakStrategyV2Contract.depositToken(), DEFUALT_AMOUNT);
   }
 
-  const vault = initVault(contractAddress, timestamp, blockNumber);
+  const vault = getOrCreateVault(contractAddress, block);
   const beforeReinvestSupply = vault.outputTokenSupply;
-  
-  return newTotalSupply.minus(beforeReinvestSupply!);
+
+  return newTotalSupply.minus(beforeReinvestSupply);
 }

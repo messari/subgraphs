@@ -1,4 +1,4 @@
-import { Address, BigInt, BigDecimal, bigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigInt, BigDecimal, bigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
 import { ZERO_BIGDECIMAL, DEFUALT_AMOUNT } from "../helpers/constants";
 import { calculatePriceInUSD } from "./priceInUSDCalculator";
@@ -6,9 +6,7 @@ import { calculateDistributedReward } from "./distributedRewardCalculator";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
 
 export function calculateDistributedRewardInUSD(contractAddress: Address,
-  timestamp: BigInt,
-  blockNumber: BigInt,
-  newTotalSupply: BigInt
+  distributedReward: BigInt,
 ): BigDecimal {
   const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
   let depositTokenPrice: BigDecimal;
@@ -25,17 +23,6 @@ export function calculateDistributedRewardInUSD(contractAddress: Address,
     allFees = ZERO_BIGDECIMAL;
   } else {
     allFees = (yakStrategyV2Contract.DEV_FEE_BIPS().plus(yakStrategyV2Contract.ADMIN_FEE_BIPS().plus(yakStrategyV2Contract.REINVEST_REWARD_BIPS()))).toBigDecimal().div(bigDecimal.fromString("1000"));
-  }
-
-  const distributedReward = calculateDistributedReward(contractAddress, timestamp, blockNumber, newTotalSupply);
-  let allDistributedReward: BigDecimal;
-
-  if (allFees != ZERO_BIGDECIMAL) {
-    allDistributedReward = distributedReward
-      .toBigDecimal()
-      .div(allFees);
-  } else {
-    allDistributedReward = ZERO_BIGDECIMAL;
   }
 
   return depositTokenPrice.times(convertBigIntToBigDecimal(distributedReward, 18));

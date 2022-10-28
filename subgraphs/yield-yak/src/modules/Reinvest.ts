@@ -15,10 +15,16 @@ export function _Reinvest(
 ): void {
     const numberOfRewardTokens = vault.rewardTokens!.length;
 
-    const distributedReward = calculateDistributedReward(contractAddress, block.timestamp, block.number, newTotalSupply);
-    const distributedRewardInUSD = calculateDistributedRewardInUSD(contractAddress, block.timestamp, block.number, newTotalSupply);
-    const protocolRewardInUSD = calculateProtocolRewardInUSD(contractAddress, block.timestamp, block.number, newTotalSupply);
-    const allDistributedRewardInUSD = calculateAllDistributedRewardInUSD(contractAddress, block.timestamp, block.number, newTotalSupply);
+    const distributedReward = calculateDistributedReward(contractAddress, block, newTotalSupply);
+    const distributedRewardInUSD = calculateDistributedRewardInUSD(contractAddress, distributedReward);
+    const protocolRewardInUSD = calculateProtocolRewardInUSD(contractAddress, distributedReward);
+    const allDistributedRewardInUSD = calculateAllDistributedRewardInUSD(contractAddress, distributedReward);
+
+    log.error(`distributedReward: ${distributedReward.toString()},
+    distributedRewardInUSD: ${distributedRewardInUSD.toString()},
+    protocolRewardInUSD: ${protocolRewardInUSD.toString()},
+    allDistributedRewardInUSD: ${allDistributedRewardInUSD.toString()}
+    `, [])
 
     if (numberOfRewardTokens > 0) {
         for (let i = 0; i < numberOfRewardTokens; i++) {
@@ -29,48 +35,44 @@ export function _Reinvest(
     }
     vault.save();
 
-    log.error(`allDistributedRewardInUSD: ${allDistributedRewardInUSD.toString()}`, []);
-    log.error(`distributedRewardInUSD: ${distributedRewardInUSD.toString()}`, []);
-    log.error(`protocolRewardInUSD: ${protocolRewardInUSD.toString()}`, []);
-
-    updateFinancialsRewardAfterReinvest(block, allDistributedRewardInUSD, distributedRewardInUSD, protocolRewardInUSD);
+    updateFinancialsRewardAfterReinvest(block, distributedRewardInUSD, distributedRewardInUSD, distributedRewardInUSD);
 }
 
 export function updateFinancialsRewardAfterReinvest(
     block: ethereum.Block,
-    totalRevenueUSD: BigDecimal,
-    supplySideRevenueUSD: BigDecimal,
-    protocolSideRevenueUSD: BigDecimal
+    allDistributedRewardInUSD: BigDecimal,
+    distributedRewardInUSD: BigDecimal,
+    protocolRewardInUSD: BigDecimal
 ): void {
     const financialMetrics = getOrCreateFinancialDailySnapshots(block);
     const protocol = getOrCreateYieldAggregator();
 
     // TotalRevenueUSD Metrics
     financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
-        totalRevenueUSD
+        allDistributedRewardInUSD
     );
     protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-        totalRevenueUSD
+        allDistributedRewardInUSD
     );
     financialMetrics.cumulativeTotalRevenueUSD =
         protocol.cumulativeTotalRevenueUSD;
 
     // SupplySideRevenueUSD Metrics
     financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(
-        supplySideRevenueUSD
+        distributedRewardInUSD
     );
     protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-        supplySideRevenueUSD
+        distributedRewardInUSD
     );
     financialMetrics.cumulativeSupplySideRevenueUSD =
         protocol.cumulativeSupplySideRevenueUSD;
 
     // ProtocolSideRevenueUSD Metrics
     financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
-        protocolSideRevenueUSD
+        protocolRewardInUSD
     );
     protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-        protocolSideRevenueUSD
+        protocolRewardInUSD
     );
     financialMetrics.cumulativeProtocolSideRevenueUSD =
         protocol.cumulativeProtocolSideRevenueUSD;

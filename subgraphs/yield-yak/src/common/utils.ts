@@ -1,6 +1,9 @@
 import { ethereum, Address, log, json, JSONValue } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/schema";
-import { BIGDECIMAL_HUNDRED, ZERO_BIGDECIMAL } from "../helpers/constants";
+import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
+import { calculatePriceInUSD } from "../calculators/priceInUSDCalculator";
+import { BIGDECIMAL_HUNDRED, DEFUALT_AMOUNT, ZERO_BIGDECIMAL } from "../helpers/constants";
+import { convertBigIntToBigDecimal } from "../helpers/converters";
 import { getOrCreateYieldAggregator } from "./initializers";
 
 export function readValue<T>(
@@ -11,7 +14,7 @@ export function readValue<T>(
 }
 
 export function updateProtocolAfterNewVault(vaultAddress: Address): void {
-  const protocol = getOrCreateYieldAggregator(vaultAddress);
+  const protocol = getOrCreateYieldAggregator();
 
   let vaultIds = protocol._vaultIds;
   vaultIds.push(vaultAddress.toHexString())
@@ -23,15 +26,18 @@ export function updateProtocolAfterNewVault(vaultAddress: Address): void {
   protocol.save();
 }
 
-export function updateProtocolTotalValueLockedUSD(contractAddress: Address): void {
-  const protocol = getOrCreateYieldAggregator(contractAddress);
+export function updateProtocolTotalValueLockedUSD(): void {
+  const protocol = getOrCreateYieldAggregator();
   const vaultIds = protocol._vaultIds;
 
   let totalValueLockedUSD = ZERO_BIGDECIMAL;
   for (let vaultIdx = 0; vaultIdx < vaultIds.length; vaultIdx++) {
     const vault = Vault.load(vaultIds[vaultIdx]);
 
-    if (!vault) continue;
+    if (!vault) {
+      continue;
+    }
+
     totalValueLockedUSD = totalValueLockedUSD.plus(vault.totalValueLockedUSD);
   }
 

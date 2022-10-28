@@ -2,12 +2,9 @@ import { Address, BigInt, BigDecimal, bigDecimal } from "@graphprotocol/graph-ts
 import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
 import { ZERO_BIGDECIMAL, DEFUALT_AMOUNT } from "../helpers/constants";
 import { calculatePriceInUSD } from "./priceInUSDCalculator";
-import { calculateDistributedReward } from "./distributedRewardCalculator";
 
 export function calculateAllDistributedRewardInUSD(contractAddress: Address,
-  timestamp: BigInt,
-  blockNumber: BigInt,
-  newTotalSupply: BigInt
+  distributedReward: BigInt,
 ): BigDecimal {
   const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
   let depositTokenPrice: BigDecimal;
@@ -36,7 +33,6 @@ export function calculateAllDistributedRewardInUSD(contractAddress: Address,
   if (allFees == ZERO_BIGDECIMAL) {
     allDistributedReward = ZERO_BIGDECIMAL;
   } else {
-    const distributedReward = calculateDistributedReward(contractAddress, timestamp, blockNumber, newTotalSupply);
     allDistributedReward = distributedReward
       .toBigDecimal()
       .div(allFees);

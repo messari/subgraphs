@@ -103,9 +103,9 @@ export function initVault(contractAddress: Address, timestamp: BigInt, blockNumb
 }
 
 function defineRewardToken(rewardTokenAddress: Address, blockNumber: BigInt): RewardToken {
-  let rewardToken = RewardToken.load("DEPOSIT-".concat(rewardTokenAddress.toHexString()));
+  let rewardToken = RewardToken.load(rewardTokenAddress.toHexString());
   if (rewardToken == null) {
-    rewardToken = new RewardToken("DEPOSIT-".concat(rewardTokenAddress.toHexString()));
+    rewardToken = new RewardToken(rewardTokenAddress.toHexString());
   }
   rewardToken.token = initInputToken(rewardTokenAddress, blockNumber).id;
   rewardToken.type = "DEPOSIT";

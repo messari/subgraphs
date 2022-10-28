@@ -5,9 +5,7 @@ import { calculatePriceInUSD } from "./priceInUSDCalculator";
 import { calculateDistributedReward } from "./distributedRewardCalculator";
 
 export function calculateProtocolRewardInUSD(contractAddress: Address,
-  timestamp: BigInt,
-  blockNumber: BigInt,
-  newTotalSupply: BigInt
+  distributedReward: BigInt
 ): BigDecimal {
   const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
   let depositTokenPrice: BigDecimal;
@@ -29,7 +27,6 @@ export function calculateProtocolRewardInUSD(contractAddress: Address,
       .div(bigDecimal.fromString("1000"));
   }
 
-  const distributedReward = calculateDistributedReward(contractAddress, timestamp, blockNumber, newTotalSupply);
   let allDistributedReward: BigDecimal;
 
   if (allFees != ZERO_BIGDECIMAL) {

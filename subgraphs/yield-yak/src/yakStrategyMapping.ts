@@ -7,9 +7,9 @@ import {
   Withdraw as WithdrawEvent
 } from "../generated/YakStrategyV2/YakStrategyV2";
 import { getOrCreateVault } from "./common/initializers";
-import { MAX_UINT256 } from "./helpers/constants";
 import { _Deposit } from "./modules/Deposit";
 import { updateFinancials, updateUsageMetrics, updateVaultSnapshots } from "./modules/Metrics";
+import { _Reinvest } from "./modules/Reinvest";
 import { _Withdraw } from "./modules/Withdraw";
 
 export function handleDeposit(event: DepositEvent): void {
@@ -23,12 +23,11 @@ export function handleDeposit(event: DepositEvent): void {
       event.block,
       vault,
       event.params.amount,
-      MAX_UINT256
     );
   }
 
-  updateFinancials(event.block, contractAddress);
-  updateUsageMetrics(event.block, event.transaction.from, contractAddress);
+  updateFinancials(event.block);
+  updateUsageMetrics(event.block, event.transaction.from);
   updateVaultSnapshots(contractAddress, event.block);
 }
 
@@ -44,18 +43,32 @@ export function handleWithdraw(event: WithdrawEvent): void {
       event.transaction,
       event.block,
       vault,
-      withdrawAmount,
-      MAX_UINT256
+      withdrawAmount
     );
   }
 
-  updateFinancials(event.block, contractAddress);
-  updateUsageMetrics(event.block, event.transaction.from, contractAddress);
+  updateFinancials(event.block);
+  updateUsageMetrics(event.block, event.transaction.from);
   updateVaultSnapshots(contractAddress, event.block);
 }
 
 export function handleReinvest(event: ReinvestEvent): void {
+  let contractAddress = event.address;
+  let vault = getOrCreateVault(contractAddress, event.block);
 
+  if (vault) {
+    _Reinvest(
+      contractAddress,
+      event.transaction,
+      event.block,
+      vault,
+      event.params.newTotalSupply
+    )
+  }
+
+  updateFinancials(event.block);
+  updateUsageMetrics(event.block, event.transaction.from);
+  updateVaultSnapshots(contractAddress, event.block);
 }
 
 export function handleUpdateAdminFee(event: UpdateAdminFee): void {

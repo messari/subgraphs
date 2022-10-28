@@ -1,15 +1,13 @@
-import { Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
-import { Account, FinancialsDailySnapshot, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot, Vault, VaultDailySnapshot, VaultHourlySnapshot } from "../../generated/schema";
+import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { Account, FinancialsDailySnapshot, RewardToken, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot, Vault, VaultDailySnapshot, VaultHourlySnapshot, YieldAggregator } from "../../generated/schema";
 import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
 import * as utils from "./utils";
-import { initProtocol } from "../initializers/protocolInitializer";
 import { DEFUALT_AMOUNT, DEFUALT_DECIMALS, ZERO_BIGINT, ZERO_ADDRESS, ZERO_BIGDECIMAL, YAK_STRATEGY_MANAGER_ADDRESS, ZERO_INT, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../helpers/constants";
 import { Token } from "../../generated/schema";
 import { YakERC20 } from "../../generated/YakStrategyV2/YakERC20";
 import { calculatePriceInUSD } from "../calculators/priceInUSDCalculator";
 import { VaultFee } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
-import { YieldAggregator } from "../../generated/schema";
 
 export function getOrCreateVault(contractAddress: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(contractAddress.toHexString());
@@ -21,7 +19,7 @@ export function getOrCreateVault(contractAddress: Address, block: ethereum.Block
     vault.name = utils.readValue<string>(stategyContract.try_name(), "");
     vault.symbol = utils.readValue<string>(stategyContract.try_symbol(), "");
 
-    const protocol = getOrCreateYieldAggregator(contractAddress);
+    const protocol = getOrCreateYieldAggregator();
     vault.protocol = protocol.id;
 
     vault.depositLimit = utils.readValue<BigInt>(stategyContract.try_MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST(), ZERO_BIGINT);
@@ -51,6 +49,26 @@ export function getOrCreateVault(contractAddress: Address, block: ethereum.Block
     vault.inputTokenBalance = ZERO_BIGINT;
     vault.rewardTokenEmissionsAmount = [];
 
+    let rewardTokenAddress: Address;
+    if (stategyContract.try_rewardToken().reverted) {
+      rewardTokenAddress = ZERO_ADDRESS;
+    } else {
+      rewardTokenAddress = stategyContract.rewardToken();
+    }
+
+    const rewardToken = defineRewardToken(rewardTokenAddress, block.number);
+    const rewardTokenArr = new Array<string>();
+    rewardTokenArr.push(rewardToken.id);
+    vault.rewardTokens = rewardTokenArr;
+
+    const rewardTokenEmissionsAmountArr = new Array<BigInt>();
+    rewardTokenEmissionsAmountArr.push(ZERO_BIGINT);
+    vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmountArr;
+
+    const rewardTokenEmissionsUSDArr = new Array<BigDecimal>();
+    rewardTokenEmissionsUSDArr.push(ZERO_BIGDECIMAL);
+    vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSDArr;
+
     const adminFee = defineFee(contractAddress, "-adminFee")
     const developerFee = defineFee(contractAddress, "-developerFee")
     const reinvestorFee = defineFee(contractAddress, "-reinvestorFee")
@@ -65,6 +83,18 @@ export function getOrCreateVault(contractAddress: Address, block: ethereum.Block
   vault.save();
 
   return vault;
+}
+
+function defineRewardToken(rewardTokenAddress: Address, blockNumber: BigInt): RewardToken {
+  let rewardToken = RewardToken.load(rewardTokenAddress.toHexString());
+  if (rewardToken == null) {
+    rewardToken = new RewardToken(rewardTokenAddress.toHexString());
+  }
+  rewardToken.token = getOrCreateToken(rewardTokenAddress, blockNumber).id;
+  rewardToken.type = "DEPOSIT";
+  rewardToken.save();
+
+  return rewardToken
 }
 
 export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
@@ -93,7 +123,7 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
   return token;
 }
 
-export function getOrCreateYieldAggregator(contractAddress: Address): YieldAggregator {
+export function getOrCreateYieldAggregator(): YieldAggregator {
   // const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
   // let ownerAddress: Address;
 
@@ -114,7 +144,6 @@ export function getOrCreateYieldAggregator(contractAddress: Address): YieldAggre
     protocol.methodologyVersion = "1.0.0";
     protocol.network = "AVALANCHE";
     protocol.type = "YIELD";
-    protocol.protocolControlledValueUSD = ZERO_BIGDECIMAL;
     protocol.totalValueLockedUSD = ZERO_BIGDECIMAL;
     protocol.cumulativeSupplySideRevenueUSD = ZERO_BIGDECIMAL;
     protocol.cumulativeProtocolSideRevenueUSD = ZERO_BIGDECIMAL;
@@ -129,14 +158,14 @@ export function getOrCreateYieldAggregator(contractAddress: Address): YieldAggre
   return protocol;
 }
 
-export function getOrCreateUsageMetricsDailySnapshot(block: ethereum.Block, contractAddress: Address): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricsDailySnapshot(block: ethereum.Block): UsageMetricsDailySnapshot {
   let id: string = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id);
 
-    const protocol = getOrCreateYieldAggregator(contractAddress);
+    const protocol = getOrCreateYieldAggregator();
     usageMetrics.protocol = protocol.id;
 
     usageMetrics.dailyActiveUsers = 0;
@@ -156,12 +185,12 @@ export function getOrCreateUsageMetricsDailySnapshot(block: ethereum.Block, cont
   return usageMetrics;
 }
 
-export function getOrCreateUsageMetricsHourlySnapshot(block: ethereum.Block, contractAddress: Address): UsageMetricsHourlySnapshot {
+export function getOrCreateUsageMetricsHourlySnapshot(block: ethereum.Block): UsageMetricsHourlySnapshot {
   let metricsID: string = (block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
   let usageMetrics = UsageMetricsHourlySnapshot.load(metricsID);
 
   if (!usageMetrics) {
-    const protocol = getOrCreateYieldAggregator(contractAddress);
+    const protocol = getOrCreateYieldAggregator();
 
     usageMetrics = new UsageMetricsHourlySnapshot(metricsID);
     usageMetrics.protocol = protocol.id;
@@ -180,14 +209,14 @@ export function getOrCreateUsageMetricsHourlySnapshot(block: ethereum.Block, con
   return usageMetrics;
 }
 
-export function getOrCreateFinancialDailySnapshots(block: ethereum.Block, contractAddress: Address): FinancialsDailySnapshot {
+export function getOrCreateFinancialDailySnapshots(block: ethereum.Block): FinancialsDailySnapshot {
   let id = block.timestamp.toI64() / SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
 
-    const protocol = getOrCreateYieldAggregator(contractAddress);
+    const protocol = getOrCreateYieldAggregator();
 
     financialMetrics.protocol = protocol.id;
 
@@ -209,14 +238,14 @@ export function getOrCreateFinancialDailySnapshots(block: ethereum.Block, contra
   return financialMetrics;
 }
 
-export function getOrCreateAccount(id: string, contractAddress: Address): Account {
+export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
 
   if (!account) {
     account = new Account(id);
     account.save();
 
-    const protocol = getOrCreateYieldAggregator(contractAddress);
+    const protocol = getOrCreateYieldAggregator();
     protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
@@ -224,7 +253,7 @@ export function getOrCreateAccount(id: string, contractAddress: Address): Accoun
   return account;
 }
 
-export function getOrCreateVaultsDailySnapshots(vaultId: string, block: ethereum.Block, contractAddress: Address): VaultDailySnapshot {
+export function getOrCreateVaultsDailySnapshots(vaultId: string, block: ethereum.Block): VaultDailySnapshot {
   let id: string = vaultId
     .concat("-")
     .concat((block.timestamp.toI64() / SECONDS_PER_DAY).toString());
@@ -233,7 +262,7 @@ export function getOrCreateVaultsDailySnapshots(vaultId: string, block: ethereum
   if (!vaultSnapshots) {
     vaultSnapshots = new VaultDailySnapshot(id);
 
-    const protocol = getOrCreateYieldAggregator(contractAddress);
+    const protocol = getOrCreateYieldAggregator();
     vaultSnapshots.protocol = protocol.id;
     vaultSnapshots.vault = vaultId;
 
@@ -261,7 +290,7 @@ export function getOrCreateVaultsDailySnapshots(vaultId: string, block: ethereum
   return vaultSnapshots;
 }
 
-export function getOrCreateVaultsHourlySnapshots(vaultId: string, block: ethereum.Block, contractAddress: Address): VaultHourlySnapshot {
+export function getOrCreateVaultsHourlySnapshots(vaultId: string, block: ethereum.Block): VaultHourlySnapshot {
   let id: string = vaultId
     .concat("-")
     .concat((block.timestamp.toI64() / SECONDS_PER_HOUR).toString());
@@ -270,7 +299,7 @@ export function getOrCreateVaultsHourlySnapshots(vaultId: string, block: ethereu
   if (!vaultSnapshots) {
     vaultSnapshots = new VaultHourlySnapshot(id);
 
-    const protocol = getOrCreateYieldAggregator(contractAddress);
+    const protocol = getOrCreateYieldAggregator();
     vaultSnapshots.protocol = protocol.id;
     vaultSnapshots.vault = vaultId;
 
