@@ -5,7 +5,20 @@ import {
   BigInt,
   log,
 } from "@graphprotocol/graph-ts";
-import { getOrCreateToken, getOrCreateInterestRate } from "./getters";
+import {
+  getOrCreateToken,
+  getOrCreateInterestRate,
+  getOrCreateFinancialsDailySnapshot,
+  getOrCreateMarketDailySnapshot,
+  getOrCreateMarketHourlySnapshot,
+  getOpenPosition,
+  getOrCreateAccount,
+  getOrCreateUsageMetricsDailySnapshot,
+  getOrCreateUsageMetricsHourlySnapshot,
+  getNewPosition,
+  getOrCreateProtocol,
+  getSnapshotRates,
+} from "./getters";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -322,11 +335,11 @@ export function snapshotFinancials(
   transactionType: string | null = null
 ): void {
   const block = event.block;
-  const financialMetrics = getOrCreateFinancials(block.timestamp, block.number);
+  const financialMetrics = getOrCreateFinancialsDailySnapshot(event);
 
   if (block.number.ge(financialMetrics.blockNumber)) {
     // financials snapshot already exists and is stale, refresh
-    if (!protocol) protocol = getOrCreateLendingProtocol();
+    if (!protocol) protocol = getOrCreateProtocol();
     financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
     financialMetrics.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
     financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
@@ -380,8 +393,8 @@ export function updateUsageMetrics(
   // Number of days since Unix epoch
   const days: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   const hours: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
-  const dailyMetrics = getOrCreateUsageDailySnapshot(event);
-  const hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
+  const dailyMetrics = getOrCreateUsageMetricsDailySnapshot(event);
+  const hourlyMetrics = getOrCreateUsageMetricsHourlySnapshot(event);
 
   // Update the block number and timestamp to that of the last transaction of that day
   dailyMetrics.blockNumber = event.block.number;
@@ -618,19 +631,14 @@ export function updatePosition(
     market.closedPositionCount += INT_ONE;
   }
 
-  switch (transactionType) {
-    case TransactionType.DEPOSIT:
-      openPosition.depositCount += INT_ONE;
-      break;
-    case TransactionType.WITHDRAW:
-      openPosition.withdrawCount += INT_ONE;
-      break;
-    case TransactionType.BORROW:
-      openPosition.borrowCount += INT_ONE;
-      break;
-    case TransactionType.REPAY:
-      openPosition.repayCount += INT_ONE;
-      break;
+  if (transactionType == TransactionType.DEPOSIT) {
+    openPosition.depositCount += INT_ONE;
+  } else if (transactionType == TransactionType.WITHDRAW) {
+    openPosition.withdrawCount += INT_ONE;
+  } else if (transactionType == TransactionType.BORROW) {
+    openPosition.borrowCount += INT_ONE;
+  } else if (transactionType == TransactionType.REPAY) {
+    openPosition.repayCount += INT_ONE;
   }
   openPosition.save();
   account.save();

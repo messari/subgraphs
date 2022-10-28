@@ -55,7 +55,7 @@ export function handleBackerRewardsClaimed1(
   const dailyScaler = BigInt.fromI32(SECONDS_PER_DAY).divDecimal(secondsSince);
   market.rewardTokenEmissionsAmount = [
     bigDecimalToBigInt(
-      market._cumulativeRewardAmount.toBigDecimal().times(dailyScaler)
+      market._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler)
     ),
   ];
   // Note rewards are recorded when they are claimed

@@ -48,7 +48,7 @@ export function getOrCreatePoolToken(
   marketId: string | null = null
 ): _PoolToken {
   let poolToken = _PoolToken.load(tokenId);
-  if (!poolToken && marketId != null) {
+  if (!poolToken) {
     poolToken = new _PoolToken(tokenId);
     poolToken.market = marketId!;
     poolToken.save();

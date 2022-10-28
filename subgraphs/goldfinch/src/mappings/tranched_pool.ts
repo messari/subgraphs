@@ -230,8 +230,8 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
     market,
     owner,
     positionID,
-    amount,
-    amountUSD,
+    event.params.principalWithdrawn,
+    principalAmountUSD,
     event
   );
 
@@ -372,7 +372,7 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   const market = getOrCreateMarket(marketID, event);
   if (market._borrower != payer) {
     // if payer != borrower, use borrower for position
-    log.error("[]payer {} != borrower {}", [payer, market._borrower]);
+    log.error("[]payer {} != borrower {}", [payer, market._borrower!]);
   }
   const account = getOrCreateAccount(market._borrower!);
 

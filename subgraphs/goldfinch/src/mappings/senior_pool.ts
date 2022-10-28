@@ -143,7 +143,7 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
 
   const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(event.address.toHexString(), event);
-  const account = getOrCreateAccount(event.params.capitalProvider);
+  const account = getOrCreateAccount(capitalProvider);
   const outputToken = Token.load(market.outputToken!)!;
 
   // USDC
@@ -268,7 +268,7 @@ export function handleInterestCollected(event: InterestCollected): void {
     seniorPoolContract.sharePrice(),
     outputToken.decimals
   );
-  market.outputTokenPriceUSD = outputToken.lastPriceUSD;
+  market.outputTokenPriceUSD = outputToken.lastPriceUSD!;
   market.save();
   outputToken.save();
 
@@ -327,7 +327,7 @@ export function handlePrincipalWrittenDown(event: PrincipalWrittenDown): void {
     seniorPoolContract.sharePrice(),
     outputToken.decimals
   );
-  market.outputTokenPriceUSD = outputToken.lastPriceUSD;
+  market.outputTokenPriceUSD = outputToken.lastPriceUSD!;
   market.save();
   outputToken.save();
   market.save();

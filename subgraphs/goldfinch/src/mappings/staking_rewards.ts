@@ -164,7 +164,6 @@ export function handleDepositedAndStaked1(event: DepositedAndStaked1): void {
     event.params.user,
     event.params.depositedAmount
   );
-  d;
 }
 
 export function handleUnstakedAndWithdrew(event: UnstakedAndWithdrew): void {
@@ -195,12 +194,12 @@ export function handleRewardPaid(event: RewardPaid): void {
     event.params.reward
   );
   const secondsSince = event.block.timestamp
-    .minus(market._rewardTimestamp!)
+    .minus(seniorPool._rewardTimestamp!)
     .toBigDecimal();
   const dailyScaler = BigInt.fromI32(SECONDS_PER_DAY).divDecimal(secondsSince);
   seniorPool.rewardTokenEmissionsAmount = [
     bigDecimalToBigInt(
-      seniorPool._cumulativeRewardAmount.toBigDecimal().times(dailyScaler)
+      seniorPool._cumulativeRewardAmount!.toBigDecimal().times(dailyScaler)
     ),
   ];
 
