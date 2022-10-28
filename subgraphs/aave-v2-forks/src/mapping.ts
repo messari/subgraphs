@@ -52,7 +52,6 @@ import {
   updateSnapshots,
 } from "./helpers";
 import { AToken as ATokenTemplate } from "../generated/templates";
-import { ETH_PARASWAP_ROUTER } from "../protocols/aave-v2/src/constants";
 
 //////////////////////////
 ///// Helper Classes /////
@@ -1070,8 +1069,8 @@ export function _handleTransfer(
   if (
     to == Address.fromString(ZERO_ADDRESS) ||
     from == Address.fromString(ZERO_ADDRESS) ||
-    to.toHexString().toLowerCase() == market.outputToken!.toLowerCase() ||
-    from.toHexString().toLowerCase() == market.outputToken!.toLowerCase()
+    to == Address.fromString(market.outputToken!) ||
+    from == Address.fromString(market.outputToken!)
   ) {
     return;
   }
@@ -1099,14 +1098,6 @@ export function _handleTransfer(
 
   // update balance from sender
   if (fromAccount) {
-    // if (from == Address.fromString(ETH_PARASWAP_ROUTER)) {
-    // log.warning("fromAccount: Transaction: {} balance: {} market: {}", [
-    //   event.transaction.hash.toHexString(),
-    //   aTokenContract.balanceOf(from).toString(),
-    //   market.id,
-    // ]);
-    // }
-
     subtractPosition(
       protocol,
       market,
@@ -1120,14 +1111,6 @@ export function _handleTransfer(
 
   // update balance from receiver
   if (toAccount) {
-    // if (to == Address.fromString(ETH_PARASWAP_ROUTER)) {
-    // log.warning("toAccount: Transaction: {} balance: {} market: {}", [
-    //   event.transaction.hash.toHexString(),
-    //   aTokenContract.balanceOf(to).toString(),
-    //   market.id,
-    // ]);
-    // }
-
     addPosition(
       protocol,
       market,

@@ -64,8 +64,9 @@ Not applicable to Aave
 - Aave V2 Mainnet (not AMM), Polygon, and Avalanche have a collateral swap feature. This allows a user to switch collateral positions without doing a withdraw and deposit. The contract that is responsible for this is the Paraswap Router (a Paraswap router).
   - Example transaction: https://snowtrace.io/tx/0x873b4019fa2d77dc9809c57b4c03d2db909d26776129225132c8e14f05c1319b
   - e.g. aWAVAX is converted to WAVAX, WAVAX is swapped for USDC, USDC is converted to aUSDC then returned to the account executing the transaction
-  - For our purposes we will consider this a withdrawal and deposit of two separate assets
-- The WETH wrapper also creates positional problems
+  - There are also similar features with swapAndRepay routers and swapAndLiquidate routers.
+  - This does not affect any of the position data though.
+- There is also a feature in Aave V2 to execute transactions on behalf of another account. We do account for this in the mappings.
 
 ## Useful links and references
 

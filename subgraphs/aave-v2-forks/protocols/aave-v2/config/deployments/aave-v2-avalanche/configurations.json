@@ -12,10 +12,6 @@
     "startBlock": "4607005",
     "address": "0x4F01AeD16D97E3aB5ab2B501154DC9bb0F1A5A2C"
   },
-  "paraswapRouter": {
-    "startBlock": "4607005",
-    "address": "0x1bD8eBfDcBcBfDcBcBcBcBcBcBcBcBcBcBcBcBcB"
-  },
   "graftEnabled": false,
   "subgraphId": "QmbEQvJSV6QdaLucfAuQ3x4z5jp1wErdafKK88JYfLm5na",
   "graftStartBlock": 17825987

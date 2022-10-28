@@ -330,7 +330,7 @@ export function handleWithdraw(event: Withdraw): void {
     event.params.amount,
     event.params.reserve,
     getProtocolData(),
-    event.params.to
+    event.params.user
   );
 }
 
