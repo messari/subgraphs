@@ -262,7 +262,7 @@
       },
       "aave-v2-polygon": {
         "network": "polygon",
-        "status": "prod",
+        "status": "dev",
         "versions": {
           "schema": "2.0.1",
           "subgraph": "1.2.14",
