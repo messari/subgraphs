@@ -4,6 +4,7 @@ import {
   GovernanceFramework,
   Spell,
   Slate,
+  DelegateVotingPowerChange,
 } from "../generated/schema";
 import { DSChief } from "../generated/DSChief/DSChief";
 import { DSSpell } from "../generated/DSChief/DSSpell";
@@ -56,6 +57,29 @@ export function getDelegate(address: string): Delegate {
     delegate.numberPoleVotes = 0;
   }
   return delegate;
+}
+
+export function createDelegateVotingPowerChange(
+  event: ethereum.Event,
+  previousBalance: BigInt,
+  newBalance: BigInt,
+  delegate: string
+): DelegateVotingPowerChange {
+  const delegateVotingPwerChangeId = `${event.block.timestamp.toI64()}-${
+    event.logIndex
+  }`;
+  const delegateVPChange = new DelegateVotingPowerChange(
+    delegateVotingPwerChangeId
+  );
+  delegateVPChange.previousBalance = previousBalance;
+  delegateVPChange.newBalance = newBalance;
+  delegateVPChange.delegate = delegate;
+  delegateVPChange.tokenAddress = event.address.toHexString();
+  delegateVPChange.txnHash = event.transaction.hash.toHexString();
+  delegateVPChange.blockTimestamp = event.block.timestamp;
+  delegateVPChange.logIndex = event.logIndex;
+  delegateVPChange.blockNumber = event.block.number;
+  return delegateVPChange;
 }
 
 export function getGovernanceFramework(

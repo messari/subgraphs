@@ -1,6 +1,10 @@
 import { Delegation } from "../../../generated/schema";
 import { Lock, Free } from "../../../generated/DSChief/VoteDelegate";
-import { getDelegate, getGovernanceFramework } from "../../../src/helpers";
+import {
+  createDelegateVotingPowerChange,
+  getDelegate,
+  getGovernanceFramework,
+} from "../../../src/helpers";
 import { BIGINT_ZERO, CHIEF } from "../../../src/constants";
 
 export function handleDelegateLock(event: Lock): void {
@@ -19,6 +23,15 @@ export function handleDelegateLock(event: Lock): void {
   if (delegation.amount.equals(BIGINT_ZERO)) {
     delegate.tokenHoldersRepresented = delegate.tokenHoldersRepresented + 1;
   }
+
+  const delegateVPChange = createDelegateVotingPowerChange(
+    event,
+    delegation.amount,
+    delegation.amount.plus(event.params.wad),
+    delegate.id
+  );
+  delegateVPChange.save();
+
   delegation.amount = delegation.amount.plus(event.params.wad);
   delegation.save();
   delegate.save();
@@ -38,6 +51,15 @@ export function handleDelegateFree(event: Free): void {
   const delegationID = delegate.id + "-" + sender;
   const delegation = Delegation.load(delegationID);
   if (!delegation) return;
+
+  const delegateVPChange = createDelegateVotingPowerChange(
+    event,
+    delegation.amount,
+    delegation.amount.minus(event.params.wad),
+    delegate.id
+  );
+  delegateVPChange.save();
+
   delegation.amount = delegation.amount.minus(event.params.wad);
   if (delegation.amount.equals(BIGINT_ZERO)) {
     delegate.tokenHoldersRepresented = delegate.tokenHoldersRepresented - 1;

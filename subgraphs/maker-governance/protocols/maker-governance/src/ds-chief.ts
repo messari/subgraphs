@@ -16,6 +16,7 @@ import {
 } from "../../../src/constants";
 import {
   addWeightToSpells,
+  createDelegateVotingPowerChange,
   createSlate,
   getDelegate,
   getGovernanceFramework,
@@ -61,6 +62,14 @@ export function handleLock(event: LogNote): void {
     }
   }
 
+  const delegateVPChange = createDelegateVotingPowerChange(
+    event,
+    delegate.votingPowerRaw,
+    delegate.votingPowerRaw.plus(amount),
+    delegate.id
+  );
+  delegateVPChange.save();
+
   delegate.votingPowerRaw = delegate.votingPowerRaw.plus(amount);
   delegate.votingPower = delegate.votingPower.plus(toDecimal(amount));
   addWeightToSpells(delegate.currentSpells, amount);
@@ -79,6 +88,15 @@ export function handleFree(event: LogNote): void {
   const amount = BigInt.fromString(amountStr); //.foo is the amount being locked
 
   const delegate = getDelegate(sender.toHexString());
+
+  const delegateVPChange = createDelegateVotingPowerChange(
+    event,
+    delegate.votingPowerRaw,
+    delegate.votingPowerRaw.minus(amount),
+    delegate.id
+  );
+  delegateVPChange.save();
+
   delegate.votingPowerRaw = delegate.votingPowerRaw.minus(amount);
   delegate.votingPower = delegate.votingPower.minus(toDecimal(amount));
   removeWeightFromSpells(delegate.currentSpells, amount);
@@ -147,6 +165,7 @@ function _handleSlateVote(
       vote.block = event.block.number;
       vote.blockTime = event.block.timestamp;
       vote.txnHash = event.transaction.hash.toHexString();
+      vote.logIndex = event.logIndex;
       vote.save();
 
       spell.totalVotes = spell.totalVotes.plus(BIGINT_ONE);

@@ -140,6 +140,27 @@ type Delegation @entity {
   amount: BigInt!
 }
 
+type DelegateVotingPowerChange @entity(immutable: true) {
+  "Unique entity used to keep track of voting power delta"
+  id: ID!
+  "Token addresss"
+  tokenAddress: String
+  "Token address for delegate"
+  delegate: String!
+  "Previous voting power of delegate"
+  previousBalance: BigInt!
+  "New voting power of delegate"
+  newBalance: BigInt!
+  "Block time change happened"
+  blockTimestamp: BigInt!
+  "Transaction hash of the voting power change"
+  txnHash: String!
+  "Log index for delegate voting power change"
+  logIndex: BigInt!
+  "Block number of event"
+  blockNumber: BigInt!
+}
+
 type Vote @entity {
   "Delegate ID + spell ID"
   id: ID!
@@ -158,6 +179,8 @@ type Vote @entity {
   blockTime: BigInt!
   "Transaction hash of the vote"
   txnHash: String!
+  "Log index for event"
+  logIndex: BigInt!
 }
 
 # Polling Entities
