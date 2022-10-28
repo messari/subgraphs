@@ -44,13 +44,13 @@ export class VSSFinanceCronosConfigurations implements Configurations {
       Address.fromString("0x3b44b2a187a7b3824131f8db5a74194d0a42fc15")
     );
   }
-  getTradeFee(): BigDecimal {
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.1");
   }
-  getLPFeeToOn(): BigDecimal {
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.2");
   }
   getProtocolFeeToOff(): BigDecimal {

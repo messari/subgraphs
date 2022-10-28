@@ -43,13 +43,13 @@ export class HoneyswapMaticConfigurations implements Configurations {
       Address.fromString("0x03DAa61d8007443a6584e3d8f85105096543C19c")
     );
   }
-  getTradeFee(): BigDecimal {
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.5");
   }
-  getLPFeeToOn(): BigDecimal {
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("2.5");
   }
   getProtocolFeeToOff(): BigDecimal {

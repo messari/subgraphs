@@ -44,13 +44,13 @@ export class UniswapV2MainnetConfigurations implements Configurations {
       Address.fromString("0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f")
     );
   }
-  getTradeFee(): BigDecimal {
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  getLPFeeToOn(): BigDecimal {
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {

@@ -49,13 +49,13 @@ export class UbeswapCeloConfigurations implements Configurations {
       Address.fromString("0x62d5b84be28a183abb507e125b384122d2c25fae")
     );
   }
-  getTradeFee(): BigDecimal {
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.3");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  getLPFeeToOn(): BigDecimal {
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {

@@ -44,13 +44,13 @@ export class ApeswapBscConfigurations implements Configurations {
       Address.fromString("0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6")
     );
   }
-  getTradeFee(): BigDecimal {
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.2");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  getLPFeeToOn(): BigDecimal {
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.15");
   }
   getProtocolFeeToOff(): BigDecimal {
