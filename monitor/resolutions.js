@@ -14,7 +14,7 @@ export async function pullMessagesByThread(channelIdList, channelToProtocolIssue
         const promiseSettle = await Promise.allSettled(fetchMessagesPromiseArr);
         promiseSettle.forEach((res) => {
             if (res?.value?.length > 0) {
-                res.value.forEach((protocolMessageObject, idx) => {
+                res.value.forEach((protocolMessageObject) => {
                     const networkList = Object.keys(channelToProtocolIssuesMappingCopy[protocolMessageObject.channel_id] || []);
                     if (networkList.length === 0) {
                         return;
