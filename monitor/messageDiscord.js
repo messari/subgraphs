@@ -462,6 +462,7 @@ export async function sendMessageToAggThread(aggThreadId, channelId = process.en
 
     try {
         await resolveQueriesToAttempt(aggThreadQueriesToResolve);
+        aggThreadMsgObjects = [];
     } catch (err) {
         if (err?.response?.status === 429) {
             return aggThreadMsgObjects;
