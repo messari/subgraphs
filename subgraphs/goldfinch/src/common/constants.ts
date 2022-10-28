@@ -171,6 +171,7 @@ export enum CONFIG_KEYS_ADDRESSES {
 ////////////////////////
 
 export const FACTORY_ADDRESS = "0xd20508e1e971b80ee172c73517905bfffcbd87f9";
+export const SENIOR_POOL_ADDRESS = "0x8481a6ebaf5c7dabc3f7e09e44a89531fd31f822";
 export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const FIDU_ADDRESS = "0x6a445e9f40e0b97c92d0b8a3366cef1d67f700bf";
 export const GFI_ADDRESS = "0xdab396ccf3d84cf2d07c4454e10c8a6f5b008d2b";

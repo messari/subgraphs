@@ -1,11 +1,4 @@
-import {
-  Address,
-  ethereum,
-  BigInt,
-  BigDecimal,
-  log,
-} from "@graphprotocol/graph-ts";
-import { GoldfinchFactory } from "../../generated/GoldfinchFactory/GoldfinchFactory";
+import { Address, ethereum, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/GoldfinchFactory/ERC20";
 import {
   Token,
@@ -20,6 +13,7 @@ import {
   InterestRate,
   RewardToken,
   User,
+  _PoolToken,
 } from "../../generated/schema";
 import {
   Network,
@@ -45,7 +39,19 @@ import {
 } from "./constants";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
 import { prefixID } from "./utils";
-import { USDC } from "../../generated/SeniorPool/USDC";
+
+export function getOrCreatePoolToken(
+  tokenId: string,
+  marketId: string | null = null
+): _PoolToken {
+  let poolToken = _PoolToken.load(tokenId);
+  if (!poolToken && marketId != null) {
+    poolToken = new _PoolToken(tokenId);
+    poolToken.market = marketId!;
+    poolToken.save();
+  }
+  return poolToken;
+}
 
 export function getOrCreateToken(tokenAddr: Address): Token {
   const tokenId: string = tokenAddr.toHexString();

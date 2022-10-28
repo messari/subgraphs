@@ -1,4 +1,4 @@
-import { InterestRate, TranchedPool } from "../../generated/schema";
+import { InterestRate, TranchedPool, _PoolToken } from "../../generated/schema";
 import { GoldfinchConfig as GoldfinchConfigContract } from "../../generated/templates/TranchedPool/GoldfinchConfig";
 import { CreditLine as CreditLineContract } from "../../generated/templates/TranchedPool/CreditLine";
 import {
@@ -38,7 +38,11 @@ import {
 import { getOrInitUser } from "../entities/user";
 import { createZapMaybe, deleteZapAfterUnzapMaybe } from "../entities/zapper";
 import { getAddressFromConfig } from "../common/utils";
-import { getOrCreateMarket, getOrCreateProtocol } from "../common/getters";
+import {
+  getOrCreateMarket,
+  getOrCreatePoolToken,
+  getOrCreateProtocol,
+} from "../common/getters";
 import { CreditLine } from "../../generated/templates/TranchedPool/CreditLine";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
@@ -77,6 +81,11 @@ export function handleDepositMade(event: DepositMade): void {
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
   market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(amountUSD);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
+  // calculate average daily emission since first deposit
+  if (!market._rewardTimestamp) {
+    market._rewardTimestamp = event.block.timestamp;
+    market._cumulativeRewardAmount = BIGINT_ZERO;
+  }
   market.save();
 
   const protocol = getOrCreateProtocol();
@@ -89,6 +98,10 @@ export function handleDepositMade(event: DepositMade): void {
   snapshotMarket(market, amountUSD, event, TransactionType.DEPOSIT);
   snapshotFinancials(protocol, amountUSD, event, TransactionType.DEPOSIT);
   updateUsageMetrics(protocol, owner, event, TransactionType.DEPOSIT);
+
+  // save a mapping of tokenID to market (tranched pool) id for backer emission reward
+  const tokenId = event.params.tokenId.toHexString();
+  getOrCreatePoolToken(tokenId, market.id);
 
   //
   handleDeposit(event);

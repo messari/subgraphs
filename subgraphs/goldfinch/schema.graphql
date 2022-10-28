@@ -659,6 +659,12 @@ type Market @entity {
 
   " timestamp when for interest accrual (used for interest rates calculation) "
   _interestTimestamp: BigInt
+
+  " cumulative Reward Emission Amount "
+  _cumulativeRewardAmount: BigInt
+
+  " timestamp when reward emission started "
+  _rewardTimestamp: BigInt
 }
 
 #################################
@@ -1235,6 +1241,19 @@ type Liquidate @entity {
 type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
+}
+
+# Helper entity for mapping TokenID to market (tranched pool) for calculating
+# reward emission
+type _PoolToken @entity {
+  " ERC721 PoolToken ID "
+  id: ID!
+  " market id (pool address) "
+  market: Market!
+  " owner address "
+  owner: String
+  " principle amount "
+  amount: BigInt
 }
 
 ### Entity below are from goldfinch's official subgraph ###

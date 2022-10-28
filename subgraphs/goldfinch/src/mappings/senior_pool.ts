@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import {
   SeniorPool as SeniorPoolContract,
   DepositMade,
@@ -15,12 +15,8 @@ import { Fidu as FiduContract } from "../../generated/templates/SeniorPool/Fidu"
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
-  INT_ONE,
-  INT_ZERO,
-  SECONDS_PER_DAY,
-  SECONDS_PER_HOUR,
+  BIGINT_ZERO,
   TransactionType,
-  USDC_ADDRESS,
   USDC_DECIMALS,
 } from "../common/constants";
 import { createTransactionFromEvent } from "../entities/helpers";
@@ -30,20 +26,8 @@ import {
 } from "../entities/senior_pool";
 import { handleDeposit } from "../entities/user";
 import { bigIntToBDUseDecimals } from "../common/utils";
-import {
-  getOrCreateAccount,
-  getOrCreateMarket,
-  getOrCreateProtocol,
-  getOrCreateUsageMetricsDailySnapshot,
-  getOrCreateUsageMetricsHourlySnapshot,
-} from "../common/getters";
-import {
-  Account,
-  ActiveAccount,
-  Deposit,
-  Token,
-  Withdraw,
-} from "../../generated/schema";
+import { getOrCreateMarket, getOrCreateProtocol } from "../common/getters";
+import { Token } from "../../generated/schema";
 import {
   createTransaction,
   snapshotFinancials,
@@ -85,6 +69,12 @@ export function handleDepositMade(event: DepositMade): void {
   market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(amountUSD);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
+  // calculate average daily emission since first deposit
+  if (!market._rewardTimestamp) {
+    market._rewardTimestamp = event.block.timestamp;
+    market._cumulativeRewardAmount = BIGINT_ZERO;
+  }
+
   market.save();
 
   protocol.totalDepositBalanceUSD =

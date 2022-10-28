@@ -13,6 +13,9 @@ import {
   UnstakedAndWithdrewMultiple,
   RewardPaid,
 } from "../../generated/StakingRewards/StakingRewards";
+import { SECONDS_PER_DAY, SENIOR_POOL_ADDRESS } from "../common/constants";
+import { getOrCreateMarket } from "../common/getters";
+import { bigDecimalToBigInt } from "../common/utils";
 
 import { createTransactionFromEvent } from "../entities/helpers";
 import { updateCurrentEarnRate } from "../entities/staking_rewards";
@@ -185,6 +188,25 @@ export function handleUnstakedAndWithdrewMultiple(
 }
 
 export function handleRewardPaid(event: RewardPaid): void {
+  // set RewardTokenEmission for senior pool
+  // normalized to daily amount
+  const seniorPool = getOrCreateMarket(SENIOR_POOL_ADDRESS, event);
+  seniorPool._cumulativeRewardAmount = seniorPool._cumulativeRewardAmount!.plus(
+    event.params.reward
+  );
+  const secondsSince = event.block.timestamp
+    .minus(market._rewardTimestamp!)
+    .toBigDecimal();
+  const dailyScaler = BigInt.fromI32(SECONDS_PER_DAY).divDecimal(secondsSince);
+  seniorPool.rewardTokenEmissionsAmount = [
+    bigDecimalToBigInt(
+      seniorPool._cumulativeRewardAmount.toBigDecimal().times(dailyScaler)
+    ),
+  ];
+
+  seniorPool.save();
+
+  //
   const position = assert(
     SeniorPoolStakedPosition.load(event.params.tokenId.toString())
   );
