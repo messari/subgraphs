@@ -992,6 +992,9 @@ type PositionSnapshot @entity {
   " Nonce of the transaction that triggered this snapshot "
   nonce: BigInt!
 
+  " Account that owns this position "
+  account: Account!
+
   " Position of this snapshot "
   position: Position!
 
