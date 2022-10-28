@@ -982,7 +982,7 @@ export function getOrCreateMarket(
     // Create a new Market
     market = new Market(marketId.toHexString());
 
-    market.protocol = protocol.name;
+    market.protocol = protocol.id;
     market.isActive = true; // initialized to true on creation
     market.canUseAsCollateral = true; // only stopped when protocol is paused
     market.canBorrowFrom = true; // this field changes occasinally, but all markets are set to true after creation
