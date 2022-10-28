@@ -66,7 +66,7 @@ export function createPoolFees(
     poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOff();
   }
 
-  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee();
+  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee(blockNumber);
 
   poolLpFee.save();
   poolProtocolFee.save();
@@ -74,9 +74,9 @@ export function createPoolFees(
 
   log.error("blockNumber: {}, lpFee - {} protocolFee - {} tradingFee - {}", [
     blockNumber.toString(),
-    poolLpFee.feePercentage.toString(),
-    poolProtocolFee.feePercentage.toString(),
-    poolTradingFee.feePercentage.toString(),
+    poolLpFee.feePercentage!.toString(),
+    poolProtocolFee.feePercentage!.toString(),
+    poolTradingFee.feePercentage!.toString(),
   ]);
 
   return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
