@@ -76,7 +76,10 @@ import { Market } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
 import { StakedAave } from "../../../generated/LendingPool/StakedAave";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
-import { Transfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken"
+import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken"
+
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
@@ -366,13 +369,18 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   );
 }
 
-//////////////////////
-//// AToken Event ////
-//////////////////////
+/////////////////////////
+//// Transfer Events ////
+/////////////////////////
 
-export function handleTransfer(event: Transfer): void {
+<<<<<<< Updated upstream
+export function handleCollateralTransfer(event: CollateralTransfer): void {
+=======
+export function handleTransfer(event: CollateralTransfer): void {
+>>>>>>> Stashed changes
   _handleTransfer(event, event.params.to, event.params.from, getProtocolData());
 }
+
 
 ///////////////////
 ///// Helpers /////

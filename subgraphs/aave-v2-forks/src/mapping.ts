@@ -1040,11 +1040,11 @@ export function _handleLiquidate(
   );
 }
 
-//////////////////////
-//// AToken Event ////
-//////////////////////
+/////////////////////////
+//// Transfer Events ////
+/////////////////////////
 
-export function _handleTransfer(
+export function _handleCollateralTransfer(
   event: ethereum.Event,
   to: Address,
   from: Address,
