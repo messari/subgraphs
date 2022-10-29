@@ -93,17 +93,6 @@ export function updateFeesIfChanged(
   poolProtocolFee.save();
   poolTradingFee.save();
 
-  log.error(
-    "FEES UPDATED --- poolAddress: {}, blockNumber: {}, lpFee - {} protocolFee - {} tradingFee - {}",
-    [
-      poolAddress,
-      blockNumber.toString(),
-      poolLpFee.feePercentage!.toString(),
-      poolProtocolFee.feePercentage!.toString(),
-      poolTradingFee.feePercentage!.toString(),
-    ]
-  );
-
   return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
 

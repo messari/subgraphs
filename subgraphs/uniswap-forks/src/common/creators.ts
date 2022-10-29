@@ -72,17 +72,6 @@ export function createPoolFees(
   poolProtocolFee.save();
   poolTradingFee.save();
 
-  log.error(
-    "FEES SET --- poolAddress: {}, blockNumber: {}, lpFee - {} protocolFee - {} tradingFee - {}",
-    [
-      poolAddress,
-      blockNumber.toString(),
-      poolLpFee.feePercentage!.toString(),
-      poolProtocolFee.feePercentage!.toString(),
-      poolTradingFee.feePercentage!.toString(),
-    ]
-  );
-
   return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
 
@@ -332,23 +321,6 @@ export function createSwapHandleVolumeAndFees(
   swap.pool = pool.id;
 
   swap.save();
-
-  log.error(
-    " ---> SWAPS --- tx: {}, token0: {}, token1: {}, token0Price: {}, token1Price: {}, amount0Total: {}, amount1Total: {}, amount0TotalConverted: {}, amount1TotalConverted: {}, token0USD: {}, token1USD: {}",
-    [
-      transactionHash,
-      token0.symbol,
-      token1.symbol,
-      token0.lastPriceUSD!.toString(),
-      token1.lastPriceUSD!.toString(),
-      amount0Total.toString(),
-      amount1Total.toString(),
-      amount0TotalConverted.toString(),
-      amount1TotalConverted.toString(),
-      token0USD.toString(),
-      token1USD.toString(),
-    ]
-  );
 
   // only accounts for volume through white listed tokens
   const trackedAmountUSD = getTrackedVolumeUSD(
