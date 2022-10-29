@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { TokenABI } from "../../generated/Factory/TokenABI";
 import {
