@@ -43,12 +43,15 @@ export class HoneyswapXdaiConfigurations implements Configurations {
       Address.fromString("0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7")
     );
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("3");
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.5");
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("2.5");
   }

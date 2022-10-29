@@ -49,12 +49,15 @@ export class SushiswapMaticConfigurations implements Configurations {
       )
     );
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.3");
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.25");
   }

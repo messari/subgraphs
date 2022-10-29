@@ -51,6 +51,7 @@ export class BiswapBscConfigurations implements Configurations {
       return BigDecimal.fromString("0.2");
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
