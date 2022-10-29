@@ -17,11 +17,11 @@ import {
 } from "../../../../src/common/constants";
 import { createPoolFees } from "../../../../src/common/creators";
 import {
-  getOrCreateDex,
   getOrCreateToken,
   getOrCreateLPToken,
   getOrCreateRewardToken,
   getLiquidityPool,
+  getOrCreateProtocol,
 } from "../../../../src/common/getters";
 import { updateTokenWhitelists } from "../../../../src/common/updateMetrics";
 import { NetworkConfigs } from "../../../../configurations/configure";
@@ -72,7 +72,7 @@ export function createLiquidityPool(
   token0Address: string,
   token1Address: string
 ): void {
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
 
   // create the tokens and tokentracker
   const token0 = getOrCreateToken(token0Address);
