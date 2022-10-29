@@ -41,7 +41,7 @@ import {
   createAccount,
   createInterestRate,
   getBorrowBalance,
-  getMarketByOutputToken,
+  getMarketByAuxillaryToken,
   getOrCreateLendingProtocol,
   getOrCreateMarket,
   getOrCreateToken,
@@ -51,7 +51,12 @@ import {
   updateMarketSnapshots,
   updateSnapshots,
 } from "./helpers";
-import { AToken as ATokenTemplate } from "../generated/templates";
+import {
+  AToken as ATokenTemplate,
+  VariableDebtToken as VTokenTemplate,
+  StableDebtToken as STokenTemplate,
+} from "../generated/templates";
+import { ERC20 } from "../generated/LendingPool/ERC20";
 
 //////////////////////////
 ///// Helper Classes /////
@@ -102,8 +107,10 @@ export function _handleReserveInitialized(
   market.createdBlockNumber = event.block.number;
   market.createdTimestamp = event.block.timestamp;
   market.vToken = variableDebtTokenEntity.id;
+  VTokenTemplate.create(variableDebtToken);
   if (stableDebtToken != Address.fromString(ZERO_ADDRESS)) {
     market.sToken = getOrCreateToken(stableDebtToken).id;
+    STokenTemplate.create(stableDebtToken);
   }
 
   market.save();
@@ -1044,33 +1051,33 @@ export function _handleLiquidate(
 //// Transfer Events ////
 /////////////////////////
 
-export function _handleCollateralTransfer(
+export function _handleTransfer(
   event: ethereum.Event,
+  protocolData: ProtocolData,
+  positionSide: string,
   to: Address,
-  from: Address,
-  protocolData: ProtocolData
+  from: Address
 ): void {
+  const asset = event.address;
   const protocol = getOrCreateLendingProtocol(protocolData);
-  const market = getMarketByOutputToken(
-    event.address.toHexString(),
-    protocolData
-  );
+  const market = getMarketByAuxillaryToken(asset.toHexString(), protocolData);
   if (!market) {
-    log.warning("[_handleTransfer] market not found: {}", [
+    log.warning("[handleCollateralTransfer] market not found: {}", [
       event.address.toHexString(),
     ]);
     return;
   }
 
-  // if the to / from addresses are the same as the aToken
+  // if the to / from addresses are the same as the asset
   // then this transfer is emitted as part of another event
   // ie, a deposit, withdraw, borrow, repay, etc
   // we want to let that handler take care of position updates
+  // and zero addresses mean it is apart of a burn / mint
   if (
     to == Address.fromString(ZERO_ADDRESS) ||
     from == Address.fromString(ZERO_ADDRESS) ||
-    to == Address.fromString(market.outputToken!) ||
-    from == Address.fromString(market.outputToken!)
+    to == asset ||
+    from == asset
   ) {
     return;
   }
@@ -1094,7 +1101,7 @@ export function _handleCollateralTransfer(
     protocol.save();
   }
 
-  const aTokenContract = AToken.bind(event.address);
+  const tokenContract = ERC20.bind(asset);
 
   // update balance from sender
   if (fromAccount) {
@@ -1102,8 +1109,8 @@ export function _handleCollateralTransfer(
       protocol,
       market,
       fromAccount,
-      aTokenContract.try_balanceOf(from),
-      PositionSide.LENDER,
+      tokenContract.try_balanceOf(from),
+      positionSide,
       -1, // TODO: not sure how to classify this event yet
       event
     );
@@ -1115,8 +1122,8 @@ export function _handleCollateralTransfer(
       protocol,
       market,
       toAccount,
-      aTokenContract.try_balanceOf(to),
-      PositionSide.LENDER,
+      tokenContract.try_balanceOf(to),
+      positionSide,
       -1, // TODO: not sure how to classify this event yet
       event
     );
