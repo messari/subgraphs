@@ -72,15 +72,27 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
                 if (!isLoadedPending) {
                     pendingRow = (
-                        <TableRow onClick={() => {
-                            if (!validationSupported) {
-                                window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending";
-                                return;
-                            }
-                            if (!pendingObject?.fatalError) {
-                                navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`)
+                        <TableRow onClick={(event) => {
+                            if (event.ctrlKey) {
+                                if (!validationSupported) {
+                                    window.open("https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending", "_blank");
+                                    return;
+                                }
+                                if (!pendingObject?.fatalError) {
+                                    window.open(`https://subgraphs.messari.io/subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`, "_blank");
+                                } else {
+                                    window.open("https://okgraph.xyz/?q=" + pendingObject?.subgraph, "_blank");
+                                }
                             } else {
-                                window.location.href = "https://okgraph.xyz/?q=" + pendingObject?.subgraph;
+                                if (!validationSupported) {
+                                    window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending";
+                                    return;
+                                }
+                                if (!pendingObject?.fatalError) {
+                                    navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`)
+                                } else {
+                                    window.location.href = "https://okgraph.xyz/?q=" + pendingObject?.subgraph;
+                                }
                             }
                         }
                         } key={subgraphName + depo.hostedServiceId + "DepInDevRow-PENDING"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
@@ -133,15 +145,27 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                     )
                 } else {
                     pendingRow = (
-                        <TableRow onClick={() => {
-                            if (!validationSupported) {
-                                window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending";
-                                return;
-                            }
-                            if (!pendingObject?.fatalError) {
-                                navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`)
+                        <TableRow onClick={(event) => {
+                            if (event.ctrlKey) {
+                                if (!validationSupported) {
+                                    window.open("https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending", "_blank");
+                                    return;
+                                }
+                                if (!pendingObject?.fatalError) {
+                                    window.open(`https://subgraphs.messari.io/subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`, "_blank");
+                                } else {
+                                    window.open("https://okgraph.xyz/?q=" + pendingObject?.subgraph, "_blank");
+                                }
                             } else {
-                                window.location.href = "https://okgraph.xyz/?q=" + pendingObject?.subgraph;
+                                if (!validationSupported) {
+                                    window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending";
+                                    return;
+                                }
+                                if (!pendingObject?.fatalError) {
+                                    navigate(`subgraph?endpoint=messari/${depo.hostedServiceId}&tab=protocol&version=pending`);
+                                } else {
+                                    window.location.href = "https://okgraph.xyz/?q=" + pendingObject?.subgraph;
+                                }
                             }
                         }} key={subgraphName + depo.hostedServiceId + "DepInDevRow-PENDING"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                             <TableCell
@@ -251,16 +275,29 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
                     );
                 }
                 decenRow = (
-                    <TableRow onClick={() => {
-                        if (!validationSupported) {
-                            window.location.href = `https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview`;
-                            return;
+                    <TableRow onClick={(event) => {
+                        if (event.ctrlKey) {
+                            if (!validationSupported) {
+                                window.open(`https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview`, "_blank");
+                                return;
+                            }
+                            if (!decenObject?.fatalError) {
+                                window.open(`https://subgraphs.messari.io/subgraph?endpoint=${endpointURL}&tab=protocol`, "_blank");
+                            } else {
+                                window.open("https://okgraph.xyz/?q=" + depo.decentralizedNetworkId, "_blank");
+                            }
+                        } else {
+                            if (!validationSupported) {
+                                window.location.href = `https://thegraph.com/explorer/subgraph?id=${decenSubgraphId}&view=Overview`;
+                                return;
+                            }
+                            if (!decenObject?.fatalError) {
+                                navigate(`subgraph?endpoint=${endpointURL}&tab=protocol`)
+                            } else {
+                                window.location.href = "https://okgraph.xyz/?q=" + depo.decentralizedNetworkId;
+                            }
                         }
-                        if (decenObject?.fatalError) {
-                            window.location.href = "https://okgraph.xyz/?q=" + depo?.decentralizedNetworkId;
-                            return;
-                        }
-                        navigate(`subgraph?endpoint=${endpointURL}&tab=protocol`)
+                        return;
                     }} key={subgraphName + depo.hostedServiceId + "DepInDevRow-DECEN"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell
                             sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${highlightColor} solid 34px`, verticalAlign: "middle", display: "flex" }}
@@ -351,16 +388,29 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
             if (!isLoaded) {
                 return (<>
-                    <TableRow onClick={() => {
-                        if (!validationSupported) {
-                            window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId;
-                            return;
-                        }
-                        if (!currentObject?.fatalError) {
-                            navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`);
+                    <TableRow onClick={(event) => {
+                        if (event.ctrlKey) {
+                            if (!validationSupported) {
+                                window.open("https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending", "_blank");
+                                return;
+                            }
+                            if (!currentObject?.fatalError) {
+                                window.open(`https://subgraphs.messari.io/subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`, "_blank");
+                            } else {
+                                window.open("https://okgraph.xyz/?q=" + depo.hostedServiceId, "_blank");
+                            }
                         } else {
-                            window.location.href = "https://okgraph.xyz/?q=messari/" + depo.hostedServiceId;
+                            if (!validationSupported) {
+                                window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending";
+                                return;
+                            }
+                            if (!currentObject?.fatalError) {
+                                navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`)
+                            } else {
+                                window.location.href = "https://okgraph.xyz/?q=" + depo.hostedServiceId;
+                            }
                         }
+                        return;
                     }} key={subgraphName + depo.hostedServiceId + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell
                             sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `rgb(55, 55, 55) solid 34px`, verticalAlign: "middle", display: "flex" }}
@@ -411,16 +461,29 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
             return (
                 <>
                     {decenRow}
-                    <TableRow onClick={() => {
-                        if (!validationSupported) {
-                            window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId;
-                            return;
-                        }
-                        if (!currentObject?.fatalError) {
-                            navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`);
+                    <TableRow onClick={(event) => {
+                        if (event.ctrlKey) {
+                            if (!validationSupported) {
+                                window.open("https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending", "_blank");
+                                return;
+                            }
+                            if (!currentObject?.fatalError) {
+                                window.open(`https://subgraphs.messari.io/subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`, "_blank");
+                            } else {
+                                window.open("https://okgraph.xyz/?q=" + depo.hostedServiceId, "_blank");
+                            }
                         } else {
-                            window.location.href = "https://okgraph.xyz/?q=messari/" + depo.hostedServiceId;
+                            if (!validationSupported) {
+                                window.location.href = "https://thegraph.com/hosted-service/subgraph/messari/" + depo.hostedServiceId + "?version=pending";
+                                return;
+                            }
+                            if (!currentObject?.fatalError) {
+                                navigate(`subgraph?endpoint=${subgraphUrlBase}messari/${depo.hostedServiceId}&tab=protocol`)
+                            } else {
+                                window.location.href = "https://okgraph.xyz/?q=" + depo.hostedServiceId;
+                            }
                         }
+                        return;
                     }} key={subgraphName + depo.hostedServiceId + "DepInDevRow"} sx={{ height: "10px", width: "100%", backgroundColor: "rgba(22,24,29,0.9)", cursor: "pointer" }}>
                         <TableCell
                             sx={{ backgroundColor: "rgb(55, 55, 55)", color: "white", padding: "0", paddingLeft: "6px", borderLeft: `${highlightColor} solid 34px`, verticalAlign: "middle", display: "flex" }}
