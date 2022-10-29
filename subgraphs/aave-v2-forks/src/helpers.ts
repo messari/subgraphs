@@ -65,9 +65,6 @@ export function getOrCreateLendingProtocol(
 
     lendingProtocol.name = protocolData.name;
     lendingProtocol.slug = protocolData.slug;
-    lendingProtocol.schemaVersion = protocolData.schemaVersion;
-    lendingProtocol.subgraphVersion = protocolData.subgraphVersion;
-    lendingProtocol.methodologyVersion = protocolData.methodologyVersion;
     lendingProtocol.network = protocolData.network;
     lendingProtocol.type = ProtocolType.LENDING;
     lendingProtocol.lendingType = LendingType.POOLED;
@@ -91,9 +88,12 @@ export function getOrCreateLendingProtocol(
     lendingProtocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     lendingProtocol.priceOracle = ZERO_ADDRESS;
     lendingProtocol.marketIDs = [];
-
-    lendingProtocol.save();
   }
+
+  lendingProtocol.schemaVersion = protocolData.schemaVersion;
+  lendingProtocol.subgraphVersion = protocolData.subgraphVersion;
+  lendingProtocol.methodologyVersion = protocolData.methodologyVersion;
+  lendingProtocol.save();
 
   return lendingProtocol;
 }
@@ -982,7 +982,7 @@ export function getOrCreateMarket(
     // Create a new Market
     market = new Market(marketId.toHexString());
 
-    market.protocol = protocol.name;
+    market.protocol = protocol.id;
     market.isActive = true; // initialized to true on creation
     market.canUseAsCollateral = true; // only stopped when protocol is paused
     market.canBorrowFrom = true; // this field changes occasinally, but all markets are set to true after creation
