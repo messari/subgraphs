@@ -344,6 +344,12 @@ export function updateRevenue(
     } else {
       newProtocolSideInterestRevenue = newProtocolSideRevenue.minus(newLiquidationRevenue);
     }
+    log.info("[updateRevenue]liquidation rev ${} + interest rev ${} = total protocol rev of ${} for tx {}", [
+      newLiquidationRevenue.toString(),
+      newProtocolSideInterestRevenue.toString(),
+      newProtocolSideRevenue.toString(),
+      event.transaction.hash.toHexString(),
+    ]);
   }
   // reserve fee from interest revenue
   // because protocolSideRev = totalRev * reserveFee/RESERVE_FEE_SCALE
@@ -614,101 +620,6 @@ function updateTransactionCount(
   dailyUsage.save();
 }
 
-export function rollbackRevenue(marketId: string, event: Liquidation, assetStatus: _AssetStatus): void {
-  // Roll back supply side & total revenue accounted from liquidation
-  // The handleAssetStatus works as if all reserveBalance increases are
-  // from interest and calculates total revenue & supply side revenue
-  // from reserve increases. But euler collect fees from liquidations too.
-  // These fees should be excluded in calculating total & supply side
-  // revenue. Here we roll back total and supply side revenue that have already
-  // been added because logAssetStatus is emitted before Liquidation in
-  // executeLiquidation().
-  const protocol = getOrCreateLendingProtocol();
-  const market = getOrCreateMarket(marketId);
-  const token = getOrCreateToken(event.params.underlying);
-  const repay = bigIntToBDUseDecimals(event.params.repay, DEFAULT_DECIMALS);
-  // Line 156 Liquidation.sol: repay * (1 + 0.02)
-  const desiredRepay = repay.times(BIGDECIMAL_ONE.plus(UNDERLYING_RESERVES_FEE.div(DECIMAL_PRECISION)));
-  const repayExtraUSD = desiredRepay.minus(repay).times(token.lastPriceUSD!);
-  const deltaTotalRevenueUSD = repayExtraUSD.times(RESERVE_FEE_SCALE).div(assetStatus.reserveFee.toBigDecimal());
-  const deltaSupplySideRevenueUSD = deltaTotalRevenueUSD.minus(repayExtraUSD);
-
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    protocol.cumulativeProtocolSideRevenueUSD,
-  );
-  protocol.save();
-
-  const financialsSnapshot = getOrCreateFinancials(event.block.timestamp, event.block.number);
-  financialsSnapshot.cumulativeSupplySideRevenueUSD =
-    financialsSnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  financialsSnapshot.cumulativeTotalRevenueUSD = financialsSnapshot.cumulativeSupplySideRevenueUSD.plus(
-    financialsSnapshot.cumulativeProtocolSideRevenueUSD,
-  );
-  if (financialsSnapshot.dailySupplySideRevenueUSD.ge(deltaSupplySideRevenueUSD)) {
-    financialsSnapshot.dailySupplySideRevenueUSD =
-      financialsSnapshot.dailySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-    financialsSnapshot.dailyTotalRevenueUSD = financialsSnapshot.dailySupplySideRevenueUSD.minus(
-      financialsSnapshot.dailyProtocolSideRevenueUSD,
-    );
-  }
-  financialsSnapshot.save();
-
-  market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  market.cumulativeTotalRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(
-    market.cumulativeProtocolSideRevenueUSD,
-  );
-  market.save();
-
-  const marketDailySnapshot = getOrCreateMarketDailySnapshot(event.block, marketId);
-  marketDailySnapshot.cumulativeSupplySideRevenueUSD =
-    marketDailySnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  marketDailySnapshot.cumulativeTotalRevenueUSD = marketDailySnapshot.cumulativeSupplySideRevenueUSD.plus(
-    marketDailySnapshot.cumulativeProtocolSideRevenueUSD,
-  );
-  if (marketDailySnapshot.dailySupplySideRevenueUSD.ge(deltaSupplySideRevenueUSD)) {
-    marketDailySnapshot.dailySupplySideRevenueUSD =
-      marketDailySnapshot.dailySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-    marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
-      marketDailySnapshot.dailyProtocolSideRevenueUSD,
-    );
-  } else {
-    log.error("[rollbackRevenue]market={}/{},blk={},tx={},deltaTotalRevUSD={}>market.dailyTotalRevnueUSD={}", [
-      market.name!,
-      market.id,
-      event.block.number.toString(),
-      event.transaction.hash.toHexString(),
-      deltaTotalRevenueUSD.toString(),
-      marketDailySnapshot.dailyTotalRevenueUSD.toString(),
-    ]);
-  }
-  marketDailySnapshot.save();
-
-  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event.block, marketId);
-  marketHourlySnapshot.cumulativeSupplySideRevenueUSD =
-    marketHourlySnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  marketHourlySnapshot.cumulativeTotalRevenueUSD = marketHourlySnapshot.cumulativeSupplySideRevenueUSD.plus(
-    marketHourlySnapshot.cumulativeProtocolSideRevenueUSD,
-  );
-  if (marketHourlySnapshot.hourlySupplySideRevenueUSD.ge(deltaSupplySideRevenueUSD)) {
-    marketHourlySnapshot.hourlySupplySideRevenueUSD =
-      marketHourlySnapshot.hourlySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-    marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
-      marketHourlySnapshot.hourlyProtocolSideRevenueUSD,
-    );
-  } else {
-    log.error("[rollbackRevenue]market={}/{},blk={},tx={},deltaTotalRevUSD={}>market.hourlyTotalRevnueUSD={}", [
-      market.name!,
-      market.id,
-      event.block.number.toString(),
-      event.transaction.hash.toHexString(),
-      deltaTotalRevenueUSD.toString(),
-      marketHourlySnapshot.hourlyTotalRevenueUSD.toString(),
-    ]);
-  }
-  marketHourlySnapshot.save();
-}
-
 // get repay amount if a Liquidation event is emitted after current event in the same transaction
 // return null if not a liquidation event or error
 function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
@@ -716,12 +627,6 @@ function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
     log.warning("[isReserveFeeFromLiquidation][{}] has no event.receipt", [event.transaction.hash.toHexString()]);
     return null;
   }
-
-  log.warning("[isReserveFeeFromLiquidation][{}] event.logIndex={},event.receipt.logs.length={}", [
-    event.transaction.hash.toHexString(),
-    event.logIndex.toString(),
-    event.receipt!.logs.length.toString(),
-  ]);
 
   const currentEventLogIndex = event.logIndex;
   const logs = event.receipt!.logs;
@@ -746,29 +651,9 @@ function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
   // the logIndex of the first AssetStatus is 115, logIndex of Liquidation is 120
   if (foundIndex >= 0 && foundIndex + 5 < logs.length) {
     const nextLog = logs.at(foundIndex + 5);
-    log.debug("[isReserveFeeFromLiquidation]tx={},foundIndex={},logIndex={},logIndex(+2)={},logs.length={}", [
-      event.transaction.hash.toHexString(),
-      foundIndex.toString(),
-      currentEventLogIndex.toString(),
-      nextLog.logIndex.toString(),
-      logs.length.toString(),
-    ]);
-
     const topic0Sig = nextLog.topics.at(0); //topic0
-    log.debug("[isReserveFeeFromLiquidation]tx={},logIndex={},topic0={},liquidationSig={}, topic0==target?={}", [
-      event.transaction.hash.toHexString(),
-      nextLog.logIndex.toString(),
-      topic0Sig.toHexString(),
-      liquidationSig.toHexString(),
-      topic0Sig.equals(liquidationSig).toString(),
-    ]);
-
     if (topic0Sig.equals(liquidationSig)) {
       const repay = ethereum.decode("uint256", Bytes.fromUint8Array(nextLog.data.subarray(32, 64)))!.toBigInt();
-      log.debug("[isReserveFeeFromLiquidation]tx={},repay={}", [
-        event.transaction.hash.toHexString(),
-        repay.toString(),
-      ]);
       return repay;
     }
   }
