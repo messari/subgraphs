@@ -116,7 +116,6 @@ export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel
   for (let i = 0; i < arrData.length; i++) {
     let row = "";
     for (let index in arrData[i]) {
-      console.log('indy', arrData[i][index], index)
       row += '"' + arrData[i][index] + '",';
     }
     row.slice(0, row.length - 1);
