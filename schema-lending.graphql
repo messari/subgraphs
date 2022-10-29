@@ -1250,6 +1250,7 @@ type Account @entity {
   flashloans: [Flashloan!]! @derivedFrom(field: "account")
 }
 
+# A position is defined as who has control over the collateral or debt
 type Position @entity {
   " { Account address }-{ Market address }-{ Position Side }-{ Optional: Interest Rate Type}-{ Counter } "
   id: Bytes!
@@ -1650,8 +1651,11 @@ type Transfer @entity(immutable: true) {
   " The user positions changed by this event "
   positions: [Position!]!
 
-  " Token transferred "
+  " The market associated with the token transfer "
   market: Market!
+
+  " The asset that was actually transfered. This could also include a debt token. "
+  asset: Token!
 
   " Amount of token transferred in native units "
   amount: BigInt!
