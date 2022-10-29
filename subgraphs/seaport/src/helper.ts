@@ -1,4 +1,32 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+
+export namespace MethodSignatures {
+  export const FULFILL_BASIC_ORDER = "0XFB0F3EE1"
+  export const FULFILL_ORDER = "0XB3A34C4C"
+  export const FULFILL_ADVANCED_ORDER = "0XE7ACAB24"
+  export const FULFILL_AVAILABLE_ORDERS = "0XED98A574"
+  export const FULFILL_AVAILABLE_ADVANCED_ORDERS = "0X87201B41"
+  export const MATCH_ORDERS = "0XA8174404"
+  export const MATCH_ADVANCED_ORDERS = "0X55944A42"
+}
+
+export namespace OrderFulfillmentMethods {
+  export const FULFILL_BASIC_ORDER = "FULFILL_BASIC_ORDER" 
+  export const FULFILL_ORDER = "FULFILL_ORDER" 
+  export const FULFILL_ADVANCED_ORDER = "FULFILL_ADVANCED_ORDER" 
+  export const FULFILL_AVAILABLE_ORDERS = "FULFILL_AVAILABLE_ORDERS"
+  export const FULFILL_AVAILABLE_ADVANCED_ORDERS = "FULFILL_AVAILABLE_ADVANCED_ORDERS"
+  export const MATCH_ORDERS = "MATCH_ORDERS" 
+  export const MATCH_ADVANCED_ORDERS = "MATCH_ADVANCED_ORDERS" 
+}
+
+export namespace MethodSignatureTypeStrings {
+  export const FULFILL_ORDER_TYPE = "((address,address,(uint8,address,uint256,uint256,uint256)[],(uint8,address,uint256,uint256,uint256,address)[],uint8,uint256,uint256,bytes32,uint256,bytes32,uint256),bytes),bytes32)"
+  export const FULFILL_BASIC_ORDER_TYPE = "(address,uint256,uint256,address,address,address,uint256,uint256,uint8,uint256,uint256,bytes32,uint256,bytes32,bytes32,uint256,(uint256,address)[],bytes)" 
+  export const FULFILL_ADVANCED_ORDER_TYPE = "((address,address,(uint8,address,uint256,uint256,uint256)[],(uint8,address,uint256,uint256,uint256,address)[],uint8,uint256,uint256,bytes32,uint256,bytes32,uint256),uint120,uint120,bytes,bytes),(uint256,uint8,uint256,uint256,bytes32[])[],bytes32,address)"
+  export const MATCH_ORDERS_TYPE = "((address,address,(uint8,address,uint256,uint256,uint256)[],(uint8,address,uint256,uint256,uint256,address)[],uint8,uint256,uint256,bytes32,uint256,bytes32,uint256),bytes)[],((uint256,uint256)[],(uint256,uint256)[])[])"
+  export const MATCH_ADVANCED_ORDERS_TYPE = "((address,address,(uint8,address,uint256,uint256,uint256)[],(uint8,address,uint256,uint256,uint256,address)[],uint8,uint256,uint256,bytes32,uint256,bytes32,uint256),uint120,uint120,bytes,bytes)[],(uint256,uint8,uint256,uint256,bytes32[])[],((uint256,uint256)[],(uint256,uint256)[])[])"
+}
 
 export const PROTOCOL_SCHEMA_VERSION = "1.0.0";
 
@@ -123,3 +151,104 @@ export function isOpenSeaFeeAccount(address: Address): boolean {
     address == OPENSEA_ETHEREUM_FEE_COLLECTOR
   );
 }
+
+export const valueToString = (value:ethereum.Value):string => {
+  
+  if(value.kind === ethereum.ValueKind.ADDRESS) {
+    return value.toAddress().toHexString()
+  }
+  if(value.kind === ethereum.ValueKind.BOOL) {
+    return value.toBoolean() ? "True" : "False"
+  }
+  if(value.kind === ethereum.ValueKind.BYTES) {
+    return value.toBytes().toHexString()
+  }
+  if(value.kind === ethereum.ValueKind.FIXED_BYTES) {
+    return value.toBytes().toHexString()
+  }
+  if(value.kind === ethereum.ValueKind.INT) {
+    return value.toBigInt().toString()
+  }
+  if(value.kind === ethereum.ValueKind.STRING) {
+    return value.toString()
+  }
+  if(value.kind === ethereum.ValueKind.UINT) {
+    return value.toBigInt().toString()
+  }
+  if(value.kind === ethereum.ValueKind.ARRAY) {
+    return "Is an array"
+  }
+  
+  return "value kind not found"
+}
+
+export function orderFulfillmentMethod(event:ethereum.Event):string | null {
+  let methodSignature = event.transaction.input.toHexString().slice(0,10).toUpperCase()
+
+  let fulfillmentType: string | null = null
+  if(methodSignature == MethodSignatures.FULFILL_BASIC_ORDER.toUpperCase()) {
+    fulfillmentType = OrderFulfillmentMethods.FULFILL_BASIC_ORDER
+  }
+
+  if(methodSignature == MethodSignatures.FULFILL_ORDER) {
+    fulfillmentType = OrderFulfillmentMethods.FULFILL_ORDER
+  }
+
+  if(methodSignature == MethodSignatures.FULFILL_ADVANCED_ORDER) {
+    fulfillmentType = OrderFulfillmentMethods.FULFILL_ADVANCED_ORDER
+  }
+
+  if(methodSignature == MethodSignatures.FULFILL_AVAILABLE_ORDERS) {
+    fulfillmentType = OrderFulfillmentMethods.FULFILL_AVAILABLE_ORDERS
+  }
+  
+  if(methodSignature == MethodSignatures.FULFILL_AVAILABLE_ADVANCED_ORDERS) {
+    fulfillmentType = OrderFulfillmentMethods.FULFILL_AVAILABLE_ADVANCED_ORDERS
+  }
+
+  if(methodSignature == MethodSignatures.MATCH_ORDERS) {
+    fulfillmentType = OrderFulfillmentMethods.MATCH_ORDERS
+  }
+
+  if(methodSignature == MethodSignatures.MATCH_ADVANCED_ORDERS) {
+    fulfillmentType === OrderFulfillmentMethods.MATCH_ADVANCED_ORDERS
+  }
+
+  return fulfillmentType;
+}
+export function tradeStrategy(event:ethereum.Event):string {
+  let methodSignature = event.transaction.input.toHexString().slice(0,10).toUpperCase()
+
+  let strategy = SaleStrategy.STANDARD_SALE; // default to this
+  if(methodSignature == MethodSignatures.FULFILL_BASIC_ORDER) {
+    strategy = SaleStrategy.STANDARD_SALE
+  }
+
+  if(methodSignature == MethodSignatures.FULFILL_ORDER) {
+    strategy = SaleStrategy.ANY_ITEM_FROM_SET
+  }
+
+  if(methodSignature == MethodSignatures.FULFILL_ADVANCED_ORDER) {
+    strategy = SaleStrategy.ANY_ITEM_FROM_SET
+  }
+
+  if(methodSignature == MethodSignatures.FULFILL_AVAILABLE_ORDERS) {
+    strategy = SaleStrategy.ANY_ITEM_FROM_SET
+  }
+  
+  if(methodSignature == MethodSignatures.FULFILL_AVAILABLE_ADVANCED_ORDERS) {
+    strategy = SaleStrategy.ANY_ITEM_FROM_SET
+  }
+
+  if(methodSignature == MethodSignatures.MATCH_ORDERS) {
+    strategy = SaleStrategy.ANY_ITEM_FROM_SET
+  }
+
+  if(methodSignature == MethodSignatures.MATCH_ADVANCED_ORDERS) {
+    strategy = SaleStrategy.ANY_ITEM_FROM_SET
+  }
+
+  return strategy;
+}
+
+
