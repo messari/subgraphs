@@ -15,7 +15,7 @@ export namespace Protocol {
   export const NAME = "Aave RWA";
   export const SLUG = "aave-rwa";
   export const SCHEMA_VERSION = "2.0.1";
-  export const SUBGRAPH_VERSION = "1.2.15";
+  export const SUBGRAPH_VERSION = "1.2.16";
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 export const AAVE_DECIMALS = 8;
