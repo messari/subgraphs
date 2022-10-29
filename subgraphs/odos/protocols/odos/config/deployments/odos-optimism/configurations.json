@@ -1,0 +1,8 @@
+{
+  "deployment": "ODOS_OPTIMISM",
+  "network": "optimism",
+  "factory": {
+    "address": "0x69dd38645f7457be13571a847ffd905f9acbaf6d",
+    "startBlock": 27703431
+  }
+}

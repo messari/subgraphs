@@ -1,0 +1,8 @@
+{
+  "deployment": "ODOS_POLYGON",
+  "network": "matic",
+  "factory": {
+    "address": "0xa32ee1c40594249eb3183c10792bcf573d4da47c",
+    "startBlock": 25785198
+  }
+}
