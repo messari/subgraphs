@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { TokenABI } from "../../generated/Factory/TokenABI";
 import {
@@ -27,6 +27,7 @@ import {
   RewardTokenType,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
+  FeeSwitch,
 } from "./constants";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
@@ -55,8 +56,55 @@ export function getOrCreateProtocol(): DexAmmProtocol {
   return protocol;
 }
 
-export function getLiquidityPool(poolAddress: string): LiquidityPool {
-  return LiquidityPool.load(poolAddress)!;
+export function getLiquidityPool(
+  poolAddress: string,
+  blockNumber: BigInt
+): LiquidityPool {
+  const pool = LiquidityPool.load(poolAddress)!;
+  pool.fees = updateFeesIfChanged(poolAddress, blockNumber);
+  pool.save();
+  return pool;
+}
+
+export function updateFeesIfChanged(
+  poolAddress: string,
+  blockNumber: BigInt
+): string[] {
+  const poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
+  const poolProtocolFee = new LiquidityPoolFee(
+    poolAddress.concat("-protocol-fee")
+  );
+  const poolTradingFee = new LiquidityPoolFee(
+    poolAddress.concat("-trading-fee")
+  );
+
+  if (NetworkConfigs.getFeeOnOff() == FeeSwitch.ON) {
+    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn(blockNumber);
+    poolProtocolFee.feePercentage =
+      NetworkConfigs.getProtocolFeeToOn(blockNumber);
+  } else {
+    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOff();
+    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOff();
+  }
+
+  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee(blockNumber);
+
+  poolLpFee.save();
+  poolProtocolFee.save();
+  poolTradingFee.save();
+
+  log.error(
+    "FEES UPDATED --- poolAddress: {}, blockNumber: {}, lpFee - {} protocolFee - {} tradingFee - {}",
+    [
+      poolAddress,
+      blockNumber.toString(),
+      poolLpFee.feePercentage!.toString(),
+      poolProtocolFee.feePercentage!.toString(),
+      poolTradingFee.feePercentage!.toString(),
+    ]
+  );
+
+  return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
 
 export function getLiquidityPoolAmounts(

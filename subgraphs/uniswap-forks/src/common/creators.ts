@@ -72,12 +72,16 @@ export function createPoolFees(
   poolProtocolFee.save();
   poolTradingFee.save();
 
-  log.error("blockNumber: {}, lpFee - {} protocolFee - {} tradingFee - {}", [
-    blockNumber.toString(),
-    poolLpFee.feePercentage!.toString(),
-    poolProtocolFee.feePercentage!.toString(),
-    poolTradingFee.feePercentage!.toString(),
-  ]);
+  log.error(
+    "FEES SET --- poolAddress: {}, blockNumber: {}, lpFee - {} protocolFee - {} tradingFee - {}",
+    [
+      poolAddress,
+      blockNumber.toString(),
+      poolLpFee.feePercentage!.toString(),
+      poolProtocolFee.feePercentage!.toString(),
+      poolTradingFee.feePercentage!.toString(),
+    ]
+  );
 
   return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
@@ -162,7 +166,10 @@ export function createDeposit(
 ): void {
   const transfer = getOrCreateTransfer(event);
 
-  const pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
 
   const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
@@ -206,7 +213,10 @@ export function createWithdraw(
 ): void {
   const transfer = getOrCreateTransfer(event);
 
-  const pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
 
   const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
@@ -256,7 +266,10 @@ export function createSwapHandleVolumeAndFees(
   amount1Out: BigInt
 ): void {
   const protocol = getOrCreateProtocol();
-  const pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
   const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
   const token0 = getOrCreateToken(pool.inputTokens[0]);
@@ -321,7 +334,7 @@ export function createSwapHandleVolumeAndFees(
   swap.save();
 
   log.error(
-    " ---> swaps --- tx: {}, token0: {}, token1: {}, token0Price: {}, token1Price: {}, amount0Total: {}, amount1Total: {}, amount0TotalConverted: {}, amount1TotalConverted: {}, token0USD: {}, token1USD: {}",
+    " ---> SWAPS --- tx: {}, token0: {}, token1: {}, token0Price: {}, token1Price: {}, amount0Total: {}, amount1Total: {}, amount0TotalConverted: {}, amount1TotalConverted: {}, token0USD: {}, token1USD: {}",
     [
       transactionHash,
       token0.symbol,
