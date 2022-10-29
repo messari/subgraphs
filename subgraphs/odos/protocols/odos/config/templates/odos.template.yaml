@@ -1,0 +1,61 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema-dex-aggregator.graphql
+dataSources:
+  - kind: ethereum
+    name: OdosRouter
+    network: "{{ network }}"
+    source:
+      address: "{{ factory.address }}"
+      abi: OdosRouter
+      startBlock: {{ factory.startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: OdosRouter
+          file: ./abis/odos/odosRouter.json
+        - name: ERC20
+          file: ./abis/Prices/ERC20.json
+          
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        ## Indexer staking events
+        - event: Swapped(address,uint256[],address[],uint256[],(address,uint256,address)[],uint256)
+          handler: handleSwapped
+      file: ./src/handlers/handleSwapped.ts
+
+

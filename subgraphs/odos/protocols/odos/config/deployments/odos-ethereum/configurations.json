@@ -1,0 +1,8 @@
+{
+  "deployment": "ODOS_ETHEREUM",
+  "network": "mainnet",
+  "factory": {
+    "address": "0x76f4eed9fe41262669d0250b2a97db79712ad855",
+    "startBlock": 15482404
+  }
+}
