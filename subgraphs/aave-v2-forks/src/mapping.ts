@@ -1051,7 +1051,7 @@ export function _handleLiquidate(
 //// Transfer Events ////
 /////////////////////////
 
-export function _handleCollateralTransfer(
+export function _handleTransfer(
   event: ethereum.Event,
   protocolData: ProtocolData,
   positionSide: string,
