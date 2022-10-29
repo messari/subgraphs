@@ -130,7 +130,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.15",
+          "subgraph": "1.2.16",
           "methodology": "1.0.0"
         },
         "files": {
@@ -159,7 +159,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.15",
+          "subgraph": "1.2.16",
           "methodology": "1.0.0"
         },
         "files": {
@@ -188,7 +188,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.15",
+          "subgraph": "1.2.16",
           "methodology": "1.0.0"
         },
         "files": {
@@ -217,7 +217,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.14",
+          "subgraph": "1.2.15",
           "methodology": "1.0.0"
         },
         "files": {
@@ -239,7 +239,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.14",
+          "subgraph": "1.2.15",
           "methodology": "1.0.0"
         },
         "files": {
@@ -265,7 +265,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.14",
+          "subgraph": "1.2.15",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2874,7 +2874,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.10",
+          "subgraph": "1.0.11",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2903,7 +2903,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2932,7 +2932,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.1",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
