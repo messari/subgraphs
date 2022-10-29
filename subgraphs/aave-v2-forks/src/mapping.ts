@@ -1062,8 +1062,8 @@ export function _handleTransfer(
   const protocol = getOrCreateLendingProtocol(protocolData);
   const market = getMarketByAuxillaryToken(asset.toHexString(), protocolData);
   if (!market) {
-    log.warning("[handleCollateralTransfer] market not found: {}", [
-      event.address.toHexString(),
+    log.warning("[_handleTransfer] market not found: {}", [
+      asset.toHexString(),
     ]);
     return;
   }
