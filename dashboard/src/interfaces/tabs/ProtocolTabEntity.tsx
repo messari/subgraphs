@@ -12,6 +12,8 @@ interface ProtocolTabEntityProps {
   entityName: string;
   protocolType: string;
   protocolTableData: { [x: string]: any };
+  overlaySchemaData: any;
+  protocolSchemaData: any;
   currentEntityData: any;
   currentOverlayEntityData: any;
   currentTimeseriesLoading: any;
@@ -26,6 +28,8 @@ function ProtocolTabEntity({
   entityName,
   protocolType,
   protocolTableData,
+  overlaySchemaData,
+  protocolSchemaData,
   currentEntityData,
   currentOverlayEntityData,
   currentTimeseriesLoading,
@@ -435,7 +439,9 @@ function ProtocolTabEntity({
             }
             let dataChartToPass: any = dataFields[field];
             if (overlayDataFields[field]) {
-              dataChartToPass = { current: dataFields[field], overlay: overlayDataFields[field] };
+              const baseKey = `${protocolSchemaData?.protocols[0]?.name}-${protocolSchemaData?.protocols[0]?.network}-${protocolSchemaData?.protocols[0]?.subgraphVersion}`;
+              const overlayKey = `${overlaySchemaData?.protocols[0]?.name}-${overlaySchemaData?.protocols[0]?.network}-${overlaySchemaData?.protocols[0]?.subgraphVersion}`;
+              dataChartToPass = { [baseKey]: dataFields[field], [overlayKey]: overlayDataFields[field] };
             }
             return (
               <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} />

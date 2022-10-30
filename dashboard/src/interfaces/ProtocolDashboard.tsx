@@ -130,6 +130,9 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
     if (overlayDeploymentURL && protocolSchemaData) {
       getOverlaySchemaData();
     }
+    if (overlayDeploymentURL === "" && overlayError) {
+      setOverlayError(null);
+    }
   }, [protocolSchemaData, overlayDeploymentURL])
 
   // By default, set the schema version to the user selected. If user has not selected, go to the version on the protocol entity
@@ -330,7 +333,7 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
   );
 
   const queryPoolOverview = gql`
-    ${poolOverview(protocolType, schemaVersion)}
+  ${poolOverview(protocolType, schemaVersion)}
   `;
 
   const [
@@ -1031,6 +1034,23 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
     };
   }
 
+  let overlaySchemaDataProp = overlaySchemaData;
+  const overlayBrokenDownName = subgraphName.split("/")[1]?.split("-");
+  const overlayNetwork = overlayBrokenDownName?.pop() || "";
+  if (!overlaySchemaDataProp?.protocols[0]) {
+    overlaySchemaDataProp = {
+      protocols: [
+        {
+          type: "N/A",
+          name: overlayBrokenDownName ? overlayBrokenDownName?.join(" ") : "",
+          network: overlayNetwork.toUpperCase(),
+          schemaVersion: "N/A",
+          subgraphVersion: "N/A",
+        },
+      ],
+    };
+  }
+
   const indexingStatusKey = "indexingStatusFor" + (isCurrentVersion ? "CurrentVersion" : "PendingVersion");
   if (!errorDisplayProps && indexingFailureData) {
     const errMsg = indexingFailureData[indexingStatusKey]?.fatalError?.message;
@@ -1085,6 +1105,8 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
           poolData={poolData}
           protocolFields={protocolFields}
           protocolTableData={protocolTableData}
+          overlaySchemaData={overlaySchemaDataProp}
+          protocolSchemaData={protocolSchemaDataProp}
           subgraphToQueryURL={subgraphToQuery.url}
           skipAmt={skipAmt}
           poolOverviewRequest={{ poolOverviewError: anyPoolOverviewError, poolOverviewLoading: anyPoolOverviewLoading }}
