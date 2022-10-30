@@ -1,4 +1,5 @@
 import {
+  getOrCreateLpToken,
   getOrCreateVaultFee,
   getOrCreateYieldAggregator,
 } from "./initializers";
@@ -60,10 +61,13 @@ export function getVaultFromGauge(gaugeAddress: Address): Address {
 
   if (vaultAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return vaultAddress;
 
-  vaultAddress = readValue<Address>(
+  const lpTokenAddress = readValue<Address>(
     gaugeContract.try_stakingToken(),
     constants.NULL.TYPE_ADDRESS
   );
+
+  const lpTokenStore = getOrCreateLpToken(lpTokenAddress);
+  vaultAddress = Address.fromString(lpTokenStore.vaultAddress);
 
   return vaultAddress;
 }
@@ -114,6 +118,10 @@ export function getInputTokenFromVault(vaultAddress: Address): Address {
     vaultContract.try_token(),
     constants.NULL.TYPE_ADDRESS
   );
+
+  const lpTokenStore = getOrCreateLpToken(inputTokenAddress);
+  lpTokenStore.vaultAddress = vaultAddress.toHexString();
+  lpTokenStore.save();
 
   return inputTokenAddress;
 }
@@ -175,7 +183,7 @@ export function getVaultFees(
     vaultAddress.toHexString();
   let performanceFeeStore = getOrCreateVaultFee(
     performanceFeeId,
-    constants.VaultFeeType.WITHDRAWAL_FEE,
+    constants.VaultFeeType.PERFORMANCE_FEE,
     performanceFee.divDecimal(constants.BIGDECIMAL_HUNDRED)
   );
 
@@ -241,7 +249,7 @@ export function getLiquidityLockersVaultFees(
     vaultAddress.toHexString();
   let performanceFeeStore = getOrCreateVaultFee(
     performanceFeeId,
-    constants.VaultFeeType.WITHDRAWAL_FEE,
+    constants.VaultFeeType.PERFORMANCE_FEE,
     accumulatorFee
       .plus(performanceFee)
       .plus(claimerRewardFee)

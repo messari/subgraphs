@@ -4,7 +4,6 @@ import {
   updateVaultSnapshots,
 } from "../modules/Metrics";
 import {
-  Earn,
   DepositCall,
   WithdrawCall,
   SetGaugeCall,
@@ -13,11 +12,8 @@ import {
 } from "../../generated/templates/Vault/Vault";
 import { Deposit } from "../modules/Deposit";
 import { Withdraw } from "../modules/Withdraw";
-import * as constants from "../common/constants";
-import { updateRevenueSnapshots } from "../modules/Revenue";
 import { Gauge as GaugeTemplate } from "../../generated/templates";
 import { SetLiquidityGaugeCall } from "../../generated/Controller/Vault";
-import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
 
 export function handleDeposit(call: DepositCall): void {
   const vaultAddress = call.to;
@@ -82,27 +78,4 @@ export function handleSetLiquidityGauge(call: SetLiquidityGaugeCall): void {
   const gaugeAddress = call.inputs._liquidityGauge;
 
   GaugeTemplate.create(gaugeAddress);
-}
-
-export function handleEarn(event: Earn): void {
-  const vaultAddress = event.address;
-  const tokenAddress = event.params._token;
-  const earnedAmount = event.params._amount;
-
-  let vault = getOrCreateVault(vaultAddress, event.block);
-  let earnedToken = getOrCreateToken(tokenAddress, event.block);
-  let earnedTokenDecimals = constants.BIGINT_TEN.pow(
-    earnedToken.decimals as u8
-  ).toBigDecimal();
-
-  let supplySideRevenue = earnedAmount
-    .divDecimal(earnedTokenDecimals)
-    .times(earnedToken.lastPriceUSD!);
-
-  updateRevenueSnapshots(
-    vault,
-    supplySideRevenue,
-    constants.BIGDECIMAL_ZERO,
-    event.block
-  );
 }

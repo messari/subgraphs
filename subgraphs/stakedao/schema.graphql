@@ -689,3 +689,11 @@ type _Strategy @entity {
   " Input token of the vault "
   inputToken: Bytes!
 }
+
+type _lpToken @entity {
+  " Address of the lpToken "
+  id: ID!
+
+  " Address of the vault associated with this Lp Token "
+  vaultAddress: String!
+}

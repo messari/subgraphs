@@ -3,6 +3,7 @@ import {
   Token,
   Account,
   VaultFee,
+  _lpToken,
   RewardToken,
   YieldAggregator,
   VaultDailySnapshot,
@@ -54,6 +55,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalPoolCount = 0;
     protocol._vaultIds = [];
+
     protocol.save();
   }
 
@@ -100,6 +102,19 @@ export function getOrCreateToken(
   return token;
 }
 
+export function getOrCreateLpToken(lpToken: Address): _lpToken {
+  let lpTokenStore = _lpToken.load(lpToken.toHexString());
+
+  if (!lpTokenStore) {
+    lpTokenStore = new _lpToken(lpToken.toHexString());
+    lpTokenStore.vaultAddress = constants.NULL.TYPE_STRING;
+
+    lpTokenStore.save();
+  }
+
+  return lpTokenStore;
+}
+
 export function getOrCreateTokenFromString(
   tokenAddress: string,
   block: ethereum.Block
@@ -123,7 +138,7 @@ export function getOrCreateRewardToken(
 
     rewardToken.save();
   }
-  return rewardToken as RewardToken;
+  return rewardToken;
 }
 
 export function getOrCreateVaultFee(

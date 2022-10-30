@@ -216,6 +216,8 @@ dataSources:
           handler: handleGaugeSet
         - event: VaultToggled(address,bool)
           handler: handleVaultToggled
+        - event: Claimed(address,address,uint256)
+          handler: handleClaimed
       file: ./src/mappings/liqudityLockerMappings.ts
   {{/liquidityLockers}}
 
@@ -288,8 +290,6 @@ templates:
           handler: handleDepositEvent
         - event: Withdraw(address,uint256)
           handler: handleWithdrawEvent
-        - event: Earn(address,uint256)
-          handler: handleEarn
       callHandlers:
         - function: deposit(uint256)
           handler: handleDeposit

@@ -22,7 +22,8 @@ export function handleRewardAdded(event: RewardAdded): void {
 
 export function handleRewardDataUpdate(event: RewardDataUpdate): void {
   const gaugeAddress = event.address;
-  const vaultAddress = utils.getVaultFromGauge(gaugeAddress)
+  const vaultAddress = utils.getVaultFromGauge(gaugeAddress);
+  if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
   updateRewardToken(vaultAddress, gaugeAddress, event.block);
 }
