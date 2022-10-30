@@ -124,10 +124,9 @@ export function Deposit(
     .divDecimal(inputTokenDecimals)
     .times(inputToken.lastPriceUSD!);
 
-  vault.inputTokenBalance = utils.readValue(
-    vaultContract.try_balance(),
-    constants.BIGINT_ZERO
-  );
+  vault.inputTokenBalance = utils.getVaultBalance(vaultAddress);
+
+  utils.readValue(vaultContract.try_balance(), constants.BIGINT_ZERO);
   vault.outputTokenSupply = utils.readValue(
     vaultContract.try_totalSupply(),
     constants.BIGINT_ZERO

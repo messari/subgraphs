@@ -119,10 +119,8 @@ export function Withdraw(
     }
   }
 
-  vault.inputTokenBalance = utils.readValue(
-    vaultContract.try_balance(),
-    constants.BIGINT_ZERO
-  );
+  vault.inputTokenBalance = utils.getVaultBalance(vaultAddress);
+
   vault.outputTokenSupply = utils.readValue(
     vaultContract.try_totalSupply(),
     constants.BIGINT_ZERO

@@ -29,7 +29,7 @@
     }
   ],
 
-  "graftEnabled": true,
-  "subgraphId": "QmVcNBfWVaCmgSmbagJnaCQ5wXAp9SzKntUPGeZTyifU7p",
-  "graftStartBlock": "14803768"
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": ""
 }

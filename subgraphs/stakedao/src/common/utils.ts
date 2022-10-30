@@ -2,13 +2,13 @@ import {
   getOrCreateVaultFee,
   getOrCreateYieldAggregator,
 } from "./initializers";
-import * as constants from "./constants";
 import { PoolFeesType } from "./types";
+import * as constants from "./constants";
 import { Vault as VaultStore } from "../../generated/schema";
-import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
 import { Vault as VaultContract } from "../../generated/templates/Vault/Vault";
 import { Gauge as GaugeContract } from "../../generated/templates/Gauge/Gauge";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import { Strategy as StrategyContract } from "../../generated/controller/Strategy";
 import { LiquidityLockerStrategy } from "../../generated/curveStrategy/LiquidityLockerStrategy";
 import { EthereumController as ControllerContract } from "../../generated/Controller/EthereumController";
@@ -66,6 +66,18 @@ export function getVaultFromGauge(gaugeAddress: Address): Address {
   );
 
   return vaultAddress;
+}
+
+export function getVaultBalance(vaultAddress: Address): BigInt {
+  const gaugeAddress = getGaugeFromVault(vaultAddress);
+  const gaugeContract = GaugeContract.bind(gaugeAddress);
+
+  const totalSupply = readValue<BigInt>(
+    gaugeContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
+
+  return totalSupply;
 }
 
 export function getMultiGaugeFromLiquidityLocker(
