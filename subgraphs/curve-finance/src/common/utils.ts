@@ -303,7 +303,7 @@ export function getPoolFromLpToken(lpToken: Address): Address {
   const lpTokenStore = getOrCreateLpToken(lpToken);
 
   let poolAddress = Address.fromString(lpTokenStore.poolAddress);
-  if (poolAddress.equals(constants.NULL.TYPE_ADDRESS)) return poolAddress;
+  if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return poolAddress;
 
   const registryAddress = Address.fromString(lpTokenStore.registryAddress);
   if (registryAddress.equals(constants.NULL.TYPE_ADDRESS)) return lpToken;

@@ -86,7 +86,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 7. Curve Router
-  let curvePrice = CurveRouter.getCurvePriceUsdc(tokenAddr, network);
+  let curvePrice = CurveRouter.getPriceUsdc(tokenAddr);
   if (!curvePrice.reverted) {
     log.info("[CurveRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
