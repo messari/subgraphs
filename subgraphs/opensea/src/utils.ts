@@ -77,7 +77,7 @@ export function getSaleStrategy(saleKind: i32): string {
  * Relevant function selectors/method IDs can be found via https://www.4byte.directory
  */
 export function validateCallDataFunctionSelector(callData: Bytes): boolean {
-  let functionSelector = getFunctionSelector(callData);
+  const functionSelector = getFunctionSelector(callData);
   return (
     functionSelector == TRANSFER_FROM_SELECTOR ||
     functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR ||
@@ -96,11 +96,11 @@ export function atomicizeCallData(
   callDatas: Bytes,
   callDataLengths: BigInt[]
 ): Bytes[] {
-  let atomicizedCallData: Bytes[] = [];
+  const atomicizedCallData: Bytes[] = [];
   let index = 0;
   for (let i = 0; i < callDataLengths.length; i++) {
-    let length = callDataLengths[i].toI32();
-    let callData = Bytes.fromUint8Array(
+    const length = callDataLengths[i].toI32();
+    const callData = Bytes.fromUint8Array(
       callDatas.subarray(index, index + length)
     );
     atomicizedCallData.push(callData);
@@ -116,17 +116,17 @@ export function atomicizeCallData(
  * https://github.com/ProjectWyvern/wyvern-ethereum/blob/bfca101b2407e4938398fccd8d1c485394db7e01/contracts/exchange/ExchangeCore.sol#L460
  */
 export function calculateMatchPrice(call: AtomicMatch_Call): BigInt {
-  let sellSideFeeRecipient = call.inputs.addrs[10];
+  const sellSideFeeRecipient = call.inputs.addrs[10];
 
-  let sellSide = call.inputs.feeMethodsSidesKindsHowToCalls[5];
-  let sellSaleKind = call.inputs.feeMethodsSidesKindsHowToCalls[6];
-  let sellBasePrice = call.inputs.uints[13];
-  let sellExtra = call.inputs.uints[14];
-  let sellListingTime = call.inputs.uints[15];
-  let sellExpirationTime = call.inputs.uints[16];
+  const sellSide = call.inputs.feeMethodsSidesKindsHowToCalls[5];
+  const sellSaleKind = call.inputs.feeMethodsSidesKindsHowToCalls[6];
+  const sellBasePrice = call.inputs.uints[13];
+  const sellExtra = call.inputs.uints[14];
+  const sellListingTime = call.inputs.uints[15];
+  const sellExpirationTime = call.inputs.uints[16];
 
   // Calculate sell price
-  let sellPrice = calculateFinalPrice(
+  const sellPrice = calculateFinalPrice(
     sellSide,
     sellSaleKind,
     sellBasePrice,
@@ -136,15 +136,15 @@ export function calculateMatchPrice(call: AtomicMatch_Call): BigInt {
     call.block.timestamp
   );
 
-  let buySide = call.inputs.feeMethodsSidesKindsHowToCalls[1];
-  let buySaleKind = call.inputs.feeMethodsSidesKindsHowToCalls[2];
-  let buyBasePrice = call.inputs.uints[4];
-  let buyExtra = call.inputs.uints[5];
-  let buyListingTime = call.inputs.uints[6];
-  let buyExpirationTime = call.inputs.uints[7];
+  const buySide = call.inputs.feeMethodsSidesKindsHowToCalls[1];
+  const buySaleKind = call.inputs.feeMethodsSidesKindsHowToCalls[2];
+  const buyBasePrice = call.inputs.uints[4];
+  const buyExtra = call.inputs.uints[5];
+  const buyListingTime = call.inputs.uints[6];
+  const buyExpirationTime = call.inputs.uints[7];
 
   // Calculate buy price
-  let buyPrice = calculateFinalPrice(
+  const buyPrice = calculateFinalPrice(
     buySide,
     buySaleKind,
     buyBasePrice,
@@ -177,7 +177,7 @@ export function calculateFinalPrice(
   if (getSaleStrategy(saleKind) == SaleStrategy.STANDARD_SALE) {
     return basePrice;
   } else if (getSaleStrategy(saleKind) == SaleStrategy.DUTCH_AUCTION) {
-    let diff = extra
+    const diff = extra
       .times(now.minus(listingTime))
       .div(expirationTime.minus(listingTime));
     if (getOrderSide(side) == Side.SELL) {
@@ -207,9 +207,9 @@ export function guardedArrayReplace(
   }
 
   // Copies original Bytes Array to avoid buffer overwrite
-  let array = Bytes.fromUint8Array(_array.slice(0));
-  let replacement = Bytes.fromUint8Array(_replacement.slice(0));
-  let mask = Bytes.fromUint8Array(_mask.slice(0));
+  const array = Bytes.fromUint8Array(_array.slice(0));
+  const replacement = Bytes.fromUint8Array(_replacement.slice(0));
+  const mask = Bytes.fromUint8Array(_mask.slice(0));
 
   array.reverse();
   replacement.reverse();
@@ -217,7 +217,7 @@ export function guardedArrayReplace(
 
   let bigIntArray = BigInt.fromUnsignedBytes(array);
   let bigIntReplacement = BigInt.fromUnsignedBytes(replacement);
-  let bigIntMask = BigInt.fromUnsignedBytes(mask);
+  const bigIntMask = BigInt.fromUnsignedBytes(mask);
 
   bigIntReplacement = bigIntReplacement.bitAnd(bigIntMask);
   bigIntArray = bigIntArray.bitOr(bigIntReplacement);
@@ -235,15 +235,17 @@ export function decode_ERC721Transfer_Method(
   target: Address,
   callData: Bytes
 ): DecodedTransferResult {
-  let functionSelector = getFunctionSelector(callData);
-  let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
+  const functionSelector = getFunctionSelector(callData);
+  const dataWithoutFunctionSelector = Bytes.fromUint8Array(
+    callData.subarray(4)
+  );
 
-  let decoded = ethereum
+  const decoded = ethereum
     .decode("(address,address,uint256)", dataWithoutFunctionSelector)!
     .toTuple();
-  let senderAddress = decoded[0].toAddress();
-  let recieverAddress = decoded[1].toAddress();
-  let tokenId = decoded[2].toBigInt();
+  const senderAddress = decoded[0].toAddress();
+  const recieverAddress = decoded[1].toAddress();
+  const tokenId = decoded[2].toBigInt();
 
   return new DecodedTransferResult(
     functionSelector,
@@ -265,22 +267,24 @@ export function decode_ERC1155Transfer_Method(
   target: Address,
   callData: Bytes
 ): DecodedTransferResult {
-  let functionSelector = getFunctionSelector(callData);
-  let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
-  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
+  const functionSelector = getFunctionSelector(callData);
+  const dataWithoutFunctionSelector = Bytes.fromUint8Array(
+    callData.subarray(4)
+  );
+  const dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
     dataWithoutFunctionSelector
   );
 
-  let decoded = ethereum
+  const decoded = ethereum
     .decode(
       "(address,address,uint256,uint256,bytes)",
       dataWithoutFunctionSelectorWithPrefix
     )!
     .toTuple();
-  let senderAddress = decoded[0].toAddress();
-  let recieverAddress = decoded[1].toAddress();
-  let tokenId = decoded[2].toBigInt();
-  let amount = decoded[3].toBigInt();
+  const senderAddress = decoded[0].toAddress();
+  const recieverAddress = decoded[1].toAddress();
+  const tokenId = decoded[2].toBigInt();
+  const amount = decoded[3].toBigInt();
 
   return new DecodedTransferResult(
     functionSelector,
@@ -303,22 +307,24 @@ export function decode_ERC1155Transfer_Method(
 export function decode_matchERC721UsingCriteria_Method(
   callData: Bytes
 ): DecodedTransferResult {
-  let functionSelector = getFunctionSelector(callData);
-  let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
-  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
+  const functionSelector = getFunctionSelector(callData);
+  const dataWithoutFunctionSelector = Bytes.fromUint8Array(
+    callData.subarray(4)
+  );
+  const dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
     dataWithoutFunctionSelector
   );
 
-  let decoded = ethereum
+  const decoded = ethereum
     .decode(
       "(address,address,address,uint256,bytes32,bytes32[])",
       dataWithoutFunctionSelectorWithPrefix
     )!
     .toTuple();
-  let senderAddress = decoded[0].toAddress();
-  let recieverAddress = decoded[1].toAddress();
-  let nftContractAddress = decoded[2].toAddress();
-  let tokenId = decoded[3].toBigInt();
+  const senderAddress = decoded[0].toAddress();
+  const recieverAddress = decoded[1].toAddress();
+  const nftContractAddress = decoded[2].toAddress();
+  const tokenId = decoded[3].toBigInt();
 
   return new DecodedTransferResult(
     functionSelector,
@@ -339,23 +345,25 @@ export function decode_matchERC721UsingCriteria_Method(
 export function decode_matchERC1155UsingCriteria_Method(
   callData: Bytes
 ): DecodedTransferResult {
-  let functionSelector = getFunctionSelector(callData);
-  let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
-  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
+  const functionSelector = getFunctionSelector(callData);
+  const dataWithoutFunctionSelector = Bytes.fromUint8Array(
+    callData.subarray(4)
+  );
+  const dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
     dataWithoutFunctionSelector
   );
 
-  let decoded = ethereum
+  const decoded = ethereum
     .decode(
       "(address,address,address,uint256,uint256,bytes32,bytes32[])",
       dataWithoutFunctionSelectorWithPrefix
     )!
     .toTuple();
-  let senderAddress = decoded[0].toAddress();
-  let recieverAddress = decoded[1].toAddress();
-  let nftContractAddress = decoded[2].toAddress();
-  let tokenId = decoded[3].toBigInt();
-  let amount = decoded[4].toBigInt();
+  const senderAddress = decoded[0].toAddress();
+  const recieverAddress = decoded[1].toAddress();
+  const nftContractAddress = decoded[2].toAddress();
+  const tokenId = decoded[3].toBigInt();
+  const amount = decoded[4].toBigInt();
 
   return new DecodedTransferResult(
     functionSelector,
@@ -376,21 +384,23 @@ export function decode_matchERC1155UsingCriteria_Method(
 export function decode_atomicize_Method(
   callData: Bytes
 ): DecodedAtomicizeResult {
-  let dataWithoutFunctionSelector = Bytes.fromUint8Array(callData.subarray(4));
-  let dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
+  const dataWithoutFunctionSelector = Bytes.fromUint8Array(
+    callData.subarray(4)
+  );
+  const dataWithoutFunctionSelectorWithPrefix = ETHABI_DECODE_PREFIX.concat(
     dataWithoutFunctionSelector
   );
-  let decoded = ethereum
+  const decoded = ethereum
     .decode(
       "(address[],uint256[],uint256[],bytes)",
       dataWithoutFunctionSelectorWithPrefix
     )!
     .toTuple();
-  let targets = decoded[0].toAddressArray();
-  let callDataLengths = decoded[2].toBigIntArray();
-  let callDatas = decoded[3].toBytes();
+  const targets = decoded[0].toAddressArray();
+  const callDataLengths = decoded[2].toBigIntArray();
+  const callDatas = decoded[3].toBytes();
 
-  let atomicizedCallDatas = atomicizeCallData(callDatas, callDataLengths);
+  const atomicizedCallDatas = atomicizeCallData(callDatas, callDataLengths);
 
   return new DecodedAtomicizeResult(targets, atomicizedCallDatas);
 }
@@ -399,7 +409,7 @@ export function decode_nftTransfer_Method(
   target: Address,
   callData: Bytes
 ): DecodedTransferResult {
-  let functionSelector = getFunctionSelector(callData);
+  const functionSelector = getFunctionSelector(callData);
   if (
     functionSelector == TRANSFER_FROM_SELECTOR ||
     functionSelector == ERC721_SAFE_TRANSFER_FROM_SELECTOR
