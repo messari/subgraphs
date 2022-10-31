@@ -69,7 +69,7 @@ export function updateEstimatedApyFromGfiRaw(): void {
 }
 
 export function updatePoolStatus(seniorPoolAddress: Address): void {
-  let seniorPool = getOrInitSeniorPool(seniorPoolAddress);
+  const seniorPool = getOrInitSeniorPool(seniorPoolAddress);
 
   const seniorPoolContract = SeniorPoolContract.bind(seniorPoolAddress);
   const fidu_contract = FiduContract.bind(
@@ -79,25 +79,25 @@ export function updatePoolStatus(seniorPoolAddress: Address): void {
     getAddressFromConfig(seniorPoolContract, CONFIG_KEYS_ADDRESSES.USDC)
   );
 
-  let sharePrice = seniorPoolContract.sharePrice();
-  let compoundBalance = seniorPoolContract.compoundBalance();
-  let totalLoansOutstanding = seniorPoolContract.totalLoansOutstanding();
-  let totalSupply = fidu_contract.totalSupply();
-  let totalPoolAssets = totalSupply.times(sharePrice);
-  let totalPoolAssetsUsdc = bigDecimalToBigInt(
+  const sharePrice = seniorPoolContract.sharePrice();
+  const compoundBalance = seniorPoolContract.compoundBalance();
+  const totalLoansOutstanding = seniorPoolContract.totalLoansOutstanding();
+  const totalSupply = fidu_contract.totalSupply();
+  const totalPoolAssets = totalSupply.times(sharePrice);
+  const totalPoolAssetsUsdc = bigDecimalToBigInt(
     totalPoolAssets
       .toBigDecimal()
       .times(USDC_DECIMALS)
       .div(FIDU_DECIMALS)
       .div(FIDU_DECIMALS)
   );
-  let balance = seniorPoolContract
+  const balance = seniorPoolContract
     .assets()
     .minus(seniorPoolContract.totalLoansOutstanding())
     .plus(seniorPoolContract.totalWritedowns());
-  let rawBalance = balance;
+  const rawBalance = balance;
 
-  let poolStatus = SeniorPoolStatus.load(
+  const poolStatus = SeniorPoolStatus.load(
     seniorPool.latestPoolStatus
   ) as SeniorPoolStatus;
   poolStatus.compoundBalance = compoundBalance;
@@ -121,8 +121,8 @@ export function updatePoolInvestments(
   seniorPoolAddress: Address,
   tranchedPoolAddress: Address
 ): void {
-  let seniorPool = getOrInitSeniorPool(seniorPoolAddress);
-  let investments = seniorPool.investmentsMade;
+  const seniorPool = getOrInitSeniorPool(seniorPoolAddress);
+  const investments = seniorPool.investmentsMade;
   investments.push(tranchedPoolAddress.toHexString());
   seniorPool.investmentsMade = investments;
   seniorPool.save();
@@ -148,7 +148,7 @@ export function recalculateSeniorPoolAPY(poolStatus: SeniorPoolStatus): void {
       .div(FIDU_DECIMALS)
       .div(FIDU_DECIMALS)
       .times(USDC_DECIMALS);
-    let estimatedApy = estimatedTotalInterest.div(totalPoolAssetsInDollars);
+    const estimatedApy = estimatedTotalInterest.div(totalPoolAssetsInDollars);
     poolStatus.estimatedApy = estimatedApy;
   }
 

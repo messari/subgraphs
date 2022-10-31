@@ -30,8 +30,8 @@ export function getTotalDeposited(
   let totalDeposited = new BigInt(0);
 
   for (let i = 0, k = juniorTranches.length; i < k; ++i) {
-    let jrTranche = juniorTranches[i];
-    let srTranche = seniorTranches[i];
+    const jrTranche = juniorTranches[i];
+    const srTranche = seniorTranches[i];
 
     if (!jrTranche || !srTranche) {
       throw new Error(
@@ -162,32 +162,33 @@ export function estimateJuniorAPY(tranchedPool: TranchedPool): BigDecimal {
 
   const leverageRatio = tranchedPool.estimatedLeverageRatio;
   // A missing leverage ratio implies this was a v1 style deal and the senior pool supplied all the capital
-  let seniorFraction = leverageRatio
+  const seniorFraction = leverageRatio
     ? leverageRatio.divDecimal(ONE.plus(leverageRatio).toBigDecimal())
     : ONE.toBigDecimal();
-  let juniorFraction = leverageRatio
+  const juniorFraction = leverageRatio
     ? ONE.divDecimal(ONE.plus(leverageRatio).toBigDecimal())
     : ZERO.toBigDecimal();
-  let interestRateFraction = creditLine.interestAprDecimal.div(ONE_HUNDRED);
-  let juniorFeeFraction = tranchedPool.juniorFeePercent.divDecimal(ONE_HUNDRED);
-  let reserveFeeFraction =
+  const interestRateFraction = creditLine.interestAprDecimal.div(ONE_HUNDRED);
+  const juniorFeeFraction =
+    tranchedPool.juniorFeePercent.divDecimal(ONE_HUNDRED);
+  const reserveFeeFraction =
     tranchedPool.reserveFeePercent.divDecimal(ONE_HUNDRED);
 
-  let grossSeniorInterest = balance
+  const grossSeniorInterest = balance
     .toBigDecimal()
     .times(interestRateFraction)
     .times(seniorFraction);
-  let grossJuniorInterest = balance
+  const grossJuniorInterest = balance
     .toBigDecimal()
     .times(interestRateFraction)
     .times(juniorFraction);
   const juniorFee = grossSeniorInterest.times(juniorFeeFraction);
 
   const juniorReserveFeeOwed = grossJuniorInterest.times(reserveFeeFraction);
-  let netJuniorInterest = grossJuniorInterest
+  const netJuniorInterest = grossJuniorInterest
     .plus(juniorFee)
     .minus(juniorReserveFeeOwed);
-  let juniorTranche = balance.toBigDecimal().times(juniorFraction);
+  const juniorTranche = balance.toBigDecimal().times(juniorFraction);
   return netJuniorInterest.div(juniorTranche).times(ONE_HUNDRED);
 }
 

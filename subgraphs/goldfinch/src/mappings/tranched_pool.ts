@@ -1,4 +1,4 @@
-import { InterestRate, TranchedPool, _PoolToken } from "../../generated/schema";
+import { InterestRate, TranchedPool } from "../../generated/schema";
 import { GoldfinchConfig as GoldfinchConfigContract } from "../../generated/templates/TranchedPool/GoldfinchConfig";
 import { CreditLine as CreditLineContract } from "../../generated/templates/TranchedPool/CreditLine";
 import {
@@ -45,18 +45,11 @@ import { getAddressFromConfig } from "../common/utils";
 import {
   getOrCreateAccount,
   getOrCreateMarket,
-  getOrCreatePoolToken,
   getOrCreateProtocol,
   getOrCreateRewardToken,
 } from "../common/getters";
 import { CreditLine } from "../../generated/templates/TranchedPool/CreditLine";
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ethereum,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   createTransaction,
   snapshotFinancials,

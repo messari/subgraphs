@@ -29,7 +29,7 @@ export function initOrUpdateCreditLine(
   if (!creditLine) {
     creditLine = new CreditLine(address.toHexString());
   }
-  let contract = CreditLineContract.bind(address);
+  const contract = CreditLineContract.bind(address);
 
   creditLine.borrower = contract.borrower();
   creditLine.balance = contract.balance();

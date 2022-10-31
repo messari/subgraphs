@@ -24,7 +24,6 @@ import {
   INT_ZERO,
   FACTORY_ADDRESS,
   ProtocolType,
-  LendingType,
   RiskType,
   InterestRateType,
   InterestRateSide,
@@ -39,7 +38,6 @@ import {
   GFI_ADDRESS,
   INT_ONE,
   LendingType,
-  FIDU_ADDRESS,
   BIGDECIMAL_ONE,
 } from "./constants";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
@@ -275,12 +273,12 @@ export function getOrCreateMarketHourlySnapshot(
   event: ethereum.Event
 ): MarketHourlySnapshot {
   // Hours since Unix epoch time
-  let hours = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
-  let hoursStr = hours.toString();
+  const hours = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const hoursStr = hours.toString();
 
-  let id = prefixID(marketId, hoursStr);
+  const id = prefixID(marketId, hoursStr);
 
-  let market = getOrCreateMarket(marketId, event);
+  const market = getOrCreateMarket(marketId, event);
   let marketMetrics = MarketHourlySnapshot.load(id);
   if (marketMetrics == null) {
     marketMetrics = new MarketHourlySnapshot(id);
@@ -329,10 +327,10 @@ export function getOrCreateUsageMetricsDailySnapshot(
   event: ethereum.Event
 ): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
-  let days = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let daysStr: string = days.toString();
+  const days = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const daysStr: string = days.toString();
 
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
   let usageMetrics = UsageMetricsDailySnapshot.load(daysStr);
   if (usageMetrics == null) {
     usageMetrics = new UsageMetricsDailySnapshot(daysStr);
@@ -366,10 +364,10 @@ export function getOrCreateUsageMetricsHourlySnapshot(
   event: ethereum.Event
 ): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
-  let hours = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const hours = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
-  let hoursStr: string = hours.toString();
-  let protocol = getOrCreateProtocol();
+  const hoursStr: string = hours.toString();
+  const protocol = getOrCreateProtocol();
   let usageMetrics = UsageMetricsHourlySnapshot.load(hoursStr);
   if (usageMetrics == null) {
     usageMetrics = new UsageMetricsHourlySnapshot(hoursStr);
@@ -393,10 +391,10 @@ export function getOrCreateUsageMetricsHourlySnapshot(
 export function getOrCreateFinancialsDailySnapshot(
   event: ethereum.Event
 ): FinancialsDailySnapshot {
-  let daysStr: string = (
+  const daysStr: string = (
     event.block.timestamp.toI64() / SECONDS_PER_DAY
   ).toString();
-  let protocol = getOrCreateProtocol();
+  const protocol = getOrCreateProtocol();
   let financialMetrics = FinancialsDailySnapshot.load(daysStr);
   if (financialMetrics == null) {
     financialMetrics = new FinancialsDailySnapshot(daysStr);
@@ -484,7 +482,7 @@ export function getSnapshotRates(
 ): string[] {
   const snapshotRates: string[] = [];
   for (let i = 0; i < rates.length; i++) {
-    let rate = InterestRate.load(rates[i]);
+    const rate = InterestRate.load(rates[i]);
     if (!rate) {
       log.warning("[getSnapshotRates] rate {} not found, should not happen", [
         rates[i],
@@ -493,8 +491,8 @@ export function getSnapshotRates(
     }
 
     // create new snapshot rate
-    let snapshotRateId = rates[i].concat("-").concat(timeSuffix);
-    let snapshotRate = new InterestRate(snapshotRateId);
+    const snapshotRateId = rates[i].concat("-").concat(timeSuffix);
+    const snapshotRate = new InterestRate(snapshotRateId);
     snapshotRate.side = rate.side;
     snapshotRate.type = rate.type;
     snapshotRate.rate = rate.rate;

@@ -19,7 +19,7 @@ export function getOrInitUser(address: Address): User {
 }
 
 export function handleDeposit(event: DepositMade): void {
-  let userAddress = event.params.capitalProvider;
+  const userAddress = event.params.capitalProvider;
   // Just adds a corresponding user entity to the database
   getOrInitUser(userAddress);
 }

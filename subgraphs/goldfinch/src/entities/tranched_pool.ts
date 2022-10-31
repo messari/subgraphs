@@ -48,7 +48,7 @@ export function updatePoolCreditLine(
   timestamp: BigInt
 ): void {
   const contract = TranchedPoolContract.bind(address);
-  let tranchedPool = getOrInitTranchedPool(address, timestamp);
+  const tranchedPool = getOrInitTranchedPool(address, timestamp);
 
   const creditLineAddress = contract.creditLine().toHexString();
   const creditLine = initOrUpdateCreditLine(
@@ -63,7 +63,7 @@ export function updatePoolCreditLine(
 export function handleDeposit(event: DepositMade): void {
   const backer = getOrInitUser(event.params.owner);
 
-  let tranchedPool = getOrInitTranchedPool(
+  const tranchedPool = getOrInitTranchedPool(
     event.address,
     event.block.timestamp
   );
@@ -125,7 +125,7 @@ export function initOrUpdateTranchedPool(
   timestamp: BigInt
 ): TranchedPool {
   let tranchedPool = TranchedPool.load(address.toHexString());
-  let isCreating = !tranchedPool;
+  const isCreating = !tranchedPool;
   if (!tranchedPool) {
     tranchedPool = new TranchedPool(address.toHexString());
   }
@@ -172,8 +172,8 @@ export function initOrUpdateTranchedPool(
   }
 
   let counter = 1;
-  let juniorTranches: JuniorTrancheInfo[] = [];
-  let seniorTranches: SeniorTrancheInfo[] = [];
+  const juniorTranches: JuniorTrancheInfo[] = [];
+  const seniorTranches: SeniorTrancheInfo[] = [];
   for (let i = 0; i < numSlices.toI32(); i++) {
     const seniorTrancheInfo = poolContract.getTranche(BigInt.fromI32(counter));
     const seniorId = `${address.toHexString()}-${seniorTrancheInfo.id.toString()}`;
@@ -383,7 +383,7 @@ class GfiRewardOnInterest {
   }
 }
 
-export function calculateApyFromGfiForAllPools(now: BigInt): void {
+export function calculateApyFromGfiForAllPools(): void {
   const backerRewards = getBackerRewards();
   // Bail out early if the backer rewards parameters aren't populated yet
   if (
@@ -414,7 +414,7 @@ export function calculateApyFromGfiForAllPools(now: BigInt): void {
     backerRewards.totalRewards,
     backerRewards.maxInterestDollarsEligible
   );
-  const summedRewardsByTranchedPool = new Map<String, BigDecimal>();
+  const summedRewardsByTranchedPool = new Map<string, BigDecimal>();
   for (let i = 0; i < rewardsSchedules.length; i++) {
     const reward = rewardsSchedules[i];
     const tranchedPoolAddress = reward.tranchedPoolAddress;
@@ -451,8 +451,7 @@ function repaymentComparator(a: Repayment, b: Repayment): i32 {
 }
 
 function getApproximateRepaymentSchedule(
-  tranchedPool: TranchedPool,
-  now: BigInt
+  tranchedPool: TranchedPool
 ): Repayment[] {
   const creditLine = CreditLine.load(tranchedPool.creditLine);
   if (!creditLine) {
@@ -547,9 +546,9 @@ function estimateRewards(
 
 // ! The estimate done here is very crude. It's not as accurate as the code that lives at `ethereum/backerRewards` in the old Goldfinch client
 function calculateAnnualizedGfiRewardsPerPrincipalDollar(
-  summedRewardsByTranchedPool: Map<String, BigDecimal>
-): Map<String, BigDecimal> {
-  const rewardsPerPrincipalDollar = new Map<String, BigDecimal>();
+  summedRewardsByTranchedPool: Map<string, BigDecimal>
+): Map<string, BigDecimal> {
+  const rewardsPerPrincipalDollar = new Map<string, BigDecimal>();
   for (let i = 0; i < summedRewardsByTranchedPool.keys().length; i++) {
     const tranchedPoolAddress = summedRewardsByTranchedPool.keys()[i];
     const tranchedPool = TranchedPool.load(tranchedPoolAddress as string);

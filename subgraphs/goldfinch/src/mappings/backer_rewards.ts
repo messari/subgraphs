@@ -9,7 +9,7 @@ import {
 
 import { updateBackerRewardsData } from "../entities/backer_rewards";
 import { calculateApyFromGfiForAllPools } from "../entities/tranched_pool";
-import { getOrCreateMarket, getOrCreatePoolToken } from "../common/getters";
+import { getOrCreateMarket } from "../common/getters";
 import { bigDecimalToBigInt } from "../common/utils";
 import { SECONDS_PER_DAY } from "../common/constants";
 

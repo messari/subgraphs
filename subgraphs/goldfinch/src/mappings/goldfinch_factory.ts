@@ -4,14 +4,12 @@ import {
   PoolCreated,
   GoldfinchFactory,
 } from "../../generated/GoldfinchFactory/GoldfinchFactory";
-import { CreditLine as CreditLineContract } from "../../generated/GoldfinchFactory/CreditLine";
 import { GoldfinchConfig } from "../../generated/GoldfinchConfig/GoldfinchConfig";
 import { getOrInitTranchedPool } from "../entities/tranched_pool";
 import { TranchedPool as TranchedPoolTemplate } from "../../generated/templates";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
 import { Account } from "../../generated/schema";
 import {
-  BIGINT_ONE,
   CONFIG_KEYS_ADDRESSES,
   FIDU_ADDRESS,
   GFI_ADDRESS,
