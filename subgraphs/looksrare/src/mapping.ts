@@ -30,9 +30,9 @@ import {
   NftStandard,
   SaleStrategy,
   SECONDS_PER_DAY,
-  STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESS,
-  STRATEGY_PRIVATE_SALE_ADDRESS,
-  STRATEGY_STANDARD_SALE_ADDRESS,
+  STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESSES,
+  STRATEGY_PRIVATE_SALE_ADDRESSES,
+  STRATEGY_STANDARD_SALE_ADDRESSES,
   WETH_ADDRESS,
 } from "./helper";
 import { NetworkConfigs } from "../configurations/configure";
@@ -372,11 +372,11 @@ function getOrCreateExecutionStrategy(address: Address): _ExecutionStrategy {
   let strategy = _ExecutionStrategy.load(address.toHexString());
   if (!strategy) {
     strategy = new _ExecutionStrategy(address.toHexString());
-    if (address == STRATEGY_STANDARD_SALE_ADDRESS) {
+    if (STRATEGY_STANDARD_SALE_ADDRESSES.includes(address)) {
       strategy.saleStrategy = SaleStrategy.STANDARD_SALE;
-    } else if (address == STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESS) {
+    } else if (STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESSES.includes(address)) {
       strategy.saleStrategy = SaleStrategy.ANY_ITEM_FROM_COLLECTION;
-    } else if (address == STRATEGY_PRIVATE_SALE_ADDRESS) {
+    } else if (STRATEGY_PRIVATE_SALE_ADDRESSES.includes(address)) {
       strategy.saleStrategy = SaleStrategy.PRIVATE_SALE;
     }
     const contract = ExecutionStrategy.bind(address);
