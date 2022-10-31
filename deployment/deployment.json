@@ -601,6 +601,10 @@
           "hosted-service": {
             "slug": "balancer-v2-ethereum",
             "query-id": "balancer-v2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "balancer-v2-ethereum",
+            "query-id": "NOT-PUBLISHED"
           }
         }
       }
@@ -1737,6 +1741,10 @@
           "hosted-service": {
             "slug": "curve-finance-ethereum",
             "query-id": "curve-finance-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "curve-finance-ethereum",
+            "query-id": "NOT-PUBLISHED"
           }
         }
       },
@@ -2040,6 +2048,10 @@
           "hosted-service": {
             "slug": "liquity-ethereum",
             "query-id": "liquity-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "liquity-ethereum",
+            "query-id": "NOT-PUBLISHED"
           }
         }
       }
@@ -3048,6 +3060,10 @@
           "hosted-service": {
             "slug": "uniswap-v3-ethereum",
             "query-id": "uniswap-v3-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "uniswap-v3-ethereum",
+            "query-id": "NOT-PUBLISHED"
           }
         }
       },
@@ -5140,6 +5156,10 @@
           "hosted-service": {
             "slug": "opensea-v1-ethereum",
             "query-id": "opensea-v1-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "opensea-v1-ethereum",
+            "query-id": "NOT-PUBLISHED"
           }
         }
       }
@@ -5169,6 +5189,10 @@
           "hosted-service": {
             "slug": "opensea-v2-ethereum",
             "query-id": "opensea-v2-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "opensea-v2-ethereum",
+            "query-id": "NOT-PUBLISHED"
           }
         }
       }
