@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefV2Spookyswap } from "../../../../../generated/MasterChefV2/MasterChefV2Spookyswap";
 import {
@@ -12,7 +12,10 @@ import {
   convertTokenToDecimal,
   roundToWholeNumber,
 } from "../../../../../src/common/utils/utils";
-import { getOrCreateMasterChef } from "../../../../../src/common/masterchef/helpers";
+import {
+  getOrCreateMasterChef,
+  getOrCreateMasterChefStakingPool,
+} from "../../../../../src/common/masterchef/helpers";
 
 // Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
 export function updateMasterChef(
@@ -20,9 +23,29 @@ export function updateMasterChef(
   pid: BigInt,
   amount: BigInt
 ): void {
-  const masterChefV2Pool = _MasterChefStakingPool.load(
-    MasterChef.MASTERCHEFV2 + "-" + pid.toString()
-  )!;
+  const poolContract = MasterChefV2Spookyswap.bind(event.address);
+  const masterChefV2Pool = getOrCreateMasterChefStakingPool(
+    event,
+    MasterChef.MASTERCHEFV2,
+    pid
+  );
+
+  if (!masterChefV2Pool.poolAddress) {
+    const poolAddress = poolContract.try_lpToken(pid);
+    if (!poolAddress.reverted) {
+      masterChefV2Pool.poolAddress = poolAddress.value.toHexString();
+    }
+    masterChefV2Pool.save();
+
+    if (!masterChefV2Pool.poolAddress) {
+      log.warning(
+        "poolInfo reverted: Could not find pool address for masterchef pool",
+        []
+      );
+      return;
+    }
+  }
+
   const masterchefV2Contract = MasterChefV2Spookyswap.bind(event.address);
   const masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
@@ -69,6 +92,7 @@ export function updateMasterChef(
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
+
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
       pool.rewardTokenEmissionsAmount![INT_ZERO],
