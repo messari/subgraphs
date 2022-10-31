@@ -7,8 +7,8 @@ import {
   Deposit,
   StratHarvest,
   Withdraw,
-} from "../../generated/aave-aave-eol/BeefyStrategy";
-import { BeefyVault } from "../../generated/aave-aave-eol/BeefyVault";
+} from "../../generated/Standard/BeefyStrategy";
+import { BeefyVault } from "../../generated/Standard/BeefyVault";
 import {
   getBeefyFinanceOrCreate,
   getTokenOrCreate,
@@ -128,7 +128,7 @@ export function getFees(
   vaultId: string,
   strategyContract: BeefyStrategy
 ): string[] {
-  let fees: string[] = [];
+  const fees: string[] = [];
   let call = strategyContract.try_STRATEGIST_FEE();
   if (!call.reverted) {
     const strategistFee = new VaultFee("STRATEGIST_FEE-" + vaultId);

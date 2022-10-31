@@ -1,9 +1,6 @@
-import { Swap } from "../../generated/templates";
 import { NewSwapPool } from "../../generated/templates/Swap/SwapDeployer";
-import { createPoolFromEvent } from "../entities/pool";
+import { createPoolFromFactoryEvent } from "../entities/pool";
 
 export function handleNewSwapPool(event: NewSwapPool): void {
-  if (createPoolFromEvent(event)) {
-    Swap.create(event.params.swapAddress);
-  }
+  createPoolFromFactoryEvent(event)
 }

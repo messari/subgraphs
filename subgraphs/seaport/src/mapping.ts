@@ -90,38 +90,44 @@ class Fees {
  * - We are not handling bundle sale where NFTs from multiple collections are exchanged since we don't know how to treat the price, eg https://etherscan.io/tx/0xd8d2612fe4995478bc7537eb46786c3d6f0b13b1c50e01e04067eb92ba298d17
  */
 export function handleOrderFulfilled(event: OrderFulfilled): void {
-  let offerer = event.params.offerer;
-  let recipient = event.params.recipient;
-  let offer = event.params.offer;
-  let consideration = event.params.consideration;
+  const offerer = event.params.offerer;
+  const recipient = event.params.recipient;
+  const offer = event.params.offer;
+  const consideration = event.params.consideration;
 
-  let saleResult = tryGetSale(event, offerer, recipient, offer, consideration);
+  const saleResult = tryGetSale(
+    event,
+    offerer,
+    recipient,
+    offer,
+    consideration
+  );
   if (!saleResult) {
     return;
   }
 
-  let isBundle = saleResult.nfts.tokenIds.length > 1;
-  let collectionAddr = saleResult.nfts.collection.toHexString();
-  let collection = getOrCreateCollection(collectionAddr);
-  let buyer = saleResult.buyer.toHexString();
-  let seller = saleResult.seller.toHexString();
-  let royaltyFee = saleResult.fees.creatorRevenue
+  const isBundle = saleResult.nfts.tokenIds.length > 1;
+  const collectionAddr = saleResult.nfts.collection.toHexString();
+  const collection = getOrCreateCollection(collectionAddr);
+  const buyer = saleResult.buyer.toHexString();
+  const seller = saleResult.seller.toHexString();
+  const royaltyFee = saleResult.fees.creatorRevenue
     .toBigDecimal()
     .div(saleResult.money.amount.toBigDecimal())
     .times(BIGDECIMAL_HUNDRED);
-  let totalNftAmount = saleResult.nfts.amounts.reduce(
+  const totalNftAmount = saleResult.nfts.amounts.reduce(
     (acc, curr) => acc.plus(curr),
     BIGINT_ZERO
   );
-  let volumeETH = saleResult.money.amount.toBigDecimal().div(MANTISSA_FACTOR);
-  let priceETH = volumeETH.div(totalNftAmount.toBigDecimal());
+  const volumeETH = saleResult.money.amount.toBigDecimal().div(MANTISSA_FACTOR);
+  const priceETH = volumeETH.div(totalNftAmount.toBigDecimal());
 
   //
   // new trade
   //
-  let nNewTrade = saleResult.nfts.tokenIds.length;
+  const nNewTrade = saleResult.nfts.tokenIds.length;
   for (let i = 0; i < nNewTrade; i++) {
-    let tradeID = isBundle
+    const tradeID = isBundle
       ? event.transaction.hash
           .toHexString()
           .concat("-")
@@ -133,7 +139,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
           .concat("-")
           .concat(event.logIndex.toString());
 
-    let trade = new Trade(tradeID);
+    const trade = new Trade(tradeID);
     trade.transactionHash = event.transaction.hash.toHexString();
     trade.logIndex = event.logIndex.toI32();
     trade.timestamp = event.block.timestamp;
@@ -155,7 +161,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   //
   collection.tradeCount += nNewTrade;
   collection.royaltyFee = royaltyFee;
-  let buyerCollectionAccountID = "COLLECTION_ACCOUNT-BUYER-"
+  const buyerCollectionAccountID = "COLLECTION_ACCOUNT-BUYER-"
     .concat(collection.id)
     .concat("-")
     .concat(buyer);
@@ -165,7 +171,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
     buyerCollectionAccount.save();
     collection.buyerCount += 1;
   }
-  let sellerCollectionAccountID = "COLLECTION_ACCOUNT-SELLER-"
+  const sellerCollectionAccountID = "COLLECTION_ACCOUNT-SELLER-"
     .concat(collection.id)
     .concat("-")
     .concat(seller);
@@ -177,10 +183,10 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   }
   collection.cumulativeTradeVolumeETH =
     collection.cumulativeTradeVolumeETH.plus(volumeETH);
-  let deltaMarketplaceRevenueETH = saleResult.fees.protocolRevenue
+  const deltaMarketplaceRevenueETH = saleResult.fees.protocolRevenue
     .toBigDecimal()
     .div(MANTISSA_FACTOR);
-  let deltaCreatorRevenueETH = saleResult.fees.creatorRevenue
+  const deltaCreatorRevenueETH = saleResult.fees.creatorRevenue
     .toBigDecimal()
     .div(MANTISSA_FACTOR);
   collection.marketplaceRevenueETH = collection.marketplaceRevenueETH.plus(
@@ -197,7 +203,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   //
   // update marketplace
   //
-  let marketplace = getOrCreateMarketplace(
+  const marketplace = getOrCreateMarketplace(
     NetworkConfigs.getMarketplaceAddress()
   );
   marketplace.tradeCount += 1;
@@ -212,14 +218,14 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   marketplace.totalRevenueETH = marketplace.marketplaceRevenueETH.plus(
     marketplace.creatorRevenueETH
   );
-  let buyerAccountID = "MARKETPLACE_ACCOUNT-".concat(buyer);
+  const buyerAccountID = "MARKETPLACE_ACCOUNT-".concat(buyer);
   let buyerAccount = _Item.load(buyerAccountID);
   if (!buyerAccount) {
     buyerAccount = new _Item(buyerAccountID);
     buyerAccount.save();
     marketplace.cumulativeUniqueTraders += 1;
   }
-  let sellerAccountID = "MARKETPLACE_ACCOUNT-".concat(seller);
+  const sellerAccountID = "MARKETPLACE_ACCOUNT-".concat(seller);
   let sellerAccount = _Item.load(sellerAccountID);
   if (!sellerAccount) {
     sellerAccount = new _Item(sellerAccountID);
@@ -231,7 +237,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   // prepare for updating dailyTradedItemCount
   let newDailyTradedItem = 0;
   for (let i = 0; i < nNewTrade; i++) {
-    let dailyTradedItemID = "DAILY_TRADED_ITEM-"
+    const dailyTradedItemID = "DAILY_TRADED_ITEM-"
       .concat(collectionAddr)
       .concat("-")
       .concat(saleResult.nfts.tokenIds[i].toString())
@@ -247,7 +253,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   //
   // take collection snapshot
   //
-  let collectionSnapshot = getOrCreateCollectionDailySnapshot(
+  const collectionSnapshot = getOrCreateCollectionDailySnapshot(
     collectionAddr,
     event.block.timestamp
   );
@@ -276,7 +282,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   //
   // take marketplace snapshot
   //
-  let marketplaceSnapshot = getOrCreateMarketplaceDailySnapshot(
+  const marketplaceSnapshot = getOrCreateMarketplaceDailySnapshot(
     event.block.timestamp
   );
   marketplaceSnapshot.blockNumber = event.block.number;
@@ -290,21 +296,21 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
   marketplaceSnapshot.tradeCount = marketplace.tradeCount;
   marketplaceSnapshot.cumulativeUniqueTraders =
     marketplace.cumulativeUniqueTraders;
-  let dailyBuyerID = "DAILY_MARKERPLACE_ACCOUNT-".concat(buyer);
+  const dailyBuyerID = "DAILY_MARKERPLACE_ACCOUNT-".concat(buyer);
   let dailyBuyer = _Item.load(dailyBuyerID);
   if (!dailyBuyer) {
     dailyBuyer = new _Item(dailyBuyerID);
     dailyBuyer.save();
     marketplaceSnapshot.dailyActiveTraders += 1;
   }
-  let dailySellerID = "DAILY_MARKETPLACE_ACCOUNT-".concat(seller);
+  const dailySellerID = "DAILY_MARKETPLACE_ACCOUNT-".concat(seller);
   let dailySeller = _Item.load(dailySellerID);
   if (!dailySeller) {
     dailySeller = new _Item(dailySellerID);
     dailySeller.save();
     marketplaceSnapshot.dailyActiveTraders += 1;
   }
-  let dailyTradedCollectionID = "DAILY_TRADED_COLLECTION-"
+  const dailyTradedCollectionID = "DAILY_TRADED_COLLECTION-"
     .concat(collectionAddr)
     .concat("-")
     .concat((event.block.timestamp.toI32() / SECONDS_PER_DAY).toString());
@@ -323,16 +329,16 @@ function getOrCreateCollection(collectionID: string): Collection {
   if (!collection) {
     collection = new Collection(collectionID);
     collection.nftStandard = getNftStandard(collectionID);
-    let contract = NftMetadata.bind(Address.fromString(collectionID));
-    let nameResult = contract.try_name();
+    const contract = NftMetadata.bind(Address.fromString(collectionID));
+    const nameResult = contract.try_name();
     if (!nameResult.reverted) {
       collection.name = nameResult.value;
     }
-    let symbolResult = contract.try_symbol();
+    const symbolResult = contract.try_symbol();
     if (!symbolResult.reverted) {
       collection.symbol = symbolResult.value;
     }
-    let totalSupplyResult = contract.try_totalSupply();
+    const totalSupplyResult = contract.try_totalSupply();
     if (!totalSupplyResult.reverted) {
       collection.totalSupply = totalSupplyResult.value;
     }
@@ -346,7 +352,7 @@ function getOrCreateCollection(collectionID: string): Collection {
     collection.sellerCount = 0;
     collection.save();
 
-    let marketplace = getOrCreateMarketplace(
+    const marketplace = getOrCreateMarketplace(
       NetworkConfigs.getMarketplaceAddress()
     );
     marketplace.collectionCount += 1;
@@ -381,7 +387,7 @@ function getOrCreateCollectionDailySnapshot(
   collection: string,
   timestamp: BigInt
 ): CollectionDailySnapshot {
-  let snapshotID = collection
+  const snapshotID = collection
     .concat("-")
     .concat((timestamp.toI32() / SECONDS_PER_DAY).toString());
   let snapshot = CollectionDailySnapshot.load(snapshotID);
@@ -408,7 +414,7 @@ function getOrCreateCollectionDailySnapshot(
 function getOrCreateMarketplaceDailySnapshot(
   timestamp: BigInt
 ): MarketplaceDailySnapshot {
-  let snapshotID = (timestamp.toI32() / SECONDS_PER_DAY).toString();
+  const snapshotID = (timestamp.toI32() / SECONDS_PER_DAY).toString();
   let snapshot = MarketplaceDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketplaceDailySnapshot(snapshotID);
@@ -431,9 +437,9 @@ function getOrCreateMarketplaceDailySnapshot(
 }
 
 function getNftStandard(collectionID: string): string {
-  let erc165 = ERC165.bind(Address.fromString(collectionID));
+  const erc165 = ERC165.bind(Address.fromString(collectionID));
 
-  let isERC721Result = erc165.try_supportsInterface(
+  const isERC721Result = erc165.try_supportsInterface(
     Bytes.fromHexString(ERC721_INTERFACE_IDENTIFIER)
   );
   if (isERC721Result.reverted) {
@@ -444,7 +450,7 @@ function getNftStandard(collectionID: string): string {
     }
   }
 
-  let isERC1155Result = erc165.try_supportsInterface(
+  const isERC1155Result = erc165.try_supportsInterface(
     Bytes.fromHexString(ERC1155_INTERFACE_IDENTIFIER)
   );
   if (isERC1155Result.reverted) {
@@ -473,8 +479,8 @@ function tryGetSale(
   offer: Array<OrderFulfilledOfferStruct>,
   consideration: Array<OrderFulfilledConsiderationStruct>
 ): Sale | null {
-  let txn = event.transaction.hash.toHexString();
-  let txnLogIdx = event.transactionLogIndex.toString();
+  const txn = event.transaction.hash.toHexString();
+  const txnLogIdx = event.transactionLogIndex.toString();
 
   // if non weth erc20, ignore
   for (let i = 0; i < offer.length; i++) {
@@ -508,9 +514,9 @@ function tryGetSale(
   }
 
   // if money is in `offer` then NFTs are must in `consideration`
-  let moneyInOffer = offer.length == 1 && isMoney(offer[0].itemType);
+  const moneyInOffer = offer.length == 1 && isMoney(offer[0].itemType);
   if (moneyInOffer) {
-    let considerationNFTsResult = tryGetNFTsFromConsideration(consideration);
+    const considerationNFTsResult = tryGetNFTsFromConsideration(consideration);
     if (!considerationNFTsResult) {
       log.warning(
         "[{}] nft not found or multiple nfts found in consideration: {}",
@@ -532,7 +538,8 @@ function tryGetSale(
     );
   } else {
     // otherwise, money is in `consideration` and NFTs are in `offer`
-    let considerationMoneyResult = tryGetMoneyFromConsideration(consideration);
+    const considerationMoneyResult =
+      tryGetMoneyFromConsideration(consideration);
     if (!considerationMoneyResult) {
       log.warning("[{}] money not found in consideration: {}", [
         txn,
@@ -543,7 +550,7 @@ function tryGetSale(
       ]);
       return null;
     }
-    let offerNFTsResult = tryGetNFTsFromOffer(offer);
+    const offerNFTsResult = tryGetNFTsFromOffer(offer);
     if (!offerNFTsResult) {
       log.warning("[{}] nft not found or multiple nfts found in offer: {}", [
         txn,
@@ -589,12 +596,12 @@ function tryGetNFTsFromOffer(
   if (offer.some((o) => !isNFT(o.itemType))) {
     return null;
   }
-  let collection = offer[0].token;
-  let tpe = offer[0].itemType;
-  let tokenIds: Array<BigInt> = [];
-  let amounts: Array<BigInt> = [];
+  const collection = offer[0].token;
+  const tpe = offer[0].itemType;
+  const tokenIds: Array<BigInt> = [];
+  const amounts: Array<BigInt> = [];
   for (let i = 0; i < offer.length; i++) {
-    let o = offer[i];
+    const o = offer[i];
     if (o.token != collection) {
       log.warning(
         "[tryGetNFTsFromOffer] we're not handling collection > 1 case",
@@ -605,7 +612,7 @@ function tryGetNFTsFromOffer(
     tokenIds.push(o.identifier);
     amounts.push(o.amount);
   }
-  let standard = isERC721(tpe)
+  const standard = isERC721(tpe)
     ? NftStandard.ERC721
     : isERC1155(tpe)
     ? NftStandard.ERC1155
@@ -616,16 +623,16 @@ function tryGetNFTsFromOffer(
 function tryGetNFTsFromConsideration(
   consideration: Array<OrderFulfilledConsiderationStruct>
 ): NFTs | null {
-  let nftItems = consideration.filter((c) => isNFT(c.itemType));
+  const nftItems = consideration.filter((c) => isNFT(c.itemType));
   if (nftItems.length == 0) {
     return null;
   }
-  let collection = nftItems[0].token;
-  let tpe = nftItems[0].itemType;
-  let tokenIds: Array<BigInt> = [];
-  let amounts: Array<BigInt> = [];
+  const collection = nftItems[0].token;
+  const tpe = nftItems[0].itemType;
+  const tokenIds: Array<BigInt> = [];
+  const amounts: Array<BigInt> = [];
   for (let i = 0; i < nftItems.length; i++) {
-    let item = nftItems[i];
+    const item = nftItems[i];
     if (item.token != collection) {
       log.warning(
         "[tryGetNFTsFromConsideration] we're not handling collection > 1 case",
@@ -636,7 +643,7 @@ function tryGetNFTsFromConsideration(
     tokenIds.push(item.identifier);
     amounts.push(item.amount);
   }
-  let standard = isERC721(tpe)
+  const standard = isERC721(tpe)
     ? NftStandard.ERC721
     : isERC1155(tpe)
     ? NftStandard.ERC1155
@@ -652,7 +659,7 @@ function getFees(
   excludedRecipient: Address,
   consideration: Array<OrderFulfilledConsiderationStruct>
 ): Fees {
-  let protocolFeeItems = consideration.filter((c) =>
+  const protocolFeeItems = consideration.filter((c) =>
     isOpenSeaFeeAccount(c.recipient)
   );
   let protocolRevenue = BIGINT_ZERO;
@@ -667,14 +674,14 @@ function getFees(
     protocolRevenue = protocolFeeItems[0].amount;
   }
 
-  let royaltyFeeItems: Array<OrderFulfilledConsiderationStruct> = [];
+  const royaltyFeeItems: Array<OrderFulfilledConsiderationStruct> = [];
   for (let i = 0; i < consideration.length; i++) {
-    let c = consideration[i];
+    const c = consideration[i];
     if (!isOpenSeaFeeAccount(c.recipient) && c.recipient != excludedRecipient) {
       royaltyFeeItems.push(c);
     }
   }
-  let royaltyRevenue =
+  const royaltyRevenue =
     royaltyFeeItems.length > 0 ? royaltyFeeItems[0].amount : BIGINT_ZERO;
 
   return new Fees(protocolRevenue, royaltyRevenue);

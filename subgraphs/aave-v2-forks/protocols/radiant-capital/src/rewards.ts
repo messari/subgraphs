@@ -32,22 +32,22 @@ export function updateMarketRewards(
     return;
   }
 
-  let tryIncentiveController = rTokenContract.try_getIncentivesController();
+  const tryIncentiveController = rTokenContract.try_getIncentivesController();
   if (tryIncentiveController.reverted) {
     return;
   }
 
-  let incentiveController = ChefIncentivesController.bind(
+  const incentiveController = ChefIncentivesController.bind(
     tryIncentiveController.value
   );
-  let tryDepPoolInfo = incentiveController.try_poolInfo(
+  const tryDepPoolInfo = incentiveController.try_poolInfo(
     Address.fromString(market.outputToken!)
   );
-  let tryBorPoolInfo = incentiveController.try_poolInfo(
+  const tryBorPoolInfo = incentiveController.try_poolInfo(
     Address.fromString(market.vToken!)
   );
-  let tryTotalAllocPoint = incentiveController.try_totalAllocPoint();
-  let tryTotalRewardsPerSecond = incentiveController.try_rewardsPerSecond();
+  const tryTotalAllocPoint = incentiveController.try_totalAllocPoint();
+  const tryTotalRewardsPerSecond = incentiveController.try_rewardsPerSecond();
 
   if (
     tryDepPoolInfo.reverted ||
@@ -59,38 +59,38 @@ export function updateMarketRewards(
   }
 
   // create reward tokens
-  let borrowRewardToken = getOrCreateRewardToken(
+  const borrowRewardToken = getOrCreateRewardToken(
     Address.fromString(REWARD_TOKEN_ADDRESS),
     RewardTokenType.BORROW
   );
-  let depositRewardToken = getOrCreateRewardToken(
+  const depositRewardToken = getOrCreateRewardToken(
     Address.fromString(REWARD_TOKEN_ADDRESS),
     RewardTokenType.DEPOSIT
   );
   market.rewardTokens = [borrowRewardToken.id, depositRewardToken.id];
 
   // deposit rewards
-  let depositRewardsPerSecond = tryTotalRewardsPerSecond.value
+  const depositRewardsPerSecond = tryTotalRewardsPerSecond.value
     .times(tryDepPoolInfo.value.value1)
     .div(tryTotalAllocPoint.value);
-  let depositRewardsPerDay = depositRewardsPerSecond.times(
+  const depositRewardsPerDay = depositRewardsPerSecond.times(
     BigInt.fromI32(SECONDS_PER_DAY)
   );
   // borrow rewards
-  let borrowRewardsPerSecond = tryTotalRewardsPerSecond.value
+  const borrowRewardsPerSecond = tryTotalRewardsPerSecond.value
     .times(tryBorPoolInfo.value.value1)
     .div(tryTotalAllocPoint.value);
-  let borrowRewardsPerDay = borrowRewardsPerSecond.times(
+  const borrowRewardsPerDay = borrowRewardsPerSecond.times(
     BigInt.fromI32(SECONDS_PER_DAY)
   );
 
-  let rewardTokenPriceUSD = getRewardPrice();
-  let depRewardsPerDayUSD = depositRewardsPerDay
+  const rewardTokenPriceUSD = getRewardPrice();
+  const depRewardsPerDayUSD = depositRewardsPerDay
     .toBigDecimal()
     .div(exponentToBigDecimal(DEFAULT_DECIMALS))
     .times(rewardTokenPriceUSD);
 
-  let borRewardsPerDayUSD = borrowRewardsPerDay
+  const borRewardsPerDayUSD = borrowRewardsPerDay
     .toBigDecimal()
     .div(exponentToBigDecimal(DEFAULT_DECIMALS))
     .times(rewardTokenPriceUSD);
@@ -107,9 +107,9 @@ export function updateMarketRewards(
 
 // Radiant price is generated from WETH-RDNT reserve on Sushiswap.
 export function getRewardPrice(): BigDecimal {
-  let pair = UniswapV2Pair.bind(Address.fromString(RDNT_WETH_Uniswap_Pair));
+  const pair = UniswapV2Pair.bind(Address.fromString(RDNT_WETH_Uniswap_Pair));
 
-  let reserves = pair.try_getReserves();
+  const reserves = pair.try_getReserves();
   if (reserves.reverted) {
     log.error("[getRewardPrice] Unable to get price for asset {}", [
       REWARD_TOKEN_ADDRESS,
@@ -117,14 +117,16 @@ export function getRewardPrice(): BigDecimal {
     return BIGDECIMAL_ZERO;
   }
 
-  let reserveRDNT = reserves.value.value0;
-  let reserveWETH = reserves.value.value1;
+  const reserveRDNT = reserves.value.value0;
+  const reserveWETH = reserves.value.value1;
 
-  let priceInWETH = reserveWETH.toBigDecimal().div(reserveRDNT.toBigDecimal());
+  const priceInWETH = reserveWETH
+    .toBigDecimal()
+    .div(reserveRDNT.toBigDecimal());
 
   // get WETH price in USD from aToken contract.
-  let rToken = RToken.bind(Address.fromString(RWETH_ADDRESS));
-  let call = rToken.try_getAssetPrice();
+  const rToken = RToken.bind(Address.fromString(RWETH_ADDRESS));
+  const call = rToken.try_getAssetPrice();
   return call.reverted
     ? BIGDECIMAL_ZERO
     : call.value

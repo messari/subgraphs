@@ -306,7 +306,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Iron Bank",
     "iron-bank",
     "2.0.1",
-    "1.1.6",
+    "1.1.7",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
