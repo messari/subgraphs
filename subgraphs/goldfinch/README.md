@@ -1,4 +1,97 @@
-# The Graph subgraphs related to the Goldfinch Protocol
+# Goldfinch Lending Protocol Subgraph
+
+## Calculation Methodology v1.0.0
+
+### Total Value Locked (TVL) USD
+
+Sum across all Markets (Pools):
+
+`Total deposit amount USD - total withdrawal amount USD`
+
+Note: Investments made to Tranched Pools from the Senior Pool are deducted from Protocol TVL to avoid double counting.
+
+### Total Deposit USD
+
+Sum across all Markets (Pools):
+
+`Total deposit amount USD - total withdrawal amount USD`
+
+Note: Investments made to Tranched Pools from the Senior Pool are deducted from Protocol Total Deposit to avoid double counting.
+
+### Total Borrow USD
+
+Sum across all Tranched Pools:
+
+`Draw down amount USD`
+
+### Total Revenue USD
+
+Sum across all Markets:
+
+`Protocol-Side revenue + Supply-Side revenue`
+
+### Protocol-Side Revenue USD
+
+Sum across all Markets:
+
+`Reserve Fund Collected`
+
+Note: Goldfinch collect reserve fund from withdraw and interest (from borrowers and extra Senior Pool fund sweeped to compound)
+
+### Supply-Side Revenue USD
+
+Sum across all Markets
+
+`PaymentApplied.InterestAmount`
+
+### Total Unique Users
+
+Count of Unique Addresses which have interacted with the protocol via any transaction
+
+`'frob' LogNote event emitted by Vat addresses which include deposits/withdrawals/borrows/repays + Cat.Bite events or Dog.Bark events emitted during liquidations`
+
+### Reward Token Emissions
+
+The reward token is GFI. There are two types of reward emissions : backer rewards and staking rewards, each managed by its own contract.
+
+- Staking Rewards (StakingRewards.sol): `event RewardPaid.params.reward`
+- Backer Rewards (BackerRewards.sol): sum over all claims by markets `BackerRewardsClaimed.params.amountOfTranchedPoolRewards + BackerRewardsClaimed.params.amountOfSeniorPoolRewards`
+
+### Minted Token Supply (None)
+
+## References and Useful Links
+
+- Protocol: https://goldfinch.finance/
+- Analytics: https://api.thegraph.com/subgraphs/name/goldfinch-eng/goldfinch/graphql
+- Docs: https://docs.goldfinch.finance/goldfinch/
+- Smart contracts: https://github.com/goldfinch-eng/mono/tree/main/packages/protocol/contracts
+- Deployed addresses: https://github.com/goldfinch-eng/mono/tree/main/packages/protocol/deployments/mainnet
+
+## Smart Contracts Interactions
+
+![Goldfinch](../../docs/images/protocols/goldfinch.png "Goldfinch")
+
+## Build
+
+- Initialize subgraph (Subgraph Studio):
+  ```
+  graph init --product subgraph-studio
+  --from-contract <CONTRACT_ADDRESS> [--network <ETHEREUM_NETWORK>] [--abi <FILE>] <SUBGRAPH_SLUG> [<DIRECTORY>]
+  ```
+- Initialize subgraph (Hosted Service):
+  ```
+  graph init --product hosted-service --from-contract <CONTRACT_ADDRESS> <GITHUB_USER>/<SUBGRAPH_NAME>[<DIRECTORY>]
+  ```
+- Generate code from manifest and schema: `graph codegen`
+- Build subgraph: `graph build`
+
+## Deploy
+
+- Authenticate (just once): `graph auth --product hosted-service <ACCESS_TOKEN>`
+- Deploy to Subgraph Studio: `graph deploy --studio <SUBGRAPH_NAME>`
+- Deploy to Hosted Service: `graph deploy --product hosted-service <GITHUB_USER>/<SUBGRAPH_NAME>`
+
+# The Graph subgraphs related to the Goldfinch Protocol (from official Goldfinch Subgraph)
 
 ## Usage
 
@@ -31,12 +124,12 @@ The schema is defined under: [schema.graphql](./schema.graphql)
 ##### Create vs Update pattern
 
 ```js
-let id = seniorPoolAddress.toHex()
-let seniorPool = SeniorPool.load(id)
+let id = seniorPoolAddress.toHex();
+let seniorPool = SeniorPool.load(id);
 
 if (seniorPool === null) {
-  seniorPool = new SeniorPool(id)
-  seniorPool.createdAt = event.block.timestamp
+  seniorPool = new SeniorPool(id);
+  seniorPool.createdAt = event.block.timestamp;
 }
 ```
 
@@ -44,39 +137,39 @@ if (seniorPool === null) {
 
 If you have the ABIs on the contracts defined on `subgraph.yaml` you can call public methods from smart contracts:
 
-
 ```js
-let contract = SeniorPoolContract.bind(seniorPoolAddress)
-let sharePrice = contract.sharePrice()
-let compoundBalance = contract.compoundBalance()
-let totalLoansOutstanding = contract.totalLoansOutstanding()
-let totalSupply = fidu_contract.totalSupply()
-let totalPoolAssets = totalSupply.times(sharePrice)
+let contract = SeniorPoolContract.bind(seniorPoolAddress);
+let sharePrice = contract.sharePrice();
+let compoundBalance = contract.compoundBalance();
+let totalLoansOutstanding = contract.totalLoansOutstanding();
+let totalSupply = fidu_contract.totalSupply();
+let totalPoolAssets = totalSupply.times(sharePrice);
 ```
 
 ##### Updating array properties
 
 ```js
 // This won't work
-entity.numbers.push(BigInt.fromI32(1))
-entity.save()
+entity.numbers.push(BigInt.fromI32(1));
+entity.save();
 
 // This will work
-let numbers = entity.numbers
-numbers.push(BigInt.fromI32(1))
-entity.numbers = numbers
-entity.save()
+let numbers = entity.numbers;
+numbers.push(BigInt.fromI32(1));
+entity.numbers = numbers;
+entity.save();
 ```
 
 ### Regarding Upgradeable Contracts
 
-The subgraph doesn't need to know anything about upgradeable contracts. If a contract is upgradeable, just define it as an ordinary `dataSource` in `subgraph.yaml`, *not* a `template`. The address that you write will be the address of the proxy, because all events are emitted under the proxy's address. The ABI will be the ABI of the implementation contract, but that should come as no surprise because the ABI of the proxy contract itself isn't useful.
+The subgraph doesn't need to know anything about upgradeable contracts. If a contract is upgradeable, just define it as an ordinary `dataSource` in `subgraph.yaml`, _not_ a `template`. The address that you write will be the address of the proxy, because all events are emitted under the proxy's address. The ABI will be the ABI of the implementation contract, but that should come as no surprise because the ABI of the proxy contract itself isn't useful.
 
 With all that said, you do need to be careful of how contracts change over time. Subgraph mapping code allows you to run view functions on the block being ingested. If you try to run a function as you're ingesting block 1000, but the upgrade that introduced that function happened on block 1001, then you'll get an error. Another problem is how event signatures can change through upgrades (see the excerpt below).
 
 ### Updating event signatures
 
 If an event signature updates (meaning the parameters change), then Ethereum considers the event to be completely different. You would have to search for the event by it's old and new signatures to get a complete history. This means that some action must be taken in the subgraph mappings in order to consume all old and new events. Let's demonstrate with an example: the `Unstaked` event on `StakingRewards.sol`. Suppose that the signature updates from `Unstaked(indexed address,indexed uint256,uint256)` to `Unstaked(indexed address,indexed uint256,uint256,uint8)`. In the latest ABI for `StakingRewards.sol` (StakingRewards.json), it will list only the newest definition of `Unstaked`. In the ABI that we place in `subgraph/abis`, we have to make sure that both the old and new definition are present. Thankfully, this is actually easy to do, because the artifact file (`StakingRewards.json`) contains a `history` block that will hold the definition for the old version of this event. Therefore, we can just insert this block into `subgraph/abis/StakingRewards.json` to make it aware of the new version of `Unstaked` (assuming it already has the old version):
+
 ```
     {
       "anonymous": false,
@@ -110,19 +203,25 @@ If an event signature updates (meaning the parameters change), then Ethereum con
       "type": "event"
     },
 ```
+
 be sure to place this directly _after_ the old version. This will affect what the graph SDK will produce when you run `codegen`.
 
 When you run codegen, the first `Unstaked` event defined in the ABI can be imported as follows (same as before):
+
 ```
 import { Unstaked } from "../../generated/templates/StakingRewards/StakingRewards"
 ```
+
 The second one will be generated under the name `Unstaked1`:
+
 ```
 import { Unstaked1 } from "../../generated/templates/StakingRewards/StakingRewards"
 ```
+
 You must write a handler for the new `Unstaked1` (it can have the same logic as the old one, if that is desired).
 
 Finally, be sure that you add your new handler for `Unstaked1` to `subgraph.yaml` (otherwise it will never run):
+
 ```
 - event: Unstaked(indexed address,indexed uint256,uint256,uint8)
   handler: handleUnstaked1
@@ -131,6 +230,7 @@ Finally, be sure that you add your new handler for `Unstaked1` to `subgraph.yaml
 ### Debugging
 
 Debugging on the graph should be done through logs and checking the subgraph logs:
+
 - [Logging and Debugging](https://thegraph.com/docs/developer/assemblyscript-api#logging-and-debugging)
 
 In practical terms, logs should be added to monitor the progress of the application.
@@ -139,6 +239,7 @@ In practical terms, logs should be added to monitor the progress of the applicat
 
 1. Change the network to be mainnet
 2. Change on App.tsx the currentBlock. eg:
+
 ```
 - const currentBlock = getBlockInfo(await getCurrentBlock())
 + const currentBlock = {
@@ -146,7 +247,9 @@ In practical terms, logs should be added to monitor the progress of the applicat
 +   timestamp: 1637262806,
 + }
 ```
+
 - Add the block number on the graphql/queries.ts. eg:
+
 ```
 _meta(block: {number: 13845148}) {
   ...
@@ -158,7 +261,9 @@ tranchedPools(block: {number: 13845148}) {
   ...
 }
 ```
+
 - On `usePoolsData`, disable the skip flag from web3 and add the validation scripts
+
 ```
   // Fetch data from subgraph
   const {error, backers: backersSubgraph, seniorPoolStatus, data} = useTranchedPoolSubgraphData(..., false)
@@ -172,7 +277,8 @@ tranchedPools(block: {number: 13845148}) {
     generalBackerValidation(goldfinchProtocol, data, currentBlock)
   }
 ```
-  - Beaware that running `generalBackerValidation` will run the validations for all backers which is subject to rate limit of the web3 provider
+
+- Beaware that running `generalBackerValidation` will run the validations for all backers which is subject to rate limit of the web3 provider
 - On `src/graphql/client.ts` change the `API_URLS` for the url of the subgraph you want to validate
 
 ### Tests
