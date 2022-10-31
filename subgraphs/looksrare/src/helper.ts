@@ -52,15 +52,17 @@ export const SECONDS_PER_DAY = 24 * 60 * 60;
 export const WETH_ADDRESS = Address.fromString(
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 );
-export const STRATEGY_STANDARD_SALE_ADDRESS = Address.fromString(
-  "0x56244bb70cbd3ea9dc8007399f61dfc065190031"
-);
-export const STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESS = Address.fromString(
-  "0x86f909f70813cdb1bc733f4d97dc6b03b8e7e8f3"
-);
-export const STRATEGY_PRIVATE_SALE_ADDRESS = Address.fromString(
-  "0x58d83536d3efedb9f7f2a1ec3bdaad2b1a4dd98c"
-);
+export const STRATEGY_STANDARD_SALE_ADDRESSES = [
+  Address.fromString("0x56244bb70cbd3ea9dc8007399f61dfc065190031"),
+  Address.fromString("0x579af6fd30bf83a5ac0d636bc619f98dbdeb930c"),
+];
+export const STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESSES = [
+  Address.fromString("0x86f909f70813cdb1bc733f4d97dc6b03b8e7e8f3"),
+  Address.fromString("0x09f93623019049c76209c26517acc2af9d49c69b"),
+];
+export const STRATEGY_PRIVATE_SALE_ADDRESSES = [
+  Address.fromString("0x58d83536d3efedb9f7f2a1ec3bdaad2b1a4dd98c"),
+];
 
 export const ERC721_INTERFACE_IDENTIFIER = "0x80ac58cd";
 export const ERC1155_INTERFACE_IDENTIFIER = "0xd9b67a26";
