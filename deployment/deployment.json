@@ -4108,6 +4108,35 @@
       }
     }
   },
+  "maker-governance": {
+    "schema": "governance",
+    "base": "maker-governance",
+    "protocol": "maker-governance",
+    "deployments": {
+      "maker-governance-ethereum": {
+        "network": "ethereum",
+        "status": "dev",
+        "versions": {
+          "schema": "1.0.0",
+          "subgraph": "1.0.0",
+          "methodology": "1.0.0"
+        },
+        "files": {
+          "template": "maker-governance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "maker-governance",
+            "query-id": "maker-governance"
+          }
+        }
+      }
+    }
+  },
   "aave-governance": {
     "schema": "governance",
     "base": "aave-governance",

@@ -1,0 +1,212 @@
+type GovernanceFramework @entity {
+  "Governance framework contract address"
+  id: String!
+  "Name of the governance framework"
+  name: String!
+  "Type of governance framework"
+  type: GovernanceFrameworkType!
+
+  "The contract address associated with the governance token used for voting on the governance framework proposals"
+  tokenAddress: String!
+  "Total Supply of token"
+  totalTokenSupply: BigInt!
+  "Number of token holders currently"
+  currentTokenHolders: BigInt!
+  "Number of delegates participating on the governance currently"
+  totalDelegates: Int!
+
+  "MKR locked in chief i.e. total voting power"
+  currentTokenLockedInChief: BigInt!
+  "Amount of voting power delegated"
+  currentTokenDelegated: BigInt!
+  "Current spell that is the 'hat'"
+  currentHat: Spell
+  "Total number of spells created"
+  spells: Int!
+}
+
+enum GovernanceFrameworkType {
+  GovernorAlpha
+  GovernorBravo
+  OZGovernor
+  AaveGovernanceV2
+  MakerGovernance
+}
+
+type Slate @entity {
+  "Unique Slate ID, produced by hashing the addresses in the slate"
+  id: ID!
+  "Transaction hash of the Slate creation"
+  txnHash: String!
+  "Block number slate was created "
+  creationBlock: BigInt!
+  "Timestamp of block slate was created in"
+  creationTime: BigInt!
+
+  "Spells that are on this slate"
+  yays: [Spell!]!
+}
+
+# Also referred to as Executive Proposal
+type Spell @entity {
+  "Spell's contract address"
+  id: ID!
+  "Spell description"
+  description: String!
+  "State of the spell"
+  state: SpellState!
+  "Governance Framework that spell is part of"
+  governanceFramework: GovernanceFramework!
+
+  "Block number spell was created in"
+  creationBlock: BigInt!
+  "Timestamp of block spell was created in"
+  creationTime: BigInt!
+  "Timestamp of spell expiry"
+  expiryTime: BigInt!
+  "Transaction hash of Spell lift"
+  liftedTxnHash: String
+  "Timestamp of Spell lift"
+  liftedTime: BigInt
+  "Voting power when lifted"
+  liftedWith: BigInt
+  "Transaction hash of Spell scheduled"
+  scheduledTxnHash: String
+  "Timestamp of Spell scheduled"
+  scheduledTime: BigInt
+  "Transaction hash of Spell cast"
+  castTxnHash: String
+  "Timestamp of Spell cast"
+  castTime: BigInt
+  "Voting power when cast"
+  castWith: BigInt
+  "Number of votes for the Spell"
+  totalVotes: BigInt!
+  "Weighted voting power for the Spell"
+  totalWeightedVotes: BigInt!
+
+  "Votes associated to this spell"
+  votes: [Vote!]! @derivedFrom(field: "spell")
+}
+enum SpellState {
+  ACTIVE
+  LIFTED
+  SCHEDULED
+  CAST
+}
+type DelegateAdmin @entity {
+  "A delegate admin is an address controls a Vote Delegate contract"
+  id: String!
+  "Vote delegate contract that delegate admin controls"
+  voteDelegate: Delegate
+}
+
+type Delegate @entity {
+  "A Delegate is any address that has been delegated with voting tokens by a token holder, id is the blockchain address of said delegate"
+  id: String!
+  "Is a vote delegate contract"
+  isVoteDelegate: Boolean
+
+  "Delegate admin is the address that controls a Vote Delegate contract"
+  delegateAdmin: DelegateAdmin
+
+  "Delegate voting power expressed in the smallest unit of the token"
+  votingPowerRaw: BigInt!
+  "Delegate voting power expressed as a BigDecimal normalized value"
+  votingPower: BigDecimal!
+
+  "Delegations that this contract has received"
+  delegations: [Delegation!]!
+  "Number of token holders delegate represents"
+  tokenHoldersRepresented: Int!
+
+  "Current slate of spells delegate is voting for"
+  currentSpells: [Spell!]!
+
+  "Votes that a delegate has made in different spells"
+  votes: [Vote!]! @derivedFrom(field: "voter")
+  "Number of spells voted on"
+  numberVotes: Int!
+
+  "Poll votes associated to this spell"
+  poleVotes: [PollVote!]! @derivedFrom(field: "voter")
+  "Number of spells voted on"
+  numberPoleVotes: Int!
+}
+type Delegation @entity {
+  "delegate-delegator"
+  id: String!
+  "Address of the delegator"
+  delegator: String!
+  "Total amount delegated"
+  amount: BigInt!
+}
+
+type DelegateVotingPowerChange @entity(immutable: true) {
+  "Unique entity used to keep track of voting power delta"
+  id: ID!
+  "Token addresss"
+  tokenAddress: String
+  "Token address for delegate"
+  delegate: String!
+  "Previous voting power of delegate"
+  previousBalance: BigInt!
+  "New voting power of delegate"
+  newBalance: BigInt!
+  "Block time change happened"
+  blockTimestamp: BigInt!
+  "Transaction hash of the voting power change"
+  txnHash: String!
+  "Log index for delegate voting power change"
+  logIndex: BigInt!
+  "Block number of event"
+  blockNumber: BigInt!
+}
+
+type Vote @entity {
+  "Delegate ID + spell ID"
+  id: ID!
+  "Voting weight expressed in the vote"
+  weight: BigInt!
+  "Reason for voting choice"
+  reason: String
+  "Delegate that emitted the vote"
+  voter: Delegate!
+  "spell that is being voted on"
+  spell: Spell!
+
+  "Block number vote is cast in"
+  block: BigInt!
+  "Timestamp of block vote was cast in"
+  blockTime: BigInt!
+  "Transaction hash of the vote"
+  txnHash: String!
+  "Log index for event"
+  logIndex: BigInt!
+}
+
+# Polling Entities
+type PollVote @entity {
+  "Voter ID + Poll ID"
+  id: String!
+  "Voting weight expressed in the vote"
+  choice: BigInt!
+  "Delegate that emitted the vote"
+  voter: Delegate!
+  "Poll that is being voted on"
+  poll: Poll!
+
+  "Block number vote is cast in"
+  block: BigInt!
+  "Timestamp of block vote was cast in"
+  blockTime: BigInt!
+  "Transaction hash of the vote"
+  txnHash: String!
+}
+
+type Poll @entity {
+  "Poll's id"
+  id: String!
+  "Poll votes associated to this spell"
+  polevotes: [PollVote!]! @derivedFrom(field: "poll")
+}

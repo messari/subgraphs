@@ -1,0 +1,429 @@
+[
+  {
+    "inputs": [
+      { "internalType": "contract DSToken", "name": "GOV", "type": "address" },
+      { "internalType": "contract DSToken", "name": "IOU", "type": "address" },
+      { "internalType": "uint256", "name": "MAX_YAYS", "type": "uint256" }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "slate",
+        "type": "bytes32"
+      }
+    ],
+    "name": "Etch",
+    "type": "event"
+  },
+  {
+    "anonymous": true,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes4",
+        "name": "sig",
+        "type": "bytes4"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "guy",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "foo",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "bar",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "wad",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "fax",
+        "type": "bytes"
+      }
+    ],
+    "name": "LogNote",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "authority",
+        "type": "address"
+      }
+    ],
+    "name": "LogSetAuthority",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "LogSetOwner",
+    "type": "event"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "GOV",
+    "outputs": [
+      { "internalType": "contract DSToken", "name": "", "type": "address" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "IOU",
+    "outputs": [
+      { "internalType": "contract DSToken", "name": "", "type": "address" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "MAX_YAYS",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "approvals",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "authority",
+    "outputs": [
+      { "internalType": "contract DSAuthority", "name": "", "type": "address" }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "address", "name": "caller", "type": "address" },
+      { "internalType": "address", "name": "code", "type": "address" },
+      { "internalType": "bytes4", "name": "sig", "type": "bytes4" }
+    ],
+    "name": "canCall",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "deposits",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address[]", "name": "yays", "type": "address[]" }
+    ],
+    "name": "etch",
+    "outputs": [
+      { "internalType": "bytes32", "name": "slate", "type": "bytes32" }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "internalType": "uint256", "name": "wad", "type": "uint256" }],
+    "name": "free",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "address", "name": "code", "type": "address" },
+      { "internalType": "bytes4", "name": "sig", "type": "bytes4" }
+    ],
+    "name": "getCapabilityRoles",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "internalType": "address", "name": "who", "type": "address" }],
+    "name": "getUserRoles",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "address", "name": "who", "type": "address" },
+      { "internalType": "uint8", "name": "role", "type": "uint8" }
+    ],
+    "name": "hasUserRole",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "hat",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "address", "name": "code", "type": "address" },
+      { "internalType": "bytes4", "name": "sig", "type": "bytes4" }
+    ],
+    "name": "isCapabilityPublic",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "internalType": "address", "name": "who", "type": "address" }],
+    "name": "isUserRoot",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "last",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "launch",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address", "name": "whom", "type": "address" }
+    ],
+    "name": "lift",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "live",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{ "internalType": "uint256", "name": "wad", "type": "uint256" }],
+    "name": "lock",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "contract DSAuthority",
+        "name": "authority_",
+        "type": "address"
+      }
+    ],
+    "name": "setAuthority",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address", "name": "owner_", "type": "address" }
+    ],
+    "name": "setOwner",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address", "name": "code", "type": "address" },
+      { "internalType": "bytes4", "name": "sig", "type": "bytes4" },
+      { "internalType": "bool", "name": "enabled", "type": "bool" }
+    ],
+    "name": "setPublicCapability",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "uint8", "name": "role", "type": "uint8" },
+      { "internalType": "address", "name": "code", "type": "address" },
+      { "internalType": "bytes4", "name": "sig", "type": "bytes4" },
+      { "internalType": "bool", "name": "enabled", "type": "bool" }
+    ],
+    "name": "setRoleCapability",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address", "name": "who", "type": "address" },
+      { "internalType": "bool", "name": "enabled", "type": "bool" }
+    ],
+    "name": "setRootUser",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address", "name": "who", "type": "address" },
+      { "internalType": "uint8", "name": "role", "type": "uint8" },
+      { "internalType": "bool", "name": "enabled", "type": "bool" }
+    ],
+    "name": "setUserRole",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      { "internalType": "bytes32", "name": "", "type": "bytes32" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "slates",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "bytes32", "name": "slate", "type": "bytes32" }
+    ],
+    "name": "vote",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      { "internalType": "address[]", "name": "yays", "type": "address[]" }
+    ],
+    "name": "vote",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "votes",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
