@@ -725,6 +725,15 @@ type Market @entity {
   " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
   liquidationPenalty: BigDecimal!
 
+  " Can the user choose to isloate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
+  canIsolate: Boolean!
+
+  " Allowed limit to how much of the underlying asset can be supplied to this market. "
+  supplyCap: BigInt
+
+  " Allowed limit for how much of the underlying asset can be borrowed from this market. "
+  borrowCap: BigInt
+
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
@@ -1290,6 +1299,9 @@ type Position @entity {
 
   " Whether this position has been enabled as a collateral (only applies to LENDER positions). For protocols (e.g. MakerDAO) that doesn't require enabling explicitly, this will always be true. "
   isCollateral: Boolean
+
+  " Whether this position is being isolated from risk from other positions (only applies to LENDER positions). For protocols (e.g. Aave V3) this reduces risk exposure from other user positions. "
+  isIsolated: Boolean
 
   " Token balance in this position, in native amounts "
   balance: BigInt!
