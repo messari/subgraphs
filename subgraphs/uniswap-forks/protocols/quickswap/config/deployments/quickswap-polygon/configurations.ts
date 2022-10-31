@@ -107,6 +107,9 @@ export class QuickswapMaticConfigurations implements Configurations {
   getUntrackedTokens(): string[] {
     return [];
   }
+  getBrokenERC20Tokens(): string[] {
+    return ["0x5d76fa95c308fce88d347556785dd1dd44416272"];
+  }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }
