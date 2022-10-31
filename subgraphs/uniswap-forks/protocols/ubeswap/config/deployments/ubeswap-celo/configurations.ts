@@ -83,21 +83,26 @@ export class UbeswapCeloConfigurations implements Configurations {
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
       "0x471ece3750da237f93b8e339c536989b8978a438", //celo
+      "0x7037f7296b2fc7908de7b57a89efaa8319f0c500", // mcelo1
+      "0x7d00cd74ff385c955ea3d79e47bf06bd7386387d", // mcelo2
       "0x765de816845861e75a25fca122bb6898b8b1282a", // cusd
-      "0xe273ad7ee11dcfaa87383ad5977ee1504ac07568", //mCEUR
-      "0xd629eb00deced2a080b7ec630ef6ac117e614f1b", //wbtc
-      "0x122013fd7df1c6f636a5bb8f03108e876548b455", //weth
-      "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73", //cEUR
+      "0xa8d0e6799ff3fd19c6459bf02689ae09c4d78ba7", // mcEUR2
+      "0xe273ad7ee11dcfaa87383ad5977ee1504ac07568", // mcEUR2
+      "0xd629eb00deced2a080b7ec630ef6ac117e614f1b", // wbtc
+      "0x122013fd7df1c6f636a5bb8f03108e876548b455", // weth
+      "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73", // cEUR
       "0x00be915b9dcf56a3cbe739d9b9c202ca692409ec", // ube
-      "0x918146359264c492bd6934071c6bd31c854edbc3", // mcUSD
-      "0x2a3684e9dc20b857375ea04235f2f7edbe818fa7", // USDC
+      "0x64defa3544c695db8c535d289d843a189aa26b98", // mcUSD1
+      "0x918146359264c492bd6934071c6bd31c854edbc3", // mcUSD2
+      "0x17700282592d6917f6a73d0bf8accf4d578c131e", // MOO
     ]);
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
       "0x2a3684e9dc20b857375ea04235f2f7edbe818fa7", // USDC
       "0x765de816845861e75a25fca122bb6898b8b1282a", // cusd
-      "0x918146359264c492bd6934071c6bd31c854edbc3", // mcUSD
+      "0x64defa3544c695db8c535d289d843a189aa26b98", // mcUSD1
+      "0x918146359264c492bd6934071c6bd31c854edbc3", // mcUSD2
     ]);
   }
   getStableOraclePools(): string[] {

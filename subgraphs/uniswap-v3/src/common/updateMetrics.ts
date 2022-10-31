@@ -21,7 +21,7 @@ import {
   BIGINT_NEG_ONE,
 } from "./constants";
 import {
-  getOrCreateDex,
+  getOrCreateProtocol,
   getLiquidityPool,
   getLiquidityPoolFee,
   getLiquidityPoolAmounts,
@@ -44,7 +44,7 @@ import { percToDec } from "./utils/utils";
 export function updateFinancials(event: ethereum.Event): void {
   const financialMetricsDaily = getOrCreateFinancialsDailySnapshot(event);
 
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
 
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetricsDaily.blockNumber = event.block.number;
@@ -66,7 +66,7 @@ export function updateUsageMetrics(
   const usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
   const usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
 
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetricsDaily.blockNumber = event.block.number;

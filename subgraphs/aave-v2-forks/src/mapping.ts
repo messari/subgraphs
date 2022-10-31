@@ -80,7 +80,7 @@ export function _handlePriceOracleUpdated(
   log.info("[PriceOracleUpdated] OracleAddress: {}", [
     newPriceOracle.toHexString(),
   ]);
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const protocol = getOrCreateLendingProtocol(protocolData);
   protocol.priceOracle = newPriceOracle.toHexString();
   protocol.save();
 }
@@ -94,11 +94,11 @@ export function _handleReserveInitialized(
   stableDebtToken: Address = Address.fromString(ZERO_ADDRESS)
 ): void {
   // create tokens
-  let outputTokenEntity = getOrCreateToken(outputToken);
-  let variableDebtTokenEntity = getOrCreateToken(variableDebtToken);
+  const outputTokenEntity = getOrCreateToken(outputToken);
+  const variableDebtTokenEntity = getOrCreateToken(variableDebtToken);
 
   // update and initialize specofic market variables
-  let market = getOrCreateMarket(underlyingToken, protocolData);
+  const market = getOrCreateMarket(underlyingToken, protocolData);
 
   market.name = outputTokenEntity.name;
   market.outputToken = outputTokenEntity.id;
@@ -123,7 +123,7 @@ export function _handleCollateralConfigurationChanged(
   protocolData: ProtocolData
 ): void {
   // Adjust market LTV, liquidation, and collateral data when a reserve's collateral configuration has changed
-  let market = getOrCreateMarket(marketId, protocolData);
+  const market = getOrCreateMarket(marketId, protocolData);
 
   market.maximumLTV = maximumLTV.toBigDecimal().div(BIGDECIMAL_HUNDRED);
   market.liquidationThreshold = liquidationThreshold
@@ -147,7 +147,7 @@ export function _handleBorrowingEnabledOnReserve(
   marketId: Address,
   protocolData: ProtocolData
 ): void {
-  let market = getOrCreateMarket(marketId, protocolData);
+  const market = getOrCreateMarket(marketId, protocolData);
 
   market.canBorrowFrom = true;
   market.prePauseState = [
@@ -162,7 +162,7 @@ export function _handleBorrowingDisabledOnReserve(
   marketId: Address,
   protocolData: ProtocolData
 ): void {
-  let market = getOrCreateMarket(marketId, protocolData);
+  const market = getOrCreateMarket(marketId, protocolData);
 
   market.canBorrowFrom = false;
   market.prePauseState = [
@@ -177,7 +177,7 @@ export function _handleReserveActivated(
   marketId: Address,
   protocolData: ProtocolData
 ): void {
-  let market = getOrCreateMarket(marketId, protocolData);
+  const market = getOrCreateMarket(marketId, protocolData);
 
   market.isActive = true;
   market.prePauseState = [
@@ -192,7 +192,7 @@ export function _handleReserveDeactivated(
   marketId: Address,
   protocolData: ProtocolData
 ): void {
-  let market = getOrCreateMarket(marketId, protocolData);
+  const market = getOrCreateMarket(marketId, protocolData);
 
   market.isActive = false;
   market.prePauseState = [
@@ -208,7 +208,7 @@ export function _handleReserveFactorChanged(
   reserveFactor: BigInt,
   protocolData: ProtocolData
 ): void {
-  let market = getOrCreateMarket(marketId, protocolData);
+  const market = getOrCreateMarket(marketId, protocolData);
 
   market.reserveFactor = reserveFactor
     .toBigDecimal()
@@ -221,9 +221,9 @@ export function _handleReserveUsedAsCollateralEnabled(
   accountID: Address,
   protocolData: ProtocolData
 ): void {
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
-  let market = getOrCreateMarket(marketId, protocolData);
+  const market = getOrCreateMarket(marketId, protocolData);
 
   // grab account
   let account = Account.load(accountID.toHexString());
@@ -234,7 +234,7 @@ export function _handleReserveUsedAsCollateralEnabled(
     protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
-  let markets = account.enabledCollaterals;
+  const markets = account.enabledCollaterals;
   markets.push(market.id);
   account.enabledCollaterals = markets;
   account.save();
@@ -245,18 +245,18 @@ export function _handleReserveUsedAsCollateralDisabled(
   accountID: Address,
   protocolData: ProtocolData
 ): void {
-  let market = getOrCreateMarket(marketId, protocolData);
+  const market = getOrCreateMarket(marketId, protocolData);
 
   // grab account
-  let account = Account.load(accountID.toHexString());
+  const account = Account.load(accountID.toHexString());
   if (!account) {
     log.warning("[ReserveUsedAsCollateralEnabled] Account not found: {}", [
       accountID.toHexString(),
     ]);
     return;
   }
-  let markets = account.enabledCollaterals;
-  let index = markets.indexOf(market.id);
+  const markets = account.enabledCollaterals;
+  const index = markets.indexOf(market.id);
   if (index >= 0) {
     // drop 1 element at given index
     markets.splice(index, 1);
@@ -266,10 +266,10 @@ export function _handleReserveUsedAsCollateralDisabled(
 }
 
 export function _handlePaused(protocolData: ProtocolData): void {
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   for (let i = 0; i < protocol.marketIDs.length; i++) {
-    let market = Market.load(protocol.marketIDs[i]);
+    const market = Market.load(protocol.marketIDs[i]);
     if (!market) {
       log.warning("[Paused] Market not found: {}", [protocol.marketIDs[i]]);
       continue;
@@ -289,10 +289,10 @@ export function _handlePaused(protocolData: ProtocolData): void {
 }
 
 export function _handleUnpaused(protocolData: ProtocolData): void {
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   for (let i = 0; i < protocol.marketIDs.length; i++) {
-    let market = Market.load(protocol.marketIDs[i]);
+    const market = Market.load(protocol.marketIDs[i]);
     if (!market) {
       log.warning("[Paused] Market not found: {}", [protocol.marketIDs[i]]);
       continue;
@@ -320,17 +320,17 @@ export function _handleReserveDataUpdated(
   marketId: Address,
   assetPriceUSD: BigDecimal
 ): void {
-  let market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId.toHexString());
   if (!market) {
     log.warning("[_handlReserveDataUpdated] Market not found {}", [
       marketId.toHexString(),
     ]);
     return;
   }
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   // get input token and decimals
-  let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+  const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
 
   // update market prices
   market.inputTokenPriceUSD = assetPriceUSD;
@@ -339,15 +339,15 @@ export function _handleReserveDataUpdated(
   // get current borrow balance
   let trySBorrowBalance: ethereum.CallResult<BigInt> | null = null;
   if (market.sToken) {
-    let stableDebtContract = StableDebtToken.bind(
+    const stableDebtContract = StableDebtToken.bind(
       Address.fromString(market.sToken!)
     );
     trySBorrowBalance = stableDebtContract.try_totalSupply();
   }
-  let variableDebtContract = VariableDebtToken.bind(
+  const variableDebtContract = VariableDebtToken.bind(
     Address.fromString(market.vToken!)
   );
-  let tryVBorrowBalance = variableDebtContract.try_totalSupply();
+  const tryVBorrowBalance = variableDebtContract.try_totalSupply();
   let sBorrowBalance = BIGINT_ZERO;
   let vBorrowBalance = BIGINT_ZERO;
 
@@ -368,15 +368,15 @@ export function _handleReserveDataUpdated(
     return;
   }
 
-  let totalBorrowBalance = sBorrowBalance
+  const totalBorrowBalance = sBorrowBalance
     .plus(vBorrowBalance)
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals));
   market.totalBorrowBalanceUSD = totalBorrowBalance.times(assetPriceUSD);
 
   // update total supply balance
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  let tryTotalSupply = aTokenContract.try_totalSupply();
+  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  const tryTotalSupply = aTokenContract.try_totalSupply();
   if (tryTotalSupply.reverted) {
     log.warning(
       "[ReserveDataUpdated] Error getting total supply on market: {}",
@@ -384,7 +384,7 @@ export function _handleReserveDataUpdated(
     );
     return;
   }
-  let tryScaledSupply = aTokenContract.try_scaledTotalSupply();
+  const tryScaledSupply = aTokenContract.try_scaledTotalSupply();
   if (tryScaledSupply.reverted) {
     log.warning(
       "[ReserveDataUpdated] Error getting scaled total supply on market: {}",
@@ -403,20 +403,20 @@ export function _handleReserveDataUpdated(
 
   // calculate new revenue
   // New Interest = totalScaledSupply * (difference in liquidity index)
-  let liquidityIndexDiff = liquidityIndex
+  const liquidityIndexDiff = liquidityIndex
     .minus(market.liquidityIndex)
     .toBigDecimal()
     .div(exponentToBigDecimal(RAY_OFFSET));
   market.liquidityIndex = liquidityIndex; // must update to current liquidity index
-  let newRevenueBD = tryScaledSupply.value
+  const newRevenueBD = tryScaledSupply.value
     .toBigDecimal()
     .div(exponentToBigDecimal(inputToken.decimals))
     .times(liquidityIndexDiff);
-  let totalRevenueDeltaUSD = newRevenueBD.times(assetPriceUSD);
-  let protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(
+  const totalRevenueDeltaUSD = newRevenueBD.times(assetPriceUSD);
+  const protocolSideRevenueDeltaUSD = totalRevenueDeltaUSD.times(
     market.reserveFactor.div(exponentToBigDecimal(INT_TWO))
   );
-  let supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
+  const supplySideRevenueDeltaUSD = totalRevenueDeltaUSD.minus(
     protocolSideRevenueDeltaUSD
   );
 
@@ -439,7 +439,7 @@ export function _handleReserveDataUpdated(
   ]);
 
   // update rates
-  let vBorrowRate = createInterestRate(
+  const vBorrowRate = createInterestRate(
     market.id,
     InterestRateSide.BORROWER,
     InterestRateType.VARIABLE,
@@ -448,7 +448,7 @@ export function _handleReserveDataUpdated(
       .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2))
   );
 
-  let depositRate = createInterestRate(
+  const depositRate = createInterestRate(
     market.id,
     InterestRateSide.LENDER,
     InterestRateType.VARIABLE,
@@ -459,7 +459,7 @@ export function _handleReserveDataUpdated(
 
   if (market.sToken) {
     // geist does not have stable borrow rates
-    let sBorrowRate = createInterestRate(
+    const sBorrowRate = createInterestRate(
       market.id,
       InterestRateSide.BORROWER,
       InterestRateType.STABLE,
@@ -479,7 +479,7 @@ export function _handleReserveDataUpdated(
   let depositUSD = BIGDECIMAL_ZERO;
   let borrowUSD = BIGDECIMAL_ZERO;
   for (let i = 0; i < protocol.marketIDs.length; i++) {
-    let thisMarket = Market.load(protocol.marketIDs[i])!;
+    const thisMarket = Market.load(protocol.marketIDs[i])!;
     tvl = tvl.plus(thisMarket.totalValueLockedUSD);
     depositUSD = depositUSD.plus(thisMarket.totalDepositBalanceUSD);
     borrowUSD = borrowUSD.plus(thisMarket.totalBorrowBalanceUSD);
@@ -516,19 +516,19 @@ export function _handleDeposit(
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  let market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId.toHexString());
   if (!market) {
     log.warning("[Deposit] Market not found on protocol: {}", [
       marketId.toHexString(),
     ]);
     return;
   }
-  let inputToken = Token.load(market.inputToken);
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const inputToken = Token.load(market.inputToken);
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   // create deposit entity
-  let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
-  let deposit = new Deposit(id);
+  const id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
+  const deposit = new Deposit(id);
 
   // create account
   let account = Account.load(accountID.toHexString());
@@ -543,8 +543,8 @@ export function _handleDeposit(
   account.save();
 
   // update position
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  let positionId = addPosition(
+  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  const positionId = addPosition(
     protocol,
     market,
     account,
@@ -608,19 +608,19 @@ export function _handleWithdraw(
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  let market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId.toHexString());
   if (!market) {
     log.warning("[Withdraw] Market not found on protocol: {}", [
       marketId.toHexString(),
     ]);
     return;
   }
-  let inputToken = Token.load(market.inputToken);
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const inputToken = Token.load(market.inputToken);
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   // create withdraw entity
-  let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
-  let withdraw = new Withdraw(id);
+  const id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
+  const withdraw = new Withdraw(id);
 
   // get account
   let account = Account.load(accountID.toHexString());
@@ -634,8 +634,8 @@ export function _handleWithdraw(
   account.withdrawCount += 1;
   account.save();
 
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
-  let positionId = subtractPosition(
+  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  const positionId = subtractPosition(
     protocol,
     market,
     account,
@@ -695,19 +695,19 @@ export function _handleBorrow(
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  let market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId.toHexString());
   if (!market) {
     log.warning("[Borrow] Market not found on protocol: {}", [
       marketId.toHexString(),
     ]);
     return;
   }
-  let inputToken = Token.load(market.inputToken);
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const inputToken = Token.load(market.inputToken);
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   // create borrow entity
-  let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
-  let borrow = new Borrow(id);
+  const id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
+  const borrow = new Borrow(id);
 
   // create account
   let account = Account.load(accountID.toHexString());
@@ -722,7 +722,7 @@ export function _handleBorrow(
   account.save();
 
   // update position
-  let positionId = addPosition(
+  const positionId = addPosition(
     protocol,
     market,
     account,
@@ -786,19 +786,19 @@ export function _handleRepay(
   protocolData: ProtocolData,
   accountID: Address
 ): void {
-  let market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId.toHexString());
   if (!market) {
     log.warning("[Repay] Market not found on protocol: {}", [
       marketId.toHexString(),
     ]);
     return;
   }
-  let inputToken = Token.load(market.inputToken);
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const inputToken = Token.load(market.inputToken);
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   // create repay entity
-  let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
-  let repay = new Repay(id);
+  const id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
+  const repay = new Repay(id);
 
   // get account
   let account = Account.load(accountID.toHexString());
@@ -812,7 +812,7 @@ export function _handleRepay(
   account.repayCount += 1;
   account.save();
 
-  let positionId = subtractPosition(
+  const positionId = subtractPosition(
     protocol,
     market,
     account,
@@ -874,19 +874,19 @@ export function _handleLiquidate(
   borrower: Address, // account liquidated
   repayToken: Address // token repaid to cover debt
 ): void {
-  let market = Market.load(marketId.toHexString());
+  const market = Market.load(marketId.toHexString());
   if (!market) {
     log.warning("[Liquidate] Market not found on protocol: {}", [
       marketId.toHexString(),
     ]);
     return;
   }
-  let inputToken = Token.load(market.inputToken);
-  let protocol = getOrCreateLendingProtocol(protocolData);
+  const inputToken = Token.load(market.inputToken);
+  const protocol = getOrCreateLendingProtocol(protocolData);
 
   // create liquidate entity
-  let id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
-  let liquidate = new Liquidate(id);
+  const id = `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`;
+  const liquidate = new Liquidate(id);
 
   // update liquidators account
   let liquidatorAccount = Account.load(liquidator.toHexString());
@@ -899,7 +899,7 @@ export function _handleLiquidate(
   }
   liquidatorAccount.liquidateCount += 1;
   liquidatorAccount.save();
-  let liquidatorActorID = "liquidator"
+  const liquidatorActorID = "liquidator"
     .concat("-")
     .concat(liquidator.toHexString());
   let liquidatorActor = ActorAccount.load(liquidatorActorID);
@@ -922,7 +922,7 @@ export function _handleLiquidate(
   }
   account.liquidationCount += 1;
   account.save();
-  let liquidateeActorID = "liquidatee"
+  const liquidateeActorID = "liquidatee"
     .concat("-")
     .concat(borrower.toHexString());
   let liquidateeActor = ActorAccount.load(liquidateeActorID);
@@ -934,7 +934,7 @@ export function _handleLiquidate(
     protocol.save();
   }
 
-  let repayTokenMarket = Market.load(repayToken.toHexString());
+  const repayTokenMarket = Market.load(repayToken.toHexString());
   if (!repayTokenMarket) {
     log.warning("[Liquidate] Repay token market not found on protocol: {}", [
       repayToken.toHexString(),
@@ -943,7 +943,7 @@ export function _handleLiquidate(
   }
 
   // account for borrow being repaid by liquidator
-  let positionId = subtractPosition(
+  const positionId = subtractPosition(
     protocol,
     repayTokenMarket,
     account, // the borrower
@@ -960,7 +960,7 @@ export function _handleLiquidate(
   }
 
   // account for borrower losing aToken (collateral)
-  let aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
+  const aTokenContract = AToken.bind(Address.fromString(market.outputToken!));
   subtractPosition(
     protocol,
     market, // collateral market
@@ -1050,8 +1050,8 @@ export function _handleTransfer(
   from: Address,
   protocolData: ProtocolData
 ): void {
-  let protocol = getOrCreateLendingProtocol(protocolData);
-  let market = getMarketByOutputToken(
+  const protocol = getOrCreateLendingProtocol(protocolData);
+  const market = getMarketByOutputToken(
     event.address.toHexString(),
     protocolData
   );
@@ -1100,7 +1100,7 @@ export function _handleTransfer(
     }
   }
 
-  let aTokenContract = AToken.bind(event.address);
+  const aTokenContract = AToken.bind(event.address);
 
   // update balance from sender
   if (fromAccount) {

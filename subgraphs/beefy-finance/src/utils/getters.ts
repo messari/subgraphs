@@ -1,7 +1,7 @@
 import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { Token, Vault, YieldAggregator } from "../../generated/schema";
 import { createVaultFromStrategy } from "../mappings/vault";
-import { BeefyStrategy } from "../../generated/aave-aave-eol/BeefyStrategy";
+import { BeefyStrategy } from "../../generated/Standard/BeefyStrategy";
 import {
   fetchTokenDecimals,
   fetchTokenName,
@@ -59,10 +59,7 @@ export function getBeefyFinanceOrCreate(vaultId: string): YieldAggregator {
     beefy.schemaVersion = "1.2.1";
     beefy.subgraphVersion = "1.0.2";
     beefy.methodologyVersion = "1.1.0";
-    beefy.network = dataSource
-      .network()
-      .toUpperCase()
-      .replace("-", "_");
+    beefy.network = dataSource.network().toUpperCase().replace("-", "_");
     beefy.type = "YIELD";
     beefy.totalValueLockedUSD = BIGDECIMAL_ZERO;
     beefy.protocolControlledValueUSD = BIGDECIMAL_ZERO;
