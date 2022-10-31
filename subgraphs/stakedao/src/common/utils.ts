@@ -73,6 +73,11 @@ export function getVaultFromGauge(gaugeAddress: Address): Address {
 }
 
 export function getVaultBalance(vaultAddress: Address): BigInt {
+  const vaultContract = VaultContract.bind(vaultAddress);
+
+  const balance = readValue(vaultContract.try_balance(), constants.BIGINT_ZERO);
+  if (balance.notEqual(constants.BIGINT_ZERO)) return balance;
+
   const gaugeAddress = getGaugeFromVault(vaultAddress);
   const gaugeContract = GaugeContract.bind(gaugeAddress);
 
