@@ -62,6 +62,8 @@ type Spell @entity {
   creationBlock: BigInt!
   "Timestamp of block spell was created in"
   creationTime: BigInt!
+  "Timestamp of spell expiry"
+  expiryTime: BigInt!
   "Transaction hash of Spell lift"
   liftedTxnHash: String
   "Timestamp of Spell lift"

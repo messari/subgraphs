@@ -14,6 +14,7 @@ import {
   GOVERNANCE_TYPE,
   MKR_TOKEN,
   SpellState,
+  ZERO_ADDRESS,
 } from "./constants";
 import { DSSpell as DSSpellTemplate } from "../generated/templates";
 
@@ -117,7 +118,7 @@ export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
 
     const spellID = spellAddress.toHexString();
     let spell = Spell.load(spellID);
-    if (!spell) {
+    if (!spell && spellID != ZERO_ADDRESS) {
       spell = new Spell(spellID);
       spell.description = "";
       spell.state = SpellState.ACTIVE;
@@ -128,6 +129,10 @@ export function createSlate(slateID: Bytes, event: ethereum.Event): Slate {
       const dsDescription = dsSpell.try_description();
       if (!dsDescription.reverted) {
         spell.description = dsDescription.value;
+      }
+      const expiration = dsSpell.try_expiration();
+      if (!expiration.reverted) {
+        spell.expiryTime = expiration.value;
       }
       spell.governanceFramework = event.address.toHexString();
       spell.totalVotes = BIGINT_ZERO;
