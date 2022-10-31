@@ -1,13 +1,13 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 ////////////////////
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_NAME = "Uniswap v2";
-export const PROTOCOL_SLUG = "uniswap-v2";
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.2";
+export const PROTOCOL_NAME = "GMX";
+export const PROTOCOL_SLUG = "gmx";
+export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -132,9 +132,9 @@ export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString('10').pow(18);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 );
 
 export const INT_NEGATIVE_ONE = -1 as i32;
@@ -157,22 +157,41 @@ export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const MS_PER_YEAR = DAYS_PER_YEAR.times(
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+);
 
 ////////////////
 ///// Misc /////
 ////////////////
 
-export const ETH_SYMBOL = "ETH"
-export const ETH_NAME = "Ether"
+export const ETH_SYMBOL = "ETH";
+export const ETH_NAME = "Ether";
 
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
-export const TRADING_FEE = BigDecimal.fromString("3");
-export const PROTOCOL_FEE_TO_ON = BigDecimal.fromString("0.5");
-export const LP_FEE_TO_ON = BigDecimal.fromString("2.5");
-export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0.0");
-export const LP_FEE_TO_OFF = BigDecimal.fromString("3");
+export const PROTOCOL_ADDRESS_MAP = new TypedMap<string, Address>();
+PROTOCOL_ADDRESS_MAP.set(
+  "arbitrum-one",
+  Address.fromString("0x489ee077994B6658eAfA855C308275EAd8097C4A")
+);
+PROTOCOL_ADDRESS_MAP.set(
+  "avalanche",
+  Address.fromString("0x9ab2De34A33fB459b538c43f251eB825645e8595")
+);
+
+export const GLP_ADDRESS_MAP = new TypedMap<string, Address>();
+GLP_ADDRESS_MAP.set(
+  "arbitrum-one",
+  Address.fromString("0x4277f8F2c384827B5273592FF7CeBd9f2C1ac258")
+);
+GLP_ADDRESS_MAP.set(
+  "avalanche",
+  Address.fromString("0x01234181085565ed162a948b6a5e88758CD7c7b8")
+);
+
+export const VAULT_PRICE_FEED_DECIMALS = 30;
+export const FEES_PROTOCOL_SHARE = BigDecimal.fromString("0.3");
+export const FEES_SUPPLY_SHARE = BigDecimal.fromString("0.7");
