@@ -220,7 +220,10 @@ export function updateSnapshotsVolume(
     poolDailySnaphot.dailyVolumeUSD.plus(volumeUSD);
   poolHourlySnaphot.hourlyVolumeUSD =
     poolHourlySnaphot.hourlyVolumeUSD.plus(volumeUSD);
-  protcol.cumulativeVolumeUSD = protcol.cumulativeVolumeUSD.plus(volumeUSD);
+
+  if (!constants.BLACKLISTED_PHANTOM_POOLS.includes(poolAddress)) {
+    protcol.cumulativeVolumeUSD = protcol.cumulativeVolumeUSD.plus(volumeUSD);
+  }
 
   financialsDailySnapshot.save();
   poolHourlySnaphot.save();

@@ -95,7 +95,6 @@ export namespace NULL {
 export namespace Protocol {
   export const NAME = "Balancer v2";
   export const SLUG = "balancer-v2";
-  export const NETWORK = Network.MAINNET;
 }
 
 export namespace MasterChef {
@@ -156,6 +155,11 @@ export const GAUGE_CONTROLLER_ADDRESS = Address.fromString(
 export const AAVE_BOOSTED_POOL_ADDRESS = Address.fromString(
   "0x7b50775383d3d6f0215a8f290f2c9e2eebbeceb2"
 );
+export const BLACKLISTED_PHANTOM_POOLS: Address[] = [
+  Address.fromString("0x2bbf681cc4eb09218bee85ea2a5d3d13fa40fc0c"), // Balancer Aave Boosted Pool (USDT)
+  Address.fromString("0x804cdb9116a10bb78768d3252355a1b18067bf8f"), // Balancer Aave Boosted Pool (DAI)
+  Address.fromString("0x9210f1204b5a24742eba12f710636d76240df3d0"), // Balancer Aave Boosted Pool (USDC)
+];
 
 export const INFLATION_INTERVAL = "TIMESTAMP";
 export const STARTING_INFLATION_RATE = BigDecimal.fromString(

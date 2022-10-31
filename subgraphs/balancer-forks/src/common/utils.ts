@@ -280,7 +280,15 @@ export function updateProtocolTotalValueLockedUSD(): void {
   for (let poolIdx = 0; poolIdx < poolIds.length; poolIdx++) {
     const pool = LiquidityPool.load(poolIds[poolIdx]);
 
-    if (!pool) continue;
+    if (
+      !pool ||
+      constants.BLACKLISTED_PHANTOM_POOLS.includes(
+        Address.fromString(poolIds[poolIdx])
+      )
+    ) {
+      continue;
+    }
+
     totalValueLockedUSD = totalValueLockedUSD.plus(pool.totalValueLockedUSD);
   }
 
