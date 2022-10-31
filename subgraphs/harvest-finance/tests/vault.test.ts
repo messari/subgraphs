@@ -25,6 +25,7 @@ import { withdraws } from '../src/utils/withdraws'
 import { tokens } from '../src/utils/tokens'
 import { constants } from '../src/utils/constants'
 import { protocols } from '../src/utils/protocols'
+import { helpers } from './helpers/mock'
 
 const vaultAddress = Address.fromString(
   '0x0000000000000000000000000000000000000001'
@@ -76,6 +77,10 @@ describe('Vault', () => {
       BigInt.fromString('99975399'),
       8
     )
+    helpers.mock.vault_underlyingBalanceWithInvestment(
+      vaultAddress,
+      BigInt.fromString('120000000') // 120
+    )
   })
 
   beforeEach(() => {
@@ -88,7 +93,7 @@ describe('Vault', () => {
   })
 
   describe('handleDeposit', () => {
-    test('increments inputTokenBalance', () => {
+    test('updates inputTokenBalance', () => {
       const vault = createVault()
 
       const beneficiaryAddress = Address.fromString(
@@ -100,12 +105,7 @@ describe('Vault', () => {
 
       handleDeposit(event)
 
-      assert.fieldEquals(
-        'Vault',
-        vault.id,
-        'inputTokenBalance',
-        amount.toString()
-      )
+      assert.fieldEquals('Vault', vault.id, 'inputTokenBalance', '120000000')
     })
 
     test('creates Deposit', () => {
@@ -157,7 +157,12 @@ describe('Vault', () => {
       handleDeposit(event)
 
       assert.fieldEquals('Token', token.id, 'lastPriceUSD', '0.99975399')
-      assert.fieldEquals('Vault', vault.id, 'totalValueLockedUSD', '99.975399')
+      assert.fieldEquals(
+        'Vault',
+        vault.id,
+        'totalValueLockedUSD',
+        '119.9704788'
+      )
     })
 
     test('updates VaultSnapshots', () => {
@@ -244,7 +249,7 @@ describe('Vault', () => {
   })
 
   describe('handleWithdraw', () => {
-    test('decrements inputTokenBalance', () => {
+    test('updates inputTokenBalance', () => {
       const vault = createVault()
       vault.inputTokenBalance = BigInt.fromString('1000000000') // 1000
       vault.save()
@@ -258,7 +263,7 @@ describe('Vault', () => {
 
       handleWithdraw(event)
 
-      assert.fieldEquals('Vault', vault.id, 'inputTokenBalance', '900000000') // 900
+      assert.fieldEquals('Vault', vault.id, 'inputTokenBalance', '120000000') // 120
     })
 
     test('creates Withdraw', () => {
@@ -312,7 +317,12 @@ describe('Vault', () => {
       handleWithdraw(event)
 
       assert.fieldEquals('Token', token.id, 'lastPriceUSD', '0.99975399')
-      assert.fieldEquals('Vault', vault.id, 'totalValueLockedUSD', '599.852394')
+      assert.fieldEquals(
+        'Vault',
+        vault.id,
+        'totalValueLockedUSD',
+        '119.9704788'
+      )
     })
 
     test('updates VaultSnapshots', () => {

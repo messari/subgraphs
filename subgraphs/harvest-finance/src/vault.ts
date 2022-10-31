@@ -11,6 +11,7 @@ import { deposits } from './utils/deposits'
 import { withdraws } from './utils/withdraws'
 import { metrics } from './utils/metrics'
 import { decimals } from './utils'
+import { vaults } from './utils/vaults'
 
 export function handleWithdraw(event: WithdrawEvent): void {
   const beneficiary = event.params.beneficiary
@@ -48,7 +49,11 @@ export function handleWithdraw(event: WithdrawEvent): void {
   withdraw.amount = amount
   withdraw.vault = vault.id
 
-  vault.inputTokenBalance = vault.inputTokenBalance.minus(amount)
+  const inputTokenBalance = vaults.extractInputTokenBalance(vaultAddress)
+
+  if (inputTokenBalance) {
+    vault.inputTokenBalance = inputTokenBalance
+  }
 
   vault.totalValueLockedUSD = decimals
     .fromBigInt(vault.inputTokenBalance, token.decimals as u8)
@@ -102,7 +107,11 @@ export function handleDeposit(event: DepositEvent): void {
   deposit.amount = amount
   deposit.vault = vault.id
 
-  vault.inputTokenBalance = vault.inputTokenBalance.plus(amount)
+  const inputTokenBalance = vaults.extractInputTokenBalance(vaultAddress)
+
+  if (inputTokenBalance) {
+    vault.inputTokenBalance = inputTokenBalance
+  }
 
   vault.totalValueLockedUSD = decimals
     .fromBigInt(vault.inputTokenBalance, token.decimals as u8)

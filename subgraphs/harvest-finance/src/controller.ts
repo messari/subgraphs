@@ -2,16 +2,16 @@ import {
   AddVaultAndStrategyCall,
   SharePriceChangeLog,
 } from '../generated/Controller/ControllerContract'
-import { VaultContract } from '../generated/Controller/VaultContract'
-import { BigInt, log } from '@graphprotocol/graph-ts'
+import { Address, BigInt, log } from '@graphprotocol/graph-ts'
 import { tokens } from './utils/tokens'
 import { vaults } from './utils/vaults'
 import { Vault as VaultTemplate } from '../generated/templates'
-import { Vault } from '../generated/schema'
+import { Token, Vault } from '../generated/schema'
 import { prices } from './utils/prices'
 import { protocols } from './utils/protocols'
 import { constants } from './utils/constants'
 import { fees } from './utils/fees'
+import { decimals } from './utils'
 
 export function handleAddVaultAndStrategy(call: AddVaultAndStrategyCall): void {
   let vaultAddress = call.inputs._vault
@@ -98,24 +98,32 @@ export function handleSharePriceChangeLog(event: SharePriceChangeLog): void {
 
   if (!vault) return
 
-  //TODO: Review this logic
-  vault.pricePerShare = event.params.newSharePrice.toBigDecimal()
+  const inputToken = Token.load(vault.inputToken)
 
-  const vaultContract = VaultContract.bind(vaultAddress)
+  if (!inputToken) return
+
+  inputToken.lastPriceUSD = prices.getPricePerToken(
+    Address.fromString(vault.inputToken)
+  )
+  inputToken.lastPriceBlockNumber = event.block.number
+
+  inputToken.save()
+
+  vault.pricePerShare = decimals.fromBigInt(
+    event.params.newSharePrice,
+    inputToken.decimals as u8
+  )
 
   const oldInputTokenBalance = vault.inputTokenBalance
 
-  const inputTokenBalanceCall =
-    vaultContract.try_underlyingBalanceWithInvestment()
+  const newInputTokenBalance = vaults.extractInputTokenBalance(vaultAddress)
 
-  if (inputTokenBalanceCall.reverted) {
-    log.debug('VaultCall Reverted block: {}, tx: {}', [
-      event.block.number.toString(),
-      event.transaction.hash.toHexString(),
-    ])
-  }
+  if (!newInputTokenBalance) return
 
-  const newInputTokenBalance = inputTokenBalanceCall.value
+  vault.totalValueLockedUSD = decimals
+    .fromBigInt(newInputTokenBalance, inputToken.decimals as u8)
+    .times(inputToken.lastPriceUSD)
+
   vault.inputTokenBalance = newInputTokenBalance
 
   //TODO: Review this logic

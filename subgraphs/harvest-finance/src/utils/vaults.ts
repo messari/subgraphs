@@ -1,4 +1,4 @@
-import { Address } from '@graphprotocol/graph-ts'
+import { Address, BigInt, log } from '@graphprotocol/graph-ts'
 import { VaultContract } from '../../generated/Controller/VaultContract'
 import { Vault } from '../../generated/schema'
 import { constants } from '../utils/constants'
@@ -42,6 +42,24 @@ export namespace vaults {
       symbolCall.value,
       decimalsCall.value
     )
+  }
+
+  export function extractInputTokenBalance(
+    vaultAddress: Address
+  ): BigInt | null {
+    const contract = VaultContract.bind(vaultAddress)
+
+    const call = contract.try_underlyingBalanceWithInvestment()
+
+    if (call.reverted) {
+      log.debug(
+        'Vault.underlyingBalanceWithInvestment Reverted for address {}',
+        [vaultAddress.toHexString()]
+      )
+      return null
+    }
+
+    return call.value
   }
 
   export function findOrInitialize(address: Address): Vault {
