@@ -119,6 +119,9 @@ export class SushiswapFantomConfigurations implements Configurations {
       "0x6160240896d8039b2d901cd59dea95396c94a1c2", // Adult Entertainment Token
     ];
   }
+  getBrokenERC20Tokens(): string[] {
+    return [];
+  }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_TWO_HUNDRED_FIFTY_THOUSAND;
   }
