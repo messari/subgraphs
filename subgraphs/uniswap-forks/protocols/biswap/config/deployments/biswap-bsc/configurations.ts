@@ -47,9 +47,8 @@ export class BiswapBscConfigurations implements Configurations {
   getTradeFee(blockNumber: BigInt): BigDecimal {
     if (blockNumber < BigInt.fromI32(20488163)) {
       return BigDecimal.fromString("0.1");
-    } else {
-      return BigDecimal.fromString("0.2");
     }
+    return BigDecimal.fromString("0.2");
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
@@ -58,9 +57,8 @@ export class BiswapBscConfigurations implements Configurations {
   getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     if (blockNumber < BigInt.fromI32(20488163)) {
       return BigDecimal.fromString("0.05");
-    } else {
-      return BigDecimal.fromString("0.15");
     }
+    return BigDecimal.fromString("0.15");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");

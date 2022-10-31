@@ -45,18 +45,32 @@ export function createPoolFees(
   poolAddress: string,
   blockNumber: BigInt
 ): string[] {
-  const poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
-  const poolProtocolFee = new LiquidityPoolFee(
+  // get or create fee entities
+  let poolLpFee = LiquidityPoolFee.load(poolAddress.concat("-lp-fee"));
+  if (!poolLpFee) {
+    poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
+  }
+
+  let poolProtocolFee = LiquidityPoolFee.load(
     poolAddress.concat("-protocol-fee")
   );
-  const poolTradingFee = new LiquidityPoolFee(
+  if (!poolProtocolFee) {
+    poolProtocolFee = new LiquidityPoolFee(poolAddress.concat("-protocol-fee"));
+  }
+
+  let poolTradingFee = LiquidityPoolFee.load(
     poolAddress.concat("-trading-fee")
   );
+  if (!poolTradingFee) {
+    poolTradingFee = new LiquidityPoolFee(poolAddress.concat("-trading-fee"));
+  }
 
+  // set fee types
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
 
+  // set fees
   if (NetworkConfigs.getFeeOnOff() == FeeSwitch.ON) {
     poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn(blockNumber);
     poolProtocolFee.feePercentage =

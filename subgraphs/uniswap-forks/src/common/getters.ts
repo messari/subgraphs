@@ -29,6 +29,7 @@ import {
   SECONDS_PER_HOUR,
   FeeSwitch,
 } from "./constants";
+import { createPoolFees } from "./creators";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.getFactoryAddress());
@@ -61,39 +62,9 @@ export function getLiquidityPool(
   blockNumber: BigInt
 ): LiquidityPool {
   const pool = LiquidityPool.load(poolAddress)!;
-  pool.fees = updateFeesIfChanged(poolAddress, blockNumber);
+  pool.fees = createPoolFees(poolAddress, blockNumber);
   pool.save();
   return pool;
-}
-
-export function updateFeesIfChanged(
-  poolAddress: string,
-  blockNumber: BigInt
-): string[] {
-  const poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
-  const poolProtocolFee = new LiquidityPoolFee(
-    poolAddress.concat("-protocol-fee")
-  );
-  const poolTradingFee = new LiquidityPoolFee(
-    poolAddress.concat("-trading-fee")
-  );
-
-  if (NetworkConfigs.getFeeOnOff() == FeeSwitch.ON) {
-    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn(blockNumber);
-    poolProtocolFee.feePercentage =
-      NetworkConfigs.getProtocolFeeToOn(blockNumber);
-  } else {
-    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOff();
-    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOff();
-  }
-
-  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee(blockNumber);
-
-  poolLpFee.save();
-  poolProtocolFee.save();
-  poolTradingFee.save();
-
-  return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
 
 export function getLiquidityPoolAmounts(
