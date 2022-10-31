@@ -220,9 +220,30 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
   }
 }
 // this event is never emitted in the current version
+// because senior pool never invests in junior tranche
 export function handleInvestmentMadeInJunior(
   event: InvestmentMadeInJunior
 ): void {
+  const newBorrowUSD = event.params.amount.divDecimal(USDC_DECIMALS);
+  const market = getOrCreateMarket(event.address.toHexString(), event);
+  market.totalBorrowBalanceUSD =
+    market.totalBorrowBalanceUSD.plus(newBorrowUSD);
+  market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(newBorrowUSD);
+  market.save();
+
+  snapshotMarket(market, newBorrowUSD, event, null);
+
+  // deduct investment amount from TVL/totalDepositBalance to avoid double counting
+  // because they will be counted as deposits to invested tranched pools
+  // Similarly, not updating protocol.totalBorrowBalanceUSD to avoid double counting
+  const protocol = getOrCreateProtocol();
+  protocol.totalDepositBalanceUSD =
+    protocol.totalDepositBalanceUSD.minus(newBorrowUSD);
+  protocol.cumulativeBorrowUSD =
+    protocol.cumulativeDepositUSD.minus(newBorrowUSD);
+  protocol.save();
+
+  //
   updatePoolStatus(event.address);
   updatePoolInvestments(event.address, event.params.tranchedPool);
 }
@@ -238,16 +259,19 @@ export function handleInvestmentMadeInSenior(
   market.save();
 
   snapshotMarket(market, newBorrowUSD, event, null);
-  // not updating protocol as it is updated when a borrower draws down
-  // the creditline
-  /*
-  const protocol = getOrCreateProtocol();
-  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(newBorrowUSD)
-  protocol.cumulativeBorrowUSD =
-    protocol.cumulativeBorrowUSD.plus(newBorrowUSD);
-  protocol.save();
-  */
 
+  // deduct investment amount from TVL/totalDepositBalance to avoid double counting
+  // because they will be counted as deposits to invested tranched pools
+  // Similarly, not updating protocol.totalBorrowBalanceUSD to avoid double counting
+  const protocol = getOrCreateProtocol();
+  protocol.totalDepositBalanceUSD =
+    protocol.totalDepositBalanceUSD.minus(newBorrowUSD);
+  protocol.cumulativeBorrowUSD =
+    protocol.cumulativeDepositUSD.minus(newBorrowUSD);
+  protocol.save();
+
+  // no need to snapshotFinancials here because it will snapshoted
+  // when DepositMade is handled in tranched pool
   // not updating usage metrics as this is not of the transaction type of interest
 
   // ORIGINAL CODE

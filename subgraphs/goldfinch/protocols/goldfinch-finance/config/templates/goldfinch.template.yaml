@@ -6,6 +6,41 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
+    name: GoldfinchFactory
+    network: mainnet
+    source:
+      address: "0xd20508E1E971b80EE172c73517905bfFfcBD87f9"
+      abi: GoldfinchFactory
+      startBlock: 11370655
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/goldfinch_factory.ts
+      entities:
+        - TranchedPool
+      abis:
+        - name: GoldfinchFactory
+          file: ./abis/GoldfinchFactory.json
+        - name: TranchedPool
+          file: ./abis/TranchedPool.json
+        - name: CreditLine
+          file: ./abis/CreditLine.json
+        - name: GoldfinchConfig
+          file: ./abis/GoldfinchConfig.json
+        - name: SeniorPool
+          file: ./abis/SeniorPool.json
+        - name: FixedLeverageRatioStrategy
+          file: ./abis/FixedLeverageRatioStrategy.json
+        - name: PoolTokens
+          file: ./abis/PoolTokens.json
+      eventHandlers:
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: PoolCreated(indexed address,indexed address)
+          handler: handlePoolCreated
+          
+  - kind: ethereum/contract
     name: SeniorPool
     network: mainnet
     source:
