@@ -46,6 +46,7 @@ export namespace rewardTokens {
           'Contract call to NoMintRewardPool with address {} failed to obtain rewardToken',
           [address.toHexString()]
         )
+        continue
       }
 
       const rewardToken = getOrCreateRewardToken(rewardTokenAddress.value)
@@ -56,6 +57,7 @@ export namespace rewardTokens {
           'Contract call to NoMintRewardPool with address {} failed to obtain vaultAddress',
           [address.toHexString()]
         )
+        continue
       }
 
       let vault = Vault.load(vaultAddress.value.toHexString())
