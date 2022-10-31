@@ -35,6 +35,9 @@ dataSources:
       callHandlers:
         - function: addVaultAndStrategy(address,address)
           handler: handleAddVaultAndStrategy
+      eventHandlers:
+        - event: SharePriceChangeLog(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleSharePriceChangeLog
       file: ./src/controller.ts
 
   - kind: ethereum
