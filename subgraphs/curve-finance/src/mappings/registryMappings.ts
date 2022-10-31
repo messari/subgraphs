@@ -15,7 +15,6 @@ import {
 } from "../../generated/templates/PoolTemplate/Registry";
 import * as utils from "../common/utils";
 import { Address, log } from "@graphprotocol/graph-ts";
-import { PoolTemplate } from "../../generated/templates";
 
 export function handlePoolAdded(event: PoolAdded): void {
   const registryAddress = event.address;
@@ -46,8 +45,6 @@ export function handlePoolAdded(event: PoolAdded): void {
 
   lpTokenStore.save();
   pool.save();
-
-  PoolTemplate.create(poolAddress);
 
   log.warning("[PoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
     pool.id,
@@ -86,8 +83,6 @@ export function handlePoolAddedWithRate(event: PoolAdded1): void {
   lpTokenStore.save();
   pool.save();
 
-  PoolTemplate.create(poolAddress);
-
   log.warning("[PoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
     pool.id,
     registryAddress.toHexString(),
@@ -104,8 +99,6 @@ export function handleBasePoolAdded(event: BasePoolAdded): void {
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   pool._registryAddress = registryAddress;
   pool.save();
-
-  PoolTemplate.create(poolAddress);
 
   log.warning("[BasePoolAdded] PoolAddress: {}, Registry: {}, TxnHash: {}", [
     pool.id,
@@ -124,8 +117,6 @@ export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
   const pool = getOrCreateLiquidityPool(poolAddress, event.block);
   pool._registryAddress = registryAddress.toHexString();
   pool.save();
-
-  PoolTemplate.create(poolAddress);
 
   log.warning(
     "[PlainPoolDeployed] PoolAddress: {}, Registry: {}, TxnHash: {}",
@@ -157,8 +148,6 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
   pool._registryAddress = registryAddress.toHexString();
   pool.save();
 
-  PoolTemplate.create(poolAddress);
-
   log.warning(
     "[MetaPoolDeployed] PoolAddress: {}, registryAddress: {}, basePoolAddress: {}, TxnHash: {}",
     [
@@ -183,8 +172,6 @@ export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
   pool._registryAddress = registryAddress.toHexString();
   pool.outputToken = lpToken.toHexString();
   pool.save();
-
-  PoolTemplate.create(poolAddress);
 
   log.warning(
     "[CryptoPoolDeployed] PoolAddress: {}, registryAddress: {}, TxnHash: {}",

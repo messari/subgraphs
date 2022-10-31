@@ -10,14 +10,15 @@ import { CurveRegistry as CurveRegistryContract } from "../../../generated/templ
 export function isCurveLpToken(lpAddress: Address): bool {
   const poolAddress = getPoolFromLpToken(lpAddress);
 
-  return poolAddress.notEqual(constants.NULL.TYPE_ADDRESS);
+  if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return true;
+  
+  return false;
 }
 
 export function getPoolFromLpToken(lpAddress: Address): Address {
   let config = utils.getConfig();
   const curveRegistryAdresses = config.curveRegistry();
 
-  let poolAddress = constants.NULL.TYPE_ADDRESS;
   for (let idx = 0; idx < curveRegistryAdresses.length; idx++) {
     let curveRegistryContract = CurveRegistryContract.bind(
       curveRegistryAdresses[idx]
@@ -30,7 +31,8 @@ export function getPoolFromLpToken(lpAddress: Address): Address {
 
     if (poolAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return poolAddress;
   }
-  return poolAddress;
+
+  return constants.NULL.TYPE_ADDRESS;
 }
 
 export function isLpCryptoPool(lpAddress: Address): bool {

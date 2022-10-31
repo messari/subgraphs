@@ -21,12 +21,12 @@ import {
   LiquidityPoolHourlySnapshot,
 } from "../../generated/schema";
 import * as utils from "./utils";
+import { Versions } from "../versions";
 import * as constants from "./constants";
 import { getUsdPricePerToken } from "../prices";
 import { LiquidityPool as LiquidityPoolStore } from "../../generated/schema";
 import { LiquidityGauge as LiquidityGaugeTemplate } from "../../generated/templates";
 import { ERC20 as ERC20Contract } from "../../generated/templates/PoolTemplate/ERC20";
-import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -465,6 +465,8 @@ export function getOrCreateLiquidityPool(
     pool._registryAddress = constants.NULL.TYPE_STRING;
     pool._gaugeAddress = constants.NULL.TYPE_STRING;
     pool.save();
+    
+    PoolTemplate.create(poolAddress);
 
     log.warning(
       "[NewLiquidityPool] Pool: {}, inputTokens: [{}], outputToken/lpToken: {}",
