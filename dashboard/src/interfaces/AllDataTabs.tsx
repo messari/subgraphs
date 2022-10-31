@@ -31,6 +31,8 @@ interface AllDataTabsProps {
   events: string[];
   subgraphToQueryURL: string;
   skipAmt: number;
+  overlaySchemaData: any;
+  protocolSchemaData: any;
   poolOverviewRequest: { [x: string]: any };
   poolTimeseriesRequest: { [x: string]: any };
   overlayPoolTimeseriesData: any;
@@ -67,6 +69,8 @@ function AllDataTabs({
   events,
   subgraphToQueryURL,
   skipAmt,
+  overlaySchemaData,
+  protocolSchemaData,
   poolOverviewRequest,
   poolTimeseriesRequest,
   protocolTimeseriesData,
@@ -155,6 +159,8 @@ function AllDataTabs({
             protocolFields={protocolFields}
             protocolType={data.protocols[0].type}
             protocolTableData={protocolTableData}
+            overlaySchemaData={overlaySchemaData}
+            protocolSchemaData={protocolSchemaData}
             protocolTimeseriesData={protocolTimeseriesData}
             protocolTimeseriesLoading={protocolTimeseriesLoading}
             protocolTimeseriesError={protocolTimeseriesError}
