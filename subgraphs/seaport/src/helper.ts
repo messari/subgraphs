@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export namespace MethodSignatures {
   export const FULFILL_BASIC_ORDER = "0XFB0F3EE1"
@@ -183,7 +183,7 @@ export const valueToString = (value:ethereum.Value):string => {
 }
 
 export function orderFulfillmentMethod(event:ethereum.Event):string | null {
-  let methodSignature = event.transaction.input.toHexString().slice(0,10).toUpperCase()
+  const methodSignature = event.transaction.input.toHexString().slice(0,10).toUpperCase()
 
   let fulfillmentType: string | null = null
   if(methodSignature == MethodSignatures.FULFILL_BASIC_ORDER.toUpperCase()) {
@@ -217,7 +217,7 @@ export function orderFulfillmentMethod(event:ethereum.Event):string | null {
   return fulfillmentType;
 }
 export function tradeStrategy(event:ethereum.Event):string {
-  let methodSignature = event.transaction.input.toHexString().slice(0,10).toUpperCase()
+  const methodSignature = event.transaction.input.toHexString().slice(0,10).toUpperCase()
 
   let strategy = SaleStrategy.STANDARD_SALE; // default to this
   if(methodSignature == MethodSignatures.FULFILL_BASIC_ORDER) {

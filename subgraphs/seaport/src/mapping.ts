@@ -154,7 +154,7 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
     trade.save();
 
     // Save details of how trade was fulfilled
-    let orderFulfillment = new _OrderFulfillment(tradeID);
+    const orderFulfillment = new _OrderFulfillment(tradeID);
     orderFulfillment.trade = tradeID;
     orderFulfillment.orderFulfillmentMethod = orderFulfillmentMethod(event)
     orderFulfillment.save()
