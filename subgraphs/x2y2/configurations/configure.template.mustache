@@ -2,7 +2,7 @@ import { getNetworkConfigurations } from "./configurations/configurations";
 import { Deploy } from "./configurations/deploy";
 
 // Select the deployment protocol and network
-let deployment = Deploy.{{ deployment }};
+const deployment = Deploy.{{ deployment }};
 
 // export const NetworkConfigs = configurationsMap.get(deployment)!
 export const NetworkConfigs = getNetworkConfigurations(deployment);

@@ -11,6 +11,8 @@ interface ProtocolTabProps {
   protocolType: string;
   protocolFields: { [x: string]: string };
   protocolTableData: { [x: string]: any };
+  overlaySchemaData: any;
+  protocolSchemaData: any;
   protocolTimeseriesData: any;
   protocolTimeseriesLoading: any;
   protocolTimeseriesError: any;
@@ -23,6 +25,8 @@ function ProtocolTab({
   protocolType,
   protocolFields,
   protocolTableData,
+  overlaySchemaData,
+  protocolSchemaData,
   protocolTimeseriesData,
   protocolTimeseriesLoading,
   protocolTimeseriesError,
@@ -57,6 +61,8 @@ function ProtocolTab({
           entityName={entityName}
           entitiesData={entitiesData}
           currentEntityData={currentEntityData}
+          overlaySchemaData={overlaySchemaData}
+          protocolSchemaData={protocolSchemaData}
           currentOverlayEntityData={currentOverlayEntityData}
           currentTimeseriesLoading={protocolTimeseriesLoading[entityName]}
           currentTimeseriesError={protocolTimeseriesError[entityName]}
@@ -88,7 +94,7 @@ function ProtocolTab({
     Object.keys(issues).forEach((iss) => {
       brokenDownIssuesState = brokenDownIssuesState.concat(issues[iss]);
     });
-    if (allLoaded) {
+    if (allLoaded && brokenDownIssuesState.length !== issuesToDisplay.length) {
       setIssuesToDisplay(brokenDownIssuesState);
     }
   }, [protocolTimeseriesData, protocolTimeseriesLoading, tableIssues]);
@@ -98,18 +104,6 @@ function ProtocolTab({
   }
 
   const tableIssuesInit = tableIssues;
-  if (
-    tableIssues.filter((x) => x.fieldName === `${protocolEntityNameSingular}-totalValueLockedUSD` && x.type === "TVL-")
-      .length === 0 &&
-    Number(protocolTableData[protocolEntityNameSingular].totalValueLockedUSD) < 1000
-  ) {
-    tableIssuesInit.push({
-      type: "TVL-",
-      message: "",
-      level: "critical",
-      fieldName: `${protocolEntityNameSingular}-totalValueLockedUSD`,
-    });
-  }
   return (
     <>
       <IssuesDisplay issuesArrayProps={issuesToDisplay} oneLoaded={oneLoaded} allLoaded={allLoaded} />
