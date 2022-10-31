@@ -1,17 +1,7 @@
-import { ethereum, Address, log, json, JSONValue } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/schema";
-import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
-import { calculatePriceInUSD } from "../calculators/priceInUSDCalculator";
-import { BIGDECIMAL_HUNDRED, DEFUALT_AMOUNT, ZERO_BIGDECIMAL } from "../helpers/constants";
-import { convertBigIntToBigDecimal } from "../helpers/converters";
+import { ZERO_BIGDECIMAL } from "../helpers/constants";
 import { getOrCreateYieldAggregator } from "./initializers";
-
-export function readValue<T>(
-  callResult: ethereum.CallResult<T>,
-  defaultValue: T
-): T {
-  return callResult.reverted ? defaultValue : callResult.value;
-}
 
 export function updateProtocolAfterNewVault(vaultAddress: Address): void {
   const protocol = getOrCreateYieldAggregator();

@@ -1,6 +1,11 @@
 import {
   getOrCreateAccount,
-  getOrCreateFinancialDailySnapshots, getOrCreateUsageMetricsDailySnapshot, getOrCreateUsageMetricsHourlySnapshot, getOrCreateVault, getOrCreateVaultsDailySnapshots, getOrCreateVaultsHourlySnapshots, getOrCreateYieldAggregator
+  getOrCreateFinancialDailySnapshots,
+  getOrCreateUsageMetricsDailySnapshot,
+  getOrCreateUsageMetricsHourlySnapshot,
+  getOrCreateVaultsDailySnapshots,
+  getOrCreateVaultsHourlySnapshots,
+  getOrCreateYieldAggregator
 } from "../common/initializers";
 import { ethereum, Address } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY } from "../helpers/constants";
@@ -11,12 +16,9 @@ export function updateFinancials(block: ethereum.Block): void {
   const protocol = getOrCreateYieldAggregator();
 
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
 
   financialMetrics.blockNumber = block.number;
   financialMetrics.timestamp = block.timestamp;
@@ -43,9 +45,7 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (
-    block.timestamp.toI64() / SECONDS_PER_DAY
-  )
+  let dailyActiveAccountId = (block.timestamp.toI64() / SECONDS_PER_DAY)
     .toString()
     .concat("-")
     .concat(from.toHexString());

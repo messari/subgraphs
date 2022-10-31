@@ -1,13 +1,17 @@
-import { Address, ethereum, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, BigDecimal, bigDecimal } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/schema";
-import { defineFee, getOrCreateFinancialDailySnapshots, getOrCreateUsageMetricsDailySnapshot, getOrCreateUsageMetricsHourlySnapshot, getOrCreateYieldAggregator } from "../common/initializers";
-import { calculatePriceInUSD } from "../calculators/priceInUSDCalculator";
+import {
+  getOrCreateFinancialDailySnapshots,
+  getOrCreateUsageMetricsDailySnapshot,
+  getOrCreateUsageMetricsHourlySnapshot,
+  getOrCreateYieldAggregator
+} from "../common/initializers";
 import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
-import { DEFUALT_AMOUNT, BIGINT_TEN, ZERO_BIGINT, BIGDECIMAL_HUNDRED, ZERO_BIGDECIMAL } from "../helpers/constants";
+import { DEFUALT_AMOUNT, ZERO_BIGINT, ZERO_BIGDECIMAL } from "../helpers/constants";
 import * as utils from "../common/utils";
-import { calculateOutputTokenPriceInUSD } from "../calculators/outputTokenPriceInUSDCalculator";
 import { Withdraw } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
+import { calculatePriceInUSD, calculateOutputTokenPriceInUSD } from "../common/calculators";
 
 export function _Withdraw(
   contractAddress: Address,
@@ -19,11 +23,11 @@ export function _Withdraw(
   const vaultAddress = Address.fromString(vault.id);
   const strategyContract = YakStrategyV2.bind(contractAddress);
 
-  let totalSupply = utils.readValue<BigInt>(
-    strategyContract.try_totalSupply(),
-    ZERO_BIGINT
-  );
-  vault.outputTokenSupply = totalSupply;
+  if (strategyContract.try_totalSupply().reverted) {
+    vault.outputTokenSupply = ZERO_BIGINT;
+  } else {
+    vault.outputTokenSupply = strategyContract.totalSupply();
+  }
 
   if (strategyContract.try_totalDeposits().reverted) {
     vault.inputTokenBalance = ZERO_BIGINT;
@@ -42,10 +46,6 @@ export function _Withdraw(
     vault.pricePerShare = convertBigIntToBigDecimal(strategyContract.getDepositTokensForShares(DEFUALT_AMOUNT), 18);
   }
   vault.outputTokenPriceUSD = calculateOutputTokenPriceInUSD(contractAddress);
-
-  // vault.pricePerShare = utils
-  //   .readValue<BigInt>(strategyContract.try_getDepositTokensForShares(DEFUALT_AMOUNT), ZERO_BIGINT)
-  //   .toBigDecimal();
 
   // Update hourly and daily withdraw transaction count
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
@@ -72,38 +72,47 @@ export function _Withdraw(
     withdrawAmountUSD
   );
 
-  const withdrawFeePercentage = defineFee(contractAddress, "-developerFee");
+  let protocolSideFee: BigDecimal;
+  let protocolSideRevenueUSD: BigDecimal
 
-  let withdrawalFeeUSD = withdrawAmountUSD
-    .times(withdrawFeePercentage.feePercentage!)
-    .div(BIGDECIMAL_HUNDRED);
+  if (strategyContract.try_DEV_FEE_BIPS().reverted) {
+    protocolSideFee = ZERO_BIGDECIMAL;
+    protocolSideRevenueUSD = ZERO_BIGDECIMAL;
+  } else {
+    protocolSideFee = strategyContract.DEV_FEE_BIPS()
+      .toBigDecimal()
+      .div(bigDecimal.fromString("10000"));
 
-  updateUsageMetricsAfterWithdraw(block, withdrawalFeeUSD);
+    protocolSideRevenueUSD = withdrawAmountUSD
+      .times(protocolSideFee);
+  }
+
+  updateUsageMetricsAfterWithdraw(block, protocolSideRevenueUSD);
 }
 
 export function updateUsageMetricsAfterWithdraw(block: ethereum.Block, protocolSideRevenueUSD: BigDecimal): void {
   const financialMetrics = getOrCreateFinancialDailySnapshots(block);
   const protocol = getOrCreateYieldAggregator();
 
-  // TotalRevenueUSD Metrics
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
     protocolSideRevenueUSD
   );
+
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
     protocolSideRevenueUSD
   );
-  financialMetrics.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD;
 
-  // ProtocolSideRevenueUSD Metrics
+  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+
   financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
     protocolSideRevenueUSD
   );
+
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
     protocolSideRevenueUSD
   );
-  financialMetrics.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
+
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
 
   financialMetrics.save();
   protocol.save();

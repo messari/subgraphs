@@ -8,6 +8,7 @@ import {
 } from "../generated/YakStrategyV2/YakStrategyV2";
 import { getOrCreateVault } from "./common/initializers";
 import { _Deposit } from "./modules/Deposit";
+import { updateVaultFee } from "./modules/Fee";
 import { updateFinancials, updateUsageMetrics, updateVaultSnapshots } from "./modules/Metrics";
 import { _Reinvest } from "./modules/Reinvest";
 import { _Withdraw } from "./modules/Withdraw";
@@ -59,7 +60,6 @@ export function handleReinvest(event: ReinvestEvent): void {
   if (vault) {
     _Reinvest(
       contractAddress,
-      event.transaction,
       event.block,
       vault,
       event.params.newTotalSupply
@@ -72,10 +72,13 @@ export function handleReinvest(event: ReinvestEvent): void {
 }
 
 export function handleUpdateAdminFee(event: UpdateAdminFee): void {
+  updateVaultFee(event.address, event.params.newValue, "-adminFee");
 }
 
 export function handleUpdateDevFee(event: UpdateDevFee): void {
+  updateVaultFee(event.address, event.params.newValue, "-developerFee");
 }
 
 export function handleUpdateReinvestReward(event: UpdateReinvestReward): void {
+  updateVaultFee(event.address, event.params.newValue, "-reinvestorFee");
 }
