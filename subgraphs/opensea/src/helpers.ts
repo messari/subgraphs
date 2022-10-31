@@ -66,17 +66,17 @@ export function getOrCreateCollection(collectionID: string): Collection {
     collection = new Collection(collectionID);
 
     collection.nftStandard = getNftStandard(collectionID);
-    let contract = NftMetadata.bind(Address.fromString(collectionID));
+    const contract = NftMetadata.bind(Address.fromString(collectionID));
 
-    let nameResult = contract.try_name();
+    const nameResult = contract.try_name();
     if (!nameResult.reverted) {
       collection.name = nameResult.value;
     }
-    let symbolResult = contract.try_symbol();
+    const symbolResult = contract.try_symbol();
     if (!symbolResult.reverted) {
       collection.symbol = symbolResult.value;
     }
-    let totalSupplyResult = contract.try_totalSupply();
+    const totalSupplyResult = contract.try_totalSupply();
     if (!totalSupplyResult.reverted) {
       collection.totalSupply = totalSupplyResult.value;
     }
@@ -92,7 +92,7 @@ export function getOrCreateCollection(collectionID: string): Collection {
 
     collection.save();
 
-    let marketplace = getOrCreateMarketplace(
+    const marketplace = getOrCreateMarketplace(
       NetworkConfigs.getMarketplaceAddress()
     );
     marketplace.collectionCount += 1;
@@ -105,7 +105,7 @@ export function getOrCreateCollection(collectionID: string): Collection {
 export function getOrCreateMarketplaceDailySnapshot(
   timestamp: BigInt
 ): MarketplaceDailySnapshot {
-  let snapshotID = (timestamp.toI32() / SECONDS_PER_DAY).toString();
+  const snapshotID = (timestamp.toI32() / SECONDS_PER_DAY).toString();
 
   let snapshot = MarketplaceDailySnapshot.load(snapshotID);
   if (!snapshot) {
@@ -134,7 +134,7 @@ export function getOrCreateCollectionDailySnapshot(
   collection: string,
   timestamp: BigInt
 ): CollectionDailySnapshot {
-  let snapshotID = collection
+  const snapshotID = collection
     .concat("-")
     .concat((timestamp.toI32() / SECONDS_PER_DAY).toString());
 
@@ -162,9 +162,9 @@ export function getOrCreateCollectionDailySnapshot(
 }
 
 function getNftStandard(collectionID: string): string {
-  let erc165 = ERC165.bind(Address.fromString(collectionID));
+  const erc165 = ERC165.bind(Address.fromString(collectionID));
 
-  let isERC721Result = erc165.try_supportsInterface(
+  const isERC721Result = erc165.try_supportsInterface(
     Bytes.fromHexString(ERC721_INTERFACE_IDENTIFIER)
   );
   if (isERC721Result.reverted) {
@@ -177,7 +177,7 @@ function getNftStandard(collectionID: string): string {
     }
   }
 
-  let isERC1155Result = erc165.try_supportsInterface(
+  const isERC1155Result = erc165.try_supportsInterface(
     Bytes.fromHexString(ERC1155_INTERFACE_IDENTIFIER)
   );
   if (isERC1155Result.reverted) {
@@ -202,7 +202,7 @@ export function calcTradePriceETH(
   paymentToken: Address
 ): BigDecimal {
   if (paymentToken == NULL_ADDRESS || paymentToken == WETH_ADDRESS) {
-    let price = calculateMatchPrice(call);
+    const price = calculateMatchPrice(call);
     return price.toBigDecimal().div(MANTISSA_FACTOR);
   } else {
     return BIGDECIMAL_ZERO;
@@ -213,7 +213,7 @@ export function decodeSingleNftData(
   call: AtomicMatch_Call,
   callData: Bytes
 ): DecodedTransferResult | null {
-  let sellTarget = call.inputs.addrs[11];
+  const sellTarget = call.inputs.addrs[11];
   if (!validateCallDataFunctionSelector(callData)) {
     log.warning(
       "[checkCallDataFunctionSelector] returned false, Method ID: {}, transaction hash: {}, target: {}",
@@ -233,11 +233,11 @@ export function decodeBundleNftData(
   call: AtomicMatch_Call,
   callDatas: Bytes
 ): DecodedTransferResult[] {
-  let decodedTransferResults: DecodedTransferResult[] = [];
-  let decodedAtomicizeResult = decode_atomicize_Method(callDatas);
+  const decodedTransferResults: DecodedTransferResult[] = [];
+  const decodedAtomicizeResult = decode_atomicize_Method(callDatas);
   for (let i = 0; i < decodedAtomicizeResult.targets.length; i++) {
-    let target = decodedAtomicizeResult.targets[i];
-    let calldata = decodedAtomicizeResult.callDatas[i];
+    const target = decodedAtomicizeResult.targets[i];
+    const calldata = decodedAtomicizeResult.callDatas[i];
     // Skip unrecognized method calls
     if (!validateCallDataFunctionSelector(calldata)) {
       log.warning(
@@ -249,7 +249,10 @@ export function decodeBundleNftData(
         ]
       );
     } else {
-      let singleNftTransferResult = decode_nftTransfer_Method(target, calldata);
+      const singleNftTransferResult = decode_nftTransfer_Method(
+        target,
+        calldata
+      );
       decodedTransferResults.push(singleNftTransferResult);
     }
   }

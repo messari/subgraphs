@@ -34,19 +34,19 @@ class Token {
 }
 
 export function handleEvInventory(event: EvInventory): void {
-  let tokens = decodeTokens(event.params.item.data);
-  let collectionAddr = tokens[0].address.toHexString();
-  let collection = getOrCreateCollection(collectionAddr);
-  let isBundle = tokens.length > 1;
-  let volumeETH = event.params.item.price.toBigDecimal().div(MANTISSA_FACTOR);
-  let priceETH = volumeETH.div(BigInt.fromI32(tokens.length).toBigDecimal());
+  const tokens = decodeTokens(event.params.item.data);
+  const collectionAddr = tokens[0].address.toHexString();
+  const collection = getOrCreateCollection(collectionAddr);
+  const isBundle = tokens.length > 1;
+  const volumeETH = event.params.item.price.toBigDecimal().div(MANTISSA_FACTOR);
+  const priceETH = volumeETH.div(BigInt.fromI32(tokens.length).toBigDecimal());
   // TODO: private sale is also possible but yet to figured out how to tell if an event is from a private sale
-  let strategy = SaleStrategy.STANDARD_SALE;
-  let buyer =
+  const strategy = SaleStrategy.STANDARD_SALE;
+  const buyer =
     event.params.detail.op == X2Y2Op.COMPLETE_BUY_OFFER
       ? event.params.maker.toHexString()
       : event.params.taker.toHexString();
-  let seller =
+  const seller =
     event.params.detail.op == X2Y2Op.COMPLETE_BUY_OFFER
       ? event.params.taker.toHexString()
       : event.params.maker.toHexString();
@@ -55,7 +55,7 @@ export function handleEvInventory(event: EvInventory): void {
   // new trade
   //
   for (let i = 0; i < tokens.length; i++) {
-    let tradeID = isBundle
+    const tradeID = isBundle
       ? event.transaction.hash
           .toHexString()
           .concat("-")
@@ -67,7 +67,7 @@ export function handleEvInventory(event: EvInventory): void {
           .concat("-")
           .concat(event.logIndex.toString());
 
-    let trade = new Trade(tradeID);
+    const trade = new Trade(tradeID);
     trade.transactionHash = event.transaction.hash.toHexString();
     trade.logIndex = event.logIndex.toI32();
     trade.timestamp = event.block.timestamp;
@@ -90,9 +90,9 @@ export function handleEvInventory(event: EvInventory): void {
   //
   let marketplaceRevenuePercentage = BIGINT_ZERO;
   let creatorRevenuePercentage = BIGINT_ZERO;
-  let fees = event.params.detail.fees;
+  const fees = event.params.detail.fees;
   for (let i = 0; i < fees.length; i++) {
-    let fee = fees[i];
+    const fee = fees[i];
     if (fee.to == PROTOCOL_FEE_MANAGER) {
       marketplaceRevenuePercentage = marketplaceRevenuePercentage.plus(
         fee.percentage
@@ -110,7 +110,7 @@ export function handleEvInventory(event: EvInventory): void {
     .toBigDecimal()
     .div(FEE_PERCENTAGE_FACTOR)
     .times(BIGDECIMAL_HUNDRED);
-  let buyerCollectionAccountID = "COLLECTION_ACCOUNT-BUYER-"
+  const buyerCollectionAccountID = "COLLECTION_ACCOUNT-BUYER-"
     .concat(collection.id)
     .concat("-")
     .concat(buyer);
@@ -120,7 +120,7 @@ export function handleEvInventory(event: EvInventory): void {
     buyerCollectionAccount.save();
     collection.buyerCount += 1;
   }
-  let sellerCollectionAccountID = "COLLECTION_ACCOUNT-SELLER-"
+  const sellerCollectionAccountID = "COLLECTION_ACCOUNT-SELLER-"
     .concat(collection.id)
     .concat("-")
     .concat(seller);
@@ -132,10 +132,10 @@ export function handleEvInventory(event: EvInventory): void {
   }
   collection.cumulativeTradeVolumeETH =
     collection.cumulativeTradeVolumeETH.plus(volumeETH);
-  let deltaMarketplaceRevenueETH = volumeETH.times(
+  const deltaMarketplaceRevenueETH = volumeETH.times(
     marketplaceRevenuePercentage.toBigDecimal().div(FEE_PERCENTAGE_FACTOR)
   );
-  let deltaCreatorRevenueETH = volumeETH.times(
+  const deltaCreatorRevenueETH = volumeETH.times(
     creatorRevenuePercentage.toBigDecimal().div(FEE_PERCENTAGE_FACTOR)
   );
   collection.marketplaceRevenueETH = collection.marketplaceRevenueETH.plus(
@@ -152,7 +152,7 @@ export function handleEvInventory(event: EvInventory): void {
   //
   // update marketplace
   //
-  let marketplace = getOrCreateMarketplace(
+  const marketplace = getOrCreateMarketplace(
     NetworkConfigs.getMarketplaceAddress()
   );
   marketplace.tradeCount += 1;
@@ -167,14 +167,14 @@ export function handleEvInventory(event: EvInventory): void {
   marketplace.totalRevenueETH = marketplace.marketplaceRevenueETH.plus(
     marketplace.creatorRevenueETH
   );
-  let buyerAccountID = "MARKETPLACE_ACCOUNT-".concat(buyer);
+  const buyerAccountID = "MARKETPLACE_ACCOUNT-".concat(buyer);
   let buyerAccount = _Item.load(buyerAccountID);
   if (!buyerAccount) {
     buyerAccount = new _Item(buyerAccountID);
     buyerAccount.save();
     marketplace.cumulativeUniqueTraders += 1;
   }
-  let sellerAccountID = "MARKETPLACE_ACCOUNT-".concat(seller);
+  const sellerAccountID = "MARKETPLACE_ACCOUNT-".concat(seller);
   let sellerAccount = _Item.load(sellerAccountID);
   if (!sellerAccount) {
     sellerAccount = new _Item(sellerAccountID);
@@ -186,7 +186,7 @@ export function handleEvInventory(event: EvInventory): void {
   // prepare for updating dailyTradedItemCount
   let newDailyTradedItem = 0;
   for (let i = 0; i < tokens.length; i++) {
-    let dailyTradedItemID = "DAILY_TRADED_ITEM-"
+    const dailyTradedItemID = "DAILY_TRADED_ITEM-"
       .concat(collectionAddr)
       .concat("-")
       .concat(tokens[i].tokenId.toString())
@@ -202,7 +202,7 @@ export function handleEvInventory(event: EvInventory): void {
   //
   // take collection snapshot
   //
-  let collectionSnapshot = getOrCreateCollectionDailySnapshot(
+  const collectionSnapshot = getOrCreateCollectionDailySnapshot(
     collectionAddr,
     event.block.timestamp
   );
@@ -231,7 +231,7 @@ export function handleEvInventory(event: EvInventory): void {
   //
   // take marketplace snapshot
   //
-  let marketplaceSnapshot = getOrCreateMarketplaceDailySnapshot(
+  const marketplaceSnapshot = getOrCreateMarketplaceDailySnapshot(
     event.block.timestamp
   );
   marketplaceSnapshot.blockNumber = event.block.number;
@@ -245,21 +245,21 @@ export function handleEvInventory(event: EvInventory): void {
   marketplaceSnapshot.tradeCount = marketplace.tradeCount;
   marketplaceSnapshot.cumulativeUniqueTraders =
     marketplace.cumulativeUniqueTraders;
-  let dailyBuyerID = "DAILY_MARKERPLACE_ACCOUNT-".concat(buyer);
+  const dailyBuyerID = "DAILY_MARKERPLACE_ACCOUNT-".concat(buyer);
   let dailyBuyer = _Item.load(dailyBuyerID);
   if (!dailyBuyer) {
     dailyBuyer = new _Item(dailyBuyerID);
     dailyBuyer.save();
     marketplaceSnapshot.dailyActiveTraders += 1;
   }
-  let dailySellerID = "DAILY_MARKETPLACE_ACCOUNT-".concat(seller);
+  const dailySellerID = "DAILY_MARKETPLACE_ACCOUNT-".concat(seller);
   let dailySeller = _Item.load(dailySellerID);
   if (!dailySeller) {
     dailySeller = new _Item(dailySellerID);
     dailySeller.save();
     marketplaceSnapshot.dailyActiveTraders += 1;
   }
-  let dailyTradedCollectionID = "DAILY_TRADED_COLLECTION-"
+  const dailyTradedCollectionID = "DAILY_TRADED_COLLECTION-"
     .concat(collectionAddr)
     .concat("-")
     .concat((event.block.timestamp.toI32() / SECONDS_PER_DAY).toString());
@@ -279,16 +279,16 @@ function getOrCreateCollection(collectionID: string): Collection {
     collection = new Collection(collectionID);
     // only ERC721 is supported atm, but more (such as ERC1155) will come
     collection.nftStandard = NftStandard.ERC721;
-    let contract = NftMetadata.bind(Address.fromString(collectionID));
-    let nameResult = contract.try_name();
+    const contract = NftMetadata.bind(Address.fromString(collectionID));
+    const nameResult = contract.try_name();
     if (!nameResult.reverted) {
       collection.name = nameResult.value;
     }
-    let symbolResult = contract.try_symbol();
+    const symbolResult = contract.try_symbol();
     if (!symbolResult.reverted) {
       collection.symbol = symbolResult.value;
     }
-    let totalSupplyResult = contract.try_totalSupply();
+    const totalSupplyResult = contract.try_totalSupply();
     if (!totalSupplyResult.reverted) {
       collection.totalSupply = totalSupplyResult.value;
     }
@@ -302,7 +302,7 @@ function getOrCreateCollection(collectionID: string): Collection {
     collection.sellerCount = 0;
     collection.save();
 
-    let marketplace = getOrCreateMarketplace(
+    const marketplace = getOrCreateMarketplace(
       NetworkConfigs.getMarketplaceAddress()
     );
     marketplace.collectionCount += 1;
@@ -337,7 +337,7 @@ function getOrCreateCollectionDailySnapshot(
   collection: string,
   timestamp: BigInt
 ): CollectionDailySnapshot {
-  let snapshotID = collection
+  const snapshotID = collection
     .concat("-")
     .concat((timestamp.toI32() / SECONDS_PER_DAY).toString());
   let snapshot = CollectionDailySnapshot.load(snapshotID);
@@ -364,7 +364,7 @@ function getOrCreateCollectionDailySnapshot(
 function getOrCreateMarketplaceDailySnapshot(
   timestamp: BigInt
 ): MarketplaceDailySnapshot {
-  let snapshotID = (timestamp.toI32() / SECONDS_PER_DAY).toString();
+  const snapshotID = (timestamp.toI32() / SECONDS_PER_DAY).toString();
   let snapshot = MarketplaceDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketplaceDailySnapshot(snapshotID);
@@ -391,14 +391,14 @@ function getOrCreateMarketplaceDailySnapshot(
  * @param data encoding `struct Pair { IERC721 token; uint256 tokenId; }`
  */
 function decodeTokens(data: Bytes): Array<Token> {
-  let decoded = ethereum.decode("(address,uint256)[]", data);
-  let result: Array<Token> = [];
+  const decoded = ethereum.decode("(address,uint256)[]", data);
+  const result: Array<Token> = [];
   if (!decoded) {
     log.warning("failed to decode {}", [data.toHexString()]);
   } else {
-    let pairs = decoded.toArray();
+    const pairs = decoded.toArray();
     for (let i = 0; i < pairs.length; i++) {
-      let pair = pairs[i].toTuple();
+      const pair = pairs[i].toTuple();
       result.push(new Token(pair[0].toAddress(), pair[1].toBigInt()));
     }
   }
