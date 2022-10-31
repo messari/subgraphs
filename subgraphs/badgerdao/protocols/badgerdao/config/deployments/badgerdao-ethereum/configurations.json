@@ -1,5 +1,9 @@
 {
   "chain": "mainnet",
+  
+  "rewardsLoggerAddress": "0x0A4F4e92C3334821EbB523324D09E321a6B0d8ec",
+  "rewardsLoggerStartBlock": "12325490",
+
   "vaults": [
     {
       "name": "bBADGER",

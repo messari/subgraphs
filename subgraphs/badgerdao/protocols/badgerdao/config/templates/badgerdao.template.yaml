@@ -29,6 +29,8 @@ dataSources:
           file: ./abis/Controller.json
         - name: BaseRewardPool
           file: ./abis/BaseRewardPool.json
+        - name: RewardsLogger
+          file: ./abis/RewardsLogger.json
         - name: ERC20
           file: ./abis/ERC20.json
 
@@ -95,6 +97,74 @@ dataSources:
       file: ./src/mappings/vaultMappings.ts
   {{/vaults}}
 
+  - kind: ethereum
+    name: rewardsLogger
+    network: {{ chain }}
+    source:
+      address: "{{ rewardsLoggerAddress }}"
+      startBlock: {{ rewardsLoggerStartBlock }}
+      abi: RewardsLogger
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Deposit
+        - Withdraw
+      abis:
+        - name: RewardsLogger
+          file: ./abis/RewardsLogger.json
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: BribesProcessor
+          file: ./abis/BribesProcessor.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: BaseRewardPool
+          file: ./abis/BaseRewardPool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # Aave Oracle Contract
+        - name: AaveOracleContract
+          file: ./abis/Prices/AaveOracle.json
+        # SushiSwap Contracts
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+      eventHandlers:
+        - event: UnlockScheduleSet(indexed address,address,uint256,uint256,uint256,uint256,indexed uint256,indexed uint256)
+          handler: handleUnlockScheduleSet
+      file: ./src/mappings/rewardsLoggerMappings.ts
+
 templates: 
   - kind: ethereum
     name: Strategy
@@ -120,6 +190,8 @@ templates:
           file: ./abis/Controller.json
         - name: BaseRewardPool
           file: ./abis/BaseRewardPool.json
+        - name: RewardsLogger
+          file: ./abis/RewardsLogger.json
         - name: ERC20
           file: ./abis/ERC20.json
 
@@ -205,6 +277,8 @@ templates:
           file: ./abis/Controller.json
         - name: BaseRewardPool
           file: ./abis/BaseRewardPool.json
+        - name: RewardsLogger
+          file: ./abis/RewardsLogger.json
         - name: ERC20
           file: ./abis/ERC20.json
         
@@ -270,6 +344,8 @@ templates:
           file: ./abis/Controller.json
         - name: BaseRewardPool
           file: ./abis/BaseRewardPool.json
+        - name: RewardsLogger
+          file: ./abis/RewardsLogger.json
         - name: ERC20
           file: ./abis/ERC20.json
         

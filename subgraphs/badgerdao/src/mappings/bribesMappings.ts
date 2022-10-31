@@ -7,7 +7,6 @@ import {
   SentBribeToGovernance,
   PerformanceFeeGovernance,
 } from "../../generated/templates/BribesProcessor/BribesProcessor";
-import { updateRewardTokenInfo } from "../modules/Rewards";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
 
@@ -147,15 +146,6 @@ export function handleSentBribeToTree(event: SentBribeToTree): void {
     vault,
     supplySideRevenueUSD,
     constants.BIGDECIMAL_ZERO,
-    event.block
-  );
-
-  updateRewardTokenInfo(
-    vaultAddress,
-    rewardToken,
-    rewardTokenEmissionAmount,
-    event.block.number,
-    event.block.timestamp,
     event.block
   );
 

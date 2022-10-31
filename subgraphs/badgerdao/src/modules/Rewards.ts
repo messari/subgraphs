@@ -3,23 +3,21 @@ import {
   getOrCreateVault,
   getOrCreateRewardToken,
 } from "../common/initializers";
+import { Token } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { getRewardsPerDay } from "../common/rewards";
 import { log, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
-import { Token } from "../../generated/schema";
 
 export function updateRewardTokenInfo(
   vaultAddress: Address,
   rewardToken: Token,
-  rewardAmount: BigInt,
-  blockNumber: BigInt,
-  timestamp: BigInt,
+  rewardRate: BigInt,
   block: ethereum.Block
 ): void {
   let rewardRatePerDay = getRewardsPerDay(
-    timestamp,
-    blockNumber,
-    rewardAmount.toBigDecimal(),
+    block.timestamp,
+    block.number,
+    rewardRate.toBigDecimal(),
     constants.RewardIntervalType.TIMESTAMP
   );
 

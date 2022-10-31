@@ -22,7 +22,6 @@ import { Deposit } from "../modules/Deposit";
 import { log } from "@graphprotocol/graph-ts";
 import { Withdraw } from "../modules/Withdraw";
 import * as constants from "../common/constants";
-import { updateRewardTokenInfo } from "../modules/Rewards";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
 
@@ -124,15 +123,6 @@ export function handleTreeDistribution(event: TreeDistribution): void {
     vault,
     supplySideRevenueUSD,
     constants.BIGDECIMAL_ZERO,
-    event.block
-  );
-
-  updateRewardTokenInfo(
-    vaultAddress,
-    rewardToken,
-    rewardTokenEmissionAmount,
-    event.params.blockNumber,
-    event.params.timestamp,
     event.block
   );
 

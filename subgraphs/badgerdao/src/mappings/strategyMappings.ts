@@ -16,7 +16,6 @@ import {
 import * as utils from "../common/utils";
 import { log } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
-import { updateRewardTokenInfo } from "../modules/Rewards";
 import { updateRevenueSnapshots } from "../modules/Revenue";
 import { getOrCreateToken, getOrCreateVault } from "../common/initializers";
 
@@ -87,15 +86,6 @@ export function handleFarmHarvest(event: FarmHarvest): void {
     vault,
     supplySideRevenueUSD,
     protocolSideRevenueUSD,
-    event.block
-  );
-
-  updateRewardTokenInfo(
-    vaultAddress,
-    rewardToken,
-    rewardTokenEmissionAmount,
-    event.params.blockNumber,
-    event.params.timestamp,
     event.block
   );
 
@@ -174,15 +164,6 @@ export function handleHarvestState(event: HarvestState): void {
     vault,
     supplySideRevenueUSD,
     protocolSideRevenueUSD,
-    event.block
-  );
-
-  updateRewardTokenInfo(
-    vaultAddress,
-    rewardToken,
-    rewardTokenEmissionAmount,
-    event.params.blockNumber,
-    event.params.timestamp,
     event.block
   );
 
@@ -405,15 +386,6 @@ export function handleTreeDistribution(event: TreeDistribution): void {
     vault,
     supplySideRevenueUSD,
     constants.BIGDECIMAL_ZERO,
-    event.block
-  );
-
-  updateRewardTokenInfo(
-    vaultAddress,
-    rewardToken,
-    rewardTokenEmissionAmount,
-    event.params.blockNumber,
-    event.params.timestamp,
     event.block
   );
 
