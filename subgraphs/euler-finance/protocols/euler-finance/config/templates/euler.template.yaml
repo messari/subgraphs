@@ -19,7 +19,7 @@ dataSources:
       startBlock: {{ startBlock }} # this is when the first market was deployed
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - AssetStatus
@@ -46,6 +46,7 @@ dataSources:
       eventHandlers:
         - event: AssetStatus(indexed address,uint256,uint256,uint96,uint256,uint256,int96,uint256)
           handler: handleAssetStatus
+          receipt: true
         - event: Borrow(indexed address,indexed address,uint256)
           handler: handleBorrow
         - event: Deposit(indexed address,indexed address,uint256)

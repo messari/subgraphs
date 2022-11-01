@@ -80,6 +80,9 @@ export class SushiswapAvalancheConfigurations implements Configurations {
   getRewardToken(): string {
     return toLowerCase("0x37B608519F91f70F2EeB0e5Ed9AF4061722e4F76");
   }
+  getBrokenERC20Tokens(): string[] {
+    return [];
+  }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
       "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7", // wAVAX
