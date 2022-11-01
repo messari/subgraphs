@@ -1,4 +1,4 @@
-import { BigDecimal } from "@graphprotocol/graph-ts/index";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts/index";
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
@@ -54,7 +54,8 @@ export function updateNativeTokenPriceInUSD(): Token {
  **/
 export function findUSDPricePerToken(
   token: Token,
-  nativeToken: Token
+  nativeToken: Token,
+  blockNumber: BigInt
 ): BigDecimal {
   if (token.id == NetworkConfigs.getReferenceToken()) {
     return nativeToken.lastPriceUSD!;
@@ -76,7 +77,7 @@ export function findUSDPricePerToken(
     for (let i = 0; i < whiteList.length; ++i) {
       const poolAddress = whiteList[i];
       const poolAmounts = getLiquidityPoolAmounts(poolAddress);
-      const pool = getLiquidityPool(poolAddress);
+      const pool = getLiquidityPool(poolAddress, blockNumber);
 
       if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
         if (

@@ -43,13 +43,16 @@ export class MMFinanceMaticConfigurations implements Configurations {
       Address.fromString("0x7cfb780010e9c861e03bcbc7ac12e013137d47a5")
     );
   }
-  getTradeFee(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getTradeFee(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.17");
   }
-  getProtocolFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.068"); // in their docs it's 0.07, but looking at the code is really 0.068
   }
-  getLPFeeToOn(): BigDecimal {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.102");
   }
   getProtocolFeeToOff(): BigDecimal {

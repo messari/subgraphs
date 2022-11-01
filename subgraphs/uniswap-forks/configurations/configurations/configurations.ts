@@ -25,10 +25,12 @@ import { MMFinanceCronosConfigurations } from "../../protocols/mm-finance/config
 import { MMFinanceMaticConfigurations } from "../../protocols/mm-finance/config/deployments/mm-finance-polygon/configurations";
 import { HoneyswapXdaiConfigurations } from "../../protocols/honeyswap/config/deployments/honeyswap-gnosis/configurations";
 import { HoneyswapMaticConfigurations } from "../../protocols/honeyswap/config/deployments/honeyswap-polygon/configurations";
+import { PangolinAvalancheConfigurations } from "../../protocols/pangolin/config/deployments/pangolin-avalanche/configurations";
+import { BiswapBscConfigurations } from "../../protocols/biswap/config/deployments/biswap-bsc/configurations";
+
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
-import { PangolinAvalancheConfigurations } from "../../protocols/pangolin/config/deployments/pangolin-avalanche/configurations";
 
 // This function is called to load in the proper configurations for a protocol/network deployment.
 // To add a new deployment, add a value to the `Deploy` namespace and add a new configuration class to the network specific typescript file in the `protocols` folder.
@@ -118,6 +120,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
     }
     case Deploy.PANGOLIN_AVALANCHE: {
       return new PangolinAvalancheConfigurations();
+    }
+    case Deploy.BISWAP_BSC: {
+      return new BiswapBscConfigurations();
     }
     default: {
       log.critical(
