@@ -80,7 +80,7 @@ function ProtocolTabEntity({
         // create the base yield field for DEXs
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
           // skip the timestamp field on each entity instance
-          if (fieldName === "timestamp" || fieldName === "id") {
+          if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename") {
             return;
           }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
@@ -420,7 +420,7 @@ function ProtocolTabEntity({
               if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
                 issues.push({
                   type: "JS",
-                  message: message,
+                  message: 6 + message,
                   level: "critical",
                   fieldName: entityName + "-" + field,
                 });
@@ -441,7 +441,11 @@ function ProtocolTabEntity({
             if (overlayDataFields[field]) {
               const baseKey = `${protocolSchemaData?.protocols[0]?.name}-${protocolSchemaData?.protocols[0]?.network}-${protocolSchemaData?.protocols[0]?.subgraphVersion}`;
               const overlayKey = `${overlaySchemaData?.protocols[0]?.name}-${overlaySchemaData?.protocols[0]?.network}-${overlaySchemaData?.protocols[0]?.subgraphVersion}`;
-              dataChartToPass = { [baseKey]: dataFields[field], [overlayKey]: overlayDataFields[field] };
+              let keyDiff = "";
+              if (baseKey === overlayKey) {
+                keyDiff = ' (Overlay)';
+              }
+              dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
             }
             return (
               <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} />
