@@ -30,12 +30,23 @@ export function updateMasterChef(
     pid
   );
 
+  const masterchefV2Contract = MasterChefV2Spookyswap.bind(event.address);
+  const masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+
   if (!masterChefV2Pool.poolAddress) {
     const poolAddress = poolContract.try_lpToken(pid);
+    const poolInfo = poolContract.try_poolInfo(pid);
     if (!poolAddress.reverted) {
       masterChefV2Pool.poolAddress = poolAddress.value.toHexString();
     }
+    if (!poolInfo.reverted) {
+      masterChefV2Pool.poolAllocPoint = poolInfo.value.getAllocPoint();
+      masterChefV2.totalAllocPoint = masterChefV2.totalAllocPoint.plus(
+        poolInfo.value.getAllocPoint()
+      );
+    }
     masterChefV2Pool.save();
+    masterChefV2.save();
 
     if (!masterChefV2Pool.poolAddress) {
       log.warning(
@@ -45,9 +56,6 @@ export function updateMasterChef(
       return;
     }
   }
-
-  const masterchefV2Contract = MasterChefV2Spookyswap.bind(event.address);
-  const masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
   // Return if pool does not exist
   const pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
