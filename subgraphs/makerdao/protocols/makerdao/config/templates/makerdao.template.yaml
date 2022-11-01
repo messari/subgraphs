@@ -303,7 +303,7 @@ dataSources:
     source:
       abi: DSProxyFactory
       address: "0xA26e15C895EFc0616177B7c1e7270A4C7D51C997"
-      startBlock: 8928152
+      startBlock: 5834580
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
