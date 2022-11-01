@@ -12,9 +12,9 @@ export interface Configurations {
   getMethodologyVersion(): string;
   getFactoryAddress(): string;
   getFactoryContract(): Factory;
-  getTradeFee(): BigDecimal;
-  getProtocolFeeToOn(): BigDecimal;
-  getLPFeeToOn(): BigDecimal;
+  getTradeFee(blockNumber: BigInt): BigDecimal;
+  getProtocolFeeToOn(blockNumber: BigInt): BigDecimal;
+  getLPFeeToOn(blockNumber: BigInt): BigDecimal;
   getProtocolFeeToOff(): BigDecimal;
   getLPFeeToOff(): BigDecimal;
   getFeeOnOff(): string;

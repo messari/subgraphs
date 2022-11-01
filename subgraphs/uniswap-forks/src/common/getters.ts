@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../configurations/configure";
 import { TokenABI } from "../../generated/Factory/TokenABI";
 import {
@@ -28,6 +28,7 @@ import {
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
 } from "./constants";
+import { createPoolFees } from "./creators";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.getFactoryAddress());
@@ -55,8 +56,14 @@ export function getOrCreateProtocol(): DexAmmProtocol {
   return protocol;
 }
 
-export function getLiquidityPool(poolAddress: string): LiquidityPool {
-  return LiquidityPool.load(poolAddress)!;
+export function getLiquidityPool(
+  poolAddress: string,
+  blockNumber: BigInt
+): LiquidityPool {
+  const pool = LiquidityPool.load(poolAddress)!;
+  pool.fees = createPoolFees(poolAddress, blockNumber);
+  pool.save();
+  return pool;
 }
 
 export function getLiquidityPoolAmounts(

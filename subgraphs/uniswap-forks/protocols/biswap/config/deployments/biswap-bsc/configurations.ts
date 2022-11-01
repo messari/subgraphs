@@ -16,14 +16,10 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
 } from "../../../src/common/constants";
-import {
-  toLowerCase,
-  toLowerCaseList,
-} from "../../../../../src/common/utils/utils";
 
-export class SushiswapFuseConfigurations implements Configurations {
+export class BiswapBscConfigurations implements Configurations {
   getNetwork(): string {
-    return Network.FUSE;
+    return Network.BSC;
   }
   getSchemaVersion(): string {
     return PROTOCOL_SCHEMA_VERSION;
@@ -41,76 +37,80 @@ export class SushiswapFuseConfigurations implements Configurations {
     return PROTOCOL_SLUG;
   }
   getFactoryAddress(): string {
-    return toLowerCase("0x43eA90e2b786728520e4f930d2A71a477BF2737C");
+    return "0x858e3312ed3a876947ea49d572a7c42de08af7ee";
   }
   getFactoryContract(): Factory {
     return Factory.bind(
-      Address.fromString(
-        toLowerCase("0x43eA90e2b786728520e4f930d2A71a477BF2737C")
-      )
+      Address.fromString("0x858e3312ed3a876947ea49d572a7c42de08af7ee")
     );
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getTradeFee(blockNumber: BigInt): BigDecimal {
-    return BigDecimal.fromString("0.3");
+    if (blockNumber < BigInt.fromI32(20488163)) {
+      return BigDecimal.fromString("0.1");
+    }
+    return BigDecimal.fromString("0.2");
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProtocolFeeToOn(blockNumber: BigInt): BigDecimal {
     return BigDecimal.fromString("0.05");
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getLPFeeToOn(blockNumber: BigInt): BigDecimal {
-    return BigDecimal.fromString("0.25");
+    if (blockNumber < BigInt.fromI32(20488163)) {
+      return BigDecimal.fromString("0.05");
+    }
+    return BigDecimal.fromString("0.15");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("0.3");
+    return BigDecimal.fromString("0");
   }
   getFeeOnOff(): string {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.TIMESTAMP;
+    return RewardIntervalType.NONE;
   }
   getRewardTokenRate(): BigInt {
     return BIGINT_ZERO;
   }
   getReferenceToken(): string {
-    return toLowerCase("0xa722c13135930332Eb3d749B2F0906559D2C5b99");
+    return "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c";
   }
   getRewardToken(): string {
-    return toLowerCase("0x90708b20ccC1eb95a4FA7C8b18Fd2C22a0Ff9E78");
+    return "0x603c7f932ed1fc6575303d8fb018fdcbb0f39a95";
   }
   getWhitelistTokens(): string[] {
-    return toLowerCaseList([
-      "0x0be9e53fd7edac9f859882afdda116645287c629", // wFUSE
-      "0xa722c13135930332eb3d749b2f0906559d2c5b99", // wETH
-      "0x33284f95ccb7b948d9d352e1439561cf83d8d00d", // wBTC
-      "0x620fd5fa44be6af63715ef4e65ddfa0387ad13f5", // USDC
-      "0x94ba7a27c7a95863d1bdc7645ac2951e0cca06ba", // DAI
-      "0xfadbbf8ce7d5b7041be672561bba99f79c532e10", // USDT
-      "0x249be57637d8b013ad64785404b24aebae9b098b", // fUSD
-    ]);
+    return [
+      "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c", // WBNB
+      "0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
+      "0x55d398326f99059ff775485246999027b3197955", // USDT
+      "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d", // USDC
+      "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3", // DAI
+      "0x4bd17003473389a42daf6a0a729f6fdb328bbbd7", // VAI
+      "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c", // BTCB
+      "0x2170ed0880ac9a755fd29b2688956bd959f933f8", // WETH
+      "0x250632378e573c6be1ac2f97fcdf00515d0aa91b", // BETH
+      "0x965F527D9159dCe6288a2219DB51fc6Eef120dD1", // BSW
+    ];
   }
   getStableCoins(): string[] {
-    return toLowerCaseList([
-      "0x620fd5fa44BE6af63715Ef4E65DDFA0387aD13F5", // USDC
-      "0x94Ba7A27c7A95863d1bdC7645AC2951E0cca06bA", // DAI
-      "0xFaDbBF8Ce7D5b7041bE672561bbA99f79c532e10", // USDT
-      "0x249be57637d8b013ad64785404b24aebae9b098b", // fUSD
-    ]);
+    return [
+      "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d", // USDC
+      "0x55d398326f99059ff775485246999027b3197955", // USDT
+      "0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
+    ];
   }
   getStableOraclePools(): string[] {
-    return toLowerCaseList([
-      "0xba9ca720e314f42e17e80991c1d0affe47387108", // wETH/USDC
-      "0xadf3924f44d0ae0242333cde32d75309b30a0fcc", // wETH/USDT
-      "0x44f5b873d6b2a2ee8309927e22f3359c7f23d428", // wETH/DAI
-    ]);
+    return [
+      "0x06cd679121ec37b0a2fd673d4976b09d81791856", // USDC/WBNB
+      "0x8840c6252e2e86e545defb6da98b2a0e26d8c1ba", // USDT/WBNB
+      "0xacaac9311b0096e04dfe96b6d87dec867d3883dc", // BUSD/WBNB
+    ];
   }
   getUntrackedPairs(): string[] {
-    return toLowerCaseList([]);
+    return [];
   }
   getUntrackedTokens(): string[] {
     return [];
