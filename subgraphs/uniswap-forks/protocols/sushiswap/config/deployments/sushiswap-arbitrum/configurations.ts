@@ -111,6 +111,9 @@ export class SushiswapArbitrumConfigurations implements Configurations {
   getUntrackedTokens(): string[] {
     return [];
   }
+  getBrokenERC20Tokens(): string[] {
+    return [];
+  }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }

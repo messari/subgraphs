@@ -68,7 +68,7 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
                 },
             ];
         } else if (typeof dataChart === "object") {
-            const colorList = ["red", "blue", "yellow", "lime", "pink", "black", "orange", "green"];
+            const colorList = ["rgb(53, 162, 235)", "red", "yellow", "lime", "pink", "black", "orange", "green"];
             datasets = Object.keys(dataChart).map((item: string, idx: number) => {
                 if (labels.length === 0) {
                     labels = dataChart[item].map((e: any) => toDate(e.date));
