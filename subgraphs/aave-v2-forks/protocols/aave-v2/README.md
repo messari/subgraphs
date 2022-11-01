@@ -65,8 +65,8 @@ Not applicable to Aave
   - Example transaction: https://snowtrace.io/tx/0x873b4019fa2d77dc9809c57b4c03d2db909d26776129225132c8e14f05c1319b
   - e.g. aWAVAX is converted to WAVAX, WAVAX is swapped for USDC, USDC is converted to aUSDC then returned to the account executing the transaction
   - There are also similar features with swapAndRepay routers and swapAndLiquidate routers.
-  - This does not affect any of the position data though.
-- There is also a feature in Aave V2 to execute transactions on behalf of another account. We do account for this in the mappings.
+  - The logic in our subgraph accounts for all of the unique behaviour described above.
+- There is also a feature in Aave V2 to execute transactions on behalf of another account. We do account for this in the mappings. A position and transaction follow the controller of the collateral or debt.
 
 ## Useful links and references
 
