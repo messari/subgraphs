@@ -1,6 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts";
 import {
-  Burn as BurnEvent,
   Initialize,
   Mint as MintEvent,
   Swap as SwapEvent,
@@ -45,21 +44,6 @@ export function handleMint(event: MintEvent): void {
   updatePoolMetrics(event);
 }
 
-// Handle a burn event emitted from a pool contract. Considered a withdraw into the given liquidity pool.
-export function handleBurn(event: BurnEvent): void {
-  createWithdraw(
-    event,
-    event.params.owner,
-    event.params.owner,
-    event.params.amount0,
-    event.params.amount1,
-    false
-  );
-  updateUsageMetrics(event, event.params.owner, UsageType.WITHDRAW);
-  updateFinancials(event);
-  updatePoolMetrics(event);
-}
-
 // Handle a swap event emitted from a pool contract.
 export function handleSwap(event: SwapEvent): void {
   createSwapHandleVolumeAndFees(
@@ -78,11 +62,9 @@ export function handleSwap(event: SwapEvent): void {
 export function handleCollect(event: CollectEvent): void {
   createWithdraw(
     event,
-    event.params.owner,
     event.params.recipient,
     event.params.amount0,
-    event.params.amount1,
-    true
+    event.params.amount1
   );
   updateFinancials(event);
   updatePoolMetrics(event);
