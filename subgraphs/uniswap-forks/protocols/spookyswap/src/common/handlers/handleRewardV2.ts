@@ -33,6 +33,7 @@ export function updateMasterChef(
   const masterchefV2Contract = MasterChefV2Spookyswap.bind(event.address);
   const masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
 
+  // Sometimes the pool addition event is not emitted before the deposit/withdraw event. In this case, we need to add the pool and allocation to the masterchef entity.
   if (!masterChefV2Pool.poolAddress) {
     const poolAddress = poolContract.try_lpToken(pid);
     const poolInfo = poolContract.try_poolInfo(pid);
