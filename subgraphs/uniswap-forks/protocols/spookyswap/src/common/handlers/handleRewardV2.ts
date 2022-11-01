@@ -3,7 +3,6 @@ import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefV2Spookyswap } from "../../../../../generated/MasterChefV2/MasterChefV2Spookyswap";
 import {
   LiquidityPool,
-  _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
