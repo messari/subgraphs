@@ -62,9 +62,6 @@ export class ProtocolData {
     public readonly protocolAddress: string,
     public readonly name: string,
     public readonly slug: string,
-    public readonly schemaVersion: string,
-    public readonly subgraphVersion: string,
-    public readonly methodologyVersion: string,
     public readonly network: string
   ) {}
 }

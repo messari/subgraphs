@@ -72,9 +72,6 @@ function getProtocolData(): ProtocolData {
     Protocol.PROTOCOL_ADDRESS,
     Protocol.NAME,
     Protocol.SLUG,
-    Protocol.SCHEMA_VERSION,
-    Protocol.SUBGRAPH_VERSION,
-    Protocol.METHODOLOGY_VERSION,
     Protocol.NETWORK
   );
 }

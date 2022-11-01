@@ -15,11 +15,12 @@ export function updateMarketplace(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
-  let marketplace = getOrCreateMarketplace();
+  const marketplace = getOrCreateMarketplace();
   marketplace.tradeCount += 1;
-  marketplace.cumulativeTradeVolumeETH = marketplace.cumulativeTradeVolumeETH.plus(
-    tokenAmount.divDecimal(constants.ETH_DECIMALS)
-  );
+  marketplace.cumulativeTradeVolumeETH =
+    marketplace.cumulativeTradeVolumeETH.plus(
+      tokenAmount.divDecimal(constants.ETH_DECIMALS)
+    );
   marketplace.save();
 
   createUserMarketplaceAccount(buyerAddress, block);
@@ -33,15 +34,15 @@ export function updateMarketplaceDailySnapshot(
   buyerAddress: Address,
   sellerAddress: Address
 ): void {
-  let marketplaceDailySnapshot = getOrCreateMarketplaceDailySnapshot(
+  const marketplaceDailySnapshot = getOrCreateMarketplaceDailySnapshot(
     block.timestamp,
     block.number
   );
-  let noOfDaysSinceUnix = (
+  const noOfDaysSinceUnix = (
     block.timestamp.toI32() / constants.SECONDS_PER_DAY
   ).toString();
   let isUniqueDailyTradedItem = false;
-  let itemId = "DAILY_TRADED_ITEM"
+  const itemId = "DAILY_TRADED_ITEM"
     .concat("-")
     .concat(noOfDaysSinceUnix)
     .concat("-")
@@ -51,10 +52,10 @@ export function updateMarketplaceDailySnapshot(
     dailyTradedItem = new _Item(itemId);
     isUniqueDailyTradedItem = true;
   }
-  let buyerId = constants.AccountType.DAILY_MARKETPLACE_ACCOUNT.concat(
+  const buyerId = constants.AccountType.DAILY_MARKETPLACE_ACCOUNT.concat(
     "-"
   ).concat(buyerAddress.toHexString());
-  let sellerId = constants.AccountType.DAILY_MARKETPLACE_ACCOUNT.concat(
+  const sellerId = constants.AccountType.DAILY_MARKETPLACE_ACCOUNT.concat(
     "-"
   ).concat(sellerAddress.toHexString());
 

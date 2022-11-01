@@ -3,13 +3,17 @@
   "status": "prod",
   "versions": {
     "schema": "1.0.0",
-    "subgraph": "1.0.0",
+    "subgraph": "1.0.1",
     "methodology": "1.0.0"
   },
   "services": {
     "hosted-service": {
       "slug": "the-graph-ethereum",
       "query-id": "the-graph-ethereum"
+    },
+    "decentralized-network": {
+      "slug": "the-graph-ethereum",
+      "query-id": "NOT-PUBLISHED"
     }
   },
   "files": {

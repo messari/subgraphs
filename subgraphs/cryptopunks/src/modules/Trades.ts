@@ -7,7 +7,7 @@ import {
   getStrategy,
 } from "../constants/utils";
 import { updateCollection } from "./Collections";
-import { _User, _Bid } from "../../generated/schema";
+import { _Bid } from "../../generated/schema";
 import { updateMarketplace } from "./Marketplaces";
 
 export function updateTrades(
@@ -18,17 +18,17 @@ export function updateTrades(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
-  let strategy = getStrategy(punkIndex, buyerAddress);
+  const strategy = getStrategy(punkIndex, buyerAddress);
   let bAddress = buyerAddress;
   let tempAmount = tokenAmount;
   if (strategy === constants.SaleStrategy.PRIVATE_SALE) {
     bAddress = getSellerAddressFromPunksOfferedForSale(punkIndex);
-    let highestBidderAddress = getHighestBiddersAddress(punkIndex);
-    let bidId = punkIndex
+    const highestBidderAddress = getHighestBiddersAddress(punkIndex);
+    const bidId = punkIndex
       .toString()
       .concat("-")
       .concat(highestBidderAddress.toHexString());
-    let winningBid = _Bid.load(bidId) as _Bid;
+    const winningBid = _Bid.load(bidId) as _Bid;
     tempAmount = winningBid.tokensBid;
   }
 
@@ -69,13 +69,13 @@ export function createTradeTransaction(
   transaction: ethereum.Transaction,
   block: ethereum.Block
 ): void {
-  let trade = getOrCreateTrade(
+  const trade = getOrCreateTrade(
     transaction.hash.toHexString(),
     transaction.index
   );
   trade.timestamp = block.timestamp;
   trade.blockNumber = block.number;
-  
+
   trade.amount = constants.BIGINT_ONE;
   trade.priceETH = tokenAmount.divDecimal(constants.ETH_DECIMALS);
   trade.strategy = strategy;
