@@ -143,6 +143,9 @@ export class SushiswapMainnetConfigurations implements Configurations {
       "0x4b4d2e899658fb59b1d518b68fe836b100ee8958", // MIS
     ];
   }
+  getBrokenERC20Tokens(): string[] {
+    return [];
+  }
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal {
     return MINIMUM_LIQUIDITY_TEN_THOUSAND;
   }

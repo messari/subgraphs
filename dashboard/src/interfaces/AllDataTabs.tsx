@@ -135,6 +135,36 @@ function AllDataTabs({
       </TabPanel>
     );
   }
+
+  let showDropDown = false;
+  let failedToLoad = false;
+  if (tabValue + "" === "1" &&
+    (protocolTimeseriesData.financialsDailySnapshots || protocolTimeseriesError.financialsDailySnapshots) &&
+    (protocolTimeseriesData.usageMetricsDailySnapshots || protocolTimeseriesError.usageMetricDailySnapshots) &&
+    (protocolTimeseriesData.usageMetricsHourlySnapshots || protocolTimeseriesError.usageMetricsHourlySnapshots)) {
+    if ((overlayDeploymentURL &&
+      overlayProtocolTimeseriesData.financialsDailySnapshots?.length > 0 &&
+      overlayProtocolTimeseriesData.usageMetricsDailySnapshots?.length > 0 &&
+      overlayProtocolTimeseriesData.usageMetricsHourlySnapshots?.length > 0) || !overlayDeploymentURL) {
+      showDropDown = true;
+    }
+    if ((!protocolTimeseriesData.financialsDailySnapshots &&
+      !protocolTimeseriesData.usageMetricsDailySnapshots &&
+      !protocolTimeseriesData.usageMetricsHourlySnapshots) ||
+      (overlayDeploymentURL &&
+        !overlayProtocolTimeseriesData?.financialsDailySnapshots &&
+        !overlayProtocolTimeseriesData?.usageMetricsDailySnapshots &&
+        !overlayProtocolTimeseriesData?.usageMetricsHourlySnapshots)) {
+      failedToLoad = true;
+    }
+  } else if (tabValue + "" === "3" && poolTimeseriesRequest.poolTimeseriesData) {
+    if (Object.values(poolTimeseriesRequest.poolTimeseriesData).filter((x: any) => x?.length > 0)?.length === Object.values(poolTimeseriesRequest.poolTimeseriesData).length) {
+      showDropDown = true;
+    } else if (poolTimeseriesRequest.poolTimeseriesError) {
+      failedToLoad = true;
+    }
+  }
+
   return (
     <>
       <TabContext value={tabValue}>
@@ -146,10 +176,15 @@ function AllDataTabs({
             {eventsTabButton}
             {positionsQuery && <Tab label="Positions" value="5" />}
           </StyledTabs>
-          <DeploymentOverlayDropDown setDeploymentURL={(x: string) => {
-            setOverlayDeploymentClient(NewClient(x));
-            setOverlayDeploymentURL(x);
-          }} deploymentsList={[{ value: "", label: "NO OVERLAY" }, { value: subgraphToQueryURL, label: subgraphToQueryURL }]} currentDeploymentURL={overlayDeploymentURL} />
+          <DeploymentOverlayDropDown
+            setDeploymentURL={(x: string) => {
+              setOverlayDeploymentClient(NewClient(x));
+              setOverlayDeploymentURL(x);
+            }}
+            deploymentsList={[{ value: "", label: "NO OVERLAY" }, { value: subgraphToQueryURL, label: subgraphToQueryURL }]}
+            currentDeploymentURL={overlayDeploymentURL}
+            showDropDown={showDropDown}
+            failedToLoad={failedToLoad} />
         </div>
         {protocolDropDown}
         <TabPanel value="1">

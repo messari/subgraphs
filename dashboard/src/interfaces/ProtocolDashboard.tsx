@@ -41,6 +41,7 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
   const scrollToView = searchParams.get("view") || "";
   const skipAmtParam = Number(searchParams.get("skipAmt")) || 0;
   const version = searchParams.get("version") || "current";
+  const overlayParam = searchParams.get("overlay") || "";
 
   const navigate = useNavigate();
   let queryURL = `${SubgraphBaseUrl}${subgraphParam}`;
@@ -84,6 +85,13 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
     },
   );
 
+  useEffect(() => {
+    if (isValidHttpUrl(overlayParam)) {
+      setOverlayDeploymentURL(overlayParam);
+      setOverlayDeploymentClient(NewClient(overlayParam));
+    }
+  }, [])
+
   const [positionSnapshots, setPositionSnapshots] = useState();
   const [positionsLoading, setPositionsLoading] = useState(false);
   ChartJS.register(...registerables);
@@ -125,6 +133,17 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
     loading: overlaySchemaQueryLoading,
     error: overlaySchemaQueryError,
   }] = useLazyQuery(query, { client: overlayDeploymentClient });
+
+  useEffect(() => {
+    const href = new URL(window.location.href);
+    const p = new URLSearchParams(href.search);
+    if (overlayDeploymentURL === "") {
+      p.delete("overlay");
+    } else {
+      p.set("overlay", overlayDeploymentURL);
+    }
+    navigate("?" + p.toString().split("%2F").join("/").split("%3A").join(":"));
+  }, [overlayDeploymentURL])
 
   useEffect(() => {
     if (overlayDeploymentURL && protocolSchemaData) {
@@ -175,7 +194,7 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
         errorMessage: `OVERLAY ERROR - Current subgraph ${subgraphToQuery.url} has a schema type of ${protocolType} while the overlay subgraph ${overlayDeploymentURL} has a schema type of ${overlayProtocolType}. In order to do an overlay comparison, these types have to match.`,
       }));
     }
-  }, [overlaySchemaData])
+  }, [overlaySchemaData, overlaySchemaQueryError])
 
   const [protocolId, setprotocolId] = useState<string>(protocolIdToUse);
 
@@ -426,6 +445,10 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
     const href = new URL(window.location.href);
     const p = new URLSearchParams(href.search);
     const poolIdFromParam = p.get("poolId");
+    let overlayParam = "";
+    if (overlayDeploymentURL) {
+      overlayParam = "&overlay=" + overlayDeploymentURL;
+    }
     let deploymentVersionParam = "";
     if (!isCurrentVersion) {
       deploymentVersionParam = "&version=pending";
@@ -452,7 +475,7 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
       tabName = "positions";
     }
     navigate(
-      `?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}${deploymentVersionParam}`,
+      `?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}${deploymentVersionParam}${overlayParam}`,
     );
     setTabValue(newValue);
   };

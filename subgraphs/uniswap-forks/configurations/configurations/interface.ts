@@ -27,6 +27,7 @@ export interface Configurations {
   getStableOraclePools(): string[];
   getUntrackedPairs(): string[];
   getUntrackedTokens(): string[];
+  getBrokenERC20Tokens(): string[];
   getMinimumLiquidityThresholdTrackVolume(): BigDecimal;
   getMinimumLiquidityThresholdTrackPrice(): BigDecimal;
 }
