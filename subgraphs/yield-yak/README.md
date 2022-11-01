@@ -12,25 +12,21 @@ Sum across all Vaults:
 
 Sum across all Vaults
 
-`protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD + protocol.cumulativeSupplyProtocolRevenueUSD`
+`Vault TVL`
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Vaults
 
-`protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD + protocolRewardInUSD`
-
-protocolRewardInUSD - calculate based on admin fees
+`protocol.protocolSideRevenueUSD = (Withdraw Amount * Withdraw Fee) + (Deposit Amount * Deposit Fee)`
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Vaults
 
-`protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD + distributedRewardInUSD`
-
-distributedRewardInUSD - calculate based on Deposit Token Price
+`protocol.cumulativeSupplySideRevenueUSD = (Before Reinvest Supply - New Total Supply) * Reinvest Fee`
 
 ### Total Unique Users
 

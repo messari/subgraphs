@@ -1,14 +1,16 @@
-import { Address, ethereum, BigInt, BigDecimal, log, dataSource } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/schema";
-import { getOrCreateUsageMetricsDailySnapshot, getOrCreateUsageMetricsHourlySnapshot, getOrCreateYieldAggregator } from "../common/initializers";
+import {
+  getOrCreateUsageMetricsDailySnapshot,
+  getOrCreateUsageMetricsHourlySnapshot,
+  getOrCreateYieldAggregator
+} from "../common/initializers";
 import { YakStrategyV2 } from "../../generated/YakStrategyV2/YakStrategyV2";
-import { DEFUALT_AMOUNT, BIGINT_TEN, ZERO_BIGINT, ZERO_BIGDECIMAL } from "../helpers/constants";
+import { DEFUALT_AMOUNT, ZERO_BIGINT, ZERO_BIGDECIMAL } from "../helpers/constants";
 import * as utils from "../common/utils";
-import { Token } from "../../generated/schema";
 import { Deposit } from "../../generated/schema";
-import { calculatePriceInUSD } from "../calculators/priceInUSDCalculator";
-import { calculateOutputTokenPriceInUSD } from "../calculators/outputTokenPriceInUSDCalculator";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
+import { calculatePriceInUSD, calculateOutputTokenPriceInUSD } from "../common/calculators";
 
 export function _Deposit(
   contractAddress: Address,
@@ -20,31 +22,34 @@ export function _Deposit(
   const vaultAddress = Address.fromString(vault.id);
   const strategyContract = YakStrategyV2.bind(contractAddress);
 
-  let totalSupply = utils.readValue<BigInt>(
-    strategyContract.try_totalSupply(),
-    ZERO_BIGINT
-  );
-  vault.outputTokenSupply = totalSupply;
+  if (strategyContract.try_totalSupply().reverted) {
+    vault.outputTokenSupply = ZERO_BIGINT;
+  } else {
+    vault.outputTokenSupply = strategyContract.totalSupply();
+  }
 
-  let totalAssets = utils.readValue<BigInt>(
-    strategyContract.try_totalDeposits(),
-    ZERO_BIGINT
-  );
-  vault.inputTokenBalance = totalAssets;
+  if (strategyContract.try_totalDeposits().reverted) {
+    vault.inputTokenBalance = ZERO_BIGINT;
+  } else {
+    vault.inputTokenBalance = strategyContract.totalDeposits();
+    if (strategyContract.try_depositToken().reverted) {
+      vault.totalValueLockedUSD = ZERO_BIGDECIMAL;
+    } else {
+      vault.totalValueLockedUSD = calculatePriceInUSD(strategyContract.depositToken(), DEFUALT_AMOUNT).times(convertBigIntToBigDecimal(strategyContract.totalDeposits(), 18));
+    }
+  }
 
-  let inputToken = Token.load(vault.inputToken);
   let inputTokenAddress = Address.fromString(vault.inputToken);
   let depositAmountUSD = calculatePriceInUSD(inputTokenAddress, depositAmount);
-  let inputTokenDecimals = BIGINT_TEN.pow(
-    inputToken!.decimals as u8
-  ).toBigDecimal();
 
   vault.totalValueLockedUSD = calculatePriceInUSD(strategyContract.depositToken(), DEFUALT_AMOUNT).times(convertBigIntToBigDecimal(strategyContract.totalDeposits(), 18));
-  vault.outputTokenPriceUSD = calculateOutputTokenPriceInUSD(contractAddress);
 
-  vault.pricePerShare = utils
-    .readValue<BigInt>(strategyContract.try_getDepositTokensForShares(DEFUALT_AMOUNT), ZERO_BIGINT)
-    .toBigDecimal();
+  if (strategyContract.try_getDepositTokensForShares(DEFUALT_AMOUNT).reverted) {
+    vault.pricePerShare = ZERO_BIGDECIMAL;
+  } else {
+    vault.pricePerShare = convertBigIntToBigDecimal(strategyContract.getDepositTokensForShares(DEFUALT_AMOUNT), 18);
+  }
+  vault.outputTokenPriceUSD = calculateOutputTokenPriceInUSD(contractAddress);
 
   // Update hourly and daily deposit transaction count
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);

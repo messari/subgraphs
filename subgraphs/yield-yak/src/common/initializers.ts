@@ -5,9 +5,9 @@ import * as utils from "./utils";
 import { DEFUALT_AMOUNT, DEFUALT_DECIMALS, ZERO_BIGINT, ZERO_ADDRESS, ZERO_BIGDECIMAL, YAK_STRATEGY_MANAGER_ADDRESS, ZERO_INT, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../helpers/constants";
 import { Token } from "../../generated/schema";
 import { YakERC20 } from "../../generated/YakStrategyV2/YakERC20";
-import { calculatePriceInUSD } from "../calculators/priceInUSDCalculator";
 import { VaultFee } from "../../generated/schema";
 import { convertBigIntToBigDecimal } from "../helpers/converters";
+import { calculatePriceInUSD } from "./calculators";
 
 export function getOrCreateVault(contractAddress: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(contractAddress.toHexString());
@@ -16,13 +16,26 @@ export function getOrCreateVault(contractAddress: Address, block: ethereum.Block
     vault = new Vault(contractAddress.toHexString());
     const stategyContract = YakStrategyV2.bind(contractAddress);
 
-    vault.name = utils.readValue<string>(stategyContract.try_name(), "");
-    vault.symbol = utils.readValue<string>(stategyContract.try_symbol(), "");
+    if (stategyContract.try_name().reverted) {
+      vault.name = "";
+    } else {
+      vault.name = stategyContract.name();
+    }
+
+    if (stategyContract.try_symbol().reverted) {
+      vault.symbol = "";
+    } else {
+      vault.symbol = stategyContract.symbol();
+    }
 
     const protocol = getOrCreateYieldAggregator();
     vault.protocol = protocol.id;
 
-    vault.depositLimit = utils.readValue<BigInt>(stategyContract.try_MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST(), ZERO_BIGINT);
+    if (stategyContract.try_MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST().reverted) {
+      vault.depositLimit = ZERO_BIGINT;
+    } else {
+      vault.depositLimit = stategyContract.MAX_TOKENS_TO_DEPOSIT_WITHOUT_REINVEST();
+    }
 
     if (stategyContract.try_depositToken().reverted) {
       const inputTokenAddress = ZERO_ADDRESS;
@@ -73,9 +86,7 @@ export function getOrCreateVault(contractAddress: Address, block: ethereum.Block
     const developerFee = defineFee(contractAddress, "-developerFee")
     const reinvestorFee = defineFee(contractAddress, "-reinvestorFee")
 
-    vault.fees.push(adminFee.id);
-    vault.fees.push(developerFee.id);
-    vault.fees.push(reinvestorFee.id);
+    vault.fees = [adminFee.id, developerFee.id, reinvestorFee.id];
 
     utils.updateProtocolAfterNewVault(contractAddress);
   }
@@ -105,8 +116,17 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
 
     const contract = YakERC20.bind(address);
 
-    token.name = utils.readValue<string>(contract.try_name(), "");
-    token.symbol = utils.readValue<string>(contract.try_symbol(), "");
+    if (contract.try_name().reverted) {
+      token.name = "";
+    } else {
+      token.name = contract.name();
+    }
+
+    if (contract.try_symbol().reverted) {
+      token.symbol = "";
+    } else {
+      token.symbol = contract.symbol();
+    }
 
     if (contract.try_decimals().reverted) {
       token.decimals = DEFUALT_DECIMALS.toI32();
@@ -124,15 +144,6 @@ export function getOrCreateToken(address: Address, blockNumber: BigInt): Token {
 }
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
-  // const yakStrategyV2Contract = YakStrategyV2.bind(contractAddress);
-  // let ownerAddress: Address;
-
-  // if (yakStrategyV2Contract.try_owner().reverted) {
-  //   ownerAddress = YAK_STRATEGY_MANAGER_ADDRESS;
-  // } else {
-  //   ownerAddress = yakStrategyV2Contract.owner();
-  // }
-
   let protocol = YieldAggregator.load(YAK_STRATEGY_MANAGER_ADDRESS.toHexString());
 
   if (protocol == null) {
