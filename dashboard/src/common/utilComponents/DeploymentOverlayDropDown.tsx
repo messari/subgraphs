@@ -1,4 +1,4 @@
-import { Autocomplete, Typography } from "@mui/material";
+import { Autocomplete, CircularProgress, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { isValidHttpUrl } from "../../utils";
 import { ComboBoxInput } from "./ComboBoxInput";
@@ -7,17 +7,26 @@ interface DeploymentOverlayDropDownProps {
     deploymentsList: any[];
     setDeploymentURL: any;
     currentDeploymentURL: string;
+    showDropDown: Boolean;
+    failedToLoad: Boolean;
 }
 
 export const DeploymentOverlayDropDown = ({
     deploymentsList,
     setDeploymentURL,
-    currentDeploymentURL
+    currentDeploymentURL,
+    showDropDown,
+    failedToLoad
 }: DeploymentOverlayDropDownProps) => {
     const options = deploymentsList.map(x => x.label);
     const currentDeploymentLabel = deploymentsList.find(x => x.value === currentDeploymentURL) || currentDeploymentURL;
     const [textInput, setTextInput] = useState<string>(currentDeploymentLabel);
-
+    if (failedToLoad) {
+        return null;
+    }
+    if (!showDropDown) {
+        return <CircularProgress size={20} sx={{ mx: 2 }} />;
+    }
     return (
         <>
             <Autocomplete
