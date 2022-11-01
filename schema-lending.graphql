@@ -1440,7 +1440,7 @@ type Deposit @entity(immutable: true) {
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that controls the position (e.g. the holder of the new cTokens in Compound) "
+  "Account where deposit was executed (e.g. a deposit on behalf of account)"
   account: Account!
 
   " Account that executed the executed the deposit (e.g. a deposit on behalf of account) "
