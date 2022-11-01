@@ -3,6 +3,7 @@ import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefV2Spookyswap } from "../../../../../generated/MasterChefV2/MasterChefV2Spookyswap";
 import {
   LiquidityPool,
+  _MasterChef,
   _MasterChefStakingPool,
 } from "../../../../../generated/schema";
 import { INT_ZERO, MasterChef } from "../../../../../src/common/constants";
@@ -23,8 +24,7 @@ export function updateMasterChef(
   pid: BigInt,
   amount: BigInt
 ): void {
-  const poolContract = MasterChefV2Spookyswap.bind(event.address);
-  const masterChefV2Pool = getOrCreateMasterChefStakingPool(
+  let masterChefV2Pool = getOrCreateMasterChefStakingPool(
     event,
     MasterChef.MASTERCHEFV2,
     pid
@@ -35,27 +35,16 @@ export function updateMasterChef(
 
   // Sometimes the pool addition event is not emitted before the deposit/withdraw event. In this case, we need to add the pool and allocation to the masterchef entity.
   if (!masterChefV2Pool.poolAddress) {
-    const poolAddress = poolContract.try_lpToken(pid);
-    const poolInfo = poolContract.try_poolInfo(pid);
-    if (!poolAddress.reverted) {
-      masterChefV2Pool.poolAddress = poolAddress.value.toHexString();
-    }
-    if (!poolInfo.reverted) {
-      masterChefV2Pool.poolAllocPoint = poolInfo.value.getAllocPoint();
-      masterChefV2.totalAllocPoint = masterChefV2.totalAllocPoint.plus(
-        poolInfo.value.getAllocPoint()
-      );
-    }
+    masterChefV2Pool = getPoolAddressAndAllocation(
+      event,
+      pid,
+      masterChefV2Pool
+    );
+    masterChefV2.totalAllocPoint = masterChefV2.totalAllocPoint.plus(
+      masterChefV2Pool.poolAllocPoint
+    );
     masterChefV2Pool.save();
     masterChefV2.save();
-
-    if (!masterChefV2Pool.poolAddress) {
-      log.warning(
-        "poolInfo reverted: Could not find pool address for masterchef pool",
-        []
-      );
-      return;
-    }
   }
 
   // Return if pool does not exist
@@ -115,4 +104,28 @@ export function updateMasterChef(
   masterChefV2.save();
   rewardToken.save();
   pool.save();
+}
+
+export function getPoolAddressAndAllocation(
+  event: ethereum.Event,
+  pid: BigInt,
+  masterChefV2Pool: _MasterChefStakingPool
+): _MasterChefStakingPool {
+  const poolContract = MasterChefV2Spookyswap.bind(event.address);
+
+  const poolAddress = poolContract.try_lpToken(pid);
+  const poolInfo = poolContract.try_poolInfo(pid);
+  if (!poolAddress.reverted) {
+    masterChefV2Pool.poolAddress = poolAddress.value.toHexString();
+  }
+  if (!poolInfo.reverted) {
+    masterChefV2Pool.poolAllocPoint = poolInfo.value.getAllocPoint();
+  }
+  if (!masterChefV2Pool.poolAddress) {
+    log.critical(
+      "poolInfo reverted: Could not find pool address for masterchef pool",
+      []
+    );
+  }
+  return masterChefV2Pool;
 }
