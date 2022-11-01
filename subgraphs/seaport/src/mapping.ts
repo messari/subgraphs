@@ -9,6 +9,7 @@ import {
   CollectionDailySnapshot,
   Marketplace,
   MarketplaceDailySnapshot,
+  _OrderFulfillment,
   Trade,
   _Item,
 } from "../generated/schema";
@@ -17,6 +18,8 @@ import {
   BIGDECIMAL_MAX,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  orderFulfillmentMethod,
+  tradeStrategy,
   ERC1155_INTERFACE_IDENTIFIER,
   ERC721_INTERFACE_IDENTIFIER,
   isERC1155,
@@ -28,7 +31,6 @@ import {
   max,
   min,
   NftStandard,
-  SaleStrategy,
   SeaportItemType,
   SECONDS_PER_DAY,
   WETH_ADDRESS,
@@ -149,11 +151,19 @@ export function handleOrderFulfilled(event: OrderFulfilled): void {
     trade.tokenId = saleResult.nfts.tokenIds[i];
     trade.priceETH = priceETH;
     trade.amount = saleResult.nfts.amounts[i];
-    // TODO: cannot tell?
-    trade.strategy = SaleStrategy.STANDARD_SALE;
+    // if it is a basic order then STANDARD_SALE
+    // otherwise ANY_ITEM_FROM_SET. 
+    // TODO: ANY_ITEM_FROM_SET correct strategy? Cannot find docs on how to decide
+    trade.strategy = tradeStrategy(event);
     trade.buyer = buyer;
     trade.seller = seller;
     trade.save();
+
+    // Save details of how trade was fulfilled
+    const orderFulfillment = new _OrderFulfillment(tradeID);
+    orderFulfillment.trade = tradeID;
+    orderFulfillment.orderFulfillmentMethod = orderFulfillmentMethod(event)
+    orderFulfillment.save()
   }
 
   //

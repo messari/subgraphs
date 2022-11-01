@@ -5251,6 +5251,10 @@
           "hosted-service": {
             "slug": "opensea-seaport-ethereum",
             "query-id": "opensea-seaport-ethereum"
+          },
+          "decentralized-network": {
+            "slug": "opensea-seaport-ethereum",
+            "query-id": "9ZvDz8qtx3PrnaUw1duQ7EhgGphgQcgSHqhLzQXBa16u"
           }
         }
       }
