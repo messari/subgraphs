@@ -1,5 +1,3 @@
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.1";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_MARKETPLACE_NAME = "OpenSea V1";
 export const PROTOCOL_MARKETPLACE_SLUG = "opensea-v1";
 export const PROTOCOL_MARKETPLACE_ADDRESS =
