@@ -199,8 +199,14 @@ type TokenBalances @entity {
   " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
   exchangeRates: [BigDecimal!]
 
-  " All interest rates for this input token in this market. Should be in APR format "
+  " All interest rates for this input token. Should be in APR format "
   rates: [InterestRate!]
+
+  " Allowed limit to how much of the underlying asset can be supplied to this market. "
+  supplyCap: BigInt
+
+  " Allowed limit for how much of the underlying asset can be borrowed from this market. "
+  borrowCap: BigInt
 }
 
 enum RevenueSource {
@@ -743,12 +749,6 @@ type Market @entity {
 
   " Can the user choose to isloate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
   canIsolate: Boolean!
-
-  " Allowed limit to how much of the underlying asset can be supplied to this market. "
-  supplyCap: BigInt
-
-  " Allowed limit for how much of the underlying asset can be borrowed from this market. "
-  borrowCap: BigInt
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
