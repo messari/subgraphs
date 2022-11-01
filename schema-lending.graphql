@@ -54,6 +54,9 @@ type Token @entity {
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
 
+  " The type of token the protocol creates for positions "
+  type: TokenType
+
   " Details about the price oracle used to get this token's price "
   oracle: Oracle
 }
@@ -105,6 +108,16 @@ enum RiskType {
 
   " Isolated risk means each users position in a market or CDP is isolated for risk of liquidation "
   ISOLATED
+}
+
+# This is used for representative token descriptions
+# e.g. collateral or debt tokens in a protocol
+enum TokenType {
+  " Rebasing tokens continuously adjust balances / supply as interest is accrued (e.g. Aave debt balances adjust at each block with interest) "
+  REBASING
+
+  " Non-rebasing token balances / supply do not change as interest is accried (e.g. Compound's cToken's do not adjust balance, the exchange rate changes with interest) "
+  NON_REBASING
 }
 
 enum InterestRateType {
