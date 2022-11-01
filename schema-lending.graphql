@@ -1440,8 +1440,11 @@ type Deposit @entity(immutable: true) {
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that deposited tokens "
+  " Account that controls the position (e.g. the holder of the new cTokens in Compound) "
   account: Account!
+
+  " Account that executed the executed the deposit (e.g. a deposit on behalf of account) "
+  accountActor: Account
 
   " The market tokens are deposited to "
   market: Market!
@@ -1484,8 +1487,11 @@ type Withdraw @entity(immutable: true) {
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that withdrew tokens "
+  " Account that controls the position (e.g. the aToken owner initiating the withdraw in Aave) "
   account: Account!
+
+  " Account that receives the underlying withdrawn amount "
+  accountActor: Account
 
   " The market tokens are withdrew from "
   market: Market!
@@ -1533,8 +1539,11 @@ type Borrow @entity(immutable: true) {
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that borrowed/minted tokens "
+  " Account that controls incurs debt in this transaction "
   account: Account!
+
+  " Account that receives the funds from the new debt "
+  accountActor: Account
 
   " The market tokens are borrowed/minted from "
   market: Market!
@@ -1578,8 +1587,11 @@ type Repay @entity(immutable: true) {
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that repaid/burned tokens "
+  " Account that reduces their debt on this transaction "
   account: Account!
+
+  " Account that is providing the funds to repay the debt "
+  accountActor: Account
 
   " The market tokens are repaid/burned to "
   market: Market!
@@ -1720,8 +1732,11 @@ type Flashloan @entity(immutable: true) {
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that carried out the flashloan "
+  " Account that receieves the funds from the flashloan "
   account: Account!
+
+  " Account that initiates the flashloan "
+  accountActor: Account
 
   " The market in which this flashloan is executed "
   market: Market!
