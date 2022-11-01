@@ -185,6 +185,9 @@ type TokenBalances @entity {
 
   " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
   exchangeRates: [BigDecimal!]
+
+  " All interest rates for this input token in this market. Should be in APR format "
+  rates: [InterestRate!]
 }
 
 enum RevenueSource {
@@ -742,8 +745,8 @@ type Market @entity {
 
   ##### Quantitative Data #####
 
-  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
-  rates: [InterestRate!]!
+  " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
+  fees: [InterestRate!]!
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
