@@ -1001,6 +1001,9 @@ type PositionSnapshot @entity {
   " Token balance in this position, in native amounts "
   balance: BigInt!
 
+  " Token balance in this position, in USD "
+  balanceUSD: BigDecimal!
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
