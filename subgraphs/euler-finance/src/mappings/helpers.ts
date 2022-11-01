@@ -322,21 +322,27 @@ export function updateRevenue(
     .times(token.lastPriceUSD!);
 
   // AssetStatus.reserveBalance may include protocol side revenue
-  // from interest and liquidation; split protocol side revenue
-  // if it is a liquidation
+  // from interest and liquidation; separate protocol side revenue
+  // into interest revenue and liquidation revenue if it is a liquidation,
+  // because liquidation revenue is not shared with the supply side,
+  // and interest revenue is shared
   let newLiquidationRevenue = BIGDECIMAL_ZERO;
   let newProtocolSideInterestRevenue = newProtocolSideRevenue;
   let newTotalInterestRevenue = newProtocolSideInterestRevenue;
   let newSupplySideRevenue = BIGDECIMAL_ZERO;
-  const repay = getRepayForLiquidation(event);
-  if (repay) {
+  const repayFromLiquidation = getRepayForLiquidation(event);
+  if (repayFromLiquidation) {
     // split reserve fee from liquidation
-    const repayAmount = bigIntToBDUseDecimals(repay, DEFAULT_DECIMALS);
-    // Line 156 Liquidation.sol: repay * (1 + 0.02)
-    const desiredRepay = repayAmount.times(BIGDECIMAL_ONE.plus(UNDERLYING_RESERVES_FEE.div(DECIMAL_PRECISION)));
-    newLiquidationRevenue = desiredRepay.minus(repayAmount).times(token.lastPriceUSD!);
+    const repayAmountFromLiquidation = bigIntToBDUseDecimals(repayFromLiquidation, DEFAULT_DECIMALS);
+    // The reserve fee is charged on repay amount in a liquidation, the percent is
+    // determined by UNDERLYING_RESERVES_FEE.div(DECIMAL_PRECISION)
+    // UNDERLYING_RESERVES_FEE = 0.02 * 1e18 as of Oct 2022
+    // Reference: Line 156 Liquidation.sol
+    // https://github.com/euler-xyz/euler-contracts/blob/580fa725d65ac1fc1a42603e54aa28022f6cda6d/contracts/modules/Liquidation.sol#L156
+    const reserveFeeProportion = UNDERLYING_RESERVES_FEE.div(DECIMAL_PRECISION);
+    newLiquidationRevenue = repayAmountFromLiquidation.times(reserveFeeProportion).times(token.lastPriceUSD!);
     if (newProtocolSideRevenue.lt(newLiquidationRevenue)) {
-      log.error("[updateRevenue]total protocol side revenue {} < liquidation revenue {} at tx {}", [
+      log.warning("[updateRevenue]total protocol side revenue {} < liquidation revenue {} at tx {}", [
         newProtocolSideRevenue.toString(),
         newLiquidationRevenue.toString(),
         event.transaction.hash.toHexString(),
