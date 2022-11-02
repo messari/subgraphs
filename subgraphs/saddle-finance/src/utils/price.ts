@@ -66,6 +66,15 @@ export function getPriceUSD(token: Token, event: ethereum.Event): BigDecimal {
   if (symbol == SDL) {
     return BIGDECIMAL_ZERO;
   }
+
+  if (token._pool) {
+    // it is an LP token, get price from underlying
+    const pool = LiquidityPool.load(token._pool!)!;
+    return pool.outputTokenPriceUSD
+      ? pool.outputTokenPriceUSD!
+      : BIGDECIMAL_ZERO;
+  }
+
   const network = dataSource.network();
   if (network == OPTIMISM) {
     // Optimism currently has only one USD pool, should not reach this
