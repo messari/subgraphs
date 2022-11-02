@@ -25,12 +25,10 @@ import {
   RewardTokenType,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
   USDC_ADDRESS,
   BIGDECIMAL_ONE,
 } from "../common/constants";
+import { Versions } from "../versions";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let tokenId = tokenAddress.toHexString();
@@ -271,9 +269,6 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.OPTIMISM; // Need to change this
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -287,10 +282,15 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol._volatileFee = BigDecimal.fromString("0.02"); // Value hardcoded in factory constructor
     protocol._stablePools = [];
     protocol._volatilePools = [];
-    protocol._lastFeeCheckBlockNumber = BIGINT_ZERO
-
-    protocol.save();
+    protocol._lastFeeCheckBlockNumber = BIGINT_ZERO;
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 
