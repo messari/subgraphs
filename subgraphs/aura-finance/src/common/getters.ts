@@ -43,6 +43,7 @@ import { RewardPool as RewardPoolTemplate } from "../../generated/templates";
 import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
 import { Booster } from "../../generated/Booster/Booster";
 import { StablePool } from "../../generated/Booster/StablePool";
+import { Versions } from "../versions";
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
   const protocolId = NetworkConfigs.getFactoryAddress();
@@ -52,9 +53,6 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol = new YieldAggregator(protocolId);
     protocol.name = NetworkConfigs.getProtocolName();
     protocol.slug = NetworkConfigs.getProtocolSlug();
-    protocol.schemaVersion = NetworkConfigs.getSchemaVersion();
-    protocol.subgraphVersion = NetworkConfigs.getSubgraphVersion();
-    protocol.methodologyVersion = NetworkConfigs.getMethodologyVersion();
     protocol.network = NetworkConfigs.getNetwork();
     protocol.type = ProtocolType.YIELD;
 
@@ -68,6 +66,12 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol._activePoolCount = BIGINT_ZERO;
     protocol._vaultIds = [];
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }
@@ -218,9 +222,7 @@ export function getOrCreateBalancerPoolToken(
 
     let poolTVL = BIGDECIMAL_ZERO;
     for (let idx = 0; idx < tokens.length; idx++) {
-      if (
-        tokens[idx].lastPriceUSD == BIGDECIMAL_ZERO
-      ) {
+      if (tokens[idx].lastPriceUSD == BIGDECIMAL_ZERO) {
         const unknownPricePoolToken = tokens[idx];
 
         const weights = getPoolTokenWeights(poolAddress, popIndex);
@@ -428,9 +430,7 @@ export function getOrCreateVault(
     getOrCreateFeeType(
       performanceFeeId,
       VaultFeeType.PERFORMANCE_FEE,
-      getFees()
-        .totalFees()
-        .times(BIGDECIMAL_HUNDRED)
+      getFees().totalFees().times(BIGDECIMAL_HUNDRED)
     );
 
     vault.fees = [performanceFeeId];
