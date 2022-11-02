@@ -13,14 +13,16 @@ interface ChartContainerProps {
     dataTable: any;
     downloadAllCharts: boolean;
     elementId: string;
+    chartsImageFiles: any;
+    setChartsImageFiles: any;
 }
 
-export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart, dataTable, downloadAllCharts }: ChartContainerProps) => {
+export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart, dataTable, downloadAllCharts, chartsImageFiles, setChartsImageFiles }: ChartContainerProps) => {
     const chartRef = useRef<any>(null);
     const [chartIsImage, setChartIsImage] = useState<boolean>(false);
     const [initialLoaded, setInitialLoaded] = useState<boolean>(false);
 
-    function jpegDownloadHandler() {
+    function jpegDownloadHandler(downloadInZip: boolean) {
         try {
             const link = document.createElement('a');
             const field = datasetLabel.split("-")[1] || datasetLabel;
@@ -31,9 +33,13 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
             if (field?.toUpperCase()?.includes("DAILY") || field?.toUpperCase()?.includes("HOURLY")) {
                 freq = "";
             }
-            link.download = identifier + '-' + freq + field + "-" + moment.utc(Date.now()).format("MMDDYY") + ".jpeg";
-            link.href = chartRef.current?.toBase64Image('image/jpeg', 1);
-            link.click();
+            if (downloadInZip) {
+                setChartsImageFiles((prevState: any) => ({ ...prevState, [datasetLabel]: chartRef.current?.toBase64Image('image/jpeg', 1) }))
+            } else {
+                link.download = identifier + '-' + freq + field + "-" + moment.utc(Date.now()).format("MMDDYY") + ".jpeg";
+                link.href = chartRef.current?.toBase64Image('image/jpeg', 1);
+                link.click();
+            }
         } catch (err) {
             return;
         }
@@ -49,7 +55,7 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
 
     useEffect(() => {
         if (!!downloadAllCharts) {
-            jpegDownloadHandler();
+            jpegDownloadHandler(true);
         }
     }, [downloadAllCharts])
 
@@ -178,7 +184,7 @@ export const ChartContainer = ({ identifier, elementId, datasetLabel, dataChart,
                     {chart}
                 </Grid>
                 <Grid key={datasetLabel + "table2"} item xs={4}>
-                    <TableChart datasetLabel={datasetLabel} dataTable={dataTable} jpegDownloadHandler={jpegDownloadHandler} />
+                    <TableChart datasetLabel={datasetLabel} dataTable={dataTable} jpegDownloadHandler={() => jpegDownloadHandler(false)} />
                 </Grid>
             </Grid>
         </div>
