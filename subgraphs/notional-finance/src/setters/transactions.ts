@@ -50,10 +50,10 @@ export function getOrCreatePosition(
 ): Position {
   const accountId = account.id;
   const marketId = market.id;
-  let positionIdPrefix = `${accountId}-${marketId}-${side}`;
+  const positionIdPrefix = `${accountId}-${marketId}-${side}`;
 
   for (let curr = 0; curr < account.openPositionCount; curr += 1) {
-    let op = account.openPositions.at(curr);
+    const op = account.openPositions.at(curr);
     if (op.startsWith(positionIdPrefix)) {
       log.info(" ----- Found position with prefix... {}", [
         Position.load(op)!.id,
@@ -64,14 +64,14 @@ export function getOrCreatePosition(
 
   let count = 0;
   for (let curr = 0; curr < account.closedPositionCount; curr += 1) {
-    let cp = account.closedPositions.at(curr);
+    const cp = account.closedPositions.at(curr);
     if (cp.startsWith(positionIdPrefix)) {
       count += 1;
     }
   }
 
-  let positionId = `${accountId}-${market.id}-${side}-${count}`;
-  let position = new Position(positionId);
+  const positionId = `${accountId}-${market.id}-${side}-${count}`;
+  const position = new Position(positionId);
 
   account.openPositionCount += 1;
   account.openPositions = addToArrayAtIndex(
@@ -90,7 +90,7 @@ export function getOrCreatePosition(
   }
   market.save();
 
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
   protocol.openPositionCount += 1;
   protocol.cumulativePositionCount += 1;
   protocol.save();
@@ -131,7 +131,7 @@ export function closePosition(
   market: Market,
   event: ethereum.Event
 ): void {
-  let account_index = account.openPositions.indexOf(position.id);
+  const account_index = account.openPositions.indexOf(position.id);
   account.openPositionCount -= 1;
   account.openPositions = removeFromArrayAtIndex(
     account.openPositions,
@@ -149,7 +149,7 @@ export function closePosition(
   market.closedPositionCount += 1;
   market.save();
 
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
   protocol.openPositionCount -= 1;
   protocol.save();
 
@@ -163,9 +163,9 @@ export function createPositionSnapshot(
   position: Position,
   event: ethereum.Event
 ): void {
-  let hash = event.transaction.hash.toHexString();
-  let txlogIndex = event.transactionLogIndex.toI32();
-  let snapshot = new PositionSnapshot(`${position.id}-${hash}-${txlogIndex}`);
+  const hash = event.transaction.hash.toHexString();
+  const txlogIndex = event.transactionLogIndex.toI32();
+  const snapshot = new PositionSnapshot(`${position.id}-${hash}-${txlogIndex}`);
 
   snapshot.position = position.id;
   snapshot.hash = hash;
@@ -190,8 +190,8 @@ export function updatePosition(
 ): void {
   let closePositionToggle = false;
 
-  let market = getOrCreateMarket(event, marketId);
-  let account = getOrCreateAccount(accountId, event);
+  const market = getOrCreateMarket(event, marketId);
+  const account = getOrCreateAccount(accountId, event);
 
   // interest rate side
   let side: string;
@@ -207,7 +207,7 @@ export function updatePosition(
     side = InterestRateSide.BORROWER;
   }
 
-  let position = getOrCreatePosition(event, account, market, side!);
+  const position = getOrCreatePosition(event, account, market, side!);
 
   // deposit
   if (transactionType == TransactionType.DEPOSIT) {
@@ -215,7 +215,7 @@ export function updatePosition(
     position.depositCount = position.depositCount + 1;
     position.balance = position.balance.plus(amount);
 
-    let deposit = new Deposit(eventId);
+    const deposit = new Deposit(eventId);
     deposit.position = position.id;
     deposit.save();
     addAccountToProtocol(transactionType, account, event);
@@ -235,7 +235,7 @@ export function updatePosition(
     //   liquidate.save();
     // }
 
-    let withdraw = new Withdraw(eventId);
+    const withdraw = new Withdraw(eventId);
     withdraw.position = position.id;
     withdraw.save();
 
@@ -247,7 +247,7 @@ export function updatePosition(
     position.borrowCount = position.borrowCount + 1;
     position.balance = position.balance.plus(amount);
 
-    let borrow = new Borrow(eventId);
+    const borrow = new Borrow(eventId);
     borrow.position = position.id;
     borrow.save();
 
@@ -268,7 +268,7 @@ export function updatePosition(
     //   liquidate.save();
     // }
 
-    let repay = new Repay(eventId);
+    const repay = new Repay(eventId);
     repay.position = position.id;
     repay.save();
   }
@@ -296,13 +296,13 @@ export function createDeposit(
 ): Deposit {
   const id =
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
-  let deposit = new Deposit(id);
+  const deposit = new Deposit(id);
   const account = getOrCreateAccount(
     event.transaction.from.toHexString(),
     event
   );
 
-  let transactionType = TransactionType.DEPOSIT;
+  const transactionType = TransactionType.DEPOSIT;
 
   deposit.hash = event.transaction.hash.toHexString();
   // deposit.nonce = event.transaction.
@@ -349,13 +349,13 @@ export function createWithdraw(
 ): Withdraw {
   const id =
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
-  let withdraw = new Withdraw(id);
+  const withdraw = new Withdraw(id);
   const account = getOrCreateAccount(
     event.transaction.from.toHexString(),
     event
   );
 
-  let transactionType = TransactionType.WITHDRAW;
+  const transactionType = TransactionType.WITHDRAW;
 
   withdraw.hash = event.transaction.hash.toHexString();
   // withdraw.nonce = event.transaction.nonce;
@@ -402,14 +402,14 @@ export function createBorrow(
 ): Borrow {
   const id =
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
-  let borrow = new Borrow(id);
+  const borrow = new Borrow(id);
 
   const account = getOrCreateAccount(
     event.transaction.from.toHexString(),
     event
   );
 
-  let transactionType = TransactionType.BORROW;
+  const transactionType = TransactionType.BORROW;
 
   borrow.hash = event.transaction.hash.toHexString();
   // borrow.nonce = event.transaction.nonce;
@@ -455,14 +455,14 @@ export function createRepay(
 ): Repay {
   const id =
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
-  let repay = new Repay(id);
+  const repay = new Repay(id);
 
   const account = getOrCreateAccount(
     event.transaction.from.toHexString(),
     event
   );
 
-  let transactionType = TransactionType.REPAY;
+  const transactionType = TransactionType.REPAY;
 
   repay.hash = event.transaction.hash.toHexString();
   // repay.nonce = event.transaction.nonce;
@@ -509,9 +509,9 @@ export function createLiquidate(
 ): Liquidate {
   const id =
     event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
-  let liquidate = new Liquidate(id);
-  let liquidatorAccount = getOrCreateAccount(liquidator.toHexString(), event);
-  let liquidateeAccount = getOrCreateAccount(liquidatee.toHexString(), event);
+  const liquidate = new Liquidate(id);
+  const liquidatorAccount = getOrCreateAccount(liquidator.toHexString(), event);
+  const liquidateeAccount = getOrCreateAccount(liquidatee.toHexString(), event);
 
   liquidate.hash = event.transaction.hash.toHexString();
   // liquidate.nonce = event.transaction.nonce;
@@ -527,7 +527,7 @@ export function createLiquidate(
   // TODO: verify if a TX is observed in liquidation and deposit/repay
   // updateLiquidation
 
-  let token = getTokenFromCurrency(event, currencyId);
+  const token = getTokenFromCurrency(event, currencyId);
 
   liquidate.amount = bigIntToBigDecimal(cTokenAmount, token.decimals);
   liquidate.amountUSD = liquidate.amount.times(token.lastPriceUSD!);

@@ -6,10 +6,10 @@ import { getOrCreateLendingProtocol } from "./protocol";
 export function getOrCreateFinancialsDailySnapshot(
   event: ethereum.Event
 ): FinancialsDailySnapshot {
-  let dailyId: string = (
+  const dailyId: string = (
     event.block.timestamp.toI64() / SECONDS_PER_DAY
   ).toString();
-  let protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateLendingProtocol();
   let financialMetrics = FinancialsDailySnapshot.load(dailyId);
   if (financialMetrics == null) {
     financialMetrics = new FinancialsDailySnapshot(dailyId);

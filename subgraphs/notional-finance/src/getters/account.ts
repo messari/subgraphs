@@ -27,7 +27,7 @@ export function getOrCreateAccount(
     account.liquidationCount = 0;
     account.save();
 
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
     protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }

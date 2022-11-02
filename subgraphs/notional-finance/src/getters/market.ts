@@ -36,11 +36,11 @@ export function getOrCreateMarket(
   let market = Market.load(marketId);
 
   if (market == null) {
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
     protocol.totalPoolCount += 1;
     protocol.save();
 
-    let currencyId = marketId.split("-")[0];
+    const currencyId = marketId.split("-")[0];
 
     // market metadata
     market = new Market(marketId);
@@ -55,8 +55,8 @@ export function getOrCreateMarket(
     market.liquidationThreshold = BIGDECIMAL_ZERO;
 
     // TODO: liquidation penalty methodology needs to be reviewed
-    let notional = Notional.bind(Address.fromString(PROTOCOL_ID));
-    let currencyAndRatesCallResult = notional.try_getCurrencyAndRates(
+    const notional = Notional.bind(Address.fromString(PROTOCOL_ID));
+    const currencyAndRatesCallResult = notional.try_getCurrencyAndRates(
       parseInt(currencyId) as i32
     );
     if (currencyAndRatesCallResult.reverted) {
@@ -127,11 +127,11 @@ export function getOrCreateMarketDailySnapshot(
   event: ethereum.Event,
   marketId: string
 ): MarketDailySnapshot {
-  let dailyId = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let id = "daily-" + marketId + "-" + dailyId.toString();
+  const dailyId = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id = "daily-" + marketId + "-" + dailyId.toString();
 
-  let protocol = getOrCreateLendingProtocol();
-  let market = getOrCreateMarket(event, marketId);
+  const protocol = getOrCreateLendingProtocol();
+  const market = getOrCreateMarket(event, marketId);
   let marketMetrics = MarketDailySnapshot.load(id);
   if (marketMetrics == null) {
     marketMetrics = new MarketDailySnapshot(id);
@@ -180,11 +180,11 @@ export function getOrCreateMarketHourlySnapshot(
   marketId: string
 ): MarketHourlySnapshot {
   // Hours since Unix epoch time
-  let hourlyId = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
-  let id = "hourly-" + marketId + "-" + hourlyId.toString();
+  const hourlyId = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const id = "hourly-" + marketId + "-" + hourlyId.toString();
 
-  let protocol = getOrCreateLendingProtocol();
-  let market = getOrCreateMarket(event, marketId);
+  const protocol = getOrCreateLendingProtocol();
+  const market = getOrCreateMarket(event, marketId);
   let marketMetrics = MarketHourlySnapshot.load(id);
   if (marketMetrics == null) {
     marketMetrics = new MarketHourlySnapshot(id);
@@ -229,7 +229,7 @@ export function getOrCreateMarketHourlySnapshot(
 }
 
 export function getMarketsWithStatus(event: ethereum.Event): MarketsStatus {
-  let id = "0";
+  const id = "0";
   let marketsStatus = MarketsStatus.load(id);
 
   if (marketsStatus == null) {

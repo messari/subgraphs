@@ -7,7 +7,7 @@ export function getOrCreateAsset(
   currencyId: string,
   maturity: BigInt
 ): Asset {
-  let id = accountId + "-" + currencyId + "-" + maturity.toString();
+  const id = accountId + "-" + currencyId + "-" + maturity.toString();
   let asset = Asset.load(id);
 
   if (asset == null) {
@@ -27,13 +27,13 @@ export function updateAccountAssets(
   event: ethereum.Event
 ): void {
   for (let i: i32 = 0; i < portfolio.length; i++) {
-    let genericAsset = portfolio[i];
+    const genericAsset = portfolio[i];
     // This casting is required to get around type errors in AssemblyScript
-    let currencyId = genericAsset[0].toBigInt().toI32();
-    let maturity = genericAsset[1].toBigInt();
-    let notional = genericAsset[3].toBigInt();
+    const currencyId = genericAsset[0].toBigInt().toI32();
+    const maturity = genericAsset[1].toBigInt();
+    const notional = genericAsset[3].toBigInt();
 
-    let asset = getOrCreateAsset(account.id, currencyId.toString(), maturity);
+    const asset = getOrCreateAsset(account.id, currencyId.toString(), maturity);
 
     if (asset.notional.notEqual(notional)) {
       asset.notional = notional;
@@ -53,7 +53,7 @@ export function updateAccountAssetOnEmptyPortfolio(
   maturity: BigInt,
   event: ethereum.Event
 ): void {
-  let asset = getOrCreateAsset(accountId, currencyId, maturity);
+  const asset = getOrCreateAsset(accountId, currencyId, maturity);
 
   asset.notional = BIGINT_ZERO;
   asset.lastUpdateBlockNumber = event.block.number;

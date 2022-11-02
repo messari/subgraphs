@@ -46,13 +46,13 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   // let nonce = event.transaction.nonce;
   // log.error(" -- After Nonce", [nonce.toString()]);
 
-  let currencyId = event.params.currencyId;
-  let maturity = event.params.maturity;
-  let marketId = currencyId.toString() + "-" + maturity.toString();
+  const currencyId = event.params.currencyId;
+  const maturity = event.params.maturity;
+  const marketId = currencyId.toString() + "-" + maturity.toString();
 
-  let market = getOrCreateMarket(event, marketId);
-  let account = getOrCreateAccount(event.params.account.toHexString(), event);
-  let token = getTokenFromCurrency(event, currencyId.toString());
+  const market = getOrCreateMarket(event, marketId);
+  const account = getOrCreateAccount(event.params.account.toHexString(), event);
+  const token = getTokenFromCurrency(event, currencyId.toString());
 
   // update market
   market.inputTokenPriceUSD = token.lastPriceUSD!;
@@ -72,7 +72,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   // marketstatus entity
   // TODO: we could make this protocol entity
   // TODO: do this getOrCreateMarket?
-  let markets = getMarketsWithStatus(event);
+  const markets = getMarketsWithStatus(event);
   if (markets.activeMarkets.indexOf(market.id) < 0) {
     markets.activeMarkets = addToArrayAtIndex(
       markets.activeMarkets,
@@ -83,11 +83,11 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   }
 
   // getActiveMarkets
-  let currencyIds = [1, 2, 3, 4];
-  let notional = Notional.bind(Address.fromString(PROTOCOL_ID));
+  const currencyIds = [1, 2, 3, 4];
+  const notional = Notional.bind(Address.fromString(PROTOCOL_ID));
   let activeMarkets: string[] = [];
   for (let i = 0; i < currencyIds.length; i++) {
-    let call = notional.try_getActiveMarkets(currencyIds[i]);
+    const call = notional.try_getActiveMarkets(currencyIds[i]);
     if (call.reverted) {
       log.error(
         "[handleLendBorrowTrade] getActiveMarkets for currencyId {} reverted",
@@ -95,7 +95,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
       );
     } else {
       for (let j = 0; j < call.value.length; j++) {
-        let currencyMarket =
+        const currencyMarket =
           currencyIds[i].toString() + "-" + call.value[j].maturity.toString();
         activeMarkets = activeMarkets.concat([currencyMarket]);
       }
@@ -105,7 +105,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   for (let k = 0; k < markets.activeMarkets.length; k++) {
     if (!activeMarkets.includes(markets.activeMarkets[k])) {
       // event is irrelevant
-      let m = getOrCreateMarket(event, markets.activeMarkets[k]);
+      const m = getOrCreateMarket(event, markets.activeMarkets[k]);
 
       // status
       m.isActive = false;
@@ -126,7 +126,7 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
 
       m.save();
 
-      let maturedMarketIndex = markets.activeMarkets.indexOf(m.id);
+      const maturedMarketIndex = markets.activeMarkets.indexOf(m.id);
       markets.activeMarkets = removeFromArrayAtIndex(
         markets.activeMarkets,
         maturedMarketIndex
@@ -141,21 +141,21 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   }
 
   // account fCash before; we use asset entity to track fCash values before and after TX
-  let fCashBeforeTransaction = getOrCreateAsset(
+  const fCashBeforeTransaction = getOrCreateAsset(
     account.id,
     currencyId.toString(),
     event.params.maturity
   ).notional;
 
   // update fCash asset values
-  let accountPortfolioCallResult = notional.try_getAccountPortfolio(
+  const accountPortfolioCallResult = notional.try_getAccountPortfolio(
     event.transaction.from
   );
 
   if (accountPortfolioCallResult.reverted) {
     log.error("[handleLendBorrowTrade] getAccountPortfolio reverted", []);
   } else {
-    let portfolio = new Array<ethereum.Tuple>();
+    const portfolio = new Array<ethereum.Tuple>();
     for (let i = 0; i < accountPortfolioCallResult.value.length; i++) {
       portfolio.push(accountPortfolioCallResult.value[i]);
     }
@@ -172,16 +172,16 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
   }
 
   // account fCash after; we use asset entity to track fCash values before and after TX
-  let fCashAfterTransaction = getOrCreateAsset(
+  const fCashAfterTransaction = getOrCreateAsset(
     account.id,
     currencyId.toString(),
     event.params.maturity
   ).notional;
 
   // LendBorrow amounts (assetCash, fCash, USD)
-  let cTokenAmount = event.params.netAssetCash;
-  let fCashAmount = event.params.netfCash;
-  let amountUSD = bigIntToBigDecimal(cTokenAmount, token.decimals).times(
+  const cTokenAmount = event.params.netAssetCash;
+  const fCashAmount = event.params.netfCash;
+  const amountUSD = bigIntToBigDecimal(cTokenAmount, token.decimals).times(
     token.lastPriceUSD!
   );
 
@@ -291,10 +291,10 @@ export function handleLendBorrowTrade(event: LendBorrowTrade): void {
 export function handleLiquidateLocalCurrency(
   event: LiquidateLocalCurrency
 ): void {
-  let currencyId = event.params.localCurrencyId as i32;
-  let liquidatee = event.params.liquidated;
-  let liquidator = event.params.liquidator;
-  let amount = event.params.netLocalFromLiquidator;
+  const currencyId = event.params.localCurrencyId as i32;
+  const liquidatee = event.params.liquidated;
+  const liquidator = event.params.liquidator;
+  const amount = event.params.netLocalFromLiquidator;
   // TODO: not possible to calculate
   // let profit
 
@@ -308,10 +308,10 @@ export function handleLiquidateLocalCurrency(
 export function handleLiquidateCollateralCurrency(
   event: LiquidateCollateralCurrency
 ): void {
-  let currencyId = event.params.localCurrencyId as i32;
-  let liquidatee = event.params.liquidated;
-  let liquidator = event.params.liquidator;
-  let amount = event.params.netLocalFromLiquidator;
+  const currencyId = event.params.localCurrencyId as i32;
+  const liquidatee = event.params.liquidated;
+  const liquidator = event.params.liquidator;
+  const amount = event.params.netLocalFromLiquidator;
   // TODO: not possible to calculate
   // let profit
 
@@ -323,10 +323,10 @@ export function handleLiquidateCollateralCurrency(
 }
 
 export function handleLiquidatefCash(event: LiquidatefCashEvent): void {
-  let currencyId = event.params.localCurrencyId as i32;
-  let liquidatee = event.params.liquidated;
-  let liquidator = event.params.liquidator;
-  let amount = event.params.netLocalFromLiquidator;
+  const currencyId = event.params.localCurrencyId as i32;
+  const liquidatee = event.params.liquidated;
+  const liquidator = event.params.liquidator;
+  const amount = event.params.netLocalFromLiquidator;
   // TODO: not possible to calculate
   // let profit
 

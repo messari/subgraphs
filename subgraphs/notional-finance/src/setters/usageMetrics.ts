@@ -23,11 +23,11 @@ export function updateUsageMetrics(
   to: Address,
   transactionType: string
 ): void {
-  let hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
-  let dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
-  let usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
-  let protocol = getOrCreateLendingProtocol();
+  const hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
+  const usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
+  const protocol = getOrCreateLendingProtocol();
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageHourlySnapshot.blockNumber = event.block.number;
@@ -46,7 +46,7 @@ export function updateUsageMetrics(
   usageDailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the hour/day
-  let hourlyActiveAccountIdFrom =
+  const hourlyActiveAccountIdFrom =
     "hourly-" + from.toHexString() + "-" + hourlyId.toString();
   let hourlyActiveAccountFrom = ActiveAccount.load(hourlyActiveAccountIdFrom);
   if (!hourlyActiveAccountFrom) {
@@ -55,7 +55,7 @@ export function updateUsageMetrics(
     usageHourlySnapshot.hourlyActiveUsers += 1;
   }
 
-  let hourlyActiveAccountIdTo =
+  const hourlyActiveAccountIdTo =
     "hourly-" + to.toHexString() + "-" + hourlyId.toString();
   let hourlyActiveAccountTo = ActiveAccount.load(hourlyActiveAccountIdTo);
   if (!hourlyActiveAccountTo) {
@@ -64,7 +64,7 @@ export function updateUsageMetrics(
     usageHourlySnapshot.hourlyActiveUsers += 1;
   }
 
-  let dailyActiveAccountIdFrom =
+  const dailyActiveAccountIdFrom =
     "daily-" + from.toHexString() + "-" + dailyId.toString();
   let dailyActiveAccountFrom = ActiveAccount.load(dailyActiveAccountIdFrom);
   if (!dailyActiveAccountFrom) {
@@ -73,7 +73,7 @@ export function updateUsageMetrics(
     usageDailySnapshot.dailyActiveUsers += 1;
   }
 
-  let dailyActiveAccountIdTo =
+  const dailyActiveAccountIdTo =
     "daily-" + to.toHexString() + "-" + dailyId.toString();
   let dailyActiveAccountTo = ActiveAccount.load(dailyActiveAccountIdTo);
   if (!dailyActiveAccountTo) {
@@ -110,13 +110,13 @@ export function addAccountToProtocol(
   account: Account,
   event: ethereum.Event
 ): void {
-  let protocol = getOrCreateLendingProtocol();
-  let dailyId: string = (
+  const protocol = getOrCreateLendingProtocol();
+  const dailyId: string = (
     event.block.timestamp.toI64() / SECONDS_PER_DAY
   ).toString();
-  let activeEventId = `hourly-${account.id}-${dailyId}-${transactionType}`;
+  const activeEventId = `hourly-${account.id}-${dailyId}-${transactionType}`;
   let activeEvent = ActiveEventAccount.load(activeEventId);
-  let dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
+  const dailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
   if (transactionType == TransactionType.DEPOSIT) {
     if (protocol.depositors.indexOf(account.id) < 0) {
       protocol.depositors = addToArrayAtIndex(

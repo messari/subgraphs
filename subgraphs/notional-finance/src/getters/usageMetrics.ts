@@ -10,13 +10,13 @@ export function getOrCreateUsageMetricsHourlySnapshot(
   event: ethereum.Event
 ): UsageMetricsHourlySnapshot {
   // Number of hours since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
   // Create unique id for the hour
   let usageMetrics = UsageMetricsHourlySnapshot.load(id.toString());
 
   if (!usageMetrics) {
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
     usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
     usageMetrics.protocol = getOrCreateLendingProtocol().id;
 
@@ -42,13 +42,13 @@ export function getOrCreateUsageMetricsDailySnapshot(
   event: ethereum.Event
 ): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
 
   if (!usageMetrics) {
-    let protocol = getOrCreateLendingProtocol();
+    const protocol = getOrCreateLendingProtocol();
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = getOrCreateLendingProtocol().id;
 

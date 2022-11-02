@@ -34,17 +34,17 @@ export function updateFinancials(
   amountUSD: BigDecimal,
   marketId: string
 ): void {
-  let financialsDailySnapshots = getOrCreateFinancialsDailySnapshot(event);
-  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, marketId);
-  let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, marketId);
-  let protocol = getOrCreateLendingProtocol();
-  let market = getOrCreateMarket(event, marketId);
+  const financialsDailySnapshots = getOrCreateFinancialsDailySnapshot(event);
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, marketId);
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, marketId);
+  const protocol = getOrCreateLendingProtocol();
+  const market = getOrCreateMarket(event, marketId);
 
   // fees and revenue amounts
-  let feesUSD = amountUSD.times(NOTIONAL_TRADE_FEES);
-  let totalRevenueUSD = feesUSD;
-  let supplySideRevenueUSD = feesUSD.times(NOTIONAL_USER_REVENUE_SHARE);
-  let protocolSideRevenueUSD = feesUSD.times(NOTIONAL_PROTOCOL_REVENUE_SHARE);
+  const feesUSD = amountUSD.times(NOTIONAL_TRADE_FEES);
+  const totalRevenueUSD = feesUSD;
+  const supplySideRevenueUSD = feesUSD.times(NOTIONAL_USER_REVENUE_SHARE);
+  const protocolSideRevenueUSD = feesUSD.times(NOTIONAL_PROTOCOL_REVENUE_SHARE);
 
   // market cumulatives
   market.cumulativeTotalRevenueUSD =
@@ -138,20 +138,25 @@ export function updateFinancials(
 // This is dependent on having activeMarkets
 
 export function updateTVLAndBalances(event: ethereum.Event): void {
-  let protocol = getOrCreateLendingProtocol();
-  let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+  const protocol = getOrCreateLendingProtocol();
+  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
 
   // TVL
   let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
-  let tokenAddress = [cETH_ADDRESS, cDAI_ADDRESS, cUSDC_ADDRESS, cWBTC_ADDRESS];
+  const tokenAddress = [
+    cETH_ADDRESS,
+    cDAI_ADDRESS,
+    cUSDC_ADDRESS,
+    cWBTC_ADDRESS,
+  ];
   for (let i = 0; i < tokenAddress.length; i++) {
-    let assetToken = getOrCreateToken(
+    const assetToken = getOrCreateToken(
       Address.fromString(tokenAddress[i]),
       event.block.number
     );
-    let erc20 = ERC20.bind(Address.fromString(assetToken.id));
+    const erc20 = ERC20.bind(Address.fromString(assetToken.id));
     // TODO: This doesn't work for cWBTC_ADDRESS (there are two tokens cWBTC, cWBTC: 2)
-    let assetTokenBalance = erc20.balanceOf(Address.fromString(PROTOCOL_ID));
+    const assetTokenBalance = erc20.balanceOf(Address.fromString(PROTOCOL_ID));
 
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(
       bigIntToBigDecimal(assetTokenBalance, 8).times(assetToken.lastPriceUSD!)
@@ -160,9 +165,9 @@ export function updateTVLAndBalances(event: ethereum.Event): void {
 
   let protocolTotalDepositBalanceUSD = BIGDECIMAL_ZERO;
   let protocolTotalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-  let activeMarkets = getMarketsWithStatus(event).activeMarkets;
+  const activeMarkets = getMarketsWithStatus(event).activeMarkets;
   for (let i = 0; i < activeMarkets.length; i++) {
-    let market = getOrCreateMarket(event, activeMarkets[i]);
+    const market = getOrCreateMarket(event, activeMarkets[i]);
     protocolTotalDepositBalanceUSD = protocolTotalDepositBalanceUSD.plus(
       market.totalDepositBalanceUSD
     );
@@ -195,20 +200,23 @@ export function updateMarket(
   amountUSD: BigDecimal,
   event: ethereum.Event
 ): void {
-  let market = getOrCreateMarket(event, marketId);
-  let protocol = getOrCreateLendingProtocol();
+  const market = getOrCreateMarket(event, marketId);
+  const protocol = getOrCreateLendingProtocol();
 
-  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
-  let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
-  let financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
+    event,
+    market.id
+  );
+  const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
+  const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
 
   // amount in USD
-  let amount = cTokenAmount;
-  let token = getOrCreateToken(
+  const amount = cTokenAmount;
+  const token = getOrCreateToken(
     Address.fromString(market.inputToken),
     event.block.number
   );
-  let priceUSD = token.lastPriceUSD!;
+  const priceUSD = token.lastPriceUSD!;
 
   // last updated block number and timestamp
   marketHourlySnapshot.blockNumber = event.block.number;
@@ -220,7 +228,7 @@ export function updateMarket(
 
   if (transactionType == TransactionType.DEPOSIT) {
     // tvl in market
-    let inputTokenBalance = market.inputTokenBalance.plus(amount);
+    const inputTokenBalance = market.inputTokenBalance.plus(amount);
     market.inputTokenBalance = inputTokenBalance;
     market.totalValueLockedUSD = bigIntToBigDecimal(
       inputTokenBalance,
@@ -251,7 +259,7 @@ export function updateMarket(
       financialsDailySnapshot.dailyDepositUSD.plus(amountUSD);
   } else if (transactionType == TransactionType.WITHDRAW) {
     // tvl in market
-    let inputTokenBalance = market.inputTokenBalance.minus(amount);
+    const inputTokenBalance = market.inputTokenBalance.minus(amount);
     market.inputTokenBalance = inputTokenBalance;
     market.totalValueLockedUSD = bigIntToBigDecimal(
       inputTokenBalance,
@@ -272,7 +280,7 @@ export function updateMarket(
   } else if (transactionType == TransactionType.BORROW) {
     // update total borrow amount
     // TODO: we are using cToken as outputToken but ideal we should be use fCash
-    let outputTokenSupply = market.outputTokenSupply.plus(amount);
+    const outputTokenSupply = market.outputTokenSupply.plus(amount);
     market.outputTokenSupply = outputTokenSupply;
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(
       outputTokenSupply,
@@ -296,7 +304,7 @@ export function updateMarket(
       financialsDailySnapshot.dailyBorrowUSD.plus(amountUSD);
   } else if (transactionType == TransactionType.REPAY) {
     // update total borrow amount
-    let outputTokenSupply = market.outputTokenSupply.minus(amount);
+    const outputTokenSupply = market.outputTokenSupply.minus(amount);
     market.outputTokenSupply = outputTokenSupply;
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(
       outputTokenSupply,

@@ -27,7 +27,7 @@ export function getTokenFromCurrency(
     log.info(" -- New currency found: {}", [currencyId.toString()]);
   }
 
-  let token = getOrCreateToken(
+  const token = getOrCreateToken(
     Address.fromString(tokenAddress!),
     event.block.number
   );
