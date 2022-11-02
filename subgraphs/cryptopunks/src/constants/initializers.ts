@@ -8,20 +8,16 @@ import {
   _User,
   _Bid,
 } from "../../generated/schema";
+import { Versions } from "../versions";
 import * as constants from "./constants";
 
 export function getOrCreateMarketplace(): Marketplace {
-  let marketplace = Marketplace.load(
-    constants.CRYPTOPUNK_CONTRACT_ADDRESS
-  );
+  let marketplace = Marketplace.load(constants.CRYPTOPUNK_CONTRACT_ADDRESS);
   if (!marketplace) {
     marketplace = new Marketplace(constants.CRYPTOPUNK_CONTRACT_ADDRESS);
     marketplace.name = constants.MARKETPLACE_NAME;
     marketplace.slug = constants.MARKETPLACE_SLUG;
     marketplace.network = constants.Network.MAINNET;
-    marketplace.schemaVersion = "1.0.0";
-    marketplace.subgraphVersion = "1.0.0";
-    marketplace.methodologyVersion = "1.0.0";
     marketplace.collectionCount = 1;
     marketplace.tradeCount = 0;
     marketplace.cumulativeTradeVolumeETH = constants.BIGDECIMAL_ZERO;
@@ -29,19 +25,21 @@ export function getOrCreateMarketplace(): Marketplace {
     marketplace.creatorRevenueETH = constants.BIGDECIMAL_ZERO;
     marketplace.totalRevenueETH = constants.BIGDECIMAL_ZERO;
     marketplace.cumulativeUniqueTraders = 0;
-    marketplace.save();
   }
+
+  marketplace.schemaVersion = Versions.getSchemaVersion();
+  marketplace.subgraphVersion = Versions.getSubgraphVersion();
+  marketplace.methodologyVersion = Versions.getMethodologyVersion();
+
+  marketplace.save();
+
   return marketplace;
 }
 
 export function getOrCreateCollection(): Collection {
-  let collection = Collection.load(
-    constants.CRYPTOPUNK_CONTRACT_ADDRESS
-  );
+  let collection = Collection.load(constants.CRYPTOPUNK_CONTRACT_ADDRESS);
   if (!collection) {
-    collection = new Collection(
-      constants.CRYPTOPUNK_CONTRACT_ADDRESS
-    );
+    collection = new Collection(constants.CRYPTOPUNK_CONTRACT_ADDRESS);
     collection.name = constants.CRYPTOPUNK_NAME;
     collection.symbol = constants.CRYPTOPUNK_SYMBOL;
     collection.totalSupply = constants.CRYPTOPUNK_TOTAL_SUPPLY;
@@ -66,7 +64,7 @@ export function getOrCreateTrade(
   transactionHash: string,
   logIndex: BigInt
 ): Trade {
-  let id = transactionHash.concat("-").concat(logIndex.toString());
+  const id = transactionHash.concat("-").concat(logIndex.toString());
   let trade = Trade.load(id);
   if (!trade) {
     trade = new Trade(id);
@@ -91,17 +89,16 @@ export function getOrCreateMarketplaceDailySnapshot(
   timestamp: BigInt,
   blockNumber: BigInt
 ): MarketplaceDailySnapshot {
-  let noOfDaysSinceUnix = (
+  const noOfDaysSinceUnix = (
     timestamp.toI32() / constants.SECONDS_PER_DAY
   ).toString();
-  let snapshotID = constants.CRYPTOPUNK_CONTRACT_ADDRESS.concat(
-    "-"
-  ).concat(noOfDaysSinceUnix);
+  const snapshotID =
+    constants.CRYPTOPUNK_CONTRACT_ADDRESS.concat("-").concat(noOfDaysSinceUnix);
   let marketplaceDailySnapshot = MarketplaceDailySnapshot.load(snapshotID);
   if (!marketplaceDailySnapshot) {
     marketplaceDailySnapshot = new MarketplaceDailySnapshot(snapshotID);
 
-    let marketplace = getOrCreateMarketplace();
+    const marketplace = getOrCreateMarketplace();
     marketplaceDailySnapshot.marketplace =
       constants.CRYPTOPUNK_CONTRACT_ADDRESS;
 
@@ -131,22 +128,20 @@ export function getOrCreateMarketplaceDailySnapshot(
 }
 
 export function getOrCreateCollectionDailySnapshot(
-  block:ethereum.Block
+  block: ethereum.Block
 ): CollectionDailySnapshot {
-  let noOfDaysSinceUnix = (
+  const noOfDaysSinceUnix = (
     block.timestamp.toI32() / constants.SECONDS_PER_DAY
   ).toString();
-  let snapshotID = constants.CRYPTOPUNK_CONTRACT_ADDRESS.concat(
-    "-"
-  ).concat(noOfDaysSinceUnix);
+  const snapshotID =
+    constants.CRYPTOPUNK_CONTRACT_ADDRESS.concat("-").concat(noOfDaysSinceUnix);
   let collectionDailySnapshot = CollectionDailySnapshot.load(snapshotID);
   if (!collectionDailySnapshot) {
     collectionDailySnapshot = new CollectionDailySnapshot(snapshotID);
 
-    let collection = getOrCreateCollection();
+    const collection = getOrCreateCollection();
 
-    collectionDailySnapshot.collection =
-      constants.CRYPTOPUNK_CONTRACT_ADDRESS;
+    collectionDailySnapshot.collection = constants.CRYPTOPUNK_CONTRACT_ADDRESS;
 
     collectionDailySnapshot.totalRevenueETH = constants.BIGDECIMAL_ZERO;
     collectionDailySnapshot.dailyTradeVolumeETH = constants.BIGDECIMAL_ZERO;
@@ -177,7 +172,7 @@ export function createBid(
   bidderAddress: Address,
   block: ethereum.Block
 ): _Bid {
-  let bidId = tokenId
+  const bidId = tokenId
     .toString()
     .concat("-")
     .concat(bidderAddress.toHexString());
@@ -198,7 +193,7 @@ export function createUserCollectionAccount(
   type: string,
   address: Address
 ): void {
-  let collection = getOrCreateCollection();
+  const collection = getOrCreateCollection();
 
   if (type === constants.TradeType.BUYER) {
     let buyerCollection = _User.load(
@@ -221,7 +216,7 @@ export function createUserCollectionAccount(
     collection.save();
   }
   if (type === constants.TradeType.SELLER) {
-    let collection = getOrCreateCollection();
+    const collection = getOrCreateCollection();
 
     let sellerCollection = _User.load(
       constants.AccountType.COLLECTION_ACCOUNT.concat("-")
@@ -255,8 +250,8 @@ export function createUserMarketplaceAccount(
   );
 
   if (!marketplaceUser) {
-    let marketplace = getOrCreateMarketplace();
-    let marketplaceDailySnapshot = getOrCreateMarketplaceDailySnapshot(
+    const marketplace = getOrCreateMarketplace();
+    const marketplaceDailySnapshot = getOrCreateMarketplaceDailySnapshot(
       block.timestamp,
       block.number
     );

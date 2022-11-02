@@ -8,9 +8,6 @@ import { Network } from "../../../src/constants";
 export namespace Protocol {
   export const NAME = "UwU Lend";
   export const SLUG = "uwu-lend";
-  export const SCHEMA_VERSION = "2.0.1";
-  export const SUBGRAPH_VERSION = "1.0.2";
-  export const METHODOLOGY_VERSION = "1.0.0";
 }
 export const UWU_DECIMALS = 8;
 export const UWU_TOKEN_ADDRESS = "0x55C08ca52497e2f1534B59E2917BF524D4765257";

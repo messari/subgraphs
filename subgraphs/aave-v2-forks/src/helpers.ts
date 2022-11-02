@@ -50,6 +50,7 @@ import { ProtocolData } from "./mapping";
 import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
 import { IPriceOracleGetter } from "../generated/LendingPool/IPriceOracleGetter";
 import { AToken } from "../generated/LendingPool/AToken";
+import { Versions } from "./versions";
 
 ////////////////////////
 ///// Initializers /////
@@ -90,9 +91,10 @@ export function getOrCreateLendingProtocol(
     lendingProtocol.marketIDs = [];
   }
 
-  lendingProtocol.schemaVersion = protocolData.schemaVersion;
-  lendingProtocol.subgraphVersion = protocolData.subgraphVersion;
-  lendingProtocol.methodologyVersion = protocolData.methodologyVersion;
+  lendingProtocol.schemaVersion = Versions.getSchemaVersion();
+  lendingProtocol.subgraphVersion = Versions.getSubgraphVersion();
+  lendingProtocol.methodologyVersion = Versions.getMethodologyVersion();
+
   lendingProtocol.save();
 
   return lendingProtocol;
