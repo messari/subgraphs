@@ -17,6 +17,7 @@ import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
 import { Strategy as StrategyContract } from "../../generated/controller/Strategy";
 import { EthereumController as ControllerContract } from "../../generated/Controller/EthereumController";
+import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
   let account = Account.load(id);
@@ -41,15 +42,16 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol = new YieldAggregator(protocolId);
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
-    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Protocol.NETWORK;
     protocol.type = constants.Protocol.TYPE;
     protocol.totalPoolCount = 0;
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }

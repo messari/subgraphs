@@ -1,4 +1,5 @@
 import { YieldAggregator } from "../../generated/schema";
+import { Versions } from "../versions";
 import * as constants from "./constants";
 
 export function getOrCreateProtocol(): YieldAggregator {
@@ -7,9 +8,6 @@ export function getOrCreateProtocol(): YieldAggregator {
     protocol = new YieldAggregator(constants.PROTOCOL_ID);
     protocol.name = "Tokemak";
     protocol.slug = "tokemak";
-    protocol.schemaVersion = "1.2.1";
-    protocol.subgraphVersion = "1.0.0";
-    protocol.methodologyVersion = "1.0.0";
     protocol.network = constants.Network.MAINNET;
     protocol.type = constants.ProtocolType.YIELD;
 
@@ -22,8 +20,13 @@ export function getOrCreateProtocol(): YieldAggregator {
     protocol.cumulativeUniqueUsers = 0;
 
     protocol._vaultIds = [];
-
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }

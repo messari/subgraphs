@@ -29,15 +29,13 @@ import {
   RewardTokenType,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
   LendingType,
   RiskType,
   INT_ZERO,
   DEFAULT_RESERVE_FEE,
   BIGDECIMAL_ONE,
 } from "../common/constants";
+import { Versions } from "../versions";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -356,10 +354,12 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol._lastUpdateBlockNumber = BIGINT_ZERO;
   }
   // ensure to update versions with grafting
-  protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-  protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-  protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
   protocol.save();
+
   return protocol;
 }
 

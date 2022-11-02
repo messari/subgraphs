@@ -6,9 +6,6 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export const PROTOCOL_NAME = "Vesta Finance";
 export const PROTOCOL_SLUG = "vesta-finance";
-export const PROTOCOL_SCHEMA_VERSION = "2.0.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
 ///// Schema Enums /////

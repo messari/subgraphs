@@ -306,7 +306,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.3",
+          "subgraph": "1.0.4",
           "methodology": "1.0.0"
         },
         "files": {
@@ -445,7 +445,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.1",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -522,7 +522,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "subgraph": "1.2.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -555,7 +555,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -577,7 +577,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -599,7 +599,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -632,7 +632,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -654,7 +654,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -683,7 +683,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -705,7 +705,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -727,7 +727,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -749,7 +749,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -771,7 +771,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -793,7 +793,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -815,7 +815,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -837,7 +837,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -859,7 +859,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -881,7 +881,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -903,7 +903,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -925,7 +925,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -947,7 +947,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -976,7 +976,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.1.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1005,7 +1005,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1038,7 +1038,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1067,7 +1067,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1096,7 +1096,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1125,7 +1125,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1154,7 +1154,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1212,7 +1212,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.7.6",
+          "subgraph": "1.7.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1245,7 +1245,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1344,7 +1344,7 @@
         "status": "dev",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.2",
+          "subgraph": "1.2.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1483,7 +1483,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1560,7 +1560,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1611,7 +1611,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.9",
+          "subgraph": "1.1.10",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1666,7 +1666,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.6",
+          "subgraph": "1.1.7",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1695,7 +1695,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.1.7",
+          "subgraph": "1.1.8",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1724,7 +1724,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1746,7 +1746,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1768,7 +1768,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1794,7 +1794,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1816,7 +1816,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1838,7 +1838,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1860,7 +1860,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1889,7 +1889,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -1976,7 +1976,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.2",
+          "subgraph": "1.2.3",
           "methodology": "1.1.0"
         },
         "files": {
@@ -2009,7 +2009,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.2",
+          "subgraph": "1.2.5",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2042,7 +2042,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2075,7 +2075,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.2.0",
+          "subgraph": "1.2.1",
           "methodology": "1.0.1"
         },
         "files": {
@@ -2108,7 +2108,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2137,7 +2137,7 @@
         "status": "prod",
         "versions": {
           "schema": "2.0.1",
-          "subgraph": "1.0.2",
+          "subgraph": "1.0.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2170,7 +2170,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2199,7 +2199,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2221,7 +2221,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2250,7 +2250,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2272,7 +2272,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2294,7 +2294,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2316,7 +2316,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2338,7 +2338,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2360,7 +2360,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2382,7 +2382,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2404,7 +2404,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2426,7 +2426,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2448,7 +2448,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2470,7 +2470,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2492,7 +2492,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2514,7 +2514,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2536,7 +2536,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2558,7 +2558,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2580,7 +2580,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2609,7 +2609,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.1.1",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2638,7 +2638,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2660,7 +2660,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2686,7 +2686,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2708,7 +2708,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2737,8 +2737,8 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.0",
-          "methodology": "1.0.1"
+          "subgraph": "1.2.2",
+          "methodology": "1.1.0"
         },
         "files": {
           "template": "makerdao.template.yaml"
@@ -2770,7 +2770,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.1",
+          "subgraph": "1.1.2",
           "methodology": "1.1.0"
         },
         "files": {
@@ -2803,7 +2803,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.3.0",
+          "subgraph": "1.3.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2832,7 +2832,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2854,7 +2854,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.5",
+          "subgraph": "1.1.6",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2876,7 +2876,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -2898,7 +2898,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.2",
+          "subgraph": "1.1.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3018,7 +3018,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.2.1",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3168,7 +3168,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3190,7 +3190,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3212,7 +3212,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3234,7 +3234,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3256,7 +3256,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3278,7 +3278,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3300,7 +3300,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3322,7 +3322,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.1.0",
+          "subgraph": "1.1.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -3351,7 +3351,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.4.2",
+          "subgraph": "1.4.3",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4073,7 +4073,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4102,7 +4102,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "subgraph": "1.2.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4128,7 +4128,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "subgraph": "1.2.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4150,7 +4150,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.2.0",
+          "subgraph": "1.2.2",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4957,7 +4957,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -4990,7 +4990,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5019,7 +5019,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.3.0",
+          "subgraph": "1.3.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5286,7 +5286,7 @@
         "status": "dev",
         "versions": {
           "schema": "1.0.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.1",
           "methodology": "1.0.0"
         },
         "files": {
@@ -5348,7 +5348,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "services": {
@@ -5374,7 +5374,7 @@
         "status": "prod",
         "versions": {
           "schema": "1.3.0",
-          "subgraph": "1.0.0",
+          "subgraph": "1.0.2",
           "methodology": "1.0.0"
         },
         "services": {
@@ -5517,6 +5517,35 @@
             "slug": "cryptopunks-ethereum",
             "query-id": "7vJEsy8pJmRQZQh5kTXNz68SRHXBS859hMq3o5uWF1Ac"
           }
+        }
+      }
+    }
+  },
+  "yeti-finance": {
+    "schema": "lending",
+    "base": "yeti-finance",
+    "protocol": "yeti-finance",
+    "deployments": {
+      "yeti-finance-avalanche": {
+        "network": "avalanche",
+        "status": "dev",
+        "versions": {
+          "schema": "1.2.1",
+          "subgraph": "1.2.0",
+          "methodology": "1.0.1"
+        },
+        "services": {
+          "hosted-service": {
+            "slug": "yeti-finance-avalanche",
+            "query-id": "yeti-finance-avalanche"
+          }
+        },
+        "files": {
+          "template": "yeti.finance.template.yaml"
+        },
+        "options": {
+          "prepare:yaml": true,
+          "prepare:constants": false
         }
       }
     }
