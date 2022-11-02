@@ -21,9 +21,11 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   CONFIG_KEYS_ADDRESSES,
+  GFI_ADDRESS,
   InterestRateSide,
   InterestRateType,
   PositionSide,
+  RewardTokenType,
   SECONDS_PER_YEAR,
   TransactionType,
   USDC_DECIMALS,
@@ -45,6 +47,7 @@ import {
   getOrCreateMarket,
   getOrCreatePoolToken,
   getOrCreateProtocol,
+  getOrCreateRewardToken,
 } from "../common/getters";
 import { CreditLine } from "../../generated/templates/TranchedPool/CreditLine";
 import {
@@ -67,7 +70,11 @@ export function handleCreditLineMigrated(event: CreditLineMigrated): void {
   const market = getOrCreateMarket(event.address.toHexString(), event);
   market._creditLine = event.params.newCreditLine.toHexString();
   const creditLineContract = CreditLine.bind(event.params.newCreditLine);
-  if (creditLineContract.currentLimit().le(BIGINT_ZERO)) {
+  const currentLimitResult = creditLineContract.try_currentLimit();
+  if (
+    !currentLimitResult.reverted &&
+    currentLimitResult.value.le(BIGINT_ZERO)
+  ) {
     creditLineContract.interestApr();
     market.canBorrowFrom = false;
   }
@@ -86,11 +93,38 @@ export function handleDepositMade(event: DepositMade): void {
 
   const market = getOrCreateMarket(marketID, event);
   const account = getOrCreateAccount(owner);
-  const creditLineContract = CreditLineContract.bind(
-    Address.fromString(market._creditLine!)
-  );
-  market.inputTokenBalance = creditLineContract.balance();
 
+  const tranchedPoolContract = TranchedPoolContract.bind(event.address);
+  const configContract = GoldfinchConfigContract.bind(
+    tranchedPoolContract.config()
+  );
+  const rewardTokenAddress = Address.fromString(GFI_ADDRESS);
+  const rewardToken = getOrCreateRewardToken(
+    rewardTokenAddress,
+    RewardTokenType.DEPOSIT
+  );
+
+  market.rewardTokens = [rewardToken.id];
+
+  if (!market._poolToken) {
+    market._poolToken = configContract
+      .getAddress(BigInt.fromI32(CONFIG_KEYS_ADDRESSES.PoolTokens))
+      .toHexString();
+  }
+
+  const creditLineAddress = tranchedPoolContract.creditLine();
+  const creditLineContract = CreditLineContract.bind(creditLineAddress);
+  if (!market._creditLine) {
+    market._creditLine = creditLineAddress.toHexString();
+  }
+
+  const curretLimitResult = creditLineContract.try_currentLimit();
+  if (!curretLimitResult.reverted && curretLimitResult.value.gt(BIGINT_ZERO)) {
+    market.isActive = true;
+    market.canBorrowFrom = true;
+  }
+
+  market.inputTokenBalance = creditLineContract.balance();
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(amountUSD);
   market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(amountUSD);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
@@ -263,6 +297,10 @@ export function handleWithdrawalMade(event: WithdrawalMade): void {
 export function handleTrancheLocked(event: TrancheLocked): void {
   const marketID = event.address.toHexString();
   const market = getOrCreateMarket(marketID, event);
+  log.debug(
+    "[handleTrancheLocked]market._interestTimestamp for market {} set to {}",
+    [marketID, event.block.timestamp.toString()]
+  );
   market._interestTimestamp = event.block.timestamp;
   market.save();
   //
@@ -305,6 +343,13 @@ export function handleDrawdownMade(event: DrawdownMade): void {
   const market = getOrCreateMarket(marketID, event);
   const account = getOrCreateAccount(borrower);
 
+  if (!market._interestTimestamp) {
+    market._interestTimestamp = event.block.timestamp;
+    log.debug(
+      "[handleDrawdownMade]market._interestTimestamp for market {} set to {}",
+      [marketID, event.block.timestamp.toString()]
+    );
+  }
   market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(amountUSD);
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(amountUSD);
   market.save();
@@ -370,17 +415,28 @@ export function handlePaymentApplied(event: PaymentApplied): void {
 
   const protocol = getOrCreateProtocol();
   const market = getOrCreateMarket(marketID, event);
+  /*
   if (market._borrower != payer) {
     // if payer != borrower, use borrower for position
     log.error("[]payer {} != borrower {}", [payer, market._borrower!]);
   }
-  const account = getOrCreateAccount(market._borrower!);
+  */
+  const account = getOrCreateAccount(payer);
 
   market.totalBorrowBalanceUSD =
     market.totalBorrowBalanceUSD.minus(principleAmountUSD);
   protocol.totalBorrowBalanceUSD =
     protocol.totalBorrowBalanceUSD.minus(principleAmountUSD);
 
+  if (!market._interestTimestamp) {
+    log.error(
+      "[handlePaymentApplied]market._interestTimestamp for market {} not set",
+      [marketID]
+    );
+    market._interestTimestamp = event.block.timestamp;
+    market.save();
+    return;
+  }
   // scale interest rate to APR
   // since interest is not compounding, apply a linear scaler based on time
   const InterestRateScaler = BigInt.fromI32(SECONDS_PER_YEAR).divDecimal(
@@ -390,6 +446,8 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   // the actual rate may not be stable
   const borrowerInterestRateID = `${marketID}-${InterestRateSide.BORROWER}-${InterestRateType.STABLE}`;
   const borrowerInterestRate = new InterestRate(borrowerInterestRateID);
+  borrowerInterestRate.side = InterestRateSide.BORROWER;
+  borrowerInterestRate.type = InterestRateType.STABLE;
   borrowerInterestRate.rate = interestAmountUSD
     .div(market.totalBorrowBalanceUSD)
     .times(InterestRateScaler)
@@ -398,6 +456,8 @@ export function handlePaymentApplied(event: PaymentApplied): void {
   // senior and junior rates are different, this is an average of them
   const lenderInterestRateID = `${marketID}-${InterestRateSide.LENDER}-${InterestRateType.STABLE}`;
   const lenderInterestRate = new InterestRate(lenderInterestRateID);
+  borrowerInterestRate.side = InterestRateSide.LENDER;
+  borrowerInterestRate.type = InterestRateType.STABLE;
   lenderInterestRate.rate = interestAmountUSD
     .div(market.totalDepositBalanceUSD)
     .times(InterestRateScaler)

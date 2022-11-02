@@ -404,7 +404,7 @@ export function calculateApyFromGfiForAllPools(now: BigInt): void {
     if (!creditLine || !creditLine.isEligibleForRewards) {
       continue;
     }
-    const schedule = getApproximateRepaymentSchedule(tranchedPool, now);
+    const schedule = getApproximateRepaymentSchedule(tranchedPool);
     repaymentSchedules = repaymentSchedules.concat(schedule);
   }
   repaymentSchedules.sort(repaymentComparator);

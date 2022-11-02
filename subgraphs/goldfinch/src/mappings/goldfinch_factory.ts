@@ -8,21 +8,24 @@ import { CreditLine as CreditLineContract } from "../../generated/GoldfinchFacto
 import { GoldfinchConfig } from "../../generated/GoldfinchConfig/GoldfinchConfig";
 import { getOrInitTranchedPool } from "../entities/tranched_pool";
 import { TranchedPool as TranchedPoolTemplate } from "../../generated/templates";
+import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
 import { Account } from "../../generated/schema";
 import {
   BIGINT_ONE,
   CONFIG_KEYS_ADDRESSES,
   FIDU_ADDRESS,
+  GFI_ADDRESS,
   INT_ONE,
   RewardTokenType,
+  SENIOR_POOL_ADDRESS,
 } from "../common/constants";
 import {
   getOrCreateMarket,
   getOrCreateProtocol,
   getOrCreateAccount,
   getOrCreateRewardToken,
+  getOrCreateToken,
 } from "../common/getters";
-import { TranchedPool } from "../../generated/templates/TranchedPool/TranchedPool";
 
 export function handleRoleGranted(event: RoleGranted): void {
   // Init GoldfinchConfig and SeniorPool template when GoldfinchFactory grants OWNER_ROLE (initialize())
@@ -31,37 +34,32 @@ export function handleRoleGranted(event: RoleGranted): void {
   // OWNER_ROLE is granted in _setRoleAdmin() inside initialize()
   // which sets config to the GoldfinchConfig argument
   if (event.params.role == OWNER_ROLE) {
-    const protocol = getOrCreateProtocol();
+    getOrCreateProtocol();
 
+    /*
     const configAddress = contract.config();
     log.info(
       "[handleRoleGranted]Init GoldfinchConfig template at {} by tx {}",
       [configAddress.toHexString(), event.transaction.hash.toHexString()]
     );
-    protocol._GoldfinchConfig = configAddress.toHexString();
+    //protocol._GoldfinchConfig = configAddress.toHexString();
     protocol.save();
     //GoldfinchConfigTemplate.create(configAddress);
-
+    
     const configContract = GoldfinchConfig.bind(configAddress);
+    */
     //Addresses enum defined in ConfigOptions.sol
-    const seniorPoolAddress = configContract.getAddress(
-      BigInt.fromI32(CONFIG_KEYS_ADDRESSES.SeniorPool)
-    );
-    const rewardTokenAddress = configContract.getAddress(
-      BigInt.fromI32(CONFIG_KEYS_ADDRESSES.StakingRewards)
-    );
+
+    getOrCreateProtocol();
     const rewardToken = getOrCreateRewardToken(
-      rewardTokenAddress,
+      Address.fromString(GFI_ADDRESS),
       RewardTokenType.DEPOSIT
     );
-    log.info("[handleRoleGranted]Init SeniroPool template at {} by tx {}", [
-      seniorPoolAddress.toHexString(),
-      event.transaction.hash.toHexString(),
-    ]);
 
     // senior pool is a market lender can deposit
-    const market = getOrCreateMarket(seniorPoolAddress.toHexString(), event);
-    market.outputToken = FIDU_ADDRESS;
+    const market = getOrCreateMarket(SENIOR_POOL_ADDRESS, event);
+    const FiduToken = getOrCreateToken(Address.fromString(FIDU_ADDRESS));
+    market.outputToken = FiduToken.id;
     market.rewardTokens = [rewardToken.id];
     market.save();
 
@@ -76,8 +74,19 @@ export function handlePoolCreated(event: PoolCreated): void {
   // init TranchedPool tempate
   const poolAddress = event.params.pool;
   const protocol = getOrCreateProtocol();
-  const market = getOrCreateMarket(poolAddress.toHexString(), event);
   const borrowerAddr = event.params.borrower.toHexString();
+  const tranchedPoolContract = TranchedPoolContract.bind(poolAddress);
+  const configContract = GoldfinchConfig.bind(tranchedPoolContract.config());
+  const poolTokenAddr = configContract
+    .getAddress(BigInt.fromI32(CONFIG_KEYS_ADDRESSES.PoolTokens))
+    .toHexString();
+
+  const market = getOrCreateMarket(poolAddress.toHexString(), event);
+  market._borrower = borrowerAddr;
+  market._creditLine = tranchedPoolContract.creditLine().toHexString();
+  market._poolToken = poolTokenAddr;
+  market.save();
+
   let account = Account.load(borrowerAddr);
   if (!account) {
     account = getOrCreateAccount(borrowerAddr);
@@ -87,34 +96,6 @@ export function handlePoolCreated(event: PoolCreated): void {
   protocol.totalPoolCount += INT_ONE;
   protocol.save();
 
-  const configContract = GoldfinchConfig.bind(
-    Address.fromString(protocol._GoldfinchConfig!)
-  );
-  const rewardTokenAddress = configContract.getAddress(
-    BigInt.fromI32(CONFIG_KEYS_ADDRESSES.StakingRewards)
-  );
-  const rewardToken = getOrCreateRewardToken(
-    rewardTokenAddress,
-    RewardTokenType.DEPOSIT
-  );
-
-  market.rewardTokens = [rewardToken.id];
-
-  market._poolToken = configContract
-    .addresses(BigInt.fromI32(CONFIG_KEYS_ADDRESSES.PoolTokens))
-    .toHexString();
-
-  // CreditLineCreated event is not avaiable in deployed smartcontract
-  // Call the contract function instead
-  const poolContract = TranchedPool.bind(event.params.pool);
-  const creditLineAddress = poolContract.creditLine();
-  market._creditLine = creditLineAddress.toHexString();
-  const creditLineContract = CreditLineContract.bind(creditLineAddress);
-  if (creditLineContract.currentLimit().gt(BIGINT_ONE)) {
-    market.isActive = true;
-    market.canBorrowFrom = true;
-  }
-  market.save();
   TranchedPoolTemplate.create(poolAddress);
 
   //

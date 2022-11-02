@@ -39,6 +39,8 @@ import {
   USDC_ADDRESS,
   GFI_ADDRESS,
   INT_ONE,
+  LendingType,
+  FIDU_ADDRESS,
 } from "./constants";
 import { TranchedPool as TranchedPoolContract } from "../../generated/templates/TranchedPool/TranchedPool";
 import { prefixID } from "./utils";
@@ -63,11 +65,19 @@ export function getOrCreateToken(tokenAddr: Address): Token {
   if (token == null) {
     token = new Token(tokenId);
 
-    const contract = ERC20.bind(tokenAddr);
-    token.name = contract.name();
-    token.symbol = contract.symbol();
-    token.decimals = contract.decimals();
-
+    // GFI contract was deployed after senior pool; the following call will fail
+    // when invoked by senior_pool.handleDepositMade
+    if (tokenId == GFI_ADDRESS) {
+      token.name = "Goldfinch";
+      token.symbol = "GFI";
+      token.decimals = 18;
+    } else {
+      log.info("[getOrCreateToken]tokenAddr={}", [tokenId]);
+      const contract = ERC20.bind(tokenAddr);
+      token.name = contract.name();
+      token.symbol = contract.symbol();
+      token.decimals = contract.decimals();
+    }
     token.save();
   }
   return token;
@@ -77,11 +87,12 @@ export function getOrCreateRewardToken(
   tokenAddr: Address,
   type: string
 ): RewardToken {
-  const tokenId: string = tokenAddr.toHexString();
+  const tokenId: string = `${type}-${tokenAddr.toHexString()}`;
   let rewardToken = RewardToken.load(tokenId);
   if (!rewardToken) {
     const token = getOrCreateToken(tokenAddr);
-    rewardToken = new RewardToken(token.id);
+    rewardToken = new RewardToken(tokenId);
+    rewardToken.token = token.id;
     rewardToken.type = type;
     rewardToken.save();
   }
@@ -93,15 +104,23 @@ export function getOrCreateProtocol(): LendingProtocol {
 
   if (!protocol) {
     protocol = new LendingProtocol(FACTORY_ADDRESS);
+    protocol.name = PROTOCOL_NAME;
+    protocol.slug = PROTOCOL_SLUG;
+    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
+    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
+    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
-    protocol.lendingType = "?";
+    protocol.lendingType = LendingType.POOLED;
     protocol.riskType = RiskType.GLOBAL;
     protocol.mintedTokens = [];
     protocol.mintedTokenSupplies = [];
     ////// quantitative data //////
-    protocol.totalPoolCount = INT_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
+    protocol.cumulativeUniqueDepositors = INT_ZERO;
+    protocol.cumulativeUniqueBorrowers = INT_ZERO;
+    protocol.cumulativeUniqueLiquidators = INT_ZERO;
+    protocol.cumulativeUniqueLiquidatees = INT_ZERO;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -111,12 +130,12 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-
+    protocol.totalPoolCount = INT_ZERO;
+    protocol.openPositionCount = INT_ZERO;
+    protocol.cumulativePositionCount = INT_ZERO;
     protocol.save();
   }
   // ensure versions are updated even when grafting
-  protocol.name = PROTOCOL_NAME;
-  protocol.slug = PROTOCOL_SLUG;
   protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
   protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
   protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
@@ -150,8 +169,8 @@ export function getOrCreateMarket(
     market.liquidationPenalty = BIGDECIMAL_ZERO; // TODO: what should this be?
 
     market.inputToken = USDC_ADDRESS;
-    market.outputToken = marketId; //TODO: pool share token
-    market.rewardTokens = [prefixID(GFI_ADDRESS, RewardTokenType.DEPOSIT)];
+    //market.outputToken; //TODO: pool share token
+    //market.rewardTokens = [prefixID(GFI_ADDRESS, RewardTokenType.DEPOSIT)];
     market.rates = [];
     //market.stableBorrowRate
 
@@ -170,9 +189,13 @@ export function getOrCreateMarket(
     market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-    market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-
+    market.rewardTokenEmissionsAmount = [];
+    market.rewardTokenEmissionsUSD = [];
+    market.positionCount = 0;
+    market.openPositionCount = 0;
+    market.closedPositionCount = 0;
+    market.lendingPositionCount = 0;
+    market.borrowingPositionCount = 0;
     //market.snapshots - derived and don't need to be initialized
     //market.deposits
     //market.withdraws
@@ -306,16 +329,24 @@ export function getOrCreateUsageMetricsDailySnapshot(
   if (usageMetrics == null) {
     usageMetrics = new UsageMetricsDailySnapshot(daysStr);
 
-    usageMetrics.protocol = FACTORY_ADDRESS;
+    usageMetrics.protocol = protocol.id;
+    usageMetrics.totalPoolCount = INT_ZERO;
     usageMetrics.dailyActiveUsers = INT_ZERO;
-    usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.dailyActiveDepositors = INT_ZERO;
+    usageMetrics.dailyActiveBorrowers = INT_ZERO;
+    usageMetrics.dailyActiveLiquidators = INT_ZERO;
+    usageMetrics.dailyActiveLiquidatees = INT_ZERO;
+    usageMetrics.cumulativeUniqueUsers = INT_ZERO;
+    usageMetrics.cumulativeUniqueDepositors = INT_ZERO;
+    usageMetrics.cumulativeUniqueBorrowers = INT_ZERO;
+    usageMetrics.cumulativeUniqueLiquidators = INT_ZERO;
+    usageMetrics.cumulativeUniqueLiquidatees = INT_ZERO;
     usageMetrics.dailyTransactionCount = INT_ZERO;
     usageMetrics.dailyDepositCount = INT_ZERO;
     usageMetrics.dailyWithdrawCount = INT_ZERO;
     usageMetrics.dailyBorrowCount = INT_ZERO;
     usageMetrics.dailyRepayCount = INT_ZERO;
     usageMetrics.dailyLiquidateCount = INT_ZERO;
-    usageMetrics.totalPoolCount = protocol.totalPoolCount;
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.save();
@@ -335,9 +366,9 @@ export function getOrCreateUsageMetricsHourlySnapshot(
   if (usageMetrics == null) {
     usageMetrics = new UsageMetricsHourlySnapshot(hoursStr);
 
-    usageMetrics.protocol = FACTORY_ADDRESS;
+    usageMetrics.protocol = protocol.id;
     usageMetrics.hourlyActiveUsers = INT_ZERO;
-    usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.cumulativeUniqueUsers = INT_ZERO;
     usageMetrics.hourlyTransactionCount = INT_ZERO;
     usageMetrics.hourlyDepositCount = INT_ZERO;
     usageMetrics.hourlyWithdrawCount = INT_ZERO;
