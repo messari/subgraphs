@@ -1,6 +1,6 @@
 # Subgraph Schema: Lending Protocol
-# Version: 2.0.1
-# See https://github.com/messari/subgraphs/blob/master/docs/SCHEMA.md for details
+# Version: 3.0.0
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
   ARBITRUM_ONE
@@ -37,7 +37,7 @@ enum ProtocolType {
 
 type Token @entity {
   " Smart contract address of the token "
-  id: ID!
+  id: Bytes!
 
   " Name of the token, mirrored from the smart contract "
   name: String!
@@ -53,17 +53,26 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  " The type of token the protocol creates for positions "
+  type: TokenType
+
+  " Details about the price oracle used to get this token's price "
+  oracle: Oracle
 }
 
 enum RewardTokenType {
   " For reward tokens awarded to LPs/lenders "
   DEPOSIT
 
-  " For reward tokens awarded to borrowers "
-  BORROW
+  " For reward tokens awarded to borrowers of variable debt "
+  VARIABLE_BORROW
+
+  " For reward tokens awarded to borrowers of stable debt "
+  STABLE_BORROW
 }
 
-type RewardToken @entity {
+type RewardToken @entity(immutable: true) {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
@@ -82,12 +91,33 @@ enum LendingType {
   POOLED
 }
 
+enum PermissionType {
+  " Protocols that only allow KYC'd users "
+  PERMISSIONED
+
+  " Protocols that allow a mix of KYC'd and non-KYC'd users "
+  PARTIALLY_PERMISSIONED
+
+  " Protocols that do not KYC. Can be used by any account "
+  PERMISSIONLESS
+}
+
 enum RiskType {
   " Global risk means each users position in a market is combined for one score to determine if they can be liquidated "
   GLOBAL
 
   " Isolated risk means each users position in a market or CDP is isolated for risk of liquidation "
   ISOLATED
+}
+
+# This is used for representative token descriptions
+# e.g. collateral or debt tokens in a protocol
+enum TokenType {
+  " Rebasing tokens continuously adjust balances / supply as interest is accrued (e.g. Aave debt balances adjust at each block with interest) "
+  REBASING
+
+  " Non-rebasing token balances / supply do not change as interest is accried (e.g. Compound's cToken's do not adjust balance, the exchange rate changes with interest) "
+  NON_REBASING
 }
 
 enum InterestRateType {
@@ -110,8 +140,8 @@ enum InterestRateSide {
 }
 
 enum PositionSide {
-  " Position opened as a lender "
-  LENDER
+  " Position opened as a lender (used as collateral) "
+  COLLATERAL
 
   " Position opened as a borrower "
   BORROWER
@@ -144,9 +174,30 @@ type InterestRate @entity {
 # There is a wide range of formats of lending protocols
 # And there are many unique mappings when it comes to input / output tokens
 # This generic type will help define the unique relationships between tokens in a market
-type TokenBalances @entity {
+# You can think of this as a 1:M relationship between 1 input token and output tokens
+type TokenData @entity {
   " { Input Token Address }-{ Optional: Snapshot ID } "
   id: Bytes!
+
+  " Can you use the output token as collateral "
+  canUseAsCollateral: Boolean!
+
+  " Can you borrow from this market "
+  canBorrowFrom: Boolean!
+
+  " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
+  maximumLTV: BigDecimal!
+
+  " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
+  liquidationThreshold: BigDecimal!
+
+  " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
+  liquidationPenalty: BigDecimal!
+
+  " Can the user choose to isloate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
+  canIsolate: Boolean!
+
+  ##### Token Data #####
 
   " Tokens that need to be deposited in this market to take a position in protocol (should be alphabetized) "
   inputToken: Token!
@@ -256,10 +307,13 @@ interface Protocol {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: Bytes!
 
-  " Name of the protocol, including version. e.g. Uniswap v3 "
+  " Base name of the protocol, excluding transformations. e.g. Aave "
+  protocol: String!
+
+  " Name of the protocol, including version. e.g. Aave v2 "
   name: String!
 
-  " Slug of protocol, including version. e.g. uniswap-v3 "
+  " Slug of protocol, including version. e.g. aave-v2 "
   slug: String!
 
   " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
@@ -281,7 +335,7 @@ interface Protocol {
   lendingType: LendingType
 
   " The specific permissions required to use the protocol "
-  PermissionType: PermissionType
+  permissionType: PermissionType
 
   " Risk type of the lending protocol "
   riskType: RiskType
@@ -327,6 +381,9 @@ type LendingProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: Bytes!
 
+  " Base name of the protocol, excluding transformations. e.g. Aave "
+  protocol: String!
+
   " Name of the protocol, including version. e.g. Aave v2 "
   name: String!
 
@@ -352,13 +409,16 @@ type LendingProtocol implements Protocol @entity {
   lendingType: LendingType
 
   " The specific permissions required to use the protocol "
-  PermissionType: PermissionType
+  permissionType: PermissionType
 
   " Risk type of the lending protocol "
   riskType: RiskType
 
   " Tokens that can be minted. Only applies to CDP "
   mintedTokens: [Token!]
+
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. "
+  rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
 
@@ -392,6 +452,9 @@ type LendingProtocol implements Protocol @entity {
   " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
   cumulativeTotalRevenueUSD: BigDecimal!
 
+  " Details of revenue sources and amounts "
+  revenueDetails: RevenueDetails
+
   " Current balance of all deposited assets, in USD. Note this metric should be the same as TVL. "
   totalDepositBalanceUSD: BigDecimal!
 
@@ -419,6 +482,38 @@ type LendingProtocol implements Protocol @entity {
   " Total number of positions (open and closed) "
   cumulativePositionCount: Int!
 
+  " Total number of transactions "
+  transactionCount: Int!
+
+  " Total number of deposits "
+  depositCount: Int!
+
+  " Total number of withdrawals "
+  withdrawalCount: Int!
+
+  " Total number of borrows "
+  borrowCount: Int!
+
+  " Total number of repayments "
+  repayCount: Int!
+
+  " Total number of liquidations "
+  liquidationCount: Int!
+
+  " Total number of transfers "
+  transferCount: Int!
+
+  " Total number of flashloans "
+  flashloanCount: Int!
+
+  ##### Token Balances #####
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
@@ -445,6 +540,9 @@ type LendingProtocol implements Protocol @entity {
 type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
+
+  " Number of days since Unix epoch time "
+  days: Int!
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
@@ -497,6 +595,15 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of liquidations in a day "
   dailyLiquidateCount: Int!
 
+  " Total number of positions (open and closed) "
+  cumulativePositionCount: Int!
+
+  " Total number of open positions "
+  openPositionCount: Int!
+
+  " Total number of positions touched in a day. This includes opening, closing, and modifying positions. "
+  dailyActivePositions: Int!
+
   " Total number of pools "
   totalPoolCount: Int!
 
@@ -510,6 +617,9 @@ type UsageMetricsDailySnapshot @entity {
 type UsageMetricsHourlySnapshot @entity {
   " { # of hours since Unix epoch time } "
   id: ID!
+
+  " Number of hours since Unix epoch time "
+  hours: Int!
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
@@ -549,6 +659,9 @@ type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
 
+  " Number of days since Unix epoch time "
+  days: Int!
+
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
 
@@ -586,6 +699,9 @@ type FinancialsDailySnapshot @entity {
 
   " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
   cumulativeTotalRevenueUSD: BigDecimal!
+
+  " Details of revenue sources and amounts "
+  revenueDetails: RevenueDetails
 
   ##### Lending Activities #####
 
@@ -626,7 +742,7 @@ type FinancialsDailySnapshot @entity {
 
 type Market @entity {
   " Smart contract address of the market "
-  id: ID!
+  id: Bytes!
 
   " The protocol this pool belongs to "
   protocol: LendingProtocol!
@@ -637,31 +753,16 @@ type Market @entity {
   " Is this market active or is it frozen "
   isActive: Boolean!
 
-  " Can you use the output token as collateral "
-  canUseAsCollateral: Boolean!
-
-  " Can you borrow from this market "
-  canBorrowFrom: Boolean!
-
-  " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
-  maximumLTV: BigDecimal!
-
-  " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
-  liquidationThreshold: BigDecimal!
-
-  " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
-  liquidationPenalty: BigDecimal!
-
-  " Can the user choose to isloate assets in this market. e.g. only this market's collateral can be used for a borrow in Aave V3 "
-  canIsolate: Boolean!
-
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
+  " All oracles that have been used for this market "
+  oracles: [Oracle!]! @derivedFrom(field: "market")
+
   ##### Quantitative Data #####
 
-  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
-  rates: [InterestRate!]!
+  " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
+  fees: [InterestRate!]!
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -674,6 +775,9 @@ type Market @entity {
 
   " All revenue generated by the market. "
   cumulativeTotalRevenueUSD: BigDecimal!
+
+  " Details of revenue sources and amounts "
+  revenueDetails: RevenueDetails
 
   " Current balance of all deposited assets (not historical cumulative), in USD "
   totalDepositBalanceUSD: BigDecimal!
@@ -746,7 +850,7 @@ type Market @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market "
-  tokens: [TokenBalances!]
+  tokens: [TokenData!]
 
   " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
   variableBorrowedTokenBalance: BigInt
@@ -810,6 +914,12 @@ type Market @entity {
 
   " All liquidations made to this market "
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
+
+  " All transfers made in this market "
+  transfers: [Transfer!]! @derivedFrom(field: "market")
+
+  " All flashloans made in this market"
+  flashloans: [Flashloan!]! @derivedFrom(field: "market")
 }
 
 #################################
@@ -818,7 +928,10 @@ type Market @entity {
 
 type MarketDailySnapshot @entity {
   " { Smart contract address of the market }-{ # of days since Unix epoch time } "
-  id: ID!
+  id: Bytes!
+
+  " Number of days since Unix epoch time "
+  days: Int!
 
   " The protocol this snapshot belongs to "
   protocol: LendingProtocol!
@@ -858,11 +971,17 @@ type MarketDailySnapshot @entity {
   " Daily revenue generated by the market. "
   dailyTotalRevenueUSD: BigDecimal!
 
+  " Details of revenue sources and amounts "
+  revenueDetails: RevenueDetails
+
   " Current balance of all deposited assets (not historical cumulative), in USD. Same as pool TVL. "
   totalDepositBalanceUSD: BigDecimal!
 
   " Sum of all deposits made on a given day, in USD "
   dailyDepositUSD: BigDecimal!
+
+  " Sum of all the deposits on a given day, in native units "
+  dailyNativeDeposit: BigInt!
 
   " Sum of all historical deposits in USD (only considers deposits and not withdrawals) "
   cumulativeDepositUSD: BigDecimal!
@@ -873,11 +992,17 @@ type MarketDailySnapshot @entity {
   " Sum of all borrows/mints made on a given day, in USD "
   dailyBorrowUSD: BigDecimal!
 
+  " Sum of all the borrows on a given day, in native units "
+  dailyNativeBorrow: BigInt!
+
   " Sum of all historical borrows/mints in USD (i.e. total loan origination) "
   cumulativeBorrowUSD: BigDecimal!
 
   " Total assets liquidated on a given day, in USD. "
   dailyLiquidateUSD: BigDecimal!
+
+  " Total assets liquidated on a given day, in native units. "
+  dailyNativeLiquidate: BigInt!
 
   " Sum of all historical liquidations in USD "
   cumulativeLiquidateUSD: BigDecimal!
@@ -885,22 +1010,26 @@ type MarketDailySnapshot @entity {
   " Total assets withdrawn on a given day, in USD. "
   dailyWithdrawUSD: BigDecimal!
 
+  " Total assets withdrawn on a given day, in native units. "
+  dailyNativeWithdraw: BigInt!
+
   " Total assets repaid on a given day, in USD. "
   dailyRepayUSD: BigDecimal!
 
-  ##### Token Balances #####
+  " Total assets repaid on a given day, in native units. "
+  dailyNativeRepay: BigInt!
 
   " Total assets transferred on a given day, in USD. "
   dailyTransferUSD: BigDecimal!
 
-  " Price per share of input token in USD "
-  inputTokenPriceUSD: BigDecimal!
+  " Total assets transferred on a given day, in native units. "
+  dailyNativeTransfer: BigInt!
 
-  " Total supply of output token "
-  outputTokenSupply: BigInt!
+  " Sum of all historical transfers in USD "
+  cumulativeTransferUSD: BigDecimal!
 
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
+  " Total assets flashloaned on a given day, in USD. "
+  dailyFlashloanUSD: BigDecimal!
 
   " Total assets flashloaned on a given day, in native units. "
   dailyNativeFlashloan: BigInt!
@@ -978,7 +1107,7 @@ type MarketDailySnapshot @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market (a list of input token structs) "
-  tokens: [TokenBalances!]
+  tokens: [TokenData!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -989,7 +1118,10 @@ type MarketDailySnapshot @entity {
 
 type MarketHourlySnapshot @entity {
   " { Smart contract address of the market }-{ # of hours since Unix epoch time } "
-  id: ID!
+  id: Bytes!
+
+  " Number of hours since Unix epoch time "
+  hours: Int!
 
   " The protocol this snapshot belongs to "
   protocol: LendingProtocol!
@@ -1062,7 +1194,7 @@ type MarketHourlySnapshot @entity {
   ##### Token Balances #####
 
   " Balances and relationships of all tokens within this market "
-  tokens: [TokenBalances!]
+  tokens: [TokenData!]
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -1077,7 +1209,7 @@ type MarketHourlySnapshot @entity {
 
 type Account @entity {
   " { Account address } "
-  id: ID!
+  id: Bytes!
 
   " Number of positions this account has "
   positionCount: Int!
@@ -1126,11 +1258,30 @@ type Account @entity {
 
   " All liquidation events where this account got liquidated "
   liquidations: [Liquidate!]! @derivedFrom(field: "liquidatee")
+
+  " Number of times this account has transferred "
+  transferredCount: Int!
+
+  " All transfer events where this account was the sender "
+  transfers: [Transfer!]! @derivedFrom(field: "sender")
+
+  " Number of times this account has received a transfer "
+  receivedCount: Int!
+
+  " All transfer events where this account was the receiver "
+  receives: [Transfer!]! @derivedFrom(field: "receiver")
+
+  " Number of times this account has executed a flashloan "
+  flashloanCount: Int!
+
+  " All flashloan events where this account executed it "
+  flashloans: [Flashloan!]! @derivedFrom(field: "account")
 }
 
+# A position is defined as who has control over the collateral or debt
 type Position @entity {
-  " { Account address }-{ Market address }-{ Position Side }-{ Counter } "
-  id: ID!
+  " { Account address }-{ Market address }-{ Position Side }-{ Optional: Interest Rate Type}-{ Counter } "
+  id: Bytes!
 
   " Account that owns this position "
   account: Account!
@@ -1138,11 +1289,14 @@ type Position @entity {
   " The market in which this position was opened "
   market: Market!
 
+  " The asset in which this position was opened with "
+  asset: Token!
+
   " The hash of the transaction that opened this position "
-  hashOpened: String!
+  hashOpened: Bytes!
 
   " The hash of the transaction that closed this position "
-  hashClosed: String
+  hashClosed: Bytes
 
   " Block number of when the position was opened "
   blockNumberOpened: BigInt!
@@ -1159,8 +1313,14 @@ type Position @entity {
   " Side of the position (either lender or borrower) "
   side: PositionSide!
 
+  " Type of interest rate used for this position (stable or variable). Generally for borrow side positions."
+  type: InterestRateType
+
   " Whether this position has been enabled as a collateral (only applies to LENDER positions). For protocols (e.g. MakerDAO) that doesn't require enabling explicitly, this will always be true. "
   isCollateral: Boolean
+
+  " Whether this position is being isolated from risk from other positions (only applies to LENDER positions). For protocols (e.g. Aave V3) this reduces risk exposure from other user positions. "
+  isIsolated: Boolean
 
   " Token balance in this position, in native amounts "
   balance: BigInt!
@@ -1189,11 +1349,20 @@ type Position @entity {
   " All repay events of this position "
   repays: [Repay!]! @derivedFrom(field: "position")
 
-  " Number of liquidations related to this position "
+  " Number of liquidations related to this position (incremented when this position was liquidated) "
   liquidationCount: Int!
 
   " Liquidation event related to this position (if exists) "
-  liquidations: [Liquidate!]! @derivedFrom(field: "position")
+  liquidations: [Liquidate!]! @derivedFrom(field: "positions")
+
+  " Number of times this position has transferred "
+  transferredCount: Int!
+
+  " Number of times this position has received a transfer "
+  receivedCount: Int!
+
+  " All transfer events related to this position "
+  transfers: [Transfer!]! @derivedFrom(field: "positions")
 
   " Position daily snapshots for open positions "
   snapshots: [PositionSnapshot!]! @derivedFrom(field: "position")
@@ -1204,13 +1373,13 @@ type Position @entity {
 # closing events. This will prevent an ever growing number of snapshots
 # for positions that are not moving. As we are only recording the balance
 # in token amounts instead of in USD, this will work well.
-# Note that we only take snapshot for open positions
-type PositionSnapshot @entity {
+# Note that we only take snapshot for open positions.
+type PositionSnapshot @entity(immutable: true) {
   " { Position ID }-{ Transaction hash }-{ Log index } "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that triggered this snapshot "
-  hash: String!
+  hash: Bytes!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
@@ -1237,9 +1406,9 @@ type PositionSnapshot @entity {
   timestamp: BigInt!
 }
 
-##################################
+############################
 ##### Event-Level Data #####
-##################################
+############################
 
 """
 An event is any user action that occurs in a protocol. Generally, they are Ethereum events
@@ -1249,12 +1418,12 @@ the deposit and withdraw functions in Yearn do not emit any events. In our subgr
 store them as events, although they are not technically Ethereum events emitted by smart
 contracts.
 """
-type Deposit @entity {
+type Deposit @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Nonce of the transaction that emitted this event "
   nonce: BigInt!
@@ -1262,14 +1431,23 @@ type Deposit @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
+  " Price of gas in this transaction "
+  gasPrice: BigInt!
+
+  " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
+  gasLimit: BigInt!
+
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that deposited tokens "
+  "Account where deposit was executed (e.g. a deposit on behalf of account)"
   account: Account!
+
+  " Account that executed the executed the deposit (e.g. a deposit on behalf of account) "
+  accountActor: Account
 
   " The market tokens are deposited to "
   market: Market!
@@ -1287,12 +1465,12 @@ type Deposit @entity {
   amountUSD: BigDecimal!
 }
 
-type Withdraw @entity {
-  " { Transaction hash }-{ Log index }"
-  id: ID!
+type Withdraw @entity(immutable: true) {
+  " { Transaction hash }-{ Log index } "
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Nonce of the transaction that emitted this event "
   nonce: BigInt!
@@ -1300,14 +1478,23 @@ type Withdraw @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
+  " Price of gas in this transaction "
+  gasPrice: BigInt!
+
+  " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
+  gasLimit: BigInt!
+
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that withdrew tokens "
+  " Account that controls the position (e.g. the aToken owner initiating the withdraw in Aave) "
   account: Account!
+
+  " Account that receives the underlying withdrawn amount "
+  accountActor: Account
 
   " The market tokens are withdrew from "
   market: Market!
@@ -1330,12 +1517,12 @@ type Withdraw @entity {
 }
 
 # For CDPs, use this for mint events
-type Borrow @entity {
+type Borrow @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Nonce of the transaction that emitted this event "
   nonce: BigInt!
@@ -1343,14 +1530,23 @@ type Borrow @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
+  " Price of gas in this transaction "
+  gasPrice: BigInt!
+
+  " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
+  gasLimit: BigInt!
+
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that borrowed/minted tokens "
+  " Account that controls incurs debt in this transaction "
   account: Account!
+
+  " Account that receives the funds from the new debt "
+  accountActor: Account
 
   " The market tokens are borrowed/minted from "
   market: Market!
@@ -1369,12 +1565,12 @@ type Borrow @entity {
 }
 
 # For CDPs, use this for burn events
-type Repay @entity {
+type Repay @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Nonce of the transaction that emitted this event "
   nonce: BigInt!
@@ -1382,14 +1578,23 @@ type Repay @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
+  " Price of gas in this transaction "
+  gasPrice: BigInt!
+
+  " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
+  gasLimit: BigInt!
+
   " Block number of this event "
   blockNumber: BigInt!
 
   " Timestamp of this event "
   timestamp: BigInt!
 
-  " Account that repaid/burned tokens "
+  " Account that reduces their debt on this transaction "
   account: Account!
+
+  " Account that is providing the funds to repay the debt "
+  accountActor: Account
 
   " The market tokens are repaid/burned to "
   market: Market!
@@ -1407,18 +1612,24 @@ type Repay @entity {
   amountUSD: BigDecimal!
 }
 
-type Liquidate @entity {
+type Liquidate @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
-  id: ID!
+  id: Bytes!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: String!
+  hash: Bytes!
 
   " Nonce of the transaction that emitted this event "
   nonce: BigInt!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
+  " Price of gas in this transaction "
+  gasPrice: BigInt!
+
+  " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
+  gasLimit: BigInt!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1436,7 +1647,7 @@ type Liquidate @entity {
   market: Market!
 
   " The user position changed by this event "
-  position: Position!
+  positions: [Position!]!
 
   " Asset repaid (borrowed) "
   asset: Token!
@@ -1451,8 +1662,106 @@ type Liquidate @entity {
   profitUSD: BigDecimal!
 }
 
+# Note that only one transfer event should be created per transfer.
+type Transfer @entity(immutable: true) {
+  " { Transaction hash }-{ Log index } "
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Price of gas in this transaction "
+  gasPrice: BigInt!
+
+  " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
+  gasLimit: BigInt!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " The account that sent the tokens "
+  sender: Account!
+
+  " The Account that received the tokens "
+  receiver: Account!
+
+  " The user positions changed by this event "
+  positions: [Position!]!
+
+  " The market associated with the token transfer "
+  market: Market!
+
+  " The asset that was actually transfered. This could also include a debt token. "
+  asset: Token!
+
+  " Amount of token transferred in native units "
+  amount: BigInt!
+
+  " Amount of token transferred in USD "
+  amountUSD: BigDecimal!
+}
+
+type Flashloan @entity(immutable: true) {
+  " { Transaction hash }-{ Log index } "
+  id: Bytes!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: Bytes!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: BigInt!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " Price of gas in this transaction "
+  gasPrice: BigInt
+
+  " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
+  gasLimit: BigInt
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " Account that receieves the funds from the flashloan "
+  account: Account!
+
+  " Account that initiates the flashloan "
+  accountActor: Account
+
+  " The market in which this flashloan is executed "
+  market: Market!
+
+  " Asset borrowed "
+  asset: Token!
+
+  " Amount of asset borrowed in native units "
+  amount: BigInt!
+
+  " Amount of asset borrowed in USD "
+  amountUSD: BigDecimal!
+
+  " Amount of asset taken by protocol as a fee in native units "
+  feeAmount: BigInt
+
+  " Amount of asset taken by protocol as a fee in USD "
+  feeAmountUSD: BigDecimal
+}
+
 # Helper entity for calculating daily/hourly active users
-type ActiveAccount @entity {
+type ActiveAccount @entity(immutable: true) {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
-  id: ID!
+  id: Bytes!
 }

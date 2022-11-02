@@ -1,0 +1,50 @@
+specVersion: 0.0.4
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+{{#graftEnabled}}
+description: ...
+features:
+  - grafting
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
+dataSources:
+  - kind: ethereum/contract
+    name: Configurator
+    network: {{ network }}
+    source:
+      address: "{{ factoryAddress }}"
+      abi: Configurator
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./protocols/compound-v3/src/mapping.ts
+      entities: []
+      abis:
+        - name: Configurator
+          file: ./abis/Configurator.json
+      eventHandlers:
+        - event: CometDeployed(indexed address,indexed address)
+          handler: handleCometDeployed
+templates:
+  - name: Comet
+    kind: ethereum/contract
+    network: {{ network }}
+    source:
+      abi: Comet
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./protocols/compound-v3/src/mapping.ts
+      entities: []
+      abis:
+        - name: Comet
+          file: ./abis/Comet.json
+      eventHandlers:
+        - event: Supply(indexed address,indexed address,uint256)
+          handler: handleSupply
