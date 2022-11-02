@@ -21,6 +21,7 @@ const StyledTabs = styled(Tabs)`
 interface AllDataTabsProps {
   data: any;
   overlayData: any;
+  subgraphEndpoints: any;
   entitiesData: { [x: string]: { [x: string]: string } };
   protocolFields: { [x: string]: string };
   tabValue: string;
@@ -59,6 +60,7 @@ interface AllDataTabsProps {
 function AllDataTabs({
   data,
   overlayData,
+  subgraphEndpoints,
   entitiesData,
   protocolFields,
   tabValue,
@@ -177,11 +179,12 @@ function AllDataTabs({
             {positionsQuery && <Tab label="Positions" value="5" />}
           </StyledTabs>
           <DeploymentOverlayDropDown
+            data={data}
             setDeploymentURL={(x: string) => {
               setOverlayDeploymentClient(NewClient(x));
               setOverlayDeploymentURL(x);
             }}
-            deploymentsList={[{ value: "", label: "NO OVERLAY" }, { value: subgraphToQueryURL, label: subgraphToQueryURL }]}
+            subgraphEndpoints={subgraphEndpoints}
             currentDeploymentURL={overlayDeploymentURL}
             showDropDown={showDropDown}
             failedToLoad={failedToLoad} />

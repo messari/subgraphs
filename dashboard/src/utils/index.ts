@@ -98,7 +98,11 @@ export const schemaMapping: { [x: string]: any } = {
   "dex-amm": "exchanges",
   "yield-aggregator": "vaults",
   "lending": "lending",
-  "generic": "generic"
+  "generic": "generic",
+  "EXCHANGE": "exchanges",
+  "LENDING": "lending",
+  "YIELD": "vaults",
+  "GENERIC": "generic"
 }
 
 export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
@@ -156,4 +160,15 @@ export function downloadCSV(data: any[], label: string, identifier: string) {
     console.log(err)
     return;
   }
+}
+
+export function base64toBlobJPEG(dataURI: string) {
+  const byteString = atob(dataURI.split(',')[1]);
+  const arrayBuffer = new ArrayBuffer(byteString.length);
+  const integerArray = new Uint8Array(arrayBuffer);
+
+  for (let i = 0; i < byteString.length; i++) {
+    integerArray[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([arrayBuffer], { type: 'image/jpeg' });
 }
