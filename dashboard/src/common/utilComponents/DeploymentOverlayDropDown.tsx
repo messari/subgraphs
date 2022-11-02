@@ -20,14 +20,24 @@ export const DeploymentOverlayDropDown = ({
     showDropDown,
     failedToLoad
 }: DeploymentOverlayDropDownProps) => {
-
-    const protocolObj = subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0].slug];
-
-    const deploymentsList: any[] = Object.keys(protocolObj).map(chain => {
-        return data.protocols[0].name + ' ' + chain + ' ' + protocolObj[chain];
-    });
-    const currentDeploymentLabel = deploymentsList.find(x => x.includes(currentDeploymentURL)) || currentDeploymentURL;
+    let currentDeploymentLabel = currentDeploymentURL;
+    let deploymentsList: any[] = [];
+    let componentRenderOverwrite = undefined;
+    try {
+        const protocolObj = subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0].slug];
+        if (protocolObj) {
+            deploymentsList = Object.keys(protocolObj).map(chain => {
+                return data.protocols[0].name + ' ' + chain + ' ' + protocolObj[chain];
+            });
+            currentDeploymentLabel = deploymentsList.find(x => x.includes(currentDeploymentURL)) || currentDeploymentURL;
+        }
+    } catch (err) {
+        componentRenderOverwrite = null;
+    }
     const [textInput, setTextInput] = useState<string>(currentDeploymentLabel);
+    if (componentRenderOverwrite === null) {
+        return null;
+    }
     if (failedToLoad) {
         return null;
     }
@@ -43,7 +53,7 @@ export const DeploymentOverlayDropDown = ({
                 size="small"
                 onChange={(event: React.SyntheticEvent) => {
                     const targEle = event?.target as HTMLLIElement;
-                    const deploymentSelected = deploymentsList.find(x => {
+                    const deploymentSelected = deploymentsList.find((x: string) => {
                         return x.trim() === targEle.innerText.trim();
                     });
                     if (deploymentSelected) {
