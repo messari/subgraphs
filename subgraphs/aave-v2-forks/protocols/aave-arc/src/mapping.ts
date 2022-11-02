@@ -66,6 +66,7 @@ import {
   equalsIgnoreCase,
   exponentToBigDecimal,
   Network,
+  PositionSide,
   readValue,
   RewardTokenType,
   SECONDS_PER_DAY,
@@ -74,7 +75,9 @@ import { Market } from "../../../generated/schema";
 import { AaveIncentivesController } from "../../../generated/LendingPool/AaveIncentivesController";
 import { StakedAave } from "../../../generated/LendingPool/StakedAave";
 import { IPriceOracleGetter } from "../../../generated/LendingPool/IPriceOracleGetter";
-import { Transfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as StableTransfer } from "../../../generated/templates/StableDebtToken/StableDebtToken";
+import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 
 function getProtocolData(): ProtocolData {
   const constants = getNetworkSpecificConstant();
@@ -364,12 +367,38 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   );
 }
 
-//////////////////////
-//// AToken Event ////
-//////////////////////
+/////////////////////////
+//// Transfer Events ////
+/////////////////////////
 
-export function handleTransfer(event: Transfer): void {
-  _handleTransfer(event, event.params.to, event.params.from, getProtocolData());
+export function handleCollateralTransfer(event: CollateralTransfer): void {
+  _handleTransfer(
+    event,
+    getProtocolData(),
+    PositionSide.LENDER,
+    event.params.to,
+    event.params.from
+  );
+}
+
+export function handleVariableTransfer(event: VariableTransfer): void {
+  _handleTransfer(
+    event,
+    getProtocolData(),
+    PositionSide.BORROWER,
+    event.params.to,
+    event.params.from
+  );
+}
+
+export function handleStableTransfer(event: StableTransfer): void {
+  _handleTransfer(
+    event,
+    getProtocolData(),
+    PositionSide.BORROWER,
+    event.params.to,
+    event.params.from
+  );
 }
 
 ///////////////////

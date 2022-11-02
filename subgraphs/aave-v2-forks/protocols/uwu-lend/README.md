@@ -54,6 +54,12 @@ To be added
 
 Not applicable to Aave
 
+## Notes
+
+- The MultiFeeDistribution Contract (0x7c0bF1108935e7105E218BBB4f670E5942c5e237) tries to send out collateral tokens and has not opened a position for it before. This contract is staking contract.
+  - This tries to subtract from a position that doesn't exist. Therefore there is no record of tokens going there.
+  - Since this is an internal contract (and not a whale) we are going to leave as is.
+
 ## Resources
 
 App: https://uwulend.fi/

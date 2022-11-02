@@ -195,3 +195,9 @@ Reference: https://docs.radiant.capital/docs/project-info/vesting-and-locking/po
 There's no protocol owned liquidity for Radiant, but only a treasury.
 3% of RDNT allocation is for Treasury and Liquidity.
 Reference: https://docs.radiant.capital/docs/project-info/rdnt-token
+
+## Positional Notes
+
+- The MultiFeeDistribution Contract (0xc2054a8c33bfce28de8af4af548c48915c455c13) tries to send out collateral tokens and has not opened a position for it before. This contract is staking contract.
+  - This tries to subtract from a position that doesn't exist. Therefore there is no record of tokens going there.
+  - Since this is an internal contract (and not a whale) we are going to leave as is.

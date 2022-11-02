@@ -23,10 +23,6 @@ export const AAVE_DECIMALS = 8;
 ///// Network Specific /////
 ////////////////////////////
 
-export const AMM_ADDRESS = Address.fromString(
-  "0xAcc030EF66f9dFEAE9CbB0cd1B25654b82cFA8d5"
-);
-
 export class NetworkSpecificConstant {
   constructor(
     public readonly protocolAddress: Address, // aka, LendingPoolAddressesProvider
@@ -34,7 +30,6 @@ export class NetworkSpecificConstant {
   ) {}
 }
 
-// TODO- figure out how to get different mainnet deployments to work (ie, arc, rwa, eth amm, eth)
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {

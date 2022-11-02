@@ -45,10 +45,15 @@ import {
   _handleUnpaused,
   _handleWithdraw,
 } from "../../../src/mapping";
-import { BIGDECIMAL_ZERO, exponentToBigDecimal } from "../../../src/constants";
+import {
+  BIGDECIMAL_ZERO,
+  exponentToBigDecimal,
+  PositionSide,
+} from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { updateMarketRewards } from "./rewards";
-import { Transfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 
 function getProtocolData(): ProtocolData {
   return new ProtocolData(
@@ -254,10 +259,26 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   );
 }
 
-//////////////////////
-//// AToken Event ////
-//////////////////////
+/////////////////////////
+//// Transfer Events ////
+/////////////////////////
 
-export function handleTransfer(event: Transfer): void {
-  _handleTransfer(event, event.params.to, event.params.from, getProtocolData());
+export function handleCollateralTransfer(event: CollateralTransfer): void {
+  _handleTransfer(
+    event,
+    getProtocolData(),
+    PositionSide.LENDER,
+    event.params.to,
+    event.params.from
+  );
+}
+
+export function handleVariableTransfer(event: VariableTransfer): void {
+  _handleTransfer(
+    event,
+    getProtocolData(),
+    PositionSide.BORROWER,
+    event.params.to,
+    event.params.from
+  );
 }

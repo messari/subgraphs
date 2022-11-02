@@ -147,7 +147,47 @@ templates:
       abis:
         - name: AToken
           file: ./abis/aave-v2/AToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
+          handler: handleCollateralTransfer
+      file: ./protocols/aave-rwa/src/mapping.ts
+  - kind: ethereum/contract
+    name: VariableDebtToken
+    network: {{ network }}
+    source:
+      abi: VariableDebtToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: VariableDebtToken
+          file: ./abis/VariableDebtToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleVariableTransfer
+      file: ./protocols/aave-rwa/src/mapping.ts
+  - kind: ethereum/contract
+    name: StableDebtToken
+    network: {{ network }}
+    source:
+      abi: StableDebtToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableDebtToken
+          file: ./abis/StableDebtToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleStableTransfer
       file: ./protocols/aave-rwa/src/mapping.ts

@@ -59,13 +59,15 @@ import {
   BIGINT_THREE,
   DEFAULT_DECIMALS,
   exponentToBigDecimal,
+  PositionSide,
   RewardTokenType,
   SECONDS_PER_DAY,
 } from "../../../src/constants";
 import { Market } from "../../../generated/schema";
 import { ChefIncentivesController } from "../../../generated/LendingPool/ChefIncentivesController";
 import { SpookySwapOracle } from "../../../generated/LendingPool/SpookySwapOracle";
-import { Transfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as CollateralTransfer } from "../../../generated/templates/AToken/AToken";
+import { Transfer as VariableTransfer } from "../../../generated/templates/VariableDebtToken/VariableDebtToken";
 
 function getProtocolData(): ProtocolData {
   return new ProtocolData(
@@ -344,12 +346,28 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   );
 }
 
-//////////////////////
-//// AToken Event ////
-//////////////////////
+/////////////////////////
+//// Transfer Events ////
+/////////////////////////
 
-export function handleTransfer(event: Transfer): void {
-  _handleTransfer(event, event.params.to, event.params.from, getProtocolData());
+export function handleCollateralTransfer(event: CollateralTransfer): void {
+  _handleTransfer(
+    event,
+    getProtocolData(),
+    PositionSide.LENDER,
+    event.params.to,
+    event.params.from
+  );
+}
+
+export function handleVariableTransfer(event: VariableTransfer): void {
+  _handleTransfer(
+    event,
+    getProtocolData(),
+    PositionSide.BORROWER,
+    event.params.to,
+    event.params.from
+  );
 }
 
 ///////////////////
