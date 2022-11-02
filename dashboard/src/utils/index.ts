@@ -1,16 +1,6 @@
 import moment from "moment";
-import {
-  ApolloClient,
-  ApolloError,
-  gql,
-  HttpLink,
-  InMemoryCache,
-  LazyQueryResult,
-  NormalizedCacheObject,
-  QueryTuple,
-  useLazyQuery,
-} from "@apollo/client";
-import { useEffect, useRef, useState } from "react";
+import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
+import { useEffect, useRef } from "react";
 
 export const toDate = (timestamp: number, hour: boolean = false) => {
   let formatString = "YYYY-MM-DD";
@@ -98,3 +88,82 @@ export const formatIntToFixed2 = (val: number): string => {
   }
   return returnStr;
 };
+
+export const schemaMapping: { [x: string]: any } = {
+  "dex-amm": "exchanges",
+  "yield-aggregator": "vaults",
+  lending: "lending",
+  generic: "generic",
+  EXCHANGE: "exchanges",
+  LENDING: "lending",
+  YIELD: "vaults",
+  GENERIC: "generic",
+};
+
+export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
+  const arrData = typeof JSONData != "object" ? JSON.parse(JSONData) : JSONData;
+  let CSV = "";
+  if (ShowLabel) {
+    let row = "";
+    for (let index in arrData[0]) {
+      row += index + ",";
+    }
+    row = row.slice(0, -1);
+    CSV += row + "\r\n";
+  }
+
+  for (let i = 0; i < arrData.length; i++) {
+    let row = "";
+    for (let index in arrData[i]) {
+      row += '"' + arrData[i][index] + '",';
+    }
+    row.slice(0, row.length - 1);
+    CSV += row + "\r\n";
+  }
+
+  if (CSV === "") {
+    return;
+  }
+
+  const csv = CSV;
+  const blob = new Blob([csv], { type: "text/csv" });
+  const csvUrl = window.webkitURL.createObjectURL(blob);
+  const filename = (ReportTitle || "UserExport") + ".csv";
+  return { csvUrl, filename };
+}
+
+export function downloadCSV(data: any[], label: string, identifier: string) {
+  try {
+    const link = document.createElement("a");
+    const field = label.split("-")[1] || label;
+    let freq = label.split("-")[0]?.toUpperCase()?.includes("HOURLY") ? "hourly-" : "";
+    if (label.split("-")[0]?.toUpperCase()?.includes("DAILY")) {
+      freq = "daily-";
+    }
+    if (field?.toUpperCase()?.includes("DAILY") || field?.toUpperCase()?.includes("HOURLY")) {
+      freq = "";
+    }
+    link.download = identifier + "-" + freq + field + "-" + moment.utc(Date.now()).format("MMDDYY") + ".csv";
+    const csvEle = JSONToCSVConvertor(data, label + "-csv", label);
+    if (!csvEle?.csvUrl) {
+      throw new Error("csv File not constructed");
+    } else {
+      link.href = csvEle?.csvUrl;
+      link.click();
+    }
+  } catch (err) {
+    console.log(err);
+    return;
+  }
+}
+
+export function base64toBlobJPEG(dataURI: string) {
+  const byteString = atob(dataURI.split(",")[1]);
+  const arrayBuffer = new ArrayBuffer(byteString.length);
+  const integerArray = new Uint8Array(arrayBuffer);
+
+  for (let i = 0; i < byteString.length; i++) {
+    integerArray[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([arrayBuffer], { type: "image/jpeg" });
+}

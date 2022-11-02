@@ -7,6 +7,8 @@ description: ...
 graft:
   base: {{subgraphId}} # Subgraph ID of base subgraph
   block: {{graftStartBlock}} # Block number
+features:
+  - grafting
 {{/graftEnabled}}
 dataSources:
   - kind: ethereum/contract
@@ -20,7 +22,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/factory.ts
+      file: ./src/mappings/Factory.ts
       entities:
         - Token
         - DexAmmProtocol
@@ -31,7 +33,7 @@ dataSources:
         - _LiquidityPoolAmount
       abis:
         - name: Factory
-          file: ./abis/factory.json
+          file: ./abis/Factory.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
@@ -75,7 +77,7 @@ templates:
         - name: Pool
           file: ./abis/pool.json
         - name: Factory
-          file: ./abis/factory.json
+          file: ./abis/Factory.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
@@ -87,5 +89,7 @@ templates:
           handler: handleSwap
         - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
           handler: handleMint
-        - event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
-          handler: handleBurn
+        - event: Collect(indexed address,address,indexed int24,indexed int24,uint128,uint128)
+          handler: handleCollect
+        #- event: Burn(indexed address,indexed int24,indexed int24,uint128,uint256,uint256)
+          #handler: handleBurn

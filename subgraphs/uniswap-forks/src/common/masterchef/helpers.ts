@@ -14,7 +14,7 @@ export function createMasterChefStakingPool(
   pid: BigInt,
   poolAddress: Address
 ): _MasterChefStakingPool {
-  let masterChefPool = new _MasterChefStakingPool(
+  const masterChefPool = new _MasterChefStakingPool(
     masterChefType + "-" + pid.toString()
   );
 
@@ -24,7 +24,7 @@ export function createMasterChefStakingPool(
   masterChefPool.lastRewardBlock = event.block.number;
   log.warning("MASTERCHEF POOL CREATED: " + pid.toString(), []);
 
-  let pool = LiquidityPool.load(masterChefPool.poolAddress!);
+  const pool = LiquidityPool.load(masterChefPool.poolAddress!);
   if (pool) {
     pool.rewardTokens = [getOrCreateToken(NetworkConfigs.getRewardToken()).id];
     pool.save();
@@ -42,17 +42,26 @@ export function getOrCreateMasterChef(
 ): _MasterChef {
   let masterChef = _MasterChef.load(masterChefType);
 
-  if (!masterChef) {
-    masterChef = new _MasterChef(masterChefType);
+  if (masterChef) {
+    if (masterChef.address) {
+      return masterChef;
+    }
+
     masterChef.address = event.address.toHexString();
-    masterChef.totalAllocPoint = BIGINT_ZERO;
-    masterChef.rewardTokenInterval = NetworkConfigs.getRewardIntervalType();
-    masterChef.rewardTokenRate = NetworkConfigs.getRewardTokenRate();
-    log.warning("MasterChef Type: " + masterChefType, []);
-    masterChef.adjustedRewardTokenRate = NetworkConfigs.getRewardTokenRate();
-    masterChef.lastUpdatedRewardRate = BIGINT_ZERO;
     masterChef.save();
+    return masterChef;
   }
+
+  masterChef = new _MasterChef(masterChefType);
+  masterChef.address = event.address.toHexString();
+  masterChef.totalAllocPoint = BIGINT_ZERO;
+  masterChef.rewardTokenInterval = NetworkConfigs.getRewardIntervalType();
+  masterChef.rewardTokenRate = NetworkConfigs.getRewardTokenRate();
+  log.warning("MasterChef Type: " + masterChefType, []);
+  masterChef.adjustedRewardTokenRate = NetworkConfigs.getRewardTokenRate();
+  masterChef.lastUpdatedRewardRate = BIGINT_ZERO;
+  masterChef.save();
+
   return masterChef;
 }
 
@@ -90,7 +99,7 @@ export function updateMasterChefTotalAllocation(
   newPoolAlloc: BigInt,
   masterChefType: string
 ): void {
-  let masterChef = getOrCreateMasterChef(event, masterChefType);
+  const masterChef = getOrCreateMasterChef(event, masterChefType);
   masterChef.totalAllocPoint = masterChef.totalAllocPoint.plus(
     newPoolAlloc.minus(oldPoolAlloc)
   );

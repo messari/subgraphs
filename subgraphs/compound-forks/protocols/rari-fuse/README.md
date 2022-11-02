@@ -74,6 +74,19 @@ Count of Unique Addresses which have interacted with the protocol via any transa
   - Market `0xc0c997227922004da3a47185ac2be1d648db0062` has a very high TVL (~$100m). This is likely due to the fact that 10% of the total supply of the `inputToken` is in this vault and there are only 5 holders. Price of this asset is probably hard to calculate.
     - A potential fix is to recalculate TVL in every market each time `AccrueInterest` emits. This would slow down syncing as lots of contract calls would be introduced.
   - `fMIM` seems to have price oracle manipulation between 2/1/22 - 2/4/22 so I took the average price and overrided any transactions within those timestamps
+  - We need to use the same blocks/day as ethereum (hardcoded) because of this (https://github.com/OffchainLabs/arbitrum/blob/master/docs/Time_in_Arbitrum.md#example)
+
+## Fuse Issues and How it affects the subgraph
+
+Fuse has had a number of hacks throughout it's life. There are numerous price oracle manipulation hacks
+
+- Vesper pool (0x2914e8c1c2c54e5335dc9554551438c59373e807) exhibited price oracle manipulation on 11/2/2021 and 12/30/2021
+  - To correct the erroneous prices we override the pricing during those points in time to prevent unrealilistic numbers in our subgraph
+  - This new price is calculated from our price library if the token price is outside of the threshold ($0.50-$2.00) as a backup
+- There was a weak price oracle exploit done on a FLOAT market on Janruary 14th, 2022. https://twitter.com/FloatProtocol/status/1482113645903446019
+  - To fix the uncharacteristic spike we use another price oracle to get the price.
+  - Transaction: https://etherscan.io/tx/0x40db7bd89d2a3f7df2793ba4f5be9a2ca93463d6bb6af024e5cd1b73ff827248
+- There is an unusually high `dailyDepositUSD` on April 30, 2022. This is a result of reentrancy attacks: https://twitter.com/BlockSecTeam/status/1520350965274386433?s=20&t=UQ6FVaxg-3Sd7weIH3rUZA
 
 ## Reference and Useful Links
 

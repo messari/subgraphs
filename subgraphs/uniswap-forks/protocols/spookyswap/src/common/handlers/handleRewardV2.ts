@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefV2Spookyswap } from "../../../../../generated/MasterChefV2/MasterChefV2Spookyswap";
 import {
@@ -12,7 +12,10 @@ import {
   convertTokenToDecimal,
   roundToWholeNumber,
 } from "../../../../../src/common/utils/utils";
-import { getOrCreateMasterChef } from "../../../../../src/common/masterchef/helpers";
+import {
+  getOrCreateMasterChef,
+  getOrCreateMasterChefStakingPool,
+} from "../../../../../src/common/masterchef/helpers";
 
 // Updated Liquidity pool staked amount and emmissions on a deposit to the masterchef contract.
 export function updateMasterChef(
@@ -20,24 +23,41 @@ export function updateMasterChef(
   pid: BigInt,
   amount: BigInt
 ): void {
-  let masterChefV2Pool = _MasterChefStakingPool.load(
-    MasterChef.MASTERCHEFV2 + "-" + pid.toString()
-  )!;
-  let masterchefV2Contract = MasterChefV2Spookyswap.bind(event.address);
-  let masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+  let masterChefV2Pool = getOrCreateMasterChefStakingPool(
+    event,
+    MasterChef.MASTERCHEFV2,
+    pid
+  );
+
+  const masterchefV2Contract = MasterChefV2Spookyswap.bind(event.address);
+  const masterChefV2 = getOrCreateMasterChef(event, MasterChef.MASTERCHEFV2);
+
+  // Sometimes the pool addition event is not emitted before the deposit/withdraw event. In this case, we need to add the pool and allocation to the masterchef entity.
+  if (!masterChefV2Pool.poolAddress) {
+    masterChefV2Pool = getPoolAddressAndAllocation(
+      event,
+      pid,
+      masterChefV2Pool
+    );
+    masterChefV2.totalAllocPoint = masterChefV2.totalAllocPoint.plus(
+      masterChefV2Pool.poolAllocPoint
+    );
+    masterChefV2Pool.save();
+    masterChefV2.save();
+  }
 
   // Return if pool does not exist
-  let pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
+  const pool = LiquidityPool.load(masterChefV2Pool.poolAddress!);
   if (!pool) {
     return;
   }
 
-  let rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
+  const rewardToken = getOrCreateToken(NetworkConfigs.getRewardToken());
   pool.rewardTokens = [rewardToken.id];
 
   // Get the amount of reward tokens emitted per block at this point in time.
   if (masterChefV2.lastUpdatedRewardRate != event.block.number) {
-    let getSpookyPerBlock = masterchefV2Contract.try_booPerSecond();
+    const getSpookyPerBlock = masterchefV2Contract.try_booPerSecond();
     if (!getSpookyPerBlock.reverted) {
       masterChefV2.adjustedRewardTokenRate = getSpookyPerBlock.value;
     }
@@ -46,15 +66,15 @@ export function updateMasterChef(
 
   // Calculate Reward Emission per second to a specific pool
   // Pools are allocated based on their fraction of the total allocation times the rewards emitted per block.
-  let rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
+  const rewardAmountPerInterval = masterChefV2.adjustedRewardTokenRate
     .times(masterChefV2Pool.poolAllocPoint)
     .div(masterChefV2.totalAllocPoint);
-  let rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
+  const rewardAmountPerIntervalBigDecimal = BigDecimal.fromString(
     rewardAmountPerInterval.toString()
   );
 
   // Based on the emissions rate for the pool, calculate the rewards per day for the pool.
-  let rewardTokenPerDay = getRewardsPerDay(
+  const rewardTokenPerDay = getRewardsPerDay(
     event.block.timestamp,
     event.block.number,
     rewardAmountPerIntervalBigDecimal,
@@ -69,6 +89,7 @@ export function updateMasterChef(
   pool.rewardTokenEmissionsAmount = [
     BigInt.fromString(roundToWholeNumber(rewardTokenPerDay).toString()),
   ];
+
   pool.rewardTokenEmissionsUSD = [
     convertTokenToDecimal(
       pool.rewardTokenEmissionsAmount![INT_ZERO],
@@ -82,4 +103,28 @@ export function updateMasterChef(
   masterChefV2.save();
   rewardToken.save();
   pool.save();
+}
+
+export function getPoolAddressAndAllocation(
+  event: ethereum.Event,
+  pid: BigInt,
+  masterChefV2Pool: _MasterChefStakingPool
+): _MasterChefStakingPool {
+  const poolContract = MasterChefV2Spookyswap.bind(event.address);
+
+  const poolAddress = poolContract.try_lpToken(pid);
+  const poolInfo = poolContract.try_poolInfo(pid);
+  if (!poolAddress.reverted) {
+    masterChefV2Pool.poolAddress = poolAddress.value.toHexString();
+  }
+  if (!poolInfo.reverted) {
+    masterChefV2Pool.poolAllocPoint = poolInfo.value.getAllocPoint();
+  }
+  if (!masterChefV2Pool.poolAddress) {
+    log.critical(
+      "poolInfo reverted: Could not find pool address for masterchef pool",
+      []
+    );
+  }
+  return masterChefV2Pool;
 }

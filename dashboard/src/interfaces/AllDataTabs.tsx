@@ -7,8 +7,11 @@ import ProtocolTab from "./tabs/ProtocolTab";
 import { styled } from "../styled";
 import PoolOverviewTab from "./tabs/PoolOverviewTab";
 import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
-import { ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
+import { PoolName, ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 import PositionTab from "./tabs/PositionTab";
+import { NewClient } from "../utils";
+import { NormalizedCacheObject, ApolloClient } from "@apollo/client";
+import { DeploymentOverlayDropDown } from "../common/utilComponents/DeploymentOverlayDropDown";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -17,6 +20,8 @@ const StyledTabs = styled(Tabs)`
 
 interface AllDataTabsProps {
   data: any;
+  overlayData: any;
+  subgraphEndpoints: any;
   entitiesData: { [x: string]: { [x: string]: string } };
   protocolFields: { [x: string]: string };
   tabValue: string;
@@ -27,25 +32,35 @@ interface AllDataTabsProps {
   events: string[];
   subgraphToQueryURL: string;
   skipAmt: number;
+  overlaySchemaData: any;
+  protocolSchemaData: any;
   poolOverviewRequest: { [x: string]: any };
   poolTimeseriesRequest: { [x: string]: any };
+  overlayPoolTimeseriesData: any;
   protocolTimeseriesData: any;
   protocolTimeseriesLoading: any;
   protocolTimeseriesError: any;
+  overlayProtocolTimeseriesData: any;
   protocolTableData: any;
   poolsListData: { [x: string]: any };
   poolListLoading: any;
   poolsListError: any;
   positionsQuery?: string;
+  overlayDeploymentClient: ApolloClient<NormalizedCacheObject>;
+  overlayDeploymentURL: string;
   handleTabChange: (event: any, newValue: string) => void;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
   setProtocolId: React.Dispatch<React.SetStateAction<string>>;
   paginate: React.Dispatch<React.SetStateAction<number>>;
+  setOverlayDeploymentClient: React.Dispatch<React.SetStateAction<ApolloClient<NormalizedCacheObject>>>;
+  setOverlayDeploymentURL: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // This component is for each individual subgraph
 function AllDataTabs({
   data,
+  overlayData,
+  subgraphEndpoints,
   entitiesData,
   protocolFields,
   tabValue,
@@ -56,20 +71,28 @@ function AllDataTabs({
   events,
   subgraphToQueryURL,
   skipAmt,
+  overlaySchemaData,
+  protocolSchemaData,
   poolOverviewRequest,
   poolTimeseriesRequest,
   protocolTimeseriesData,
+  overlayPoolTimeseriesData,
   protocolTableData,
   poolsListData,
   poolListLoading,
   protocolTimeseriesLoading,
   protocolTimeseriesError,
+  overlayProtocolTimeseriesData,
   poolsListError,
   positionsQuery,
+  overlayDeploymentClient,
+  overlayDeploymentURL,
   handleTabChange,
   setPoolId,
   setProtocolId,
   paginate,
+  setOverlayDeploymentClient,
+  setOverlayDeploymentURL,
 }: AllDataTabsProps) {
   let protocolDropDown = null;
   if (data.protocols.length > 1) {
@@ -114,16 +137,71 @@ function AllDataTabs({
       </TabPanel>
     );
   }
+
+  let showDropDown = false;
+  let failedToLoad = false;
+  if (
+    tabValue + "" === "1" &&
+    (protocolTimeseriesData.financialsDailySnapshots || protocolTimeseriesError.financialsDailySnapshots) &&
+    (protocolTimeseriesData.usageMetricsDailySnapshots || protocolTimeseriesError.usageMetricDailySnapshots) &&
+    (protocolTimeseriesData.usageMetricsHourlySnapshots || protocolTimeseriesError.usageMetricsHourlySnapshots)
+  ) {
+    if (
+      (overlayDeploymentURL &&
+        overlayProtocolTimeseriesData.financialsDailySnapshots?.length > 0 &&
+        overlayProtocolTimeseriesData.usageMetricsDailySnapshots?.length > 0 &&
+        overlayProtocolTimeseriesData.usageMetricsHourlySnapshots?.length > 0) ||
+      !overlayDeploymentURL
+    ) {
+      showDropDown = true;
+    }
+    if (
+      (!protocolTimeseriesData.financialsDailySnapshots &&
+        !protocolTimeseriesData.usageMetricsDailySnapshots &&
+        !protocolTimeseriesData.usageMetricsHourlySnapshots) ||
+      (overlayDeploymentURL &&
+        !overlayProtocolTimeseriesData?.financialsDailySnapshots &&
+        !overlayProtocolTimeseriesData?.usageMetricsDailySnapshots &&
+        !overlayProtocolTimeseriesData?.usageMetricsHourlySnapshots)
+    ) {
+      failedToLoad = true;
+    }
+  } else if (tabValue + "" === "3" && poolTimeseriesRequest.poolTimeseriesData) {
+    if (
+      Object.values(poolTimeseriesRequest.poolTimeseriesData).filter((x: any) => x?.length > 0)?.length ===
+      Object.values(poolTimeseriesRequest.poolTimeseriesData).length
+    ) {
+      showDropDown = true;
+    } else if (poolTimeseriesRequest.poolTimeseriesError) {
+      failedToLoad = true;
+    }
+  }
+
   return (
     <>
       <TabContext value={tabValue}>
-        <StyledTabs value={tabValue} onChange={handleTabChange}>
-          <Tab label="Protocol" value="1" />
-          <Tab label="Pool Overview" value="2" />
-          <Tab label="Pool" value="3" />
-          {eventsTabButton}
-          {positionsQuery && <Tab label="Positions" value="5" />}
-        </StyledTabs>
+        <div
+          style={{ display: "flex", backgroundColor: "#292f38", justifyContent: "space-between", alignItems: "center" }}
+        >
+          <StyledTabs value={tabValue} onChange={handleTabChange}>
+            <Tab label="Protocol" value="1" />
+            <Tab label="Pool Overview" value="2" />
+            <Tab label="Pool" value="3" />
+            {eventsTabButton}
+            {positionsQuery && <Tab label="Positions" value="5" />}
+          </StyledTabs>
+          <DeploymentOverlayDropDown
+            data={data}
+            setDeploymentURL={(x: string) => {
+              setOverlayDeploymentClient(NewClient(x));
+              setOverlayDeploymentURL(x);
+            }}
+            subgraphEndpoints={subgraphEndpoints}
+            currentDeploymentURL={overlayDeploymentURL}
+            showDropDown={showDropDown}
+            failedToLoad={failedToLoad}
+          />
+        </div>
         {protocolDropDown}
         <TabPanel value="1">
           {/* PROTOCOL TAB */}
@@ -132,9 +210,12 @@ function AllDataTabs({
             protocolFields={protocolFields}
             protocolType={data.protocols[0].type}
             protocolTableData={protocolTableData}
+            overlaySchemaData={overlaySchemaData}
+            protocolSchemaData={protocolSchemaData}
             protocolTimeseriesData={protocolTimeseriesData}
             protocolTimeseriesLoading={protocolTimeseriesLoading}
             protocolTimeseriesError={protocolTimeseriesError}
+            overlayProtocolTimeseriesData={overlayProtocolTimeseriesData}
           />
         </TabPanel>
         <TabPanel value="2">
@@ -156,8 +237,10 @@ function AllDataTabs({
           {/* POOL TAB */}
           <PoolTab
             data={data}
+            overlayData={overlayData}
             entitiesData={entitiesData}
             poolTimeseriesData={poolTimeseriesRequest.poolTimeseriesData}
+            overlayPoolTimeseriesData={overlayPoolTimeseriesData}
             poolTimeseriesLoading={poolTimeseriesRequest.poolTimeseriesLoading}
             poolTimeseriesError={poolTimeseriesRequest.poolTimeseriesError}
             poolId={poolId}
@@ -175,7 +258,7 @@ function AllDataTabs({
           <TabPanel value="5">
             {/* POSITIONS TAB */}
             <PositionTab
-              positions={data?.market?.positions}
+              positions={data[PoolName[protocolType]]?.positions}
               poolId={poolId}
               poolsList={poolsListData}
               poolListLoading={poolListLoading}

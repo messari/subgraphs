@@ -1,0 +1,32 @@
+{
+  "basepools": [
+    {
+      "name": "3EPS",
+      "address": "0x160CAed03795365F3A589f10C379FfA7d75d4E76",
+      "startblock": 5936381,
+      "abi": "BasePool3",
+      "num_coins": 3,
+      "NewFee": ""
+    },
+    {
+      "name": "btcEPS",
+      "address": "0x2477fB288c5b4118315714ad3c7Fd7CC69b00bf9",
+      "startblock": 6570997,
+      "abi": "BasePool2",
+      "num_coins": 2,
+      "NewFee": ",uint256"
+    }
+  ],
+  "stablepools": [
+    { "name": "anyBTC", "address": "0xf707Df3e4c70E40c2F26C660338dD0C81ad280f1", "startblock": 7868954 },
+    { "name": "DAI", "address": "0xc6a752948627bECaB5474a10821Df73fF4771a49", "startblock": 6935464 },
+    { "name": "fUSDT", "address": "0x556ea0b4c06D043806859c9490072FaadC104b63", "startblock": 6310798 },
+    { "name": "pBTC", "address": "0x60E4ED61C6f17972559E86F2125BF8A30f249088", "startblock": 7868603 },
+    { "name": "USDN", "address": "0x2f8E25C21A17BD9D0C337e1b409e73bc959B41BE", "startblock": 8186429 },
+    { "name": "UST", "address": "0x780de1A0E4613da6b65ceF7F5FB63d14CbDcfB72", "startblock": 10655759 },
+    { "name": "TUSD", "address": "0x8D7408C2b3154F9f97fc6dd24cd36143908d1E52", "startblock": 6936611 }
+  ],
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
+}

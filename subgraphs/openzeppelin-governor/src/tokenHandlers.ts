@@ -1,8 +1,11 @@
-import { BigInt, log } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 import {
+  createDelegateChange,
+  createDelegateVotingPowerChange,
   getGovernance,
   getOrCreateDelegate,
+  getOrCreateTokenDailySnapshot,
   getOrCreateTokenHolder,
   toDecimal,
 } from "./handlers";
@@ -10,11 +13,12 @@ import {
 export function _handleDelegateChanged(
   delegator: string,
   fromDelegate: string,
-  toDelegate: string
+  toDelegate: string,
+  event: ethereum.Event
 ): void {
-  let tokenHolder = getOrCreateTokenHolder(delegator);
-  let previousDelegate = getOrCreateDelegate(fromDelegate);
-  let newDelegate = getOrCreateDelegate(toDelegate);
+  const tokenHolder = getOrCreateTokenHolder(delegator);
+  const previousDelegate = getOrCreateDelegate(fromDelegate);
+  const newDelegate = getOrCreateDelegate(toDelegate);
 
   tokenHolder.delegate = newDelegate.id;
   tokenHolder.save();
@@ -26,22 +30,41 @@ export function _handleDelegateChanged(
   newDelegate.tokenHoldersRepresentedAmount =
     newDelegate.tokenHoldersRepresentedAmount + 1;
   newDelegate.save();
+
+  const delegateChanged = createDelegateChange(
+    event,
+    toDelegate,
+    fromDelegate,
+    delegator
+  );
+
+  delegateChanged.save();
 }
 
 export function _handleDelegateVotesChanged(
   delegateAddress: string,
   previousBalance: BigInt,
-  newBalance: BigInt
+  newBalance: BigInt,
+  event: ethereum.Event
 ): void {
-  let votesDifference = newBalance.minus(previousBalance);
+  const votesDifference = newBalance.minus(previousBalance);
 
-  let delegate = getOrCreateDelegate(delegateAddress);
+  const delegate = getOrCreateDelegate(delegateAddress);
   delegate.delegatedVotesRaw = newBalance;
   delegate.delegatedVotes = toDecimal(newBalance);
   delegate.save();
 
+  // Create DelegateVotingPowerChange
+  const delegateVPChange = createDelegateVotingPowerChange(
+    event,
+    previousBalance,
+    newBalance,
+    delegateAddress
+  );
+  delegateVPChange.save();
+
   // Update governance delegate count
-  let governance = getGovernance();
+  const governance = getGovernance();
   if (previousBalance == BIGINT_ZERO && newBalance > BIGINT_ZERO) {
     governance.currentDelegates = governance.currentDelegates.plus(BIGINT_ONE);
   }
@@ -54,15 +77,21 @@ export function _handleDelegateVotesChanged(
   governance.save();
 }
 
-export function _handleTransfer(from: string, to: string, value: BigInt): void {
-  let fromHolder = getOrCreateTokenHolder(from);
-  let toHolder = getOrCreateTokenHolder(to);
-  let governance = getGovernance();
+export function _handleTransfer(
+  from: string,
+  to: string,
+  value: BigInt,
+  event: ethereum.Event
+): void {
+  const fromHolder = getOrCreateTokenHolder(from);
+  const toHolder = getOrCreateTokenHolder(to);
+  const governance = getGovernance();
 
-  // Deduct from from holder balance + decrement gov token holders
-  // if holder now owns 0 or increment gov token holders if new holder
-  if (from != ZERO_ADDRESS) {
-    let fromHolderPreviousBalance = fromHolder.tokenBalanceRaw;
+  const isBurn = to == ZERO_ADDRESS;
+  const isMint = from == ZERO_ADDRESS;
+
+  if (!isMint) {
+    const fromHolderPreviousBalance = fromHolder.tokenBalanceRaw;
     fromHolder.tokenBalanceRaw = fromHolder.tokenBalanceRaw.minus(value);
     fromHolder.tokenBalance = toDecimal(fromHolder.tokenBalanceRaw);
 
@@ -74,45 +103,48 @@ export function _handleTransfer(from: string, to: string, value: BigInt): void {
     }
 
     if (
-      fromHolder.tokenBalanceRaw == BIGINT_ZERO &&
-      fromHolderPreviousBalance > BIGINT_ZERO
+      fromHolderPreviousBalance > BIGINT_ZERO &&
+      fromHolder.tokenBalanceRaw == BIGINT_ZERO
     ) {
       governance.currentTokenHolders =
         governance.currentTokenHolders.minus(BIGINT_ONE);
       governance.save();
-    } else if (
-      fromHolder.tokenBalanceRaw > BIGINT_ZERO &&
-      fromHolderPreviousBalance == BIGINT_ZERO
-    ) {
-      governance.currentTokenHolders =
-        governance.currentTokenHolders.plus(BIGINT_ONE);
-      governance.save();
     }
-
     fromHolder.save();
   }
 
   // Increment to holder balance and total tokens ever held
-  let toHolderPreviousBalance = toHolder.tokenBalanceRaw;
+  const toHolderPreviousBalance = toHolder.tokenBalanceRaw;
   toHolder.tokenBalanceRaw = toHolder.tokenBalanceRaw.plus(value);
   toHolder.tokenBalance = toDecimal(toHolder.tokenBalanceRaw);
   toHolder.totalTokensHeldRaw = toHolder.totalTokensHeldRaw.plus(value);
   toHolder.totalTokensHeld = toDecimal(toHolder.totalTokensHeldRaw);
 
   if (
-    toHolder.tokenBalanceRaw == BIGINT_ZERO &&
-    toHolderPreviousBalance > BIGINT_ZERO
-  ) {
-    governance.currentTokenHolders =
-      governance.currentTokenHolders.minus(BIGINT_ONE);
-    governance.save();
-  } else if (
-    toHolder.tokenBalanceRaw > BIGINT_ZERO &&
-    toHolderPreviousBalance == BIGINT_ZERO
+    toHolderPreviousBalance == BIGINT_ZERO &&
+    toHolder.tokenBalanceRaw > BIGINT_ZERO
   ) {
     governance.currentTokenHolders =
       governance.currentTokenHolders.plus(BIGINT_ONE);
     governance.save();
   }
   toHolder.save();
+
+  // Adjust token total supply if it changes
+  if (isMint) {
+    governance.totalTokenSupply = governance.totalTokenSupply.plus(value);
+    governance.save();
+  } else if (isBurn) {
+    governance.totalTokenSupply = governance.totalTokenSupply.minus(value);
+    governance.save();
+  }
+
+  // Take snapshot
+  const dailySnapshot = getOrCreateTokenDailySnapshot(event.block);
+  dailySnapshot.totalSupply = governance.totalTokenSupply;
+  dailySnapshot.tokenHolders = governance.currentTokenHolders;
+  dailySnapshot.delegates = governance.currentDelegates;
+  dailySnapshot.blockNumber = event.block.number;
+  dailySnapshot.timestamp = event.block.timestamp;
+  dailySnapshot.save();
 }

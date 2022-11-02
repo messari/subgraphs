@@ -108,7 +108,7 @@ export const AVALANCHE_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 2; // 2 = seconds pe
 export const FANTOM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 1; // 1 = seconds per block. This is NOT ideal since fantom has variable block time.
 export const BSC_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 3; // 3 = seconds per block
 export const MATIC_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 2; // 2 = seconds per block
-export const ARBITRUM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 1; // 1 = seconds per block. This is NOT ideal since fantom has variable block time.
+export const ARBITRUM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 1; // 1 = seconds per block.
 
 /////////////////////////////
 /////        Math       /////
@@ -122,9 +122,34 @@ export const cTokenDecimalsBD = exponentToBigDecimal(cTokenDecimals);
 // n => 10^n
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
   let result = BIGINT_ONE;
-  let ten = BigInt.fromI32(10);
+  const ten = BigInt.fromI32(10);
   for (let i = 0; i < decimals; i++) {
     result = result.times(ten);
   }
   return result.toBigDecimal();
 }
+
+//change number of decimals for BigDecimal
+export function BDChangeDecimals(
+  x: BigDecimal,
+  from: i32,
+  to: i32
+): BigDecimal {
+  if (to > from) {
+    // increase number of decimals
+    const diffMagnitude = exponentToBigDecimal(to - from);
+    return x.times(diffMagnitude);
+  } else if (to < from) {
+    // decrease number of decimals
+    const diffMagnitude = exponentToBigDecimal(from - to);
+    return x.div(diffMagnitude);
+  } else {
+    return x;
+  }
+}
+
+/////////////////////////////
+/////     Addresses     /////
+/////////////////////////////
+
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";

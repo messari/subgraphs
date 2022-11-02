@@ -1,5 +1,6 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { prefixID } from "./strings";
+import { Versions } from "../versions";
 
 ////////////////////
 ///// Versions /////
@@ -7,9 +8,9 @@ import { prefixID } from "./strings";
 
 export const PROTOCOL_NAME = "Saddle Finance";
 export const PROTOCOL_SLUG = "saddle-finance";
-export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.2";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
+export const PROTOCOL_SCHEMA_VERSION = Versions.getSchemaVersion();
+export const PROTOCOL_SUBGRAPH_VERSION = Versions.getSubgraphVersion();
+export const PROTOCOL_METHODOLOGY_VERSION = Versions.getMethodologyVersion();
 
 ////////////////////////
 ///// Schema Enums /////
@@ -173,6 +174,20 @@ export const ETH_NAME = "Ether";
 
 export const DEPLOYER_ADDRESS = "0x5bdb37d0ddea3a90f233c7b7f6b9394b6b2eef34";
 export const FEE_PRECISION = 10 as i32;
+
+export const LIQUIDITY_THRESHOLD_FOR_SADDLE_PRICING =
+  BigDecimal.fromString("100000.00");
+
+const MAINNET_STABLES = new Set<string>();
+MAINNET_STABLES.add("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"); // USDC mainnet
+MAINNET_STABLES.add("0xdac17f958d2ee523a2206206994597c13d831ec7"); // USDT mainnet
+MAINNET_STABLES.add("0x6b175474e89094c44da98b954eedeac495271d0f"); // DAI  mainnet
+
+export const WHITELISTED_STABLE_ADDRESSES = new Map<string, Set<string>>();
+WHITELISTED_STABLE_ADDRESSES.set(
+  Network.MAINNET.toLowerCase(),
+  MAINNET_STABLES
+);
 
 export const BROKEN_POOLS = new Set<string>();
 BROKEN_POOLS.add("0x2334b53ce1309e83a889c337d9422a2a3953dd5a");

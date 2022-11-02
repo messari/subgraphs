@@ -57,43 +57,9 @@ Reward emissions for borrowers: `distributionSpeed * priceOracle.getUnderlyingPr
 
 Not applicable.
 
-## Links
+## Notes
 
-- Protocol: https://dforce.network/
-- Analytics: [Not found]
-- Docs: https://docs.dforce.network/
-- Smart contracts: https://github.com/dforce-network/LendingContractsV2
-- Deployed addresses: https://developers.dforce.network/lend/lend-and-synth/deployed-contracts
-- Official subgraph: [Not found]
-
-## Build
-
-- Initialize subgraph (Subgraph Studio):
-  ```
-  graph init --product subgraph-studio
-  --from-contract <CONTRACT_ADDRESS> [--network <ETHEREUM_NETWORK>] [--abi <FILE>] <SUBGRAPH_SLUG> [<DIRECTORY>]
-  ```
-- Initialize subgraph (Hosted Service):
-  ```
-  graph init --product hosted-service --from-contract <CONTRACT_ADDRESS> <GITHUB_USER>/<SUBGRAPH_NAME>[<DIRECTORY>]
-  ```
-- Generate code from manifest and schema: `graph codegen`
-- Build subgraph: `graph build`
-
-## Deploy
-
-- Authenticate (just once): `graph auth --product hosted-service <ACCESS_TOKEN>`
-- Deploy to Subgraph Studio: `graph deploy --studio <SUBGRAPH_NAME>`
-- Deploy to Hosted Service: `graph deploy --product hosted-service <GITHUB_USER>/<SUBGRAPH_NAME>`
-
-## Hosted Subgraph
-
-- Arbitrum: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-arbitrum
-- Avalanche: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-avalanche
-- BSC: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-bsc
-- Mainnet: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce
-- Optimism: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-optimism
-- Polygon: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-polygon
+- Avalanche is not supported on their frontend. We will keep the config for now, but it is not actively being used as far as we know.
 
 ## Smart Contracts Interactions
 
@@ -110,3 +76,12 @@ The dForce Network Lending Protocol is controled by a [controller contract](http
 ### USX/EUX stablecoin
 
 The dForce Network also manages the USX and EUX stablecoin. The USX is pegged to \$1, and the peg is maintained through controling the interest rate via [Protocol-Direct-Liquidity-Provision](https://docs.dforce.network/protocols/usx/price-stability). When the demand for USX is high (price is above \$1), the pool increases the USX supply by minting more USX tokens; vice versa.
+
+## Resources
+
+- Protocol: https://dforce.network/
+- Analytics: [Not found]
+- Docs: https://docs.dforce.network/
+- Smart contracts: https://github.com/dforce-network/LendingContractsV2
+- Deployed addresses: https://developers.dforce.network/lend/lend-and-synth/deployed-contracts
+- Official subgraph: [Not found]

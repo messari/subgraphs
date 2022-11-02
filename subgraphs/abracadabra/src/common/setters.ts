@@ -232,10 +232,7 @@ export function updateTokenPrice(rate: BigInt, token: Token, market: Market, blo
   // the exchange rate is way too low
   // it seems like it should be offset by 6 (instead of 18) until 6431888
   // this only affects one deposit
-  if (
-    market.id.toLowerCase() == AVAX_JOE_BAR_MARKET_ADDRESS.toLowerCase() &&
-    blockNumber.lt(BigInt.fromI32(6431889))
-  ) {
+  if (market.id.toLowerCase() == AVAX_JOE_BAR_MARKET_ADDRESS.toLowerCase() && blockNumber.lt(BigInt.fromI32(6431889))) {
     priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(rate, 6));
   }
 

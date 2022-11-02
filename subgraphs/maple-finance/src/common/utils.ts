@@ -107,10 +107,7 @@ export function formatUnits(value: BigDecimal, decimals: i32): BigInt {
  */
 export function computeNewAverage(oldAvg: BigDecimal, oldCount: BigInt, newVal: BigDecimal): BigDecimal {
     // new_avg = (old_avg * old_count + new_val) / (oldCount + 1)
-    return oldAvg
-        .times(oldCount.toBigDecimal())
-        .plus(newVal)
-        .div(oldCount.plus(ONE_BI).toBigDecimal());
+    return oldAvg.times(oldCount.toBigDecimal()).plus(newVal).div(oldCount.plus(ONE_BI).toBigDecimal());
 }
 
 /**
@@ -137,7 +134,7 @@ export function readCallResult<T>(
  * @param call call to create the event from
  */
 export function createEventFromCall(call: ethereum.Call): ethereum.Event {
-    return new ethereum.Event(call.from, ZERO_BI, ZERO_BI, null, call.block, call.transaction, []);
+    return new ethereum.Event(call.from, ZERO_BI, ZERO_BI, null, call.block, call.transaction, [], null);
 }
 
 /**

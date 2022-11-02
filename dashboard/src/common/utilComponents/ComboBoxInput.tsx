@@ -1,14 +1,16 @@
 import { AutocompleteRenderInputParams, TextField } from "@mui/material";
 
 interface ComboBoxInputProps {
-  setTextInput: React.Dispatch<React.SetStateAction<string>>;
+  setTextInput: any;
   params: AutocompleteRenderInputParams;
   label: string;
+  style?: any;
 }
 
-export const ComboBoxInput = ({ setTextInput, params, label }: ComboBoxInputProps) => {
+export const ComboBoxInput = ({ setTextInput, params, label, style = {} }: ComboBoxInputProps) => {
   return (
     <TextField
+      sx={style}
       onFocus={() => setTextInput("")}
       onChange={(inp) => setTextInput(inp.target.value)}
       {...params}

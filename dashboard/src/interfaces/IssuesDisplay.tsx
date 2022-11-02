@@ -34,9 +34,6 @@ const messagesByLevel = (
         }
         issuesMsg = `All values in ${issuesArray[x].fieldName} are 0 (or null). ${factors}Verify that this data is being mapped correctly.`;
       }
-      if (issuesArray[x].type === "LIQ") {
-        issuesMsg = `${issuesArray[x].fieldName} timeseries value cannot be higher than totalValueLockedUSD on the pool. Look at snapshot id ${issuesArray[x].message}`;
-      }
       if (issuesArray[x].type === "CUMULATIVE") {
         issuesMsg = `
           ${issuesArray[x].fieldName} cumulative value dropped on snapshot id ${issuesArray[x].message}. Cumulative values should always increase.`;

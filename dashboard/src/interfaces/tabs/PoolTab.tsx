@@ -9,11 +9,13 @@ import PoolTabEntity from "./PoolTabEntity";
 
 interface PoolTabProps {
   data: any;
+  overlayData: any;
   entitiesData: { [x: string]: { [x: string]: string } };
   protocolData: { [x: string]: any };
   poolTimeseriesData: any;
   poolTimeseriesError: any;
   poolTimeseriesLoading: any;
+  overlayPoolTimeseriesData: any;
   poolId: string;
   poolData: { [x: string]: string };
   poolsList: { [x: string]: any[] };
@@ -25,11 +27,13 @@ interface PoolTabProps {
 
 function PoolTab({
   data,
+  overlayData,
   entitiesData,
   protocolData,
   poolTimeseriesData,
   poolTimeseriesError,
   poolTimeseriesLoading,
+  overlayPoolTimeseriesData,
   poolId,
   poolData,
   poolsList,
@@ -93,7 +97,7 @@ function PoolTab({
         setIssues={(x) => {
           setTableIssues(x);
         }}
-        markets={poolsList[poolNames]}
+        pools={poolsList[poolNames]}
       />
     );
   } else if (poolListLoading) {
@@ -126,13 +130,30 @@ function PoolTab({
         />
       );
     }
+    let activeMessage = null;
+    if (data.protocols[0].type === "LENDING") {
+      activeMessage = (
+        <Typography sx={{ color: "lime", my: 3 }} variant="h5">
+          This Market is active.
+        </Typography>
+      );
+      if (!entityData?.isActive) {
+        activeMessage = (
+          <Typography sx={{ color: "red", my: 3 }} variant="h5">
+            This Market is <b>NOT</b> active.
+          </Typography>
+        );
+      }
+    }
     if (poolTimeseriesData) {
       const poolEntityElements = Object.keys(poolTimeseriesData).map((entityName: string) => {
         return (
           <PoolTabEntity
             key={"poolTabEntity-" + entityName}
             data={data}
+            overlayData={overlayData}
             currentEntityData={poolTimeseriesData[entityName]}
+            overlayPoolTimeseriesData={overlayPoolTimeseriesData[entityName]}
             entityName={entityName}
             entitiesData={entitiesData}
             poolId={poolId}
@@ -145,6 +166,7 @@ function PoolTab({
       poolDataSection = (
         <div>
           {poolTable}
+          {activeMessage}
           {poolEntityElements}
         </div>
       );

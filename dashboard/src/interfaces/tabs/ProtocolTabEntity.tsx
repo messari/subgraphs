@@ -1,18 +1,22 @@
 import { Box, CircularProgress, Grid, Typography } from "@mui/material";
-import { Chart } from "../../common/chartComponents/Chart";
-import { TableChart } from "../../common/chartComponents/TableChart";
 import { negativeFieldList } from "../../constants";
-import { convertTokenDecimals } from "../../utils";
-import { useEffect } from "react";
+import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
+import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import { BigNumber } from "bignumber.js";
+import { ChartContainer } from "../../common/chartComponents/ChartContainer";
+import moment from "moment";
+import JSZip from "jszip";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   entityName: string;
   protocolType: string;
   protocolTableData: { [x: string]: any };
+  overlaySchemaData: any;
+  protocolSchemaData: any;
   currentEntityData: any;
+  currentOverlayEntityData: any;
   currentTimeseriesLoading: any;
   currentTimeseriesError: any;
   issuesProps: { [x: string]: { message: string; type: string; level: string; fieldName: string }[] };
@@ -25,7 +29,10 @@ function ProtocolTabEntity({
   entityName,
   protocolType,
   protocolTableData,
+  overlaySchemaData,
+  protocolSchemaData,
   currentEntityData,
+  currentOverlayEntityData,
   currentTimeseriesLoading,
   currentTimeseriesError,
   issuesProps,
@@ -33,6 +40,26 @@ function ProtocolTabEntity({
 }: ProtocolTabEntityProps) {
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   const list: { [x: string]: any } = {};
+
+  const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
+  const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
+
+  useEffect(() => {
+    if (downloadAllCharts) {
+      let zip = new JSZip();
+      Object.keys(chartsImageFiles).forEach((fileName) => {
+        const blob = base64toBlobJPEG(chartsImageFiles[fileName]);
+        zip.file(fileName + ".jpeg", blob);
+      });
+      zip.generateAsync({ type: "base64" }).then(function (content) {
+        const link = document.createElement("a");
+        link.download = "charts.zip";
+        link.href = "data:application/zip;base64," + content;
+        link.click();
+        triggerDownloadAllCharts(false);
+      });
+    }
+  }, [chartsImageFiles]);
 
   useEffect(() => {
     const issuesToSet = { ...issuesProps };
@@ -56,17 +83,27 @@ function ProtocolTabEntity({
       // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
       const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
       // For the current entity, loop through all instances of that entity
+      const overlayDataFields: { [dataField: string]: { date: number; value: number }[] } = {};
+
+      const overlayDifference = currentEntityData.length - currentOverlayEntityData.length;
       for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
+        const overlayTimeseriesInstance: { [x: string]: any } = currentOverlayEntityData[x - overlayDifference];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
           // skip the timestamp field on each entity instance
-          if (fieldName === "timestamp" || fieldName === "id") {
+          if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename") {
             return;
           }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
           const currentInstanceField = timeseriesInstance[fieldName];
+          let currentOverlayInstanceField: any = {};
+          if (overlayTimeseriesInstance) {
+            if (Object.keys(overlayTimeseriesInstance).includes(fieldName)) {
+              currentOverlayInstanceField = overlayTimeseriesInstance[fieldName];
+            }
+          }
           try {
             if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField)) {
               // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
@@ -194,6 +231,58 @@ function ProtocolTabEntity({
                 }
               }
             }
+
+            if (x < overlayDifference && currentOverlayEntityData.length > 0) {
+              overlayDataFields[fieldName] = [
+                { value: 0, date: Number(timeseriesInstance.timestamp) },
+                ...overlayDataFields[fieldName],
+              ];
+            } else if (overlayTimeseriesInstance) {
+              if (!isNaN(currentOverlayInstanceField) && !Array.isArray(currentOverlayInstanceField)) {
+                // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
+                // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
+                if (!overlayDataFields[fieldName]) {
+                  overlayDataFields[fieldName] = [
+                    { value: Number(currentOverlayInstanceField), date: Number(overlayTimeseriesInstance.timestamp) },
+                  ];
+                } else {
+                  overlayDataFields[fieldName].push({
+                    value: Number(currentOverlayInstanceField),
+                    date: Number(overlayTimeseriesInstance.timestamp),
+                  });
+                }
+              } else if (Array.isArray(currentOverlayInstanceField)) {
+                // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
+                // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
+                // currentOverlayInstanceField.forEach((val: string, arrayIndex: number) => {
+                for (let arrayIndex = 0; arrayIndex < currentOverlayInstanceField.length; arrayIndex++) {
+                  const val = currentOverlayInstanceField[arrayIndex];
+                  const dataFieldKey = fieldName + " [" + arrayIndex + "]";
+                  let value = Number(val);
+                  try {
+                    if (fieldName === "mintedTokenSupplies" && protocolTableData?.lendingType === "CDP") {
+                      if (protocolTableData?.mintedTokens.length > 0) {
+                        value = convertTokenDecimals(val, protocolTableData.mintedTokens[arrayIndex]?.decimals);
+                      }
+                    } else if (fieldName === "mintedTokenSupplies" && protocolTableData?.lendingType !== "CDP") {
+                      continue;
+                    }
+                  } catch (err) {
+                    console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
+                  }
+                  if (!overlayDataFields[dataFieldKey]) {
+                    overlayDataFields[dataFieldKey] = [
+                      { value: value, date: Number(overlayTimeseriesInstance.timestamp) },
+                    ];
+                  } else {
+                    overlayDataFields[dataFieldKey].push({
+                      value: value,
+                      date: Number(overlayTimeseriesInstance.timestamp),
+                    });
+                  }
+                }
+              }
+            }
           } catch (err) {
             if (issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0) {
               let message = "JAVASCRIPT ERROR";
@@ -241,17 +330,43 @@ function ProtocolTabEntity({
         }
       }
 
+      const mappedCurrentEntityData = currentEntityData
+        .map((instance: any, idx: number) => {
+          let instanceToSave: any = {};
+          instanceToSave.date = moment.utc(Number(instance.timestamp) * 1000).format("YYYY-MM-DD");
+          instanceToSave = { ...instanceToSave, ...instance };
+          delete instanceToSave.__typename;
+          return instanceToSave;
+        })
+        .sort((a: any, b: any) => Number(a.timestamp) - Number(b.timestamp));
+
       // For each entity field/key in the dataFields object, create a chart and tableChart component
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
       return (
         <Grid key={entityName}>
-          <Box my={3}>
+          <Box sx={{ marginTop: "24px" }}>
             <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
               <Typography variant="h4" id={entityName}>
                 {entityName}
               </Typography>
             </CopyLinkToClipboard>
           </Box>
+          <div>
+            <div
+              style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }}
+              className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root"
+              onClick={() => downloadCSV(mappedCurrentEntityData, entityName, entityName)}
+            >
+              Download Snapshots as csv
+            </div>
+            <div
+              style={{ display: "block", paddingLeft: "5px", textAlign: "left", color: "white" }}
+              className="Hover-Underline MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButtonBase-root  css-1huqmjz-MuiButtonBase-root-MuiButton-root"
+              onClick={() => triggerDownloadAllCharts(true)}
+            >
+              Download All Chart Images
+            </div>
+          </div>
           {Object.keys(dataFields).map((field: string) => {
             // The following checks if the field is required or can be null
             const fieldName = field.split(" [")[0];
@@ -336,7 +451,7 @@ function ProtocolTabEntity({
               if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
                 issues.push({
                   type: "JS",
-                  message: message,
+                  message: 6 + message,
                   level: "critical",
                   fieldName: entityName + "-" + field,
                 });
@@ -353,22 +468,27 @@ function ProtocolTabEntity({
                 </div>
               );
             }
+            let dataChartToPass: any = dataFields[field];
+            if (overlayDataFields[field]) {
+              const baseKey = `${protocolSchemaData?.protocols[0]?.name}-${protocolSchemaData?.protocols[0]?.network}-${protocolSchemaData?.protocols[0]?.subgraphVersion}`;
+              const overlayKey = `${overlaySchemaData?.protocols[0]?.name}-${overlaySchemaData?.protocols[0]?.network}-${overlaySchemaData?.protocols[0]?.subgraphVersion}`;
+              let keyDiff = "";
+              if (baseKey === overlayKey) {
+                keyDiff = " (Overlay)";
+              }
+              dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
+            }
             return (
-              <div key={elementId} id={elementId}>
-                <Box mt={3} mb={1}>
-                  <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-                    <Typography variant="h6">{field}</Typography>
-                  </CopyLinkToClipboard>
-                </Box>
-                <Grid container justifyContent="space-between">
-                  <Grid key={label + "1"} item xs={7.5}>
-                    <Chart datasetLabel={label} dataChart={dataFields[field]} />
-                  </Grid>
-                  <Grid key={label + "2"} item xs={4}>
-                    <TableChart datasetLabel={label} dataTable={dataFields[field]} />
-                  </Grid>
-                </Grid>
-              </div>
+              <ChartContainer
+                elementId={elementId}
+                downloadAllCharts={downloadAllCharts}
+                identifier={protocolTableData?.slug}
+                datasetLabel={label}
+                dataTable={dataFields[field]}
+                dataChart={dataChartToPass}
+                chartsImageFiles={chartsImageFiles}
+                setChartsImageFiles={(x: any) => setChartsImageFiles(x)}
+              />
             );
           })}
         </Grid>
@@ -395,13 +515,6 @@ function ProtocolTabEntity({
       </Grid>
     );
   } else {
-    console.log(
-      currentTimeseriesLoading,
-      currentTimeseriesLoading,
-      currentEntityData,
-      currentTimeseriesError,
-      protocolTableData,
-    );
     return (
       <Grid key={entityName}>
         <Box my={3}>

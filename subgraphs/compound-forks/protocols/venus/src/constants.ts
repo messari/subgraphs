@@ -2,7 +2,7 @@ import { Address } from "@graphprotocol/graph-ts";
 import { cTokenDecimals } from "../../../src/constants";
 import { TokenData } from "../../../src/mapping";
 
-export let comptrollerAddr = Address.fromString(
+export const comptrollerAddr = Address.fromString(
   "0xfD36E2c2a6789Db23113685031d7F16329158384"
 );
 

@@ -16,29 +16,12 @@ export const USDC_POS_TOKEN_ADDRESS =
 export namespace Protocol {
   export const NAME = "Aave v2";
   export const SLUG = "aave-v2";
-  export const SCHEMA_VERSION = "2.0.1";
-  export const SUBGRAPH_VERSION = "1.2.13";
-  export const METHODOLOGY_VERSION = "1.0.0";
 }
 export const AAVE_DECIMALS = 8;
 
 ////////////////////////////
 ///// Network Specific /////
 ////////////////////////////
-
-// used to differentiate between different mainnet implementations
-export const MAINNET_ADDRESS = Address.fromString(
-  "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"
-);
-export const AMM_ADDRESS = Address.fromString(
-  "0xAcc030EF66f9dFEAE9CbB0cd1B25654b82cFA8d5"
-);
-export const ARC_ADDRESS = Address.fromString(
-  "0x6FdfafB66d39cD72CFE7984D3Bbcc76632faAb00"
-);
-export const RWA_ADDRESS = Address.fromString(
-  "0xB953a066377176092879a151C07798B3946EEa4b"
-);
 
 export class NetworkSpecificConstant {
   constructor(
@@ -47,9 +30,8 @@ export class NetworkSpecificConstant {
   ) {}
 }
 
-// TODO- figure out how to get different mainnet deployments to work (ie, arc, rwa, eth amm, eth)
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
-  let network = dataSource.network();
+  const network = dataSource.network();
   if (equalsIgnoreCase(network, Network.MAINNET)) {
     return new NetworkSpecificConstant(
       Address.fromString("0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"),

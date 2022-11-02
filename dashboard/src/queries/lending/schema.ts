@@ -958,6 +958,9 @@ export const schema201 = (): Schema => {
         deposits {
           hash
         }
+        liquidations {
+          hash
+        }
       }
   `;
 

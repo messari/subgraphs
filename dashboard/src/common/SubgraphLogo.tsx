@@ -54,6 +54,16 @@ const subgraphLogoMap: Record<string, string> = {
   ubeswap: "https://assets.coingecko.com/coins/images/15317/small/ubeswap.png?1620395836",
   tectonic: "https://assets.coingecko.com/coins/images/21982/small/TONIC_logo.png?1640575290",
   "maple-finance": "https://assets.coingecko.com/coins/images/14097/small/Maple_Logo_Mark_Maple_Orange.png?1653381382",
+  cosmos: "https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png?1555657960",
+  near: "https://assets.coingecko.com/coins/images/10365/small/near_icon.png?1601359077",
+  trisolaris: "https://assets.coingecko.com/coins/images/20607/small/logo_-_2021-11-19T104946.772.png?1637290197",
+  arweave: "https://assets.coingecko.com/coins/images/4343/small/oRt6SiEN_400x400.jpg?1591059616",
+  "rocket-pool": "https://assets.coingecko.com/coins/images/2090/small/rocket_pool_%28RPL%29.png?1637662441",
+  "tornado-cash": "https://assets.coingecko.com/coins/images/13496/small/ZINt8NSB_400x400.jpg?1609193407",
+  graph: "https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png?1608145566",
+  truefi: "https://assets.coingecko.com/coins/images/13180/small/truefi_glyph_color.png?1617610941",
+  radiant: "https://assets.coingecko.com/coins/images/26536/small/Radiant-Logo-200x200.png?1658715865",
+  velodrome: "https://assets.coingecko.com/coins/images/25783/small/velo.png?1653817876",
 };
 
 // used for protocols with multiple versions
@@ -68,17 +78,29 @@ const subgraphMap: Record<string, string> = {
   "uniswap-v3": "uniswap",
   "uniswap-v2": "uniswap",
   "rari-vaults-v1": "rari",
+  "rari-vaults": "rari",
   "compound-v2": "compound",
   "yearn-v2": "yearn",
+  stakedao: "stake-dao",
+  "curve-finance": "curve",
+  "vesper-finance": "vesper",
+  "gamma-strategies": "gamma",
+  "convex-finance": "convex",
+  "graph-protocol": "graph",
 };
 
 interface SubgraphLogoProps {
   name: string;
+  size: number;
 }
 
-export const SubgraphLogo = ({ name }: SubgraphLogoProps) => {
+export const SubgraphLogo = ({ name, size }: SubgraphLogoProps) => {
   const logoName = subgraphMap[name] ?? name;
-  const url = subgraphLogoMap[logoName] ?? "";
-
-  return <Avatar src={url} />;
+  let src = subgraphLogoMap[logoName];
+  let opacity = 1;
+  if (!src) {
+    src = subgraphLogoMap.uniswap;
+    opacity = 0;
+  }
+  return <Avatar src={src} sx={{ height: size, width: size, opacity }} />;
 };

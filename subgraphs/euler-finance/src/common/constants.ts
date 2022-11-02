@@ -1,5 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////
 ///// Versions /////
@@ -7,9 +6,9 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export const PROTOCOL_NAME = "Euler";
 export const PROTOCOL_SLUG = "euler";
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.3";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
+export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.2.2";
+export const PROTOCOL_METHODOLOGY_VERSION = "1.1.0";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -95,6 +94,11 @@ export namespace TransactionType {
   export const REPAY = "REPAY";
 }
 
+export namespace ActivityType {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
@@ -108,6 +112,7 @@ export const USDC_WETH_03_ADDRESS = "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8"
 export const USDC_ERC20_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const EULER_GENERAL_VIEW_ADDRESS = "0x9D2B3052f5A3c156A34FC32cD08E9F5501720ea4";
 export const EULER_GENERAL_VIEW_V2_ADDRESS = "0xACC25c4d40651676FEEd43a3467F3169e3E68e42";
+export const CRYPTEX_MARKET_ID = "0x321c2fe4446c7c963dc41dd58879af648838f98d";
 
 export const VIEW_V2_START_BLOCK_NUMBER = BigInt.fromI32(14482429);
 
@@ -122,8 +127,16 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_THREE = BigInt.fromI32(3);
+export const BIGINT_FOUR = BigInt.fromI32(4);
+export const BIGINT_SIX = BigInt.fromI32(6);
+export const BIGINT_TWELVE = BigInt.fromI32(12);
+export const BIGINT_TWENTY_FOUR = BigInt.fromI32(24);
+export const BIGINT_SEVENTY_FIVE = BigInt.fromI32(75);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
+export const BIGINT_ONE_HUNDRED_TWENTY = BigInt.fromI32(120);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromI32(10).pow(18);
 export const BIGINT_MAX = BigInt.fromString(
@@ -139,6 +152,13 @@ export const INT_FOUR = 4 as i32;
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_THREE = new BigDecimal(BIGINT_THREE);
+export const BIGDECIMAL_FOUR = new BigDecimal(BIGINT_FOUR);
+export const BIGDECIMAL_SIX = new BigDecimal(BIGINT_SIX);
+export const BIGDECIMAL_TWELVE = new BigDecimal(BIGINT_TWELVE);
+export const BIGDECIMAL_TWENTY_FOUR = new BigDecimal(BIGINT_TWENTY_FOUR);
+export const BIGDECIMAL_ONE_HUNDRED_TWENTY = new BigDecimal(BIGINT_ONE_HUNDRED_TWENTY);
+export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -157,21 +177,32 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 ///// Misc /////
 ////////////////
 
-export const ETH_SYMBOL = "ETH"
-export const ETH_NAME = "Ether"
+export const ETH_SYMBOL = "ETH";
+export const ETH_NAME = "Ether";
 export const USDC_SYMBOL = "USDC";
 
 //////////////////////////
 ///// Euler Specific /////
 //////////////////////////
 
+export const DECIMAL_PRECISION = BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal();
 export const CONFIG_FACTOR_SCALE = BigDecimal.fromString("4e9");
 export const RESERVE_FEE_SCALE = BigDecimal.fromString("4e9");
+export const DEFAULT_RESERVE_FEE = BigDecimal.fromString("0.23").times(RESERVE_FEE_SCALE);
+// How much of a liquidation is credited to the underlying's reserves.
+export const UNDERLYING_RESERVES_FEE = BigDecimal.fromString("0.02").times(DECIMAL_PRECISION);
+// if delta Reverse < delta totalBalances +/- RESERVE_PRECISION
+// consider them equal
+export const RESERVE_PRECISION = BigInt.fromI32(10).pow(9);
+
+export const INITIAL_RESERVES = BigInt.fromI32(1e6 as i32);
 export const EXEC_START_BLOCK_NUMBER = BigInt.fromI32(13711556);
-export const UNISWAP_Q192 = BigDecimal.fromString(
-  BigInt.fromI32(2)
-    .pow(192)
-    .toString(),
-);
-export const DECIMAL_PRECISION = BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal();
+export const UNISWAP_Q192 = BigDecimal.fromString(BigInt.fromI32(2).pow(192).toString());
+
 export const INTEREST_RATE_PRECISION = BigDecimal.fromString("1e25");
+export const INTEREST_RATE_DECIMALS = BigDecimal.fromString("1e27");
+export const INTERNAL_DEBT_PRECISION = BigDecimal.fromString("1e9");
+export const MODULEID__EXEC = BigInt.fromI32(5);
+export const MODULEID__RISK_MANAGER = BigInt.fromI32(1000000);
+export const MODULEID__MARKETS = BigInt.fromI32(2);
+export const INITIAL_INTEREST_ACCUMULATOR = BigInt.fromI32(10).pow(27);

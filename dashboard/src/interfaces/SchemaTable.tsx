@@ -97,6 +97,14 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
           issues.push({ type: "TVL+", message: "", level: "critical", fieldName: `${schemaName}-${fieldName}` });
         }
 
+        if (
+          fieldName.toUpperCase() === "TOTALVALUELOCKEDUSD" &&
+          issues.filter((x) => x.fieldName === `${schemaName}-${fieldName}` && x.type === "TVL-").length === 0 &&
+          Number(value) < 1_000
+        ) {
+          issues.push({ type: "TVL-", message: "", level: "critical", fieldName: `${schemaName}-${fieldName}` });
+        }
+
         if (fieldName.toUpperCase().includes("OUTPUTTOKEN")) {
           if (fieldName === "outputTokenSupply" || fieldName === "stakedOutputTokenAmount") {
             value = convertTokenDecimals(value, entityData?.outputToken?.decimals).toString();
@@ -159,17 +167,19 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
             let rewardFactorsStr = "N/A";
             let rewardAPRs: string[] = entityData?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
               let apr = 0;
-              if (protocolType === "LENDING" && (entityData.rewardTokens[idx]?.type === "BORROW" || entityData.rewardTokens[idx]?.token?.type === "BORROW")) {
+              if (
+                protocolType === "LENDING" &&
+                (entityData.rewardTokens[idx]?.type === "BORROW" ||
+                  entityData.rewardTokens[idx]?.token?.type === "BORROW")
+              ) {
                 if (
                   !Number(entityData.totalBorrowBalanceUSD) &&
-                  issues.filter(
-                    (x) => x.fieldName === `${entityData.name}-totalBorrowBalanceUSD-pool value`,
-                  ).length === 0
+                  issues.filter((x) => x.fieldName === `${entityData.name}-totalBorrowBalanceUSD-pool value`).length ===
+                    0
                 ) {
                   issues.push({
                     type: "VAL",
-                    message: `${entityData.name
-                      } does not have a valid 'totalBorrowBalanceUSD' value. Reward APR (BORROWER) could not be properly calculated.`,
+                    message: `${entityData.name} does not have a valid 'totalBorrowBalanceUSD' value. Reward APR (BORROWER) could not be properly calculated.`,
                     level: "critical",
                     fieldName: `${entityData.name}-totalBorrowBalanceUSD-pool value`,
                   });
@@ -185,17 +195,14 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
                   !Number(entityData.totalValueLockedUSD) &&
                   issues.filter(
                     (x) =>
-                      x.fieldName ===
-                      `${entityData.name} - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
+                      x.fieldName === `${entityData.name} - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
                   ).length === 0
                 ) {
                   issues.push({
                     type: "VAL",
-                    message: `${entityData.name
-                      } does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
+                    message: `${entityData.name} does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APR (DEPOSITOR) nor Base Yield could be properly calculated.`,
                     level: "critical",
-                    fieldName: `${entityData.name
-                      } - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
+                    fieldName: `${entityData.name} - totalDepositBalanceUSD / totalValueLockedUSD - pool value`,
                   });
                 } else if (entityData.totalDepositBalanceUSD) {
                   apr = (Number(val) / Number(entityData.totalDepositBalanceUSD)) * 100 * 365;
@@ -209,7 +216,8 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
                   ).toFixed(2)} (TVL)) * 100 * 365 = ${apr.toFixed(2)}% `;
                 }
               } else {
-                let outputStakedFactor = Number(entityData?.stakedOutputTokenAmount) / Number(entityData?.outputTokenSupply);
+                let outputStakedFactor =
+                  Number(entityData?.stakedOutputTokenAmount) / Number(entityData?.outputTokenSupply);
                 if (!outputStakedFactor) {
                   outputStakedFactor = 1;
                 }
@@ -225,14 +233,18 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
                 issues.filter(
                   (x) =>
                     x.fieldName ===
-                    `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                    `${entityData.name} ${
+                      entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol
+                    } RewardAPR`,
                 ).length === 0
               ) {
                 issues.push({
                   type: "RATEZERO",
                   message: "",
                   level: "warning",
-                  fieldName: `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                  fieldName: `${entityData.name} ${
+                    entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol
+                  } RewardAPR`,
                 });
               }
               if (
@@ -240,14 +252,18 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
                 issues.filter(
                   (x) =>
                     x.fieldName ===
-                    `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                    `${entityData.name} ${
+                      entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol
+                    } RewardAPR`,
                 ).length === 0
               ) {
                 issues.push({
                   type: "NAN",
                   message: "",
                   level: "critical",
-                  fieldName: `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                  fieldName: `${entityData.name} ${
+                    entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol
+                  } RewardAPR`,
                 });
               }
               if (
@@ -255,28 +271,34 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
                 issues.filter(
                   (x) =>
                     x.fieldName ===
-                    `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                    `${entityData.name} ${
+                      entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol
+                    } RewardAPR`,
                 ).length === 0
               ) {
                 issues.push({
                   type: "RATENEG",
                   message: "",
                   level: "critical",
-                  fieldName: `${entityData.name} ${entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol} RewardAPR`,
+                  fieldName: `${entityData.name} ${
+                    entityData.rewardTokens[idx]?.symbol || entityData.rewardTokens[idx]?.token?.symbol
+                  } RewardAPR`,
                 });
               }
               rewardFactors.push("Token [" + idx + "] " + rewardFactorsStr);
               return Number(apr).toFixed(2) + "%";
             });
             if (rewardAPRs.length >= 1) {
-              const dataType = rewardAPRs.map((x, idx) => `${entityData.rewardTokens[idx]?.token?.name} (${entityData.rewardTokens[idx]?.type}) APR%`)
+              const dataType = rewardAPRs.map(
+                (x, idx) => `${entityData.rewardTokens[idx]?.token?.name} (${entityData.rewardTokens[idx]?.type}) APR%`,
+              );
               additionalElement = (
                 <TableRow key="reward-APRs">
                   <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
-                    reward APRs: <b>[{dataType.join(', ')}]</b>
+                    reward APRs: <b>[{dataType.join(", ")}]</b>
                   </TableCell>
                   <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
-                    [{rewardAPRs.join(', ')}]
+                    [{rewardAPRs.join(", ")}]
                   </TableCell>
                 </TableRow>
               );
@@ -441,7 +463,8 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
         }
       }
       return (
-        <>{additionalElement}
+        <>
+          {additionalElement}
           <TableRow key={fieldName}>
             <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
               {fieldName}: <b>{dataType}</b>
@@ -450,7 +473,8 @@ function SchemaTable({ entityData, protocolType, schemaName, dataFields, issuesP
               {value}
             </TableCell>
           </TableRow>
-        </>);
+        </>
+      );
     });
   }
 

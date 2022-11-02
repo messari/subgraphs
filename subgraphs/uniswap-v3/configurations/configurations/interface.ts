@@ -5,14 +5,11 @@ export interface Configurations {
   getNetwork(): string;
   getProtocolName(): string;
   getProtocolSlug(): string;
-  getSchemaVersion(): string;
-  getSubgraphVersion(): string;
-  getMethodologyVersion(): string;
   getFactoryAddress(): string;
   getFactoryContract(): Factory;
   getFeeOnOff(): string;
   getRewardIntervalType(): string;
-  getReferenceToken(): string
+  getReferenceToken(): string;
   getRewardToken(): string;
   getWhitelistTokens(): string[];
   getStableCoins(): string[];

@@ -42,6 +42,9 @@ dataSources:
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
@@ -55,6 +58,12 @@ dataSources:
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
         # Uniswap Contracts
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
@@ -107,6 +116,9 @@ dataSources:
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
@@ -120,6 +132,12 @@ dataSources:
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
         # Uniswap Contracts
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
@@ -174,6 +192,9 @@ templates:
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
@@ -187,6 +208,12 @@ templates:
         # ChainLink Contracts
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
+        # 1Inch Contracts
+        - name: OneInchOracleContract
+          file: ./abis/Prices/1Inch/Oracle.json
+        # Aave Contracts
+        - name: AaveOracleContract
+          file: ./abis/Prices/Aave/Oracle.json
         # Uniswap Contracts
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json

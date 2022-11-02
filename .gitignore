@@ -1,8 +1,12 @@
-generated/
-build/
 Reference/
 .vscode/
+
 subgraph.yaml
+versions.ts
+deploymentJsonContext.json
+**/configurations/configure.ts
+generated/
+subgraphs/**/build/
 
 **/.DS_Store
 

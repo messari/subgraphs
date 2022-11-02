@@ -1,0 +1,149 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: DSChief
+    network: {{ network }}
+    source:
+      address: "{{ governorContractAddress }}"
+      abi: DSChief
+      startBlock: {{ governorContractStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Slate
+        - Spell
+        - Delegate
+        - DelegateAdmin
+        - Vote
+        - Poll
+        - PollVote
+      abis:
+        - name: DSChief
+          file: ./abis/maker-governance/DSChief.json
+        - name: DSSpell
+          file: ./abis/maker-governance/DSSpell.json
+        - name: VoteDelegate
+          file: ./abis/maker-governance/VoteDelegate.json
+      eventHandlers:
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,uint256,bytes)
+          topic0: '0xdd46706400000000000000000000000000000000000000000000000000000000' # lock(uint)
+          handler: handleLock
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,uint256,bytes)
+          topic0: '0xd8ccd0f300000000000000000000000000000000000000000000000000000000' # free(uint)
+          handler: handleFree
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,uint256,bytes)
+          topic0: '0xa69beaba00000000000000000000000000000000000000000000000000000000' # vote(bytes32)
+          handler: handleVote
+        - event: Etch(indexed bytes32) # etch event as a proxy to vote array so we can capture the slate id
+          topic0: '0x4f0892983790f53eea39a7a496f6cb40e8811b313871337b6a761efc6c67bb1f'
+          handler: handleEtch
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,uint256,bytes)
+          topic0: '0x3c278bd500000000000000000000000000000000000000000000000000000000' # lift(address)
+          handler: handleLift
+      file: ./protocols/maker-governance/src/ds-chief.ts
+  - kind: ethereum
+    name: PollingEmitter
+    network: mainnet
+    source:
+      address: "0xd3a9fe267852281a1e6307a1c37cdfd76d39b133"
+      abi: PollingEmitter
+      startBlock: 11327777
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Slate
+        - Spell
+        - Delegate
+        - DelegateAdmin
+        - Vote
+        - Poll
+        - PollVote
+      abis:
+        - name: PollingEmitter
+          file: ./abis/maker-governance/PollingEmitter.json
+      eventHandlers:
+        - event: Voted(indexed address,indexed uint256,indexed uint256)
+          handler: handlePollVote
+      file: ./protocols/maker-governance/src/polling-emitter.ts
+  # - kind: ethereum
+  #   name: DSToken
+  #   network:  mainnet
+  #   source:
+  #     address: {{ tokenContractAddress }}
+  #     abi: DSToken
+  #     startBlock: {{ tokenContractStartBlock }}
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Slate
+  #       - Spell
+  #       - Delegate
+  #       - Vote
+  #       - Poll
+  #     abis:
+  #       - name: DSToken
+  #         file: ./abis/DSToken.json
+  #     eventHandlers:
+  #       - event: Transfer(indexed address,indexed address,uint256)
+  #         handler: handleTransfer
+  #     file: ./src/ds-token.ts
+templates:
+  - kind: ethereum
+    name: DSSpell
+    network: mainnet
+    source:
+      abi: DSSpell
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Slate
+        - Spell
+        - Delegate
+        - Vote
+      abis:
+        - name: DSChief
+          file: ./abis/maker-governance/DSChief.json
+        - name: DSSpell
+          file: ./abis/maker-governance/DSSpell.json
+      callHandlers:
+        - function: schedule()
+          handler: handleSchedule
+        - function: cast()
+          handler: handleCast
+      file: ./protocols/maker-governance/src/ds-spell.ts
+  - kind: ethereum
+    name: VoteDelegate
+    network: mainnet
+    source:
+      abi: VoteDelegate
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Slate
+        - Spell
+        - Delegate
+        - Vote
+      abis:
+        - name: DSChief
+          file: ./abis/maker-governance/DSChief.json
+        - name: VoteDelegate
+          file: ./abis/maker-governance/VoteDelegate.json
+      eventHandlers:
+        - event: Lock(indexed address,uint256)
+          handler: handleDelegateLock
+        - event: Free(indexed address,uint256)
+          handler: handleDelegateFree
+      file: ./protocols/maker-governance/src/vote-delegate.ts

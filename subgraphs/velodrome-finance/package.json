@@ -1,0 +1,11 @@
+{
+  "name": "velodrome-finance",
+  "license": "MIT",
+  "scripts": {
+    "codegen": "graph codegen"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.33.0",
+    "@graphprotocol/graph-ts": "^0.27.0"
+  }
+}

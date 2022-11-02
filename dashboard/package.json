@@ -24,6 +24,7 @@
     "chart.js": "^3.7.1",
     "graphql": "^16.3.0",
     "graphql2chartjs": "^0.3.1",
+    "jszip": "^3.10.1",
     "moment": "^2.29.2",
     "react": "^18.0.0",
     "react-chartjs-2": "^4.0.1",
@@ -32,13 +33,20 @@
     "react-router": "^6.3.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.0",
-    "typescript": "^4.4.2",
     "web-vitals": "^2.1.0"
   },
   "devDependencies": {
     "@types/react-lazyload": "^3.2.0",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "eslint": "^8.23.1",
+    "eslint-config-standard-with-typescript": "^23.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.5",
+    "eslint-plugin-promise": "^6.0.1",
+    "eslint-plugin-react": "^7.31.8",
     "gh-pages": "^3.2.3",
-    "prettier": "2.6.1"
+    "prettier": "2.6.1",
+    "typescript": "^4.8.3"
   },
   "scripts": {
     "predeploy": "npm run build",
@@ -48,12 +56,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [

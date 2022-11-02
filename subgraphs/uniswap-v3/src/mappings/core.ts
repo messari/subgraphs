@@ -1,9 +1,9 @@
-// import { log } from '@graphprotocol/graph-ts'
+// import { log } from "@graphprotocol/graph-ts";
 import {
-  Burn as BurnEvent,
   Initialize,
   Mint as MintEvent,
   Swap as SwapEvent,
+  Collect as CollectEvent,
   SetFeeProtocol,
 } from "../../generated/templates/Pool/Pool";
 import { UsageType } from "../common/constants";
@@ -44,19 +44,6 @@ export function handleMint(event: MintEvent): void {
   updatePoolMetrics(event);
 }
 
-// Handle a burn event emitted from a pool contract. Considered a withdraw into the given liquidity pool.
-export function handleBurn(event: BurnEvent): void {
-  createWithdraw(
-    event,
-    event.params.owner,
-    event.params.amount0,
-    event.params.amount1
-  );
-  updateUsageMetrics(event, event.params.owner, UsageType.WITHDRAW);
-  updateFinancials(event);
-  updatePoolMetrics(event);
-}
-
 // Handle a swap event emitted from a pool contract.
 export function handleSwap(event: SwapEvent): void {
   createSwapHandleVolumeAndFees(
@@ -64,10 +51,22 @@ export function handleSwap(event: SwapEvent): void {
     event.params.amount0,
     event.params.amount1,
     event.params.recipient,
-    event.params.sender,
+    event.transaction.from,
     event.params.sqrtPriceX96
   );
   updateFinancials(event);
   updatePoolMetrics(event);
-  updateUsageMetrics(event, event.params.sender, UsageType.SWAP);
+  updateUsageMetrics(event, event.transaction.from, UsageType.SWAP);
+}
+
+export function handleCollect(event: CollectEvent): void {
+  createWithdraw(
+    event,
+    event.params.recipient,
+    event.params.amount0,
+    event.params.amount1
+  );
+  updateFinancials(event);
+  updatePoolMetrics(event);
+  updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import IssuesDisplay from "./IssuesDisplay";
 import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
@@ -9,6 +9,7 @@ import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery } from "@apoll
 import { DeploymentsDropDown } from "../common/utilComponents/DeploymentsDropDown";
 import { Chart as ChartJS, registerables, PointElement } from "chart.js";
 import { useNavigate } from "react-router";
+import moment from "moment";
 
 interface DefiLlamaComparsionTabProps {
   deploymentJSON: { [x: string]: any };
@@ -21,23 +22,43 @@ const lineupChartDatapoints = (compChart: any, stitchLeftIndex: number): any => 
       const startIndex = compChart.defiLlama.findIndex((x: any) => x.date >= compChart.subgraph[stitchLeftIndex].date);
       let newArray = [...compChart.defiLlama.slice(startIndex)];
       if (stitchLeftIndex > 0) {
-        newArray = [...compChart.defiLlama.slice(0, stitchLeftIndex), ...compChart.defiLlama.slice(startIndex, compChart.defiLlama.length)];
+        newArray = [
+          ...compChart.defiLlama.slice(0, stitchLeftIndex),
+          ...compChart.defiLlama.slice(startIndex, compChart.defiLlama.length),
+        ];
       }
       compChart.defiLlama = newArray;
     } else {
       const startIndex = compChart.subgraph.findIndex((x: any) => x.date >= compChart.defiLlama[stitchLeftIndex].date);
       let newArray = [...compChart.subgraph.slice(startIndex)];
       if (stitchLeftIndex > 0) {
-        newArray = [...compChart.subgraph.slice(0, stitchLeftIndex), ...compChart.subgraph.slice(startIndex, compChart.subgraph.length)];
+        newArray = [
+          ...compChart.subgraph.slice(0, stitchLeftIndex),
+          ...compChart.subgraph.slice(startIndex, compChart.subgraph.length),
+        ];
       }
       compChart.subgraph = newArray;
     }
   }
   return compChart;
-}
+};
 
 // This component is for each individual subgraph
 function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsionTabProps) {
+  function jpegDownloadHandler() {
+    try {
+      const fileName =
+        defiLlamaSlug?.split(" (").join("-")?.split(")")?.join("-")?.split(" ")?.join("-") +
+        moment.utc(Date.now()).format("MMDDYY") +
+        ".jpeg";
+      const link = document.createElement("a");
+      link.download = fileName;
+      link.href = chartRef.current?.toBase64Image("image/jpeg", 1);
+      link.click();
+    } catch (err) {
+      return;
+    }
+  }
   const navigate = useNavigate();
 
   ChartJS.register(...registerables);
@@ -51,6 +72,9 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   const [defiLlamaData, setDefiLlamaData] = useState<{ [x: string]: any }>({});
   const [defiLlamaProtocols, setDefiLlamaProtocols] = useState<any[]>([]);
   const [isMonthly, setIsMonthly] = useState(false);
+  const [includeStakedTVL, setIncludeStakedTVL] = useState(true);
+  const [includeBorrowedTVL, setIncludeBorrowedTVL] = useState(true);
+
   const client = useMemo(() => {
     return new ApolloClient({
       link: new HttpLink({
@@ -66,33 +90,53 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
     }
   }, []);
 
+  const chartRef = useRef<any>(null);
   const deploymentNameToUrlMapping: any = {};
 
   Object.values(deploymentJSON).forEach((protocolsOnType: { [x: string]: any }) => {
     Object.entries(protocolsOnType).forEach(([protocolName, deploymentOnNetwork]) => {
       protocolName = protocolName.toLowerCase();
-      const protocolNameVersionRemoved = protocolName.split("-v")[0];
       deploymentNameToUrlMapping[protocolName] = {
         slug: "",
         defiLlamaNetworks: [],
         subgraphNetworks: deploymentOnNetwork,
       };
-      deploymentNameToUrlMapping[protocolNameVersionRemoved] = {
-        slug: "",
-        defiLlamaNetworks: [],
-        subgraphNetworks: deploymentOnNetwork,
-      };
+      if (protocolName.includes("-v")) {
+        const protocolNameVersionRemoved = protocolName.split("-v")[0];
+        deploymentNameToUrlMapping[protocolNameVersionRemoved] = {
+          slug: "",
+          defiLlamaNetworks: [],
+          subgraphNetworks: deploymentOnNetwork,
+        };
+      }
+      if (protocolName.includes("-finance")) {
+        deploymentNameToUrlMapping[protocolName.split("-finance")[0]] = {
+          slug: "",
+          defiLlamaNetworks: [],
+          subgraphNetworks: deploymentOnNetwork,
+        };
+      } else {
+        deploymentNameToUrlMapping[protocolName + "-finance"] = {
+          slug: "",
+          defiLlamaNetworks: [],
+          subgraphNetworks: deploymentOnNetwork,
+        };
+      }
     });
   });
 
   if (defiLlamaProtocols.length > 0) {
     defiLlamaProtocols.forEach((protocol) => {
       const currentName = protocol.name.toLowerCase().split(" ").join("-");
-      if (deploymentNameToUrlMapping[currentName]?.slug === "") {
-        deploymentNameToUrlMapping[currentName].slug = protocol.slug;
-        deploymentNameToUrlMapping[currentName].defiLlamaNetworks = Object.keys(protocol.chainTvls).map((x) =>
-          x.toLowerCase(),
-        );
+      if (
+        Object.keys(deploymentNameToUrlMapping).includes(currentName) ||
+        Object.keys(deploymentNameToUrlMapping).includes(currentName.split("-")[0])
+      ) {
+        const key = Object.keys(deploymentNameToUrlMapping).includes(currentName)
+          ? currentName
+          : currentName.split("-")[0];
+        deploymentNameToUrlMapping[key].slug = protocol.slug;
+        deploymentNameToUrlMapping[key].defiLlamaNetworks = Object.keys(protocol.chainTvls).map((x) => x.toLowerCase());
       }
     });
   }
@@ -169,14 +213,14 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   }, [issuesState]);
 
   let chart = null;
-  if (
+  let chartRenderCondition =
     Object.keys(defiLlamaData).length > 0 &&
     financialsData?.financialsDailySnapshots &&
-    defiLlamaData.name.toLowerCase() === defiLlamaSlug?.split(" (")[0].toLowerCase()
-  ) {
+    defiLlamaData?.name?.toLowerCase() === defiLlamaSlug?.split(" (")[0]?.toLowerCase();
 
-    let stakedDataset = "";
-    let borrowedDataset = "";
+  let stakedDataset = "";
+  let borrowedDataset = "";
+  if (chartRenderCondition) {
     let dataset: string = "";
 
     Object.keys(defiLlamaData.chainTvls).forEach((chain) => {
@@ -190,10 +234,10 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
       if (chain.toUpperCase() === networkName) {
         dataset = chain;
       }
-      if (chain.toUpperCase() === networkName + '-STAKING') {
+      if (chain.toUpperCase() === networkName + "-STAKING") {
         stakedDataset = chain;
       }
-      if (chain.toUpperCase() === networkName + '-BORROWED') {
+      if (chain.toUpperCase() === networkName + "-BORROWED") {
         borrowedDataset = chain;
       }
     });
@@ -203,14 +247,18 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
         let value = x.totalLiquidityUSD;
         const date = toDate(x.date);
         if (defiLlamaData.chainTvls[stakedDataset]) {
-          const stakedDatapoint = defiLlamaData.chainTvls[stakedDataset]?.tvl?.find((x: any) => toDate(x.date) === date);
-          if (stakedDatapoint) {
+          const stakedDatapoint = defiLlamaData.chainTvls[stakedDataset]?.tvl?.find(
+            (x: any) => toDate(x.date) === date,
+          );
+          if (stakedDatapoint && includeStakedTVL) {
             value += stakedDatapoint.totalLiquidityUSD;
           }
         }
         if (defiLlamaData.chainTvls[borrowedDataset]) {
-          const borrowedDatapoint = defiLlamaData.chainTvls[borrowedDataset]?.tvl?.find((x: any) => toDate(x.date) === date);
-          if (borrowedDatapoint) {
+          const borrowedDatapoint = defiLlamaData.chainTvls[borrowedDataset]?.tvl?.find(
+            (x: any) => toDate(x.date) === date,
+          );
+          if (borrowedDatapoint && includeBorrowedTVL) {
             value += borrowedDatapoint.totalLiquidityUSD;
           }
         }
@@ -243,22 +291,24 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
     }
 
     compChart = lineupChartDatapoints({ ...compChart }, 0);
-    compChart.defiLlama
-      .forEach((val: any, i: any) => {
-        const subgraphPoint = compChart.subgraph[i];
-        if (!subgraphPoint) {
-          return;
-        }
+    compChart.defiLlama.forEach((val: any, i: any) => {
+      const subgraphPoint = compChart.subgraph[i];
+      if (!subgraphPoint) {
+        return;
+      }
 
-        const subgraphTimestamp = subgraphPoint?.date || 0;
-        const llamaDate = toDate(val.date);
+      const subgraphTimestamp = subgraphPoint?.date || 0;
+      const llamaDate = toDate(val.date);
 
-        if (Math.abs(subgraphTimestamp - val.date) > 86400) {
-          const dateIndex = compChart.subgraph.findIndex((x: any) => toDate(x.date) === llamaDate || x.date > val.date);
-          compChart.subgraph = [...compChart.subgraph.slice(0, i), ...compChart.subgraph.slice(dateIndex, compChart.subgraph.length)];
-          compChart = lineupChartDatapoints({ ...compChart }, i);
-        }
-      });
+      if (Math.abs(subgraphTimestamp - val.date) > 86400) {
+        const dateIndex = compChart.subgraph.findIndex((x: any) => toDate(x.date) === llamaDate || x.date > val.date);
+        compChart.subgraph = [
+          ...compChart.subgraph.slice(0, i),
+          ...compChart.subgraph.slice(dateIndex, compChart.subgraph.length),
+        ];
+        compChart = lineupChartDatapoints({ ...compChart }, i);
+      }
+    });
 
     const elementId = `${isMonthly ? "Monthly" : "Daily"} Chart - ${defiLlamaSlug}`;
     chart = (
@@ -270,7 +320,7 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
         </Box>
         <Grid container justifyContent="space-between">
           <Grid key={elementId} item xs={7.5}>
-            <Chart datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} />
+            <Chart identifier={""} datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} chartRef={chartRef} />
           </Grid>
           <Grid key={elementId + "2"} item xs={4}>
             <ComparisonTable
@@ -278,6 +328,7 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
               dataTable={compChart}
               isMonthly={isMonthly}
               setIsMonthly={(x: boolean) => setIsMonthly(x)}
+              jpegDownloadHandler={() => jpegDownloadHandler()}
             />
           </Grid>
         </Grid>
@@ -302,21 +353,61 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
     chart = <CircularProgress sx={{ my: 5 }} size={40} />;
   }
 
+  let valueToggles = null;
+  if (chartRenderCondition) {
+    let stakedTVL = null;
+    if (stakedDataset) {
+      stakedTVL = (
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ my: 4, marginRight: "16px" }}
+          onClick={() => setIncludeStakedTVL(!includeStakedTVL)}
+        >
+          {includeStakedTVL ? "Disclude Staked TVL" : "Include Staked TVL"}
+        </Button>
+      );
+    }
+
+    let borrowedTVL = null;
+    if (borrowedDataset) {
+      borrowedTVL = (
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ my: 4 }}
+          onClick={() => setIncludeBorrowedTVL(!includeBorrowedTVL)}
+        >
+          {includeBorrowedTVL ? "Disclude Borrowed TVL" : "Include Borrowed TVL"}
+        </Button>
+      );
+    }
+
+    valueToggles = (
+      <div style={{ display: "flex" }}>
+        {stakedTVL}
+        {borrowedTVL}
+      </div>
+    );
+  }
   return (
     <>
-      <Button variant="contained" color="primary" sx={{ my: 4 }} onClick={() => navigate("/")}>
+      <Button variant="contained" color="primary" sx={{ my: 4, mx: 2 }} onClick={() => navigate("/")}>
         Back To Deployments List
       </Button>
-      <DeploymentsDropDown
-        setDeploymentURL={(x) => setDeploymentURL(x)}
-        setDefiLlamaSlug={(x) => setDefiLlamaSlug(x)}
-        setIssues={(x: any) => setIssues(x)}
-        issuesProps={issues}
-        deploymentURL={deploymentURL}
-        deploymentJSON={deploymentNameToUrlMapping}
-      />
-      <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
-      {chart}
+      <div style={{ margin: "0px 16px" }}>
+        <DeploymentsDropDown
+          setDeploymentURL={(x) => setDeploymentURL(x)}
+          setDefiLlamaSlug={(x) => setDefiLlamaSlug(x)}
+          setIssues={(x: any) => setIssues(x)}
+          issuesProps={issues}
+          deploymentURL={deploymentURL}
+          deploymentJSON={deploymentNameToUrlMapping}
+        />
+        <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
+        {chart}
+        {valueToggles}
+      </div>
     </>
   );
 }
