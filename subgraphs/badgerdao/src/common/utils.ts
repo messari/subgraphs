@@ -1,13 +1,16 @@
 import {
+  log,
   BigInt,
   Address,
   ethereum,
   dataSource,
   BigDecimal,
+  DataSourceContext,
 } from "@graphprotocol/graph-ts";
 import {
   getOrCreateToken,
   getOrCreateVaultFee,
+  getOrCreateWantToken,
   getOrCreateYieldAggregator,
 } from "./initializers";
 import { PoolFeesType } from "./types";
@@ -15,8 +18,11 @@ import * as constants from "./constants";
 import { ERC20 } from "../../generated/templates/Strategy/ERC20";
 import { Token, Vault as VaultStore, VaultFee } from "../../generated/schema";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
+import { BribesProcessor as BribesProcessorTemplate } from "../../generated/templates";
 import { Strategy as StrategyContract } from "../../generated/templates/Strategy/Strategy";
 import { Controller as ControllerContract } from "../../generated/templates/Strategy/Controller";
+import { RewardsLogger as RewardsLoggerContract } from "../../generated/templates/Strategy/RewardsLogger";
+import { updateRewardTokenInfo } from "../modules/Rewards";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -110,28 +116,51 @@ export function getVaultAddressFromController(
 ): Address {
   const controllerContract = ControllerContract.bind(controllerAddress);
 
-  const vaultAddress = readValue<Address>(
+  let vaultAddress = readValue<Address>(
     controllerContract.try_vaults(wantToken),
     constants.NULL.TYPE_ADDRESS
   );
 
+  if (vaultAddress.notEqual(constants.NULL.TYPE_ADDRESS)) return vaultAddress;
+
+  const wantTokenStore = getOrCreateWantToken(wantToken, null);
+  vaultAddress = Address.fromString(wantTokenStore.vaultAddress);
+
   return vaultAddress;
 }
 
-export function getBribesProcessor(strategyAddress: Address): Address {
+export function getBribesProcessor(
+  vaultAddress: Address,
+  strategyAddress: Address
+): Address {
   const strategyContract = StrategyContract.bind(strategyAddress);
 
   let bribesProcessor = readValue<Address>(
     strategyContract.try_BRIBES_PROCESSOR(),
     constants.NULL.TYPE_ADDRESS
   );
-  if (bribesProcessor.notEqual(constants.NULL.TYPE_ADDRESS))
-    return bribesProcessor;
 
-  bribesProcessor = readValue<Address>(
-    strategyContract.try_bribesProcessor(),
-    constants.NULL.TYPE_ADDRESS
-  );
+  if (bribesProcessor.equals(constants.NULL.TYPE_ADDRESS)) {
+    bribesProcessor = readValue<Address>(
+      strategyContract.try_bribesProcessor(),
+      constants.NULL.TYPE_ADDRESS
+    );
+  }
+
+  if (bribesProcessor.notEqual(constants.NULL.TYPE_ADDRESS)) {
+    let context = new DataSourceContext();
+    context.setString("vaultAddress", vaultAddress.toHexString());
+    BribesProcessorTemplate.createWithContext(bribesProcessor, context);
+
+    log.warning(
+      "[SetBribesProcessor] Vault: {}, Strategy: {}, bribesProcessor: {}",
+      [
+        vaultAddress.toHexString(),
+        strategyAddress.toHexString(),
+        bribesProcessor.toHexString(),
+      ]
+    );
+  }
 
   return bribesProcessor;
 }
@@ -231,6 +260,32 @@ export function getVaultFees(
   let performanceFees = getVaultPerformanceFees(vaultAddress, strategyAddress);
 
   return new PoolFeesType(withdrawalFees, performanceFees);
+}
+
+export function deactivateFinishedRewards(
+  vaultAddress: Address,
+  block: ethereum.Block
+): void {
+  const rewardsLoggerContract = RewardsLoggerContract.bind(
+    constants.REWARDS_LOGGER_ADDRESS
+  );
+
+  const unlockSchedulesArray =
+    rewardsLoggerContract.try_getAllUnlockSchedulesFor(vaultAddress);
+  if (unlockSchedulesArray.reverted) return;
+
+  for (let i = 0; i < unlockSchedulesArray.value.length; i++) {
+    let unlockSchedule = unlockSchedulesArray.value[i];
+
+    if (unlockSchedule.end.lt(block.timestamp)) {
+      updateRewardTokenInfo(
+        vaultAddress,
+        getOrCreateToken(unlockSchedule.token, block),
+        constants.BIGINT_ZERO,
+        block
+      );
+    }
+  }
 }
 
 export function updateProtocolTotalValueLockedUSD(): void {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   log,
   Address,
@@ -9,6 +10,7 @@ import {
   Token,
   Account,
   VaultFee,
+  _WantToken,
   RewardToken,
   YieldAggregator,
   VaultDailySnapshot,
@@ -23,7 +25,7 @@ import { getUsdPricePerToken } from "../prices";
 import { Vault as VaultStore } from "../../generated/schema";
 import { ERC20 as ERC20Contract } from "../../generated/templates/Strategy/ERC20";
 import { Vault as VaultContract } from "../../generated/templates/Strategy/Vault";
-import { Strategy as StrategyTemplate, BribesProcessor as BribesProcessorTemplate } from "../../generated/templates";
+import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { Versions } from "../versions";
 
 export function getOrCreateAccount(id: string): Account {
@@ -71,7 +73,10 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
   return protocol;
 }
 
-export function getOrCreateToken(address: Address, block: ethereum.Block): Token {
+export function getOrCreateToken(
+  address: Address,
+  block: ethereum.Block
+): Token {
   let token = Token.load(address.toHexString());
 
   if (!token) {
@@ -103,7 +108,29 @@ export function getOrCreateToken(address: Address, block: ethereum.Block): Token
   return token;
 }
 
-export function getOrCreateRewardToken(address: Address, block: ethereum.Block): RewardToken {
+export function getOrCreateWantToken(
+  wantToken: Address,
+  vaultAddress: Address | null
+): _WantToken {
+  let wantTokenStore = _WantToken.load(wantToken.toHexString());
+
+  if (!wantTokenStore) {
+    wantTokenStore = new _WantToken(wantToken.toHexString());
+
+    if (!vaultAddress) vaultAddress = constants.NULL.TYPE_ADDRESS;
+
+    wantTokenStore.vaultAddress = vaultAddress.toHexString();
+
+    wantTokenStore.save();
+  }
+
+  return wantTokenStore;
+}
+
+export function getOrCreateRewardToken(
+  address: Address,
+  block: ethereum.Block
+): RewardToken {
   let rewardToken = RewardToken.load(address.toHexString());
 
   if (!rewardToken) {
@@ -328,6 +355,8 @@ export function getOrCreateVault(
       constants.NULL.TYPE_ADDRESS
     );
     const inputToken = getOrCreateToken(inputTokenAddress, block);
+    getOrCreateWantToken(inputTokenAddress, vaultAddress);
+
     vault.inputToken = inputToken.id;
     vault.inputTokenBalance = constants.BIGINT_ZERO;
 
@@ -348,8 +377,14 @@ export function getOrCreateVault(
     vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
-    const strategyAddress = utils.getVaultStrategy(vaultAddress, inputTokenAddress);
-    const bribesAddress = utils.getBribesProcessor(strategyAddress);
+    const strategyAddress = utils.getVaultStrategy(
+      vaultAddress,
+      inputTokenAddress
+    );
+    const bribesAddress = utils.getBribesProcessor(
+      vaultAddress,
+      strategyAddress
+    );
 
     if (strategyAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
       let context = new DataSourceContext();
@@ -358,29 +393,33 @@ export function getOrCreateVault(
       StrategyTemplate.createWithContext(strategyAddress, context);
     }
 
-    if (bribesAddress.notEqual(constants.NULL.TYPE_ADDRESS)) {
-      let context = new DataSourceContext();
-      context.setString("vaultAddress", vaultAddress.toHexString());
-
-      BribesProcessorTemplate.createWithContext(bribesAddress, context);
-    }
-
     vault.fees = utils.getVaultFees(vaultAddress, strategyAddress).stringIds();
+    vault._lastRewardsBlockNumber = block.number;
+
+    vault._bribesProcessor = bribesAddress.toHexString();
     vault._strategy = strategyAddress.toHexString();
+
     vault.save();
 
     utils.updateProtocolAfterNewVault(vaultAddress);
 
-    log.warning(
-      "[NewVault] VaultId: {}, inputToken: {}, strategy: {}",
-      [
-        vaultAddress.toHexString(),
-        inputTokenAddress.toHexString(),
-        strategyAddress.toHexString(),
-      ]
-    );
+    log.warning("[NewVault] VaultId: {}, inputToken: {}, strategy: {}", [
+      vaultAddress.toHexString(),
+      inputTokenAddress.toHexString(),
+      strategyAddress.toHexString(),
+    ]);
+  }
+
+  if (
+    block.number
+      .minus(vault._lastRewardsBlockNumber)
+      .gt(constants.REWARDS_LOGGER_CACHING)
+  ) {
+    utils.deactivateFinishedRewards(vaultAddress, block);
+
+    vault._lastRewardsBlockNumber = block.number;
+    vault.save();
   }
 
   return vault;
 }
->>>>>>> update Badger

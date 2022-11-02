@@ -53,10 +53,10 @@ export function updateRewardTokenEmissions(
   let rewardTokens = vault.rewardTokens!;
   if (!rewardTokens.includes(rewardToken.id)) {
     rewardTokens.push(rewardToken.id);
-    vault.rewardTokens = rewardTokens;
+    vault.rewardTokens = rewardTokens.sort();
   }
 
-  const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
+  const rewardTokenIndex = vault.rewardTokens!.indexOf(rewardToken.id);
 
   if (!vault.rewardTokenEmissionsAmount) {
     vault.rewardTokenEmissionsAmount = [];

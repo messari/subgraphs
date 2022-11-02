@@ -1,11 +1,12 @@
 import * as utils from "../common/utils";
-import { log } from "@graphprotocol/graph-ts";
 import * as constants from "../common/constants";
 import {
   SetVaultCall,
   SetStrategyCall,
 } from "../../generated/templates/Controller/Controller";
 import { getOrCreateVault } from "../common/initializers";
+import { DataSourceContext, log } from "@graphprotocol/graph-ts";
+import { Strategy as StrategyTemplate } from "../../generated/templates";
 
 export function handleSetVault(call: SetVaultCall): void {
   const controllerAddress = call.to;
@@ -39,8 +40,15 @@ export function handleSetStrategy(call: SetStrategyCall): void {
   if (vaultAddress.equals(constants.NULL.TYPE_ADDRESS)) return;
 
   const vault = getOrCreateVault(vaultAddress, call.block);
+  const bribesAddress = utils.getBribesProcessor(vaultAddress, strategyAddress);
+
+  vault._bribesProcessor = bribesAddress.toHexString();
   vault._strategy = strategyAddress.toHexString();
   vault.save();
+
+  let context = new DataSourceContext();
+  context.setString("vaultAddress", vaultAddress.toHexString());
+  StrategyTemplate.createWithContext(strategyAddress, context);
 
   log.warning(
     "[SetStrategy] Controller: {}, Vault: {}, Strategy: {}, TxnHash: {}",

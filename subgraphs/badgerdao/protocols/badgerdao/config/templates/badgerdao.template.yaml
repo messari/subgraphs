@@ -125,6 +125,8 @@ dataSources:
           file: ./abis/Controller.json
         - name: BaseRewardPool
           file: ./abis/BaseRewardPool.json
+        - name: DiggToken
+          file: ./abis/DiggToken.json
         - name: ERC20
           file: ./abis/ERC20.json
 
