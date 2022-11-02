@@ -176,14 +176,11 @@ type InterestRate @entity {
 # This generic type will help define the unique relationships between tokens in a market
 # You can think of this as a 1:M relationship between 1 input token and output tokens
 type TokenData @entity {
-  " { Input Token Address }-{ Optional: Snapshot ID } "
+  " { Market Address }-{ Input Token Address }-{ Optional: Snapshot ID } "
   id: Bytes!
 
   " Can you use the output token as collateral "
   canUseAsCollateral: Boolean!
-
-  " Can you borrow from this market "
-  canBorrowFrom: Boolean!
 
   " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
   maximumLTV: BigDecimal!
@@ -222,6 +219,15 @@ type TokenData @entity {
 
   " All interest rates for this input token. Should be in APR format "
   rates: [InterestRate!]
+
+  " The token that can be borrowed (e.g. inputToken in POOLED and generally a stable in CDPs) "
+  borrowedToken: Token
+
+  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
+  variableBorrowedTokenBalance: BigInt
+
+  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
+  stableBorrowedTokenBalance: BigInt
 
   " Allowed limit to how much of the underlying asset can be supplied to this market. "
   supplyCap: BigInt
@@ -753,6 +759,9 @@ type Market @entity {
   " Is this market active or is it frozen "
   isActive: Boolean!
 
+  " Can you borrow from this market "
+  canBorrowFrom: Boolean!
+
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
@@ -762,7 +771,7 @@ type Market @entity {
   ##### Quantitative Data #####
 
   " All fees allowed in the market. Fee should be in percentage format. e.g. 0.30% liquidation fee "
-  fees: [InterestRate!]!
+  fees: [InterestRate!]
 
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
@@ -851,12 +860,6 @@ type Market @entity {
 
   " Balances and relationships of all tokens within this market "
   tokens: [TokenData!]
-
-  " Amount of input tokens borrowed in this market using variable interest rates (in native terms) "
-  variableBorrowedTokenBalance: BigInt
-
-  " Amount of input tokens borrowed in this market using stable interest rates (in native terms) "
-  stableBorrowedTokenBalance: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]

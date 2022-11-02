@@ -1,7 +1,18 @@
-import { Address, Bytes } from "@graphprotocol/graph-ts";
-import { LendingProtocol } from "../../generated/schema";
+import { Address, Bytes, BigInt } from "@graphprotocol/graph-ts";
+import {
+  LendingProtocol,
+  Market,
+  Token,
+  TokenData,
+} from "../../generated/schema";
 import { Versions } from "../versions";
-import { BIGDECIMAL_ZERO, INT_ZERO, ProtocolType } from "./constants";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  INT_ZERO,
+  ProtocolType,
+} from "./constants";
+import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./token";
 
 /**
  * This file contains schema type getter (or creator)
@@ -76,4 +87,94 @@ export function getOrCreateLendingProtocol(
   return protocol;
 }
 
-export function getOrCreateMarket(marketID: string): Market {}
+export function getOrCreateMarket(
+  marketID: Address,
+  protocolID: string,
+  timestamp: BigInt,
+  blockNumber: BigInt
+): Market {
+  let market = Market.load(marketID);
+  if (!market) {
+    market = new Market(marketID);
+    market.protocol = protocolID;
+    market.isActive = true;
+    market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    market.cumulativeTransferUSD = BIGDECIMAL_ZERO;
+    market.cumulativeFlashloanUSD = BIGDECIMAL_ZERO;
+    market.transactionCount = INT_ZERO;
+    market.depositCount = INT_ZERO;
+    market.withdrawalCount = INT_ZERO;
+    market.borrowCount = INT_ZERO;
+    market.repayCount = INT_ZERO;
+    market.liquidationCount = INT_ZERO;
+    market.transferCount = INT_ZERO;
+    market.flashloanCount = INT_ZERO;
+
+    market.cumulativeUniqueUsers = INT_ZERO;
+    market.cumulativeUniqueDepositors = INT_ZERO;
+    market.cumulativeUniqueBorrowers = INT_ZERO;
+    market.cumulativeUniqueLiquidators = INT_ZERO;
+    market.cumulativeUniqueLiquidatees = INT_ZERO;
+    market.cumulativeUniqueTransferrers = INT_ZERO;
+    market.cumulativeUniqueFlashloaners = INT_ZERO;
+
+    market.createdTimestamp = timestamp;
+    market.createdBlockNumber = blockNumber;
+
+    market.positionCount = INT_ZERO;
+    market.openPositionCount = INT_ZERO;
+    market.closedPositionCount = INT_ZERO;
+    market.lendingPositionCount = INT_ZERO;
+    market.borrowingPositionCount = INT_ZERO;
+    market.save();
+  }
+
+  return market;
+}
+
+export function getOrCreateTokenData(
+  marketID: Address,
+  inputTokenID: Address
+): TokenData {
+  let tokenDataID = marketID.concat(inputTokenID);
+  let tokenData = TokenData.load(tokenDataID);
+  if (!tokenData) {
+    const token = getOrCreateToken(inputTokenID);
+    tokenData = new TokenData(tokenDataID);
+
+    // default values
+    tokenData.canUseAsCollateral = false;
+    tokenData.canBorrowFrom = false;
+    tokenData.maximumLTV = BIGDECIMAL_ZERO;
+    tokenData.liquidationThreshold = BIGDECIMAL_ZERO;
+    tokenData.liquidationPenalty = BIGDECIMAL_ZERO;
+    tokenData.canIsolate = false;
+    tokenData.inputToken = token.id;
+    tokenData.inputTokenBalance = BIGINT_ZERO;
+    tokenData.inputTokenPricesUSD = BIGDECIMAL_ZERO;
+    tokenData.save();
+  }
+
+  return tokenData;
+}
+
+export function getOrCreateToken(tokenAddress: Address): Token {
+  let token = Token.load(tokenAddress);
+  if (!token) {
+    token = new Token(tokenAddress);
+    token.name = fetchTokenName(tokenAddress);
+    token.symbol = fetchTokenSymbol(tokenAddress);
+    token.decimals = fetchTokenDecimals(tokenAddress);
+    token.save();
+  }
+
+  return token;
+}
