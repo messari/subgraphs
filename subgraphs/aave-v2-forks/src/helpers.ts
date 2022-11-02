@@ -781,9 +781,10 @@ export function createAccount(accountID: string): Account {
   return account;
 }
 
-// returns the market based on the output token
-export function getMarketByOutputToken(
-  outputTokenID: string,
+// returns the market based on any auxillary token
+// ie, outputToken, vToken, or sToken
+export function getMarketByAuxillaryToken(
+  auxillaryToken: string,
   protocolData: ProtocolData
 ): Market | null {
   const protocol = getOrCreateLendingProtocol(protocolData);
@@ -795,8 +796,20 @@ export function getMarketByOutputToken(
       continue;
     }
 
-    if (market.outputToken!.toLowerCase() == outputTokenID.toLowerCase()) {
+    if (market.outputToken!.toLowerCase() == auxillaryToken.toLowerCase()) {
       // we found a matching market!
+      return market;
+    }
+    if (
+      market.vToken &&
+      market.vToken!.toLowerCase() == auxillaryToken.toLowerCase()
+    ) {
+      return market;
+    }
+    if (
+      market.sToken &&
+      market.sToken!.toLowerCase() == auxillaryToken.toLowerCase()
+    ) {
       return market;
     }
   }

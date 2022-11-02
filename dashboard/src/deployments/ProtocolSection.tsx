@@ -8,6 +8,7 @@ import { convertTokenDecimals, formatIntToFixed2, toPercent } from "../utils";
 
 interface ProtocolSection {
     protocol: { [x: string]: any };
+    schemaType: string;
     subgraphName: string;
     clientIndexing: any;
     decenDeposToSubgraphIds: { [x: string]: any };
@@ -19,7 +20,7 @@ interface ProtocolSection {
     validationSupported: boolean;
 }
 
-function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
+function ProtocolSection({ protocol, schemaType, subgraphName, clientIndexing, decenDeposToSubgraphIds, tableExpanded, isLoaded, isLoadedPending, validationSupported, indexQueryError, indexQueryErrorPending }: ProtocolSection) {
     const [showDeposDropDown, toggleShowDeposDropDown] = useState<boolean>(false);
     const navigate = useNavigate();
 
@@ -66,7 +67,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
                 let schemaCell = <span>{depo?.versions?.schema}</span>;
 
-                if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
+                if ((!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) && schemaType !== "governance") {
                     schemaCell = <Tooltip title="This deployment does not have the latest schema verison" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
                 }
 
@@ -251,7 +252,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
                 let schemaCell = <span>{depo?.versions?.schema}</span>;
 
-                if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
+                if ((!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) && schemaType !== "governance") {
                     schemaCell = <Tooltip title="This deployment does not have the latest schema version" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
                 }
                 let decenDeposBySubgraphId = decenDeposToSubgraphIds[depo?.decentralizedNetworkId];
@@ -377,7 +378,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
 
             let schemaCell = <span>{depo?.versions?.schema}</span>;
 
-            if (!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) {
+            if ((!depo?.versions?.schema || !latestSchemaVersions.includes(depo?.versions?.schema)) && schemaType !== "governance") {
                 schemaCell = <Tooltip title="This deployment does not have the latest schema verison" placement="top" ><span style={{ color: "#FFA500" }}>{depo?.versions?.schema || "N/A"}</span></Tooltip>
             }
 
@@ -607,7 +608,7 @@ function ProtocolSection({ protocol, subgraphName, clientIndexing, decenDeposToS
     let schemaCell = <span>N/A</span>;
     if (protocol?.schemaVersions?.length > 0) {
         const schemaColored = protocol?.schemaVersions?.map((x: string, idx: number) => {
-            if (latestSchemaVersions.includes(x)) {
+            if (latestSchemaVersions.includes(x) || schemaType === "governance") {
                 return <span>{x}</span>;
             }
             return <span key={subgraphName + "-protocol-schemaVerRow-" + idx} style={{ color: "#FFA500" }}>{x}</span>;

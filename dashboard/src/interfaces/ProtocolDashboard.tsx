@@ -31,9 +31,10 @@ const BackBanner = styled("div")`
 interface ProtocolProps {
   protocolJSON: any;
   getData: any;
+  subgraphEndpoints: any;
 }
 
-function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
+function ProtocolDashboard({ protocolJSON, getData, subgraphEndpoints }: ProtocolProps) {
   const [searchParams] = useSearchParams();
   const subgraphParam = searchParams.get("endpoint") || "";
   const tabString = searchParams.get("tab") || "";
@@ -1116,6 +1117,7 @@ function ProtocolDashboard({ protocolJSON, getData }: ProtocolProps) {
         <AllDataTabs
           data={data}
           overlayData={overlayData}
+          subgraphEndpoints={subgraphEndpoints}
           entitiesData={entitiesData}
           tabValue={tabValue}
           events={events}

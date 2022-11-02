@@ -41,7 +41,7 @@ import {
   createAccount,
   createInterestRate,
   getBorrowBalance,
-  getMarketByOutputToken,
+  getMarketByAuxillaryToken,
   getOrCreateLendingProtocol,
   getOrCreateMarket,
   getOrCreateToken,
@@ -51,7 +51,12 @@ import {
   updateMarketSnapshots,
   updateSnapshots,
 } from "./helpers";
-import { AToken as ATokenTemplate } from "../generated/templates";
+import {
+  AToken as ATokenTemplate,
+  VariableDebtToken as VTokenTemplate,
+  StableDebtToken as STokenTemplate,
+} from "../generated/templates";
+import { ERC20 } from "../generated/LendingPool/ERC20";
 
 //////////////////////////
 ///// Helper Classes /////
@@ -102,8 +107,10 @@ export function _handleReserveInitialized(
   market.createdBlockNumber = event.block.number;
   market.createdTimestamp = event.block.timestamp;
   market.vToken = variableDebtTokenEntity.id;
+  VTokenTemplate.create(variableDebtToken);
   if (stableDebtToken != Address.fromString(ZERO_ADDRESS)) {
     market.sToken = getOrCreateToken(stableDebtToken).id;
+    STokenTemplate.create(stableDebtToken);
   }
 
   market.save();
@@ -642,9 +649,10 @@ export function _handleWithdraw(
     event
   );
   if (positionId === null) {
-    log.warning("[handleWithdraw] Position not found for account: {}", [
-      accountID.toHexString(),
-    ]);
+    log.warning(
+      "[handleWithdraw] Position not found for account: {} in transaction: {}",
+      [accountID.toHexString(), event.transaction.hash.toHexString()]
+    );
     return;
   }
 
@@ -819,9 +827,10 @@ export function _handleRepay(
     event
   );
   if (positionId === null) {
-    log.warning("[handleRepay] Position not found for account: {}", [
-      accountID.toHexString(),
-    ]);
+    log.warning(
+      "[handleRepay] Position not found for account: {} in transaction; {}",
+      [accountID.toHexString(), event.transaction.hash.toHexString()]
+    );
     return;
   }
 
@@ -950,9 +959,10 @@ export function _handleLiquidate(
     event
   );
   if (positionId === null) {
-    log.warning("[handleLiquidate] Position not found for account: {}", [
-      borrower.toHexString(),
-    ]);
+    log.warning(
+      "[handleLiquidate] Position not found for account: {} in transaction: {}",
+      [borrower.toHexString(), event.transaction.hash.toHexString()]
+    );
     return;
   }
 
@@ -1037,35 +1047,37 @@ export function _handleLiquidate(
   );
 }
 
-//////////////////////
-//// AToken Event ////
-//////////////////////
+/////////////////////////
+//// Transfer Events ////
+/////////////////////////
 
 export function _handleTransfer(
   event: ethereum.Event,
+  protocolData: ProtocolData,
+  positionSide: string,
   to: Address,
-  from: Address,
-  protocolData: ProtocolData
+  from: Address
 ): void {
+  const asset = event.address;
   const protocol = getOrCreateLendingProtocol(protocolData);
-  const market = getMarketByOutputToken(
-    event.address.toHexString(),
-    protocolData
-  );
+  const market = getMarketByAuxillaryToken(asset.toHexString(), protocolData);
   if (!market) {
     log.warning("[_handleTransfer] market not found: {}", [
-      event.address.toHexString(),
+      asset.toHexString(),
     ]);
     return;
   }
 
-  // if the to / from addresses are the same as the aToken
+  // if the to / from addresses are the same as the asset
   // then this transfer is emitted as part of another event
   // ie, a deposit, withdraw, borrow, repay, etc
   // we want to let that handler take care of position updates
+  // and zero addresses mean it is apart of a burn / mint
   if (
-    to.toHexString().toLowerCase() == market.outputToken!.toLowerCase() ||
-    from.toHexString().toLowerCase() == market.outputToken!.toLowerCase()
+    to == Address.fromString(ZERO_ADDRESS) ||
+    from == Address.fromString(ZERO_ADDRESS) ||
+    to == asset ||
+    from == asset
   ) {
     return;
   }
@@ -1073,31 +1085,23 @@ export function _handleTransfer(
   // grab accounts
   let toAccount = Account.load(to.toHexString());
   if (!toAccount) {
-    if (to == Address.fromString(ZERO_ADDRESS)) {
-      toAccount = null;
-    } else {
-      toAccount = createAccount(to.toHexString());
-      toAccount.save();
+    toAccount = createAccount(to.toHexString());
+    toAccount.save();
 
-      protocol.cumulativeUniqueUsers++;
-      protocol.save();
-    }
+    protocol.cumulativeUniqueUsers++;
+    protocol.save();
   }
 
   let fromAccount = Account.load(from.toHexString());
   if (!fromAccount) {
-    if (from == Address.fromString(ZERO_ADDRESS)) {
-      fromAccount = null;
-    } else {
-      fromAccount = createAccount(from.toHexString());
-      fromAccount.save();
+    fromAccount = createAccount(from.toHexString());
+    fromAccount.save();
 
-      protocol.cumulativeUniqueUsers++;
-      protocol.save();
-    }
+    protocol.cumulativeUniqueUsers++;
+    protocol.save();
   }
 
-  const aTokenContract = AToken.bind(event.address);
+  const tokenContract = ERC20.bind(asset);
 
   // update balance from sender
   if (fromAccount) {
@@ -1105,8 +1109,8 @@ export function _handleTransfer(
       protocol,
       market,
       fromAccount,
-      aTokenContract.try_balanceOf(from),
-      PositionSide.LENDER,
+      tokenContract.try_balanceOf(from),
+      positionSide,
       -1, // TODO: not sure how to classify this event yet
       event
     );
@@ -1118,8 +1122,8 @@ export function _handleTransfer(
       protocol,
       market,
       toAccount,
-      aTokenContract.try_balanceOf(to),
-      PositionSide.LENDER,
+      tokenContract.try_balanceOf(to),
+      positionSide,
       -1, // TODO: not sure how to classify this event yet
       event
     );
