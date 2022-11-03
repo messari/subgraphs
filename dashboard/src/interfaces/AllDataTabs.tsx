@@ -9,9 +9,10 @@ import PoolOverviewTab from "./tabs/PoolOverviewTab";
 import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
 import { PoolName, ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 import PositionTab from "./tabs/PositionTab";
-import { NewClient } from "../utils";
+import { NewClient, schemaMapping } from "../utils";
 import { NormalizedCacheObject, ApolloClient } from "@apollo/client";
 import { DeploymentOverlayDropDown } from "../common/utilComponents/DeploymentOverlayDropDown";
+import { getPendingSubgraphsOnProtocolQuery } from "../queries/subgraphStatusQuery";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -42,6 +43,7 @@ interface AllDataTabsProps {
   protocolTimeseriesError: any;
   overlayProtocolTimeseriesData: any;
   protocolTableData: any;
+  decentralizedDeployments: any;
   poolsListData: { [x: string]: any };
   poolListLoading: any;
   poolsListError: any;
@@ -78,6 +80,7 @@ function AllDataTabs({
   protocolTimeseriesData,
   overlayPoolTimeseriesData,
   protocolTableData,
+  decentralizedDeployments,
   poolsListData,
   poolListLoading,
   protocolTimeseriesLoading,
@@ -140,33 +143,41 @@ function AllDataTabs({
 
   let showDropDown = false;
   let failedToLoad = false;
-  if (tabValue + "" === "1" &&
-    (protocolTimeseriesData.financialsDailySnapshots || protocolTimeseriesError.financialsDailySnapshots) &&
-    (protocolTimeseriesData.usageMetricsDailySnapshots || protocolTimeseriesError.usageMetricDailySnapshots) &&
-    (protocolTimeseriesData.usageMetricsHourlySnapshots || protocolTimeseriesError.usageMetricsHourlySnapshots)) {
-    if ((overlayDeploymentURL &&
-      overlayProtocolTimeseriesData.financialsDailySnapshots?.length > 0 &&
-      overlayProtocolTimeseriesData.usageMetricsDailySnapshots?.length > 0 &&
-      overlayProtocolTimeseriesData.usageMetricsHourlySnapshots?.length > 0) || !overlayDeploymentURL) {
-      showDropDown = true;
+  try {
+    if (tabValue + "" === "1" &&
+      (protocolTimeseriesData.financialsDailySnapshots || protocolTimeseriesError.financialsDailySnapshots) &&
+      (protocolTimeseriesData.usageMetricsDailySnapshots || protocolTimeseriesError.usageMetricDailySnapshots) &&
+      (protocolTimeseriesData.usageMetricsHourlySnapshots || protocolTimeseriesError.usageMetricsHourlySnapshots)) {
+      if ((overlayDeploymentURL &&
+        overlayProtocolTimeseriesData.financialsDailySnapshots?.length > 0 &&
+        overlayProtocolTimeseriesData.usageMetricsDailySnapshots?.length > 0 &&
+        overlayProtocolTimeseriesData.usageMetricsHourlySnapshots?.length > 0) || !overlayDeploymentURL) {
+        showDropDown = true;
+      }
+      if ((!protocolTimeseriesData.financialsDailySnapshots &&
+        !protocolTimeseriesData.usageMetricsDailySnapshots &&
+        !protocolTimeseriesData.usageMetricsHourlySnapshots) ||
+        (overlayDeploymentURL &&
+          !overlayProtocolTimeseriesData?.financialsDailySnapshots &&
+          !overlayProtocolTimeseriesData?.usageMetricsDailySnapshots &&
+          !overlayProtocolTimeseriesData?.usageMetricsHourlySnapshots)) {
+        failedToLoad = true;
+      }
+    } else if (tabValue + "" === "3" && poolTimeseriesRequest.poolTimeseriesData) {
+      if (Object.values(poolTimeseriesRequest.poolTimeseriesData).filter((x: any) => x?.length > 0)?.length === Object.values(poolTimeseriesRequest.poolTimeseriesData).length) {
+        showDropDown = true;
+      } else if (poolTimeseriesRequest.poolTimeseriesError) {
+        failedToLoad = true;
+      }
     }
-    if ((!protocolTimeseriesData.financialsDailySnapshots &&
-      !protocolTimeseriesData.usageMetricsDailySnapshots &&
-      !protocolTimeseriesData.usageMetricsHourlySnapshots) ||
-      (overlayDeploymentURL &&
-        !overlayProtocolTimeseriesData?.financialsDailySnapshots &&
-        !overlayProtocolTimeseriesData?.usageMetricsDailySnapshots &&
-        !overlayProtocolTimeseriesData?.usageMetricsHourlySnapshots)) {
-      failedToLoad = true;
-    }
-  } else if (tabValue + "" === "3" && poolTimeseriesRequest.poolTimeseriesData) {
-    if (Object.values(poolTimeseriesRequest.poolTimeseriesData).filter((x: any) => x?.length > 0)?.length === Object.values(poolTimeseriesRequest.poolTimeseriesData).length) {
-      showDropDown = true;
-    } else if (poolTimeseriesRequest.poolTimeseriesError) {
-      failedToLoad = true;
-    }
+  } catch (err: any) {
+    console.error(err.message);
   }
 
+  if (tabValue + "" !== "1" && tabValue + "" !== "3") {
+    failedToLoad = true;
+  }
+  console.log(getPendingSubgraphsOnProtocolQuery(subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0].slug]));
   return (
     <>
       <TabContext value={tabValue}>
@@ -185,6 +196,7 @@ function AllDataTabs({
               setOverlayDeploymentURL(x);
             }}
             subgraphEndpoints={subgraphEndpoints}
+            decentralizedDeployments={decentralizedDeployments}
             currentDeploymentURL={overlayDeploymentURL}
             showDropDown={showDropDown}
             failedToLoad={failedToLoad} />

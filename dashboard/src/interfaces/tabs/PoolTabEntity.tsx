@@ -1,11 +1,12 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
-import { convertTokenDecimals, downloadCSV, JSONToCSVConvertor, toDate } from "../../utils";
+import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
+import JSZip from "jszip";
 
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
@@ -82,6 +83,29 @@ function PoolTabEntity({
   const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
 
   useEffect(() => {
+    if (downloadAllCharts) {
+      if (chartsImageFiles) {
+        if (Object.keys(chartsImageFiles).length > 0) {
+          let zip = new JSZip();
+          Object.keys(chartsImageFiles).forEach(fileName => {
+            const blob = base64toBlobJPEG(chartsImageFiles[fileName]);
+            if (blob) {
+              zip.file(fileName + '.jpeg', blob);
+            }
+          });
+          zip.generateAsync({ type: "base64" }).then(function (content) {
+            const link = document.createElement('a');
+            link.download = "charts.zip";
+            link.href = "data:application/zip;base64," + content;
+            link.click()
+            triggerDownloadAllCharts(false);
+          });
+        }
+      }
+    }
+  }, [chartsImageFiles])
+
+  useEffect(() => {
     if (!!downloadAllCharts) {
       triggerDownloadAllCharts(false);
     }
@@ -94,7 +118,6 @@ function PoolTabEntity({
   });
 
   try {
-    // entityName is the type of entity being looped through
     if (!poolId) {
       return null;
     }

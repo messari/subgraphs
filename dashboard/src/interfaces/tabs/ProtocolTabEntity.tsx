@@ -46,18 +46,24 @@ function ProtocolTabEntity({
 
   useEffect(() => {
     if (downloadAllCharts) {
-      let zip = new JSZip();
-      Object.keys(chartsImageFiles).forEach(fileName => {
-        const blob = base64toBlobJPEG(chartsImageFiles[fileName]);
-        zip.file(fileName + '.jpeg', blob);
-      });
-      zip.generateAsync({ type: "base64" }).then(function (content) {
-        const link = document.createElement('a');
-        link.download = "charts.zip";
-        link.href = "data:application/zip;base64," + content;
-        link.click()
-        triggerDownloadAllCharts(false);
-      });
+      if (chartsImageFiles) {
+        if (Object.keys(chartsImageFiles).length > 0) {
+          let zip = new JSZip();
+          Object.keys(chartsImageFiles).forEach(fileName => {
+            const blob = base64toBlobJPEG(chartsImageFiles[fileName]);
+            if (blob) {
+              zip.file(fileName + '.jpeg', blob);
+            }
+          });
+          zip.generateAsync({ type: "base64" }).then(function (content) {
+            const link = document.createElement('a');
+            link.download = "charts.zip";
+            link.href = "data:application/zip;base64," + content;
+            link.click()
+            triggerDownloadAllCharts(false);
+          });
+        }
+      }
     }
   }, [chartsImageFiles])
 

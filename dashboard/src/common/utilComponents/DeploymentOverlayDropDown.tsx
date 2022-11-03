@@ -1,4 +1,4 @@
-import { Autocomplete, CircularProgress, Typography } from "@mui/material";
+import { Autocomplete, CircularProgress } from "@mui/material";
 import React, { useState } from "react";
 import { isValidHttpUrl, schemaMapping } from "../../utils";
 import { ComboBoxInput } from "./ComboBoxInput";
@@ -8,6 +8,7 @@ interface DeploymentOverlayDropDownProps {
     subgraphEndpoints: any[];
     setDeploymentURL: any;
     currentDeploymentURL: string;
+    decentralizedDeployments: any;
     showDropDown: Boolean;
     failedToLoad: Boolean;
 }
@@ -17,6 +18,7 @@ export const DeploymentOverlayDropDown = ({
     subgraphEndpoints,
     setDeploymentURL,
     currentDeploymentURL,
+    decentralizedDeployments,
     showDropDown,
     failedToLoad
 }: DeploymentOverlayDropDownProps) => {
@@ -26,9 +28,13 @@ export const DeploymentOverlayDropDown = ({
     try {
         const protocolObj = subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0].slug];
         if (protocolObj) {
+            if (decentralizedDeployments[data.protocols[0].slug]) {
+                protocolObj[data.protocols[0].network + '-Decentralized'] = "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + decentralizedDeployments[data.protocols[0].slug].subgraphId;
+            }
             deploymentsList = Object.keys(protocolObj).map(chain => {
                 return data.protocols[0].name + ' ' + chain + ' ' + protocolObj[chain];
             });
+            deploymentsList.unshift('NONE (CLEAR)');
             currentDeploymentLabel = deploymentsList.find(x => x.includes(currentDeploymentURL)) || currentDeploymentURL;
         }
     } catch (err) {
@@ -56,7 +62,9 @@ export const DeploymentOverlayDropDown = ({
                     const deploymentSelected = deploymentsList.find((x: string) => {
                         return x.trim() === targEle.innerText.trim();
                     });
-                    if (deploymentSelected) {
+                    if (deploymentSelected === 'NONE (CLEAR)') {
+                        setDeploymentURL("");
+                    } else if (deploymentSelected) {
                         setDeploymentURL('http' + deploymentSelected.split('http')[1]);
                     } else if (isValidHttpUrl(textInput)) {
                         setDeploymentURL(textInput);
