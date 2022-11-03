@@ -1,21 +1,19 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 import { LendingProtocol, _PoolFactory } from "../../../../generated/schema";
+import { Versions } from "../../../versions";
 
 import {
     PROTOCOL_ID,
     PROTOCOL_INITIAL_TREASURY_FEE,
     PROTOCOL_LENDING_TYPE,
-    PROTOCOL_METHODOLOGY_VERSION,
     PROTOCOL_NAME,
     PROTOCOL_NETWORK,
     PROTOCOL_RISK_TYPE,
-    PROTOCOL_SCHEMA_VERSION,
     PROTOCOL_SLUG,
-    PROTOCOL_SUBGRAPH_VERSION,
     PROTOCOL_TYPE,
     ZERO_BD,
-    ZERO_I32
+    ZERO_I32,
 } from "../../constants";
 
 export function getOrCreateProtocol(): LendingProtocol {
@@ -26,9 +24,6 @@ export function getOrCreateProtocol(): LendingProtocol {
 
         protocol.name = PROTOCOL_NAME;
         protocol.slug = PROTOCOL_SLUG;
-        protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-        protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-        protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
         protocol.network = PROTOCOL_NETWORK;
         protocol.type = PROTOCOL_TYPE;
         protocol.lendingType = PROTOCOL_LENDING_TYPE;
@@ -49,9 +44,13 @@ export function getOrCreateProtocol(): LendingProtocol {
         protocol.totalPoolCount = ZERO_I32;
 
         protocol._treasuryFee = PROTOCOL_INITIAL_TREASURY_FEE;
-
-        protocol.save();
     }
+
+    protocol.schemaVersion = Versions.getSchemaVersion();
+    protocol.subgraphVersion = Versions.getSubgraphVersion();
+    protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+    protocol.save();
 
     return protocol;
 }

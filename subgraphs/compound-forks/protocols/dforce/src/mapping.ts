@@ -682,9 +682,6 @@ function getOrCreateProtocol(): LendingProtocol {
     comptrollerAddr,
     "dForce v2",
     "dforce-v2",
-    "2.0.1",
-    "1.2.2",
-    "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_priceOracle()

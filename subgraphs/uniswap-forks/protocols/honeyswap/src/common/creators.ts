@@ -1,4 +1,4 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   _HelperStore,
   _LiquidityPoolAmount,
@@ -17,17 +17,20 @@ import {
 } from "../../../../src/common/constants";
 import { createPoolFees } from "../../../../src/common/creators";
 import {
-  getOrCreateDex,
   getOrCreateToken,
   getOrCreateLPToken,
   getOrCreateRewardToken,
   getLiquidityPool,
+  getOrCreateProtocol,
 } from "../../../../src/common/getters";
 import { updateTokenWhitelists } from "../../../../src/common/updateMetrics";
 import { NetworkConfigs } from "../../../../configurations/configure";
 
 // Create a liquidity pool from PairCreated contract call (for WETH pairs on Polygon)
-function createHalvedPoolFees(poolAddress: string): string[] {
+function createHalvedPoolFees(
+  poolAddress: string,
+  blockNumber: BigInt
+): string[] {
   const poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
   const poolProtocolFee = new LiquidityPoolFee(
     poolAddress.concat("-protocol-fee")
@@ -41,9 +44,10 @@ function createHalvedPoolFees(poolAddress: string): string[] {
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
 
   if (NetworkConfigs.getFeeOnOff() == FeeSwitch.ON) {
-    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn().div(BIGDECIMAL_TWO);
+    poolLpFee.feePercentage =
+      NetworkConfigs.getLPFeeToOn(blockNumber).div(BIGDECIMAL_TWO);
     poolProtocolFee.feePercentage =
-      NetworkConfigs.getProtocolFeeToOn().div(BIGDECIMAL_TWO);
+      NetworkConfigs.getProtocolFeeToOn(blockNumber).div(BIGDECIMAL_TWO);
   } else {
     poolLpFee.feePercentage =
       NetworkConfigs.getLPFeeToOff().div(BIGDECIMAL_TWO);
@@ -52,7 +56,7 @@ function createHalvedPoolFees(poolAddress: string): string[] {
   }
 
   poolTradingFee.feePercentage =
-    NetworkConfigs.getTradeFee().div(BIGDECIMAL_TWO);
+    NetworkConfigs.getTradeFee(blockNumber).div(BIGDECIMAL_TWO);
 
   poolLpFee.save();
   poolProtocolFee.save();
@@ -68,7 +72,7 @@ export function createLiquidityPool(
   token0Address: string,
   token1Address: string
 ): void {
-  const protocol = getOrCreateDex();
+  const protocol = getOrCreateProtocol();
 
   // create the tokens and tokentracker
   const token0 = getOrCreateToken(token0Address);
@@ -110,9 +114,9 @@ export function createLiquidityPool(
     NetworkConfigs.getReferenceToken() == token0Address ||
     NetworkConfigs.getReferenceToken() == token1Address
   ) {
-    pool.fees = createHalvedPoolFees(poolAddress);
+    pool.fees = createHalvedPoolFees(poolAddress, event.block.number);
   } else {
-    pool.fees = createPoolFees(poolAddress);
+    pool.fees = createPoolFees(poolAddress, event.block.number);
   }
 
   // Used to track the number of deposits in a liquidity pool
@@ -135,8 +139,11 @@ export function createLiquidityPool(
 }
 
 // Add reward token to liquidity pool from HoneyFarm add contract call (PoolAdded event)
-export function createPoolRewardToken(poolAddress: string): void {
-  const pool = getLiquidityPool(poolAddress);
+export function createPoolRewardToken(
+  poolAddress: string,
+  blockNumber: BigInt
+): void {
+  const pool = getLiquidityPool(poolAddress, blockNumber);
 
   pool.rewardTokens = [
     getOrCreateRewardToken(NetworkConfigs.getRewardToken()).id,
@@ -146,8 +153,11 @@ export function createPoolRewardToken(poolAddress: string): void {
 }
 
 // Remove reward token from liquidity pool from HoneyFarm set contract call (PoolRemoved event)
-export function removePoolRewardToken(poolAddress: string): void {
-  const pool = getLiquidityPool(poolAddress);
+export function removePoolRewardToken(
+  poolAddress: string,
+  blockNumber: BigInt
+): void {
+  const pool = getLiquidityPool(poolAddress, blockNumber);
 
   pool.rewardTokens = [];
 

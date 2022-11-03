@@ -73,6 +73,7 @@ import {
   zeroBD,
   zeroBI,
 } from "./constants";
+import { Versions } from "./versions";
 
 let withdrawFeeIdx = 0;
 let tradingFeeIdx = 1;
@@ -662,9 +663,6 @@ function getOrCreateProtocol(): DexAmmProtocol {
     protocol = new DexAmmProtocol(BancorNetworkAddr);
     protocol.name = "Bancor V3";
     protocol.slug = "bancor-v3";
-    protocol.schemaVersion = "1.3.0";
-    protocol.subgraphVersion = "1.0.2";
-    protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalValueLockedUSD = zeroBD;
@@ -678,8 +676,14 @@ function getOrCreateProtocol(): DexAmmProtocol {
     protocol._defaultTradingFeeRate = zeroBD;
     protocol._networkFeeRate = zeroBD;
     protocol._withdrawalFeeRate = zeroBD;
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }
 

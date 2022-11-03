@@ -8,9 +8,6 @@ import { Versions } from "../versions";
 
 export const PROTOCOL_NAME = "Saddle Finance";
 export const PROTOCOL_SLUG = "saddle-finance";
-export const PROTOCOL_SCHEMA_VERSION = Versions.getSchemaVersion();
-export const PROTOCOL_SUBGRAPH_VERSION = Versions.getSubgraphVersion();
-export const PROTOCOL_METHODOLOGY_VERSION = Versions.getMethodologyVersion();
 
 ////////////////////////
 ///// Schema Enums /////

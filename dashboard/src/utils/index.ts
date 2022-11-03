@@ -98,39 +98,48 @@ export const schemaMapping: { [x: string]: any } = {
   "dex-amm": "exchanges",
   "yield-aggregator": "vaults",
   "lending": "lending",
-  "generic": "generic"
+  "generic": "generic",
+  "EXCHANGE": "exchanges",
+  "LENDING": "lending",
+  "YIELD": "vaults",
+  "GENERIC": "generic"
 }
 
 export function JSONToCSVConvertor(JSONData: any, ReportTitle: string, ShowLabel: string) {
-  const arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
-  let CSV = '';
-  if (ShowLabel) {
-    let row = "";
-    for (let index in arrData[0]) {
-      row += index + ',';
+  try {
+    const arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+    let CSV = '';
+    if (ShowLabel) {
+      let row = "";
+      for (let index in arrData[0]) {
+        row += index + ',';
+      }
+      row = row.slice(0, -1);
+      CSV += row + '\r\n';
     }
-    row = row.slice(0, -1);
-    CSV += row + '\r\n';
-  }
 
-  for (let i = 0; i < arrData.length; i++) {
-    let row = "";
-    for (let index in arrData[i]) {
-      row += '"' + arrData[i][index] + '",';
+    for (let i = 0; i < arrData.length; i++) {
+      let row = "";
+      for (let index in arrData[i]) {
+        row += '"' + arrData[i][index] + '",';
+      }
+      row.slice(0, row.length - 1);
+      CSV += row + '\r\n';
     }
-    row.slice(0, row.length - 1);
-    CSV += row + '\r\n';
-  }
 
-  if (CSV === '') {
-    return;
-  }
+    if (CSV === '') {
+      return;
+    }
 
-  const csv = CSV;
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const csvUrl = window.webkitURL.createObjectURL(blob);
-  const filename = (ReportTitle || 'UserExport') + '.csv';
-  return { csvUrl, filename };
+    const csv = CSV;
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const csvUrl = window.webkitURL.createObjectURL(blob);
+    const filename = (ReportTitle || 'UserExport') + '.csv';
+    return { csvUrl, filename };
+  } catch (err: any) {
+    console.error(err.message);
+    return { csvURL: "", filename: "" };
+  }
 }
 
 export function downloadCSV(data: any[], label: string, identifier: string) {
@@ -152,8 +161,24 @@ export function downloadCSV(data: any[], label: string, identifier: string) {
       link.href = csvEle?.csvUrl;
       link.click();
     }
-  } catch (err) {
-    console.log(err)
+  } catch (err: any) {
+    console.error(err.message);
+    return;
+  }
+}
+
+export function base64toBlobJPEG(dataURI: string) {
+  try {
+    const byteString = atob(dataURI.split(',')[1]);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const integerArray = new Uint8Array(arrayBuffer);
+
+    for (let i = 0; i < byteString.length; i++) {
+      integerArray[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([arrayBuffer], { type: 'image/jpeg' });
+  } catch (err: any) {
+    console.error(err.message);
     return;
   }
 }

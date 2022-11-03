@@ -30,12 +30,13 @@ import {
   NftStandard,
   SaleStrategy,
   SECONDS_PER_DAY,
-  STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESS,
-  STRATEGY_PRIVATE_SALE_ADDRESS,
-  STRATEGY_STANDARD_SALE_ADDRESS,
+  STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESSES,
+  STRATEGY_PRIVATE_SALE_ADDRESSES,
+  STRATEGY_STANDARD_SALE_ADDRESSES,
   WETH_ADDRESS,
 } from "./helper";
 import { NetworkConfigs } from "../configurations/configure";
+import { Versions } from "./versions";
 
 export function handleTakerBid(event: TakerBid): void {
   if (event.params.currency != WETH_ADDRESS) {
@@ -353,9 +354,6 @@ function getOrCreateMarketplace(marketplaceID: string): Marketplace {
     marketplace.name = NetworkConfigs.getProtocolName();
     marketplace.slug = NetworkConfigs.getProtocolSlug();
     marketplace.network = NetworkConfigs.getNetwork();
-    marketplace.schemaVersion = NetworkConfigs.getSchemaVersion();
-    marketplace.subgraphVersion = NetworkConfigs.getSubgraphVersion();
-    marketplace.methodologyVersion = NetworkConfigs.getMethodologyVersion();
     marketplace.collectionCount = 0;
     marketplace.tradeCount = 0;
     marketplace.cumulativeTradeVolumeETH = BIGDECIMAL_ZERO;
@@ -363,8 +361,14 @@ function getOrCreateMarketplace(marketplaceID: string): Marketplace {
     marketplace.creatorRevenueETH = BIGDECIMAL_ZERO;
     marketplace.totalRevenueETH = BIGDECIMAL_ZERO;
     marketplace.cumulativeUniqueTraders = 0;
-    marketplace.save();
   }
+
+  marketplace.schemaVersion = Versions.getSchemaVersion();
+  marketplace.subgraphVersion = Versions.getSubgraphVersion();
+  marketplace.methodologyVersion = Versions.getMethodologyVersion();
+
+  marketplace.save();
+
   return marketplace;
 }
 
@@ -372,11 +376,11 @@ function getOrCreateExecutionStrategy(address: Address): _ExecutionStrategy {
   let strategy = _ExecutionStrategy.load(address.toHexString());
   if (!strategy) {
     strategy = new _ExecutionStrategy(address.toHexString());
-    if (address == STRATEGY_STANDARD_SALE_ADDRESS) {
+    if (STRATEGY_STANDARD_SALE_ADDRESSES.includes(address)) {
       strategy.saleStrategy = SaleStrategy.STANDARD_SALE;
-    } else if (address == STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESS) {
+    } else if (STRATEGY_ANY_ITEM_FROM_COLLECTION_ADDRESSES.includes(address)) {
       strategy.saleStrategy = SaleStrategy.ANY_ITEM_FROM_COLLECTION;
-    } else if (address == STRATEGY_PRIVATE_SALE_ADDRESS) {
+    } else if (STRATEGY_PRIVATE_SALE_ADDRESSES.includes(address)) {
       strategy.saleStrategy = SaleStrategy.PRIVATE_SALE;
     }
     const contract = ExecutionStrategy.bind(address);

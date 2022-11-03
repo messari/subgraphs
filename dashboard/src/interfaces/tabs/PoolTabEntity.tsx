@@ -1,11 +1,12 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
 import { negativeFieldList, PoolName, PoolNames } from "../../constants";
-import { convertTokenDecimals, downloadCSV, JSONToCSVConvertor, toDate } from "../../utils";
+import { base64toBlobJPEG, convertTokenDecimals, downloadCSV, toDate } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
+import JSZip from "jszip";
 
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
@@ -79,6 +80,30 @@ function PoolTabEntity({
   const excludedEntities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "usageMetricsHourlySnapshots"];
   const list: { [x: string]: any } = {};
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
+  const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
+
+  useEffect(() => {
+    if (downloadAllCharts) {
+      if (chartsImageFiles) {
+        if (Object.keys(chartsImageFiles).length > 0) {
+          let zip = new JSZip();
+          Object.keys(chartsImageFiles).forEach(fileName => {
+            const blob = base64toBlobJPEG(chartsImageFiles[fileName]);
+            if (blob) {
+              zip.file(fileName + '.jpeg', blob);
+            }
+          });
+          zip.generateAsync({ type: "base64" }).then(function (content) {
+            const link = document.createElement('a');
+            link.download = "charts.zip";
+            link.href = "data:application/zip;base64," + content;
+            link.click()
+            triggerDownloadAllCharts(false);
+          });
+        }
+      }
+    }
+  }, [chartsImageFiles])
 
   useEffect(() => {
     if (!!downloadAllCharts) {
@@ -93,7 +118,6 @@ function PoolTabEntity({
   });
 
   try {
-    // entityName is the type of entity being looped through
     if (!poolId) {
       return null;
     }
@@ -842,7 +866,7 @@ function PoolTabEntity({
         rewardAPRElement = null;
       } else {
         rewardAPRElement = (
-          <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} />
+          <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="rewardAPR" dataChart={rewardChart} dataTable={tableVals} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
         );
       }
     }
@@ -874,7 +898,7 @@ function PoolTabEntity({
         }
       });
       ratesElement = (
-        <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} />
+        <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel="RATES" dataTable={tableVals} dataChart={ratesChart} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
       );
     }
 
@@ -1234,10 +1258,16 @@ function PoolTabEntity({
           }
           let dataChartToPass: any = dataFields[field];
           if (overlayDataFields[field]) {
+            const baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network}-${data?.protocols[0]?.subgraphVersion}`;
+            const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network}-${overlayData?.protocols[0]?.subgraphVersion}`;
+            let keyDiff = "";
+            if (baseKey === overlayKey) {
+              keyDiff = ' (Overlay)';
+            }
             dataChartToPass = { current: dataFields[field], overlay: overlayDataFields[field] };
           }
           return (
-            <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} />
+            <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
           );
         })}
         {ratesElement}

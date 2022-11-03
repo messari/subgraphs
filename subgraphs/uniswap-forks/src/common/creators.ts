@@ -41,28 +41,44 @@ import { getTrackedVolumeUSD } from "../price/price";
  * Create the fee for a pool depending on the the protocol and network specific fee structure.
  * Specified in the typescript configuration file.
  */
-export function createPoolFees(poolAddress: string): string[] {
-  const poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
-  const poolProtocolFee = new LiquidityPoolFee(
+export function createPoolFees(
+  poolAddress: string,
+  blockNumber: BigInt
+): string[] {
+  // get or create fee entities, set fee types
+  let poolLpFee = LiquidityPoolFee.load(poolAddress.concat("-lp-fee"));
+  if (!poolLpFee) {
+    poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
+    poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
+  }
+
+  let poolProtocolFee = LiquidityPoolFee.load(
     poolAddress.concat("-protocol-fee")
   );
-  const poolTradingFee = new LiquidityPoolFee(
+  if (!poolProtocolFee) {
+    poolProtocolFee = new LiquidityPoolFee(poolAddress.concat("-protocol-fee"));
+    poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
+  }
+
+  let poolTradingFee = LiquidityPoolFee.load(
     poolAddress.concat("-trading-fee")
   );
+  if (!poolTradingFee) {
+    poolTradingFee = new LiquidityPoolFee(poolAddress.concat("-trading-fee"));
+    poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
+  }
 
-  poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
-  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
-  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
-
+  // set fees
   if (NetworkConfigs.getFeeOnOff() == FeeSwitch.ON) {
-    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn();
-    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOn();
+    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn(blockNumber);
+    poolProtocolFee.feePercentage =
+      NetworkConfigs.getProtocolFeeToOn(blockNumber);
   } else {
     poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOff();
     poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOff();
   }
 
-  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee();
+  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee(blockNumber);
 
   poolLpFee.save();
   poolProtocolFee.save();
@@ -95,7 +111,7 @@ export function createLiquidityPool(
   pool.symbol = LPtoken.symbol;
   pool.inputTokens = [token0.id, token1.id];
   pool.outputToken = LPtoken.id;
-  pool.fees = createPoolFees(poolAddress);
+  pool.fees = createPoolFees(poolAddress, event.block.number);
   pool.isSingleSided = false;
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
@@ -151,7 +167,10 @@ export function createDeposit(
 ): void {
   const transfer = getOrCreateTransfer(event);
 
-  const pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
 
   const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
@@ -195,7 +214,10 @@ export function createWithdraw(
 ): void {
   const transfer = getOrCreateTransfer(event);
 
-  const pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
 
   const token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
   const token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
@@ -245,7 +267,10 @@ export function createSwapHandleVolumeAndFees(
   amount1Out: BigInt
 ): void {
   const protocol = getOrCreateProtocol();
-  const pool = getLiquidityPool(event.address.toHexString());
+  const pool = getLiquidityPool(
+    event.address.toHexString(),
+    event.block.number
+  );
   const poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
   const token0 = getOrCreateToken(pool.inputTokens[0]);

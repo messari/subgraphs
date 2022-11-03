@@ -24,13 +24,11 @@ import {
   SECONDS_PER_HOUR,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
   REGISTRY_ADDRESS_MAP,
   RewardTokenType,
 } from "../common/constants";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils/datetime";
+import { Versions } from "../versions";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -138,7 +136,7 @@ export function getOrCreateFinancialsDailySnapshot(
     financialMetrics.protocol = protocol.id;
 
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    financialMetrics.protocolControlledValueUSD = null
+    financialMetrics.protocolControlledValueUSD = null;
 
     financialMetrics.cumulativeSupplySideRevenueUSD =
       protocol.cumulativeSupplySideRevenueUSD;
@@ -173,12 +171,12 @@ export function getOrCreateVaultDailySnapshot(
     snapshot.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
     snapshot.vault = vaultAddress.toHex();
     snapshot.totalValueLockedUSD = BigDecimal.zero();
-    snapshot.cumulativeSupplySideRevenueUSD = BigDecimal.zero()
-    snapshot.dailySupplySideRevenueUSD = BigDecimal.zero()
-    snapshot.cumulativeProtocolSideRevenueUSD = BigDecimal.zero()
-    snapshot.dailyProtocolSideRevenueUSD = BigDecimal.zero()
-    snapshot.cumulativeTotalRevenueUSD = BigDecimal.zero()
-    snapshot.dailyTotalRevenueUSD = BigDecimal.zero()
+    snapshot.cumulativeSupplySideRevenueUSD = BigDecimal.zero();
+    snapshot.dailySupplySideRevenueUSD = BigDecimal.zero();
+    snapshot.cumulativeProtocolSideRevenueUSD = BigDecimal.zero();
+    snapshot.dailyProtocolSideRevenueUSD = BigDecimal.zero();
+    snapshot.cumulativeTotalRevenueUSD = BigDecimal.zero();
+    snapshot.dailyTotalRevenueUSD = BigDecimal.zero();
     snapshot.inputTokenBalance = BIGINT_ZERO;
     snapshot.outputTokenSupply = BIGINT_ZERO;
     snapshot.outputTokenPriceUSD = BigDecimal.zero();
@@ -210,11 +208,11 @@ export function getOrCreateVaultHourlySnapshot(
     snapshot.vault = vaultAddress.toHex();
     snapshot.totalValueLockedUSD = BigDecimal.zero();
     snapshot.cumulativeSupplySideRevenueUSD = BigDecimal.zero();
-    snapshot.hourlySupplySideRevenueUSD = BigDecimal.zero()
-    snapshot.cumulativeProtocolSideRevenueUSD = BigDecimal.zero()
-    snapshot.hourlyProtocolSideRevenueUSD = BigDecimal.zero()
-    snapshot.cumulativeTotalRevenueUSD = BigDecimal.zero()
-    snapshot.hourlyTotalRevenueUSD = BigDecimal.zero()
+    snapshot.hourlySupplySideRevenueUSD = BigDecimal.zero();
+    snapshot.cumulativeProtocolSideRevenueUSD = BigDecimal.zero();
+    snapshot.hourlyProtocolSideRevenueUSD = BigDecimal.zero();
+    snapshot.cumulativeTotalRevenueUSD = BigDecimal.zero();
+    snapshot.hourlyTotalRevenueUSD = BigDecimal.zero();
     snapshot.inputTokenBalance = BIGINT_ZERO;
     snapshot.outputTokenSupply = BIGINT_ZERO;
     snapshot.outputTokenPriceUSD = BigDecimal.zero();
@@ -244,9 +242,6 @@ export function getOrCreateYieldAggregator(
     protocol = new YieldAggregator(registryId);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = ProtocolType.YIELD;
     protocol.totalValueLockedUSD = BigDecimal.zero();
@@ -254,9 +249,15 @@ export function getOrCreateYieldAggregator(
     protocol.cumulativeSupplySideRevenueUSD = BigDecimal.zero();
     protocol.cumulativeProtocolSideRevenueUSD = BigDecimal.zero();
     protocol.cumulativeTotalRevenueUSD = BigDecimal.zero();
-    protocol.totalPoolCount = INT_ZERO
+    protocol.totalPoolCount = INT_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
-    protocol.save();
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
+
   return protocol;
 }

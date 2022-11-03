@@ -86,49 +86,53 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   const chartRef = useRef<any>(null);
   const deploymentNameToUrlMapping: any = {};
 
-  Object.values(deploymentJSON).forEach((protocolsOnType: { [x: string]: any }) => {
-    Object.entries(protocolsOnType).forEach(([protocolName, deploymentOnNetwork]) => {
-      protocolName = protocolName.toLowerCase();
-      deploymentNameToUrlMapping[protocolName] = {
-        slug: "",
-        defiLlamaNetworks: [],
-        subgraphNetworks: deploymentOnNetwork,
-      };
-      if (protocolName.includes('-v')) {
-        const protocolNameVersionRemoved = protocolName.split("-v")[0];
-        deploymentNameToUrlMapping[protocolNameVersionRemoved] = {
+  try {
+    Object.values(deploymentJSON).forEach((protocolsOnType: { [x: string]: any }) => {
+      Object.entries(protocolsOnType).forEach(([protocolName, deploymentOnNetwork]) => {
+        protocolName = protocolName.toLowerCase();
+        deploymentNameToUrlMapping[protocolName] = {
           slug: "",
           defiLlamaNetworks: [],
           subgraphNetworks: deploymentOnNetwork,
         };
-      }
-      if (protocolName.includes('-finance')) {
-        deploymentNameToUrlMapping[protocolName.split('-finance')[0]] = {
-          slug: "",
-          defiLlamaNetworks: [],
-          subgraphNetworks: deploymentOnNetwork,
-        };
-      } else {
-        deploymentNameToUrlMapping[protocolName + '-finance'] = {
-          slug: "",
-          defiLlamaNetworks: [],
-          subgraphNetworks: deploymentOnNetwork,
-        };
-      }
+        if (protocolName.includes('-v')) {
+          const protocolNameVersionRemoved = protocolName.split("-v")[0];
+          deploymentNameToUrlMapping[protocolNameVersionRemoved] = {
+            slug: "",
+            defiLlamaNetworks: [],
+            subgraphNetworks: deploymentOnNetwork,
+          };
+        }
+        if (protocolName.includes('-finance')) {
+          deploymentNameToUrlMapping[protocolName.split('-finance')[0]] = {
+            slug: "",
+            defiLlamaNetworks: [],
+            subgraphNetworks: deploymentOnNetwork,
+          };
+        } else {
+          deploymentNameToUrlMapping[protocolName + '-finance'] = {
+            slug: "",
+            defiLlamaNetworks: [],
+            subgraphNetworks: deploymentOnNetwork,
+          };
+        }
+      });
     });
-  });
 
-  if (defiLlamaProtocols.length > 0) {
-    defiLlamaProtocols.forEach((protocol) => {
-      const currentName = protocol.name.toLowerCase().split(" ").join("-");
-      if (Object.keys(deploymentNameToUrlMapping).includes(currentName) || Object.keys(deploymentNameToUrlMapping).includes(currentName.split('-')[0])) {
-        const key = Object.keys(deploymentNameToUrlMapping).includes(currentName) ? currentName : currentName.split('-')[0];
-        deploymentNameToUrlMapping[key].slug = protocol.slug;
-        deploymentNameToUrlMapping[key].defiLlamaNetworks = Object.keys(protocol.chainTvls).map((x) =>
-          x.toLowerCase(),
-        );
-      }
-    });
+    if (defiLlamaProtocols.length > 0) {
+      defiLlamaProtocols.forEach((protocol) => {
+        const currentName = protocol.name.toLowerCase().split(" ").join("-");
+        if (Object.keys(deploymentNameToUrlMapping).includes(currentName) || Object.keys(deploymentNameToUrlMapping).includes(currentName.split('-')[0])) {
+          const key = Object.keys(deploymentNameToUrlMapping).includes(currentName) ? currentName : currentName.split('-')[0];
+          deploymentNameToUrlMapping[key].slug = protocol.slug;
+          deploymentNameToUrlMapping[key].defiLlamaNetworks = Object.keys(protocol.chainTvls).map((x) =>
+            x.toLowerCase(),
+          );
+        }
+      });
+    }
+  } catch (err: any) {
+    console.error(err.message);
   }
 
   const fetchDefiLlamaProtocols = () => {
@@ -209,116 +213,119 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
 
   let stakedDataset = "";
   let borrowedDataset = "";
-  if (chartRenderCondition) {
-
-    let dataset: string = "";
-
-    Object.keys(defiLlamaData.chainTvls).forEach((chain) => {
-      let networkName = defiLlamaSlug?.split(" (")[1]?.split(")")[0]?.toUpperCase();
-      if (networkName === "MAINNET") {
-        networkName = "ETHEREUM";
-      }
-      if (networkName === "MATIC") {
-        networkName = "POLYGON";
-      }
-      if (chain.toUpperCase() === networkName) {
-        dataset = chain;
-      }
-      if (chain.toUpperCase() === networkName + '-STAKING') {
-        stakedDataset = chain;
-      }
-      if (chain.toUpperCase() === networkName + '-BORROWED') {
-        borrowedDataset = chain;
-      }
-    });
-
-    let compChart = {
-      defiLlama: defiLlamaData.chainTvls[dataset].tvl.map((x: any, idx: number) => {
-        let value = x.totalLiquidityUSD;
-        const date = toDate(x.date);
-        if (defiLlamaData.chainTvls[stakedDataset]) {
-          const stakedDatapoint = defiLlamaData.chainTvls[stakedDataset]?.tvl?.find((x: any) => toDate(x.date) === date);
-          if (stakedDatapoint && includeStakedTVL) {
-            value += stakedDatapoint.totalLiquidityUSD;
-          }
+  try {
+    if (chartRenderCondition) {
+      let dataset: string = "";
+      Object.keys(defiLlamaData.chainTvls).forEach((chain) => {
+        let networkName = defiLlamaSlug?.split(" (")[1]?.split(")")[0]?.toUpperCase();
+        if (networkName === "MAINNET") {
+          networkName = "ETHEREUM";
         }
-        if (defiLlamaData.chainTvls[borrowedDataset]) {
-          const borrowedDatapoint = defiLlamaData.chainTvls[borrowedDataset]?.tvl?.find((x: any) => toDate(x.date) === date);
-          if (borrowedDatapoint && includeBorrowedTVL) {
-            value += borrowedDatapoint.totalLiquidityUSD;
-          }
+        if (networkName === "MATIC") {
+          networkName = "POLYGON";
         }
-        return { value: value, date: x.date };
-      }),
-      subgraph: financialsData.financialsDailySnapshots.map((x: any) => ({
-        value: parseFloat(x.totalValueLockedUSD),
-        date: parseInt(x.timestamp),
-      })),
-    };
-    if (isMonthly) {
-      // key number of months from epoch value first val of month
-      const tempChartData: any = { defiLlama: {}, subgraph: {} };
-      compChart.defiLlama.forEach((point: { [x: string]: any }) => {
-        const monthKey = toDate(point.date).split("-").slice(0, 2).join("-");
-        if (!Object.keys(tempChartData.defiLlama).includes(monthKey)) {
-          tempChartData.defiLlama[monthKey] = { value: point.value, date: point.date };
+        if (chain.toUpperCase() === networkName) {
+          dataset = chain;
+        }
+        if (chain.toUpperCase() === networkName + '-STAKING') {
+          stakedDataset = chain;
+        }
+        if (chain.toUpperCase() === networkName + '-BORROWED') {
+          borrowedDataset = chain;
         }
       });
-      compChart.subgraph.forEach((point: { [x: string]: any }) => {
-        const monthKey = toDate(point.date).split("-").slice(0, 2).join("-");
-        if (!Object.keys(tempChartData.subgraph).includes(monthKey)) {
-          tempChartData.subgraph[monthKey] = { value: point.value, date: point.date };
-        }
-      });
-      compChart = {
-        defiLlama: Object.values(tempChartData.defiLlama).map((val: any) => ({ date: val.date, value: val.value })),
-        subgraph: Object.values(tempChartData.subgraph).map((val: any) => ({ date: val.date, value: val.value })),
+
+      let compChart = {
+        defiLlama: defiLlamaData.chainTvls[dataset].tvl.map((x: any, idx: number) => {
+          let value = x.totalLiquidityUSD;
+          const date = toDate(x.date);
+          if (defiLlamaData.chainTvls[stakedDataset]) {
+            const stakedDatapoint = defiLlamaData.chainTvls[stakedDataset]?.tvl?.find((x: any) => toDate(x.date) === date);
+            if (stakedDatapoint && includeStakedTVL) {
+              value += stakedDatapoint.totalLiquidityUSD;
+            }
+          }
+          if (defiLlamaData.chainTvls[borrowedDataset]) {
+            const borrowedDatapoint = defiLlamaData.chainTvls[borrowedDataset]?.tvl?.find((x: any) => toDate(x.date) === date);
+            if (borrowedDatapoint && includeBorrowedTVL) {
+              value += borrowedDatapoint.totalLiquidityUSD;
+            }
+          }
+          return { value: value, date: x.date };
+        }),
+        subgraph: financialsData.financialsDailySnapshots.map((x: any) => ({
+          value: parseFloat(x.totalValueLockedUSD),
+          date: parseInt(x.timestamp),
+        })),
       };
+      if (isMonthly) {
+        // key number of months from epoch value first val of month
+        const tempChartData: any = { defiLlama: {}, subgraph: {} };
+        compChart.defiLlama.forEach((point: { [x: string]: any }) => {
+          const monthKey = toDate(point.date).split("-").slice(0, 2).join("-");
+          if (!Object.keys(tempChartData.defiLlama).includes(monthKey)) {
+            tempChartData.defiLlama[monthKey] = { value: point.value, date: point.date };
+          }
+        });
+        compChart.subgraph.forEach((point: { [x: string]: any }) => {
+          const monthKey = toDate(point.date).split("-").slice(0, 2).join("-");
+          if (!Object.keys(tempChartData.subgraph).includes(monthKey)) {
+            tempChartData.subgraph[monthKey] = { value: point.value, date: point.date };
+          }
+        });
+        compChart = {
+          defiLlama: Object.values(tempChartData.defiLlama).map((val: any) => ({ date: val.date, value: val.value })),
+          subgraph: Object.values(tempChartData.subgraph).map((val: any) => ({ date: val.date, value: val.value })),
+        };
+      }
+
+      compChart = lineupChartDatapoints({ ...compChart }, 0);
+      compChart.defiLlama
+        .forEach((val: any, i: any) => {
+          const subgraphPoint = compChart.subgraph[i];
+          if (!subgraphPoint) {
+            return;
+          }
+
+          const subgraphTimestamp = subgraphPoint?.date || 0;
+          const llamaDate = toDate(val.date);
+
+          if (Math.abs(subgraphTimestamp - val.date) > 86400) {
+            const dateIndex = compChart.subgraph.findIndex((x: any) => toDate(x.date) === llamaDate || x.date > val.date);
+            compChart.subgraph = [...compChart.subgraph.slice(0, i), ...compChart.subgraph.slice(dateIndex, compChart.subgraph.length)];
+            compChart = lineupChartDatapoints({ ...compChart }, i);
+          }
+        });
+
+      const elementId = `${isMonthly ? "Monthly" : "Daily"} Chart - ${defiLlamaSlug}`;
+      chart = (
+        <div key={elementId} id={elementId}>
+          <Box mt={3} mb={1}>
+            <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
+              <Typography variant="h6">{elementId}</Typography>
+            </CopyLinkToClipboard>
+          </Box>
+          <Grid container justifyContent="space-between">
+            <Grid key={elementId} item xs={7.5}>
+              <Chart identifier={""} datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} chartRef={chartRef} />
+            </Grid>
+            <Grid key={elementId + "2"} item xs={4}>
+              <ComparisonTable
+                datasetLabel="Data Comparison"
+                dataTable={compChart}
+                isMonthly={isMonthly}
+                setIsMonthly={(x: boolean) => setIsMonthly(x)}
+                jpegDownloadHandler={() => jpegDownloadHandler()}
+              />
+            </Grid>
+          </Grid>
+        </div>
+      );
     }
-
-    compChart = lineupChartDatapoints({ ...compChart }, 0);
-    compChart.defiLlama
-      .forEach((val: any, i: any) => {
-        const subgraphPoint = compChart.subgraph[i];
-        if (!subgraphPoint) {
-          return;
-        }
-
-        const subgraphTimestamp = subgraphPoint?.date || 0;
-        const llamaDate = toDate(val.date);
-
-        if (Math.abs(subgraphTimestamp - val.date) > 86400) {
-          const dateIndex = compChart.subgraph.findIndex((x: any) => toDate(x.date) === llamaDate || x.date > val.date);
-          compChart.subgraph = [...compChart.subgraph.slice(0, i), ...compChart.subgraph.slice(dateIndex, compChart.subgraph.length)];
-          compChart = lineupChartDatapoints({ ...compChart }, i);
-        }
-      });
-
-    const elementId = `${isMonthly ? "Monthly" : "Daily"} Chart - ${defiLlamaSlug}`;
-    chart = (
-      <div key={elementId} id={elementId}>
-        <Box mt={3} mb={1}>
-          <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-            <Typography variant="h6">{elementId}</Typography>
-          </CopyLinkToClipboard>
-        </Box>
-        <Grid container justifyContent="space-between">
-          <Grid key={elementId} item xs={7.5}>
-            <Chart identifier={""} datasetLabel={`Chart-${defiLlamaSlug}`} dataChart={compChart} chartRef={chartRef} />
-          </Grid>
-          <Grid key={elementId + "2"} item xs={4}>
-            <ComparisonTable
-              datasetLabel="Data Comparison"
-              dataTable={compChart}
-              isMonthly={isMonthly}
-              setIsMonthly={(x: boolean) => setIsMonthly(x)}
-              jpegDownloadHandler={() => jpegDownloadHandler()}
-            />
-          </Grid>
-        </Grid>
-      </div>
-    );
+  } catch (err: any) {
+    console.error(err.message)
   }
+
   if (financialsError && !(issues.filter((x) => x.fieldName === deploymentURL).length > 0)) {
     setIssues([
       {

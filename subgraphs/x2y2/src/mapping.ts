@@ -25,6 +25,7 @@ import {
   X2Y2Op,
 } from "./helper";
 import { NetworkConfigs } from "../configurations/configure";
+import { Versions } from "./versions";
 
 class Token {
   constructor(
@@ -318,9 +319,6 @@ function getOrCreateMarketplace(marketplaceID: string): Marketplace {
     marketplace.name = NetworkConfigs.getProtocolName();
     marketplace.slug = NetworkConfigs.getProtocolSlug();
     marketplace.network = NetworkConfigs.getNetwork();
-    marketplace.schemaVersion = NetworkConfigs.getSchemaVersion();
-    marketplace.subgraphVersion = NetworkConfigs.getSubgraphVersion();
-    marketplace.methodologyVersion = NetworkConfigs.getMethodologyVersion();
     marketplace.collectionCount = 0;
     marketplace.tradeCount = 0;
     marketplace.cumulativeTradeVolumeETH = BIGDECIMAL_ZERO;
@@ -328,8 +326,14 @@ function getOrCreateMarketplace(marketplaceID: string): Marketplace {
     marketplace.creatorRevenueETH = BIGDECIMAL_ZERO;
     marketplace.totalRevenueETH = BIGDECIMAL_ZERO;
     marketplace.cumulativeUniqueTraders = 0;
-    marketplace.save();
   }
+
+  marketplace.schemaVersion = Versions.getSchemaVersion();
+  marketplace.subgraphVersion = Versions.getSubgraphVersion();
+  marketplace.methodologyVersion = Versions.getMethodologyVersion();
+
+  marketplace.save();
+
   return marketplace;
 }
 

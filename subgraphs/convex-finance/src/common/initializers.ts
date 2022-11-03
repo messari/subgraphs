@@ -23,6 +23,7 @@ import * as constants from "./constants";
 import { getTotalFees } from "../modules/Fees";
 import { ERC20 as ERC20Contract } from "../../generated/Booster/ERC20";
 import { PoolCrvRewards as PoolCrvRewardsTemplate } from "../../generated/templates";
+import { Versions } from "../versions";
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
   const protocolId = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
@@ -32,9 +33,6 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol = new YieldAggregator(protocolId);
     protocol.name = constants.Protocol.NAME;
     protocol.slug = constants.Protocol.SLUG;
-    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
-    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
-    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Network.MAINNET;
     protocol.type = constants.ProtocolType.YIELD;
 
@@ -50,6 +48,12 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol._poolCount = constants.BIGINT_ZERO;
     protocol._vaultIds = [];
   }
+
+  protocol.schemaVersion = Versions.getSchemaVersion();
+  protocol.subgraphVersion = Versions.getSubgraphVersion();
+  protocol.methodologyVersion = Versions.getMethodologyVersion();
+
+  protocol.save();
 
   return protocol;
 }

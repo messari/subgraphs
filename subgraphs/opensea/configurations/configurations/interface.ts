@@ -4,8 +4,5 @@ export interface Configurations {
   getNetwork(): string;
   getProtocolName(): string;
   getProtocolSlug(): string;
-  getSchemaVersion(): string;
-  getSubgraphVersion(): string;
-  getMethodologyVersion(): string;
   getMarketplaceAddress(): string;
 }

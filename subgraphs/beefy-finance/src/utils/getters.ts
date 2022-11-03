@@ -13,6 +13,7 @@ import {
   PROTOCOL_ID,
 } from "../prices/common/constants";
 import { getUsdPricePerToken } from "../prices";
+import { Versions } from "../versions";
 
 export function getTokenOrCreate(
   tokenAddress: Address,
@@ -56,9 +57,6 @@ export function getBeefyFinanceOrCreate(vaultId: string): YieldAggregator {
     beefy = new YieldAggregator(PROTOCOL_ID);
     beefy.name = "Beefy Finance";
     beefy.slug = "beefy-finance";
-    beefy.schemaVersion = "1.2.1";
-    beefy.subgraphVersion = "1.0.2";
-    beefy.methodologyVersion = "1.1.0";
     beefy.network = dataSource.network().toUpperCase().replace("-", "_");
     beefy.type = "YIELD";
     beefy.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -68,7 +66,13 @@ export function getBeefyFinanceOrCreate(vaultId: string): YieldAggregator {
     beefy.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     beefy.cumulativeUniqueUsers = BIGINT_ZERO;
     beefy.vaults = [vaultId];
-    beefy.save();
   }
+
+  beefy.schemaVersion = Versions.getSchemaVersion();
+  beefy.subgraphVersion = Versions.getSubgraphVersion();
+  beefy.methodologyVersion = Versions.getMethodologyVersion();
+
+  beefy.save();
+
   return beefy;
 }

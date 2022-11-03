@@ -1,4 +1,4 @@
-import { Address, BigDecimal, ethereum, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum, BigInt, log, crypto, ByteArray, Bytes } from "@graphprotocol/graph-ts";
 import { Borrow, Deposit, Liquidation, Repay, Withdraw } from "../../generated/euler/Euler";
 import {
   getOrCreateDeposit,
@@ -315,31 +315,72 @@ export function updateRevenue(
 
   const deltaReserveBalance = reserveBalance.minus(assetStatus.reserveBalance);
 
-  const deltaProtocolSideRevenue = deltaReserveBalance
+  const newProtocolSideRevenue = deltaReserveBalance
     .toBigDecimal()
     .times(market.exchangeRate!) // convert to underlying
     .div(DECIMAL_PRECISION)
     .times(token.lastPriceUSD!);
 
-  // assume reserve fee is interest revenue
-  // revenue from liquidation reserve fee is handled in rollbackRevenue()
+  // AssetStatus.reserveBalance may include protocol side revenue
+  // from interest and liquidation; separate protocol side revenue
+  // into interest revenue and liquidation revenue if it is a liquidation,
+  // because liquidation revenue is not shared with the supply side,
+  // and interest revenue is shared
+  let newLiquidationRevenue = BIGDECIMAL_ZERO;
+  let newProtocolSideInterestRevenue = newProtocolSideRevenue;
+  let newTotalInterestRevenue = newProtocolSideInterestRevenue;
+  let newSupplySideRevenue = BIGDECIMAL_ZERO;
+  const repayFromLiquidation = getRepayForLiquidation(event);
+  if (repayFromLiquidation) {
+    // split reserve fee from liquidation
+    const repayAmountFromLiquidation = bigIntToBDUseDecimals(repayFromLiquidation, DEFAULT_DECIMALS);
+    // The reserve fee is charged on repay amount in a liquidation, the percent is
+    // determined by UNDERLYING_RESERVES_FEE.div(DECIMAL_PRECISION)
+    // UNDERLYING_RESERVES_FEE = 0.02 * 1e18 as of Oct 2022
+    // Reference: Line 156 Liquidation.sol
+    // https://github.com/euler-xyz/euler-contracts/blob/580fa725d65ac1fc1a42603e54aa28022f6cda6d/contracts/modules/Liquidation.sol#L156
+    const reserveFeeProportion = UNDERLYING_RESERVES_FEE.div(DECIMAL_PRECISION);
+    newLiquidationRevenue = repayAmountFromLiquidation.times(reserveFeeProportion).times(token.lastPriceUSD!);
+    if (newProtocolSideRevenue.lt(newLiquidationRevenue)) {
+      log.warning("[updateRevenue]total protocol side revenue {} < liquidation revenue {} at tx {}", [
+        newProtocolSideRevenue.toString(),
+        newLiquidationRevenue.toString(),
+        event.transaction.hash.toHexString(),
+      ]);
+    } else {
+      newProtocolSideInterestRevenue = newProtocolSideRevenue.minus(newLiquidationRevenue);
+    }
+    log.info("[updateRevenue]liquidation rev ${} + interest rev ${} = total protocol rev of ${} for tx {}", [
+      newLiquidationRevenue.toString(),
+      newProtocolSideInterestRevenue.toString(),
+      newProtocolSideRevenue.toString(),
+      event.transaction.hash.toHexString(),
+    ]);
+  }
+  // reserve fee from interest revenue
   // because protocolSideRev = totalRev * reserveFee/RESERVE_FEE_SCALE
   // ==> totalRev = protocolSideRev * RESERVE_FEE_SCALE / reserveFee
-  const deltaTotalRevenue = deltaProtocolSideRevenue
-    .times(RESERVE_FEE_SCALE)
-    .div(assetStatus.reserveFee.toBigDecimal());
-  const deltaSupplySideRevenue = deltaTotalRevenue.minus(deltaProtocolSideRevenue);
+  if (newProtocolSideInterestRevenue.gt(BIGDECIMAL_ZERO)) {
+    newTotalInterestRevenue = newProtocolSideInterestRevenue
+      .times(RESERVE_FEE_SCALE)
+      .div(assetStatus.reserveFee.toBigDecimal());
+    newSupplySideRevenue = newTotalInterestRevenue.minus(newProtocolSideInterestRevenue);
+  }
 
   // update protocol revenue
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(deltaSupplySideRevenue);
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(deltaProtocolSideRevenue);
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(deltaTotalRevenue);
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenue);
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(newProtocolSideRevenue);
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
+    protocol.cumulativeProtocolSideRevenueUSD,
+  );
   protocol.save();
 
   // update market's revenue
-  market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(deltaSupplySideRevenue);
-  market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(deltaProtocolSideRevenue);
-  market.cumulativeTotalRevenueUSD = market.cumulativeTotalRevenueUSD.plus(deltaTotalRevenue);
+  market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenue);
+  market.cumulativeProtocolSideRevenueUSD = market.cumulativeProtocolSideRevenueUSD.plus(newProtocolSideRevenue);
+  market.cumulativeTotalRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(
+    market.cumulativeProtocolSideRevenueUSD,
+  );
   market.save();
 
   const marketDailySnapshot = getOrCreateMarketDailySnapshot(block, marketId);
@@ -348,26 +389,31 @@ export function updateRevenue(
 
   // update daily snapshot
   marketDailySnapshot.dailySupplySideRevenueUSD =
-    marketDailySnapshot.dailySupplySideRevenueUSD.plus(deltaSupplySideRevenue);
+    marketDailySnapshot.dailySupplySideRevenueUSD.plus(newSupplySideRevenue);
   marketDailySnapshot.dailyProtocolSideRevenueUSD =
-    marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(deltaProtocolSideRevenue);
-  marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailyTotalRevenueUSD.plus(deltaTotalRevenue);
+    marketDailySnapshot.dailyProtocolSideRevenueUSD.plus(newProtocolSideRevenue);
+  marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
+    marketDailySnapshot.dailyProtocolSideRevenueUSD,
+  );
   marketDailySnapshot.save();
 
   // update hourly snapshot
   marketHourlySnapshot.hourlySupplySideRevenueUSD =
-    marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(deltaSupplySideRevenue);
+    marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(newSupplySideRevenue);
   marketHourlySnapshot.hourlyProtocolSideRevenueUSD =
-    marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(deltaProtocolSideRevenue);
-  marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlyTotalRevenueUSD.plus(deltaTotalRevenue);
+    marketHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(newProtocolSideRevenue);
+  marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
+    marketHourlySnapshot.hourlyProtocolSideRevenueUSD,
+  );
   marketHourlySnapshot.save();
 
   // update financials
-  financialSnapshot.dailySupplySideRevenueUSD =
-    financialSnapshot.dailySupplySideRevenueUSD.plus(deltaSupplySideRevenue);
+  financialSnapshot.dailySupplySideRevenueUSD = financialSnapshot.dailySupplySideRevenueUSD.plus(newSupplySideRevenue);
   financialSnapshot.dailyProtocolSideRevenueUSD =
-    financialSnapshot.dailyProtocolSideRevenueUSD.plus(deltaProtocolSideRevenue);
-  financialSnapshot.dailyTotalRevenueUSD = financialSnapshot.dailyTotalRevenueUSD.plus(deltaTotalRevenue);
+    financialSnapshot.dailyProtocolSideRevenueUSD.plus(newProtocolSideRevenue);
+  financialSnapshot.dailyTotalRevenueUSD = financialSnapshot.dailySupplySideRevenueUSD.plus(
+    financialSnapshot.dailyProtocolSideRevenueUSD,
+  );
   financialSnapshot.save();
 }
 
@@ -580,97 +626,43 @@ function updateTransactionCount(
   dailyUsage.save();
 }
 
-export function rollbackRevenue(marketId: string, event: Liquidation, assetStatus: _AssetStatus): void {
-  // Roll back supply side & total revenue accounted from liquidation
-  // The handleAssetStatus works as if all reserveBalance increases are
-  // from interest and calculates total revenue & supply side revenue
-  // from reserve increases. But euler collect fees from liquidations too.
-  // These fees should be excluded in calculating total & supply side
-  // revenue. Here we roll back total and supply side revenue that have already
-  // been added because logAssetStatus is emitted before Liquidation in
-  // executeLiquidation().
-  const protocol = getOrCreateLendingProtocol();
-  const market = getOrCreateMarket(marketId);
-  const token = getOrCreateToken(event.params.underlying);
-  const repay = bigIntToBDUseDecimals(event.params.repay, DEFAULT_DECIMALS);
-  // Line 156 Liquidation.sol: repay * (1 + 0.02)
-  const desiredRepay = repay.times(BIGDECIMAL_ONE.plus(UNDERLYING_RESERVES_FEE.div(DECIMAL_PRECISION)));
-  const repayExtraUSD = desiredRepay.minus(repay).times(token.lastPriceUSD!);
-  const deltaTotalRevenueUSD = repayExtraUSD.times(RESERVE_FEE_SCALE).div(assetStatus.reserveFee.toBigDecimal());
-  const deltaSupplySideRevenueUSD = deltaTotalRevenueUSD.minus(repayExtraUSD);
-
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    protocol.cumulativeProtocolSideRevenueUSD,
-  );
-  protocol.save();
-
-  const financialsSnapshot = getOrCreateFinancials(event.block.timestamp, event.block.number);
-  financialsSnapshot.cumulativeSupplySideRevenueUSD =
-    financialsSnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  financialsSnapshot.cumulativeTotalRevenueUSD = financialsSnapshot.cumulativeSupplySideRevenueUSD.plus(
-    financialsSnapshot.cumulativeProtocolSideRevenueUSD,
-  );
-  if (financialsSnapshot.dailySupplySideRevenueUSD.ge(deltaSupplySideRevenueUSD)) {
-    financialsSnapshot.dailySupplySideRevenueUSD =
-      financialsSnapshot.dailySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-    financialsSnapshot.dailyTotalRevenueUSD = financialsSnapshot.dailySupplySideRevenueUSD.minus(
-      financialsSnapshot.dailyProtocolSideRevenueUSD,
-    );
+// get repay amount if a Liquidation event is emitted after current event in the same transaction
+// return null if not a liquidation event or error
+function getRepayForLiquidation(event: ethereum.Event): BigInt | null {
+  if (!event.receipt) {
+    log.warning("[isReserveFeeFromLiquidation][{}] has no event.receipt", [event.transaction.hash.toHexString()]);
+    return null;
   }
-  financialsSnapshot.save();
 
-  market.cumulativeSupplySideRevenueUSD = market.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  market.cumulativeTotalRevenueUSD = market.cumulativeSupplySideRevenueUSD.plus(
-    market.cumulativeProtocolSideRevenueUSD,
+  const currentEventLogIndex = event.logIndex;
+  const logs = event.receipt!.logs;
+  const liquidationSig = crypto.keccak256(
+    ByteArray.fromUTF8("Liquidation(address,address,address,address,uint256,uint256,uint256,uint256,uint256)"),
   );
-  market.save();
 
-  const marketDailySnapshot = getOrCreateMarketDailySnapshot(event.block, marketId);
-  marketDailySnapshot.cumulativeSupplySideRevenueUSD =
-    marketDailySnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  marketDailySnapshot.cumulativeTotalRevenueUSD = marketDailySnapshot.cumulativeSupplySideRevenueUSD.plus(
-    marketDailySnapshot.cumulativeProtocolSideRevenueUSD,
-  );
-  if (marketDailySnapshot.dailySupplySideRevenueUSD.ge(deltaSupplySideRevenueUSD)) {
-    marketDailySnapshot.dailySupplySideRevenueUSD =
-      marketDailySnapshot.dailySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-    marketDailySnapshot.dailyTotalRevenueUSD = marketDailySnapshot.dailySupplySideRevenueUSD.plus(
-      marketDailySnapshot.dailyProtocolSideRevenueUSD,
-    );
-  } else {
-    log.error("[rollbackRevenue]market={}/{},blk={},tx={},deltaTotalRevUSD={}>market.dailyTotalRevnueUSD={}", [
-      market.name!,
-      market.id,
-      event.block.number.toString(),
-      event.transaction.hash.toHexString(),
-      deltaTotalRevenueUSD.toString(),
-      marketDailySnapshot.dailyTotalRevenueUSD.toString(),
-    ]);
+  let foundIndex: i32 = -1;
+  for (let i = 0; i < logs.length; i++) {
+    const currLog = logs.at(i);
+
+    if (currLog.logIndex.equals(currentEventLogIndex)) {
+      // only check event after the current logIndex
+      foundIndex = i;
+      break;
+    }
   }
-  marketDailySnapshot.save();
 
-  const marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event.block, marketId);
-  marketHourlySnapshot.cumulativeSupplySideRevenueUSD =
-    marketHourlySnapshot.cumulativeSupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-  marketHourlySnapshot.cumulativeTotalRevenueUSD = marketHourlySnapshot.cumulativeSupplySideRevenueUSD.plus(
-    marketHourlySnapshot.cumulativeProtocolSideRevenueUSD,
-  );
-  if (marketHourlySnapshot.hourlySupplySideRevenueUSD.ge(deltaSupplySideRevenueUSD)) {
-    marketHourlySnapshot.hourlySupplySideRevenueUSD =
-      marketHourlySnapshot.hourlySupplySideRevenueUSD.minus(deltaSupplySideRevenueUSD);
-    marketHourlySnapshot.hourlyTotalRevenueUSD = marketHourlySnapshot.hourlySupplySideRevenueUSD.plus(
-      marketHourlySnapshot.hourlyProtocolSideRevenueUSD,
-    );
-  } else {
-    log.error("[rollbackRevenue]market={}/{},blk={},tx={},deltaTotalRevUSD={}>market.hourlyTotalRevnueUSD={}", [
-      market.name!,
-      market.id,
-      event.block.number.toString(),
-      event.transaction.hash.toHexString(),
-      deltaTotalRevenueUSD.toString(),
-      marketHourlySnapshot.hourlyTotalRevenueUSD.toString(),
-    ]);
+  // L222 executeLiquidation() . in Liquidation.sol
+  // there are 4 other events (Withdraw, Deposit, Transfer, AssetStatue) between first (underlying) AssetStatus
+  // and Liquidation. E.g. for tx 0x11656662685b05549734fff285e314521c6b3e6c1fa82cd551e2e40a41fae7a9
+  // the logIndex of the first AssetStatus is 115, logIndex of Liquidation is 120
+  if (foundIndex >= 0 && foundIndex + 5 < logs.length) {
+    const nextLog = logs.at(foundIndex + 5);
+    const topic0Sig = nextLog.topics.at(0); //topic0
+    if (topic0Sig.equals(liquidationSig)) {
+      const repay = ethereum.decode("uint256", Bytes.fromUint8Array(nextLog.data.subarray(32, 64)))!.toBigInt();
+      return repay;
+    }
   }
-  marketHourlySnapshot.save();
+
+  return null;
 }
