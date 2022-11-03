@@ -1,7 +1,8 @@
-import { Address, Bytes, BigInt } from "@graphprotocol/graph-ts";
+import { Address, Bytes, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   LendingProtocol,
   Market,
+  Oracle,
   Token,
   TokenData,
 } from "../../generated/schema";
@@ -89,7 +90,7 @@ export function getOrCreateLendingProtocol(
 
 export function getOrCreateMarket(
   marketID: Address,
-  protocolID: string,
+  protocolID: Bytes,
   timestamp: BigInt,
   blockNumber: BigInt
 ): Market {
@@ -98,6 +99,7 @@ export function getOrCreateMarket(
     market = new Market(marketID);
     market.protocol = protocolID;
     market.isActive = true;
+    market.canBorrowFrom = false; // default
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
     market.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     market.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -144,7 +146,7 @@ export function getOrCreateTokenData(
   marketID: Address,
   inputTokenID: Address
 ): TokenData {
-  let tokenDataID = marketID.concat(inputTokenID);
+  const tokenDataID = marketID.concat(inputTokenID);
   let tokenData = TokenData.load(tokenDataID);
   if (!tokenData) {
     const token = getOrCreateToken(inputTokenID);
@@ -152,7 +154,6 @@ export function getOrCreateTokenData(
 
     // default values
     tokenData.canUseAsCollateral = false;
-    tokenData.canBorrowFrom = false;
     tokenData.maximumLTV = BIGDECIMAL_ZERO;
     tokenData.liquidationThreshold = BIGDECIMAL_ZERO;
     tokenData.liquidationPenalty = BIGDECIMAL_ZERO;
@@ -164,6 +165,31 @@ export function getOrCreateTokenData(
   }
 
   return tokenData;
+}
+
+export function getOrCreateOracle(
+  event: ethereum.Event,
+  oracleAddress: Address,
+  marketID: Address,
+  isUSD: boolean,
+  source?: string
+): Oracle {
+  const oracleID = marketID.concat(oracleAddress);
+  let oracle = Oracle.load(oracleID);
+  if (!oracle) {
+    oracle = new Oracle(oracleID);
+    oracle.market = marketID;
+    oracle.blockCreated = event.block.number;
+    oracle.timestampCreated = event.block.timestamp;
+    oracle.isActive = true;
+    oracle.isUSD = isUSD;
+    if (source) {
+      oracle.oracleSource = source;
+    }
+    oracle.save();
+  }
+
+  return oracle;
 }
 
 export function getOrCreateToken(tokenAddress: Address): Token {

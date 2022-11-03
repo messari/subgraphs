@@ -89,6 +89,15 @@ export namespace RevenueSource {
   export const FLASHLOAN_FEE = "FLASHLOAN_FEE";
 }
 
+export namespace OracleSource {
+  export const UNISWAP = "UNISWAP";
+  export const BALANCER = "BALANCER";
+  export const CHAINLINK = "CHAINLINK";
+  export const YEARN = "YEARN";
+  export const SUSHISWAP = "SUSHISWAP";
+  export const CURVE = "CURVE";
+}
+
 export namespace TransactionType {
   export const DEPOSIT = "DEPOSIT";
   export const WITHDRAW = "WITHDRAW";

@@ -274,7 +274,7 @@ enum OracleSource {
 # As oracles are a source of truth it is important to understand the details.
 # This entity will help track oracle-related data in a market
 type Oracle @entity {
-  " { Oracle Address } "
+  " { Market ID }-{ Oracle Address } "
   id: Bytes!
 
   " The market that this oracle is used for pricing "
@@ -283,14 +283,8 @@ type Oracle @entity {
   " The block this oracle was adopted for a market "
   blockCreated: BigInt!
 
-  " The most recent block that the oracle was updated (Update when an oracle proxy updates the contract, this happens in compound for example) "
-  blockLU: BigInt!
-
   " The timestamp this oracle was adopted for a market "
   timestampCreated: BigInt!
-
-  " The most recent timestamp that the oracle was updated (Updated when the oracle address is updated) "
-  timestampLU: BigInt!
 
   " Is the Oracle currently used as the source of truth for a market"
   isActive: Boolean!

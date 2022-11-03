@@ -88,6 +88,7 @@ export const INT_FOUR = 4 as i32;
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
@@ -127,6 +128,11 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
     result = result.times(ten);
   }
   return result.toBigDecimal();
+}
+
+// BigInt to BigDecimal
+export function bigIntToBigDecimal(x: BigInt, decimals: i32): BigDecimal {
+  return x.toBigDecimal().div(exponentToBigDecimal(decimals));
 }
 
 //change number of decimals for BigDecimal
