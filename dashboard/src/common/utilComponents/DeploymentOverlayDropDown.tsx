@@ -8,6 +8,7 @@ interface DeploymentOverlayDropDownProps {
     subgraphEndpoints: any[];
     setDeploymentURL: any;
     currentDeploymentURL: string;
+    pendingSubgraphData: any;
     decentralizedDeployments: any;
     showDropDown: Boolean;
     failedToLoad: Boolean;
@@ -18,6 +19,7 @@ export const DeploymentOverlayDropDown = ({
     subgraphEndpoints,
     setDeploymentURL,
     currentDeploymentURL,
+    pendingSubgraphData,
     decentralizedDeployments,
     showDropDown,
     failedToLoad
@@ -26,10 +28,27 @@ export const DeploymentOverlayDropDown = ({
     let deploymentsList: any[] = [];
     let componentRenderOverwrite = undefined;
     try {
-        const protocolObj = subgraphEndpoints[schemaMapping[data.protocols[0].type]][data.protocols[0].slug];
+        let protocolObj: any = null;
+        let protocolObjKey = Object.keys(subgraphEndpoints[schemaMapping[data.protocols[0].type]]).find(x => x.includes(data.protocols[0].slug));
+        if (protocolObjKey) {
+            protocolObj = subgraphEndpoints[schemaMapping[data.protocols[0].type]][protocolObjKey];
+        } else {
+            protocolObjKey = Object.keys(subgraphEndpoints[schemaMapping[data.protocols[0].type]]).find(x => x.includes(data.protocols[0].slug.split("-")[0]));
+            if (protocolObjKey) {
+                protocolObj = subgraphEndpoints[schemaMapping[data.protocols[0].type]][protocolObjKey];
+            }
+        }
+
         if (protocolObj) {
             if (decentralizedDeployments[data.protocols[0].slug]) {
-                protocolObj[data.protocols[0].network + '-Decentralized'] = "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + decentralizedDeployments[data.protocols[0].slug].subgraphId;
+                protocolObj[decentralizedDeployments[data.protocols[0].slug].network + ' (DECENTRALIZED)'] = "https://gateway.thegraph.com/api/" + process.env.REACT_APP_GRAPH_API_KEY + "/subgraphs/id/" + decentralizedDeployments[data.protocols[0].slug].subgraphId;
+            }
+            if (pendingSubgraphData) {
+                if (Object.keys(pendingSubgraphData).length > 0) {
+                    Object.keys(pendingSubgraphData).forEach(depoKey => {
+                        protocolObj[depoKey + ' (PENDING)'] = "https://api.thegraph.com/subgraphs/id/" + pendingSubgraphData[depoKey].subgraph;
+                    })
+                }
             }
             deploymentsList = Object.keys(protocolObj).map(chain => {
                 return data.protocols[0].name + ' ' + chain + ' ' + protocolObj[chain];
