@@ -143,21 +143,26 @@ export const idQuery = gql`
 `;
 
 export function getPendingSubgraphsOnProtocolQuery(protocol: any) {
-  const depoKeys = Object.keys(protocol).filter(x => !x.toUpperCase().includes('DECENTRALIZED'));
-  if (depoKeys.length > 0) {
-    let query = `{`;
-    depoKeys.forEach(depo => {
-      const slug = protocol[depo].split('name/')[1];
-      query += `${slug.split('-').join('_').split('/').join('_')}: indexingStatusForPendingVersion(subgraphName: "${slug}") {
-        subgraph
-        health
-        entityCount
-      }`;
-    });
-    query += ` }`;
-    return gql`
-      ${query}
-      `;
+  try {
+    const depoKeys = Object.keys(protocol).filter(x => !x.toUpperCase().includes('DECENTRALIZED'));
+    if (depoKeys.length > 0) {
+      let query = `{`;
+      depoKeys.forEach(depo => {
+        const slug = protocol[depo].split('name/')[1];
+        query += `${slug.split('-').join('_').split('/').join('_')}: indexingStatusForPendingVersion(subgraphName: "${slug}") {
+          subgraph
+          health
+          entityCount
+        }`;
+      });
+      query += ` }`;
+      return gql`
+        ${query}
+        `;
+    }
+    return null;
+  } catch (err: any) {
+    console.error(err.message);
+    return null;
   }
-  return null;
 }
