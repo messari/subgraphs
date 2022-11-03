@@ -89,10 +89,9 @@ export function getOrCreateLendingProtocol(
 }
 
 export function getOrCreateMarket(
+  event: ethereum.Event,
   marketID: Address,
-  protocolID: Bytes,
-  timestamp: BigInt,
-  blockNumber: BigInt
+  protocolID: Bytes
 ): Market {
   let market = Market.load(marketID);
   if (!market) {
@@ -128,8 +127,8 @@ export function getOrCreateMarket(
     market.cumulativeUniqueTransferrers = INT_ZERO;
     market.cumulativeUniqueFlashloaners = INT_ZERO;
 
-    market.createdTimestamp = timestamp;
-    market.createdBlockNumber = blockNumber;
+    market.createdTimestamp = event.block.timestamp;
+    market.createdBlockNumber = event.block.number;
 
     market.positionCount = INT_ZERO;
     market.openPositionCount = INT_ZERO;

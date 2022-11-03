@@ -56,3 +56,5 @@ templates:
       eventHandlers:
         - event: Supply(indexed address,indexed address,uint256)
           handler: handleSupply
+        - event: SupplyCollateral(indexed address,indexed address,indexed address,uint256)
+          handler: handleSupplyCollateral

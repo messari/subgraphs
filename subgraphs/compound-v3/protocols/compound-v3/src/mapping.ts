@@ -1,6 +1,10 @@
-import { Bytes, log } from "@graphprotocol/graph-ts";
+import { Address, Bytes, log } from "@graphprotocol/graph-ts";
 import { CometDeployed } from "../../../generated/Configurator/Configurator";
-import { Comet, Supply } from "../../../generated/templates/Comet/Comet";
+import {
+  Comet,
+  Supply,
+  SupplyCollateral,
+} from "../../../generated/templates/Comet/Comet";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
@@ -15,8 +19,14 @@ import {
   getOrCreateToken,
   getOrCreateTokenData,
 } from "../../../src/utils/getters";
-import { getProtocolData, OracleSource, TokenType } from "./constants";
+import {
+  CONFIGURATOR_ADDRESS,
+  getProtocolData,
+  OracleSource,
+  TokenType,
+} from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
+import { createDeposit } from "../../../src/utils/creator";
 
 ///////////////////////////////
 ///// Configurator Events /////
@@ -26,16 +36,11 @@ import { Comet as CometTemplate } from "../../../generated/templates";
 //
 // market creation
 export function handleCometDeployed(event: CometDeployed): void {
-  CometTemplate.create(event.params.newComet);
+  CometTemplate.create(event.params.cometProxy);
 
   const marketID = event.params.newComet;
   const protocol = getOrCreateLendingProtocol(getProtocolData());
-  const market = getOrCreateMarket(
-    marketID,
-    protocol.id,
-    event.block.timestamp,
-    event.block.number
-  );
+  const market = getOrCreateMarket(event, marketID, protocol.id);
   market.canBorrowFrom = true;
 
   // create base token TokenData
@@ -126,7 +131,34 @@ export function handleCometDeployed(event: CometDeployed): void {
 ///// Comet Events /////
 ////////////////////////
 
+//
+//
+// Supplying the base token
 export function handleSupply(event: Supply): void {
-  // TODO: Implement
-  log.warning("supply: {}", [event.params.amount.toString()]);
+  const cometContract = Comet.bind(event.address);
+  const tryBaseToken = cometContract.try_baseToken();
+  const market = getOrCreateMarket(
+    event,
+    event.address,
+    Address.fromString(CONFIGURATOR_ADDRESS)
+  );
+  const accountID = event.params.dst;
+  const accountActorID = event.params.from;
+  const amount = event.params.amount;
+  // TODO update base token price
+
+  const deposit = createDeposit(
+    event,
+    event.address,
+    tryBaseToken.value,
+    accountID,
+    amount,
+    BIGDECIMAL_ZERO
+  );
+  deposit.accountActor = accountActorID;
+  deposit.save();
+}
+
+export function handleSupplyCollateral(event: SupplyCollateral): void {
+  log.warning("test", []);
 }
