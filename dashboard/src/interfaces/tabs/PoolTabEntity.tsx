@@ -1258,13 +1258,13 @@ function PoolTabEntity({
           }
           let dataChartToPass: any = dataFields[field];
           if (overlayDataFields[field]) {
-            const baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network}-${data?.protocols[0]?.subgraphVersion}`;
-            const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network}-${overlayData?.protocols[0]?.subgraphVersion}`;
+            const baseKey = `${data?.protocols[0]?.name}-${data?.protocols[0]?.network || ""}-${data?.protocols[0]?.subgraphVersion}`;
+            const overlayKey = `${overlayData?.protocols[0]?.name}-${overlayData?.protocols[0]?.network || ""}-${overlayData?.protocols[0]?.subgraphVersion}`;
             let keyDiff = "";
             if (baseKey === overlayKey) {
               keyDiff = ' (Overlay)';
             }
-            dataChartToPass = { current: dataFields[field], overlay: overlayDataFields[field] };
+            dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
           }
           return (
             <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolData[Object.keys(protocolData)[0]]?.slug + '-' + data[poolKeySingular]?.id} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
