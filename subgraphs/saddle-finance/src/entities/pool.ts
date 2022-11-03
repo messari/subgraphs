@@ -431,43 +431,18 @@ function updateRewardTokenEmissionsUSD(
   pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
 }
 
-// addLPVolume will convert a given LP amount from a swap into the underlying equivalent
-// and add it to an array of pool inputTokenVolumes. If the swap doesn't involve the LP
-// it won't do anything.
-function addLPVolume(
-  pool: LiquidityPool,
-  swap: SwapEvent,
-  poolVolumes: BigInt[]
-): BigInt[] {
+// isLPSwap will return true if any of the tokens on a given swap is an
+// LP token from a metapool.
+function isLPSwap(swap: SwapEvent, pool: LiquidityPool): boolean {
+  if (!pool._basePool) {
+    return false;
+  }
+
   const basePool = LiquidityPool.load(pool._basePool!)!;
-  if (basePool.outputTokenSupply!.equals(BIGINT_ZERO)) {
-    return poolVolumes;
-  }
-
-  if (
-    swap.tokenIn != basePool.outputToken &&
-    swap.tokenOut != basePool.outputToken
-  ) {
-    return poolVolumes;
-  }
-
-  let lpAmount = swap.amountIn;
-  if (swap.tokenOut == basePool.outputToken) {
-    lpAmount = swap.amountOut;
-  }
-
-  const multiplier = lpAmount.divDecimal(
-    basePool.outputTokenSupply!.toBigDecimal()
+  return (
+    basePool.outputToken == swap.tokenIn ||
+    basePool.outputToken == swap.tokenOut
   );
-  for (let i = 0; i < basePool.inputTokens.length; i++) {
-    const token = basePool.inputTokens[i];
-    const balance = basePool.inputTokenBalances[i].toBigDecimal();
-    const tokenIndex = pool.inputTokens.indexOf(token);
-
-    const vol = bigDecimalToBigInt(balance.times(multiplier));
-    poolVolumes[tokenIndex] = poolVolumes[tokenIndex].plus(vol);
-  }
-  return poolVolumes;
 }
 
 function addTokenVolume(
@@ -475,50 +450,15 @@ function addTokenVolume(
   swap: SwapEvent,
   pool: LiquidityPool
 ): BigInt[] {
-  if (pool._basePool) {
-    tokenVolume = addLPVolume(pool, swap, tokenVolume);
+  if (isLPSwap(swap, pool)) {
+    return addLPSwapVolume(pool, swap, tokenVolume);
   }
 
   const tokenInIndex = pool.inputTokens.indexOf(swap.tokenIn);
   const tokenOutIndex = pool.inputTokens.indexOf(swap.tokenOut);
-  if (tokenInIndex != -1) {
-    tokenVolume[tokenInIndex] = tokenVolume[tokenInIndex].plus(swap.amountIn);
-  }
-  if (tokenOutIndex != -1) {
-    tokenVolume[tokenOutIndex] = tokenVolume[tokenOutIndex].plus(
-      swap.amountOut
-    );
-  }
+  tokenVolume[tokenInIndex] = tokenVolume[tokenInIndex].plus(swap.amountIn);
+  tokenVolume[tokenOutIndex] = tokenVolume[tokenOutIndex].plus(swap.amountOut);
   return tokenVolume;
-}
-
-function addLPVolumeUSD(
-  pool: LiquidityPool,
-  swap: SwapEvent,
-  volumes: BigDecimal[]
-): BigDecimal[] {
-  const basePool = LiquidityPool.load(pool._basePool!)!;
-  if (
-    swap.tokenIn != basePool.outputToken &&
-    swap.tokenOut != basePool.outputToken
-  ) {
-    return volumes;
-  }
-
-  let amountUSD = swap.amountInUSD;
-  if (swap.tokenOut == basePool.outputToken) {
-    amountUSD = swap.amountOutUSD;
-  }
-
-  for (let i = 0; i < basePool.inputTokens.length; i++) {
-    const token = basePool.inputTokens[i];
-    const index = pool.inputTokens.indexOf(token);
-    const weight = basePool.inputTokenWeights[i].div(BIGDECIMAL_HUNDRED);
-
-    const vol = amountUSD.times(weight);
-    volumes[index] = volumes[index].plus(vol);
-  }
-  return volumes;
 }
 
 function addTokenVolumeUSD(
@@ -526,23 +466,92 @@ function addTokenVolumeUSD(
   swap: SwapEvent,
   pool: LiquidityPool
 ): BigDecimal[] {
-  if (pool._basePool) {
-    tokenVolume = addLPVolumeUSD(pool, swap, tokenVolume);
+  if (isLPSwap(swap, pool)) {
+    return addLPSwapVolumeUSD(pool, swap, tokenVolume);
   }
 
   const tokenInIndex = pool.inputTokens.indexOf(swap.tokenIn);
   const tokenOutIndex = pool.inputTokens.indexOf(swap.tokenOut);
-  if (tokenInIndex != -1) {
-    tokenVolume[tokenInIndex] = tokenVolume[tokenInIndex].plus(
-      swap.amountInUSD
-    );
-  }
-  if (tokenOutIndex != -1) {
-    tokenVolume[tokenOutIndex] = tokenVolume[tokenOutIndex].plus(
-      swap.amountOutUSD
-    );
-  }
+  tokenVolume[tokenInIndex] = tokenVolume[tokenInIndex].plus(swap.amountInUSD);
+  tokenVolume[tokenOutIndex] = tokenVolume[tokenOutIndex].plus(
+    swap.amountOutUSD
+  );
   return tokenVolume;
+}
+
+// addLPSwapVolume will add to a given volumes array the volume of each token
+// involved in a swap. It will assume that one of the two tokens swapped is an LP token.
+// Since we keep the underlying tokens that compose the LP instead of the LP token
+// itself, we'll add the proportional part of each underlying from the LP volume.
+function addLPSwapVolume(
+  pool: LiquidityPool,
+  swap: SwapEvent,
+  poolVolumes: BigInt[]
+): BigInt[] {
+  const basePool = LiquidityPool.load(pool._basePool!)!;
+  const lpToken = basePool.outputToken;
+
+  let lpAmount = swap.amountIn;
+  let nonLPAmount = swap.amountOut;
+  let nonLPToken = swap.tokenOut;
+  if (swap.tokenOut == lpToken) {
+    lpAmount = swap.amountOut;
+    nonLPAmount = swap.amountIn;
+    nonLPToken = swap.tokenIn;
+  }
+
+  const multiplier = lpAmount.divDecimal(
+    basePool.outputTokenSupply!.toBigDecimal()
+  );
+  const underlyingTokens = basePool.inputTokens;
+  for (let i = 0; i < underlyingTokens.length; i++) {
+    const token = underlyingTokens[i];
+    const balance = basePool.inputTokenBalances[i].toBigDecimal();
+    const tokenIndex = pool.inputTokens.indexOf(token);
+
+    const vol = bigDecimalToBigInt(balance.times(multiplier));
+    poolVolumes[tokenIndex] = poolVolumes[tokenIndex].plus(vol);
+  }
+
+  const index = pool.inputTokens.indexOf(nonLPToken);
+  poolVolumes[index] = poolVolumes[index].plus(nonLPAmount);
+  return poolVolumes;
+}
+
+// addLPSwapVolumeUSD will add to a given volumes array the volumeUSD of each token
+// involved in a swap. It will assume that one of the two tokens swapped is an LP token.
+// Since we keep the underlying tokens that compose the LP instead of the LP token 
+// itself, we'll add the proportional part of each underlying from the LP volume.
+function addLPSwapVolumeUSD(
+  pool: LiquidityPool,
+  swap: SwapEvent,
+  poolVolumes: BigDecimal[]
+): BigDecimal[] {
+  const basePool = LiquidityPool.load(pool._basePool!)!;
+  const lpToken = basePool.outputToken;
+
+  let lpAmountUSD = swap.amountInUSD;
+  let nonLPAmountUSD = swap.amountOutUSD;
+  let nonLPToken = swap.tokenOut;
+  if (swap.tokenOut == lpToken) {
+    lpAmountUSD = swap.amountOutUSD;
+    nonLPAmountUSD = swap.amountInUSD;
+    nonLPToken = swap.tokenIn;
+  }
+
+  const underlyingTokens = basePool.inputTokens;
+  for (let i = 0; i < underlyingTokens.length; i++) {
+    const token = underlyingTokens[i];
+    const index = pool.inputTokens.indexOf(token);
+    const weight = basePool.inputTokenWeights[i].div(BIGDECIMAL_HUNDRED);
+
+    const vol = lpAmountUSD.times(weight);
+    poolVolumes[index] = poolVolumes[index].plus(vol);
+  }
+
+  const index = pool.inputTokens.indexOf(nonLPToken);
+  poolVolumes[index] = poolVolumes[index].plus(nonLPAmountUSD);
+  return poolVolumes;
 }
 
 function getBasePool(contract: Swap): string | null {
