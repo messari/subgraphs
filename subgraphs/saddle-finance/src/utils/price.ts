@@ -207,7 +207,7 @@ function poolHasWhitelistedStable(pool: LiquidityPool): boolean {
 }
 
 // calculateSwap returns the amount of `tokenOut` that would result from swapping
-// `amount` of `tokenIn` ina given saddle pool.
+// `amount` of `tokenIn` in a given saddle pool.
 function calculateSwap(
   pool: LiquidityPool,
   tokenIn: Address,
@@ -226,7 +226,12 @@ function calculateSwap(
   }
 
   const contract = SwapContract.bind(Address.fromString(pool.id));
-  const call = contract.try_calculateSwap(inputIndex, outputIndex, amount);
+  let call: ethereum.CallResult<BigInt>;
+  if (!pool._basePool) {
+    call = contract.try_calculateSwap(inputIndex, outputIndex, amount);
+  } else {
+    call = contract.try_calculateSwapUnderlying(inputIndex, outputIndex, amount);
+  }
   if (call.reverted) {
     log.error(
       "unable to calculate swap from saddle pool. Pool: {}, TokenIn: {}, TokenOut: {}, Amount: {}",
