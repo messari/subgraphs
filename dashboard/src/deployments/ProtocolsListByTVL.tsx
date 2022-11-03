@@ -85,27 +85,32 @@ function ProtocolsListByTVL({ protocolsToQuery, getData }: ProtocolsListByTVLPro
 
     // Filter defi llama protocols for supported chains, supported schema types, and protocols already accounted for
     const protocolsToDevelop = defiLlamaProtocols.filter((x: any, idx: number) => {
-        let onSupportedChain = false;
-        x.chains.forEach((chain: any) => {
-            if (!!Object.keys(NetworkLogos).includes(chain.toLowerCase())) {
-                onSupportedChain = true;
+        try {
+            let onSupportedChain = false;
+            x.chains.forEach((chain: any) => {
+                if (!!Object.keys(NetworkLogos).includes(chain.toLowerCase())) {
+                    onSupportedChain = true;
+                }
+            })
+            const supportedCategory = Object.keys(categoryTypesSupported).includes(x?.category?.toLowerCase());
+            let slugNotUsed = false;
+            if (!protocolSlugs.includes(x.slug) && !protocolSlugs.includes(x.slug.split('-')[0]) && !protocolSlugs.includes(x.slug + '-finance') && !protocolSlugs.includes(x.slug + '-protocol')) {
+                slugNotUsed = true;
             }
-        })
-        const supportedCategory = Object.keys(categoryTypesSupported).includes(x?.category?.toLowerCase());
-        let slugNotUsed = false;
-        if (!protocolSlugs.includes(x.slug) && !protocolSlugs.includes(x.slug.split('-')[0]) && !protocolSlugs.includes(x.slug + '-finance') && !protocolSlugs.includes(x.slug + '-protocol')) {
-            slugNotUsed = true;
-        }
 
-        let isCurrentProtocolType = categoryTypesSupported[x?.category?.toLowerCase()] === currentProtocolType;
-        if (currentProtocolType === "" || currentProtocolType === "All Protocol Types") {
-            isCurrentProtocolType = true;
-        }
-        if (!protocolTypeList.includes(x?.category?.toLowerCase()) && supportedCategory) {
-            protocolTypeList.push(x?.category?.toLowerCase());
-        }
+            let isCurrentProtocolType = categoryTypesSupported[x?.category?.toLowerCase()] === currentProtocolType;
+            if (currentProtocolType === "" || currentProtocolType === "All Protocol Types") {
+                isCurrentProtocolType = true;
+            }
+            if (!protocolTypeList.includes(x?.category?.toLowerCase()) && supportedCategory) {
+                protocolTypeList.push(x?.category?.toLowerCase());
+            }
 
-        return slugNotUsed && onSupportedChain && supportedCategory && isCurrentProtocolType;
+            return slugNotUsed && onSupportedChain && supportedCategory && isCurrentProtocolType;
+        } catch (err: any) {
+            console.error(err.message)
+            return false;
+        }
     }).sort((a, b) => {
         let aAddedTVL = 0;
         Object.keys(a.chainTvls).forEach(x => {

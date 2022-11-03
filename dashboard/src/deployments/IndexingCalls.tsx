@@ -292,27 +292,6 @@ function IndexingCalls({ setIndexingStatus, setPendingIndexingStatus, indexingSt
         }
     }, [statusLendingPendingLoading, statusDexAmmPendingLoading, statusYieldPendingLoading, statusGenericPendingLoading, statusErc20PendingLoading, statusErc721PendingLoading, statusGovernancePendingLoading, statusNetworkPendingLoading, statusNFTPendingLoading]);
 
-
-    // useEffect(() => {
-    //     if ((statusLendingPending || statusLendingPendingError) && (statusDexAmmPending || statusDexAmmPendingError) && (statusYieldPending || statusYieldPendingError) && (statusGenericPending || statusGenericPendingError)) {
-    //         setIndexingStatusLoadedPending({ lending: true, exchanges: true, vaults: true, generic: true });
-    //         const newErrorObject = { ...indexingStatusErrorPending };
-    //         if (statusLendingPendingError && !indexingStatusErrorPending.lending) {
-    //             newErrorObject.lending = true;
-    //         }
-    //         if (statusDexAmmPendingError && !indexingStatusErrorPending.exchanges) {
-    //             newErrorObject.exchanges = true;
-    //         }
-    //         if (statusYieldPendingError && !indexingStatusErrorPending.vaults) {
-    //             newErrorObject.vaults = true;
-    //         }
-    //         if (statusGenericPendingError && !indexingStatusErrorPending.generic) {
-    //             newErrorObject.generic = true;
-    //         }
-    //         setIndexingStatusErrorPending(newErrorObject);
-    //     }
-    // }, [statusLendingPendingLoading, statusDexAmmPendingLoading, statusYieldPendingLoading, statusGenericPendingLoading]);
-
     // No need to return a JSX element to render, function needed for state management
     return (null);
 }
