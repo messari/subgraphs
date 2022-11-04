@@ -177,6 +177,7 @@ export function getOrCreateOracle(
   let oracle = Oracle.load(oracleID);
   if (!oracle) {
     oracle = new Oracle(oracleID);
+    oracle.oracleAddress = oracleAddress;
     oracle.market = marketID;
     oracle.blockCreated = event.block.number;
     oracle.timestampCreated = event.block.timestamp;

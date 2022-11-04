@@ -3,13 +3,17 @@ import { CometDeployed } from "../../../generated/Configurator/Configurator";
 import {
   Comet,
   Supply,
+  Withdraw,
+  Transfer,
   SupplyCollateral,
+  WithdrawCollateral,
 } from "../../../generated/templates/Comet/Comet";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   bigIntToBigDecimal,
   BIGINT_HUNDRED,
+  BIGINT_ONE,
   BIGINT_ZERO,
 } from "../../../src/utils/constants";
 import {
@@ -26,7 +30,7 @@ import {
   TokenType,
 } from "./constants";
 import { Comet as CometTemplate } from "../../../generated/templates";
-import { createDeposit } from "../../../src/utils/creator";
+import { createDeposit, createWithdraw } from "../../../src/utils/creator";
 
 ///////////////////////////////
 ///// Configurator Events /////
@@ -38,8 +42,8 @@ import { createDeposit } from "../../../src/utils/creator";
 export function handleCometDeployed(event: CometDeployed): void {
   CometTemplate.create(event.params.cometProxy);
 
-  const marketID = event.params.newComet;
   const protocol = getOrCreateLendingProtocol(getProtocolData());
+  const marketID = event.params.cometProxy;
   const market = getOrCreateMarket(event, marketID, protocol.id);
   market.canBorrowFrom = true;
 
@@ -137,19 +141,14 @@ export function handleCometDeployed(event: CometDeployed): void {
 export function handleSupply(event: Supply): void {
   const cometContract = Comet.bind(event.address);
   const tryBaseToken = cometContract.try_baseToken();
-  const market = getOrCreateMarket(
-    event,
-    event.address,
-    Address.fromString(CONFIGURATOR_ADDRESS)
-  );
   const accountID = event.params.dst;
   const accountActorID = event.params.from;
   const amount = event.params.amount;
-  // TODO update base token price
+  // TODO update all token price in this market
 
   const deposit = createDeposit(
     event,
-    event.address,
+    event.address, // marketID
     tryBaseToken.value,
     accountID,
     amount,
@@ -159,6 +158,76 @@ export function handleSupply(event: Supply): void {
   deposit.save();
 }
 
+//
+//
+// Supplying collateral tokens
 export function handleSupplyCollateral(event: SupplyCollateral): void {
-  log.warning("test", []);
+  const accountID = event.params.dst;
+  const accountActorID = event.params.from;
+  const asset = event.params.asset;
+  const amount = event.params.amount;
+  // TODO update all token price in this market
+
+  const deposit = createDeposit(
+    event,
+    event.address, // marketID
+    asset,
+    accountID,
+    amount,
+    BIGDECIMAL_ZERO
+  );
+  deposit.accountActor = accountActorID;
+  deposit.save();
 }
+
+//
+//
+// withdraws baseToken (could be a Withdrawal or Borrow)
+export function handleWithdraw(event: Withdraw): void {
+  const amount = event.params.amount;
+  const transferIndex = event.transaction.index.plus(BIGINT_ONE);
+  if (event.receipt) {
+    const logs = event.receipt!.logs;
+    for (let i = 0; i < logs.length; i++) {
+      if (logs[i].logIndex == transferIndex) {
+        log.warning("Real withdraw:index: {} hash: {} data: {} topics: {}", [
+          event.logIndex.toString(),
+          event.transaction.hash.toHexString(),
+          logs[i].data.toHexString(),
+          logs[i].topics[0].toHexString(),
+        ]);
+      }
+    }
+  }
+}
+
+// if (newPrincipal >= 0) {
+// withdraw no borrow
+// withdraw =
+//   return (uint104(oldPrincipal - newPrincipal), 0);
+// } else if (oldPrincipal <= 0) {
+//   return (0, uint104(oldPrincipal - newPrincipal));
+// } else {
+//   return (uint104(oldPrincipal), uint104(-newPrincipal));
+// }
+
+export function handleWithdrawCollateral(event: WithdrawCollateral): void {
+  const accountID = event.params.src;
+  const accountActorID = event.params.to;
+  const asset = event.params.asset;
+  const amount = event.params.amount;
+  // TODO update all token price in this market
+
+  const deposit = createWithdraw(
+    event,
+    event.address, // marketID
+    asset,
+    accountID,
+    amount,
+    BIGDECIMAL_ZERO // TODO price asset
+  );
+  deposit.accountActor = accountActorID;
+  deposit.save();
+}
+
+export function handleTransfer(event: Transfer): void {}

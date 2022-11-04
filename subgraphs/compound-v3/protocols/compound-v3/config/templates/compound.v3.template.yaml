@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 0.0.5
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
@@ -58,3 +58,13 @@ templates:
           handler: handleSupply
         - event: SupplyCollateral(indexed address,indexed address,indexed address,uint256)
           handler: handleSupplyCollateral
+        - event: Withdraw(indexed address,indexed address,uint256)
+          handler: handleWithdraw
+          receipt: true
+        - event: WithdrawCollateral(indexed address,indexed address,indexed address,uint256)
+          handler: handleWithdrawCollateral
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        # - event: AbsorbCollateral(indexed address,indexed address,indexed address,uint256,uint256)
+        #   handler: handleAbsorbCollateral
+        # - event: AbsorbDebt()

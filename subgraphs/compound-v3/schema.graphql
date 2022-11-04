@@ -277,6 +277,8 @@ type Oracle @entity {
   " { Market ID }-{ Oracle Address } "
   id: Bytes!
 
+  oracleAddress: Bytes!
+
   " The market that this oracle is used for pricing "
   market: Market!
 
@@ -1429,10 +1431,13 @@ type Deposit @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1476,10 +1481,13 @@ type Withdraw @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1528,10 +1536,13 @@ type Borrow @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1576,10 +1587,13 @@ type Repay @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1623,10 +1637,13 @@ type Liquidate @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -1659,6 +1676,9 @@ type Liquidate @entity(immutable: true) {
   profitUSD: BigDecimal!
 }
 
+# This entity is solely for transfers outside of normal protocol interaction
+# e.g. transferring aTokens (collateral) directly, not a deposit.
+# Transfers associated with other transactions in this schema should live there and not here.
 # Note that only one transfer event should be created per transfer.
 type Transfer @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
@@ -1674,10 +1694,13 @@ type Transfer @entity(immutable: true) {
   logIndex: Int!
 
   " Price of gas in this transaction "
-  gasPrice: BigInt!
+  gasPrice: BigInt
+
+  " Gas used in this transaction. (Optional because not every chain will support this) "
+  gasUsed: BigInt
 
   " Gas limit of this transaction. e.g. the amount of gas the sender will pay "
-  gasLimit: BigInt!
+  gasLimit: BigInt
 
   " Block number of this event "
   blockNumber: BigInt!
