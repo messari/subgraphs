@@ -1,8 +1,8 @@
 import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 import { assert, describe, test } from 'matchstick-as'
 import { prices } from '../../src/utils/prices'
-import { mockChainLink } from '../controller-utils'
 import { constants } from '../../src/utils/constants'
+import { helpers } from '../helpers'
 
 const tokenAddress = Address.fromString(
   '0x6b175474e89094c44da98b954eedeac495271d0f'
@@ -11,7 +11,7 @@ const tokenAddress = Address.fromString(
 describe('prices', () => {
   describe('getPrice', () => {
     test('returns amount in USD', () => {
-      mockChainLink(
+      helpers.mocking.chainLink.chainLink(
         constants.CHAIN_LINK_CONTRACT_ADDRESS,
         tokenAddress,
         constants.CHAIN_LINK_USD_ADDRESS,

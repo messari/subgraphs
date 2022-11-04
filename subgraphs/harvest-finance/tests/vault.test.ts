@@ -7,25 +7,15 @@ import {
   describe,
   test,
 } from 'matchstick-as'
-import {
-  assertDeposit,
-  assertVaultDailySnapshot,
-  assertUsageMetricsDailySnapshot,
-  assertWithdraw,
-  createDepositEvent,
-  createTransferEvent,
-  createWithdrawEvent,
-} from './vault-utils'
 import { handleDeposit, handleTransfer, handleWithdraw } from '../src/vault'
 import { Token, Vault } from '../generated/schema'
-import { assertProtocol, mockChainLink } from './controller-utils'
 import { vaults } from '../src/utils/vaults'
 import { deposits } from '../src/utils/deposits'
 import { withdraws } from '../src/utils/withdraws'
 import { tokens } from '../src/utils/tokens'
 import { constants } from '../src/utils/constants'
 import { protocols } from '../src/utils/protocols'
-import { helpers } from './helpers/mock'
+import { helpers } from './helpers'
 
 const vaultAddress = Address.fromString(
   '0x0000000000000000000000000000000000000001'
@@ -70,14 +60,15 @@ describe('Vault', () => {
   })
 
   beforeEach(() => {
-    mockChainLink(
+    helpers.mocking.chainLink.chainLink(
       constants.CHAIN_LINK_CONTRACT_ADDRESS,
       inputTokenAddress,
       constants.CHAIN_LINK_USD_ADDRESS,
       BigInt.fromString('99975399'),
       8
     )
-    helpers.mock.vault_underlyingBalanceWithInvestment(
+
+    helpers.mocking.vault.underlyingBalanceWithInvestment(
       vaultAddress,
       BigInt.fromString('120000000') // 120
     )
@@ -100,12 +91,15 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('100000000') // 100
-      const event = createDepositEvent(amount, beneficiaryAddress)
+      const event = helpers.createDepositEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
 
       handleDeposit(event)
 
-      assert.fieldEquals('Vault', vault.id, 'inputTokenBalance', '120000000')
+      helpers.asserting.vaults.inputTokenBalance(
+        vault.id,
+        BigInt.fromString('120000000')
+      )
     })
 
     test('creates Deposit', () => {
@@ -119,7 +113,7 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('100000000') // 100
-      const event = createDepositEvent(amount, beneficiaryAddress)
+      const event = helpers.createDepositEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
       event.transaction.from = fromAddress
       handleDeposit(event)
@@ -129,7 +123,7 @@ describe('Vault', () => {
         event.logIndex
       )
 
-      assertDeposit(depositId, {
+      helpers.asserting.deposits.deposit(depositId, {
         hash: event.transaction.hash,
         to: beneficiaryAddress,
         from: fromAddress,
@@ -151,17 +145,16 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('100000000') // 100
-      const event = createDepositEvent(amount, beneficiaryAddress)
+      const event = helpers.createDepositEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
 
       handleDeposit(event)
 
       assert.fieldEquals('Token', token.id, 'lastPriceUSD', '0.99975399')
-      assert.fieldEquals(
-        'Vault',
+
+      helpers.asserting.vaults.totalValueLockedUSD(
         vault.id,
-        'totalValueLockedUSD',
-        '119.9704788'
+        BigDecimal.fromString('119.9704788')
       )
     })
 
@@ -178,7 +171,7 @@ describe('Vault', () => {
       const amount = BigInt.fromString('100000000') // 100
 
       // 1st deposit
-      const event0 = createDepositEvent(amount, beneficiaryAddress)
+      const event0 = helpers.createDepositEvent(amount, beneficiaryAddress)
       event0.address = Address.fromString(vault.id)
       event0.transaction.from = fromAddress
       handleDeposit(event0)
@@ -195,23 +188,26 @@ describe('Vault', () => {
           ).toString()
         )
 
-      assertVaultDailySnapshot(vaultDailySnapshotId0, {
-        protocol: constants.PROTOCOL_ID.toHexString(),
-        vault: vaultAddress,
-        totalValueLockedUSD: vaultStore0.totalValueLockedUSD,
-        inputTokenBalance: vaultStore0.inputTokenBalance,
-        outputTokenSupply: vaultStore0.outputTokenSupply!,
-        outputTokenPriceUSD: vaultStore0.outputTokenPriceUSD!,
-        pricePerShare: vaultStore0.pricePerShare!,
-        stakedOutputTokenAmount: vaultStore0.stakedOutputTokenAmount!,
-        rewardTokenEmissionsAmount: vaultStore0.rewardTokenEmissionsAmount,
-        rewardTokenEmissionsUSD: vaultStore0.rewardTokenEmissionsUSD,
-        blockNumber: event0.block.number,
-        timestamp: event0.block.timestamp,
-      })
+      helpers.asserting.vaultDailySnapshots.vaultDailySnapshot(
+        vaultDailySnapshotId0,
+        {
+          protocol: constants.PROTOCOL_ID.toHexString(),
+          vault: vaultAddress,
+          totalValueLockedUSD: vaultStore0.totalValueLockedUSD,
+          inputTokenBalance: vaultStore0.inputTokenBalance,
+          outputTokenSupply: vaultStore0.outputTokenSupply!,
+          outputTokenPriceUSD: vaultStore0.outputTokenPriceUSD!,
+          pricePerShare: vaultStore0.pricePerShare!,
+          stakedOutputTokenAmount: vaultStore0.stakedOutputTokenAmount!,
+          rewardTokenEmissionsAmount: vaultStore0.rewardTokenEmissionsAmount,
+          rewardTokenEmissionsUSD: vaultStore0.rewardTokenEmissionsUSD,
+          blockNumber: event0.block.number,
+          timestamp: event0.block.timestamp,
+        }
+      )
 
       // 2nd deposit on different day. Should create new snapshot
-      const event1 = createDepositEvent(amount, beneficiaryAddress)
+      const event1 = helpers.createDepositEvent(amount, beneficiaryAddress)
       event1.address = Address.fromString(vault.id)
       event1.transaction.from = fromAddress
       event1.block.timestamp = event1.block.timestamp.plus(
@@ -231,20 +227,23 @@ describe('Vault', () => {
           ).toString()
         )
 
-      assertVaultDailySnapshot(vaultDailySnapshotId1, {
-        protocol: constants.PROTOCOL_ID.toHexString(),
-        vault: vaultAddress,
-        totalValueLockedUSD: vaultStore1.totalValueLockedUSD,
-        inputTokenBalance: vaultStore1.inputTokenBalance,
-        outputTokenSupply: vaultStore1.outputTokenSupply!,
-        outputTokenPriceUSD: vaultStore1.outputTokenPriceUSD!,
-        pricePerShare: vaultStore1.pricePerShare!,
-        stakedOutputTokenAmount: vaultStore1.stakedOutputTokenAmount!,
-        rewardTokenEmissionsAmount: vaultStore1.rewardTokenEmissionsAmount,
-        rewardTokenEmissionsUSD: vaultStore1.rewardTokenEmissionsUSD,
-        blockNumber: event1.block.number,
-        timestamp: event1.block.timestamp,
-      })
+      helpers.asserting.vaultDailySnapshots.vaultDailySnapshot(
+        vaultDailySnapshotId1,
+        {
+          protocol: constants.PROTOCOL_ID.toHexString(),
+          vault: vaultAddress,
+          totalValueLockedUSD: vaultStore1.totalValueLockedUSD,
+          inputTokenBalance: vaultStore1.inputTokenBalance,
+          outputTokenSupply: vaultStore1.outputTokenSupply!,
+          outputTokenPriceUSD: vaultStore1.outputTokenPriceUSD!,
+          pricePerShare: vaultStore1.pricePerShare!,
+          stakedOutputTokenAmount: vaultStore1.stakedOutputTokenAmount!,
+          rewardTokenEmissionsAmount: vaultStore1.rewardTokenEmissionsAmount,
+          rewardTokenEmissionsUSD: vaultStore1.rewardTokenEmissionsUSD,
+          blockNumber: event1.block.number,
+          timestamp: event1.block.timestamp,
+        }
+      )
     })
   })
 
@@ -258,12 +257,15 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('100000000') // 100
-      const event = createWithdrawEvent(amount, beneficiaryAddress)
+      const event = helpers.createWithdrawEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
 
       handleWithdraw(event)
 
-      assert.fieldEquals('Vault', vault.id, 'inputTokenBalance', '120000000') // 120
+      helpers.asserting.vaults.inputTokenBalance(
+        vault.id,
+        BigInt.fromString('120000000')
+      )
     })
 
     test('creates Withdraw', () => {
@@ -277,7 +279,7 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('100000000') // 100
-      const event = createWithdrawEvent(amount, beneficiaryAddress)
+      const event = helpers.createWithdrawEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
       event.transaction.from = fromAddress
       handleWithdraw(event)
@@ -287,7 +289,7 @@ describe('Vault', () => {
         event.logIndex
       )
 
-      assertWithdraw(withdrawId, {
+      helpers.asserting.withdraws.withdraw(withdrawId, {
         hash: event.transaction.hash,
         to: beneficiaryAddress,
         from: fromAddress,
@@ -311,17 +313,16 @@ describe('Vault', () => {
         '0x0000000000000000000000000000000000000009'
       )
       const amount = BigInt.fromString('400000000') // 400
-      const event = createWithdrawEvent(amount, beneficiaryAddress)
+      const event = helpers.createWithdrawEvent(amount, beneficiaryAddress)
       event.address = Address.fromString(vault.id)
 
       handleWithdraw(event)
 
       assert.fieldEquals('Token', token.id, 'lastPriceUSD', '0.99975399')
-      assert.fieldEquals(
-        'Vault',
+
+      helpers.asserting.vaults.totalValueLockedUSD(
         vault.id,
-        'totalValueLockedUSD',
-        '119.9704788'
+        BigDecimal.fromString('119.9704788')
       )
     })
 
@@ -341,7 +342,7 @@ describe('Vault', () => {
       const amount = BigInt.fromString('100000000') // 100
 
       // 1st withdraw
-      const event0 = createWithdrawEvent(amount, beneficiaryAddress)
+      const event0 = helpers.createWithdrawEvent(amount, beneficiaryAddress)
       event0.address = Address.fromString(vault.id)
       event0.transaction.from = fromAddress
       handleWithdraw(event0)
@@ -358,23 +359,26 @@ describe('Vault', () => {
           ).toString()
         )
 
-      assertVaultDailySnapshot(vaultDailySnapshotId0, {
-        protocol: constants.PROTOCOL_ID.toHexString(),
-        vault: vaultAddress,
-        totalValueLockedUSD: vaultStore0.totalValueLockedUSD,
-        inputTokenBalance: vaultStore0.inputTokenBalance,
-        outputTokenSupply: vaultStore0.outputTokenSupply!,
-        outputTokenPriceUSD: vaultStore0.outputTokenPriceUSD!,
-        pricePerShare: vaultStore0.pricePerShare!,
-        stakedOutputTokenAmount: vaultStore0.stakedOutputTokenAmount!,
-        rewardTokenEmissionsAmount: vaultStore0.rewardTokenEmissionsAmount,
-        rewardTokenEmissionsUSD: vaultStore0.rewardTokenEmissionsUSD,
-        blockNumber: event0.block.number,
-        timestamp: event0.block.timestamp,
-      })
+      helpers.asserting.vaultDailySnapshots.vaultDailySnapshot(
+        vaultDailySnapshotId0,
+        {
+          protocol: constants.PROTOCOL_ID.toHexString(),
+          vault: vaultAddress,
+          totalValueLockedUSD: vaultStore0.totalValueLockedUSD,
+          inputTokenBalance: vaultStore0.inputTokenBalance,
+          outputTokenSupply: vaultStore0.outputTokenSupply!,
+          outputTokenPriceUSD: vaultStore0.outputTokenPriceUSD!,
+          pricePerShare: vaultStore0.pricePerShare!,
+          stakedOutputTokenAmount: vaultStore0.stakedOutputTokenAmount!,
+          rewardTokenEmissionsAmount: vaultStore0.rewardTokenEmissionsAmount,
+          rewardTokenEmissionsUSD: vaultStore0.rewardTokenEmissionsUSD,
+          blockNumber: event0.block.number,
+          timestamp: event0.block.timestamp,
+        }
+      )
 
       // 2nd withdraw on different day. Should create new snapshot
-      const event1 = createWithdrawEvent(amount, beneficiaryAddress)
+      const event1 = helpers.createWithdrawEvent(amount, beneficiaryAddress)
       event1.address = Address.fromString(vault.id)
       event1.transaction.from = fromAddress
       event1.block.timestamp = event1.block.timestamp.plus(
@@ -394,20 +398,23 @@ describe('Vault', () => {
           ).toString()
         )
 
-      assertVaultDailySnapshot(vaultDailySnapshotId1, {
-        protocol: constants.PROTOCOL_ID.toHexString(),
-        vault: vaultAddress,
-        totalValueLockedUSD: vaultStore1.totalValueLockedUSD,
-        inputTokenBalance: vaultStore1.inputTokenBalance,
-        outputTokenSupply: vaultStore1.outputTokenSupply!,
-        outputTokenPriceUSD: vaultStore1.outputTokenPriceUSD!,
-        pricePerShare: vaultStore1.pricePerShare!,
-        stakedOutputTokenAmount: vaultStore1.stakedOutputTokenAmount!,
-        rewardTokenEmissionsAmount: vaultStore1.rewardTokenEmissionsAmount,
-        rewardTokenEmissionsUSD: vaultStore1.rewardTokenEmissionsUSD,
-        blockNumber: event1.block.number,
-        timestamp: event1.block.timestamp,
-      })
+      helpers.asserting.vaultDailySnapshots.vaultDailySnapshot(
+        vaultDailySnapshotId1,
+        {
+          protocol: constants.PROTOCOL_ID.toHexString(),
+          vault: vaultAddress,
+          totalValueLockedUSD: vaultStore1.totalValueLockedUSD,
+          inputTokenBalance: vaultStore1.inputTokenBalance,
+          outputTokenSupply: vaultStore1.outputTokenSupply!,
+          outputTokenPriceUSD: vaultStore1.outputTokenPriceUSD!,
+          pricePerShare: vaultStore1.pricePerShare!,
+          stakedOutputTokenAmount: vaultStore1.stakedOutputTokenAmount!,
+          rewardTokenEmissionsAmount: vaultStore1.rewardTokenEmissionsAmount,
+          rewardTokenEmissionsUSD: vaultStore1.rewardTokenEmissionsUSD,
+          blockNumber: event1.block.number,
+          timestamp: event1.block.timestamp,
+        }
+      )
     })
   })
 
@@ -423,18 +430,17 @@ describe('Vault', () => {
 
         const amount = BigInt.fromString('200000000') // 200
 
-        const event = createTransferEvent(zeroAddress, toAddress, amount)
+        const event = helpers.createTransferEvent(
+          zeroAddress,
+          toAddress,
+          amount
+        )
 
         event.address = vaultAddress
 
         handleTransfer(event)
 
-        assert.fieldEquals(
-          'Vault',
-          vault.id,
-          'outputTokenSupply',
-          amount.toString()
-        )
+        helpers.asserting.vaults.outputTokenSupply(vault.id, amount)
       })
     })
   })
@@ -461,7 +467,7 @@ describe('Vault', () => {
       let withdrawCount = 0
 
       // 1st deposit
-      const event0 = createDepositEvent(amount, beneficiaryAddress)
+      const event0 = helpers.createDepositEvent(amount, beneficiaryAddress)
       dailyTxCount++
       depositCount++
       event0.address = Address.fromString(vault.id)
@@ -472,37 +478,43 @@ describe('Vault', () => {
         event0.block.timestamp.toI64() / constants.SECONDS_PER_DAY
       ).toString()
 
-      assertUsageMetricsDailySnapshot(usageMetricDailySnapshotId0, {
-        protocol: protocolAddressString,
-        activeUsers: 1,
-        cumulativeUniqueUsers: 1,
-        transactionCount: dailyTxCount,
-        depositCount: depositCount,
-        withdrawCount: 0,
-        totalPoolCount: 1,
-        blockNumber: event0.block.number,
-        timestamp: event0.block.timestamp,
-      })
+      helpers.asserting.usageMetricsDailySnapshots.usageMetricsDailySnapshot(
+        usageMetricDailySnapshotId0,
+        {
+          protocol: protocolAddressString,
+          activeUsers: 1,
+          cumulativeUniqueUsers: 1,
+          transactionCount: dailyTxCount,
+          depositCount: depositCount,
+          withdrawCount: 0,
+          totalPoolCount: 1,
+          blockNumber: event0.block.number,
+          timestamp: event0.block.timestamp,
+        }
+      )
 
       // 1st withdraw
-      const event1 = createWithdrawEvent(amount, beneficiaryAddress)
+      const event1 = helpers.createWithdrawEvent(amount, beneficiaryAddress)
       dailyTxCount++
       withdrawCount++
       event1.address = Address.fromString(vault.id)
       event1.transaction.from = fromAddress
       handleWithdraw(event1)
 
-      assertUsageMetricsDailySnapshot(usageMetricDailySnapshotId0, {
-        protocol: protocolAddressString,
-        activeUsers: 1,
-        cumulativeUniqueUsers: 1,
-        transactionCount: dailyTxCount,
-        depositCount: depositCount,
-        withdrawCount: withdrawCount,
-        totalPoolCount: 1,
-        blockNumber: event1.block.number,
-        timestamp: event1.block.timestamp,
-      })
+      helpers.asserting.usageMetricsDailySnapshots.usageMetricsDailySnapshot(
+        usageMetricDailySnapshotId0,
+        {
+          protocol: protocolAddressString,
+          activeUsers: 1,
+          cumulativeUniqueUsers: 1,
+          transactionCount: dailyTxCount,
+          depositCount: depositCount,
+          withdrawCount: withdrawCount,
+          totalPoolCount: 1,
+          blockNumber: event1.block.number,
+          timestamp: event1.block.timestamp,
+        }
+      )
 
       //Reset daily counters
       dailyTxCount = 0
@@ -511,7 +523,7 @@ describe('Vault', () => {
 
       // New Day
       // 2nd deposit. Should create new snapshot
-      const event2 = createDepositEvent(amount, beneficiaryAddress)
+      const event2 = helpers.createDepositEvent(amount, beneficiaryAddress)
       dailyTxCount++
       depositCount++
       event2.address = Address.fromString(vault.id)
@@ -525,20 +537,23 @@ describe('Vault', () => {
         event2.block.timestamp.toI64() / constants.SECONDS_PER_DAY
       ).toString()
 
-      assertUsageMetricsDailySnapshot(usageMetricDailySnapshotId1, {
-        protocol: protocolAddressString,
-        activeUsers: 1,
-        cumulativeUniqueUsers: 1,
-        transactionCount: dailyTxCount,
-        depositCount: depositCount,
-        withdrawCount: withdrawCount,
-        totalPoolCount: 1,
-        blockNumber: event2.block.number,
-        timestamp: event2.block.timestamp,
-      })
+      helpers.asserting.usageMetricsDailySnapshots.usageMetricsDailySnapshot(
+        usageMetricDailySnapshotId1,
+        {
+          protocol: protocolAddressString,
+          activeUsers: 1,
+          cumulativeUniqueUsers: 1,
+          transactionCount: dailyTxCount,
+          depositCount: depositCount,
+          withdrawCount: withdrawCount,
+          totalPoolCount: 1,
+          blockNumber: event2.block.number,
+          timestamp: event2.block.timestamp,
+        }
+      )
 
       // 3rd deposit. Different user. Should increment active users
-      const event3 = createDepositEvent(amount, beneficiaryAddress)
+      const event3 = helpers.createDepositEvent(amount, beneficiaryAddress)
       dailyTxCount++
       depositCount++
       event3.address = Address.fromString(vault.id)
@@ -548,35 +563,41 @@ describe('Vault', () => {
       )
       handleDeposit(event3)
 
-      assertUsageMetricsDailySnapshot(usageMetricDailySnapshotId1, {
-        protocol: protocolAddressString,
-        activeUsers: 2,
-        cumulativeUniqueUsers: 2,
-        transactionCount: dailyTxCount,
-        depositCount: depositCount,
-        withdrawCount: withdrawCount,
-        totalPoolCount: 1,
-        blockNumber: event3.block.number,
-        timestamp: event3.block.timestamp,
-      })
+      helpers.asserting.usageMetricsDailySnapshots.usageMetricsDailySnapshot(
+        usageMetricDailySnapshotId1,
+        {
+          protocol: protocolAddressString,
+          activeUsers: 2,
+          cumulativeUniqueUsers: 2,
+          transactionCount: dailyTxCount,
+          depositCount: depositCount,
+          withdrawCount: withdrawCount,
+          totalPoolCount: 1,
+          blockNumber: event3.block.number,
+          timestamp: event3.block.timestamp,
+        }
+      )
 
       // Check derived fields are correct for yieldAggregator
-      assertProtocol(
-        constants.CONTROLLER_ADDRESS,
-        'Harvest Finance',
-        'harvest-finance',
-        '1.3.0',
-        '0.1.0',
-        '1.0.0',
-        'MAINNET',
-        'YIELD',
-        BigDecimal.fromString('0'),
-        BigDecimal.fromString('0'),
-        BigDecimal.fromString('0'),
-        BigDecimal.fromString('0'),
-        BigDecimal.fromString('0'),
-        2,
-        1
+
+      helpers.asserting.protocol.protocol(
+        constants.CONTROLLER_ADDRESS.toHexString(),
+        {
+          name: 'Harvest Finance',
+          slug: 'harvest-finance',
+          schemaVersion: '1.3.0',
+          subgraphVersion: '0.1.0',
+          methodologyVersion: '1.0.0',
+          network: 'MAINNET',
+          type: 'YIELD',
+          totalValueLockedUSD: BigDecimal.fromString('0'),
+          protocolControlledValueUSD: BigDecimal.fromString('0'),
+          cumulativeSupplySideRevenueUSD: BigDecimal.fromString('0'),
+          cumulativeProtocolSideRevenueUSD: BigDecimal.fromString('0'),
+          cumulativeTotalRevenueUSD: BigDecimal.fromString('0'),
+          cumulativeUniqueUsers: BigInt.fromString('2'),
+          totalPoolCount: BigInt.fromString('1'),
+        }
       )
     })
   })

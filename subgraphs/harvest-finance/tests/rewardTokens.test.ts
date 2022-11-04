@@ -1,9 +1,8 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigInt } from '@graphprotocol/graph-ts'
 import { assert, describe, test, afterEach, clearStore } from 'matchstick-as'
 import { handleNotifyPools } from '../src/notifyHelper'
 import { createVault } from './vault.test'
-import { mockERC20 } from './controller-utils'
-import { helpers } from './utils/helpers'
+import { helpers } from './helpers'
 import { RewardToken } from '../generated/schema'
 
 describe('RewardTokens', () => {
@@ -19,13 +18,13 @@ describe('RewardTokens', () => {
     const tokenAddress = Address.fromString(
       '0x0000000000000000000000000000000000000004'
     )
-    mockERC20(tokenAddress, 'FARM', 'FARM', 18)
+    helpers.mocking.erc20.erc20(tokenAddress, 'FARM', 'FARM', 18)
 
     //Create pool
     const poolAddress = Address.fromString(
       '0x0000000000000000000000000000000000000005'
     )
-    helpers.mockNoMintRewardPool(
+    helpers.mocking.noMintRewardPool.noMintRewardPool(
       poolAddress,
       tokenAddress,
       Address.fromString(vault.id)
