@@ -4,7 +4,7 @@ import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
 import { Chart } from "../common/chartComponents/Chart";
 import { ComparisonTable } from "../common/chartComponents/ComparisonTable";
-import { toDate } from "../utils";
+import { lineupChartDatapoints, toDate } from "../utils";
 import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery } from "@apollo/client";
 import { DeploymentsDropDown } from "../common/utilComponents/DeploymentsDropDown";
 import { Chart as ChartJS, registerables, PointElement } from "chart.js";
@@ -12,33 +12,13 @@ import { useNavigate } from "react-router";
 import moment from "moment";
 
 interface DefiLlamaComparsionTabProps {
-  deploymentJSON: { [x: string]: any };
+  subgraphEndpoints: { [x: string]: any };
   getData: any;
-}
-
-const lineupChartDatapoints = (compChart: any, stitchLeftIndex: number): any => {
-  while (toDate(compChart.defiLlama[stitchLeftIndex].date) !== toDate(compChart.subgraph[stitchLeftIndex].date)) {
-    if (compChart.defiLlama[stitchLeftIndex].date < compChart.subgraph[stitchLeftIndex].date) {
-      const startIndex = compChart.defiLlama.findIndex((x: any) => x.date >= compChart.subgraph[stitchLeftIndex].date);
-      let newArray = [...compChart.defiLlama.slice(startIndex)];
-      if (stitchLeftIndex > 0) {
-        newArray = [...compChart.defiLlama.slice(0, stitchLeftIndex), ...compChart.defiLlama.slice(startIndex, compChart.defiLlama.length)];
-      }
-      compChart.defiLlama = newArray;
-    } else {
-      const startIndex = compChart.subgraph.findIndex((x: any) => x.date >= compChart.defiLlama[stitchLeftIndex].date);
-      let newArray = [...compChart.subgraph.slice(startIndex)];
-      if (stitchLeftIndex > 0) {
-        newArray = [...compChart.subgraph.slice(0, stitchLeftIndex), ...compChart.subgraph.slice(startIndex, compChart.subgraph.length)];
-      }
-      compChart.subgraph = newArray;
-    }
-  }
-  return compChart;
+  financialsData: any;
 }
 
 // This component is for each individual subgraph
-function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsionTabProps) {
+function DefiLlamaComparsionTab({ subgraphEndpoints, getData, financialsData }: DefiLlamaComparsionTabProps) {
 
   function jpegDownloadHandler() {
     try {
@@ -77,7 +57,7 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   }, [deploymentURL]);
 
   useEffect(() => {
-    if (!deploymentJSON || Object.keys(deploymentJSON).length === 0) {
+    if (!subgraphEndpoints || Object.keys(subgraphEndpoints).length === 0) {
       getData();
     }
   }, []);
@@ -87,7 +67,7 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   const deploymentNameToUrlMapping: any = {};
 
   try {
-    Object.values(deploymentJSON).forEach((protocolsOnType: { [x: string]: any }) => {
+    Object.values(subgraphEndpoints).forEach((protocolsOnType: { [x: string]: any }) => {
       Object.entries(protocolsOnType).forEach(([protocolName, deploymentOnNetwork]) => {
         protocolName = protocolName.toLowerCase();
         deploymentNameToUrlMapping[protocolName] = {
@@ -159,20 +139,6 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
     fetchDefiLlamaProtocols();
   }, []);
 
-  const [
-    getFinancialsData,
-    { data: financialsData, loading: financialsLoading, error: financialsError, refetch: financialsRefetch },
-  ] = useLazyQuery(
-    gql`
-      {
-        financialsDailySnapshots(first: 1000) {
-          totalValueLockedUSD
-          timestamp
-        }
-      }
-    `,
-    { client },
-  );
 
   const defiLlama = () => {
     fetch("https://api.llama.fi/protocol/" + defiLlamaSlug?.split(" (")[0].split(" ").join("-"), {
@@ -196,9 +162,6 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
     if (defiLlamaSlug.length > 0) {
       setDefiLlamaData({});
       defiLlama();
-    }
-    if (deploymentURL.length > 0) {
-      getFinancialsData();
     }
   }, [defiLlamaSlug, deploymentURL]);
 
@@ -326,21 +289,11 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
     console.error(err.message)
   }
 
-  if (financialsError && !(issues.filter((x) => x.fieldName === deploymentURL).length > 0)) {
-    setIssues([
-      {
-        message: `Error fetching subgraph data - ${defiLlamaSlug}; ${financialsError.message}`,
-        type: "VAL",
-        level: "critical",
-        fieldName: deploymentURL,
-      },
-    ]);
-  }
   useEffect(() => {
     setIssues([]);
   }, [deploymentURL]);
 
-  if (financialsLoading || defiLlamaRequestLoading) {
+  if (defiLlamaRequestLoading) {
     chart = <CircularProgress sx={{ my: 5 }} size={40} />;
   }
 
@@ -365,9 +318,6 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
   }
   return (
     <>
-      <Button variant="contained" color="primary" sx={{ my: 4, mx: 2 }} onClick={() => navigate("/")}>
-        Back To Deployments List
-      </Button>
       <div style={{ margin: "0px 16px" }}>
         <DeploymentsDropDown
           setDeploymentURL={(x) => setDeploymentURL(x)}
@@ -380,7 +330,6 @@ function DefiLlamaComparsionTab({ deploymentJSON, getData }: DefiLlamaComparsion
         <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
         {chart}
         {valueToggles}
-
       </div>
     </>
   );

@@ -222,6 +222,7 @@ function AllDataTabs({
           {/* PROTOCOL TAB */}
           <ProtocolTab
             entitiesData={entitiesData}
+            subgraphEndpoints={subgraphEndpoints}
             protocolFields={protocolFields}
             protocolType={data.protocols[0].type}
             protocolTableData={protocolTableData}

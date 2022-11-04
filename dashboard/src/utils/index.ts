@@ -182,3 +182,24 @@ export function base64toBlobJPEG(dataURI: string) {
     return;
   }
 }
+
+export function lineupChartDatapoints(compChart: any, stitchLeftIndex: number) {
+  while (toDate(compChart.defiLlama[stitchLeftIndex].date) !== toDate(compChart.subgraph[stitchLeftIndex].date)) {
+    if (compChart.defiLlama[stitchLeftIndex].date < compChart.subgraph[stitchLeftIndex].date) {
+      const startIndex = compChart.defiLlama.findIndex((x: any) => x.date >= compChart.subgraph[stitchLeftIndex].date);
+      let newArray = [...compChart.defiLlama.slice(startIndex)];
+      if (stitchLeftIndex > 0) {
+        newArray = [...compChart.defiLlama.slice(0, stitchLeftIndex), ...compChart.defiLlama.slice(startIndex, compChart.defiLlama.length)];
+      }
+      compChart.defiLlama = newArray;
+    } else {
+      const startIndex = compChart.subgraph.findIndex((x: any) => x.date >= compChart.defiLlama[stitchLeftIndex].date);
+      let newArray = [...compChart.subgraph.slice(startIndex)];
+      if (stitchLeftIndex > 0) {
+        newArray = [...compChart.subgraph.slice(0, stitchLeftIndex), ...compChart.subgraph.slice(startIndex, compChart.subgraph.length)];
+      }
+      compChart.subgraph = newArray;
+    }
+  }
+  return compChart;
+}

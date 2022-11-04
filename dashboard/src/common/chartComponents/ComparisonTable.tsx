@@ -36,13 +36,6 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
         align: "right" as GridAlignment,
       },
       {
-        field: "differenceVal",
-        headerName: "Diff. (value)",
-        minWidth: 160,
-        headerAlign: "right" as GridAlignment,
-        align: "right" as GridAlignment,
-      },
-      {
         field: "differencePercentage",
         headerName: "Diff. (%)",
         minWidth: 120,
@@ -71,7 +64,6 @@ export const ComparisonTable = ({ datasetLabel, dataTable, isMonthly, setIsMonth
           date: date,
           subgraphData: "$" + formatIntToFixed2(val.value),
           defiLlamaData: "$" + formatIntToFixed2(llamaVal),
-          differenceVal: "$" + formatIntToFixed2(diff),
           differencePercentage: ((diff / llamaVal) * 100).toFixed(2) + "%",
         };
       })

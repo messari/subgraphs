@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Grid, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { negativeFieldList } from "../../constants";
 import { base64toBlobJPEG, convertTokenDecimals, downloadCSV } from "../../utils";
 import { useEffect, useState } from "react";
@@ -7,11 +7,13 @@ import { BigNumber } from "bignumber.js";
 import { ChartContainer } from "../../common/chartComponents/ChartContainer";
 import moment from "moment";
 import JSZip from "jszip";
+import DefiLlamaComparsionTab from "../DefiLlamaComparisonTab";
 
 interface ProtocolTabEntityProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   entityName: string;
   protocolType: string;
+  subgraphEndpoints: any;
   protocolTableData: { [x: string]: any };
   overlaySchemaData: any;
   protocolSchemaData: any;
@@ -28,6 +30,7 @@ function ProtocolTabEntity({
   entitiesData,
   entityName,
   protocolType,
+  subgraphEndpoints,
   protocolTableData,
   overlaySchemaData,
   protocolSchemaData,
@@ -43,6 +46,7 @@ function ProtocolTabEntity({
 
   const [downloadAllCharts, triggerDownloadAllCharts] = useState<boolean>(false);
   const [chartsImageFiles, setChartsImageFiles] = useState<any>({});
+  const [defiLlamaCompareTVL, setDefiLlamaCompareTVL] = useState<boolean>(false);
 
   useEffect(() => {
     if (downloadAllCharts) {
@@ -102,6 +106,9 @@ function ProtocolTabEntity({
           if (fieldName === "timestamp" || fieldName === "id" || fieldName === "__typename") {
             return;
           }
+          // if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
+          //   return;
+          // }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
           const currentInstanceField = timeseriesInstance[fieldName];
           let currentOverlayInstanceField: any = {};
@@ -358,12 +365,10 @@ function ProtocolTabEntity({
           {Object.keys(dataFields).map((field: string) => {
             // The following checks if the field is required or can be null
             const fieldName = field.split(" [")[0];
-            if (entitiesData[entityName][fieldName]) {
-              const schemaFieldTypeString = entitiesData[entityName][fieldName]?.split("");
-              if (schemaFieldTypeString[schemaFieldTypeString?.length - 1] !== "!") {
-                // return null;
-              }
+            if (fieldName === "totalValueLockedUSD" && defiLlamaCompareTVL && entityName === "financialsDailySnapshots") {
+              return <><Button onClick={() => setDefiLlamaCompareTVL(false)}>Show Regular TVL Component</Button><DefiLlamaComparsionTab subgraphEndpoints={subgraphEndpoints} getData={() => console.log('GET DATA')} financialsData={{ financialsDailySnapshots: currentEntityData }} /></>;
             }
+
             const label = entityName + "-" + field;
             const elementId = label.split(" ").join("%20");
 
@@ -466,8 +471,15 @@ function ProtocolTabEntity({
               }
               dataChartToPass = { [baseKey]: dataFields[field], [overlayKey + keyDiff]: overlayDataFields[field] };
             }
+            let tvlButton = null;
+            if (fieldName === "totalValueLockedUSD" && entityName === "financialsDailySnapshots") {
+              tvlButton = <Button onClick={() => setDefiLlamaCompareTVL(true)}>Show DefiLlama Component</Button>;
+            }
             return (
-              <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+              <>
+                {tvlButton}
+                <ChartContainer elementId={elementId} downloadAllCharts={downloadAllCharts} identifier={protocolTableData?.slug} datasetLabel={label} dataTable={dataFields[field]} dataChart={dataChartToPass} chartsImageFiles={chartsImageFiles} setChartsImageFiles={(x: any) => setChartsImageFiles(x)} />
+              </>
             );
           })}
         </Grid>
